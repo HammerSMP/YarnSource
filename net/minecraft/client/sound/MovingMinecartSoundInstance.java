@@ -1,0 +1,65 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ */
+package net.minecraft.client.sound;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.sound.MovingSoundInstance;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.vehicle.AbstractMinecartEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.MathHelper;
+
+@Environment(value=EnvType.CLIENT)
+public class MovingMinecartSoundInstance
+extends MovingSoundInstance {
+    private final AbstractMinecartEntity minecart;
+    private float distance = 0.0f;
+
+    public MovingMinecartSoundInstance(AbstractMinecartEntity arg) {
+        super(SoundEvents.ENTITY_MINECART_RIDING, SoundCategory.NEUTRAL);
+        this.minecart = arg;
+        this.repeat = true;
+        this.repeatDelay = 0;
+        this.volume = 0.0f;
+        this.x = (float)arg.getX();
+        this.y = (float)arg.getY();
+        this.z = (float)arg.getZ();
+    }
+
+    @Override
+    public boolean canPlay() {
+        return !this.minecart.isSilent();
+    }
+
+    @Override
+    public boolean shouldAlwaysPlay() {
+        return true;
+    }
+
+    @Override
+    public void tick() {
+        if (this.minecart.removed) {
+            this.setDone();
+            return;
+        }
+        this.x = (float)this.minecart.getX();
+        this.y = (float)this.minecart.getY();
+        this.z = (float)this.minecart.getZ();
+        float f = MathHelper.sqrt(Entity.squaredHorizontalLength(this.minecart.getVelocity()));
+        if ((double)f >= 0.01) {
+            this.distance = MathHelper.clamp(this.distance + 0.0025f, 0.0f, 1.0f);
+            this.volume = MathHelper.lerp(MathHelper.clamp(f, 0.0f, 0.5f), 0.0f, 0.7f);
+        } else {
+            this.distance = 0.0f;
+            this.volume = 0.0f;
+        }
+    }
+}
+

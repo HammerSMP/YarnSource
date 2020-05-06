@@ -1,0 +1,46 @@
+/*
+ * Decompiled with CFR 0.149.
+ */
+package net.minecraft.entity.ai.goal;
+
+import java.util.EnumSet;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.mob.MobEntity;
+
+public class LookAroundGoal
+extends Goal {
+    private final MobEntity mob;
+    private double deltaX;
+    private double deltaZ;
+    private int lookTime;
+
+    public LookAroundGoal(MobEntity arg) {
+        this.mob = arg;
+        this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
+    }
+
+    @Override
+    public boolean canStart() {
+        return this.mob.getRandom().nextFloat() < 0.02f;
+    }
+
+    @Override
+    public boolean shouldContinue() {
+        return this.lookTime >= 0;
+    }
+
+    @Override
+    public void start() {
+        double d = Math.PI * 2 * this.mob.getRandom().nextDouble();
+        this.deltaX = Math.cos(d);
+        this.deltaZ = Math.sin(d);
+        this.lookTime = 20 + this.mob.getRandom().nextInt(20);
+    }
+
+    @Override
+    public void tick() {
+        --this.lookTime;
+        this.mob.getLookControl().lookAt(this.mob.getX() + this.deltaX, this.mob.getEyeY(), this.mob.getZ() + this.deltaZ);
+    }
+}
+

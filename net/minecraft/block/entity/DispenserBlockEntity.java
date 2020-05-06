@@ -1,0 +1,96 @@
+/*
+ * Decompiled with CFR 0.149.
+ */
+package net.minecraft.block.entity;
+
+import java.util.Random;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.screen.Generic3x3ContainerScreenHandler;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.collection.DefaultedList;
+
+public class DispenserBlockEntity
+extends LootableContainerBlockEntity {
+    private static final Random RANDOM = new Random();
+    private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
+
+    protected DispenserBlockEntity(BlockEntityType<?> arg) {
+        super(arg);
+    }
+
+    public DispenserBlockEntity() {
+        this(BlockEntityType.DISPENSER);
+    }
+
+    @Override
+    public int size() {
+        return 9;
+    }
+
+    public int chooseNonEmptySlot() {
+        this.checkLootInteraction(null);
+        int i = -1;
+        int j = 1;
+        for (int k = 0; k < this.inventory.size(); ++k) {
+            if (this.inventory.get(k).isEmpty() || RANDOM.nextInt(j++) != 0) continue;
+            i = k;
+        }
+        return i;
+    }
+
+    public int addToFirstFreeSlot(ItemStack arg) {
+        for (int i = 0; i < this.inventory.size(); ++i) {
+            if (!this.inventory.get(i).isEmpty()) continue;
+            this.setStack(i, arg);
+            return i;
+        }
+        return -1;
+    }
+
+    @Override
+    protected Text getContainerName() {
+        return new TranslatableText("container.dispenser");
+    }
+
+    @Override
+    public void fromTag(BlockState arg, CompoundTag arg2) {
+        super.fromTag(arg, arg2);
+        this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
+        if (!this.deserializeLootTable(arg2)) {
+            Inventories.fromTag(arg2, this.inventory);
+        }
+    }
+
+    @Override
+    public CompoundTag toTag(CompoundTag arg) {
+        super.toTag(arg);
+        if (!this.serializeLootTable(arg)) {
+            Inventories.toTag(arg, this.inventory);
+        }
+        return arg;
+    }
+
+    @Override
+    protected DefaultedList<ItemStack> getInvStackList() {
+        return this.inventory;
+    }
+
+    @Override
+    protected void setInvStackList(DefaultedList<ItemStack> arg) {
+        this.inventory = arg;
+    }
+
+    @Override
+    protected ScreenHandler createContainer(int i, PlayerInventory arg) {
+        return new Generic3x3ContainerScreenHandler(i, arg, this);
+    }
+}
+

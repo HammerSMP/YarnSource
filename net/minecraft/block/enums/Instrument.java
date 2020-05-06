@@ -1,0 +1,100 @@
+/*
+ * Decompiled with CFR 0.149.
+ */
+package net.minecraft.block.enums;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.util.StringIdentifiable;
+
+public enum Instrument implements StringIdentifiable
+{
+    HARP("harp", SoundEvents.BLOCK_NOTE_BLOCK_HARP),
+    BASEDRUM("basedrum", SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM),
+    SNARE("snare", SoundEvents.BLOCK_NOTE_BLOCK_SNARE),
+    HAT("hat", SoundEvents.BLOCK_NOTE_BLOCK_HAT),
+    BASS("bass", SoundEvents.BLOCK_NOTE_BLOCK_BASS),
+    FLUTE("flute", SoundEvents.BLOCK_NOTE_BLOCK_FLUTE),
+    BELL("bell", SoundEvents.BLOCK_NOTE_BLOCK_BELL),
+    GUITAR("guitar", SoundEvents.BLOCK_NOTE_BLOCK_GUITAR),
+    CHIME("chime", SoundEvents.BLOCK_NOTE_BLOCK_CHIME),
+    XYLOPHONE("xylophone", SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE),
+    IRON_XYLOPHONE("iron_xylophone", SoundEvents.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE),
+    COW_BELL("cow_bell", SoundEvents.BLOCK_NOTE_BLOCK_COW_BELL),
+    DIDGERIDOO("didgeridoo", SoundEvents.BLOCK_NOTE_BLOCK_DIDGERIDOO),
+    BIT("bit", SoundEvents.BLOCK_NOTE_BLOCK_BIT),
+    BANJO("banjo", SoundEvents.BLOCK_NOTE_BLOCK_BANJO),
+    PLING("pling", SoundEvents.BLOCK_NOTE_BLOCK_PLING);
+
+    private final String name;
+    private final SoundEvent sound;
+
+    private Instrument(String string2, SoundEvent arg) {
+        this.name = string2;
+        this.sound = arg;
+    }
+
+    @Override
+    public String asString() {
+        return this.name;
+    }
+
+    public SoundEvent getSound() {
+        return this.sound;
+    }
+
+    public static Instrument fromBlockState(BlockState arg) {
+        if (arg.isOf(Blocks.CLAY)) {
+            return FLUTE;
+        }
+        if (arg.isOf(Blocks.GOLD_BLOCK)) {
+            return BELL;
+        }
+        if (arg.isIn(BlockTags.WOOL)) {
+            return GUITAR;
+        }
+        if (arg.isOf(Blocks.PACKED_ICE)) {
+            return CHIME;
+        }
+        if (arg.isOf(Blocks.BONE_BLOCK)) {
+            return XYLOPHONE;
+        }
+        if (arg.isOf(Blocks.IRON_BLOCK)) {
+            return IRON_XYLOPHONE;
+        }
+        if (arg.isOf(Blocks.SOUL_SAND)) {
+            return COW_BELL;
+        }
+        if (arg.isOf(Blocks.PUMPKIN)) {
+            return DIDGERIDOO;
+        }
+        if (arg.isOf(Blocks.EMERALD_BLOCK)) {
+            return BIT;
+        }
+        if (arg.isOf(Blocks.HAY_BLOCK)) {
+            return BANJO;
+        }
+        if (arg.isOf(Blocks.GLOWSTONE)) {
+            return PLING;
+        }
+        Material lv = arg.getMaterial();
+        if (lv == Material.STONE) {
+            return BASEDRUM;
+        }
+        if (lv == Material.SAND) {
+            return SNARE;
+        }
+        if (lv == Material.GLASS) {
+            return HAT;
+        }
+        if (lv == Material.WOOD || lv == Material.NETHER_WOOD) {
+            return BASS;
+        }
+        return HARP;
+    }
+}
+

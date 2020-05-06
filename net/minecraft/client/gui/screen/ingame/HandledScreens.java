@@ -1,0 +1,127 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.Maps
+ *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
+ */
+package net.minecraft.client.gui.screen.ingame;
+
+import com.google.common.collect.Maps;
+import java.util.Map;
+import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.client.gui.screen.ingame.BeaconScreen;
+import net.minecraft.client.gui.screen.ingame.BlastFurnaceScreen;
+import net.minecraft.client.gui.screen.ingame.BrewingStandScreen;
+import net.minecraft.client.gui.screen.ingame.CartographyTableScreen;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
+import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
+import net.minecraft.client.gui.screen.ingame.Generic3x3ContainerScreen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.GrindstoneScreen;
+import net.minecraft.client.gui.screen.ingame.HopperScreen;
+import net.minecraft.client.gui.screen.ingame.LecternScreen;
+import net.minecraft.client.gui.screen.ingame.LoomScreen;
+import net.minecraft.client.gui.screen.ingame.MerchantScreen;
+import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
+import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.client.gui.screen.ingame.SmithingScreen;
+import net.minecraft.client.gui.screen.ingame.SmokerScreen;
+import net.minecraft.client.gui.screen.ingame.StonecutterScreen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.text.Text;
+import net.minecraft.util.registry.Registry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+@Environment(value=EnvType.CLIENT)
+public class HandledScreens {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Map<ScreenHandlerType<?>, Provider<?, ?>> PROVIDERS = Maps.newHashMap();
+
+    public static <T extends ScreenHandler> void open(@Nullable ScreenHandlerType<T> arg, MinecraftClient arg2, int i, Text arg3) {
+        if (arg == null) {
+            LOGGER.warn("Trying to open invalid screen with name: {}", (Object)arg3.getString());
+            return;
+        }
+        Provider<T, ?> lv = HandledScreens.getProvider(arg);
+        if (lv == null) {
+            LOGGER.warn("Failed to create screen for menu type: {}", (Object)Registry.SCREEN_HANDLER.getId(arg));
+            return;
+        }
+        lv.open(arg3, arg, arg2, i);
+    }
+
+    @Nullable
+    private static <T extends ScreenHandler> Provider<T, ?> getProvider(ScreenHandlerType<T> arg) {
+        return PROVIDERS.get(arg);
+    }
+
+    private static <M extends ScreenHandler, U extends Screen> void register(ScreenHandlerType<? extends M> arg, Provider<M, U> arg2) {
+        Provider<M, U> lv = PROVIDERS.put(arg, arg2);
+        if (lv != null) {
+            throw new IllegalStateException("Duplicate registration for " + Registry.SCREEN_HANDLER.getId(arg));
+        }
+    }
+
+    public static boolean validateScreens() {
+        boolean bl = false;
+        for (ScreenHandlerType screenHandlerType : Registry.SCREEN_HANDLER) {
+            if (PROVIDERS.containsKey(screenHandlerType)) continue;
+            LOGGER.debug("Menu {} has no matching screen", (Object)Registry.SCREEN_HANDLER.getId(screenHandlerType));
+            bl = true;
+        }
+        return bl;
+    }
+
+    static {
+        HandledScreens.register(ScreenHandlerType.GENERIC_9X1, GenericContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.GENERIC_9X2, GenericContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.GENERIC_9X3, GenericContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.GENERIC_9X4, GenericContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.GENERIC_9X5, GenericContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.GENERIC_9X6, GenericContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.GENERIC_3X3, Generic3x3ContainerScreen::new);
+        HandledScreens.register(ScreenHandlerType.ANVIL, AnvilScreen::new);
+        HandledScreens.register(ScreenHandlerType.BEACON, BeaconScreen::new);
+        HandledScreens.register(ScreenHandlerType.BLAST_FURNACE, BlastFurnaceScreen::new);
+        HandledScreens.register(ScreenHandlerType.BREWING_STAND, BrewingStandScreen::new);
+        HandledScreens.register(ScreenHandlerType.CRAFTING, CraftingScreen::new);
+        HandledScreens.register(ScreenHandlerType.ENCHANTMENT, EnchantmentScreen::new);
+        HandledScreens.register(ScreenHandlerType.FURNACE, FurnaceScreen::new);
+        HandledScreens.register(ScreenHandlerType.GRINDSTONE, GrindstoneScreen::new);
+        HandledScreens.register(ScreenHandlerType.HOPPER, HopperScreen::new);
+        HandledScreens.register(ScreenHandlerType.LECTERN, LecternScreen::new);
+        HandledScreens.register(ScreenHandlerType.LOOM, LoomScreen::new);
+        HandledScreens.register(ScreenHandlerType.MERCHANT, MerchantScreen::new);
+        HandledScreens.register(ScreenHandlerType.SHULKER_BOX, ShulkerBoxScreen::new);
+        HandledScreens.register(ScreenHandlerType.SMITHING, SmithingScreen::new);
+        HandledScreens.register(ScreenHandlerType.SMOKER, SmokerScreen::new);
+        HandledScreens.register(ScreenHandlerType.CARTOGRAPHY_TABLE, CartographyTableScreen::new);
+        HandledScreens.register(ScreenHandlerType.STONECUTTER, StonecutterScreen::new);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static interface Provider<T extends ScreenHandler, U extends Screen> {
+        default public void open(Text arg, ScreenHandlerType<T> arg2, MinecraftClient arg3, int i) {
+            U lv = this.create(arg2.create(i, arg3.player.inventory), arg3.player.inventory, arg);
+            arg3.player.currentScreenHandler = ((ScreenHandlerProvider)lv).getScreenHandler();
+            arg3.openScreen((Screen)lv);
+        }
+
+        public U create(T var1, PlayerInventory var2, Text var3);
+    }
+}
+

@@ -1,0 +1,125 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ */
+package net.minecraft.client.tutorial;
+
+import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.tutorial.TutorialStep;
+import net.minecraft.client.tutorial.TutorialStepHandler;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.KeybindText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameMode;
+
+@Environment(value=EnvType.CLIENT)
+public class TutorialManager {
+    private final MinecraftClient client;
+    @Nullable
+    private TutorialStepHandler currentHandler;
+
+    public TutorialManager(MinecraftClient arg) {
+        this.client = arg;
+    }
+
+    public void onMovement(Input arg) {
+        if (this.currentHandler != null) {
+            this.currentHandler.onMovement(arg);
+        }
+    }
+
+    public void onUpdateMouse(double d, double e) {
+        if (this.currentHandler != null) {
+            this.currentHandler.onMouseUpdate(d, e);
+        }
+    }
+
+    public void tick(@Nullable ClientWorld arg, @Nullable HitResult arg2) {
+        if (this.currentHandler != null && arg2 != null && arg != null) {
+            this.currentHandler.onTarget(arg, arg2);
+        }
+    }
+
+    public void onBlockAttacked(ClientWorld arg, BlockPos arg2, BlockState arg3, float f) {
+        if (this.currentHandler != null) {
+            this.currentHandler.onBlockAttacked(arg, arg2, arg3, f);
+        }
+    }
+
+    public void onInventoryOpened() {
+        if (this.currentHandler != null) {
+            this.currentHandler.onInventoryOpened();
+        }
+    }
+
+    public void onSlotUpdate(ItemStack arg) {
+        if (this.currentHandler != null) {
+            this.currentHandler.onSlotUpdate(arg);
+        }
+    }
+
+    public void destroyHandler() {
+        if (this.currentHandler == null) {
+            return;
+        }
+        this.currentHandler.destroy();
+        this.currentHandler = null;
+    }
+
+    public void createHandler() {
+        if (this.currentHandler != null) {
+            this.destroyHandler();
+        }
+        this.currentHandler = this.client.options.tutorialStep.createHandler(this);
+    }
+
+    public void tick() {
+        if (this.currentHandler != null) {
+            if (this.client.world != null) {
+                this.currentHandler.tick();
+            } else {
+                this.destroyHandler();
+            }
+        } else if (this.client.world != null) {
+            this.createHandler();
+        }
+    }
+
+    public void setStep(TutorialStep arg) {
+        this.client.options.tutorialStep = arg;
+        this.client.options.write();
+        if (this.currentHandler != null) {
+            this.currentHandler.destroy();
+            this.currentHandler = arg.createHandler(this);
+        }
+    }
+
+    public MinecraftClient getClient() {
+        return this.client;
+    }
+
+    public GameMode getGameMode() {
+        if (this.client.interactionManager == null) {
+            return GameMode.NOT_SET;
+        }
+        return this.client.interactionManager.getCurrentGameMode();
+    }
+
+    public static Text getKeybindName(String string) {
+        return new KeybindText("key." + string).formatted(Formatting.BOLD);
+    }
+}
+

@@ -1,0 +1,82 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableSet
+ *  javax.annotation.Nullable
+ */
+package net.minecraft.village;
+
+import com.google.common.collect.ImmutableSet;
+import javax.annotation.Nullable;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.poi.PointOfInterestType;
+
+public class VillagerProfession {
+    public static final VillagerProfession NONE = VillagerProfession.register("none", PointOfInterestType.UNEMPLOYED, null);
+    public static final VillagerProfession ARMORER = VillagerProfession.register("armorer", PointOfInterestType.ARMORER, SoundEvents.ENTITY_VILLAGER_WORK_ARMORER);
+    public static final VillagerProfession BUTCHER = VillagerProfession.register("butcher", PointOfInterestType.BUTCHER, SoundEvents.ENTITY_VILLAGER_WORK_BUTCHER);
+    public static final VillagerProfession CARTOGRAPHER = VillagerProfession.register("cartographer", PointOfInterestType.CARTOGRAPHER, SoundEvents.ENTITY_VILLAGER_WORK_CARTOGRAPHER);
+    public static final VillagerProfession CLERIC = VillagerProfession.register("cleric", PointOfInterestType.CLERIC, SoundEvents.ENTITY_VILLAGER_WORK_CLERIC);
+    public static final VillagerProfession FARMER = VillagerProfession.register("farmer", PointOfInterestType.FARMER, (ImmutableSet<Item>)ImmutableSet.of((Object)Items.WHEAT, (Object)Items.WHEAT_SEEDS, (Object)Items.BEETROOT_SEEDS, (Object)Items.BONE_MEAL), (ImmutableSet<Block>)ImmutableSet.of((Object)Blocks.FARMLAND), SoundEvents.ENTITY_VILLAGER_WORK_FARMER);
+    public static final VillagerProfession FISHERMAN = VillagerProfession.register("fisherman", PointOfInterestType.FISHERMAN, SoundEvents.ENTITY_VILLAGER_WORK_FISHERMAN);
+    public static final VillagerProfession FLETCHER = VillagerProfession.register("fletcher", PointOfInterestType.FLETCHER, SoundEvents.ENTITY_VILLAGER_WORK_FLETCHER);
+    public static final VillagerProfession LEATHERWORKER = VillagerProfession.register("leatherworker", PointOfInterestType.LEATHERWORKER, SoundEvents.ENTITY_VILLAGER_WORK_LEATHERWORKER);
+    public static final VillagerProfession LIBRARIAN = VillagerProfession.register("librarian", PointOfInterestType.LIBRARIAN, SoundEvents.ENTITY_VILLAGER_WORK_LIBRARIAN);
+    public static final VillagerProfession MASON = VillagerProfession.register("mason", PointOfInterestType.MASON, SoundEvents.ENTITY_VILLAGER_WORK_MASON);
+    public static final VillagerProfession NITWIT = VillagerProfession.register("nitwit", PointOfInterestType.NITWIT, null);
+    public static final VillagerProfession SHEPHERD = VillagerProfession.register("shepherd", PointOfInterestType.SHEPHERD, SoundEvents.ENTITY_VILLAGER_WORK_SHEPHERD);
+    public static final VillagerProfession TOOLSMITH = VillagerProfession.register("toolsmith", PointOfInterestType.TOOLSMITH, SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH);
+    public static final VillagerProfession WEAPONSMITH = VillagerProfession.register("weaponsmith", PointOfInterestType.WEAPONSMITH, SoundEvents.ENTITY_VILLAGER_WORK_WEAPONSMITH);
+    private final String id;
+    private final PointOfInterestType workStation;
+    private final ImmutableSet<Item> gatherableItems;
+    private final ImmutableSet<Block> secondaryJobSites;
+    @Nullable
+    private final SoundEvent workSound;
+
+    private VillagerProfession(String string, PointOfInterestType arg, ImmutableSet<Item> immutableSet, ImmutableSet<Block> immutableSet2, @Nullable SoundEvent arg2) {
+        this.id = string;
+        this.workStation = arg;
+        this.gatherableItems = immutableSet;
+        this.secondaryJobSites = immutableSet2;
+        this.workSound = arg2;
+    }
+
+    public PointOfInterestType getWorkStation() {
+        return this.workStation;
+    }
+
+    public ImmutableSet<Item> getGatherableItems() {
+        return this.gatherableItems;
+    }
+
+    public ImmutableSet<Block> getSecondaryJobSites() {
+        return this.secondaryJobSites;
+    }
+
+    @Nullable
+    public SoundEvent getWorkSound() {
+        return this.workSound;
+    }
+
+    public String toString() {
+        return this.id;
+    }
+
+    static VillagerProfession register(String string, PointOfInterestType arg, @Nullable SoundEvent arg2) {
+        return VillagerProfession.register(string, arg, (ImmutableSet<Item>)ImmutableSet.of(), (ImmutableSet<Block>)ImmutableSet.of(), arg2);
+    }
+
+    static VillagerProfession register(String string, PointOfInterestType arg, ImmutableSet<Item> immutableSet, ImmutableSet<Block> immutableSet2, @Nullable SoundEvent arg2) {
+        return Registry.register(Registry.VILLAGER_PROFESSION, new Identifier(string), new VillagerProfession(string, arg, immutableSet, immutableSet2, arg2));
+    }
+}
+

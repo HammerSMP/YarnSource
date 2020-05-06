@@ -1,0 +1,57 @@
+/*
+ * Decompiled with CFR 0.149.
+ */
+package net.minecraft.entity.ai.goal;
+
+import java.util.EnumSet;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.passive.TameableEntity;
+
+public class SitGoal
+extends Goal {
+    private final TameableEntity tameable;
+
+    public SitGoal(TameableEntity arg) {
+        this.tameable = arg;
+        this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
+    }
+
+    @Override
+    public boolean shouldContinue() {
+        return this.tameable.method_24345();
+    }
+
+    @Override
+    public boolean canStart() {
+        if (!this.tameable.isTamed()) {
+            return false;
+        }
+        if (this.tameable.isInsideWaterOrBubbleColumn()) {
+            return false;
+        }
+        if (!this.tameable.isOnGround()) {
+            return false;
+        }
+        LivingEntity lv = this.tameable.getOwner();
+        if (lv == null) {
+            return true;
+        }
+        if (this.tameable.squaredDistanceTo(lv) < 144.0 && lv.getAttacker() != null) {
+            return false;
+        }
+        return this.tameable.method_24345();
+    }
+
+    @Override
+    public void start() {
+        this.tameable.getNavigation().stop();
+        this.tameable.setSitting(true);
+    }
+
+    @Override
+    public void stop() {
+        this.tameable.setSitting(false);
+    }
+}
+

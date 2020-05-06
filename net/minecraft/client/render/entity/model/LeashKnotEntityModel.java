@@ -1,0 +1,42 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ */
+package net.minecraft.client.render.entity.model;
+
+import com.google.common.collect.ImmutableList;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.entity.model.CompositeEntityModel;
+import net.minecraft.entity.Entity;
+
+@Environment(value=EnvType.CLIENT)
+public class LeashKnotEntityModel<T extends Entity>
+extends CompositeEntityModel<T> {
+    private final ModelPart leashKnot;
+
+    public LeashKnotEntityModel() {
+        this.textureWidth = 32;
+        this.textureHeight = 32;
+        this.leashKnot = new ModelPart(this, 0, 0);
+        this.leashKnot.addCuboid(-3.0f, -6.0f, -3.0f, 6.0f, 8.0f, 6.0f, 0.0f);
+        this.leashKnot.setPivot(0.0f, 0.0f, 0.0f);
+    }
+
+    @Override
+    public Iterable<ModelPart> getParts() {
+        return ImmutableList.of((Object)this.leashKnot);
+    }
+
+    @Override
+    public void setAngles(T arg, float f, float g, float h, float i, float j) {
+        this.leashKnot.yaw = i * ((float)Math.PI / 180);
+        this.leashKnot.pitch = j * ((float)Math.PI / 180);
+    }
+}
+

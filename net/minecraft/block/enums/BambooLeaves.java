@@ -1,0 +1,29 @@
+/*
+ * Decompiled with CFR 0.149.
+ */
+package net.minecraft.block.enums;
+
+import net.minecraft.util.StringIdentifiable;
+
+public enum BambooLeaves implements StringIdentifiable
+{
+    NONE("none"),
+    SMALL("small"),
+    LARGE("large");
+
+    private final String name;
+
+    private BambooLeaves(String string2) {
+        this.name = string2;
+    }
+
+    public String toString() {
+        return this.name;
+    }
+
+    @Override
+    public String asString() {
+        return this.name;
+    }
+}
+

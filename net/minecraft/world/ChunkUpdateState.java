@@ -1,0 +1,58 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  it.unimi.dsi.fastutil.longs.LongOpenHashSet
+ *  it.unimi.dsi.fastutil.longs.LongSet
+ */
+package net.minecraft.world;
+
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.PersistentState;
+
+public class ChunkUpdateState
+extends PersistentState {
+    private LongSet all = new LongOpenHashSet();
+    private LongSet remaining = new LongOpenHashSet();
+
+    public ChunkUpdateState(String string) {
+        super(string);
+    }
+
+    @Override
+    public void fromTag(CompoundTag arg) {
+        this.all = new LongOpenHashSet(arg.getLongArray("All"));
+        this.remaining = new LongOpenHashSet(arg.getLongArray("Remaining"));
+    }
+
+    @Override
+    public CompoundTag toTag(CompoundTag arg) {
+        arg.putLongArray("All", this.all.toLongArray());
+        arg.putLongArray("Remaining", this.remaining.toLongArray());
+        return arg;
+    }
+
+    public void add(long l) {
+        this.all.add(l);
+        this.remaining.add(l);
+    }
+
+    public boolean contains(long l) {
+        return this.all.contains(l);
+    }
+
+    public boolean isRemaining(long l) {
+        return this.remaining.contains(l);
+    }
+
+    public void markResolved(long l) {
+        this.remaining.remove(l);
+    }
+
+    public LongSet getAll() {
+        return this.all;
+    }
+}
+
