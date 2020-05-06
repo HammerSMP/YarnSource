@@ -32,10 +32,10 @@ implements GameVersion {
 
     public MinecraftVersion() {
         this.id = UUID.randomUUID().toString().replaceAll("-", "");
-        this.name = "20w19a";
+        this.name = "20w18a";
         this.stable = false;
-        this.worldVersion = 2534;
-        this.protocolVersion = 715;
+        this.worldVersion = 2532;
+        this.protocolVersion = 714;
         this.packVersion = 5;
         this.buildTime = new Date();
         this.releaseTarget = "1.16";

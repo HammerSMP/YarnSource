@@ -830,7 +830,7 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
         this.registerWithFunction(Blocks.LAPIS_ORE, arg -> BlockLootTableGenerator.createForNeedingSilkTouch(arg, (LootEntry.Builder)BlockLootTableGenerator.addExplosionDecayLootFunction(arg, ((LeafEntry.Builder)ItemEntry.builder(Items.LAPIS_LAZULI).withFunction(SetCountLootFunction.builder(UniformLootTableRange.between(4.0f, 9.0f)))).withFunction(ApplyBonusLootFunction.oreDrops(Enchantments.FORTUNE)))));
         this.registerWithFunction(Blocks.COBWEB, arg -> BlockLootTableGenerator.createForNeedingSilkTouchShears(arg, (LootEntry.Builder)BlockLootTableGenerator.addSurvivesExplosionLootCondition(arg, ItemEntry.builder(Items.STRING))));
         this.registerWithFunction(Blocks.DEAD_BUSH, arg -> BlockLootTableGenerator.createForNeedingShears(arg, (LootEntry.Builder)BlockLootTableGenerator.addExplosionDecayLootFunction(arg, ItemEntry.builder(Items.STICK).withFunction(SetCountLootFunction.builder(UniformLootTableRange.between(0.0f, 2.0f))))));
-        this.registerWithFunction(Blocks.NETHER_SPROUTS, BlockLootTableGenerator::createForBlockNeedingShears);
+        this.registerWithFunction(Blocks.NETHER_SPROUTS, arg -> BlockLootTableGenerator.createForNeedingSilkTouchShears(arg, (LootEntry.Builder)BlockLootTableGenerator.addSurvivesExplosionLootCondition(arg, ItemEntry.builder(Blocks.NETHER_SPROUTS))));
         this.registerWithFunction(Blocks.SEAGRASS, BlockLootTableGenerator::createForBlockNeedingShears);
         this.registerWithFunction(Blocks.VINE, BlockLootTableGenerator::createForBlockNeedingShears);
         this.register(Blocks.TALL_SEAGRASS, BlockLootTableGenerator.createForBlockNeedingShears(Blocks.SEAGRASS));

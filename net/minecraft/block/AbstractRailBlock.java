@@ -80,7 +80,31 @@ extends Block {
             return;
         }
         RailShape lv = arg.get(this.getShapeProperty());
-        if (AbstractRailBlock.method_27935(arg3, arg2, lv) && !arg2.isAir(arg3)) {
+        boolean bl2 = false;
+        BlockPos lv2 = arg3.down();
+        if (!AbstractRailBlock.hasTopRim(arg2, lv2)) {
+            bl2 = true;
+        }
+        BlockPos lv3 = arg3.east();
+        if (lv == RailShape.ASCENDING_EAST && !AbstractRailBlock.hasTopRim(arg2, lv3)) {
+            bl2 = true;
+        } else {
+            BlockPos lv4 = arg3.west();
+            if (lv == RailShape.ASCENDING_WEST && !AbstractRailBlock.hasTopRim(arg2, lv4)) {
+                bl2 = true;
+            } else {
+                BlockPos lv5 = arg3.north();
+                if (lv == RailShape.ASCENDING_NORTH && !AbstractRailBlock.hasTopRim(arg2, lv5)) {
+                    bl2 = true;
+                } else {
+                    BlockPos lv6 = arg3.south();
+                    if (lv == RailShape.ASCENDING_SOUTH && !AbstractRailBlock.hasTopRim(arg2, lv6)) {
+                        bl2 = true;
+                    }
+                }
+            }
+        }
+        if (bl2 && !arg2.isAir(arg3)) {
             if (!bl) {
                 AbstractRailBlock.dropStacks(arg, arg2, arg3);
             }
@@ -88,27 +112,6 @@ extends Block {
         } else {
             this.updateBlockState(arg, arg2, arg3, arg4);
         }
-    }
-
-    private static boolean method_27935(BlockPos arg, World arg2, RailShape arg3) {
-        if (!AbstractRailBlock.hasTopRim(arg2, arg.down())) {
-            return true;
-        }
-        switch (arg3) {
-            case ASCENDING_EAST: {
-                return !AbstractRailBlock.hasTopRim(arg2, arg.east());
-            }
-            case ASCENDING_WEST: {
-                return !AbstractRailBlock.hasTopRim(arg2, arg.west());
-            }
-            case ASCENDING_NORTH: {
-                return !AbstractRailBlock.hasTopRim(arg2, arg.north());
-            }
-            case ASCENDING_SOUTH: {
-                return !AbstractRailBlock.hasTopRim(arg2, arg.south());
-            }
-        }
-        return false;
     }
 
     protected void updateBlockState(BlockState arg, World arg2, BlockPos arg3, Block arg4) {

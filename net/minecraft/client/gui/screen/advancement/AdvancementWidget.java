@@ -138,7 +138,7 @@ extends DrawableHelper {
             }
             this.client.getTextureManager().bindTexture(WIDGETS_TEX);
             this.drawTexture(arg, i + this.xPos + 3, j + this.yPos, this.display.getFrame().texV(), 128 + lv2.getSpriteIndex() * 26, 26, 26);
-            this.client.getItemRenderer().method_27953(this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
+            this.client.getItemRenderer().renderGuiItem(null, this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
         }
         for (AdvancementWidget lv3 : this.children) {
             lv3.renderWidgets(arg, i, j);
@@ -229,7 +229,7 @@ extends DrawableHelper {
                 this.client.textRenderer.draw(arg, this.description.get(u), (float)(r + 5), (float)(j + this.yPos + 9 + 17 + u * 9), -5592406);
             }
         }
-        this.client.getItemRenderer().method_27953(this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
+        this.client.getItemRenderer().renderGuiItem(null, this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
     }
 
     protected void method_2324(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, int p, int q) {

@@ -102,11 +102,9 @@ public class ModelPredicateProviderRegistry {
             public float call(ItemStack arg, @Nullable ClientWorld arg2, @Nullable LivingEntity arg3) {
                 double e;
                 Entity lv;
-                Entity entity = lv = arg3 != null ? arg3 : arg.getHolder();
-                if (lv == null) {
-                    return 0.0f;
-                }
-                if (arg2 == null && lv.world instanceof ClientWorld) {
+                boolean bl = arg3 != null;
+                Entity entity = lv = bl ? arg3 : arg.getFrame();
+                if (arg2 == null && lv != null && lv.world instanceof ClientWorld) {
                     arg2 = (ClientWorld)lv.world;
                 }
                 if (arg2 == null) {

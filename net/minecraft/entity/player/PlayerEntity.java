@@ -67,7 +67,6 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.passive.PigEntity;
-import net.minecraft.entity.passive.StriderEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.ItemCooldownManager;
@@ -822,13 +821,7 @@ extends LivingEntity {
 
     @Override
     protected void damageShield(float f) {
-        if (this.activeItemStack.getItem() != Items.SHIELD) {
-            return;
-        }
-        if (!this.world.isClient) {
-            this.incrementStat(Stats.USED.getOrCreateStat(this.activeItemStack.getItem()));
-        }
-        if (f >= 3.0f) {
+        if (f >= 3.0f && this.activeItemStack.getItem() == Items.SHIELD) {
             int i = 1 + MathHelper.floor(f);
             Hand lv = this.getActiveHand();
             this.activeItemStack.damage(i, this, arg2 -> arg2.sendToolBreakStatus(lv));
@@ -1368,17 +1361,14 @@ extends LivingEntity {
     private void increaseRidingMotionStats(double d, double e, double f) {
         int i;
         if (this.hasVehicle() && (i = Math.round(MathHelper.sqrt(d * d + e * e + f * f) * 100.0f)) > 0) {
-            Entity lv = this.getVehicle();
-            if (lv instanceof AbstractMinecartEntity) {
+            if (this.getVehicle() instanceof AbstractMinecartEntity) {
                 this.increaseStat(Stats.MINECART_ONE_CM, i);
-            } else if (lv instanceof BoatEntity) {
+            } else if (this.getVehicle() instanceof BoatEntity) {
                 this.increaseStat(Stats.BOAT_ONE_CM, i);
-            } else if (lv instanceof PigEntity) {
+            } else if (this.getVehicle() instanceof PigEntity) {
                 this.increaseStat(Stats.PIG_ONE_CM, i);
-            } else if (lv instanceof HorseBaseEntity) {
+            } else if (this.getVehicle() instanceof HorseBaseEntity) {
                 this.increaseStat(Stats.HORSE_ONE_CM, i);
-            } else if (lv instanceof StriderEntity) {
-                this.increaseStat(Stats.STRIDER_ONE_CM, i);
             }
         }
     }
@@ -1396,7 +1386,7 @@ extends LivingEntity {
 
     public boolean checkFallFlying() {
         ItemStack lv;
-        if (!(this.onGround || this.isFallFlying() || this.isTouchingWater() || this.hasStatusEffect(StatusEffects.LEVITATION) || (lv = this.getEquippedStack(EquipmentSlot.CHEST)).getItem() != Items.ELYTRA || !ElytraItem.isUsable(lv))) {
+        if (!this.onGround && !this.isFallFlying() && !this.isTouchingWater() && (lv = this.getEquippedStack(EquipmentSlot.CHEST)).getItem() == Items.ELYTRA && ElytraItem.isUsable(lv)) {
             this.startFallFlying();
             return true;
         }

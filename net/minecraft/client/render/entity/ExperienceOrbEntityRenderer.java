@@ -19,7 +19,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
@@ -37,8 +36,8 @@ extends EntityRenderer<ExperienceOrbEntity> {
     }
 
     @Override
-    protected int getBlockLight(ExperienceOrbEntity arg, BlockPos arg2) {
-        return MathHelper.clamp(super.getBlockLight(arg, arg2) + 7, 0, 15);
+    protected int getBlockLight(ExperienceOrbEntity arg, float f) {
+        return MathHelper.clamp(super.getBlockLight(arg, f) + 7, 0, 15);
     }
 
     @Override

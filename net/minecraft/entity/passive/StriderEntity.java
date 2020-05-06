@@ -15,7 +15,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.class_5275;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityPose;
@@ -65,6 +64,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -234,13 +234,14 @@ Saddleable {
         }
         for (BlockPos lv3 : set) {
             if (this.world.getFluidState(lv3).matches(FluidTags.LAVA)) continue;
-            for (EntityPose lv4 : arg.getPoses()) {
-                Vec3d lv6;
-                Box lv5;
+            Vec3d lv4 = Vec3d.method_24955(lv3);
+            for (EntityPose lv5 : arg.getPoses()) {
+                Box lv7;
+                Box lv6 = arg.method_24833(lv5).offset(lv4);
                 double g = this.world.method_26372(lv3);
-                if (!class_5275.method_27932(g) || !class_5275.method_27933(this.world, arg, (lv5 = arg.method_24833(lv4)).offset(lv6 = Vec3d.method_26410(lv3, g)))) continue;
-                arg.setPose(lv4);
-                return lv6;
+                if (Double.isInfinite(g) || !(g < 1.0) || !this.world.getBlockCollisions(arg, lv7 = lv6.offset(0.0, g, 0.0)).allMatch(VoxelShape::isEmpty)) continue;
+                arg.setPose(lv5);
+                return new Vec3d(lv4.x, (double)lv3.getY() + g, lv4.z);
             }
         }
         return new Vec3d(this.getX(), this.getBoundingBox().y2, this.getZ());

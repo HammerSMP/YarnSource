@@ -39,19 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 @Environment(value=EnvType.CLIENT)
 public class HeadFeatureRenderer<T extends LivingEntity, M extends EntityModel<T>>
 extends FeatureRenderer<T, M> {
-    private final float field_24474;
-    private final float field_24475;
-    private final float field_24476;
-
     public HeadFeatureRenderer(FeatureRendererContext<T, M> arg) {
-        this(arg, 1.0f, 1.0f, 1.0f);
-    }
-
-    public HeadFeatureRenderer(FeatureRendererContext<T, M> arg, float f, float g, float h) {
         super(arg);
-        this.field_24474 = f;
-        this.field_24475 = g;
-        this.field_24476 = h;
     }
 
     @Override
@@ -63,7 +52,6 @@ extends FeatureRenderer<T, M> {
         }
         Item lv2 = lv.getItem();
         arg.push();
-        arg.scale(this.field_24474, this.field_24475, this.field_24476);
         boolean bl2 = bl = arg3 instanceof VillagerEntity || arg3 instanceof ZombieVillagerEntity;
         if (((LivingEntity)arg3).isBaby() && !(arg3 instanceof VillagerEntity)) {
             float m = 2.0f;

@@ -128,7 +128,7 @@ public class VillagerTaskListProvider {
     }
 
     private static Pair<Integer, Task<LivingEntity>> createFreeFollowTask() {
-        return Pair.of((Object)5, new RandomTask(ImmutableList.of((Object)Pair.of((Object)new FollowMobTask(EntityType.CAT, 8.0f), (Object)8), (Object)Pair.of((Object)new FollowMobTask(EntityType.VILLAGER, 8.0f), (Object)2), (Object)Pair.of((Object)new FollowMobTask(EntityType.PLAYER, 8.0f), (Object)2), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.CREATURE, 8.0f), (Object)1), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.WATER_CREATURE, 8.0f), (Object)1), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.WATER_AMBIENT, 8.0f), (Object)1), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.MONSTER, 8.0f), (Object)1), (Object)Pair.of((Object)new WaitTask(30, 60), (Object)2))));
+        return Pair.of((Object)5, new RandomTask(ImmutableList.of((Object)Pair.of((Object)new FollowMobTask(EntityType.CAT, 8.0f), (Object)8), (Object)Pair.of((Object)new FollowMobTask(EntityType.VILLAGER, 8.0f), (Object)2), (Object)Pair.of((Object)new FollowMobTask(EntityType.PLAYER, 8.0f), (Object)2), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.CREATURE, 8.0f), (Object)1), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.WATER_CREATURE, 8.0f), (Object)1), (Object)Pair.of((Object)new FollowMobTask(EntityCategory.MONSTER, 8.0f), (Object)1), (Object)Pair.of((Object)new WaitTask(30, 60), (Object)2))));
     }
 
     private static Pair<Integer, Task<LivingEntity>> createBusyFollowTask() {

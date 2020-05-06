@@ -212,7 +212,7 @@ implements ItemConvertible {
 
     public static boolean hasTopRim(BlockView arg, BlockPos arg2) {
         BlockState lv = arg.getBlockState(arg2);
-        return lv.isFullCube(arg, arg2) && lv.isSideSolidFullSquare(arg, arg2, Direction.UP) || !VoxelShapes.matchesAnywhere(lv.getSidesShape(arg, arg2).getFace(Direction.UP), SOLID_MEDIUM_SQUARE_SHAPE, BooleanBiFunction.ONLY_SECOND);
+        return !VoxelShapes.matchesAnywhere(lv.getSidesShape(arg, arg2).getFace(Direction.UP), SOLID_MEDIUM_SQUARE_SHAPE, BooleanBiFunction.ONLY_SECOND);
     }
 
     public static boolean sideCoversSmallSquare(WorldView arg, BlockPos arg2, Direction arg3) {

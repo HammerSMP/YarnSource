@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import net.minecraft.SharedConstants;
 import net.minecraft.class_5196;
-import net.minecraft.class_5273;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.AddTrappedChestFix;
 import net.minecraft.datafixer.fix.AdvancementRenameFix;
@@ -517,8 +516,6 @@ public class Schemas {
         dataFixerBuilder.addFixer((DataFix)new StriderGravityFix(schema116, false));
         Schema schema117 = dataFixerBuilder.addSchema(2531, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer((DataFix)new RedstoneConnectionsFix(schema117));
-        Schema schema118 = dataFixerBuilder.addSchema(2533, EMPTY_IDENTIFIER_NORMALIZE);
-        dataFixerBuilder.addFixer((DataFix)new class_5273(schema118));
     }
 }
 

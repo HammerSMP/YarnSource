@@ -47,7 +47,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +73,6 @@ import org.apache.logging.log4j.Logger;
 public class Util {
     private static final AtomicInteger NEXT_SERVER_WORKER_ID = new AtomicInteger(1);
     private static final ExecutorService SERVER_WORKER_EXECUTOR = Util.createServerWorkerExecutor();
-    private static final ExecutorService field_24477 = Util.method_27959();
     public static LongSupplier nanoTimeSupplier = System::nanoTime;
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -126,7 +124,17 @@ public class Util {
                 };
                 forkJoinWorkerThread.setName("Worker-" + NEXT_SERVER_WORKER_ID.getAndIncrement());
                 return forkJoinWorkerThread;
-            }, Util::method_18347, true);
+            }, (thread, throwable) -> {
+                Util.throwOrPause(throwable);
+                if (throwable instanceof CompletionException) {
+                    throwable = throwable.getCause();
+                }
+                if (throwable instanceof CrashException) {
+                    Bootstrap.println(((CrashException)throwable).getReport().asString());
+                    System.exit(-1);
+                }
+                LOGGER.error(String.format("Caught exception in thread %s", thread), throwable);
+            }, true);
         }
         return executorService2;
     }
@@ -135,36 +143,18 @@ public class Util {
         return SERVER_WORKER_EXECUTOR;
     }
 
-    public static Executor method_27958() {
-        return field_24477;
-    }
-
     public static void shutdownServerWorkerExecutor() {
-        Util.method_27957(SERVER_WORKER_EXECUTOR);
-        Util.method_27957(field_24477);
-    }
-
-    private static void method_27957(ExecutorService executorService) {
         boolean bl2;
-        executorService.shutdown();
+        SERVER_WORKER_EXECUTOR.shutdown();
         try {
-            boolean bl = executorService.awaitTermination(3L, TimeUnit.SECONDS);
+            boolean bl = SERVER_WORKER_EXECUTOR.awaitTermination(3L, TimeUnit.SECONDS);
         }
         catch (InterruptedException interruptedException) {
             bl2 = false;
         }
         if (!bl2) {
-            executorService.shutdownNow();
+            SERVER_WORKER_EXECUTOR.shutdownNow();
         }
-    }
-
-    private static ExecutorService method_27959() {
-        return Executors.newCachedThreadPool(runnable -> {
-            Thread thread = new Thread(runnable);
-            thread.setName("IO-Worker-" + NEXT_SERVER_WORKER_ID.getAndIncrement());
-            thread.setUncaughtExceptionHandler(Util::method_18347);
-            return thread;
-        });
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -177,18 +167,6 @@ public class Util {
     @Environment(value=EnvType.CLIENT)
     public static void throwUnchecked(Throwable throwable) {
         throw throwable instanceof RuntimeException ? (RuntimeException)throwable : new RuntimeException(throwable);
-    }
-
-    private static void method_18347(Thread thread, Throwable throwable) {
-        Util.throwOrPause(throwable);
-        if (throwable instanceof CompletionException) {
-            throwable = throwable.getCause();
-        }
-        if (throwable instanceof CrashException) {
-            Bootstrap.println(((CrashException)throwable).getReport().asString());
-            System.exit(-1);
-        }
-        LOGGER.error(String.format("Caught exception in thread %s", thread), throwable);
     }
 
     public static OperatingSystem getOperatingSystem() {

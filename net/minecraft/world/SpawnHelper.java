@@ -82,7 +82,7 @@ public final class SpawnHelper {
                 object2IntOpenHashMap.addTo((Object)lv4, 1);
             });
         }
-        return new Info(i, object2IntOpenHashMap, lv);
+        return new Info(i, (Object2IntMap)object2IntOpenHashMap, lv);
     }
 
     private static Biome getBiomeDirectly(BlockPos arg, Chunk arg2) {
@@ -171,7 +171,7 @@ public final class SpawnHelper {
         if (lv.getCategory() == EntityCategory.MISC) {
             return false;
         }
-        if (!lv.isSpawnableFarFromPlayer() && d > (double)(lv.getCategory().method_27919() * lv.getCategory().method_27919())) {
+        if (!lv.isSpawnableFarFromPlayer() && d > (double)(lv.getImmediateDespawnRange() * lv.getImmediateDespawnRange())) {
             return false;
         }
         if (!lv.isSummonable() || !SpawnHelper.containsSpawnEntry(arg3, arg4, arg2, arg5, arg6)) {
@@ -208,7 +208,7 @@ public final class SpawnHelper {
     }
 
     private static boolean isValidSpawn(ServerWorld arg, MobEntity arg2, double d) {
-        if (d > (double)(arg2.getType().getCategory().method_27919() * arg2.getType().getCategory().method_27919()) && arg2.canImmediatelyDespawn(d)) {
+        if (d > (double)(arg2.getType().getImmediateDespawnRange() * arg2.getType().getImmediateDespawnRange()) && arg2.canImmediatelyDespawn(d)) {
             return false;
         }
         return arg2.canSpawn(arg, SpawnType.NATURAL) && arg2.canSpawn(arg);
@@ -246,7 +246,7 @@ public final class SpawnHelper {
         if (!arg4.isEmpty()) {
             return false;
         }
-        return !arg3.isIn(BlockTags.PREVENT_MOB_SPAWNING_INSIDE);
+        return !arg3.isIn(BlockTags.RAILS);
     }
 
     public static boolean canSpawn(SpawnRestriction.Location arg, WorldView arg2, BlockPos arg3, @Nullable EntityType<?> arg4) {
@@ -355,7 +355,7 @@ public final class SpawnHelper {
 
     public static class Info {
         private final int spawningChunkCount;
-        private final Object2IntOpenHashMap<EntityCategory> categoryToCount;
+        private final Object2IntMap<EntityCategory> categoryToCount;
         private final GravityField densityField;
         private final Object2IntMap<EntityCategory> categoryToCountView;
         @Nullable
@@ -364,11 +364,11 @@ public final class SpawnHelper {
         private EntityType<?> cachedEntityType;
         private double cachedDensityMass;
 
-        private Info(int i, Object2IntOpenHashMap<EntityCategory> object2IntOpenHashMap, GravityField arg) {
+        private Info(int i, Object2IntMap<EntityCategory> object2IntMap, GravityField arg) {
             this.spawningChunkCount = i;
-            this.categoryToCount = object2IntOpenHashMap;
+            this.categoryToCount = object2IntMap;
             this.densityField = arg;
-            this.categoryToCountView = Object2IntMaps.unmodifiable(object2IntOpenHashMap);
+            this.categoryToCountView = Object2IntMaps.unmodifiable(object2IntMap);
         }
 
         private boolean test(EntityType<?> arg, BlockPos arg2, Chunk arg3) {
@@ -387,7 +387,7 @@ public final class SpawnHelper {
         }
 
         private void run(MobEntity arg, Chunk arg2) {
-            double f;
+            double e;
             EntityType<?> lv = arg.getType();
             BlockPos lv2 = arg.getBlockPos();
             if (lv2.equals(this.cachedPos) && lv == this.cachedEntityType) {
@@ -395,14 +395,12 @@ public final class SpawnHelper {
             } else {
                 Biome lv3 = SpawnHelper.getBiomeDirectly(lv2, arg2);
                 Biome.SpawnDensity lv4 = lv3.getSpawnDensity(lv);
-                if (lv4 != null) {
-                    double e = lv4.getMass();
-                } else {
-                    f = 0.0;
+                if (lv4 == null) {
+                    return;
                 }
+                e = lv4.getMass();
             }
-            this.densityField.addPoint(lv2, f);
-            this.categoryToCount.addTo((Object)lv.getCategory(), 1);
+            this.densityField.addPoint(lv2, e);
         }
 
         @Environment(value=EnvType.CLIENT)

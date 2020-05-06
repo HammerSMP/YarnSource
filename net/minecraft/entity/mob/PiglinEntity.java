@@ -257,7 +257,7 @@ implements CrossbowUser {
     }
 
     public boolean canConvert() {
-        return this.world.getDimension().getType() != DimensionType.THE_NETHER && !this.isImmuneToZombification() && !this.isAiDisabled();
+        return this.world.getDimension().getType() == DimensionType.OVERWORLD && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
     @Override
@@ -404,15 +404,16 @@ implements CrossbowUser {
 
     @Override
     protected boolean isBetterItemFor(ItemStack arg, ItemStack arg2) {
-        boolean bl = PiglinBrain.isGoldenItem(arg.getItem());
-        boolean bl2 = PiglinBrain.isGoldenItem(arg2.getItem());
-        if (bl && !bl2) {
+        if (PiglinBrain.isGoldenItem(arg.getItem()) && PiglinBrain.isGoldenItem(arg2.getItem())) {
+            return super.method_26320(arg, arg2);
+        }
+        if (PiglinBrain.isGoldenItem(arg.getItem())) {
             return true;
         }
-        if (!bl && bl2) {
+        if (PiglinBrain.isGoldenItem(arg2.getItem())) {
             return false;
         }
-        if (this.isAdult() && arg.getItem() != Items.CROSSBOW && arg2.getItem() == Items.CROSSBOW) {
+        if (this.isAdult() && arg2.getItem() == Items.CROSSBOW) {
             return false;
         }
         return super.isBetterItemFor(arg, arg2);

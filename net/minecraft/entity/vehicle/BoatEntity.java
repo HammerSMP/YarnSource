@@ -16,9 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LilyPadBlock;
-import net.minecraft.class_5275;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -601,28 +599,27 @@ extends Entity {
 
     @Override
     public Vec3d method_24829(LivingEntity arg) {
+        double f;
         double e;
-        Vec3d lv = BoatEntity.method_24826(this.getWidth() * MathHelper.SQUARE_ROOT_OF_TWO, arg.getWidth(), this.yaw);
+        Vec3d lv = BoatEntity.method_24826(Math.sqrt((double)(this.getWidth() * this.getWidth()) * 2.0), arg.getWidth(), this.yaw);
         double d = this.getX() + lv.x;
-        BlockPos lv2 = new BlockPos(d, this.getBoundingBox().y2, e = this.getZ() + lv.z);
+        BlockPos lv2 = new BlockPos(d, e = this.getBoundingBox().y2 + 0.001, f = this.getZ() + lv.z);
         BlockPos lv3 = lv2.down();
         if (!this.world.isWater(lv3)) {
-            for (EntityPose lv4 : arg.getPoses()) {
-                Vec3d lv7;
-                Vec3d lv6;
-                Box lv5 = arg.method_24833(lv4);
-                double f = this.world.method_26372(lv2);
-                if (class_5275.method_27932(f) && class_5275.method_27933(this.world, arg, lv5.offset(lv6 = new Vec3d(d, (double)lv2.getY() + f, e)))) {
-                    arg.setPose(lv4);
-                    return lv6;
+            Box lv6;
+            double h;
+            Box lv4 = arg.method_24833(arg.method_26081()).offset(d, e, f);
+            double g = this.world.method_26372(lv2);
+            if (!Double.isInfinite(g) && g < 1.0) {
+                Box lv5 = lv4.offset(d, (double)lv2.getY() + g, f);
+                if (this.world.getBlockCollisions(arg, lv5).allMatch(VoxelShape::isEmpty)) {
+                    return new Vec3d(d, (double)lv2.getY() + g, f);
                 }
-                double g = this.world.method_26372(lv3);
-                if (!class_5275.method_27932(g) || !class_5275.method_27933(this.world, arg, lv5.offset(lv7 = new Vec3d(d, (double)lv3.getY() + g, e)))) continue;
-                arg.setPose(lv4);
-                return lv7;
+            } else if (g < 1.0 && !Double.isInfinite(h = this.world.method_26372(lv3)) && h <= 0.5 && this.world.getBlockCollisions(arg, lv6 = lv4.offset(d, (double)lv3.getY() + h, f)).allMatch(VoxelShape::isEmpty)) {
+                return new Vec3d(d, (double)lv3.getY() + h, f);
             }
         }
-        return super.method_24829(arg);
+        return new Vec3d(this.getX(), e, this.getZ());
     }
 
     protected void copyEntityData(Entity arg) {

@@ -16,7 +16,6 @@ import net.minecraft.client.render.entity.model.WitherEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 
 @Environment(value=EnvType.CLIENT)
 public class WitherEntityRenderer
@@ -30,7 +29,7 @@ extends MobEntityRenderer<WitherEntity, WitherEntityModel<WitherEntity>> {
     }
 
     @Override
-    protected int getBlockLight(WitherEntity arg, BlockPos arg2) {
+    protected int getBlockLight(WitherEntity arg, float f) {
         return 15;
     }
 

@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.DynamicOps;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
@@ -2091,7 +2092,7 @@ extends Entity {
 
     private void initAi() {
         boolean bl = this.getFlag(7);
-        if (bl && !this.onGround && !this.hasVehicle() && !this.hasStatusEffect(StatusEffects.LEVITATION)) {
+        if (bl && !this.onGround && !this.hasVehicle()) {
             ItemStack lv = this.getEquippedStack(EquipmentSlot.CHEST);
             if (lv.getItem() == Items.ELYTRA && ElytraItem.isUsable(lv)) {
                 bl = true;
@@ -2548,6 +2549,10 @@ extends Entity {
 
     public ImmutableList<EntityPose> getPoses() {
         return ImmutableList.of((Object)((Object)EntityPose.STANDING));
+    }
+
+    public EntityPose method_26081() {
+        return this.getPoses().stream().min(Comparator.comparing(arg -> Float.valueOf(this.getDimensions((EntityPose)arg).height))).orElse(EntityPose.STANDING);
     }
 
     public Box method_24833(EntityPose arg) {

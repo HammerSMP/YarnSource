@@ -98,7 +98,7 @@ extends AbstractButtonWidget {
             lv.getItemRenderer().renderGuiItem(lv2, this.x + m + 1, this.y + m + 1);
             --m;
         }
-        lv.getItemRenderer().method_27953(lv2, this.x + m, this.y + m);
+        lv.getItemRenderer().renderGuiItem(lv2, this.x + m, this.y + m);
         if (bl) {
             RenderSystem.popMatrix();
         }

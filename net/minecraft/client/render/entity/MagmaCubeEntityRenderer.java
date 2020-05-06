@@ -15,7 +15,6 @@ import net.minecraft.client.render.entity.model.MagmaCubeEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 @Environment(value=EnvType.CLIENT)
@@ -28,7 +27,7 @@ extends MobEntityRenderer<MagmaCubeEntity, MagmaCubeEntityModel<MagmaCubeEntity>
     }
 
     @Override
-    protected int getBlockLight(MagmaCubeEntity arg, BlockPos arg2) {
+    protected int getBlockLight(MagmaCubeEntity arg, float f) {
         return 15;
     }
 

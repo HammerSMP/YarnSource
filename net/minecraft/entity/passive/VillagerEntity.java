@@ -762,6 +762,10 @@ VillagerDataContainer {
     }
 
     public boolean canSummonGolem(long l) {
+        VillagerData lv = this.getVillagerData();
+        if (lv.getProfession() == VillagerProfession.NONE || lv.getProfession() == VillagerProfession.NITWIT) {
+            return false;
+        }
         if (!this.hasRecentlyWorkedAndSlept(this.world.getTime())) {
             return false;
         }
@@ -849,8 +853,9 @@ VillagerDataContainer {
 
     private boolean hasRecentlyWorkedAndSlept(long l) {
         Optional<Timestamp> optional = this.brain.getOptionalMemory(MemoryModuleType.LAST_SLEPT);
-        if (optional.isPresent()) {
-            return l - optional.get().getTime() < 24000L;
+        Optional<Timestamp> optional2 = this.brain.getOptionalMemory(MemoryModuleType.LAST_WORKED_AT_POI);
+        if (optional.isPresent() && optional2.isPresent()) {
+            return l - optional.get().getTime() < 24000L && l - optional2.get().getTime() < 36000L;
         }
         return false;
     }

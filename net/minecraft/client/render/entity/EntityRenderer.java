@@ -36,19 +36,14 @@ public abstract class EntityRenderer<T extends Entity> {
     }
 
     public final int getLight(T arg, float f) {
-        BlockPos lv = new BlockPos(((Entity)arg).getCameraPosVec(f));
-        return LightmapTextureManager.pack(this.getBlockLight(arg, lv), this.method_27950(arg, lv));
+        return LightmapTextureManager.pack(this.getBlockLight(arg, f), ((Entity)arg).world.getLightLevel(LightType.SKY, new BlockPos(((Entity)arg).getCameraPosVec(f))));
     }
 
-    protected int method_27950(T arg, BlockPos arg2) {
-        return ((Entity)arg).world.getLightLevel(LightType.SKY, arg2);
-    }
-
-    protected int getBlockLight(T arg, BlockPos arg2) {
+    protected int getBlockLight(T arg, float f) {
         if (((Entity)arg).isOnFire()) {
             return 15;
         }
-        return ((Entity)arg).world.getLightLevel(LightType.BLOCK, arg2);
+        return ((Entity)arg).world.getLightLevel(LightType.BLOCK, new BlockPos(((Entity)arg).getCameraPosVec(f)));
     }
 
     public boolean shouldRender(T arg, Frustum arg2, double d, double e, double f) {

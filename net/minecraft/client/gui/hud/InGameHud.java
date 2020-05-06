@@ -951,7 +951,7 @@ extends DrawableHelper {
             RenderSystem.scalef(1.0f / h, (h + 1.0f) / 2.0f, 1.0f);
             RenderSystem.translatef(-(i + 8), -(j + 12), 0.0f);
         }
-        this.itemRenderer.method_27951(arg, arg2, i, j);
+        this.itemRenderer.renderGuiItem(arg, arg2, i, j);
         if (g > 0.0f) {
             RenderSystem.popMatrix();
         }

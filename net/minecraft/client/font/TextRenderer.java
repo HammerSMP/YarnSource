@@ -305,7 +305,7 @@ public class TextRenderer {
                 float h = (float)(i >> 16 & 0xFF) / 255.0f;
                 float j = (float)(i >> 8 & 0xFF) / 255.0f;
                 float k = (float)(i & 0xFF) / 255.0f;
-                this.addRectangle(new GlyphRenderer.Rectangle(f - 1.0f, this.y + 9.0f, this.x + 1.0f, this.y - 1.0f, 0.01f, h, j, k, g));
+                this.addRectangle(new GlyphRenderer.Rectangle(f - 1.0f, this.y + 9.0f, this.x + 1.0f, this.y - 1.0f, -0.01f, h, j, k, g));
             }
             if (this.rectangles != null) {
                 GlyphRenderer lv = TextRenderer.this.getFontStorage(Style.DEFAULT_FONT_ID).getRectangleRenderer();

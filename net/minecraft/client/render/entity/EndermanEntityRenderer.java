@@ -18,6 +18,7 @@ import net.minecraft.client.render.entity.feature.EndermanBlockFeatureRenderer;
 import net.minecraft.client.render.entity.feature.EndermanEyesFeatureRenderer;
 import net.minecraft.client.render.entity.model.EndermanEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -55,6 +56,11 @@ extends MobEntityRenderer<EndermanEntity, EndermanEntityModel<EndermanEntity>> {
     @Override
     public Identifier getTexture(EndermanEntity arg) {
         return TEXTURE;
+    }
+
+    @Override
+    public /* synthetic */ Vec3d getPositionOffset(Entity arg, float f) {
+        return this.getPositionOffset((EndermanEntity)arg, f);
     }
 }
 

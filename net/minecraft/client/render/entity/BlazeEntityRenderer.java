@@ -14,7 +14,6 @@ import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.model.BlazeEntityModel;
 import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 
 @Environment(value=EnvType.CLIENT)
 public class BlazeEntityRenderer
@@ -26,7 +25,7 @@ extends MobEntityRenderer<BlazeEntity, BlazeEntityModel<BlazeEntity>> {
     }
 
     @Override
-    protected int getBlockLight(BlazeEntity arg, BlockPos arg2) {
+    protected int getBlockLight(BlazeEntity arg, float f) {
         return 15;
     }
 

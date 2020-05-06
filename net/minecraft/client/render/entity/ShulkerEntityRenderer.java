@@ -16,6 +16,7 @@ import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.feature.ShulkerHeadFeatureRenderer;
 import net.minecraft.client.render.entity.model.ShulkerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -84,6 +85,11 @@ extends MobEntityRenderer<ShulkerEntity, ShulkerEntityModel<ShulkerEntity>> {
     protected void scale(ShulkerEntity arg, MatrixStack arg2, float f) {
         float g = 0.999f;
         arg2.scale(0.999f, 0.999f, 0.999f);
+    }
+
+    @Override
+    public /* synthetic */ Vec3d getPositionOffset(Entity arg, float f) {
+        return this.getPositionOffset((ShulkerEntity)arg, f);
     }
 }
 

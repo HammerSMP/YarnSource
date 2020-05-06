@@ -22,21 +22,15 @@ extends Goal {
     protected final double speed;
     protected int chance;
     protected boolean ignoringChance;
-    private boolean field_24463;
 
     public WanderAroundGoal(MobEntityWithAi arg, double d) {
         this(arg, d, 120);
     }
 
     public WanderAroundGoal(MobEntityWithAi arg, double d, int i) {
-        this(arg, d, i, true);
-    }
-
-    public WanderAroundGoal(MobEntityWithAi arg, double d, int i, boolean bl) {
         this.mob = arg;
         this.speed = d;
         this.chance = i;
-        this.field_24463 = bl;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 
@@ -47,7 +41,7 @@ extends Goal {
             return false;
         }
         if (!this.ignoringChance) {
-            if (this.field_24463 && this.mob.getDespawnCounter() >= 100) {
+            if (this.mob.getDespawnCounter() >= 100) {
                 return false;
             }
             if (this.mob.getRandom().nextInt(this.chance) != 0) {

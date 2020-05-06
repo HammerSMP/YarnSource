@@ -17,7 +17,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5275;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -70,6 +69,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -284,7 +284,7 @@ Saddleable {
         if (this.world.isClient) {
             return;
         }
-        this.setHorseFlag(4, !this.items.getStack(0).isEmpty());
+        this.setHorseFlag(4, !this.items.getStack(0).isEmpty() && this.canBeSaddled());
     }
 
     @Override
@@ -914,43 +914,25 @@ Saddleable {
         return this.getPassengerList().get(0);
     }
 
-    @Nullable
-    private Vec3d method_27930(Vec3d arg, LivingEntity arg2) {
-        double d = this.getX() + arg.x;
-        double e = this.getBoundingBox().y1;
-        double f = this.getZ() + arg.z;
-        BlockPos.Mutable lv = new BlockPos.Mutable();
-        block0: for (EntityPose lv2 : arg2.getPoses()) {
-            lv.set(d, e, f);
-            double g = this.getBoundingBox().y2 + 0.75;
-            do {
-                Vec3d lv4;
-                Box lv3;
-                double h = this.world.method_26372(lv);
-                if ((double)lv.getY() + h > g) continue block0;
-                if (class_5275.method_27932(h) && class_5275.method_27933(this.world, arg2, (lv3 = arg2.method_24833(lv2)).offset(lv4 = new Vec3d(d, (double)lv.getY() + h, f)))) {
-                    arg2.setPose(lv2);
-                    return lv4;
-                }
-                lv.move(Direction.UP);
-            } while ((double)lv.getY() < g);
-        }
-        return null;
-    }
-
     @Override
     public Vec3d method_24829(LivingEntity arg) {
         Vec3d lv = HorseBaseEntity.method_24826(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.RIGHT ? 90.0f : -90.0f));
-        Vec3d lv2 = this.method_27930(lv, arg);
-        if (lv2 != null) {
-            return lv2;
-        }
-        Vec3d lv3 = HorseBaseEntity.method_24826(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.LEFT ? 90.0f : -90.0f));
-        Vec3d lv4 = this.method_27930(lv3, arg);
-        if (lv4 != null) {
-            return lv4;
-        }
-        return this.getPos();
+        double d = this.getX() + lv.x;
+        double e = this.getBoundingBox().y1;
+        double f = this.getZ() + lv.z;
+        Box lv2 = arg.method_24833(arg.method_26081()).offset(d, e, f);
+        BlockPos.Mutable lv3 = new BlockPos.Mutable(d, e, f);
+        double g = this.getBoundingBox().y2 + 0.75;
+        do {
+            Box lv4;
+            double h = this.world.method_26372(lv3);
+            if ((double)lv3.getY() + h > g) break;
+            if (!Double.isInfinite(h) && h < 1.0 && this.world.getBlockCollisions(arg, lv4 = lv2.offset(d, (double)lv3.getY() + h, f)).allMatch(VoxelShape::isEmpty)) {
+                return new Vec3d(d, (double)lv3.getY() + h, f);
+            }
+            lv3.move(Direction.UP);
+        } while ((double)lv3.getY() < g);
+        return new Vec3d(this.getX(), this.getY(), this.getZ());
     }
 
     protected void initAttributes() {

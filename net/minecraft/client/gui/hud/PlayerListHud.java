@@ -165,7 +165,7 @@ extends DrawableHelper {
                 }
                 ab += 9;
             }
-            this.client.textRenderer.drawWithShadow(arg, this.getPlayerName(lv6), (float)ab, (float)ac, lv6.getGameMode() == GameMode.SPECTATOR ? -1862270977 : -1);
+            this.client.textRenderer.drawWithShadow(arg, this.getPlayerName(lv6), (float)ab, (float)ac, -1862270977);
             if (arg3 != null && lv6.getGameMode() != GameMode.SPECTATOR && (ai = (ah = ab + j + 1) + r) - ah > 5) {
                 this.renderScoreboardObjective(arg3, ac, gameProfile.getName(), ah, ai, lv6, arg);
             }

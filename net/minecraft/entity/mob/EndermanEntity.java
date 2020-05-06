@@ -289,7 +289,7 @@ extends HostileEntity {
             return false;
         }
         boolean bl = super.damage(arg, f);
-        if (!this.world.isClient() && this.random.nextInt(10) != 0) {
+        if (!this.world.isClient() && arg.bypassesArmor() && this.random.nextInt(10) != 0) {
             this.teleportRandomly();
         }
         return bl;

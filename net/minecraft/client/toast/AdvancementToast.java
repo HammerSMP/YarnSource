@@ -69,7 +69,7 @@ implements Toast {
                     arg2.getGame().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f));
                 }
             }
-            arg2.getGame().getItemRenderer().method_27953(lv.getIcon(), 8, 8);
+            arg2.getGame().getItemRenderer().renderGuiItem(null, lv.getIcon(), 8, 8);
             return l >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
         }
         return Toast.Visibility.HIDE;

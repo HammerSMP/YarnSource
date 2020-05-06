@@ -93,12 +93,10 @@ extends LivingEntityRenderer<T, M> {
         float v = MathHelper.fastInverseSqrt(r * r + t * t) * 0.025f / 2.0f;
         float w = t * v;
         float x = r * v;
-        BlockPos lv3 = new BlockPos(((Entity)arg).getCameraPosVec(f));
-        BlockPos lv4 = new BlockPos(arg4.getCameraPosVec(f));
-        int y = this.getBlockLight(arg, lv3);
-        int z = this.dispatcher.getRenderer(arg4).getBlockLight(arg4, lv4);
-        int aa = ((MobEntity)arg).world.getLightLevel(LightType.SKY, lv3);
-        int ab = ((MobEntity)arg).world.getLightLevel(LightType.SKY, lv4);
+        int y = this.getBlockLight(arg, f);
+        int z = this.dispatcher.getRenderer(arg4).getBlockLight(arg4, f);
+        int aa = ((MobEntity)arg).world.getLightLevel(LightType.SKY, new BlockPos(((Entity)arg).getCameraPosVec(f)));
+        int ab = ((MobEntity)arg).world.getLightLevel(LightType.SKY, new BlockPos(arg4.getCameraPosVec(f)));
         MobEntityRenderer.method_23186(lv, lv2, r, s, t, y, z, aa, ab, 0.025f, 0.025f, w, x);
         MobEntityRenderer.method_23186(lv, lv2, r, s, t, y, z, aa, ab, 0.025f, 0.0f, w, x);
         arg2.pop();

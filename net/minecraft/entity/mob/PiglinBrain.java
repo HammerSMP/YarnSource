@@ -14,7 +14,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.util.Pair;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -241,7 +240,7 @@ public class PiglinBrain {
                 if (PiglinBrain.isGoldenItem(lv2.getItem())) {
                     PiglinBrain.method_24849(arg, lv2);
                 } else {
-                    PiglinBrain.doBarter(arg, Collections.singletonList(lv2));
+                    PiglinBrain.doBarter(arg, lv2);
                 }
                 arg.equipToMainHand(lv);
             }
@@ -257,39 +256,37 @@ public class PiglinBrain {
 
     private static void method_24849(PiglinEntity arg, ItemStack arg2) {
         ItemStack lv = arg.addItem(arg2);
-        PiglinBrain.dropBarteredItem(arg, Collections.singletonList(lv));
+        PiglinBrain.dropBarteredItem(arg, lv);
     }
 
-    private static void doBarter(PiglinEntity arg, List<ItemStack> list) {
+    private static void doBarter(PiglinEntity arg, ItemStack arg2) {
         Optional<PlayerEntity> optional = arg.getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_PLAYER);
         if (optional.isPresent()) {
-            PiglinBrain.dropBarteredItem(arg, optional.get(), list);
+            PiglinBrain.dropBarteredItem(arg, optional.get(), arg2);
         } else {
-            PiglinBrain.dropBarteredItem(arg, list);
+            PiglinBrain.dropBarteredItem(arg, arg2);
         }
     }
 
-    private static void dropBarteredItem(PiglinEntity arg, List<ItemStack> list) {
-        PiglinBrain.drop(arg, list, PiglinBrain.findGround(arg));
+    private static void dropBarteredItem(PiglinEntity arg, ItemStack arg2) {
+        PiglinBrain.drop(arg, arg2, PiglinBrain.findGround(arg));
     }
 
-    private static void dropBarteredItem(PiglinEntity arg, PlayerEntity arg2, List<ItemStack> list) {
-        PiglinBrain.drop(arg, list, arg2.getPos());
+    private static void dropBarteredItem(PiglinEntity arg, PlayerEntity arg2, ItemStack arg3) {
+        PiglinBrain.drop(arg, arg3, arg2.getPos());
     }
 
-    private static void drop(PiglinEntity arg, List<ItemStack> list, Vec3d arg2) {
-        if (!list.isEmpty()) {
+    private static void drop(PiglinEntity arg, ItemStack arg2, Vec3d arg3) {
+        if (!arg2.isEmpty()) {
             arg.swingHand(Hand.OFF_HAND);
-            for (ItemStack lv : list) {
-                LookTargetUtil.give(arg, lv, arg2.add(0.0, 1.0, 0.0));
-            }
+            LookTargetUtil.give(arg, arg2, arg3.add(0.0, 1.0, 0.0));
         }
     }
 
-    private static List<ItemStack> getBarteredItem(PiglinEntity arg) {
+    private static ItemStack getBarteredItem(PiglinEntity arg) {
         LootTable lv = arg.world.getServer().getLootManager().getTable(LootTables.PIGLIN_BARTERING_GAMEPLAY);
         List<ItemStack> list = lv.getDrops(new LootContext.Builder((ServerWorld)arg.world).put(LootContextParameters.THIS_ENTITY, arg).setRandom(arg.world.random).build(LootContextTypes.BARTER));
-        return list;
+        return list.isEmpty() ? ItemStack.EMPTY : list.get(0);
     }
 
     protected static boolean canGather(PiglinEntity arg, ItemStack arg2) {

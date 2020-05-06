@@ -19,7 +19,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.projectile.DragonFireballEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 
@@ -34,7 +33,7 @@ extends EntityRenderer<DragonFireballEntity> {
     }
 
     @Override
-    protected int getBlockLight(DragonFireballEntity arg, BlockPos arg2) {
+    protected int getBlockLight(DragonFireballEntity arg, float f) {
         return 15;
     }
 

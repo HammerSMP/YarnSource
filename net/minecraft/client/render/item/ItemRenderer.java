@@ -116,13 +116,6 @@ implements SynchronousResourceReloadListener {
         arg3.pop();
     }
 
-    public static VertexConsumer method_27952(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
-        if (bl2) {
-            return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.method_27948() : RenderLayer.method_27949()), arg.getBuffer(arg2));
-        }
-        return arg.getBuffer(arg2);
-    }
-
     public static VertexConsumer getArmorVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
             return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getGlint() : RenderLayer.getEntityGlint()), arg.getBuffer(arg2));
@@ -210,15 +203,7 @@ implements SynchronousResourceReloadListener {
         this.renderGuiItem(MinecraftClient.getInstance().player, arg, i, j);
     }
 
-    public void method_27953(ItemStack arg, int i, int j) {
-        this.renderGuiItem(null, arg, i, j);
-    }
-
-    public void method_27951(LivingEntity arg, ItemStack arg2, int i, int j) {
-        this.renderGuiItem(arg, arg2, i, j);
-    }
-
-    private void renderGuiItem(@Nullable LivingEntity arg, ItemStack arg2, int i, int j) {
+    public void renderGuiItem(@Nullable LivingEntity arg, ItemStack arg2, int i, int j) {
         if (arg2.isEmpty()) {
             return;
         }

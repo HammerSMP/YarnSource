@@ -75,7 +75,7 @@ enum AdvancementTabType {
                 m += 5;
             }
         }
-        arg.method_27953(arg2, l, m);
+        arg.renderGuiItem(null, arg2, l, m);
     }
 
     public int getTabX(int i) {

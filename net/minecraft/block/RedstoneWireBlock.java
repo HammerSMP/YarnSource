@@ -28,7 +28,6 @@ import net.minecraft.block.ObserverBlock;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.enums.WireConnection;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.state.StateManager;
@@ -59,7 +58,6 @@ extends Block {
     private static final Map<Direction, VoxelShape> field_24414 = Maps.newEnumMap((Map)ImmutableMap.of((Object)Direction.NORTH, (Object)Block.createCuboidShape(3.0, 0.0, 0.0, 13.0, 1.0, 13.0), (Object)Direction.SOUTH, (Object)Block.createCuboidShape(3.0, 0.0, 3.0, 13.0, 1.0, 16.0), (Object)Direction.EAST, (Object)Block.createCuboidShape(3.0, 0.0, 3.0, 16.0, 1.0, 13.0), (Object)Direction.WEST, (Object)Block.createCuboidShape(0.0, 0.0, 3.0, 13.0, 1.0, 13.0)));
     private static final Map<Direction, VoxelShape> field_24415 = Maps.newEnumMap((Map)ImmutableMap.of((Object)Direction.NORTH, (Object)VoxelShapes.union(field_24414.get(Direction.NORTH), Block.createCuboidShape(3.0, 0.0, 0.0, 13.0, 16.0, 1.0)), (Object)Direction.SOUTH, (Object)VoxelShapes.union(field_24414.get(Direction.SOUTH), Block.createCuboidShape(3.0, 0.0, 15.0, 13.0, 16.0, 16.0)), (Object)Direction.EAST, (Object)VoxelShapes.union(field_24414.get(Direction.EAST), Block.createCuboidShape(15.0, 0.0, 3.0, 16.0, 16.0, 13.0)), (Object)Direction.WEST, (Object)VoxelShapes.union(field_24414.get(Direction.WEST), Block.createCuboidShape(0.0, 0.0, 3.0, 1.0, 16.0, 13.0))));
     private final Map<BlockState, VoxelShape> field_24416 = Maps.newHashMap();
-    private static final Vector3f[] field_24466 = new Vector3f[16];
     private boolean wiresGivePower = true;
 
     public RedstoneWireBlock(AbstractBlock.Settings arg) {
@@ -175,14 +173,17 @@ extends Block {
     }
 
     private WireConnection method_27841(BlockView arg, BlockPos arg2, Direction arg3, boolean bl) {
-        boolean bl2;
         BlockPos lv = arg2.offset(arg3);
         BlockState lv2 = arg.getBlockState(lv);
-        if (bl && (bl2 = this.method_27937(arg, lv, lv2)) && RedstoneWireBlock.connectsTo(arg.getBlockState(lv.up()))) {
-            if (lv2.isSideSolidFullSquare(arg, lv, arg3.getOpposite())) {
-                return WireConnection.UP;
+        if (bl) {
+            boolean bl2;
+            boolean bl3 = bl2 = lv2.isSideSolidFullSquare(arg, lv, Direction.UP) || lv2.isOf(Blocks.HOPPER);
+            if (bl2 && RedstoneWireBlock.connectsTo(arg.getBlockState(lv.up()))) {
+                if (lv2.isFullCube(arg, lv)) {
+                    return WireConnection.UP;
+                }
+                return WireConnection.SIDE;
             }
-            return WireConnection.SIDE;
         }
         if (RedstoneWireBlock.connectsTo(lv2, arg3) || !lv2.isSolidBlock(arg, lv) && RedstoneWireBlock.connectsTo(arg.getBlockState(lv.down()))) {
             return WireConnection.SIDE;
@@ -194,11 +195,7 @@ extends Block {
     public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
         BlockPos lv = arg3.down();
         BlockState lv2 = arg2.getBlockState(lv);
-        return this.method_27937(arg2, lv, lv2);
-    }
-
-    private boolean method_27937(BlockView arg, BlockPos arg2, BlockState arg3) {
-        return arg3.isSideSolidFullSquare(arg, arg2, Direction.UP) || arg3.isOf(Blocks.HOPPER);
+        return lv2.isSideSolidFullSquare(arg2, lv, Direction.UP) || lv2.isOf(Blocks.HOPPER);
     }
 
     private void update(World arg, BlockPos arg2, BlockState arg3) {
@@ -357,22 +354,23 @@ extends Block {
 
     @Environment(value=EnvType.CLIENT)
     public static int getWireColor(int i) {
-        Vector3f lv = field_24466[i];
-        return MathHelper.packRgb(lv.getX(), lv.getY(), lv.getZ());
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    private void method_27936(World arg, Random random, BlockPos arg2, Vector3f arg3, Direction arg4, Direction arg5, float f, float g) {
-        float h = g - f;
-        if (random.nextFloat() >= 0.2f * h) {
-            return;
+        float f = (float)i / 15.0f;
+        float g = f * 0.6f + 0.4f;
+        if (i == 0) {
+            g = 0.3f;
         }
-        float i = 0.4375f;
-        float j = f + h * random.nextFloat();
-        float k = 0.5f + 0.4375f * (float)arg4.getOffsetX() + j * (float)arg5.getOffsetX();
-        float l = 0.5f + 0.4375f * (float)arg4.getOffsetY() + j * (float)arg5.getOffsetY();
-        float m = 0.5f + 0.4375f * (float)arg4.getOffsetZ() + j * (float)arg5.getOffsetZ();
-        arg.addParticle(new DustParticleEffect(arg3.getX(), arg3.getY(), arg3.getZ(), 1.0f), (float)arg2.getX() + k, (float)arg2.getY() + l, (float)arg2.getZ() + m, 0.0, 0.0, 0.0);
+        float h = f * f * 0.7f - 0.5f;
+        float j = f * f * 0.6f - 0.7f;
+        if (h < 0.0f) {
+            h = 0.0f;
+        }
+        if (j < 0.0f) {
+            j = 0.0f;
+        }
+        int k = MathHelper.clamp((int)(g * 255.0f), 0, 255);
+        int l = MathHelper.clamp((int)(h * 255.0f), 0, 255);
+        int m = MathHelper.clamp((int)(j * 255.0f), 0, 255);
+        return 0xFF000000 | k << 16 | l << 8 | m;
     }
 
     @Override
@@ -382,19 +380,14 @@ extends Block {
         if (i == 0) {
             return;
         }
-        block4: for (Direction lv : Direction.Type.HORIZONTAL) {
-            WireConnection lv2 = (WireConnection)arg.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(lv));
-            switch (lv2) {
-                case UP: {
-                    this.method_27936(arg2, random, arg3, field_24466[i], lv, Direction.UP, -0.5f, 0.5f);
-                }
-                case SIDE: {
-                    this.method_27936(arg2, random, arg3, field_24466[i], Direction.DOWN, lv, 0.0f, 0.5f);
-                    continue block4;
-                }
-            }
-            this.method_27936(arg2, random, arg3, field_24466[i], Direction.DOWN, lv, 0.0f, 0.3f);
-        }
+        double d = (double)arg3.getX() + 0.5 + ((double)random.nextFloat() - 0.5) * 0.2;
+        double e = (float)arg3.getY() + 0.0625f;
+        double f = (double)arg3.getZ() + 0.5 + ((double)random.nextFloat() - 0.5) * 0.2;
+        float g = (float)i / 15.0f;
+        float h = g * 0.6f + 0.4f;
+        float j = Math.max(0.0f, g * g * 0.7f - 0.5f);
+        float k = Math.max(0.0f, g * g * 0.6f - 0.7f);
+        arg2.addParticle(new DustParticleEffect(h, j, k, 1.0f), d, e, f, 0.0, 0.0, 0.0);
     }
 
     @Override
@@ -429,16 +422,6 @@ extends Block {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
         arg.add(WIRE_CONNECTION_NORTH, WIRE_CONNECTION_EAST, WIRE_CONNECTION_SOUTH, WIRE_CONNECTION_WEST, POWER);
-    }
-
-    static {
-        for (int i = 0; i <= 15; ++i) {
-            float f;
-            float g = f * 0.6f + ((f = (float)i / 15.0f) > 0.0f ? 0.4f : 0.3f);
-            float h = MathHelper.clamp(f * f * 0.7f - 0.5f, 0.0f, 1.0f);
-            float j = MathHelper.clamp(f * f * 0.6f - 0.7f, 0.0f, 1.0f);
-            RedstoneWireBlock.field_24466[i] = new Vector3f(g, h, j);
-        }
     }
 }
 

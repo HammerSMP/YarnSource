@@ -43,15 +43,11 @@ extends Task<MobEntity> {
     protected boolean shouldRun(ServerWorld arg, MobEntity arg2) {
         Brain<?> lv = arg2.getBrain();
         WalkTarget lv2 = lv.getOptionalMemory(MemoryModuleType.WALK_TARGET).get();
-        boolean bl = this.hasReached(arg2, lv2);
-        if (!bl && this.hasFinishedPath(arg2, lv2, arg.getTime())) {
+        if (!this.hasReached(arg2, lv2) && this.hasFinishedPath(arg2, lv2, arg.getTime())) {
             this.lookTargetPos = lv2.getLookTarget().getBlockPos();
             return true;
         }
         lv.forget(MemoryModuleType.WALK_TARGET);
-        if (bl) {
-            lv.forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
-        }
         return false;
     }
 

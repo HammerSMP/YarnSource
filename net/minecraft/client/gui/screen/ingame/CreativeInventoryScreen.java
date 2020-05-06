@@ -582,11 +582,11 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             }
             this.searchResultTags.forEach((arg2, arg3) -> {
                 if (arg3.contains(lv)) {
-                    list2.add(1, new LiteralText("#" + arg2).formatted(Formatting.DARK_PURPLE));
+                    list2.add(1, new LiteralText("#" + arg2).formatted(Formatting.BOLD, Formatting.DARK_PURPLE));
                 }
             });
             if (lv2 != null) {
-                list2.add(1, new TranslatableText(lv2.getTranslationKey()).formatted(Formatting.BLUE));
+                list2.add(1, new TranslatableText(lv2.getTranslationKey()).formatted(Formatting.BOLD, Formatting.BLUE));
             }
             this.renderTooltip(arg, list2, i, j);
         } else {

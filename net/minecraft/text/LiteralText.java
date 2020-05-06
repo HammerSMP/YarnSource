@@ -27,9 +27,7 @@ extends BaseText {
 
     @Override
     public LiteralText copy() {
-        LiteralText lv = new LiteralText(this.string);
-        lv.setStyle(this.getStyle());
-        return lv;
+        return new LiteralText(this.string);
     }
 
     @Override

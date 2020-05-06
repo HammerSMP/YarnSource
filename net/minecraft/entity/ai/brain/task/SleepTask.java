@@ -38,7 +38,6 @@ extends Task<LivingEntity> {
 
     @Override
     protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        long l;
         if (arg2.hasVehicle()) {
             return false;
         }
@@ -48,7 +47,7 @@ extends Task<LivingEntity> {
             return false;
         }
         Optional<Timestamp> optional = lv.getOptionalMemory(MemoryModuleType.LAST_WOKEN);
-        if (optional.isPresent() && (l = arg.getTime() - optional.get().getTime()) > 0L && l < 100L) {
+        if (optional.isPresent() && arg.getTime() - optional.get().getTime() < 100L) {
             return false;
         }
         BlockState lv3 = arg.getBlockState(lv2.getPos());

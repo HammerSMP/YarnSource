@@ -618,10 +618,10 @@ extends LivingEntity {
             int i;
             int j;
             double d = lv.squaredDistanceTo(this);
-            if (d > (double)(j = (i = this.getType().getCategory().method_27919()) * i) && this.canImmediatelyDespawn(d)) {
+            if (d > (double)(j = (i = this.getType().getImmediateDespawnRange()) * i) && this.canImmediatelyDespawn(d)) {
                 this.remove();
             }
-            int k = this.getType().getCategory().method_27920();
+            int k = this.getType().getDespawnStartRange();
             int l = k * k;
             if (this.despawnCounter > 600 && this.random.nextInt(800) == 0 && d > (double)l && this.canImmediatelyDespawn(d)) {
                 this.remove();

@@ -18,8 +18,8 @@ import net.minecraft.util.math.Vec3d;
 
 public class WanderAroundPointOfInterestGoal
 extends WanderAroundGoal {
-    public WanderAroundPointOfInterestGoal(MobEntityWithAi arg, double d, boolean bl) {
-        super(arg, d, 10, bl);
+    public WanderAroundPointOfInterestGoal(MobEntityWithAi arg, double d) {
+        super(arg, d, 10);
     }
 
     @Override

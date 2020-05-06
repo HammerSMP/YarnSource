@@ -477,7 +477,6 @@ extends ProjectileEntity {
         return lv instanceof PlayerEntity ? (PlayerEntity)lv : null;
     }
 
-    @Nullable
     public Entity getHookedEntity() {
         return this.hookedEntity;
     }

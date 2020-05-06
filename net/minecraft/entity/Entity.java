@@ -2,9 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Sets
+ *  com.google.common.collect.UnmodifiableIterator
  *  it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap
  *  it.unimi.dsi.fastutil.objects.Object2DoubleMap
  *  javax.annotation.Nullable
@@ -15,9 +18,12 @@
  */
 package net.minecraft.entity;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.collect.UnmodifiableIterator;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import java.util.Arrays;
@@ -44,6 +50,7 @@ import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.HoneyBlock;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
@@ -133,6 +140,7 @@ CommandOutput {
     protected static final Logger LOGGER = LogManager.getLogger();
     private static final AtomicInteger MAX_ENTITY_ID = new AtomicInteger();
     private static final List<ItemStack> EMPTY_STACK_LIST = Collections.emptyList();
+    private static final ImmutableMap<EntityPose, ImmutableList<Integer>> POSE_HEIGHTS = ImmutableMap.of((Object)((Object)EntityPose.STANDING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.CROUCHING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.SWIMMING), (Object)ImmutableList.of((Object)0, (Object)1));
     private static final Box NULL_BOX = new Box(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     private static double renderDistanceMultiplier = 1.0;
     private final EntityType<?> type;
@@ -2418,8 +2426,51 @@ CommandOutput {
         return new Vec3d((double)h * g / (double)j, 0.0, (double)i * g / (double)j);
     }
 
-    public Vec3d method_24829(LivingEntity arg) {
-        return new Vec3d(this.getX(), this.getBoundingBox().y2, this.getZ());
+    public Vec3d method_24829(LivingEntity arg2) {
+        Direction lv = this.getMovementDirection();
+        if (lv.getAxis() == Direction.Axis.Y) {
+            return new Vec3d(this.getX(), this.getBoundingBox().y2, this.getZ());
+        }
+        Direction lv2 = lv.rotateYClockwise();
+        int[][] is = new int[][]{{lv2.getOffsetX(), lv2.getOffsetZ()}, {-lv2.getOffsetX(), -lv2.getOffsetZ()}, {-lv.getOffsetX() + lv2.getOffsetX(), -lv.getOffsetZ() + lv2.getOffsetZ()}, {-lv.getOffsetX() - lv2.getOffsetX(), -lv.getOffsetZ() - lv2.getOffsetZ()}, {lv.getOffsetX() + lv2.getOffsetX(), lv.getOffsetZ() + lv2.getOffsetZ()}, {lv.getOffsetX() - lv2.getOffsetX(), lv.getOffsetZ() - lv2.getOffsetZ()}, {-lv.getOffsetX(), -lv.getOffsetZ()}, {lv.getOffsetX(), lv.getOffsetZ()}};
+        BlockPos lv3 = this.getBlockPos();
+        BlockPos.Mutable lv4 = new BlockPos.Mutable();
+        ImmutableList<EntityPose> immutableList = arg2.getPoses();
+        for (EntityPose lv5 : immutableList) {
+            EntityDimensions lv6 = arg2.getDimensions(lv5);
+            float f = Math.min(lv6.width, 1.0f) / 2.0f;
+            float g = 0.5f - f;
+            float h = 0.5f + f;
+            UnmodifiableIterator unmodifiableIterator = ((ImmutableList)POSE_HEIGHTS.get((Object)lv5)).iterator();
+            while (unmodifiableIterator.hasNext()) {
+                int i = (Integer)unmodifiableIterator.next();
+                for (int[] js : is) {
+                    lv4.set(lv3.getX() + js[0], lv3.getY() + i, lv3.getZ() + js[1]);
+                    double d = this.world.method_26097(lv4, arg -> {
+                        if (arg.isIn(BlockTags.CLIMBABLE)) {
+                            return true;
+                        }
+                        return arg.getBlock() instanceof TrapdoorBlock && arg.get(TrapdoorBlock.OPEN) != false;
+                    });
+                    if (Double.isInfinite(d) || d >= 1.0) continue;
+                    double e = (double)lv4.getY() + d;
+                    Box lv7 = new Box((float)lv4.getX() + g, e, (float)lv4.getZ() + g, (float)lv4.getX() + h, e + (double)lv6.height, (float)lv4.getZ() + h);
+                    if (!this.world.getBlockCollisions(arg2, lv7).allMatch(VoxelShape::isEmpty)) continue;
+                    arg2.setPose(lv5);
+                    return Vec3d.method_26410(lv4, d);
+                }
+            }
+        }
+        double j = this.getBoundingBox().y2;
+        lv4.set((double)lv3.getX(), j, (double)lv3.getZ());
+        for (EntityPose lv8 : immutableList) {
+            double k = arg2.getDimensions((EntityPose)lv8).height;
+            double l = (double)lv4.getY() + this.world.method_26096(lv4, j - (double)lv4.getY() + k);
+            if (!(j + k <= l)) continue;
+            arg2.setPose(lv8);
+            break;
+        }
+        return new Vec3d(this.getX(), j, this.getZ());
     }
 
     @Nullable

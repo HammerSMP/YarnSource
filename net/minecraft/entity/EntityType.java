@@ -168,7 +168,7 @@ public class EntityType<T extends Entity> {
     public static final EntityType<CatEntity> CAT = EntityType.register("cat", Builder.create(CatEntity::new, EntityCategory.CREATURE).setDimensions(0.6f, 0.7f).maxTrackingRange(8));
     public static final EntityType<CaveSpiderEntity> CAVE_SPIDER = EntityType.register("cave_spider", Builder.create(CaveSpiderEntity::new, EntityCategory.MONSTER).setDimensions(0.7f, 0.5f).maxTrackingRange(8));
     public static final EntityType<ChickenEntity> CHICKEN = EntityType.register("chicken", Builder.create(ChickenEntity::new, EntityCategory.CREATURE).setDimensions(0.4f, 0.7f).maxTrackingRange(10));
-    public static final EntityType<CodEntity> COD = EntityType.register("cod", Builder.create(CodEntity::new, EntityCategory.WATER_AMBIENT).setDimensions(0.5f, 0.3f).maxTrackingRange(4));
+    public static final EntityType<CodEntity> COD = EntityType.register("cod", Builder.create(CodEntity::new, EntityCategory.WATER_CREATURE).setDimensions(0.5f, 0.3f).immediateDespawnRange(64).maxTrackingRange(4));
     public static final EntityType<CowEntity> COW = EntityType.register("cow", Builder.create(CowEntity::new, EntityCategory.CREATURE).setDimensions(0.9f, 1.4f).maxTrackingRange(10));
     public static final EntityType<CreeperEntity> CREEPER = EntityType.register("creeper", Builder.create(CreeperEntity::new, EntityCategory.MONSTER).setDimensions(0.6f, 1.7f).maxTrackingRange(8));
     public static final EntityType<DolphinEntity> DOLPHIN = EntityType.register("dolphin", Builder.create(DolphinEntity::new, EntityCategory.WATER_CREATURE).setDimensions(0.9f, 0.6f));
@@ -221,10 +221,10 @@ public class EntityType<T extends Entity> {
     public static final EntityType<PillagerEntity> PILLAGER = EntityType.register("pillager", Builder.create(PillagerEntity::new, EntityCategory.MONSTER).spawnableFarFromPlayer().setDimensions(0.6f, 1.95f).maxTrackingRange(8));
     public static final EntityType<PolarBearEntity> POLAR_BEAR = EntityType.register("polar_bear", Builder.create(PolarBearEntity::new, EntityCategory.CREATURE).setDimensions(1.4f, 1.4f).maxTrackingRange(10));
     public static final EntityType<TntEntity> TNT = EntityType.register("tnt", Builder.create(TntEntity::new, EntityCategory.MISC).makeFireImmune().setDimensions(0.98f, 0.98f).maxTrackingRange(10).trackingTickInterval(10));
-    public static final EntityType<PufferfishEntity> PUFFERFISH = EntityType.register("pufferfish", Builder.create(PufferfishEntity::new, EntityCategory.WATER_AMBIENT).setDimensions(0.7f, 0.7f).maxTrackingRange(4));
+    public static final EntityType<PufferfishEntity> PUFFERFISH = EntityType.register("pufferfish", Builder.create(PufferfishEntity::new, EntityCategory.WATER_CREATURE).setDimensions(0.7f, 0.7f).immediateDespawnRange(64).maxTrackingRange(4));
     public static final EntityType<RabbitEntity> RABBIT = EntityType.register("rabbit", Builder.create(RabbitEntity::new, EntityCategory.CREATURE).setDimensions(0.4f, 0.5f).maxTrackingRange(8));
     public static final EntityType<RavagerEntity> RAVAGER = EntityType.register("ravager", Builder.create(RavagerEntity::new, EntityCategory.MONSTER).setDimensions(1.95f, 2.2f).maxTrackingRange(10));
-    public static final EntityType<SalmonEntity> SALMON = EntityType.register("salmon", Builder.create(SalmonEntity::new, EntityCategory.WATER_AMBIENT).setDimensions(0.7f, 0.4f).maxTrackingRange(4));
+    public static final EntityType<SalmonEntity> SALMON = EntityType.register("salmon", Builder.create(SalmonEntity::new, EntityCategory.WATER_CREATURE).setDimensions(0.7f, 0.4f).immediateDespawnRange(64).maxTrackingRange(4));
     public static final EntityType<SheepEntity> SHEEP = EntityType.register("sheep", Builder.create(SheepEntity::new, EntityCategory.CREATURE).setDimensions(0.9f, 1.3f).maxTrackingRange(10));
     public static final EntityType<ShulkerEntity> SHULKER = EntityType.register("shulker", Builder.create(ShulkerEntity::new, EntityCategory.MONSTER).makeFireImmune().spawnableFarFromPlayer().setDimensions(1.0f, 1.0f).maxTrackingRange(10));
     public static final EntityType<ShulkerBulletEntity> SHULKER_BULLET = EntityType.register("shulker_bullet", Builder.create(ShulkerBulletEntity::new, EntityCategory.MISC).setDimensions(0.3125f, 0.3125f).maxTrackingRange(8));
@@ -246,7 +246,7 @@ public class EntityType<T extends Entity> {
     public static final EntityType<PotionEntity> POTION = EntityType.register("potion", Builder.create(PotionEntity::new, EntityCategory.MISC).setDimensions(0.25f, 0.25f).maxTrackingRange(4).trackingTickInterval(10));
     public static final EntityType<TridentEntity> TRIDENT = EntityType.register("trident", Builder.create(TridentEntity::new, EntityCategory.MISC).setDimensions(0.5f, 0.5f).maxTrackingRange(4).trackingTickInterval(20));
     public static final EntityType<TraderLlamaEntity> TRADER_LLAMA = EntityType.register("trader_llama", Builder.create(TraderLlamaEntity::new, EntityCategory.CREATURE).setDimensions(0.9f, 1.87f).maxTrackingRange(10));
-    public static final EntityType<TropicalFishEntity> TROPICAL_FISH = EntityType.register("tropical_fish", Builder.create(TropicalFishEntity::new, EntityCategory.WATER_AMBIENT).setDimensions(0.5f, 0.4f).maxTrackingRange(4));
+    public static final EntityType<TropicalFishEntity> TROPICAL_FISH = EntityType.register("tropical_fish", Builder.create(TropicalFishEntity::new, EntityCategory.WATER_CREATURE).setDimensions(0.5f, 0.4f).immediateDespawnRange(64).maxTrackingRange(4));
     public static final EntityType<TurtleEntity> TURTLE = EntityType.register("turtle", Builder.create(TurtleEntity::new, EntityCategory.CREATURE).setDimensions(1.2f, 0.4f).maxTrackingRange(10));
     public static final EntityType<VexEntity> VEX = EntityType.register("vex", Builder.create(VexEntity::new, EntityCategory.MONSTER).makeFireImmune().setDimensions(0.4f, 0.8f).maxTrackingRange(8));
     public static final EntityType<VillagerEntity> VILLAGER = EntityType.register("villager", Builder.create(VillagerEntity::new, EntityCategory.MISC).setDimensions(0.6f, 1.95f).maxTrackingRange(10));
@@ -271,6 +271,8 @@ public class EntityType<T extends Entity> {
     private final boolean summonable;
     private final boolean fireImmune;
     private final boolean spawnableFarFromPlayer;
+    private final int immediateDespawnRange;
+    private final int despawnStartRange;
     private final int maxTrackDistance;
     private final int trackTickInterval;
     @Nullable
@@ -293,16 +295,18 @@ public class EntityType<T extends Entity> {
         return Registry.ENTITY_TYPE.getOrEmpty(Identifier.tryParse(string));
     }
 
-    public EntityType(EntityFactory<T> arg, EntityCategory arg2, boolean bl, boolean bl2, boolean bl3, boolean bl4, EntityDimensions arg3, int i, int j) {
+    public EntityType(EntityFactory<T> arg, EntityCategory arg2, boolean bl, boolean bl2, boolean bl3, boolean bl4, int i, int j, EntityDimensions arg3, int k, int l) {
         this.factory = arg;
         this.category = arg2;
         this.spawnableFarFromPlayer = bl4;
+        this.immediateDespawnRange = i;
+        this.despawnStartRange = j;
         this.saveable = bl;
         this.summonable = bl2;
         this.fireImmune = bl3;
         this.dimensions = arg3;
-        this.maxTrackDistance = i;
-        this.trackTickInterval = j;
+        this.maxTrackDistance = k;
+        this.trackTickInterval = l;
     }
 
     @Nullable
@@ -386,6 +390,14 @@ public class EntityType<T extends Entity> {
 
     public boolean isSpawnableFarFromPlayer() {
         return this.spawnableFarFromPlayer;
+    }
+
+    public int getImmediateDespawnRange() {
+        return this.immediateDespawnRange;
+    }
+
+    public int getDespawnStartRange() {
+        return this.despawnStartRange;
     }
 
     public EntityCategory getCategory() {
@@ -508,6 +520,8 @@ public class EntityType<T extends Entity> {
         private boolean summonable = true;
         private boolean fireImmune;
         private boolean spawnableFarFromPlayer;
+        private int immediateDespawnRange = 128;
+        private int despawnStartRange = 32;
         private int maxTrackingRange = 5;
         private int trackingTickInterval = 3;
         private EntityDimensions dimensions = EntityDimensions.changing(0.6f, 1.8f);
@@ -551,6 +565,11 @@ public class EntityType<T extends Entity> {
             return this;
         }
 
+        public Builder<T> immediateDespawnRange(int i) {
+            this.immediateDespawnRange = i;
+            return this;
+        }
+
         public Builder<T> maxTrackingRange(int i) {
             this.maxTrackingRange = i;
             return this;
@@ -573,7 +592,7 @@ public class EntityType<T extends Entity> {
                     LOGGER.warn("No data fixer registered for entity {}", (Object)string);
                 }
             }
-            return new EntityType<T>(this.factory, this.category, this.saveable, this.summonable, this.fireImmune, this.spawnableFarFromPlayer, this.dimensions, this.maxTrackingRange, this.trackingTickInterval);
+            return new EntityType<T>(this.factory, this.category, this.saveable, this.summonable, this.fireImmune, this.spawnableFarFromPlayer, this.immediateDespawnRange, this.despawnStartRange, this.dimensions, this.maxTrackingRange, this.trackingTickInterval);
         }
     }
 }
