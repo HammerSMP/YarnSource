@@ -316,7 +316,8 @@ extends AbstractListTag<Tag> {
         return lv2;
     }
 
-    public int getElementType() {
+    @Override
+    public byte getElementType() {
         return this.type;
     }
 

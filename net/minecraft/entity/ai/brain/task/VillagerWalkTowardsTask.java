@@ -55,7 +55,7 @@ extends Task<VillagerEntity> {
                 int i;
                 Vec3d lv = null;
                 int j = 1000;
-                for (i = 0; i < 1000 && (lv == null || this.exceedsMaxRange(arg, arg2, GlobalPos.create(arg2.dimension, new BlockPos(lv)))); ++i) {
+                for (i = 0; i < 1000 && (lv == null || this.exceedsMaxRange(arg, arg2, GlobalPos.create(arg.method_27983(), new BlockPos(lv)))); ++i) {
                     lv = TargetFinder.findTargetTowards(arg2, 15, 7, Vec3d.ofBottomCenter(arg4.getPos()));
                 }
                 if (i == 1000) {

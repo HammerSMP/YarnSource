@@ -23,6 +23,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MaterialColor;
+import net.minecraft.class_5321;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -82,7 +83,7 @@ extends NetworkSyncedItem {
         return lv != null && lv.contains("map", 99) ? lv.getInt("map") : 0;
     }
 
-    private static MapState createMapState(ItemStack arg, World arg2, int i, int j, int k, boolean bl, boolean bl2, DimensionType arg3) {
+    private static MapState createMapState(ItemStack arg, World arg2, int i, int j, int k, boolean bl, boolean bl2, class_5321<DimensionType> arg3) {
         int l = arg2.getNextMapId();
         MapState lv = new MapState(FilledMapItem.getMapName(l));
         lv.init(i, j, k, bl, bl2, arg3);
@@ -105,7 +106,7 @@ extends NetworkSyncedItem {
         int l = MathHelper.floor(arg2.getX() - (double)j) / i + 64;
         int m = MathHelper.floor(arg2.getZ() - (double)k) / i + 64;
         int n = 128 / i;
-        if (arg.method_27983().method_27998()) {
+        if (arg.getDimension().method_27998()) {
             n /= 2;
         }
         MapState.PlayerUpdateTracker lv = arg3.getPlayerSyncData((PlayerEntity)arg2);
@@ -133,7 +134,7 @@ extends NetworkSyncedItem {
                 int v = t & 0xF;
                 int w = 0;
                 double e = 0.0;
-                if (arg.method_27983().method_27998()) {
+                if (arg.getDimension().method_27998()) {
                     int x = s + t * 231871;
                     if (((x = x * x * 31287121 + x * 11) >> 20 & 1) == 0) {
                         multiset.add((Object)Blocks.DIRT.getDefaultState().getTopMaterialColor(arg, BlockPos.ORIGIN), 10);

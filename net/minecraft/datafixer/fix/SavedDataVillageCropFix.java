@@ -3,16 +3,16 @@
  * 
  * Could not load the following classes:
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import java.util.stream.Stream;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.BlockStateFlattening;
@@ -32,7 +32,7 @@ extends DataFix {
     }
 
     private static <T> Dynamic<T> method_5157(Dynamic<T> dynamic) {
-        return dynamic.asStreamOpt().map(SavedDataVillageCropFix::fixVillageChildren).map(dynamic::createList).orElse(dynamic);
+        return dynamic.asStreamOpt().map(SavedDataVillageCropFix::fixVillageChildren).map(dynamic::createList).result().orElse(dynamic);
     }
 
     private static Stream<? extends Dynamic<?>> fixVillageChildren(Stream<? extends Dynamic<?>> stream) {
@@ -61,7 +61,7 @@ extends DataFix {
     }
 
     private static <T> Dynamic<T> fixCropId(Dynamic<T> dynamic, String string) {
-        if (dynamic.get(string).asNumber().isPresent()) {
+        if (dynamic.get(string).asNumber().result().isPresent()) {
             return dynamic.set(string, BlockStateFlattening.lookupState(dynamic.get(string).asInt(0) << 4));
         }
         return dynamic;

@@ -5,7 +5,6 @@
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
  *  com.mojang.datafixers.DataFixUtils
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
@@ -13,13 +12,13 @@
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.types.templates.List$ListType
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.DataFixUtils;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
@@ -27,6 +26,7 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.List;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.List;
 import java.util.stream.LongStream;
 import net.minecraft.datafixer.TypeReferences;

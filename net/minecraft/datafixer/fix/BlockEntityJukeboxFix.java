@@ -3,21 +3,22 @@
  * 
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
-import java.util.Optional;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.ChoiceFix;
 import net.minecraft.datafixer.fix.ItemIdFix;
@@ -43,7 +44,7 @@ extends ChoiceFix {
                 Dynamic dynamic2 = dynamic.emptyMap();
                 dynamic2 = dynamic2.set("id", dynamic2.createString(string));
                 dynamic2 = dynamic2.set("Count", dynamic2.createByte((byte)1));
-                return typed.set(opticFinder, (Typed)((Optional)type2.readTyped(dynamic2).getSecond()).orElseThrow(() -> new IllegalStateException("Could not create record item stack."))).set(DSL.remainderFinder(), (Object)dynamic);
+                return typed.set(opticFinder, (Typed)((Pair)type2.readTyped(dynamic2).result().orElseThrow(() -> new IllegalStateException("Could not create record item stack."))).getFirst()).set(DSL.remainderFinder(), (Object)dynamic);
             }
         }
         return typed;

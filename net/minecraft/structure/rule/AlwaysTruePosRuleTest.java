@@ -2,13 +2,11 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.structure.rule;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.Random;
 import net.minecraft.structure.rule.PosRuleTest;
 import net.minecraft.structure.rule.PosRuleTestType;
@@ -16,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class AlwaysTruePosRuleTest
 extends PosRuleTest {
+    public static final Codec<AlwaysTruePosRuleTest> field_25006 = Codec.unit(() -> INSTANCE);
     public static final AlwaysTruePosRuleTest INSTANCE = new AlwaysTruePosRuleTest();
 
     private AlwaysTruePosRuleTest() {
@@ -27,13 +26,8 @@ extends PosRuleTest {
     }
 
     @Override
-    protected PosRuleTestType getType() {
+    protected PosRuleTestType<?> getType() {
         return PosRuleTestType.ALWAYS_TRUE;
-    }
-
-    @Override
-    protected <T> Dynamic<T> serializeContents(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.emptyMap());
     }
 }
 

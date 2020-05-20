@@ -2,20 +2,22 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class CountDepthDecoratorConfig
 implements DecoratorConfig {
+    public static final Codec<CountDepthDecoratorConfig> field_24982 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.INT.fieldOf("baseline").forGetter(arg -> arg.baseline), (App)Codec.INT.fieldOf("spread").forGetter(arg -> arg.spread)).apply((Applicative)instance, CountDepthDecoratorConfig::new));
     public final int count;
     public final int baseline;
     public final int spread;
@@ -24,18 +26,6 @@ implements DecoratorConfig {
         this.count = i;
         this.baseline = j;
         this.spread = k;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("count"), (Object)dynamicOps.createInt(this.count), (Object)dynamicOps.createString("baseline"), (Object)dynamicOps.createInt(this.baseline), (Object)dynamicOps.createString("spread"), (Object)dynamicOps.createInt(this.spread))));
-    }
-
-    public static CountDepthDecoratorConfig deserialize(Dynamic<?> dynamic) {
-        int i = dynamic.get("count").asInt(0);
-        int j = dynamic.get("baseline").asInt(0);
-        int k = dynamic.get("spread").asInt(0);
-        return new CountDepthDecoratorConfig(i, j, k);
     }
 }
 

@@ -4,27 +4,28 @@
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class ItemWaterPotionFix
 extends DataFix {
@@ -34,7 +35,7 @@ extends DataFix {
 
     public TypeRewriteRule makeRule() {
         Type type = this.getInputSchema().getType(TypeReferences.ITEM_STACK);
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), (Type)DSL.namespacedString()));
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
         OpticFinder opticFinder2 = type.findField("tag");
         return this.fixTypeEverywhereTyped("ItemWaterPotionFix", type, typed -> {
             String string;
@@ -42,7 +43,7 @@ extends DataFix {
             if (optional.isPresent() && ("minecraft:potion".equals(string = (String)((Pair)optional.get()).getSecond()) || "minecraft:splash_potion".equals(string) || "minecraft:lingering_potion".equals(string) || "minecraft:tipped_arrow".equals(string))) {
                 Typed typed2 = typed.getOrCreateTyped(opticFinder2);
                 Dynamic dynamic = (Dynamic)typed2.get(DSL.remainderFinder());
-                if (!dynamic.get("Potion").asString().isPresent()) {
+                if (!dynamic.get("Potion").asString().result().isPresent()) {
                     dynamic = dynamic.set("Potion", dynamic.createString("minecraft:water"));
                 }
                 return typed.set(opticFinder2, typed2.set(DSL.remainderFinder(), (Object)dynamic));

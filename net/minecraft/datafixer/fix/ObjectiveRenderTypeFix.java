@@ -36,7 +36,7 @@ extends DataFix {
             throw new IllegalStateException("Objective type is not what was expected.");
         }
         return this.fixTypeEverywhere("ObjectiveRenderTypeFix", type, dynamicOps -> pair -> pair.mapSecond(dynamic -> {
-            Optional optional = dynamic.get("RenderType").asString();
+            Optional optional = dynamic.get("RenderType").asString().result();
             if (!optional.isPresent()) {
                 String string = dynamic.get("CriteriaName").asString("");
                 ScoreboardCriterion.RenderType lv = ObjectiveRenderTypeFix.parseLegacyRenderType(string);

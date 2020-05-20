@@ -4,13 +4,13 @@
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Sets
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -46,8 +45,8 @@ import net.minecraft.world.gen.foliage.FoliagePlacer;
 
 public class TreeFeature
 extends Feature<TreeFeatureConfig> {
-    public TreeFeature(Function<Dynamic<?>, ? extends TreeFeatureConfig> function) {
-        super(function);
+    public TreeFeature(Codec<TreeFeatureConfig> codec) {
+        super(codec);
     }
 
     public static boolean canTreeReplace(TestableWorld arg2, BlockPos arg22) {
@@ -190,7 +189,7 @@ extends Feature<TreeFeatureConfig> {
             for (Direction lv5 : Direction.values()) {
                 BlockState lv6;
                 lv2.set(lv4, lv5);
-                if (set.contains(lv2) || !(lv6 = arg.getBlockState(lv2)).contains(Properties.DISTANCE_1_7)) continue;
+                if (set.contains(lv2) || !(lv6 = arg.getBlockState(lv2)).method_28498(Properties.DISTANCE_1_7)) continue;
                 ((Set)list.get(0)).add(lv2.toImmutable());
                 TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, lv2, (BlockState)lv6.with(Properties.DISTANCE_1_7, 1));
                 if (!arg2.contains(lv2)) continue;
@@ -208,7 +207,7 @@ extends Feature<TreeFeatureConfig> {
                     int l;
                     BlockState lv9;
                     lv2.set(lv7, lv8);
-                    if (set3.contains(lv2) || set4.contains(lv2) || !(lv9 = arg.getBlockState(lv2)).contains(Properties.DISTANCE_1_7) || (l = lv9.get(Properties.DISTANCE_1_7).intValue()) <= k + 1) continue;
+                    if (set3.contains(lv2) || set4.contains(lv2) || !(lv9 = arg.getBlockState(lv2)).method_28498(Properties.DISTANCE_1_7) || (l = lv9.get(Properties.DISTANCE_1_7).intValue()) <= k + 1) continue;
                     BlockState lv10 = (BlockState)lv9.with(Properties.DISTANCE_1_7, k + 1);
                     TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, lv2, lv10);
                     if (arg2.contains(lv2)) {

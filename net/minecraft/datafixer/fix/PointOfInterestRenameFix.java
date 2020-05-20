@@ -5,20 +5,20 @@
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
  *  com.mojang.datafixers.DataFixUtils
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.DataFixUtils;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import com.mojang.serialization.Dynamic;
 import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
@@ -42,7 +42,7 @@ extends DataFix {
     }
 
     private <T> Optional<Dynamic<T>> method_23304(Dynamic<T> dynamic) {
-        return dynamic.asStreamOpt().map(stream -> dynamic.createList(stream.map(dynamic2 -> dynamic2.update("type", dynamic -> (Dynamic)DataFixUtils.orElse(dynamic.asString().map(this::rename).map(((Dynamic)dynamic)::createString), (Object)dynamic)))));
+        return dynamic.asStreamOpt().map(stream -> dynamic.createList(stream.map(dynamic2 -> dynamic2.update("type", dynamic -> (Dynamic)DataFixUtils.orElse((Optional)dynamic.asString().map(this::rename).map(((Dynamic)dynamic)::createString).result(), (Object)dynamic))))).result();
     }
 
     protected abstract String rename(String var1);

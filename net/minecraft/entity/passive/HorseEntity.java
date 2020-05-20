@@ -160,6 +160,12 @@ extends HorseBaseEntity {
     }
 
     @Override
+    @Nullable
+    protected SoundEvent method_28368() {
+        return SoundEvents.ENTITY_HORSE_EAT;
+    }
+
+    @Override
     protected SoundEvent getHurtSound(DamageSource arg) {
         super.getHurtSound(arg);
         return SoundEvents.ENTITY_HORSE_HURT;

@@ -2,39 +2,29 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class EmeraldOreFeatureConfig
 implements FeatureConfig {
+    public static final Codec<EmeraldOreFeatureConfig> field_24904 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state)).apply((Applicative)instance, EmeraldOreFeatureConfig::new));
     public final BlockState target;
     public final BlockState state;
 
     public EmeraldOreFeatureConfig(BlockState arg, BlockState arg2) {
         this.target = arg;
         this.state = arg2;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("target"), (Object)BlockState.serialize(dynamicOps, this.target).getValue(), (Object)dynamicOps.createString("state"), (Object)BlockState.serialize(dynamicOps, this.state).getValue())));
-    }
-
-    public static <T> EmeraldOreFeatureConfig deserialize(Dynamic<T> dynamic) {
-        BlockState lv = dynamic.get("target").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        BlockState lv2 = dynamic.get("state").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        return new EmeraldOreFeatureConfig(lv, lv2);
     }
 }
 

@@ -98,7 +98,7 @@ extends Item {
     }
 
     private static void sendMessage(PlayerEntity arg, Text arg2) {
-        ((ServerPlayerEntity)arg).sendMessage(arg2, MessageType.GAME_INFO);
+        ((ServerPlayerEntity)arg).sendMessage(arg2, MessageType.GAME_INFO, Util.field_25140);
     }
 
     private static <T extends Comparable<T>> String getValueString(BlockState arg, Property<T> arg2) {

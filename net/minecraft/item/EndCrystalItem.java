@@ -12,11 +12,11 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.TheEndDimension;
 
 public class EndCrystalItem
 extends Item {
@@ -43,12 +43,12 @@ extends Item {
         if (!list.isEmpty()) {
             return ActionResult.FAIL;
         }
-        if (!lv.isClient) {
+        if (lv instanceof ServerWorld) {
             EndCrystalEntity lv5 = new EndCrystalEntity(lv, d + 0.5, e, f + 0.5);
             lv5.setShowBottom(false);
             lv.spawnEntity(lv5);
-            if (lv.getDimension() instanceof TheEndDimension) {
-                EnderDragonFight lv6 = ((TheEndDimension)lv.getDimension()).getEnderDragonFight();
+            EnderDragonFight lv6 = ((ServerWorld)lv).method_29198();
+            if (lv6 != null) {
                 lv6.respawnDragon();
             }
         }

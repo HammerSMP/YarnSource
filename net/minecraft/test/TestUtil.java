@@ -146,7 +146,7 @@ public class TestUtil {
     }
 
     private static void sendMessage(ServerWorld arg3, Formatting arg22, String string) {
-        arg3.getPlayers(arg -> true).forEach(arg2 -> arg2.sendSystemMessage(new LiteralText(string).formatted(arg22)));
+        arg3.getPlayers(arg -> true).forEach(arg2 -> arg2.sendSystemMessage(new LiteralText(string).formatted(arg22), Util.field_25140));
     }
 
     public static void clearDebugMarkers(ServerWorld arg) {

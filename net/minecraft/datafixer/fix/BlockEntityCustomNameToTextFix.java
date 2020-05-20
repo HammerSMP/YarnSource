@@ -7,7 +7,6 @@
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
- *  com.mojang.datafixers.types.Type
  */
 package net.minecraft.datafixer.fix;
 
@@ -16,11 +15,11 @@ import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
-import com.mojang.datafixers.types.Type;
 import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.EntityCustomNameToTextFix;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class BlockEntityCustomNameToTextFix
 extends DataFix {
@@ -29,7 +28,7 @@ extends DataFix {
     }
 
     public TypeRewriteRule makeRule() {
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.namespacedString());
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", IdentifierNormalizingSchema.method_28295());
         return this.fixTypeEverywhereTyped("BlockEntityCustomNameToComponentFix", this.getInputSchema().getType(TypeReferences.BLOCK_ENTITY), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
             Optional optional = typed.getOptional(opticFinder);
             if (optional.isPresent() && Objects.equals(optional.get(), "minecraft:command_block")) {

@@ -50,7 +50,7 @@ public class ChunkStatus {
     public static final ChunkStatus STRUCTURE_STARTS = ChunkStatus.register("structure_starts", EMPTY, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ChunkStatus arg, ServerWorld arg2, ChunkGenerator arg3, StructureManager arg4, ServerLightingProvider arg5, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> list, Chunk arg6) -> {
         if (!arg6.getStatus().isAtLeast(arg)) {
             if (arg2.getServer().method_27728().method_28057().method_28029()) {
-                arg3.setStructureStarts(arg2.getStructureAccessor(), arg2.getBiomeAccess().withSource(arg3.getBiomeSource()), arg6, arg3, arg4, arg2.getSeed());
+                arg3.setStructureStarts(arg2.getStructureAccessor(), arg6, arg4, arg2.getSeed());
             }
             if (arg6 instanceof ProtoChunk) {
                 ((ProtoChunk)arg6).setStatus(arg);
@@ -62,8 +62,8 @@ public class ChunkStatus {
     public static final ChunkStatus BIOMES = ChunkStatus.register("biomes", STRUCTURE_REFERENCES, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.populateBiomes(arg3));
     public static final ChunkStatus NOISE = ChunkStatus.register("noise", BIOMES, 8, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.populateNoise(new ChunkRegion(arg, list), arg.getStructureAccessor(), arg3));
     public static final ChunkStatus SURFACE = ChunkStatus.register("surface", NOISE, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.buildSurface(new ChunkRegion(arg, list), arg3));
-    public static final ChunkStatus CARVERS = ChunkStatus.register("carvers", SURFACE, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.carve(arg.getSeed(), arg.getBiomeAccess().withSource(arg2.getBiomeSource()), arg3, GenerationStep.Carver.AIR));
-    public static final ChunkStatus LIQUID_CARVERS = ChunkStatus.register("liquid_carvers", CARVERS, 0, POST_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.carve(arg.getSeed(), arg.getBiomeAccess().withSource(arg2.getBiomeSource()), arg3, GenerationStep.Carver.LIQUID));
+    public static final ChunkStatus CARVERS = ChunkStatus.register("carvers", SURFACE, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.carve(arg.getSeed(), arg.getBiomeAccess(), arg3, GenerationStep.Carver.AIR));
+    public static final ChunkStatus LIQUID_CARVERS = ChunkStatus.register("liquid_carvers", CARVERS, 0, POST_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.carve(arg.getSeed(), arg.getBiomeAccess(), arg3, GenerationStep.Carver.LIQUID));
     public static final ChunkStatus FEATURES = ChunkStatus.register("features", LIQUID_CARVERS, 8, POST_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ChunkStatus arg, ServerWorld arg2, ChunkGenerator arg3, StructureManager arg4, ServerLightingProvider arg5, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> list, Chunk arg6) -> {
         ProtoChunk lv = (ProtoChunk)arg6;
         lv.setLightingProvider(arg5);

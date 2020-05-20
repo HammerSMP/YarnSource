@@ -60,7 +60,7 @@ extends MinecraftServer {
         this.setServerName(arg.getSession().getUsername());
         this.setDemo(arg.isDemo());
         this.setWorldHeight(256);
-        this.setPlayerManager(new IntegratedPlayerManager(this, this.field_24371));
+        this.setPlayerManager(new IntegratedPlayerManager(this, this.field_25132, this.field_24371));
         this.client = arg;
     }
 

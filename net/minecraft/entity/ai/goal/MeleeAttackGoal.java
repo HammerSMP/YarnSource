@@ -15,15 +15,15 @@ import net.minecraft.util.Hand;
 public class MeleeAttackGoal
 extends Goal {
     protected final MobEntityWithAi mob;
-    protected int ticksUntilAttack;
     private final double speed;
     private final boolean pauseWhenMobIdle;
     private Path path;
-    private int updateCountdownTicks;
     private double targetX;
     private double targetY;
     private double targetZ;
-    protected final int attackIntervalTicks = 20;
+    private int updateCountdownTicks;
+    private int field_24667;
+    private final int attackIntervalTicks = 20;
     private long lastUpdateTime;
 
     public MeleeAttackGoal(MobEntityWithAi arg, double d, boolean bl) {
@@ -77,6 +77,7 @@ extends Goal {
         this.mob.getNavigation().startMovingAlong(this.path, this.speed);
         this.mob.setAttacking(true);
         this.updateCountdownTicks = 0;
+        this.field_24667 = 0;
     }
 
     @Override
@@ -94,7 +95,7 @@ extends Goal {
         LivingEntity lv = this.mob.getTarget();
         this.mob.getLookControl().lookAt(lv, 30.0f, 30.0f);
         double d = this.mob.squaredDistanceTo(lv.getX(), lv.getY(), lv.getZ());
-        --this.updateCountdownTicks;
+        this.updateCountdownTicks = Math.max(this.updateCountdownTicks - 1, 0);
         if ((this.pauseWhenMobIdle || this.mob.getVisibilityCache().canSee(lv)) && this.updateCountdownTicks <= 0 && (this.targetX == 0.0 && this.targetY == 0.0 && this.targetZ == 0.0 || lv.squaredDistanceTo(this.targetX, this.targetY, this.targetZ) >= 1.0 || this.mob.getRandom().nextFloat() < 0.05f)) {
             this.targetX = lv.getX();
             this.targetY = lv.getY();
@@ -109,17 +110,33 @@ extends Goal {
                 this.updateCountdownTicks += 15;
             }
         }
-        this.ticksUntilAttack = Math.max(this.ticksUntilAttack - 1, 0);
+        this.field_24667 = Math.max(this.field_24667 - 1, 0);
         this.attack(lv, d);
     }
 
     protected void attack(LivingEntity arg, double d) {
         double e = this.getSquaredMaxAttackDistance(arg);
-        if (d <= e && this.ticksUntilAttack <= 0) {
-            this.ticksUntilAttack = 20;
+        if (d <= e && this.field_24667 <= 0) {
+            this.method_28346();
             this.mob.swingHand(Hand.MAIN_HAND);
             this.mob.tryAttack(arg);
         }
+    }
+
+    protected void method_28346() {
+        this.field_24667 = 20;
+    }
+
+    protected boolean method_28347() {
+        return this.field_24667 <= 0;
+    }
+
+    protected int method_28348() {
+        return this.field_24667;
+    }
+
+    protected int method_28349() {
+        return 20;
     }
 
     protected double getSquaredMaxAttackDistance(LivingEntity arg) {

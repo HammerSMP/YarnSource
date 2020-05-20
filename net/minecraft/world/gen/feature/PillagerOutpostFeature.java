@@ -3,14 +3,13 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.List;
-import java.util.function.Function;
 import net.minecraft.entity.EntityType;
 import net.minecraft.structure.PillagerOutpostGenerator;
 import net.minecraft.structure.StructureManager;
@@ -19,31 +18,18 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
-import net.minecraft.world.gen.feature.AbstractTempleFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class PillagerOutpostFeature
-extends AbstractTempleFeature<DefaultFeatureConfig> {
+extends StructureFeature<DefaultFeatureConfig> {
     private static final List<Biome.SpawnEntry> MONSTER_SPAWNS = Lists.newArrayList((Object[])new Biome.SpawnEntry[]{new Biome.SpawnEntry(EntityType.PILLAGER, 1, 1, 1)});
 
-    public PillagerOutpostFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
-    }
-
-    @Override
-    public String getName() {
-        return "Pillager_Outpost";
-    }
-
-    @Override
-    public int getRadius() {
-        return 3;
+    public PillagerOutpostFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -52,7 +38,7 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
         int k = i >> 4;
         int m = j >> 4;
         arg3.setSeed((long)(k ^ m << 4) ^ l);
@@ -62,8 +48,8 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
         }
         for (int n = i - 10; n <= i + 10; ++n) {
             for (int o = j - 10; o <= j + 10; ++o) {
-                Biome lv = arg.getBiome(new BlockPos((n << 4) + 9, 0, (o << 4) + 9));
-                if (!Feature.VILLAGE.method_27217(arg, arg2, l, arg3, n, o, lv)) continue;
+                ChunkPos lv = StructureFeature.VILLAGE.method_27218(arg.getConfig().method_28600(StructureFeature.VILLAGE), l, arg3, n, o);
+                if (n != lv.x || o != lv.z) continue;
                 return false;
             }
         }
@@ -71,23 +57,18 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    public StructureFeature.StructureStartFactory getStructureStartFactory() {
+    public StructureFeature.StructureStartFactory<DefaultFeatureConfig> getStructureStartFactory() {
         return Start::new;
     }
 
-    @Override
-    protected int getSeedModifier(ChunkGeneratorConfig arg) {
-        return 165745296;
-    }
-
     public static class Start
-    extends VillageStructureStart {
-        public Start(StructureFeature<?> arg, int i, int j, BlockBox arg2, int k, long l) {
+    extends VillageStructureStart<DefaultFeatureConfig> {
+        public Start(StructureFeature<DefaultFeatureConfig> arg, int i, int j, BlockBox arg2, int k, long l) {
             super(arg, i, j, arg2, k, l);
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
             BlockPos lv = new BlockPos(i * 16, 0, j * 16);
             PillagerOutpostGenerator.addPieces(arg, arg2, lv, this.children, this.random);
             this.setBoundingBoxFromChildren();

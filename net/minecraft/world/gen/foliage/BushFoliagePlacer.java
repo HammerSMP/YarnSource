@@ -2,11 +2,15 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.foliage;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.util.math.BlockPos;
@@ -18,12 +22,15 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class BushFoliagePlacer
 extends BlobFoliagePlacer {
+    public static final Codec<BushFoliagePlacer> field_24928 = RecordCodecBuilder.create(instance -> BushFoliagePlacer.method_28838(instance).apply((Applicative)instance, BushFoliagePlacer::new));
+
     public BushFoliagePlacer(int i, int j, int k, int l, int m) {
         super(i, j, k, l, m, FoliagePlacerType.BUSH_FOLIAGE_PLACER);
     }
 
-    public <T> BushFoliagePlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("radius").asInt(0), dynamic.get("radius_random").asInt(0), dynamic.get("offset").asInt(0), dynamic.get("offset_random").asInt(0), dynamic.get("height").asInt(0));
+    @Override
+    protected FoliagePlacerType<?> method_28843() {
+        return FoliagePlacerType.BUSH_FOLIAGE_PLACER;
     }
 
     @Override

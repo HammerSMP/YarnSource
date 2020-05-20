@@ -54,6 +54,10 @@ implements IndexedIterable<K> {
         return this.ids[i];
     }
 
+    public boolean method_28138(int i) {
+        return this.get(i) != null;
+    }
+
     public int add(K object) {
         int i = this.nextId();
         this.put(object, i);

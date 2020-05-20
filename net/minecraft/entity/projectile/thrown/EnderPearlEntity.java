@@ -14,6 +14,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
+import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -130,9 +131,9 @@ extends ThrownItemEntity {
 
     @Override
     @Nullable
-    public Entity changeDimension(DimensionType arg) {
+    public Entity changeDimension(class_5321<DimensionType> arg) {
         Entity lv = this.getOwner();
-        if (lv.dimension != arg) {
+        if (lv != null && lv.world.method_27983() != arg) {
             this.setOwner(null);
         }
         return super.changeDimension(arg);

@@ -14,7 +14,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.FluidStateImpl;
 import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.state.StateManager;
@@ -36,7 +35,7 @@ public abstract class Fluid {
     protected Fluid() {
         StateManager.Builder<Fluid, FluidState> lv = new StateManager.Builder<Fluid, FluidState>(this);
         this.appendProperties(lv);
-        this.stateManager = lv.build(FluidStateImpl::new);
+        this.stateManager = lv.build(Fluid::getDefaultState, FluidState::new);
         this.setDefaultState(this.stateManager.getDefaultState());
     }
 

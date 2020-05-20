@@ -25,6 +25,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import net.minecraft.class_5321;
 import net.minecraft.command.arguments.BlockPosArgumentType;
 import net.minecraft.command.arguments.ColumnPosArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -47,38 +48,38 @@ public class ForceLoadCommand {
 
     private static int executeQuery(ServerCommandSource arg, ColumnPos arg2) throws CommandSyntaxException {
         ChunkPos lv = new ChunkPos(arg2.x >> 4, arg2.z >> 4);
-        DimensionType lv2 = arg.getWorld().method_27983();
+        class_5321<DimensionType> lv2 = arg.getWorld().method_27983();
         boolean bl = arg.getMinecraftServer().getWorld(lv2).getForcedChunks().contains(lv.toLong());
         if (bl) {
-            arg.sendFeedback(new TranslatableText("commands.forceload.query.success", lv, lv2), false);
+            arg.sendFeedback(new TranslatableText("commands.forceload.query.success", lv, lv2.method_29177()), false);
             return 1;
         }
-        throw QUERY_FAILURE_EXCEPTION.create((Object)lv, (Object)lv2);
+        throw QUERY_FAILURE_EXCEPTION.create((Object)lv, (Object)lv2.method_29177());
     }
 
     private static int executeQuery(ServerCommandSource arg) {
-        DimensionType lv = arg.getWorld().method_27983();
+        class_5321<DimensionType> lv = arg.getWorld().method_27983();
         LongSet longSet = arg.getMinecraftServer().getWorld(lv).getForcedChunks();
         int i = longSet.size();
         if (i > 0) {
             String string = Joiner.on((String)", ").join(longSet.stream().sorted().map(ChunkPos::new).map(ChunkPos::toString).iterator());
             if (i == 1) {
-                arg.sendFeedback(new TranslatableText("commands.forceload.list.single", lv, string), false);
+                arg.sendFeedback(new TranslatableText("commands.forceload.list.single", lv.method_29177(), string), false);
             } else {
-                arg.sendFeedback(new TranslatableText("commands.forceload.list.multiple", i, lv, string), false);
+                arg.sendFeedback(new TranslatableText("commands.forceload.list.multiple", i, lv.method_29177(), string), false);
             }
         } else {
-            arg.sendError(new TranslatableText("commands.forceload.added.none", lv));
+            arg.sendError(new TranslatableText("commands.forceload.added.none", lv.method_29177()));
         }
         return i;
     }
 
     private static int executeRemoveAll(ServerCommandSource arg) {
-        DimensionType lv = arg.getWorld().method_27983();
+        class_5321<DimensionType> lv = arg.getWorld().method_27983();
         ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
         LongSet longSet = lv2.getForcedChunks();
         longSet.forEach(l -> lv2.setChunkForced(ChunkPos.getPackedX(l), ChunkPos.getPackedZ(l), false));
-        arg.sendFeedback(new TranslatableText("commands.forceload.removed.all", lv), true);
+        arg.sendFeedback(new TranslatableText("commands.forceload.removed.all", lv.method_29177()), true);
         return 0;
     }
 
@@ -98,7 +99,7 @@ public class ForceLoadCommand {
         if (q > 256L) {
             throw TOO_BIG_EXCEPTION.create((Object)256, (Object)q);
         }
-        DimensionType lv = arg.getWorld().method_27983();
+        class_5321<DimensionType> lv = arg.getWorld().method_27983();
         ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
         ChunkPos lv3 = null;
         int r = 0;
@@ -115,11 +116,11 @@ public class ForceLoadCommand {
             throw (bl ? ADDED_FAILURE_EXCEPTION : REMOVED_FAILURE_EXCEPTION).create();
         }
         if (r == 1) {
-            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".single", lv3, lv), true);
+            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".single", lv3, lv.method_29177()), true);
         } else {
             ChunkPos lv4 = new ChunkPos(m, n);
             ChunkPos lv5 = new ChunkPos(o, p);
-            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".multiple", r, lv, lv4, lv5), true);
+            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".multiple", r, lv.method_29177(), lv4, lv5), true);
         }
         return r;
     }

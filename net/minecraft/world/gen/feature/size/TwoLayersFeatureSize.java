@@ -2,23 +2,24 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature.size;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.OptionalInt;
 import net.minecraft.world.gen.feature.size.FeatureSize;
 import net.minecraft.world.gen.feature.size.FeatureSizeType;
 
 public class TwoLayersFeatureSize
 extends FeatureSize {
+    public static final Codec<TwoLayersFeatureSize> field_24925 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.field_24155), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.field_24156), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.field_24157), TwoLayersFeatureSize.method_28820()).apply((Applicative)instance, TwoLayersFeatureSize::new));
     private final int field_24155;
     private final int field_24156;
     private final int field_24157;
@@ -28,26 +29,20 @@ extends FeatureSize {
     }
 
     public TwoLayersFeatureSize(int i, int j, int k, OptionalInt optionalInt) {
-        super(FeatureSizeType.TWO_LAYERS_FEATURE_SIZE, optionalInt);
+        super(optionalInt);
         this.field_24155 = i;
         this.field_24156 = j;
         this.field_24157 = k;
     }
 
-    public <T> TwoLayersFeatureSize(Dynamic<T> dynamic) {
-        this(dynamic.get("limit").asInt(1), dynamic.get("lower_size").asInt(0), dynamic.get("upper_size").asInt(1), dynamic.get("min_clipped_height").asNumber().map(number -> OptionalInt.of(number.intValue())).orElse(OptionalInt.empty()));
+    @Override
+    protected FeatureSizeType<?> method_28824() {
+        return FeatureSizeType.TWO_LAYERS_FEATURE_SIZE;
     }
 
     @Override
     public int method_27378(int i, int j) {
         return j < this.field_24155 ? this.field_24156 : this.field_24157;
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        builder.put(dynamicOps.createString("limit"), dynamicOps.createInt(this.field_24155)).put(dynamicOps.createString("lower_size"), dynamicOps.createInt(this.field_24156)).put(dynamicOps.createString("upper_size"), dynamicOps.createInt(this.field_24157));
-        return (T)dynamicOps.merge(super.serialize(dynamicOps), dynamicOps.createMap((Map)builder.build()));
     }
 }
 

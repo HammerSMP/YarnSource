@@ -275,10 +275,10 @@ extends GolemEntity {
             for (int i = 1; i < 3; ++i) {
                 BlockState lv5;
                 BlockPos lv4 = lv.up(i);
-                if (SpawnHelper.isClearForSpawn(arg, lv4, lv5 = arg.getBlockState(lv4), lv5.getFluidState())) continue;
+                if (SpawnHelper.isClearForSpawn(arg, lv4, lv5 = arg.getBlockState(lv4), lv5.getFluidState(), EntityType.IRON_GOLEM)) continue;
                 return false;
             }
-            return SpawnHelper.isClearForSpawn(arg, lv, arg.getBlockState(lv), Fluids.EMPTY.getDefaultState()) && arg.intersectsEntities(this);
+            return SpawnHelper.isClearForSpawn(arg, lv, arg.getBlockState(lv), Fluids.EMPTY.getDefaultState(), EntityType.IRON_GOLEM) && arg.intersectsEntities(this);
         }
         return false;
     }

@@ -37,6 +37,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.class_5217;
 import net.minecraft.class_5269;
 import net.minecraft.class_5294;
+import net.minecraft.class_5318;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -120,7 +121,7 @@ extends World {
         this.field_24430 = arg2;
         this.netHandler = arg;
         this.worldRenderer = arg4;
-        this.field_24606 = class_5294.method_28111(arg3);
+        this.field_24606 = class_5294.method_28111(arg.method_29091().method_29116().method_29113(arg3));
         this.setSpawnPos(new BlockPos(8, 64, 8));
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
@@ -132,10 +133,31 @@ extends World {
 
     public void tick(BooleanSupplier booleanSupplier) {
         this.getWorldBorder().tick();
-        this.tickTime();
+        this.method_29090();
         this.getProfiler().push("blocks");
         this.field_24605.method_28102(booleanSupplier);
         this.getProfiler().pop();
+    }
+
+    private void method_29090() {
+        this.method_29089(this.properties.getTime() + 1L);
+        if (this.properties.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
+            this.setTimeOfDay(this.properties.getTimeOfDay() + 1L);
+        }
+    }
+
+    public void method_29089(long l) {
+        this.field_24430.setTime(l);
+    }
+
+    public void setTimeOfDay(long l) {
+        if (l < 0L) {
+            l = -l;
+            this.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(false, null);
+        } else {
+            this.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(true, null);
+        }
+        this.field_24430.setTimeOfDay(l);
     }
 
     public Iterable<Entity> getEntities() {
@@ -363,7 +385,7 @@ extends World {
         if (!lv.isFullCube(this, arg)) {
             this.getBiome(arg).getParticleConfig().ifPresent(arg2 -> {
                 if (arg2.shouldAddParticle(this.random)) {
-                    this.addParticle(arg2.getParticleType(), (float)arg.getX() + this.random.nextFloat(), (float)arg.getY() + this.random.nextFloat(), (float)arg.getZ() + this.random.nextFloat(), arg2.generateVelocityX(this.random), arg2.generateVelocityY(this.random), arg2.generateVelocityZ(this.random));
+                    this.addParticle(arg2.getParticleType(), (float)arg.getX() + this.random.nextFloat(), (float)arg.getY() + this.random.nextFloat(), (float)arg.getZ() + this.random.nextFloat(), 0.0, 0.0, 0.0);
                 }
             });
         }
@@ -472,17 +494,6 @@ extends World {
     }
 
     @Override
-    public void setTimeOfDay(long l) {
-        if (l < 0L) {
-            l = -l;
-            this.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(false, null);
-        } else {
-            this.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(true, null);
-        }
-        super.setTimeOfDay(l);
-    }
-
-    @Override
     public TickScheduler<Block> getBlockTickScheduler() {
         return DummyClientTickScheduler.get();
     }
@@ -521,6 +532,11 @@ extends World {
     @Override
     public RegistryTagManager getTagManager() {
         return this.netHandler.getTagManager();
+    }
+
+    @Override
+    public class_5318 method_28380() {
+        return this.netHandler.method_29091();
     }
 
     @Override
@@ -689,8 +705,7 @@ extends World {
 
     @Override
     public float getBrightness(Direction arg, boolean bl) {
-        boolean bl2;
-        boolean bl3 = bl2 = this.method_27983() == DimensionType.THE_NETHER;
+        boolean bl2 = this.getDimension().method_28542();
         if (!bl) {
             return bl2 ? 0.9f : 1.0f;
         }
@@ -833,12 +848,10 @@ extends World {
             this.field_24437 = i;
         }
 
-        @Override
         public void setTime(long l) {
             this.field_24438 = l;
         }
 
-        @Override
         public void setTimeOfDay(long l) {
             this.field_24439 = l;
         }

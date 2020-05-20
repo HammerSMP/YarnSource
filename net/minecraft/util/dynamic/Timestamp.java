@@ -2,17 +2,14 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.util.dynamic;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import net.minecraft.util.dynamic.DynamicSerializable;
+import com.mojang.serialization.Codec;
 
-public final class Timestamp
-implements DynamicSerializable {
+public final class Timestamp {
+    public static final Codec<Timestamp> field_25121 = Codec.LONG.xmap(Timestamp::new, arg -> arg.time);
     private final long time;
 
     private Timestamp(long l) {
@@ -21,15 +18,6 @@ implements DynamicSerializable {
 
     public long getTime() {
         return this.time;
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        return (T)dynamicOps.createLong(this.time);
-    }
-
-    public static Timestamp of(Dynamic<?> dynamic) {
-        return new Timestamp(dynamic.asNumber((Number)0).longValue());
     }
 
     public static Timestamp of(long l) {

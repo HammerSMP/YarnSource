@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.decorator;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +19,8 @@ import net.minecraft.world.gen.decorator.TopSolidHeightmapNoiseBiasedDecoratorCo
 
 public class HeightmapNoiseBiasedDecorator
 extends Decorator<TopSolidHeightmapNoiseBiasedDecoratorConfig> {
-    public HeightmapNoiseBiasedDecorator(Function<Dynamic<?>, ? extends TopSolidHeightmapNoiseBiasedDecoratorConfig> function) {
-        super(function);
+    public HeightmapNoiseBiasedDecorator(Codec<TopSolidHeightmapNoiseBiasedDecoratorConfig> codec) {
+        super(codec);
     }
 
     @Override

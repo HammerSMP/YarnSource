@@ -39,7 +39,6 @@ import net.minecraft.server.world.ServerLightingProvider;
 import net.minecraft.server.world.ServerTickScheduler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.SimpleTickScheduler;
-import net.minecraft.structure.StructureFeatures;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.BlockPos;
@@ -65,6 +64,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,7 +89,7 @@ public class ChunkSerializer {
         ListTag lv9 = lv3.getList("Sections", 10);
         int i = 16;
         ChunkSection[] lvs = new ChunkSection[16];
-        boolean bl2 = arg3.method_27983().hasSkyLight();
+        boolean bl2 = arg3.getDimension().hasSkyLight();
         ServerChunkManager lv10 = arg3.getChunkManager();
         LightingProvider lv11 = ((ChunkManager)lv10).getLightingProvider();
         if (bl) {
@@ -270,7 +270,9 @@ public class ChunkSerializer {
             lv3.put("Lights", ChunkSerializer.toNbt(lv19.getLightSourcesBySection()));
             CompoundTag lv20 = new CompoundTag();
             for (GenerationStep.Carver lv21 : GenerationStep.Carver.values()) {
-                lv20.putByteArray(lv21.toString(), arg22.getCarvingMask(lv21).toByteArray());
+                BitSet bitSet = lv19.getCarvingMask(lv21);
+                if (bitSet == null) continue;
+                lv20.putByteArray(lv21.toString(), bitSet.toByteArray());
             }
             lv3.put("CarvingMasks", lv20);
         }
@@ -294,7 +296,7 @@ public class ChunkSerializer {
         lv3.put("PostProcessing", ChunkSerializer.toNbt(arg22.getPostProcessingLists()));
         CompoundTag lv24 = new CompoundTag();
         for (Map.Entry<Heightmap.Type, Heightmap> entry : arg22.getHeightmaps()) {
-            if (!arg22.getStatus().getHeightmapTypes().contains((Object)entry.getKey())) continue;
+            if (!arg22.getStatus().getHeightmapTypes().contains(entry.getKey())) continue;
             lv24.put(entry.getKey().getName(), new LongArrayTag(entry.getValue().asLongArray()));
         }
         lv3.put("Heightmaps", lv24);
@@ -336,10 +338,10 @@ public class ChunkSerializer {
         }
     }
 
-    private static CompoundTag writeStructures(ChunkPos arg, Map<String, StructureStart> map, Map<String, LongSet> map2) {
+    private static CompoundTag writeStructures(ChunkPos arg, Map<String, StructureStart<?>> map, Map<String, LongSet> map2) {
         CompoundTag lv = new CompoundTag();
         CompoundTag lv2 = new CompoundTag();
-        for (Map.Entry<String, StructureStart> entry : map.entrySet()) {
+        for (Map.Entry<String, StructureStart<?>> entry : map.entrySet()) {
             lv2.put(entry.getKey(), entry.getValue().toTag(arg.x, arg.z));
         }
         lv.put("Starts", lv2);
@@ -351,11 +353,11 @@ public class ChunkSerializer {
         return lv;
     }
 
-    private static Map<String, StructureStart> readStructureStarts(StructureManager arg, CompoundTag arg2, long l) {
+    private static Map<String, StructureStart<?>> readStructureStarts(StructureManager arg, CompoundTag arg2, long l) {
         HashMap map = Maps.newHashMap();
         CompoundTag lv = arg2.getCompound("Starts");
         for (String string : lv.getKeys()) {
-            map.put(string, StructureFeatures.readStructureStart(arg, lv.getCompound(string), l));
+            map.put(string, StructureFeature.method_28660(arg, lv.getCompound(string), l));
         }
         return map;
     }

@@ -51,7 +51,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
@@ -369,7 +368,7 @@ extends ChunkManager {
             });
             this.world.getProfiler().push("customSpawners");
             if (bl2) {
-                this.chunkGenerator.spawnEntities(this.world, this.spawnMonsters, this.spawnAnimals);
+                this.world.method_29202(this.spawnMonsters, this.spawnAnimals);
             }
             this.world.getProfiler().pop();
             this.world.getProfiler().pop();
@@ -495,7 +494,7 @@ extends ChunkManager {
     final class MainThreadExecutor
     extends ThreadExecutor<Runnable> {
         private MainThreadExecutor(World arg2) {
-            super("Chunk source main thread executor for " + Registry.DIMENSION_TYPE.getId(arg2.method_27983()));
+            super("Chunk source main thread executor for " + arg2.method_27983().method_29177());
         }
 
         @Override

@@ -1007,7 +1007,7 @@ public class Blocks {
     }
 
     private static Block createNetherStemBlock(MaterialColor arg) {
-        return new PillarBlock(AbstractBlock.Settings.of(Material.NETHER_WOOD, arg2 -> arg).strength(1.0f).sounds(BlockSoundGroup.NETHER_STEM));
+        return new PillarBlock(AbstractBlock.Settings.of(Material.NETHER_WOOD, arg2 -> arg).strength(2.0f).sounds(BlockSoundGroup.NETHER_STEM));
     }
 
     private static boolean always(BlockState arg, BlockView arg2, BlockPos arg3) {

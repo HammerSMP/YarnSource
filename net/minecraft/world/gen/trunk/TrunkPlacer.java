@@ -2,18 +2,19 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.Products$P3
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder$Instance
+ *  com.mojang.serialization.codecs.RecordCodecBuilder$Mu
  */
 package net.minecraft.world.gen.trunk;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.Products;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.block.Block;
@@ -32,17 +33,22 @@ import net.minecraft.world.gen.foliage.FoliagePlacer;
 import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public abstract class TrunkPlacer {
-    private final int baseHeight;
-    private final int firstRandomHeight;
-    private final int secondRandomHeight;
-    protected final TrunkPlacerType<?> type;
+    public static final Codec<TrunkPlacer> field_24972 = Registry.TRUNK_PLACER_TYPE.dispatch(TrunkPlacer::method_28903, TrunkPlacerType::method_28908);
+    protected final int baseHeight;
+    protected final int firstRandomHeight;
+    protected final int secondRandomHeight;
 
-    public TrunkPlacer(int i, int j, int k, TrunkPlacerType<?> arg) {
+    protected static <P extends TrunkPlacer> Products.P3<RecordCodecBuilder.Mu<P>, Integer, Integer, Integer> method_28904(RecordCodecBuilder.Instance<P> instance) {
+        return instance.group((App)Codec.INT.fieldOf("base_height").forGetter(arg -> arg.baseHeight), (App)Codec.INT.fieldOf("height_rand_a").forGetter(arg -> arg.firstRandomHeight), (App)Codec.INT.fieldOf("height_rand_b").forGetter(arg -> arg.secondRandomHeight));
+    }
+
+    public TrunkPlacer(int i, int j, int k) {
         this.baseHeight = i;
         this.firstRandomHeight = j;
         this.secondRandomHeight = k;
-        this.type = arg;
     }
+
+    protected abstract TrunkPlacerType<?> method_28903();
 
     public abstract List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld var1, Random var2, int var3, BlockPos var4, Set<BlockPos> var5, BlockBox var6, TreeFeatureConfig var7);
 
@@ -81,12 +87,6 @@ public abstract class TrunkPlacer {
         if (TreeFeature.canTreeReplace(arg, arg2)) {
             TrunkPlacer.method_27402(arg, random, arg2, set, arg3, arg4);
         }
-    }
-
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        builder.put(dynamicOps.createString("type"), dynamicOps.createString(Registry.TRUNK_PLACER_TYPE.getId(this.type).toString())).put(dynamicOps.createString("base_height"), dynamicOps.createInt(this.baseHeight)).put(dynamicOps.createString("height_rand_a"), dynamicOps.createInt(this.firstRandomHeight)).put(dynamicOps.createString("height_rand_b"), dynamicOps.createInt(this.secondRandomHeight));
-        return (T)new Dynamic(dynamicOps, dynamicOps.createMap((Map)builder.build())).getValue();
     }
 }
 

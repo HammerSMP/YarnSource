@@ -8,7 +8,6 @@ package net.minecraft.entity.ai.brain.task;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.BlockPosLookTarget;
@@ -39,7 +38,7 @@ extends Task<VillagerEntity> {
         }
         this.lastCheckedTime = arg.getTime();
         GlobalPos lv = arg2.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).get();
-        return Objects.equals(lv.getDimension(), arg.method_27983()) && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
+        return lv.getDimension() == arg.method_27983() && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
     }
 
     @Override
@@ -64,7 +63,7 @@ extends Task<VillagerEntity> {
             return false;
         }
         GlobalPos lv = optional.get();
-        return Objects.equals(lv.getDimension(), arg.method_27983()) && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
+        return lv.getDimension() == arg.method_27983() && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
     }
 
     @Override

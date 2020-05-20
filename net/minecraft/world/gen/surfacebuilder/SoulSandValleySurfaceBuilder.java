@@ -3,13 +3,12 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.surfacebuilder;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.Dynamic;
-import java.util.function.Function;
+import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.surfacebuilder.AbstractNetherSurfaceBuilder;
@@ -22,8 +21,8 @@ extends AbstractNetherSurfaceBuilder {
     private static final BlockState GRAVEL = Blocks.GRAVEL.getDefaultState();
     private static final ImmutableList<BlockState> field_23924 = ImmutableList.of((Object)SOUL_SAND, (Object)SOUL_SOIL);
 
-    public SoulSandValleySurfaceBuilder(Function<Dynamic<?>, ? extends TernarySurfaceConfig> function) {
-        super(function);
+    public SoulSandValleySurfaceBuilder(Codec<TernarySurfaceConfig> codec) {
+        super(codec);
     }
 
     @Override

@@ -3,7 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Dynamic
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -11,7 +11,7 @@
 package net.minecraft.entity.mob;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Dynamic;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -59,7 +59,6 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.dimension.DimensionType;
 
 public class HoglinEntity
 extends AnimalEntity
@@ -119,9 +118,13 @@ Hoglin {
         return bl;
     }
 
+    protected Brain.class_5303<HoglinEntity> method_28306() {
+        return Brain.method_28311(MEMORY_MODULE_TYPES, SENSOR_TYPES);
+    }
+
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return HoglinBrain.create(dynamic);
+        return HoglinBrain.create(this.method_28306().method_28335(dynamic));
     }
 
     public Brain<HoglinEntity> getBrain() {
@@ -295,7 +298,7 @@ Hoglin {
     }
 
     public boolean canConvert() {
-        return this.world.method_27983() != DimensionType.THE_NETHER && !this.isImmuneToZombification() && !this.isAiDisabled();
+        return !this.world.getDimension().method_28542() && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
     private void setCannotBeHunted(boolean bl) {

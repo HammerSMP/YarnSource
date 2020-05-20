@@ -4,19 +4,19 @@
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.stream.Collectors;
 import net.minecraft.datafixer.TypeReferences;
 
@@ -33,7 +33,7 @@ extends DataFix {
                 return Pair.of(entry.getKey(), (Object)dynamic.createString("key.keyboard." + string.substring("key.".length())));
             }
             return Pair.of(entry.getKey(), entry.getValue());
-        }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)))).orElse((Dynamic)dynamic)));
+        }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)))).result().orElse(dynamic)));
     }
 }
 

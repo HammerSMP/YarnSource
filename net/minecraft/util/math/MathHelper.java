@@ -267,11 +267,6 @@ public class MathHelper {
         return NumberUtils.toInt((String)string, (int)i);
     }
 
-    @Environment(value=EnvType.CLIENT)
-    public static int parseInt(String string, int i, int j) {
-        return Math.max(j, MathHelper.parseInt(string, i));
-    }
-
     public static int smallestEncompassingPowerOfTwo(int i) {
         int j = i - 1;
         j |= j >> 1;
@@ -293,6 +288,23 @@ public class MathHelper {
 
     public static int log2(int i) {
         return MathHelper.log2DeBruijn(i) - (MathHelper.isPowerOfTwo(i) ? 0 : 1);
+    }
+
+    public static int method_28139(int i, int j) {
+        int k;
+        if (j == 0) {
+            return 0;
+        }
+        if (i == 0) {
+            return j;
+        }
+        if (i < 0) {
+            j *= -1;
+        }
+        if ((k = i % j) == 0) {
+            return i;
+        }
+        return i + j - k;
     }
 
     @Environment(value=EnvType.CLIENT)

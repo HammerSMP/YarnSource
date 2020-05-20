@@ -7,6 +7,7 @@
 package net.minecraft.village;
 
 import javax.annotation.Nullable;
+import net.minecraft.class_5304;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -20,7 +21,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 
-public class ZombieSiegeManager {
+public class ZombieSiegeManager
+implements class_5304 {
     private boolean spawned;
     private State state = State.SIEGE_DONE;
     private int remaining;
@@ -29,6 +31,7 @@ public class ZombieSiegeManager {
     private int startY;
     private int startZ;
 
+    @Override
     public int spawn(ServerWorld arg, boolean bl, boolean bl2) {
         if (arg.isDay() || !bl) {
             this.state = State.SIEGE_DONE;

@@ -38,7 +38,7 @@ implements Toast {
         arg2.getGame().getTextureManager().bindTexture(TOASTS_TEX);
         RenderSystem.color3f(1.0f, 1.0f, 1.0f);
         AdvancementDisplay lv = this.advancement.getDisplay();
-        arg2.drawTexture(arg, 0, 0, 0, 0, 160, 32);
+        arg2.drawTexture(arg, 0, 0, 0, 0, this.method_29049(), this.method_29050());
         if (lv != null) {
             int i;
             List<Text> list = arg2.getGame().textRenderer.wrapLines(lv.getTitle(), 125);
@@ -55,7 +55,7 @@ implements Toast {
                 } else {
                     int m = MathHelper.floor(MathHelper.clamp((float)(l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000;
                     arg2.getGame().textRenderer.getClass();
-                    int n2 = 16 - list.size() * 9 / 2;
+                    int n2 = this.method_29050() / 2 - list.size() * 9 / 2;
                     for (Text lv2 : list) {
                         arg2.getGame().textRenderer.draw(arg, lv2, 30.0f, (float)n2, 0xFFFFFF | m);
                         arg2.getGame().textRenderer.getClass();

@@ -4,25 +4,25 @@
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.types.templates.List$ListType
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.List;
+import com.mojang.serialization.Dynamic;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.util.math.MathHelper;
@@ -51,12 +51,12 @@ extends DataFix {
             Optional optional;
             int j;
             Dynamic dynamic = (Dynamic)typed2.get(DSL.remainderFinder());
-            int i = ((Number)dynamic.get("VillagerData").get("level").asNumber().orElse(0)).intValue();
+            int i = dynamic.get("VillagerData").get("level").asInt(0);
             Typed<?> typed22 = typed2;
             if ((i == 0 || i == 1) && (i = MathHelper.clamp((j = typed2.getOptionalTyped(opticFinder2).flatMap(typed -> typed.getOptionalTyped(opticFinder3)).map(typed -> typed.getAllTyped(opticFinder4).size()).orElse(0).intValue()) / 2, 1, 5)) > 1) {
                 typed22 = VillagerXpRebuildFix.method_20487(typed22, i);
             }
-            if (!(optional = dynamic.get("Xp").asNumber()).isPresent()) {
+            if (!(optional = dynamic.get("Xp").asNumber().result()).isPresent()) {
                 typed22 = VillagerXpRebuildFix.method_20490(typed22, i);
             }
             return typed22;

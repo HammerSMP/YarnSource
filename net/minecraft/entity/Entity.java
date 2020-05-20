@@ -46,6 +46,7 @@ import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.piston.PistonBehavior;
+import net.minecraft.class_5321;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.ProtectionEnchantment;
@@ -113,6 +114,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -201,7 +203,6 @@ CommandOutput {
     public int netherPortalCooldown;
     protected boolean inNetherPortal;
     protected int netherPortalTime;
-    public DimensionType dimension;
     protected BlockPos lastNetherPortalPosition;
     protected Vec3d lastNetherPortalDirectionVector;
     protected Direction lastNetherPortalDirection;
@@ -223,9 +224,6 @@ CommandOutput {
         this.pos = Vec3d.ZERO;
         this.blockPos = BlockPos.ORIGIN;
         this.updatePosition(0.0, 0.0, 0.0);
-        if (arg2 != null) {
-            this.dimension = arg2.method_27983();
-        }
         this.dataTracker = new DataTracker(this);
         this.dataTracker.startTracking(FLAGS, (byte)0);
         this.dataTracker.startTracking(AIR, this.getMaxAir());
@@ -913,7 +911,7 @@ CommandOutput {
         if (this.isTouchingWater()) {
             return true;
         }
-        double d = this.world.method_27983().method_27998() ? 0.007 : 0.0023333333333333335;
+        double d = this.world.getDimension().method_27998() ? 0.007 : 0.0023333333333333335;
         return this.updateMovementInFluid(FluidTags.LAVA, d);
     }
 
@@ -1264,7 +1262,6 @@ CommandOutput {
             arg.putShort("Fire", (short)this.fireTicks);
             arg.putShort("Air", (short)this.getAir());
             arg.putBoolean("OnGround", this.onGround);
-            arg.putInt("Dimension", this.dimension.getRawId());
             arg.putBoolean("Invulnerable", this.invulnerable);
             arg.putInt("PortalCooldown", this.netherPortalCooldown);
             arg.putUuidNew("UUID", this.getUuid());
@@ -1333,9 +1330,6 @@ CommandOutput {
             this.fireTicks = arg.getShort("Fire");
             this.setAir(arg.getShort("Air"));
             this.onGround = arg.getBoolean("OnGround");
-            if (arg.contains("Dimension")) {
-                this.dimension = DimensionType.byRawId(arg.getInt("Dimension"));
-            }
             this.invulnerable = arg.getBoolean("Invulnerable");
             this.netherPortalCooldown = arg.getInt("PortalCooldown");
             if (arg.containsUuidNew("UUID")) {
@@ -1630,7 +1624,8 @@ CommandOutput {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
                 this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
-                this.changeDimension(this.world.method_27983() == DimensionType.THE_NETHER ? DimensionType.OVERWORLD : DimensionType.THE_NETHER);
+                class_5321<DimensionType> lv = this.world.getDimension().method_28542() ? DimensionType.field_24753 : DimensionType.field_24754;
+                this.changeDimension(lv);
                 this.world.getProfiler().pop();
             }
             this.inNetherPortal = false;
@@ -1965,33 +1960,35 @@ CommandOutput {
     }
 
     @Nullable
-    public Entity changeDimension(DimensionType arg) {
-        BlockPos lv8;
+    public Entity changeDimension(class_5321<DimensionType> arg) {
+        BlockPos lv11;
         if (this.world.isClient || this.removed) {
             return null;
         }
         this.world.getProfiler().push("changeDimension");
         MinecraftServer minecraftServer = this.getServer();
-        DimensionType lv = this.dimension;
+        class_5321<DimensionType> lv = this.world.method_27983();
         ServerWorld lv2 = minecraftServer.getWorld(lv);
         ServerWorld lv3 = minecraftServer.getWorld(arg);
-        this.dimension = arg;
         this.detach();
         this.world.getProfiler().push("reposition");
         Vec3d lv4 = this.getVelocity();
         float f = 0.0f;
-        if (lv == DimensionType.THE_END && arg == DimensionType.OVERWORLD) {
+        if (lv == DimensionType.field_24755 && arg == DimensionType.field_24753) {
             BlockPos lv5 = lv3.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv3.method_27911());
-        } else if (arg == DimensionType.THE_END) {
-            BlockPos lv6 = lv3.getForcedSpawnPoint();
+        } else if (arg == DimensionType.field_24755) {
+            BlockPos lv6 = ServerWorld.field_25144;
         } else {
             double d = this.getX();
             double e = this.getZ();
+            Registry<DimensionType> lv7 = minecraftServer.method_29174().method_29116();
+            DimensionType lv8 = lv7.method_29107(lv);
+            DimensionType lv9 = lv7.method_29107(arg);
             double g = 8.0;
-            if (lv == DimensionType.OVERWORLD && arg == DimensionType.THE_NETHER) {
+            if (!lv8.method_28539() && lv9.method_28539()) {
                 d /= 8.0;
                 e /= 8.0;
-            } else if (lv == DimensionType.THE_NETHER && arg == DimensionType.OVERWORLD) {
+            } else if (lv8.method_28539() && !lv9.method_28539()) {
                 d *= 8.0;
                 e *= 8.0;
             }
@@ -2001,30 +1998,33 @@ CommandOutput {
             double k = Math.min(2.9999872E7, lv3.getWorldBorder().getBoundSouth() - 16.0);
             d = MathHelper.clamp(d, h, j);
             e = MathHelper.clamp(e, i, k);
-            Vec3d lv7 = this.getLastNetherPortalDirectionVector();
-            lv8 = new BlockPos(d, this.getY(), e);
-            BlockPattern.TeleportTarget lv9 = lv3.getPortalForcer().getPortal(lv8, lv4, this.getLastNetherPortalDirection(), lv7.x, lv7.y, this instanceof PlayerEntity);
-            if (lv9 == null) {
+            Vec3d lv10 = this.getLastNetherPortalDirectionVector();
+            lv11 = new BlockPos(d, this.getY(), e);
+            BlockPattern.TeleportTarget lv12 = lv3.getPortalForcer().getPortal(lv11, lv4, this.getLastNetherPortalDirection(), lv10.x, lv10.y, this instanceof PlayerEntity);
+            if (lv12 == null) {
                 return null;
             }
-            lv8 = new BlockPos(lv9.pos);
-            lv4 = lv9.velocity;
-            f = lv9.yaw;
+            lv11 = new BlockPos(lv12.pos);
+            lv4 = lv12.velocity;
+            f = lv12.yaw;
         }
         this.world.getProfiler().swap("reloading");
-        Object lv10 = this.getType().create(lv3);
-        if (lv10 != null) {
-            ((Entity)lv10).copyFrom(this);
-            ((Entity)lv10).refreshPositionAndAngles(lv8, ((Entity)lv10).yaw + f, ((Entity)lv10).pitch);
-            ((Entity)lv10).setVelocity(lv4);
-            lv3.onDimensionChanged((Entity)lv10);
+        Object lv13 = this.getType().create(lv3);
+        if (lv13 != null) {
+            ((Entity)lv13).copyFrom(this);
+            ((Entity)lv13).refreshPositionAndAngles(lv11, ((Entity)lv13).yaw + f, ((Entity)lv13).pitch);
+            ((Entity)lv13).setVelocity(lv4);
+            lv3.onDimensionChanged((Entity)lv13);
+            if (arg == DimensionType.field_24755) {
+                ServerWorld.method_29200(lv3);
+            }
         }
         this.removed = true;
         this.world.getProfiler().pop();
         lv2.resetIdleTimeout();
         lv3.resetIdleTimeout();
         this.world.getProfiler().pop();
-        return lv10;
+        return lv13;
     }
 
     public boolean canUsePortals() {
@@ -2239,7 +2239,7 @@ CommandOutput {
     }
 
     @Override
-    public void sendSystemMessage(Text arg) {
+    public void sendSystemMessage(Text arg, UUID uUID) {
     }
 
     public World getEntityWorld() {

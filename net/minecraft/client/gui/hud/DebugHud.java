@@ -74,7 +74,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.dimension.DimensionType;
 
 @Environment(value=EnvType.CLIENT)
 public class DebugHud
@@ -214,7 +213,7 @@ extends DrawableHelper {
         if (string8 != null) {
             list.add(string8);
         }
-        list.add(DimensionType.getId(this.client.world.method_27983()).toString() + " FC: " + Integer.toString(longSet.size()));
+        list.add(this.client.world.method_27983().method_29177() + " FC: " + longSet.size());
         list.add("");
         list.add(String.format(Locale.ROOT, "XYZ: %.3f / %.5f / %.3f", this.client.getCameraEntity().getX(), this.client.getCameraEntity().getY(), this.client.getCameraEntity().getZ()));
         list.add(String.format("Block: %d %d %d", lv3.getX(), lv3.getY(), lv3.getZ()));
@@ -240,14 +239,14 @@ extends DrawableHelper {
                     StringBuilder stringBuilder = new StringBuilder("CH");
                     for (Heightmap.Type lv11 : Heightmap.Type.values()) {
                         if (!lv11.shouldSendToClient()) continue;
-                        stringBuilder.append(" ").append(HEIGHT_MAP_TYPES.get((Object)lv11)).append(": ").append(lv8.sampleHeightmap(lv11, lv3.getX(), lv3.getZ()));
+                        stringBuilder.append(" ").append(HEIGHT_MAP_TYPES.get(lv11)).append(": ").append(lv8.sampleHeightmap(lv11, lv3.getX(), lv3.getZ()));
                     }
                     list.add(stringBuilder.toString());
                     stringBuilder.setLength(0);
                     stringBuilder.append("SH");
                     for (Heightmap.Type lv12 : Heightmap.Type.values()) {
                         if (!lv12.isStoredServerSide()) continue;
-                        stringBuilder.append(" ").append(HEIGHT_MAP_TYPES.get((Object)lv12)).append(": ");
+                        stringBuilder.append(" ").append(HEIGHT_MAP_TYPES.get(lv12)).append(": ");
                         if (lv9 != null) {
                             stringBuilder.append(lv9.sampleHeightmap(lv12, lv3.getX(), lv3.getZ()));
                             continue;
@@ -279,7 +278,7 @@ extends DrawableHelper {
             if (lv15 != null) {
                 Object2IntMap<SpawnGroup> object2IntMap = lv15.getGroupToCount();
                 int m = lv15.getSpawningChunkCount();
-                list.add("SC: " + m + ", " + Stream.of(SpawnGroup.values()).map(arg -> Character.toUpperCase(arg.getName().charAt(0)) + ": " + object2IntMap.getInt((Object)arg)).collect(Collectors.joining(", ")));
+                list.add("SC: " + m + ", " + Stream.of(SpawnGroup.values()).map(arg -> Character.toUpperCase(arg.getName().charAt(0)) + ": " + object2IntMap.getInt(arg)).collect(Collectors.joining(", ")));
             } else {
                 list.add("SC: N/A");
             }

@@ -29,6 +29,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
@@ -216,7 +217,7 @@ extends AnimalEntity {
     @Override
     public void onDeath(DamageSource arg) {
         if (!this.world.isClient && this.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES) && this.getOwner() instanceof ServerPlayerEntity) {
-            this.getOwner().sendSystemMessage(this.getDamageTracker().getDeathMessage());
+            this.getOwner().sendSystemMessage(this.getDamageTracker().getDeathMessage(), Util.field_25140);
         }
         super.onDeath(arg);
     }

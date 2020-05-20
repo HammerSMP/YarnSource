@@ -231,7 +231,6 @@ import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.TheEndDimension;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -283,6 +282,8 @@ WindowEventHandler {
     public final MetricsData metricsData = new MetricsData();
     private final boolean is64Bit;
     private final boolean isDemo;
+    private final boolean field_25033;
+    private final boolean field_25034;
     private final ReloadableResourceManager resourceManager;
     private final ClientBuiltinResourcePackProvider builtinPackProvider;
     private final ResourcePackManager<ClientResourcePackProfile> resourcePackManager;
@@ -378,9 +379,11 @@ WindowEventHandler {
         LOGGER.info("Setting user: {}", (Object)this.session.getUsername());
         LOGGER.debug("(Session ID is {})", (Object)this.session.getSessionId());
         this.isDemo = arg.game.demo;
+        this.field_25033 = !arg.game.field_25061;
+        this.field_25034 = !arg.game.field_25062;
         this.is64Bit = MinecraftClient.checkIs64Bit();
         this.server = null;
-        if (arg.autoConnect.serverAddress != null) {
+        if (this.field_25033 && arg.autoConnect.serverAddress != null) {
             String string = arg.autoConnect.serverAddress;
             int i = arg.autoConnect.serverPort;
         } else {
@@ -741,6 +744,16 @@ WindowEventHandler {
 
     public LevelStorage getLevelStorage() {
         return this.levelStorage;
+    }
+
+    private void method_29041(String string) {
+        if (!this.isInSingleplayer() && !this.method_29044()) {
+            if (this.player != null) {
+                this.player.sendSystemMessage(new TranslatableText("chat.cannotSend").formatted(Formatting.RED), Util.field_25140);
+            }
+        } else {
+            this.openScreen(new ChatScreen(string));
+        }
     }
 
     public void openScreen(@Nullable Screen arg) {
@@ -1401,10 +1414,10 @@ WindowEventHandler {
         boolean bl = bl3 = this.options.chatVisibility != ChatVisibility.HIDDEN;
         if (bl3) {
             while (this.options.keyChat.wasPressed()) {
-                this.openScreen(new ChatScreen(""));
+                this.method_29041("");
             }
             if (this.currentScreen == null && this.overlay == null && this.options.keyCommand.wasPressed()) {
-                this.openScreen(new ChatScreen("/"));
+                this.method_29041("/");
             }
         }
         if (this.player.isUsingItem()) {
@@ -1450,6 +1463,7 @@ WindowEventHandler {
             this.openScreen(null);
             return;
         }
+        MinecraftServer.method_27725((LevelStorage.Session)lv2);
         class_5219 lv3 = lv2.readLevelProperties();
         if (lv3 == null) {
             if (arg2 == null) {
@@ -1582,6 +1596,21 @@ WindowEventHandler {
         this.particleManager.setWorld(arg);
         BlockEntityRenderDispatcher.INSTANCE.setWorld(arg);
         this.updateWindowTitle();
+    }
+
+    public boolean method_29043() {
+        return this.field_25033;
+    }
+
+    public boolean method_29042(UUID uUID) {
+        if (!this.method_29044()) {
+            return (this.player == null || !uUID.equals(this.player.getUuid())) && !uUID.equals(Util.field_25140);
+        }
+        return false;
+    }
+
+    public boolean method_29044() {
+        return this.field_25034;
     }
 
     public final boolean isDemo() {
@@ -1913,7 +1942,7 @@ WindowEventHandler {
             return MusicType.CREDITS;
         }
         if (this.player != null) {
-            if (this.player.world.getDimension() instanceof TheEndDimension) {
+            if (this.player.world.getDimension().method_28543()) {
                 if (this.inGameHud.getBossBarHud().shouldPlayDragonMusic()) {
                     return MusicType.DRAGON;
                 }

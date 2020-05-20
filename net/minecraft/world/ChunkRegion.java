@@ -52,7 +52,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,7 +67,7 @@ implements ServerWorldAccess {
     private final long seed;
     private final class_5217 levelProperties;
     private final Random random;
-    private final Dimension dimension;
+    private final DimensionType dimension;
     private final TickScheduler<Block> blockTickScheduler = new MultiTickScheduler<Block>(arg -> this.getChunk((BlockPos)arg).getBlockTickScheduler());
     private final TickScheduler<Fluid> fluidTickScheduler = new MultiTickScheduler<Fluid>(arg -> this.getChunk((BlockPos)arg).getFluidTickScheduler());
     private final BiomeAccess biomeAccess;
@@ -90,7 +89,7 @@ implements ServerWorldAccess {
         this.levelProperties = arg2.getLevelProperties();
         this.random = arg2.getRandom();
         this.dimension = arg2.getDimension();
-        this.biomeAccess = new BiomeAccess(this, BiomeAccess.hashSeed(this.seed), arg2.method_27983().getBiomeAccessType());
+        this.biomeAccess = new BiomeAccess(this, BiomeAccess.hashSeed(this.seed), arg2.getDimension().getBiomeAccessType());
         this.field_23788 = list.get(0).getPos();
         this.field_23789 = list.get(list.size() - 1).getPos();
     }
@@ -346,13 +345,8 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public Dimension getDimension() {
+    public DimensionType getDimension() {
         return this.dimension;
-    }
-
-    @Override
-    public DimensionType method_27983() {
-        return this.dimension.getType();
     }
 
     @Override

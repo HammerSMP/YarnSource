@@ -35,6 +35,7 @@ import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexFormats;
@@ -142,8 +143,6 @@ Drawable {
         if (list.isEmpty()) {
             return;
         }
-        RenderSystem.disableRescaleNormal();
-        RenderSystem.disableDepthTest();
         int k = 0;
         for (Text lv : list) {
             int l = this.textRenderer.getWidth(lv);
@@ -163,38 +162,50 @@ Drawable {
         if (n + p + 6 > this.height) {
             n = this.height - p - 6;
         }
-        this.setZOffset(300);
+        arg.push();
         this.itemRenderer.zOffset = 300.0f;
         int q = -267386864;
-        this.fillGradient(arg, m - 3, n - 4, m + o + 3, n - 3, -267386864, -267386864);
-        this.fillGradient(arg, m - 3, n + p + 3, m + o + 3, n + p + 4, -267386864, -267386864);
-        this.fillGradient(arg, m - 3, n - 3, m + o + 3, n + p + 3, -267386864, -267386864);
-        this.fillGradient(arg, m - 4, n - 3, m - 3, n + p + 3, -267386864, -267386864);
-        this.fillGradient(arg, m + o + 3, n - 3, m + o + 4, n + p + 3, -267386864, -267386864);
         int r = 0x505000FF;
         int s = 1344798847;
-        this.fillGradient(arg, m - 3, n - 3 + 1, m - 3 + 1, n + p + 3 - 1, 0x505000FF, 1344798847);
-        this.fillGradient(arg, m + o + 2, n - 3 + 1, m + o + 3, n + p + 3 - 1, 0x505000FF, 1344798847);
-        this.fillGradient(arg, m - 3, n - 3, m + o + 3, n - 3 + 1, 0x505000FF, 0x505000FF);
-        this.fillGradient(arg, m - 3, n + p + 2, m + o + 3, n + p + 3, 1344798847, 1344798847);
-        VertexConsumerProvider.Immediate lv2 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        int t = 300;
+        Tessellator lv2 = Tessellator.getInstance();
+        BufferBuilder lv3 = lv2.getBuffer();
+        lv3.begin(7, VertexFormats.POSITION_COLOR);
+        Matrix4f lv4 = arg.peek().getModel();
+        Screen.fillGradient(lv4, lv3, m - 3, n - 4, m + o + 3, n - 3, 300, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 3, n + p + 3, m + o + 3, n + p + 4, 300, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n + p + 3, 300, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 4, n - 3, m - 3, n + p + 3, 300, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m + o + 3, n - 3, m + o + 4, n + p + 3, 300, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 3 + 1, m - 3 + 1, n + p + 3 - 1, 300, 0x505000FF, 1344798847);
+        Screen.fillGradient(lv4, lv3, m + o + 2, n - 3 + 1, m + o + 3, n + p + 3 - 1, 300, 0x505000FF, 1344798847);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n - 3 + 1, 300, 0x505000FF, 0x505000FF);
+        Screen.fillGradient(lv4, lv3, m - 3, n + p + 2, m + o + 3, n + p + 3, 300, 1344798847, 1344798847);
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.shadeModel(7425);
+        lv3.end();
+        BufferRenderer.draw(lv3);
+        RenderSystem.shadeModel(7424);
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+        VertexConsumerProvider.Immediate lv5 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         arg.translate(0.0, 0.0, this.itemRenderer.zOffset);
-        Matrix4f lv3 = arg.peek().getModel();
-        for (int t = 0; t < list.size(); ++t) {
-            Text lv4 = list.get(t);
-            if (lv4 != null) {
-                this.textRenderer.draw(lv4, (float)m, (float)n, -1, true, lv3, (VertexConsumerProvider)lv2, false, 0, 0xF000F0);
+        for (int u = 0; u < list.size(); ++u) {
+            Text lv6 = list.get(u);
+            if (lv6 != null) {
+                this.textRenderer.draw(lv6, (float)m, (float)n, -1, true, lv4, (VertexConsumerProvider)lv5, false, 0, 0xF000F0);
             }
-            if (t == 0) {
+            if (u == 0) {
                 n += 2;
             }
             n += 10;
         }
-        lv2.draw();
-        this.setZOffset(0);
+        lv5.draw();
+        arg.pop();
         this.itemRenderer.zOffset = 0.0f;
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableRescaleNormal();
     }
 
     protected void renderTextHoverEffect(MatrixStack arg, @Nullable Text arg2, int i, int j) {

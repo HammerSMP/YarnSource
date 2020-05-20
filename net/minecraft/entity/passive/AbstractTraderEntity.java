@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -187,7 +188,7 @@ Trader {
 
     @Override
     @Nullable
-    public Entity changeDimension(DimensionType arg) {
+    public Entity changeDimension(class_5321<DimensionType> arg) {
         this.resetCustomer();
         return super.changeDimension(arg);
     }

@@ -6,7 +6,11 @@
  *  com.google.gson.JsonNull
  *  com.google.gson.JsonObject
  *  com.google.gson.JsonSyntaxException
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.JsonOps
  *  javax.annotation.Nullable
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.predicate.entity;
 
@@ -14,8 +18,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.block.CampfireBlock;
+import net.minecraft.class_5321;
 import net.minecraft.predicate.BlockPredicate;
 import net.minecraft.predicate.FluidPredicate;
 import net.minecraft.predicate.LightPredicate;
@@ -27,10 +34,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.StructureFeature;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LocationPredicate {
+    private static final Logger field_24732 = LogManager.getLogger();
     public static final LocationPredicate ANY = new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, null, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     private final NumberRange.FloatRange x;
     private final NumberRange.FloatRange y;
@@ -40,14 +49,14 @@ public class LocationPredicate {
     @Nullable
     private final StructureFeature<?> feature;
     @Nullable
-    private final DimensionType dimension;
+    private final class_5321<DimensionType> dimension;
     @Nullable
     private final Boolean smokey;
     private final LightPredicate light;
     private final BlockPredicate block;
     private final FluidPredicate fluid;
 
-    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable DimensionType arg6, @Nullable Boolean arg7, LightPredicate arg8, BlockPredicate arg9, FluidPredicate arg10) {
+    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable class_5321<DimensionType> arg6, @Nullable Boolean arg7, LightPredicate arg8, BlockPredicate arg9, FluidPredicate arg10) {
         this.x = arg;
         this.y = arg2;
         this.z = arg3;
@@ -64,7 +73,7 @@ public class LocationPredicate {
         return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, arg, null, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
-    public static LocationPredicate dimension(DimensionType arg) {
+    public static LocationPredicate dimension(class_5321<DimensionType> arg) {
         return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, null, arg, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
@@ -94,7 +103,7 @@ public class LocationPredicate {
         if (!(this.biome == null || bl && this.biome == arg.getBiome(lv))) {
             return false;
         }
-        if (!(this.feature == null || bl && this.feature.isInsideStructure(arg.getStructureAccessor(), lv))) {
+        if (!(this.feature == null || bl && arg.getStructureAccessor().method_28388(lv, true, this.feature).hasChildren())) {
             return false;
         }
         if (!(this.smokey == null || bl && this.smokey == CampfireBlock.isLitCampfireInRange(arg, lv))) {
@@ -122,10 +131,10 @@ public class LocationPredicate {
             jsonObject.add("position", (JsonElement)jsonObject2);
         }
         if (this.dimension != null) {
-            jsonObject.addProperty("dimension", DimensionType.getId(this.dimension).toString());
+            DimensionType.field_24751.encodeStart((DynamicOps)JsonOps.INSTANCE, this.dimension).resultOrPartial(((Logger)field_24732)::error).ifPresent(jsonElement -> jsonObject.add("dimension", jsonElement));
         }
         if (this.feature != null) {
-            jsonObject.addProperty("feature", (String)Feature.STRUCTURES.inverse().get(this.feature));
+            jsonObject.addProperty("feature", this.feature.getName());
         }
         if (this.biome != null) {
             jsonObject.addProperty("biome", Registry.BIOME.getId(this.biome).toString());
@@ -148,8 +157,8 @@ public class LocationPredicate {
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject2.get("x"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject2.get("y"));
         NumberRange.FloatRange lv3 = NumberRange.FloatRange.fromJson(jsonObject2.get("z"));
-        DimensionType lv4 = jsonObject.has("dimension") ? DimensionType.byId(new Identifier(JsonHelper.getString(jsonObject, "dimension"))) : null;
-        StructureFeature lv5 = jsonObject.has("feature") ? (StructureFeature)Feature.STRUCTURES.get((Object)JsonHelper.getString(jsonObject, "feature")) : null;
+        class_5321 lv4 = jsonObject.has("dimension") ? (class_5321)Identifier.field_25139.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonObject.get("dimension")).resultOrPartial(((Logger)field_24732)::error).map(arg -> class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, arg)).orElse(null) : null;
+        StructureFeature lv5 = jsonObject.has("feature") ? (StructureFeature)StructureFeature.field_24842.get((Object)JsonHelper.getString(jsonObject, "feature")) : null;
         Biome lv6 = null;
         if (jsonObject.has("biome")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "biome"));
@@ -171,7 +180,7 @@ public class LocationPredicate {
         @Nullable
         private StructureFeature<?> feature;
         @Nullable
-        private DimensionType dimension;
+        private class_5321<DimensionType> dimension;
         @Nullable
         private Boolean smokey;
         private LightPredicate light = LightPredicate.ANY;

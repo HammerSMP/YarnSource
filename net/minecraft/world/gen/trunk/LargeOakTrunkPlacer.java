@@ -3,12 +3,16 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.trunk;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,16 +33,15 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class LargeOakTrunkPlacer
 extends TrunkPlacer {
+    public static final Codec<LargeOakTrunkPlacer> field_24967 = RecordCodecBuilder.create(instance -> LargeOakTrunkPlacer.method_28904(instance).apply((Applicative)instance, LargeOakTrunkPlacer::new));
+
     public LargeOakTrunkPlacer(int i, int j, int k) {
-        this(i, j, k, (TrunkPlacerType<? extends LargeOakTrunkPlacer>)TrunkPlacerType.FANCY_TRUNK_PLACER);
+        super(i, j, k);
     }
 
-    public LargeOakTrunkPlacer(int i, int j, int k, TrunkPlacerType<? extends LargeOakTrunkPlacer> arg) {
-        super(i, j, k, arg);
-    }
-
-    public <T> LargeOakTrunkPlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("base_height").asInt(0), dynamic.get("height_rand_a").asInt(0), dynamic.get("height_rand_b").asInt(0));
+    @Override
+    protected TrunkPlacerType<?> method_28903() {
+        return TrunkPlacerType.FANCY_TRUNK_PLACER;
     }
 
     @Override

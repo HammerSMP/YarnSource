@@ -15,6 +15,7 @@ import net.minecraft.client.util.NarratorManager;
 import net.minecraft.network.MessageType;
 import net.minecraft.realms.RepeatedNarrator;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
 
 @Environment(value=EnvType.CLIENT)
 public class Realms {
@@ -23,7 +24,7 @@ public class Realms {
     public static void narrateNow(String string) {
         NarratorManager lv = NarratorManager.INSTANCE;
         lv.clear();
-        lv.onChatMessage(MessageType.SYSTEM, new LiteralText(Realms.fixNarrationNewlines(string)));
+        lv.onChatMessage(MessageType.SYSTEM, new LiteralText(Realms.fixNarrationNewlines(string)), Util.field_25140);
     }
 
     private static String fixNarrationNewlines(String string) {

@@ -3,12 +3,16 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.trunk;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,12 +28,15 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class MegaJungleTrunkPlacer
 extends GiantTrunkPlacer {
+    public static final Codec<MegaJungleTrunkPlacer> field_24970 = RecordCodecBuilder.create(instance -> MegaJungleTrunkPlacer.method_28904(instance).apply((Applicative)instance, MegaJungleTrunkPlacer::new));
+
     public MegaJungleTrunkPlacer(int i, int j, int k) {
-        super(i, j, k, (TrunkPlacerType<? extends GiantTrunkPlacer>)TrunkPlacerType.MEGA_JUNGLE_TRUNK_PLACER);
+        super(i, j, k);
     }
 
-    public <T> MegaJungleTrunkPlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("base_height").asInt(0), dynamic.get("height_rand_a").asInt(0), dynamic.get("height_rand_b").asInt(0));
+    @Override
+    protected TrunkPlacerType<?> method_28903() {
+        return TrunkPlacerType.MEGA_JUNGLE_TRUNK_PLACER;
     }
 
     @Override

@@ -2,20 +2,14 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ServerWorldAccess;
@@ -32,6 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ConfiguredFeature<FC extends FeatureConfig, F extends Feature<FC>> {
+    public static final ConfiguredFeature<?, ?> field_24832 = new ConfiguredFeature<DefaultFeatureConfig, Feature<DefaultFeatureConfig>>(Feature.NO_OP, DefaultFeatureConfig.DEFAULT);
+    public static final Codec<ConfiguredFeature<?, ?>> field_24833 = Registry.FEATURE.dispatch("name", arg -> arg.feature, Feature::method_28627).withDefault(field_24832);
     public static final Logger log = LogManager.getLogger();
     public final F feature;
     public final FC config;
@@ -39,10 +35,6 @@ public class ConfiguredFeature<FC extends FeatureConfig, F extends Feature<FC>> 
     public ConfiguredFeature(F arg, FC arg2) {
         this.feature = arg;
         this.config = arg2;
-    }
-
-    public ConfiguredFeature(F arg, Dynamic<?> dynamic) {
-        this(arg, ((Feature)arg).deserializeConfig(dynamic));
     }
 
     public ConfiguredFeature<?, ?> createDecoratedFeature(ConfiguredDecorator<?> arg) {
@@ -54,24 +46,8 @@ public class ConfiguredFeature<FC extends FeatureConfig, F extends Feature<FC>> 
         return new RandomFeatureEntry(this, f);
     }
 
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("name"), (Object)dynamicOps.createString(Registry.FEATURE.getId((Feature<?>)this.feature).toString()), (Object)dynamicOps.createString("config"), (Object)this.config.serialize(dynamicOps).getValue())));
-    }
-
     public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4) {
         return ((Feature)this.feature).generate(arg, arg2, arg3, random, arg4, this.config);
-    }
-
-    public static <T> ConfiguredFeature<?, ?> deserialize(Dynamic<T> dynamic) {
-        String string = dynamic.get("name").asString("");
-        Feature<?> lv = Registry.FEATURE.get(new Identifier(string));
-        try {
-            return new ConfiguredFeature(lv, dynamic.get("config").orElseEmptyMap());
-        }
-        catch (RuntimeException runtimeException) {
-            log.warn("Error while deserializing {}", (Object)string);
-            return new ConfiguredFeature<DefaultFeatureConfig, Feature<DefaultFeatureConfig>>(Feature.NO_OP, DefaultFeatureConfig.DEFAULT);
-        }
     }
 }
 

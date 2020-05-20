@@ -4,36 +4,46 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableList$Builder
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
  *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.MapLike
+ *  com.mojang.serialization.RecordBuilder
  *  it.unimi.dsi.fastutil.objects.ObjectArrayList
  *  javax.annotation.Nullable
+ *  org.apache.commons.lang3.mutable.MutableObject
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.entity.ai.brain;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Memory;
@@ -43,14 +53,16 @@ import net.minecraft.entity.ai.brain.Schedule;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.ai.brain.task.Task;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.DynamicSerializable;
+import net.minecraft.util.Util;
 import net.minecraft.util.registry.Registry;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class Brain<E extends LivingEntity>
-implements DynamicSerializable {
+public class Brain<E extends LivingEntity> {
+    private static final Logger field_24656 = LogManager.getLogger();
+    private final Supplier<Codec<Brain<E>>> field_24657;
     private final Map<MemoryModuleType<?>, Optional<? extends Memory<?>>> memories = Maps.newHashMap();
     private final Map<SensorType<? extends Sensor<? super E>>, Sensor<? super E>> sensors = Maps.newLinkedHashMap();
     private final Map<Integer, Map<Activity, Set<Task<? super E>>>> tasks = Maps.newTreeMap();
@@ -62,7 +74,47 @@ implements DynamicSerializable {
     private Activity defaultActivity = Activity.IDLE;
     private long activityStartTime = -9999L;
 
-    public <T> Brain(Collection<MemoryModuleType<?>> collection, Collection<SensorType<? extends Sensor<? super E>>> collection2, Dynamic<T> dynamic) {
+    public static <E extends LivingEntity> class_5303<E> method_28311(Collection<? extends MemoryModuleType<?>> collection, Collection<? extends SensorType<? extends Sensor<? super E>>> collection2) {
+        return new class_5303(collection, collection2);
+    }
+
+    public static <E extends LivingEntity> Codec<Brain<E>> method_28313(final Collection<? extends MemoryModuleType<?>> collection, final Collection<? extends SensorType<? extends Sensor<? super E>>> collection2) {
+        final MutableObject mutableObject = new MutableObject();
+        mutableObject.setValue((Object)new MapCodec<Brain<E>>(){
+
+            public <T> Stream<T> keys(DynamicOps<T> dynamicOps) {
+                return collection.stream().flatMap(arg -> Util.stream(arg.getFactory().map(codec -> Registry.MEMORY_MODULE_TYPE.getId((MemoryModuleType<?>)arg)))).map(arg -> dynamicOps.createString(arg.toString()));
+            }
+
+            public <T> DataResult<Brain<E>> decode(DynamicOps<T> dynamicOps, MapLike<T> mapLike) {
+                MutableObject mutableObject2 = new MutableObject((Object)DataResult.success((Object)ImmutableList.builder()));
+                mapLike.entries().forEach(pair -> {
+                    DataResult dataResult = Registry.MEMORY_MODULE_TYPE.parse(dynamicOps, pair.getFirst());
+                    DataResult dataResult2 = dataResult.flatMap(arg -> this.method_28320((MemoryModuleType)arg, dynamicOps, (Object)pair.getSecond()));
+                    mutableObject2.setValue((Object)((DataResult)mutableObject2.getValue()).apply2(ImmutableList.Builder::add, dataResult2));
+                });
+                ImmutableList immutableList = ((DataResult)mutableObject2.getValue()).resultOrPartial(((Logger)field_24656)::error).map(ImmutableList.Builder::build).orElseGet(ImmutableList::of);
+                return DataResult.success(new Brain(collection, collection2, immutableList, ((MutableObject)mutableObject)::getValue));
+            }
+
+            private <T, U> DataResult<class_5302<U>> method_28320(MemoryModuleType<U> arg, DynamicOps<T> dynamicOps, T object) {
+                return arg.getFactory().map(DataResult::success).orElseGet(() -> DataResult.error((String)("No codec for memory: " + arg))).flatMap(codec -> codec.parse(dynamicOps, object)).map(arg2 -> new class_5302(arg, Optional.of(arg2)));
+            }
+
+            public <T> RecordBuilder<T> encode(Brain<E> arg2, DynamicOps<T> dynamicOps, RecordBuilder<T> recordBuilder) {
+                arg2.method_28315().forEach(arg -> arg.method_28330(dynamicOps, recordBuilder));
+                return recordBuilder;
+            }
+
+            public /* synthetic */ RecordBuilder encode(Object object, DynamicOps dynamicOps, RecordBuilder recordBuilder) {
+                return this.encode((Brain)object, dynamicOps, recordBuilder);
+            }
+        }.fieldOf("memories").codec());
+        return (Codec)mutableObject.getValue();
+    }
+
+    public Brain(Collection<? extends MemoryModuleType<?>> collection, Collection<? extends SensorType<? extends Sensor<? super E>>> collection2, ImmutableList<class_5302<?>> immutableList, Supplier<Codec<Brain<E>>> supplier) {
+        this.field_24657 = supplier;
         for (MemoryModuleType<?> memoryModuleType : collection) {
             this.memories.put(memoryModuleType, Optional.empty());
         }
@@ -74,18 +126,21 @@ implements DynamicSerializable {
                 this.memories.put(lv4, Optional.empty());
             }
         }
-        for (Map.Entry entry : dynamic.get("memories").asMap(Function.identity(), Function.identity()).entrySet()) {
-            this.readMemory(Registry.MEMORY_MODULE_TYPE.get(new Identifier(((Dynamic)entry.getKey()).asString(""))), (Dynamic)entry.getValue());
+        for (class_5302 class_53022 : immutableList) {
+            class_53022.method_28328(this);
         }
+    }
+
+    public <T> DataResult<T> method_28310(DynamicOps<T> dynamicOps) {
+        return this.field_24657.get().encodeStart(dynamicOps, (Object)this);
+    }
+
+    private Stream<class_5302<?>> method_28315() {
+        return this.memories.entrySet().stream().map(entry -> class_5302.method_28333((MemoryModuleType)entry.getKey(), (Optional)entry.getValue()));
     }
 
     public boolean hasMemoryModule(MemoryModuleType<?> arg) {
         return this.isMemoryInState(arg, MemoryModuleState.VALUE_PRESENT);
-    }
-
-    private <T, U> void readMemory(MemoryModuleType<U> arg, Dynamic<T> dynamic) {
-        Memory<U> lv = new Memory<U>(arg.getFactory().orElseThrow(RuntimeException::new), dynamic);
-        this.setMemory(arg, Optional.of(lv));
     }
 
     public <U> void forget(MemoryModuleType<U> arg) {
@@ -101,7 +156,7 @@ implements DynamicSerializable {
     }
 
     public <U> void remember(MemoryModuleType<U> arg, Optional<? extends U> optional) {
-        this.setMemory(arg, optional.map(Memory::permanent));
+        this.setMemory(arg, optional.map(Memory::method_28355));
     }
 
     private <U> void setMemory(MemoryModuleType<U> arg, Optional<? extends Memory<?>> optional) {
@@ -247,7 +302,7 @@ implements DynamicSerializable {
     }
 
     public Brain<E> copy() {
-        Brain<E> lv = new Brain<E>(this.memories.keySet(), this.sensors.keySet(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)new CompoundTag()));
+        Brain<E> lv = new Brain<E>(this.memories.keySet(), this.sensors.keySet(), ImmutableList.of(), this.field_24657);
         for (Map.Entry<MemoryModuleType<?>, Optional<Memory<?>>> entry : this.memories.entrySet()) {
             MemoryModuleType<?> lv2 = entry.getKey();
             if (!entry.getValue().isPresent()) continue;
@@ -284,20 +339,6 @@ implements DynamicSerializable {
         for (Task<E> lv : this.method_27074()) {
             lv.stop(arg, arg2, l);
         }
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        for (Map.Entry<MemoryModuleType<?>, Optional<Memory<?>>> entry : this.memories.entrySet()) {
-            MemoryModuleType<?> lv = entry.getKey();
-            if (!entry.getValue().isPresent() || !lv.getFactory().isPresent()) continue;
-            Memory<?> lv2 = entry.getValue().get();
-            Object object = dynamicOps.createString(Registry.MEMORY_MODULE_TYPE.getId(lv).toString());
-            Object object2 = lv2.serialize(dynamicOps);
-            builder.put(object, object2);
-        }
-        return (T)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("memories"), (Object)dynamicOps.createMap((Map)builder.build())));
     }
 
     private void startTasks(ServerWorld arg, E arg2) {
@@ -346,6 +387,44 @@ implements DynamicSerializable {
             builder.add((Object)Pair.of((Object)j++, (Object)lv));
         }
         return builder.build();
+    }
+
+    static final class class_5302<U> {
+        private final MemoryModuleType<U> field_24661;
+        private final Optional<? extends Memory<U>> field_24662;
+
+        private static <U> class_5302<U> method_28333(MemoryModuleType<U> arg, Optional<? extends Memory<?>> optional) {
+            return new class_5302<U>(arg, optional);
+        }
+
+        private class_5302(MemoryModuleType<U> arg, Optional<? extends Memory<U>> optional) {
+            this.field_24661 = arg;
+            this.field_24662 = optional;
+        }
+
+        private void method_28328(Brain<?> arg) {
+            ((Brain)arg).setMemory(this.field_24661, this.field_24662);
+        }
+
+        public <T> void method_28330(DynamicOps<T> dynamicOps, RecordBuilder<T> recordBuilder) {
+            this.field_24661.getFactory().ifPresent(codec -> this.field_24662.ifPresent(arg -> recordBuilder.add(Registry.MEMORY_MODULE_TYPE.encodeStart(dynamicOps, this.field_24661), codec.encodeStart(dynamicOps, arg))));
+        }
+    }
+
+    public static final class class_5303<E extends LivingEntity> {
+        private final Collection<? extends MemoryModuleType<?>> field_24663;
+        private final Collection<? extends SensorType<? extends Sensor<? super E>>> field_24664;
+        private final Codec<Brain<E>> field_24665;
+
+        private class_5303(Collection<? extends MemoryModuleType<?>> collection, Collection<? extends SensorType<? extends Sensor<? super E>>> collection2) {
+            this.field_24663 = collection;
+            this.field_24664 = collection2;
+            this.field_24665 = Brain.method_28313(collection, collection2);
+        }
+
+        public Brain<E> method_28335(Dynamic<?> dynamic) {
+            return this.field_24665.parse(dynamic).resultOrPartial(((Logger)field_24656)::error).orElseGet(() -> new Brain(this.field_24663, this.field_24664, ImmutableList.of(), () -> this.field_24665));
+        }
     }
 }
 

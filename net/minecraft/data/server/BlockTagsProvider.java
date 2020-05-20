@@ -97,7 +97,7 @@ extends AbstractTagProvider<Block> {
         this.getOrCreateTagBuilder(BlockTags.STRIDER_WARM_BLOCKS).add(Blocks.LAVA);
         this.getOrCreateTagBuilder(BlockTags.CAMPFIRES).add(Blocks.CAMPFIRE, Blocks.SOUL_CAMPFIRE);
         this.getOrCreateTagBuilder(BlockTags.GUARDED_BY_PIGLINS).add(Blocks.GOLD_BLOCK, Blocks.BARREL, Blocks.CHEST, Blocks.ENDER_CHEST, Blocks.GILDED_BLACKSTONE, Blocks.TRAPPED_CHEST).addTag(BlockTags.SHULKER_BOXES).addTag(BlockTags.GOLD_ORES);
-        this.getOrCreateTagBuilder(BlockTags.PREVENT_MOB_SPAWNING_INSIDE).addTag(BlockTags.RAILS).add(Blocks.WITHER_ROSE, Blocks.SWEET_BERRY_BUSH);
+        this.getOrCreateTagBuilder(BlockTags.PREVENT_MOB_SPAWNING_INSIDE).addTag(BlockTags.RAILS).add(Blocks.SWEET_BERRY_BUSH);
     }
 
     @Override

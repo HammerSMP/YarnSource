@@ -4,11 +4,13 @@
  * Could not load the following classes:
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.particle;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
@@ -39,13 +41,19 @@ implements ParticleEffect {
             return this.read(arg, stringReader);
         }
     };
+    private final Codec<DefaultParticleType> field_25127 = Codec.unit(this::getType);
 
     protected DefaultParticleType(boolean bl) {
         super(bl, PARAMETER_FACTORY);
     }
 
-    public ParticleType<DefaultParticleType> getType() {
+    public DefaultParticleType getType() {
         return this;
+    }
+
+    @Override
+    public Codec<DefaultParticleType> method_29138() {
+        return this.field_25127;
     }
 
     @Override
@@ -55,6 +63,10 @@ implements ParticleEffect {
     @Override
     public String asString() {
         return Registry.PARTICLE_TYPE.getId(this).toString();
+    }
+
+    public /* synthetic */ ParticleType getType() {
+        return this.getType();
     }
 }
 

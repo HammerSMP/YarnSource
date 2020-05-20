@@ -5,6 +5,7 @@ package net.minecraft.world.gen;
 
 import java.util.List;
 import java.util.Random;
+import net.minecraft.class_5304;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.SpawnRestriction;
@@ -16,13 +17,15 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 
-public class CatSpawner {
+public class CatSpawner
+implements class_5304 {
     private int ticksUntilNextSpawn;
 
+    @Override
     public int spawn(ServerWorld arg, boolean bl, boolean bl2) {
         Random random;
         if (!bl2 || !arg.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
@@ -47,7 +50,7 @@ public class CatSpawner {
             if (arg.isNearOccupiedPointOfInterest(lv2, 2)) {
                 return this.spawnInHouse(arg, lv2);
             }
-            if (Feature.SWAMP_HUT.isInsideStructure(arg.getStructureAccessor(), lv2)) {
+            if (arg.getStructureAccessor().method_28388(lv2, true, StructureFeature.field_24851).hasChildren()) {
                 return this.spawnInSwampHut(arg, lv2);
             }
         }

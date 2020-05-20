@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
+ *  com.mojang.serialization.MapCodec
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -10,6 +11,7 @@
 package net.minecraft.block;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +50,6 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.state.AbstractState;
 import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
 import net.minecraft.tag.FluidTags;
@@ -365,8 +366,7 @@ public abstract class AbstractBlock {
     }
 
     public static abstract class AbstractBlockState
-    extends AbstractState<Block, BlockState>
-    implements State<BlockState> {
+    extends State<Block, BlockState> {
         private final int luminance;
         private final boolean hasSidedTransparency;
         private final boolean isAir;
@@ -382,8 +382,8 @@ public abstract class AbstractBlock {
         @Nullable
         protected ShapeCache shapeCache;
 
-        protected AbstractBlockState(Block arg, ImmutableMap<Property<?>, Comparable<?>> immutableMap) {
-            super(arg, immutableMap);
+        protected AbstractBlockState(Block arg, ImmutableMap<Property<?>, Comparable<?>> immutableMap, MapCodec<BlockState> mapCodec) {
+            super(arg, immutableMap, mapCodec);
             Settings lv = arg.settings;
             this.luminance = lv.luminance.applyAsInt(this.asBlockState());
             this.hasSidedTransparency = arg.hasSidedTransparency(this.asBlockState());
@@ -406,7 +406,7 @@ public abstract class AbstractBlock {
         }
 
         public Block getBlock() {
-            return (Block)this.owner;
+            return (Block)this.field_24739;
         }
 
         public Material getMaterial() {

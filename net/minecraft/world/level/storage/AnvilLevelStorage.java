@@ -44,9 +44,9 @@ public class AnvilLevelStorage {
         ArrayList list = Lists.newArrayList();
         ArrayList list2 = Lists.newArrayList();
         ArrayList list3 = Lists.newArrayList();
-        File file = arg.method_27424(DimensionType.OVERWORLD);
-        File file2 = arg.method_27424(DimensionType.THE_NETHER);
-        File file3 = arg.method_27424(DimensionType.THE_END);
+        File file = arg.method_27424(DimensionType.field_24753);
+        File file2 = arg.method_27424(DimensionType.field_24754);
+        File file3 = arg.method_27424(DimensionType.field_24755);
         LOGGER.info("Scanning folders...");
         AnvilLevelStorage.addRegionFiles(file, list);
         if (file2.exists()) {
@@ -62,7 +62,7 @@ public class AnvilLevelStorage {
         if (lv != null && lv.method_28057().method_28034()) {
             FixedBiomeSource lv2 = new FixedBiomeSource(Biomes.PLAINS);
         } else {
-            lv3 = new VanillaLayeredBiomeSource(l, false, 4);
+            lv3 = new VanillaLayeredBiomeSource(l, false, false);
         }
         AnvilLevelStorage.convertRegions(new File(file, "region"), list, lv3, 0, i, arg2);
         AnvilLevelStorage.convertRegions(new File(file2, "region"), list2, new FixedBiomeSource(Biomes.NETHER_WASTES), list.size(), i, arg2);

@@ -3,18 +3,18 @@
  * 
  * Could not load the following classes:
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.datafixer.TypeReferences;
 
 public class IglooMetadataRemovalFix
@@ -30,7 +30,7 @@ extends DataFix {
     }
 
     private static <T> Dynamic<T> removeMetadata(Dynamic<T> dynamic) {
-        boolean bl = dynamic.get("Children").asStreamOpt().map(stream -> stream.allMatch(IglooMetadataRemovalFix::isIgloo)).orElse(false);
+        boolean bl = dynamic.get("Children").asStreamOpt().map(stream -> stream.allMatch(IglooMetadataRemovalFix::isIgloo)).result().orElse(false);
         if (bl) {
             return dynamic.set("id", dynamic.createString("Igloo")).remove("Children");
         }
@@ -38,7 +38,7 @@ extends DataFix {
     }
 
     private static <T> Dynamic<T> removeIgloos(Dynamic<T> dynamic) {
-        return dynamic.asStreamOpt().map(stream -> stream.filter(dynamic -> !IglooMetadataRemovalFix.isIgloo(dynamic))).map(dynamic::createList).orElse(dynamic);
+        return dynamic.asStreamOpt().map(stream -> stream.filter(dynamic -> !IglooMetadataRemovalFix.isIgloo(dynamic))).map(dynamic::createList).result().orElse(dynamic);
     }
 
     private static boolean isIgloo(Dynamic<?> dynamic) {

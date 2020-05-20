@@ -8,6 +8,7 @@ package net.minecraft.entity.vehicle;
 
 import javax.annotation.Nullable;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -124,7 +125,7 @@ NamedScreenHandlerFactory {
 
     @Override
     @Nullable
-    public Entity changeDimension(DimensionType arg) {
+    public Entity changeDimension(class_5321<DimensionType> arg) {
         this.field_7733 = false;
         return super.changeDimension(arg);
     }

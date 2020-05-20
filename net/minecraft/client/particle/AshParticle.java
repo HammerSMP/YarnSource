@@ -34,7 +34,7 @@ extends AscendingParticle {
 
         @Override
         public Particle createParticle(DefaultParticleType arg, ClientWorld arg2, double d, double e, double f, double g, double h, double i) {
-            return new AshParticle(arg2, d, e, f, g, h, i, 1.0f, this.spriteProvider);
+            return new AshParticle(arg2, d, e, f, 0.0, 0.0, 0.0, 1.0f, this.spriteProvider);
         }
     }
 }

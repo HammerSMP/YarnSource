@@ -18,6 +18,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 
@@ -37,7 +38,7 @@ public class GameModeCommand {
             arg.sendFeedback(new TranslatableText("commands.gamemode.success.self", lv), true);
         } else {
             if (arg.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
-                arg2.sendSystemMessage(new TranslatableText("gameMode.changed", lv));
+                arg2.sendSystemMessage(new TranslatableText("gameMode.changed", lv), Util.field_25140);
             }
             arg.sendFeedback(new TranslatableText("commands.gamemode.success.other", arg2.getDisplayName(), lv), true);
         }

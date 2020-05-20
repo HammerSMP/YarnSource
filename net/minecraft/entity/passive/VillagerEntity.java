@@ -5,24 +5,26 @@
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.ImmutableSet
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  it.unimi.dsi.fastutil.ints.Int2ObjectMap
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.entity.passive;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,6 +107,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
+import org.apache.logging.log4j.Logger;
 
 public class VillagerEntity
 extends AbstractTraderEntity
@@ -139,16 +142,19 @@ VillagerDataContainer {
         this.getNavigation().setCanSwim(true);
         this.setCanPickUpLoot(true);
         this.setVillagerData(this.getVillagerData().withType(arg3).withProfession(VillagerProfession.NONE));
-        this.brain = this.deserializeBrain(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)new CompoundTag()));
     }
 
     public Brain<VillagerEntity> getBrain() {
         return super.getBrain();
     }
 
+    protected Brain.class_5303<VillagerEntity> method_28306() {
+        return Brain.method_28311(MEMORY_MODULES, SENSORS);
+    }
+
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        Brain<VillagerEntity> lv = new Brain<VillagerEntity>((Collection<MemoryModuleType<?>>)MEMORY_MODULES, (Collection<SensorType<Sensor<VillagerEntity>>>)SENSORS, dynamic);
+        Brain<VillagerEntity> lv = this.method_28306().method_28335(dynamic);
         this.initBrain(lv);
         return lv;
     }
@@ -384,7 +390,7 @@ VillagerDataContainer {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        arg.put("VillagerData", this.getVillagerData().serialize(NbtOps.INSTANCE));
+        VillagerData.field_24669.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("VillagerData", (Tag)arg2));
         arg.putByte("FoodLevel", this.foodLevel);
         arg.put("Gossips", (Tag)this.gossip.serialize(NbtOps.INSTANCE).getValue());
         arg.putInt("Xp", this.experience);
@@ -397,7 +403,8 @@ VillagerDataContainer {
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
         if (arg.contains("VillagerData", 10)) {
-            this.setVillagerData(new VillagerData(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData"))));
+            DataResult dataResult = VillagerData.field_24669.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData")));
+            dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(this::setVillagerData);
         }
         if (arg.contains("Offers", 10)) {
             this.offers = new TraderOfferList(arg.getCompound("Offers"));

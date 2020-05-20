@@ -65,7 +65,7 @@ extends ConditionalLootFunction {
                 lv4 = new CompoundTag();
                 lv2.put("BlockStateTag", lv4);
             }
-            this.properties.stream().filter(lv::contains).forEach(arg3 -> lv4.putString(arg3.getName(), CopyStateFunction.method_21893(lv, arg3)));
+            this.properties.stream().filter(lv::method_28498).forEach(arg3 -> lv4.putString(arg3.getName(), CopyStateFunction.method_21893(lv, arg3)));
         }
         return arg;
     }

@@ -5,6 +5,7 @@
  *  com.google.common.collect.Lists
  *  com.mojang.authlib.GameProfile
  *  com.mojang.datafixers.util.Either
+ *  com.mojang.serialization.DynamicOps
  *  io.netty.util.concurrent.Future
  *  io.netty.util.concurrent.GenericFutureListener
  *  javax.annotation.Nullable
@@ -16,6 +17,7 @@ package net.minecraft.server.network;
 import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.DynamicOps;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.util.ArrayList;
@@ -24,18 +26,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Random;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.class_5217;
+import net.minecraft.class_5321;
+import net.minecraft.class_5322;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -55,6 +60,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.NetworkSyncedItem;
 import net.minecraft.item.WrittenBookItem;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket;
@@ -132,6 +138,7 @@ import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -175,7 +182,7 @@ implements ScreenHandlerListener {
     @Nullable
     private Vec3d enteredNetherPos;
     private ChunkSectionPos cameraPosition = ChunkSectionPos.from(0, 0, 0);
-    private DimensionType spawnPointDimension = DimensionType.OVERWORLD;
+    private class_5321<DimensionType> spawnPointDimension = DimensionType.field_24753;
     private BlockPos spawnPointPosition;
     private boolean spawnPointSet;
     private int screenHandlerSyncId;
@@ -197,7 +204,7 @@ implements ScreenHandlerListener {
 
     private void moveToSpawn(ServerWorld arg) {
         BlockPos lv = arg.method_27911();
-        if (arg.method_27983().hasSkyLight() && arg.getServer().method_27728().getGameMode() != GameMode.ADVENTURE) {
+        if (arg.getDimension().hasSkyLight() && arg.getServer().method_27728().getGameMode() != GameMode.ADVENTURE) {
             long l;
             long m;
             int i = Math.max(0, this.server.getSpawnRadius(arg));
@@ -215,7 +222,7 @@ implements ScreenHandlerListener {
                 int q = (o + n * p) % k;
                 int r = q % (i * 2 + 1);
                 int s = q / (i * 2 + 1);
-                BlockPos lv2 = arg.getDimension().getTopSpawningBlockPosition(arg.getSeed(), lv.getX() + r - i, lv.getZ() + s - i, false);
+                BlockPos lv2 = class_5322.method_29197(arg, lv, i, r, s);
                 if (lv2 == null) continue;
                 this.refreshPositionAndAngles(lv2, 0.0f, 0.0f);
                 if (!arg.doesNotCollide(this)) {
@@ -259,9 +266,8 @@ implements ScreenHandlerListener {
         if (arg.contains("SpawnX", 99) && arg.contains("SpawnY", 99) && arg.contains("SpawnZ", 99)) {
             this.spawnPointPosition = new BlockPos(arg.getInt("SpawnX"), arg.getInt("SpawnY"), arg.getInt("SpawnZ"));
             this.spawnPointSet = arg.getBoolean("SpawnForced");
-            if (arg.contains("SpawnDimension", 8)) {
-                Identifier lv2 = Identifier.tryParse(arg.getString("SpawnDimension"));
-                this.spawnPointDimension = lv2 != null ? DimensionType.byId(lv2) : DimensionType.OVERWORLD;
+            if (arg.contains("SpawnDimension")) {
+                this.spawnPointDimension = DimensionType.field_24751.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(DimensionType.field_24753);
             }
         }
     }
@@ -289,12 +295,13 @@ implements ScreenHandlerListener {
             arg.put("RootVehicle", lv4);
         }
         arg.put("recipeBook", this.recipeBook.toTag());
+        arg.putString("Dimension", this.world.method_27983().method_29177().toString());
         if (this.spawnPointPosition != null) {
             arg.putInt("SpawnX", this.spawnPointPosition.getX());
             arg.putInt("SpawnY", this.spawnPointPosition.getY());
             arg.putInt("SpawnZ", this.spawnPointPosition.getZ());
             arg.putBoolean("SpawnForced", this.spawnPointSet);
-            arg.putString("SpawnDimension", DimensionType.getId(this.spawnPointDimension).toString());
+            Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.method_29177()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("SpawnDimension", (Tag)arg2));
         }
     }
 
@@ -467,7 +474,7 @@ implements ScreenHandlerListener {
             }));
             AbstractTeam lv2 = this.getScoreboardTeam();
             if (lv2 == null || lv2.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.ALWAYS) {
-                this.server.getPlayerManager().sendToAll(lv);
+                this.server.getPlayerManager().broadcastChatMessage(lv, MessageType.SYSTEM, Util.field_25140);
             } else if (lv2.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS) {
                 this.server.getPlayerManager().sendToTeam(this, lv);
             } else if (lv2.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM) {
@@ -563,10 +570,11 @@ implements ScreenHandlerListener {
 
     @Override
     @Nullable
-    public Entity changeDimension(DimensionType arg) {
+    public Entity changeDimension(class_5321<DimensionType> arg) {
+        float h;
         this.inTeleportationState = true;
-        DimensionType lv = this.dimension;
-        if (lv == DimensionType.THE_END && arg == DimensionType.OVERWORLD) {
+        class_5321<DimensionType> lv = this.world.method_27983();
+        if (lv == DimensionType.field_24755 && arg == DimensionType.field_24753) {
             this.detach();
             this.getServerWorld().removePlayer(this);
             if (!this.notInAnyWorld) {
@@ -577,10 +585,9 @@ implements ScreenHandlerListener {
             return this;
         }
         ServerWorld lv2 = this.server.getWorld(lv);
-        this.dimension = arg;
         ServerWorld lv3 = this.server.getWorld(arg);
         class_5217 lv4 = lv3.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg, BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.method_27982(), lv3.method_28125(), true));
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.method_29177(), BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.method_27982(), lv3.method_28125(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
         PlayerManager lv5 = this.server.getPlayerManager();
         lv5.sendCommandTree(this);
@@ -590,24 +597,30 @@ implements ScreenHandlerListener {
         double e = this.getY();
         double f = this.getZ();
         float g = this.pitch;
-        float h = this.yaw;
-        double i = 8.0;
-        float j = h;
+        float i = h = this.yaw;
         lv2.getProfiler().push("moving");
-        if (lv == DimensionType.OVERWORLD && arg == DimensionType.THE_NETHER) {
-            this.enteredNetherPos = this.getPos();
-            d /= 8.0;
-            f /= 8.0;
-        } else if (lv == DimensionType.THE_NETHER && arg == DimensionType.OVERWORLD) {
-            d *= 8.0;
-            f *= 8.0;
-        } else if (lv == DimensionType.OVERWORLD && arg == DimensionType.THE_END) {
-            BlockPos lv6 = lv3.getForcedSpawnPoint();
+        if (lv == DimensionType.field_24753 && arg == DimensionType.field_24755) {
+            BlockPos lv6 = ServerWorld.field_25144;
             d = lv6.getX();
             e = lv6.getY();
             f = lv6.getZ();
             h = 90.0f;
             g = 0.0f;
+        } else {
+            if (lv == DimensionType.field_24753 && arg == DimensionType.field_24754) {
+                this.enteredNetherPos = this.getPos();
+            }
+            Registry<DimensionType> lv7 = this.server.method_29174().method_29116();
+            DimensionType lv8 = lv7.method_29107(lv);
+            DimensionType lv9 = lv7.method_29107(arg);
+            double j = 8.0;
+            if (!lv8.method_28539() && lv9.method_28539()) {
+                d /= 8.0;
+                f /= 8.0;
+            } else if (lv8.method_28539() && !lv9.method_28539()) {
+                d *= 8.0;
+                f *= 8.0;
+            }
         }
         this.refreshPositionAndAngles(d, e, f, h, g);
         lv2.getProfiler().pop();
@@ -619,28 +632,16 @@ implements ScreenHandlerListener {
         d = MathHelper.clamp(d, k, m);
         f = MathHelper.clamp(f, l, n);
         this.refreshPositionAndAngles(d, e, f, h, g);
-        if (arg == DimensionType.THE_END) {
+        if (arg == DimensionType.field_24755) {
             int o = MathHelper.floor(this.getX());
             int p = MathHelper.floor(this.getY()) - 1;
             int q = MathHelper.floor(this.getZ());
-            boolean r = true;
-            boolean s = false;
-            for (int t = -2; t <= 2; ++t) {
-                for (int u = -2; u <= 2; ++u) {
-                    for (int v = -1; v < 3; ++v) {
-                        int w = o + u * 1 + t * 0;
-                        int x = p + v;
-                        int y = q + u * 0 - t * 1;
-                        boolean bl = v < 0;
-                        lv3.setBlockState(new BlockPos(w, x, y), bl ? Blocks.OBSIDIAN.getDefaultState() : Blocks.AIR.getDefaultState());
-                    }
-                }
-            }
+            ServerWorld.method_29200(lv3);
             this.refreshPositionAndAngles(o, p, q, h, 0.0f);
             this.setVelocity(Vec3d.ZERO);
-        } else if (!lv3.getPortalForcer().usePortal(this, j)) {
+        } else if (!lv3.getPortalForcer().usePortal(this, i)) {
             lv3.getPortalForcer().createPortal(this);
-            lv3.getPortalForcer().usePortal(this, j);
+            lv3.getPortalForcer().usePortal(this, i);
         }
         lv2.getProfiler().pop();
         this.setWorld(lv3);
@@ -651,8 +652,8 @@ implements ScreenHandlerListener {
         this.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(this.abilities));
         lv5.sendWorldInfo(this, lv3);
         lv5.sendPlayerStatus(this);
-        for (StatusEffectInstance lv7 : this.getStatusEffects()) {
-            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv7));
+        for (StatusEffectInstance lv10 : this.getStatusEffects()) {
+            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv10));
         }
         this.networkHandler.sendPacket(new WorldEventS2CPacket(1032, BlockPos.ORIGIN, 0, false));
         this.syncedExperience = -1;
@@ -662,13 +663,15 @@ implements ScreenHandlerListener {
     }
 
     private void dimensionChanged(ServerWorld arg) {
-        DimensionType lv = arg.method_27983();
-        DimensionType lv2 = this.world.method_27983();
-        Criteria.CHANGED_DIMENSION.trigger(this, lv, lv2);
-        if (lv == DimensionType.THE_NETHER && lv2 == DimensionType.OVERWORLD && this.enteredNetherPos != null) {
+        DimensionType lv = arg.getDimension();
+        DimensionType lv2 = this.world.getDimension();
+        class_5321<DimensionType> lv3 = arg.method_27983();
+        class_5321<DimensionType> lv4 = this.world.method_27983();
+        Criteria.CHANGED_DIMENSION.trigger(this, lv3, lv4);
+        if (lv.method_28542() && lv2.method_28541() && this.enteredNetherPos != null) {
             Criteria.NETHER_TRAVEL.trigger(this, this.enteredNetherPos);
         }
-        if (lv2 != DimensionType.THE_NETHER) {
+        if (lv4 != DimensionType.field_24754) {
             this.enteredNetherPos = null;
         }
     }
@@ -703,7 +706,7 @@ implements ScreenHandlerListener {
         if (this.isSleeping() || !this.isAlive()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OTHER_PROBLEM));
         }
-        if (!this.world.getDimension().hasVisibleSky()) {
+        if (!this.world.getDimension().method_28537()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_HERE));
         }
         if (!this.isBedTooFarAway(arg2, lv)) {
@@ -808,8 +811,7 @@ implements ScreenHandlerListener {
         if (!this.world.isChunkLoaded(lv)) {
             return;
         }
-        BlockState lv2 = this.world.getBlockState(lv);
-        super.fall(d, bl, lv2, lv);
+        super.fall(d, bl, this.world.getBlockState(lv), lv);
     }
 
     @Override
@@ -834,7 +836,7 @@ implements ScreenHandlerListener {
         ScreenHandler lv = arg.createMenu(this.screenHandlerSyncId, this.inventory, this);
         if (lv == null) {
             if (this.isSpectator()) {
-                this.sendMessage((Text)new TranslatableText("container.spectatorCantOpen").formatted(Formatting.RED), true);
+                this.sendMessage(new TranslatableText("container.spectatorCantOpen").formatted(Formatting.RED), true);
             }
             return OptionalInt.empty();
         }
@@ -992,7 +994,7 @@ implements ScreenHandlerListener {
 
     @Override
     public void sendMessage(Text arg, boolean bl) {
-        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, bl ? MessageType.GAME_INFO : MessageType.CHAT));
+        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, bl ? MessageType.GAME_INFO : MessageType.CHAT, Util.field_25140));
     }
 
     @Override
@@ -1135,17 +1137,17 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void sendSystemMessage(Text arg) {
-        this.sendMessage(arg, MessageType.SYSTEM);
+    public void sendSystemMessage(Text arg, UUID uUID) {
+        this.sendMessage(arg, MessageType.SYSTEM, uUID);
     }
 
-    public void sendMessage(Text arg, MessageType arg2) {
-        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, arg2), (GenericFutureListener<? extends Future<? super Void>>)((GenericFutureListener)future -> {
+    public void sendMessage(Text arg, MessageType arg2, UUID uUID) {
+        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, arg2, uUID), (GenericFutureListener<? extends Future<? super Void>>)((GenericFutureListener)future -> {
             if (!(future.isSuccess() || arg2 != MessageType.GAME_INFO && arg2 != MessageType.SYSTEM)) {
                 int i = 256;
                 String string = arg.asTruncatedString(256);
                 MutableText lv = new LiteralText(string).formatted(Formatting.YELLOW);
-                this.networkHandler.sendPacket(new GameMessageS2CPacket(new TranslatableText("multiplayer.message_not_delivered", lv).formatted(Formatting.RED), MessageType.SYSTEM));
+                this.networkHandler.sendPacket(new GameMessageS2CPacket(new TranslatableText("multiplayer.message_not_delivered", lv).formatted(Formatting.RED), MessageType.SYSTEM, uUID));
             }
         }));
     }
@@ -1275,9 +1277,8 @@ implements ScreenHandlerListener {
             this.networkHandler.requestTeleport(d, e, f, g, h);
         } else {
             ServerWorld lv = this.getServerWorld();
-            this.dimension = arg.method_27983();
             class_5217 lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(this.dimension, BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.method_27982(), arg.method_28125(), true));
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.method_27983().method_29177(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.method_27982(), arg.method_28125(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);
@@ -1298,7 +1299,7 @@ implements ScreenHandlerListener {
         return this.spawnPointPosition;
     }
 
-    public DimensionType getSpawnPointDimension() {
+    public class_5321<DimensionType> getSpawnPointDimension() {
         return this.spawnPointDimension;
     }
 
@@ -1306,19 +1307,19 @@ implements ScreenHandlerListener {
         return this.spawnPointSet;
     }
 
-    public void setSpawnPoint(DimensionType arg, BlockPos arg2, boolean bl, boolean bl2) {
+    public void setSpawnPoint(class_5321<DimensionType> arg, BlockPos arg2, boolean bl, boolean bl2) {
         if (arg2 != null) {
             boolean bl3;
             boolean bl4 = bl3 = arg2.equals(this.spawnPointPosition) && arg.equals(this.spawnPointDimension);
             if (bl2 && !bl3) {
-                this.sendSystemMessage(new TranslatableText("block.minecraft.set_spawn"));
+                this.sendSystemMessage(new TranslatableText("block.minecraft.set_spawn"), Util.field_25140);
             }
             this.spawnPointPosition = arg2;
             this.spawnPointDimension = arg;
             this.spawnPointSet = bl;
         } else {
             this.spawnPointPosition = null;
-            this.spawnPointDimension = DimensionType.OVERWORLD;
+            this.spawnPointDimension = DimensionType.field_24753;
             this.spawnPointSet = false;
         }
     }

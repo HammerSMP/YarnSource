@@ -2,102 +2,215 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
- *  javax.annotation.Nullable
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.Lists
+ *  com.google.common.collect.Maps
+ *  com.google.common.collect.Sets
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.datafixers.util.Either
+ *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.Lifecycle
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.dimension;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.Lifecycle;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.io.File;
-import java.util.function.BiFunction;
-import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalLong;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.class_5284;
+import net.minecraft.class_5318;
+import net.minecraft.class_5321;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.DynamicSerializable;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeAccessType;
 import net.minecraft.world.biome.source.HorizontalVoronoiBiomeAccessType;
+import net.minecraft.world.biome.source.MultiNoiseBiomeSource;
+import net.minecraft.world.biome.source.TheEndBiomeSource;
 import net.minecraft.world.biome.source.VoronoiBiomeAccessType;
-import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.OverworldDimension;
-import net.minecraft.world.dimension.TheEndDimension;
-import net.minecraft.world.dimension.TheNetherDimension;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 
-public class DimensionType
-implements DynamicSerializable {
-    public static final DimensionType OVERWORLD = DimensionType.register("overworld", new DimensionType(1, "", "", OverworldDimension::new, true, false, false, HorizontalVoronoiBiomeAccessType.INSTANCE));
-    public static final DimensionType THE_NETHER = DimensionType.register("the_nether", new DimensionType(0, "_nether", "DIM-1", TheNetherDimension::new, false, true, true, VoronoiBiomeAccessType.INSTANCE));
-    public static final DimensionType THE_END = DimensionType.register("the_end", new DimensionType(2, "_end", "DIM1", TheEndDimension::new, false, false, false, VoronoiBiomeAccessType.INSTANCE));
-    private final int id;
+public class DimensionType {
+    public static final Codec<class_5321<DimensionType>> field_24751 = Identifier.field_25139.xmap(class_5321.method_29178(Registry.DIMENSION_TYPE_KEY), class_5321::method_29177);
+    private static final Codec<DimensionType> field_24757 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.field_24761), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::method_27998), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::method_27999), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::method_28537), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::method_28539), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.field_24766))).apply((Applicative)instance, DimensionType::new));
+    public static final float[] field_24752 = new float[]{1.0f, 0.75f, 0.5f, 0.25f, 0.0f, 0.25f, 0.5f, 0.75f};
+    public static final class_5321<DimensionType> field_24753 = class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld"));
+    public static final class_5321<DimensionType> field_24754 = class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, new Identifier("the_nether"));
+    public static final class_5321<DimensionType> field_24755 = class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, new Identifier("the_end"));
+    private static final LinkedHashSet<class_5321<DimensionType>> field_24758 = Sets.newLinkedHashSet((Iterable)ImmutableList.of(field_24753, field_24754, field_24755));
+    private static final DimensionType field_13072 = new DimensionType("", OptionalLong.empty(), true, false, false, true, false, false, HorizontalVoronoiBiomeAccessType.INSTANCE, Optional.of(field_24753), 0.0f);
+    private static final DimensionType _NETHER = new DimensionType("_nether", OptionalLong.of(18000L), false, true, true, false, true, false, VoronoiBiomeAccessType.INSTANCE, Optional.of(field_24754), 0.1f);
+    private static final DimensionType _END = new DimensionType("_end", OptionalLong.of(6000L), false, false, false, false, false, true, VoronoiBiomeAccessType.INSTANCE, Optional.of(field_24755), 0.0f);
+    private static final Map<class_5321<DimensionType>, DimensionType> field_24759 = ImmutableMap.of(field_24753, (Object)field_13072, field_24754, (Object)_NETHER, field_24755, (Object)_END);
+    private static final Codec<DimensionType> field_24760 = field_24751.flatXmap(arg -> Optional.ofNullable(field_24759.get(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown builtin dimension: " + arg))), arg -> arg.field_24765.map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown builtin dimension: " + arg)))).stable();
+    public static final Codec<DimensionType> field_24756 = Codec.either(field_24760, field_24757).flatXmap(either -> (DataResult)either.map(arg -> DataResult.success((Object)arg, (Lifecycle)Lifecycle.stable()), DataResult::success), arg -> arg.field_24765.isPresent() ? DataResult.success((Object)Either.left((Object)arg), (Lifecycle)Lifecycle.stable()) : DataResult.success((Object)Either.right((Object)arg)));
     private final String suffix;
-    private final String saveDir;
-    private final BiFunction<World, DimensionType, ? extends Dimension> factory;
+    private final OptionalLong field_24761;
     private final boolean hasSkyLight;
     private final boolean field_24504;
     private final boolean field_24505;
+    private final boolean field_24762;
+    private final boolean field_24763;
+    private final boolean field_24764;
     private final BiomeAccessType biomeAccessType;
+    private final Optional<class_5321<DimensionType>> field_24765;
+    private final float field_24766;
+    private final transient float[] field_24767;
 
-    private static DimensionType register(String string, DimensionType arg) {
-        return Registry.register(Registry.DIMENSION_TYPE, arg.id, string, arg);
+    protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, float f) {
+        this("", optionalLong, bl, bl2, bl3, bl4, bl5, false, VoronoiBiomeAccessType.INSTANCE, Optional.empty(), f);
     }
 
-    protected DimensionType(int i, String string, String string2, BiFunction<World, DimensionType, ? extends Dimension> biFunction, boolean bl, boolean bl2, boolean bl3, BiomeAccessType arg) {
-        this.id = i;
+    protected DimensionType(String string, OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, BiomeAccessType arg, Optional<class_5321<DimensionType>> optional, float f) {
         this.suffix = string;
-        this.saveDir = string2;
-        this.factory = biFunction;
+        this.field_24761 = optionalLong;
         this.hasSkyLight = bl;
         this.field_24504 = bl2;
         this.field_24505 = bl3;
+        this.field_24762 = bl4;
+        this.field_24763 = bl5;
+        this.field_24764 = bl6;
         this.biomeAccessType = arg;
+        this.field_24765 = optional;
+        this.field_24766 = f;
+        this.field_24767 = DimensionType.method_28515(f);
     }
 
-    public static DimensionType deserialize(Dynamic<?> dynamic) {
-        return Registry.DIMENSION_TYPE.get(new Identifier(dynamic.asString("")));
+    private static float[] method_28515(float f) {
+        float[] fs = new float[16];
+        for (int i = 0; i <= 15; ++i) {
+            float g = (float)i / 15.0f;
+            float h = g / (4.0f - 3.0f * g);
+            fs[i] = MathHelper.lerp(f, h, 1.0f);
+        }
+        return fs;
     }
 
-    public static Iterable<DimensionType> getAll() {
-        return Registry.DIMENSION_TYPE;
+    @Deprecated
+    public static DataResult<class_5321<DimensionType>> method_28521(Dynamic<?> dynamic) {
+        DataResult dataResult = dynamic.asNumber();
+        if (dataResult.result().equals(Optional.of(-1))) {
+            return DataResult.success(field_24754);
+        }
+        if (dataResult.result().equals(Optional.of(0))) {
+            return DataResult.success(field_24753);
+        }
+        if (dataResult.result().equals(Optional.of(1))) {
+            return DataResult.success(field_24755);
+        }
+        return Identifier.field_25139.xmap(class_5321.method_29178(Registry.DIMENSION_TYPE_KEY), class_5321::method_29177).parse(dynamic);
     }
 
-    public int getRawId() {
-        return this.id + -1;
+    @Environment(value=EnvType.CLIENT)
+    public static class_5318.class_5319 method_28523(class_5318.class_5319 arg) {
+        arg.method_29119(field_24753, field_13072);
+        arg.method_29119(field_24754, _NETHER);
+        arg.method_29119(field_24755, _END);
+        return arg;
+    }
+
+    private static ChunkGenerator method_28533(long l) {
+        return new SurfaceChunkGenerator(new TheEndBiomeSource(l), l, class_5284.class_5307.END.method_28568());
+    }
+
+    private static ChunkGenerator method_28535(long l) {
+        return new SurfaceChunkGenerator(MultiNoiseBiomeSource.class_5305.field_24723.method_28469(l), l, class_5284.class_5307.NETHER.method_28568());
+    }
+
+    public static LinkedHashMap<class_5321<DimensionType>, Pair<DimensionType, ChunkGenerator>> method_28517(long l) {
+        LinkedHashMap linkedHashMap = Maps.newLinkedHashMap();
+        linkedHashMap.put(field_24754, Pair.of((Object)_NETHER, (Object)DimensionType.method_28535(l)));
+        linkedHashMap.put(field_24755, Pair.of((Object)_END, (Object)DimensionType.method_28533(l)));
+        return linkedHashMap;
+    }
+
+    public static DimensionType method_28514() {
+        return field_13072;
+    }
+
+    public static boolean method_28518(long l, LinkedHashMap<class_5321<DimensionType>, Pair<DimensionType, ChunkGenerator>> linkedHashMap) {
+        ArrayList list = Lists.newArrayList(linkedHashMap.entrySet());
+        if (list.size() != 3) {
+            return false;
+        }
+        Map.Entry entry = (Map.Entry)list.get(0);
+        Map.Entry entry2 = (Map.Entry)list.get(1);
+        Map.Entry entry3 = (Map.Entry)list.get(2);
+        if (entry.getKey() != field_24753 || entry2.getKey() != field_24754 || entry3.getKey() != field_24755) {
+            return false;
+        }
+        if (((Pair)entry.getValue()).getFirst() != field_13072 || ((Pair)entry2.getValue()).getFirst() != _NETHER || ((Pair)entry3.getValue()).getFirst() != _END) {
+            return false;
+        }
+        if (!(((Pair)entry2.getValue()).getSecond() instanceof SurfaceChunkGenerator) || !(((Pair)entry3.getValue()).getSecond() instanceof SurfaceChunkGenerator)) {
+            return false;
+        }
+        SurfaceChunkGenerator lv = (SurfaceChunkGenerator)((Pair)entry2.getValue()).getSecond();
+        SurfaceChunkGenerator lv2 = (SurfaceChunkGenerator)((Pair)entry3.getValue()).getSecond();
+        if (!lv.method_28548(l, class_5284.class_5307.NETHER)) {
+            return false;
+        }
+        if (!lv2.method_28548(l, class_5284.class_5307.END)) {
+            return false;
+        }
+        if (!(lv.getBiomeSource() instanceof MultiNoiseBiomeSource)) {
+            return false;
+        }
+        MultiNoiseBiomeSource lv3 = (MultiNoiseBiomeSource)lv.getBiomeSource();
+        if (!lv3.method_28462(l)) {
+            return false;
+        }
+        if (!(lv2.getBiomeSource() instanceof TheEndBiomeSource)) {
+            return false;
+        }
+        TheEndBiomeSource lv4 = (TheEndBiomeSource)lv2.getBiomeSource();
+        return lv4.method_28479(l);
     }
 
     public String getSuffix() {
         return this.suffix;
     }
 
-    public File getSaveDirectory(File file) {
-        if (this.saveDir.isEmpty()) {
+    public static File getSaveDirectory(class_5321<?> arg, File file) {
+        if (Objects.equals(arg, field_24753)) {
             return file;
         }
-        return new File(file, this.saveDir);
-    }
-
-    public Dimension create(World arg) {
-        return this.factory.apply(arg, this);
-    }
-
-    public String toString() {
-        return DimensionType.getId(this).toString();
-    }
-
-    @Nullable
-    public static DimensionType byRawId(int i) {
-        return (DimensionType)Registry.DIMENSION_TYPE.get(i - -1);
-    }
-
-    @Nullable
-    public static DimensionType byId(Identifier arg) {
-        return Registry.DIMENSION_TYPE.get(arg);
-    }
-
-    @Nullable
-    public static Identifier getId(DimensionType arg) {
-        return Registry.DIMENSION_TYPE.getId(arg);
+        if (Objects.equals(arg, field_24755)) {
+            return new File(file, "DIM1");
+        }
+        if (Objects.equals(arg, field_24754)) {
+            return new File(file, "DIM-1");
+        }
+        return new File(file, "dimensions/" + arg.method_29177().getNamespace() + "/" + arg.method_29177().getPath());
     }
 
     public boolean hasSkyLight() {
@@ -112,13 +225,60 @@ implements DynamicSerializable {
         return this.field_24505;
     }
 
+    public boolean method_28537() {
+        return this.field_24762;
+    }
+
+    public boolean method_28539() {
+        return this.field_24763;
+    }
+
+    public boolean method_28540() {
+        return this.field_24764;
+    }
+
     public BiomeAccessType getBiomeAccessType() {
         return this.biomeAccessType;
     }
 
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        return (T)dynamicOps.createString(Registry.DIMENSION_TYPE.getId(this).toString());
+    public float method_28528(long l) {
+        double d = MathHelper.fractionalPart((double)this.field_24761.orElse(l) / 24000.0 - 0.25);
+        double e = 0.5 - Math.cos(d * Math.PI) / 2.0;
+        return (float)(d * 2.0 + e) / 3.0f;
+    }
+
+    public int method_28531(long l) {
+        return (int)(l / 24000L % 8L + 8L) % 8;
+    }
+
+    public float method_28516(int i) {
+        return this.field_24767[i];
+    }
+
+    public boolean method_28541() {
+        return this == field_13072;
+    }
+
+    public boolean method_28542() {
+        return this == _NETHER;
+    }
+
+    public boolean method_28543() {
+        return this == _END;
+    }
+
+    public static LinkedHashMap<class_5321<DimensionType>, Pair<DimensionType, ChunkGenerator>> method_28524(Map<class_5321<DimensionType>, Pair<DimensionType, ChunkGenerator>> map) {
+        LinkedHashMap linkedHashMap = Maps.newLinkedHashMap();
+        for (class_5321 class_53212 : field_24758) {
+            Pair<DimensionType, ChunkGenerator> pair = map.get(class_53212);
+            if (pair == null) continue;
+            linkedHashMap.put(class_53212, pair);
+        }
+        for (Map.Entry entry : map.entrySet()) {
+            if (field_24758.contains(entry.getKey())) continue;
+            linkedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return linkedHashMap;
     }
 }
 

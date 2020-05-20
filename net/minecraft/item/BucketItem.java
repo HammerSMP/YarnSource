@@ -8,6 +8,7 @@ package net.minecraft.item;
 
 import javax.annotation.Nullable;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidDrainable;
 import net.minecraft.block.FluidFillable;
@@ -115,38 +116,41 @@ extends Item {
     }
 
     public boolean placeFluid(@Nullable PlayerEntity arg, World arg2, BlockPos arg3, @Nullable BlockHitResult arg4) {
+        boolean bl2;
         if (!(this.fluid instanceof FlowableFluid)) {
             return false;
         }
         BlockState lv = arg2.getBlockState(arg3);
-        Material lv2 = lv.getMaterial();
+        Block lv2 = lv.getBlock();
+        Material lv3 = lv.getMaterial();
         boolean bl = lv.canBucketPlace(this.fluid);
-        if (lv.isAir() || bl || lv.getBlock() instanceof FluidFillable && ((FluidFillable)((Object)lv.getBlock())).canFillWithFluid(arg2, arg3, lv, this.fluid)) {
-            if (arg2.method_27983().method_27999() && this.fluid.isIn(FluidTags.WATER)) {
-                int i = arg3.getX();
-                int j = arg3.getY();
-                int k = arg3.getZ();
-                arg2.playSound(arg, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (arg2.random.nextFloat() - arg2.random.nextFloat()) * 0.8f);
-                for (int l = 0; l < 8; ++l) {
-                    arg2.addParticle(ParticleTypes.LARGE_SMOKE, (double)i + Math.random(), (double)j + Math.random(), (double)k + Math.random(), 0.0, 0.0, 0.0);
-                }
-            } else if (lv.getBlock() instanceof FluidFillable && this.fluid == Fluids.WATER) {
-                if (((FluidFillable)((Object)lv.getBlock())).tryFillWithFluid(arg2, arg3, lv, ((FlowableFluid)this.fluid).getStill(false))) {
-                    this.playEmptyingSound(arg, arg2, arg3);
-                }
-            } else {
-                if (!arg2.isClient && bl && !lv2.isLiquid()) {
-                    arg2.breakBlock(arg3, true);
-                }
-                this.playEmptyingSound(arg, arg2, arg3);
-                return arg2.setBlockState(arg3, this.fluid.getDefaultState().getBlockState(), 11);
+        boolean bl3 = bl2 = lv.isAir() || bl || lv2 instanceof FluidFillable && ((FluidFillable)((Object)lv2)).canFillWithFluid(arg2, arg3, lv, this.fluid);
+        if (!bl2) {
+            return arg4 != null && this.placeFluid(arg, arg2, arg4.getBlockPos().offset(arg4.getSide()), null);
+        }
+        if (arg2.getDimension().method_27999() && this.fluid.isIn(FluidTags.WATER)) {
+            int i = arg3.getX();
+            int j = arg3.getY();
+            int k = arg3.getZ();
+            arg2.playSound(arg, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (arg2.random.nextFloat() - arg2.random.nextFloat()) * 0.8f);
+            for (int l = 0; l < 8; ++l) {
+                arg2.addParticle(ParticleTypes.LARGE_SMOKE, (double)i + Math.random(), (double)j + Math.random(), (double)k + Math.random(), 0.0, 0.0, 0.0);
             }
             return true;
         }
-        if (arg4 == null) {
-            return false;
+        if (lv2 instanceof FluidFillable && this.fluid == Fluids.WATER) {
+            ((FluidFillable)((Object)lv2)).tryFillWithFluid(arg2, arg3, lv, ((FlowableFluid)this.fluid).getStill(false));
+            this.playEmptyingSound(arg, arg2, arg3);
+            return true;
         }
-        return this.placeFluid(arg, arg2, arg4.getBlockPos().offset(arg4.getSide()), null);
+        if (!arg2.isClient && bl && !lv3.isLiquid()) {
+            arg2.breakBlock(arg3, true);
+        }
+        if (arg2.setBlockState(arg3, this.fluid.getDefaultState().getBlockState(), 11) || lv.getFluidState().isStill()) {
+            this.playEmptyingSound(arg, arg2, arg3);
+            return true;
+        }
+        return false;
     }
 
     protected void playEmptyingSound(@Nullable PlayerEntity arg, WorldAccess arg2, BlockPos arg3) {

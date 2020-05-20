@@ -2,14 +2,13 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,8 +27,8 @@ import net.minecraft.world.gen.feature.WeepingVinesFeature;
 
 public class HugeFungusFeature
 extends Feature<HugeFungusFeatureConfig> {
-    public HugeFungusFeature(Function<Dynamic<?>, ? extends HugeFungusFeatureConfig> function) {
-        super(function);
+    public HugeFungusFeature(Codec<HugeFungusFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

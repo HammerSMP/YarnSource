@@ -71,6 +71,8 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.world.gen.feature.StructureFeature;
 
 public class DolphinEntity
 extends WaterCreatureEntity {
@@ -408,17 +410,18 @@ extends WaterCreatureEntity {
             this.noPathToStructure = false;
             this.dolphin.getNavigation().stop();
             BlockPos lv2 = this.dolphin.getBlockPos();
-            String string = (double)lv.random.nextFloat() >= 0.5 ? "Ocean_Ruin" : "Shipwreck";
-            BlockPos lv3 = lv.locateStructure(string, lv2, 50, false);
-            if (lv3 == null) {
-                BlockPos lv4 = lv.locateStructure(string.equals("Ocean_Ruin") ? "Shipwreck" : "Ocean_Ruin", lv2, 50, false);
-                if (lv4 == null) {
+            StructureFeature<FeatureConfig> lv3 = (double)lv.random.nextFloat() >= 0.5 ? StructureFeature.OCEAN_RUIN : StructureFeature.SHIPWRECK;
+            BlockPos lv4 = lv.locateStructure(lv3, lv2, 50, false);
+            if (lv4 == null) {
+                StructureFeature<FeatureConfig> structureFeature = lv3.equals(StructureFeature.OCEAN_RUIN) ? StructureFeature.SHIPWRECK : StructureFeature.OCEAN_RUIN;
+                BlockPos lv6 = lv.locateStructure(structureFeature, lv2, 50, false);
+                if (lv6 == null) {
                     this.noPathToStructure = true;
                     return;
                 }
-                this.dolphin.setTreasurePos(lv4);
+                this.dolphin.setTreasurePos(lv6);
             } else {
-                this.dolphin.setTreasurePos(lv3);
+                this.dolphin.setTreasurePos(lv4);
             }
             lv.sendEntityStatus(this.dolphin, (byte)38);
         }

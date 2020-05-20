@@ -3,24 +3,29 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Maps
+ *  com.mojang.serialization.Codec
  *  it.unimi.dsi.fastutil.objects.ObjectArrayList
  *  it.unimi.dsi.fastutil.objects.ObjectListIterator
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.world;
 
 import com.google.common.collect.Maps;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.PackedIntegerArray;
 import net.minecraft.util.math.BlockPos;
@@ -122,7 +127,8 @@ public class Heightmap {
         return SUFFOCATES;
     }
 
-    public static enum Type {
+    public static enum Type implements StringIdentifiable
+    {
         WORLD_SURFACE_WG("WORLD_SURFACE_WG", Purpose.WORLDGEN, Heightmap.method_16683()),
         WORLD_SURFACE("WORLD_SURFACE", Purpose.CLIENT, Heightmap.method_16683()),
         OCEAN_FLOOR_WG("OCEAN_FLOOR_WG", Purpose.WORLDGEN, Heightmap.method_16681()),
@@ -130,6 +136,7 @@ public class Heightmap {
         MOTION_BLOCKING("MOTION_BLOCKING", Purpose.CLIENT, arg -> arg.getMaterial().blocksMovement() || !arg.getFluidState().isEmpty()),
         MOTION_BLOCKING_NO_LEAVES("MOTION_BLOCKING_NO_LEAVES", Purpose.LIVE_WORLD, arg -> (arg.getMaterial().blocksMovement() || !arg.getFluidState().isEmpty()) && !(arg.getBlock() instanceof LeavesBlock));
 
+        public static final Codec<Type> field_24772;
         private final String name;
         private final Purpose purpose;
         private final Predicate<BlockState> blockPredicate;
@@ -154,6 +161,7 @@ public class Heightmap {
             return this.purpose != Purpose.WORLDGEN;
         }
 
+        @Nullable
         public static Type byName(String string) {
             return BY_NAME.get(string);
         }
@@ -162,7 +170,13 @@ public class Heightmap {
             return this.blockPredicate;
         }
 
+        @Override
+        public String asString() {
+            return this.name;
+        }
+
         static {
+            field_24772 = StringIdentifiable.method_28140(Type::values, Type::byName);
             BY_NAME = Util.make(Maps.newHashMap(), hashMap -> {
                 for (Type lv : Type.values()) {
                     hashMap.put(lv.name, lv);

@@ -3,14 +3,16 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.structure;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.datafixer.NbtOps;
@@ -24,17 +26,18 @@ import net.minecraft.structure.StructurePieceType;
 import net.minecraft.structure.pool.EmptyPoolElement;
 import net.minecraft.structure.pool.StructurePoolElement;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.dynamic.DynamicDeserializer;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class PoolStructurePiece
 extends StructurePiece {
+    private static final Logger field_24991 = LogManager.getLogger();
     protected final StructurePoolElement poolElement;
     protected BlockPos pos;
     private final int groundLevelDelta;
@@ -57,12 +60,12 @@ extends StructurePiece {
         this.structureManager = arg2;
         this.pos = new BlockPos(arg22.getInt("PosX"), arg22.getInt("PosY"), arg22.getInt("PosZ"));
         this.groundLevelDelta = arg22.getInt("ground_level_delta");
-        this.poolElement = DynamicDeserializer.deserialize(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg22.getCompound("pool_element")), Registry.STRUCTURE_POOL_ELEMENT, "element_type", EmptyPoolElement.INSTANCE);
+        this.poolElement = StructurePoolElement.field_24953.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg22.getCompound("pool_element")).resultOrPartial(((Logger)field_24991)::error).orElse(EmptyPoolElement.INSTANCE);
         this.rotation = BlockRotation.valueOf(arg22.getString("rotation"));
         this.boundingBox = this.poolElement.getBoundingBox(arg2, this.pos, this.rotation);
         ListTag lv = arg22.getList("junctions", 10);
         this.junctions.clear();
-        lv.forEach(arg -> this.junctions.add(JigsawJunction.deserialize(new Dynamic((DynamicOps)NbtOps.INSTANCE, arg))));
+        lv.forEach(arg -> this.junctions.add(JigsawJunction.method_28873(new Dynamic((DynamicOps)NbtOps.INSTANCE, arg))));
     }
 
     @Override
@@ -71,7 +74,7 @@ extends StructurePiece {
         arg.putInt("PosY", this.pos.getY());
         arg.putInt("PosZ", this.pos.getZ());
         arg.putInt("ground_level_delta", this.groundLevelDelta);
-        arg.put("pool_element", (Tag)this.poolElement.toDynamic(NbtOps.INSTANCE).getValue());
+        StructurePoolElement.field_24953.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.poolElement).resultOrPartial(((Logger)field_24991)::error).ifPresent(arg2 -> arg.put("pool_element", (Tag)arg2));
         arg.putString("rotation", this.rotation.name());
         ListTag lv = new ListTag();
         for (JigsawJunction lv2 : this.junctions) {

@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
@@ -18,8 +17,8 @@ import net.minecraft.world.gen.feature.FillLayerFeatureConfig;
 
 public class FillLayerFeature
 extends Feature<FillLayerFeatureConfig> {
-    public FillLayerFeature(Function<Dynamic<?>, ? extends FillLayerFeatureConfig> function) {
-        super(function);
+    public FillLayerFeature(Codec<FillLayerFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

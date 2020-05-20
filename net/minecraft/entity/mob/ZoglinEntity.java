@@ -4,8 +4,8 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableSet
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
@@ -13,9 +13,8 @@ package net.minecraft.entity.mob;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.util.Pair;
-import java.util.Collection;
+import com.mojang.serialization.Dynamic;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -80,9 +79,13 @@ Hoglin {
         this.experiencePoints = 5;
     }
 
+    protected Brain.class_5303<ZoglinEntity> method_28306() {
+        return Brain.method_28311(field_23733, field_23731);
+    }
+
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        Brain<ZoglinEntity> lv = new Brain<ZoglinEntity>((Collection<MemoryModuleType<?>>)field_23733, (Collection<SensorType<Sensor<ZoglinEntity>>>)field_23731, dynamic);
+        Brain<ZoglinEntity> lv = this.method_28306().method_28335(dynamic);
         ZoglinEntity.method_26928(lv);
         ZoglinEntity.method_26929(lv);
         ZoglinEntity.method_26930(lv);

@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Set;
+import net.minecraft.class_5321;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
@@ -28,7 +29,7 @@ extends Sensor<VillagerEntity> {
 
     @Override
     protected void sense(ServerWorld arg, VillagerEntity arg2) {
-        DimensionType lv = arg.method_27983();
+        class_5321<DimensionType> lv = arg.method_27983();
         BlockPos lv2 = arg2.getBlockPos();
         ArrayList list = Lists.newArrayList();
         int i = 4;

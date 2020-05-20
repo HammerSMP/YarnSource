@@ -2,17 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
 package net.minecraft.structure.processor;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.serialization.Codec;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.structure.Structure;
@@ -24,14 +19,11 @@ import net.minecraft.world.WorldView;
 
 public class BlockRotStructureProcessor
 extends StructureProcessor {
+    public static final Codec<BlockRotStructureProcessor> field_25000 = Codec.FLOAT.fieldOf("integrity").withDefault((Object)Float.valueOf(1.0f)).xmap(BlockRotStructureProcessor::new, arg -> Float.valueOf(arg.integrity)).codec();
     private final float integrity;
 
     public BlockRotStructureProcessor(float f) {
         this.integrity = f;
-    }
-
-    public BlockRotStructureProcessor(Dynamic<?> dynamic) {
-        this(dynamic.get("integrity").asFloat(1.0f));
     }
 
     @Override
@@ -45,13 +37,8 @@ extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType getType() {
+    protected StructureProcessorType<?> getType() {
         return StructureProcessorType.BLOCK_ROT;
-    }
-
-    @Override
-    protected <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("integrity"), (Object)dynamicOps.createFloat(this.integrity))));
     }
 }
 

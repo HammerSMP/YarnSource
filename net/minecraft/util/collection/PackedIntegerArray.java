@@ -90,10 +90,6 @@ public class PackedIntegerArray {
         return this.size;
     }
 
-    public int getElementBits() {
-        return this.elementBits;
-    }
-
     public void forEach(IntConsumer intConsumer) {
         int i = 0;
         for (long l : this.storage) {

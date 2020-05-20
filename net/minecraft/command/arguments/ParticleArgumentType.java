@@ -53,7 +53,7 @@ implements ArgumentType<ParticleEffect> {
 
     public static ParticleEffect readParameters(StringReader stringReader) throws CommandSyntaxException {
         Identifier lv = Identifier.fromCommandInput(stringReader);
-        ParticleType<? extends ParticleEffect> lv2 = Registry.PARTICLE_TYPE.getOrEmpty(lv).orElseThrow(() -> UNKNOWN_PARTICLE_EXCEPTION.create((Object)lv));
+        ParticleType<?> lv2 = Registry.PARTICLE_TYPE.getOrEmpty(lv).orElseThrow(() -> UNKNOWN_PARTICLE_EXCEPTION.create((Object)lv));
         return ParticleArgumentType.readParameters(stringReader, lv2);
     }
 

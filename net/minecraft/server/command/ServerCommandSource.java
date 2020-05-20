@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import net.minecraft.class_5318;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -40,6 +41,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
@@ -220,7 +222,7 @@ implements CommandSource {
 
     public void sendFeedback(Text arg, boolean bl) {
         if (this.output.shouldReceiveFeedback() && !this.silent) {
-            this.output.sendSystemMessage(arg);
+            this.output.sendSystemMessage(arg, Util.field_25140);
         }
         if (bl && this.output.shouldBroadcastConsoleToOps() && !this.silent) {
             this.sendToOps(arg);
@@ -232,17 +234,17 @@ implements CommandSource {
         if (this.server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
             for (ServerPlayerEntity lv2 : this.server.getPlayerManager().getPlayerList()) {
                 if (lv2 == this.output || !this.server.getPlayerManager().isOperator(lv2.getGameProfile())) continue;
-                lv2.sendSystemMessage(lv);
+                lv2.sendSystemMessage(lv, Util.field_25140);
             }
         }
         if (this.output != this.server && this.server.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS)) {
-            this.server.sendSystemMessage(lv);
+            this.server.sendSystemMessage(lv, Util.field_25140);
         }
     }
 
     public void sendError(Text arg) {
         if (this.output.shouldTrackOutput() && !this.silent) {
-            this.output.sendSystemMessage(new LiteralText("").append(arg).formatted(Formatting.RED));
+            this.output.sendSystemMessage(new LiteralText("").append(arg).formatted(Formatting.RED), Util.field_25140);
         }
     }
 
@@ -275,6 +277,11 @@ implements CommandSource {
     @Override
     public CompletableFuture<Suggestions> getCompletions(CommandContext<CommandSource> commandContext, SuggestionsBuilder suggestionsBuilder) {
         return null;
+    }
+
+    @Override
+    public class_5318 method_29038() {
+        return this.server.method_29174();
     }
 }
 

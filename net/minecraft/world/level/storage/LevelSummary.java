@@ -2,19 +2,22 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.mojang.serialization.Lifecycle
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
+ *  org.apache.commons.lang3.StringUtils
  */
 package net.minecraft.world.level.storage;
 
+import com.mojang.serialization.Lifecycle;
 import java.io.File;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5219;
 import net.minecraft.class_5285;
+import net.minecraft.class_5315;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -22,42 +25,30 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ChatUtil;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.level.LevelInfo;
+import org.apache.commons.lang3.StringUtils;
 
 @Environment(value=EnvType.CLIENT)
 public class LevelSummary
 implements Comparable<LevelSummary> {
+    private final LevelInfo field_25022;
+    private final class_5315 field_25023;
     private final String name;
-    private final String displayName;
-    private final long lastPlayed;
-    private final long getSizeOnDisk;
     private final boolean requiresConversion;
-    private final GameMode gameMode;
-    private final boolean hardcore;
-    private final boolean commandsAllowed;
-    private final String versionName;
-    private final int versionId;
-    private final boolean snapshot;
     private final boolean locked;
     private final File file;
-    private final class_5285 generatorType;
+    private final Lifecycle generatorType;
     @Nullable
     private Text field_24191;
 
-    public LevelSummary(class_5219 arg, String string, String string2, long l, boolean bl, boolean bl2, File file) {
+    public LevelSummary(LevelInfo arg, class_5315 arg2, String string, boolean bl, boolean bl2, File file, Lifecycle lifecycle) {
+        this.field_25022 = arg;
+        this.field_25023 = arg2;
         this.name = string;
-        this.displayName = string2;
         this.locked = bl2;
         this.file = file;
-        this.lastPlayed = arg.getLastPlayed();
-        this.getSizeOnDisk = l;
-        this.gameMode = arg.getGameMode();
         this.requiresConversion = bl;
-        this.hardcore = arg.isHardcore();
-        this.commandsAllowed = arg.areCommandsAllowed();
-        this.versionName = arg.getVersionName();
-        this.versionId = arg.getVersionId();
-        this.snapshot = arg.isVersionSnapshot();
-        this.generatorType = arg.method_28057();
+        this.generatorType = lifecycle;
     }
 
     public String getName() {
@@ -65,7 +56,7 @@ implements Comparable<LevelSummary> {
     }
 
     public String getDisplayName() {
-        return this.displayName;
+        return StringUtils.isEmpty((CharSequence)this.field_25022.getLevelName()) ? this.name : this.field_25022.getLevelName();
     }
 
     public File getFile() {
@@ -77,53 +68,61 @@ implements Comparable<LevelSummary> {
     }
 
     public long getLastPlayed() {
-        return this.lastPlayed;
+        return this.field_25023.method_29024();
     }
 
     @Override
     public int compareTo(LevelSummary arg) {
-        if (this.lastPlayed < arg.lastPlayed) {
+        if (this.field_25023.method_29024() < arg.field_25023.method_29024()) {
             return 1;
         }
-        if (this.lastPlayed > arg.lastPlayed) {
+        if (this.field_25023.method_29024() > arg.field_25023.method_29024()) {
             return -1;
         }
         return this.name.compareTo(arg.name);
     }
 
     public GameMode getGameMode() {
-        return this.gameMode;
+        return this.field_25022.getGameMode();
     }
 
     public boolean isHardcore() {
-        return this.hardcore;
+        return this.field_25022.hasStructures();
     }
 
     public boolean hasCheats() {
-        return this.commandsAllowed;
+        return this.field_25022.isHardcore();
     }
 
     public MutableText getVersion() {
-        if (ChatUtil.isEmpty(this.versionName)) {
+        if (ChatUtil.isEmpty(this.field_25023.method_29025())) {
             return new TranslatableText("selectWorld.versionUnknown");
         }
-        return new LiteralText(this.versionName);
+        return new LiteralText(this.field_25023.method_29025());
     }
 
     public boolean isDifferentVersion() {
-        return this.isFutureLevel() || !SharedConstants.getGameVersion().isStable() && !this.snapshot || this.isOutdatedLevel() || this.isLegacyCustomizedWorld();
+        return this.isFutureLevel() || !SharedConstants.getGameVersion().isStable() && !this.field_25023.method_29027() || this.isOutdatedLevel() || this.method_29020() || this.isLegacyCustomizedWorld();
     }
 
     public boolean isFutureLevel() {
-        return this.versionId > SharedConstants.getGameVersion().getWorldVersion();
+        return this.field_25023.method_29026() > SharedConstants.getGameVersion().getWorldVersion();
+    }
+
+    public boolean method_29020() {
+        return this.field_25022.getGeneratorOptions().method_28035() && this.field_25023.method_29026() < 1466;
+    }
+
+    protected class_5285 method_29021() {
+        return this.field_25022.getGeneratorOptions();
     }
 
     public boolean isLegacyCustomizedWorld() {
-        return this.generatorType.method_28035();
+        return this.generatorType != Lifecycle.stable();
     }
 
     public boolean isOutdatedLevel() {
-        return this.versionId < SharedConstants.getGameVersion().getWorldVersion();
+        return this.field_25023.method_29026() < SharedConstants.getGameVersion().getWorldVersion();
     }
 
     public boolean isLocked() {

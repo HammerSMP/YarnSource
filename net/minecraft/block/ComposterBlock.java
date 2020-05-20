@@ -267,7 +267,7 @@ implements InventoryProvider {
     @Override
     public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
         if (arg.get(LEVEL) == 7) {
-            arg2.setBlockState(arg3, (BlockState)arg.cycle(LEVEL), 3);
+            arg2.setBlockState(arg3, (BlockState)arg.method_28493(LEVEL), 3);
             arg2.playSound(null, arg3, SoundEvents.BLOCK_COMPOSTER_READY, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
     }

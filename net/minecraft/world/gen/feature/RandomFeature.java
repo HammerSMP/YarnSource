@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
@@ -19,8 +18,8 @@ import net.minecraft.world.gen.feature.RandomFeatureEntry;
 
 public class RandomFeature
 extends Feature<RandomFeatureConfig> {
-    public RandomFeature(Function<Dynamic<?>, ? extends RandomFeatureConfig> function) {
-        super(function);
+    public RandomFeature(Codec<RandomFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

@@ -7,14 +7,14 @@
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
- *  com.mojang.datafixers.types.DynamicOps
- *  com.mojang.datafixers.types.JsonOps
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.JsonOps
  *  javax.annotation.Nullable
  */
 package net.minecraft.datafixer.fix;
@@ -24,14 +24,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
-import com.mojang.datafixers.types.DynamicOps;
-import com.mojang.datafixers.types.JsonOps;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -130,10 +130,9 @@ extends DataFix {
 
     protected TypeRewriteRule makeRule() {
         Type type = this.getOutputSchema().getType(TypeReferences.LEVEL);
-        return this.fixTypeEverywhereTyped("LevelDataGeneratorOptionsFix", this.getInputSchema().getType(TypeReferences.LEVEL), type, typed -> {
+        return this.fixTypeEverywhereTyped("LevelDataGeneratorOptionsFix", this.getInputSchema().getType(TypeReferences.LEVEL), type, typed -> (Typed)typed.write().flatMap(dynamic -> {
             Dynamic dynamic5;
-            Dynamic dynamic = typed.write();
-            Optional optional = dynamic.get("generatorOptions").asString();
+            Optional optional = dynamic.get("generatorOptions").asString().result();
             if ("flat".equalsIgnoreCase(dynamic.get("generatorName").asString(""))) {
                 String string = optional.orElse("");
                 Dynamic dynamic2 = dynamic.set("generatorOptions", LevelDataGeneratorOptionsFix.fixGeneratorOptions(string, dynamic.getOps()));
@@ -143,8 +142,8 @@ extends DataFix {
             } else {
                 dynamic5 = dynamic;
             }
-            return (Typed)((Optional)type.readTyped(dynamic5).getSecond()).orElseThrow(() -> new IllegalStateException("Could not read new level type."));
-        });
+            return type.readTyped(dynamic5);
+        }).map(Pair::getFirst).result().orElseThrow(() -> new IllegalStateException("Could not read new level type.")));
     }
 
     private static <T> Dynamic<T> fixGeneratorOptions(String string, DynamicOps<T> dynamicOps) {

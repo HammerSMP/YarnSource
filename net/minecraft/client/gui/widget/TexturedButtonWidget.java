@@ -54,13 +54,12 @@ extends ButtonWidget {
     public void renderButton(MatrixStack arg, int i, int j, float f) {
         MinecraftClient lv = MinecraftClient.getInstance();
         lv.getTextureManager().bindTexture(this.texture);
-        RenderSystem.disableDepthTest();
         int k = this.v;
         if (this.isHovered()) {
             k += this.hoveredVOffset;
         }
-        TexturedButtonWidget.drawTexture(arg, this.x, this.y, this.u, k, this.width, this.height, this.textureWidth, this.textureHeight);
         RenderSystem.enableDepthTest();
+        TexturedButtonWidget.drawTexture(arg, this.x, this.y, this.u, k, this.width, this.height, this.textureWidth, this.textureHeight);
     }
 }
 

@@ -2,12 +2,11 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
-import java.util.function.Function;
+import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.structure.NetherFossilGenerator;
@@ -20,55 +19,28 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
-import net.minecraft.world.gen.feature.AbstractTempleFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class NetherFossilFeature
-extends AbstractTempleFeature<DefaultFeatureConfig> {
-    public NetherFossilFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
+extends StructureFeature<DefaultFeatureConfig> {
+    public NetherFossilFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
-    protected int getSeedModifier(ChunkGeneratorConfig arg) {
-        return 14357921;
-    }
-
-    @Override
-    public StructureFeature.StructureStartFactory getStructureStartFactory() {
+    public StructureFeature.StructureStartFactory<DefaultFeatureConfig> getStructureStartFactory() {
         return Start::new;
     }
 
-    @Override
-    public String getName() {
-        return "Nether_Fossil";
-    }
-
-    @Override
-    protected int getSpacing(ChunkGeneratorConfig arg) {
-        return 2;
-    }
-
-    @Override
-    protected int getSeparation(ChunkGeneratorConfig arg) {
-        return 1;
-    }
-
-    @Override
-    public int getRadius() {
-        return 3;
-    }
-
     public static class Start
-    extends StructureStart {
-        public Start(StructureFeature<?> arg, int i, int j, BlockBox arg2, int k, long l) {
+    extends StructureStart<DefaultFeatureConfig> {
+        public Start(StructureFeature<DefaultFeatureConfig> arg, int i, int j, BlockBox arg2, int k, long l) {
             super(arg, i, j, arg2, k, l);
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
             int n;
             ChunkPos lv = new ChunkPos(i, j);
             int k = lv.getStartX() + this.random.nextInt(16);

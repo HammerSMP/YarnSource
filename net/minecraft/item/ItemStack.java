@@ -8,6 +8,10 @@
  *  com.google.gson.JsonParseException
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -22,6 +26,10 @@ import com.google.common.collect.Multimap;
 import com.google.gson.JsonParseException;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -93,6 +101,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class ItemStack {
+    public static final Codec<ItemStack> field_24671 = RecordCodecBuilder.create(instance -> instance.group((App)Registry.ITEM.fieldOf("id").forGetter(arg -> arg.item), (App)Codec.INT.fieldOf("Count").forGetter(arg -> arg.count), (App)CompoundTag.field_25128.optionalFieldOf("tag").forGetter(arg -> Optional.ofNullable(arg.tag))).apply((Applicative)instance, ItemStack::new));
     private static final Logger LOGGER = LogManager.getLogger();
     public static final ItemStack EMPTY = new ItemStack((ItemConvertible)null);
     public static final DecimalFormat MODIFIER_FORMAT = Util.make(new DecimalFormat("#.##"), decimalFormat -> decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ROOT)));
@@ -111,6 +120,11 @@ public final class ItemStack {
 
     public ItemStack(ItemConvertible arg) {
         this(arg, 1);
+    }
+
+    private ItemStack(ItemConvertible arg, int i, Optional<CompoundTag> optional) {
+        this(arg, i);
+        optional.ifPresent(this::setTag);
     }
 
     public ItemStack(ItemConvertible arg, int i) {

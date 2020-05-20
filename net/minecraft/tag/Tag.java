@@ -9,6 +9,8 @@
  *  com.google.gson.JsonArray
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonObject
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
  */
 package net.minecraft.tag;
 
@@ -18,6 +20,8 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +29,17 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
+import net.minecraft.tag.TagContainer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public interface Tag<T> {
+    public static <T> Codec<Tag<T>> method_28134(Supplier<TagContainer<T>> supplier) {
+        return Identifier.field_25139.flatXmap(arg -> Optional.ofNullable(((TagContainer)supplier.get()).get((Identifier)arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))), arg -> Optional.ofNullable(((TagContainer)supplier.get()).getId(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))));
+    }
+
     public boolean contains(T var1);
 
     public List<T> values();

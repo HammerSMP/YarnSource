@@ -33,24 +33,25 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ExplorationMapLootFunction
 extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
+    public static final StructureFeature<?> field_25032 = StructureFeature.BURIED_TREASURE;
     public static final MapIcon.Type DEFAULT_DECORATION = MapIcon.Type.MANSION;
-    private final String destination;
+    private final StructureFeature<?> destination;
     private final MapIcon.Type decoration;
     private final byte zoom;
     private final int searchRadius;
     private final boolean skipExistingChunks;
 
-    private ExplorationMapLootFunction(LootCondition[] args, String string, MapIcon.Type arg, byte b, int i, boolean bl) {
+    private ExplorationMapLootFunction(LootCondition[] args, StructureFeature<?> arg, MapIcon.Type arg2, byte b, int i, boolean bl) {
         super(args);
-        this.destination = string;
-        this.decoration = arg;
+        this.destination = arg;
+        this.decoration = arg2;
         this.zoom = b;
         this.searchRadius = i;
         this.skipExistingChunks = bl;
@@ -73,7 +74,7 @@ extends ConditionalLootFunction {
             ItemStack lv4 = FilledMapItem.createMap(lv2, lv3.getX(), lv3.getZ(), this.zoom, true, true);
             FilledMapItem.fillExplorationMap(lv2, lv4);
             MapState.addDecorationsTag(lv4, lv3, "+", this.decoration);
-            lv4.setCustomName(new TranslatableText("filled_map." + this.destination.toLowerCase(Locale.ROOT)));
+            lv4.setCustomName(new TranslatableText("filled_map." + this.destination.getName().toLowerCase(Locale.ROOT)));
             return lv4;
         }
         return arg;
@@ -92,8 +93,8 @@ extends ConditionalLootFunction {
         @Override
         public void toJson(JsonObject jsonObject, ExplorationMapLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
-            if (!arg.destination.equals("Buried_Treasure")) {
-                jsonObject.add("destination", jsonSerializationContext.serialize((Object)arg.destination));
+            if (!arg.destination.equals(field_25032)) {
+                jsonObject.add("destination", jsonSerializationContext.serialize((Object)arg.destination.getName()));
             }
             if (arg.decoration != DEFAULT_DECORATION) {
                 jsonObject.add("decoration", jsonSerializationContext.serialize((Object)arg.decoration.toString().toLowerCase(Locale.ROOT)));
@@ -111,20 +112,28 @@ extends ConditionalLootFunction {
 
         @Override
         public ExplorationMapLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            String string = jsonObject.has("destination") ? JsonHelper.getString(jsonObject, "destination") : "Buried_Treasure";
-            string = Feature.STRUCTURES.containsKey((Object)string.toLowerCase(Locale.ROOT)) ? string : "Buried_Treasure";
-            String string2 = jsonObject.has("decoration") ? JsonHelper.getString(jsonObject, "decoration") : "mansion";
-            MapIcon.Type lv = DEFAULT_DECORATION;
+            StructureFeature<?> lv = Factory.method_29039(jsonObject);
+            String string = jsonObject.has("decoration") ? JsonHelper.getString(jsonObject, "decoration") : "mansion";
+            MapIcon.Type lv2 = DEFAULT_DECORATION;
             try {
-                lv = MapIcon.Type.valueOf(string2.toUpperCase(Locale.ROOT));
+                lv2 = MapIcon.Type.valueOf(string.toUpperCase(Locale.ROOT));
             }
             catch (IllegalArgumentException illegalArgumentException) {
-                LOGGER.error("Error while parsing loot table decoration entry. Found {}. Defaulting to " + (Object)((Object)DEFAULT_DECORATION), (Object)string2);
+                LOGGER.error("Error while parsing loot table decoration entry. Found {}. Defaulting to " + (Object)((Object)DEFAULT_DECORATION), (Object)string);
             }
             byte b = JsonHelper.getByte(jsonObject, "zoom", (byte)2);
             int i = JsonHelper.getInt(jsonObject, "search_radius", 50);
             boolean bl = JsonHelper.getBoolean(jsonObject, "skip_existing_chunks", true);
-            return new ExplorationMapLootFunction(args, string, lv, b, i, bl);
+            return new ExplorationMapLootFunction(args, lv, lv2, b, i, bl);
+        }
+
+        private static StructureFeature<?> method_29039(JsonObject jsonObject) {
+            String string;
+            StructureFeature lv;
+            if (jsonObject.has("destination") && (lv = (StructureFeature)StructureFeature.field_24842.get((Object)(string = JsonHelper.getString(jsonObject, "destination")).toLowerCase(Locale.ROOT))) != null) {
+                return lv;
+            }
+            return field_25032;
         }
 
         @Override
@@ -135,7 +144,7 @@ extends ConditionalLootFunction {
 
     public static class Builder
     extends ConditionalLootFunction.Builder<Builder> {
-        private String destination = "Buried_Treasure";
+        private StructureFeature<?> destination = field_25032;
         private MapIcon.Type decoration = DEFAULT_DECORATION;
         private byte zoom = (byte)2;
         private int searchRadius = 50;
@@ -146,8 +155,8 @@ extends ConditionalLootFunction {
             return this;
         }
 
-        public Builder withDestination(String string) {
-            this.destination = string;
+        public Builder withDestination(StructureFeature<?> arg) {
+            this.destination = arg;
             return this;
         }
 

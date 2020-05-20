@@ -3,20 +3,16 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
 package net.minecraft.structure.processor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,6 +25,7 @@ import net.minecraft.world.WorldView;
 
 public class BlockIgnoreStructureProcessor
 extends StructureProcessor {
+    public static final Codec<BlockIgnoreStructureProcessor> field_24998 = BlockState.field_24734.xmap(AbstractBlock.AbstractBlockState::getBlock, Block::getDefaultState).listOf().fieldOf("blocks").xmap(BlockIgnoreStructureProcessor::new, arg -> arg.blocks).codec();
     public static final BlockIgnoreStructureProcessor IGNORE_STRUCTURE_BLOCKS = new BlockIgnoreStructureProcessor((List<Block>)ImmutableList.of((Object)Blocks.STRUCTURE_BLOCK));
     public static final BlockIgnoreStructureProcessor IGNORE_AIR = new BlockIgnoreStructureProcessor((List<Block>)ImmutableList.of((Object)Blocks.AIR));
     public static final BlockIgnoreStructureProcessor IGNORE_AIR_AND_STRUCTURE_BLOCKS = new BlockIgnoreStructureProcessor((List<Block>)ImmutableList.of((Object)Blocks.AIR, (Object)Blocks.STRUCTURE_BLOCK));
@@ -36,10 +33,6 @@ extends StructureProcessor {
 
     public BlockIgnoreStructureProcessor(List<Block> list) {
         this.blocks = ImmutableList.copyOf(list);
-    }
-
-    public BlockIgnoreStructureProcessor(Dynamic<?> dynamic2) {
-        this(dynamic2.get("blocks").asList(dynamic -> BlockState.deserialize(dynamic).getBlock()));
     }
 
     @Override
@@ -52,13 +45,8 @@ extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType getType() {
+    protected StructureProcessorType<?> getType() {
         return StructureProcessorType.BLOCK_IGNORE;
-    }
-
-    @Override
-    protected <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("blocks"), (Object)dynamicOps.createList(this.blocks.stream().map(arg -> BlockState.serialize(dynamicOps, arg.getDefaultState()).getValue())))));
     }
 }
 

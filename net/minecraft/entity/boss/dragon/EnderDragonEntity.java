@@ -49,6 +49,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -60,7 +61,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.TheEndDimension;
 import net.minecraft.world.gen.feature.EndPortalFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,7 +112,7 @@ implements Monster {
         this.setHealth(this.getMaximumHealth());
         this.noClip = true;
         this.ignoreCameraFrustum = true;
-        this.fight = !arg2.isClient && arg2.getDimension() instanceof TheEndDimension ? ((TheEndDimension)arg2.getDimension()).getEnderDragonFight() : null;
+        this.fight = arg2 instanceof ServerWorld ? ((ServerWorld)arg2).method_29198() : null;
         this.phaseManager = new PhaseManager(this);
     }
 

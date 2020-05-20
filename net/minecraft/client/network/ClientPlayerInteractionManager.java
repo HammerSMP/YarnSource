@@ -299,7 +299,7 @@ public class ClientPlayerInteractionManager {
         int i = lv.getCount();
         TypedActionResult<ItemStack> lv2 = lv.use(arg2, arg, arg3);
         ItemStack lv3 = lv2.getValue();
-        if (lv3 != lv || lv3.getCount() != i) {
+        if (lv3 != lv) {
             arg.setStackInHand(arg3, lv3);
         }
         return lv2.getResult();

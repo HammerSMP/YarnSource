@@ -189,7 +189,7 @@ implements DedicatedServer {
         if (!ServerConfigHandler.checkSuccess(this)) {
             return false;
         }
-        this.setPlayerManager(new DedicatedPlayerManager(this, this.field_24371));
+        this.setPlayerManager(new DedicatedPlayerManager(this, this.field_25132, this.field_24371));
         long l = Util.getMeasuringTimeNano();
         this.setWorldHeight(lv.maxBuildHeight);
         SkullBlockEntity.setUserCache(this.getUserCache());
@@ -403,7 +403,7 @@ implements DedicatedServer {
     @Override
     public boolean isSpawnProtected(ServerWorld arg, BlockPos arg2, PlayerEntity arg3) {
         int j;
-        if (arg.method_27983() != DimensionType.OVERWORLD) {
+        if (arg.method_27983() != DimensionType.field_24753) {
             return false;
         }
         if (this.getPlayerManager().getOpList().isEmpty()) {

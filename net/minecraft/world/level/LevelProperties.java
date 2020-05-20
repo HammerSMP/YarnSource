@@ -3,22 +3,29 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
- *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
  *  com.mojang.datafixers.DataFixer
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.OptionalDynamic
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.world.level;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.DataFixer;
-import java.util.Map;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.OptionalDynamic;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,169 +33,107 @@ import net.minecraft.SharedConstants;
 import net.minecraft.class_5219;
 import net.minecraft.class_5268;
 import net.minecraft.class_5285;
+import net.minecraft.class_5315;
 import net.minecraft.datafixer.DataFixTypes;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.timer.Timer;
 import net.minecraft.world.timer.TimerCallbackSerializer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LevelProperties
 implements class_5268,
 class_5219 {
-    private final String versionName;
-    private final int versionId;
-    private final boolean versionSnapshot;
-    private final class_5285 generatorOptions;
+    private static final Logger field_25029 = LogManager.getLogger();
+    private LevelInfo field_25030;
     private int spawnX;
     private int spawnY;
     private int spawnZ;
     private long time;
     private long timeOfDay;
-    private long lastPlayed;
-    private long sizeOnDisk;
     @Nullable
     private final DataFixer dataFixer;
     private final int dataVersion;
     private boolean playerDataLoaded;
+    @Nullable
     private CompoundTag playerData;
-    private final String levelName;
     private final int version;
     private int clearWeatherTime;
     private boolean raining;
     private int rainTime;
     private boolean thundering;
     private int thunderTime;
-    private GameMode gameMode;
-    private final boolean hardcore;
-    private final boolean commandsAllowed;
     private boolean initialized;
-    private Difficulty difficulty = Difficulty.NORMAL;
     private boolean difficultyLocked;
-    private WorldBorder.class_5200 field_24193 = WorldBorder.field_24122;
-    private final Set<String> disabledDataPacks = Sets.newHashSet();
-    private final Set<String> enabledDataPacks = Sets.newLinkedHashSet();
-    private final Map<DimensionType, CompoundTag> worldData = Maps.newIdentityHashMap();
+    private WorldBorder.class_5200 field_24193;
+    private final Set<String> disabledDataPacks;
+    private final Set<String> enabledDataPacks;
+    private CompoundTag field_25031;
     @Nullable
     private CompoundTag customBossEvents;
     private int wanderingTraderSpawnDelay;
     private int wanderingTraderSpawnChance;
+    @Nullable
     private UUID wanderingTraderId;
-    private Set<String> serverBrands = Sets.newLinkedHashSet();
+    private final Set<String> serverBrands;
     private boolean modded;
-    private final GameRules gameRules = new GameRules();
-    private final Timer<MinecraftServer> scheduledEvents = new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE);
+    private final Timer<MinecraftServer> scheduledEvents;
 
-    public LevelProperties(CompoundTag arg, DataFixer dataFixer, int i, @Nullable CompoundTag arg2) {
+    private LevelProperties(@Nullable DataFixer dataFixer, int i, @Nullable CompoundTag arg, boolean bl, int j, int k, int l, long m, long n, int o, int p, int q, boolean bl2, int r, boolean bl3, boolean bl4, boolean bl5, WorldBorder.class_5200 arg2, int s, int t, @Nullable UUID uUID, LinkedHashSet<String> linkedHashSet, LinkedHashSet<String> linkedHashSet2, Set<String> set, Timer<MinecraftServer> arg3, @Nullable CompoundTag arg4, CompoundTag arg5, LevelInfo arg6) {
         this.dataFixer = dataFixer;
-        ListTag lv = arg.getList("ServerBrands", 8);
-        for (int j = 0; j < lv.size(); ++j) {
-            this.serverBrands.add(lv.getString(j));
-        }
-        this.modded = arg.getBoolean("WasModded");
-        if (arg.contains("Version", 10)) {
-            CompoundTag lv2 = arg.getCompound("Version");
-            this.versionName = lv2.getString("Name");
-            this.versionId = lv2.getInt("Id");
-            this.versionSnapshot = lv2.getBoolean("Snapshot");
-        } else {
-            this.versionName = SharedConstants.getGameVersion().getName();
-            this.versionId = SharedConstants.getGameVersion().getWorldVersion();
-            this.versionSnapshot = !SharedConstants.getGameVersion().isStable();
-        }
-        this.gameMode = GameMode.byId(arg.getInt("GameType"));
-        this.generatorOptions = class_5285.method_28023(arg, dataFixer, i);
-        this.spawnX = arg.getInt("SpawnX");
-        this.spawnY = arg.getInt("SpawnY");
-        this.spawnZ = arg.getInt("SpawnZ");
-        this.time = arg.getLong("Time");
-        this.timeOfDay = arg.contains("DayTime", 99) ? arg.getLong("DayTime") : this.time;
-        this.lastPlayed = arg.getLong("LastPlayed");
-        this.sizeOnDisk = arg.getLong("SizeOnDisk");
-        this.levelName = arg.getString("LevelName");
-        this.version = arg.getInt("version");
-        this.clearWeatherTime = arg.getInt("clearWeatherTime");
-        this.rainTime = arg.getInt("rainTime");
-        this.raining = arg.getBoolean("raining");
-        this.thunderTime = arg.getInt("thunderTime");
-        this.thundering = arg.getBoolean("thundering");
-        this.hardcore = arg.getBoolean("hardcore");
-        this.initialized = arg.contains("initialized", 99) ? arg.getBoolean("initialized") : true;
-        this.commandsAllowed = arg.contains("allowCommands", 99) ? arg.getBoolean("allowCommands") : this.gameMode == GameMode.CREATIVE;
+        this.modded = bl;
+        this.field_25030 = arg6;
+        this.spawnX = j;
+        this.spawnY = k;
+        this.spawnZ = l;
+        this.time = m;
+        this.timeOfDay = n;
+        this.version = o;
+        this.clearWeatherTime = p;
+        this.rainTime = q;
+        this.raining = bl2;
+        this.thunderTime = r;
+        this.thundering = bl3;
+        this.initialized = bl4;
+        this.difficultyLocked = bl5;
+        this.field_24193 = arg2;
+        this.wanderingTraderSpawnDelay = s;
+        this.wanderingTraderSpawnChance = t;
+        this.wanderingTraderId = uUID;
+        this.serverBrands = linkedHashSet;
+        this.playerData = arg;
         this.dataVersion = i;
-        if (arg2 != null) {
-            this.playerData = arg2;
-        }
-        if (arg.contains("GameRules", 10)) {
-            this.gameRules.load(arg.getCompound("GameRules"));
-        }
-        if (arg.contains("Difficulty", 99)) {
-            this.difficulty = Difficulty.byOrdinal(arg.getByte("Difficulty"));
-        }
-        if (arg.contains("DifficultyLocked", 1)) {
-            this.difficultyLocked = arg.getBoolean("DifficultyLocked");
-        }
-        this.field_24193 = WorldBorder.class_5200.method_27358(arg, WorldBorder.field_24122);
-        if (arg.contains("DimensionData", 10)) {
-            CompoundTag lv3 = arg.getCompound("DimensionData");
-            for (String string : lv3.getKeys()) {
-                this.worldData.put(DimensionType.byRawId(Integer.parseInt(string)), lv3.getCompound(string));
-            }
-        }
-        if (arg.contains("DataPacks", 10)) {
-            CompoundTag lv4 = arg.getCompound("DataPacks");
-            ListTag lv5 = lv4.getList("Disabled", 8);
-            for (int k = 0; k < lv5.size(); ++k) {
-                this.disabledDataPacks.add(lv5.getString(k));
-            }
-            ListTag lv6 = lv4.getList("Enabled", 8);
-            for (int l = 0; l < lv6.size(); ++l) {
-                this.enabledDataPacks.add(lv6.getString(l));
-            }
-        }
-        if (arg.contains("CustomBossEvents", 10)) {
-            this.customBossEvents = arg.getCompound("CustomBossEvents");
-        }
-        if (arg.contains("ScheduledEvents", 9)) {
-            this.scheduledEvents.fromTag(arg.getList("ScheduledEvents", 10));
-        }
-        if (arg.contains("WanderingTraderSpawnDelay", 99)) {
-            this.wanderingTraderSpawnDelay = arg.getInt("WanderingTraderSpawnDelay");
-        }
-        if (arg.contains("WanderingTraderSpawnChance", 99)) {
-            this.wanderingTraderSpawnChance = arg.getInt("WanderingTraderSpawnChance");
-        }
-        if (arg.containsUuidNew("WanderingTraderId")) {
-            this.wanderingTraderId = arg.getUuidNew("WanderingTraderId");
-        }
+        this.scheduledEvents = arg3;
+        this.enabledDataPacks = linkedHashSet2;
+        this.disabledDataPacks = set;
+        this.customBossEvents = arg4;
+        this.field_25031 = arg5;
     }
 
     public LevelProperties(LevelInfo arg) {
-        this.dataFixer = null;
-        this.dataVersion = SharedConstants.getGameVersion().getWorldVersion();
-        this.gameMode = arg.getGameMode();
-        this.difficulty = arg.getDifficulty();
-        this.hardcore = arg.hasStructures();
-        this.generatorOptions = arg.getGeneratorOptions();
-        this.commandsAllowed = arg.isHardcore();
-        this.levelName = arg.getLevelName();
-        this.version = 19133;
-        this.initialized = false;
-        this.versionName = SharedConstants.getGameVersion().getName();
-        this.versionId = SharedConstants.getGameVersion().getWorldVersion();
-        this.versionSnapshot = !SharedConstants.getGameVersion().isStable();
-        this.gameRules.setAllValues(arg.getGameRules(), null);
+        this(null, SharedConstants.getGameVersion().getWorldVersion(), null, false, 0, 0, 0, 0L, 0L, 19133, 0, 0, false, 0, false, false, false, WorldBorder.field_24122, 0, 0, null, Sets.newLinkedHashSet(), Sets.newLinkedHashSet(), Sets.newHashSet(), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE), null, new CompoundTag(), arg.method_28385());
+    }
+
+    public static LevelProperties method_29029(Dynamic<Tag> dynamic2, DataFixer dataFixer, int i, @Nullable CompoundTag arg, LevelInfo arg2, class_5315 arg3) {
+        long l = dynamic2.get("Time").asLong(0L);
+        OptionalDynamic optionalDynamic = dynamic2.get("DataPacks");
+        CompoundTag lv = (CompoundTag)dynamic2.get("DragonFight").result().map(Dynamic::getValue).orElseGet(() -> (Tag)dynamic2.get("DimensionData").get("1").get("DragonFight").orElseEmptyMap().getValue());
+        return new LevelProperties(dataFixer, i, arg, dynamic2.get("WasModded").asBoolean(false), dynamic2.get("SpawnX").asInt(0), dynamic2.get("SpawnY").asInt(0), dynamic2.get("SpawnZ").asInt(0), l, dynamic2.get("DayTime").asLong(l), arg3.method_29022(), dynamic2.get("clearWeatherTime").asInt(0), dynamic2.get("rainTime").asInt(0), dynamic2.get("raining").asBoolean(false), dynamic2.get("thunderTime").asInt(0), dynamic2.get("thundering").asBoolean(false), dynamic2.get("initialized").asBoolean(true), dynamic2.get("DifficultyLocked").asBoolean(false), WorldBorder.class_5200.method_27358(dynamic2, WorldBorder.field_24122), dynamic2.get("WanderingTraderSpawnDelay").asInt(0), dynamic2.get("WanderingTraderSpawnChance").asInt(0), dynamic2.get("WanderingTraderId").read(DynamicSerializableUuid.field_25122).result().map(DynamicSerializableUuid::getUuid).orElse(null), dynamic2.get("ServerBrands").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), optionalDynamic.get("Enabled").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), optionalDynamic.get("Disabled").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toSet()), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE, dynamic2.get("ScheduledEvents").asStream()), (CompoundTag)dynamic2.get("CustomBossEvents").orElseEmptyMap().getValue(), lv, arg2);
     }
 
     @Override
@@ -202,7 +147,7 @@ class_5219 {
         return lv;
     }
 
-    private void updateProperties(CompoundTag arg, CompoundTag arg2) {
+    private void updateProperties(CompoundTag arg, CompoundTag arg22) {
         ListTag lv = new ListTag();
         this.serverBrands.stream().map(StringTag::of).forEach(lv::add);
         arg.put("ServerBrands", lv);
@@ -213,52 +158,44 @@ class_5219 {
         lv2.putBoolean("Snapshot", !SharedConstants.getGameVersion().isStable());
         arg.put("Version", lv2);
         arg.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-        CompoundTag lv3 = this.generatorOptions.method_28025();
-        for (String string : lv3.getKeys()) {
-            arg.put(string, lv3.get(string));
-        }
-        arg.putInt("GameType", this.gameMode.getId());
+        class_5285.field_24826.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.field_25030.getGeneratorOptions()).resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)field_25029)::error)).ifPresent(arg2 -> arg.put("WorldGenSettings", (Tag)arg2));
+        arg.putInt("GameType", this.field_25030.getGameMode().getId());
         arg.putInt("SpawnX", this.spawnX);
         arg.putInt("SpawnY", this.spawnY);
         arg.putInt("SpawnZ", this.spawnZ);
         arg.putLong("Time", this.time);
         arg.putLong("DayTime", this.timeOfDay);
-        arg.putLong("SizeOnDisk", this.sizeOnDisk);
         arg.putLong("LastPlayed", Util.getEpochTimeMs());
-        arg.putString("LevelName", this.levelName);
+        arg.putString("LevelName", this.field_25030.getLevelName());
         arg.putInt("version", 19133);
         arg.putInt("clearWeatherTime", this.clearWeatherTime);
         arg.putInt("rainTime", this.rainTime);
         arg.putBoolean("raining", this.raining);
         arg.putInt("thunderTime", this.thunderTime);
         arg.putBoolean("thundering", this.thundering);
-        arg.putBoolean("hardcore", this.hardcore);
-        arg.putBoolean("allowCommands", this.commandsAllowed);
+        arg.putBoolean("hardcore", this.field_25030.hasStructures());
+        arg.putBoolean("allowCommands", this.field_25030.isHardcore());
         arg.putBoolean("initialized", this.initialized);
         this.field_24193.method_27357(arg);
-        arg.putByte("Difficulty", (byte)this.difficulty.getId());
+        arg.putByte("Difficulty", (byte)this.field_25030.getDifficulty().getId());
         arg.putBoolean("DifficultyLocked", this.difficultyLocked);
-        arg.put("GameRules", this.gameRules.toNbt());
-        CompoundTag lv4 = new CompoundTag();
-        for (Map.Entry<DimensionType, CompoundTag> entry : this.worldData.entrySet()) {
-            lv4.put(String.valueOf(entry.getKey().getRawId()), entry.getValue());
+        arg.put("GameRules", this.field_25030.getGameRules().toNbt());
+        arg.put("DragonFight", this.field_25031);
+        if (arg22 != null) {
+            arg.put("Player", arg22);
         }
-        arg.put("DimensionData", lv4);
-        if (arg2 != null) {
-            arg.put("Player", arg2);
+        CompoundTag lv3 = new CompoundTag();
+        ListTag lv4 = new ListTag();
+        for (String string : this.enabledDataPacks) {
+            lv4.add(StringTag.of(string));
         }
-        CompoundTag compoundTag = new CompoundTag();
-        ListTag listTag = new ListTag();
-        for (String string2 : this.enabledDataPacks) {
-            listTag.add(StringTag.of(string2));
+        lv3.put("Enabled", lv4);
+        ListTag lv5 = new ListTag();
+        for (String string2 : this.disabledDataPacks) {
+            lv5.add(StringTag.of(string2));
         }
-        compoundTag.put("Enabled", listTag);
-        ListTag lv7 = new ListTag();
-        for (String string3 : this.disabledDataPacks) {
-            lv7.add(StringTag.of(string3));
-        }
-        compoundTag.put("Disabled", lv7);
-        arg.put("DataPacks", compoundTag);
+        lv3.put("Disabled", lv5);
+        arg.put("DataPacks", lv3);
         if (this.customBossEvents != null) {
             arg.put("CustomBossEvents", this.customBossEvents);
         }
@@ -330,12 +267,12 @@ class_5219 {
     }
 
     @Override
-    public void setTime(long l) {
+    public void method_29034(long l) {
         this.time = l;
     }
 
     @Override
-    public void setTimeOfDay(long l) {
+    public void method_29035(long l) {
         this.timeOfDay = l;
     }
 
@@ -348,18 +285,12 @@ class_5219 {
 
     @Override
     public String getLevelName() {
-        return this.levelName;
+        return this.field_25030.getLevelName();
     }
 
     @Override
     public int getVersion() {
         return this.version;
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public long getLastPlayed() {
-        return this.lastPlayed;
     }
 
     @Override
@@ -414,22 +345,22 @@ class_5219 {
 
     @Override
     public GameMode getGameMode() {
-        return this.gameMode;
+        return this.field_25030.getGameMode();
     }
 
     @Override
     public void setGameMode(GameMode arg) {
-        this.gameMode = arg;
+        this.field_25030 = this.field_25030.method_28382(arg);
     }
 
     @Override
     public boolean isHardcore() {
-        return this.hardcore;
+        return this.field_25030.hasStructures();
     }
 
     @Override
     public boolean areCommandsAllowed() {
-        return this.commandsAllowed;
+        return this.field_25030.isHardcore();
     }
 
     @Override
@@ -444,7 +375,7 @@ class_5219 {
 
     @Override
     public GameRules getGameRules() {
-        return this.gameRules;
+        return this.field_25030.getGameRules();
     }
 
     @Override
@@ -459,12 +390,12 @@ class_5219 {
 
     @Override
     public Difficulty getDifficulty() {
-        return this.difficulty;
+        return this.field_25030.getDifficulty();
     }
 
     @Override
     public void setDifficulty(Difficulty arg) {
-        this.difficulty = arg;
+        this.field_25030 = this.field_25030.method_28381(arg);
     }
 
     @Override
@@ -489,50 +420,18 @@ class_5219 {
     }
 
     @Override
-    public CompoundTag getWorldData(DimensionType arg) {
-        CompoundTag lv = this.worldData.get(arg);
-        if (lv == null) {
-            return new CompoundTag();
-        }
-        return lv;
-    }
-
-    @Override
-    public void setWorldData(DimensionType arg, CompoundTag arg2) {
-        this.worldData.put(arg, arg2);
-    }
-
-    @Override
     public class_5285 method_28057() {
-        return this.generatorOptions;
+        return this.field_25030.getGeneratorOptions();
     }
 
     @Override
-    public CompoundTag getWorldData() {
-        return this.getWorldData(DimensionType.OVERWORLD);
+    public CompoundTag method_29036() {
+        return this.field_25031;
     }
 
     @Override
-    public void setWorldData(CompoundTag arg) {
-        this.setWorldData(DimensionType.OVERWORLD, arg);
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public int getVersionId() {
-        return this.versionId;
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public boolean isVersionSnapshot() {
-        return this.versionSnapshot;
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public String getVersionName() {
-        return this.versionName;
+    public void method_29037(CompoundTag arg) {
+        this.field_25031 = arg;
     }
 
     @Override
@@ -605,7 +504,7 @@ class_5219 {
     @Override
     @Environment(value=EnvType.CLIENT)
     public LevelInfo getLevelInfo() {
-        return new LevelInfo(this.levelName, this.gameMode, this.hardcore, this.difficulty, this.commandsAllowed, this.gameRules.copy(), this.generatorOptions);
+        return this.field_25030.method_28385();
     }
 }
 

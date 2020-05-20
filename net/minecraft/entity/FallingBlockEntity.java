@@ -147,7 +147,7 @@ extends Entity {
                         boolean bl4 = FallingBlock.canFallThrough(this.world.getBlockState(lv3.down())) && (!bl || !bl2);
                         boolean bl6 = bl5 = this.block.canPlaceAt(this.world, lv3) && !bl4;
                         if (bl3 && bl5) {
-                            if (this.block.contains(Properties.WATERLOGGED) && this.world.getFluidState(lv3).getFluid() == Fluids.WATER) {
+                            if (this.block.method_28498(Properties.WATERLOGGED) && this.world.getFluidState(lv3).getFluid() == Fluids.WATER) {
                                 this.block = (BlockState)this.block.with(Properties.WATERLOGGED, true);
                             }
                             if (this.world.setBlockState(lv3, this.block, 3)) {

@@ -5,7 +5,6 @@ package net.minecraft;
 
 import java.util.UUID;
 import net.minecraft.class_5269;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.GameMode;
@@ -38,10 +37,6 @@ extends class_5269 {
 
     public void setClearWeatherTime(int var1);
 
-    public CompoundTag getWorldData();
-
-    public void setWorldData(CompoundTag var1);
-
     public int getWanderingTraderSpawnDelay();
 
     public void setWanderingTraderSpawnDelay(int var1);
@@ -67,5 +62,9 @@ extends class_5269 {
     public void setGameMode(GameMode var1);
 
     public Timer<MinecraftServer> getScheduledEvents();
+
+    public void method_29034(long var1);
+
+    public void method_29035(long var1);
 }
 

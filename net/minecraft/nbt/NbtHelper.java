@@ -7,8 +7,8 @@
  *  com.mojang.authlib.GameProfile
  *  com.mojang.authlib.properties.Property
  *  com.mojang.datafixers.DataFixer
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  javax.annotation.Nullable
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -19,8 +19,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -200,7 +200,7 @@ public final class NbtHelper {
         return lv2;
     }
 
-    private static <S extends State<S>, T extends Comparable<T>> S withProperty(S arg, Property<T> arg2, String string, CompoundTag arg3, CompoundTag arg4) {
+    private static <S extends State<?, S>, T extends Comparable<T>> S withProperty(S arg, Property<T> arg2, String string, CompoundTag arg3, CompoundTag arg4) {
         Optional<T> optional = arg2.parse(arg3.getString(string));
         if (optional.isPresent()) {
             return (S)((State)arg.with(arg2, (Comparable)((Comparable)optional.get())));

@@ -6,7 +6,6 @@
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
  *  com.mojang.datafixers.DataFixUtils
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
@@ -14,6 +13,7 @@
  *  com.mojang.datafixers.types.templates.Tag$TagType
  *  com.mojang.datafixers.util.Either
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.DataFixUtils;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
@@ -29,11 +28,13 @@ import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.Tag;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.BlockStateFlattening;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class EntityBlockStateFix
 extends DataFix {
@@ -308,7 +309,7 @@ extends DataFix {
         Schema schema2 = this.getOutputSchema();
         Function<Typed, Typed> function = typed -> this.mergeIdAndData((Typed<?>)typed, "DisplayTile", "DisplayData", "DisplayState");
         Function<Typed, Typed> function2 = typed -> this.mergeIdAndData((Typed<?>)typed, "inTile", "inData", "inBlockState");
-        Type type = DSL.and((Type)DSL.optional((Type)DSL.field((String)"inTile", (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), (Type)DSL.namespacedString())))), (Type)DSL.remainderType());
+        Type type = DSL.and((Type)DSL.optional((Type)DSL.field((String)"inTile", (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), IdentifierNormalizingSchema.method_28295())))), (Type)DSL.remainderType());
         Function<Typed, Typed> function3 = typed -> typed.update(type.finder(), DSL.remainderType(), Pair::getSecond);
         return this.fixTypeEverywhereTyped("EntityBlockStateFix", schema.getType(TypeReferences.ENTITY), schema2.getType(TypeReferences.ENTITY), typed2 -> {
             typed2 = this.useFunction((Typed<?>)typed2, "minecraft:falling_block", this::method_15695);
@@ -335,12 +336,12 @@ extends DataFix {
     }
 
     private Typed<?> method_15695(Typed<?> typed) {
-        Type type = DSL.optional((Type)DSL.field((String)"Block", (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), (Type)DSL.namespacedString()))));
+        Type type = DSL.optional((Type)DSL.field((String)"Block", (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), IdentifierNormalizingSchema.method_28295()))));
         Type type2 = DSL.optional((Type)DSL.field((String)"BlockState", (Type)DSL.named((String)TypeReferences.BLOCK_STATE.typeName(), (Type)DSL.remainderType())));
         Dynamic dynamic = (Dynamic)typed.get(DSL.remainderFinder());
         return typed.update(type.finder(), type2, either -> {
             int i = (Integer)either.map(pair -> (Integer)((Either)pair.getSecond()).map(integer -> integer, EntityBlockStateFix::getNumericalBlockId), unit -> {
-                Optional optional = dynamic.get("TileID").asNumber();
+                Optional optional = dynamic.get("TileID").asNumber().result();
                 return optional.map(Number::intValue).orElseGet(() -> dynamic.get("Tile").asByte((byte)0) & 0xFF);
             });
             int j = dynamic.get("Data").asInt(0) & 0xF;
@@ -349,7 +350,7 @@ extends DataFix {
     }
 
     private Typed<?> mergeIdAndData(Typed<?> typed, String string, String string2, String string3) {
-        Tag.TagType type = DSL.field((String)string, (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), (Type)DSL.namespacedString())));
+        Tag.TagType type = DSL.field((String)string, (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), IdentifierNormalizingSchema.method_28295())));
         Tag.TagType type2 = DSL.field((String)string3, (Type)DSL.named((String)TypeReferences.BLOCK_STATE.typeName(), (Type)DSL.remainderType()));
         Dynamic dynamic = (Dynamic)typed.getOrCreate(DSL.remainderFinder());
         return typed.update(type.finder(), (Type)type2, pair -> {

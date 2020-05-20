@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowyBlock;
@@ -24,8 +23,8 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class FreezeTopLayerFeature
 extends Feature<DefaultFeatureConfig> {
-    public FreezeTopLayerFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
+    public FreezeTopLayerFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -46,7 +45,7 @@ extends Feature<DefaultFeatureConfig> {
                 if (!lv3.canSetSnow(arg, lv)) continue;
                 arg.setBlockState(lv, Blocks.SNOW.getDefaultState(), 2);
                 BlockState lv4 = arg.getBlockState(lv2);
-                if (!lv4.contains(SnowyBlock.SNOWY)) continue;
+                if (!lv4.method_28498(SnowyBlock.SNOWY)) continue;
                 arg.setBlockState(lv2, (BlockState)lv4.with(SnowyBlock.SNOWY, true), 2);
             }
         }

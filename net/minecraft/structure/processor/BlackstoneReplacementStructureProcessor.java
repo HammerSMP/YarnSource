@@ -3,14 +3,12 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Maps
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.structure.processor;
 
 import com.google.common.collect.Maps;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -27,6 +25,7 @@ import net.minecraft.world.WorldView;
 
 public class BlackstoneReplacementStructureProcessor
 extends StructureProcessor {
+    public static final Codec<BlackstoneReplacementStructureProcessor> field_24996 = Codec.unit(() -> INSTANCE);
     public static final BlackstoneReplacementStructureProcessor INSTANCE = new BlackstoneReplacementStructureProcessor();
     private final Map<Block, Block> replacementMap = Util.make(Maps.newHashMap(), hashMap -> {
         hashMap.put(Blocks.COBBLESTONE, Blocks.BLACKSTONE);
@@ -54,6 +53,9 @@ extends StructureProcessor {
         hashMap.put(Blocks.IRON_BARS, Blocks.CHAIN);
     });
 
+    private BlackstoneReplacementStructureProcessor() {
+    }
+
     @Override
     public Structure.StructureBlockInfo process(WorldView arg, BlockPos arg2, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
         Block lv = this.replacementMap.get(arg5.state.getBlock());
@@ -62,26 +64,21 @@ extends StructureProcessor {
         }
         BlockState lv2 = arg5.state;
         BlockState lv3 = lv.getDefaultState();
-        if (lv2.contains(StairsBlock.FACING)) {
+        if (lv2.method_28498(StairsBlock.FACING)) {
             lv3 = (BlockState)lv3.with(StairsBlock.FACING, lv2.get(StairsBlock.FACING));
         }
-        if (lv2.contains(StairsBlock.HALF)) {
+        if (lv2.method_28498(StairsBlock.HALF)) {
             lv3 = (BlockState)lv3.with(StairsBlock.HALF, lv2.get(StairsBlock.HALF));
         }
-        if (lv2.contains(SlabBlock.TYPE)) {
+        if (lv2.method_28498(SlabBlock.TYPE)) {
             lv3 = (BlockState)lv3.with(SlabBlock.TYPE, lv2.get(SlabBlock.TYPE));
         }
         return new Structure.StructureBlockInfo(arg5.pos, lv3, arg5.tag);
     }
 
     @Override
-    protected StructureProcessorType getType() {
+    protected StructureProcessorType<?> getType() {
         return StructureProcessorType.BLACKSTONE_REPLACE;
-    }
-
-    @Override
-    protected <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.emptyMap());
     }
 }
 

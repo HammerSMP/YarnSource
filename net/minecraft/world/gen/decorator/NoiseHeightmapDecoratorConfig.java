@@ -2,20 +2,22 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class NoiseHeightmapDecoratorConfig
 implements DecoratorConfig {
+    public static final Codec<NoiseHeightmapDecoratorConfig> field_24890 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.DOUBLE.fieldOf("noise_level").forGetter(arg -> arg.noiseLevel), (App)Codec.INT.fieldOf("below_noise").forGetter(arg -> arg.belowNoise), (App)Codec.INT.fieldOf("above_noise").forGetter(arg -> arg.aboveNoise)).apply((Applicative)instance, NoiseHeightmapDecoratorConfig::new));
     public final double noiseLevel;
     public final int belowNoise;
     public final int aboveNoise;
@@ -24,18 +26,6 @@ implements DecoratorConfig {
         this.noiseLevel = d;
         this.belowNoise = i;
         this.aboveNoise = j;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("noise_level"), (Object)dynamicOps.createDouble(this.noiseLevel), (Object)dynamicOps.createString("below_noise"), (Object)dynamicOps.createInt(this.belowNoise), (Object)dynamicOps.createString("above_noise"), (Object)dynamicOps.createInt(this.aboveNoise))));
-    }
-
-    public static NoiseHeightmapDecoratorConfig deserialize(Dynamic<?> dynamic) {
-        double d = dynamic.get("noise_level").asDouble(0.0);
-        int i = dynamic.get("below_noise").asInt(0);
-        int j = dynamic.get("above_noise").asInt(0);
-        return new NoiseHeightmapDecoratorConfig(d, i, j);
     }
 }
 

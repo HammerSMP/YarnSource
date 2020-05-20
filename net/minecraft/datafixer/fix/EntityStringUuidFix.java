@@ -25,7 +25,7 @@ extends DataFix {
 
     public TypeRewriteRule makeRule() {
         return this.fixTypeEverywhereTyped("EntityStringUuidFix", this.getInputSchema().getType(TypeReferences.ENTITY), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
-            Optional optional = dynamic.get("UUID").asString();
+            Optional optional = dynamic.get("UUID").asString().result();
             if (optional.isPresent()) {
                 UUID uUID = UUID.fromString((String)optional.get());
                 return dynamic.remove("UUID").set("UUIDMost", dynamic.createLong(uUID.getMostSignificantBits())).set("UUIDLeast", dynamic.createLong(uUID.getLeastSignificantBits()));

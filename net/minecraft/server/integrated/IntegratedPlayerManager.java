@@ -12,6 +12,7 @@ import com.mojang.authlib.GameProfile;
 import java.net.SocketAddress;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5318;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -26,8 +27,8 @@ public class IntegratedPlayerManager
 extends PlayerManager {
     private CompoundTag userData;
 
-    public IntegratedPlayerManager(IntegratedServer arg, WorldSaveHandler arg2) {
-        super(arg, arg2, 8);
+    public IntegratedPlayerManager(IntegratedServer arg, class_5318.class_5319 arg2, WorldSaveHandler arg3) {
+        super(arg, arg2, arg3, 8);
         this.setViewDistance(10);
     }
 

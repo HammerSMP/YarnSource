@@ -96,11 +96,11 @@ public class PointOfInterestType {
     }
 
     private static PointOfInterestType register(String string, Set<BlockState> set, int i, int j) {
-        return PointOfInterestType.setup(Registry.POINT_OF_INTEREST_TYPE.add(new Identifier(string), new PointOfInterestType(string, set, i, j)));
+        return PointOfInterestType.setup(Registry.register(Registry.POINT_OF_INTEREST_TYPE, new Identifier(string), new PointOfInterestType(string, set, i, j)));
     }
 
     private static PointOfInterestType register(String string, Set<BlockState> set, int i, Predicate<PointOfInterestType> predicate, int j) {
-        return PointOfInterestType.setup(Registry.POINT_OF_INTEREST_TYPE.add(new Identifier(string), new PointOfInterestType(string, set, i, predicate, j)));
+        return PointOfInterestType.setup(Registry.register(Registry.POINT_OF_INTEREST_TYPE, new Identifier(string), new PointOfInterestType(string, set, i, predicate, j)));
     }
 
     private static PointOfInterestType setup(PointOfInterestType arg) {

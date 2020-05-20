@@ -13,12 +13,12 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.dimension.DimensionType;
 
 public class PlayerRespawnS2CPacket
 implements Packet<ClientPlayPacketListener> {
-    private DimensionType dimension;
+    private Identifier dimension;
     private long sha256Seed;
     private GameMode gameMode;
     private boolean debugWorld;
@@ -28,7 +28,7 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerRespawnS2CPacket() {
     }
 
-    public PlayerRespawnS2CPacket(DimensionType arg, long l, GameMode arg2, boolean bl, boolean bl2, boolean bl3) {
+    public PlayerRespawnS2CPacket(Identifier arg, long l, GameMode arg2, boolean bl, boolean bl2, boolean bl3) {
         this.dimension = arg;
         this.sha256Seed = l;
         this.gameMode = arg2;
@@ -44,7 +44,7 @@ implements Packet<ClientPlayPacketListener> {
 
     @Override
     public void read(PacketByteBuf arg) throws IOException {
-        this.dimension = DimensionType.byRawId(arg.readInt());
+        this.dimension = arg.readIdentifier();
         this.sha256Seed = arg.readLong();
         this.gameMode = GameMode.byId(arg.readUnsignedByte());
         this.debugWorld = arg.readBoolean();
@@ -54,7 +54,7 @@ implements Packet<ClientPlayPacketListener> {
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.dimension.getRawId());
+        arg.writeIdentifier(this.dimension);
         arg.writeLong(this.sha256Seed);
         arg.writeByte(this.gameMode.getId());
         arg.writeBoolean(this.debugWorld);
@@ -63,7 +63,7 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public DimensionType getDimension() {
+    public Identifier getDimension() {
         return this.dimension;
     }
 

@@ -6,6 +6,11 @@
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.Keyable
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  it.unimi.dsi.fastutil.longs.Long2FloatLinkedOpenHashMap
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
@@ -19,13 +24,21 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Keyable;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.longs.Long2FloatLinkedOpenHashMap;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -34,6 +47,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
+import net.minecraft.class_5312;
 import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.client.color.world.GrassColors;
 import net.minecraft.entity.EntityType;
@@ -46,12 +60,16 @@ import net.minecraft.sound.MusicSound;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.IdList;
 import net.minecraft.util.collection.WeightedPicker;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.OctaveSimplexNoiseSampler;
 import net.minecraft.util.registry.Registry;
@@ -70,7 +88,6 @@ import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
@@ -78,8 +95,9 @@ import net.minecraft.world.gen.surfacebuilder.SurfaceConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class Biome {
+public class Biome {
     public static final Logger LOGGER = LogManager.getLogger();
+    public static final Codec<Biome> field_24677 = RecordCodecBuilder.create(instance -> instance.group((App)Precipitation.field_24680.fieldOf("precipitation").forGetter(arg -> arg.precipitation), (App)Category.field_24678.fieldOf("category").forGetter(arg -> arg.category), (App)Codec.FLOAT.fieldOf("depth").forGetter(arg -> Float.valueOf(arg.depth)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale)), (App)Codec.FLOAT.fieldOf("temperature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("downfall").forGetter(arg -> Float.valueOf(arg.downfall)), (App)BiomeEffects.field_24714.fieldOf("effects").forGetter(arg -> arg.effects), (App)Codec.INT.fieldOf("sky_color").forGetter(arg -> arg.skyColor), (App)ConfiguredSurfaceBuilder.field_25015.fieldOf("surface_builder").forGetter(arg -> arg.surfaceBuilder), (App)Codec.simpleMap(GenerationStep.Carver.field_24770, (Codec)ConfiguredCarver.field_24828.listOf().promotePartial(Util.method_29188("Carver: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Carver.values())).fieldOf("carvers").forGetter(arg -> arg.carvers), (App)Codec.simpleMap(GenerationStep.Feature.field_24771, (Codec)ConfiguredFeature.field_24833.listOf().promotePartial(Util.method_29188("Feature: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Feature.values())).fieldOf("features").forGetter(arg -> arg.features), (App)class_5312.field_24834.listOf().promotePartial(Util.method_29188("Structure start: ", ((Logger)LOGGER)::error)).fieldOf("starts").forGetter(arg2 -> arg2.structureFeatures.values().stream().sorted(Comparator.comparing(arg -> Registry.STRUCTURE_FEATURE.getId((StructureFeature<?>)arg.field_24835))).collect(Collectors.toList())), (App)Codec.simpleMap(SpawnGroup.field_24655, (Codec)SpawnEntry.field_24681.listOf().promotePartial(Util.method_29188("Spawn data: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(SpawnGroup.values())).fieldOf("spawners").forGetter(arg -> arg.spawns), (App)MixedNoisePoint.field_24679.listOf().fieldOf("climate_parameters").forGetter(arg -> arg.noisePoints), (App)Codec.STRING.optionalFieldOf("parent").forGetter(arg -> Optional.ofNullable(arg.parent))).apply((Applicative)instance, Biome::new));
     public static final Set<Biome> BIOMES = Sets.newHashSet();
     public static final IdList<Biome> PARENT_BIOME_ID_MAP = new IdList();
     protected static final OctaveSimplexNoiseSampler TEMPERATURE_NOISE = new OctaveSimplexNoiseSampler(new ChunkRandom(1234L), (List<Integer>)ImmutableList.of((Object)0));
@@ -97,12 +115,13 @@ public abstract class Biome {
     protected final Category category;
     protected final Precipitation precipitation;
     protected final BiomeEffects effects;
-    protected final Map<GenerationStep.Carver, List<ConfiguredCarver<?>>> carvers = Maps.newHashMap();
-    protected final Map<GenerationStep.Feature, List<ConfiguredFeature<?, ?>>> features = Maps.newHashMap();
+    protected final Map<GenerationStep.Carver, List<ConfiguredCarver<?>>> carvers;
+    protected final Map<GenerationStep.Feature, List<ConfiguredFeature<?, ?>>> features;
     protected final List<ConfiguredFeature<?, ?>> flowerFeatures = Lists.newArrayList();
-    protected final Map<StructureFeature<?>, FeatureConfig> structureFeatures = Maps.newHashMap();
-    private final Map<SpawnGroup, List<SpawnEntry>> spawns = Maps.newHashMap();
+    private final Map<StructureFeature<?>, class_5312<?, ?>> structureFeatures;
+    private final Map<SpawnGroup, List<SpawnEntry>> spawns;
     private final Map<EntityType<?>, SpawnDensity> spawnDensities = Maps.newHashMap();
+    private final List<MixedNoisePoint> noisePoints;
     private final ThreadLocal<Long2FloatLinkedOpenHashMap> temperatureCache = ThreadLocal.withInitial(() -> Util.make(() -> {
         Long2FloatLinkedOpenHashMap long2FloatLinkedOpenHashMap = new Long2FloatLinkedOpenHashMap(1024, 0.25f){
 
@@ -112,7 +131,6 @@ public abstract class Biome {
         long2FloatLinkedOpenHashMap.defaultReturnValue(Float.NaN);
         return long2FloatLinkedOpenHashMap;
     }));
-    private final List<MixedNoisePoint> noisePoints;
 
     @Nullable
     public static Biome getModifiedBiome(Biome arg) {
@@ -138,12 +156,35 @@ public abstract class Biome {
         this.parent = arg.parent;
         this.noisePoints = arg.noises != null ? arg.noises : ImmutableList.of();
         this.effects = arg.specialEffects;
+        this.carvers = Maps.newHashMap();
+        this.structureFeatures = Maps.newHashMap();
+        this.features = Maps.newHashMap();
         for (GenerationStep.Feature feature : GenerationStep.Feature.values()) {
             this.features.put(feature, Lists.newArrayList());
         }
+        this.spawns = Maps.newHashMap();
         for (Enum enum_ : SpawnGroup.values()) {
             this.spawns.put((SpawnGroup)enum_, Lists.newArrayList());
         }
+    }
+
+    private Biome(Precipitation arg2, Category arg22, float f, float g, float h, float i, BiomeEffects arg3, int j, ConfiguredSurfaceBuilder<?> arg4, Map<GenerationStep.Carver, List<ConfiguredCarver<?>>> map, Map<GenerationStep.Feature, List<ConfiguredFeature<?, ?>>> map2, List<class_5312<?, ?>> list, Map<SpawnGroup, List<SpawnEntry>> map3, List<MixedNoisePoint> list2, Optional<String> optional) {
+        this.precipitation = arg2;
+        this.category = arg22;
+        this.depth = f;
+        this.scale = g;
+        this.temperature = h;
+        this.downfall = i;
+        this.effects = arg3;
+        this.skyColor = j;
+        this.surfaceBuilder = arg4;
+        this.carvers = map;
+        this.features = map2;
+        this.structureFeatures = list.stream().collect(Collectors.toMap(arg -> arg.field_24835, Function.identity()));
+        this.spawns = map3;
+        this.noisePoints = list2;
+        this.parent = optional.orElse(null);
+        map2.values().stream().flatMap(Collection::stream).filter(arg -> arg.feature == Feature.DECORATED_FLOWER).forEach(this.flowerFeatures::add);
     }
 
     public boolean hasParent() {
@@ -163,7 +204,7 @@ public abstract class Biome {
     }
 
     protected void addSpawn(SpawnGroup arg, SpawnEntry arg2) {
-        this.spawns.get((Object)arg).add(arg2);
+        this.spawns.get(arg).add(arg2);
     }
 
     protected void addSpawnDensity(EntityType<?> arg, double d, double e) {
@@ -171,7 +212,7 @@ public abstract class Biome {
     }
 
     public List<SpawnEntry> getEntitySpawnList(SpawnGroup arg) {
-        return this.spawns.get((Object)arg);
+        return this.spawns.get(arg);
     }
 
     @Nullable
@@ -251,7 +292,7 @@ public abstract class Biome {
         if (arg2.feature == Feature.DECORATED_FLOWER) {
             this.flowerFeatures.add(arg2);
         }
-        this.features.get((Object)arg).add(arg2);
+        this.features.get(arg).add(arg2);
     }
 
     public <C extends CarverConfig> void addCarver(GenerationStep.Carver arg2, ConfiguredCarver<C> arg22) {
@@ -262,17 +303,20 @@ public abstract class Biome {
         return this.carvers.computeIfAbsent(arg2, arg -> Lists.newArrayList());
     }
 
-    public <C extends FeatureConfig> void addStructureFeature(ConfiguredFeature<C, ? extends StructureFeature<C>> arg) {
-        this.structureFeatures.put((StructureFeature<?>)arg.feature, (FeatureConfig)arg.config);
+    public void addStructureFeature(class_5312<?, ?> arg) {
+        this.structureFeatures.put((StructureFeature<?>)arg.field_24835, arg);
     }
 
-    public <C extends FeatureConfig> boolean hasStructureFeature(StructureFeature<C> arg) {
+    public boolean hasStructureFeature(StructureFeature<?> arg) {
         return this.structureFeatures.containsKey(arg);
     }
 
-    @Nullable
-    public <C extends FeatureConfig> C getStructureFeatureConfig(StructureFeature<C> arg) {
-        return (C)this.structureFeatures.get(arg);
+    public Iterable<class_5312<?, ?>> method_28413() {
+        return this.structureFeatures.values();
+    }
+
+    public class_5312<?, ?> method_28405(class_5312<?, ?> arg) {
+        return this.structureFeatures.getOrDefault(arg.field_24835, arg);
     }
 
     public List<ConfiguredFeature<?, ?>> getFlowerFeatures() {
@@ -280,20 +324,39 @@ public abstract class Biome {
     }
 
     public List<ConfiguredFeature<?, ?>> getFeaturesForStep(GenerationStep.Feature arg) {
-        return this.features.get((Object)arg);
+        return this.features.get(arg);
     }
 
-    public void generateFeatureStep(GenerationStep.Feature arg, StructureAccessor arg2, ChunkGenerator arg3, ServerWorldAccess arg4, long l, ChunkRandom arg5, BlockPos arg6) {
+    public void generateFeatureStep(GenerationStep.Feature arg, StructureAccessor arg2, ChunkGenerator arg3, ServerWorldAccess arg4, long l, ChunkRandom arg52, BlockPos arg6) {
         int i = 0;
-        for (ConfiguredFeature<?, ?> lv : this.features.get((Object)arg)) {
-            arg5.setDecoratorSeed(l, i, arg.ordinal());
-            try {
-                lv.generate(arg4, arg2, arg3, arg5, arg6);
+        if (arg2.method_27834()) {
+            for (StructureFeature structureFeature : Registry.STRUCTURE_FEATURE) {
+                if (structureFeature.method_28663() != arg) continue;
+                arg52.setDecoratorSeed(l, i, arg.ordinal());
+                int j = arg6.getX() >> 4;
+                int k = arg6.getZ() >> 4;
+                int m = j << 4;
+                int n = k << 4;
+                try {
+                    arg2.getStructuresWithChildren(ChunkSectionPos.from(arg6), structureFeature).forEach(arg5 -> arg5.generateStructure(arg4, arg2, arg3, arg52, new BlockBox(m, n, m + 15, n + 15), new ChunkPos(j, k)));
+                }
+                catch (Exception exception) {
+                    CrashReport lv2 = CrashReport.create(exception, "Feature placement");
+                    lv2.addElement("Feature").add("Id", Registry.STRUCTURE_FEATURE.getId(structureFeature)).add("Description", () -> lv.toString());
+                    throw new CrashException(lv2);
+                }
+                ++i;
             }
-            catch (Exception exception) {
-                CrashReport lv2 = CrashReport.create(exception, "Feature placement");
-                lv2.addElement("Feature").add("Id", Registry.FEATURE.getId((Feature<?>)lv.feature)).add("Config", lv.config).add("Description", () -> arg.feature.toString());
-                throw new CrashException(lv2);
+        }
+        for (ConfiguredFeature<?, ?> configuredFeature : this.features.get(arg)) {
+            arg52.setDecoratorSeed(l, i, arg.ordinal());
+            try {
+                configuredFeature.generate(arg4, arg2, arg3, arg52, arg6);
+            }
+            catch (Exception exception2) {
+                CrashReport lv4 = CrashReport.create(exception2, "Feature placement");
+                lv4.addElement("Feature").add("Id", Registry.FEATURE.getId((Feature<?>)configuredFeature.feature)).add("Config", configuredFeature.config).add("Description", () -> arg.feature.toString());
+                throw new CrashException(lv4);
             }
             ++i;
         }
@@ -424,6 +487,7 @@ public abstract class Biome {
     }
 
     public static class MixedNoisePoint {
+        public static final Codec<MixedNoisePoint> field_24679 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("temparature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("humidity").forGetter(arg -> Float.valueOf(arg.humidity)), (App)Codec.FLOAT.fieldOf("altitude").forGetter(arg -> Float.valueOf(arg.altitude)), (App)Codec.FLOAT.fieldOf("weirdness").forGetter(arg -> Float.valueOf(arg.weirdness)), (App)Codec.FLOAT.fieldOf("offset").forGetter(arg -> Float.valueOf(arg.weight))).apply((Applicative)instance, MixedNoisePoint::new));
         private final float temperature;
         private final float humidity;
         private final float altitude;
@@ -549,19 +613,20 @@ public abstract class Biome {
         }
 
         public String toString() {
-            return "BiomeBuilder{\nsurfaceBuilder=" + this.surfaceBuilder + ",\nprecipitation=" + (Object)((Object)this.precipitation) + ",\nbiomeCategory=" + (Object)((Object)this.category) + ",\ndepth=" + this.depth + ",\nscale=" + this.scale + ",\ntemperature=" + this.temperature + ",\ndownfall=" + this.downfall + ",\nspecialEffects=" + this.specialEffects + ",\nparent='" + this.parent + '\'' + "\n" + '}';
+            return "BiomeBuilder{\nsurfaceBuilder=" + this.surfaceBuilder + ",\nprecipitation=" + this.precipitation + ",\nbiomeCategory=" + this.category + ",\ndepth=" + this.depth + ",\nscale=" + this.scale + ",\ntemperature=" + this.temperature + ",\ndownfall=" + this.downfall + ",\nspecialEffects=" + this.specialEffects + ",\nparent='" + this.parent + '\'' + "\n" + '}';
         }
     }
 
     public static class SpawnEntry
     extends WeightedPicker.Entry {
+        public static final Codec<SpawnEntry> field_24681 = RecordCodecBuilder.create(instance -> instance.group((App)Registry.ENTITY_TYPE.fieldOf("type").forGetter(arg -> arg.type), (App)Codec.INT.fieldOf("weight").forGetter(arg -> arg.weight), (App)Codec.INT.fieldOf("minCount").forGetter(arg -> arg.minGroupSize), (App)Codec.INT.fieldOf("maxCount").forGetter(arg -> arg.maxGroupSize)).apply((Applicative)instance, SpawnEntry::new));
         public final EntityType<?> type;
         public final int minGroupSize;
         public final int maxGroupSize;
 
         public SpawnEntry(EntityType<?> arg, int i, int j, int k) {
             super(i);
-            this.type = arg;
+            this.type = arg.getSpawnGroup() == SpawnGroup.MISC ? EntityType.PIG : arg;
             this.minGroupSize = j;
             this.maxGroupSize = k;
         }
@@ -589,11 +654,13 @@ public abstract class Biome {
         }
     }
 
-    public static enum Precipitation {
+    public static enum Precipitation implements StringIdentifiable
+    {
         NONE("none"),
         RAIN("rain"),
         SNOW("snow");
 
+        public static final Codec<Precipitation> field_24680;
         private static final Map<String, Precipitation> NAME_MAP;
         private final String name;
 
@@ -605,12 +672,23 @@ public abstract class Biome {
             return this.name;
         }
 
+        public static Precipitation method_28431(String string) {
+            return NAME_MAP.get(string);
+        }
+
+        @Override
+        public String asString() {
+            return this.name;
+        }
+
         static {
+            field_24680 = StringIdentifiable.method_28140(Precipitation::values, Precipitation::method_28431);
             NAME_MAP = Arrays.stream(Precipitation.values()).collect(Collectors.toMap(Precipitation::getName, arg -> arg));
         }
     }
 
-    public static enum Category {
+    public static enum Category implements StringIdentifiable
+    {
         NONE("none"),
         TAIGA("taiga"),
         EXTREME_HILLS("extreme_hills"),
@@ -629,6 +707,7 @@ public abstract class Biome {
         MUSHROOM("mushroom"),
         NETHER("nether");
 
+        public static final Codec<Category> field_24678;
         private static final Map<String, Category> NAME_MAP;
         private final String name;
 
@@ -640,7 +719,17 @@ public abstract class Biome {
             return this.name;
         }
 
+        public static Category method_28424(String string) {
+            return NAME_MAP.get(string);
+        }
+
+        @Override
+        public String asString() {
+            return this.name;
+        }
+
         static {
+            field_24678 = StringIdentifiable.method_28140(Category::values, Category::method_28424);
             NAME_MAP = Arrays.stream(Category.values()).collect(Collectors.toMap(Category::getName, arg -> arg));
         }
     }

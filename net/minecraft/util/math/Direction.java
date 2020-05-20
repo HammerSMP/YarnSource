@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Iterators
+ *  com.mojang.serialization.Codec
  *  it.unimi.dsi.fastutil.longs.Long2ObjectMap
  *  it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
  *  javax.annotation.Nullable
@@ -12,6 +13,7 @@
 package net.minecraft.util.math;
 
 import com.google.common.collect.Iterators;
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.Arrays;
@@ -430,6 +432,7 @@ public enum Direction implements StringIdentifiable
         };
 
         private static final Axis[] field_23780;
+        public static final Codec<Axis> field_25065;
         private static final Map<String, Axis> BY_NAME;
         private final String name;
 
@@ -496,6 +499,7 @@ public enum Direction implements StringIdentifiable
 
         static {
             field_23780 = Axis.values();
+            field_25065 = StringIdentifiable.method_28140(Axis::values, Axis::fromName);
             BY_NAME = Arrays.stream(field_23780).collect(Collectors.toMap(Axis::getName, arg -> arg));
         }
     }

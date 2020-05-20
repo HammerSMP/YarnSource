@@ -2,17 +2,17 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.Vec3i;
@@ -20,6 +20,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class NetherrackReplaceBlobsFeatureConfig
 implements FeatureConfig {
+    public static final Codec<NetherrackReplaceBlobsFeatureConfig> field_24905 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Vec3i.field_25123.fieldOf("minimum_reach").forGetter(arg -> arg.minReachPos), (App)Vec3i.field_25123.fieldOf("maximum_reach").forGetter(arg -> arg.maxReachPos)).apply((Applicative)instance, NetherrackReplaceBlobsFeatureConfig::new));
     public final BlockState target;
     public final BlockState state;
     public final Vec3i minReachPos;
@@ -30,32 +31,6 @@ implements FeatureConfig {
         this.state = arg2;
         this.minReachPos = arg3;
         this.maxReachPos = arg4;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        builder.put(dynamicOps.createString("target"), BlockState.serialize(dynamicOps, this.target).getValue());
-        builder.put(dynamicOps.createString("state"), BlockState.serialize(dynamicOps, this.state).getValue());
-        builder.put(dynamicOps.createString("minimum_reach_x"), dynamicOps.createInt(this.minReachPos.getX()));
-        builder.put(dynamicOps.createString("minimum_reach_y"), dynamicOps.createInt(this.minReachPos.getY()));
-        builder.put(dynamicOps.createString("minimum_reach_z"), dynamicOps.createInt(this.minReachPos.getZ()));
-        builder.put(dynamicOps.createString("maximum_reach_x"), dynamicOps.createInt(this.maxReachPos.getX()));
-        builder.put(dynamicOps.createString("maximum_reach_y"), dynamicOps.createInt(this.maxReachPos.getY()));
-        builder.put(dynamicOps.createString("maximum_reach_z"), dynamicOps.createInt(this.maxReachPos.getZ()));
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)builder.build()));
-    }
-
-    public static <T> NetherrackReplaceBlobsFeatureConfig deserialize(Dynamic<T> dynamic) {
-        BlockState lv = dynamic.get("target").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        BlockState lv2 = dynamic.get("state").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        int i = dynamic.get("minimum_reach_x").asInt(0);
-        int j = dynamic.get("minimum_reach_y").asInt(0);
-        int k = dynamic.get("minimum_reach_z").asInt(0);
-        int l = dynamic.get("maximum_reach_x").asInt(0);
-        int m = dynamic.get("maximum_reach_y").asInt(0);
-        int n = dynamic.get("maximum_reach_z").asInt(0);
-        return new NetherrackReplaceBlobsFeatureConfig(lv, lv2, new Vec3i(i, j, k), new Vec3i(l, m, n));
     }
 
     public static class Builder {

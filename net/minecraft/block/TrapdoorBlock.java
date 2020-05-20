@@ -94,7 +94,7 @@ implements Waterloggable {
         if (this.material == Material.METAL) {
             return ActionResult.PASS;
         }
-        arg = (BlockState)arg.cycle(OPEN);
+        arg = (BlockState)arg.method_28493(OPEN);
         arg2.setBlockState(arg3, arg, 2);
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg2.getFluidTickScheduler().schedule(arg3, Fluids.WATER, Fluids.WATER.getTickRate(arg2));

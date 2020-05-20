@@ -172,7 +172,7 @@ implements ItemConvertible {
         super(arg);
         StateManager.Builder<Block, BlockState> lv = new StateManager.Builder<Block, BlockState>(this);
         this.appendProperties(lv);
-        this.stateManager = lv.build(BlockState::new);
+        this.stateManager = lv.build(Block::getDefaultState, BlockState::new);
         this.setDefaultState(this.stateManager.getDefaultState());
     }
 

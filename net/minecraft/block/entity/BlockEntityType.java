@@ -3,7 +3,6 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
- *  com.mojang.datafixers.DataFixUtils
  *  com.mojang.datafixers.types.Type
  *  javax.annotation.Nullable
  *  org.apache.logging.log4j.LogManager
@@ -12,12 +11,10 @@
 package net.minecraft.block.entity;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.types.Type;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BannerBlockEntity;
@@ -54,9 +51,9 @@ import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.SmokerBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
 import net.minecraft.block.entity.TrappedChestBlockEntity;
-import net.minecraft.datafixer.Schemas;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
@@ -108,21 +105,10 @@ public class BlockEntityType<T extends BlockEntity> {
     }
 
     private static <T extends BlockEntity> BlockEntityType<T> create(String string, Builder<T> arg) {
-        Type type;
-        block3: {
-            type = null;
-            try {
-                type = Schemas.getFixer().getSchema(DataFixUtils.makeKey((int)SharedConstants.getGameVersion().getWorldVersion())).getChoiceType(TypeReferences.BLOCK_ENTITY, string);
-            }
-            catch (IllegalArgumentException illegalArgumentException) {
-                LOGGER.error("No data fixer registered for block entity {}", (Object)string);
-                if (!SharedConstants.isDevelopment) break block3;
-                throw illegalArgumentException;
-            }
-        }
         if (((Builder)arg).blocks.isEmpty()) {
             LOGGER.warn("Block entity type {} requires at least one valid block to be defined!", (Object)string);
         }
+        Type<?> type = Util.method_29187(TypeReferences.BLOCK_ENTITY, string);
         return Registry.register(Registry.BLOCK_ENTITY_TYPE, string, arg.build(type));
     }
 

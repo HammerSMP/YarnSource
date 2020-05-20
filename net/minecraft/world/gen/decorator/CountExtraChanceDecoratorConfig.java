@@ -2,20 +2,22 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class CountExtraChanceDecoratorConfig
 implements DecoratorConfig {
+    public static final Codec<CountExtraChanceDecoratorConfig> field_24986 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.FLOAT.fieldOf("extra_chance").forGetter(arg -> Float.valueOf(arg.extraChance)), (App)Codec.INT.fieldOf("extra_count").forGetter(arg -> arg.extraCount)).apply((Applicative)instance, CountExtraChanceDecoratorConfig::new));
     public final int count;
     public final float extraChance;
     public final int extraCount;
@@ -24,18 +26,6 @@ implements DecoratorConfig {
         this.count = i;
         this.extraChance = f;
         this.extraCount = j;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("count"), (Object)dynamicOps.createInt(this.count), (Object)dynamicOps.createString("extra_chance"), (Object)dynamicOps.createFloat(this.extraChance), (Object)dynamicOps.createString("extra_count"), (Object)dynamicOps.createInt(this.extraCount))));
-    }
-
-    public static CountExtraChanceDecoratorConfig deserialize(Dynamic<?> dynamic) {
-        int i = dynamic.get("count").asInt(0);
-        float f = dynamic.get("extra_chance").asFloat(0.0f);
-        int j = dynamic.get("extra_count").asInt(0);
-        return new CountExtraChanceDecoratorConfig(i, f, j);
     }
 }
 

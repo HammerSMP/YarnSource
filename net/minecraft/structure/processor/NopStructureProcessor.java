@@ -2,14 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
 package net.minecraft.structure.processor;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
@@ -20,6 +18,7 @@ import net.minecraft.world.WorldView;
 
 public class NopStructureProcessor
 extends StructureProcessor {
+    public static final Codec<NopStructureProcessor> field_25005 = Codec.unit(() -> INSTANCE);
     public static final NopStructureProcessor INSTANCE = new NopStructureProcessor();
 
     private NopStructureProcessor() {
@@ -32,13 +31,8 @@ extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType getType() {
+    protected StructureProcessorType<?> getType() {
         return StructureProcessorType.NOP;
-    }
-
-    @Override
-    protected <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.emptyMap());
     }
 }
 

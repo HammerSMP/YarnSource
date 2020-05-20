@@ -59,7 +59,7 @@ extends Item {
     }
 
     public static boolean isIgnitable(BlockState arg2) {
-        return arg2.method_27851(BlockTags.CAMPFIRES, arg -> arg.contains(Properties.WATERLOGGED) && arg.contains(Properties.LIT)) && arg2.get(Properties.WATERLOGGED) == false && arg2.get(Properties.LIT) == false;
+        return arg2.method_27851(BlockTags.CAMPFIRES, arg -> arg.method_28498(Properties.WATERLOGGED) && arg.method_28498(Properties.LIT)) && arg2.get(Properties.WATERLOGGED) == false && arg2.get(Properties.LIT) == false;
     }
 
     public static boolean canIgnite(BlockState arg, WorldAccess arg2, BlockPos arg3) {

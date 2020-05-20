@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class ItemInstanceSpawnEggFix
 extends DataFix {
@@ -86,8 +87,8 @@ extends DataFix {
 
     public TypeRewriteRule makeRule() {
         Type type = this.getInputSchema().getType(TypeReferences.ITEM_STACK);
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), (Type)DSL.namespacedString()));
-        OpticFinder opticFinder2 = DSL.fieldFinder((String)"id", (Type)DSL.namespacedString());
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
+        OpticFinder opticFinder2 = DSL.fieldFinder((String)"id", IdentifierNormalizingSchema.method_28295());
         OpticFinder opticFinder3 = type.findField("tag");
         OpticFinder opticFinder4 = opticFinder3.type().findField("EntityTag");
         return this.fixTypeEverywhereTyped("ItemInstanceSpawnEggFix", type, typed -> {

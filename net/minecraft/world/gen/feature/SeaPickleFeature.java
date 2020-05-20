@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SeaPickleBlock;
@@ -22,8 +21,8 @@ import net.minecraft.world.gen.feature.SeaPickleFeatureConfig;
 
 public class SeaPickleFeature
 extends Feature<SeaPickleFeatureConfig> {
-    public SeaPickleFeature(Function<Dynamic<?>, ? extends SeaPickleFeatureConfig> function) {
-        super(function);
+    public SeaPickleFeature(Codec<SeaPickleFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

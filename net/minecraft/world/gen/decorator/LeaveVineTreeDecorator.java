@@ -2,24 +2,18 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.block.VineBlock;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ModifiableTestableWorld;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.decorator.TreeDecorator;
@@ -28,12 +22,12 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class LeaveVineTreeDecorator
 extends TreeDecorator {
-    public LeaveVineTreeDecorator() {
-        super(TreeDecoratorType.LEAVE_VINE);
-    }
+    public static final Codec<LeaveVineTreeDecorator> field_24960 = Codec.unit(() -> field_24961);
+    public static final LeaveVineTreeDecorator field_24961 = new LeaveVineTreeDecorator();
 
-    public <T> LeaveVineTreeDecorator(Dynamic<T> dynamic) {
-        this();
+    @Override
+    protected TreeDecoratorType<?> method_28893() {
+        return TreeDecoratorType.LEAVE_VINE;
     }
 
     @Override
@@ -65,11 +59,6 @@ extends TreeDecorator {
             this.placeVine(arg, arg2, arg3, set, arg4);
             arg2 = arg2.down();
         }
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        return (T)new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString(Registry.TREE_DECORATOR_TYPE.getId(this.type).toString())))).getValue();
     }
 }
 

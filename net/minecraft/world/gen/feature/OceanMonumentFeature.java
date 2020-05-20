@@ -3,16 +3,15 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 import net.minecraft.entity.EntityType;
 import net.minecraft.structure.OceanMonumentGenerator;
 import net.minecraft.structure.StructureManager;
@@ -22,11 +21,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
@@ -34,23 +32,8 @@ public class OceanMonumentFeature
 extends StructureFeature<DefaultFeatureConfig> {
     private static final List<Biome.SpawnEntry> MONSTER_SPAWNS = Lists.newArrayList((Object[])new Biome.SpawnEntry[]{new Biome.SpawnEntry(EntityType.GUARDIAN, 1, 2, 4)});
 
-    public OceanMonumentFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
-    }
-
-    @Override
-    protected int getSpacing(ChunkGeneratorConfig arg) {
-        return arg.getOceanMonumentSpacing();
-    }
-
-    @Override
-    protected int getSeparation(ChunkGeneratorConfig arg) {
-        return arg.getOceanMonumentSeparation();
-    }
-
-    @Override
-    protected int getSeedModifier(ChunkGeneratorConfig arg) {
-        return 10387313;
+    public OceanMonumentFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -59,13 +42,13 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
-        Set<Biome> set = arg2.getBiomeSource().getBiomesInArea(i * 16 + 9, arg2.getSeaLevel(), j * 16 + 9, 16);
+    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
+        Set<Biome> set = arg2.getBiomesInArea(i * 16 + 9, arg.getSeaLevel(), j * 16 + 9, 16);
         for (Biome lv : set) {
-            if (arg2.hasStructure(lv, this)) continue;
+            if (lv.hasStructureFeature(this)) continue;
             return false;
         }
-        Set<Biome> set2 = arg2.getBiomeSource().getBiomesInArea(i * 16 + 9, arg2.getSeaLevel(), j * 16 + 9, 29);
+        Set<Biome> set2 = arg2.getBiomesInArea(i * 16 + 9, arg.getSeaLevel(), j * 16 + 9, 29);
         for (Biome lv2 : set2) {
             if (lv2.getCategory() == Biome.Category.OCEAN || lv2.getCategory() == Biome.Category.RIVER) continue;
             return false;
@@ -74,18 +57,8 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    public StructureFeature.StructureStartFactory getStructureStartFactory() {
+    public StructureFeature.StructureStartFactory<DefaultFeatureConfig> getStructureStartFactory() {
         return Start::new;
-    }
-
-    @Override
-    public String getName() {
-        return "Monument";
-    }
-
-    @Override
-    public int getRadius() {
-        return 8;
     }
 
     @Override
@@ -94,15 +67,15 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     public static class Start
-    extends StructureStart {
+    extends StructureStart<DefaultFeatureConfig> {
         private boolean field_13717;
 
-        public Start(StructureFeature<?> arg, int i, int j, BlockBox arg2, int k, long l) {
+        public Start(StructureFeature<DefaultFeatureConfig> arg, int i, int j, BlockBox arg2, int k, long l) {
             super(arg, i, j, arg2, k, l);
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
             this.method_16588(i, j);
         }
 

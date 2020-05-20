@@ -3,13 +3,13 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Dynamic
  *  javax.annotation.Nullable
  */
 package net.minecraft.entity.mob;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Dynamic;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -64,7 +64,6 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.dimension.DimensionType;
 
 public class PiglinEntity
 extends HostileEntity
@@ -194,9 +193,13 @@ implements CrossbowUser {
         }
     }
 
+    protected Brain.class_5303<PiglinEntity> method_28306() {
+        return Brain.method_28311(MEMORY_MODULE_TYPES, SENSOR_TYPES);
+    }
+
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return PiglinBrain.create(this, dynamic);
+        return PiglinBrain.create(this, this.method_28306().method_28335(dynamic));
     }
 
     public Brain<PiglinEntity> getBrain() {
@@ -257,7 +260,7 @@ implements CrossbowUser {
     }
 
     public boolean canConvert() {
-        return this.world.method_27983() != DimensionType.THE_NETHER && !this.isImmuneToZombification() && !this.isAiDisabled();
+        return !this.world.getDimension().method_28542() && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
     @Override
@@ -404,8 +407,9 @@ implements CrossbowUser {
 
     @Override
     protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
-        boolean bl = PiglinBrain.isGoldenItem(arg.getItem());
-        boolean bl2 = PiglinBrain.isGoldenItem(arg2.getItem());
+        boolean bl2;
+        boolean bl = PiglinBrain.isGoldenItem(arg.getItem()) || arg.getItem() == Items.CROSSBOW;
+        boolean bl3 = bl2 = PiglinBrain.isGoldenItem(arg2.getItem()) || arg2.getItem() == Items.CROSSBOW;
         if (bl && !bl2) {
             return true;
         }

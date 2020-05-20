@@ -226,7 +226,7 @@ implements Waterloggable {
     }
 
     public static boolean isLitCampfire(BlockState arg) {
-        return arg.getBlock().isIn(BlockTags.CAMPFIRES) && arg.contains(LIT) && arg.get(LIT) != false;
+        return arg.getBlock().isIn(BlockTags.CAMPFIRES) && arg.method_28498(LIT) && arg.get(LIT) != false;
     }
 
     @Override

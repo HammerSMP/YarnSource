@@ -1,13 +1,25 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.chunk;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.registry.Registry;
 
 public class FlatChunkGeneratorLayer {
+    public static final Codec<FlatChunkGeneratorLayer> field_24974 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("height").forGetter(FlatChunkGeneratorLayer::getThickness), (App)Registry.BLOCK.fieldOf("block").withDefault((Object)Blocks.AIR).forGetter(arg -> arg.getBlockState().getBlock())).apply((Applicative)instance, FlatChunkGeneratorLayer::new));
     private final BlockState blockState;
     private final int thickness;
     private int startY;

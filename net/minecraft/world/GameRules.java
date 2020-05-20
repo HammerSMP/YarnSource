@@ -9,6 +9,7 @@
  *  com.mojang.brigadier.arguments.IntegerArgumentType
  *  com.mojang.brigadier.builder.RequiredArgumentBuilder
  *  com.mojang.brigadier.context.CommandContext
+ *  com.mojang.serialization.DynamicLike
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -24,6 +25,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.serialization.DynamicLike;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -96,11 +98,15 @@ public class GameRules {
         return lv;
     }
 
+    public GameRules(DynamicLike<?> dynamicLike) {
+        this();
+        this.load(dynamicLike);
+    }
+
     public GameRules() {
         this.rules = (Map)RULE_TYPES.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> ((RuleType)entry.getValue()).createRule()));
     }
 
-    @Environment(value=EnvType.CLIENT)
     private GameRules(Map<RuleKey<?>, Rule<?>> map) {
         this.rules = map;
     }
@@ -115,15 +121,10 @@ public class GameRules {
         return lv;
     }
 
-    public void load(CompoundTag arg) {
-        this.rules.forEach((arg2, arg3) -> {
-            if (arg.contains(((RuleKey)arg2).name)) {
-                arg3.deserialize(arg.getString(((RuleKey)arg2).name));
-            }
-        });
+    private void load(DynamicLike<?> dynamicLike) {
+        this.rules.forEach((arg, arg2) -> dynamicLike.get(((RuleKey)arg).name).asString().result().ifPresent(arg2::deserialize));
     }
 
-    @Environment(value=EnvType.CLIENT)
     public GameRules copy() {
         return new GameRules((Map)this.rules.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> ((Rule)entry.getValue()).copy())));
     }
@@ -139,10 +140,12 @@ public class GameRules {
         lv2.method_27336(arg, lv);
     }
 
+    @Environment(value=EnvType.CLIENT)
     public void setAllValues(GameRules arg, @Nullable MinecraftServer minecraftServer) {
         arg.rules.keySet().forEach(arg2 -> this.setValue((RuleKey)arg2, arg, minecraftServer));
     }
 
+    @Environment(value=EnvType.CLIENT)
     private <T extends Rule<T>> void setValue(RuleKey<T> arg, GameRules arg2, @Nullable MinecraftServer minecraftServer) {
         T lv = arg2.get(arg);
         ((Rule)this.get(arg)).setValue(lv, minecraftServer);
@@ -208,19 +211,18 @@ public class GameRules {
         }
 
         @Override
-        @Environment(value=EnvType.CLIENT)
         protected BooleanRule copy() {
             return new BooleanRule(this.type, this.value);
         }
 
         @Override
+        @Environment(value=EnvType.CLIENT)
         public void setValue(BooleanRule arg, @Nullable MinecraftServer minecraftServer) {
             this.value = arg.value;
             this.changed(minecraftServer);
         }
 
         @Override
-        @Environment(value=EnvType.CLIENT)
         protected /* synthetic */ Rule copy() {
             return this.copy();
         }
@@ -309,19 +311,18 @@ public class GameRules {
         }
 
         @Override
-        @Environment(value=EnvType.CLIENT)
         protected IntRule copy() {
             return new IntRule(this.type, this.value);
         }
 
         @Override
+        @Environment(value=EnvType.CLIENT)
         public void setValue(IntRule arg, @Nullable MinecraftServer minecraftServer) {
             this.value = arg.value;
             this.changed(minecraftServer);
         }
 
         @Override
-        @Environment(value=EnvType.CLIENT)
         protected /* synthetic */ Rule copy() {
             return this.copy();
         }
@@ -368,9 +369,9 @@ public class GameRules {
 
         protected abstract T getThis();
 
-        @Environment(value=EnvType.CLIENT)
         protected abstract T copy();
 
+        @Environment(value=EnvType.CLIENT)
         public abstract void setValue(T var1, @Nullable MinecraftServer var2);
     }
 

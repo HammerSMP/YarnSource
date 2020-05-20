@@ -2,17 +2,17 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.util.math.BlockPos;
@@ -23,15 +23,17 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class JungleFoliagePlacer
 extends FoliagePlacer {
+    public static final Codec<JungleFoliagePlacer> field_24933 = RecordCodecBuilder.create(instance -> JungleFoliagePlacer.method_28846(instance).and((App)Codec.INT.fieldOf("height").forGetter(arg -> arg.height)).apply((Applicative)instance, JungleFoliagePlacer::new));
     protected final int height;
 
     public JungleFoliagePlacer(int i, int j, int k, int l, int m) {
-        super(i, j, k, l, FoliagePlacerType.JUNGLE_FOLIAGE_PLACER);
+        super(i, j, k, l);
         this.height = m;
     }
 
-    public <T> JungleFoliagePlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("radius").asInt(0), dynamic.get("radius_random").asInt(0), dynamic.get("offset").asInt(0), dynamic.get("offset_random").asInt(0), dynamic.get("height").asInt(0));
+    @Override
+    protected FoliagePlacerType<?> method_28843() {
+        return FoliagePlacerType.JUNGLE_FOLIAGE_PLACER;
     }
 
     @Override
@@ -54,13 +56,6 @@ extends FoliagePlacer {
             return true;
         }
         return i * i + k * k > l * l;
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        builder.put(dynamicOps.createString("height"), dynamicOps.createInt(this.height));
-        return (T)dynamicOps.merge(super.serialize(dynamicOps), dynamicOps.createMap((Map)builder.build()));
     }
 }
 

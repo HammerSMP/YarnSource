@@ -3,35 +3,30 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
-import java.util.Map;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.gen.decorator.TreeDecorator;
 import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.size.FeatureSize;
-import net.minecraft.world.gen.feature.size.FeatureSizeType;
 import net.minecraft.world.gen.foliage.FoliagePlacer;
-import net.minecraft.world.gen.foliage.FoliagePlacerType;
 import net.minecraft.world.gen.stateprovider.BlockStateProvider;
-import net.minecraft.world.gen.stateprovider.BlockStateProviderType;
 import net.minecraft.world.gen.trunk.TrunkPlacer;
-import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class TreeFeatureConfig
 implements FeatureConfig {
+    public static final Codec<TreeFeatureConfig> field_24921 = RecordCodecBuilder.create(instance -> instance.group((App)BlockStateProvider.field_24937.fieldOf("trunk_provider").forGetter(arg -> arg.trunkProvider), (App)BlockStateProvider.field_24937.fieldOf("leaves_provider").forGetter(arg -> arg.leavesProvider), (App)FoliagePlacer.field_24931.fieldOf("foliage_placer").forGetter(arg -> arg.foliagePlacer), (App)TrunkPlacer.field_24972.fieldOf("trunk_placer").forGetter(arg -> arg.trunkPlacer), (App)FeatureSize.field_24922.fieldOf("minimum_size").forGetter(arg -> arg.featureSize), (App)TreeDecorator.field_24962.listOf().fieldOf("decorators").forGetter(arg -> arg.decorators), (App)Codec.INT.fieldOf("max_water_depth").withDefault((Object)0).forGetter(arg -> arg.baseHeight), (App)Codec.BOOL.fieldOf("ignore_vines").withDefault((Object)false).forGetter(arg -> arg.ignoreVines), (App)Heightmap.Type.field_24772.fieldOf("heightmap").forGetter(arg -> arg.heightmap)).apply((Applicative)instance, TreeFeatureConfig::new));
     public final BlockStateProvider trunkProvider;
     public final BlockStateProvider leavesProvider;
     public final List<TreeDecorator> decorators;
@@ -61,22 +56,6 @@ implements FeatureConfig {
 
     public TreeFeatureConfig setTreeDecorators(List<TreeDecorator> list) {
         return new TreeFeatureConfig(this.trunkProvider, this.leavesProvider, this.foliagePlacer, this.trunkPlacer, this.featureSize, list, this.baseHeight, this.ignoreVines, this.heightmap);
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        builder.put(dynamicOps.createString("trunk_provider"), this.trunkProvider.serialize(dynamicOps)).put(dynamicOps.createString("leaves_provider"), this.leavesProvider.serialize(dynamicOps)).put(dynamicOps.createString("decorators"), dynamicOps.createList(this.decorators.stream().map(arg -> arg.serialize(dynamicOps)))).put(dynamicOps.createString("foliage_placer"), this.foliagePlacer.serialize(dynamicOps)).put(dynamicOps.createString("trunk_placer"), this.trunkPlacer.serialize(dynamicOps)).put(dynamicOps.createString("minimum_size"), this.featureSize.serialize(dynamicOps)).put(dynamicOps.createString("max_water_depth"), dynamicOps.createInt(this.baseHeight)).put(dynamicOps.createString("ignore_vines"), dynamicOps.createBoolean(this.ignoreVines)).put(dynamicOps.createString("heightmap"), dynamicOps.createString(this.heightmap.getName()));
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)builder.build()));
-    }
-
-    public static <T> TreeFeatureConfig deserialize(Dynamic<T> dynamic2) {
-        BlockStateProviderType<?> lv = Registry.BLOCK_STATE_PROVIDER_TYPE.get(new Identifier((String)dynamic2.get("trunk_provider").get("type").asString().orElseThrow(RuntimeException::new)));
-        BlockStateProviderType<?> lv2 = Registry.BLOCK_STATE_PROVIDER_TYPE.get(new Identifier((String)dynamic2.get("leaves_provider").get("type").asString().orElseThrow(RuntimeException::new)));
-        FoliagePlacerType<?> lv3 = Registry.FOLIAGE_PLACER_TYPE.get(new Identifier((String)dynamic2.get("foliage_placer").get("type").asString().orElseThrow(RuntimeException::new)));
-        TrunkPlacerType<?> lv4 = Registry.TRUNK_PLACER_TYPE.get(new Identifier((String)dynamic2.get("trunk_placer").get("type").asString().orElseThrow(RuntimeException::new)));
-        FeatureSizeType<?> lv5 = Registry.FEATURE_SIZE_TYPE.get(new Identifier((String)dynamic2.get("minimum_size").get("type").asString().orElseThrow(RuntimeException::new)));
-        return new TreeFeatureConfig((BlockStateProvider)lv.deserialize(dynamic2.get("trunk_provider").orElseEmptyMap()), (BlockStateProvider)lv2.deserialize(dynamic2.get("leaves_provider").orElseEmptyMap()), (FoliagePlacer)lv3.deserialize(dynamic2.get("foliage_placer").orElseEmptyMap()), (TrunkPlacer)lv4.deserialize(dynamic2.get("trunk_placer").orElseEmptyMap()), (FeatureSize)lv5.method_27381(dynamic2.get("minimum_size").orElseEmptyMap()), dynamic2.get("decorators").asList(dynamic -> Registry.TREE_DECORATOR_TYPE.get(new Identifier((String)dynamic.get("type").asString().orElseThrow(RuntimeException::new))).method_23472((Dynamic<?>)dynamic)), dynamic2.get("max_water_depth").asInt(0), dynamic2.get("ignore_vines").asBoolean(false), Heightmap.Type.byName(dynamic2.get("heightmap").asString("")));
     }
 
     public static class Builder {

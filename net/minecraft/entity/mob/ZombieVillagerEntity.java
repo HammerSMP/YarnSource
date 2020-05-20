@@ -2,16 +2,19 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.entity.mob;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -55,6 +58,7 @@ import net.minecraft.village.VillagerType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import org.apache.logging.log4j.Logger;
 
 public class ZombieVillagerEntity
 extends ZombieEntity
@@ -82,7 +86,7 @@ implements VillagerDataContainer {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        arg.put("VillagerData", this.getVillagerData().serialize(NbtOps.INSTANCE));
+        VillagerData.field_24669.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("VillagerData", (Tag)arg2));
         if (this.offerData != null) {
             arg.put("Offers", this.offerData);
         }
@@ -100,7 +104,8 @@ implements VillagerDataContainer {
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
         if (arg.contains("VillagerData", 10)) {
-            this.setVillagerData(new VillagerData(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData"))));
+            DataResult dataResult = VillagerData.field_24669.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData")));
+            dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(this::setVillagerData);
         }
         if (arg.contains("Offers", 10)) {
             this.offerData = arg.getCompound("Offers");

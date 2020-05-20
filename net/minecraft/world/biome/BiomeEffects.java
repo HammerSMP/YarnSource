@@ -2,11 +2,19 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.biome;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import java.util.OptionalInt;
 import net.fabricmc.api.EnvType;
@@ -18,6 +26,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.biome.BiomeParticleConfig;
 
 public class BiomeEffects {
+    public static final Codec<BiomeEffects> field_24714 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("fog_color").forGetter(arg -> arg.fogColor), (App)Codec.INT.fieldOf("water_color").forGetter(arg -> arg.waterColor), (App)Codec.INT.fieldOf("water_fog_color").forGetter(arg -> arg.waterFogColor), (App)BiomeParticleConfig.field_24675.optionalFieldOf("particle").forGetter(arg -> arg.particleConfig), (App)SoundEvent.field_24628.optionalFieldOf("ambient_sound").forGetter(arg -> arg.loopSound), (App)BiomeMoodSound.field_24674.optionalFieldOf("mood_sound").forGetter(arg -> arg.moodSound), (App)BiomeAdditionsSound.field_24673.optionalFieldOf("additions_sound").forGetter(arg -> arg.additionsSound), (App)MusicSound.field_24627.optionalFieldOf("music").forGetter(arg -> arg.music)).apply((Applicative)instance, BiomeEffects::new));
     private final int fogColor;
     private final int waterColor;
     private final int waterFogColor;

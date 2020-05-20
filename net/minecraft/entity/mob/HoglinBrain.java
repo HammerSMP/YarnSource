@@ -4,16 +4,13 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableSet
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.util.Pair
  */
 package net.minecraft.entity.mob;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.util.Pair;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,8 +20,6 @@ import net.minecraft.entity.ai.Durations;
 import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
-import net.minecraft.entity.ai.brain.sensor.Sensor;
-import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.ai.brain.task.BreedTask;
 import net.minecraft.entity.ai.brain.task.ConditionalTask;
 import net.minecraft.entity.ai.brain.task.FollowMobTask;
@@ -55,16 +50,15 @@ import net.minecraft.util.math.IntRange;
 public class HoglinBrain {
     private static final IntRange AVOID_MEMORY_DURATION = Durations.betweenSeconds(5, 20);
 
-    protected static Brain<?> create(Dynamic<?> dynamic) {
-        Brain<HoglinEntity> lv = new Brain<HoglinEntity>((Collection<MemoryModuleType<?>>)HoglinEntity.MEMORY_MODULE_TYPES, (Collection<SensorType<Sensor<HoglinEntity>>>)HoglinEntity.SENSOR_TYPES, dynamic);
-        HoglinBrain.addCoreTasks(lv);
-        HoglinBrain.addIdleTasks(lv);
-        HoglinBrain.addFightTasks(lv);
-        HoglinBrain.addAvoidTasks(lv);
-        lv.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
-        lv.setDefaultActivity(Activity.IDLE);
-        lv.resetPossibleActivities();
-        return lv;
+    protected static Brain<?> create(Brain<HoglinEntity> arg) {
+        HoglinBrain.addCoreTasks(arg);
+        HoglinBrain.addIdleTasks(arg);
+        HoglinBrain.addFightTasks(arg);
+        HoglinBrain.addAvoidTasks(arg);
+        arg.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
+        arg.setDefaultActivity(Activity.IDLE);
+        arg.resetPossibleActivities();
+        return arg;
     }
 
     private static void addCoreTasks(Brain<HoglinEntity> arg) {

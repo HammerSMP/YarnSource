@@ -6,10 +6,10 @@
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
- *  com.mojang.datafixers.types.DynamicOps
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.types.templates.TaggedChoice$TaggedChoiceType
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.DynamicOps
  */
 package net.minecraft.datafixer.fix;
 
@@ -17,10 +17,10 @@ import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
-import com.mojang.datafixers.types.DynamicOps;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.TaggedChoice;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.datafixer.TypeReferences;
 
 public abstract class EntityTransformFix

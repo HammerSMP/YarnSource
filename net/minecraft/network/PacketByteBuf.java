@@ -2,6 +2,10 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.DataResult$PartialResult
+ *  com.mojang.serialization.DynamicOps
  *  io.netty.buffer.ByteBuf
  *  io.netty.buffer.ByteBufAllocator
  *  io.netty.buffer.ByteBufInputStream
@@ -15,6 +19,9 @@
  */
 package net.minecraft.network;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufInputStream;
@@ -39,6 +46,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -66,6 +74,23 @@ extends ByteBuf {
             return j;
         }
         return 5;
+    }
+
+    public <T> T method_29171(Codec<T> codec) throws IOException {
+        CompoundTag lv = this.readCompoundTag();
+        DataResult dataResult = codec.parse((DynamicOps)NbtOps.INSTANCE, (Object)lv);
+        if (dataResult.error().isPresent()) {
+            throw new IOException("Failed to decode: " + ((DataResult.PartialResult)dataResult.error().get()).message() + " " + lv);
+        }
+        return dataResult.result().get();
+    }
+
+    public <T> void method_29172(Codec<T> codec, T object) throws IOException {
+        DataResult dataResult = codec.encodeStart((DynamicOps)NbtOps.INSTANCE, object);
+        if (dataResult.error().isPresent()) {
+            throw new IOException("Failed to encode: " + ((DataResult.PartialResult)dataResult.error().get()).message() + " " + object);
+        }
+        this.writeCompoundTag((CompoundTag)dataResult.result().get());
     }
 
     public PacketByteBuf writeByteArray(byte[] bs) {

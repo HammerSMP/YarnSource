@@ -7,11 +7,12 @@
  *  com.google.common.collect.Maps
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  *  javax.annotation.Nullable
  *  org.apache.commons.lang3.StringUtils
  */
@@ -22,11 +23,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -54,13 +56,13 @@ extends DataFix {
         return this.fixTypeEverywhereTyped("StatsCounterFix", this.getInputSchema().getType(TypeReferences.STATS), type, typed -> {
             Dynamic dynamic = (Dynamic)typed.get(DSL.remainderFinder());
             HashMap map = Maps.newHashMap();
-            Optional optional = dynamic.getMapValues();
+            Optional optional = dynamic.getMapValues().result();
             if (optional.isPresent()) {
                 for (Map.Entry entry : ((Map)optional.get()).entrySet()) {
                     String string13;
                     String string11;
                     String string;
-                    if (!((Dynamic)entry.getValue()).asNumber().isPresent() || SKIP.contains(string = ((Dynamic)entry.getKey()).asString(""))) continue;
+                    if (!((Dynamic)entry.getValue()).asNumber().result().isPresent() || SKIP.contains(string = ((Dynamic)entry.getKey()).asString(""))) continue;
                     if (RENAMED_GENERAL_STATS.containsKey(string)) {
                         String string2 = "minecraft:custom";
                         String string3 = RENAMED_GENERAL_STATS.get(string);
@@ -88,7 +90,7 @@ extends DataFix {
                     map.put(dynamic22, dynamic3.set(string13, (Dynamic)entry.getValue()));
                 }
             }
-            return (Typed)((Optional)type.readTyped(dynamic.emptyMap().set("stats", dynamic.createMap((Map)map))).getSecond()).orElseThrow(() -> new IllegalStateException("Could not parse new stats object."));
+            return (Typed)((Pair)type.readTyped(dynamic.emptyMap().set("stats", dynamic.createMap((Map)map))).result().orElseThrow(() -> new IllegalStateException("Could not parse new stats object."))).getFirst();
         });
     }
 

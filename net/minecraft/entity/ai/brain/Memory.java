@@ -2,22 +2,20 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.Maps
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.entity.ai.brain;
 
-import com.google.common.collect.Maps;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import net.minecraft.util.dynamic.DynamicSerializable;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
 
-public class Memory<T>
-implements DynamicSerializable {
+public class Memory<T> {
     private final T value;
     private long expiry;
 
@@ -26,22 +24,14 @@ implements DynamicSerializable {
         this.expiry = l;
     }
 
-    public Memory(T object) {
-        this(object, Long.MAX_VALUE);
-    }
-
-    public Memory(Function<Dynamic<?>, T> function, Dynamic<?> dynamic) {
-        this(function.apply((Dynamic<?>)dynamic.get("value").get().orElseThrow(RuntimeException::new)), dynamic.get("ttl").asLong(Long.MAX_VALUE));
-    }
-
     public void method_24913() {
         if (this.method_24914()) {
             --this.expiry;
         }
     }
 
-    public static <T> Memory<T> permanent(T object) {
-        return new Memory<T>(object);
+    public static <T> Memory<T> method_28355(T object) {
+        return new Memory<T>(object, Long.MAX_VALUE);
     }
 
     public static <T> Memory<T> timed(T object, long l) {
@@ -64,14 +54,8 @@ implements DynamicSerializable {
         return this.expiry != Long.MAX_VALUE;
     }
 
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        HashMap map = Maps.newHashMap();
-        map.put(dynamicOps.createString("value"), ((DynamicSerializable)this.value).serialize(dynamicOps));
-        if (this.method_24914()) {
-            map.put(dynamicOps.createString("ttl"), dynamicOps.createLong(this.expiry));
-        }
-        return (T)dynamicOps.createMap((Map)map);
+    public static <T> Codec<Memory<T>> method_28353(Codec<T> codec) {
+        return RecordCodecBuilder.create(instance -> instance.group((App)codec.fieldOf("value").forGetter(arg -> arg.value), (App)Codec.LONG.optionalFieldOf("ttl").forGetter(arg -> arg.method_24914() ? Optional.of(arg.expiry) : Optional.empty())).apply((Applicative)instance, (object, optional) -> new Memory<Object>(object, optional.orElse(Long.MAX_VALUE))));
     }
 }
 

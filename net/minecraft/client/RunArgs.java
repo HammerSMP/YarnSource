@@ -88,11 +88,15 @@ public class RunArgs {
         public final boolean demo;
         public final String version;
         public final String versionType;
+        public final boolean field_25061;
+        public final boolean field_25062;
 
-        public Game(boolean bl, String string, String string2) {
+        public Game(boolean bl, String string, String string2, boolean bl2, boolean bl3) {
             this.demo = bl;
             this.version = string;
             this.versionType = string2;
+            this.field_25061 = bl2;
+            this.field_25062 = bl3;
         }
     }
 }

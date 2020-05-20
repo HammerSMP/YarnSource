@@ -4,16 +4,24 @@
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  javax.annotation.Nullable
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.item.map;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.minecraft.class_5321;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FilledMapItem;
@@ -23,21 +31,26 @@ import net.minecraft.item.map.MapFrameMarker;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.MapUpdateS2CPacket;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.dimension.DimensionType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MapState
 extends PersistentState {
+    private static final Logger field_25019 = LogManager.getLogger();
     public int xCenter;
     public int zCenter;
-    public DimensionType dimension;
+    public class_5321<DimensionType> dimension;
     public boolean showIcons;
     public boolean unlimitedTracking;
     public byte scale;
@@ -53,7 +66,7 @@ extends PersistentState {
         super(string);
     }
 
-    public void init(int i, int j, int k, boolean bl, boolean bl2, DimensionType arg) {
+    public void init(int i, int j, int k, boolean bl, boolean bl2, class_5321<DimensionType> arg) {
         this.scale = (byte)k;
         this.calculateCenter(i, j, this.scale);
         this.dimension = arg;
@@ -72,12 +85,7 @@ extends PersistentState {
 
     @Override
     public void fromTag(CompoundTag arg) {
-        int i = arg.getInt("dimension");
-        DimensionType lv = DimensionType.byRawId(i);
-        if (lv == null) {
-            throw new IllegalArgumentException("Invalid map dimension: " + i);
-        }
-        this.dimension = lv;
+        this.dimension = (class_5321)DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("dimension"))).resultOrPartial(((Logger)field_25019)::error).orElseThrow(() -> new IllegalArgumentException("Invalid map dimension: " + arg.get("dimension")));
         this.xCenter = arg.getInt("xCenter");
         this.zCenter = arg.getInt("zCenter");
         this.scale = (byte)MathHelper.clamp(arg.getByte("scale"), 0, 4);
@@ -88,23 +96,23 @@ extends PersistentState {
         if (this.colors.length != 16384) {
             this.colors = new byte[16384];
         }
-        ListTag lv2 = arg.getList("banners", 10);
-        for (int j = 0; j < lv2.size(); ++j) {
-            MapBannerMarker lv3 = MapBannerMarker.fromNbt(lv2.getCompound(j));
-            this.banners.put(lv3.getKey(), lv3);
-            this.addIcon(lv3.getIconType(), null, lv3.getKey(), lv3.getPos().getX(), lv3.getPos().getZ(), 180.0, lv3.getName());
+        ListTag lv = arg.getList("banners", 10);
+        for (int i = 0; i < lv.size(); ++i) {
+            MapBannerMarker lv2 = MapBannerMarker.fromNbt(lv.getCompound(i));
+            this.banners.put(lv2.getKey(), lv2);
+            this.addIcon(lv2.getIconType(), null, lv2.getKey(), lv2.getPos().getX(), lv2.getPos().getZ(), 180.0, lv2.getName());
         }
-        ListTag lv4 = arg.getList("frames", 10);
-        for (int k = 0; k < lv4.size(); ++k) {
-            MapFrameMarker lv5 = MapFrameMarker.fromTag(lv4.getCompound(k));
-            this.frames.put(lv5.getKey(), lv5);
-            this.addIcon(MapIcon.Type.FRAME, null, "frame-" + lv5.getEntityId(), lv5.getPos().getX(), lv5.getPos().getZ(), lv5.getRotation(), null);
+        ListTag lv3 = arg.getList("frames", 10);
+        for (int j = 0; j < lv3.size(); ++j) {
+            MapFrameMarker lv4 = MapFrameMarker.fromTag(lv3.getCompound(j));
+            this.frames.put(lv4.getKey(), lv4);
+            this.addIcon(MapIcon.Type.FRAME, null, "frame-" + lv4.getEntityId(), lv4.getPos().getX(), lv4.getPos().getZ(), lv4.getRotation(), null);
         }
     }
 
     @Override
     public CompoundTag toTag(CompoundTag arg) {
-        arg.putInt("dimension", this.dimension.getRawId());
+        Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.dimension.method_29177()).resultOrPartial(((Logger)field_25019)::error).ifPresent(arg2 -> arg.put("dimension", (Tag)arg2));
         arg.putInt("xCenter", this.xCenter);
         arg.putInt("zCenter", this.zCenter);
         arg.putByte("scale", this.scale);
@@ -154,7 +162,7 @@ extends PersistentState {
                 this.icons.remove(string);
                 continue;
             }
-            if (arg2.isInFrame() || lv2.player.dimension != this.dimension || !this.showIcons) continue;
+            if (arg2.isInFrame() || lv2.player.world.method_27983() != this.dimension || !this.showIcons) continue;
             this.addIcon(MapIcon.Type.PLAYER, lv2.player.world, string, lv2.player.getX(), lv2.player.getZ(), lv2.player.yaw, null);
         }
         if (arg2.isInFrame() && this.showIcons) {
@@ -212,7 +220,7 @@ extends PersistentState {
         int j = 63;
         if (g >= -63.0f && h >= -63.0f && g <= 63.0f && h <= 63.0f) {
             byte k = (byte)((f += f < 0.0 ? -8.0 : 8.0) * 16.0 / 360.0);
-            if (this.dimension == DimensionType.THE_NETHER && arg2 != null) {
+            if (this.dimension == DimensionType.field_24754 && arg2 != null) {
                 int l = (int)(arg2.getLevelProperties().getTimeOfDay() / 10L);
                 k = (byte)(l * l * 34187121 + l * 121 >> 15 & 0xF);
             }

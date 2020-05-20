@@ -19,6 +19,7 @@ public interface ParticleEffect {
 
     public String asString();
 
+    @Deprecated
     public static interface Factory<T extends ParticleEffect> {
         public T read(ParticleType<T> var1, StringReader var2) throws CommandSyntaxException;
 

@@ -50,7 +50,7 @@ extends ChunkManager {
     public ClientChunkManager(ClientWorld arg, int i) {
         this.world = arg;
         this.emptyChunk = new EmptyChunk((World)arg, new ChunkPos(0, 0));
-        this.lightingProvider = new LightingProvider(this, true, arg.method_27983().hasSkyLight());
+        this.lightingProvider = new LightingProvider(this, true, arg.getDimension().hasSkyLight());
         this.chunks = new ClientChunkMap(ClientChunkManager.getChunkMapRadius(i));
     }
 

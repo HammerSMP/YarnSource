@@ -3,12 +3,12 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.carver;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,8 +25,8 @@ import net.minecraft.world.gen.carver.CaveCarver;
 
 public class NetherCaveCarver
 extends CaveCarver {
-    public NetherCaveCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> function) {
-        super(function, 128);
+    public NetherCaveCarver(Codec<ProbabilityConfig> codec) {
+        super(codec, 128);
         this.alwaysCarvableBlocks = ImmutableSet.of((Object)Blocks.STONE, (Object)Blocks.GRANITE, (Object)Blocks.DIORITE, (Object)Blocks.ANDESITE, (Object)Blocks.DIRT, (Object)Blocks.COARSE_DIRT, (Object[])new Block[]{Blocks.PODZOL, Blocks.GRASS_BLOCK, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL, Blocks.CRIMSON_NYLIUM, Blocks.WARPED_NYLIUM, Blocks.NETHER_WART_BLOCK, Blocks.WARPED_WART_BLOCK, Blocks.BASALT, Blocks.BLACKSTONE});
         this.carvableFluids = ImmutableSet.of((Object)Fluids.LAVA, (Object)Fluids.WATER);
     }

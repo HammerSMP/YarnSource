@@ -3,16 +3,16 @@
  * 
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import java.util.Random;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.ChoiceFix;
@@ -27,7 +27,7 @@ extends ChoiceFix {
 
     public Dynamic<?> fixZombieType(Dynamic<?> dynamic) {
         if (dynamic.get("IsVillager").asBoolean(false)) {
-            if (!dynamic.get("ZombieType").get().isPresent()) {
+            if (!dynamic.get("ZombieType").result().isPresent()) {
                 int i = this.clampType(dynamic.get("VillagerProfession").asInt(-1));
                 if (i == -1) {
                     i = this.clampType(RANDOM.nextInt(6));

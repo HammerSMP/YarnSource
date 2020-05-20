@@ -2,17 +2,18 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  javax.annotation.Nullable
  */
 package net.minecraft.structure.processor;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.Structure;
@@ -25,16 +26,13 @@ import net.minecraft.world.WorldView;
 
 public class GravityStructureProcessor
 extends StructureProcessor {
+    public static final Codec<GravityStructureProcessor> field_25002 = RecordCodecBuilder.create(instance -> instance.group((App)Heightmap.Type.field_24772.fieldOf("heightmap").withDefault((Object)Heightmap.Type.WORLD_SURFACE_WG).forGetter(arg -> arg.heightmap), (App)Codec.INT.fieldOf("offset").withDefault((Object)0).forGetter(arg -> arg.offset)).apply((Applicative)instance, GravityStructureProcessor::new));
     private final Heightmap.Type heightmap;
     private final int offset;
 
     public GravityStructureProcessor(Heightmap.Type arg, int i) {
         this.heightmap = arg;
         this.offset = i;
-    }
-
-    public GravityStructureProcessor(Dynamic<?> dynamic) {
-        this(Heightmap.Type.byName(dynamic.get("heightmap").asString(Heightmap.Type.WORLD_SURFACE_WG.getName())), dynamic.get("offset").asInt(0));
     }
 
     @Override
@@ -58,13 +56,8 @@ extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType getType() {
+    protected StructureProcessorType<?> getType() {
         return StructureProcessorType.GRAVITY;
-    }
-
-    @Override
-    protected <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("heightmap"), (Object)dynamicOps.createString(this.heightmap.getName()), (Object)dynamicOps.createString("offset"), (Object)dynamicOps.createInt(this.offset))));
     }
 }
 

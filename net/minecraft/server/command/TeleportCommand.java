@@ -137,7 +137,6 @@ public class TeleportCommand {
                 arg2.setHeadYaw(i);
             } else {
                 arg2.detach();
-                arg2.dimension = arg3.method_27983();
                 Entity lv3 = arg2;
                 arg2 = lv3.getType().create(arg3);
                 if (arg2 != null) {

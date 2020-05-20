@@ -34,6 +34,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.class_5217;
 import net.minecraft.class_5269;
+import net.minecraft.class_5318;
+import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -79,7 +81,6 @@ import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.logging.log4j.LogManager;
@@ -104,7 +105,7 @@ AutoCloseable {
     protected float thunderGradientPrev;
     protected float thunderGradient;
     public final Random random = new Random();
-    private final Dimension dimension;
+    private final DimensionType dimension;
     protected final class_5269 properties;
     private final Supplier<Profiler> profiler;
     public final boolean isClient;
@@ -115,9 +116,20 @@ AutoCloseable {
     protected World(class_5269 arg, DimensionType arg2, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
         this.profiler = supplier;
         this.properties = arg;
-        this.dimension = arg2.create(this);
+        this.dimension = arg2;
         this.isClient = bl;
-        this.border = this.getDimension().createWorldBorder();
+        this.border = arg2.method_28539() ? new WorldBorder(){
+
+            @Override
+            public double getCenterX() {
+                return super.getCenterX() / 8.0;
+            }
+
+            @Override
+            public double getCenterZ() {
+                return super.getCenterZ() / 8.0;
+            }
+        } : new WorldBorder();
         this.thread = Thread.currentThread();
         this.biomeAccess = new BiomeAccess(this, l, arg2.getBiomeAccessType());
         this.field_24496 = bl2;
@@ -387,11 +399,11 @@ AutoCloseable {
     }
 
     public boolean isDay() {
-        return this.method_27983() == DimensionType.OVERWORLD && this.ambientDarkness < 4;
+        return this.getDimension().method_28541() && this.ambientDarkness < 4;
     }
 
     public boolean isNight() {
-        return this.method_27983() == DimensionType.OVERWORLD && !this.isDay();
+        return this.getDimension().method_28541() && !this.isDay();
     }
 
     @Override
@@ -910,27 +922,12 @@ AutoCloseable {
     public void disconnect() {
     }
 
-    public void setTime(long l) {
-        this.properties.setTime(l);
-    }
-
     public long getTime() {
         return this.properties.getTime();
     }
 
     public long getTimeOfDay() {
         return this.properties.getTimeOfDay();
-    }
-
-    public void setTimeOfDay(long l) {
-        this.properties.setTimeOfDay(l);
-    }
-
-    protected void tickTime() {
-        this.setTime(this.properties.getTime() + 1L);
-        if (this.properties.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
-            this.setTimeOfDay(this.properties.getTimeOfDay() + 1L);
-        }
     }
 
     public boolean canPlayerModifyAt(PlayerEntity arg, BlockPos arg2) {
@@ -974,7 +971,7 @@ AutoCloseable {
     }
 
     public boolean isThundering() {
-        if (!this.method_27983().hasSkyLight() || this.method_27983().method_27998()) {
+        if (!this.getDimension().hasSkyLight() || this.getDimension().method_27998()) {
             return false;
         }
         return (double)this.getThunderGradient(1.0f) > 0.9;
@@ -1017,7 +1014,7 @@ AutoCloseable {
         CrashReportSection lv = arg.addElement("Affected level", 1);
         lv.add("All players", () -> this.getPlayers().size() + " total; " + this.getPlayers());
         lv.add("Chunk stats", this.getChunkManager()::getDebugString);
-        lv.add("Level dimension", () -> this.method_27983().toString());
+        lv.add("Level dimension", () -> this.method_27983().method_29177().toString());
         try {
             this.properties.populateCrashReport(lv);
         }
@@ -1078,13 +1075,12 @@ AutoCloseable {
     }
 
     @Override
-    public Dimension getDimension() {
+    public DimensionType getDimension() {
         return this.dimension;
     }
 
-    @Override
-    public DimensionType method_27983() {
-        return this.dimension.getType();
+    public class_5321<DimensionType> method_27983() {
+        return this.method_28380().method_29116().method_29113(this.dimension);
     }
 
     @Override
@@ -1127,6 +1123,8 @@ AutoCloseable {
     public final boolean method_27982() {
         return this.field_24496;
     }
+
+    public abstract class_5318 method_28380();
 
     @Override
     public /* synthetic */ Chunk getChunk(int i, int j) {

@@ -113,7 +113,7 @@ implements BlockEntityProvider {
         if (!arg4.abilities.allowModifyWorld) {
             return ActionResult.PASS;
         }
-        float f = (arg = (BlockState)arg.cycle(MODE)).get(MODE) == ComparatorMode.SUBTRACT ? 0.55f : 0.5f;
+        float f = (arg = (BlockState)arg.method_28493(MODE)).get(MODE) == ComparatorMode.SUBTRACT ? 0.55f : 0.5f;
         arg2.playSound(arg4, arg3, SoundEvents.BLOCK_COMPARATOR_CLICK, SoundCategory.BLOCKS, 0.3f, f);
         arg2.setBlockState(arg3, arg, 2);
         this.update(arg2, arg3, arg);

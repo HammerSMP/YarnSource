@@ -3,25 +3,30 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.Applicative
  *  com.mojang.datafixers.util.Either
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Decoder
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.structure.pool;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Decoder;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import net.minecraft.block.Blocks;
@@ -34,49 +39,57 @@ import net.minecraft.structure.pool.StructurePoolElement;
 import net.minecraft.structure.pool.StructurePoolElementType;
 import net.minecraft.structure.processor.BlockIgnoreStructureProcessor;
 import net.minecraft.structure.processor.JigsawReplacementStructureProcessor;
-import net.minecraft.structure.processor.NopStructureProcessor;
 import net.minecraft.structure.processor.StructureProcessor;
+import net.minecraft.structure.processor.StructureProcessorType;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.DynamicDeserializer;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 public class SinglePoolElement
 extends StructurePoolElement {
+    private static final Codec<Either<Identifier, Structure>> field_24951 = Codec.of(SinglePoolElement::method_28877, (Decoder)Identifier.field_25139.map(Either::left));
+    public static final Codec<SinglePoolElement> field_24952 = RecordCodecBuilder.create(instance -> instance.group(SinglePoolElement.method_28882(), SinglePoolElement.method_28880(), SinglePoolElement.method_28883()).apply((Applicative)instance, SinglePoolElement::new));
     protected final Either<Identifier, Structure> field_24015;
     protected final ImmutableList<StructureProcessor> processors;
 
-    @Deprecated
-    public SinglePoolElement(String string, List<StructureProcessor> list) {
-        this(string, list, StructurePool.Projection.RIGID);
+    private static <T> DataResult<T> method_28877(Either<Identifier, Structure> either, DynamicOps<T> dynamicOps, T object) {
+        Optional optional = either.left();
+        if (!optional.isPresent()) {
+            return DataResult.error((String)"Can not serialize a runtime pool element");
+        }
+        return Identifier.field_25139.encode(optional.get(), dynamicOps, object);
     }
 
-    public SinglePoolElement(String string, List<StructureProcessor> list, StructurePool.Projection arg) {
+    protected static <E extends SinglePoolElement> RecordCodecBuilder<E, List<StructureProcessor>> method_28880() {
+        return StructureProcessorType.field_25013.listOf().fieldOf("processors").forGetter(arg -> arg.processors);
+    }
+
+    protected static <E extends SinglePoolElement> RecordCodecBuilder<E, Either<Identifier, Structure>> method_28882() {
+        return field_24951.fieldOf("location").forGetter(arg -> arg.field_24015);
+    }
+
+    @Deprecated
+    public SinglePoolElement(String string, List<StructureProcessor> list) {
+        this((Either<Identifier, Structure>)Either.left((Object)new Identifier(string)), list, StructurePool.Projection.RIGID);
+    }
+
+    protected SinglePoolElement(Either<Identifier, Structure> either, List<StructureProcessor> list, StructurePool.Projection arg) {
         super(arg);
-        this.field_24015 = Either.left((Object)new Identifier(string));
+        this.field_24015 = either;
         this.processors = ImmutableList.copyOf(list);
     }
 
     public SinglePoolElement(Structure arg, List<StructureProcessor> list, StructurePool.Projection arg2) {
-        super(arg2);
-        this.field_24015 = Either.right((Object)arg);
-        this.processors = ImmutableList.copyOf(list);
+        this((Either<Identifier, Structure>)Either.right((Object)arg), list, arg2);
     }
 
     @Deprecated
     public SinglePoolElement(String string) {
         this(string, (List<StructureProcessor>)ImmutableList.of());
-    }
-
-    public SinglePoolElement(Dynamic<?> dynamic2) {
-        super(dynamic2);
-        this.field_24015 = Either.left((Object)new Identifier(dynamic2.get("location").asString("")));
-        this.processors = ImmutableList.copyOf((Collection)dynamic2.get("processors").asList(dynamic -> DynamicDeserializer.deserialize(dynamic, Registry.STRUCTURE_PROCESSOR, "processor_type", NopStructureProcessor.INSTANCE)));
     }
 
     private Structure method_27233(StructureManager arg) {
@@ -140,13 +153,8 @@ extends StructurePoolElement {
     }
 
     @Override
-    public StructurePoolElementType getType() {
+    public StructurePoolElementType<?> getType() {
         return StructurePoolElementType.SINGLE_POOL_ELEMENT;
-    }
-
-    @Override
-    public <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("location"), (Object)dynamicOps.createString(((Identifier)this.field_24015.left().orElseThrow(RuntimeException::new)).toString()), (Object)dynamicOps.createString("processors"), (Object)dynamicOps.createList(this.processors.stream().map(arg -> arg.toDynamic(dynamicOps).getValue())))));
     }
 
     public String toString() {

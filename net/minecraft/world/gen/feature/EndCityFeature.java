@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.structure.EndCityGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
@@ -18,32 +17,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class EndCityFeature
 extends StructureFeature<DefaultFeatureConfig> {
-    public EndCityFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
-    }
-
-    @Override
-    protected int getSpacing(ChunkGeneratorConfig arg) {
-        return arg.getEndCitySpacing();
-    }
-
-    @Override
-    protected int getSeparation(ChunkGeneratorConfig arg) {
-        return arg.getEndCitySeparation();
-    }
-
-    @Override
-    protected int getSeedModifier(ChunkGeneratorConfig arg) {
-        return 10387313;
+    public EndCityFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -52,23 +35,13 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
-        return EndCityFeature.getGenerationHeight(i, j, arg2) >= 60;
+    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
+        return EndCityFeature.getGenerationHeight(i, j, arg) >= 60;
     }
 
     @Override
-    public StructureFeature.StructureStartFactory getStructureStartFactory() {
+    public StructureFeature.StructureStartFactory<DefaultFeatureConfig> getStructureStartFactory() {
         return Start::new;
-    }
-
-    @Override
-    public String getName() {
-        return "EndCity";
-    }
-
-    @Override
-    public int getRadius() {
-        return 8;
     }
 
     private static int getGenerationHeight(int i, int j, ChunkGenerator arg) {
@@ -94,13 +67,13 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     public static class Start
-    extends StructureStart {
-        public Start(StructureFeature<?> arg, int i, int j, BlockBox arg2, int k, long l) {
+    extends StructureStart<DefaultFeatureConfig> {
+        public Start(StructureFeature<DefaultFeatureConfig> arg, int i, int j, BlockBox arg2, int k, long l) {
             super(arg, i, j, arg2, k, l);
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
             BlockRotation lv = BlockRotation.random(this.random);
             int k = EndCityFeature.getGenerationHeight(i, j, arg);
             if (k < 60) {

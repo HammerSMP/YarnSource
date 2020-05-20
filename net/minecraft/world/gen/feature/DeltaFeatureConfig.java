@@ -2,23 +2,24 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DeltaFeatureConfig
 implements FeatureConfig {
+    public static final Codec<DeltaFeatureConfig> field_24881 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("contents").forGetter(arg -> arg.contents), (App)BlockState.field_24734.fieldOf("rim").forGetter(arg -> arg.rim), (App)Codec.INT.fieldOf("minimum_radius").forGetter(arg -> arg.minRadius), (App)Codec.INT.fieldOf("maximum_radius").forGetter(arg -> arg.maxRadius), (App)Codec.INT.fieldOf("maximum_rim").forGetter(arg -> arg.maxRim)).apply((Applicative)instance, DeltaFeatureConfig::new));
     public final BlockState contents;
     public final BlockState rim;
     public final int minRadius;
@@ -31,20 +32,6 @@ implements FeatureConfig {
         this.minRadius = i;
         this.maxRadius = j;
         this.maxRim = k;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)new ImmutableMap.Builder().put(dynamicOps.createString("contents"), BlockState.serialize(dynamicOps, this.contents).getValue()).put(dynamicOps.createString("rim"), BlockState.serialize(dynamicOps, this.rim).getValue()).put(dynamicOps.createString("minimum_radius"), dynamicOps.createInt(this.minRadius)).put(dynamicOps.createString("maximum_radius"), dynamicOps.createInt(this.maxRadius)).put(dynamicOps.createString("maximum_rim"), dynamicOps.createInt(this.maxRim)).build()));
-    }
-
-    public static <T> DeltaFeatureConfig deserialize(Dynamic<T> dynamic) {
-        BlockState lv = dynamic.get("contents").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        BlockState lv2 = dynamic.get("rim").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        int i = dynamic.get("minimum_radius").asInt(0);
-        int j = dynamic.get("maximum_radius").asInt(0);
-        int k = dynamic.get("maximum_rim").asInt(0);
-        return new DeltaFeatureConfig(lv, lv2, i, j, k);
     }
 
     public static class Builder {

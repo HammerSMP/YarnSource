@@ -134,7 +134,7 @@ public class BlockArgumentParser {
 
     private CompletableFuture<Suggestions> suggestBlockProperties(SuggestionsBuilder suggestionsBuilder) {
         String string = suggestionsBuilder.getRemaining().toLowerCase(Locale.ROOT);
-        for (Property<?> lv : this.blockState.getProperties()) {
+        for (Property<?> lv : this.blockState.method_28501()) {
             if (this.blockProperties.containsKey(lv) || !lv.getName().startsWith(string)) continue;
             suggestionsBuilder.suggest(lv.getName() + '=');
         }
@@ -187,7 +187,7 @@ public class BlockArgumentParser {
         if (suggestionsBuilder.getRemaining().isEmpty()) {
             suggestionsBuilder.suggest(String.valueOf(']'));
         }
-        if (suggestionsBuilder.getRemaining().isEmpty() && this.blockProperties.size() < this.blockState.getProperties().size()) {
+        if (suggestionsBuilder.getRemaining().isEmpty() && this.blockProperties.size() < this.blockState.method_28501().size()) {
             suggestionsBuilder.suggest(String.valueOf(','));
         }
         return suggestionsBuilder.buildFuture();
@@ -396,7 +396,7 @@ public class BlockArgumentParser {
 
     public static String stringifyBlockState(BlockState arg) {
         StringBuilder stringBuilder = new StringBuilder(Registry.BLOCK.getId(arg.getBlock()).toString());
-        if (!arg.getProperties().isEmpty()) {
+        if (!arg.method_28501().isEmpty()) {
             stringBuilder.append('[');
             boolean bl = false;
             for (Map.Entry entry : arg.getEntries().entrySet()) {

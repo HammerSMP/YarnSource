@@ -57,6 +57,7 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BowItem;
+import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -549,6 +550,9 @@ extends LivingEntity {
             return this.prefersNewDamageableItem(arg, arg2);
         }
         if (arg.getItem() instanceof BowItem && arg2.getItem() instanceof BowItem) {
+            return this.prefersNewDamageableItem(arg, arg2);
+        }
+        if (arg.getItem() instanceof CrossbowItem && arg2.getItem() instanceof CrossbowItem) {
             return this.prefersNewDamageableItem(arg, arg2);
         }
         if (arg.getItem() instanceof ArmorItem) {

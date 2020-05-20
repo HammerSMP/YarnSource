@@ -3,12 +3,14 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
+ *  com.mojang.serialization.DynamicLike
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.border;
 
 import com.google.common.collect.Lists;
+import com.mojang.serialization.DynamicLike;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -289,43 +291,16 @@ public class WorldBorder {
             return this.field_24131;
         }
 
-        public static class_5200 method_27358(CompoundTag arg, class_5200 arg2) {
-            double d = arg2.field_24123;
-            double e = arg2.field_24124;
-            double f = arg2.field_24129;
-            long l = arg2.field_24130;
-            double g = arg2.field_24131;
-            double h = arg2.field_24126;
-            double i = arg2.field_24125;
-            int j = arg2.field_24127;
-            int k = arg2.field_24128;
-            if (arg.contains("BorderCenterX", 99)) {
-                d = arg.getDouble("BorderCenterX");
-            }
-            if (arg.contains("BorderCenterZ", 99)) {
-                e = arg.getDouble("BorderCenterZ");
-            }
-            if (arg.contains("BorderSize", 99)) {
-                f = arg.getDouble("BorderSize");
-            }
-            if (arg.contains("BorderSizeLerpTime", 99)) {
-                l = arg.getLong("BorderSizeLerpTime");
-            }
-            if (arg.contains("BorderSizeLerpTarget", 99)) {
-                g = arg.getDouble("BorderSizeLerpTarget");
-            }
-            if (arg.contains("BorderSafeZone", 99)) {
-                h = arg.getDouble("BorderSafeZone");
-            }
-            if (arg.contains("BorderDamagePerBlock", 99)) {
-                i = arg.getDouble("BorderDamagePerBlock");
-            }
-            if (arg.contains("BorderWarningBlocks", 99)) {
-                j = arg.getInt("BorderWarningBlocks");
-            }
-            if (arg.contains("BorderWarningTime", 99)) {
-                k = arg.getInt("BorderWarningTime");
-            }
+        public static class_5200 method_27358(DynamicLike<?> dynamicLike, class_5200 arg) {
+            double d = dynamicLike.get("BorderCenterX").asDouble(arg.field_24123);
+            double e = dynamicLike.get("BorderCenterZ").asDouble(arg.field_24124);
+            double f = dynamicLike.get("BorderSize").asDouble(arg.field_24129);
+            long l = dynamicLike.get("BorderSizeLerpTime").asLong(arg.field_24130);
+            double g = dynamicLike.get("BorderSizeLerpTarget").asDouble(arg.field_24131);
+            double h = dynamicLike.get("BorderSafeZone").asDouble(arg.field_24126);
+            double i = dynamicLike.get("BorderDamagePerBlock").asDouble(arg.field_24125);
+            int j = dynamicLike.get("BorderWarningBlocks").asInt(arg.field_24127);
+            int k = dynamicLike.get("BorderWarningTime").asInt(arg.field_24128);
             return new class_5200(d, e, i, h, j, k, f, l, g);
         }
 

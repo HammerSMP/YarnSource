@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -236,7 +237,7 @@ public final class SpawnHelper {
         return new BlockPos(i, l, j);
     }
 
-    public static boolean isClearForSpawn(BlockView arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public static boolean isClearForSpawn(BlockView arg, BlockPos arg2, BlockState arg3, FluidState arg4, EntityType arg5) {
         if (arg3.isFullCube(arg, arg2)) {
             return false;
         }
@@ -246,7 +247,10 @@ public final class SpawnHelper {
         if (!arg4.isEmpty()) {
             return false;
         }
-        return !arg3.isIn(BlockTags.PREVENT_MOB_SPAWNING_INSIDE);
+        if (arg3.isIn(BlockTags.PREVENT_MOB_SPAWNING_INSIDE)) {
+            return false;
+        }
+        return !arg3.isOf(Blocks.WITHER_ROSE) || arg5 == EntityType.WITHER_SKELETON;
     }
 
     public static boolean canSpawn(SpawnRestriction.Location arg, WorldView arg2, BlockPos arg3, @Nullable EntityType<?> arg4) {
@@ -272,7 +276,7 @@ public final class SpawnHelper {
         if (!lv5.allowsSpawning(arg2, lv4, arg4)) {
             return false;
         }
-        return SpawnHelper.isClearForSpawn(arg2, arg3, lv, lv2) && SpawnHelper.isClearForSpawn(arg2, lv3, arg2.getBlockState(lv3), arg2.getFluidState(lv3));
+        return SpawnHelper.isClearForSpawn(arg2, arg3, lv, lv2, arg4) && SpawnHelper.isClearForSpawn(arg2, lv3, arg2.getBlockState(lv3), arg2.getFluidState(lv3), arg4);
     }
 
     /*

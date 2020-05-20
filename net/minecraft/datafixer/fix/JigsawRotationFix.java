@@ -5,18 +5,18 @@
  *  com.google.common.collect.ImmutableMap
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
@@ -30,7 +30,7 @@ extends DataFix {
     }
 
     private static Dynamic<?> updateBlockState(Dynamic<?> dynamic2) {
-        Optional optional = dynamic2.get("Name").asString();
+        Optional optional = dynamic2.get("Name").asString().result();
         if (optional.equals(Optional.of("minecraft:jigsaw"))) {
             return dynamic2.update("Properties", dynamic -> {
                 String string = dynamic.get("facing").asString("north");

@@ -4,17 +4,17 @@
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.datafixer.TypeReferences;
 
 public class RedstoneConnectionsFix
@@ -29,15 +29,15 @@ extends DataFix {
     }
 
     private <T> Dynamic<T> updateBlockState(Dynamic<T> dynamic) {
-        boolean bl = dynamic.get("Name").asString().filter("minecraft:redstone_wire"::equals).isPresent();
+        boolean bl = dynamic.get("Name").asString().result().filter("minecraft:redstone_wire"::equals).isPresent();
         if (!bl) {
             return dynamic;
         }
         return dynamic.update("Properties", dynamic2 -> {
-            String string = dynamic2.get("east").asString().orElseGet(() -> "none");
-            String string2 = dynamic2.get("west").asString().orElseGet(() -> "none");
-            String string3 = dynamic2.get("north").asString().orElseGet(() -> "none");
-            String string4 = dynamic2.get("south").asString().orElseGet(() -> "none");
+            String string = dynamic2.get("east").asString("none");
+            String string2 = dynamic2.get("west").asString("none");
+            String string3 = dynamic2.get("north").asString("none");
+            String string4 = dynamic2.get("south").asString("none");
             boolean bl = RedstoneConnectionsFix.hasObsoleteValue(string) || RedstoneConnectionsFix.hasObsoleteValue(string2);
             boolean bl2 = RedstoneConnectionsFix.hasObsoleteValue(string3) || RedstoneConnectionsFix.hasObsoleteValue(string4);
             String string5 = !RedstoneConnectionsFix.hasObsoleteValue(string) && !bl2 ? "side" : string;

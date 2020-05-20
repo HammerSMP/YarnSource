@@ -3,15 +3,14 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -29,8 +28,8 @@ public class BasaltColumnsFeature
 extends Feature<BasaltColumnsFeatureConfig> {
     private static final ImmutableList<Block> field_24132 = ImmutableList.of((Object)Blocks.LAVA, (Object)Blocks.BEDROCK, (Object)Blocks.MAGMA_BLOCK, (Object)Blocks.SOUL_SAND, (Object)Blocks.NETHER_BRICKS, (Object)Blocks.NETHER_BRICK_FENCE, (Object)Blocks.NETHER_BRICK_STAIRS, (Object)Blocks.NETHER_WART, (Object)Blocks.CHEST, (Object)Blocks.SPAWNER);
 
-    public BasaltColumnsFeature(Function<Dynamic<?>, ? extends BasaltColumnsFeatureConfig> function) {
-        super(function);
+    public BasaltColumnsFeature(Codec<BasaltColumnsFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

@@ -2,17 +2,15 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.foliage;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.util.math.BlockPos;
@@ -23,12 +21,15 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class DarkOakFoliagePlacer
 extends FoliagePlacer {
+    public static final Codec<DarkOakFoliagePlacer> field_24929 = RecordCodecBuilder.create(instance -> DarkOakFoliagePlacer.method_28846(instance).apply((Applicative)instance, DarkOakFoliagePlacer::new));
+
     public DarkOakFoliagePlacer(int i, int j, int k, int l) {
-        super(i, j, k, l, FoliagePlacerType.DARK_OAK_FOLIAGE_PLACER);
+        super(i, j, k, l);
     }
 
-    public <T> DarkOakFoliagePlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("radius").asInt(0), dynamic.get("radius_random").asInt(0), dynamic.get("offset").asInt(0), dynamic.get("offset_random").asInt(0));
+    @Override
+    protected FoliagePlacerType<?> method_28843() {
+        return FoliagePlacerType.DARK_OAK_FOLIAGE_PLACER;
     }
 
     @Override
@@ -70,12 +71,6 @@ extends FoliagePlacer {
             return i + k > l * 2 - 2;
         }
         return false;
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        return (T)dynamicOps.merge(super.serialize(dynamicOps), dynamicOps.createMap((Map)builder.build()));
     }
 }
 

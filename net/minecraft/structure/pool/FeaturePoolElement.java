@@ -2,20 +2,21 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.structure.pool;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -41,6 +42,7 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class FeaturePoolElement
 extends StructurePoolElement {
+    public static final Codec<FeaturePoolElement> field_24948 = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.field_24833.fieldOf("feature").forGetter(arg -> arg.feature), FeaturePoolElement.method_28883()).apply((Applicative)instance, FeaturePoolElement::new));
     private final ConfiguredFeature<?, ?> feature;
     private final CompoundTag tag;
 
@@ -52,12 +54,6 @@ extends StructurePoolElement {
     private FeaturePoolElement(ConfiguredFeature<?, ?> arg, StructurePool.Projection arg2) {
         super(arg2);
         this.feature = arg;
-        this.tag = this.createDefaultJigsawTag();
-    }
-
-    public <T> FeaturePoolElement(Dynamic<T> dynamic) {
-        super(dynamic);
-        this.feature = ConfiguredFeature.deserialize(dynamic.get("feature").orElseEmptyMap());
         this.tag = this.createDefaultJigsawTag();
     }
 
@@ -94,12 +90,7 @@ extends StructurePoolElement {
     }
 
     @Override
-    public <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("feature"), (Object)this.feature.serialize(dynamicOps).getValue())));
-    }
-
-    @Override
-    public StructurePoolElementType getType() {
+    public StructurePoolElementType<?> getType() {
         return StructurePoolElementType.FEATURE_POOL_ELEMENT;
     }
 

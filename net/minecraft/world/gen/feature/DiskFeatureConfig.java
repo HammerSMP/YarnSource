@@ -2,23 +2,24 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
-import java.util.Map;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DiskFeatureConfig
 implements FeatureConfig {
+    public static final Codec<DiskFeatureConfig> field_24882 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("radius").withDefault((Object)0).forGetter(arg -> arg.radius), (App)Codec.INT.fieldOf("y_size").withDefault((Object)0).forGetter(arg -> arg.ySize), (App)BlockState.field_24734.listOf().fieldOf("targets").forGetter(arg -> arg.targets)).apply((Applicative)instance, DiskFeatureConfig::new));
     public final BlockState state;
     public final int radius;
     public final int ySize;
@@ -29,19 +30,6 @@ implements FeatureConfig {
         this.radius = i;
         this.ySize = j;
         this.targets = list;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("state"), (Object)BlockState.serialize(dynamicOps, this.state).getValue(), (Object)dynamicOps.createString("radius"), (Object)dynamicOps.createInt(this.radius), (Object)dynamicOps.createString("y_size"), (Object)dynamicOps.createInt(this.ySize), (Object)dynamicOps.createString("targets"), (Object)dynamicOps.createList(this.targets.stream().map(arg -> BlockState.serialize(dynamicOps, arg).getValue())))));
-    }
-
-    public static <T> DiskFeatureConfig deserialize(Dynamic<T> dynamic) {
-        BlockState lv = dynamic.get("state").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        int i = dynamic.get("radius").asInt(0);
-        int j = dynamic.get("y_size").asInt(0);
-        List list = dynamic.get("targets").asList(BlockState::deserialize);
-        return new DiskFeatureConfig(lv, i, j, list);
     }
 }
 

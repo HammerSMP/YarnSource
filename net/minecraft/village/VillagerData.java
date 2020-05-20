@@ -2,27 +2,28 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.village;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.village.VillagerProfession;
 import net.minecraft.village.VillagerType;
 
 public class VillagerData {
     private static final int[] LEVEL_BASE_EXPERIENCE = new int[]{0, 10, 70, 150, 250};
+    public static final Codec<VillagerData> field_24669 = RecordCodecBuilder.create(instance -> instance.group((App)Registry.VILLAGER_TYPE.fieldOf("type").forGetter(arg -> arg.type), (App)Registry.VILLAGER_PROFESSION.fieldOf("profession").forGetter(arg -> arg.profession), (App)Codec.INT.fieldOf("level").withDefault((Object)1).forGetter(arg -> arg.level)).apply((Applicative)instance, VillagerData::new));
     private final VillagerType type;
     private final VillagerProfession profession;
     private final int level;
@@ -31,10 +32,6 @@ public class VillagerData {
         this.type = arg;
         this.profession = arg2;
         this.level = Math.max(1, i);
-    }
-
-    public VillagerData(Dynamic<?> dynamic) {
-        this(Registry.VILLAGER_TYPE.get(Identifier.tryParse(dynamic.get("type").asString(""))), Registry.VILLAGER_PROFESSION.get(Identifier.tryParse(dynamic.get("profession").asString(""))), dynamic.get("level").asInt(1));
     }
 
     public VillagerType getType() {
@@ -59,10 +56,6 @@ public class VillagerData {
 
     public VillagerData withLevel(int i) {
         return new VillagerData(this.type, this.profession, i);
-    }
-
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        return (T)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString(Registry.VILLAGER_TYPE.getId(this.type).toString()), (Object)dynamicOps.createString("profession"), (Object)dynamicOps.createString(Registry.VILLAGER_PROFESSION.getId(this.profession).toString()), (Object)dynamicOps.createString("level"), (Object)dynamicOps.createInt(this.level)));
     }
 
     @Environment(value=EnvType.CLIENT)

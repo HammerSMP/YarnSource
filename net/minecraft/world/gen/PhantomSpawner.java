@@ -5,6 +5,7 @@ package net.minecraft.world.gen;
 
 import java.util.Random;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5304;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -21,9 +22,11 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.SpawnHelper;
 
-public class PhantomSpawner {
+public class PhantomSpawner
+implements class_5304 {
     private int ticksUntilNextSpawn;
 
+    @Override
     public int spawn(ServerWorld arg, boolean bl, boolean bl2) {
         if (!bl) {
             return 0;
@@ -37,7 +40,7 @@ public class PhantomSpawner {
             return 0;
         }
         this.ticksUntilNextSpawn += (60 + random.nextInt(60)) * 20;
-        if (arg.getAmbientDarkness() < 5 && arg.method_27983().hasSkyLight()) {
+        if (arg.getAmbientDarkness() < 5 && arg.getDimension().hasSkyLight()) {
             return 0;
         }
         int i = 0;
@@ -48,11 +51,11 @@ public class PhantomSpawner {
             LocalDifficulty lv3;
             if (playerEntity.isSpectator()) continue;
             BlockPos lv2 = playerEntity.getBlockPos();
-            if (arg.method_27983().hasSkyLight() && (lv2.getY() < arg.getSeaLevel() || !arg.isSkyVisible(lv2)) || !(lv3 = arg.getLocalDifficulty(lv2)).isHarderThan(random.nextFloat() * 3.0f)) continue;
+            if (arg.getDimension().hasSkyLight() && (lv2.getY() < arg.getSeaLevel() || !arg.isSkyVisible(lv2)) || !(lv3 = arg.getLocalDifficulty(lv2)).isHarderThan(random.nextFloat() * 3.0f)) continue;
             ServerStatHandler lv4 = ((ServerPlayerEntity)playerEntity).getStatHandler();
             int j = MathHelper.clamp(lv4.getStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST)), 1, Integer.MAX_VALUE);
             int k = 24000;
-            if (random.nextInt(j) < 72000 || !SpawnHelper.isClearForSpawn(arg, lv5 = lv2.up(20 + random.nextInt(15)).east(-10 + random.nextInt(21)).south(-10 + random.nextInt(21)), lv6 = arg.getBlockState(lv5), lv7 = arg.getFluidState(lv5))) continue;
+            if (random.nextInt(j) < 72000 || !SpawnHelper.isClearForSpawn(arg, lv5 = lv2.up(20 + random.nextInt(15)).east(-10 + random.nextInt(21)).south(-10 + random.nextInt(21)), lv6 = arg.getBlockState(lv5), lv7 = arg.getFluidState(lv5), EntityType.PHANTOM)) continue;
             EntityData lv8 = null;
             int l = 1 + random.nextInt(lv3.getGlobalDifficulty().getId() + 1);
             for (int m = 0; m < l; ++m) {

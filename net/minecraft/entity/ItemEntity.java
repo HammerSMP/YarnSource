@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -309,7 +310,7 @@ extends Entity {
 
     @Override
     @Nullable
-    public Entity changeDimension(DimensionType arg) {
+    public Entity changeDimension(class_5321<DimensionType> arg) {
         Entity lv = super.changeDimension(arg);
         if (!this.world.isClient && lv instanceof ItemEntity) {
             ((ItemEntity)lv).tryMerge();

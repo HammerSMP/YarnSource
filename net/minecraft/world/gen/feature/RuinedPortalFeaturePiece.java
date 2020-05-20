@@ -2,17 +2,25 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -25,6 +33,7 @@ import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.structure.SimpleStructurePiece;
 import net.minecraft.structure.Structure;
@@ -52,9 +61,12 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RuinedPortalFeaturePiece
 extends SimpleStructurePiece {
+    private static final Logger field_24992 = LogManager.getLogger();
     private final Identifier template;
     private final BlockRotation rotation;
     private final BlockMirror mirror;
@@ -78,7 +90,7 @@ extends SimpleStructurePiece {
         this.rotation = BlockRotation.valueOf(arg2.getString("Rotation"));
         this.mirror = BlockMirror.valueOf(arg2.getString("Mirror"));
         this.verticalPlacement = VerticalPlacement.getFromId(arg2.getString("VerticalPlacement"));
-        this.properties = new Properties(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg2.get("Properties")));
+        this.properties = (Properties)Properties.field_24993.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg2.get("Properties"))).getOrThrow(true, ((Logger)field_24992)::error);
         Structure lv = arg.getStructureOrBlank(this.template);
         this.processProperties(lv, new BlockPos(lv.getSize().getX() / 2, 0, lv.getSize().getZ() / 2));
     }
@@ -90,7 +102,7 @@ extends SimpleStructurePiece {
         arg.putString("Rotation", this.rotation.name());
         arg.putString("Mirror", this.mirror.name());
         arg.putString("VerticalPlacement", this.verticalPlacement.getId());
-        arg.put("Properties", this.properties.serialize(NbtOps.INSTANCE));
+        Properties.field_24993.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.properties).resultOrPartial(((Logger)field_24992)::error).ifPresent(arg2 -> arg.put("Properties", (Tag)arg2));
     }
 
     private void processProperties(Structure arg, BlockPos arg2) {
@@ -103,7 +115,7 @@ extends SimpleStructurePiece {
         }
         StructurePlacementData lv2 = new StructurePlacementData().setRotation(this.rotation).setMirror(this.mirror).setPosition(arg2).addProcessor(lv).addProcessor(new RuleStructureProcessor(list)).addProcessor(new BlockAgeStructureProcessor(this.properties.mossiness));
         if (this.properties.replaceWithBlackstone) {
-            lv2.addProcessor(new BlackstoneReplacementStructureProcessor());
+            lv2.addProcessor(BlackstoneReplacementStructureProcessor.INSTANCE);
         }
         this.setStructureData(arg, this.pos, lv2);
     }
@@ -276,6 +288,7 @@ extends SimpleStructurePiece {
     }
 
     public static class Properties {
+        public static final Codec<Properties> field_24993 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.BOOL.fieldOf("cold").forGetter(arg -> arg.cold), (App)Codec.FLOAT.fieldOf("mossiness").forGetter(arg -> Float.valueOf(arg.mossiness)), (App)Codec.BOOL.fieldOf("air_pocket").forGetter(arg -> arg.airPocket), (App)Codec.BOOL.fieldOf("overgrown").forGetter(arg -> arg.overgrown), (App)Codec.BOOL.fieldOf("vines").forGetter(arg -> arg.vines), (App)Codec.BOOL.fieldOf("replace_with_blackstone").forGetter(arg -> arg.replaceWithBlackstone)).apply((Applicative)instance, Properties::new));
         public boolean cold;
         public float mossiness = 0.2f;
         public boolean airPocket;
@@ -286,17 +299,13 @@ extends SimpleStructurePiece {
         public Properties() {
         }
 
-        public <T> Properties(Dynamic<T> dynamic) {
-            this.cold = dynamic.get("Cold").asBoolean(false);
-            this.mossiness = dynamic.get("Mossiness").asFloat(0.2f);
-            this.airPocket = dynamic.get("AirPocket").asBoolean(false);
-            this.overgrown = dynamic.get("Overgrown").asBoolean(false);
-            this.vines = dynamic.get("Vines").asBoolean(false);
-            this.replaceWithBlackstone = dynamic.get("ReplaceWithBlackstone").asBoolean(false);
-        }
-
-        public <T> T serialize(DynamicOps<T> dynamicOps) {
-            return (T)dynamicOps.createMap((Map)ImmutableMap.builder().put(dynamicOps.createString("Cold"), dynamicOps.createBoolean(this.cold)).put(dynamicOps.createString("Mossiness"), dynamicOps.createFloat(this.mossiness)).put(dynamicOps.createString("AirPocket"), dynamicOps.createBoolean(this.airPocket)).put(dynamicOps.createString("Overgrown"), dynamicOps.createBoolean(this.overgrown)).put(dynamicOps.createString("Vines"), dynamicOps.createBoolean(this.vines)).put(dynamicOps.createString("ReplaceWithBlackstone"), dynamicOps.createBoolean(this.replaceWithBlackstone)).build());
+        public <T> Properties(boolean bl, float f, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
+            this.cold = bl;
+            this.mossiness = f;
+            this.airPocket = bl2;
+            this.overgrown = bl3;
+            this.vines = bl4;
+            this.replaceWithBlackstone = bl5;
         }
     }
 }

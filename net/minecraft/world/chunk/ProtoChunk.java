@@ -7,6 +7,7 @@
  *  com.google.common.collect.Sets
  *  it.unimi.dsi.fastutil.longs.LongOpenHashSet
  *  it.unimi.dsi.fastutil.longs.LongSet
+ *  it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
  *  it.unimi.dsi.fastutil.shorts.ShortList
  *  javax.annotation.Nullable
  *  org.apache.logging.log4j.LogManager
@@ -19,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -74,13 +76,13 @@ implements Chunk {
     private final List<CompoundTag> entities = Lists.newArrayList();
     private final List<BlockPos> lightSources = Lists.newArrayList();
     private final ShortList[] postProcessingLists = new ShortList[16];
-    private final Map<String, StructureStart> structureStarts = Maps.newHashMap();
+    private final Map<String, StructureStart<?>> structureStarts = Maps.newHashMap();
     private final Map<String, LongSet> structureReferences = Maps.newHashMap();
     private final UpgradeData upgradeData;
     private final ChunkTickScheduler<Block> blockTickScheduler;
     private final ChunkTickScheduler<Fluid> fluidTickScheduler;
     private long inhabitedTime;
-    private final Map<GenerationStep.Carver, BitSet> carvingMasks = Maps.newHashMap();
+    private final Map<GenerationStep.Carver, BitSet> carvingMasks = new Object2ObjectArrayMap();
     private volatile boolean lightOn;
 
     public ProtoChunk(ChunkPos arg2, UpgradeData arg22) {
@@ -172,7 +174,7 @@ implements Chunk {
         EnumSet<Heightmap.Type> enumSet = this.getStatus().getHeightmapTypes();
         EnumSet<Heightmap.Type> enumSet2 = null;
         for (Heightmap.Type lv4 : enumSet) {
-            Heightmap lv5 = this.heightmaps.get((Object)lv4);
+            Heightmap lv5 = this.heightmaps.get(lv4);
             if (lv5 != null) continue;
             if (enumSet2 == null) {
                 enumSet2 = EnumSet.noneOf(Heightmap.Type.class);
@@ -183,7 +185,7 @@ implements Chunk {
             Heightmap.populateHeightmaps(this, enumSet2);
         }
         for (Heightmap.Type lv6 : enumSet) {
-            this.heightmaps.get((Object)lv6).trackUpdate(i & 0xF, j, k & 0xF, arg2);
+            this.heightmaps.get(lv6).trackUpdate(i & 0xF, j, k & 0xF, arg2);
         }
         return lv2;
     }
@@ -288,15 +290,15 @@ implements Chunk {
 
     @Override
     public Heightmap getHeightmap(Heightmap.Type arg2) {
-        return this.heightmaps.computeIfAbsent(arg2, arg -> new Heightmap(this, (Heightmap.Type)((Object)arg)));
+        return this.heightmaps.computeIfAbsent(arg2, arg -> new Heightmap(this, (Heightmap.Type)arg));
     }
 
     @Override
     public int sampleHeightmap(Heightmap.Type arg, int i, int j) {
-        Heightmap lv = this.heightmaps.get((Object)arg);
+        Heightmap lv = this.heightmaps.get(arg);
         if (lv == null) {
             Heightmap.populateHeightmaps(this, EnumSet.of(arg));
-            lv = this.heightmaps.get((Object)arg);
+            lv = this.heightmaps.get(arg);
         }
         return lv.get(i & 0xF, j & 0xF) - 1;
     }
@@ -312,23 +314,23 @@ implements Chunk {
 
     @Override
     @Nullable
-    public StructureStart getStructureStart(String string) {
+    public StructureStart<?> getStructureStart(String string) {
         return this.structureStarts.get(string);
     }
 
     @Override
-    public void setStructureStart(String string, StructureStart arg) {
+    public void setStructureStart(String string, StructureStart<?> arg) {
         this.structureStarts.put(string, arg);
         this.shouldSave = true;
     }
 
     @Override
-    public Map<String, StructureStart> getStructureStarts() {
+    public Map<String, StructureStart<?>> getStructureStarts() {
         return Collections.unmodifiableMap(this.structureStarts);
     }
 
     @Override
-    public void setStructureStarts(Map<String, StructureStart> map) {
+    public void setStructureStarts(Map<String, StructureStart<?>> map) {
         this.structureStarts.clear();
         this.structureStarts.putAll(map);
         this.shouldSave = true;
@@ -444,8 +446,12 @@ implements Chunk {
         this.blockEntityTags.remove(arg);
     }
 
-    @Override
-    public BitSet getCarvingMask(GenerationStep.Carver arg2) {
+    @Nullable
+    public BitSet getCarvingMask(GenerationStep.Carver arg) {
+        return this.carvingMasks.get(arg);
+    }
+
+    public BitSet method_28510(GenerationStep.Carver arg2) {
         return this.carvingMasks.computeIfAbsent(arg2, arg -> new BitSet(65536));
     }
 

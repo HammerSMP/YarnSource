@@ -53,7 +53,7 @@ implements Fertilizable {
     public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
         BlockPos lv;
         if (arg.get(AGE) < 25 && random.nextDouble() < this.growthChance && this.chooseStemState(arg2.getBlockState(lv = arg3.offset(this.growthDirection)))) {
-            arg2.setBlockState(lv, (BlockState)arg.cycle(AGE));
+            arg2.setBlockState(lv, (BlockState)arg.method_28493(AGE));
         }
     }
 

@@ -91,7 +91,7 @@ extends BlockEntityRenderer<T> {
         World lv = ((BlockEntity)arg).getWorld();
         boolean bl = lv != null;
         BlockState lv2 = bl ? ((BlockEntity)arg).getCachedState() : (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH);
-        ChestType lv3 = lv2.contains(ChestBlock.CHEST_TYPE) ? lv2.get(ChestBlock.CHEST_TYPE) : ChestType.SINGLE;
+        ChestType lv3 = lv2.method_28498(ChestBlock.CHEST_TYPE) ? lv2.get(ChestBlock.CHEST_TYPE) : ChestType.SINGLE;
         Block lv4 = lv2.getBlock();
         if (!(lv4 instanceof AbstractChestBlock)) {
             return;

@@ -36,7 +36,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.TheEndDimension;
 import net.minecraft.world.gen.feature.EndGatewayFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
@@ -158,7 +157,7 @@ implements Tickable {
             return;
         }
         this.teleportCooldown = 100;
-        if (this.exitPortalPos == null && this.world.getDimension() instanceof TheEndDimension) {
+        if (this.exitPortalPos == null && this.world.getDimension().method_28543()) {
             this.createPortal((ServerWorld)this.world);
         }
         if (this.exitPortalPos != null) {

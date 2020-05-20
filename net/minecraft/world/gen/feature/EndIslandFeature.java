@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -20,8 +19,8 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class EndIslandFeature
 extends Feature<DefaultFeatureConfig> {
-    public EndIslandFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
+    public EndIslandFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

@@ -4,6 +4,10 @@
  * Could not load the following classes:
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
@@ -11,6 +15,10 @@ package net.minecraft.particle;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Locale;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,6 +32,7 @@ import net.minecraft.util.registry.Registry;
 public class DustParticleEffect
 implements ParticleEffect {
     public static final DustParticleEffect RED = new DustParticleEffect(1.0f, 0.0f, 0.0f, 1.0f);
+    public static final Codec<DustParticleEffect> field_25124 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("r").forGetter(arg -> Float.valueOf(arg.red)), (App)Codec.FLOAT.fieldOf("g").forGetter(arg -> Float.valueOf(arg.green)), (App)Codec.FLOAT.fieldOf("b").forGetter(arg -> Float.valueOf(arg.blue)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale))).apply((Applicative)instance, DustParticleEffect::new));
     public static final ParticleEffect.Factory<DustParticleEffect> PARAMETERS_FACTORY = new ParticleEffect.Factory<DustParticleEffect>(){
 
         @Override

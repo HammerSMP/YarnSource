@@ -2,46 +2,37 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class StructurePoolFeatureConfig
 implements FeatureConfig {
+    public static final Codec<StructurePoolFeatureConfig> field_24886 = RecordCodecBuilder.create(instance -> instance.group((App)Identifier.field_25139.fieldOf("start_pool").forGetter(StructurePoolFeatureConfig::getStartPool), (App)Codec.INT.fieldOf("size").forGetter(StructurePoolFeatureConfig::getSize)).apply((Applicative)instance, StructurePoolFeatureConfig::new));
     public final Identifier startPool;
     public final int size;
 
-    public StructurePoolFeatureConfig(String string, int i) {
-        this.startPool = new Identifier(string);
+    public StructurePoolFeatureConfig(Identifier arg, int i) {
+        this.startPool = arg;
         this.size = i;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("start_pool"), (Object)dynamicOps.createString(this.startPool.toString()), (Object)dynamicOps.createString("size"), (Object)dynamicOps.createInt(this.size))));
-    }
-
-    public static <T> StructurePoolFeatureConfig deserialize(Dynamic<T> dynamic) {
-        String string = dynamic.get("start_pool").asString("");
-        int i = dynamic.get("size").asInt(6);
-        return new StructurePoolFeatureConfig(string, i);
     }
 
     public int getSize() {
         return this.size;
     }
 
-    public String getStartPool() {
-        return this.startPool.toString();
+    public Identifier getStartPool() {
+        return this.startPool;
     }
 }
 

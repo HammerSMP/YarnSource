@@ -51,12 +51,12 @@ extends Screen {
         this.config = arg2;
     }
 
-    public String getConfigString() {
-        return this.config.toString();
+    public FlatChunkGeneratorConfig method_29055() {
+        return this.config;
     }
 
-    public void setConfigString(String string) {
-        this.config = FlatChunkGeneratorConfig.fromString(string);
+    public void method_29054(FlatChunkGeneratorConfig arg) {
+        this.config = arg;
     }
 
     @Override

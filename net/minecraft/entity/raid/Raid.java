@@ -378,7 +378,7 @@ public class Raid {
             Set<RaiderEntity> set2 = iterator.next();
             for (RaiderEntity lv : set2) {
                 BlockPos lv2 = lv.getBlockPos();
-                if (lv.removed || lv.dimension != this.world.method_27983() || this.center.getSquaredDistance(lv2) >= 12544.0) {
+                if (lv.removed || lv.world.method_27983() != this.world.method_27983() || this.center.getSquaredDistance(lv2) >= 12544.0) {
                     set.add(lv);
                     continue;
                 }

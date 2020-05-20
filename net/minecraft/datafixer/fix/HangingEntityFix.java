@@ -4,21 +4,21 @@
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.datafixer.TypeReferences;
 
 public class HangingEntityFix
@@ -30,16 +30,16 @@ extends DataFix {
     }
 
     private Dynamic<?> fixDecorationPosition(Dynamic<?> dynamic, boolean bl, boolean bl2) {
-        if ((bl || bl2) && !dynamic.get("Facing").asNumber().isPresent()) {
+        if ((bl || bl2) && !dynamic.get("Facing").asNumber().result().isPresent()) {
             int j;
-            if (dynamic.get("Direction").asNumber().isPresent()) {
+            if (dynamic.get("Direction").asNumber().result().isPresent()) {
                 int i = dynamic.get("Direction").asByte((byte)0) % OFFSETS.length;
                 int[] is = OFFSETS[i];
                 dynamic = dynamic.set("TileX", dynamic.createInt(dynamic.get("TileX").asInt(0) + is[0]));
                 dynamic = dynamic.set("TileY", dynamic.createInt(dynamic.get("TileY").asInt(0) + is[1]));
                 dynamic = dynamic.set("TileZ", dynamic.createInt(dynamic.get("TileZ").asInt(0) + is[2]));
                 dynamic = dynamic.remove("Direction");
-                if (bl2 && dynamic.get("ItemRotation").asNumber().isPresent()) {
+                if (bl2 && dynamic.get("ItemRotation").asNumber().result().isPresent()) {
                     dynamic = dynamic.set("ItemRotation", dynamic.createByte((byte)(dynamic.get("ItemRotation").asByte((byte)0) * 2)));
                 }
             } else {

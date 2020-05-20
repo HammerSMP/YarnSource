@@ -6,13 +6,14 @@
  *  com.google.common.collect.Maps
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.types.templates.List$ListType
+ *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
@@ -20,19 +21,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.List;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import net.minecraft.datafixer.TypeReferences;
@@ -84,7 +85,7 @@ extends DataFix {
                         map.put(dynamic22.createString("y"), dynamic22.createInt(p + (l << 4)));
                         map.put(dynamic22.createString("z"), dynamic22.createInt(q + (j << 4)));
                         map.put(dynamic22.createString("color"), dynamic22.createShort((short)14));
-                        list.add(((Optional)type2.read(dynamic22.createMap((Map)map)).getSecond()).orElseThrow(() -> new IllegalStateException("Could not parse newly created bed block entity.")));
+                        list.add(((Pair)type2.read(dynamic22.createMap((Map)map)).result().orElseThrow(() -> new IllegalStateException("Could not parse newly created bed block entity."))).getFirst());
                     }
                     ++m;
                 }

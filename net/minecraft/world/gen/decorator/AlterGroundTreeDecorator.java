@@ -2,23 +2,16 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ModifiableTestableWorld;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.decorator.TreeDecorator;
@@ -28,15 +21,16 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 
 public class AlterGroundTreeDecorator
 extends TreeDecorator {
+    public static final Codec<AlterGroundTreeDecorator> field_24957 = BlockStateProvider.field_24937.fieldOf("provider").xmap(AlterGroundTreeDecorator::new, arg -> arg.field_21316).codec();
     private final BlockStateProvider field_21316;
 
     public AlterGroundTreeDecorator(BlockStateProvider arg) {
-        super(TreeDecoratorType.ALTER_GROUND);
         this.field_21316 = arg;
     }
 
-    public <T> AlterGroundTreeDecorator(Dynamic<T> dynamic) {
-        this((BlockStateProvider)Registry.BLOCK_STATE_PROVIDER_TYPE.get(new Identifier((String)dynamic.get("provider").get("type").asString().orElseThrow(RuntimeException::new))).deserialize(dynamic.get("provider").orElseEmptyMap()));
+    @Override
+    protected TreeDecoratorType<?> method_28893() {
+        return TreeDecoratorType.ALTER_GROUND;
     }
 
     @Override
@@ -75,11 +69,6 @@ extends TreeDecorator {
             }
             if (!Feature.method_27370(arg, lv) && i < 0) break;
         }
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        return (T)new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString(Registry.TREE_DECORATOR_TYPE.getId(this.type).toString()), (Object)dynamicOps.createString("provider"), this.field_21316.serialize(dynamicOps)))).getValue();
     }
 }
 

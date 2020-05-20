@@ -56,7 +56,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
 
 public class BedBlock
@@ -120,7 +119,7 @@ implements BlockEntityProvider {
     }
 
     public static boolean isOverworld(World arg, BlockPos arg2) {
-        return arg.method_27983() == DimensionType.OVERWORLD;
+        return arg.getDimension().method_28541();
     }
 
     private boolean isFree(World arg, BlockPos arg2) {

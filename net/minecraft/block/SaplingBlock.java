@@ -47,7 +47,7 @@ implements Fertilizable {
 
     public void generate(ServerWorld arg, BlockPos arg2, BlockState arg3, Random random) {
         if (arg3.get(STAGE) == 0) {
-            arg.setBlockState(arg2, (BlockState)arg3.cycle(STAGE), 4);
+            arg.setBlockState(arg2, (BlockState)arg3.method_28493(STAGE), 4);
         } else {
             this.generator.generate(arg, arg.getChunkManager().getChunkGenerator(), arg2, arg3, random);
         }

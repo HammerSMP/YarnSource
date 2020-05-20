@@ -7,6 +7,7 @@
  */
 package net.minecraft.client.gui;
 
+import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -24,7 +25,10 @@ implements ClientChatListener {
     }
 
     @Override
-    public void onChatMessage(MessageType arg, Text arg2) {
+    public void onChatMessage(MessageType arg, Text arg2, UUID uUID) {
+        if (this.client.method_29042(uUID)) {
+            return;
+        }
         this.client.inGameHud.setOverlayMessage(arg2, false);
     }
 }

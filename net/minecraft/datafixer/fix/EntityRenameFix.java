@@ -19,6 +19,7 @@ import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.TaggedChoice;
 import java.util.Objects;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public abstract class EntityRenameFix
 extends DataFix {
@@ -32,7 +33,7 @@ extends DataFix {
     public TypeRewriteRule makeRule() {
         TaggedChoice.TaggedChoiceType taggedChoiceType = this.getInputSchema().findChoiceType(TypeReferences.ENTITY);
         TaggedChoice.TaggedChoiceType taggedChoiceType2 = this.getOutputSchema().findChoiceType(TypeReferences.ENTITY);
-        Type type = DSL.named((String)TypeReferences.ENTITY_NAME.typeName(), (Type)DSL.namespacedString());
+        Type type = DSL.named((String)TypeReferences.ENTITY_NAME.typeName(), IdentifierNormalizingSchema.method_28295());
         if (!Objects.equals((Object)this.getOutputSchema().getType(TypeReferences.ENTITY_NAME), (Object)type)) {
             throw new IllegalStateException("Entity name type is not what was expected.");
         }

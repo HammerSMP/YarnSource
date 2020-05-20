@@ -8,7 +8,6 @@ package net.minecraft.entity.ai.brain.task;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
@@ -38,7 +37,7 @@ extends Task<LivingEntity> {
     @Override
     protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
         GlobalPos lv = arg2.getBrain().getOptionalMemory(this.memoryModule).get();
-        return Objects.equals(arg.method_27983(), lv.getDimension()) && lv.getPos().isWithinDistance(arg2.getPos(), 5.0);
+        return arg.method_27983() == lv.getDimension() && lv.getPos().isWithinDistance(arg2.getPos(), 5.0);
     }
 
     @Override

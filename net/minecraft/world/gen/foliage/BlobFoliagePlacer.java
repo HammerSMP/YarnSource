@@ -2,17 +2,21 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.google.common.collect.ImmutableMap$Builder
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.Products$P5
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  com.mojang.serialization.codecs.RecordCodecBuilder$Instance
+ *  com.mojang.serialization.codecs.RecordCodecBuilder$Mu
  */
 package net.minecraft.world.gen.foliage;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.Products;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.util.math.BlockPos;
@@ -23,10 +27,15 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class BlobFoliagePlacer
 extends FoliagePlacer {
+    public static final Codec<BlobFoliagePlacer> field_24927 = RecordCodecBuilder.create(instance -> BlobFoliagePlacer.method_28838(instance).apply((Applicative)instance, BlobFoliagePlacer::new));
     protected final int height;
 
+    protected static <P extends BlobFoliagePlacer> Products.P5<RecordCodecBuilder.Mu<P>, Integer, Integer, Integer, Integer, Integer> method_28838(RecordCodecBuilder.Instance<P> instance) {
+        return BlobFoliagePlacer.method_28846(instance).and((App)Codec.INT.fieldOf("height").forGetter(arg -> arg.height));
+    }
+
     protected BlobFoliagePlacer(int i, int j, int k, int l, int m, FoliagePlacerType<?> arg) {
-        super(i, j, k, l, arg);
+        super(i, j, k, l);
         this.height = m;
     }
 
@@ -34,8 +43,9 @@ extends FoliagePlacer {
         this(i, j, k, l, m, FoliagePlacerType.BLOB_FOLIAGE_PLACER);
     }
 
-    public <T> BlobFoliagePlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("radius").asInt(0), dynamic.get("radius_random").asInt(0), dynamic.get("offset").asInt(0), dynamic.get("offset_random").asInt(0), dynamic.get("height").asInt(0));
+    @Override
+    protected FoliagePlacerType<?> method_28843() {
+        return FoliagePlacerType.BLOB_FOLIAGE_PLACER;
     }
 
     @Override
@@ -54,13 +64,6 @@ extends FoliagePlacer {
     @Override
     protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
         return i == l && k == l && (random.nextInt(2) == 0 || j == 0);
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        ImmutableMap.Builder builder = ImmutableMap.builder();
-        builder.put(dynamicOps.createString("height"), dynamicOps.createInt(this.height));
-        return (T)dynamicOps.merge(super.serialize(dynamicOps), dynamicOps.createMap((Map)builder.build()));
     }
 }
 

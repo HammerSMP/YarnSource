@@ -10,9 +10,9 @@
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonParseException
  *  com.mojang.datafixers.DSL
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  *  org.apache.commons.lang3.StringUtils
  */
 package net.minecraft.datafixer.fix;
@@ -25,9 +25,9 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.mojang.datafixers.DSL;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import java.lang.reflect.Type;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.ChoiceFix;

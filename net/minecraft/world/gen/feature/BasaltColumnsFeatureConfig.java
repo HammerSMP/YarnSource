@@ -2,20 +2,22 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.feature;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class BasaltColumnsFeatureConfig
 implements FeatureConfig {
+    public static final Codec<BasaltColumnsFeatureConfig> field_24877 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("minimum_reach").forGetter(arg -> arg.minReach), (App)Codec.INT.fieldOf("maximum_reach").forGetter(arg -> arg.maxReach), (App)Codec.INT.fieldOf("minimum_height").forGetter(arg -> arg.minHeight), (App)Codec.INT.fieldOf("maximum_height").forGetter(arg -> arg.maxHeight)).apply((Applicative)instance, BasaltColumnsFeatureConfig::new));
     public final int minReach;
     public final int maxReach;
     public final int minHeight;
@@ -26,19 +28,6 @@ implements FeatureConfig {
         this.maxReach = j;
         this.minHeight = k;
         this.maxHeight = l;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("minimum_reach"), (Object)dynamicOps.createInt(this.minReach), (Object)dynamicOps.createString("maximum_reach"), (Object)dynamicOps.createInt(this.maxReach), (Object)dynamicOps.createString("minimum_height"), (Object)dynamicOps.createInt(this.minHeight), (Object)dynamicOps.createString("maximum_height"), (Object)dynamicOps.createInt(this.maxHeight))));
-    }
-
-    public static <T> BasaltColumnsFeatureConfig deserialize(Dynamic<T> dynamic) {
-        int i = dynamic.get("minimum_reach").asInt(0);
-        int j = dynamic.get("maximum_reach").asInt(0);
-        int k = dynamic.get("minimum_height").asInt(1);
-        int l = dynamic.get("maximum_height").asInt(1);
-        return new BasaltColumnsFeatureConfig(i, j, k, l);
     }
 
     public static class Builder {

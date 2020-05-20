@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5318;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -124,6 +125,11 @@ implements CommandSource {
         }
         Vec3d lv2 = lv.getPos();
         return Collections.singleton(new CommandSource.RelativePosition(ClientCommandSource.format(lv2.x), ClientCommandSource.format(lv2.y), ClientCommandSource.format(lv2.z)));
+    }
+
+    @Override
+    public class_5318 method_29038() {
+        return this.networkHandler.method_29091();
     }
 
     public void onCommandSuggestions(int i, Suggestions suggestions) {

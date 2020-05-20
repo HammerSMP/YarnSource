@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public abstract class BlockNameFix
 extends DataFix {
@@ -32,12 +33,12 @@ extends DataFix {
     public TypeRewriteRule makeRule() {
         Type type2;
         Type type = this.getInputSchema().getType(TypeReferences.BLOCK_NAME);
-        if (!Objects.equals((Object)type, (Object)(type2 = DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.namespacedString())))) {
+        if (!Objects.equals((Object)type, (Object)(type2 = DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), IdentifierNormalizingSchema.method_28295())))) {
             throw new IllegalStateException("block type is not what was expected.");
         }
         TypeRewriteRule typeRewriteRule = this.fixTypeEverywhere(this.name + " for block", type2, dynamicOps -> pair -> pair.mapSecond(this::rename));
         TypeRewriteRule typeRewriteRule2 = this.fixTypeEverywhereTyped(this.name + " for block_state", this.getInputSchema().getType(TypeReferences.BLOCK_STATE), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
-            Optional optional = dynamic.get("Name").asString();
+            Optional optional = dynamic.get("Name").asString().result();
             if (optional.isPresent()) {
                 return dynamic.set("Name", dynamic.createString(this.rename((String)optional.get())));
             }

@@ -4,21 +4,26 @@
  * Could not load the following classes:
  *  com.google.common.base.Objects
  *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Maps
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  *  org.apache.commons.lang3.tuple.Pair
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.entity;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -57,7 +62,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.brain.Brain;
-import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.DefaultAttributeRegistry;
@@ -94,6 +98,7 @@ import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
@@ -115,7 +120,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
-import net.minecraft.tag.Tag;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -131,6 +135,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Logger;
 
 public abstract class LivingEntity
 extends Entity {
@@ -227,15 +232,20 @@ extends Entity {
         this.randomLargeSeed = (float)Math.random() * 12398.0f;
         this.headYaw = this.yaw = (float)(Math.random() * 6.2831854820251465);
         this.stepHeight = 0.6f;
-        this.brain = this.deserializeBrain(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)new CompoundTag()));
+        NbtOps lv = NbtOps.INSTANCE;
+        this.brain = this.deserializeBrain(new Dynamic((DynamicOps)lv, lv.createMap((Map)ImmutableMap.of((Object)lv.createString("memories"), (Object)lv.emptyMap()))));
     }
 
     public Brain<?> getBrain() {
         return this.brain;
     }
 
+    protected Brain.class_5303<?> method_28306() {
+        return Brain.method_28311(ImmutableList.of(), ImmutableList.of());
+    }
+
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return new Brain((Collection<MemoryModuleType<?>>)ImmutableList.of(), ImmutableList.of(), dynamic);
+        return this.method_28306().method_28335(dynamic);
     }
 
     @Override
@@ -550,7 +560,8 @@ extends Entity {
             arg.putInt("SleepingY", arg2.getY());
             arg.putInt("SleepingZ", arg2.getZ());
         });
-        arg.put("Brain", this.brain.serialize(NbtOps.INSTANCE));
+        DataResult<Tag> dataResult = this.brain.method_28310(NbtOps.INSTANCE);
+        dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("Brain", (Tag)arg2));
     }
 
     @Override
@@ -1660,7 +1671,7 @@ extends Entity {
         this.setVelocity(this.getVelocity().add(0.0, -0.04f, 0.0));
     }
 
-    protected void swimUpward(Tag<Fluid> arg) {
+    protected void swimUpward(net.minecraft.tag.Tag<Fluid> arg) {
         this.setVelocity(this.getVelocity().add(0.0, 0.04f, 0.0));
     }
 

@@ -7,6 +7,7 @@
  */
 package net.minecraft.client.particle;
 
+import java.util.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.AscendingParticle;
@@ -37,7 +38,11 @@ extends AscendingParticle {
 
         @Override
         public Particle createParticle(DefaultParticleType arg, ClientWorld arg2, double d, double e, double f, double g, double h, double i) {
-            return new WhiteAshParticle(arg2, d, e, f, g, h, i, 1.0f, this.spriteProvider);
+            Random random = arg2.random;
+            double j = (double)random.nextFloat() * -1.9 * (double)random.nextFloat() * 0.1;
+            double k = (double)random.nextFloat() * -0.5 * (double)random.nextFloat() * 0.1 * 5.0;
+            double l = (double)random.nextFloat() * -1.9 * (double)random.nextFloat() * 0.1;
+            return new WhiteAshParticle(arg2, d, e, f, j, k, l, 1.0f, this.spriteProvider);
         }
     }
 }

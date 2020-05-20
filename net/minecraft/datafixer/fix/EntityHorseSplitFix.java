@@ -3,22 +3,21 @@
  * 
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.Objects;
-import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.EntityTransformFix;
 
@@ -57,7 +56,7 @@ extends EntityTransformFix {
             }
             dynamic.remove("Type");
             Type type = (Type)this.getOutputSchema().findChoiceType(TypeReferences.ENTITY).types().get(string6);
-            return Pair.of((Object)string6, ((Optional)type.readTyped(typed.write()).getSecond()).orElseThrow(() -> new IllegalStateException("Could not parse the new horse")));
+            return Pair.of((Object)string6, (Object)((Pair)typed.write().flatMap(((Type)type)::readTyped).result().orElseThrow(() -> new IllegalStateException("Could not parse the new horse"))).getFirst());
         }
         return Pair.of((Object)string, typed);
     }

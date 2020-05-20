@@ -18,6 +18,7 @@ import com.mojang.datafixers.types.Type;
 import java.util.Map;
 import java.util.Objects;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class BiomeRenameFix
 extends DataFix {
@@ -31,7 +32,7 @@ extends DataFix {
     }
 
     protected TypeRewriteRule makeRule() {
-        Type type = DSL.named((String)TypeReferences.BIOME.typeName(), (Type)DSL.namespacedString());
+        Type type = DSL.named((String)TypeReferences.BIOME.typeName(), IdentifierNormalizingSchema.method_28295());
         if (!Objects.equals((Object)type, (Object)this.getInputSchema().getType(TypeReferences.BIOME))) {
             throw new IllegalStateException("Biome type is not what was expected.");
         }

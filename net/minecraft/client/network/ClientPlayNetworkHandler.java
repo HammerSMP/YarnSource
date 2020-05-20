@@ -53,6 +53,8 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
+import net.minecraft.class_5318;
+import net.minecraft.class_5321;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -340,6 +342,7 @@ implements ClientPlayPacketListener {
     private CommandDispatcher<CommandSource> commandDispatcher = new CommandDispatcher();
     private final RecipeManager recipeManager = new RecipeManager();
     private final UUID sessionId = UUID.randomUUID();
+    private class_5318 field_25063 = class_5318.method_29117();
 
     public ClientPlayNetworkHandler(MinecraftClient arg, Screen arg2, ClientConnection arg3, GameProfile gameProfile) {
         this.client = arg;
@@ -364,7 +367,7 @@ implements ClientPlayPacketListener {
 
     @Override
     public void onGameJoin(GameJoinS2CPacket arg) {
-        ClientWorld.class_5271 lv;
+        ClientWorld.class_5271 lv2;
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         this.client.interactionManager = new ClientPlayerInteractionManager(this.client, this);
         if (!this.connection.isLocal()) {
@@ -373,11 +376,13 @@ implements ClientPlayPacketListener {
             FluidTags.markReady();
             EntityTypeTags.markReady();
         }
+        this.field_25063 = arg.getDimension();
+        DimensionType lv = this.field_25063.method_29116().get(arg.method_29176());
         this.chunkLoadDistance = arg.getChunkLoadDistance();
         boolean bl = arg.isDebugWorld();
         boolean bl2 = arg.isFlatWorld();
-        this.worldProperties = lv = new ClientWorld.class_5271(Difficulty.NORMAL, arg.isHardcore(), bl2);
-        this.world = new ClientWorld(this, lv, arg.getDimension(), this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSeed());
+        this.worldProperties = lv2 = new ClientWorld.class_5271(Difficulty.NORMAL, arg.isHardcore(), bl2);
+        this.world = new ClientWorld(this, lv2, lv, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSeed());
         this.client.joinWorld(this.world);
         if (this.client.player == null) {
             this.client.player = this.client.interactionManager.createPlayer(this.world, new StatHandler(), new ClientRecipeBook(this.world.getRecipeManager()));
@@ -393,7 +398,6 @@ implements ClientPlayPacketListener {
         this.client.player.input = new KeyboardInput(this.client.options);
         this.client.interactionManager.copyAbilities(this.client.player);
         this.client.cameraEntity = this.client.player;
-        this.client.player.dimension = arg.getDimension();
         this.client.openScreen(new DownloadingTerrainScreen());
         this.client.player.setEntityId(i);
         this.client.player.setReducedDebugInfo(arg.hasReducedDebugInfo());
@@ -828,7 +832,7 @@ implements ClientPlayPacketListener {
     @Override
     public void onGameMessage(GameMessageS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.inGameHud.addChatMessage(arg.getLocation(), arg.getMessage());
+        this.client.inGameHud.addChatMessage(arg.getLocation(), arg.getMessage(), arg.method_29175());
     }
 
     @Override
@@ -898,7 +902,7 @@ implements ClientPlayPacketListener {
     @Override
     public void onWorldTimeUpdate(WorldTimeUpdateS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.world.setTime(arg.getTime());
+        this.client.world.method_29089(arg.getTime());
         this.client.world.setTimeOfDay(arg.getTimeOfDay());
     }
 
@@ -982,41 +986,41 @@ implements ClientPlayPacketListener {
     @Override
     public void onPlayerRespawn(PlayerRespawnS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        DimensionType lv = arg.getDimension();
-        ClientPlayerEntity lv2 = this.client.player;
-        int i = lv2.getEntityId();
+        class_5321 lv = class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, arg.getDimension());
+        DimensionType lv2 = this.field_25063.method_29116().method_29107(lv);
+        ClientPlayerEntity lv3 = this.client.player;
+        int i = lv3.getEntityId();
         this.positionLookSetup = false;
-        if (lv != lv2.dimension) {
-            ClientWorld.class_5271 lv4;
-            Scoreboard lv3 = this.world.getScoreboard();
+        if (lv != lv3.world.method_27983()) {
+            ClientWorld.class_5271 lv5;
+            Scoreboard lv4 = this.world.getScoreboard();
             boolean bl = arg.isDebugWorld();
             boolean bl2 = arg.isFlatWorld();
-            this.worldProperties = lv4 = new ClientWorld.class_5271(this.worldProperties.getDifficulty(), this.worldProperties.isHardcore(), bl2);
-            this.world = new ClientWorld(this, lv4, arg.getDimension(), this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
-            this.world.setScoreboard(lv3);
+            this.worldProperties = lv5 = new ClientWorld.class_5271(this.worldProperties.getDifficulty(), this.worldProperties.isHardcore(), bl2);
+            this.world = new ClientWorld(this, lv5, lv2, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
+            this.world.setScoreboard(lv4);
             this.client.joinWorld(this.world);
             this.client.openScreen(new DownloadingTerrainScreen());
         }
         this.world.finishRemovingEntities();
-        String string = lv2.getServerBrand();
+        String string = lv3.getServerBrand();
         this.client.cameraEntity = null;
-        ClientPlayerEntity lv5 = this.client.interactionManager.createPlayer(this.world, lv2.getStatHandler(), lv2.getRecipeBook());
-        lv5.setEntityId(i);
-        lv5.dimension = lv;
-        this.client.player = lv5;
-        this.client.cameraEntity = lv5;
-        lv5.getDataTracker().writeUpdatedEntries(lv2.getDataTracker().getAllEntries());
+        ClientPlayerEntity lv6 = this.client.interactionManager.createPlayer(this.world, lv3.getStatHandler(), lv3.getRecipeBook());
+        lv6.setEntityId(i);
+        this.client.player = lv6;
+        this.client.cameraEntity = lv6;
+        lv6.getDataTracker().writeUpdatedEntries(lv3.getDataTracker().getAllEntries());
         if (arg.shouldKeepPlayerAttributes()) {
-            lv5.getAttributes().setFrom(lv2.getAttributes());
+            lv6.getAttributes().setFrom(lv3.getAttributes());
         }
-        lv5.afterSpawn();
-        lv5.setServerBrand(string);
-        this.world.addPlayer(i, lv5);
-        lv5.yaw = -180.0f;
-        lv5.input = new KeyboardInput(this.client.options);
-        this.client.interactionManager.copyAbilities(lv5);
-        lv5.setReducedDebugInfo(lv2.getReducedDebugInfo());
-        lv5.setShowsDeathScreen(lv2.showsDeathScreen());
+        lv6.afterSpawn();
+        lv6.setServerBrand(string);
+        this.world.addPlayer(i, lv6);
+        lv6.yaw = -180.0f;
+        lv6.input = new KeyboardInput(this.client.options);
+        this.client.interactionManager.copyAbilities(lv6);
+        lv6.setReducedDebugInfo(lv3.getReducedDebugInfo());
+        lv6.setShowsDeathScreen(lv3.showsDeathScreen());
         if (this.client.currentScreen instanceof DeathScreen) {
             this.client.openScreen(null);
         }
@@ -1709,7 +1713,7 @@ implements ClientPlayPacketListener {
                 }
                 this.client.debugRenderer.caveDebugRenderer.method_3704(lv5, list, list2);
             } else if (CustomPayloadS2CPacket.DEBUG_STRUCTURES.equals(lv)) {
-                DimensionType lv6 = DimensionType.byRawId(lv2.readInt());
+                DimensionType lv6 = this.field_25063.method_29116().get(lv2.readIdentifier());
                 BlockBox lv7 = new BlockBox(lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt());
                 int m = lv2.readInt();
                 ArrayList list3 = Lists.newArrayList();
@@ -2139,6 +2143,10 @@ implements ClientPlayPacketListener {
 
     public UUID getSessionId() {
         return this.sessionId;
+    }
+
+    public class_5318 method_29091() {
+        return this.field_25063;
     }
 }
 

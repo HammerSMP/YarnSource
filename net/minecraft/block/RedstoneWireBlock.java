@@ -29,14 +29,18 @@ import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -60,11 +64,13 @@ extends Block {
     private static final Map<Direction, VoxelShape> field_24415 = Maps.newEnumMap((Map)ImmutableMap.of((Object)Direction.NORTH, (Object)VoxelShapes.union(field_24414.get(Direction.NORTH), Block.createCuboidShape(3.0, 0.0, 0.0, 13.0, 16.0, 1.0)), (Object)Direction.SOUTH, (Object)VoxelShapes.union(field_24414.get(Direction.SOUTH), Block.createCuboidShape(3.0, 0.0, 15.0, 13.0, 16.0, 16.0)), (Object)Direction.EAST, (Object)VoxelShapes.union(field_24414.get(Direction.EAST), Block.createCuboidShape(15.0, 0.0, 3.0, 16.0, 16.0, 13.0)), (Object)Direction.WEST, (Object)VoxelShapes.union(field_24414.get(Direction.WEST), Block.createCuboidShape(0.0, 0.0, 3.0, 1.0, 16.0, 13.0))));
     private final Map<BlockState, VoxelShape> field_24416 = Maps.newHashMap();
     private static final Vector3f[] field_24466 = new Vector3f[16];
+    private final BlockState field_24733;
     private boolean wiresGivePower = true;
 
     public RedstoneWireBlock(AbstractBlock.Settings arg) {
         super(arg);
-        this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(WIRE_CONNECTION_NORTH, WireConnection.NONE)).with(WIRE_CONNECTION_EAST, WireConnection.NONE)).with(WIRE_CONNECTION_SOUTH, WireConnection.NONE)).with(WIRE_CONNECTION_WEST, WireConnection.NONE)).with(POWER, 0));
+        this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)).with(WIRE_CONNECTION_EAST, WireConnection.SIDE)).with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)).with(WIRE_CONNECTION_WEST, WireConnection.SIDE)).with(POWER, 0));
+        this.field_24733 = (BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(WIRE_CONNECTION_NORTH, WireConnection.NONE)).with(WIRE_CONNECTION_EAST, WireConnection.NONE)).with(WIRE_CONNECTION_SOUTH, WireConnection.NONE)).with(WIRE_CONNECTION_WEST, WireConnection.NONE);
         for (BlockState lv : this.getStateManager().getStates()) {
             if (lv.get(POWER) != 0) continue;
             this.field_24416.put(lv, this.method_27845(lv));
@@ -96,24 +102,28 @@ extends Block {
     }
 
     private BlockState method_27840(BlockView arg, BlockState arg2, BlockPos arg3) {
-        boolean bl6;
-        arg2 = this.method_27843(arg, (BlockState)this.getDefaultState().with(POWER, arg2.get(POWER)), arg3);
-        boolean bl = arg2.get(WIRE_CONNECTION_NORTH).isConnected();
-        boolean bl2 = arg2.get(WIRE_CONNECTION_SOUTH).isConnected();
-        boolean bl3 = arg2.get(WIRE_CONNECTION_EAST).isConnected();
-        boolean bl4 = arg2.get(WIRE_CONNECTION_WEST).isConnected();
-        boolean bl5 = !bl && !bl2;
-        boolean bl7 = bl6 = !bl3 && !bl4;
-        if (!bl4 && bl5) {
+        boolean bl7;
+        boolean bl = RedstoneWireBlock.method_28483(arg2);
+        arg2 = this.method_27843(arg, (BlockState)this.field_24733.with(POWER, arg2.get(POWER)), arg3);
+        boolean bl2 = arg2.get(WIRE_CONNECTION_NORTH).isConnected();
+        boolean bl3 = arg2.get(WIRE_CONNECTION_SOUTH).isConnected();
+        boolean bl4 = arg2.get(WIRE_CONNECTION_EAST).isConnected();
+        boolean bl5 = arg2.get(WIRE_CONNECTION_WEST).isConnected();
+        boolean bl6 = !bl2 && !bl3;
+        boolean bl8 = bl7 = !bl4 && !bl5;
+        if (bl && RedstoneWireBlock.method_28483(arg2)) {
+            return arg2;
+        }
+        if (!bl5 && bl6) {
             arg2 = (BlockState)arg2.with(WIRE_CONNECTION_WEST, WireConnection.SIDE);
         }
-        if (!bl3 && bl5) {
+        if (!bl4 && bl6) {
             arg2 = (BlockState)arg2.with(WIRE_CONNECTION_EAST, WireConnection.SIDE);
         }
-        if (!bl && bl6) {
+        if (!bl2 && bl7) {
             arg2 = (BlockState)arg2.with(WIRE_CONNECTION_NORTH, WireConnection.SIDE);
         }
-        if (!bl2 && bl6) {
+        if (!bl3 && bl7) {
             arg2 = (BlockState)arg2.with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE);
         }
         return arg2;
@@ -146,6 +156,10 @@ extends Block {
 
     private static boolean method_27846(BlockState arg) {
         return arg.get(WIRE_CONNECTION_NORTH).isConnected() && arg.get(WIRE_CONNECTION_SOUTH).isConnected() && arg.get(WIRE_CONNECTION_EAST).isConnected() && arg.get(WIRE_CONNECTION_WEST).isConnected();
+    }
+
+    private static boolean method_28483(BlockState arg) {
+        return !arg.get(WIRE_CONNECTION_NORTH).isConnected() && !arg.get(WIRE_CONNECTION_SOUTH).isConnected() && !arg.get(WIRE_CONNECTION_EAST).isConnected() && !arg.get(WIRE_CONNECTION_WEST).isConnected();
     }
 
     @Override
@@ -429,6 +443,28 @@ extends Block {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
         arg.add(WIRE_CONNECTION_NORTH, WIRE_CONNECTION_EAST, WIRE_CONNECTION_SOUTH, WIRE_CONNECTION_WEST, POWER);
+    }
+
+    @Override
+    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
+        if (RedstoneWireBlock.method_27846(arg) || RedstoneWireBlock.method_28483(arg)) {
+            BlockState lv = RedstoneWireBlock.method_27846(arg) ? this.field_24733 : this.getDefaultState();
+            lv = (BlockState)lv.with(POWER, arg.get(POWER));
+            if ((lv = this.method_27840(arg2, lv, arg3)) != arg) {
+                arg2.setBlockState(arg3, lv, 3);
+                this.method_28482(arg2, arg3, arg, lv);
+                return ActionResult.SUCCESS;
+            }
+        }
+        return ActionResult.PASS;
+    }
+
+    private void method_28482(World arg, BlockPos arg2, BlockState arg3, BlockState arg4) {
+        for (Direction lv : Direction.Type.HORIZONTAL) {
+            BlockPos lv2 = arg2.offset(lv);
+            if (((WireConnection)arg3.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(lv))).isConnected() == ((WireConnection)arg4.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(lv))).isConnected() || !arg.getBlockState(lv2).isSolidBlock(arg, lv2)) continue;
+            arg.updateNeighborsExcept(lv2, arg4.getBlock(), lv.getOpposite());
+        }
     }
 
     static {

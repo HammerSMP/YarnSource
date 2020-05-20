@@ -12,6 +12,7 @@ package net.minecraft.client.network;
 import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -86,7 +87,6 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.CommandBlockExecutor;
-import net.minecraft.world.dimension.DimensionType;
 
 @Environment(value=EnvType.CLIENT)
 public class ClientPlayerEntity
@@ -135,7 +135,6 @@ extends AbstractClientPlayerEntity {
         this.statHandler = arg4;
         this.recipeBook = arg5;
         this.client = arg;
-        this.dimension = DimensionType.OVERWORLD;
         this.tickables.add(new AmbientSoundPlayer(this, arg.getSoundManager()));
         this.tickables.add(new BubbleColumnSoundPlayer(this));
         this.tickables.add(new BiomeEffectSoundPlayer(this, arg.getSoundManager(), arg2.getBiomeAccess()));
@@ -473,7 +472,7 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void sendSystemMessage(Text arg) {
+    public void sendSystemMessage(Text arg, UUID uUID) {
         this.client.inGameHud.getChatHud().addMessage(arg);
     }
 

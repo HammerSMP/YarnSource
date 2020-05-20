@@ -5,29 +5,30 @@
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
  *  com.mojang.datafixers.DataFixUtils
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
  *  com.mojang.datafixers.util.Pair
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.DataFixUtils;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
 import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class ItemSpawnEggFix
 extends DataFix {
@@ -108,11 +109,12 @@ extends DataFix {
     public TypeRewriteRule makeRule() {
         Schema schema = this.getInputSchema();
         Type type = schema.getType(TypeReferences.ITEM_STACK);
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), (Type)DSL.namespacedString()));
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
         OpticFinder opticFinder2 = DSL.fieldFinder((String)"id", (Type)DSL.string());
         OpticFinder opticFinder3 = type.findField("tag");
         OpticFinder opticFinder4 = opticFinder3.type().findField("EntityTag");
         OpticFinder opticFinder5 = DSL.typeFinder((Type)schema.getTypeRaw(TypeReferences.ENTITY));
+        Type type2 = this.getOutputSchema().getTypeRaw(TypeReferences.ENTITY);
         return this.fixTypeEverywhereTyped("ItemSpawnEggFix", type, typed2 -> {
             Optional optional = typed2.getOptional(opticFinder);
             if (optional.isPresent() && Objects.equals(((Pair)optional.get()).getSecond(), "minecraft:spawn_egg")) {
@@ -128,8 +130,8 @@ extends DataFix {
                     Typed typed3 = typed2.getOrCreateTyped(opticFinder3);
                     Typed typed4 = typed3.getOrCreateTyped(opticFinder4);
                     Typed typed5 = typed4.getOrCreateTyped(opticFinder5);
-                    Dynamic dynamic2 = typed5.write().set("id", dynamic.createString(string));
-                    Typed typed6 = (Typed)((Optional)this.getOutputSchema().getTypeRaw(TypeReferences.ENTITY).readTyped(dynamic2).getSecond()).orElseThrow(() -> new IllegalStateException("Could not parse new entity"));
+                    Dynamic dynamic22 = dynamic;
+                    Typed typed6 = (Typed)((Pair)typed5.write().flatMap(dynamic2 -> type2.readTyped(dynamic2.set("id", dynamic22.createString(string)))).result().orElseThrow(() -> new IllegalStateException("Could not parse new entity"))).getFirst();
                     typed22 = typed22.set(opticFinder3, typed3.set(opticFinder4, typed4.set(opticFinder5, typed6)));
                 }
                 if (s != 0) {

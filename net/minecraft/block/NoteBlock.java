@@ -71,7 +71,7 @@ extends Block {
         if (arg2.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg = (BlockState)arg.cycle(NOTE);
+        arg = (BlockState)arg.method_28493(NOTE);
         arg2.setBlockState(arg3, arg, 3);
         this.playNote(arg2, arg3);
         arg4.incrementStat(Stats.TUNE_NOTEBLOCK);

@@ -211,11 +211,17 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                     }
                 } else if (this.level.isDifferentVersion()) {
                     DrawableHelper.drawTexture(arg, k, j, 32.0f, q, 32, 32, 256, 256);
-                    if (this.level.isLegacyCustomizedWorld()) {
+                    if (this.level.method_29020()) {
                         DrawableHelper.drawTexture(arg, k, j, 96.0f, q, 32, 32, 256, 256);
                         if (bl2) {
                             MutableText lv3 = new TranslatableText("selectWorld.tooltip.unsupported", this.level.getVersion()).formatted(Formatting.RED);
                             this.screen.setTooltip(this.client.textRenderer.wrapLines(lv3, 175));
+                        }
+                    } else if (this.level.isLegacyCustomizedWorld()) {
+                        DrawableHelper.drawTexture(arg, k, j, 96.0f, q, 32, 32, 256, 256);
+                        if (bl2) {
+                            MutableText lv4 = new TranslatableText("selectWorld.tooltip.experimental").formatted(Formatting.RED);
+                            this.screen.setTooltip(this.client.textRenderer.wrapLines(lv4, 175));
                         }
                     } else if (this.level.isFutureLevel()) {
                         DrawableHelper.drawTexture(arg, k, j, 96.0f, q, 32, 32, 256, 256);
@@ -257,12 +263,18 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             if (this.level.isLocked()) {
                 return;
             }
-            if (this.level.isOutdatedLevel() || this.level.isLegacyCustomizedWorld()) {
-                TranslatableText lv = new TranslatableText("selectWorld.backupQuestion");
-                TranslatableText lv2 = new TranslatableText("selectWorld.backupWarning", this.level.getVersion(), SharedConstants.getGameVersion().getName());
-                if (this.level.isLegacyCustomizedWorld()) {
-                    lv = new TranslatableText("selectWorld.backupQuestion.customized");
-                    lv2 = new TranslatableText("selectWorld.backupWarning.customized");
+            if (this.level.isOutdatedLevel() || this.level.method_29020() || this.level.isLegacyCustomizedWorld()) {
+                TranslatableText lv6;
+                TranslatableText lv5;
+                if (this.level.method_29020()) {
+                    TranslatableText lv = new TranslatableText("selectWorld.backupQuestion.customized");
+                    TranslatableText lv2 = new TranslatableText("selectWorld.backupWarning.customized");
+                } else if (this.level.isLegacyCustomizedWorld()) {
+                    TranslatableText lv3 = new TranslatableText("selectWorld.backupQuestion.experimental");
+                    TranslatableText lv4 = new TranslatableText("selectWorld.backupWarning.experimental");
+                } else {
+                    lv5 = new TranslatableText("selectWorld.backupQuestion");
+                    lv6 = new TranslatableText("selectWorld.backupWarning", this.level.getVersion(), SharedConstants.getGameVersion().getName());
                 }
                 this.client.openScreen(new BackupPromptScreen(this.screen, (bl, bl2) -> {
                     if (bl) {
@@ -276,7 +288,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                         }
                     }
                     this.start();
-                }, lv, lv2, false));
+                }, lv5, lv6, false));
             } else if (this.level.isFutureLevel()) {
                 this.client.openScreen(new ConfirmScreen(bl -> {
                     if (bl) {
@@ -346,7 +358,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                     class_5219 lv2 = lv.readLevelProperties();
                     if (lv2 != null) {
                         CreateWorldScreen lv3 = new CreateWorldScreen((Screen)this.screen, lv2);
-                        if (this.level.isLegacyCustomizedWorld()) {
+                        if (this.level.method_29020()) {
                             this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? lv3 : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
                         } else {
                             this.client.openScreen(lv3);

@@ -5,10 +5,10 @@
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DSL$TypeReference
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.serialization.Dynamic
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
@@ -16,10 +16,10 @@ package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import com.mojang.serialization.Dynamic;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,7 +48,7 @@ extends DataFix {
     }
 
     protected static Optional<Dynamic<?>> updateCompoundUuid(Dynamic<?> dynamic, String string, String string2) {
-        return dynamic.get(string).get().flatMap(AbstractUuidFix::createArrayFromCompoundUuid).map(dynamic2 -> dynamic.remove(string).set(string2, dynamic2));
+        return dynamic.get(string).result().flatMap(AbstractUuidFix::createArrayFromCompoundUuid).map(dynamic2 -> dynamic.remove(string).set(string2, dynamic2));
     }
 
     protected static Optional<Dynamic<?>> updateRegularMostLeast(Dynamic<?> dynamic, String string, String string2) {
@@ -58,7 +58,7 @@ extends DataFix {
     }
 
     protected static Optional<Dynamic<?>> createArrayFromStringUuid(Dynamic<?> dynamic, String string) {
-        return dynamic.get(string).get().flatMap(dynamic2 -> {
+        return dynamic.get(string).result().flatMap(dynamic2 -> {
             String string = dynamic2.asString(null);
             if (string != null) {
                 try {

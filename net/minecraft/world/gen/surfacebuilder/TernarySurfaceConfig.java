@@ -2,17 +2,23 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.surfacebuilder;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.world.gen.surfacebuilder.SurfaceConfig;
 
 public class TernarySurfaceConfig
 implements SurfaceConfig {
+    public static final Codec<TernarySurfaceConfig> field_25017 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("top_material").forGetter(arg -> arg.topMaterial), (App)BlockState.field_24734.fieldOf("under_material").forGetter(arg -> arg.underMaterial), (App)BlockState.field_24734.fieldOf("underwater_material").forGetter(arg -> arg.underwaterMaterial)).apply((Applicative)instance, TernarySurfaceConfig::new));
     private final BlockState topMaterial;
     private final BlockState underMaterial;
     private final BlockState underwaterMaterial;
@@ -35,13 +41,6 @@ implements SurfaceConfig {
 
     public BlockState getUnderwaterMaterial() {
         return this.underwaterMaterial;
-    }
-
-    public static TernarySurfaceConfig deserialize(Dynamic<?> dynamic) {
-        BlockState lv = dynamic.get("top_material").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        BlockState lv2 = dynamic.get("under_material").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        BlockState lv3 = dynamic.get("underwater_material").map(BlockState::deserialize).orElse(Blocks.AIR.getDefaultState());
-        return new TernarySurfaceConfig(lv, lv2, lv3);
     }
 }
 

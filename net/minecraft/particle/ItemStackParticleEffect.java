@@ -4,6 +4,7 @@
  * Could not load the following classes:
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
+ *  com.mojang.serialization.Codec
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
@@ -11,6 +12,7 @@ package net.minecraft.particle;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.command.arguments.ItemStackArgument;
@@ -50,6 +52,10 @@ implements ParticleEffect {
     };
     private final ParticleType<ItemStackParticleEffect> type;
     private final ItemStack stack;
+
+    public static Codec<ItemStackParticleEffect> method_29136(ParticleType<ItemStackParticleEffect> arg3) {
+        return ItemStack.field_24671.xmap(arg2 -> new ItemStackParticleEffect(arg3, (ItemStack)arg2), arg -> arg.stack);
+    }
 
     public ItemStackParticleEffect(ParticleType<ItemStackParticleEffect> arg, ItemStack arg2) {
         this.type = arg;

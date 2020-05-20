@@ -10,11 +10,12 @@ package net.minecraft.network.packet.s2c.play;
 import java.io.IOException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5318;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.dimension.DimensionType;
 
 public class GameJoinS2CPacket
 implements Packet<ClientPlayPacketListener> {
@@ -22,7 +23,8 @@ implements Packet<ClientPlayPacketListener> {
     private long seed;
     private boolean hardcore;
     private GameMode gameMode;
-    private DimensionType dimension;
+    private class_5318.class_5319 dimension;
+    private Identifier field_25134;
     private int maxPlayers;
     private int chunkLoadDistance;
     private boolean reducedDebugInfo;
@@ -33,9 +35,10 @@ implements Packet<ClientPlayPacketListener> {
     public GameJoinS2CPacket() {
     }
 
-    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, DimensionType arg2, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
+    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, class_5318.class_5319 arg2, Identifier arg3, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
         this.playerEntityId = i;
         this.dimension = arg2;
+        this.field_25134 = arg3;
         this.seed = l;
         this.gameMode = arg;
         this.maxPlayers = j;
@@ -53,7 +56,8 @@ implements Packet<ClientPlayPacketListener> {
         int i = arg.readUnsignedByte();
         this.hardcore = (i & 8) == 8;
         this.gameMode = GameMode.byId(i &= 0xFFFFFFF7);
-        this.dimension = DimensionType.byRawId(arg.readInt());
+        this.dimension = arg.method_29171(class_5318.class_5319.field_25119);
+        this.field_25134 = arg.readIdentifier();
         this.seed = arg.readLong();
         this.maxPlayers = arg.readUnsignedByte();
         this.chunkLoadDistance = arg.readVarInt();
@@ -71,7 +75,8 @@ implements Packet<ClientPlayPacketListener> {
             i |= 8;
         }
         arg.writeByte(i);
-        arg.writeInt(this.dimension.getRawId());
+        arg.method_29172(class_5318.class_5319.field_25119, this.dimension);
+        arg.writeIdentifier(this.field_25134);
         arg.writeLong(this.seed);
         arg.writeByte(this.maxPlayers);
         arg.writeVarInt(this.chunkLoadDistance);
@@ -107,8 +112,13 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public DimensionType getDimension() {
+    public class_5318 getDimension() {
         return this.dimension;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public Identifier method_29176() {
+        return this.field_25134;
     }
 
     @Environment(value=EnvType.CLIENT)

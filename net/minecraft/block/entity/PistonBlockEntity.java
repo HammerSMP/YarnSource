@@ -275,7 +275,7 @@ implements Tickable {
                     this.world.setBlockState(this.pos, this.pushedBlock, 84);
                     Block.replaceBlock(this.pushedBlock, lv, this.world, this.pos, 3);
                 } else {
-                    if (lv.contains(Properties.WATERLOGGED) && lv.get(Properties.WATERLOGGED).booleanValue()) {
+                    if (lv.method_28498(Properties.WATERLOGGED) && lv.get(Properties.WATERLOGGED).booleanValue()) {
                         lv = (BlockState)lv.with(Properties.WATERLOGGED, false);
                     }
                     this.world.setBlockState(this.pos, lv, 67);

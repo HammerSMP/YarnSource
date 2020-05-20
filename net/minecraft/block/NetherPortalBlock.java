@@ -66,7 +66,7 @@ extends Block {
 
     @Override
     public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.getDimension().hasVisibleSky() && arg2.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING) && random.nextInt(2000) < arg2.getDifficulty().getId()) {
+        if (arg2.getDimension().method_28537() && arg2.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING) && random.nextInt(2000) < arg2.getDifficulty().getId()) {
             ZombifiedPiglinEntity lv;
             while (arg2.getBlockState(arg3).isOf(this)) {
                 arg3 = arg3.down();

@@ -3,8 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.AbstractIterator
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  *  javax.annotation.concurrent.Immutable
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -12,18 +11,16 @@
 package net.minecraft.util.math;
 
 import com.google.common.collect.AbstractIterator;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Spliterator;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.concurrent.Immutable;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.dynamic.DynamicSerializable;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisCycleDirection;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.Direction;
@@ -36,8 +33,8 @@ import org.apache.logging.log4j.Logger;
 
 @Immutable
 public class BlockPos
-extends Vec3i
-implements DynamicSerializable {
+extends Vec3i {
+    public static final Codec<BlockPos> field_25064 = Codec.INT_STREAM.comapFlatMap(intStream -> Util.method_29190(intStream, 3).map(is -> new BlockPos(is[0], is[1], is[2])), arg -> IntStream.of(arg.getX(), arg.getY(), arg.getZ())).stable();
     private static final Logger LOGGER = LogManager.getLogger();
     public static final BlockPos ORIGIN = new BlockPos(0, 0, 0);
     private static final int SIZE_BITS_X;
@@ -67,24 +64,6 @@ implements DynamicSerializable {
 
     public BlockPos(Vec3i arg) {
         this(arg.getX(), arg.getY(), arg.getZ());
-    }
-
-    public static <T> BlockPos deserialize(Dynamic<T> dynamic) {
-        int[] is;
-        Spliterator.OfInt ofInt = dynamic.asIntStream().spliterator();
-        if (ofInt.tryAdvance(arg_0 -> BlockPos.method_19441(is = new int[3], arg_0)) && ofInt.tryAdvance(i -> {
-            is[1] = i;
-        })) {
-            ofInt.tryAdvance(i -> {
-                is[2] = i;
-            });
-        }
-        return new BlockPos(is[0], is[1], is[2]);
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        return (T)dynamicOps.createIntList(IntStream.of(this.getX(), this.getY(), this.getZ()));
     }
 
     public static long offset(long l, Direction arg) {
@@ -384,10 +363,6 @@ implements DynamicSerializable {
     @Override
     public /* synthetic */ Vec3i down() {
         return this.down();
-    }
-
-    private static /* synthetic */ void method_19441(int[] is, int i) {
-        is[0] = i;
     }
 
     static {

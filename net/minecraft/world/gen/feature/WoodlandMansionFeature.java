@@ -3,16 +3,15 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 import net.minecraft.block.Blocks;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructurePiece;
@@ -25,33 +24,17 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class WoodlandMansionFeature
 extends StructureFeature<DefaultFeatureConfig> {
-    public WoodlandMansionFeature(Function<Dynamic<?>, ? extends DefaultFeatureConfig> function) {
-        super(function);
-    }
-
-    @Override
-    protected int getSpacing(ChunkGeneratorConfig arg) {
-        return arg.getMansionSpacing();
-    }
-
-    @Override
-    protected int getSeparation(ChunkGeneratorConfig arg) {
-        return arg.getMansionSeparation();
-    }
-
-    @Override
-    protected int getSeedModifier(ChunkGeneratorConfig arg) {
-        return 10387319;
+    public WoodlandMansionFeature(Codec<DefaultFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override
@@ -60,38 +43,28 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
-        Set<Biome> set = arg2.getBiomeSource().getBiomesInArea(i * 16 + 9, arg2.getSeaLevel(), j * 16 + 9, 32);
+    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
+        Set<Biome> set = arg2.getBiomesInArea(i * 16 + 9, arg.getSeaLevel(), j * 16 + 9, 32);
         for (Biome lv : set) {
-            if (arg2.hasStructure(lv, this)) continue;
+            if (lv.hasStructureFeature(this)) continue;
             return false;
         }
         return true;
     }
 
     @Override
-    public StructureFeature.StructureStartFactory getStructureStartFactory() {
+    public StructureFeature.StructureStartFactory<DefaultFeatureConfig> getStructureStartFactory() {
         return Start::new;
     }
 
-    @Override
-    public String getName() {
-        return "Mansion";
-    }
-
-    @Override
-    public int getRadius() {
-        return 8;
-    }
-
     public static class Start
-    extends StructureStart {
-        public Start(StructureFeature<?> arg, int i, int j, BlockBox arg2, int k, long l) {
+    extends StructureStart<DefaultFeatureConfig> {
+        public Start(StructureFeature<DefaultFeatureConfig> arg, int i, int j, BlockBox arg2, int k, long l) {
             super(arg, i, j, arg2, k, l);
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
             BlockRotation lv = BlockRotation.random(this.random);
             int k = 5;
             int l = 5;

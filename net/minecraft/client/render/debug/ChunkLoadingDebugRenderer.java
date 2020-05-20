@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5321;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.debug.DebugRenderer;
@@ -85,41 +86,36 @@ implements DebugRenderer.Renderer {
         private final CompletableFuture<Map<ChunkPos, String>> serverStates;
 
         private ChunkLoadingStatus(IntegratedServer arg2, double d, double e) {
-            ServerWorld lv4;
             ClientWorld lv = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world;
-            DimensionType lv2 = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world.method_27983();
-            if (arg2.getWorld(lv2) != null) {
-                ServerWorld lv3 = arg2.getWorld(lv2);
-            } else {
-                lv4 = null;
-            }
+            class_5321<DimensionType> lv2 = lv.method_27983();
             int i = (int)d >> 4;
             int j = (int)e >> 4;
             ImmutableMap.Builder builder = ImmutableMap.builder();
-            ClientChunkManager lv5 = lv.getChunkManager();
+            ClientChunkManager lv3 = lv.getChunkManager();
             for (int k = i - 12; k <= i + 12; ++k) {
                 for (int l = j - 12; l <= j + 12; ++l) {
-                    ChunkPos lv6 = new ChunkPos(k, l);
+                    ChunkPos lv4 = new ChunkPos(k, l);
                     String string = "";
-                    WorldChunk lv7 = lv5.getWorldChunk(k, l, false);
+                    WorldChunk lv5 = lv3.getWorldChunk(k, l, false);
                     string = string + "Client: ";
-                    if (lv7 == null) {
+                    if (lv5 == null) {
                         string = string + "0n/a\n";
                     } else {
-                        string = string + (lv7.isEmpty() ? " E" : "");
+                        string = string + (lv5.isEmpty() ? " E" : "");
                         string = string + "\n";
                     }
-                    builder.put((Object)lv6, (Object)string);
+                    builder.put((Object)lv4, (Object)string);
                 }
             }
             this.clientStates = builder.build();
             this.serverStates = arg2.submit(() -> {
+                ServerWorld lv = arg2.getWorld(lv2);
                 ImmutableMap.Builder builder = ImmutableMap.builder();
-                ServerChunkManager lv = lv4.getChunkManager();
+                ServerChunkManager lv2 = lv.getChunkManager();
                 for (int k = i - 12; k <= i + 12; ++k) {
                     for (int l = j - 12; l <= j + 12; ++l) {
-                        ChunkPos lv2 = new ChunkPos(k, l);
-                        builder.put((Object)lv2, (Object)("Server: " + lv.method_23273(lv2)));
+                        ChunkPos lv3 = new ChunkPos(k, l);
+                        builder.put((Object)lv3, (Object)("Server: " + lv2.method_23273(lv3)));
                     }
                 }
                 return builder.build();

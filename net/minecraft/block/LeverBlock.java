@@ -87,7 +87,7 @@ extends WallMountedBlock {
     @Override
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         if (arg2.isClient) {
-            BlockState lv = (BlockState)arg.cycle(POWERED);
+            BlockState lv = (BlockState)arg.method_28493(POWERED);
             if (lv.get(POWERED).booleanValue()) {
                 LeverBlock.spawnParticles(lv, arg2, arg3, 1.0f);
             }
@@ -100,7 +100,7 @@ extends WallMountedBlock {
     }
 
     public BlockState method_21846(BlockState arg, World arg2, BlockPos arg3) {
-        arg = (BlockState)arg.cycle(POWERED);
+        arg = (BlockState)arg.method_28493(POWERED);
         arg2.setBlockState(arg3, arg, 3);
         this.updateNeighbors(arg, arg2, arg3);
         return arg;

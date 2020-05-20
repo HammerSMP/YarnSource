@@ -4,10 +4,12 @@
 package net.minecraft.item;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -33,8 +35,9 @@ extends Item {
                     arg3.stopRiding();
                 }
                 if (!arg3.teleport(g, h, j, true)) continue;
-                arg2.playSound(null, d, e, f, SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-                arg3.playSound(SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT, 1.0f, 1.0f);
+                SoundEvent lv2 = arg3 instanceof FoxEntity ? SoundEvents.ENTITY_FOX_TELEPORT : SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT;
+                arg2.playSound(null, d, e, f, lv2, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                arg3.playSound(lv2, 1.0f, 1.0f);
                 break;
             }
             if (arg3 instanceof PlayerEntity) {

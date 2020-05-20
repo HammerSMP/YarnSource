@@ -24,17 +24,18 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.world.gen.feature.MineshaftFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
-public abstract class StructureStart {
-    public static final StructureStart DEFAULT = new StructureStart((StructureFeature)Feature.MINESHAFT, 0, 0, BlockBox.empty(), 0, 0L){
+public abstract class StructureStart<C extends FeatureConfig> {
+    public static final StructureStart<?> DEFAULT = new StructureStart<MineshaftFeatureConfig>(StructureFeature.MINESHAFT, 0, 0, BlockBox.empty(), 0, 0L){
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, MineshaftFeatureConfig arg4) {
         }
     };
-    private final StructureFeature<?> feature;
+    private final StructureFeature<C> feature;
     protected final List<StructurePiece> children = Lists.newArrayList();
     protected BlockBox boundingBox;
     private final int chunkX;
@@ -42,7 +43,7 @@ public abstract class StructureStart {
     private int references;
     protected final ChunkRandom random;
 
-    public StructureStart(StructureFeature<?> arg, int i, int j, BlockBox arg2, int k, long l) {
+    public StructureStart(StructureFeature<C> arg, int i, int j, BlockBox arg2, int k, long l) {
         this.feature = arg;
         this.chunkX = i;
         this.chunkZ = j;
@@ -52,7 +53,7 @@ public abstract class StructureStart {
         this.boundingBox = arg2;
     }
 
-    public abstract void init(ChunkGenerator var1, StructureManager var2, int var3, int var4, Biome var5);
+    public abstract void init(ChunkGenerator var1, StructureManager var2, int var3, int var4, Biome var5, C var6);
 
     public BlockBox getBoundingBox() {
         return this.boundingBox;

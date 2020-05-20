@@ -172,7 +172,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         this.chunkTaskPrioritySystem = new ChunkTaskPrioritySystem((List<MessageListener<?>>)ImmutableList.of(lv, lv2, lv3), executor, Integer.MAX_VALUE);
         this.worldgenExecutor = this.chunkTaskPrioritySystem.createExecutor(lv, false);
         this.mainExecutor = this.chunkTaskPrioritySystem.createExecutor(lv2, false);
-        this.serverLightingProvider = new ServerLightingProvider(arg5, this, this.world.method_27983().hasSkyLight(), lv3, this.chunkTaskPrioritySystem.createExecutor(lv3, false));
+        this.serverLightingProvider = new ServerLightingProvider(arg5, this, this.world.getDimension().hasSkyLight(), lv3, this.chunkTaskPrioritySystem.createExecutor(lv3, false));
         this.ticketManager = new TicketManager(executor, arg4);
         this.persistentStateManagerFactory = supplier;
         this.pointOfInterestStorage = new PointOfInterestStorage(new File(this.saveDir, "poi"), dataFixer, bl);
@@ -750,7 +750,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         if (lv == null) {
             return null;
         }
-        return this.updateChunkTag(this.world.method_27983(), this.persistentStateManagerFactory, lv);
+        return this.updateChunkTag(this.world.getDimension(), this.persistentStateManagerFactory, lv);
     }
 
     boolean isTooFarFromPlayersToSpawnMobs(ChunkPos arg) {

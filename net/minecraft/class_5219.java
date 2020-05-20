@@ -19,19 +19,9 @@ import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.LevelInfo;
 
 public interface class_5219 {
-    @Environment(value=EnvType.CLIENT)
-    public int getVersionId();
-
-    @Environment(value=EnvType.CLIENT)
-    public boolean isVersionSnapshot();
-
-    @Environment(value=EnvType.CLIENT)
-    public String getVersionName();
-
     public Set<String> getDisabledDataPacks();
 
     public Set<String> getEnabledDataPacks();
@@ -85,9 +75,6 @@ public interface class_5219 {
 
     public void setGameMode(GameMode var1);
 
-    @Environment(value=EnvType.CLIENT)
-    public long getLastPlayed();
-
     public boolean areCommandsAllowed();
 
     public Difficulty getDifficulty();
@@ -102,9 +89,9 @@ public interface class_5219 {
 
     public CompoundTag getPlayerData();
 
-    public CompoundTag getWorldData(DimensionType var1);
+    public CompoundTag method_29036();
 
-    public void setWorldData(DimensionType var1, CompoundTag var2);
+    public void method_29037(CompoundTag var1);
 
     public class_5285 method_28057();
 }

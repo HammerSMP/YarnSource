@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
@@ -44,7 +43,7 @@ extends Task<LivingEntity> {
         }
         Brain<?> lv = arg2.getBrain();
         GlobalPos lv2 = lv.getOptionalMemory(MemoryModuleType.HOME).get();
-        if (!Objects.equals(arg.method_27983(), lv2.getDimension())) {
+        if (arg.method_27983() != lv2.getDimension()) {
             return false;
         }
         Optional<Timestamp> optional = lv.getOptionalMemory(MemoryModuleType.LAST_WOKEN);

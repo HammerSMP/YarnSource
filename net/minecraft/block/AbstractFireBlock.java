@@ -32,7 +32,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public abstract class AbstractFireBlock
 extends Block {
@@ -148,7 +147,7 @@ extends Block {
         if (arg4.isOf(arg.getBlock())) {
             return;
         }
-        if ((arg2.method_27983() == DimensionType.OVERWORLD || arg2.method_27983() == DimensionType.THE_NETHER) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
+        if ((arg2.getDimension().method_28541() || arg2.getDimension().method_28542()) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
             return;
         }
         if (!arg.canPlaceAt(arg2, arg3)) {

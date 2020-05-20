@@ -223,21 +223,21 @@ extends AnimalEntity {
         @Override
         protected void attack(LivingEntity arg, double d) {
             double e = this.getSquaredMaxAttackDistance(arg);
-            if (d <= e && this.ticksUntilAttack <= 0) {
-                this.ticksUntilAttack = 20;
+            if (d <= e && this.method_28347()) {
+                this.method_28346();
                 this.mob.tryAttack(arg);
                 PolarBearEntity.this.setWarning(false);
             } else if (d <= e * 2.0) {
-                if (this.ticksUntilAttack <= 0) {
+                if (this.method_28347()) {
                     PolarBearEntity.this.setWarning(false);
-                    this.ticksUntilAttack = 20;
+                    this.method_28346();
                 }
-                if (this.ticksUntilAttack <= 10) {
+                if (this.method_28348() <= 10) {
                     PolarBearEntity.this.setWarning(true);
                     PolarBearEntity.this.playWarningSound();
                 }
             } else {
-                this.ticksUntilAttack = 20;
+                this.method_28346();
                 PolarBearEntity.this.setWarning(false);
             }
         }

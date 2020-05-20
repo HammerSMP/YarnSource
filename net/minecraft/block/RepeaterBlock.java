@@ -45,7 +45,7 @@ extends AbstractRedstoneGateBlock {
         if (!arg4.abilities.allowModifyWorld) {
             return ActionResult.PASS;
         }
-        arg2.setBlockState(arg3, (BlockState)arg.cycle(DELAY), 3);
+        arg2.setBlockState(arg3, (BlockState)arg.method_28493(DELAY), 3);
         return ActionResult.SUCCESS;
     }
 

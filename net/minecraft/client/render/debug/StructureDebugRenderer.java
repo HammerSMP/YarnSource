@@ -42,7 +42,7 @@ implements DebugRenderer.Renderer {
     public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
         Camera lv = this.field_4624.gameRenderer.getCamera();
         ClientWorld lv2 = this.field_4624.world;
-        DimensionType lv3 = lv2.method_27983();
+        DimensionType lv3 = lv2.getDimension();
         BlockPos lv4 = new BlockPos(lv.getPos().x, 0.0, lv.getPos().z);
         VertexConsumer lv5 = arg2.getBuffer(RenderLayer.getLines());
         if (this.field_4626.containsKey(lv3)) {

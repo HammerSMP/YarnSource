@@ -15,9 +15,11 @@ import com.mojang.datafixers.DataFixer;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.class_5219;
+import net.minecraft.class_5321;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -33,10 +35,10 @@ import net.minecraft.world.updater.WorldUpdater;
 @Environment(value=EnvType.CLIENT)
 public class OptimizeWorldScreen
 extends Screen {
-    private static final Object2IntMap<DimensionType> DIMENSION_COLORS = (Object2IntMap)Util.make(new Object2IntOpenCustomHashMap(Util.identityHashStrategy()), object2IntOpenCustomHashMap -> {
-        object2IntOpenCustomHashMap.put((Object)DimensionType.OVERWORLD, -13408734);
-        object2IntOpenCustomHashMap.put((Object)DimensionType.THE_NETHER, -10075085);
-        object2IntOpenCustomHashMap.put((Object)DimensionType.THE_END, -8943531);
+    private static final Object2IntMap<class_5321<DimensionType>> DIMENSION_COLORS = (Object2IntMap)Util.make(new Object2IntOpenCustomHashMap(Util.identityHashStrategy()), object2IntOpenCustomHashMap -> {
+        object2IntOpenCustomHashMap.put(DimensionType.field_24753, -13408734);
+        object2IntOpenCustomHashMap.put(DimensionType.field_24754, -10075085);
+        object2IntOpenCustomHashMap.put(DimensionType.field_24755, -8943531);
         object2IntOpenCustomHashMap.defaultReturnValue(-2236963);
     });
     private final BooleanConsumer callback;
@@ -97,9 +99,9 @@ extends Screen {
             this.textRenderer.getClass();
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.total", this.updater.getTotalChunkCount()), k, 40 + (9 + 3) * 2, 0xA0A0A0);
             int o = 0;
-            for (DimensionType lv : DimensionType.getAll()) {
-                int p = MathHelper.floor(this.updater.getProgress(lv) * (float)(l - k));
-                OptimizeWorldScreen.fill(arg, k + o, m, k + o + p, n, DIMENSION_COLORS.getInt((Object)lv));
+            for (Map.Entry entry : this.updater.method_28304().entrySet()) {
+                int p = MathHelper.floor(this.updater.getProgress((DimensionType)entry.getValue()) * (float)(l - k));
+                OptimizeWorldScreen.fill(arg, k + o, m, k + o + p, n, DIMENSION_COLORS.getInt(entry.getKey()));
                 o += p;
             }
             int q = this.updater.getUpgradedChunkCount() + this.updater.getSkippedChunkCount();

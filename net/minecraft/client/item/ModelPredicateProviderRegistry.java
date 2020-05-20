@@ -15,6 +15,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5321;
 import net.minecraft.client.item.ModelPredicateProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -112,7 +113,7 @@ public class ModelPredicateProviderRegistry {
                 if (arg2 == null) {
                     return 0.0f;
                 }
-                if (arg2.getDimension().hasVisibleSky()) {
+                if (arg2.getDimension().method_28537()) {
                     double d = arg2.getSkyAngle(1.0f);
                 } else {
                     e = Math.random();
@@ -183,16 +184,16 @@ public class ModelPredicateProviderRegistry {
 
             @Nullable
             private BlockPos getSpawnPos(ClientWorld arg) {
-                return arg.getDimension().hasVisibleSky() ? arg.getSpawnPos() : null;
+                return arg.getDimension().method_28537() ? arg.getSpawnPos() : null;
             }
 
             @Nullable
             private BlockPos getLodestonePos(World arg, CompoundTag arg2) {
-                Optional<DimensionType> optional;
+                Optional<class_5321<DimensionType>> optional;
                 boolean bl = arg2.contains("LodestonePos");
                 boolean bl2 = arg2.contains("LodestoneDimension");
-                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.method_27983().equals(optional.get())) {
-                    return NbtHelper.toBlockPos((CompoundTag)arg2.get("LodestonePos"));
+                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.method_27983() == optional.get()) {
+                    return NbtHelper.toBlockPos(arg2.getCompound("LodestonePos"));
                 }
                 return null;
             }

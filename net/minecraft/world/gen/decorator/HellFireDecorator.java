@@ -3,15 +3,14 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.decorator;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.decorator.CountDecoratorConfig;
@@ -19,8 +18,8 @@ import net.minecraft.world.gen.decorator.SimpleDecorator;
 
 public class HellFireDecorator
 extends SimpleDecorator<CountDecoratorConfig> {
-    public HellFireDecorator(Function<Dynamic<?>, ? extends CountDecoratorConfig> function) {
-        super(function);
+    public HellFireDecorator(Codec<CountDecoratorConfig> codec) {
+        super(codec);
     }
 
     @Override

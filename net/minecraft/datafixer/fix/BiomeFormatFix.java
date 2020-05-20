@@ -32,7 +32,7 @@ extends DataFix {
         Type type = this.getInputSchema().getType(TypeReferences.CHUNK);
         OpticFinder opticFinder = type.findField("Level");
         return this.fixTypeEverywhereTyped("Leaves fix", type, typed2 -> typed2.updateTyped(opticFinder, typed -> typed.update(DSL.remainderFinder(), dynamic -> {
-            Optional optional = dynamic.get("Biomes").asIntStreamOpt();
+            Optional optional = dynamic.get("Biomes").asIntStreamOpt().result();
             if (!optional.isPresent()) {
                 return dynamic;
             }

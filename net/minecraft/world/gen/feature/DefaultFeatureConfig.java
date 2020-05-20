@@ -2,24 +2,16 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DefaultFeatureConfig
 implements FeatureConfig {
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.emptyMap());
-    }
-
-    public static <T> DefaultFeatureConfig deserialize(Dynamic<T> dynamic) {
-        return DEFAULT;
-    }
+    public static final Codec<DefaultFeatureConfig> field_24893 = Codec.unit(() -> field_24894);
+    public static final DefaultFeatureConfig field_24894 = new DefaultFeatureConfig();
 }
 

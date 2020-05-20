@@ -54,7 +54,7 @@ extends BlockWithEntity {
     }
 
     public static void updateState(BlockState arg, World arg2, BlockPos arg3) {
-        if (!arg2.method_27983().hasSkyLight()) {
+        if (!arg2.getDimension().hasSkyLight()) {
             return;
         }
         int i = arg2.getLightLevel(LightType.SKY, arg3) - arg2.getAmbientDarkness();
@@ -79,7 +79,7 @@ extends BlockWithEntity {
             if (arg2.isClient) {
                 return ActionResult.SUCCESS;
             }
-            BlockState lv = (BlockState)arg.cycle(INVERTED);
+            BlockState lv = (BlockState)arg.method_28493(INVERTED);
             arg2.setBlockState(arg3, lv, 4);
             DaylightDetectorBlock.updateState(lv, arg2, arg3);
             return ActionResult.SUCCESS;

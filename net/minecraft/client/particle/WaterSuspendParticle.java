@@ -7,6 +7,7 @@
  */
 package net.minecraft.client.particle;
 
+import java.util.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.Particle;
@@ -66,7 +67,8 @@ extends SpriteBillboardParticle {
 
         @Override
         public Particle createParticle(DefaultParticleType arg, ClientWorld arg2, double d, double e, double f, double g, double h, double i) {
-            WaterSuspendParticle lv = new WaterSuspendParticle(arg2, d, e, f, g, h, i);
+            double j = (double)arg2.random.nextFloat() * -1.9 * (double)arg2.random.nextFloat() * 0.1;
+            WaterSuspendParticle lv = new WaterSuspendParticle(arg2, d, e, f, 0.0, j, 0.0);
             lv.setSprite(this.spriteProvider);
             lv.setColor(0.1f, 0.1f, 0.3f);
             lv.setBoundingBoxSpacing(0.001f, 0.001f);
@@ -85,7 +87,11 @@ extends SpriteBillboardParticle {
 
         @Override
         public Particle createParticle(DefaultParticleType arg, ClientWorld arg2, double d, double e, double f, double g, double h, double i) {
-            WaterSuspendParticle lv = new WaterSuspendParticle(arg2, d, e, f, g, h, i);
+            Random random = arg2.random;
+            double j = random.nextGaussian() * (double)1.0E-6f;
+            double k = random.nextGaussian() * (double)1.0E-4f;
+            double l = random.nextGaussian() * (double)1.0E-6f;
+            WaterSuspendParticle lv = new WaterSuspendParticle(arg2, d, e, f, j, k, l);
             lv.setSprite(this.spriteProvider);
             lv.setColor(0.9f, 0.4f, 0.5f);
             return lv;

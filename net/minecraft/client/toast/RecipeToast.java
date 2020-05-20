@@ -42,7 +42,7 @@ implements Toast {
         }
         arg2.getGame().getTextureManager().bindTexture(TOASTS_TEX);
         RenderSystem.color3f(1.0f, 1.0f, 1.0f);
-        arg2.drawTexture(arg, 0, 0, 0, 32, 160, 32);
+        arg2.drawTexture(arg, 0, 0, 0, 32, this.method_29049(), this.method_29050());
         arg2.getGame().textRenderer.draw(arg, I18n.translate("recipe.toast.title", new Object[0]), 30.0f, 7.0f, -11534256);
         arg2.getGame().textRenderer.draw(arg, I18n.translate("recipe.toast.description", new Object[0]), 30.0f, 18.0f, -16777216);
         Recipe<?> lv = this.recipes.get((int)(l / Math.max(1L, 5000L / (long)this.recipes.size()) % (long)this.recipes.size()));

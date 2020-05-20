@@ -2,141 +2,220 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.google.common.collect.BiMap
+ *  com.google.common.collect.HashBiMap
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.Maps
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
-import java.util.Random;
-import java.util.function.Function;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.mojang.serialization.Codec;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import javax.annotation.Nullable;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.class_5312;
+import net.minecraft.class_5314;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.structure.StructureManager;
+import net.minecraft.structure.StructurePiece;
+import net.minecraft.structure.StructurePieceType;
 import net.minecraft.structure.StructureStart;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.ChunkRandom;
+import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.BastionRemnantFeature;
+import net.minecraft.world.gen.feature.BastionRemnantFeatureConfig;
+import net.minecraft.world.gen.feature.BuriedTreasureFeature;
+import net.minecraft.world.gen.feature.BuriedTreasureFeatureConfig;
+import net.minecraft.world.gen.feature.DefaultFeatureConfig;
+import net.minecraft.world.gen.feature.DesertPyramidFeature;
+import net.minecraft.world.gen.feature.EndCityFeature;
 import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.world.gen.feature.IglooFeature;
+import net.minecraft.world.gen.feature.JungleTempleFeature;
+import net.minecraft.world.gen.feature.MineshaftFeature;
+import net.minecraft.world.gen.feature.MineshaftFeatureConfig;
+import net.minecraft.world.gen.feature.NetherFortressFeature;
+import net.minecraft.world.gen.feature.NetherFossilFeature;
+import net.minecraft.world.gen.feature.OceanMonumentFeature;
+import net.minecraft.world.gen.feature.OceanRuinFeature;
+import net.minecraft.world.gen.feature.OceanRuinFeatureConfig;
+import net.minecraft.world.gen.feature.PillagerOutpostFeature;
+import net.minecraft.world.gen.feature.RuinedPortalFeature;
+import net.minecraft.world.gen.feature.RuinedPortalFeatureConfig;
+import net.minecraft.world.gen.feature.ShipwreckFeature;
+import net.minecraft.world.gen.feature.ShipwreckFeatureConfig;
+import net.minecraft.world.gen.feature.StrongholdFeature;
+import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
+import net.minecraft.world.gen.feature.SwampHutFeature;
+import net.minecraft.world.gen.feature.VillageFeature;
+import net.minecraft.world.gen.feature.WoodlandMansionFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class StructureFeature<C extends FeatureConfig>
-extends Feature<C> {
+public abstract class StructureFeature<C extends FeatureConfig> {
+    public static final BiMap<String, StructureFeature<?>> field_24842 = HashBiMap.create();
+    private static final Map<StructureFeature<?>, GenerationStep.Feature> field_24862 = Maps.newHashMap();
     private static final Logger LOGGER = LogManager.getLogger();
+    public static final StructureFeature<DefaultFeatureConfig> PILLAGER_OUTPOST = StructureFeature.method_28661("Pillager_Outpost", new PillagerOutpostFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<MineshaftFeatureConfig> MINESHAFT = StructureFeature.method_28661("Mineshaft", new MineshaftFeature(MineshaftFeatureConfig.field_24888), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> MANSION = StructureFeature.method_28661("Mansion", new WoodlandMansionFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> JUNGLE_PYRAMID = StructureFeature.method_28661("Jungle_Pyramid", new JungleTempleFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> DESERT_PYRAMID = StructureFeature.method_28661("Desert_Pyramid", new DesertPyramidFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> IGLOO = StructureFeature.method_28661("Igloo", new IglooFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<RuinedPortalFeatureConfig> RUINED_PORTAL = StructureFeature.method_28661("Ruined_Portal", new RuinedPortalFeature(RuinedPortalFeatureConfig.field_24906), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<ShipwreckFeatureConfig> SHIPWRECK = StructureFeature.method_28661("Shipwreck", new ShipwreckFeature(ShipwreckFeatureConfig.field_24908), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final SwampHutFeature field_24851 = StructureFeature.method_28661("Swamp_Hut", new SwampHutFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> STRONGHOLD = StructureFeature.method_28661("Stronghold", new StrongholdFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> MONUMENT = StructureFeature.method_28661("Monument", new OceanMonumentFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<OceanRuinFeatureConfig> OCEAN_RUIN = StructureFeature.method_28661("Ocean_Ruin", new OceanRuinFeature(OceanRuinFeatureConfig.field_24895), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> FORTRESS = StructureFeature.method_28661("Fortress", new NetherFortressFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.UNDERGROUND_DECORATION);
+    public static final StructureFeature<DefaultFeatureConfig> END_CITY = StructureFeature.method_28661("EndCity", new EndCityFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<BuriedTreasureFeatureConfig> BURIED_TREASURE = StructureFeature.method_28661("Buried_Treasure", new BuriedTreasureFeature(BuriedTreasureFeatureConfig.field_24875), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
+    public static final StructureFeature<StructurePoolFeatureConfig> VILLAGE = StructureFeature.method_28661("Village", new VillageFeature(StructurePoolFeatureConfig.field_24886), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> NETHER_FOSSIL = StructureFeature.method_28661("Nether_Fossil", new NetherFossilFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.UNDERGROUND_DECORATION);
+    public static final StructureFeature<BastionRemnantFeatureConfig> BASTION_REMNANT = StructureFeature.method_28661("Bastion_Remnant", new BastionRemnantFeature(BastionRemnantFeatureConfig.field_24889), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final List<StructureFeature<?>> field_24861 = ImmutableList.of(PILLAGER_OUTPOST, VILLAGE, NETHER_FOSSIL);
+    private final Codec<class_5312<C, StructureFeature<C>>> field_24863;
 
-    public StructureFeature(Function<Dynamic<?>, ? extends C> function) {
-        super(function);
+    private static <F extends StructureFeature<?>> F method_28661(String string, F arg, GenerationStep.Feature arg2) {
+        field_24842.put((Object)string.toLowerCase(Locale.ROOT), arg);
+        field_24862.put(arg, arg2);
+        return (F)Registry.register(Registry.STRUCTURE_FEATURE, string.toLowerCase(Locale.ROOT), arg);
     }
 
-    @Override
-    public ConfiguredFeature<C, ? extends StructureFeature<C>> configure(C arg) {
-        return new ConfiguredFeature<C, StructureFeature>(this, arg);
+    public StructureFeature(Codec<C> codec) {
+        this.field_24863 = codec.fieldOf("config").xmap(arg -> new class_5312<FeatureConfig, StructureFeature>(this, (FeatureConfig)arg), arg -> arg.field_24836).codec();
     }
 
-    @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg42, C arg5) {
-        if (!arg2.method_27834()) {
-            return false;
-        }
-        int i = arg42.getX() >> 4;
-        int j = arg42.getZ() >> 4;
-        int k = i << 4;
-        int l = j << 4;
-        return arg2.getStructuresWithChildren(ChunkSectionPos.from(arg42), this).map(arg4 -> {
-            arg4.generateStructure(arg, arg2, arg3, random, new BlockBox(k, l, k + 15, l + 15), new ChunkPos(i, j));
-            return null;
-        }).count() != 0L;
+    public GenerationStep.Feature method_28663() {
+        return field_24862.get(this);
     }
 
-    protected StructureStart isInsideStructure(StructureAccessor arg, BlockPos arg23, boolean bl) {
-        return arg.getStructuresWithChildren(ChunkSectionPos.from(arg23), this).filter(arg2 -> arg2.getBoundingBox().contains(arg23)).filter(arg22 -> !bl || arg22.getChildren().stream().anyMatch(arg2 -> arg2.getBoundingBox().contains(arg23))).findFirst().orElse(StructureStart.DEFAULT);
-    }
-
-    public boolean isApproximatelyInsideStructure(StructureAccessor arg, BlockPos arg2) {
-        return this.isInsideStructure(arg, arg2, false).hasChildren();
-    }
-
-    public boolean isInsideStructure(StructureAccessor arg, BlockPos arg2) {
-        return this.isInsideStructure(arg, arg2, true).hasChildren();
+    public static void method_28664() {
     }
 
     @Nullable
-    public BlockPos locateStructure(ServerWorld arg, ChunkGenerator arg2, BlockPos arg3, int i, boolean bl) {
-        if (!arg2.hasStructure(this)) {
+    public static StructureStart<?> method_28660(StructureManager arg, CompoundTag arg2, long l) {
+        String string = arg2.getString("id");
+        if ("INVALID".equals(string)) {
+            return StructureStart.DEFAULT;
+        }
+        StructureFeature<?> lv = Registry.STRUCTURE_FEATURE.get(new Identifier(string.toLowerCase(Locale.ROOT)));
+        if (lv == null) {
+            LOGGER.error("Unknown feature id: {}", (Object)string);
             return null;
         }
-        StructureAccessor lv = arg.getStructureAccessor();
-        int j = this.getSpacing(arg2.getConfig());
+        int i = arg2.getInt("ChunkX");
+        int j = arg2.getInt("ChunkZ");
+        int k = arg2.getInt("references");
+        BlockBox lv2 = arg2.contains("BB") ? new BlockBox(arg2.getIntArray("BB")) : BlockBox.empty();
+        ListTag lv3 = arg2.getList("Children", 10);
+        try {
+            StructureStart<?> lv4 = super.method_28656(i, j, lv2, k, l);
+            for (int m = 0; m < lv3.size(); ++m) {
+                CompoundTag lv5 = lv3.getCompound(m);
+                String string2 = lv5.getString("id");
+                StructurePieceType lv6 = Registry.STRUCTURE_PIECE.get(new Identifier(string2.toLowerCase(Locale.ROOT)));
+                if (lv6 == null) {
+                    LOGGER.error("Unknown structure piece id: {}", (Object)string2);
+                    continue;
+                }
+                try {
+                    StructurePiece lv7 = lv6.load(arg, lv5);
+                    lv4.getChildren().add(lv7);
+                    continue;
+                }
+                catch (Exception exception) {
+                    LOGGER.error("Exception loading structure piece with id {}", (Object)string2, (Object)exception);
+                }
+            }
+            return lv4;
+        }
+        catch (Exception exception2) {
+            LOGGER.error("Failed Start with id {}", (Object)string, (Object)exception2);
+            return null;
+        }
+    }
+
+    public Codec<class_5312<C, StructureFeature<C>>> method_28665() {
+        return this.field_24863;
+    }
+
+    public class_5312<C, ? extends StructureFeature<C>> method_28659(C arg) {
+        return new class_5312<C, StructureFeature>(this, arg);
+    }
+
+    @Nullable
+    public BlockPos locateStructure(WorldView arg, StructureAccessor arg2, BlockPos arg3, int i, boolean bl, long l, class_5314 arg4) {
+        int j = arg4.method_28803();
         int k = arg3.getX() >> 4;
-        int l = arg3.getZ() >> 4;
-        ChunkRandom lv2 = new ChunkRandom();
-        block0: for (int m = 0; m <= i; ++m) {
-            for (int n = -m; n <= m; ++n) {
-                boolean bl2 = n == -m || n == m;
-                for (int o = -m; o <= m; ++o) {
+        int m = arg3.getZ() >> 4;
+        ChunkRandom lv = new ChunkRandom();
+        block0: for (int n = 0; n <= i; ++n) {
+            for (int o = -n; o <= n; ++o) {
+                boolean bl2 = o == -n || o == n;
+                for (int p = -n; p <= n; ++p) {
                     boolean bl3;
-                    boolean bl4 = bl3 = o == -m || o == m;
+                    boolean bl4 = bl3 = p == -n || p == n;
                     if (!bl2 && !bl3) continue;
-                    int p = k + j * n;
-                    int q = l + j * o;
-                    ChunkPos lv3 = this.method_27218(arg2.getConfig(), arg.getSeed(), lv2, p, q);
-                    Chunk lv4 = arg.getChunk(lv3.x, lv3.z, ChunkStatus.STRUCTURE_STARTS);
-                    StructureStart lv5 = lv.getStructureStart(ChunkSectionPos.from(lv4.getPos(), 0), this, lv4);
-                    if (lv5 != null && lv5.hasChildren()) {
-                        if (bl && lv5.isInExistingChunk()) {
-                            lv5.incrementReferences();
-                            return lv5.getPos();
+                    int q = k + j * o;
+                    int r = m + j * p;
+                    ChunkPos lv2 = this.method_27218(arg4, l, lv, q, r);
+                    Chunk lv3 = arg.getChunk(lv2.x, lv2.z, ChunkStatus.STRUCTURE_STARTS);
+                    StructureStart<?> lv4 = arg2.getStructureStart(ChunkSectionPos.from(lv3.getPos(), 0), this, lv3);
+                    if (lv4 != null && lv4.hasChildren()) {
+                        if (bl && lv4.isInExistingChunk()) {
+                            lv4.incrementReferences();
+                            return lv4.getPos();
                         }
                         if (!bl) {
-                            return lv5.getPos();
+                            return lv4.getPos();
                         }
                     }
-                    if (m == 0) break;
+                    if (n == 0) break;
                 }
-                if (m == 0) continue block0;
+                if (n == 0) continue block0;
             }
         }
         return null;
-    }
-
-    protected int getSpacing(ChunkGeneratorConfig arg) {
-        return 1;
-    }
-
-    protected int getSeparation(ChunkGeneratorConfig arg) {
-        return 0;
-    }
-
-    protected int getSeedModifier(ChunkGeneratorConfig arg) {
-        return 0;
     }
 
     protected boolean method_27219() {
         return true;
     }
 
-    public final ChunkPos method_27218(ChunkGeneratorConfig arg, long l, ChunkRandom arg2, int i, int j) {
+    public final ChunkPos method_27218(class_5314 arg, long l, ChunkRandom arg2, int i, int j) {
         int s;
         int r;
-        int k = this.getSpacing(arg);
-        int m = this.getSeparation(arg);
+        int k = arg.method_28803();
+        int m = arg.method_28806();
         int n = Math.floorDiv(i, k);
         int o = Math.floorDiv(j, k);
-        arg2.setRegionSeed(l, n, o, this.getSeedModifier(arg));
+        arg2.setRegionSeed(l, n, o, arg.method_28808());
         if (this.method_27219()) {
             int p = arg2.nextInt(k - m);
             int q = arg2.nextInt(k - m);
@@ -147,23 +226,42 @@ extends Feature<C> {
         return new ChunkPos(n * k + r, o * k + s);
     }
 
-    public boolean method_27217(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4) {
-        ChunkPos lv = this.method_27218(arg2.getConfig(), l, arg3, i, j);
-        return i == lv.x && j == lv.z && arg2.hasStructure(arg4, this) && this.shouldStartAt(arg, arg2, l, arg3, i, j, arg4, lv);
-    }
-
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, C arg6) {
         return true;
     }
 
-    public abstract StructureStartFactory getStructureStartFactory();
+    private StructureStart<C> method_28656(int i, int j, BlockBox arg, int k, long l) {
+        return this.getStructureStartFactory().create(this, i, j, arg, k, l);
+    }
 
-    public abstract String getName();
+    public StructureStart<?> method_28657(ChunkGenerator arg, BiomeSource arg2, StructureManager arg3, long l, ChunkPos arg4, Biome arg5, int i, ChunkRandom arg6, class_5314 arg7, C arg8) {
+        ChunkPos lv = this.method_27218(arg7, l, arg6, arg4.x, arg4.z);
+        if (arg4.x == lv.x && arg4.z == lv.z && this.shouldStartAt(arg, arg2, l, arg6, arg4.x, arg4.z, arg5, lv, arg8)) {
+            StructureStart<C> lv2 = this.method_28656(arg4.x, arg4.z, BlockBox.empty(), i, l);
+            lv2.init(arg, arg3, arg4.x, arg4.z, arg5, arg8);
+            if (lv2.hasChildren()) {
+                return lv2;
+            }
+        }
+        return StructureStart.DEFAULT;
+    }
 
-    public abstract int getRadius();
+    public abstract StructureStartFactory<C> getStructureStartFactory();
 
-    public static interface StructureStartFactory {
-        public StructureStart create(StructureFeature<?> var1, int var2, int var3, BlockBox var4, int var5, long var6);
+    public String getName() {
+        return (String)field_24842.inverse().get((Object)this);
+    }
+
+    public List<Biome.SpawnEntry> getMonsterSpawns() {
+        return Collections.emptyList();
+    }
+
+    public List<Biome.SpawnEntry> getCreatureSpawns() {
+        return Collections.emptyList();
+    }
+
+    public static interface StructureStartFactory<C extends FeatureConfig> {
+        public StructureStart<C> create(StructureFeature<C> var1, int var2, int var3, BlockBox var4, int var5, long var6);
     }
 }
 

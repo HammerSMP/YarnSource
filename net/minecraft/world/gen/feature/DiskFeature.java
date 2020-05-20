@@ -2,13 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.feature;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.function.Function;
 import net.minecraft.block.BlockState;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +19,8 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class DiskFeature
 extends Feature<DiskFeatureConfig> {
-    public DiskFeature(Function<Dynamic<?>, ? extends DiskFeatureConfig> function) {
-        super(function);
+    public DiskFeature(Codec<DiskFeatureConfig> codec) {
+        super(codec);
     }
 
     @Override

@@ -81,18 +81,6 @@ public abstract class DrawableHelper {
     }
 
     protected void fillGradient(MatrixStack arg, int i, int j, int k, int l, int m, int n) {
-        this.fillGradient(arg.peek().getModel(), i, j, k, l, m, n);
-    }
-
-    private void fillGradient(Matrix4f arg, int i, int j, int k, int l, int m, int n) {
-        float f = (float)(m >> 24 & 0xFF) / 255.0f;
-        float g = (float)(m >> 16 & 0xFF) / 255.0f;
-        float h = (float)(m >> 8 & 0xFF) / 255.0f;
-        float o = (float)(m & 0xFF) / 255.0f;
-        float p = (float)(n >> 24 & 0xFF) / 255.0f;
-        float q = (float)(n >> 16 & 0xFF) / 255.0f;
-        float r = (float)(n >> 8 & 0xFF) / 255.0f;
-        float s = (float)(n & 0xFF) / 255.0f;
         RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.disableAlphaTest();
@@ -101,15 +89,27 @@ public abstract class DrawableHelper {
         Tessellator lv = Tessellator.getInstance();
         BufferBuilder lv2 = lv.getBuffer();
         lv2.begin(7, VertexFormats.POSITION_COLOR);
-        lv2.vertex(arg, k, j, this.zOffset).color(g, h, o, f).next();
-        lv2.vertex(arg, i, j, this.zOffset).color(g, h, o, f).next();
-        lv2.vertex(arg, i, l, this.zOffset).color(q, r, s, p).next();
-        lv2.vertex(arg, k, l, this.zOffset).color(q, r, s, p).next();
+        DrawableHelper.fillGradient(arg.peek().getModel(), lv2, i, j, k, l, this.zOffset, m, n);
         lv.draw();
         RenderSystem.shadeModel(7424);
         RenderSystem.disableBlend();
         RenderSystem.enableAlphaTest();
         RenderSystem.enableTexture();
+    }
+
+    protected static void fillGradient(Matrix4f arg, BufferBuilder arg2, int i, int j, int k, int l, int m, int n, int o) {
+        float f = (float)(n >> 24 & 0xFF) / 255.0f;
+        float g = (float)(n >> 16 & 0xFF) / 255.0f;
+        float h = (float)(n >> 8 & 0xFF) / 255.0f;
+        float p = (float)(n & 0xFF) / 255.0f;
+        float q = (float)(o >> 24 & 0xFF) / 255.0f;
+        float r = (float)(o >> 16 & 0xFF) / 255.0f;
+        float s = (float)(o >> 8 & 0xFF) / 255.0f;
+        float t = (float)(o & 0xFF) / 255.0f;
+        arg2.vertex(arg, k, j, m).color(g, h, p, f).next();
+        arg2.vertex(arg, i, j, m).color(g, h, p, f).next();
+        arg2.vertex(arg, i, l, m).color(r, s, t, q).next();
+        arg2.vertex(arg, k, l, m).color(r, s, t, q).next();
     }
 
     public void drawCenteredString(MatrixStack arg, TextRenderer arg2, String string, int i, int j, int k) {

@@ -3,16 +3,15 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.surfacebuilder;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Codec;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,8 +39,8 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
     protected OctaveSimplexNoiseSampler heightNoise;
     protected OctaveSimplexNoiseSampler layerNoise;
 
-    public BadlandsSurfaceBuilder(Function<Dynamic<?>, ? extends TernarySurfaceConfig> function) {
-        super(function);
+    public BadlandsSurfaceBuilder(Codec<TernarySurfaceConfig> codec) {
+        super(codec);
     }
 
     @Override

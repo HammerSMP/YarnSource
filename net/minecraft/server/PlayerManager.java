@@ -6,6 +6,8 @@
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
  *  com.mojang.authlib.GameProfile
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  io.netty.buffer.Unpooled
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
@@ -19,6 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.net.SocketAddress;
@@ -37,6 +41,9 @@ import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.class_5217;
 import net.minecraft.class_5218;
+import net.minecraft.class_5318;
+import net.minecraft.class_5321;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -91,6 +98,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.UserCache;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
@@ -121,104 +129,107 @@ public abstract class PlayerManager {
     private final Map<UUID, PlayerAdvancementTracker> advancementTrackers = Maps.newHashMap();
     private final WorldSaveHandler saveHandler;
     private boolean whitelistEnabled;
+    private final class_5318.class_5319 field_24626;
     protected final int maxPlayers;
     private int viewDistance;
     private GameMode gameMode;
     private boolean cheatsAllowed;
     private int latencyUpdateTimer;
 
-    public PlayerManager(MinecraftServer minecraftServer, WorldSaveHandler arg, int i) {
+    public PlayerManager(MinecraftServer minecraftServer, class_5318.class_5319 arg, WorldSaveHandler arg2, int i) {
         this.server = minecraftServer;
+        this.field_24626 = arg;
         this.maxPlayers = i;
-        this.saveHandler = arg;
+        this.saveHandler = arg2;
         this.getUserBanList().setEnabled(true);
         this.getIpBanList().setEnabled(true);
     }
 
     public void onPlayerConnect(ClientConnection arg, ServerPlayerEntity arg22) {
-        CompoundTag lv10;
-        Entity lv11;
-        TranslatableText lv8;
+        CompoundTag lv11;
+        Entity lv12;
+        TranslatableText lv9;
         GameProfile gameProfile = arg22.getGameProfile();
         UserCache lv = this.server.getUserCache();
         GameProfile gameProfile2 = lv.getByUuid(gameProfile.getId());
         String string = gameProfile2 == null ? gameProfile.getName() : gameProfile2.getName();
         lv.add(gameProfile);
         CompoundTag lv2 = this.loadPlayerData(arg22);
-        ServerWorld lv3 = this.server.getWorld(arg22.dimension);
-        arg22.setWorld(lv3);
+        class_5321<DimensionType> lv3 = lv2 != null ? DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2.get("Dimension"))).resultOrPartial(((Logger)LOGGER)::error).orElse(DimensionType.field_24753) : DimensionType.field_24753;
+        ServerWorld lv4 = this.server.getWorld(lv3);
+        arg22.setWorld(lv4);
         arg22.interactionManager.setWorld((ServerWorld)arg22.world);
         String string2 = "local";
         if (arg.getAddress() != null) {
             string2 = arg.getAddress().toString();
         }
         LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {})", (Object)arg22.getName().getString(), (Object)string2, (Object)arg22.getEntityId(), (Object)arg22.getX(), (Object)arg22.getY(), (Object)arg22.getZ());
-        class_5217 lv4 = lv3.getLevelProperties();
-        this.setGameMode(arg22, null, lv3);
-        ServerPlayNetworkHandler lv5 = new ServerPlayNetworkHandler(this.server, arg, arg22);
-        GameRules lv6 = lv3.getGameRules();
-        boolean bl = lv6.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
-        boolean bl2 = lv6.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv5.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv3.getSeed()), lv4.isHardcore(), lv3.method_27983(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv3.method_27982(), lv3.method_28125()));
-        lv5.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
-        lv5.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
-        lv5.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
-        lv5.sendPacket(new HeldItemChangeS2CPacket(arg22.inventory.selectedSlot));
-        lv5.sendPacket(new SynchronizeRecipesS2CPacket(this.server.getRecipeManager().values()));
-        lv5.sendPacket(new SynchronizeTagsS2CPacket(this.server.getTagManager()));
+        class_5217 lv5 = lv4.getLevelProperties();
+        this.setGameMode(arg22, null, lv4);
+        ServerPlayNetworkHandler lv6 = new ServerPlayNetworkHandler(this.server, arg, arg22);
+        GameRules lv7 = lv4.getGameRules();
+        boolean bl = lv7.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
+        boolean bl2 = lv7.getBoolean(GameRules.REDUCED_DEBUG_INFO);
+        lv6.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv4.getSeed()), lv5.isHardcore(), this.field_24626, lv4.method_27983().method_29177(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv4.method_27982(), lv4.method_28125()));
+        lv6.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
+        lv6.sendPacket(new DifficultyS2CPacket(lv5.getDifficulty(), lv5.isDifficultyLocked()));
+        lv6.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
+        lv6.sendPacket(new HeldItemChangeS2CPacket(arg22.inventory.selectedSlot));
+        lv6.sendPacket(new SynchronizeRecipesS2CPacket(this.server.getRecipeManager().values()));
+        lv6.sendPacket(new SynchronizeTagsS2CPacket(this.server.getTagManager()));
         this.sendCommandTree(arg22);
         arg22.getStatHandler().updateStatSet();
         arg22.getRecipeBook().sendInitRecipesPacket(arg22);
-        this.sendScoreboard(lv3.getScoreboard(), arg22);
+        this.sendScoreboard(lv4.getScoreboard(), arg22);
         this.server.forcePlayerSampleUpdate();
         if (arg22.getGameProfile().getName().equalsIgnoreCase(string)) {
-            TranslatableText lv7 = new TranslatableText("multiplayer.player.joined", arg22.getDisplayName());
+            TranslatableText lv8 = new TranslatableText("multiplayer.player.joined", arg22.getDisplayName());
         } else {
-            lv8 = new TranslatableText("multiplayer.player.joined.renamed", arg22.getDisplayName(), string);
+            lv9 = new TranslatableText("multiplayer.player.joined.renamed", arg22.getDisplayName(), string);
         }
-        this.sendToAll(lv8.formatted(Formatting.YELLOW));
-        lv5.requestTeleport(arg22.getX(), arg22.getY(), arg22.getZ(), arg22.yaw, arg22.pitch);
+        this.broadcastChatMessage(lv9.formatted(Formatting.YELLOW), MessageType.SYSTEM, Util.field_25140);
+        lv6.requestTeleport(arg22.getX(), arg22.getY(), arg22.getZ(), arg22.yaw, arg22.pitch);
         this.players.add(arg22);
         this.playerMap.put(arg22.getUuid(), arg22);
         this.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, arg22));
         for (int i = 0; i < this.players.size(); ++i) {
             arg22.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, this.players.get(i)));
         }
-        lv3.onPlayerConnected(arg22);
+        lv4.onPlayerConnected(arg22);
         this.server.getBossBarManager().onPlayerConnect(arg22);
-        this.sendWorldInfo(arg22, lv3);
+        this.sendWorldInfo(arg22, lv4);
         if (!this.server.getResourcePackUrl().isEmpty()) {
             arg22.sendResourcePackUrl(this.server.getResourcePackUrl(), this.server.getResourcePackHash());
         }
-        for (StatusEffectInstance lv9 : arg22.getStatusEffects()) {
-            lv5.sendPacket(new EntityStatusEffectS2CPacket(arg22.getEntityId(), lv9));
+        for (StatusEffectInstance lv10 : arg22.getStatusEffects()) {
+            lv6.sendPacket(new EntityStatusEffectS2CPacket(arg22.getEntityId(), lv10));
         }
-        if (lv2 != null && lv2.contains("RootVehicle", 10) && (lv11 = EntityType.loadEntityWithPassengers((lv10 = lv2.getCompound("RootVehicle")).getCompound("Entity"), lv3, arg2 -> {
-            if (!lv3.tryLoadEntity((Entity)arg2)) {
+        if (lv2 != null && lv2.contains("RootVehicle", 10) && (lv12 = EntityType.loadEntityWithPassengers((lv11 = lv2.getCompound("RootVehicle")).getCompound("Entity"), lv4, arg2 -> {
+            if (!lv4.tryLoadEntity((Entity)arg2)) {
                 return null;
             }
             return arg2;
         })) != null) {
             Object uUID2;
-            if (lv10.containsUuidNew("Attach")) {
-                UUID uUID = lv10.getUuidNew("Attach");
+            if (lv11.containsUuidNew("Attach")) {
+                UUID uUID = lv11.getUuidNew("Attach");
             } else {
                 uUID2 = null;
             }
-            if (lv11.getUuid().equals(uUID2)) {
-                arg22.startRiding(lv11, true);
+            if (lv12.getUuid().equals(uUID2)) {
+                arg22.startRiding(lv12, true);
             } else {
-                for (Entity lv12 : lv11.getPassengersDeep()) {
-                    if (!lv12.getUuid().equals(uUID2)) continue;
-                    arg22.startRiding(lv12, true);
+                for (Entity lv13 : lv12.getPassengersDeep()) {
+                    if (!lv13.getUuid().equals(uUID2)) continue;
+                    arg22.startRiding(lv13, true);
                     break;
                 }
             }
             if (!arg22.hasVehicle()) {
                 LOGGER.warn("Couldn't reattach entity to player");
-                lv3.removeEntity(lv11);
-                for (Entity lv13 : lv11.getPassengersDeep()) {
-                    lv3.removeEntity(lv13);
+                lv4.removeEntity(lv12);
+                for (Entity lv14 : lv12.getPassengersDeep()) {
+                    lv4.removeEntity(lv14);
                 }
             }
         }
@@ -380,15 +391,15 @@ public abstract class PlayerManager {
             lv3.networkHandler.disconnect(new TranslatableText("multiplayer.disconnect.duplicate_login"));
         }
         if (this.server.isDemo()) {
-            DemoServerPlayerInteractionManager lv4 = new DemoServerPlayerInteractionManager(this.server.getWorld(DimensionType.OVERWORLD));
+            DemoServerPlayerInteractionManager lv4 = new DemoServerPlayerInteractionManager(this.server.getWorld(DimensionType.field_24753));
         } else {
-            lv5 = new ServerPlayerInteractionManager(this.server.getWorld(DimensionType.OVERWORLD));
+            lv5 = new ServerPlayerInteractionManager(this.server.getWorld(DimensionType.field_24753));
         }
-        return new ServerPlayerEntity(this.server, this.server.getWorld(DimensionType.OVERWORLD), gameProfile, lv5);
+        return new ServerPlayerEntity(this.server, this.server.getWorld(DimensionType.field_24753), gameProfile, lv5);
     }
 
     public ServerPlayerEntity respawnPlayer(ServerPlayerEntity arg, boolean bl) {
-        ServerPlayerInteractionManager lv3;
+        ServerPlayerInteractionManager lv5;
         Optional optional2;
         this.players.remove(arg);
         arg.getServerWorld().removePlayer(arg);
@@ -399,51 +410,51 @@ public abstract class PlayerManager {
         } else {
             optional2 = Optional.empty();
         }
-        DimensionType dimensionType = arg.dimension = optional2.isPresent() ? arg.getSpawnPointDimension() : DimensionType.OVERWORLD;
+        class_5321<DimensionType> lv2 = optional2.isPresent() ? arg.getSpawnPointDimension() : DimensionType.field_24753;
+        ServerWorld lv3 = this.server.getWorld(lv2);
         if (this.server.isDemo()) {
-            DemoServerPlayerInteractionManager lv2 = new DemoServerPlayerInteractionManager(this.server.getWorld(arg.dimension));
+            DemoServerPlayerInteractionManager lv4 = new DemoServerPlayerInteractionManager(lv3);
         } else {
-            lv3 = new ServerPlayerInteractionManager(this.server.getWorld(arg.dimension));
+            lv5 = new ServerPlayerInteractionManager(lv3);
         }
-        ServerPlayerEntity lv4 = new ServerPlayerEntity(this.server, this.server.getWorld(arg.dimension), arg.getGameProfile(), lv3);
-        lv4.networkHandler = arg.networkHandler;
-        lv4.copyFrom(arg, bl);
-        lv4.setEntityId(arg.getEntityId());
-        lv4.setMainArm(arg.getMainArm());
+        ServerPlayerEntity lv6 = new ServerPlayerEntity(this.server, lv3, arg.getGameProfile(), lv5);
+        lv6.networkHandler = arg.networkHandler;
+        lv6.copyFrom(arg, bl);
+        lv6.setEntityId(arg.getEntityId());
+        lv6.setMainArm(arg.getMainArm());
         for (String string : arg.getScoreboardTags()) {
-            lv4.addScoreboardTag(string);
+            lv6.addScoreboardTag(string);
         }
-        ServerWorld lv5 = this.server.getWorld(arg.dimension);
-        this.setGameMode(lv4, arg, lv5);
+        this.setGameMode(lv6, arg, lv3);
         boolean bl3 = false;
         if (optional2.isPresent()) {
-            Vec3d lv6 = (Vec3d)optional2.get();
-            lv4.refreshPositionAndAngles(lv6.x, lv6.y, lv6.z, 0.0f, 0.0f);
-            lv4.setSpawnPoint(arg.dimension, lv, bl2, false);
-            bl3 = !bl && lv5.getBlockState(lv).getBlock() instanceof RespawnAnchorBlock;
+            Vec3d lv7 = (Vec3d)optional2.get();
+            lv6.refreshPositionAndAngles(lv7.x, lv7.y, lv7.z, 0.0f, 0.0f);
+            lv6.setSpawnPoint(lv2, lv, bl2, false);
+            bl3 = !bl && lv3.getBlockState(lv).getBlock() instanceof RespawnAnchorBlock;
         } else if (lv != null) {
-            lv4.networkHandler.sendPacket(new GameStateChangeS2CPacket(0, 0.0f));
+            lv6.networkHandler.sendPacket(new GameStateChangeS2CPacket(0, 0.0f));
         }
-        while (!lv5.doesNotCollide(lv4) && lv4.getY() < 256.0) {
-            lv4.updatePosition(lv4.getX(), lv4.getY() + 1.0, lv4.getZ());
+        while (!lv3.doesNotCollide(lv6) && lv6.getY() < 256.0) {
+            lv6.updatePosition(lv6.getX(), lv6.getY() + 1.0, lv6.getZ());
         }
-        class_5217 lv7 = lv4.world.getLevelProperties();
-        lv4.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv4.dimension, BiomeAccess.hashSeed(lv4.getServerWorld().getSeed()), lv4.interactionManager.getGameMode(), lv4.getServerWorld().method_27982(), lv4.getServerWorld().method_28125(), bl));
-        lv4.networkHandler.requestTeleport(lv4.getX(), lv4.getY(), lv4.getZ(), lv4.yaw, lv4.pitch);
-        lv4.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv5.method_27911()));
-        lv4.networkHandler.sendPacket(new DifficultyS2CPacket(lv7.getDifficulty(), lv7.isDifficultyLocked()));
-        lv4.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(lv4.experienceProgress, lv4.totalExperience, lv4.experienceLevel));
-        this.sendWorldInfo(lv4, lv5);
-        this.sendCommandTree(lv4);
-        lv5.onPlayerRespawned(lv4);
-        this.players.add(lv4);
-        this.playerMap.put(lv4.getUuid(), lv4);
-        lv4.onSpawn();
-        lv4.setHealth(lv4.getHealth());
+        class_5217 lv8 = lv6.world.getLevelProperties();
+        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.method_27983().method_29177(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.getServerWorld().method_27982(), lv6.getServerWorld().method_28125(), bl));
+        lv6.networkHandler.requestTeleport(lv6.getX(), lv6.getY(), lv6.getZ(), lv6.yaw, lv6.pitch);
+        lv6.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv3.method_27911()));
+        lv6.networkHandler.sendPacket(new DifficultyS2CPacket(lv8.getDifficulty(), lv8.isDifficultyLocked()));
+        lv6.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(lv6.experienceProgress, lv6.totalExperience, lv6.experienceLevel));
+        this.sendWorldInfo(lv6, lv3);
+        this.sendCommandTree(lv6);
+        lv3.onPlayerRespawned(lv6);
+        this.players.add(lv6);
+        this.playerMap.put(lv6.getUuid(), lv6);
+        lv6.onSpawn();
+        lv6.setHealth(lv6.getHealth());
         if (bl3) {
-            lv4.networkHandler.sendPacket(new PlaySoundS2CPacket(SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, lv.getX(), lv.getY(), lv.getZ(), 1.0f, 1.0f));
+            lv6.networkHandler.sendPacket(new PlaySoundS2CPacket(SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.BLOCKS, lv.getX(), lv.getY(), lv.getZ(), 1.0f, 1.0f));
         }
-        return lv4;
+        return lv6;
     }
 
     public void sendCommandTree(ServerPlayerEntity arg) {
@@ -465,10 +476,10 @@ public abstract class PlayerManager {
         }
     }
 
-    public void sendToDimension(Packet<?> arg, DimensionType arg2) {
+    public void sendToDimension(Packet<?> arg, class_5321<DimensionType> arg2) {
         for (int i = 0; i < this.players.size(); ++i) {
             ServerPlayerEntity lv = this.players.get(i);
-            if (lv.dimension != arg2) continue;
+            if (lv.world.method_27983() != arg2) continue;
             lv.networkHandler.sendPacket(arg);
         }
     }
@@ -482,20 +493,20 @@ public abstract class PlayerManager {
         for (String string : collection) {
             ServerPlayerEntity lv2 = this.getPlayer(string);
             if (lv2 == null || lv2 == arg) continue;
-            lv2.sendSystemMessage(arg2);
+            lv2.sendSystemMessage(arg2, arg.getUuid());
         }
     }
 
     public void sendToOtherTeams(PlayerEntity arg, Text arg2) {
         AbstractTeam lv = arg.getScoreboardTeam();
         if (lv == null) {
-            this.sendToAll(arg2);
+            this.broadcastChatMessage(arg2, MessageType.SYSTEM, arg.getUuid());
             return;
         }
         for (int i = 0; i < this.players.size(); ++i) {
             ServerPlayerEntity lv2 = this.players.get(i);
             if (lv2.getScoreboardTeam() == lv) continue;
-            lv2.sendSystemMessage(arg2);
+            lv2.sendSystemMessage(arg2, arg.getUuid());
         }
     }
 
@@ -563,13 +574,13 @@ public abstract class PlayerManager {
         return null;
     }
 
-    public void sendToAround(@Nullable PlayerEntity arg, double d, double e, double f, double g, DimensionType arg2, Packet<?> arg3) {
+    public void sendToAround(@Nullable PlayerEntity arg, double d, double e, double f, double g, class_5321<DimensionType> arg2, Packet<?> arg3) {
         for (int i = 0; i < this.players.size(); ++i) {
             double k;
             double j;
             double h;
             ServerPlayerEntity lv = this.players.get(i);
-            if (lv == arg || lv.dimension != arg2 || !((h = d - lv.getX()) * h + (j = e - lv.getY()) * j + (k = f - lv.getZ()) * k < g * g)) continue;
+            if (lv == arg || lv.world.method_27983() != arg2 || !((h = d - lv.getX()) * h + (j = e - lv.getY()) * j + (k = f - lv.getZ()) * k < g * g)) continue;
             lv.networkHandler.sendPacket(arg3);
         }
     }
@@ -600,7 +611,7 @@ public abstract class PlayerManager {
     }
 
     public void sendWorldInfo(ServerPlayerEntity arg, ServerWorld arg2) {
-        WorldBorder lv = this.server.getWorld(DimensionType.OVERWORLD).getWorldBorder();
+        WorldBorder lv = this.server.getWorld(DimensionType.field_24753).getWorldBorder();
         arg.networkHandler.sendPacket(new WorldBorderS2CPacket(lv, WorldBorderS2CPacket.Type.INITIALIZE));
         arg.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(arg2.getTime(), arg2.getTimeOfDay(), arg2.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)));
         arg.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(arg2.method_27911()));
@@ -679,14 +690,9 @@ public abstract class PlayerManager {
         }
     }
 
-    public void broadcastChatMessage(Text arg, boolean bl) {
-        this.server.sendSystemMessage(arg);
-        MessageType lv = bl ? MessageType.SYSTEM : MessageType.CHAT;
-        this.sendToAll(new GameMessageS2CPacket(arg, lv));
-    }
-
-    public void sendToAll(Text arg) {
-        this.broadcastChatMessage(arg, true);
+    public void broadcastChatMessage(Text arg, MessageType arg2, UUID uUID) {
+        this.server.sendSystemMessage(arg, uUID);
+        this.sendToAll(new GameMessageS2CPacket(arg, arg2, uUID));
     }
 
     public ServerStatHandler createStatHandler(PlayerEntity arg) {

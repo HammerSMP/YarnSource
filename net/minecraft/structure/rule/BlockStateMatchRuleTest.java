@@ -2,16 +2,11 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.structure.rule;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.serialization.Codec;
 import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.structure.rule.RuleTest;
@@ -19,14 +14,11 @@ import net.minecraft.structure.rule.RuleTestType;
 
 public class BlockStateMatchRuleTest
 extends RuleTest {
+    public static final Codec<BlockStateMatchRuleTest> field_25001 = BlockState.field_24734.fieldOf("block_state").xmap(BlockStateMatchRuleTest::new, arg -> arg.blockState).codec();
     private final BlockState blockState;
 
     public BlockStateMatchRuleTest(BlockState arg) {
         this.blockState = arg;
-    }
-
-    public <T> BlockStateMatchRuleTest(Dynamic<T> dynamic) {
-        this(BlockState.deserialize(dynamic.get("blockstate").orElseEmptyMap()));
     }
 
     @Override
@@ -35,13 +27,8 @@ extends RuleTest {
     }
 
     @Override
-    protected RuleTestType getType() {
+    protected RuleTestType<?> getType() {
         return RuleTestType.BLOCKSTATE_MATCH;
-    }
-
-    @Override
-    protected <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("blockstate"), (Object)BlockState.serialize(dynamicOps, this.blockState).getValue())));
     }
 }
 

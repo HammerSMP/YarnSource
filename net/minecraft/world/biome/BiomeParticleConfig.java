@@ -2,55 +2,43 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.biome;
 
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
-import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 
 public class BiomeParticleConfig {
-    private final DefaultParticleType type;
+    public static final Codec<BiomeParticleConfig> field_24675 = RecordCodecBuilder.create(instance -> instance.group((App)ParticleTypes.field_25125.fieldOf("options").forGetter(arg -> arg.field_24676), (App)Codec.FLOAT.fieldOf("probability").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, BiomeParticleConfig::new));
+    private final ParticleEffect field_24676;
     private final float chance;
-    private final Function<Random, Double> velocityXFactory;
-    private final Function<Random, Double> velocityYFactory;
-    private final Function<Random, Double> velocityZFactory;
 
-    public BiomeParticleConfig(DefaultParticleType arg, float f, Function<Random, Double> function, Function<Random, Double> function2, Function<Random, Double> function3) {
-        this.type = arg;
+    public BiomeParticleConfig(ParticleEffect arg, float f) {
+        this.field_24676 = arg;
         this.chance = f;
-        this.velocityXFactory = function;
-        this.velocityYFactory = function2;
-        this.velocityZFactory = function3;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public DefaultParticleType getParticleType() {
-        return this.type;
+    public ParticleEffect getParticleType() {
+        return this.field_24676;
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean shouldAddParticle(Random random) {
         return random.nextFloat() <= this.chance;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public double generateVelocityX(Random random) {
-        return this.velocityXFactory.apply(random);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public double generateVelocityY(Random random) {
-        return this.velocityYFactory.apply(random);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public double generateVelocityZ(Random random) {
-        return this.velocityZFactory.apply(random);
     }
 }
 

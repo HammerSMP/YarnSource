@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -1027,9 +1028,9 @@ extends DrawableHelper {
         }
     }
 
-    public void addChatMessage(MessageType arg, Text arg2) {
+    public void addChatMessage(MessageType arg, Text arg2, UUID uUID) {
         for (ClientChatListener lv : this.listeners.get((Object)arg)) {
-            lv.onChatMessage(arg, arg2);
+            lv.onChatMessage(arg, arg2, uUID);
         }
     }
 

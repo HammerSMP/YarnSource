@@ -2,11 +2,13 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  *  it.unimi.dsi.fastutil.shorts.Short2ObjectMap
  *  it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap
  *  org.apache.logging.log4j.LogManager
@@ -15,13 +17,17 @@
  */
 package net.minecraft.world.poi;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -30,7 +36,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import net.minecraft.util.Util;
-import net.minecraft.util.dynamic.DynamicSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.poi.PointOfInterest;
@@ -40,30 +45,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Supplier;
 
-public class PointOfInterestSet
-implements DynamicSerializable {
+public class PointOfInterestSet {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Short2ObjectMap<PointOfInterest> pointsOfInterestByPos = new Short2ObjectOpenHashMap();
     private final Map<PointOfInterestType, Set<PointOfInterest>> pointsOfInterestByType = Maps.newHashMap();
     private final Runnable updateListener;
     private boolean valid;
 
-    public PointOfInterestSet(Runnable runnable) {
-        this.updateListener = runnable;
-        this.valid = true;
+    public static Codec<PointOfInterestSet> method_28364(Runnable runnable) {
+        return RecordCodecBuilder.create(instance -> instance.group((App)RecordCodecBuilder.point((Object)runnable), (App)Codec.BOOL.fieldOf("Valid").forGetter(arg -> arg.valid), (App)PointOfInterest.method_28359(runnable).listOf().fieldOf("Records").forGetter(arg -> ImmutableList.copyOf((Collection)arg.pointsOfInterestByPos.values()))).apply((Applicative)instance, PointOfInterestSet::new)).withDefault(Util.method_29188("Failed to read POI section: ", ((Logger)LOGGER)::error), () -> new PointOfInterestSet(runnable, false, (List<PointOfInterest>)ImmutableList.of()));
     }
 
-    public <T> PointOfInterestSet(Runnable runnable, Dynamic<T> dynamic2) {
+    public PointOfInterestSet(Runnable runnable) {
+        this(runnable, true, (List<PointOfInterest>)ImmutableList.of());
+    }
+
+    private PointOfInterestSet(Runnable runnable, boolean bl, List<PointOfInterest> list) {
         this.updateListener = runnable;
-        try {
-            this.valid = dynamic2.get("Valid").asBoolean(false);
-            dynamic2.get("Records").asStream().forEach(dynamic -> this.add(new PointOfInterest(dynamic, runnable)));
-        }
-        catch (Exception exception) {
-            LOGGER.error("Failed to load POI chunk", (Throwable)exception);
-            this.clear();
-            this.valid = false;
-        }
+        this.valid = bl;
+        list.forEach(this::add);
     }
 
     public Stream<PointOfInterest> get(Predicate<PointOfInterestType> predicate, PointOfInterestStorage.OccupationStatus arg) {
@@ -127,12 +127,6 @@ implements DynamicSerializable {
         short s = ChunkSectionPos.getPackedLocalPos(arg);
         PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.get(s);
         return lv != null ? Optional.of(lv.getType()) : Optional.empty();
-    }
-
-    @Override
-    public <T> T serialize(DynamicOps<T> dynamicOps) {
-        Object object = dynamicOps.createList(this.pointsOfInterestByPos.values().stream().map(arg -> arg.serialize(dynamicOps)));
-        return (T)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("Records"), (Object)object, (Object)dynamicOps.createString("Valid"), (Object)dynamicOps.createBoolean(this.valid)));
     }
 
     public void updatePointsOfInterest(Consumer<BiConsumer<BlockPos, PointOfInterestType>> consumer) {

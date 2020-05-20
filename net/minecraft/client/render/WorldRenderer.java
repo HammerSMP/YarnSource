@@ -149,7 +149,6 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -833,7 +832,7 @@ AutoCloseable {
         this.renderLayer(RenderLayer.getSolid(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutoutMipped(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutout(), arg, d, e, g);
-        if (this.world.method_27983() == DimensionType.THE_NETHER) {
+        if (this.world.getDimension().method_28542()) {
             DiffuseLighting.enableForLevel(arg.peek().getModel());
         } else {
             DiffuseLighting.method_27869(arg.peek().getModel());
@@ -1263,7 +1262,7 @@ AutoCloseable {
     }
 
     public void renderSky(MatrixStack arg, float f) {
-        if (this.client.world.method_27983() == DimensionType.THE_END) {
+        if (this.client.world.getDimension().method_28543()) {
             this.renderEndSky(arg);
             return;
         }

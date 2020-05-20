@@ -34,7 +34,6 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 
 public class IglooGenerator {
     private static final Identifier TOP_TEMPLATE = new Identifier("igloo/top");
@@ -43,7 +42,7 @@ public class IglooGenerator {
     private static final Map<Identifier, BlockPos> field_14408 = ImmutableMap.of((Object)TOP_TEMPLATE, (Object)new BlockPos(3, 5, 5), (Object)MIDDLE_TEMPLATE, (Object)new BlockPos(1, 3, 1), (Object)BOTTOM_TEMPLATE, (Object)new BlockPos(3, 6, 7));
     private static final Map<Identifier, BlockPos> field_14406 = ImmutableMap.of((Object)TOP_TEMPLATE, (Object)BlockPos.ORIGIN, (Object)MIDDLE_TEMPLATE, (Object)new BlockPos(2, -3, 4), (Object)BOTTOM_TEMPLATE, (Object)new BlockPos(0, -3, -2));
 
-    public static void addPieces(StructureManager arg, BlockPos arg2, BlockRotation arg3, List<StructurePiece> list, Random random, DefaultFeatureConfig arg4) {
+    public static void addPieces(StructureManager arg, BlockPos arg2, BlockRotation arg3, List<StructurePiece> list, Random random) {
         if (random.nextDouble() < 0.5) {
             int i = random.nextInt(8) + 4;
             list.add(new Piece(arg, BOTTOM_TEMPLATE, arg2, arg3, i * 3));

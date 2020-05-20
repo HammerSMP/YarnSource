@@ -4,16 +4,13 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableSet
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.util.Pair
  */
 package net.minecraft.entity.mob;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.util.Pair;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +24,6 @@ import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
-import net.minecraft.entity.ai.brain.sensor.Sensor;
-import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.ai.brain.task.AdmireItemTask;
 import net.minecraft.entity.ai.brain.task.AttackTask;
 import net.minecraft.entity.ai.brain.task.ConditionalTask;
@@ -65,7 +60,6 @@ import net.minecraft.entity.ai.brain.task.WanderAroundTask;
 import net.minecraft.entity.ai.brain.task.WantNewItemTask;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -83,7 +77,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.dynamic.DynamicSerializableBoolean;
 import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.IntRange;
@@ -91,31 +84,29 @@ import net.minecraft.util.math.Vec3d;
 
 public class PiglinBrain {
     protected static final Item BARTERING_ITEM = Items.GOLD_INGOT;
-    private static final IntRange field_22477 = IntRange.between(10, 20);
     private static final IntRange HUNT_MEMORY_DURATION = Durations.betweenSeconds(30, 120);
     private static final IntRange MEMORY_TRANSFER_TASK_DURATION = Durations.betweenSeconds(10, 40);
     private static final IntRange RIDE_TARGET_MEMORY_DURATION = Durations.betweenSeconds(10, 30);
     private static final IntRange AVOID_MEMORY_DURATION = Durations.betweenSeconds(5, 20);
-    private static final Set FOOD = ImmutableSet.of((Object)Items.PORKCHOP, (Object)Items.COOKED_PORKCHOP);
+    private static final Set<Item> FOOD = ImmutableSet.of((Object)Items.PORKCHOP, (Object)Items.COOKED_PORKCHOP);
 
-    protected static Brain<?> create(PiglinEntity arg, Dynamic<?> dynamic) {
-        Brain<PiglinEntity> lv = new Brain<PiglinEntity>((Collection<MemoryModuleType<?>>)PiglinEntity.MEMORY_MODULE_TYPES, (Collection<SensorType<Sensor<PiglinEntity>>>)PiglinEntity.SENSOR_TYPES, dynamic);
-        PiglinBrain.addCoreActivities(lv);
-        PiglinBrain.addIdleActivities(lv);
-        PiglinBrain.addAdmireItemActivities(lv);
-        PiglinBrain.addFightActivities(arg, lv);
-        PiglinBrain.addCelebrateActivities(lv);
-        PiglinBrain.addAvoidActivities(lv);
-        PiglinBrain.addRideActivities(lv);
-        lv.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
-        lv.setDefaultActivity(Activity.IDLE);
-        lv.resetPossibleActivities();
-        return lv;
+    protected static Brain<?> create(PiglinEntity arg, Brain<PiglinEntity> arg2) {
+        PiglinBrain.addCoreActivities(arg2);
+        PiglinBrain.addIdleActivities(arg2);
+        PiglinBrain.addAdmireItemActivities(arg2);
+        PiglinBrain.addFightActivities(arg, arg2);
+        PiglinBrain.addCelebrateActivities(arg2);
+        PiglinBrain.addAvoidActivities(arg2);
+        PiglinBrain.addRideActivities(arg2);
+        arg2.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
+        arg2.setDefaultActivity(Activity.IDLE);
+        arg2.resetPossibleActivities();
+        return arg2;
     }
 
     protected static void setHuntedRecently(PiglinEntity arg) {
         int i = HUNT_MEMORY_DURATION.choose(arg.world.random);
-        arg.getBrain().remember(MemoryModuleType.HUNTED_RECENTLY, DynamicSerializableBoolean.of(true), i);
+        arg.getBrain().remember(MemoryModuleType.HUNTED_RECENTLY, true, i);
     }
 
     private static void addCoreActivities(Brain<PiglinEntity> arg) {
@@ -135,7 +126,7 @@ public class PiglinBrain {
     }
 
     private static void addAdmireItemActivities(Brain<PiglinEntity> arg) {
-        arg.setTaskList(Activity.ADMIRE_ITEM, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of(new WalkToNearestVisibleWantedItemTask<PiglinEntity>(PiglinBrain::doesNotHaveGoldInOffHand, 1.0f, true, 9), new ConditionalTask<PiglinEntity>(PiglinBrain::hasItemInOffHand, PiglinBrain.method_24916()), new WantNewItemTask(9)), MemoryModuleType.ADMIRING_ITEM);
+        arg.setTaskList(Activity.ADMIRE_ITEM, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of(new WalkToNearestVisibleWantedItemTask<PiglinEntity>(PiglinBrain::doesNotHaveGoldInOffHand, 1.0f, true, 9), new WantNewItemTask(9)), MemoryModuleType.ADMIRING_ITEM);
     }
 
     private static void addAvoidActivities(Brain<PiglinEntity> arg) {
@@ -152,10 +143,6 @@ public class PiglinBrain {
 
     private static RandomTask<PiglinEntity> makeRandomWanderTask() {
         return new RandomTask<PiglinEntity>((List<Pair<Task<PiglinEntity>, Integer>>)ImmutableList.of((Object)Pair.of((Object)new StrollTask(0.6f), (Object)2), (Object)Pair.of(FindEntityTask.create(EntityType.PIGLIN, 8, MemoryModuleType.INTERACTION_TARGET, 0.6f, 2), (Object)2), (Object)Pair.of(new ConditionalTask<LivingEntity>(PiglinBrain::canWander, new GoTowardsLookTarget(0.6f, 3)), (Object)2), (Object)Pair.of((Object)new WaitTask(30, 60), (Object)1)));
-    }
-
-    private static Task<PiglinEntity> method_24916() {
-        return new TimeLimitedTask<MobEntityWithAi>(new StrollTask(0.3f, 1, 0), field_22477);
     }
 
     private static GoToRememberedPositionTask<BlockPos> makeGoToSoulFireTask() {
@@ -175,7 +162,7 @@ public class PiglinBrain {
             PiglinBrain.playSound(arg);
         }
         arg.setAttacking(lv.hasMemoryModule(MemoryModuleType.ATTACK_TARGET));
-        if (!lv.hasMemoryModule(MemoryModuleType.RIDE_TARGET)) {
+        if (!lv.hasMemoryModule(MemoryModuleType.RIDE_TARGET) && (arg.getVehicle() instanceof HoglinEntity || arg.getVehicle() instanceof PiglinEntity)) {
             arg.stopRiding();
         }
         if (arg.hasVehicle() && PiglinBrain.hasPlayerHoldingWantedItemNearby(arg)) {
@@ -223,17 +210,16 @@ public class PiglinBrain {
         ItemStack lv = arg.getStackInHand(Hand.OFF_HAND);
         arg.setStackInHand(Hand.OFF_HAND, ItemStack.EMPTY);
         if (arg.isAdult()) {
-            if (bl && PiglinBrain.acceptsForBarter(lv.getItem())) {
+            boolean bl3;
+            boolean bl2 = PiglinBrain.acceptsForBarter(lv.getItem());
+            if (bl && bl2) {
                 PiglinBrain.doBarter(arg, PiglinBrain.getBarteredItem(arg));
-            } else {
-                boolean bl2 = arg.tryEquip(lv);
-                if (!bl2) {
-                    PiglinBrain.method_24849(arg, lv);
-                }
+            } else if (!bl2 && !(bl3 = arg.tryEquip(lv))) {
+                PiglinBrain.method_24849(arg, lv);
             }
         } else {
-            boolean bl3 = arg.tryEquip(lv);
-            if (!bl3) {
+            boolean bl4 = arg.tryEquip(lv);
+            if (!bl4) {
                 ItemStack lv2 = arg.getMainHandStack();
                 if (PiglinBrain.isGoldenItem(lv2.getItem())) {
                     PiglinBrain.method_24849(arg, lv2);
@@ -380,7 +366,7 @@ public class PiglinBrain {
         lv.forget(MemoryModuleType.CELEBRATE_LOCATION);
         lv.forget(MemoryModuleType.ADMIRING_ITEM);
         if (arg2 instanceof PlayerEntity) {
-            lv.remember(MemoryModuleType.ADMIRING_DISABLED, DynamicSerializableBoolean.of(true), 400L);
+            lv.remember(MemoryModuleType.ADMIRING_DISABLED, true, 400L);
         }
         if (arg.isBaby()) {
             lv.remember(MemoryModuleType.AVOID_TARGET, arg2, 100L);
@@ -534,7 +520,7 @@ public class PiglinBrain {
     }
 
     protected static void rememberHunting(PiglinEntity arg) {
-        arg.getBrain().remember(MemoryModuleType.HUNTED_RECENTLY, DynamicSerializableBoolean.of(true), HUNT_MEMORY_DURATION.choose(arg.world.random));
+        arg.getBrain().remember(MemoryModuleType.HUNTED_RECENTLY, true, HUNT_MEMORY_DURATION.choose(arg.world.random));
     }
 
     private static boolean hasPlayerHoldingWantedItemNearby(PiglinEntity arg) {
@@ -563,7 +549,7 @@ public class PiglinBrain {
     }
 
     private static void setAdmiringItem(LivingEntity arg) {
-        arg.getBrain().remember(MemoryModuleType.ADMIRING_ITEM, DynamicSerializableBoolean.of(true), 120L);
+        arg.getBrain().remember(MemoryModuleType.ADMIRING_ITEM, true, 120L);
     }
 
     private static boolean isAdmiringItem(PiglinEntity arg) {

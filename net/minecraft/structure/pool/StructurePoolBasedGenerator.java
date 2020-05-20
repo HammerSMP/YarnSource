@@ -23,7 +23,6 @@ import net.minecraft.structure.JigsawJunction;
 import net.minecraft.structure.PillagerOutpostGenerator;
 import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.Structure;
-import net.minecraft.structure.StructureFeatures;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.VillageGenerator;
 import net.minecraft.structure.pool.EmptyPoolElement;
@@ -41,6 +40,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,7 +56,7 @@ public class StructurePoolBasedGenerator {
 
     public static void addPieces(Identifier arg, int i, PieceFactory arg2, ChunkGenerator arg3, StructureManager arg4, BlockPos arg5, List<? super PoolStructurePiece> list, Random random, boolean bl, boolean bl2) {
         int m;
-        StructureFeatures.initialize();
+        StructureFeature.method_28664();
         BlockRotation lv = BlockRotation.random(random);
         StructurePool lv2 = REGISTRY.get(arg);
         StructurePoolElement lv3 = lv2.getRandomElement(random);

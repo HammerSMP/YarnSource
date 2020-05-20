@@ -2,18 +2,12 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.serialization.Codec;
 import java.util.Random;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ServerWorldAccess;
@@ -26,12 +20,9 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class ConfiguredDecorator<DC extends DecoratorConfig> {
+    public static final Codec<ConfiguredDecorator<?>> field_24981 = Registry.DECORATOR.dispatch("name", arg -> arg.decorator, Decorator::method_28928);
     public final Decorator<DC> decorator;
     public final DC config;
-
-    public ConfiguredDecorator(Decorator<DC> arg, Dynamic<?> dynamic) {
-        this(arg, arg.deserialize(dynamic));
-    }
 
     public ConfiguredDecorator(Decorator<DC> arg, DC arg2) {
         this.decorator = arg;
@@ -40,15 +31,6 @@ public class ConfiguredDecorator<DC extends DecoratorConfig> {
 
     public <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, ConfiguredFeature<FC, F> arg5) {
         return this.decorator.generate(arg, arg2, arg3, random, arg4, this.config, arg5);
-    }
-
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("name"), (Object)dynamicOps.createString(Registry.DECORATOR.getId(this.decorator).toString()), (Object)dynamicOps.createString("config"), (Object)this.config.serialize(dynamicOps).getValue())));
-    }
-
-    public static <T> ConfiguredDecorator<?> deserialize(Dynamic<T> dynamic) {
-        Decorator<?> lv = Registry.DECORATOR.get(new Identifier(dynamic.get("name").asString("")));
-        return new ConfiguredDecorator<Dynamic>((Decorator<Dynamic>)lv, dynamic.get("config").orElseEmptyMap());
     }
 }
 

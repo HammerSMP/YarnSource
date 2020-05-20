@@ -28,7 +28,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkUpdateState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class FeatureUpdater {
@@ -86,12 +85,12 @@ public class FeatureUpdater {
         CompoundTag lv3 = lv.getCompound("Structures");
         CompoundTag lv4 = lv3.getCompound("References");
         for (String string : this.field_17659) {
-            StructureFeature lv5 = (StructureFeature)Feature.STRUCTURES.get((Object)string.toLowerCase(Locale.ROOT));
+            StructureFeature lv5 = (StructureFeature)StructureFeature.field_24842.get((Object)string.toLowerCase(Locale.ROOT));
             if (lv4.contains(string, 12) || lv5 == null) continue;
-            int i = lv5.getRadius();
+            int i = 8;
             LongArrayList longList = new LongArrayList();
-            for (int j = lv2.x - i; j <= lv2.x + i; ++j) {
-                for (int k = lv2.z - i; k <= lv2.z + i; ++k) {
+            for (int j = lv2.x - 8; j <= lv2.x + 8; ++j) {
+                for (int k = lv2.z - 8; k <= lv2.z + 8; ++k) {
                     if (!this.needsUpdate(j, k, string)) continue;
                     longList.add(ChunkPos.toLong(j, k));
                 }
@@ -184,14 +183,14 @@ public class FeatureUpdater {
     }
 
     public static FeatureUpdater create(DimensionType arg, @Nullable PersistentStateManager arg2) {
-        if (arg == DimensionType.OVERWORLD) {
+        if (arg.method_28541()) {
             return new FeatureUpdater(arg2, (List<String>)ImmutableList.of((Object)"Monument", (Object)"Stronghold", (Object)"Village", (Object)"Mineshaft", (Object)"Temple", (Object)"Mansion"), (List<String>)ImmutableList.of((Object)"Village", (Object)"Mineshaft", (Object)"Mansion", (Object)"Igloo", (Object)"Desert_Pyramid", (Object)"Jungle_Pyramid", (Object)"Swamp_Hut", (Object)"Stronghold", (Object)"Monument"));
         }
-        if (arg == DimensionType.THE_NETHER) {
+        if (arg.method_28542()) {
             ImmutableList list = ImmutableList.of((Object)"Fortress");
             return new FeatureUpdater(arg2, (List<String>)list, (List<String>)list);
         }
-        if (arg == DimensionType.THE_END) {
+        if (arg.method_28543()) {
             ImmutableList list2 = ImmutableList.of((Object)"EndCity");
             return new FeatureUpdater(arg2, (List<String>)list2, (List<String>)list2);
         }

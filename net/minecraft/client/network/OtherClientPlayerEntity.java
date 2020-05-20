@@ -9,6 +9,7 @@
 package net.minecraft.client.network;
 
 import com.mojang.authlib.GameProfile;
+import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -95,8 +96,11 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void sendSystemMessage(Text arg) {
-        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(arg);
+    public void sendSystemMessage(Text arg, UUID uUID) {
+        MinecraftClient lv = MinecraftClient.getInstance();
+        if (!lv.method_29042(uUID)) {
+            lv.inGameHud.getChatHud().addMessage(arg);
+        }
     }
 }
 

@@ -5,6 +5,7 @@
  *  com.google.common.collect.HashBasedTable
  *  com.google.common.collect.Table
  *  com.google.common.primitives.UnsignedLong
+ *  com.mojang.serialization.Dynamic
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
@@ -13,12 +14,14 @@ package net.minecraft.world.timer;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.primitives.UnsignedLong;
+import com.mojang.serialization.Dynamic;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Stream;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -36,6 +39,20 @@ public class Timer<T> {
 
     private static <T> Comparator<Event<T>> createEventComparator() {
         return Comparator.comparingLong(arg -> arg.triggerTime).thenComparing(arg -> arg.id);
+    }
+
+    public Timer(TimerCallbackSerializer<T> arg, Stream<Dynamic<Tag>> stream) {
+        this(arg);
+        this.events.clear();
+        this.eventsByName.clear();
+        this.eventCounter = UnsignedLong.ZERO;
+        stream.forEach(dynamic -> {
+            if (!(dynamic.getValue() instanceof CompoundTag)) {
+                LOGGER.warn("Invalid format of events: {}", dynamic);
+                return;
+            }
+            this.addEvent((CompoundTag)dynamic.getValue());
+        });
     }
 
     public Timer(TimerCallbackSerializer<T> arg) {
@@ -80,22 +97,6 @@ public class Timer<T> {
             String string = arg.getString("Name");
             long l = arg.getLong("TriggerTime");
             this.setEvent(string, l, lv2);
-        }
-    }
-
-    public void fromTag(ListTag arg) {
-        this.events.clear();
-        this.eventsByName.clear();
-        this.eventCounter = UnsignedLong.ZERO;
-        if (arg.isEmpty()) {
-            return;
-        }
-        if (arg.getElementType() != 10) {
-            LOGGER.warn("Invalid format of events: " + arg);
-            return;
-        }
-        for (Tag lv : arg) {
-            this.addEvent((CompoundTag)lv);
         }
     }
 

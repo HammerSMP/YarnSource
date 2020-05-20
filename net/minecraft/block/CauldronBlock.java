@@ -199,7 +199,7 @@ extends Block {
         }
         BlockState lv = arg.getBlockState(arg2);
         if (lv.get(LEVEL) < 3) {
-            arg.setBlockState(arg2, (BlockState)lv.cycle(LEVEL), 2);
+            arg.setBlockState(arg2, (BlockState)lv.method_28493(LEVEL), 2);
         }
     }
 

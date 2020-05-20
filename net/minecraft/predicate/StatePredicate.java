@@ -59,7 +59,7 @@ public class StatePredicate {
         this.conditions = ImmutableList.copyOf(list);
     }
 
-    public <S extends State<S>> boolean test(StateManager<?, S> arg, S arg2) {
+    public <S extends State<?, S>> boolean test(StateManager<?, S> arg, S arg2) {
         for (Condition lv : this.conditions) {
             if (lv.test(arg, arg2)) continue;
             return false;
@@ -148,7 +148,7 @@ public class StatePredicate {
         }
 
         @Override
-        protected <T extends Comparable<T>> boolean test(State<?> arg, Property<T> arg2) {
+        protected <T extends Comparable<T>> boolean test(State<?, ?> arg, Property<T> arg2) {
             Optional<T> optional2;
             Optional<T> optional;
             T comparable = arg.get(arg2);
@@ -181,7 +181,7 @@ public class StatePredicate {
         }
 
         @Override
-        protected <T extends Comparable<T>> boolean test(State<?> arg, Property<T> arg2) {
+        protected <T extends Comparable<T>> boolean test(State<?, ?> arg, Property<T> arg2) {
             T comparable = arg.get(arg2);
             Optional<T> optional = arg2.parse(this.value);
             return optional.isPresent() && comparable.compareTo(optional.get()) == 0;
@@ -200,7 +200,7 @@ public class StatePredicate {
             this.key = string;
         }
 
-        public <S extends State<S>> boolean test(StateManager<?, S> arg, S arg2) {
+        public <S extends State<?, S>> boolean test(StateManager<?, S> arg, S arg2) {
             Property<?> lv = arg.getProperty(this.key);
             if (lv == null) {
                 return false;
@@ -208,7 +208,7 @@ public class StatePredicate {
             return this.test(arg2, lv);
         }
 
-        protected abstract <T extends Comparable<T>> boolean test(State<?> var1, Property<T> var2);
+        protected abstract <T extends Comparable<T>> boolean test(State<?, ?> var1, Property<T> var2);
 
         public abstract JsonElement toJson();
 

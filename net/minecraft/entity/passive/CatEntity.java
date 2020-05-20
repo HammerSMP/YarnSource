@@ -77,7 +77,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.StructureFeature;
 
 public class CatEntity
 extends TameableEntity {
@@ -368,7 +368,7 @@ extends TameableEntity {
             this.setCatType(this.random.nextInt(10));
         }
         World lv = arg.getWorld();
-        if (lv instanceof ServerWorld && Feature.SWAMP_HUT.isInsideStructure(((ServerWorld)lv).getStructureAccessor(), this.getBlockPos())) {
+        if (lv instanceof ServerWorld && ((ServerWorld)lv).getStructureAccessor().method_28388(this.getBlockPos(), true, StructureFeature.field_24851).hasChildren()) {
             this.setCatType(10);
             this.setPersistent();
         }
@@ -463,7 +463,7 @@ extends TameableEntity {
                 BlockPos lv2 = this.owner.getBlockPos();
                 BlockState lv3 = this.cat.world.getBlockState(lv2);
                 if (lv3.getBlock().isIn(BlockTags.BEDS)) {
-                    this.bedPos = lv3.method_27850(BedBlock.FACING).map(arg2 -> lv2.offset(arg2.getOpposite())).orElseGet(() -> new BlockPos(lv2));
+                    this.bedPos = lv3.method_28500(BedBlock.FACING).map(arg2 -> lv2.offset(arg2.getOpposite())).orElseGet(() -> new BlockPos(lv2));
                     return !this.method_16098();
                 }
             }

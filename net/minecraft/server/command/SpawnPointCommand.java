@@ -15,6 +15,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import java.util.Collection;
 import java.util.Collections;
+import net.minecraft.class_5321;
 import net.minecraft.command.arguments.BlockPosArgumentType;
 import net.minecraft.command.arguments.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -30,11 +31,11 @@ public class SpawnPointCommand {
     }
 
     private static int execute(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, BlockPos arg2) {
-        DimensionType lv = arg.getWorld().method_27983();
+        class_5321<DimensionType> lv = arg.getWorld().method_27983();
         for (ServerPlayerEntity lv2 : collection) {
             lv2.setSpawnPoint(lv, arg2, true, false);
         }
-        String string = DimensionType.getId(lv).toString();
+        String string = lv.method_29177().toString();
         if (collection.size() == 1) {
             arg.sendFeedback(new TranslatableText("commands.spawnpoint.success.single", arg2.getX(), arg2.getY(), arg2.getZ(), string, collection.iterator().next().getDisplayName()), true);
         } else {

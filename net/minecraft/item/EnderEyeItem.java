@@ -27,6 +27,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.StructureFeature;
 
 public class EnderEyeItem
 extends Item {
@@ -73,7 +74,7 @@ extends Item {
             return TypedActionResult.pass(lv);
         }
         arg2.setCurrentHand(arg3);
-        if (arg instanceof ServerWorld && (lv3 = ((ServerWorld)arg).getChunkManager().getChunkGenerator().locateStructure((ServerWorld)arg, "Stronghold", arg2.getBlockPos(), 100, false)) != null) {
+        if (arg instanceof ServerWorld && (lv3 = ((ServerWorld)arg).getChunkManager().getChunkGenerator().locateStructure((ServerWorld)arg, StructureFeature.STRONGHOLD, arg2.getBlockPos(), 100, false)) != null) {
             EyeOfEnderEntity lv4 = new EyeOfEnderEntity(arg, arg2.getX(), arg2.getBodyY(0.5), arg2.getZ());
             lv4.setItem(lv);
             lv4.moveTowards(lv3);

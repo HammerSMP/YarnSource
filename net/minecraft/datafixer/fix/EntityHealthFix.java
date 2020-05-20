@@ -5,18 +5,18 @@
  *  com.google.common.collect.Sets
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.datafixer.TypeReferences;
@@ -34,8 +34,8 @@ extends DataFix {
      */
     public Dynamic<?> fixHealth(Dynamic<?> dynamic) {
         void h;
-        Optional optional = dynamic.get("HealF").asNumber();
-        Optional optional2 = dynamic.get("Health").asNumber();
+        Optional optional = dynamic.get("HealF").asNumber().result();
+        Optional optional2 = dynamic.get("Health").asNumber().result();
         if (optional.isPresent()) {
             float f = ((Number)optional.get()).floatValue();
             dynamic = dynamic.remove("HealF");

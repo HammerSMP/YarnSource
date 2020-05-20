@@ -5,6 +5,10 @@
  *  com.google.common.base.Strings
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
+ *  com.mojang.serialization.Dynamic
+ *  com.mojang.serialization.DynamicOps
  *  javax.annotation.Nullable
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -14,6 +18,10 @@ package net.minecraft.nbt;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -29,6 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.AbstractNumberTag;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.ByteTag;
@@ -57,6 +66,13 @@ import org.apache.logging.log4j.Logger;
 
 public class CompoundTag
 implements Tag {
+    public static final Codec<CompoundTag> field_25128 = Codec.PASSTHROUGH.comapFlatMap(dynamic -> {
+        Tag lv = (Tag)dynamic.convert((DynamicOps)NbtOps.INSTANCE).getValue();
+        if (lv instanceof CompoundTag) {
+            return DataResult.success((Object)((CompoundTag)lv));
+        }
+        return DataResult.error((String)("Not a compound tag: " + lv));
+    }, arg -> new Dynamic((DynamicOps)NbtOps.INSTANCE, arg));
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Pattern PATTERN = Pattern.compile("[A-Za-z0-9._+-]+");
     public static final TagReader<CompoundTag> READER = new TagReader<CompoundTag>(){
@@ -96,7 +112,7 @@ implements Tag {
     };
     private final Map<String, Tag> tags;
 
-    private CompoundTag(Map<String, Tag> map) {
+    protected CompoundTag(Map<String, Tag> map) {
         this.tags = map;
     }
 
@@ -525,6 +541,10 @@ implements Tag {
         }
         lv.append("}");
         return lv;
+    }
+
+    protected Map<String, Tag> method_29143() {
+        return Collections.unmodifiableMap(this.tags);
     }
 
     @Override

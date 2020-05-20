@@ -37,7 +37,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
 
 public class RespawnAnchorBlock
@@ -79,7 +78,7 @@ extends Block {
     }
 
     public static boolean method_27353(World arg) {
-        return arg.method_27983() == DimensionType.THE_NETHER;
+        return arg.getDimension().method_28542();
     }
 
     public static void charge(World arg, BlockPos arg2, BlockState arg3) {

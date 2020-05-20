@@ -14,6 +14,8 @@
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
  *  com.mojang.brigadier.exceptions.SimpleCommandExceptionType
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.DataResult
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -33,6 +35,8 @@ import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import java.lang.reflect.Type;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -44,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Identifier
 implements Comparable<Identifier> {
+    public static final Codec<Identifier> field_25139 = Codec.STRING.comapFlatMap(Identifier::method_29186, Identifier::toString).stable();
     private static final SimpleCommandExceptionType COMMAND_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("argument.id.invalid"));
     protected final String namespace;
     protected final String path;
@@ -91,6 +96,15 @@ implements Comparable<Identifier> {
             }
         }
         return strings;
+    }
+
+    private static DataResult<Identifier> method_29186(String string) {
+        try {
+            return DataResult.success((Object)new Identifier(string));
+        }
+        catch (InvalidIdentifierException lv) {
+            return DataResult.error((String)("Not a valid resource location: " + string + " " + lv.getMessage()));
+        }
     }
 
     public String getPath() {
@@ -149,11 +163,27 @@ implements Comparable<Identifier> {
     }
 
     private static boolean isPathValid(String string) {
-        return string.chars().allMatch(i -> i == 95 || i == 45 || i >= 97 && i <= 122 || i >= 48 && i <= 57 || i == 47 || i == 46);
+        for (int i = 0; i < string.length(); ++i) {
+            if (Identifier.method_29184(string.charAt(i))) continue;
+            return false;
+        }
+        return true;
     }
 
     private static boolean isNamespaceValid(String string) {
-        return string.chars().allMatch(i -> i == 95 || i == 45 || i >= 97 && i <= 122 || i >= 48 && i <= 57 || i == 46);
+        for (int i = 0; i < string.length(); ++i) {
+            if (Identifier.method_29185(string.charAt(i))) continue;
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean method_29184(char c) {
+        return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '/' || c == '.';
+    }
+
+    private static boolean method_29185(char c) {
+        return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.';
     }
 
     @Environment(value=EnvType.CLIENT)

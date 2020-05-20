@@ -3,19 +3,14 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
 package net.minecraft.structure.processor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
+import com.mojang.serialization.Codec;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
@@ -30,14 +25,11 @@ import net.minecraft.world.WorldView;
 
 public class RuleStructureProcessor
 extends StructureProcessor {
+    public static final Codec<RuleStructureProcessor> field_25011 = StructureProcessorRule.field_25008.listOf().fieldOf("rules").xmap(RuleStructureProcessor::new, arg -> arg.rules).codec();
     private final ImmutableList<StructureProcessorRule> rules;
 
-    public RuleStructureProcessor(List<StructureProcessorRule> list) {
+    public RuleStructureProcessor(List<? extends StructureProcessorRule> list) {
         this.rules = ImmutableList.copyOf(list);
-    }
-
-    public RuleStructureProcessor(Dynamic<?> dynamic) {
-        this(dynamic.get("rules").asList(StructureProcessorRule::fromDynamic));
     }
 
     @Override
@@ -53,13 +45,8 @@ extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType getType() {
+    protected StructureProcessorType<?> getType() {
         return StructureProcessorType.RULE;
-    }
-
-    @Override
-    protected <T> Dynamic<T> rawToDynamic(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("rules"), (Object)dynamicOps.createList(this.rules.stream().map(arg -> arg.toDynamic(dynamicOps).getValue())))));
     }
 }
 

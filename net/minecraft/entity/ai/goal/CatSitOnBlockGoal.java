@@ -59,7 +59,7 @@ extends MoveToTargetPosGoal {
         if (lv.isOf(Blocks.FURNACE) && lv.get(FurnaceBlock.LIT).booleanValue()) {
             return true;
         }
-        return lv.method_27851(BlockTags.BEDS, arg2 -> arg2.method_27850(BedBlock.PART).map(arg -> arg != BedPart.HEAD).orElse(true));
+        return lv.method_27851(BlockTags.BEDS, arg2 -> arg2.method_28500(BedBlock.PART).map(arg -> arg != BedPart.HEAD).orElse(true));
     }
 }
 

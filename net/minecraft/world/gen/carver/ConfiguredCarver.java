@@ -1,18 +1,24 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.serialization.Codec
  */
 package net.minecraft.world.gen.carver;
 
+import com.mojang.serialization.Codec;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Function;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.carver.Carver;
 import net.minecraft.world.gen.carver.CarverConfig;
 
 public class ConfiguredCarver<WC extends CarverConfig> {
+    public static final Codec<ConfiguredCarver<?>> field_24828 = Registry.CARVER.dispatch("name", arg -> arg.carver, Carver::method_28616);
     public final Carver<WC> carver;
     public final WC config;
 

@@ -2,37 +2,28 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class HeightmapRangeDecoratorConfig
 implements DecoratorConfig {
+    public static final Codec<HeightmapRangeDecoratorConfig> field_24989 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("min").forGetter(arg -> arg.min), (App)Codec.INT.fieldOf("max").forGetter(arg -> arg.max)).apply((Applicative)instance, HeightmapRangeDecoratorConfig::new));
     public final int min;
     public final int max;
 
     public HeightmapRangeDecoratorConfig(int i, int j) {
         this.min = i;
         this.max = j;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("min"), (Object)dynamicOps.createInt(this.min), (Object)dynamicOps.createString("max"), (Object)dynamicOps.createInt(this.max))));
-    }
-
-    public static HeightmapRangeDecoratorConfig deserialize(Dynamic<?> dynamic) {
-        int i = dynamic.get("min").asInt(0);
-        int j = dynamic.get("max").asInt(0);
-        return new HeightmapRangeDecoratorConfig(i, j);
     }
 }
 

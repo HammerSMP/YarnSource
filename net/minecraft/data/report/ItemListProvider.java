@@ -20,7 +20,6 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DefaultedRegistry;
-import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 
 public class ItemListProvider
@@ -35,12 +34,12 @@ implements DataProvider {
     @Override
     public void run(DataCache arg2) throws IOException {
         JsonObject jsonObject = new JsonObject();
-        Registry.REGISTRIES.getIds().forEach(arg -> jsonObject.add(arg.toString(), ItemListProvider.toJson((MutableRegistry)Registry.REGISTRIES.get((Identifier)arg))));
+        Registry.REGISTRIES.getIds().forEach(arg -> jsonObject.add(arg.toString(), ItemListProvider.toJson(Registry.REGISTRIES.get((Identifier)arg))));
         Path path = this.root.getOutput().resolve("reports/registries.json");
         DataProvider.writeToPath(GSON, arg2, (JsonElement)jsonObject, path);
     }
 
-    private static <T> JsonElement toJson(MutableRegistry<T> arg) {
+    private static <T> JsonElement toJson(Registry<T> arg) {
         JsonObject jsonObject = new JsonObject();
         if (arg instanceof DefaultedRegistry) {
             Identifier lv = ((DefaultedRegistry)arg).getDefaultId();
@@ -50,7 +49,7 @@ implements DataProvider {
         jsonObject.addProperty("protocol_id", (Number)i);
         JsonObject jsonObject2 = new JsonObject();
         for (Identifier lv2 : arg.getIds()) {
-            Object object = arg.get(lv2);
+            T object = arg.get(lv2);
             int j = arg.getRawId(object);
             JsonObject jsonObject3 = new JsonObject();
             jsonObject3.addProperty("protocol_id", (Number)j);

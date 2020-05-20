@@ -18,6 +18,7 @@ import com.mojang.datafixers.types.Type;
 import java.util.Objects;
 import java.util.function.Function;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class RecipeRenameFix
 extends DataFix {
@@ -31,7 +32,7 @@ extends DataFix {
     }
 
     protected TypeRewriteRule makeRule() {
-        Type type = DSL.named((String)TypeReferences.RECIPE.typeName(), (Type)DSL.namespacedString());
+        Type type = DSL.named((String)TypeReferences.RECIPE.typeName(), IdentifierNormalizingSchema.method_28295());
         if (!Objects.equals((Object)type, (Object)this.getInputSchema().getType(TypeReferences.RECIPE))) {
             throw new IllegalStateException("Recipe type is not what was expected.");
         }

@@ -255,7 +255,7 @@ public class UpgradeData {
                         for (Direction lv4 : DIRECTIONS) {
                             lv.set(lv2, lv4);
                             BlockState lv5 = arg.getBlockState(lv);
-                            if (!lv5.contains(Properties.DISTANCE_1_7) || lv3.get(Properties.DISTANCE_1_7) <= i) continue;
+                            if (!lv5.method_28498(Properties.DISTANCE_1_7) || lv3.get(Properties.DISTANCE_1_7) <= i) continue;
                             objectSet2.add((Object)lv.toImmutable());
                         }
                     }

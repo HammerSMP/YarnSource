@@ -19,9 +19,5 @@ extends class_5217 {
         this.setSpawnY(arg.getY());
         this.setSpawnZ(arg.getZ());
     }
-
-    public void setTime(long var1);
-
-    public void setTimeOfDay(long var1);
 }
 

@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableMap
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
  *  com.mojang.datafixers.OpticFinder
@@ -11,12 +12,14 @@
  */
 package net.minecraft.datafixer.fix;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import java.util.Map;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
 
@@ -34,7 +37,7 @@ extends DataFix {
             if (optional.isPresent()) {
                 return typed;
             }
-            return typed.update(DSL.remainderFinder(), dynamic -> dynamic.emptyMap().merge(dynamic.createString("data"), dynamic));
+            return typed.update(DSL.remainderFinder(), dynamic -> dynamic.createMap((Map)ImmutableMap.of((Object)dynamic.createString("data"), (Object)dynamic)));
         });
     }
 }

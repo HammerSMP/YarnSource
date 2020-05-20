@@ -2,25 +2,34 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.Maps
+ *  it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+ *  it.unimi.dsi.fastutil.objects.Object2ObjectMap
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft;
 
-import com.google.common.collect.Maps;
-import java.util.Map;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5321;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 
 @Environment(value=EnvType.CLIENT)
 public abstract class class_5294 {
-    private static final Map<DimensionType, class_5294> field_24609 = Maps.newHashMap();
+    private static final Object2ObjectMap<class_5321<DimensionType>, class_5294> field_24609 = (Object2ObjectMap)Util.make(new Object2ObjectArrayMap(), object2ObjectArrayMap -> {
+        class_5297 lv = new class_5297();
+        object2ObjectArrayMap.defaultReturnValue((Object)lv);
+        object2ObjectArrayMap.put(DimensionType.field_24753, (Object)lv);
+        object2ObjectArrayMap.put(DimensionType.field_24754, (Object)new class_5296());
+        object2ObjectArrayMap.put(DimensionType.field_24755, (Object)new class_5295());
+    });
     private final float[] field_24610 = new float[4];
     private final float field_24611;
     private final boolean field_24612;
@@ -32,8 +41,8 @@ public abstract class class_5294 {
         this.field_24613 = bl2;
     }
 
-    public static class_5294 method_28111(DimensionType arg) {
-        return field_24609.getOrDefault(arg, field_24609.get(DimensionType.OVERWORLD));
+    public static class_5294 method_28111(@Nullable class_5321<DimensionType> arg) {
+        return (class_5294)field_24609.get(arg);
     }
 
     @Nullable
@@ -68,12 +77,6 @@ public abstract class class_5294 {
 
     public boolean method_28114() {
         return this.field_24613;
-    }
-
-    static {
-        field_24609.put(DimensionType.OVERWORLD, new class_5297());
-        field_24609.put(DimensionType.THE_NETHER, new class_5296());
-        field_24609.put(DimensionType.THE_END, new class_5295());
     }
 
     @Environment(value=EnvType.CLIENT)

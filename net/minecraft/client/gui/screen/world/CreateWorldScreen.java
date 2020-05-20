@@ -111,7 +111,7 @@ extends Screen {
             this.updateSaveFolderName();
         });
         this.children.add(this.levelNameField);
-        this.gameModeSwitchButton = this.addButton(new ButtonWidget(this.width / 2 - 155, 115, 150, 20, new TranslatableText("selectWorld.gameMode"), arg -> {
+        this.gameModeSwitchButton = this.addButton(new ButtonWidget(this.width / 2 - 155, 100, 150, 20, new TranslatableText("selectWorld.gameMode"), arg -> {
             switch (this.currentMode) {
                 case SURVIVAL: {
                     this.tweakDefaultsTo(Mode.HARDCORE);
@@ -138,7 +138,7 @@ extends Screen {
                 return super.getNarrationMessage().append(". ").append(CreateWorldScreen.this.firstGameModeDescriptionLine).append(" ").append(CreateWorldScreen.this.secondGameModeDescriptionLine);
             }
         });
-        this.field_24286 = this.addButton(new ButtonWidget(this.width / 2 + 5, 115, 150, 20, new TranslatableText("options.difficulty"), arg -> {
+        this.field_24286 = this.addButton(new ButtonWidget(this.width / 2 + 5, 100, 150, 20, new TranslatableText("options.difficulty"), arg -> {
             this.field_24290 = this.field_24289 = this.field_24289.cycle();
             arg.queueNarration(250);
         }){
@@ -148,7 +148,6 @@ extends Screen {
                 return new TranslatableText("options.difficulty").append(": ").append(CreateWorldScreen.this.field_24290.getTranslatableName());
             }
         });
-        this.field_24588.method_28092(this, this.client, this.textRenderer);
         this.enableCheatsButton = this.addButton(new ButtonWidget(this.width / 2 - 155, 151, 150, 20, new TranslatableText("selectWorld.allowCommands"), arg -> {
             this.tweakedCheats = true;
             this.cheatsEnabled = !this.cheatsEnabled;
@@ -165,17 +164,17 @@ extends Screen {
                 return super.getNarrationMessage().append(". ").append(new TranslatableText("selectWorld.allowCommands.info"));
             }
         });
-        this.enableCheatsButton.visible = false;
-        this.createLevelButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("selectWorld.create"), arg -> this.createLevel()));
-        this.createLevelButton.active = !this.levelName.isEmpty();
-        this.addButton(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.parent)));
-        this.moreOptionsButton = this.addButton(new ButtonWidget(this.width / 2 + 5, 185, 150, 20, new TranslatableText("selectWorld.moreWorldOptions"), arg -> this.toggleMoreOptions()));
         this.gameRulesButton = this.addButton(new ButtonWidget(this.width / 2 - 155, 185, 150, 20, new TranslatableText("selectWorld.gameRules"), arg -> this.client.openScreen(new EditGameRulesScreen(this.gameRules.copy(), optional -> {
             this.client.openScreen(this);
             optional.ifPresent(arg -> {
                 this.gameRules = arg;
             });
         }))));
+        this.field_24588.method_28092(this, this.client, this.textRenderer);
+        this.moreOptionsButton = this.addButton(new ButtonWidget(this.width / 2 + 5, 185, 150, 20, new TranslatableText("selectWorld.moreWorldOptions"), arg -> this.toggleMoreOptions()));
+        this.createLevelButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("selectWorld.create"), arg -> this.createLevel()));
+        this.createLevelButton.active = !this.levelName.isEmpty();
+        this.addButton(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.parent)));
         this.method_28084();
         this.setInitialFocus(this.levelNameField);
         this.tweakDefaultsTo(this.currentMode);
@@ -274,7 +273,7 @@ extends Screen {
             if (this.lastMode != null) {
                 this.tweakDefaultsTo(this.lastMode);
             }
-            this.enableCheatsButton.visible = this.moreOptionsOpen;
+            this.enableCheatsButton.visible = !this.moreOptionsOpen;
         }
         this.field_24588.method_28101(this.moreOptionsOpen);
         this.levelNameField.setVisible(!this.moreOptionsOpen);
@@ -314,16 +313,16 @@ extends Screen {
         if (this.moreOptionsOpen) {
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
-            if (this.enableCheatsButton.visible) {
-                this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
-            }
             this.field_24588.render(arg, i, j, f);
         } else {
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirectoryName, this.width / 2 - 100, 85, -6250336);
             this.levelNameField.render(arg, i, j, f);
-            this.drawCenteredText(arg, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 155 + 75, 137, -6250336);
-            this.drawCenteredText(arg, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 155 + 75, 149, -6250336);
+            this.drawCenteredText(arg, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 155 + 75, 122, -6250336);
+            this.drawCenteredText(arg, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 155 + 75, 134, -6250336);
+            if (this.enableCheatsButton.visible) {
+                this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
+            }
         }
         super.render(arg, i, j, f);
     }

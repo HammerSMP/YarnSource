@@ -4,21 +4,21 @@
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.OpticFinder
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.schemas.Schema
  *  com.mojang.datafixers.types.Type
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.OpticFinder;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
+import com.mojang.serialization.Dynamic;
 import java.util.Optional;
 import net.minecraft.datafixer.TypeReferences;
 
@@ -38,26 +38,26 @@ extends DataFix {
         Optional optional5;
         Optional optional4;
         Optional optional3;
-        Optional optional = dynamic.get("Heightmaps").get();
+        Optional optional = dynamic.get("Heightmaps").result();
         if (!optional.isPresent()) {
             return dynamic;
         }
         Dynamic dynamic2 = (Dynamic)optional.get();
-        Optional optional2 = dynamic2.get("LIQUID").get();
+        Optional optional2 = dynamic2.get("LIQUID").result();
         if (optional2.isPresent()) {
             dynamic2 = dynamic2.remove("LIQUID");
             dynamic2 = dynamic2.set("WORLD_SURFACE_WG", (Dynamic)optional2.get());
         }
-        if ((optional3 = dynamic2.get("SOLID").get()).isPresent()) {
+        if ((optional3 = dynamic2.get("SOLID").result()).isPresent()) {
             dynamic2 = dynamic2.remove("SOLID");
             dynamic2 = dynamic2.set("OCEAN_FLOOR_WG", (Dynamic)optional3.get());
             dynamic2 = dynamic2.set("OCEAN_FLOOR", (Dynamic)optional3.get());
         }
-        if ((optional4 = dynamic2.get("LIGHT").get()).isPresent()) {
+        if ((optional4 = dynamic2.get("LIGHT").result()).isPresent()) {
             dynamic2 = dynamic2.remove("LIGHT");
             dynamic2 = dynamic2.set("LIGHT_BLOCKING", (Dynamic)optional4.get());
         }
-        if ((optional5 = dynamic2.get("RAIN").get()).isPresent()) {
+        if ((optional5 = dynamic2.get("RAIN").result()).isPresent()) {
             dynamic2 = dynamic2.remove("RAIN");
             dynamic2 = dynamic2.set("MOTION_BLOCKING", (Dynamic)optional5.get());
             dynamic2 = dynamic2.set("MOTION_BLOCKING_NO_LEAVES", (Dynamic)optional5.get());

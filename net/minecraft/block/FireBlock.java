@@ -35,7 +35,6 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.dimension.TheEndDimension;
 
 public class FireBlock
 extends AbstractFireBlock {
@@ -122,7 +121,7 @@ extends AbstractFireBlock {
             arg2.removeBlock(arg3, false);
         }
         BlockState lv = arg2.getBlockState(arg3.down());
-        boolean bl = arg2.getDimension() instanceof TheEndDimension && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
+        boolean bl = arg2.getDimension().method_28543() && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
         int i = arg.get(AGE);
         if (!bl && arg2.isRaining() && this.isRainingAround(arg2, arg3) && random.nextFloat() < 0.2f + (float)i * 0.03f) {
             arg2.removeBlock(arg3, false);
@@ -183,14 +182,14 @@ extends AbstractFireBlock {
     }
 
     private int getSpreadChance(BlockState arg) {
-        if (arg.contains(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
+        if (arg.method_28498(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
             return 0;
         }
         return this.spreadChances.getInt((Object)arg.getBlock());
     }
 
     private int getBurnChance(BlockState arg) {
-        if (arg.contains(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
+        if (arg.method_28498(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
             return 0;
         }
         return this.burnChances.getInt((Object)arg.getBlock());

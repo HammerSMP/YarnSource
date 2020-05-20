@@ -44,7 +44,7 @@ public class Bootstrap {
             return;
         }
         initialized = true;
-        if (Registry.REGISTRIES.isEmpty()) {
+        if (Registry.REGISTRIES.getIds().isEmpty()) {
             throw new IllegalStateException("Unable to load registries");
         }
         FireBlock.registerDefaultFlammables();

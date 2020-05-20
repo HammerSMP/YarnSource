@@ -7,6 +7,7 @@
  */
 package net.minecraft.client.gui.hud;
 
+import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -24,7 +25,10 @@ implements ClientChatListener {
     }
 
     @Override
-    public void onChatMessage(MessageType arg, Text arg2) {
+    public void onChatMessage(MessageType arg, Text arg2, UUID uUID) {
+        if (this.client.method_29042(uUID)) {
+            return;
+        }
         if (arg != MessageType.CHAT) {
             this.client.inGameHud.getChatHud().addMessage(arg2);
         } else {

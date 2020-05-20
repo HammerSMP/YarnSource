@@ -519,7 +519,7 @@ public interface DispenserBehavior {
                 World lv = arg2.getWorld();
                 BlockPos lv2 = arg2.getBlockPos().offset(arg2.getBlockState().get(DispenserBlock.FACING));
                 BlockState lv3 = lv.getBlockState(lv2);
-                if (lv3.method_27851(BlockTags.BEEHIVES, arg -> arg.contains(BeehiveBlock.HONEY_LEVEL)) && lv3.get(BeehiveBlock.HONEY_LEVEL) >= 5) {
+                if (lv3.method_27851(BlockTags.BEEHIVES, arg -> arg.method_28498(BeehiveBlock.HONEY_LEVEL)) && lv3.get(BeehiveBlock.HONEY_LEVEL) >= 5) {
                     ((BeehiveBlock)lv3.getBlock()).takeHoney(lv.getWorld(), lv3, lv2, null, BeehiveBlockEntity.BeeState.BEE_RELEASED);
                     this.setSuccess(true);
                     return this.method_22141(arg2, arg22, new ItemStack(Items.HONEY_BOTTLE));

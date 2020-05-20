@@ -2,20 +2,22 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.decorator;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import java.util.Map;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class RangeDecoratorConfig
 implements DecoratorConfig {
+    public static final Codec<RangeDecoratorConfig> field_24879 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.INT.fieldOf("bottom_offset").withDefault((Object)0).forGetter(arg -> arg.bottomOffset), (App)Codec.INT.fieldOf("top_offset").withDefault((Object)0).forGetter(arg -> arg.topOffset), (App)Codec.INT.fieldOf("maximum").withDefault((Object)0).forGetter(arg -> arg.maximum)).apply((Applicative)instance, RangeDecoratorConfig::new));
     public final int count;
     public final int bottomOffset;
     public final int topOffset;
@@ -26,19 +28,6 @@ implements DecoratorConfig {
         this.bottomOffset = j;
         this.topOffset = k;
         this.maximum = l;
-    }
-
-    @Override
-    public <T> Dynamic<T> serialize(DynamicOps<T> dynamicOps) {
-        return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("count"), (Object)dynamicOps.createInt(this.count), (Object)dynamicOps.createString("bottom_offset"), (Object)dynamicOps.createInt(this.bottomOffset), (Object)dynamicOps.createString("top_offset"), (Object)dynamicOps.createInt(this.topOffset), (Object)dynamicOps.createString("maximum"), (Object)dynamicOps.createInt(this.maximum))));
-    }
-
-    public static RangeDecoratorConfig deserialize(Dynamic<?> dynamic) {
-        int i = dynamic.get("count").asInt(0);
-        int j = dynamic.get("bottom_offset").asInt(0);
-        int k = dynamic.get("top_offset").asInt(0);
-        int l = dynamic.get("maximum").asInt(0);
-        return new RangeDecoratorConfig(i, j, k, l);
     }
 }
 

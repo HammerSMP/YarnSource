@@ -6,7 +6,6 @@ package net.minecraft.world.level;
 import java.util.UUID;
 import net.minecraft.class_5219;
 import net.minecraft.class_5268;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
@@ -106,11 +105,11 @@ implements class_5268 {
     }
 
     @Override
-    public void setTime(long l) {
+    public void method_29034(long l) {
     }
 
     @Override
-    public void setTimeOfDay(long l) {
+    public void method_29035(long l) {
     }
 
     @Override
@@ -183,16 +182,6 @@ implements class_5268 {
     @Override
     public Timer<MinecraftServer> getScheduledEvents() {
         return this.properties.getScheduledEvents();
-    }
-
-    @Override
-    public void setWorldData(CompoundTag arg) {
-        this.field_24179.setWorldData(this.field_24178, arg);
-    }
-
-    @Override
-    public CompoundTag getWorldData() {
-        return this.field_24179.getWorldData(this.field_24178);
     }
 
     @Override

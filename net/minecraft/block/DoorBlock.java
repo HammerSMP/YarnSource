@@ -200,7 +200,7 @@ extends Block {
         if (this.material == Material.METAL) {
             return ActionResult.PASS;
         }
-        arg = (BlockState)arg.cycle(OPEN);
+        arg = (BlockState)arg.method_28493(OPEN);
         arg2.setBlockState(arg3, arg, 10);
         arg2.syncWorldEvent(arg4, arg.get(OPEN) != false ? this.getCloseSoundEventId() : this.getOpenSoundEventId(), arg3, 0);
         return ActionResult.SUCCESS;
@@ -256,7 +256,7 @@ extends Block {
         if (arg2 == BlockMirror.NONE) {
             return arg;
         }
-        return (BlockState)arg.rotate(arg2.getRotation(arg.get(FACING))).cycle(HINGE);
+        return (BlockState)arg.rotate(arg2.getRotation(arg.get(FACING))).method_28493(HINGE);
     }
 
     @Override

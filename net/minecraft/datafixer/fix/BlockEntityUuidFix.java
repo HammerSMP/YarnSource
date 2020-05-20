@@ -2,17 +2,17 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
  *  com.mojang.datafixers.TypeRewriteRule
  *  com.mojang.datafixers.Typed
  *  com.mojang.datafixers.schemas.Schema
+ *  com.mojang.serialization.Dynamic
  */
 package net.minecraft.datafixer.fix;
 
-import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.AbstractUuidFix;
 
@@ -31,7 +31,7 @@ extends AbstractUuidFix {
     }
 
     private Dynamic<?> updateSkull(Dynamic<?> dynamic3) {
-        return dynamic3.get("Owner").get().map(dynamic -> BlockEntityUuidFix.updateStringUuid(dynamic, "Id", "Id").orElse((Dynamic<?>)dynamic)).map(dynamic2 -> dynamic3.remove("Owner").set("SkullOwner", dynamic2)).orElse(dynamic3);
+        return dynamic3.get("Owner").get().map(dynamic -> BlockEntityUuidFix.updateStringUuid(dynamic, "Id", "Id").orElse((Dynamic<?>)dynamic)).map(dynamic2 -> dynamic3.remove("Owner").set("SkullOwner", dynamic2)).result().orElse(dynamic3);
     }
 
     private Dynamic<?> updateConduit(Dynamic<?> dynamic) {

@@ -249,7 +249,7 @@ extends HandledScreen<BeaconScreenHandler> {
         public void renderToolTip(MatrixStack arg, int i, int j) {
             TranslatableText lv = new TranslatableText(this.effect.getTranslationKey());
             if (!this.primary && this.effect != StatusEffects.REGENERATION) {
-                lv.append("II");
+                lv.append(" II");
             }
             BeaconScreen.this.renderTooltip(arg, lv, i, j);
         }

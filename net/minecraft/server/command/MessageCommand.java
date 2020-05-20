@@ -16,6 +16,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import java.util.Collection;
+import java.util.UUID;
 import net.minecraft.command.arguments.EntityArgumentType;
 import net.minecraft.command.arguments.MessageArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -24,6 +25,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 
 public class MessageCommand {
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
@@ -33,8 +35,9 @@ public class MessageCommand {
     }
 
     private static int execute(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, Text arg2) {
+        UUID uUID = arg.getEntity() == null ? Util.field_25140 : arg.getEntity().getUuid();
         for (ServerPlayerEntity lv : collection) {
-            lv.sendSystemMessage(new TranslatableText("commands.message.display.incoming", arg.getDisplayName(), arg2).formatted(Formatting.GRAY, Formatting.ITALIC));
+            lv.sendSystemMessage(new TranslatableText("commands.message.display.incoming", arg.getDisplayName(), arg2).formatted(Formatting.GRAY, Formatting.ITALIC), uUID);
             arg.sendFeedback(new TranslatableText("commands.message.display.outgoing", lv.getDisplayName(), arg2).formatted(Formatting.GRAY, Formatting.ITALIC), false);
         }
         return collection.size();

@@ -2,11 +2,15 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.mojang.datafixers.Dynamic
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.gen.foliage;
 
-import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.util.math.BlockPos;
@@ -17,12 +21,15 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class AcaciaFoliagePlacer
 extends FoliagePlacer {
+    public static final Codec<AcaciaFoliagePlacer> field_24926 = RecordCodecBuilder.create(instance -> AcaciaFoliagePlacer.method_28846(instance).apply((Applicative)instance, AcaciaFoliagePlacer::new));
+
     public AcaciaFoliagePlacer(int i, int j, int k, int l) {
-        super(i, j, k, l, FoliagePlacerType.ACACIA_FOLIAGE_PLACER);
+        super(i, j, k, l);
     }
 
-    public <T> AcaciaFoliagePlacer(Dynamic<T> dynamic) {
-        this(dynamic.get("radius").asInt(0), dynamic.get("radius_random").asInt(0), dynamic.get("offset").asInt(0), dynamic.get("offset_random").asInt(0));
+    @Override
+    protected FoliagePlacerType<?> method_28843() {
+        return FoliagePlacerType.ACACIA_FOLIAGE_PLACER;
     }
 
     @Override
