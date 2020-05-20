@@ -25,7 +25,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
@@ -67,9 +67,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class PandaEntity
 extends AnimalEntity {
@@ -79,7 +79,7 @@ extends AnimalEntity {
     private static final TrackedData<Byte> MAIN_GENE = DataTracker.registerData(PandaEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Byte> HIDDEN_GENE = DataTracker.registerData(PandaEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Byte> PANDA_FLAGS = DataTracker.registerData(PandaEntity.class, TrackedDataHandlerRegistry.BYTE);
-    private static final TargetPredicate field_21803 = new TargetPredicate().setBaseMaxDistance(8.0).includeTeammates().includeInvulnerable();
+    private static final TargetPredicate ASK_FOR_BAMBOO_TARGET = new TargetPredicate().setBaseMaxDistance(8.0).includeTeammates().includeInvulnerable();
     private boolean shouldGetRevenge;
     private boolean shouldAttack;
     public int playingTicks;
@@ -472,6 +472,7 @@ extends AnimalEntity {
     @Override
     protected void loot(ItemEntity arg) {
         if (this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty() && IS_FOOD.test(arg)) {
+            this.method_27964(arg);
             ItemStack lv = arg.getStack();
             this.equipStack(EquipmentSlot.MAINHAND, lv);
             this.handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2.0f;
@@ -488,7 +489,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setMainGene(Gene.createRandom(this.random));
         this.setHiddenGene(Gene.createRandom(this.random));
         this.resetAttributes();
@@ -814,7 +815,7 @@ extends AnimalEntity {
                         this.panda.setAskForBambooTicks(32);
                         this.nextAskPlayerForBambooAge = this.panda.age + 600;
                         if (this.panda.canMoveVoluntarily()) {
-                            PlayerEntity lv = this.world.getClosestPlayer(field_21803, this.panda);
+                            PlayerEntity lv = this.world.getClosestPlayer(ASK_FOR_BAMBOO_TARGET, this.panda);
                             this.panda.lookAtPlayerGoal.setTarget(lv);
                         }
                     }

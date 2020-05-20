@@ -13,8 +13,8 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class CoralFanBlock
 extends DeadCoralFanBlock {
@@ -38,7 +38,7 @@ extends DeadCoralFanBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
             return Blocks.AIR.getDefaultState();
         }

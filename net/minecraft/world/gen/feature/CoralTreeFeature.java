@@ -17,7 +17,7 @@ import java.util.function.Function;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.feature.CoralFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 
@@ -28,7 +28,7 @@ extends CoralFeature {
     }
 
     @Override
-    protected boolean spawnCoral(IWorld arg, Random random, BlockPos arg2, BlockState arg3) {
+    protected boolean spawnCoral(WorldAccess arg, Random random, BlockPos arg2, BlockState arg3) {
         BlockPos.Mutable lv = arg2.mutableCopy();
         int i = random.nextInt(3) + 1;
         for (int j = 0; j < i; ++j) {

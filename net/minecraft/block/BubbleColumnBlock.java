@@ -33,8 +33,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class BubbleColumnBlock
@@ -79,13 +79,13 @@ implements FluidDrainable {
         return Fluids.WATER.getStill(false);
     }
 
-    public static void update(IWorld arg, BlockPos arg2, boolean bl) {
+    public static void update(WorldAccess arg, BlockPos arg2, boolean bl) {
         if (BubbleColumnBlock.isStillWater(arg, arg2)) {
             arg.setBlockState(arg2, (BlockState)Blocks.BUBBLE_COLUMN.getDefaultState().with(DRAG, bl), 2);
         }
     }
 
-    public static boolean isStillWater(IWorld arg, BlockPos arg2) {
+    public static boolean isStillWater(WorldAccess arg, BlockPos arg2) {
         FluidState lv = arg.getFluidState(arg2);
         return arg.getBlockState(arg2).isOf(Blocks.WATER) && lv.getLevel() >= 8 && lv.isStill();
     }
@@ -119,7 +119,7 @@ implements FluidDrainable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (!arg.canPlaceAt(arg4, arg5)) {
             return Blocks.WATER.getDefaultState();
         }
@@ -154,7 +154,7 @@ implements FluidDrainable {
     }
 
     @Override
-    public Fluid tryDrainFluid(IWorld arg, BlockPos arg2, BlockState arg3) {
+    public Fluid tryDrainFluid(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         arg.setBlockState(arg2, Blocks.AIR.getDefaultState(), 11);
         return Fluids.WATER;
     }

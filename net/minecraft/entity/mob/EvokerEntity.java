@@ -13,7 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
@@ -264,7 +264,7 @@ extends SpellcastingIllagerEntity {
                 BlockPos lv = EvokerEntity.this.getBlockPos().add(-2 + EvokerEntity.this.random.nextInt(5), 1, -2 + EvokerEntity.this.random.nextInt(5));
                 VexEntity lv2 = EntityType.VEX.create(EvokerEntity.this.world);
                 lv2.refreshPositionAndAngles(lv, 0.0f, 0.0f);
-                lv2.initialize(EvokerEntity.this.world, EvokerEntity.this.world.getLocalDifficulty(lv), SpawnType.MOB_SUMMONED, null, null);
+                lv2.initialize(EvokerEntity.this.world, EvokerEntity.this.world.getLocalDifficulty(lv), SpawnReason.MOB_SUMMONED, null, null);
                 lv2.setOwner(EvokerEntity.this);
                 lv2.setBounds(lv);
                 lv2.setLifeTicks(20 * (30 + EvokerEntity.this.random.nextInt(90)));

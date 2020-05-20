@@ -34,8 +34,6 @@ import net.minecraft.world.biome.layer.util.LayerFactory;
 import net.minecraft.world.biome.layer.util.LayerSampleContext;
 import net.minecraft.world.biome.layer.util.LayerSampler;
 import net.minecraft.world.biome.source.BiomeLayerSampler;
-import net.minecraft.world.gen.chunk.OverworldChunkGeneratorConfig;
-import net.minecraft.world.level.LevelGeneratorType;
 
 public class BiomeLayers {
     protected static final int WARM_OCEAN_ID = Registry.BIOME.getRawId(Biomes.WARM_OCEAN);
@@ -57,7 +55,7 @@ public class BiomeLayers {
         return lv;
     }
 
-    public static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(LevelGeneratorType arg, OverworldChunkGeneratorConfig arg2, LongFunction<C> longFunction) {
+    private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(boolean bl, int i, int j, LongFunction<C> longFunction) {
         LayerFactory lv = ContinentLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(1L));
         lv = ScaleLayer.FUZZY.create((LayerSampleContext)longFunction.apply(2000L), lv);
         lv = IncreaseEdgeCurvatureLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(1L), lv);
@@ -78,14 +76,11 @@ public class BiomeLayers {
         lv = IncreaseEdgeCurvatureLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(4L), lv);
         lv = AddMushroomIslandLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(5L), lv);
         lv = AddDeepOceanLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(4L), lv);
-        lv = BiomeLayers.stack(1000L, ScaleLayer.NORMAL, lv, 0, longFunction);
-        int i = arg == LevelGeneratorType.LARGE_BIOMES ? 6 : arg2.getBiomeSize();
-        int j = arg2.getRiverSize();
-        LayerFactory lv3 = lv;
+        LayerFactory lv3 = lv = BiomeLayers.stack(1000L, ScaleLayer.NORMAL, lv, 0, longFunction);
         lv3 = BiomeLayers.stack(1000L, ScaleLayer.NORMAL, lv3, 0, longFunction);
         lv3 = SimpleLandNoiseLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(100L), lv3);
         LayerFactory lv4 = lv;
-        lv4 = new SetBaseBiomesLayer(arg, arg2.getForcedBiome()).create((LayerSampleContext)longFunction.apply(200L), lv4);
+        lv4 = new SetBaseBiomesLayer(bl).create((LayerSampleContext)longFunction.apply(200L), lv4);
         lv4 = AddBambooJungleLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(1001L), lv4);
         lv4 = BiomeLayers.stack(1000L, ScaleLayer.NORMAL, lv4, 2, longFunction);
         lv4 = EaseBiomeEdgeLayer.INSTANCE.create((LayerSampleContext)longFunction.apply(1000L), lv4);
@@ -111,9 +106,9 @@ public class BiomeLayers {
         return lv4;
     }
 
-    public static BiomeLayerSampler build(long l, LevelGeneratorType arg, OverworldChunkGeneratorConfig arg2) {
-        int i = 25;
-        LayerFactory<CachingLayerSampler> lv = BiomeLayers.build(arg, arg2, (long m) -> new CachingLayerContext(25, l, m));
+    public static BiomeLayerSampler build(long l, boolean bl, int i, int j) {
+        int k = 25;
+        LayerFactory<CachingLayerSampler> lv = BiomeLayers.build(bl, i, j, m -> new CachingLayerContext(25, l, m));
         return new BiomeLayerSampler(lv);
     }
 

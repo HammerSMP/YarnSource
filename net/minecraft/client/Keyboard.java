@@ -17,6 +17,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.GameModeSwitcherScreen;
 import net.minecraft.client.gui.screen.options.AccessibilityScreen;
 import net.minecraft.client.gui.screen.options.ChatOptionsScreen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
@@ -116,10 +117,18 @@ public class Keyboard {
             case 78: {
                 if (!this.client.player.hasPermissionLevel(2)) {
                     this.debugWarn("debug.creative_spectator.error", new Object[0]);
-                } else if (this.client.player.isCreative()) {
+                } else if (!this.client.player.isSpectator()) {
                     this.client.player.sendChatMessage("/gamemode spectator");
                 } else {
-                    this.client.player.sendChatMessage("/gamemode creative");
+                    this.client.player.sendChatMessage("/gamemode " + this.client.interactionManager.getPreviousGameMode().getName());
+                }
+                return true;
+            }
+            case 293: {
+                if (!this.client.player.hasPermissionLevel(2)) {
+                    this.debugWarn("debug.gamemodes.error", new Object[0]);
+                } else {
+                    this.client.openScreen(new GameModeSwitcherScreen());
                 }
                 return true;
             }
@@ -145,6 +154,7 @@ public class Keyboard {
                 lv.addMessage(new TranslatableText("debug.help.help"));
                 lv.addMessage(new TranslatableText("debug.reload_resourcepacks.help"));
                 lv.addMessage(new TranslatableText("debug.pause.help"));
+                lv.addMessage(new TranslatableText("debug.gamemodes.help"));
                 return true;
             }
             case 84: {
@@ -157,7 +167,7 @@ public class Keyboard {
                     return false;
                 }
                 this.debugWarn("debug.copy_location.message", new Object[0]);
-                this.setClipboard(String.format(Locale.ROOT, "/execute in %s run tp @s %.2f %.2f %.2f %.2f %.2f", DimensionType.getId(this.client.player.world.dimension.getType()), this.client.player.getX(), this.client.player.getY(), this.client.player.getZ(), Float.valueOf(this.client.player.yaw), Float.valueOf(this.client.player.pitch)));
+                this.setClipboard(String.format(Locale.ROOT, "/execute in %s run tp @s %.2f %.2f %.2f %.2f %.2f", DimensionType.getId(this.client.player.world.method_27983()), this.client.player.getX(), this.client.player.getY(), this.client.player.getZ(), Float.valueOf(this.client.player.yaw), Float.valueOf(this.client.player.pitch)));
                 return true;
             }
         }
@@ -297,7 +307,7 @@ public class Keyboard {
             }
         }
         if (this.client.currentScreen == null || this.client.currentScreen.passEvents) {
-            InputUtil.KeyCode lv2 = InputUtil.getKeyCode(i, j);
+            InputUtil.Key lv2 = InputUtil.fromKeyCode(i, j);
             if (k == 0) {
                 KeyBinding.setKeyPressed(lv2, false);
                 if (i == 292) {

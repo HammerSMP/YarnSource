@@ -445,46 +445,46 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         StructureBlockMode lv = this.structureBlock.getMode();
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
         if (lv != StructureBlockMode.DATA) {
-            this.drawString(arg, this.textRenderer, I18n.translate("structure_block.structure_name", new Object[0]), this.width / 2 - 153, 30, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.structure_name", new Object[0]), this.width / 2 - 153, 30, 0xA0A0A0);
             this.inputName.render(arg, i, j, f);
         }
         if (lv == StructureBlockMode.LOAD || lv == StructureBlockMode.SAVE) {
-            this.drawString(arg, this.textRenderer, I18n.translate("structure_block.position", new Object[0]), this.width / 2 - 153, 70, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.position", new Object[0]), this.width / 2 - 153, 70, 0xA0A0A0);
             this.inputPosX.render(arg, i, j, f);
             this.inputPosY.render(arg, i, j, f);
             this.inputPosZ.render(arg, i, j, f);
             String string = I18n.translate("structure_block.include_entities", new Object[0]);
             int k = this.textRenderer.getWidth(string);
-            this.drawString(arg, this.textRenderer, string, this.width / 2 + 154 - k, 150, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, string, this.width / 2 + 154 - k, 150, 0xA0A0A0);
         }
         if (lv == StructureBlockMode.SAVE) {
-            this.drawString(arg, this.textRenderer, I18n.translate("structure_block.size", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.size", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
             this.inputSizeX.render(arg, i, j, f);
             this.inputSizeY.render(arg, i, j, f);
             this.inputSizeZ.render(arg, i, j, f);
             String string2 = I18n.translate("structure_block.detect_size", new Object[0]);
             int l = this.textRenderer.getWidth(string2);
-            this.drawString(arg, this.textRenderer, string2, this.width / 2 + 154 - l, 110, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, string2, this.width / 2 + 154 - l, 110, 0xA0A0A0);
             String string3 = I18n.translate("structure_block.show_air", new Object[0]);
             int m = this.textRenderer.getWidth(string3);
-            this.drawString(arg, this.textRenderer, string3, this.width / 2 + 154 - m, 70, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, string3, this.width / 2 + 154 - m, 70, 0xA0A0A0);
         }
         if (lv == StructureBlockMode.LOAD) {
-            this.drawString(arg, this.textRenderer, I18n.translate("structure_block.integrity", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.integrity", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
             this.inputIntegrity.render(arg, i, j, f);
             this.inputSeed.render(arg, i, j, f);
             String string4 = I18n.translate("structure_block.show_boundingbox", new Object[0]);
             int n = this.textRenderer.getWidth(string4);
-            this.drawString(arg, this.textRenderer, string4, this.width / 2 + 154 - n, 70, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, string4, this.width / 2 + 154 - n, 70, 0xA0A0A0);
         }
         if (lv == StructureBlockMode.DATA) {
-            this.drawString(arg, this.textRenderer, I18n.translate("structure_block.custom_data", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("structure_block.custom_data", new Object[0]), this.width / 2 - 153, 110, 0xA0A0A0);
             this.inputMetadata.render(arg, i, j, f);
         }
         String string5 = "structure_block.mode_info." + lv.asString();
-        this.drawString(arg, this.textRenderer, I18n.translate(string5, new Object[0]), this.width / 2 - 153, 174, 0xA0A0A0);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate(string5, new Object[0]), this.width / 2 - 153, 174, 0xA0A0A0);
         super.render(arg, i, j, f);
     }
 

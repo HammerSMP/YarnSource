@@ -253,7 +253,7 @@ extends DrawableHelper {
                         n = MathHelper.hsvToRgb(l / 50.0f, 0.7f, 0.6f) & 0xFFFFFF;
                     }
                     int o = m << 24 & 0xFF000000;
-                    int p = lv.getStringWidth(this.overlayMessage);
+                    int p = lv.getWidth(this.overlayMessage);
                     this.drawTextBackground(arg, lv, -4, p, 0xFFFFFF | o);
                     lv.draw(arg, this.overlayMessage, (float)(-p / 2), -4.0f, n | o);
                     RenderSystem.disableBlend();
@@ -280,14 +280,14 @@ extends DrawableHelper {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(4.0f, 4.0f, 4.0f);
                     int t = r << 24 & 0xFF000000;
-                    int u = lv.getStringWidth(this.title);
+                    int u = lv.getWidth(this.title);
                     this.drawTextBackground(arg, lv, -10, u, 0xFFFFFF | t);
                     lv.drawWithShadow(arg, this.title, (float)(-u / 2), -10.0f, 0xFFFFFF | t);
                     RenderSystem.popMatrix();
                     if (this.subtitle != null) {
                         RenderSystem.pushMatrix();
                         RenderSystem.scalef(2.0f, 2.0f, 2.0f);
-                        int v = lv.getStringWidth(this.subtitle);
+                        int v = lv.getWidth(this.subtitle);
                         this.drawTextBackground(arg, lv, 5, v, 0xFFFFFF | t);
                         lv.drawWithShadow(arg, this.subtitle, (float)(-v / 2), 5.0f, 0xFFFFFF | t);
                         RenderSystem.popMatrix();
@@ -550,7 +550,7 @@ extends DrawableHelper {
             if (this.currentStack.hasCustomName()) {
                 lv.formatted(Formatting.ITALIC);
             }
-            int i = this.getFontRenderer().getStringWidth(lv);
+            int i = this.getFontRenderer().getWidth(lv);
             int j = (this.scaledWidth - i) / 2;
             int k = this.scaledHeight - 59;
             if (!this.client.interactionManager.hasStatusBars()) {
@@ -594,13 +594,13 @@ extends DrawableHelper {
         collection = list.size() > 15 ? Lists.newArrayList((Iterable)Iterables.skip(list, (int)(collection.size() - 15))) : list;
         ArrayList list2 = Lists.newArrayListWithCapacity((int)collection.size());
         Text lv2 = arg22.getDisplayName();
-        int j = i = this.getFontRenderer().getStringWidth(lv2);
+        int j = i = this.getFontRenderer().getWidth(lv2);
         int k = this.getFontRenderer().getWidth(": ");
         for (ScoreboardPlayerScore lv3 : collection) {
             Team lv4 = lv.getPlayerTeam(lv3.getPlayerName());
             MutableText lv5 = Team.modifyText(lv4, new LiteralText(lv3.getPlayerName()));
             list2.add(Pair.of((Object)lv3, (Object)lv5));
-            j = Math.max(j, this.getFontRenderer().getStringWidth(lv5) + k + this.getFontRenderer().getWidth(Integer.toString(lv3.getScore())));
+            j = Math.max(j, this.getFontRenderer().getWidth(lv5) + k + this.getFontRenderer().getWidth(Integer.toString(lv3.getScore())));
         }
         this.getFontRenderer().getClass();
         int l = collection.size() * 9;
@@ -951,7 +951,7 @@ extends DrawableHelper {
             RenderSystem.scalef(1.0f / h, (h + 1.0f) / 2.0f, 1.0f);
             RenderSystem.translatef(-(i + 8), -(j + 12), 0.0f);
         }
-        this.itemRenderer.renderGuiItem(arg, arg2, i, j);
+        this.itemRenderer.method_27951(arg, arg2, i, j);
         if (g > 0.0f) {
             RenderSystem.popMatrix();
         }

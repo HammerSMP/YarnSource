@@ -19,7 +19,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
@@ -33,13 +32,13 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getEndCityDistance();
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getEndCitySpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getEndCitySeparation();
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getEndCitySeparation();
     }
 
     @Override
@@ -53,7 +52,7 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator<?> arg2, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
         return EndCityFeature.getGenerationHeight(i, j, arg2) >= 60;
     }
 
@@ -72,7 +71,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         return 8;
     }
 
-    private static int getGenerationHeight(int i, int j, ChunkGenerator<?> arg) {
+    private static int getGenerationHeight(int i, int j, ChunkGenerator arg) {
         Random random = new Random(i + j * 10387313);
         BlockRotation lv = BlockRotation.random(random);
         int k = 5;
@@ -101,7 +100,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             BlockRotation lv = BlockRotation.random(this.random);
             int k = EndCityFeature.getGenerationHeight(i, j, arg);
             if (k < 60) {

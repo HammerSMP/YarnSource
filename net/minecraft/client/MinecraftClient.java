@@ -62,7 +62,6 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
-import net.minecraft.class_5195;
 import net.minecraft.class_5219;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Keyboard;
@@ -196,6 +195,7 @@ import net.minecraft.resource.metadata.PackResourceMetadata;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.QueueingWorldGenerationProgressListener;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.sound.MusicSound;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.text.KeybindText;
 import net.minecraft.text.LiteralText;
@@ -1446,7 +1446,7 @@ WindowEventHandler {
         }
         catch (IOException iOException) {
             LOGGER.warn("Failed to read level {} data", (Object)string, (Object)iOException);
-            SystemToast.method_27023(this, string);
+            SystemToast.addWorldAccessFailureToast(this, string);
             this.openScreen(null);
             return;
         }
@@ -1456,7 +1456,7 @@ WindowEventHandler {
                 throw new IllegalStateException("Requested world creation without any settings");
             }
             lv3 = new LevelProperties(arg2);
-            String string2 = arg2.method_27339();
+            String string2 = arg2.getLevelName();
             lv2.method_27425(lv3);
         } else {
             string3 = lv3.getLevelName();
@@ -1908,27 +1908,27 @@ WindowEventHandler {
         return this.soundManager;
     }
 
-    public class_5195 getMusicType() {
+    public MusicSound getMusicType() {
         if (this.currentScreen instanceof CreditsScreen) {
-            return MusicType.field_5578;
+            return MusicType.CREDITS;
         }
         if (this.player != null) {
-            if (this.player.world.dimension instanceof TheEndDimension) {
+            if (this.player.world.getDimension() instanceof TheEndDimension) {
                 if (this.inGameHud.getBossBarHud().shouldPlayDragonMusic()) {
-                    return MusicType.field_5580;
+                    return MusicType.DRAGON;
                 }
-                return MusicType.field_5583;
+                return MusicType.END;
             }
             Biome.Category lv = this.player.world.getBiome(this.player.getBlockPos()).getCategory();
-            if (this.musicTracker.isPlayingType(MusicType.field_5576) || this.player.isSubmergedInWater() && (lv == Biome.Category.OCEAN || lv == Biome.Category.RIVER)) {
-                return MusicType.field_5576;
+            if (this.musicTracker.isPlayingType(MusicType.UNDERWATER) || this.player.isSubmergedInWater() && (lv == Biome.Category.OCEAN || lv == Biome.Category.RIVER)) {
+                return MusicType.UNDERWATER;
             }
             if (this.player.abilities.creativeMode && this.player.abilities.allowFlying) {
-                return MusicType.field_5581;
+                return MusicType.CREATIVE;
             }
-            return this.world.getBiomeAccess().method_27344(this.player.getBlockPos()).method_27343().orElse(MusicType.field_5586);
+            return this.world.getBiomeAccess().method_27344(this.player.getBlockPos()).method_27343().orElse(MusicType.GAME);
         }
-        return MusicType.field_5585;
+        return MusicType.MENU;
     }
 
     public MinecraftSessionService getSessionService() {

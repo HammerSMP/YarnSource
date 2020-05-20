@@ -38,7 +38,7 @@ extends Task<MobEntityWithAi> {
     }
 
     public static GoToRememberedPositionTask<BlockPos> toBlock(MemoryModuleType<BlockPos> arg, float f, int i, boolean bl) {
-        return new GoToRememberedPositionTask<BlockPos>(arg, f, i, bl, Vec3d::method_24955);
+        return new GoToRememberedPositionTask<BlockPos>(arg, f, i, bl, Vec3d::ofBottomCenter);
     }
 
     public static GoToRememberedPositionTask<? extends Entity> toEntity(MemoryModuleType<? extends Entity> arg, float f, int i, boolean bl) {

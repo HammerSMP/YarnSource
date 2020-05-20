@@ -12,7 +12,7 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
@@ -31,8 +31,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class SilverfishEntity
@@ -124,7 +124,7 @@ extends HostileEntity {
         return super.getPathfindingFavor(arg, arg2);
     }
 
-    public static boolean canSpawn(EntityType<SilverfishEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<SilverfishEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         if (SilverfishEntity.canSpawnIgnoreLightLevel(arg, arg2, arg3, arg4, random)) {
             PlayerEntity lv = arg2.getClosestPlayer((double)arg4.getX() + 0.5, (double)arg4.getY() + 0.5, (double)arg4.getZ() + 0.5, 5.0, true);
             return lv == null;

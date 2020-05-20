@@ -25,13 +25,9 @@ import net.minecraft.util.ProgressListener;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.biome.source.BiomeSourceType;
 import net.minecraft.world.biome.source.FixedBiomeSource;
-import net.minecraft.world.biome.source.FixedBiomeSourceConfig;
 import net.minecraft.world.biome.source.VanillaLayeredBiomeSource;
-import net.minecraft.world.biome.source.VanillaLayeredBiomeSourceConfig;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraft.world.level.storage.AlphaChunkIo;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.storage.RegionFile;
@@ -42,7 +38,8 @@ public class AnvilLevelStorage {
     private static final Logger LOGGER = LogManager.getLogger();
 
     static boolean convertLevel(LevelStorage.Session arg, ProgressListener arg2) {
-        VanillaLayeredBiomeSource lv5;
+        VanillaLayeredBiomeSource lv3;
+        long l;
         arg2.progressStagePercentage(0);
         ArrayList list = Lists.newArrayList();
         ArrayList list2 = Lists.newArrayList();
@@ -61,17 +58,15 @@ public class AnvilLevelStorage {
         int i = list.size() + list2.size() + list3.size();
         LOGGER.info("Total conversion count is {}", (Object)i);
         class_5219 lv = arg.readLevelProperties();
-        long l = lv != null ? lv.getSeed() : 0L;
-        BiomeSourceType<FixedBiomeSourceConfig, FixedBiomeSource> lv2 = BiomeSourceType.FIXED;
-        BiomeSourceType<VanillaLayeredBiomeSourceConfig, VanillaLayeredBiomeSource> lv3 = BiomeSourceType.VANILLA_LAYERED;
-        if (lv != null && lv.method_27859().getGeneratorType() == LevelGeneratorType.FLAT) {
-            FixedBiomeSource lv4 = lv2.applyConfig(lv2.getConfig(lv.getSeed()).setBiome(Biomes.PLAINS));
+        long l2 = l = lv != null ? lv.method_28057().method_28028() : 0L;
+        if (lv != null && lv.method_28057().method_28034()) {
+            FixedBiomeSource lv2 = new FixedBiomeSource(Biomes.PLAINS);
         } else {
-            lv5 = lv3.applyConfig(lv3.getConfig(l));
+            lv3 = new VanillaLayeredBiomeSource(l, false, 4);
         }
-        AnvilLevelStorage.convertRegions(new File(file, "region"), list, lv5, 0, i, arg2);
-        AnvilLevelStorage.convertRegions(new File(file2, "region"), list2, lv2.applyConfig(lv2.getConfig(l).setBiome(Biomes.NETHER_WASTES)), list.size(), i, arg2);
-        AnvilLevelStorage.convertRegions(new File(file3, "region"), list3, lv2.applyConfig(lv2.getConfig(l).setBiome(Biomes.THE_END)), list.size() + list2.size(), i, arg2);
+        AnvilLevelStorage.convertRegions(new File(file, "region"), list, lv3, 0, i, arg2);
+        AnvilLevelStorage.convertRegions(new File(file2, "region"), list2, new FixedBiomeSource(Biomes.NETHER_WASTES), list.size(), i, arg2);
+        AnvilLevelStorage.convertRegions(new File(file3, "region"), list3, new FixedBiomeSource(Biomes.THE_END), list.size() + list2.size(), i, arg2);
         AnvilLevelStorage.makeMcrLevelDatBackup(arg);
         arg.method_27425(lv);
         return true;

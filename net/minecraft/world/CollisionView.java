@@ -73,12 +73,12 @@ extends BlockView {
     }
 
     default public Stream<VoxelShape> getBlockCollisions(final @Nullable Entity arg, final Box arg2) {
-        int i = MathHelper.floor(arg2.x1 - 1.0E-7) - 1;
-        int j = MathHelper.floor(arg2.x2 + 1.0E-7) + 1;
-        int k = MathHelper.floor(arg2.y1 - 1.0E-7) - 1;
-        int l = MathHelper.floor(arg2.y2 + 1.0E-7) + 1;
-        int m = MathHelper.floor(arg2.z1 - 1.0E-7) - 1;
-        int n = MathHelper.floor(arg2.z2 + 1.0E-7) + 1;
+        int i = MathHelper.floor(arg2.minX - 1.0E-7) - 1;
+        int j = MathHelper.floor(arg2.maxX + 1.0E-7) + 1;
+        int k = MathHelper.floor(arg2.minY - 1.0E-7) - 1;
+        int l = MathHelper.floor(arg2.maxY + 1.0E-7) + 1;
+        int m = MathHelper.floor(arg2.minZ - 1.0E-7) - 1;
+        int n = MathHelper.floor(arg2.maxZ + 1.0E-7) + 1;
         final ShapeContext lv = arg == null ? ShapeContext.absent() : ShapeContext.of(arg);
         final CuboidBlockIterator lv2 = new CuboidBlockIterator(i, k, m, j, l, n);
         final BlockPos.Mutable lv3 = new BlockPos.Mutable();
@@ -136,7 +136,7 @@ extends BlockView {
         double e = MathHelper.floor(arg.getBoundNorth());
         double f = MathHelper.ceil(arg.getBoundEast());
         double g = MathHelper.ceil(arg.getBoundSouth());
-        return arg2.x1 > d && arg2.x1 < f && arg2.z1 > e && arg2.z1 < g && arg2.x2 > d && arg2.x2 < f && arg2.z2 > e && arg2.z2 < g;
+        return arg2.minX > d && arg2.minX < f && arg2.minZ > e && arg2.minZ < g && arg2.maxX > d && arg2.maxX < f && arg2.maxZ > e && arg2.maxZ < g;
     }
 }
 

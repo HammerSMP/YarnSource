@@ -20,7 +20,7 @@ import net.minecraft.world.Difficulty;
 
 public final class EntityPredicates {
     public static final Predicate<Entity> VALID_ENTITY = Entity::isAlive;
-    public static final Predicate<LivingEntity> VALID_ENTITY_LIVING = LivingEntity::isAlive;
+    public static final Predicate<LivingEntity> VALID_LIVING_ENTITY = LivingEntity::isAlive;
     public static final Predicate<Entity> NOT_MOUNTED = arg -> arg.isAlive() && !arg.hasPassengers() && !arg.hasVehicle();
     public static final Predicate<Entity> VALID_INVENTORIES = arg -> arg instanceof Inventory && arg.isAlive();
     public static final Predicate<Entity> EXCEPT_CREATIVE_OR_SPECTATOR = arg -> !(arg instanceof PlayerEntity) || !arg.isSpectator() && !((PlayerEntity)arg).isCreative();

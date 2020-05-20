@@ -87,7 +87,7 @@ implements DebugRenderer.Renderer {
         private ChunkLoadingStatus(IntegratedServer arg2, double d, double e) {
             ServerWorld lv4;
             ClientWorld lv = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world;
-            DimensionType lv2 = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world.dimension.getType();
+            DimensionType lv2 = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world.method_27983();
             if (arg2.getWorld(lv2) != null) {
                 ServerWorld lv3 = arg2.getWorld(lv2);
             } else {

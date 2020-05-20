@@ -55,8 +55,8 @@ public class LootPool {
     private final Predicate<LootContext> predicate;
     private final LootFunction[] functions;
     private final BiFunction<ItemStack, LootContext, ItemStack> javaFunctions;
-    private final LootTableRange rollsRange;
-    private final UniformLootTableRange bonusRollsRange;
+    private final LootTableRange rolls;
+    private final UniformLootTableRange bonusRolls;
 
     private LootPool(LootEntry[] args, LootCondition[] args2, LootFunction[] args3, LootTableRange arg, UniformLootTableRange arg2) {
         this.entries = args;
@@ -64,8 +64,8 @@ public class LootPool {
         this.predicate = LootConditions.joinAnd(args2);
         this.functions = args3;
         this.javaFunctions = LootFunctions.join(args3);
-        this.rollsRange = arg;
-        this.bonusRollsRange = arg2;
+        this.rolls = arg;
+        this.bonusRolls = arg2;
     }
 
     private void supplyOnce(Consumer<ItemStack> consumer, LootContext arg) {
@@ -86,38 +86,38 @@ public class LootPool {
             return;
         }
         if (i == 1) {
-            ((LootChoice)list.get(0)).drop(consumer, arg);
+            ((LootChoice)list.get(0)).generateLoot(consumer, arg);
             return;
         }
         int j = random.nextInt(mutableInt.intValue());
         for (LootChoice lv2 : list) {
             if ((j -= lv2.getWeight(arg.getLuck())) >= 0) continue;
-            lv2.drop(consumer, arg);
+            lv2.generateLoot(consumer, arg);
             return;
         }
     }
 
-    public void drop(Consumer<ItemStack> consumer, LootContext arg) {
+    public void addGeneratedLoot(Consumer<ItemStack> consumer, LootContext arg) {
         if (!this.predicate.test(arg)) {
             return;
         }
         Consumer<ItemStack> consumer2 = LootFunction.apply(this.javaFunctions, consumer, arg);
         Random random = arg.getRandom();
-        int i = this.rollsRange.next(random) + MathHelper.floor(this.bonusRollsRange.nextFloat(random) * arg.getLuck());
+        int i = this.rolls.next(random) + MathHelper.floor(this.bonusRolls.nextFloat(random) * arg.getLuck());
         for (int j = 0; j < i; ++j) {
             this.supplyOnce(consumer2, arg);
         }
     }
 
-    public void check(LootTableReporter arg) {
+    public void validate(LootTableReporter arg) {
         for (int i = 0; i < this.conditions.length; ++i) {
-            this.conditions[i].check(arg.makeChild(".condition[" + i + "]"));
+            this.conditions[i].validate(arg.makeChild(".condition[" + i + "]"));
         }
         for (int j = 0; j < this.functions.length; ++j) {
-            this.functions[j].check(arg.makeChild(".functions[" + j + "]"));
+            this.functions[j].validate(arg.makeChild(".functions[" + j + "]"));
         }
         for (int k = 0; k < this.entries.length; ++k) {
-            this.entries[k].check(arg.makeChild(".entries[" + k + "]"));
+            this.entries[k].validate(arg.makeChild(".entries[" + k + "]"));
         }
     }
 
@@ -140,10 +140,10 @@ public class LootPool {
 
         public JsonElement serialize(LootPool arg, Type type, JsonSerializationContext jsonSerializationContext) {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.add("rolls", LootTableRanges.toJson(arg.rollsRange, jsonSerializationContext));
+            jsonObject.add("rolls", LootTableRanges.toJson(arg.rolls, jsonSerializationContext));
             jsonObject.add("entries", jsonSerializationContext.serialize((Object)arg.entries));
-            if (arg.bonusRollsRange.getMinValue() != 0.0f && arg.bonusRollsRange.getMaxValue() != 0.0f) {
-                jsonObject.add("bonus_rolls", jsonSerializationContext.serialize((Object)arg.bonusRollsRange));
+            if (arg.bonusRolls.getMinValue() != 0.0f && arg.bonusRolls.getMaxValue() != 0.0f) {
+                jsonObject.add("bonus_rolls", jsonSerializationContext.serialize((Object)arg.bonusRolls));
             }
             if (!ArrayUtils.isEmpty((Object[])arg.conditions)) {
                 jsonObject.add("conditions", jsonSerializationContext.serialize((Object)arg.conditions));
@@ -169,11 +169,11 @@ public class LootPool {
         private final List<LootEntry> entries = Lists.newArrayList();
         private final List<LootCondition> conditions = Lists.newArrayList();
         private final List<LootFunction> functions = Lists.newArrayList();
-        private LootTableRange rollsRange = new UniformLootTableRange(1.0f);
+        private LootTableRange rolls = new UniformLootTableRange(1.0f);
         private UniformLootTableRange bonusRollsRange = new UniformLootTableRange(0.0f, 0.0f);
 
-        public Builder withRolls(LootTableRange arg) {
-            this.rollsRange = arg;
+        public Builder rolls(LootTableRange arg) {
+            this.rolls = arg;
             return this;
         }
 
@@ -182,28 +182,28 @@ public class LootPool {
             return this;
         }
 
-        public Builder withEntry(LootEntry.Builder<?> arg) {
+        public Builder with(LootEntry.Builder<?> arg) {
             this.entries.add(arg.build());
             return this;
         }
 
         @Override
-        public Builder withCondition(LootCondition.Builder arg) {
+        public Builder conditionally(LootCondition.Builder arg) {
             this.conditions.add(arg.build());
             return this;
         }
 
         @Override
-        public Builder withFunction(LootFunction.Builder arg) {
+        public Builder apply(LootFunction.Builder arg) {
             this.functions.add(arg.build());
             return this;
         }
 
         public LootPool build() {
-            if (this.rollsRange == null) {
+            if (this.rolls == null) {
                 throw new IllegalArgumentException("Rolls not set");
             }
-            return new LootPool(this.entries.toArray(new LootEntry[0]), this.conditions.toArray(new LootCondition[0]), this.functions.toArray(new LootFunction[0]), this.rollsRange, this.bonusRollsRange);
+            return new LootPool(this.entries.toArray(new LootEntry[0]), this.conditions.toArray(new LootCondition[0]), this.functions.toArray(new LootFunction[0]), this.rolls, this.bonusRollsRange);
         }
 
         @Override
@@ -212,13 +212,13 @@ public class LootPool {
         }
 
         @Override
-        public /* synthetic */ Object withFunction(LootFunction.Builder arg) {
-            return this.withFunction(arg);
+        public /* synthetic */ Object apply(LootFunction.Builder arg) {
+            return this.apply(arg);
         }
 
         @Override
-        public /* synthetic */ Object withCondition(LootCondition.Builder arg) {
-            return this.withCondition(arg);
+        public /* synthetic */ Object conditionally(LootCondition.Builder arg) {
+            return this.conditionally(arg);
         }
     }
 }

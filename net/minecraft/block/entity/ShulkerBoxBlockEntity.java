@@ -142,17 +142,17 @@ Tickable {
             Box lv5 = lv4.getBoundingBox();
             switch (lv2.getAxis()) {
                 case X: {
-                    d = lv2.getDirection() == Direction.AxisDirection.POSITIVE ? lv3.x2 - lv5.x1 : lv5.x2 - lv3.x1;
+                    d = lv2.getDirection() == Direction.AxisDirection.POSITIVE ? lv3.maxX - lv5.minX : lv5.maxX - lv3.minX;
                     d += 0.01;
                     break;
                 }
                 case Y: {
-                    e = lv2.getDirection() == Direction.AxisDirection.POSITIVE ? lv3.y2 - lv5.y1 : lv5.y2 - lv3.y1;
+                    e = lv2.getDirection() == Direction.AxisDirection.POSITIVE ? lv3.maxY - lv5.minY : lv5.maxY - lv3.minY;
                     e += 0.01;
                     break;
                 }
                 case Z: {
-                    f = lv2.getDirection() == Direction.AxisDirection.POSITIVE ? lv3.z2 - lv5.z1 : lv5.z2 - lv3.z1;
+                    f = lv2.getDirection() == Direction.AxisDirection.POSITIVE ? lv3.maxZ - lv5.minZ : lv5.maxZ - lv3.minZ;
                     f += 0.01;
                 }
             }
@@ -282,7 +282,7 @@ Tickable {
     }
 
     @Override
-    protected ScreenHandler createContainer(int i, PlayerInventory arg) {
+    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
         return new ShulkerBoxScreenHandler(i, arg, this);
     }
 

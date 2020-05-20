@@ -139,7 +139,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     private final ServerWorld world;
     private final ServerLightingProvider serverLightingProvider;
     private final ThreadExecutor<Runnable> mainThreadExecutor;
-    private final ChunkGenerator<?> chunkGenerator;
+    private final ChunkGenerator chunkGenerator;
     private final Supplier<PersistentStateManager> persistentStateManagerFactory;
     private final PointOfInterestStorage pointOfInterestStorage;
     private final LongSet unloadedChunks = new LongOpenHashSet();
@@ -158,10 +158,10 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     private final Queue<Runnable> field_19343 = Queues.newConcurrentLinkedQueue();
     private int watchDistance;
 
-    public ThreadedAnvilChunkStorage(ServerWorld arg, LevelStorage.Session arg2, DataFixer dataFixer, StructureManager arg3, Executor executor, ThreadExecutor<Runnable> arg4, ChunkProvider arg5, ChunkGenerator<?> arg6, WorldGenerationProgressListener arg7, Supplier<PersistentStateManager> supplier, int i, boolean bl) {
-        super(new File(arg2.method_27424(arg.getDimension().getType()), "region"), dataFixer, bl);
+    public ThreadedAnvilChunkStorage(ServerWorld arg, LevelStorage.Session arg2, DataFixer dataFixer, StructureManager arg3, Executor executor, ThreadExecutor<Runnable> arg4, ChunkProvider arg5, ChunkGenerator arg6, WorldGenerationProgressListener arg7, Supplier<PersistentStateManager> supplier, int i, boolean bl) {
+        super(new File(arg2.method_27424(arg.method_27983()), "region"), dataFixer, bl);
         this.structureManager = arg3;
-        this.saveDir = arg2.method_27424(arg.getDimension().getType());
+        this.saveDir = arg2.method_27424(arg.method_27983());
         this.world = arg;
         this.chunkGenerator = arg6;
         this.mainThreadExecutor = arg4;
@@ -172,7 +172,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         this.chunkTaskPrioritySystem = new ChunkTaskPrioritySystem((List<MessageListener<?>>)ImmutableList.of(lv, lv2, lv3), executor, Integer.MAX_VALUE);
         this.worldgenExecutor = this.chunkTaskPrioritySystem.createExecutor(lv, false);
         this.mainExecutor = this.chunkTaskPrioritySystem.createExecutor(lv2, false);
-        this.serverLightingProvider = new ServerLightingProvider(arg5, this, this.world.getDimension().hasSkyLight(), lv3, this.chunkTaskPrioritySystem.createExecutor(lv3, false));
+        this.serverLightingProvider = new ServerLightingProvider(arg5, this, this.world.method_27983().hasSkyLight(), lv3, this.chunkTaskPrioritySystem.createExecutor(lv3, false));
         this.ticketManager = new TicketManager(executor, arg4);
         this.persistentStateManagerFactory = supplier;
         this.pointOfInterestStorage = new PointOfInterestStorage(new File(this.saveDir, "poi"), dataFixer, bl);
@@ -750,7 +750,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         if (lv == null) {
             return null;
         }
-        return this.updateChunkTag(this.world.getDimension().getType(), this.persistentStateManagerFactory, lv);
+        return this.updateChunkTag(this.world.method_27983(), this.persistentStateManagerFactory, lv);
     }
 
     boolean isTooFarFromPlayersToSpawnMobs(ChunkPos arg) {

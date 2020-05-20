@@ -8,13 +8,13 @@
 package net.minecraft.server.network;
 
 import java.util.Objects;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CommandBlock;
 import net.minecraft.block.JigsawBlock;
 import net.minecraft.block.StructureBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -234,7 +234,7 @@ public class ServerPlayerInteractionManager {
         return true;
     }
 
-    public ActionResult interactItem(PlayerEntity arg, World arg2, ItemStack arg3, Hand arg4) {
+    public ActionResult interactItem(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4) {
         if (this.gameMode == GameMode.SPECTATOR) {
             return ActionResult.PASS;
         }
@@ -262,14 +262,13 @@ public class ServerPlayerInteractionManager {
             arg.setStackInHand(arg4, ItemStack.EMPTY);
         }
         if (!arg.isUsingItem()) {
-            ((ServerPlayerEntity)arg).openHandledScreen(arg.playerScreenHandler);
+            arg.openHandledScreen(arg.playerScreenHandler);
         }
         return lv.getResult();
     }
 
-    public ActionResult interactBlock(PlayerEntity arg, World arg2, ItemStack arg3, Hand arg4, BlockHitResult arg5) {
-        ActionResult lv4;
-        boolean bl2;
+    public ActionResult interactBlock(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4, BlockHitResult arg5) {
+        ActionResult lv8;
         BlockPos lv = arg5.getBlockPos();
         BlockState lv2 = arg2.getBlockState(lv);
         if (this.gameMode == GameMode.SPECTATOR) {
@@ -281,21 +280,32 @@ public class ServerPlayerInteractionManager {
             return ActionResult.PASS;
         }
         boolean bl = !arg.getMainHandStack().isEmpty() || !arg.getOffHandStack().isEmpty();
-        boolean bl3 = bl2 = arg.shouldCancelInteraction() && bl;
-        if (!bl2 && (lv4 = lv2.onUse(arg2, arg, arg4, arg5)).isAccepted()) {
-            return lv4;
+        boolean bl2 = arg.shouldCancelInteraction() && bl;
+        ItemStack lv4 = arg3.copy();
+        if (!bl2) {
+            ActionResult lv5 = lv2.onUse(arg2, arg, arg4, arg5);
+            if (lv5 == ActionResult.SUCCESS) {
+                Criteria.ITEM_USED_ON_BLOCK.test(arg, lv, lv4);
+            }
+            if (lv5.isAccepted()) {
+                return lv5;
+            }
         }
         if (arg3.isEmpty() || arg.getItemCooldownManager().isCoolingDown(arg3.getItem())) {
             return ActionResult.PASS;
         }
-        ItemUsageContext lv5 = new ItemUsageContext(arg, arg4, arg5);
+        ItemUsageContext lv6 = new ItemUsageContext(arg, arg4, arg5);
         if (this.isCreative()) {
             int i = arg3.getCount();
-            ActionResult lv6 = arg3.useOnBlock(lv5);
+            ActionResult lv7 = arg3.useOnBlock(lv6);
             arg3.setCount(i);
-            return lv6;
+        } else {
+            lv8 = arg3.useOnBlock(lv6);
         }
-        return arg3.useOnBlock(lv5);
+        if (lv8 == ActionResult.SUCCESS) {
+            Criteria.ITEM_USED_ON_BLOCK.test(arg, lv, lv4);
+        }
+        return lv8;
     }
 
     public void setWorld(ServerWorld arg) {

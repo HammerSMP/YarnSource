@@ -69,7 +69,7 @@ extends LongRunningTask {
                     return;
                 }
                 LOGGER.error("Couldn't restore backup", (Throwable)exception);
-                this.method_27453(exception.getLocalizedMessage());
+                this.error(exception.getLocalizedMessage());
                 return;
             }
         }

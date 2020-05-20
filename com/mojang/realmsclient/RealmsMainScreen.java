@@ -51,6 +51,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
+import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -59,7 +60,6 @@ import net.minecraft.realms.Realms;
 import net.minecraft.realms.RealmsGetServerDetailsTask;
 import net.minecraft.realms.RealmsObjectSelectionList;
 import net.minecraft.realms.RealmsScreen;
-import net.minecraft.realms.TickableRealmsButton;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -910,7 +910,7 @@ extends RealmsScreen {
         int k = 0;
         int l = 0;
         for (Text lv : list) {
-            int m = this.textRenderer.getStringWidth(lv);
+            int m = this.textRenderer.getWidth(lv);
             if (m <= l) continue;
             l = m;
         }
@@ -1069,7 +1069,7 @@ extends RealmsScreen {
     @Environment(value=EnvType.CLIENT)
     class PendingInvitesButton
     extends ButtonWidget
-    implements TickableRealmsButton {
+    implements TickableElement {
         public PendingInvitesButton() {
             super(RealmsMainScreen.this.width / 2 + 47, 6, 22, 22, LiteralText.EMPTY, arg2 -> RealmsMainScreen.this.method_24985(arg2));
         }

@@ -55,7 +55,7 @@ extends Task<MobEntityWithAi> {
     }
 
     private void updateWalkTarget(MobEntityWithAi arg2, ChunkSectionPos arg22) {
-        Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findTargetTowards(arg2, this.maxHorizontalDistance, this.maxVerticalDistance, Vec3d.method_24955(arg22.getCenterPos())));
+        Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findTargetTowards(arg2, this.maxHorizontalDistance, this.maxVerticalDistance, Vec3d.ofBottomCenter(arg22.getCenterPos())));
         arg2.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
     }
 

@@ -86,7 +86,7 @@ extends GameOptionsScreen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.list.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 5, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 5, 0xFFFFFF);
         super.render(arg, i, j, f);
     }
 }

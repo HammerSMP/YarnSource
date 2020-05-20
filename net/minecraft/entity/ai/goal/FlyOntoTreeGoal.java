@@ -47,7 +47,7 @@ extends WanderAroundFarGoal {
             Block lv5;
             boolean bl;
             if (lv.equals(lv4) || !(bl = (lv5 = this.mob.world.getBlockState(lv3.set(lv4, Direction.DOWN)).getBlock()) instanceof LeavesBlock || lv5.isIn(BlockTags.LOGS)) || !this.mob.world.isAir(lv4) || !this.mob.world.isAir(lv2.set(lv4, Direction.UP))) continue;
-            return Vec3d.method_24955(lv4);
+            return Vec3d.ofBottomCenter(lv4);
         }
         return null;
     }

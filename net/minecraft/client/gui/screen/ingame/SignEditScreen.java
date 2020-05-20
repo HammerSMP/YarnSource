@@ -119,7 +119,7 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         DiffuseLighting.disableGuiDepthLighting();
         this.renderBackground(arg);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
         arg.push();
         arg.translate(this.width / 2, 0.0, 50.0);
         float g = 93.75f;

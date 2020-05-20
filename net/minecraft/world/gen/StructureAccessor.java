@@ -8,27 +8,26 @@ package net.minecraft.world.gen;
 
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import net.minecraft.class_5268;
+import net.minecraft.class_5285;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.StructureHolder;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class StructureAccessor {
     private final ServerWorld field_24404;
-    private final class_5268 field_24405;
+    private final class_5285 field_24497;
 
-    public StructureAccessor(ServerWorld arg, class_5268 arg2) {
+    public StructureAccessor(ServerWorld arg, class_5285 arg2) {
         this.field_24404 = arg;
-        this.field_24405 = arg2;
+        this.field_24497 = arg2;
     }
 
-    public Stream<StructureStart> getStructuresWithChildren(ChunkSectionPos arg2, StructureFeature<?> arg22, IWorld arg32) {
-        return arg32.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22.getName()).stream().map(arg -> ChunkSectionPos.from(new ChunkPos((long)arg), 0)).map(arg3 -> this.getStructureStart((ChunkSectionPos)arg3, arg22, arg32.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
+    public Stream<StructureStart> getStructuresWithChildren(ChunkSectionPos arg3, StructureFeature<?> arg22) {
+        return this.field_24404.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22.getName()).stream().map(arg -> ChunkSectionPos.from(new ChunkPos((long)arg), 0)).map(arg2 -> this.getStructureStart((ChunkSectionPos)arg2, arg22, this.field_24404.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
     }
 
     @Nullable
@@ -45,7 +44,7 @@ public class StructureAccessor {
     }
 
     public boolean method_27834() {
-        return this.field_24405.method_27420();
+        return this.field_24497.method_28029();
     }
 }
 

@@ -33,8 +33,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class TripwireHookBlock
@@ -78,7 +78,7 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg2.getOpposite() == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
             return Blocks.AIR.getDefaultState();
         }
@@ -186,7 +186,7 @@ extends Block {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (bl || arg.isOf(arg4.getBlock())) {
             return;
         }
@@ -199,7 +199,7 @@ extends Block {
             arg2.updateNeighborsAlways(arg3, this);
             arg2.updateNeighborsAlways(arg3.offset(arg.get(FACING).getOpposite()), this);
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override

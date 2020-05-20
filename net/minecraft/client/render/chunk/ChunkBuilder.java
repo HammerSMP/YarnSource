@@ -315,9 +315,9 @@ public class ChunkBuilder {
 
         protected double getSquaredCameraDistance() {
             Camera lv = MinecraftClient.getInstance().gameRenderer.getCamera();
-            double d = this.boundingBox.x1 + 8.0 - lv.getPos().x;
-            double e = this.boundingBox.y1 + 8.0 - lv.getPos().y;
-            double f = this.boundingBox.z1 + 8.0 - lv.getPos().z;
+            double d = this.boundingBox.minX + 8.0 - lv.getPos().x;
+            double e = this.boundingBox.minY + 8.0 - lv.getPos().y;
+            double f = this.boundingBox.minZ + 8.0 - lv.getPos().z;
             return d * d + e * e + f * f;
         }
 

@@ -65,11 +65,11 @@ extends Screen {
 
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderDirtBackground(0);
-        this.drawStringWithShadow(arg, this.textRenderer, header, this.width / 2, 30, 0xFFFFFF);
+        this.renderBackgroundTexture(0);
+        this.drawCenteredText(arg, this.textRenderer, header, this.width / 2, 30, 0xFFFFFF);
         int k = 70;
         for (Text lv : this.lines) {
-            this.drawStringWithShadow(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;
         }

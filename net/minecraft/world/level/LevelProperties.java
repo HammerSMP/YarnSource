@@ -6,8 +6,6 @@
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
  *  com.mojang.datafixers.DataFixer
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -18,8 +16,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -29,9 +25,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.class_5219;
 import net.minecraft.class_5268;
+import net.minecraft.class_5285;
 import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.datafixer.NbtOps;
-import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtHelper;
@@ -45,8 +40,6 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelGeneratorOptions;
-import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.timer.Timer;
 import net.minecraft.world.timer.TimerCallbackSerializer;
@@ -57,10 +50,7 @@ class_5219 {
     private final String versionName;
     private final int versionId;
     private final boolean versionSnapshot;
-    private final long randomSeed;
-    private final LevelGeneratorOptions generatorOptions;
-    @Nullable
-    private String legacyCustomOptions;
+    private final class_5285 generatorOptions;
     private int spawnX;
     private int spawnY;
     private int spawnZ;
@@ -81,10 +71,8 @@ class_5219 {
     private boolean thundering;
     private int thunderTime;
     private GameMode gameMode;
-    private final boolean structures;
     private final boolean hardcore;
     private final boolean commandsAllowed;
-    private final boolean field_24192;
     private boolean initialized;
     private Difficulty difficulty = Difficulty.NORMAL;
     private boolean difficultyLocked;
@@ -119,33 +107,8 @@ class_5219 {
             this.versionId = SharedConstants.getGameVersion().getWorldVersion();
             this.versionSnapshot = !SharedConstants.getGameVersion().isStable();
         }
-        this.randomSeed = arg.getLong("RandomSeed");
-        if (arg.contains("generatorName", 8)) {
-            String string = arg.getString("generatorName");
-            Object lv3 = LevelGeneratorType.getTypeFromName(string);
-            if (lv3 == null) {
-                lv3 = LevelGeneratorType.DEFAULT;
-            } else if (lv3 == LevelGeneratorType.CUSTOMIZED) {
-                this.legacyCustomOptions = arg.getString("generatorOptions");
-            } else if (((LevelGeneratorType)lv3).isVersioned()) {
-                int k = 0;
-                if (arg.contains("generatorVersion", 99)) {
-                    k = arg.getInt("generatorVersion");
-                }
-                lv3 = ((LevelGeneratorType)lv3).getTypeForVersion(k);
-            }
-            CompoundTag lv4 = arg.getCompound("generatorOptions");
-            Dynamic dynamic = new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv4);
-            Dynamic dynamic2 = LevelProperties.updateGeneratorOptionsData((LevelGeneratorType)lv3, dynamic, i, dataFixer);
-            this.generatorOptions = ((LevelGeneratorType)lv3).loadOptions(dynamic2);
-        } else {
-            this.generatorOptions = LevelGeneratorType.DEFAULT.getDefaultOptions();
-        }
         this.gameMode = GameMode.byId(arg.getInt("GameType"));
-        if (arg.contains("legacy_custom_options", 8)) {
-            this.legacyCustomOptions = arg.getString("legacy_custom_options");
-        }
-        this.structures = arg.contains("MapFeatures", 99) ? arg.getBoolean("MapFeatures") : true;
+        this.generatorOptions = class_5285.method_28023(arg, dataFixer, i);
         this.spawnX = arg.getInt("SpawnX");
         this.spawnY = arg.getInt("SpawnY");
         this.spawnZ = arg.getInt("SpawnZ");
@@ -163,7 +126,6 @@ class_5219 {
         this.hardcore = arg.getBoolean("hardcore");
         this.initialized = arg.contains("initialized", 99) ? arg.getBoolean("initialized") : true;
         this.commandsAllowed = arg.contains("allowCommands", 99) ? arg.getBoolean("allowCommands") : this.gameMode == GameMode.CREATIVE;
-        this.field_24192 = arg.getBoolean("BonusChest");
         this.dataVersion = i;
         if (arg2 != null) {
             this.playerData = arg2;
@@ -179,20 +141,20 @@ class_5219 {
         }
         this.field_24193 = WorldBorder.class_5200.method_27358(arg, WorldBorder.field_24122);
         if (arg.contains("DimensionData", 10)) {
-            CompoundTag lv5 = arg.getCompound("DimensionData");
-            for (String string2 : lv5.getKeys()) {
-                this.worldData.put(DimensionType.byRawId(Integer.parseInt(string2)), lv5.getCompound(string2));
+            CompoundTag lv3 = arg.getCompound("DimensionData");
+            for (String string : lv3.getKeys()) {
+                this.worldData.put(DimensionType.byRawId(Integer.parseInt(string)), lv3.getCompound(string));
             }
         }
         if (arg.contains("DataPacks", 10)) {
-            CompoundTag lv6 = arg.getCompound("DataPacks");
-            ListTag lv7 = lv6.getList("Disabled", 8);
-            for (int l = 0; l < lv7.size(); ++l) {
-                this.disabledDataPacks.add(lv7.getString(l));
+            CompoundTag lv4 = arg.getCompound("DataPacks");
+            ListTag lv5 = lv4.getList("Disabled", 8);
+            for (int k = 0; k < lv5.size(); ++k) {
+                this.disabledDataPacks.add(lv5.getString(k));
             }
-            ListTag lv8 = lv6.getList("Enabled", 8);
-            for (int m = 0; m < lv8.size(); ++m) {
-                this.enabledDataPacks.add(lv8.getString(m));
+            ListTag lv6 = lv4.getList("Enabled", 8);
+            for (int l = 0; l < lv6.size(); ++l) {
+                this.enabledDataPacks.add(lv6.getString(l));
             }
         }
         if (arg.contains("CustomBossEvents", 10)) {
@@ -212,30 +174,21 @@ class_5219 {
         }
     }
 
-    private static <T> Dynamic<T> updateGeneratorOptionsData(LevelGeneratorType arg, Dynamic<T> dynamic, int i, DataFixer dataFixer) {
-        int j = Math.max(i, 2501);
-        Dynamic dynamic2 = dynamic.merge(dynamic.createString("levelType"), dynamic.createString(arg.getStoredName()));
-        return dataFixer.update(TypeReferences.CHUNK_GENERATOR_SETTINGS, dynamic2, j, SharedConstants.getGameVersion().getWorldVersion()).remove("levelType");
-    }
-
     public LevelProperties(LevelInfo arg) {
         this.dataFixer = null;
         this.dataVersion = SharedConstants.getGameVersion().getWorldVersion();
-        this.randomSeed = arg.getSeed();
         this.gameMode = arg.getGameMode();
-        this.difficulty = arg.method_27340();
-        this.structures = arg.hasStructures();
-        this.hardcore = arg.isHardcore();
+        this.difficulty = arg.getDifficulty();
+        this.hardcore = arg.hasStructures();
         this.generatorOptions = arg.getGeneratorOptions();
-        this.commandsAllowed = arg.allowCommands();
-        this.field_24192 = arg.hasBonusChest();
-        this.levelName = arg.method_27339();
+        this.commandsAllowed = arg.isHardcore();
+        this.levelName = arg.getLevelName();
         this.version = 19133;
         this.initialized = false;
         this.versionName = SharedConstants.getGameVersion().getName();
         this.versionId = SharedConstants.getGameVersion().getWorldVersion();
         this.versionSnapshot = !SharedConstants.getGameVersion().isStable();
-        this.gameRules.setAllValues(arg.method_27341(), null);
+        this.gameRules.setAllValues(arg.getGameRules(), null);
     }
 
     @Override
@@ -260,18 +213,11 @@ class_5219 {
         lv2.putBoolean("Snapshot", !SharedConstants.getGameVersion().isStable());
         arg.put("Version", lv2);
         arg.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-        arg.putLong("RandomSeed", this.randomSeed);
-        arg.putString("generatorName", this.generatorOptions.getType().getStoredName());
-        arg.putInt("generatorVersion", this.generatorOptions.getType().getVersion());
-        CompoundTag lv3 = (CompoundTag)this.generatorOptions.getDynamic().convert((DynamicOps)NbtOps.INSTANCE).getValue();
-        if (!lv3.isEmpty()) {
-            arg.put("generatorOptions", lv3);
-        }
-        if (this.legacyCustomOptions != null) {
-            arg.putString("legacy_custom_options", this.legacyCustomOptions);
+        CompoundTag lv3 = this.generatorOptions.method_28025();
+        for (String string : lv3.getKeys()) {
+            arg.put(string, lv3.get(string));
         }
         arg.putInt("GameType", this.gameMode.getId());
-        arg.putBoolean("MapFeatures", this.structures);
         arg.putInt("SpawnX", this.spawnX);
         arg.putInt("SpawnY", this.spawnY);
         arg.putInt("SpawnZ", this.spawnZ);
@@ -288,7 +234,6 @@ class_5219 {
         arg.putBoolean("thundering", this.thundering);
         arg.putBoolean("hardcore", this.hardcore);
         arg.putBoolean("allowCommands", this.commandsAllowed);
-        arg.putBoolean("BonusChest", this.field_24192);
         arg.putBoolean("initialized", this.initialized);
         this.field_24193.method_27357(arg);
         arg.putByte("Difficulty", (byte)this.difficulty.getId());
@@ -302,18 +247,18 @@ class_5219 {
         if (arg2 != null) {
             arg.put("Player", arg2);
         }
-        CompoundTag lv5 = new CompoundTag();
-        ListTag lv6 = new ListTag();
-        for (String string : this.enabledDataPacks) {
-            lv6.add(StringTag.of(string));
+        CompoundTag compoundTag = new CompoundTag();
+        ListTag listTag = new ListTag();
+        for (String string2 : this.enabledDataPacks) {
+            listTag.add(StringTag.of(string2));
         }
-        lv5.put("Enabled", lv6);
+        compoundTag.put("Enabled", listTag);
         ListTag lv7 = new ListTag();
-        for (String string2 : this.disabledDataPacks) {
-            lv7.add(StringTag.of(string2));
+        for (String string3 : this.disabledDataPacks) {
+            lv7.add(StringTag.of(string3));
         }
-        lv5.put("Disabled", lv7);
-        arg.put("DataPacks", lv5);
+        compoundTag.put("Disabled", lv7);
+        arg.put("DataPacks", compoundTag);
         if (this.customBossEvents != null) {
             arg.put("CustomBossEvents", this.customBossEvents);
         }
@@ -323,11 +268,6 @@ class_5219 {
         if (this.wanderingTraderId != null) {
             arg.putUuidNew("WanderingTraderId", this.wanderingTraderId);
         }
-    }
-
-    @Override
-    public long getSeed() {
-        return this.randomSeed;
     }
 
     @Override
@@ -375,17 +315,17 @@ class_5219 {
     }
 
     @Override
-    public void method_27416(int i) {
+    public void setSpawnX(int i) {
         this.spawnX = i;
     }
 
     @Override
-    public void method_27417(int i) {
+    public void setSpawnY(int i) {
         this.spawnY = i;
     }
 
     @Override
-    public void method_27419(int i) {
+    public void setSpawnZ(int i) {
         this.spawnZ = i;
     }
 
@@ -478,11 +418,6 @@ class_5219 {
     }
 
     @Override
-    public boolean method_27420() {
-        return this.structures;
-    }
-
-    @Override
     public void setGameMode(GameMode arg) {
         this.gameMode = arg;
     }
@@ -490,16 +425,6 @@ class_5219 {
     @Override
     public boolean isHardcore() {
         return this.hardcore;
-    }
-
-    @Override
-    public LevelGeneratorType getGeneratorType() {
-        return this.generatorOptions.getType();
-    }
-
-    @Override
-    public LevelGeneratorOptions method_27421() {
-        return this.generatorOptions;
     }
 
     @Override
@@ -564,7 +489,7 @@ class_5219 {
     }
 
     @Override
-    public CompoundTag method_27434(DimensionType arg) {
+    public CompoundTag getWorldData(DimensionType arg) {
         CompoundTag lv = this.worldData.get(arg);
         if (lv == null) {
             return new CompoundTag();
@@ -573,18 +498,23 @@ class_5219 {
     }
 
     @Override
-    public void method_27435(DimensionType arg, CompoundTag arg2) {
+    public void setWorldData(DimensionType arg, CompoundTag arg2) {
         this.worldData.put(arg, arg2);
     }
 
     @Override
+    public class_5285 method_28057() {
+        return this.generatorOptions;
+    }
+
+    @Override
     public CompoundTag getWorldData() {
-        return this.method_27434(DimensionType.OVERWORLD);
+        return this.getWorldData(DimensionType.OVERWORLD);
     }
 
     @Override
     public void setWorldData(CompoundTag arg) {
-        this.method_27435(DimensionType.OVERWORLD, arg);
+        this.setWorldData(DimensionType.OVERWORLD, arg);
     }
 
     @Override
@@ -658,12 +588,12 @@ class_5219 {
     }
 
     @Override
-    public boolean method_27431() {
+    public boolean isModded() {
         return this.modded;
     }
 
     @Override
-    public Set<String> method_27432() {
+    public Set<String> getServerBrands() {
         return ImmutableSet.copyOf(this.serverBrands);
     }
 
@@ -673,15 +603,9 @@ class_5219 {
     }
 
     @Override
-    public LevelInfo method_27433() {
-        LevelInfo lv = new LevelInfo(this.levelName, this.randomSeed, this.gameMode, this.structures, this.hardcore, this.difficulty, this.generatorOptions, this.gameRules.copy());
-        if (this.field_24192) {
-            lv = lv.setBonusChest();
-        }
-        if (this.commandsAllowed) {
-            lv = lv.enableCommands();
-        }
-        return lv;
+    @Environment(value=EnvType.CLIENT)
+    public LevelInfo getLevelInfo() {
+        return new LevelInfo(this.levelName, this.gameMode, this.hardcore, this.difficulty, this.commandsAllowed, this.gameRules.copy(), this.generatorOptions);
     }
 }
 

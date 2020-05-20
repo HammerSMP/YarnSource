@@ -59,7 +59,7 @@ extends NetworkSyncedItem {
 
     public static ItemStack createMap(World arg, int i, int j, byte b, boolean bl, boolean bl2) {
         ItemStack lv = new ItemStack(Items.FILLED_MAP);
-        FilledMapItem.createMapState(lv, arg, i, j, b, bl, bl2, arg.dimension.getType());
+        FilledMapItem.createMapState(lv, arg, i, j, b, bl, bl2, arg.method_27983());
         return lv;
     }
 
@@ -71,8 +71,8 @@ extends NetworkSyncedItem {
     @Nullable
     public static MapState getOrCreateMapState(ItemStack arg, World arg2) {
         MapState lv = FilledMapItem.getMapState(arg, arg2);
-        if (lv == null && !arg2.isClient) {
-            lv = FilledMapItem.createMapState(arg, arg2, arg2.getLevelProperties().getSpawnX(), arg2.getLevelProperties().getSpawnZ(), 3, false, false, arg2.dimension.getType());
+        if (lv == null && arg2 instanceof ServerWorld) {
+            lv = FilledMapItem.createMapState(arg, arg2, arg2.getLevelProperties().getSpawnX(), arg2.getLevelProperties().getSpawnZ(), 3, false, false, arg2.method_27983());
         }
         return lv;
     }
@@ -96,7 +96,7 @@ extends NetworkSyncedItem {
     }
 
     public void updateColors(World arg, Entity arg2, MapState arg3) {
-        if (arg.dimension.getType() != arg3.dimension || !(arg2 instanceof PlayerEntity)) {
+        if (arg.method_27983() != arg3.dimension || !(arg2 instanceof PlayerEntity)) {
             return;
         }
         int i = 1 << arg3.scale;
@@ -105,7 +105,7 @@ extends NetworkSyncedItem {
         int l = MathHelper.floor(arg2.getX() - (double)j) / i + 64;
         int m = MathHelper.floor(arg2.getZ() - (double)k) / i + 64;
         int n = 128 / i;
-        if (arg.dimension.isNether()) {
+        if (arg.method_27983().method_27998()) {
             n /= 2;
         }
         MapState.PlayerUpdateTracker lv = arg3.getPlayerSyncData((PlayerEntity)arg2);
@@ -133,7 +133,7 @@ extends NetworkSyncedItem {
                 int v = t & 0xF;
                 int w = 0;
                 double e = 0.0;
-                if (arg.dimension.isNether()) {
+                if (arg.method_27983().method_27998()) {
                     int x = s + t * 231871;
                     if (((x = x * x * 31287121 + x * 11) >> 20 & 1) == 0) {
                         multiset.add((Object)Blocks.DIRT.getDefaultState().getTopMaterialColor(arg, BlockPos.ORIGIN), 10);
@@ -218,7 +218,7 @@ extends NetworkSyncedItem {
         if (lv == null) {
             return;
         }
-        if (arg.dimension.getType() != lv.dimension) {
+        if (arg.method_27983() != lv.dimension) {
             return;
         }
         int i = 1 << lv.scale;

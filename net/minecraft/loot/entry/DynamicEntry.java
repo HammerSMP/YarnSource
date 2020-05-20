@@ -31,7 +31,7 @@ extends LeafEntry {
     }
 
     @Override
-    public void drop(Consumer<ItemStack> consumer, LootContext arg) {
+    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
         arg.drop(this.name, consumer);
     }
 

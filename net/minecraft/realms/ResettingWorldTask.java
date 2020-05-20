@@ -72,7 +72,7 @@ extends LongRunningTask {
                     return;
                 }
                 LOGGER.error("Couldn't reset world");
-                this.method_27453(exception.toString());
+                this.error(exception.toString());
                 return;
             }
         }

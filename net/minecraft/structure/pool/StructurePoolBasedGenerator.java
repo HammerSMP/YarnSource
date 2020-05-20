@@ -54,7 +54,7 @@ public class StructurePoolBasedGenerator {
         PillagerOutpostGenerator.init();
     }
 
-    public static void addPieces(Identifier arg, int i, PieceFactory arg2, ChunkGenerator<?> arg3, StructureManager arg4, BlockPos arg5, List<? super PoolStructurePiece> list, Random random, boolean bl, boolean bl2) {
+    public static void addPieces(Identifier arg, int i, PieceFactory arg2, ChunkGenerator arg3, StructureManager arg4, BlockPos arg5, List<? super PoolStructurePiece> list, Random random, boolean bl, boolean bl2) {
         int m;
         StructureFeatures.initialize();
         BlockRotation lv = BlockRotation.random(random);
@@ -85,7 +85,7 @@ public class StructurePoolBasedGenerator {
         }
     }
 
-    public static void method_27230(PoolStructurePiece arg, int i, PieceFactory arg2, ChunkGenerator<?> arg3, StructureManager arg4, List<? super PoolStructurePiece> list, Random random) {
+    public static void method_27230(PoolStructurePiece arg, int i, PieceFactory arg2, ChunkGenerator arg3, StructureManager arg4, List<? super PoolStructurePiece> list, Random random) {
         StructurePoolBasedGenerator.init();
         StructurePoolGenerator lv = new StructurePoolGenerator(i, arg2, arg3, arg4, list, random);
         lv.structurePieces.addLast(new ShapedPoolStructurePiece(arg, new AtomicReference<VoxelShape>(VoxelShapes.UNBOUNDED), 0, 0));
@@ -106,13 +106,13 @@ public class StructurePoolBasedGenerator {
     static final class StructurePoolGenerator {
         private final int maxSize;
         private final PieceFactory pieceFactory;
-        private final ChunkGenerator<?> chunkGenerator;
+        private final ChunkGenerator chunkGenerator;
         private final StructureManager structureManager;
         private final List<? super PoolStructurePiece> children;
         private final Random random;
         private final Deque<ShapedPoolStructurePiece> structurePieces = Queues.newArrayDeque();
 
-        private StructurePoolGenerator(int i, PieceFactory arg, ChunkGenerator<?> arg2, StructureManager arg3, List<? super PoolStructurePiece> list, Random random) {
+        private StructurePoolGenerator(int i, PieceFactory arg, ChunkGenerator arg2, StructureManager arg3, List<? super PoolStructurePiece> list, Random random) {
             this.maxSize = i;
             this.pieceFactory = arg;
             this.chunkGenerator = arg2;
@@ -134,7 +134,7 @@ public class StructurePoolBasedGenerator {
                 StructurePoolElement lv12;
                 int o;
                 AtomicReference<VoxelShape> atomicReference4;
-                Direction lv7 = JigsawBlock.method_26378(lv6.state);
+                Direction lv7 = JigsawBlock.getFacing(lv6.state);
                 BlockPos lv8 = lv6.pos;
                 BlockPos lv9 = lv8.offset(lv7);
                 int l = lv8.getY() - k;
@@ -171,7 +171,7 @@ public class StructurePoolBasedGenerator {
                             boolean p = false;
                         } else {
                             q = list2.stream().mapToInt(arg2 -> {
-                                if (!lv14.contains(arg2.pos.offset(JigsawBlock.method_26378(arg2.state)))) {
+                                if (!lv14.contains(arg2.pos.offset(JigsawBlock.getFacing(arg2.state)))) {
                                     return 0;
                                 }
                                 Identifier lv = new Identifier(arg2.tag.getString("pool"));
@@ -192,7 +192,7 @@ public class StructurePoolBasedGenerator {
                             StructurePool.Projection lv19 = lv12.getProjection();
                             boolean bl4 = lv19 == StructurePool.Projection.RIGID;
                             int s = lv16.getY();
-                            int t = l - s + JigsawBlock.method_26378(lv6.state).getOffsetY();
+                            int t = l - s + JigsawBlock.getFacing(lv6.state).getOffsetY();
                             if (bl2 && bl4) {
                                 int u = k + t;
                             } else {

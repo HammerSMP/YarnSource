@@ -46,7 +46,7 @@ extends ConditionalLootFunction {
             return arg;
         }
         DefaultedList<ItemStack> lv = DefaultedList.of();
-        this.entries.forEach(arg32 -> arg32.expand(arg2, arg3 -> arg3.drop(LootTable.limitedConsumer(lv::add), arg2)));
+        this.entries.forEach(arg32 -> arg32.expand(arg2, arg3 -> arg3.generateLoot(LootTable.processStacks(lv::add), arg2)));
         CompoundTag lv2 = new CompoundTag();
         Inventories.toTag(lv2, lv);
         CompoundTag lv3 = arg.getOrCreateTag();
@@ -55,10 +55,10 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
-        super.check(arg);
+    public void validate(LootTableReporter arg) {
+        super.validate(arg);
         for (int i = 0; i < this.entries.size(); ++i) {
-            this.entries.get(i).check(arg.makeChild(".entry[" + i + "]"));
+            this.entries.get(i).validate(arg.makeChild(".entry[" + i + "]"));
         }
     }
 

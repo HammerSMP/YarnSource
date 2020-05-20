@@ -126,9 +126,9 @@ public class StructureTestUtil {
         ArrayList collection = Lists.newArrayList();
         Box lv = new Box(arg);
         lv = lv.expand(i);
-        for (int j = (int)lv.x1; j <= (int)lv.x2; ++j) {
-            for (int k = (int)lv.y1; k <= (int)lv.y2; ++k) {
-                for (int l = (int)lv.z1; l <= (int)lv.z2; ++l) {
+        for (int j = (int)lv.minX; j <= (int)lv.maxX; ++j) {
+            for (int k = (int)lv.minY; k <= (int)lv.maxY; ++k) {
+                for (int l = (int)lv.minZ; l <= (int)lv.maxZ; ++l) {
                     BlockPos lv2 = new BlockPos(j, k, l);
                     BlockState lv3 = arg2.getBlockState(lv2);
                     if (!lv3.isOf(Blocks.STRUCTURE_BLOCK)) continue;
@@ -188,31 +188,23 @@ public class StructureTestUtil {
     }
 
     private static void method_22368(int i, BlockPos arg, ServerWorld arg2) {
-        BlockState lv6;
-        Object lv = arg2.getChunkManager().getChunkGenerator().getConfig();
-        if (lv instanceof FlatChunkGeneratorConfig) {
-            BlockState[] lvs = ((FlatChunkGeneratorConfig)lv).getLayerBlocks();
-            if (arg.getY() < i) {
-                BlockState lv2 = lvs[arg.getY() - 1];
-            } else {
-                BlockState lv3 = Blocks.AIR.getDefaultState();
-            }
-        } else if (arg.getY() == i - 1) {
-            BlockState lv4 = arg2.getBiome(arg).getSurfaceConfig().getTopMaterial();
-        } else if (arg.getY() < i - 1) {
-            BlockState lv5 = arg2.getBiome(arg).getSurfaceConfig().getUnderMaterial();
+        BlockState lv3;
+        FlatChunkGeneratorConfig lv = FlatChunkGeneratorConfig.getDefaultConfig();
+        BlockState[] lvs = lv.getLayerBlocks();
+        if (arg.getY() < i) {
+            BlockState lv2 = lvs[arg.getY() - 1];
         } else {
-            lv6 = Blocks.AIR.getDefaultState();
+            lv3 = Blocks.AIR.getDefaultState();
         }
-        BlockStateArgument lv7 = new BlockStateArgument(lv6, Collections.emptySet(), null);
-        lv7.setBlockState(arg2, arg, 2);
-        arg2.updateNeighbors(arg, lv6.getBlock());
+        BlockStateArgument lv4 = new BlockStateArgument(lv3, Collections.emptySet(), null);
+        lv4.setBlockState(arg2, arg, 2);
+        arg2.updateNeighbors(arg, lv3.getBlock());
     }
 
     private static boolean isInStructureBounds(BlockPos arg, BlockPos arg2, ServerWorld arg3) {
         StructureBlockBlockEntity lv = (StructureBlockBlockEntity)arg3.getBlockEntity(arg);
         Box lv2 = StructureTestUtil.getStructureBoundingBox(lv);
-        return lv2.contains(Vec3d.method_24954(arg2));
+        return lv2.contains(Vec3d.of(arg2));
     }
 }
 

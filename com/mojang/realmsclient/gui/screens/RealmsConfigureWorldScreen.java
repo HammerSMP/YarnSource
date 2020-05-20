@@ -301,7 +301,7 @@ extends RealmsScreenWithCallback {
     protected void renderMousehoverTooltip(MatrixStack arg, Text arg2, int i, int j) {
         int k = i + 12;
         int l = j - 12;
-        int m = this.textRenderer.getStringWidth(arg2);
+        int m = this.textRenderer.getWidth(arg2);
         if (k + m + 3 > this.right_x) {
             k = k - m - 20;
         }

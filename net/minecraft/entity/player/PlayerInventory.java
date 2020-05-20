@@ -159,7 +159,7 @@ Nameable {
         }
     }
 
-    public int method_7369(Predicate<ItemStack> predicate, int i) {
+    public int clearItem(Predicate<ItemStack> predicate, int i) {
         int j = 0;
         for (int k = 0; k < this.size(); ++k) {
             ItemStack lv = this.getStack(k);

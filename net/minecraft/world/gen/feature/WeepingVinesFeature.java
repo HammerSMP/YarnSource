@@ -15,10 +15,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -31,7 +31,7 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
         if (!arg.isAir(arg4)) {
             return false;
         }
@@ -44,7 +44,7 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    private void generateNetherWartBlocksInArea(IWorld arg, Random random, BlockPos arg2) {
+    private void generateNetherWartBlocksInArea(WorldAccess arg, Random random, BlockPos arg2) {
         arg.setBlockState(arg2, Blocks.NETHER_WART_BLOCK.getDefaultState(), 2);
         BlockPos.Mutable lv = new BlockPos.Mutable();
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
@@ -64,7 +64,7 @@ extends Feature<DefaultFeatureConfig> {
         }
     }
 
-    private void generateVinesInArea(IWorld arg, Random random, BlockPos arg2) {
+    private void generateVinesInArea(WorldAccess arg, Random random, BlockPos arg2) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int i = 0; i < 100; ++i) {
             BlockState lv2;
@@ -83,7 +83,7 @@ extends Feature<DefaultFeatureConfig> {
         }
     }
 
-    public static void generateVineColumn(IWorld arg, Random random, BlockPos.Mutable arg2, int i, int j, int k) {
+    public static void generateVineColumn(WorldAccess arg, Random random, BlockPos.Mutable arg2, int i, int j, int k) {
         for (int l = 0; l <= i; ++l) {
             if (arg.isAir(arg2)) {
                 if (l == i || !arg.isAir((BlockPos)arg2.down())) {

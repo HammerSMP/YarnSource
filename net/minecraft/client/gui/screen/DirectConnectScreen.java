@@ -98,8 +98,8 @@ extends Screen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        this.drawString(arg, this.textRenderer, I18n.translate("addServer.enterIp", new Object[0]), this.width / 2 - 100, 100, 0xA0A0A0);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("addServer.enterIp", new Object[0]), this.width / 2 - 100, 100, 0xA0A0A0);
         this.addressField.render(arg, i, j, f);
         super.render(arg, i, j, f);
     }

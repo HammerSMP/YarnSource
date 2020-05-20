@@ -46,6 +46,12 @@ public class TargetFinder {
     }
 
     @Nullable
+    public static Vec3d method_27929(MobEntityWithAi arg, int i, int j, Vec3d arg2) {
+        Vec3d lv = arg2.subtract(arg.getX(), arg.getY(), arg.getZ());
+        return TargetFinder.findTarget(arg, i, j, 0, lv, false, 1.5707963705062866, arg::getPathfindingFavor, true, 0, 0, true);
+    }
+
+    @Nullable
     public static Vec3d findTargetTowards(MobEntityWithAi arg, int i, int j, Vec3d arg2) {
         Vec3d lv = arg2.subtract(arg.getX(), arg.getY(), arg.getZ());
         return TargetFinder.findTarget(arg, i, j, 0, lv, true, 1.5707963705062866, arg::getPathfindingFavor, false, 0, 0, true);
@@ -112,7 +118,7 @@ public class TargetFinder {
             bl6 = true;
         }
         if (bl6) {
-            return Vec3d.method_24955(lv2);
+            return Vec3d.ofBottomCenter(lv2);
         }
         return null;
     }

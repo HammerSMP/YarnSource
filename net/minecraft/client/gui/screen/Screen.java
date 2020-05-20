@@ -31,6 +31,7 @@ import net.minecraft.client.gui.AbstractParentElement;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmChatLinkScreen;
+import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.render.BufferBuilder;
@@ -55,7 +56,8 @@ import org.apache.logging.log4j.Logger;
 @Environment(value=EnvType.CLIENT)
 public abstract class Screen
 extends AbstractParentElement
-implements Drawable {
+implements TickableElement,
+Drawable {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Set<String> ALLOWED_PROTOCOLS = Sets.newHashSet((Object[])new String[]{"http", "https"});
     protected final Text title;
@@ -144,7 +146,7 @@ implements Drawable {
         RenderSystem.disableDepthTest();
         int k = 0;
         for (Text lv : list) {
-            int l = this.textRenderer.getStringWidth(lv);
+            int l = this.textRenderer.getWidth(lv);
             if (l <= k) continue;
             k = l;
         }
@@ -304,6 +306,7 @@ implements Drawable {
     protected void init() {
     }
 
+    @Override
     public void tick() {
     }
 
@@ -318,11 +321,11 @@ implements Drawable {
         if (this.client.world != null) {
             this.fillGradient(arg, 0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            this.renderDirtBackground(i);
+            this.renderBackgroundTexture(i);
         }
     }
 
-    public void renderDirtBackground(int i) {
+    public void renderBackgroundTexture(int i) {
         Tessellator lv = Tessellator.getInstance();
         BufferBuilder lv2 = lv.getBuffer();
         this.client.getTextureManager().bindTexture(BACKGROUND_TEXTURE);

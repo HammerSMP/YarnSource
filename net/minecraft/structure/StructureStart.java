@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.StructureAccessor;
@@ -31,7 +31,7 @@ public abstract class StructureStart {
     public static final StructureStart DEFAULT = new StructureStart((StructureFeature)Feature.MINESHAFT, 0, 0, BlockBox.empty(), 0, 0L){
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
         }
     };
     private final StructureFeature<?> feature;
@@ -52,7 +52,7 @@ public abstract class StructureStart {
         this.boundingBox = arg2;
     }
 
-    public abstract void init(ChunkGenerator<?> var1, StructureManager var2, int var3, int var4, Biome var5);
+    public abstract void init(ChunkGenerator var1, StructureManager var2, int var3, int var4, Biome var5);
 
     public BlockBox getBoundingBox() {
         return this.boundingBox;
@@ -65,7 +65,7 @@ public abstract class StructureStart {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public void generateStructure(IWorld arg, StructureAccessor arg2, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5) {
+    public void generateStructure(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5) {
         List<StructurePiece> list = this.children;
         synchronized (list) {
             if (this.children.isEmpty()) {

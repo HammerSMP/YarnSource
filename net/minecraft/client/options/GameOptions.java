@@ -155,9 +155,9 @@ public class GameOptions {
     public final KeyBinding keyCommand = new KeyBinding("key.command", 47, "key.categories.multiplayer");
     public final KeyBinding keyScreenshot = new KeyBinding("key.screenshot", 291, "key.categories.misc");
     public final KeyBinding keyTogglePerspective = new KeyBinding("key.togglePerspective", 294, "key.categories.misc");
-    public final KeyBinding keySmoothCamera = new KeyBinding("key.smoothCamera", InputUtil.UNKNOWN_KEYCODE.getKeyCode(), "key.categories.misc");
+    public final KeyBinding keySmoothCamera = new KeyBinding("key.smoothCamera", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.misc");
     public final KeyBinding keyFullscreen = new KeyBinding("key.fullscreen", 300, "key.categories.misc");
-    public final KeyBinding keySpectatorOutlines = new KeyBinding("key.spectatorOutlines", InputUtil.UNKNOWN_KEYCODE.getKeyCode(), "key.categories.misc");
+    public final KeyBinding keySpectatorOutlines = new KeyBinding("key.spectatorOutlines", InputUtil.UNKNOWN_KEY.getCode(), "key.categories.misc");
     public final KeyBinding keyAdvancements = new KeyBinding("key.advancements", 76, "key.categories.misc");
     public final KeyBinding[] keysHotbar = new KeyBinding[]{new KeyBinding("key.hotbar.1", 49, "key.categories.inventory"), new KeyBinding("key.hotbar.2", 50, "key.categories.inventory"), new KeyBinding("key.hotbar.3", 51, "key.categories.inventory"), new KeyBinding("key.hotbar.4", 52, "key.categories.inventory"), new KeyBinding("key.hotbar.5", 53, "key.categories.inventory"), new KeyBinding("key.hotbar.6", 54, "key.categories.inventory"), new KeyBinding("key.hotbar.7", 55, "key.categories.inventory"), new KeyBinding("key.hotbar.8", 56, "key.categories.inventory"), new KeyBinding("key.hotbar.9", 57, "key.categories.inventory")};
     public final KeyBinding keySaveToolbarActivator = new KeyBinding("key.saveToolbarActivator", 67, "key.categories.creative");
@@ -204,8 +204,8 @@ public class GameOptions {
         return this.backgroundForChatOnly ? i : (int)(this.textBackgroundOpacity * 255.0) << 24 & 0xFF000000;
     }
 
-    public void setKeyCode(KeyBinding arg, InputUtil.KeyCode arg2) {
-        arg.setKeyCode(arg2);
+    public void setKeyCode(KeyBinding arg, InputUtil.Key arg2) {
+        arg.setBoundKey(arg2);
         this.write();
     }
 
@@ -456,8 +456,8 @@ public class GameOptions {
                         this.skipMultiplayerWarning = "true".equals(string22);
                     }
                     for (KeyBinding keyBinding : this.keysAll) {
-                        if (!string2.equals("key_" + keyBinding.getId())) continue;
-                        keyBinding.setKeyCode(InputUtil.fromName(string22));
+                        if (!string2.equals("key_" + keyBinding.getTranslationKey())) continue;
+                        keyBinding.setBoundKey(InputUtil.fromTranslationKey(string22));
                     }
                     for (SoundCategory soundCategory : SoundCategory.values()) {
                         if (!string2.equals("soundCategory_" + soundCategory.getName())) continue;
@@ -581,7 +581,7 @@ public class GameOptions {
             printWriter.println("glDebugVerbosity:" + this.glDebugVerbosity);
             printWriter.println("skipMultiplayerWarning:" + this.skipMultiplayerWarning);
             for (KeyBinding keyBinding : this.keysAll) {
-                printWriter.println("key_" + keyBinding.getId() + ":" + keyBinding.getName());
+                printWriter.println("key_" + keyBinding.getTranslationKey() + ":" + keyBinding.getBoundKeyTranslationKey());
             }
             for (SoundCategory soundCategory : SoundCategory.values()) {
                 printWriter.println("soundCategory_" + soundCategory.getName() + ":" + this.getSoundVolume(soundCategory));

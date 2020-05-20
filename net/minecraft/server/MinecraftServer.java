@@ -5,27 +5,15 @@
  *  com.google.common.base.Splitter
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
- *  com.google.gson.JsonObject
  *  com.mojang.authlib.GameProfile
  *  com.mojang.authlib.GameProfileRepository
  *  com.mojang.authlib.minecraft.MinecraftSessionService
- *  com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService
  *  com.mojang.datafixers.DataFixer
- *  com.mojang.datafixers.Dynamic
- *  com.mojang.datafixers.types.DynamicOps
- *  com.mojang.datafixers.types.JsonOps
  *  io.netty.buffer.ByteBuf
  *  io.netty.buffer.ByteBufOutputStream
  *  io.netty.buffer.Unpooled
  *  it.unimi.dsi.fastutil.longs.LongIterator
  *  javax.annotation.Nullable
- *  joptsimple.AbstractOptionSpec
- *  joptsimple.ArgumentAcceptingOptionSpec
- *  joptsimple.NonOptionArgumentSpec
- *  joptsimple.OptionParser
- *  joptsimple.OptionSet
- *  joptsimple.OptionSpec
- *  joptsimple.OptionSpecBuilder
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  *  org.apache.commons.lang3.Validate
@@ -37,20 +25,14 @@ package net.minecraft.server;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.DynamicOps;
-import com.mojang.datafixers.types.JsonOps;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedWriter;
@@ -69,7 +51,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.security.KeyPair;
 import java.text.SimpleDateFormat;
@@ -83,22 +64,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
-import joptsimple.AbstractOptionSpec;
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.NonOptionArgumentSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
-import joptsimple.OptionSpecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Bootstrap;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -106,8 +78,8 @@ import net.minecraft.class_5217;
 import net.minecraft.class_5218;
 import net.minecraft.class_5219;
 import net.minecraft.class_5268;
+import net.minecraft.class_5285;
 import net.minecraft.command.DataCommandStorage;
-import net.minecraft.datafixer.Schemas;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.LootManager;
@@ -134,14 +106,9 @@ import net.minecraft.server.ServerTask;
 import net.minecraft.server.Whitelist;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
-import net.minecraft.server.WorldGenerationProgressLogger;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.dedicated.EulaReader;
-import net.minecraft.server.dedicated.MinecraftDedicatedServer;
-import net.minecraft.server.dedicated.ServerPropertiesHandler;
-import net.minecraft.server.dedicated.ServerPropertiesLoader;
 import net.minecraft.server.function.CommandFunctionManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
@@ -156,7 +123,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 import net.minecraft.util.MetricsData;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.TickDurationMonitor;
@@ -165,7 +131,6 @@ import net.minecraft.util.UserCache;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -186,6 +151,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.WorldSaveHandler;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
@@ -194,10 +160,7 @@ import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
-import net.minecraft.world.level.LevelGeneratorOptions;
-import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraft.world.level.LevelInfo;
-import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.updater.WorldUpdater;
 import org.apache.commons.lang3.Validate;
@@ -213,7 +176,7 @@ Runnable {
     private static final Logger LOGGER = LogManager.getLogger();
     public static final File USER_CACHE_FILE = new File("usercache.json");
     private static final CompletableFuture<Unit> COMPLETED_UNIT_FUTURE = CompletableFuture.completedFuture(Unit.INSTANCE);
-    public static final LevelInfo DEMO_LEVEL_INFO = new LevelInfo("Demo World", "North Carolina".hashCode(), GameMode.SURVIVAL, true, false, Difficulty.NORMAL, LevelGeneratorType.DEFAULT.getDefaultOptions()).setBonusChest();
+    public static final LevelInfo DEMO_LEVEL_INFO = new LevelInfo("Demo World", GameMode.SURVIVAL, false, Difficulty.NORMAL, false, new GameRules(), class_5285.field_24520);
     protected final LevelStorage.Session session;
     protected final WorldSaveHandler field_24371;
     private final Snooper snooper = new Snooper("server", this, Util.getMeasuringTimeMs());
@@ -284,7 +247,7 @@ Runnable {
     private final Executor workerExecutor;
     @Nullable
     private String serverId;
-    private final StructureManager field_24370;
+    private final StructureManager structureManager;
     protected final class_5219 field_24372;
 
     public MinecraftServer(LevelStorage.Session arg, class_5219 arg2, Proxy proxy, DataFixer dataFixer, CommandManager arg3, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg4, WorldGenerationProgressListenerFactory arg5) {
@@ -307,7 +270,7 @@ Runnable {
         this.dataManager.registerListener(this.commandFunctionManager);
         this.dataManager.registerListener(this.advancementLoader);
         this.workerExecutor = Util.getServerWorkerExecutor();
-        this.field_24370 = new StructureManager(this, arg, dataFixer);
+        this.structureManager = new StructureManager(this, arg, dataFixer);
     }
 
     private void initScoreboard(PersistentStateManager arg) {
@@ -396,51 +359,56 @@ Runnable {
 
     protected void createWorlds(WorldGenerationProgressListener arg) {
         class_5268 lv = this.field_24372.method_27859();
-        ServerWorld lv2 = new ServerWorld(this, this.workerExecutor, this.session, lv, DimensionType.OVERWORLD, arg);
-        this.worlds.put(DimensionType.OVERWORLD, lv2);
-        PersistentStateManager lv3 = lv2.getPersistentStateManager();
-        this.initScoreboard(lv3);
-        this.dataCommandStorage = new DataCommandStorage(lv3);
-        lv2.getWorldBorder().load(lv.method_27422());
-        ServerWorld lv4 = this.getWorld(DimensionType.OVERWORLD);
+        class_5285 lv2 = this.field_24372.method_28057();
+        boolean bl = lv2.method_28033();
+        long l = lv2.method_28028();
+        long m = BiomeAccess.hashSeed(l);
+        ServerWorld lv3 = new ServerWorld(this, this.workerExecutor, this.session, lv, DimensionType.OVERWORLD, arg, lv2.method_28032(), bl, m);
+        this.worlds.put(DimensionType.OVERWORLD, lv3);
+        PersistentStateManager lv4 = lv3.getPersistentStateManager();
+        this.initScoreboard(lv4);
+        this.dataCommandStorage = new DataCommandStorage(lv4);
+        lv3.getWorldBorder().load(lv.method_27422());
+        ServerWorld lv5 = this.getWorld(DimensionType.OVERWORLD);
         if (!lv.isInitialized()) {
             try {
-                MinecraftServer.method_27901(lv4, lv4.dimension, lv, this.field_24372.method_27433().hasBonusChest());
+                MinecraftServer.method_27901(lv5, lv5.getDimension(), lv, lv2.method_28030(), bl);
                 lv.setInitialized(true);
-                if (lv.getGeneratorType() == LevelGeneratorType.DEBUG_ALL_BLOCK_STATES) {
+                if (bl) {
                     this.setToDebugWorldProperties(this.field_24372);
                 }
             }
             catch (Throwable throwable) {
-                CrashReport lv5 = CrashReport.create(throwable, "Exception initializing level");
+                CrashReport lv6 = CrashReport.create(throwable, "Exception initializing level");
                 try {
-                    lv4.addDetailsToCrashReport(lv5);
+                    lv5.addDetailsToCrashReport(lv6);
                 }
                 catch (Throwable throwable2) {
                     // empty catch block
                 }
-                throw new CrashException(lv5);
+                throw new CrashException(lv6);
             }
             lv.setInitialized(true);
         }
-        this.getPlayerManager().setMainWorld(lv4);
+        this.getPlayerManager().setMainWorld(lv5);
         if (this.field_24372.getCustomBossEvents() != null) {
             this.getBossBarManager().fromTag(this.field_24372.getCustomBossEvents());
         }
-        for (DimensionType lv6 : DimensionType.getAll()) {
-            if (lv6 == DimensionType.OVERWORLD) continue;
-            this.worlds.put(lv6, new SecondaryServerWorld(lv4, this.field_24372.method_27859(), this, this.workerExecutor, this.session, lv6, arg));
+        for (Map.Entry<DimensionType, ChunkGenerator> entry : lv2.method_28031().entrySet()) {
+            DimensionType lv7 = entry.getKey();
+            if (lv7 == DimensionType.OVERWORLD) continue;
+            this.worlds.put(lv7, new SecondaryServerWorld(lv5, this.field_24372.method_27859(), this, this.workerExecutor, this.session, lv7, arg, entry.getValue(), bl, m));
         }
     }
 
-    private static void method_27901(ServerWorld arg, Dimension arg2, class_5268 arg3, boolean bl) {
+    private static void method_27901(ServerWorld arg, Dimension arg2, class_5268 arg3, boolean bl, boolean bl2) {
         ChunkPos lv4;
-        ChunkGenerator<?> lv = arg.getChunkManager().getChunkGenerator();
+        ChunkGenerator lv = arg.getChunkManager().getChunkGenerator();
         if (!arg2.canPlayersSleep()) {
             arg3.setSpawnPos(BlockPos.ORIGIN.up(lv.getSpawnHeight()));
             return;
         }
-        if (arg3.getGeneratorType() == LevelGeneratorType.DEBUG_ALL_BLOCK_STATES) {
+        if (bl2) {
             arg3.setSpawnPos(BlockPos.ORIGIN.up());
             return;
         }
@@ -452,10 +420,10 @@ Runnable {
         if (lv3 == null) {
             LOGGER.warn("Unable to find spawn biome");
         }
-        boolean bl2 = false;
+        boolean bl3 = false;
         for (Block lv5 : BlockTags.VALID_SPAWN.values()) {
             if (!lv2.getTopMaterials().contains(lv5.getDefaultState())) continue;
-            bl2 = true;
+            bl3 = true;
             break;
         }
         arg3.setSpawnPos(lv4.getCenterBlockPos().add(8, lv.getSpawnHeight(), 8));
@@ -466,7 +434,7 @@ Runnable {
         int m = 32;
         for (int n = 0; n < 1024; ++n) {
             BlockPos lv6;
-            if (i > -16 && i <= 16 && j > -16 && j <= 16 && (lv6 = arg2.getSpawningBlockInChunk(new ChunkPos(lv4.x + i, lv4.z + j), bl2)) != null) {
+            if (i > -16 && i <= 16 && j > -16 && j <= 16 && (lv6 = arg2.getSpawningBlockInChunk(arg.getSeed(), new ChunkPos(lv4.x + i, lv4.z + j), bl3)) != null) {
                 arg3.setSpawnPos(lv6);
                 break;
             }
@@ -516,7 +484,7 @@ Runnable {
 
     private void prepareStartRegion(WorldGenerationProgressListener arg) {
         ServerWorld lv = this.getWorld(DimensionType.OVERWORLD);
-        LOGGER.info("Preparing start region for dimension " + DimensionType.getId(lv.dimension.getType()));
+        LOGGER.info("Preparing start region for dimension " + DimensionType.getId(lv.method_27983()));
         BlockPos lv2 = lv.method_27911();
         arg.start(new ChunkPos(lv2));
         ServerChunkManager lv3 = lv.getChunkManager();
@@ -578,7 +546,7 @@ Runnable {
         boolean bl4 = false;
         for (ServerWorld lv : this.getWorlds()) {
             if (!bl) {
-                LOGGER.info("Saving chunks for level '{}'/{}", (Object)lv, (Object)DimensionType.getId(lv.dimension.getType()));
+                LOGGER.info("Saving chunks for level '{}'/{}", (Object)lv, (Object)DimensionType.getId(lv.method_27983()));
             }
             lv.save(null, bl2, lv.savingDisabled && !bl3);
             bl4 = true;
@@ -863,11 +831,11 @@ Runnable {
         this.getCommandFunctionManager().tick();
         this.profiler.swap("levels");
         for (ServerWorld lv : this.getWorlds()) {
-            if (lv.dimension.getType() != DimensionType.OVERWORLD && !this.isNetherAllowed()) continue;
-            this.profiler.push(() -> lv + " " + Registry.DIMENSION_TYPE.getId(arg.dimension.getType()));
+            if (lv.method_27983() != DimensionType.OVERWORLD && !this.isNetherAllowed()) continue;
+            this.profiler.push(() -> lv + " " + Registry.DIMENSION_TYPE.getId(lv.method_27983()));
             if (this.ticks % 20 == 0) {
                 this.profiler.push("timeSync");
-                this.playerManager.sendToDimension(new WorldTimeUpdateS2CPacket(lv.getTime(), lv.getTimeOfDay(), lv.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), lv.dimension.getType());
+                this.playerManager.sendToDimension(new WorldTimeUpdateS2CPacket(lv.getTime(), lv.getTimeOfDay(), lv.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), lv.method_27983());
                 this.profiler.pop();
             }
             this.profiler.push("tick");
@@ -902,110 +870,6 @@ Runnable {
 
     public void addServerGuiTickable(Runnable runnable) {
         this.serverGuiTickables.add(runnable);
-    }
-
-    public static void main(String[] strings) {
-        OptionParser optionParser = new OptionParser();
-        OptionSpecBuilder optionSpec = optionParser.accepts("nogui");
-        OptionSpecBuilder optionSpec2 = optionParser.accepts("initSettings", "Initializes 'server.properties' and 'eula.txt', then quits");
-        OptionSpecBuilder optionSpec3 = optionParser.accepts("demo");
-        OptionSpecBuilder optionSpec4 = optionParser.accepts("bonusChest");
-        OptionSpecBuilder optionSpec5 = optionParser.accepts("forceUpgrade");
-        OptionSpecBuilder optionSpec6 = optionParser.accepts("eraseCache");
-        AbstractOptionSpec optionSpec7 = optionParser.accepts("help").forHelp();
-        ArgumentAcceptingOptionSpec optionSpec8 = optionParser.accepts("singleplayer").withRequiredArg();
-        ArgumentAcceptingOptionSpec optionSpec9 = optionParser.accepts("universe").withRequiredArg().defaultsTo((Object)".", (Object[])new String[0]);
-        ArgumentAcceptingOptionSpec optionSpec10 = optionParser.accepts("world").withRequiredArg();
-        ArgumentAcceptingOptionSpec optionSpec11 = optionParser.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo((Object)-1, (Object[])new Integer[0]);
-        ArgumentAcceptingOptionSpec optionSpec12 = optionParser.accepts("serverId").withRequiredArg();
-        NonOptionArgumentSpec optionSpec13 = optionParser.nonOptions();
-        try {
-            boolean bl;
-            OptionSet optionSet = optionParser.parse(strings);
-            if (optionSet.has((OptionSpec)optionSpec7)) {
-                optionParser.printHelpOn((OutputStream)System.err);
-                return;
-            }
-            Path path = Paths.get("server.properties", new String[0]);
-            ServerPropertiesLoader lv = new ServerPropertiesLoader(path);
-            lv.store();
-            Path path2 = Paths.get("eula.txt", new String[0]);
-            EulaReader lv2 = new EulaReader(path2);
-            if (optionSet.has((OptionSpec)optionSpec2)) {
-                LOGGER.info("Initialized '" + path.toAbsolutePath().toString() + "' and '" + path2.toAbsolutePath().toString() + "'");
-                return;
-            }
-            if (!lv2.isEulaAgreedTo()) {
-                LOGGER.info("You need to agree to the EULA in order to run the server. Go to eula.txt for more info.");
-                return;
-            }
-            CrashReport.initCrashReport();
-            Bootstrap.initialize();
-            Bootstrap.logMissing();
-            File file = new File((String)optionSet.valueOf((OptionSpec)optionSpec9));
-            YggdrasilAuthenticationService yggdrasilAuthenticationService = new YggdrasilAuthenticationService(Proxy.NO_PROXY, UUID.randomUUID().toString());
-            MinecraftSessionService minecraftSessionService = yggdrasilAuthenticationService.createMinecraftSessionService();
-            GameProfileRepository gameProfileRepository = yggdrasilAuthenticationService.createProfileRepository();
-            UserCache lv3 = new UserCache(gameProfileRepository, new File(file, USER_CACHE_FILE.getName()));
-            String string = (String)Optional.ofNullable(optionSet.valueOf((OptionSpec)optionSpec10)).orElse(lv.getPropertiesHandler().levelName);
-            LevelStorage lv4 = LevelStorage.create(file.toPath());
-            LevelStorage.Session lv5 = lv4.createSession(string);
-            MinecraftServer.method_27725(lv5, Schemas.getFixer(), optionSet.has((OptionSpec)optionSpec5), optionSet.has((OptionSpec)optionSpec6), () -> true);
-            class_5219 lv6 = lv5.readLevelProperties();
-            if (lv6 == null) {
-                LevelInfo lv8;
-                if (optionSet.has((OptionSpec)optionSpec3)) {
-                    LevelInfo lv7 = DEMO_LEVEL_INFO;
-                } else {
-                    lv8 = MinecraftServer.method_27726(lv.getPropertiesHandler());
-                    if (optionSet.has((OptionSpec)optionSpec4)) {
-                        lv8.setBonusChest();
-                    }
-                }
-                lv6 = new LevelProperties(lv8);
-            }
-            final MinecraftDedicatedServer lv9 = new MinecraftDedicatedServer(lv5, lv6, lv, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, lv3, WorldGenerationProgressLogger::new);
-            lv9.setServerName((String)optionSet.valueOf((OptionSpec)optionSpec8));
-            lv9.setServerPort((Integer)optionSet.valueOf((OptionSpec)optionSpec11));
-            lv9.setDemo(optionSet.has((OptionSpec)optionSpec3));
-            lv9.setServerId((String)optionSet.valueOf((OptionSpec)optionSpec12));
-            boolean bl2 = bl = !optionSet.has((OptionSpec)optionSpec) && !optionSet.valuesOf((OptionSpec)optionSpec13).contains("nogui");
-            if (bl && !GraphicsEnvironment.isHeadless()) {
-                lv9.createGui();
-            }
-            lv9.start();
-            Thread thread = new Thread("Server Shutdown Thread"){
-
-                @Override
-                public void run() {
-                    lv9.stop(true);
-                }
-            };
-            thread.setUncaughtExceptionHandler(new UncaughtExceptionLogger(LOGGER));
-            Runtime.getRuntime().addShutdownHook(thread);
-        }
-        catch (Exception exception) {
-            LOGGER.fatal("Failed to start the minecraft server", (Throwable)exception);
-        }
-    }
-
-    private static LevelInfo method_27726(ServerPropertiesHandler arg) {
-        String string;
-        long l = new Random().nextLong();
-        if (!arg.levelSeed.isEmpty()) {
-            try {
-                long m = Long.parseLong(arg.levelSeed);
-                if (m != 0L) {
-                    l = m;
-                }
-            }
-            catch (NumberFormatException numberFormatException) {
-                l = arg.levelSeed.hashCode();
-            }
-        }
-        JsonObject jsonObject = !(string = arg.generatorSettings).isEmpty() ? JsonHelper.deserialize(string) : new JsonObject();
-        LevelGeneratorOptions lv = arg.levelType.loadOptions(new Dynamic((DynamicOps)JsonOps.INSTANCE, (Object)jsonObject));
-        return new LevelInfo(arg.levelName, l, arg.gameMode, arg.generateStructures, arg.hardcore, arg.difficulty, lv);
     }
 
     protected void setServerId(String string) {
@@ -1180,13 +1044,10 @@ Runnable {
         int i = 0;
         for (ServerWorld lv : this.getWorlds()) {
             if (lv == null) continue;
-            class_5217 lv2 = lv.getLevelProperties();
-            arg.addInfo("world[" + i + "][dimension]", lv.dimension.getType());
+            arg.addInfo("world[" + i + "][dimension]", lv.method_27983());
             arg.addInfo("world[" + i + "][mode]", (Object)this.field_24372.getGameMode());
             arg.addInfo("world[" + i + "][difficulty]", (Object)lv.getDifficulty());
             arg.addInfo("world[" + i + "][hardcore]", this.field_24372.isHardcore());
-            arg.addInfo("world[" + i + "][generator_name]", lv2.getGeneratorType().getName());
-            arg.addInfo("world[" + i + "][generator_version]", lv2.getGeneratorType().getVersion());
             arg.addInfo("world[" + i + "][height]", this.worldHeight);
             arg.addInfo("world[" + i + "][chunks_loaded]", lv.getChunkManager().getLoadedChunkCount());
             ++i;
@@ -1457,7 +1318,7 @@ Runnable {
     }
 
     public ServerCommandSource getCommandSource() {
-        return new ServerCommandSource(this, this.getWorld(DimensionType.OVERWORLD) == null ? Vec3d.ZERO : Vec3d.method_24954(this.getWorld(DimensionType.OVERWORLD).method_27911()), Vec2f.ZERO, this.getWorld(DimensionType.OVERWORLD), 4, "Server", new LiteralText("Server"), this, null);
+        return new ServerCommandSource(this, this.getWorld(DimensionType.OVERWORLD) == null ? Vec3d.ZERO : Vec3d.of(this.getWorld(DimensionType.OVERWORLD).method_27911()), Vec2f.ZERO, this.getWorld(DimensionType.OVERWORLD), 4, "Server", new LiteralText("Server"), this, null);
     }
 
     @Override
@@ -1662,8 +1523,8 @@ Runnable {
         return true;
     }
 
-    public StructureManager method_27727() {
-        return this.field_24370;
+    public StructureManager getStructureManager() {
+        return this.structureManager;
     }
 
     public class_5219 method_27728() {

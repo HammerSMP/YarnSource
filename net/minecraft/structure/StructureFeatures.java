@@ -19,7 +19,6 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
@@ -54,8 +53,8 @@ public class StructureFeatures {
     }
 
     @Nullable
-    public static StructureStart readStructureStart(ChunkGenerator<?> arg, StructureManager arg2, CompoundTag arg3) {
-        String string = arg3.getString("id");
+    public static StructureStart readStructureStart(StructureManager arg, CompoundTag arg2, long l) {
+        String string = arg2.getString("id");
         if ("INVALID".equals(string)) {
             return StructureStart.DEFAULT;
         }
@@ -64,15 +63,15 @@ public class StructureFeatures {
             LOGGER.error("Unknown feature id: {}", (Object)string);
             return null;
         }
-        int i = arg3.getInt("ChunkX");
-        int j = arg3.getInt("ChunkZ");
-        int k = arg3.getInt("references");
-        BlockBox lv2 = arg3.contains("BB") ? new BlockBox(arg3.getIntArray("BB")) : BlockBox.empty();
-        ListTag lv3 = arg3.getList("Children", 10);
+        int i = arg2.getInt("ChunkX");
+        int j = arg2.getInt("ChunkZ");
+        int k = arg2.getInt("references");
+        BlockBox lv2 = arg2.contains("BB") ? new BlockBox(arg2.getIntArray("BB")) : BlockBox.empty();
+        ListTag lv3 = arg2.getList("Children", 10);
         try {
-            StructureStart lv4 = lv.getStructureStartFactory().create(lv, i, j, lv2, k, arg.getSeed());
-            for (int l = 0; l < lv3.size(); ++l) {
-                CompoundTag lv5 = lv3.getCompound(l);
+            StructureStart lv4 = lv.getStructureStartFactory().create(lv, i, j, lv2, k, l);
+            for (int m = 0; m < lv3.size(); ++m) {
+                CompoundTag lv5 = lv3.getCompound(m);
                 String string2 = lv5.getString("id");
                 StructurePieceType lv6 = Registry.STRUCTURE_PIECE.get(new Identifier(string2.toLowerCase(Locale.ROOT)));
                 if (lv6 == null) {
@@ -80,7 +79,7 @@ public class StructureFeatures {
                     continue;
                 }
                 try {
-                    StructurePiece lv7 = lv6.load(arg2, lv5);
+                    StructurePiece lv7 = lv6.load(arg, lv5);
                     lv4.children.add(lv7);
                     continue;
                 }

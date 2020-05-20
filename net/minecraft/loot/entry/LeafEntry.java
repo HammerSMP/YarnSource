@@ -40,8 +40,8 @@ extends LootEntry {
     private final LootChoice choice = new Choice(){
 
         @Override
-        public void drop(Consumer<ItemStack> consumer, LootContext arg) {
-            LeafEntry.this.drop(LootFunction.apply(LeafEntry.this.compiledFunctions, consumer, arg), arg);
+        public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
+            LeafEntry.this.generateLoot(LootFunction.apply(LeafEntry.this.compiledFunctions, consumer, arg), arg);
         }
     };
 
@@ -54,14 +54,14 @@ extends LootEntry {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
-        super.check(arg);
+    public void validate(LootTableReporter arg) {
+        super.validate(arg);
         for (int i = 0; i < this.functions.length; ++i) {
-            this.functions[i].check(arg.makeChild(".functions[" + i + "]"));
+            this.functions[i].validate(arg.makeChild(".functions[" + i + "]"));
         }
     }
 
-    protected abstract void drop(Consumer<ItemStack> var1, LootContext var2);
+    protected abstract void generateLoot(Consumer<ItemStack> var1, LootContext var2);
 
     @Override
     public boolean expand(LootContext arg, Consumer<LootChoice> consumer) {
@@ -148,7 +148,7 @@ extends LootEntry {
         private final List<LootFunction> functions = Lists.newArrayList();
 
         @Override
-        public T withFunction(LootFunction.Builder arg) {
+        public T apply(LootFunction.Builder arg) {
             this.functions.add(arg.build());
             return (T)((Builder)this.getThisBuilder());
         }
@@ -157,19 +157,19 @@ extends LootEntry {
             return this.functions.toArray(new LootFunction[0]);
         }
 
-        public T setWeight(int i) {
+        public T weight(int i) {
             this.weight = i;
             return (T)((Builder)this.getThisBuilder());
         }
 
-        public T setQuality(int i) {
+        public T quality(int i) {
             this.quality = i;
             return (T)((Builder)this.getThisBuilder());
         }
 
         @Override
-        public /* synthetic */ Object withFunction(LootFunction.Builder arg) {
-            return this.withFunction(arg);
+        public /* synthetic */ Object apply(LootFunction.Builder arg) {
+            return this.apply(arg);
         }
     }
 

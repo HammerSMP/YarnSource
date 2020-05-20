@@ -76,10 +76,10 @@ implements ProgressListener {
         }
         this.renderBackground(arg);
         if (this.title != null) {
-            this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
         }
         if (this.task != null && this.progress != 0) {
-            this.drawStringWithShadow(arg, this.textRenderer, new LiteralText("").append(this.task).append(" " + this.progress + "%"), this.width / 2, 90, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, new LiteralText("").append(this.task).append(" " + this.progress + "%"), this.width / 2, 90, 0xFFFFFF);
         }
         super.render(arg, i, j, f);
     }

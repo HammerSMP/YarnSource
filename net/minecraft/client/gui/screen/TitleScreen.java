@@ -160,7 +160,7 @@ extends Screen {
                 }
             }
             catch (IOException iOException) {
-                SystemToast.method_27023(this.client, "Demo_World");
+                SystemToast.addWorldAccessFailureToast(this.client, "Demo_World");
                 field_23775.warn("Failed to access demo world", (Throwable)iOException);
             }
         }));
@@ -171,7 +171,7 @@ extends Screen {
             }
         }
         catch (IOException iOException) {
-            SystemToast.method_27023(this.client, "Demo_World");
+            SystemToast.addWorldAccessFailureToast(this.client, "Demo_World");
             field_23775.warn("Failed to read demo world data", (Throwable)iOException);
         }
     }
@@ -231,8 +231,8 @@ extends Screen {
         if (this.client.isModded()) {
             string = string + I18n.translate("menu.modded", new Object[0]);
         }
-        this.drawString(arg, this.textRenderer, string, 2, this.height - 10, 0xFFFFFF | n);
-        this.drawString(arg, this.textRenderer, "Copyright Mojang AB. Do not distribute!", this.copyrightTextX, this.height - 10, 0xFFFFFF | n);
+        this.drawStringWithShadow(arg, this.textRenderer, string, 2, this.height - 10, 0xFFFFFF | n);
+        this.drawStringWithShadow(arg, this.textRenderer, "Copyright Mojang AB. Do not distribute!", this.copyrightTextX, this.height - 10, 0xFFFFFF | n);
         if (i > this.copyrightTextX && i < this.copyrightTextX + this.copyrightTextWidth && j > this.height - 10 && j < this.height) {
             TitleScreen.fill(arg, this.copyrightTextX, this.height - 1, this.copyrightTextX + this.copyrightTextWidth, this.height, 0xFFFFFF | n);
         }
@@ -272,7 +272,7 @@ extends Screen {
                 lv.deleteSessionLock();
             }
             catch (IOException iOException) {
-                SystemToast.method_27025(this.client, "Demo_World");
+                SystemToast.addWorldDeleteFailureToast(this.client, "Demo_World");
                 field_23775.warn("Failed to delete demo world", (Throwable)iOException);
             }
         }

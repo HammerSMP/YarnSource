@@ -21,7 +21,7 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FollowParentGoal;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
@@ -48,9 +48,9 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
@@ -94,7 +94,7 @@ extends AnimalEntity {
         return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 30.0).add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0);
     }
 
-    public static boolean canSpawn(EntityType<PolarBearEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<PolarBearEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         Biome lv = arg2.getBiome(arg4);
         if (lv == Biomes.FROZEN_OCEAN || lv == Biomes.DEEP_FROZEN_OCEAN) {
             return arg2.getBaseLightLevel(arg4, 0) > 8 && arg2.getBlockState(arg4.down()).isOf(Blocks.ICE);
@@ -191,7 +191,7 @@ extends AnimalEntity {
     }
 
     @Override
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
             ((PassiveEntity.PassiveData)arg4).setBabyChance(1.0f);

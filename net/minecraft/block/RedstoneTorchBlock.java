@@ -47,7 +47,7 @@ extends TorchBlock {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (bl) {
             return;
         }

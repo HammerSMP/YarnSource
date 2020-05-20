@@ -16,10 +16,10 @@ import net.minecraft.block.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.SingleStateFeatureConfig;
 
@@ -30,7 +30,7 @@ extends Feature<SingleStateFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, SingleStateFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SingleStateFeatureConfig arg5) {
         boolean bl3;
         int l;
         arg4 = new BlockPos(arg4.getX(), arg.getSeaLevel(), arg4.getZ());
@@ -76,7 +76,7 @@ extends Feature<SingleStateFeatureConfig> {
         return true;
     }
 
-    private void method_13428(Random random, IWorld arg, int i, int j, BlockPos arg2, boolean bl, int k, double d, int l) {
+    private void method_13428(Random random, WorldAccess arg, int i, int j, BlockPos arg2, boolean bl, int k, double d, int l) {
         int m = random.nextBoolean() ? -1 : 1;
         int n = random.nextBoolean() ? -1 : 1;
         int o = random.nextInt(Math.max(i / 2 - 2, 1));
@@ -102,7 +102,7 @@ extends Feature<SingleStateFeatureConfig> {
         }
     }
 
-    private void method_13415(int i, int j, BlockPos arg, IWorld arg2, boolean bl, double d, BlockPos arg3, int k, int l) {
+    private void method_13415(int i, int j, BlockPos arg, WorldAccess arg2, boolean bl, double d, BlockPos arg3, int k, int l) {
         int m = i + 1 + k / 3;
         int n = Math.min(i - 3, 3) + l / 2 - 1;
         for (int o = -m; o < m; ++o) {
@@ -121,13 +121,13 @@ extends Feature<SingleStateFeatureConfig> {
         }
     }
 
-    private void clearSnowAbove(IWorld arg, BlockPos arg2) {
+    private void clearSnowAbove(WorldAccess arg, BlockPos arg2) {
         if (arg.getBlockState(arg2.up()).isOf(Blocks.SNOW)) {
             this.setBlockState(arg, arg2.up(), Blocks.AIR.getDefaultState());
         }
     }
 
-    private void method_13426(IWorld arg, Random random, BlockPos arg2, int i, int j, int k, int l, int m, int n, boolean bl, int o, double d, boolean bl2, BlockState arg3) {
+    private void method_13426(WorldAccess arg, Random random, BlockPos arg2, int i, int j, int k, int l, int m, int n, boolean bl, int o, double d, boolean bl2, BlockState arg3) {
         double e;
         double d2 = e = bl ? this.method_13424(j, l, BlockPos.ORIGIN, n, this.method_13416(k, i, o), d) : this.method_13421(j, l, BlockPos.ORIGIN, m, random);
         if (e < 0.0) {
@@ -141,7 +141,7 @@ extends Feature<SingleStateFeatureConfig> {
         }
     }
 
-    private void method_13425(BlockPos arg, IWorld arg2, Random random, int i, int j, boolean bl, boolean bl2, BlockState arg3) {
+    private void method_13425(BlockPos arg, WorldAccess arg2, Random random, int i, int j, boolean bl, boolean bl2, BlockState arg3) {
         BlockState lv = arg2.getBlockState(arg);
         if (lv.getMaterial() == Material.AIR || lv.isOf(Blocks.SNOW_BLOCK) || lv.isOf(Blocks.ICE) || lv.isOf(Blocks.WATER)) {
             int k;
@@ -202,7 +202,7 @@ extends Feature<SingleStateFeatureConfig> {
         return arg.getBlockState(arg2.down()).getMaterial() == Material.AIR;
     }
 
-    private void method_13418(IWorld arg, BlockPos arg2, int i, int j, boolean bl, int k) {
+    private void method_13418(WorldAccess arg, BlockPos arg2, int i, int j, boolean bl, int k) {
         int l = bl ? k : i / 2;
         for (int m = -l; m <= l; ++m) {
             for (int n = -l; n <= l; ++n) {

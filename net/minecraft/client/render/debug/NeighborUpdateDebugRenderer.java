@@ -76,7 +76,7 @@ implements DebugRenderer.Renderer {
                 Integer integer = entry2.getValue();
                 if (!set.add(lv3)) continue;
                 Box lv4 = new Box(BlockPos.ORIGIN).expand(0.002).contract(0.0025 * (double)m).offset(lv3.getX(), lv3.getY(), lv3.getZ()).offset(-d, -e, -f);
-                WorldRenderer.drawBox(arg, lv, lv4.x1, lv4.y1, lv4.z1, lv4.x2, lv4.y2, lv4.z2, 1.0f, 1.0f, 1.0f, 1.0f);
+                WorldRenderer.drawBox(arg, lv, lv4.minX, lv4.minY, lv4.minZ, lv4.maxX, lv4.maxY, lv4.maxZ, 1.0f, 1.0f, 1.0f, 1.0f);
                 map.put(lv3, integer);
             }
         }

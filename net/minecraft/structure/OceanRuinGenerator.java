@@ -16,7 +16,7 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.loot.LootTables;
@@ -41,7 +41,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.OceanRuinFeature;
@@ -169,7 +170,7 @@ public class OceanRuinGenerator {
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, IWorld arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
             if ("chest".equals(string)) {
                 arg2.setBlockState(arg, (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.WATERLOGGED, arg2.getFluidState(arg).matches(FluidTags.WATER)), 2);
                 BlockEntity lv = arg2.getBlockEntity(arg);
@@ -180,7 +181,7 @@ public class OceanRuinGenerator {
                 DrownedEntity lv2 = EntityType.DROWNED.create(arg2.getWorld());
                 lv2.setPersistent();
                 lv2.refreshPositionAndAngles(arg, 0.0f, 0.0f);
-                lv2.initialize(arg2, arg2.getLocalDifficulty(arg), SpawnType.STRUCTURE, null, null);
+                lv2.initialize(arg2, arg2.getLocalDifficulty(arg), SpawnReason.STRUCTURE, null, null);
                 arg2.spawnEntity(lv2);
                 if (arg.getY() > arg2.getSeaLevel()) {
                     arg2.setBlockState(arg, Blocks.AIR.getDefaultState(), 2);
@@ -191,7 +192,7 @@ public class OceanRuinGenerator {
         }
 
         @Override
-        public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+        public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
             this.placementData.clearProcessors().addProcessor(new BlockRotStructureProcessor(this.integrity)).addProcessor(BlockIgnoreStructureProcessor.IGNORE_AIR_AND_STRUCTURE_BLOCKS);
             int i = arg.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, this.pos.getX(), this.pos.getZ());
             this.pos = new BlockPos(this.pos.getX(), i, this.pos.getZ());

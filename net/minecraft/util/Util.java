@@ -47,6 +47,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +73,9 @@ import org.apache.logging.log4j.Logger;
 
 public class Util {
     private static final AtomicInteger NEXT_SERVER_WORKER_ID = new AtomicInteger(1);
-    private static final ExecutorService SERVER_WORKER_EXECUTOR = Util.createServerWorkerExecutor();
+    private static final ExecutorService BOOTSTRAP = Util.method_28122("Bootstrap");
+    private static final ExecutorService SERVER_WORKER_EXECUTOR = Util.method_28122("Main");
+    private static final ExecutorService field_24477 = Util.method_27959();
     public static LongSupplier nanoTimeSupplier = System::nanoTime;
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -103,7 +106,7 @@ public class Util {
         return Instant.now().toEpochMilli();
     }
 
-    private static ExecutorService createServerWorkerExecutor() {
+    private static ExecutorService method_28122(String string) {
         ForkJoinPool executorService2;
         int i = MathHelper.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 7);
         if (i <= 0) {
@@ -122,39 +125,51 @@ public class Util {
                         super.onTermination(throwable);
                     }
                 };
-                forkJoinWorkerThread.setName("Worker-" + NEXT_SERVER_WORKER_ID.getAndIncrement());
+                forkJoinWorkerThread.setName("Worker-" + string + "-" + NEXT_SERVER_WORKER_ID.getAndIncrement());
                 return forkJoinWorkerThread;
-            }, (thread, throwable) -> {
-                Util.throwOrPause(throwable);
-                if (throwable instanceof CompletionException) {
-                    throwable = throwable.getCause();
-                }
-                if (throwable instanceof CrashException) {
-                    Bootstrap.println(((CrashException)throwable).getReport().asString());
-                    System.exit(-1);
-                }
-                LOGGER.error(String.format("Caught exception in thread %s", thread), throwable);
-            }, true);
+            }, Util::method_18347, true);
         }
         return executorService2;
+    }
+
+    public static Executor method_28124() {
+        return BOOTSTRAP;
     }
 
     public static Executor getServerWorkerExecutor() {
         return SERVER_WORKER_EXECUTOR;
     }
 
+    public static Executor method_27958() {
+        return field_24477;
+    }
+
     public static void shutdownServerWorkerExecutor() {
+        Util.method_27957(SERVER_WORKER_EXECUTOR);
+        Util.method_27957(field_24477);
+    }
+
+    private static void method_27957(ExecutorService executorService) {
         boolean bl2;
-        SERVER_WORKER_EXECUTOR.shutdown();
+        executorService.shutdown();
         try {
-            boolean bl = SERVER_WORKER_EXECUTOR.awaitTermination(3L, TimeUnit.SECONDS);
+            boolean bl = executorService.awaitTermination(3L, TimeUnit.SECONDS);
         }
         catch (InterruptedException interruptedException) {
             bl2 = false;
         }
         if (!bl2) {
-            SERVER_WORKER_EXECUTOR.shutdownNow();
+            executorService.shutdownNow();
         }
+    }
+
+    private static ExecutorService method_27959() {
+        return Executors.newCachedThreadPool(runnable -> {
+            Thread thread = new Thread(runnable);
+            thread.setName("IO-Worker-" + NEXT_SERVER_WORKER_ID.getAndIncrement());
+            thread.setUncaughtExceptionHandler(Util::method_18347);
+            return thread;
+        });
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -167,6 +182,18 @@ public class Util {
     @Environment(value=EnvType.CLIENT)
     public static void throwUnchecked(Throwable throwable) {
         throw throwable instanceof RuntimeException ? (RuntimeException)throwable : new RuntimeException(throwable);
+    }
+
+    private static void method_18347(Thread thread, Throwable throwable) {
+        Util.throwOrPause(throwable);
+        if (throwable instanceof CompletionException) {
+            throwable = throwable.getCause();
+        }
+        if (throwable instanceof CrashException) {
+            Bootstrap.println(((CrashException)throwable).getReport().asString());
+            System.exit(-1);
+        }
+        LOGGER.error(String.format("Caught exception in thread %s", thread), throwable);
     }
 
     public static OperatingSystem getOperatingSystem() {

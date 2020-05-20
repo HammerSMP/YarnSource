@@ -51,11 +51,11 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.textRenderer.getClass();
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.reasonHeight / 2 - 9 * 2, 0xAAAAAA);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.reasonHeight / 2 - 9 * 2, 0xAAAAAA);
         int k = this.height / 2 - this.reasonHeight / 2;
         if (this.reasonFormatted != null) {
             for (Text lv : this.reasonFormatted) {
-                this.drawStringWithShadow(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+                this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
                 this.textRenderer.getClass();
                 k += 9;
             }

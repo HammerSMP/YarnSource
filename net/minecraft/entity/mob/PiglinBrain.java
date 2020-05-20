@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.util.Pair;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,8 +74,6 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.context.LootContext;
@@ -91,14 +90,13 @@ import net.minecraft.util.math.IntRange;
 import net.minecraft.util.math.Vec3d;
 
 public class PiglinBrain {
-    protected static final Item field_23826 = Items.GOLD_INGOT;
+    protected static final Item BARTERING_ITEM = Items.GOLD_INGOT;
     private static final IntRange field_22477 = IntRange.between(10, 20);
     private static final IntRange HUNT_MEMORY_DURATION = Durations.betweenSeconds(30, 120);
     private static final IntRange MEMORY_TRANSFER_TASK_DURATION = Durations.betweenSeconds(10, 40);
     private static final IntRange RIDE_TARGET_MEMORY_DURATION = Durations.betweenSeconds(10, 30);
     private static final IntRange AVOID_MEMORY_DURATION = Durations.betweenSeconds(5, 20);
     private static final Set FOOD = ImmutableSet.of((Object)Items.PORKCHOP, (Object)Items.COOKED_PORKCHOP);
-    private static final Set<Item> GOLDEN_ITEMS = ImmutableSet.of((Object)Items.GOLD_INGOT, (Object)Items.GOLDEN_APPLE, (Object)Items.GOLDEN_HORSE_ARMOR, (Object)Items.GOLDEN_CARROT, (Object)Items.GOLD_BLOCK, (Object)Items.GOLD_ORE, (Object[])new Item[]{Items.ENCHANTED_GOLDEN_APPLE, Items.GOLDEN_HORSE_ARMOR, Items.LIGHT_WEIGHTED_PRESSURE_PLATE, Items.BELL, Items.GLISTERING_MELON_SLICE, Items.CLOCK, Items.NETHER_GOLD_ORE, Items.GILDED_BLACKSTONE});
 
     protected static Brain<?> create(PiglinEntity arg, Dynamic<?> dynamic) {
         Brain<PiglinEntity> lv = new Brain<PiglinEntity>((Collection<MemoryModuleType<?>>)PiglinEntity.MEMORY_MODULE_TYPES, (Collection<SensorType<Sensor<PiglinEntity>>>)PiglinEntity.SENSOR_TYPES, dynamic);
@@ -125,7 +123,7 @@ public class PiglinBrain {
     }
 
     private static void addIdleActivities(Brain<PiglinEntity> arg) {
-        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of((Object)new FollowMobTask(PiglinBrain::isGoldHoldingPlayer, 14.0f), new UpdateAttackTargetTask<PiglinEntity>(PiglinEntity::isAdult, PiglinBrain::getPreferredTarget), new ConditionalTask<PiglinEntity>(PiglinEntity::method_26952, new HuntHoglinTask()), PiglinBrain.makeGoToZombifiedPiglinTask(), PiglinBrain.makeGoToSoulFireTask(), PiglinBrain.makeRememberRideableHoglinTask(), PiglinBrain.makeRandomFollowTask(), PiglinBrain.makeRandomWanderTask(), (Object)new FindInteractionTargetTask(EntityType.PLAYER, 4)));
+        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of((Object)new FollowMobTask(PiglinBrain::isGoldHoldingPlayer, 14.0f), new UpdateAttackTargetTask<PiglinEntity>(PiglinEntity::isAdult, PiglinBrain::getPreferredTarget), new ConditionalTask<PiglinEntity>(PiglinEntity::canHunt, new HuntHoglinTask()), PiglinBrain.makeGoToZombifiedPiglinTask(), PiglinBrain.makeGoToSoulFireTask(), PiglinBrain.makeRememberRideableHoglinTask(), PiglinBrain.makeRandomFollowTask(), PiglinBrain.makeRandomWanderTask(), (Object)new FindInteractionTargetTask(EntityType.PLAYER, 4)));
     }
 
     private static void addFightActivities(PiglinEntity arg, Brain<PiglinEntity> arg22) {
@@ -240,7 +238,7 @@ public class PiglinBrain {
                 if (PiglinBrain.isGoldenItem(lv2.getItem())) {
                     PiglinBrain.method_24849(arg, lv2);
                 } else {
-                    PiglinBrain.doBarter(arg, lv2);
+                    PiglinBrain.doBarter(arg, Collections.singletonList(lv2));
                 }
                 arg.equipToMainHand(lv);
             }
@@ -256,37 +254,39 @@ public class PiglinBrain {
 
     private static void method_24849(PiglinEntity arg, ItemStack arg2) {
         ItemStack lv = arg.addItem(arg2);
-        PiglinBrain.dropBarteredItem(arg, lv);
+        PiglinBrain.dropBarteredItem(arg, Collections.singletonList(lv));
     }
 
-    private static void doBarter(PiglinEntity arg, ItemStack arg2) {
+    private static void doBarter(PiglinEntity arg, List<ItemStack> list) {
         Optional<PlayerEntity> optional = arg.getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_PLAYER);
         if (optional.isPresent()) {
-            PiglinBrain.dropBarteredItem(arg, optional.get(), arg2);
+            PiglinBrain.dropBarteredItem(arg, optional.get(), list);
         } else {
-            PiglinBrain.dropBarteredItem(arg, arg2);
+            PiglinBrain.dropBarteredItem(arg, list);
         }
     }
 
-    private static void dropBarteredItem(PiglinEntity arg, ItemStack arg2) {
-        PiglinBrain.drop(arg, arg2, PiglinBrain.findGround(arg));
+    private static void dropBarteredItem(PiglinEntity arg, List<ItemStack> list) {
+        PiglinBrain.drop(arg, list, PiglinBrain.findGround(arg));
     }
 
-    private static void dropBarteredItem(PiglinEntity arg, PlayerEntity arg2, ItemStack arg3) {
-        PiglinBrain.drop(arg, arg3, arg2.getPos());
+    private static void dropBarteredItem(PiglinEntity arg, PlayerEntity arg2, List<ItemStack> list) {
+        PiglinBrain.drop(arg, list, arg2.getPos());
     }
 
-    private static void drop(PiglinEntity arg, ItemStack arg2, Vec3d arg3) {
-        if (!arg2.isEmpty()) {
+    private static void drop(PiglinEntity arg, List<ItemStack> list, Vec3d arg2) {
+        if (!list.isEmpty()) {
             arg.swingHand(Hand.OFF_HAND);
-            LookTargetUtil.give(arg, arg2, arg3.add(0.0, 1.0, 0.0));
+            for (ItemStack lv : list) {
+                LookTargetUtil.give(arg, lv, arg2.add(0.0, 1.0, 0.0));
+            }
         }
     }
 
-    private static ItemStack getBarteredItem(PiglinEntity arg) {
+    private static List<ItemStack> getBarteredItem(PiglinEntity arg) {
         LootTable lv = arg.world.getServer().getLootManager().getTable(LootTables.PIGLIN_BARTERING_GAMEPLAY);
-        List<ItemStack> list = lv.getDrops(new LootContext.Builder((ServerWorld)arg.world).put(LootContextParameters.THIS_ENTITY, arg).setRandom(arg.world.random).build(LootContextTypes.BARTER));
-        return list.isEmpty() ? ItemStack.EMPTY : list.get(0);
+        List<ItemStack> list = lv.generateLoot(new LootContext.Builder((ServerWorld)arg.world).parameter(LootContextParameters.THIS_ENTITY, arg).random(arg.world.random).build(LootContextTypes.BARTER));
+        return list;
     }
 
     protected static boolean canGather(PiglinEntity arg, ItemStack arg2) {
@@ -300,7 +300,7 @@ public class PiglinBrain {
         if (PiglinBrain.acceptsForBarter(lv)) {
             return PiglinBrain.doesNotHaveGoldInOffHand(arg);
         }
-        boolean bl = arg.method_27085(arg2);
+        boolean bl = arg.canInsertIntoInventory(arg2);
         if (lv == Items.GOLD_NUGGET) {
             return bl;
         }
@@ -314,7 +314,7 @@ public class PiglinBrain {
     }
 
     protected static boolean isGoldenItem(Item arg) {
-        return GOLDEN_ITEMS.contains(arg) || arg instanceof ToolItem && ((ToolItem)arg).getMaterial() == ToolMaterials.GOLD || arg instanceof ArmorItem && ((ArmorItem)arg).getMaterial() == ArmorMaterials.GOLD;
+        return arg.isIn(ItemTags.PIGLIN_LOVED);
     }
 
     private static boolean canRide(PiglinEntity arg, Entity arg2) {
@@ -468,7 +468,7 @@ public class PiglinBrain {
 
     protected static void angerAtCloserTargets(PiglinEntity arg, LivingEntity arg22) {
         PiglinBrain.getNearbyPiglins(arg).forEach(arg2 -> {
-            if (!(arg22.getType() != EntityType.HOGLIN || arg2.method_26952() && ((HoglinEntity)arg22).canBeHunted())) {
+            if (!(arg22.getType() != EntityType.HOGLIN || arg2.canHunt() && ((HoglinEntity)arg22).canBeHunted())) {
                 return;
             }
             PiglinBrain.angerAtIfCloser(arg2, arg22);
@@ -571,7 +571,7 @@ public class PiglinBrain {
     }
 
     private static boolean acceptsForBarter(Item arg) {
-        return arg == field_23826;
+        return arg == BARTERING_ITEM;
     }
 
     private static boolean isFood(Item arg) {

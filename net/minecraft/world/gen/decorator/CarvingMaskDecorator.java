@@ -14,10 +14,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.decorator.CarvingMaskDecoratorConfig;
 import net.minecraft.world.gen.decorator.Decorator;
 
@@ -28,7 +27,7 @@ extends Decorator<CarvingMaskDecoratorConfig> {
     }
 
     @Override
-    public Stream<BlockPos> getPositions(IWorld arg, ChunkGenerator<? extends ChunkGeneratorConfig> arg2, Random random, CarvingMaskDecoratorConfig arg3, BlockPos arg4) {
+    public Stream<BlockPos> getPositions(WorldAccess arg, ChunkGenerator arg2, Random random, CarvingMaskDecoratorConfig arg3, BlockPos arg4) {
         Chunk lv = arg.getChunk(arg4);
         ChunkPos lv2 = lv.getPos();
         BitSet bitSet = lv.getCarvingMask(arg3.step);

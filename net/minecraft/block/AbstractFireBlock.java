@@ -148,7 +148,7 @@ extends Block {
         if (arg4.isOf(arg.getBlock())) {
             return;
         }
-        if ((arg2.dimension.getType() == DimensionType.OVERWORLD || arg2.dimension.getType() == DimensionType.THE_NETHER) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
+        if ((arg2.method_27983() == DimensionType.OVERWORLD || arg2.method_27983() == DimensionType.THE_NETHER) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
             return;
         }
         if (!arg.canPlaceAt(arg2, arg3)) {

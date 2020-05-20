@@ -8,6 +8,7 @@ package net.minecraft.block.entity;
 
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
@@ -21,6 +22,7 @@ import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -67,10 +69,13 @@ extends LockableContainerBlockEntity {
     public void checkLootInteraction(@Nullable PlayerEntity arg) {
         if (this.lootTableId != null && this.world.getServer() != null) {
             LootTable lv = this.world.getServer().getLootManager().getTable(this.lootTableId);
+            if (arg instanceof ServerPlayerEntity) {
+                Criteria.PLAYER_GENERATES_CONTAINER_LOOT.test((ServerPlayerEntity)arg, this.lootTableId);
+            }
             this.lootTableId = null;
-            LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).put(LootContextParameters.POSITION, new BlockPos(this.pos)).setRandom(this.lootTableSeed);
+            LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).parameter(LootContextParameters.POSITION, new BlockPos(this.pos)).random(this.lootTableSeed);
             if (arg != null) {
-                lv2.setLuck(arg.getLuck()).put(LootContextParameters.THIS_ENTITY, arg);
+                lv2.luck(arg.getLuck()).parameter(LootContextParameters.THIS_ENTITY, arg);
             }
             lv.supplyInventory(this, lv2.build(LootContextTypes.CHEST));
         }
@@ -146,7 +151,7 @@ extends LockableContainerBlockEntity {
     public ScreenHandler createMenu(int i, PlayerInventory arg, PlayerEntity arg2) {
         if (this.checkUnlocked(arg2)) {
             this.checkLootInteraction(arg.player);
-            return this.createContainer(i, arg);
+            return this.createScreenHandler(i, arg);
         }
         return null;
     }

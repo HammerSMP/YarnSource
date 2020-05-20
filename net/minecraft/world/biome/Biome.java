@@ -34,15 +34,15 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
-import net.minecraft.class_5195;
 import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.client.color.world.GrassColors;
-import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.sound.BiomeAdditionsSound;
 import net.minecraft.sound.BiomeMoodSound;
+import net.minecraft.sound.MusicSound;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -55,8 +55,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.OctaveSimplexNoiseSampler;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.BiomeParticleConfig;
@@ -68,7 +68,6 @@ import net.minecraft.world.gen.carver.Carver;
 import net.minecraft.world.gen.carver.CarverConfig;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
@@ -102,7 +101,7 @@ public abstract class Biome {
     protected final Map<GenerationStep.Feature, List<ConfiguredFeature<?, ?>>> features = Maps.newHashMap();
     protected final List<ConfiguredFeature<?, ?>> flowerFeatures = Lists.newArrayList();
     protected final Map<StructureFeature<?>, FeatureConfig> structureFeatures = Maps.newHashMap();
-    private final Map<EntityCategory, List<SpawnEntry>> spawns = Maps.newHashMap();
+    private final Map<SpawnGroup, List<SpawnEntry>> spawns = Maps.newHashMap();
     private final Map<EntityType<?>, SpawnDensity> spawnDensities = Maps.newHashMap();
     private final ThreadLocal<Long2FloatLinkedOpenHashMap> temperatureCache = ThreadLocal.withInitial(() -> Util.make(() -> {
         Long2FloatLinkedOpenHashMap long2FloatLinkedOpenHashMap = new Long2FloatLinkedOpenHashMap(1024, 0.25f){
@@ -142,8 +141,8 @@ public abstract class Biome {
         for (GenerationStep.Feature feature : GenerationStep.Feature.values()) {
             this.features.put(feature, Lists.newArrayList());
         }
-        for (Enum enum_ : EntityCategory.values()) {
-            this.spawns.put((EntityCategory)enum_, Lists.newArrayList());
+        for (Enum enum_ : SpawnGroup.values()) {
+            this.spawns.put((SpawnGroup)enum_, Lists.newArrayList());
         }
     }
 
@@ -163,7 +162,7 @@ public abstract class Biome {
         return this.skyColor;
     }
 
-    protected void addSpawn(EntityCategory arg, SpawnEntry arg2) {
+    protected void addSpawn(SpawnGroup arg, SpawnEntry arg2) {
         this.spawns.get((Object)arg).add(arg2);
     }
 
@@ -171,7 +170,7 @@ public abstract class Biome {
         this.spawnDensities.put(arg, new SpawnDensity(e, d));
     }
 
-    public List<SpawnEntry> getEntitySpawnList(EntityCategory arg) {
+    public List<SpawnEntry> getEntitySpawnList(SpawnGroup arg) {
         return this.spawns.get((Object)arg);
     }
 
@@ -188,7 +187,7 @@ public abstract class Biome {
         return this.getRainfall() > 0.85f;
     }
 
-    public float getMaxSpawnLimit() {
+    public float getMaxSpawnChance() {
         return 0.1f;
     }
 
@@ -284,7 +283,7 @@ public abstract class Biome {
         return this.features.get((Object)arg);
     }
 
-    public void generateFeatureStep(GenerationStep.Feature arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, IWorld arg4, long l, ChunkRandom arg5, BlockPos arg6) {
+    public void generateFeatureStep(GenerationStep.Feature arg, StructureAccessor arg2, ChunkGenerator arg3, ServerWorldAccess arg4, long l, ChunkRandom arg5, BlockPos arg6) {
         int i = 0;
         for (ConfiguredFeature<?, ?> lv : this.features.get((Object)arg)) {
             arg5.setDecoratorSeed(l, i, arg.ordinal());
@@ -399,7 +398,7 @@ public abstract class Biome {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Optional<class_5195> method_27343() {
+    public Optional<MusicSound> method_27343() {
         return this.effects.method_27345();
     }
 

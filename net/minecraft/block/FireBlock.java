@@ -32,8 +32,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.dimension.TheEndDimension;
 
@@ -55,7 +55,7 @@ extends AbstractFireBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (this.canPlaceAt(arg, arg4, arg5)) {
             return this.method_24855(arg4, arg5, arg.get(AGE));
         }
@@ -122,7 +122,7 @@ extends AbstractFireBlock {
             arg2.removeBlock(arg3, false);
         }
         BlockState lv = arg2.getBlockState(arg3.down());
-        boolean bl = arg2.dimension instanceof TheEndDimension && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
+        boolean bl = arg2.getDimension() instanceof TheEndDimension && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
         int i = arg.get(AGE);
         if (!bl && arg2.isRaining() && this.isRainingAround(arg2, arg3) && random.nextFloat() < 0.2f + (float)i * 0.03f) {
             arg2.removeBlock(arg3, false);
@@ -214,7 +214,7 @@ extends AbstractFireBlock {
         }
     }
 
-    private BlockState method_24855(IWorld arg, BlockPos arg2, int i) {
+    private BlockState method_24855(WorldAccess arg, BlockPos arg2, int i) {
         BlockState lv = FireBlock.getState(arg, arg2);
         if (lv.isOf(Blocks.FIRE)) {
             return (BlockState)lv.with(AGE, i);

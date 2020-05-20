@@ -74,14 +74,14 @@ extends LongRunningTask {
                     break;
                 }
                 bl22 = true;
-                this.method_27453(lv4.toString());
+                this.error(lv4.toString());
                 LOGGER.error("Couldn't connect to world", (Throwable)lv4);
                 break;
             }
             catch (Exception exception) {
                 bl22 = true;
                 LOGGER.error("Couldn't connect to world", (Throwable)exception);
-                this.method_27453(exception.getLocalizedMessage());
+                this.error(exception.getLocalizedMessage());
                 break;
             }
             if (bl2) break;

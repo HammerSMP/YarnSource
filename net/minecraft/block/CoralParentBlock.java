@@ -24,7 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class CoralParentBlock
@@ -38,7 +38,7 @@ implements Waterloggable {
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(WATERLOGGED, true));
     }
 
-    protected void checkLivingConditions(BlockState arg, IWorld arg2, BlockPos arg3) {
+    protected void checkLivingConditions(BlockState arg, WorldAccess arg2, BlockPos arg3) {
         if (!CoralParentBlock.isInWater(arg, arg2, arg3)) {
             arg2.getBlockTickScheduler().schedule(arg3, this, 60 + arg2.getRandom().nextInt(40));
         }
@@ -68,7 +68,7 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
         }

@@ -20,8 +20,8 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class FlintAndSteelItem
 extends Item {
@@ -62,7 +62,7 @@ extends Item {
         return arg2.method_27851(BlockTags.CAMPFIRES, arg -> arg.contains(Properties.WATERLOGGED) && arg.contains(Properties.LIT)) && arg2.get(Properties.WATERLOGGED) == false && arg2.get(Properties.LIT) == false;
     }
 
-    public static boolean canIgnite(BlockState arg, IWorld arg2, BlockPos arg3) {
+    public static boolean canIgnite(BlockState arg, WorldAccess arg2, BlockPos arg3) {
         BlockState lv = AbstractFireBlock.getState(arg2, arg3);
         boolean bl = false;
         for (Direction lv2 : Direction.Type.HORIZONTAL) {

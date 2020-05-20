@@ -754,7 +754,7 @@ public final class ItemStack {
                 multimap.put((Object)optional.get(), (Object)lv3);
             }
         } else {
-            multimap2 = this.getItem().getModifiers(arg);
+            multimap2 = this.getItem().getAttributeModifiers(arg);
         }
         return multimap2;
     }

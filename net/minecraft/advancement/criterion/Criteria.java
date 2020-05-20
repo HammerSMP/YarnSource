@@ -11,7 +11,6 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.minecraft.advancement.criterion.BeeNestDestroyedCriterion;
-import net.minecraft.advancement.criterion.BlockUsedCriterion;
 import net.minecraft.advancement.criterion.BredAnimalsCriterion;
 import net.minecraft.advancement.criterion.BrewedPotionCriterion;
 import net.minecraft.advancement.criterion.ChangedDimensionCriterion;
@@ -30,12 +29,14 @@ import net.minecraft.advancement.criterion.FishingRodHookedCriterion;
 import net.minecraft.advancement.criterion.ImpossibleCriterion;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.advancement.criterion.ItemDurabilityChangedCriterion;
+import net.minecraft.advancement.criterion.ItemUsedOnBlockCriterion;
 import net.minecraft.advancement.criterion.KilledByCrossbowCriterion;
 import net.minecraft.advancement.criterion.LevitationCriterion;
 import net.minecraft.advancement.criterion.LocationArrivalCriterion;
 import net.minecraft.advancement.criterion.NetherTravelCriterion;
 import net.minecraft.advancement.criterion.OnKilledCriterion;
 import net.minecraft.advancement.criterion.PlacedBlockCriterion;
+import net.minecraft.advancement.criterion.PlayerGeneratesContainerLootCriterion;
 import net.minecraft.advancement.criterion.PlayerHurtEntityCriterion;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
 import net.minecraft.advancement.criterion.ShotCrossbowCriterion;
@@ -43,6 +44,7 @@ import net.minecraft.advancement.criterion.SlideDownBlockCriterion;
 import net.minecraft.advancement.criterion.SummonedEntityCriterion;
 import net.minecraft.advancement.criterion.TameAnimalCriterion;
 import net.minecraft.advancement.criterion.TargetHitCriterion;
+import net.minecraft.advancement.criterion.ThrownItemPickedUpByEntityCriterion;
 import net.minecraft.advancement.criterion.TickCriterion;
 import net.minecraft.advancement.criterion.UsedEnderEyeCriterion;
 import net.minecraft.advancement.criterion.UsedTotemCriterion;
@@ -86,10 +88,12 @@ public class Criteria {
     public static final KilledByCrossbowCriterion KILLED_BY_CROSSBOW = Criteria.register(new KilledByCrossbowCriterion());
     public static final LocationArrivalCriterion HERO_OF_THE_VILLAGE = Criteria.register(new LocationArrivalCriterion(new Identifier("hero_of_the_village")));
     public static final LocationArrivalCriterion VOLUNTARY_EXILE = Criteria.register(new LocationArrivalCriterion(new Identifier("voluntary_exile")));
-    public static final BlockUsedCriterion SAFELY_HARVEST_HONEY = Criteria.register(new BlockUsedCriterion(new Identifier("safely_harvest_honey")));
     public static final SlideDownBlockCriterion SLIDE_DOWN_BLOCK = Criteria.register(new SlideDownBlockCriterion());
     public static final BeeNestDestroyedCriterion BEE_NEST_DESTROYED = Criteria.register(new BeeNestDestroyedCriterion());
     public static final TargetHitCriterion TARGET_HIT = Criteria.register(new TargetHitCriterion());
+    public static final ItemUsedOnBlockCriterion ITEM_USED_ON_BLOCK = Criteria.register(new ItemUsedOnBlockCriterion());
+    public static final PlayerGeneratesContainerLootCriterion PLAYER_GENERATES_CONTAINER_LOOT = Criteria.register(new PlayerGeneratesContainerLootCriterion());
+    public static final ThrownItemPickedUpByEntityCriterion THROWN_ITEM_PICKED_UP_BY_ENTITY = Criteria.register(new ThrownItemPickedUpByEntityCriterion());
 
     private static <T extends Criterion<?>> T register(T arg) {
         if (VALUES.containsKey(arg.getId())) {

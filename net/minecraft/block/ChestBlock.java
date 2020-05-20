@@ -67,8 +67,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class ChestBlock
 extends AbstractChestBlock<ChestBlockEntity>
@@ -172,7 +172,7 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
         }
@@ -257,7 +257,7 @@ implements Waterloggable {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }
@@ -266,7 +266,7 @@ implements Waterloggable {
             ItemScatterer.spawn(arg2, arg3, (Inventory)((Object)lv));
             arg2.updateComparators(arg3, this);
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override
@@ -294,9 +294,9 @@ implements Waterloggable {
 
     @Override
     public DoubleBlockProperties.PropertySource<? extends ChestBlockEntity> getBlockEntitySource(BlockState arg3, World arg22, BlockPos arg32, boolean bl) {
-        BiPredicate<IWorld, BlockPos> biPredicate2;
+        BiPredicate<WorldAccess, BlockPos> biPredicate2;
         if (bl) {
-            BiPredicate<IWorld, BlockPos> biPredicate = (arg, arg2) -> false;
+            BiPredicate<WorldAccess, BlockPos> biPredicate = (arg, arg2) -> false;
         } else {
             biPredicate2 = ChestBlock::isChestBlocked;
         }
@@ -340,7 +340,7 @@ implements Waterloggable {
         return new ChestBlockEntity();
     }
 
-    public static boolean isChestBlocked(IWorld arg, BlockPos arg2) {
+    public static boolean isChestBlocked(WorldAccess arg, BlockPos arg2) {
         return ChestBlock.hasBlockOnTop(arg, arg2) || ChestBlock.hasOcelotOnTop(arg, arg2);
     }
 
@@ -349,11 +349,11 @@ implements Waterloggable {
         return arg.getBlockState(lv).isSolidBlock(arg, lv);
     }
 
-    private static boolean hasOcelotOnTop(IWorld arg, BlockPos arg2) {
+    private static boolean hasOcelotOnTop(WorldAccess arg, BlockPos arg2) {
         List<CatEntity> list = arg.getNonSpectatingEntities(CatEntity.class, new Box(arg2.getX(), arg2.getY() + 1, arg2.getZ(), arg2.getX() + 1, arg2.getY() + 2, arg2.getZ() + 1));
         if (!list.isEmpty()) {
             for (CatEntity lv : list) {
-                if (!lv.isSitting()) continue;
+                if (!lv.isInSittingPose()) continue;
                 return true;
             }
         }

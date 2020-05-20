@@ -43,7 +43,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.TranslatableText;
 
 public class TriggerCommand {
-    private static final SimpleCommandExceptionType FAILED_UMPRIMED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.trigger.failed.unprimed"));
+    private static final SimpleCommandExceptionType FAILED_UNPRIMED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.trigger.failed.unprimed"));
     private static final SimpleCommandExceptionType FAILED_INVALID_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.trigger.failed.invalid"));
 
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
@@ -90,11 +90,11 @@ public class TriggerCommand {
         }
         Scoreboard lv = arg.getScoreboard();
         if (!lv.playerHasObjective(string = arg.getEntityName(), arg2)) {
-            throw FAILED_UMPRIMED_EXCEPTION.create();
+            throw FAILED_UNPRIMED_EXCEPTION.create();
         }
         ScoreboardPlayerScore lv2 = lv.getPlayerScore(string, arg2);
         if (lv2.isLocked()) {
-            throw FAILED_UMPRIMED_EXCEPTION.create();
+            throw FAILED_UNPRIMED_EXCEPTION.create();
         }
         lv2.setLocked(true);
         return lv2;

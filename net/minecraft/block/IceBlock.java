@@ -34,7 +34,7 @@ extends TransparentBlock {
     public void afterBreak(World arg, PlayerEntity arg2, BlockPos arg3, BlockState arg4, @Nullable BlockEntity arg5, ItemStack arg6) {
         super.afterBreak(arg, arg2, arg3, arg4, arg5, arg6);
         if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg6) == 0) {
-            if (arg.dimension.doesWaterVaporize()) {
+            if (arg.method_27983().method_27999()) {
                 arg.removeBlock(arg3, false);
                 return;
             }
@@ -53,7 +53,7 @@ extends TransparentBlock {
     }
 
     protected void melt(BlockState arg, World arg2, BlockPos arg3) {
-        if (arg2.dimension.doesWaterVaporize()) {
+        if (arg2.method_27983().method_27999()) {
             arg2.removeBlock(arg3, false);
             return;
         }

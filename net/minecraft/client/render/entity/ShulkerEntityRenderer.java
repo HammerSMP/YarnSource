@@ -16,7 +16,6 @@ import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.feature.ShulkerHeadFeatureRenderer;
 import net.minecraft.client.render.entity.model.ShulkerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -36,10 +35,10 @@ extends MobEntityRenderer<ShulkerEntity, ShulkerEntityModel<ShulkerEntity>> {
 
     @Override
     public Vec3d getPositionOffset(ShulkerEntity arg, float f) {
-        int i = arg.method_7113();
-        if (i > 0 && arg.method_7117()) {
+        int i = arg.getTeleportLerpTimer();
+        if (i > 0 && arg.hasAttachedBlock()) {
             BlockPos lv = arg.getAttachedBlock();
-            BlockPos lv2 = arg.method_7120();
+            BlockPos lv2 = arg.getPrevAttachedBlock();
             double d = (double)((float)i - f) / 6.0;
             d *= d;
             double e = (double)(lv.getX() - lv2.getX()) * d;
@@ -55,9 +54,9 @@ extends MobEntityRenderer<ShulkerEntity, ShulkerEntityModel<ShulkerEntity>> {
         if (super.shouldRender(arg, arg2, d, e, f)) {
             return true;
         }
-        if (arg.method_7113() > 0 && arg.method_7117()) {
-            Vec3d lv = Vec3d.method_24954(arg.getAttachedBlock());
-            Vec3d lv2 = Vec3d.method_24954(arg.method_7120());
+        if (arg.getTeleportLerpTimer() > 0 && arg.hasAttachedBlock()) {
+            Vec3d lv = Vec3d.of(arg.getAttachedBlock());
+            Vec3d lv2 = Vec3d.of(arg.getPrevAttachedBlock());
             if (arg2.isVisible(new Box(lv2.x, lv2.y, lv2.z, lv.x, lv.y, lv.z))) {
                 return true;
             }
@@ -75,21 +74,10 @@ extends MobEntityRenderer<ShulkerEntity, ShulkerEntityModel<ShulkerEntity>> {
 
     @Override
     protected void setupTransforms(ShulkerEntity arg, MatrixStack arg2, float f, float g, float h) {
-        super.setupTransforms(arg, arg2, f, g, h);
+        super.setupTransforms(arg, arg2, f, g + 180.0f, h);
         arg2.translate(0.0, 0.5, 0.0);
         arg2.multiply(arg.getAttachedFace().getOpposite().getRotationQuaternion());
         arg2.translate(0.0, -0.5, 0.0);
-    }
-
-    @Override
-    protected void scale(ShulkerEntity arg, MatrixStack arg2, float f) {
-        float g = 0.999f;
-        arg2.scale(0.999f, 0.999f, 0.999f);
-    }
-
-    @Override
-    public /* synthetic */ Vec3d getPositionOffset(Entity arg, float f) {
-        return this.getPositionOffset((ShulkerEntity)arg, f);
     }
 }
 

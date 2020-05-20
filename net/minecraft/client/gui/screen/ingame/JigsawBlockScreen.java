@@ -125,7 +125,7 @@ extends Screen {
             this.joint = lvs[i];
             arg.setMessage(this.getLocalizedJointName());
         }));
-        this.jointRotationButton.active = bl = JigsawBlock.method_26378(this.jigsaw.getCachedState()).getAxis().isVertical();
+        this.jointRotationButton.active = bl = JigsawBlock.getFacing(this.jigsaw.getCachedState()).getAxis().isVertical();
         this.jointRotationButton.visible = bl;
         this.setInitialFocus(this.poolField);
         this.updateDoneButtonState();
@@ -177,16 +177,16 @@ extends Screen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        this.drawString(arg, this.textRenderer, I18n.translate("jigsaw_block.pool", new Object[0]), this.width / 2 - 153, 10, 0xA0A0A0);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.pool", new Object[0]), this.width / 2 - 153, 10, 0xA0A0A0);
         this.poolField.render(arg, i, j, f);
-        this.drawString(arg, this.textRenderer, I18n.translate("jigsaw_block.name", new Object[0]), this.width / 2 - 153, 45, 0xA0A0A0);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.name", new Object[0]), this.width / 2 - 153, 45, 0xA0A0A0);
         this.nameField.render(arg, i, j, f);
-        this.drawString(arg, this.textRenderer, I18n.translate("jigsaw_block.target", new Object[0]), this.width / 2 - 153, 80, 0xA0A0A0);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.target", new Object[0]), this.width / 2 - 153, 80, 0xA0A0A0);
         this.targetField.render(arg, i, j, f);
-        this.drawString(arg, this.textRenderer, I18n.translate("jigsaw_block.final_state", new Object[0]), this.width / 2 - 153, 115, 0xA0A0A0);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.final_state", new Object[0]), this.width / 2 - 153, 115, 0xA0A0A0);
         this.finalStateField.render(arg, i, j, f);
-        if (JigsawBlock.method_26378(this.jigsaw.getCachedState()).getAxis().isVertical()) {
-            this.drawString(arg, this.textRenderer, I18n.translate("jigsaw_block.joint_label", new Object[0]), this.width / 2 - 153, 156, 0xFFFFFF);
+        if (JigsawBlock.getFacing(this.jigsaw.getCachedState()).getAxis().isVertical()) {
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.joint_label", new Object[0]), this.width / 2 - 153, 156, 0xFFFFFF);
         }
         super.render(arg, i, j, f);
     }

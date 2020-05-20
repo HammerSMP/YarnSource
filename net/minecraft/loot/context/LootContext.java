@@ -42,7 +42,7 @@ public class LootContext {
     private final float luck;
     private final ServerWorld world;
     private final Function<Identifier, LootTable> tableGetter;
-    private final Set<LootTable> tables = Sets.newLinkedHashSet();
+    private final Set<LootTable> activeTables = Sets.newLinkedHashSet();
     private final Function<Identifier, LootCondition> conditionGetter;
     private final Set<LootCondition> conditions = Sets.newLinkedHashSet();
     private final Map<LootContextParameter<?>, Object> parameters;
@@ -74,12 +74,12 @@ public class LootContext {
         return (T)this.parameters.get(arg);
     }
 
-    public boolean addDrop(LootTable arg) {
-        return this.tables.add(arg);
+    public boolean markActive(LootTable arg) {
+        return this.activeTables.add(arg);
     }
 
-    public void removeDrop(LootTable arg) {
-        this.tables.remove(arg);
+    public void markInactive(LootTable arg) {
+        this.activeTables.remove(arg);
     }
 
     public boolean addCondition(LootCondition arg) {
@@ -167,34 +167,34 @@ public class LootContext {
             this.world = arg;
         }
 
-        public Builder setRandom(Random random) {
+        public Builder random(Random random) {
             this.random = random;
             return this;
         }
 
-        public Builder setRandom(long l) {
+        public Builder random(long l) {
             if (l != 0L) {
                 this.random = new Random(l);
             }
             return this;
         }
 
-        public Builder setRandom(long l, Random random) {
+        public Builder random(long l, Random random) {
             this.random = l == 0L ? random : new Random(l);
             return this;
         }
 
-        public Builder setLuck(float f) {
+        public Builder luck(float f) {
             this.luck = f;
             return this;
         }
 
-        public <T> Builder put(LootContextParameter<T> arg, T object) {
+        public <T> Builder parameter(LootContextParameter<T> arg, T object) {
             this.parameters.put(arg, object);
             return this;
         }
 
-        public <T> Builder putNullable(LootContextParameter<T> arg, @Nullable T object) {
+        public <T> Builder optionalParameter(LootContextParameter<T> arg, @Nullable T object) {
             if (object == null) {
                 this.parameters.remove(arg);
             } else {

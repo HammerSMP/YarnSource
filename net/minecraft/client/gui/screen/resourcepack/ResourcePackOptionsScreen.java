@@ -117,10 +117,10 @@ extends GameOptionsScreen {
 
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderDirtBackground(0);
+        this.renderBackgroundTexture(0);
         this.availablePacks.render(arg, i, j, f);
         this.enabledPacks.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 16, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 16, 0xFFFFFF);
         this.drawCenteredString(arg, this.textRenderer, I18n.translate("resourcePack.folderInfo", new Object[0]), this.width / 2 - 77, this.height - 26, 0x808080);
         super.render(arg, i, j, f);
     }

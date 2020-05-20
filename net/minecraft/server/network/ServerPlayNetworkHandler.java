@@ -1172,7 +1172,7 @@ implements ServerPlayPacketListener {
                     this.player.networkHandler.sendPacket(new ConfirmGuiActionS2CPacket(arg.getSyncId(), arg.getActionId(), true));
                     this.player.field_13991 = true;
                     this.player.currentScreenHandler.sendContentUpdates();
-                    this.player.method_14241();
+                    this.player.updateCursorStack();
                     this.player.field_13991 = false;
                 } else {
                     this.transactions.put(this.player.currentScreenHandler.syncId, arg.getActionId());

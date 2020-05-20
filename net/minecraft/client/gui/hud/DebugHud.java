@@ -48,7 +48,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.AffineTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCategory;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -214,7 +214,7 @@ extends DrawableHelper {
         if (string8 != null) {
             list.add(string8);
         }
-        list.add(DimensionType.getId(this.client.world.dimension.getType()).toString() + " FC: " + Integer.toString(longSet.size()));
+        list.add(DimensionType.getId(this.client.world.method_27983()).toString() + " FC: " + Integer.toString(longSet.size()));
         list.add("");
         list.add(String.format(Locale.ROOT, "XYZ: %.3f / %.5f / %.3f", this.client.getCameraEntity().getX(), this.client.getCameraEntity().getY(), this.client.getCameraEntity().getZ()));
         list.add(String.format("Block: %d %d %d", lv3.getX(), lv3.getY(), lv3.getZ()));
@@ -277,9 +277,9 @@ extends DrawableHelper {
         if (lv14 != null) {
             SpawnHelper.Info lv15 = lv14.getChunkManager().getSpawnInfo();
             if (lv15 != null) {
-                Object2IntMap<EntityCategory> object2IntMap = lv15.getCategoryToCount();
+                Object2IntMap<SpawnGroup> object2IntMap = lv15.getGroupToCount();
                 int m = lv15.getSpawningChunkCount();
-                list.add("SC: " + m + ", " + Stream.of(EntityCategory.values()).map(arg -> Character.toUpperCase(arg.getName().charAt(0)) + ": " + object2IntMap.getInt((Object)arg)).collect(Collectors.joining(", ")));
+                list.add("SC: " + m + ", " + Stream.of(SpawnGroup.values()).map(arg -> Character.toUpperCase(arg.getName().charAt(0)) + ": " + object2IntMap.getInt((Object)arg)).collect(Collectors.joining(", ")));
             } else {
                 list.add("SC: N/A");
             }
@@ -295,7 +295,7 @@ extends DrawableHelper {
     private ServerWorld getServerWorld() {
         IntegratedServer lv = this.client.getServer();
         if (lv != null) {
-            return lv.getWorld(this.client.world.getDimension().getType());
+            return lv.getWorld(this.client.world.method_27983());
         }
         return null;
     }
@@ -310,7 +310,7 @@ extends DrawableHelper {
     }
 
     private World getWorld() {
-        return (World)DataFixUtils.orElse(Optional.ofNullable(this.client.getServer()).map(arg -> arg.getWorld(this.client.world.dimension.getType())), (Object)this.client.world);
+        return (World)DataFixUtils.orElse(Optional.ofNullable(this.client.getServer()).map(arg -> arg.getWorld(this.client.world.method_27983())), (Object)this.client.world);
     }
 
     @Nullable

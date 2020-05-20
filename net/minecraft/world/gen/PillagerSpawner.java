@@ -6,7 +6,7 @@ package net.minecraft.world.gen;
 import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.PatrolEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -85,7 +85,7 @@ public class PillagerSpawner {
         if (!SpawnHelper.isClearForSpawn(arg, arg2, lv, lv.getFluidState())) {
             return false;
         }
-        if (!PatrolEntity.canSpawn(EntityType.PILLAGER, arg, SpawnType.PATROL, arg2, random)) {
+        if (!PatrolEntity.canSpawn(EntityType.PILLAGER, arg, SpawnReason.PATROL, arg2, random)) {
             return false;
         }
         PatrolEntity lv2 = EntityType.PILLAGER.create(arg);
@@ -95,7 +95,7 @@ public class PillagerSpawner {
                 lv2.setRandomPatrolTarget();
             }
             lv2.updatePosition(arg2.getX(), arg2.getY(), arg2.getZ());
-            lv2.initialize(arg, arg.getLocalDifficulty(arg2), SpawnType.PATROL, null, null);
+            lv2.initialize(arg, arg.getLocalDifficulty(arg2), SpawnReason.PATROL, null, null);
             arg.spawnEntity(lv2);
             return true;
         }

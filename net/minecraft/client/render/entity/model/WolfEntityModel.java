@@ -80,7 +80,7 @@ extends TintableAnimalModel<T> {
     @Override
     public void animateModel(T arg, float f, float g, float h) {
         this.tail.yaw = ((WolfEntity)arg).isAngry() ? 0.0f : MathHelper.cos(f * 0.6662f) * 1.4f * g;
-        if (((TameableEntity)arg).isSitting()) {
+        if (((TameableEntity)arg).isInSittingPose()) {
             this.neck.setPivot(-1.0f, 16.0f, -3.0f);
             this.neck.pitch = 1.2566371f;
             this.neck.yaw = 0.0f;

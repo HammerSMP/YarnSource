@@ -40,8 +40,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class FluidBlock
 extends Block
@@ -126,7 +126,7 @@ implements FluidDrainable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.getFluidState().isStill() || arg3.getFluidState().isStill()) {
             arg4.getFluidTickScheduler().schedule(arg5, arg.getFluidState().getFluid(), this.fluid.getTickRate(arg4));
         }
@@ -161,7 +161,7 @@ implements FluidDrainable {
         return true;
     }
 
-    private void playExtinguishSound(IWorld arg, BlockPos arg2) {
+    private void playExtinguishSound(WorldAccess arg, BlockPos arg2) {
         arg.syncWorldEvent(1501, arg2, 0);
     }
 
@@ -171,7 +171,7 @@ implements FluidDrainable {
     }
 
     @Override
-    public Fluid tryDrainFluid(IWorld arg, BlockPos arg2, BlockState arg3) {
+    public Fluid tryDrainFluid(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         if (arg3.get(LEVEL) == 0) {
             arg.setBlockState(arg2, Blocks.AIR.getDefaultState(), 11);
             return this.fluid;
@@ -184,7 +184,7 @@ implements FluidDrainable {
         if (this.fluid.isIn(FluidTags.LAVA)) {
             float f = (float)arg3.getY() + arg.getFluidState().getHeight(arg2, arg3);
             Box lv = arg4.getBoundingBox();
-            if (lv.y1 < (double)f || (double)f > lv.y2) {
+            if (lv.minY < (double)f || (double)f > lv.maxY) {
                 arg4.setInLava();
             }
         }

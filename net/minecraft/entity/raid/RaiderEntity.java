@@ -24,7 +24,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
@@ -50,9 +50,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 
@@ -243,6 +243,7 @@ extends PatrolEntity {
             if (!lv3.isEmpty() && (double)Math.max(this.random.nextFloat() - 0.1f, 0.0f) < d) {
                 this.dropStack(lv3);
             }
+            this.method_27964(arg);
             this.equipStack(lv2, lv);
             this.sendPickup(arg, lv.getCount());
             arg.remove();
@@ -284,8 +285,8 @@ extends PatrolEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        this.setAbleToJoinRaid(this.getType() != EntityType.WITCH || arg3 != SpawnType.NATURAL);
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+        this.setAbleToJoinRaid(this.getType() != EntityType.WITCH || arg3 != SpawnReason.NATURAL);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
 
@@ -354,7 +355,7 @@ extends PatrolEntity {
         @Override
         public void tick() {
             if (this.raider.getNavigation().isIdle()) {
-                Vec3d lv = Vec3d.method_24955(this.home);
+                Vec3d lv = Vec3d.ofBottomCenter(this.home);
                 Vec3d lv2 = TargetFinder.findTargetTowards(this.raider, 16, 7, lv, 0.3141592741012573);
                 if (lv2 == null) {
                     lv2 = TargetFinder.findTargetTowards(this.raider, 8, 7, lv);

@@ -95,7 +95,7 @@ implements LootCondition {
             this.block = arg;
         }
 
-        public Builder method_22584(StatePredicate.Builder arg) {
+        public Builder properties(StatePredicate.Builder arg) {
             this.propertyValues = arg.build();
             return this;
         }

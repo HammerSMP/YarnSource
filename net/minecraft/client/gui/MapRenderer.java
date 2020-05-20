@@ -148,7 +148,7 @@ implements AutoCloseable {
                 if (lv3.getText() != null) {
                     TextRenderer lv6 = MinecraftClient.getInstance().textRenderer;
                     Text lv7 = lv3.getText();
-                    float p = lv6.getStringWidth(lv7);
+                    float p = lv6.getWidth(lv7);
                     lv6.getClass();
                     float q = MathHelper.clamp(25.0f / p, 0.0f, 6.0f / 9.0f);
                     arg.push();

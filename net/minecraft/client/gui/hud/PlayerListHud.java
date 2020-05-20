@@ -83,7 +83,7 @@ extends DrawableHelper {
         int j = 0;
         int k = 0;
         for (PlayerListEntry lv2 : list) {
-            int l = this.client.textRenderer.getStringWidth(this.getPlayerName(lv2));
+            int l = this.client.textRenderer.getWidth(this.getPlayerName(lv2));
             j = Math.max(j, l);
             if (arg3 == null || arg3.getRenderType() == ScoreboardCriterion.RenderType.HEARTS) continue;
             l = this.client.textRenderer.getWidth(" " + arg2.getPlayerScore(lv2.getProfile().getName(), arg3).getScore());
@@ -113,21 +113,21 @@ extends DrawableHelper {
         if (this.header != null) {
             list2 = this.client.textRenderer.wrapLines(this.header, i - 50);
             for (Text text : list2) {
-                v = Math.max(v, this.client.textRenderer.getStringWidth(text));
+                v = Math.max(v, this.client.textRenderer.getWidth(text));
             }
         }
         List<Text> list3 = null;
         if (this.footer != null) {
             list3 = this.client.textRenderer.wrapLines(this.footer, i - 50);
             for (Text lv4 : list3) {
-                v = Math.max(v, this.client.textRenderer.getStringWidth(lv4));
+                v = Math.max(v, this.client.textRenderer.getWidth(lv4));
             }
         }
         if (list2 != null) {
             this.client.textRenderer.getClass();
             PlayerListHud.fill(arg, i / 2 - v / 2 - 1, u - 1, i / 2 + v / 2 + 1, u + list2.size() * 9, Integer.MIN_VALUE);
             for (Text lv5 : list2) {
-                int w = this.client.textRenderer.getStringWidth(lv5);
+                int w = this.client.textRenderer.getWidth(lv5);
                 this.client.textRenderer.drawWithShadow(arg, lv5, (float)(i / 2 - w / 2), (float)u, -1);
                 this.client.textRenderer.getClass();
                 u += 9;
@@ -165,7 +165,7 @@ extends DrawableHelper {
                 }
                 ab += 9;
             }
-            this.client.textRenderer.drawWithShadow(arg, this.getPlayerName(lv6), (float)ab, (float)ac, -1862270977);
+            this.client.textRenderer.drawWithShadow(arg, this.getPlayerName(lv6), (float)ab, (float)ac, lv6.getGameMode() == GameMode.SPECTATOR ? -1862270977 : -1);
             if (arg3 != null && lv6.getGameMode() != GameMode.SPECTATOR && (ai = (ah = ab + j + 1) + r) - ah > 5) {
                 this.renderScoreboardObjective(arg3, ac, gameProfile.getName(), ah, ai, lv6, arg);
             }
@@ -175,7 +175,7 @@ extends DrawableHelper {
             this.client.textRenderer.getClass();
             PlayerListHud.fill(arg, i / 2 - v / 2 - 1, (u += n * 9 + 1) - 1, i / 2 + v / 2 + 1, u + list3.size() * 9, Integer.MIN_VALUE);
             for (Text lv8 : list3) {
-                int aj = this.client.textRenderer.getStringWidth(lv8);
+                int aj = this.client.textRenderer.getWidth(lv8);
                 this.client.textRenderer.drawWithShadow(arg, lv8, (float)(i / 2 - aj / 2), (float)u, -1);
                 this.client.textRenderer.getClass();
                 u += 9;

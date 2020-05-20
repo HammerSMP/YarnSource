@@ -22,10 +22,9 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -55,11 +54,11 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
         Random random2 = arg.getRandom();
         BlockRotation lv = BlockRotation.random(random2);
         int i = random2.nextInt(FOSSILS.length);
-        StructureManager lv2 = ((ServerWorld)arg.getWorld()).getServer().method_27727();
+        StructureManager lv2 = ((ServerWorld)arg.getWorld()).getServer().getStructureManager();
         Structure lv3 = lv2.getStructureOrBlank(FOSSILS[i]);
         Structure lv4 = lv2.getStructureOrBlank(COAL_FOSSILS[i]);
         ChunkPos lv5 = new ChunkPos(arg4);

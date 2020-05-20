@@ -63,25 +63,25 @@ implements Toast {
         return this.type;
     }
 
-    public static void method_27024(ToastManager arg, Type arg2, Text arg3, @Nullable Text arg4) {
+    public static void add(ToastManager arg, Type arg2, Text arg3, @Nullable Text arg4) {
         arg.add(new SystemToast(arg2, arg3, arg4));
     }
 
     public static void show(ToastManager arg, Type arg2, Text arg3, @Nullable Text arg4) {
         SystemToast lv = arg.getToast(SystemToast.class, (Object)arg2);
         if (lv == null) {
-            SystemToast.method_27024(arg, arg2, arg3, arg4);
+            SystemToast.add(arg, arg2, arg3, arg4);
         } else {
             lv.setContent(arg3, arg4);
         }
     }
 
-    public static void method_27023(MinecraftClient arg, String string) {
-        SystemToast.method_27024(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.access_failure"), new LiteralText(string));
+    public static void addWorldAccessFailureToast(MinecraftClient arg, String string) {
+        SystemToast.add(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.access_failure"), new LiteralText(string));
     }
 
-    public static void method_27025(MinecraftClient arg, String string) {
-        SystemToast.method_27024(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.delete_failure"), new LiteralText(string));
+    public static void addWorldDeleteFailureToast(MinecraftClient arg, String string) {
+        SystemToast.add(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.delete_failure"), new LiteralText(string));
     }
 
     @Override

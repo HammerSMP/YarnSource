@@ -84,21 +84,21 @@ implements BlockEntityProvider {
     }
 
     public static boolean attachmentMatches(Structure.StructureBlockInfo arg, Structure.StructureBlockInfo arg2) {
-        Direction lv = JigsawBlock.method_26378(arg.state);
-        Direction lv2 = JigsawBlock.method_26378(arg2.state);
-        Direction lv3 = JigsawBlock.method_26379(arg.state);
-        Direction lv4 = JigsawBlock.method_26379(arg2.state);
+        Direction lv = JigsawBlock.getFacing(arg.state);
+        Direction lv2 = JigsawBlock.getFacing(arg2.state);
+        Direction lv3 = JigsawBlock.getRotation(arg.state);
+        Direction lv4 = JigsawBlock.getRotation(arg2.state);
         JigsawBlockEntity.Joint lv5 = JigsawBlockEntity.Joint.byName(arg.tag.getString("joint")).orElseGet(() -> lv.getAxis().isHorizontal() ? JigsawBlockEntity.Joint.ALIGNED : JigsawBlockEntity.Joint.ROLLABLE);
         boolean bl = lv5 == JigsawBlockEntity.Joint.ROLLABLE;
         return lv == lv2.getOpposite() && (bl || lv3 == lv4) && arg.tag.getString("target").equals(arg2.tag.getString("name"));
     }
 
-    public static Direction method_26378(BlockState arg) {
-        return arg.get(ORIENTATION).method_26426();
+    public static Direction getFacing(BlockState arg) {
+        return arg.get(ORIENTATION).getFacing();
     }
 
-    public static Direction method_26379(BlockState arg) {
-        return arg.get(ORIENTATION).method_26428();
+    public static Direction getRotation(BlockState arg) {
+        return arg.get(ORIENTATION).getRotation();
     }
 }
 

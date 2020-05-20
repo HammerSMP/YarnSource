@@ -94,7 +94,7 @@ public interface EntityView {
 
     default public boolean isPlayerInRange(double d, double e, double f, double g) {
         for (PlayerEntity playerEntity : this.getPlayers()) {
-            if (!EntityPredicates.EXCEPT_SPECTATOR.test(playerEntity) || !EntityPredicates.VALID_ENTITY_LIVING.test(playerEntity)) continue;
+            if (!EntityPredicates.EXCEPT_SPECTATOR.test(playerEntity) || !EntityPredicates.VALID_LIVING_ENTITY.test(playerEntity)) continue;
             double h = playerEntity.squaredDistanceTo(d, e, f);
             if (!(g < 0.0) && !(h < g * g)) continue;
             return true;

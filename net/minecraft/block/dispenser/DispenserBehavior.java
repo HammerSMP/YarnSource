@@ -32,7 +32,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Saddleable;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.passive.AbstractDonkeyEntity;
@@ -192,7 +192,7 @@ public interface DispenserBehavior {
             public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
                 EntityType<?> lv2 = ((SpawnEggItem)arg2.getItem()).getEntityType(arg2.getTag());
-                lv2.spawnFromItemStack(arg.getWorld(), arg2, null, arg.getBlockPos().offset(lv), SpawnType.DISPENSER, lv != Direction.UP, false);
+                lv2.spawnFromItemStack(arg.getWorld(), arg2, null, arg.getBlockPos().offset(lv), SpawnReason.DISPENSER, lv != Direction.UP, false);
                 arg2.decrement(1);
                 return arg2;
             }
@@ -230,7 +230,7 @@ public interface DispenserBehavior {
                 if (!list.isEmpty()) {
                     ((Saddleable)((Object)list.get(0))).saddle(SoundCategory.BLOCKS);
                     arg22.decrement(1);
-                    this.success = true;
+                    this.setSuccess(true);
                     return arg22;
                 }
                 return super.dispenseSilently(arg2, arg22);
@@ -245,7 +245,7 @@ public interface DispenserBehavior {
                 for (HorseBaseEntity lv2 : list) {
                     if (!lv2.canEquip(arg22) || lv2.setSaddled() || !lv2.isTame()) continue;
                     lv2.equip(401, arg22.split(1));
-                    this.success = true;
+                    this.setSuccess(true);
                     return arg22;
                 }
                 return super.dispenseSilently(arg2, arg22);
@@ -280,7 +280,7 @@ public interface DispenserBehavior {
                 for (AbstractDonkeyEntity lv2 : list) {
                     if (!lv2.isTame() || !lv2.equip(499, arg22)) continue;
                     arg22.decrement(1);
-                    this.success = true;
+                    this.setSuccess(true);
                     return arg22;
                 }
                 return super.dispenseSilently(arg2, arg22);
@@ -393,7 +393,7 @@ public interface DispenserBehavior {
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 World lv = arg.getWorld();
-                this.success = true;
+                this.setSuccess(true);
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
                 BlockState lv3 = lv.getBlockState(lv2);
                 if (FlintAndSteelItem.canIgnite(lv3, lv, lv2)) {
@@ -404,9 +404,9 @@ public interface DispenserBehavior {
                     TntBlock.primeTnt(lv, lv2);
                     lv.removeBlock(lv2, false);
                 } else {
-                    this.success = false;
+                    this.setSuccess(false);
                 }
-                if (this.success && arg2.damage(1, lv.random, null)) {
+                if (this.isSuccess() && arg2.damage(1, lv.random, null)) {
                     arg2.setCount(0);
                 }
                 return arg2;
@@ -416,15 +416,15 @@ public interface DispenserBehavior {
 
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-                BlockPos lv2;
-                this.success = true;
+                this.setSuccess(true);
                 World lv = arg.getWorld();
-                if (BoneMealItem.useOnFertilizable(arg2, lv, lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING))) || BoneMealItem.useOnGround(arg2, lv, lv2, null)) {
+                BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
+                if (BoneMealItem.useOnFertilizable(arg2, lv, lv2) || BoneMealItem.useOnGround(arg2, lv, lv2, null)) {
                     if (!lv.isClient) {
                         lv.syncWorldEvent(2005, lv2, 0);
                     }
                 } else {
-                    this.success = false;
+                    this.setSuccess(false);
                 }
                 return arg2;
             }
@@ -446,7 +446,7 @@ public interface DispenserBehavior {
 
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-                this.success = ArmorItem.dispenseArmor(arg, arg2);
+                this.setSuccess(ArmorItem.dispenseArmor(arg, arg2));
                 return arg2;
             }
         };
@@ -469,9 +469,9 @@ public interface DispenserBehavior {
                         WitherSkullBlock.onPlaced(lv, lv3, (SkullBlockEntity)lv4);
                     }
                     arg2.decrement(1);
-                    this.success = true;
+                    this.setSuccess(true);
                 } else {
-                    this.success = ArmorItem.dispenseArmor(arg, arg2);
+                    this.setSuccess(ArmorItem.dispenseArmor(arg, arg2));
                 }
                 return arg2;
             }
@@ -488,9 +488,9 @@ public interface DispenserBehavior {
                         lv.setBlockState(lv2, lv3.getDefaultState(), 3);
                     }
                     arg2.decrement(1);
-                    this.success = true;
+                    this.setSuccess(true);
                 } else {
-                    this.success = ArmorItem.dispenseArmor(arg, arg2);
+                    this.setSuccess(ArmorItem.dispenseArmor(arg, arg2));
                 }
                 return arg2;
             }
@@ -515,17 +515,17 @@ public interface DispenserBehavior {
 
             @Override
             public ItemStack dispenseSilently(BlockPointer arg2, ItemStack arg22) {
-                BlockPos lv2;
-                this.success = false;
+                this.setSuccess(false);
                 World lv = arg2.getWorld();
-                BlockState lv3 = lv.getBlockState(lv2 = arg2.getBlockPos().offset(arg2.getBlockState().get(DispenserBlock.FACING)));
+                BlockPos lv2 = arg2.getBlockPos().offset(arg2.getBlockState().get(DispenserBlock.FACING));
+                BlockState lv3 = lv.getBlockState(lv2);
                 if (lv3.method_27851(BlockTags.BEEHIVES, arg -> arg.contains(BeehiveBlock.HONEY_LEVEL)) && lv3.get(BeehiveBlock.HONEY_LEVEL) >= 5) {
                     ((BeehiveBlock)lv3.getBlock()).takeHoney(lv.getWorld(), lv3, lv2, null, BeehiveBlockEntity.BeeState.BEE_RELEASED);
-                    this.success = true;
+                    this.setSuccess(true);
                     return this.method_22141(arg2, arg22, new ItemStack(Items.HONEY_BOTTLE));
                 }
                 if (lv.getFluidState(lv2).matches(FluidTags.WATER)) {
-                    this.success = true;
+                    this.setSuccess(true);
                     return this.method_22141(arg2, arg22, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER));
                 }
                 return super.dispenseSilently(arg2, arg22);
@@ -539,12 +539,13 @@ public interface DispenserBehavior {
                 BlockPos lv2 = arg.getBlockPos().offset(lv);
                 World lv3 = arg.getWorld();
                 BlockState lv4 = lv3.getBlockState(lv2);
+                this.setSuccess(true);
                 if (lv4.isOf(Blocks.RESPAWN_ANCHOR)) {
                     if (lv4.get(RespawnAnchorBlock.CHARGES) != 4) {
                         RespawnAnchorBlock.charge(lv3, lv2, lv4);
                         arg2.decrement(1);
                     } else {
-                        this.success = false;
+                        this.setSuccess(false);
                     }
                     return arg2;
                 }

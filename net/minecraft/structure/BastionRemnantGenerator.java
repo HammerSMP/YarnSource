@@ -39,7 +39,7 @@ public class BastionRemnantGenerator {
         BastionData.init();
     }
 
-    public static void addPieces(ChunkGenerator<?> arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4, BastionRemnantFeatureConfig arg5) {
+    public static void addPieces(ChunkGenerator arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4, BastionRemnantFeatureConfig arg5) {
         BastionRemnantGenerator.init();
         StructurePoolFeatureConfig lv = arg5.getRandom(arg4);
         StructurePoolBasedGenerator.addPieces(lv.startPool, lv.size, Piece::new, arg, arg2, arg3, list, arg4, false, false);

@@ -29,7 +29,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 
 public class SlabBlock
 extends Block
@@ -112,7 +112,7 @@ implements Waterloggable {
     }
 
     @Override
-    public boolean tryFillWithFluid(IWorld arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
         if (arg3.get(TYPE) != SlabType.DOUBLE) {
             return Waterloggable.super.tryFillWithFluid(arg, arg2, arg3, arg4);
         }
@@ -128,7 +128,7 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
         }

@@ -56,7 +56,7 @@ implements CommandSource {
     private final int level;
     private final String simpleName;
     private final Text name;
-    private final MinecraftServer minecraftServer;
+    private final MinecraftServer server;
     private final boolean silent;
     @Nullable
     private final Entity entity;
@@ -77,7 +77,7 @@ implements CommandSource {
         this.level = i;
         this.simpleName = string;
         this.name = arg5;
-        this.minecraftServer = minecraftServer;
+        this.server = minecraftServer;
         this.resultConsumer = resultConsumer;
         this.entityAnchor = arg7;
         this.rotation = arg3;
@@ -87,28 +87,28 @@ implements CommandSource {
         if (this.entity == arg) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, arg.getName().getString(), arg.getDisplayName(), this.minecraftServer, arg, this.silent, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, arg.getName().getString(), arg.getDisplayName(), this.server, arg, this.silent, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withPosition(Vec3d arg) {
         if (this.position.equals(arg)) {
             return this;
         }
-        return new ServerCommandSource(this.output, arg, this.rotation, this.world, this.level, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, arg, this.rotation, this.world, this.level, this.simpleName, this.name, this.server, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withRotation(Vec2f arg) {
         if (this.rotation.equals(arg)) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, arg, this.world, this.level, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, arg, this.world, this.level, this.simpleName, this.name, this.server, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withConsumer(ResultConsumer<ServerCommandSource> resultConsumer) {
         if (this.resultConsumer.equals(resultConsumer)) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, this.simpleName, this.name, this.server, this.entity, this.silent, resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource mergeConsumers(ResultConsumer<ServerCommandSource> resultConsumer, BinaryOperator<ResultConsumer<ServerCommandSource>> binaryOperator) {
@@ -120,35 +120,35 @@ implements CommandSource {
         if (this.silent) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, this.simpleName, this.name, this.minecraftServer, this.entity, true, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, this.simpleName, this.name, this.server, this.entity, true, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withLevel(int i) {
         if (i == this.level) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, i, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, i, this.simpleName, this.name, this.server, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withMaxLevel(int i) {
         if (i <= this.level) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, i, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, i, this.simpleName, this.name, this.server, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withEntityAnchor(EntityAnchorArgumentType.EntityAnchor arg) {
         if (arg == this.entityAnchor) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, this.resultConsumer, arg);
+        return new ServerCommandSource(this.output, this.position, this.rotation, this.world, this.level, this.simpleName, this.name, this.server, this.entity, this.silent, this.resultConsumer, arg);
     }
 
     public ServerCommandSource withWorld(ServerWorld arg) {
         if (arg == this.world) {
             return this;
         }
-        return new ServerCommandSource(this.output, this.position, this.rotation, arg, this.level, this.simpleName, this.name, this.minecraftServer, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
+        return new ServerCommandSource(this.output, this.position, this.rotation, arg, this.level, this.simpleName, this.name, this.server, this.entity, this.silent, this.resultConsumer, this.entityAnchor);
     }
 
     public ServerCommandSource withLookingAt(Entity arg, EntityAnchorArgumentType.EntityAnchor arg2) throws CommandSyntaxException {
@@ -211,7 +211,7 @@ implements CommandSource {
     }
 
     public MinecraftServer getMinecraftServer() {
-        return this.minecraftServer;
+        return this.server;
     }
 
     public EntityAnchorArgumentType.EntityAnchor getEntityAnchor() {
@@ -229,14 +229,14 @@ implements CommandSource {
 
     private void sendToOps(Text arg) {
         MutableText lv = new TranslatableText("chat.type.admin", this.getDisplayName(), arg).formatted(Formatting.GRAY, Formatting.ITALIC);
-        if (this.minecraftServer.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
-            for (ServerPlayerEntity lv2 : this.minecraftServer.getPlayerManager().getPlayerList()) {
-                if (lv2 == this.output || !this.minecraftServer.getPlayerManager().isOperator(lv2.getGameProfile())) continue;
+        if (this.server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
+            for (ServerPlayerEntity lv2 : this.server.getPlayerManager().getPlayerList()) {
+                if (lv2 == this.output || !this.server.getPlayerManager().isOperator(lv2.getGameProfile())) continue;
                 lv2.sendSystemMessage(lv);
             }
         }
-        if (this.output != this.minecraftServer && this.minecraftServer.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS)) {
-            this.minecraftServer.sendSystemMessage(lv);
+        if (this.output != this.server && this.server.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS)) {
+            this.server.sendSystemMessage(lv);
         }
     }
 
@@ -254,12 +254,12 @@ implements CommandSource {
 
     @Override
     public Collection<String> getPlayerNames() {
-        return Lists.newArrayList((Object[])this.minecraftServer.getPlayerNames());
+        return Lists.newArrayList((Object[])this.server.getPlayerNames());
     }
 
     @Override
     public Collection<String> getTeamNames() {
-        return this.minecraftServer.getScoreboard().getTeamNames();
+        return this.server.getScoreboard().getTeamNames();
     }
 
     @Override
@@ -269,7 +269,7 @@ implements CommandSource {
 
     @Override
     public Stream<Identifier> getRecipeIds() {
-        return this.minecraftServer.getRecipeManager().keys();
+        return this.server.getRecipeManager().keys();
     }
 
     @Override

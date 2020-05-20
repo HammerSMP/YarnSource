@@ -74,7 +74,7 @@ public class ChunkSerializer {
 
     public static ProtoChunk deserialize(ServerWorld arg3, StructureManager arg22, PointOfInterestStorage arg32, ChunkPos arg4, CompoundTag arg5) {
         ProtoChunk lv21;
-        ChunkGenerator<?> lv = arg3.getChunkManager().getChunkGenerator();
+        ChunkGenerator lv = arg3.getChunkManager().getChunkGenerator();
         BiomeSource lv2 = lv.getBiomeSource();
         CompoundTag lv3 = arg5.getCompound("Level");
         ChunkPos lv4 = new ChunkPos(lv3.getInt("xPos"), lv3.getInt("zPos"));
@@ -89,7 +89,7 @@ public class ChunkSerializer {
         ListTag lv9 = lv3.getList("Sections", 10);
         int i = 16;
         ChunkSection[] lvs = new ChunkSection[16];
-        boolean bl2 = arg3.getDimension().hasSkyLight();
+        boolean bl2 = arg3.method_27983().hasSkyLight();
         ServerChunkManager lv10 = arg3.getChunkManager();
         LightingProvider lv11 = ((ChunkManager)lv10).getLightingProvider();
         if (bl) {
@@ -159,7 +159,7 @@ public class ChunkSerializer {
         }
         Heightmap.populateHeightmaps(lv21, enumSet);
         CompoundTag compoundTag = lv3.getCompound("Structures");
-        lv21.setStructureStarts(ChunkSerializer.readStructureStarts(lv, arg22, compoundTag));
+        lv21.setStructureStarts(ChunkSerializer.readStructureStarts(arg22, compoundTag, arg3.getSeed()));
         lv21.setStructureReferences(ChunkSerializer.readStructureReferences(arg4, compoundTag));
         if (lv3.getBoolean("shouldSave")) {
             lv21.setShouldSave(true);
@@ -351,11 +351,11 @@ public class ChunkSerializer {
         return lv;
     }
 
-    private static Map<String, StructureStart> readStructureStarts(ChunkGenerator<?> arg, StructureManager arg2, CompoundTag arg3) {
+    private static Map<String, StructureStart> readStructureStarts(StructureManager arg, CompoundTag arg2, long l) {
         HashMap map = Maps.newHashMap();
-        CompoundTag lv = arg3.getCompound("Starts");
+        CompoundTag lv = arg2.getCompound("Starts");
         for (String string : lv.getKeys()) {
-            map.put(string, StructureFeatures.readStructureStart(arg, arg2, lv.getCompound(string)));
+            map.put(string, StructureFeatures.readStructureStart(arg, lv.getCompound(string), l));
         }
         return map;
     }

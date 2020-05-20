@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.class_5268;
+import net.minecraft.class_5285;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.Difficulty;
@@ -35,22 +36,22 @@ public interface class_5219 {
 
     public Set<String> getEnabledDataPacks();
 
-    public boolean method_27431();
+    public boolean isModded();
 
-    public Set<String> method_27432();
+    public Set<String> getServerBrands();
 
     public void addServerBrand(String var1, boolean var2);
 
     default public void populateCrashReport(CrashReportSection arg) {
-        arg.add("Known server brands", () -> String.join((CharSequence)", ", this.method_27432()));
-        arg.add("Level was modded", () -> Boolean.toString(this.method_27431()));
+        arg.add("Known server brands", () -> String.join((CharSequence)", ", this.getServerBrands()));
+        arg.add("Level was modded", () -> Boolean.toString(this.isModded()));
         arg.add("Level storage version", () -> {
             int i = this.getVersion();
-            return String.format("0x%05X - %s", i, this.method_27440(i));
+            return String.format("0x%05X - %s", i, this.getFormatName(i));
         });
     }
 
-    default public String method_27440(int i) {
+    default public String getFormatName(int i) {
         switch (i) {
             case 19133: {
                 return "Anvil";
@@ -69,7 +70,8 @@ public interface class_5219 {
 
     public class_5268 method_27859();
 
-    public LevelInfo method_27433();
+    @Environment(value=EnvType.CLIENT)
+    public LevelInfo getLevelInfo();
 
     public CompoundTag cloneWorldTag(@Nullable CompoundTag var1);
 
@@ -86,8 +88,6 @@ public interface class_5219 {
     @Environment(value=EnvType.CLIENT)
     public long getLastPlayed();
 
-    public long getSeed();
-
     public boolean areCommandsAllowed();
 
     public Difficulty getDifficulty();
@@ -102,8 +102,10 @@ public interface class_5219 {
 
     public CompoundTag getPlayerData();
 
-    public CompoundTag method_27434(DimensionType var1);
+    public CompoundTag getWorldData(DimensionType var1);
 
-    public void method_27435(DimensionType var1, CompoundTag var2);
+    public void setWorldData(DimensionType var1, CompoundTag var2);
+
+    public class_5285 method_28057();
 }
 

@@ -18,7 +18,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.AbstractTempleFeature;
@@ -43,13 +42,13 @@ extends AbstractTempleFeature<OceanRuinFeatureConfig> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getOceanRuinSpacing();
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getOceanRuinSpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getOceanRuinSeparation();
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getOceanRuinSeparation();
     }
 
     @Override
@@ -93,7 +92,7 @@ extends AbstractTempleFeature<OceanRuinFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             OceanRuinFeatureConfig lv = arg.getStructureConfig(arg3, Feature.OCEAN_RUIN);
             int k = i * 16;
             int l = j * 16;

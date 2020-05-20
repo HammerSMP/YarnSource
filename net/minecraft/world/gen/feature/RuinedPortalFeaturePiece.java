@@ -48,7 +48,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
@@ -61,7 +62,7 @@ extends SimpleStructurePiece {
     private final Properties properties;
 
     public RuinedPortalFeaturePiece(BlockPos arg, VerticalPlacement arg2, Properties arg3, Identifier arg4, Structure arg5, BlockRotation arg6, BlockMirror arg7, BlockPos arg8) {
-        super(StructurePieceType.RUPO, 0);
+        super(StructurePieceType.RUINED_PORTAL, 0);
         this.pos = arg;
         this.template = arg4;
         this.rotation = arg6;
@@ -72,7 +73,7 @@ extends SimpleStructurePiece {
     }
 
     public RuinedPortalFeaturePiece(StructureManager arg, CompoundTag arg2) {
-        super(StructurePieceType.RUPO, arg2);
+        super(StructurePieceType.RUINED_PORTAL, arg2);
         this.template = new Identifier(arg2.getString("Template"));
         this.rotation = BlockRotation.valueOf(arg2.getString("Rotation"));
         this.mirror = BlockMirror.valueOf(arg2.getString("Mirror"));
@@ -118,7 +119,7 @@ extends SimpleStructurePiece {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg22, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg22, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
         if (!arg4.contains(this.pos)) {
             return true;
         }
@@ -140,10 +141,10 @@ extends SimpleStructurePiece {
     }
 
     @Override
-    protected void handleMetadata(String string, BlockPos arg, IWorld arg2, Random random, BlockBox arg3) {
+    protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
     }
 
-    private void generateVines(Random random, IWorld arg, BlockPos arg2) {
+    private void generateVines(Random random, WorldAccess arg, BlockPos arg2) {
         BlockState lv = arg.getBlockState(arg2);
         if (lv.isAir() || lv.isOf(Blocks.VINE)) {
             return;
@@ -161,13 +162,13 @@ extends SimpleStructurePiece {
         arg.setBlockState(lv3, (BlockState)Blocks.VINE.getDefaultState().with(lv5, true), 3);
     }
 
-    private void generateOvergrownLeaves(Random random, IWorld arg, BlockPos arg2) {
+    private void generateOvergrownLeaves(Random random, WorldAccess arg, BlockPos arg2) {
         if (random.nextFloat() < 0.5f && arg.getBlockState(arg2).isOf(Blocks.NETHERRACK) && arg.getBlockState(arg2.up()).isAir()) {
             arg.setBlockState(arg2.up(), (BlockState)Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true), 3);
         }
     }
 
-    private void updateNetherracksInBound(Random random, IWorld arg) {
+    private void updateNetherracksInBound(Random random, WorldAccess arg) {
         for (int i = this.boundingBox.minX + 1; i < this.boundingBox.maxX; ++i) {
             for (int j = this.boundingBox.minZ + 1; j < this.boundingBox.maxZ; ++j) {
                 BlockPos lv = new BlockPos(i, this.boundingBox.minY, j);
@@ -177,7 +178,7 @@ extends SimpleStructurePiece {
         }
     }
 
-    private void updateNetherracks(Random random, IWorld arg, BlockPos arg2) {
+    private void updateNetherracks(Random random, WorldAccess arg, BlockPos arg2) {
         BlockPos.Mutable lv = arg2.mutableCopy();
         this.placeNetherrackBottom(random, arg, lv);
         for (int i = 8; i > 0 && random.nextFloat() < 0.5f; --i) {
@@ -186,7 +187,7 @@ extends SimpleStructurePiece {
         }
     }
 
-    private void placeNetherrackBase(Random random, IWorld arg) {
+    private void placeNetherrackBase(Random random, WorldAccess arg) {
         boolean bl = this.verticalPlacement == VerticalPlacement.ON_LAND_SURFACE || this.verticalPlacement == VerticalPlacement.ON_OCEAN_FLOOR;
         Vec3i lv = this.boundingBox.getCenter();
         int i = lv.getX();
@@ -217,12 +218,12 @@ extends SimpleStructurePiece {
         }
     }
 
-    private boolean canFillNetherrack(IWorld arg, BlockPos arg2) {
+    private boolean canFillNetherrack(WorldAccess arg, BlockPos arg2) {
         BlockState lv = arg.getBlockState(arg2);
         return !lv.isOf(Blocks.AIR) && !lv.isOf(Blocks.OBSIDIAN) && (this.verticalPlacement == VerticalPlacement.IN_NETHER || !lv.isOf(Blocks.LAVA));
     }
 
-    private void placeNetherrackBottom(Random random, IWorld arg, BlockPos arg2) {
+    private void placeNetherrackBottom(Random random, WorldAccess arg, BlockPos arg2) {
         if (!this.properties.cold && random.nextFloat() < 0.07f) {
             arg.setBlockState(arg2, Blocks.MAGMA_BLOCK.getDefaultState(), 3);
         } else {
@@ -230,7 +231,7 @@ extends SimpleStructurePiece {
         }
     }
 
-    private static int getBaseHeight(IWorld arg, int i, int j, VerticalPlacement arg2) {
+    private static int getBaseHeight(WorldAccess arg, int i, int j, VerticalPlacement arg2) {
         return arg.getTopY(RuinedPortalFeaturePiece.getHeightmapType(arg2), i, j) - 1;
     }
 

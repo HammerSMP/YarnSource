@@ -1,21 +1,32 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.gen.chunk;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.class_5284;
 import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.gen.chunk.FloatingIslandsChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 
 public class FloatingIslandsChunkGenerator
-extends SurfaceChunkGenerator<FloatingIslandsChunkGeneratorConfig> {
-    private final BlockPos center;
+extends SurfaceChunkGenerator<class_5284> {
+    private final class_5284 generatorConfig;
 
-    public FloatingIslandsChunkGenerator(IWorld arg, BiomeSource arg2, FloatingIslandsChunkGeneratorConfig arg3) {
-        super(arg, arg2, 8, 4, 128, arg3, true);
-        this.center = arg3.getCenter();
+    public FloatingIslandsChunkGenerator(BiomeSource arg, long l, class_5284 arg2) {
+        super(arg, l, arg2, 8, 4, 128, true);
+        this.generatorConfig = arg2;
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public ChunkGenerator create(long l) {
+        return new FloatingIslandsChunkGenerator(this.biomeSource.create(l), l, this.generatorConfig);
     }
 
     @Override
@@ -31,7 +42,7 @@ extends SurfaceChunkGenerator<FloatingIslandsChunkGeneratorConfig> {
 
     @Override
     protected double[] computeNoiseRange(int i, int j) {
-        return new double[]{this.biomeSource.getNoiseRange(i, j), 0.0};
+        return new double[]{this.biomeSource.getNoiseAt(i, j), 0.0};
     }
 
     @Override
@@ -40,12 +51,12 @@ extends SurfaceChunkGenerator<FloatingIslandsChunkGeneratorConfig> {
     }
 
     @Override
-    protected double method_16409() {
-        return (int)super.method_16409() / 2;
+    protected double topInterpolationStart() {
+        return (int)super.topInterpolationStart() / 2;
     }
 
     @Override
-    protected double method_16410() {
+    protected double bottomInterpolationStart() {
         return 8.0;
     }
 

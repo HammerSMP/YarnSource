@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ModifiableTestableWorld;
-import net.minecraft.world.gen.feature.AbstractTreeFeature;
+import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.foliage.FoliagePlacer;
 import net.minecraft.world.gen.trunk.TrunkPlacer;
@@ -62,7 +62,7 @@ extends TrunkPlacer {
                 p += lv2.getOffsetZ();
                 --k;
             }
-            if (!AbstractTreeFeature.isAirOrLeaves(arg, lv3 = new BlockPos(o, s = m + r, p))) continue;
+            if (!TreeFeature.isAirOrLeaves(arg, lv3 = new BlockPos(o, s = m + r, p))) continue;
             DarkOakTrunkPlacer.method_27402(arg, random, lv3, set, arg3, arg4);
             DarkOakTrunkPlacer.method_27402(arg, random, lv3.east(), set, arg3, arg4);
             DarkOakTrunkPlacer.method_27402(arg, random, lv3.south(), set, arg3, arg4);

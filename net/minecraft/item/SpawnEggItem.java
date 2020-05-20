@@ -24,7 +24,7 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -87,7 +87,7 @@ extends Item {
             lv10 = lv3.offset(lv4);
         }
         EntityType<?> lv11 = this.getEntityType(lv2.getTag());
-        if (lv11.spawnFromItemStack(lv, lv2, arg.getPlayer(), lv10, SpawnType.SPAWN_EGG, true, !Objects.equals(lv3, lv10) && lv4 == Direction.UP) != null) {
+        if (lv11.spawnFromItemStack(lv, lv2, arg.getPlayer(), lv10, SpawnReason.SPAWN_EGG, true, !Objects.equals(lv3, lv10) && lv4 == Direction.UP) != null) {
             lv2.decrement(1);
         }
         return ActionResult.SUCCESS;
@@ -112,7 +112,7 @@ extends Item {
             return TypedActionResult.fail(lv);
         }
         EntityType<?> lv5 = this.getEntityType(lv.getTag());
-        if (lv5.spawnFromItemStack(arg, lv, arg2, lv4, SpawnType.SPAWN_EGG, false, false) == null) {
+        if (lv5.spawnFromItemStack(arg, lv, arg2, lv4, SpawnReason.SPAWN_EGG, false, false) == null) {
             return TypedActionResult.pass(lv);
         }
         if (!arg2.abilities.creativeMode) {

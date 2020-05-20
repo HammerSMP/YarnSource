@@ -200,7 +200,7 @@ NamedScreenHandlerFactory {
             string2 = arg.getName().getString();
             lv2 = arg.getDisplayName();
         }
-        Vec3d lv3 = Vec3d.method_24953(this.pos);
+        Vec3d lv3 = Vec3d.ofCenter(this.pos);
         return new ServerCommandSource(CommandOutput.DUMMY, lv3, Vec2f.ZERO, (ServerWorld)this.world, 2, string2, lv2, this.world.getServer(), arg);
     }
 

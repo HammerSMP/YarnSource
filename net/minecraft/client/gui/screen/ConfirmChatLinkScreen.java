@@ -58,7 +58,7 @@ extends ConfirmScreen {
     public void render(MatrixStack arg, int i, int j, float f) {
         super.render(arg, i, j, f);
         if (this.drawWarning) {
-            this.drawStringWithShadow(arg, this.textRenderer, this.warning, this.width / 2, 110, 0xFFCCCC);
+            this.drawCenteredText(arg, this.textRenderer, this.warning, this.width / 2, 110, 0xFFCCCC);
         }
     }
 }

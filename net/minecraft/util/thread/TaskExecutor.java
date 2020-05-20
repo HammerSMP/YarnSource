@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import net.minecraft.SharedConstants;
 import net.minecraft.util.thread.MessageListener;
 import net.minecraft.util.thread.TaskQueue;
 import org.apache.logging.log4j.LogManager;
@@ -72,6 +73,8 @@ Runnable {
     }
 
     private boolean runNext() {
+        String string2;
+        Thread thread2;
         if (!this.isUnpaused()) {
             return false;
         }
@@ -79,7 +82,18 @@ Runnable {
         if (runnable == null) {
             return false;
         }
+        if (SharedConstants.isDevelopment) {
+            Thread thread = Thread.currentThread();
+            String string = thread.getName();
+            thread.setName(this.name);
+        } else {
+            thread2 = null;
+            string2 = null;
+        }
         runnable.run();
+        if (thread2 != null) {
+            thread2.setName(string2);
+        }
         return true;
     }
 

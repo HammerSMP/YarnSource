@@ -13,10 +13,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.BlockPileFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -27,11 +27,11 @@ extends Feature<BlockPileFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, BlockPileFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, BlockPileFeatureConfig arg5) {
         return NetherForestVegetationFeature.method_26264(arg, random, arg4, arg5, 8, 4);
     }
 
-    public static boolean method_26264(IWorld arg, Random random, BlockPos arg2, BlockPileFeatureConfig arg3, int i, int j) {
+    public static boolean method_26264(WorldAccess arg, Random random, BlockPos arg2, BlockPileFeatureConfig arg3, int i, int j) {
         Block lv = arg.getBlockState(arg2.down()).getBlock();
         while (!lv.isIn(BlockTags.NYLIUM) && arg2.getY() > 0) {
             arg2 = arg2.down();

@@ -18,10 +18,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.BasaltColumnsFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -34,7 +34,7 @@ extends Feature<BasaltColumnsFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, BasaltColumnsFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, BasaltColumnsFeatureConfig arg5) {
         int i = arg3.getSeaLevel();
         BlockPos lv = BasaltColumnsFeature.method_27094(arg, i, arg4.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), Integer.MAX_VALUE);
         if (lv == null) {
@@ -53,7 +53,7 @@ extends Feature<BasaltColumnsFeatureConfig> {
         return bl2;
     }
 
-    private boolean method_27096(IWorld arg, int i, BlockPos arg2, int j, int k) {
+    private boolean method_27096(WorldAccess arg, int i, BlockPos arg2, int j, int k) {
         boolean bl = false;
         block0: for (BlockPos lv : BlockPos.iterate(arg2.getX() - k, arg2.getY(), arg2.getZ() - k, arg2.getX() + k, arg2.getY(), arg2.getZ() + k)) {
             BlockPos lv2;
@@ -76,7 +76,7 @@ extends Feature<BasaltColumnsFeatureConfig> {
     }
 
     @Nullable
-    private static BlockPos method_27094(IWorld arg, int i, BlockPos.Mutable arg2, int j) {
+    private static BlockPos method_27094(WorldAccess arg, int i, BlockPos.Mutable arg2, int j) {
         while (arg2.getY() > 1 && j > 0) {
             --j;
             if (BasaltColumnsFeature.method_27095(arg, i, arg2)) {
@@ -92,7 +92,7 @@ extends Feature<BasaltColumnsFeatureConfig> {
     }
 
     @Nullable
-    private static BlockPos method_27098(IWorld arg, BlockPos.Mutable arg2, int i) {
+    private static BlockPos method_27098(WorldAccess arg, BlockPos.Mutable arg2, int i) {
         while (arg2.getY() < arg.getHeight() && i > 0) {
             --i;
             BlockState lv = arg.getBlockState(arg2);
@@ -115,7 +115,7 @@ extends Feature<BasaltColumnsFeatureConfig> {
         return arg.minReach + random.nextInt(arg.maxReach - arg.minReach + 1);
     }
 
-    private static boolean method_27095(IWorld arg, int i, BlockPos arg2) {
+    private static boolean method_27095(WorldAccess arg, int i, BlockPos arg2) {
         BlockState lv = arg.getBlockState(arg2);
         return lv.isAir() || lv.isOf(Blocks.LAVA) && arg2.getY() <= i;
     }

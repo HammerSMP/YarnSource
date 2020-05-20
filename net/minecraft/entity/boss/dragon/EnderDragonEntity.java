@@ -112,7 +112,7 @@ implements Monster {
         this.setHealth(this.getMaximumHealth());
         this.noClip = true;
         this.ignoreCameraFrustum = true;
-        this.fight = !arg2.isClient && arg2.dimension instanceof TheEndDimension ? ((TheEndDimension)arg2.dimension).getEnderDragonFight() : null;
+        this.fight = !arg2.isClient && arg2.getDimension() instanceof TheEndDimension ? ((TheEndDimension)arg2.getDimension()).getEnderDragonFight() : null;
         this.phaseManager = new PhaseManager(this);
     }
 
@@ -338,8 +338,8 @@ implements Monster {
     }
 
     private void launchLivingEntities(List<Entity> list) {
-        double d = (this.partBody.getBoundingBox().x1 + this.partBody.getBoundingBox().x2) / 2.0;
-        double e = (this.partBody.getBoundingBox().z1 + this.partBody.getBoundingBox().z2) / 2.0;
+        double d = (this.partBody.getBoundingBox().minX + this.partBody.getBoundingBox().maxX) / 2.0;
+        double e = (this.partBody.getBoundingBox().minZ + this.partBody.getBoundingBox().maxZ) / 2.0;
         for (Entity lv : list) {
             if (!(lv instanceof LivingEntity)) continue;
             double f = lv.getX() - d;
@@ -365,12 +365,12 @@ implements Monster {
     }
 
     private boolean destroyBlocks(Box arg) {
-        int i = MathHelper.floor(arg.x1);
-        int j = MathHelper.floor(arg.y1);
-        int k = MathHelper.floor(arg.z1);
-        int l = MathHelper.floor(arg.x2);
-        int m = MathHelper.floor(arg.y2);
-        int n = MathHelper.floor(arg.z2);
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.floor(arg.minY);
+        int k = MathHelper.floor(arg.minZ);
+        int l = MathHelper.floor(arg.maxX);
+        int m = MathHelper.floor(arg.maxY);
+        int n = MathHelper.floor(arg.maxZ);
         boolean bl = false;
         boolean bl2 = false;
         for (int o = i; o <= l; ++o) {

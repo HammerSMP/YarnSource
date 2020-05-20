@@ -141,7 +141,7 @@ extends Screen {
             this.narratorTimer = l;
             NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.joining").getString());
         }
-        this.drawStringWithShadow(arg, this.textRenderer, this.status, this.width / 2, this.height / 2 - 50, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.status, this.width / 2, this.height / 2 - 50, 0xFFFFFF);
         super.render(arg, i, j, f);
     }
 }

@@ -41,7 +41,7 @@ implements LootCondition {
     public boolean test(LootContext arg) {
         DamageSource lv = arg.get(LootContextParameters.DAMAGE_SOURCE);
         BlockPos lv2 = arg.get(LootContextParameters.POSITION);
-        return lv2 != null && lv != null && this.predicate.test(arg.getWorld(), Vec3d.method_24954(lv2), lv);
+        return lv2 != null && lv != null && this.predicate.test(arg.getWorld(), Vec3d.of(lv2), lv);
     }
 
     public static LootCondition.Builder builder(DamageSourcePredicate.Builder arg) {

@@ -27,7 +27,8 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.apache.logging.log4j.LogManager;
@@ -65,7 +66,7 @@ extends StructurePiece {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
         this.placementData.setBoundingBox(arg4);
         this.boundingBox = this.structure.calculateBoundingBox(this.placementData, this.pos);
         if (this.structure.place(arg, this.pos, arg6, this.placementData, 2)) {
@@ -99,7 +100,7 @@ extends StructurePiece {
         return true;
     }
 
-    protected abstract void handleMetadata(String var1, BlockPos var2, IWorld var3, Random var4, BlockBox var5);
+    protected abstract void handleMetadata(String var1, BlockPos var2, WorldAccess var3, Random var4, BlockBox var5);
 
     @Override
     public void translate(int i, int j, int k) {

@@ -144,9 +144,9 @@ public abstract class Particle {
             this.spacingXZ = f;
             this.spacingY = g;
             Box lv = this.getBoundingBox();
-            double d = (lv.x1 + lv.x2 - (double)f) / 2.0;
-            double e = (lv.z1 + lv.z2 - (double)f) / 2.0;
-            this.setBoundingBox(new Box(d, lv.y1, e, d + (double)this.spacingXZ, lv.y1 + (double)this.spacingY, e + (double)this.spacingXZ));
+            double d = (lv.minX + lv.maxX - (double)f) / 2.0;
+            double e = (lv.minZ + lv.maxZ - (double)f) / 2.0;
+            this.setBoundingBox(new Box(d, lv.minY, e, d + (double)this.spacingXZ, lv.minY + (double)this.spacingY, e + (double)this.spacingXZ));
         }
     }
 
@@ -190,9 +190,9 @@ public abstract class Particle {
 
     protected void repositionFromBoundingBox() {
         Box lv = this.getBoundingBox();
-        this.x = (lv.x1 + lv.x2) / 2.0;
-        this.y = lv.y1;
-        this.z = (lv.z1 + lv.z2) / 2.0;
+        this.x = (lv.minX + lv.maxX) / 2.0;
+        this.y = lv.minY;
+        this.z = (lv.minZ + lv.maxZ) / 2.0;
     }
 
     protected int getColorMultiplier(float f) {

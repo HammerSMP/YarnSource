@@ -20,7 +20,7 @@ import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.control.BodyControl;
 import net.minecraft.entity.ai.control.LookControl;
@@ -46,16 +46,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class PhantomEntity
 extends FlyingEntity
 implements Monster {
     private static final TrackedData<Integer> SIZE = DataTracker.registerData(PhantomEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private Vec3d field_7314 = Vec3d.ZERO;
-    private BlockPos field_7312 = BlockPos.ORIGIN;
+    private Vec3d targetPosition = Vec3d.ZERO;
+    private BlockPos circlingCenter = BlockPos.ORIGIN;
     private PhantomMovementType movementType = PhantomMovementType.CIRCLE;
 
     public PhantomEntity(EntityType<? extends PhantomEntity> arg, World arg2) {
@@ -147,8 +147,8 @@ implements Monster {
     }
 
     @Override
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        this.field_7312 = this.getBlockPos().up(5);
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+        this.circlingCenter = this.getBlockPos().up(5);
         this.setPhantomSize(0);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
@@ -157,7 +157,7 @@ implements Monster {
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
         if (arg.contains("AX")) {
-            this.field_7312 = new BlockPos(arg.getInt("AX"), arg.getInt("AY"), arg.getInt("AZ"));
+            this.circlingCenter = new BlockPos(arg.getInt("AX"), arg.getInt("AY"), arg.getInt("AZ"));
         }
         this.setPhantomSize(arg.getInt("Size"));
     }
@@ -165,9 +165,9 @@ implements Monster {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        arg.putInt("AX", this.field_7312.getX());
-        arg.putInt("AY", this.field_7312.getY());
-        arg.putInt("AZ", this.field_7312.getZ());
+        arg.putInt("AX", this.circlingCenter.getX());
+        arg.putInt("AY", this.circlingCenter.getY());
+        arg.putInt("AZ", this.circlingCenter.getZ());
         arg.putInt("Size", this.getPhantomSize());
     }
 
@@ -259,7 +259,7 @@ implements Monster {
 
     class StartAttackGoal
     extends Goal {
-        private int field_7322;
+        private int cooldown;
 
         private StartAttackGoal() {
         }
@@ -275,33 +275,33 @@ implements Monster {
 
         @Override
         public void start() {
-            this.field_7322 = 10;
+            this.cooldown = 10;
             PhantomEntity.this.movementType = PhantomMovementType.CIRCLE;
-            this.method_7102();
+            this.startSwoop();
         }
 
         @Override
         public void stop() {
-            PhantomEntity.this.field_7312 = PhantomEntity.this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, PhantomEntity.this.field_7312).up(10 + PhantomEntity.this.random.nextInt(20));
+            PhantomEntity.this.circlingCenter = PhantomEntity.this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, PhantomEntity.this.circlingCenter).up(10 + PhantomEntity.this.random.nextInt(20));
         }
 
         @Override
         public void tick() {
             if (PhantomEntity.this.movementType == PhantomMovementType.CIRCLE) {
-                --this.field_7322;
-                if (this.field_7322 <= 0) {
+                --this.cooldown;
+                if (this.cooldown <= 0) {
                     PhantomEntity.this.movementType = PhantomMovementType.SWOOP;
-                    this.method_7102();
-                    this.field_7322 = (8 + PhantomEntity.this.random.nextInt(4)) * 20;
+                    this.startSwoop();
+                    this.cooldown = (8 + PhantomEntity.this.random.nextInt(4)) * 20;
                     PhantomEntity.this.playSound(SoundEvents.ENTITY_PHANTOM_SWOOP, 10.0f, 0.95f + PhantomEntity.this.random.nextFloat() * 0.1f);
                 }
             }
         }
 
-        private void method_7102() {
-            PhantomEntity.this.field_7312 = PhantomEntity.this.getTarget().getBlockPos().up(20 + PhantomEntity.this.random.nextInt(20));
-            if (PhantomEntity.this.field_7312.getY() < PhantomEntity.this.world.getSeaLevel()) {
-                PhantomEntity.this.field_7312 = new BlockPos(PhantomEntity.this.field_7312.getX(), PhantomEntity.this.world.getSeaLevel() + 1, PhantomEntity.this.field_7312.getZ());
+        private void startSwoop() {
+            PhantomEntity.this.circlingCenter = PhantomEntity.this.getTarget().getBlockPos().up(20 + PhantomEntity.this.random.nextInt(20));
+            if (PhantomEntity.this.circlingCenter.getY() < PhantomEntity.this.world.getSeaLevel()) {
+                PhantomEntity.this.circlingCenter = new BlockPos(PhantomEntity.this.circlingCenter.getX(), PhantomEntity.this.world.getSeaLevel() + 1, PhantomEntity.this.circlingCenter.getZ());
             }
         }
     }
@@ -354,7 +354,7 @@ implements Monster {
         @Override
         public void tick() {
             LivingEntity lv = PhantomEntity.this.getTarget();
-            PhantomEntity.this.field_7314 = new Vec3d(lv.getX(), lv.getBodyY(0.5), lv.getZ());
+            PhantomEntity.this.targetPosition = new Vec3d(lv.getX(), lv.getBodyY(0.5), lv.getZ());
             if (PhantomEntity.this.getBoundingBox().expand(0.2f).intersects(lv.getBoundingBox())) {
                 PhantomEntity.this.tryAttack(lv);
                 PhantomEntity.this.movementType = PhantomMovementType.CIRCLE;
@@ -369,10 +369,10 @@ implements Monster {
 
     class CircleMovementGoal
     extends MovementGoal {
-        private float field_7328;
-        private float field_7327;
-        private float field_7326;
-        private float field_7324;
+        private float angle;
+        private float radius;
+        private float yOffset;
+        private float circlingDirection;
 
         private CircleMovementGoal() {
         }
@@ -384,47 +384,47 @@ implements Monster {
 
         @Override
         public void start() {
-            this.field_7327 = 5.0f + PhantomEntity.this.random.nextFloat() * 10.0f;
-            this.field_7326 = -4.0f + PhantomEntity.this.random.nextFloat() * 9.0f;
-            this.field_7324 = PhantomEntity.this.random.nextBoolean() ? 1.0f : -1.0f;
-            this.method_7103();
+            this.radius = 5.0f + PhantomEntity.this.random.nextFloat() * 10.0f;
+            this.yOffset = -4.0f + PhantomEntity.this.random.nextFloat() * 9.0f;
+            this.circlingDirection = PhantomEntity.this.random.nextBoolean() ? 1.0f : -1.0f;
+            this.adjustDirection();
         }
 
         @Override
         public void tick() {
             if (PhantomEntity.this.random.nextInt(350) == 0) {
-                this.field_7326 = -4.0f + PhantomEntity.this.random.nextFloat() * 9.0f;
+                this.yOffset = -4.0f + PhantomEntity.this.random.nextFloat() * 9.0f;
             }
             if (PhantomEntity.this.random.nextInt(250) == 0) {
-                this.field_7327 += 1.0f;
-                if (this.field_7327 > 15.0f) {
-                    this.field_7327 = 5.0f;
-                    this.field_7324 = -this.field_7324;
+                this.radius += 1.0f;
+                if (this.radius > 15.0f) {
+                    this.radius = 5.0f;
+                    this.circlingDirection = -this.circlingDirection;
                 }
             }
             if (PhantomEntity.this.random.nextInt(450) == 0) {
-                this.field_7328 = PhantomEntity.this.random.nextFloat() * 2.0f * (float)Math.PI;
-                this.method_7103();
+                this.angle = PhantomEntity.this.random.nextFloat() * 2.0f * (float)Math.PI;
+                this.adjustDirection();
             }
-            if (this.method_7104()) {
-                this.method_7103();
+            if (this.isCloseToTarget()) {
+                this.adjustDirection();
             }
-            if (((PhantomEntity)PhantomEntity.this).field_7314.y < PhantomEntity.this.getY() && !PhantomEntity.this.world.isAir(PhantomEntity.this.getBlockPos().down(1))) {
-                this.field_7326 = Math.max(1.0f, this.field_7326);
-                this.method_7103();
+            if (((PhantomEntity)PhantomEntity.this).targetPosition.y < PhantomEntity.this.getY() && !PhantomEntity.this.world.isAir(PhantomEntity.this.getBlockPos().down(1))) {
+                this.yOffset = Math.max(1.0f, this.yOffset);
+                this.adjustDirection();
             }
-            if (((PhantomEntity)PhantomEntity.this).field_7314.y > PhantomEntity.this.getY() && !PhantomEntity.this.world.isAir(PhantomEntity.this.getBlockPos().up(1))) {
-                this.field_7326 = Math.min(-1.0f, this.field_7326);
-                this.method_7103();
+            if (((PhantomEntity)PhantomEntity.this).targetPosition.y > PhantomEntity.this.getY() && !PhantomEntity.this.world.isAir(PhantomEntity.this.getBlockPos().up(1))) {
+                this.yOffset = Math.min(-1.0f, this.yOffset);
+                this.adjustDirection();
             }
         }
 
-        private void method_7103() {
-            if (BlockPos.ORIGIN.equals(PhantomEntity.this.field_7312)) {
-                PhantomEntity.this.field_7312 = PhantomEntity.this.getBlockPos();
+        private void adjustDirection() {
+            if (BlockPos.ORIGIN.equals(PhantomEntity.this.circlingCenter)) {
+                PhantomEntity.this.circlingCenter = PhantomEntity.this.getBlockPos();
             }
-            this.field_7328 += this.field_7324 * 15.0f * ((float)Math.PI / 180);
-            PhantomEntity.this.field_7314 = Vec3d.method_24954(PhantomEntity.this.field_7312).add(this.field_7327 * MathHelper.cos(this.field_7328), -4.0f + this.field_7326, this.field_7327 * MathHelper.sin(this.field_7328));
+            this.angle += this.circlingDirection * 15.0f * ((float)Math.PI / 180);
+            PhantomEntity.this.targetPosition = Vec3d.of(PhantomEntity.this.circlingCenter).add(this.radius * MathHelper.cos(this.angle), -4.0f + this.yOffset, this.radius * MathHelper.sin(this.angle));
         }
     }
 
@@ -434,8 +434,8 @@ implements Monster {
             this.setControls(EnumSet.of(Goal.Control.MOVE));
         }
 
-        protected boolean method_7104() {
-            return PhantomEntity.this.field_7314.squaredDistanceTo(PhantomEntity.this.getX(), PhantomEntity.this.getY(), PhantomEntity.this.getZ()) < 4.0;
+        protected boolean isCloseToTarget() {
+            return PhantomEntity.this.targetPosition.squaredDistanceTo(PhantomEntity.this.getX(), PhantomEntity.this.getY(), PhantomEntity.this.getZ()) < 4.0;
         }
     }
 
@@ -465,11 +465,11 @@ implements Monster {
 
     class PhantomMoveControl
     extends MoveControl {
-        private float field_7331;
+        private float targetSpeed;
 
         public PhantomMoveControl(MobEntity arg2) {
             super(arg2);
-            this.field_7331 = 0.1f;
+            this.targetSpeed = 0.1f;
         }
 
         @Override
@@ -477,11 +477,11 @@ implements Monster {
             float n;
             if (PhantomEntity.this.horizontalCollision) {
                 PhantomEntity.this.yaw += 180.0f;
-                this.field_7331 = 0.1f;
+                this.targetSpeed = 0.1f;
             }
-            float f = (float)(((PhantomEntity)PhantomEntity.this).field_7314.x - PhantomEntity.this.getX());
-            float g = (float)(((PhantomEntity)PhantomEntity.this).field_7314.y - PhantomEntity.this.getY());
-            float h = (float)(((PhantomEntity)PhantomEntity.this).field_7314.z - PhantomEntity.this.getZ());
+            float f = (float)(((PhantomEntity)PhantomEntity.this).targetPosition.x - PhantomEntity.this.getX());
+            float g = (float)(((PhantomEntity)PhantomEntity.this).targetPosition.y - PhantomEntity.this.getY());
+            float h = (float)(((PhantomEntity)PhantomEntity.this).targetPosition.z - PhantomEntity.this.getZ());
             double d = MathHelper.sqrt(f * f + h * h);
             double e = 1.0 - (double)MathHelper.abs(g * 0.7f) / d;
             f = (float)((double)f * e);
@@ -492,13 +492,13 @@ implements Monster {
             float k = (float)MathHelper.atan2(h, f);
             float l = MathHelper.wrapDegrees(PhantomEntity.this.yaw + 90.0f);
             float m = MathHelper.wrapDegrees(k * 57.295776f);
-            PhantomEntity.this.bodyYaw = PhantomEntity.this.yaw = MathHelper.method_15388(l, m, 4.0f) - 90.0f;
-            this.field_7331 = MathHelper.angleBetween(j, PhantomEntity.this.yaw) < 3.0f ? MathHelper.method_15348(this.field_7331, 1.8f, 0.005f * (1.8f / this.field_7331)) : MathHelper.method_15348(this.field_7331, 0.2f, 0.025f);
+            PhantomEntity.this.bodyYaw = PhantomEntity.this.yaw = MathHelper.stepUnwrappedAngleTowards(l, m, 4.0f) - 90.0f;
+            this.targetSpeed = MathHelper.angleBetween(j, PhantomEntity.this.yaw) < 3.0f ? MathHelper.stepTowards(this.targetSpeed, 1.8f, 0.005f * (1.8f / this.targetSpeed)) : MathHelper.stepTowards(this.targetSpeed, 0.2f, 0.025f);
             PhantomEntity.this.pitch = n = (float)(-(MathHelper.atan2(-g, d) * 57.2957763671875));
             float o = PhantomEntity.this.yaw + 90.0f;
-            double p = (double)(this.field_7331 * MathHelper.cos(o * ((float)Math.PI / 180))) * Math.abs((double)f / i);
-            double q = (double)(this.field_7331 * MathHelper.sin(o * ((float)Math.PI / 180))) * Math.abs((double)h / i);
-            double r = (double)(this.field_7331 * MathHelper.sin(n * ((float)Math.PI / 180))) * Math.abs((double)g / i);
+            double p = (double)(this.targetSpeed * MathHelper.cos(o * ((float)Math.PI / 180))) * Math.abs((double)f / i);
+            double q = (double)(this.targetSpeed * MathHelper.sin(o * ((float)Math.PI / 180))) * Math.abs((double)h / i);
+            double r = (double)(this.targetSpeed * MathHelper.sin(n * ((float)Math.PI / 180))) * Math.abs((double)g / i);
             Vec3d lv = PhantomEntity.this.getVelocity();
             PhantomEntity.this.setVelocity(lv.add(new Vec3d(p, r, q).subtract(lv).multiply(0.2)));
         }

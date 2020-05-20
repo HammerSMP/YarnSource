@@ -104,7 +104,7 @@ implements StatsListener {
             this.drawCenteredString(arg, this.textRenderer, PROGRESS_BAR_STAGES[(int)(Util.getMeasuringTimeMs() / 150L % (long)PROGRESS_BAR_STAGES.length)], this.width / 2, this.height / 2 + 9 * 2, 0xFFFFFF);
         } else {
             this.getSelectedStatList().render(arg, i, j, f);
-            this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
             super.render(arg, i, j, f);
         }
     }
@@ -191,11 +191,11 @@ implements StatsListener {
                 String string = I18n.translate(Util.createTranslationKey("entity", EntityType.getId(this.entityType)), new Object[0]);
                 int p = StatsScreen.this.statHandler.getStat(Stats.KILLED.getOrCreateStat(this.entityType));
                 int q = StatsScreen.this.statHandler.getStat(Stats.KILLED_BY.getOrCreateStat(this.entityType));
-                EntityStatsListWidget.this.drawString(arg, StatsScreen.this.textRenderer, string, k + 2, j + 1, 0xFFFFFF);
+                EntityStatsListWidget.this.drawStringWithShadow(arg, StatsScreen.this.textRenderer, string, k + 2, j + 1, 0xFFFFFF);
                 StatsScreen.this.textRenderer.getClass();
-                EntityStatsListWidget.this.drawString(arg, StatsScreen.this.textRenderer, this.getKilledString(string, p), k + 2 + 10, j + 1 + 9, p == 0 ? 0x606060 : 0x909090);
+                EntityStatsListWidget.this.drawStringWithShadow(arg, StatsScreen.this.textRenderer, this.getKilledString(string, p), k + 2 + 10, j + 1 + 9, p == 0 ? 0x606060 : 0x909090);
                 StatsScreen.this.textRenderer.getClass();
-                EntityStatsListWidget.this.drawString(arg, StatsScreen.this.textRenderer, this.getKilledByString(string, q), k + 2 + 10, j + 1 + 9 * 2, q == 0 ? 0x606060 : 0x909090);
+                EntityStatsListWidget.this.drawStringWithShadow(arg, StatsScreen.this.textRenderer, this.getKilledByString(string, q), k + 2 + 10, j + 1 + 9 * 2, q == 0 ? 0x606060 : 0x909090);
             }
 
             private String getKilledString(String string, int i) {
@@ -361,7 +361,7 @@ implements StatsListener {
             }
             int k = i + 12;
             int l = j - 12;
-            int m = StatsScreen.this.textRenderer.getStringWidth(arg2);
+            int m = StatsScreen.this.textRenderer.getWidth(arg2);
             this.fillGradient(arg, k - 3, l - 3, k + m + 3, l + 8 + 3, -1073741824, -1073741824);
             RenderSystem.pushMatrix();
             RenderSystem.translatef(0.0f, 0.0f, 400.0f);
@@ -412,7 +412,7 @@ implements StatsListener {
 
             protected void render(MatrixStack arg, @Nullable Stat<?> arg2, int i, int j, boolean bl) {
                 String string = arg2 == null ? "-" : arg2.format(StatsScreen.this.statHandler.getStat(arg2));
-                ItemStatsListWidget.this.drawString(arg, StatsScreen.this.textRenderer, string, i - StatsScreen.this.textRenderer.getWidth(string), j + 5, bl ? 0xFFFFFF : 0x909090);
+                ItemStatsListWidget.this.drawStringWithShadow(arg, StatsScreen.this.textRenderer, string, i - StatsScreen.this.textRenderer.getWidth(string), j + 5, bl ? 0xFFFFFF : 0x909090);
             }
         }
 
@@ -480,9 +480,9 @@ implements StatsListener {
             @Override
             public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
                 MutableText lv = new TranslatableText(StatsScreen.method_27027(this.stat)).formatted(Formatting.GRAY);
-                GeneralStatsListWidget.this.drawString(arg, StatsScreen.this.textRenderer, lv.getString(), k + 2, j + 1, i % 2 == 0 ? 0xFFFFFF : 0x909090);
+                GeneralStatsListWidget.this.drawStringWithShadow(arg, StatsScreen.this.textRenderer, lv.getString(), k + 2, j + 1, i % 2 == 0 ? 0xFFFFFF : 0x909090);
                 String string = this.stat.format(StatsScreen.this.statHandler.getStat(this.stat));
-                GeneralStatsListWidget.this.drawString(arg, StatsScreen.this.textRenderer, string, k + 2 + 213 - StatsScreen.this.textRenderer.getWidth(string), j + 1, i % 2 == 0 ? 0xFFFFFF : 0x909090);
+                GeneralStatsListWidget.this.drawStringWithShadow(arg, StatsScreen.this.textRenderer, string, k + 2 + 213 - StatsScreen.this.textRenderer.getWidth(string), j + 1, i % 2 == 0 ? 0xFFFFFF : 0x909090);
             }
         }
     }

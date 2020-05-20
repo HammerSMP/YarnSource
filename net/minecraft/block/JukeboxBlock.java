@@ -23,8 +23,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class JukeboxBlock
 extends BlockWithEntity {
@@ -46,7 +46,7 @@ extends BlockWithEntity {
         return ActionResult.PASS;
     }
 
-    public void setRecord(IWorld arg, BlockPos arg2, BlockState arg3, ItemStack arg4) {
+    public void setRecord(WorldAccess arg, BlockPos arg2, BlockState arg3, ItemStack arg4) {
         BlockEntity lv = arg.getBlockEntity(arg2);
         if (!(lv instanceof JukeboxBlockEntity)) {
             return;
@@ -81,12 +81,12 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }
         this.removeRecord(arg2, arg3);
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override

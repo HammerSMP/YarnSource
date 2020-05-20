@@ -805,7 +805,7 @@ AutoCloseable {
         BackgroundRenderer.render(arg2, f, this.client.world, this.client.options.viewDistance, arg32.getSkyDarkness(f));
         RenderSystem.clear(16640, MinecraftClient.IS_SYSTEM_MAC);
         float h = arg32.getViewDistance();
-        boolean bl5 = bl3 = this.client.world.dimension.isFogThick(MathHelper.floor(d), MathHelper.floor(e)) || this.client.inGameHud.getBossBarHud().shouldThickenFog();
+        boolean bl5 = bl3 = this.client.world.method_28103().method_28110(MathHelper.floor(d), MathHelper.floor(e)) || this.client.inGameHud.getBossBarHud().shouldThickenFog();
         if (this.client.options.viewDistance >= 4) {
             BackgroundRenderer.applyFog(arg2, BackgroundRenderer.FogType.FOG_SKY, h, bl3);
             lv.swap("sky");
@@ -833,7 +833,7 @@ AutoCloseable {
         this.renderLayer(RenderLayer.getSolid(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutoutMipped(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutout(), arg, d, e, g);
-        if (this.world.dimension.getType() == DimensionType.THE_NETHER) {
+        if (this.world.method_27983() == DimensionType.THE_NETHER) {
             DiffuseLighting.enableForLevel(arg.peek().getModel());
         } else {
             DiffuseLighting.method_27869(arg.peek().getModel());
@@ -1263,11 +1263,11 @@ AutoCloseable {
     }
 
     public void renderSky(MatrixStack arg, float f) {
-        if (this.client.world.dimension.getType() == DimensionType.THE_END) {
+        if (this.client.world.method_27983() == DimensionType.THE_END) {
             this.renderEndSky(arg);
             return;
         }
-        if (!this.client.world.dimension.hasVisibleSky()) {
+        if (!this.client.world.method_28103().method_28114()) {
             return;
         }
         RenderSystem.disableTexture();
@@ -1289,7 +1289,7 @@ AutoCloseable {
         RenderSystem.disableAlphaTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        float[] fs = this.world.dimension.getBackgroundColor(this.world.getSkyAngle(f), f);
+        float[] fs = this.world.method_28103().method_28109(this.world.getSkyAngle(f), f);
         if (fs != null) {
             RenderSystem.disableTexture();
             RenderSystem.shadeModel(7425);
@@ -1366,7 +1366,7 @@ AutoCloseable {
         arg.pop();
         RenderSystem.disableTexture();
         RenderSystem.color3f(0.0f, 0.0f, 0.0f);
-        double d = this.client.player.getCameraPosVec((float)f).y - this.world.getSkyDarknessHeight();
+        double d = this.client.player.getCameraPosVec((float)f).y - this.world.getLevelProperties().method_28105();
         if (d < 0.0) {
             arg.push();
             arg.translate(0.0, 12.0, 0.0);
@@ -1377,7 +1377,7 @@ AutoCloseable {
             this.skyVertexFormat.endDrawing();
             arg.pop();
         }
-        if (this.world.dimension.hasGround()) {
+        if (this.world.method_28103().method_28113()) {
             RenderSystem.color3f(g * 0.2f + 0.04f, h * 0.2f + 0.04f, i * 0.6f + 0.1f);
         } else {
             RenderSystem.color3f(g, h, i);
@@ -1388,7 +1388,8 @@ AutoCloseable {
     }
 
     public void renderClouds(MatrixStack arg, float f, double d, double e, double g) {
-        if (!this.client.world.dimension.hasVisibleSky()) {
+        float h = this.world.method_28103().method_28108();
+        if (Float.isNaN(h)) {
             return;
         }
         RenderSystem.disableCull();
@@ -1398,26 +1399,26 @@ AutoCloseable {
         RenderSystem.defaultAlphaFunc();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableFog();
-        float h = 12.0f;
-        float i = 4.0f;
-        double j = 2.0E-4;
-        double k = ((float)this.ticks + f) * 0.03f;
-        double l = (d + k) / 12.0;
-        double m = this.world.dimension.getCloudHeight() - (float)e + 0.33f;
-        double n = g / 12.0 + (double)0.33f;
-        l -= (double)(MathHelper.floor(l / 2048.0) * 2048);
-        n -= (double)(MathHelper.floor(n / 2048.0) * 2048);
-        float o = (float)(l - (double)MathHelper.floor(l));
-        float p = (float)(m / 4.0 - (double)MathHelper.floor(m / 4.0)) * 4.0f;
-        float q = (float)(n - (double)MathHelper.floor(n));
+        float i = 12.0f;
+        float j = 4.0f;
+        double k = 2.0E-4;
+        double l = ((float)this.ticks + f) * 0.03f;
+        double m = (d + l) / 12.0;
+        double n = h - (float)e + 0.33f;
+        double o = g / 12.0 + (double)0.33f;
+        m -= (double)(MathHelper.floor(m / 2048.0) * 2048);
+        o -= (double)(MathHelper.floor(o / 2048.0) * 2048);
+        float p = (float)(m - (double)MathHelper.floor(m));
+        float q = (float)(n / 4.0 - (double)MathHelper.floor(n / 4.0)) * 4.0f;
+        float r = (float)(o - (double)MathHelper.floor(o));
         Vec3d lv = this.world.getCloudsColor(f);
-        int r = (int)Math.floor(l);
-        int s = (int)Math.floor(m / 4.0);
-        int t = (int)Math.floor(n);
-        if (r != this.lastCloudsBlockX || s != this.lastCloudsBlockY || t != this.lastCloudsBlockZ || this.client.options.getCloudRenderMode() != this.lastCloudsRenderMode || this.lastCloudsColor.squaredDistanceTo(lv) > 2.0E-4) {
-            this.lastCloudsBlockX = r;
-            this.lastCloudsBlockY = s;
-            this.lastCloudsBlockZ = t;
+        int s = (int)Math.floor(m);
+        int t = (int)Math.floor(n / 4.0);
+        int u = (int)Math.floor(o);
+        if (s != this.lastCloudsBlockX || t != this.lastCloudsBlockY || u != this.lastCloudsBlockZ || this.client.options.getCloudRenderMode() != this.lastCloudsRenderMode || this.lastCloudsColor.squaredDistanceTo(lv) > 2.0E-4) {
+            this.lastCloudsBlockX = s;
+            this.lastCloudsBlockY = t;
+            this.lastCloudsBlockZ = u;
             this.lastCloudsColor = lv;
             this.lastCloudsRenderMode = this.client.options.getCloudRenderMode();
             this.cloudsDirty = true;
@@ -1429,20 +1430,20 @@ AutoCloseable {
                 this.cloudsBuffer.close();
             }
             this.cloudsBuffer = new VertexBuffer(VertexFormats.POSITION_TEXTURE_COLOR_NORMAL);
-            this.renderClouds(lv2, l, m, n, lv);
+            this.renderClouds(lv2, m, n, o, lv);
             lv2.end();
             this.cloudsBuffer.upload(lv2);
         }
         this.textureManager.bindTexture(CLOUDS);
         arg.push();
         arg.scale(12.0f, 1.0f, 12.0f);
-        arg.translate(-o, p, -q);
+        arg.translate(-p, q, -r);
         if (this.cloudsBuffer != null) {
-            int u;
+            int v;
             this.cloudsBuffer.bind();
             VertexFormats.POSITION_TEXTURE_COLOR_NORMAL.startDrawing(0L);
-            for (int v = u = this.lastCloudsRenderMode == CloudRenderMode.FANCY ? 0 : 1; v < 2; ++v) {
-                if (v == 0) {
+            for (int w = v = this.lastCloudsRenderMode == CloudRenderMode.FANCY ? 0 : 1; w < 2; ++w) {
+                if (w == 0) {
                     RenderSystem.colorMask(false, false, false, false);
                 } else {
                     RenderSystem.colorMask(true, true, true, true);
@@ -1707,7 +1708,7 @@ AutoCloseable {
     }
 
     public static void drawBox(MatrixStack arg, VertexConsumer arg2, Box arg3, float f, float g, float h, float i) {
-        WorldRenderer.drawBox(arg, arg2, arg3.x1, arg3.y1, arg3.z1, arg3.x2, arg3.y2, arg3.z2, f, g, h, i, f, g, h);
+        WorldRenderer.drawBox(arg, arg2, arg3.minX, arg3.minY, arg3.minZ, arg3.maxX, arg3.maxY, arg3.maxZ, f, g, h, i, f, g, h);
     }
 
     public static void drawBox(MatrixStack arg, VertexConsumer arg2, double d, double e, double f, double g, double h, double i, float j, float k, float l, float m) {

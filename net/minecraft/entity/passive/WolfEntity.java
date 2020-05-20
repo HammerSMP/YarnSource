@@ -275,7 +275,7 @@ extends TameableEntity {
 
     @Override
     public int getLookPitchSpeed() {
-        if (this.isSitting()) {
+        if (this.isInSittingPose()) {
             return 20;
         }
         return super.getLookPitchSpeed();
@@ -287,7 +287,7 @@ extends TameableEntity {
             return false;
         }
         Entity lv = arg.getAttacker();
-        this.method_24346(false);
+        this.setSitting(false);
         if (lv != null && !(lv instanceof PlayerEntity) && !(lv instanceof PersistentProjectileEntity)) {
             f = (f + 1.0f) / 2.0f;
         }
@@ -355,7 +355,7 @@ extends TameableEntity {
             }
             if (!this.isOwner(arg)) return bl;
             if (this.isBreedingItem(lv)) return bl;
-            this.method_24346(!this.method_24345());
+            this.setSitting(!this.isSitting());
             this.jumping = false;
             this.navigation.stop();
             this.setTarget(null);
@@ -370,7 +370,7 @@ extends TameableEntity {
             this.setOwner(arg);
             this.navigation.stop();
             this.setTarget(null);
-            this.method_24346(true);
+            this.setSitting(true);
             this.world.sendEntityStatus(this, (byte)7);
             return true;
         } else {
@@ -464,7 +464,7 @@ extends TameableEntity {
         if (!lv.isTamed()) {
             return false;
         }
-        if (lv.isSitting()) {
+        if (lv.isInSittingPose()) {
             return false;
         }
         return this.isInLove() && lv.isInLove();

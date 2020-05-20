@@ -69,8 +69,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.EmptyBlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class AbstractBlock {
@@ -103,7 +103,7 @@ public abstract class AbstractBlock {
     }
 
     @Deprecated
-    public void prepare(BlockState arg, IWorld arg2, BlockPos arg3, int i) {
+    public void prepare(BlockState arg, WorldAccess arg2, BlockPos arg3, int i) {
     }
 
     @Deprecated
@@ -123,7 +123,7 @@ public abstract class AbstractBlock {
     }
 
     @Deprecated
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         return arg;
     }
 
@@ -143,7 +143,7 @@ public abstract class AbstractBlock {
     }
 
     @Deprecated
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (this.hasBlockEntity() && !arg.isOf(arg4.getBlock())) {
             arg2.removeBlockEntity(arg3);
         }
@@ -219,10 +219,10 @@ public abstract class AbstractBlock {
         if (lv == LootTables.EMPTY) {
             return Collections.emptyList();
         }
-        LootContext lv2 = arg2.put(LootContextParameters.BLOCK_STATE, arg).build(LootContextTypes.BLOCK);
+        LootContext lv2 = arg2.parameter(LootContextParameters.BLOCK_STATE, arg).build(LootContextTypes.BLOCK);
         ServerWorld lv3 = lv2.getWorld();
         LootTable lv4 = lv3.getServer().getLootManager().getTable(lv);
-        return lv4.getDrops(lv2);
+        return lv4.generateLoot(lv2);
     }
 
     @Deprecated
@@ -596,7 +596,7 @@ public abstract class AbstractBlock {
             this.getBlock().neighborUpdate(this.asBlockState(), arg, arg2, arg3, arg4, bl);
         }
 
-        public final void updateNeighbors(IWorld arg, BlockPos arg2, int i) {
+        public final void updateNeighbors(WorldAccess arg, BlockPos arg2, int i) {
             this.getBlock();
             BlockPos.Mutable lv = new BlockPos.Mutable();
             for (Direction lv2 : FACINGS) {
@@ -607,7 +607,7 @@ public abstract class AbstractBlock {
             }
         }
 
-        public void prepare(IWorld arg, BlockPos arg2, int i) {
+        public void prepare(WorldAccess arg, BlockPos arg2, int i) {
             this.getBlock().prepare(this.asBlockState(), arg, arg2, i);
         }
 
@@ -615,8 +615,8 @@ public abstract class AbstractBlock {
             this.getBlock().onBlockAdded(this.asBlockState(), arg, arg2, arg3, bl);
         }
 
-        public void onBlockRemoved(World arg, BlockPos arg2, BlockState arg3, boolean bl) {
-            this.getBlock().onBlockRemoved(this.asBlockState(), arg, arg2, arg3, bl);
+        public void onStateReplaced(World arg, BlockPos arg2, BlockState arg3, boolean bl) {
+            this.getBlock().onStateReplaced(this.asBlockState(), arg, arg2, arg3, bl);
         }
 
         public void scheduledTick(ServerWorld arg, BlockPos arg2, Random random) {
@@ -656,7 +656,7 @@ public abstract class AbstractBlock {
             return this.blockVisionPredicate.test(this.asBlockState(), arg, arg2);
         }
 
-        public BlockState getStateForNeighborUpdate(Direction arg, BlockState arg2, IWorld arg3, BlockPos arg4, BlockPos arg5) {
+        public BlockState getStateForNeighborUpdate(Direction arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, BlockPos arg5) {
             return this.getBlock().getStateForNeighborUpdate(this.asBlockState(), arg, arg2, arg3, arg4, arg5);
         }
 

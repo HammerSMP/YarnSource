@@ -1,11 +1,17 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.gen.chunk;
 
 import java.util.List;
 import java.util.stream.IntStream;
-import net.minecraft.entity.EntityCategory;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +20,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.OctavePerlinNoiseSampler;
 import net.minecraft.village.ZombieSiegeManager;
 import net.minecraft.world.ChunkRegion;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
@@ -23,10 +28,10 @@ import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.PhantomSpawner;
 import net.minecraft.world.gen.PillagerSpawner;
 import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.OverworldChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.level.LevelGeneratorType;
 
 public class OverworldChunkGenerator
 extends SurfaceChunkGenerator<OverworldChunkGeneratorConfig> {
@@ -38,18 +43,24 @@ extends SurfaceChunkGenerator<OverworldChunkGeneratorConfig> {
             }
         }
     });
-    private final OctavePerlinNoiseSampler noiseSampler;
-    private final boolean amplified;
+    private final OctavePerlinNoiseSampler depthNoiseSampler;
     private final PhantomSpawner phantomSpawner = new PhantomSpawner();
     private final PillagerSpawner pillagerSpawner = new PillagerSpawner();
     private final CatSpawner catSpawner = new CatSpawner();
     private final ZombieSiegeManager zombieSiegeManager = new ZombieSiegeManager();
+    private final OverworldChunkGeneratorConfig generatorConfig;
 
-    public OverworldChunkGenerator(IWorld arg, BiomeSource arg2, OverworldChunkGeneratorConfig arg3) {
-        super(arg, arg2, 4, 8, 256, arg3, true);
+    public OverworldChunkGenerator(BiomeSource arg, long l, OverworldChunkGeneratorConfig arg2) {
+        super(arg, l, arg2, 4, 8, 256, true);
+        this.generatorConfig = arg2;
         this.random.consume(2620);
-        this.noiseSampler = new OctavePerlinNoiseSampler(this.random, IntStream.rangeClosed(-15, 0));
-        this.amplified = arg.getLevelProperties().getGeneratorType() == LevelGeneratorType.AMPLIFIED;
+        this.depthNoiseSampler = new OctavePerlinNoiseSampler(this.random, IntStream.rangeClosed(-15, 0));
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public ChunkGenerator create(long l) {
+        return new OverworldChunkGenerator(this.biomeSource.create(l), l, this.generatorConfig);
     }
 
     @Override
@@ -97,7 +108,7 @@ extends SurfaceChunkGenerator<OverworldChunkGeneratorConfig> {
                 Biome lv = this.biomeSource.getBiomeForNoiseGen(i + n, l, j + o);
                 float p = lv.getDepth();
                 float q = lv.getScale();
-                if (this.amplified && p > 0.0f) {
+                if (this.generatorConfig.isOld() && p > 0.0f) {
                     p = 1.0f + p * 2.0f;
                     q = 1.0f + q * 4.0f;
                 }
@@ -114,13 +125,13 @@ extends SurfaceChunkGenerator<OverworldChunkGeneratorConfig> {
         g /= h;
         f = f * 0.9f + 0.1f;
         g = (g * 4.0f - 1.0f) / 8.0f;
-        ds[0] = (double)g + this.sampleNoise(i, j);
+        ds[0] = (double)g + this.sampleDepthNoise(i, j);
         ds[1] = f;
         return ds;
     }
 
-    private double sampleNoise(int i, int j) {
-        double d = this.noiseSampler.sample(i * 200, 10.0, j * 200, 1.0, 0.0, true) * 65535.0 / 8000.0;
+    private double sampleDepthNoise(int i, int j) {
+        double d = this.depthNoiseSampler.sample(i * 200, 10.0, j * 200, 1.0, 0.0, true) * 65535.0 / 8000.0;
         if (d < 0.0) {
             d = -d * 0.3;
         }
@@ -136,23 +147,23 @@ extends SurfaceChunkGenerator<OverworldChunkGeneratorConfig> {
     }
 
     @Override
-    public List<Biome.SpawnEntry> getEntitySpawnList(StructureAccessor arg, EntityCategory arg2, BlockPos arg3) {
-        if (Feature.SWAMP_HUT.method_14029(this.world, arg, arg3)) {
-            if (arg2 == EntityCategory.MONSTER) {
+    public List<Biome.SpawnEntry> getEntitySpawnList(Biome arg, StructureAccessor arg2, SpawnGroup arg3, BlockPos arg4) {
+        if (Feature.SWAMP_HUT.method_14029(arg2, arg4)) {
+            if (arg3 == SpawnGroup.MONSTER) {
                 return Feature.SWAMP_HUT.getMonsterSpawns();
             }
-            if (arg2 == EntityCategory.CREATURE) {
+            if (arg3 == SpawnGroup.CREATURE) {
                 return Feature.SWAMP_HUT.getCreatureSpawns();
             }
-        } else if (arg2 == EntityCategory.MONSTER) {
-            if (Feature.PILLAGER_OUTPOST.isApproximatelyInsideStructure(this.world, arg, arg3)) {
+        } else if (arg3 == SpawnGroup.MONSTER) {
+            if (Feature.PILLAGER_OUTPOST.isApproximatelyInsideStructure(arg2, arg4)) {
                 return Feature.PILLAGER_OUTPOST.getMonsterSpawns();
             }
-            if (Feature.OCEAN_MONUMENT.isApproximatelyInsideStructure(this.world, arg, arg3)) {
+            if (Feature.OCEAN_MONUMENT.isApproximatelyInsideStructure(arg2, arg4)) {
                 return Feature.OCEAN_MONUMENT.getMonsterSpawns();
             }
         }
-        return super.getEntitySpawnList(arg, arg2, arg3);
+        return super.getEntitySpawnList(arg, arg2, arg3, arg4);
     }
 
     @Override
@@ -161,11 +172,6 @@ extends SurfaceChunkGenerator<OverworldChunkGeneratorConfig> {
         this.pillagerSpawner.spawn(arg, bl, bl2);
         this.catSpawner.spawn(arg, bl, bl2);
         this.zombieSiegeManager.spawn(arg, bl, bl2);
-    }
-
-    @Override
-    public int getSpawnHeight() {
-        return this.world.getSeaLevel() + 1;
     }
 
     @Override

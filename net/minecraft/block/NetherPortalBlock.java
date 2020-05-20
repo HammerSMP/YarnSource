@@ -23,7 +23,7 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
@@ -40,8 +40,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class NetherPortalBlock
 extends Block {
@@ -66,18 +66,18 @@ extends Block {
 
     @Override
     public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.dimension.hasVisibleSky() && arg2.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING) && random.nextInt(2000) < arg2.getDifficulty().getId()) {
+        if (arg2.getDimension().hasVisibleSky() && arg2.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING) && random.nextInt(2000) < arg2.getDifficulty().getId()) {
             ZombifiedPiglinEntity lv;
             while (arg2.getBlockState(arg3).isOf(this)) {
                 arg3 = arg3.down();
             }
-            if (arg2.getBlockState(arg3).allowsSpawning(arg2, arg3, EntityType.ZOMBIFIED_PIGLIN) && (lv = EntityType.ZOMBIFIED_PIGLIN.spawn(arg2, null, null, null, arg3.up(), SpawnType.STRUCTURE, false, false)) != null) {
+            if (arg2.getBlockState(arg3).allowsSpawning(arg2, arg3, EntityType.ZOMBIFIED_PIGLIN) && (lv = EntityType.ZOMBIFIED_PIGLIN.spawn(arg2, null, null, null, arg3.up(), SpawnReason.STRUCTURE, false, false)) != null) {
                 lv.netherPortalCooldown = lv.getDefaultNetherPortalCooldown();
             }
         }
     }
 
-    public static boolean createPortalAt(IWorld arg, BlockPos arg2) {
+    public static boolean createPortalAt(WorldAccess arg, BlockPos arg2) {
         AreaHelper lv = NetherPortalBlock.createAreaHelper(arg, arg2);
         if (lv != null) {
             lv.createPortal();
@@ -87,7 +87,7 @@ extends Block {
     }
 
     @Nullable
-    public static AreaHelper createAreaHelper(IWorld arg, BlockPos arg2) {
+    public static AreaHelper createAreaHelper(WorldAccess arg, BlockPos arg2) {
         AreaHelper lv = new AreaHelper(arg, arg2, Direction.Axis.X);
         if (lv.isValid() && lv.foundPortalBlocks == 0) {
             return lv;
@@ -100,7 +100,7 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         boolean bl;
         Direction.Axis lv = arg2.getAxis();
         Direction.Axis lv2 = arg.get(AXIS);
@@ -173,7 +173,7 @@ extends Block {
         arg.add(AXIS);
     }
 
-    public static BlockPattern.Result findPortal(IWorld arg, BlockPos arg2) {
+    public static BlockPattern.Result findPortal(WorldAccess arg, BlockPos arg2) {
         Direction.Axis lv = Direction.Axis.Z;
         AreaHelper lv2 = new AreaHelper(arg, arg2, Direction.Axis.X);
         LoadingCache<BlockPos, CachedBlockPosition> loadingCache = BlockPattern.makeCache(arg, true);
@@ -207,7 +207,7 @@ extends Block {
     }
 
     public static class AreaHelper {
-        private final IWorld world;
+        private final WorldAccess world;
         private final Direction.Axis axis;
         private final Direction negativeDir;
         private final Direction positiveDir;
@@ -217,7 +217,7 @@ extends Block {
         private int height;
         private int width;
 
-        public AreaHelper(IWorld arg, BlockPos arg2, Direction.Axis arg3) {
+        public AreaHelper(WorldAccess arg, BlockPos arg2, Direction.Axis arg3) {
             this.world = arg;
             this.axis = arg3;
             if (arg3 == Direction.Axis.X) {

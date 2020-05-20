@@ -433,7 +433,7 @@ public class EntitySelectorOptions {
                 if (lv2 == null) {
                     return false;
                 }
-                LootContext lv3 = new LootContext.Builder(lv).put(LootContextParameters.THIS_ENTITY, arg2).put(LootContextParameters.POSITION, arg2.getBlockPos()).build(LootContextTypes.SELECTOR);
+                LootContext lv3 = new LootContext.Builder(lv).parameter(LootContextParameters.THIS_ENTITY, arg2).parameter(LootContextParameters.POSITION, arg2.getBlockPos()).build(LootContextTypes.SELECTOR);
                 return bl ^ lv2.test(lv3);
             });
         }, arg -> true, new TranslatableText("argument.entity.options.predicate.description"));

@@ -443,26 +443,26 @@ implements ResourceReloadListener {
         int k = arg.getZ();
         float f = 0.1f;
         Box lv2 = lv.getOutlineShape(this.world, arg).getBoundingBox();
-        double d = (double)i + this.random.nextDouble() * (lv2.x2 - lv2.x1 - (double)0.2f) + (double)0.1f + lv2.x1;
-        double e = (double)j + this.random.nextDouble() * (lv2.y2 - lv2.y1 - (double)0.2f) + (double)0.1f + lv2.y1;
-        double g = (double)k + this.random.nextDouble() * (lv2.z2 - lv2.z1 - (double)0.2f) + (double)0.1f + lv2.z1;
+        double d = (double)i + this.random.nextDouble() * (lv2.maxX - lv2.minX - (double)0.2f) + (double)0.1f + lv2.minX;
+        double e = (double)j + this.random.nextDouble() * (lv2.maxY - lv2.minY - (double)0.2f) + (double)0.1f + lv2.minY;
+        double g = (double)k + this.random.nextDouble() * (lv2.maxZ - lv2.minZ - (double)0.2f) + (double)0.1f + lv2.minZ;
         if (arg2 == Direction.DOWN) {
-            e = (double)j + lv2.y1 - (double)0.1f;
+            e = (double)j + lv2.minY - (double)0.1f;
         }
         if (arg2 == Direction.UP) {
-            e = (double)j + lv2.y2 + (double)0.1f;
+            e = (double)j + lv2.maxY + (double)0.1f;
         }
         if (arg2 == Direction.NORTH) {
-            g = (double)k + lv2.z1 - (double)0.1f;
+            g = (double)k + lv2.minZ - (double)0.1f;
         }
         if (arg2 == Direction.SOUTH) {
-            g = (double)k + lv2.z2 + (double)0.1f;
+            g = (double)k + lv2.maxZ + (double)0.1f;
         }
         if (arg2 == Direction.WEST) {
-            d = (double)i + lv2.x1 - (double)0.1f;
+            d = (double)i + lv2.minX - (double)0.1f;
         }
         if (arg2 == Direction.EAST) {
-            d = (double)i + lv2.x2 + (double)0.1f;
+            d = (double)i + lv2.maxX + (double)0.1f;
         }
         this.addParticle(new BlockDustParticle(this.world, d, e, g, 0.0, 0.0, 0.0, lv).setBlockPos(arg).move(0.2f).scale(0.6f));
     }

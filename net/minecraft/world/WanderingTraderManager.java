@@ -11,8 +11,8 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.class_5268;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.SpawnRestriction;
-import net.minecraft.entity.SpawnType;
 import net.minecraft.entity.passive.TraderLlamaEntity;
 import net.minecraft.entity.passive.WanderingTraderEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -94,7 +94,7 @@ public class WanderingTraderManager {
             if (this.world.getBiome(lv5) == Biomes.THE_VOID) {
                 return false;
             }
-            WanderingTraderEntity lv6 = EntityType.WANDERING_TRADER.spawn(this.world, null, null, null, lv5, SpawnType.EVENT, false, false);
+            WanderingTraderEntity lv6 = EntityType.WANDERING_TRADER.spawn(this.world, null, null, null, lv5, SpawnReason.EVENT, false, false);
             if (lv6 != null) {
                 for (int j = 0; j < 2; ++j) {
                     this.spawnLlama(lv6, 4);
@@ -114,7 +114,7 @@ public class WanderingTraderManager {
         if (lv == null) {
             return;
         }
-        TraderLlamaEntity lv2 = EntityType.TRADER_LLAMA.spawn(this.world, null, null, null, lv, SpawnType.EVENT, false, false);
+        TraderLlamaEntity lv2 = EntityType.TRADER_LLAMA.spawn(this.world, null, null, null, lv, SpawnReason.EVENT, false, false);
         if (lv2 == null) {
             return;
         }

@@ -25,7 +25,7 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.control.MoveControl;
@@ -64,9 +64,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class TurtleEntity
@@ -175,13 +175,13 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setHomePos(this.getBlockPos());
         this.setTravelPos(BlockPos.ORIGIN);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
 
-    public static boolean canSpawn(EntityType<TurtleEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<TurtleEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg4.getY() < arg2.getSeaLevel() + 4 && arg2.getBlockState(arg4.down()).isOf(Blocks.SAND) && arg2.getBaseLightLevel(arg4, 0) > 8;
     }
 
@@ -665,7 +665,7 @@ extends AnimalEntity {
                 ++this.homeReachingTryTicks;
             }
             if (this.turtle.getNavigation().isIdle()) {
-                Vec3d lv2 = Vec3d.method_24955(lv);
+                Vec3d lv2 = Vec3d.ofBottomCenter(lv);
                 Vec3d lv3 = TargetFinder.findTargetTowards(this.turtle, 16, 3, lv2, 0.3141592741012573);
                 if (lv3 == null) {
                     lv3 = TargetFinder.findTargetTowards(this.turtle, 8, 7, lv2);
@@ -718,7 +718,7 @@ extends AnimalEntity {
         @Override
         public void tick() {
             if (this.turtle.getNavigation().isIdle()) {
-                Vec3d lv = Vec3d.method_24955(this.turtle.getTravelPos());
+                Vec3d lv = Vec3d.ofBottomCenter(this.turtle.getTravelPos());
                 Vec3d lv2 = TargetFinder.findTargetTowards(this.turtle, 16, 3, lv, 0.3141592741012573);
                 if (lv2 == null) {
                     lv2 = TargetFinder.findTargetTowards(this.turtle, 8, 7, lv);

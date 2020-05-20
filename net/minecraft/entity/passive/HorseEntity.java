@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -36,9 +36,9 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class HorseEntity
 extends HorseBaseEntity {
@@ -271,10 +271,10 @@ extends HorseBaseEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         HorseColor lv2;
         if (arg4 instanceof HorseData) {
-            HorseColor lv = ((HorseData)arg4).variant;
+            HorseColor lv = ((HorseData)arg4).color;
         } else {
             lv2 = Util.getRandom(HorseColor.values(), this.random);
             arg4 = new HorseData(lv2);
@@ -285,10 +285,10 @@ extends HorseBaseEntity {
 
     public static class HorseData
     extends PassiveEntity.PassiveData {
-        public final HorseColor variant;
+        public final HorseColor color;
 
         public HorseData(HorseColor arg) {
-            this.variant = arg;
+            this.color = arg;
         }
     }
 }

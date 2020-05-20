@@ -30,7 +30,7 @@ extends AbstractFurnaceBlockEntity {
     }
 
     @Override
-    protected ScreenHandler createContainer(int i, PlayerInventory arg) {
+    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
         return new SmokerScreenHandler(i, arg, this, this.propertyDelegate);
     }
 }

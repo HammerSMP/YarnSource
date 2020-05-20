@@ -31,8 +31,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public abstract class AbstractButtonBlock
 extends WallMountedBlock {
@@ -113,21 +113,21 @@ extends WallMountedBlock {
         arg2.getBlockTickScheduler().schedule(arg3, this, this.getPressTicks());
     }
 
-    protected void playClickSound(@Nullable PlayerEntity arg, IWorld arg2, BlockPos arg3, boolean bl) {
+    protected void playClickSound(@Nullable PlayerEntity arg, WorldAccess arg2, BlockPos arg3, boolean bl) {
         arg2.playSound(bl ? arg : null, arg3, this.getClickSound(bl), SoundCategory.BLOCKS, 0.3f, bl ? 0.6f : 0.5f);
     }
 
     protected abstract SoundEvent getClickSound(boolean var1);
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (bl || arg.isOf(arg4.getBlock())) {
             return;
         }
         if (arg.get(POWERED).booleanValue()) {
             this.updateNeighbors(arg, arg2, arg3);
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override

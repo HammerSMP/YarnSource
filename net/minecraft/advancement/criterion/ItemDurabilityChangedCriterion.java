@@ -57,8 +57,8 @@ extends AbstractCriterion<Conditions> {
             this.delta = arg4;
         }
 
-        public static Conditions create(ItemPredicate arg, NumberRange.IntRange arg2) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, arg2, NumberRange.IntRange.ANY);
+        public static Conditions create(EntityPredicate.Extended arg, ItemPredicate arg2, NumberRange.IntRange arg3) {
+            return new Conditions(arg, arg2, arg3, NumberRange.IntRange.ANY);
         }
 
         public boolean matches(ItemStack arg, int i) {

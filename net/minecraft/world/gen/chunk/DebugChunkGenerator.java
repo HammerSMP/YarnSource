@@ -1,11 +1,17 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.gen.chunk;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -14,26 +20,34 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.DebugChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
 
 public class DebugChunkGenerator
-extends ChunkGenerator<DebugChunkGeneratorConfig> {
+extends ChunkGenerator {
+    public static final ChunkGenerator generator = new DebugChunkGenerator();
     private static final List<BlockState> BLOCK_STATES = StreamSupport.stream(Registry.BLOCK.spliterator(), false).flatMap(arg -> arg.getStateManager().getStates().stream()).collect(Collectors.toList());
     private static final int X_SIDE_LENGTH = MathHelper.ceil(MathHelper.sqrt(BLOCK_STATES.size()));
     private static final int Z_SIDE_LENGTH = MathHelper.ceil((float)BLOCK_STATES.size() / (float)X_SIDE_LENGTH);
     protected static final BlockState AIR = Blocks.AIR.getDefaultState();
     protected static final BlockState BARRIER = Blocks.BARRIER.getDefaultState();
 
-    public DebugChunkGenerator(IWorld arg, BiomeSource arg2, DebugChunkGeneratorConfig arg3) {
-        super(arg, arg2, arg3);
+    private DebugChunkGenerator() {
+        super(new FixedBiomeSource(Biomes.PLAINS), new ChunkGeneratorConfig());
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public ChunkGenerator create(long l) {
+        return this;
     }
 
     @Override
@@ -41,12 +55,7 @@ extends ChunkGenerator<DebugChunkGeneratorConfig> {
     }
 
     @Override
-    public void carve(BiomeAccess arg, Chunk arg2, GenerationStep.Carver arg3) {
-    }
-
-    @Override
-    public int getSpawnHeight() {
-        return this.world.getSeaLevel() + 1;
+    public void carve(long l, BiomeAccess arg, Chunk arg2, GenerationStep.Carver arg3) {
     }
 
     @Override
@@ -67,7 +76,7 @@ extends ChunkGenerator<DebugChunkGeneratorConfig> {
     }
 
     @Override
-    public void populateNoise(IWorld arg, StructureAccessor arg2, Chunk arg3) {
+    public void populateNoise(WorldAccess arg, StructureAccessor arg2, Chunk arg3) {
     }
 
     @Override

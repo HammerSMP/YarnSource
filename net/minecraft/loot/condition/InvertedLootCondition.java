@@ -38,9 +38,9 @@ implements LootCondition {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
-        LootCondition.super.check(arg);
-        this.term.check(arg);
+    public void validate(LootTableReporter arg) {
+        LootCondition.super.validate(arg);
+        this.term.validate(arg);
     }
 
     public static LootCondition.Builder builder(LootCondition.Builder arg) {

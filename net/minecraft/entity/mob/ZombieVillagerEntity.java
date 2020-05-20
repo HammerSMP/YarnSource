@@ -26,7 +26,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityInteraction;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -52,9 +52,9 @@ import net.minecraft.village.VillagerData;
 import net.minecraft.village.VillagerDataContainer;
 import net.minecraft.village.VillagerProfession;
 import net.minecraft.village.VillagerType;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class ZombieVillagerEntity
 extends ZombieEntity
@@ -196,13 +196,13 @@ implements VillagerDataContainer {
         lv.copyPositionAndRotation(this);
         lv.setVillagerData(this.getVillagerData());
         if (this.gossipData != null) {
-            lv.method_21650(this.gossipData);
+            lv.setGossipDataFromTag(this.gossipData);
         }
         if (this.offerData != null) {
             lv.setOffers(new TraderOfferList(this.offerData));
         }
         lv.setExperience(this.xp);
-        lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnType.CONVERSION, null, null);
+        lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, null, null);
         if (this.isBaby()) {
             lv.setBreedingAge(-24000);
         }
@@ -291,7 +291,7 @@ implements VillagerDataContainer {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setVillagerData(this.getVillagerData().withType(VillagerType.forBiome(arg.getBiome(this.getBlockPos()))));
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }

@@ -15,6 +15,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.class_5275;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityPose;
@@ -23,7 +24,7 @@ import net.minecraft.entity.ItemSteerable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Saddleable;
 import net.minecraft.entity.SaddledComponent;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FollowParentGoal;
@@ -64,10 +65,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class StriderEntity
@@ -93,7 +93,7 @@ Saddleable {
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, 0.0f);
     }
 
-    public static boolean canSpawn(EntityType<StriderEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<StriderEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg2.getBlockState(arg4.up()).isAir();
     }
 
@@ -222,8 +222,8 @@ Saddleable {
     public Vec3d method_24829(LivingEntity arg) {
         Vec3d[] lvs = new Vec3d[]{StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw - 22.5f), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw + 22.5f), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw - 45.0f), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw + 45.0f)};
         LinkedHashSet set = Sets.newLinkedHashSet();
-        double d = this.getBoundingBox().y2;
-        double e = this.getBoundingBox().y1 - 0.5;
+        double d = this.getBoundingBox().maxY;
+        double e = this.getBoundingBox().minY - 0.5;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Vec3d lv2 : lvs) {
             lv.set(this.getX() + lv2.x, d, this.getZ() + lv2.z);
@@ -234,17 +234,16 @@ Saddleable {
         }
         for (BlockPos lv3 : set) {
             if (this.world.getFluidState(lv3).matches(FluidTags.LAVA)) continue;
-            Vec3d lv4 = Vec3d.method_24955(lv3);
-            for (EntityPose lv5 : arg.getPoses()) {
-                Box lv7;
-                Box lv6 = arg.method_24833(lv5).offset(lv4);
+            for (EntityPose lv4 : arg.getPoses()) {
+                Vec3d lv6;
+                Box lv5;
                 double g = this.world.method_26372(lv3);
-                if (Double.isInfinite(g) || !(g < 1.0) || !this.world.getBlockCollisions(arg, lv7 = lv6.offset(0.0, g, 0.0)).allMatch(VoxelShape::isEmpty)) continue;
-                arg.setPose(lv5);
-                return new Vec3d(lv4.x, (double)lv3.getY() + g, lv4.z);
+                if (!class_5275.method_27932(g) || !class_5275.method_27933(this.world, arg, (lv5 = arg.method_24833(lv4)).offset(lv6 = Vec3d.ofCenter(lv3, g)))) continue;
+                arg.setPose(lv4);
+                return lv6;
             }
         }
-        return new Vec3d(this.getX(), this.getBoundingBox().y2, this.getZ());
+        return new Vec3d(this.getX(), this.getBoundingBox().maxY, this.getZ());
     }
 
     @Override
@@ -414,7 +413,7 @@ Saddleable {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         ZombifiedPiglinEntity lv8;
         StriderData.RiderType lv5;
         if (arg4 instanceof StriderData) {
@@ -446,7 +445,7 @@ Saddleable {
         }
         if (lv6 != null) {
             lv6.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-            lv6.initialize(arg, arg2, SpawnType.JOCKEY, null, null);
+            lv6.initialize(arg, arg2, SpawnReason.JOCKEY, null, null);
             lv6.startRiding(this, true);
             arg.spawnEntity(lv6);
         }

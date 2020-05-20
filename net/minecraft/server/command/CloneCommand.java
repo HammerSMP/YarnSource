@@ -47,7 +47,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class CloneCommand {
     private static final SimpleCommandExceptionType OVERLAP_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.clone.overlap"));
-    private static final Dynamic2CommandExceptionType TOOBIG_EXCEPTION = new Dynamic2CommandExceptionType((object, object2) -> new TranslatableText("commands.clone.toobig", object, object2));
+    private static final Dynamic2CommandExceptionType TOO_BIG_EXCEPTION = new Dynamic2CommandExceptionType((object, object2) -> new TranslatableText("commands.clone.toobig", object, object2));
     private static final SimpleCommandExceptionType FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.clone.failed"));
     public static final Predicate<CachedBlockPosition> IS_AIR_PREDICATE = arg -> !arg.getBlockState().isAir();
 
@@ -64,7 +64,7 @@ public class CloneCommand {
         }
         int i = lv.getBlockCountX() * lv.getBlockCountY() * lv.getBlockCountZ();
         if (i > 32768) {
-            throw TOOBIG_EXCEPTION.create((Object)32768, (Object)i);
+            throw TOO_BIG_EXCEPTION.create((Object)32768, (Object)i);
         }
         ServerWorld lv4 = arg.getWorld();
         if (!lv4.isRegionLoaded(arg2, arg3) || !lv4.isRegionLoaded(arg4, lv2)) {

@@ -32,23 +32,23 @@ extends LeafEntry {
     }
 
     @Override
-    public void drop(Consumer<ItemStack> consumer, LootContext arg) {
+    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
         LootTable lv = arg.getSupplier(this.id);
-        lv.drop(arg, consumer);
+        lv.generateUnprocessedLoot(arg, consumer);
     }
 
     @Override
-    public void check(LootTableReporter arg) {
+    public void validate(LootTableReporter arg) {
         if (arg.hasTable(this.id)) {
             arg.report("Table " + this.id + " is recursively called");
             return;
         }
-        super.check(arg);
+        super.validate(arg);
         LootTable lv = arg.getTable(this.id);
         if (lv == null) {
             arg.report("Unknown loot table called " + this.id);
         } else {
-            lv.check(arg.withTable("->{" + this.id + "}", this.id));
+            lv.validate(arg.withTable("->{" + this.id + "}", this.id));
         }
     }
 

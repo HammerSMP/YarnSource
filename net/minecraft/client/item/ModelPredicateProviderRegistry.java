@@ -102,15 +102,17 @@ public class ModelPredicateProviderRegistry {
             public float call(ItemStack arg, @Nullable ClientWorld arg2, @Nullable LivingEntity arg3) {
                 double e;
                 Entity lv;
-                boolean bl = arg3 != null;
-                Entity entity = lv = bl ? arg3 : arg.getFrame();
-                if (arg2 == null && lv != null && lv.world instanceof ClientWorld) {
+                Entity entity = lv = arg3 != null ? arg3 : arg.getHolder();
+                if (lv == null) {
+                    return 0.0f;
+                }
+                if (arg2 == null && lv.world instanceof ClientWorld) {
                     arg2 = (ClientWorld)lv.world;
                 }
                 if (arg2 == null) {
                     return 0.0f;
                 }
-                if (arg2.dimension.hasVisibleSky()) {
+                if (arg2.getDimension().hasVisibleSky()) {
                     double d = arg2.getSkyAngle(1.0f);
                 } else {
                     e = Math.random();
@@ -167,7 +169,7 @@ public class ModelPredicateProviderRegistry {
                     e = arg3.bodyYaw;
                 }
                 e = MathHelper.floorMod(e / 360.0, 1.0);
-                double f = this.getAngleToPos(Vec3d.method_24953(lv2), lv) / 6.2831854820251465;
+                double f = this.getAngleToPos(Vec3d.ofCenter(lv2), lv) / 6.2831854820251465;
                 if (bl) {
                     if (this.value.shouldUpdate(l)) {
                         this.value.update(l, 0.5 - (e - 0.25));
@@ -181,7 +183,7 @@ public class ModelPredicateProviderRegistry {
 
             @Nullable
             private BlockPos getSpawnPos(ClientWorld arg) {
-                return arg.dimension.hasVisibleSky() ? arg.getSpawnPos() : null;
+                return arg.getDimension().hasVisibleSky() ? arg.getSpawnPos() : null;
             }
 
             @Nullable
@@ -189,7 +191,7 @@ public class ModelPredicateProviderRegistry {
                 Optional<DimensionType> optional;
                 boolean bl = arg2.contains("LodestonePos");
                 boolean bl2 = arg2.contains("LodestoneDimension");
-                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.dimension.getType().equals(optional.get())) {
+                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.method_27983().equals(optional.get())) {
                     return NbtHelper.toBlockPos((CompoundTag)arg2.get("LodestonePos"));
                 }
                 return null;

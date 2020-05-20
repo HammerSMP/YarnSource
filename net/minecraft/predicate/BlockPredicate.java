@@ -121,8 +121,13 @@ public class BlockPredicate {
             return new Builder();
         }
 
-        public Builder tag(Tag<Block> arg) {
-            this.tag = arg;
+        public Builder block(Block arg) {
+            this.block = arg;
+            return this;
+        }
+
+        public Builder state(StatePredicate arg) {
+            this.state = arg;
             return this;
         }
 

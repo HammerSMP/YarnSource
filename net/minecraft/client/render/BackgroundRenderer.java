@@ -30,7 +30,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.Dimension;
 
 @Environment(value=EnvType.CLIENT)
 public class BackgroundRenderer {
@@ -84,21 +83,20 @@ public class BackgroundRenderer {
             float x = (float)lv2.z;
             float y = MathHelper.clamp(MathHelper.cos(arg2.getSkyAngle(f) * ((float)Math.PI * 2)) * 2.0f + 0.5f, 0.0f, 1.0f);
             BiomeAccess lv3 = arg2.getBiomeAccess();
-            Dimension lv4 = arg2.getDimension();
-            Vec3d lv5 = arg.getPos().subtract(2.0, 2.0, 2.0).multiply(0.25);
-            Vec3d lv6 = CubicSampler.sampleColor(lv5, (i, j, k) -> lv4.modifyFogColor(Vec3d.unpackRgb(lv3.getBiomeForNoiseGen(i, j, k).getFogColor()), y));
-            red = (float)lv6.getX();
-            green = (float)lv6.getY();
-            blue = (float)lv6.getZ();
+            Vec3d lv4 = arg.getPos().subtract(2.0, 2.0, 2.0).multiply(0.25);
+            Vec3d lv5 = CubicSampler.sampleColor(lv4, (i, j, k) -> arg2.method_28103().method_28112(Vec3d.unpackRgb(lv3.getBiomeForNoiseGen(i, j, k).getFogColor()), y));
+            red = (float)lv5.getX();
+            green = (float)lv5.getY();
+            blue = (float)lv5.getZ();
             if (i2 >= 4) {
                 float[] fs;
                 float z = MathHelper.sin(arg2.getSkyAngleRadians(f)) > 0.0f ? -1.0f : 1.0f;
-                Vector3f lv7 = new Vector3f(z, 0.0f, 0.0f);
-                float aa = arg.getHorizontalPlane().dot(lv7);
+                Vector3f lv6 = new Vector3f(z, 0.0f, 0.0f);
+                float aa = arg.getHorizontalPlane().dot(lv6);
                 if (aa < 0.0f) {
                     aa = 0.0f;
                 }
-                if (aa > 0.0f && (fs = arg2.dimension.getBackgroundColor(arg2.getSkyAngle(f), f)) != null) {
+                if (aa > 0.0f && (fs = arg2.method_28103().method_28109(arg2.getSkyAngle(f), f)) != null) {
                     red = red * (1.0f - (aa *= fs[3])) + fs[0] * aa;
                     green = green * (1.0f - aa) + fs[1] * aa;
                     blue = blue * (1.0f - aa) + fs[2] * aa;
@@ -123,7 +121,7 @@ public class BackgroundRenderer {
             }
             lastWaterFogColorUpdateTime = -1L;
         }
-        double d = arg.getPos().y * arg2.dimension.getHorizonShadingRatio();
+        double d = arg.getPos().y * arg2.getLevelProperties().method_28106();
         if (arg.getFocusedEntity() instanceof LivingEntity && ((LivingEntity)arg.getFocusedEntity()).hasStatusEffect(StatusEffects.BLINDNESS)) {
             int ag = ((LivingEntity)arg.getFocusedEntity()).getStatusEffect(StatusEffects.BLINDNESS).getDuration();
             d = ag < 20 ? (d *= (double)(1.0f - (float)ag / 20.0f)) : 0.0;
@@ -145,8 +143,8 @@ public class BackgroundRenderer {
         if (lv.matches(FluidTags.WATER)) {
             float ah = 0.0f;
             if (arg.getFocusedEntity() instanceof ClientPlayerEntity) {
-                ClientPlayerEntity lv8 = (ClientPlayerEntity)arg.getFocusedEntity();
-                ah = lv8.getUnderwaterVisibility();
+                ClientPlayerEntity lv7 = (ClientPlayerEntity)arg.getFocusedEntity();
+                ah = lv7.getUnderwaterVisibility();
             }
             float ai = Math.min(1.0f / red, Math.min(1.0f / green, 1.0f / blue));
             red = red * (1.0f - ah) + red * ai * ah;

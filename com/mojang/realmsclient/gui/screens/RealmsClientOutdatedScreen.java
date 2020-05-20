@@ -36,11 +36,11 @@ extends RealmsScreen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         TranslatableText lv = new TranslatableText(this.outdated ? "mco.client.outdated.title" : "mco.client.incompatible.title");
-        this.drawStringWithShadow(arg, this.textRenderer, lv, this.width / 2, RealmsClientOutdatedScreen.row(3), 0xFF0000);
+        this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, RealmsClientOutdatedScreen.row(3), 0xFF0000);
         int k = this.outdated ? 2 : 3;
         for (int l = 0; l < k; ++l) {
             String string = (this.outdated ? "mco.client.outdated.msg.line" : "mco.client.incompatible.msg.line") + (l + 1);
-            this.drawStringWithShadow(arg, this.textRenderer, new TranslatableText(string), this.width / 2, RealmsClientOutdatedScreen.row(5) + l * 12, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, new TranslatableText(string), this.width / 2, RealmsClientOutdatedScreen.row(5) + l * 12, 0xFFFFFF);
         }
         super.render(arg, i, j, f);
     }

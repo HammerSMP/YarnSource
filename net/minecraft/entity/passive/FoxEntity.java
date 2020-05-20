@@ -37,7 +37,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.control.LookControl;
 import net.minecraft.entity.ai.control.MoveControl;
@@ -92,9 +92,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -269,7 +269,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         Biome lv = arg.getBiome(this.getBlockPos());
         Type lv2 = Type.fromBiome(lv);
         boolean bl = false;
@@ -457,6 +457,7 @@ extends AnimalEntity {
                 this.dropItem(lv.split(i - 1));
             }
             this.spit(this.getEquippedStack(EquipmentSlot.MAINHAND));
+            this.method_27964(arg);
             this.equipStack(EquipmentSlot.MAINHAND, lv.split(1));
             this.handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2.0f;
             this.sendPickup(arg, lv.getCount());
@@ -1075,7 +1076,7 @@ extends AnimalEntity {
         }
 
         protected boolean isAtFavoredLocation() {
-            BlockPos lv = new BlockPos(FoxEntity.this.getX(), FoxEntity.this.getBoundingBox().y2, FoxEntity.this.getZ());
+            BlockPos lv = new BlockPos(FoxEntity.this.getX(), FoxEntity.this.getBoundingBox().maxY, FoxEntity.this.getZ());
             return !FoxEntity.this.world.isSkyVisible(lv) && FoxEntity.this.getPathfindingFavor(lv) >= 0.0f;
         }
 
@@ -1175,7 +1176,7 @@ extends AnimalEntity {
 
         @Override
         public void start() {
-            this.method_24632(this.offender);
+            this.setTargetEntity(this.offender);
             this.targetEntity = this.offender;
             if (this.friend != null) {
                 this.lastAttackedTime = this.friend.getLastAttackedTime();

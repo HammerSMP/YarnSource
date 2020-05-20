@@ -25,7 +25,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.AttackGoal;
 import net.minecraft.entity.ai.goal.CatSitOnBlockGoal;
@@ -74,9 +74,9 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.feature.Feature;
 
 public class CatEntity
@@ -360,7 +360,7 @@ extends TameableEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
         if (arg.getMoonSize() > 0.9f) {
             this.setCatType(this.random.nextInt(11));
@@ -368,7 +368,7 @@ extends TameableEntity {
             this.setCatType(this.random.nextInt(10));
         }
         World lv = arg.getWorld();
-        if (lv instanceof ServerWorld && Feature.SWAMP_HUT.isInsideStructure(arg, ((ServerWorld)lv).getStructureAccessor(), this.getBlockPos())) {
+        if (lv instanceof ServerWorld && Feature.SWAMP_HUT.isInsideStructure(((ServerWorld)lv).getStructureAccessor(), this.getBlockPos())) {
             this.setCatType(10);
             this.setPersistent();
         }
@@ -448,7 +448,7 @@ extends TameableEntity {
             if (!this.cat.isTamed()) {
                 return false;
             }
-            if (this.cat.method_24345()) {
+            if (this.cat.isSitting()) {
                 return false;
             }
             LivingEntity lv = this.cat.getOwner();
@@ -481,13 +481,13 @@ extends TameableEntity {
 
         @Override
         public boolean shouldContinue() {
-            return this.cat.isTamed() && !this.cat.method_24345() && this.owner != null && this.owner.isSleeping() && this.bedPos != null && !this.method_16098();
+            return this.cat.isTamed() && !this.cat.isSitting() && this.owner != null && this.owner.isSleeping() && this.bedPos != null && !this.method_16098();
         }
 
         @Override
         public void start() {
             if (this.bedPos != null) {
-                this.cat.setSitting(false);
+                this.cat.setInSittingPose(false);
                 this.cat.getNavigation().startMovingTo(this.bedPos.getX(), this.bedPos.getY(), this.bedPos.getZ(), 1.1f);
             }
         }
@@ -511,8 +511,8 @@ extends TameableEntity {
             this.cat.teleport(lv.getX() + random.nextInt(11) - 5, lv.getY() + random.nextInt(5) - 2, lv.getZ() + random.nextInt(11) - 5, false);
             lv.set(this.cat.getBlockPos());
             LootTable lv2 = this.cat.world.getServer().getLootManager().getTable(LootTables.CAT_MORNING_GIFT_GAMEPLAY);
-            LootContext.Builder lv3 = new LootContext.Builder((ServerWorld)this.cat.world).put(LootContextParameters.POSITION, lv).put(LootContextParameters.THIS_ENTITY, this.cat).setRandom(random);
-            List<ItemStack> list = lv2.getDrops(lv3.build(LootContextTypes.GIFT));
+            LootContext.Builder lv3 = new LootContext.Builder((ServerWorld)this.cat.world).parameter(LootContextParameters.POSITION, lv).parameter(LootContextParameters.THIS_ENTITY, this.cat).random(random);
+            List<ItemStack> list = lv2.generateLoot(lv3.build(LootContextTypes.GIFT));
             for (ItemStack lv4 : list) {
                 this.cat.world.spawnEntity(new ItemEntity(this.cat.world, (float)lv.getX() - MathHelper.sin(this.cat.bodyYaw * ((float)Math.PI / 180)), lv.getY(), (float)lv.getZ() + MathHelper.cos(this.cat.bodyYaw * ((float)Math.PI / 180)), lv4));
             }
@@ -521,7 +521,7 @@ extends TameableEntity {
         @Override
         public void tick() {
             if (this.owner != null && this.bedPos != null) {
-                this.cat.setSitting(false);
+                this.cat.setInSittingPose(false);
                 this.cat.getNavigation().startMovingTo(this.bedPos.getX(), this.bedPos.getY(), this.bedPos.getZ(), 1.1f);
                 if (this.cat.squaredDistanceTo(this.owner) < 2.5) {
                     ++this.ticksOnBed;

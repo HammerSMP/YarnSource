@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.mob.HostileEntity;
@@ -26,10 +26,10 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public abstract class PatrolEntity
 extends HostileEntity {
@@ -78,21 +78,21 @@ extends HostileEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 != SpawnType.PATROL && arg3 != SpawnType.EVENT && arg3 != SpawnType.STRUCTURE && this.random.nextFloat() < 0.06f && this.canLead()) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+        if (arg3 != SpawnReason.PATROL && arg3 != SpawnReason.EVENT && arg3 != SpawnReason.STRUCTURE && this.random.nextFloat() < 0.06f && this.canLead()) {
             this.patrolLeader = true;
         }
         if (this.isPatrolLeader()) {
             this.equipStack(EquipmentSlot.HEAD, Raid.getOminousBanner());
             this.setEquipmentDropChance(EquipmentSlot.HEAD, 2.0f);
         }
-        if (arg3 == SpawnType.PATROL) {
+        if (arg3 == SpawnReason.PATROL) {
             this.patrolling = true;
         }
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
 
-    public static boolean canSpawn(EntityType<? extends PatrolEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<? extends PatrolEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         if (arg2.getLightLevel(LightType.BLOCK, arg4) > 8) {
             return false;
         }
@@ -145,23 +145,23 @@ extends HostileEntity {
 
     public static class PatrolGoal<T extends PatrolEntity>
     extends Goal {
-        private final T actor;
+        private final T entity;
         private final double leaderSpeed;
-        private final double fellowSpeed;
-        private long field_20701;
+        private final double followSpeed;
+        private long nextPatrolSearchTime;
 
         public PatrolGoal(T arg, double d, double e) {
-            this.actor = arg;
+            this.entity = arg;
             this.leaderSpeed = d;
-            this.fellowSpeed = e;
-            this.field_20701 = -1L;
+            this.followSpeed = e;
+            this.nextPatrolSearchTime = -1L;
             this.setControls(EnumSet.of(Goal.Control.MOVE));
         }
 
         @Override
         public boolean canStart() {
-            boolean bl = ((PatrolEntity)this.actor).world.getTime() < this.field_20701;
-            return ((PatrolEntity)this.actor).isRaidCenterSet() && ((MobEntity)this.actor).getTarget() == null && !((Entity)this.actor).hasPassengers() && ((PatrolEntity)this.actor).hasPatrolTarget() && !bl;
+            boolean bl = ((PatrolEntity)this.entity).world.getTime() < this.nextPatrolSearchTime;
+            return ((PatrolEntity)this.entity).isRaidCenterSet() && ((MobEntity)this.entity).getTarget() == null && !((Entity)this.entity).hasPassengers() && ((PatrolEntity)this.entity).hasPatrolTarget() && !bl;
         }
 
         @Override
@@ -174,41 +174,41 @@ extends HostileEntity {
 
         @Override
         public void tick() {
-            boolean bl = ((PatrolEntity)this.actor).isPatrolLeader();
-            EntityNavigation lv = ((MobEntity)this.actor).getNavigation();
+            boolean bl = ((PatrolEntity)this.entity).isPatrolLeader();
+            EntityNavigation lv = ((MobEntity)this.entity).getNavigation();
             if (lv.isIdle()) {
-                List<PatrolEntity> list = this.method_22333();
-                if (((PatrolEntity)this.actor).isRaidCenterSet() && list.isEmpty()) {
-                    ((PatrolEntity)this.actor).setPatrolling(false);
-                } else if (!bl || !((PatrolEntity)this.actor).getPatrolTarget().isWithinDistance(((Entity)this.actor).getPos(), 10.0)) {
-                    Vec3d lv2 = Vec3d.method_24955(((PatrolEntity)this.actor).getPatrolTarget());
-                    Vec3d lv3 = ((Entity)this.actor).getPos();
+                List<PatrolEntity> list = this.findPatrolTargets();
+                if (((PatrolEntity)this.entity).isRaidCenterSet() && list.isEmpty()) {
+                    ((PatrolEntity)this.entity).setPatrolling(false);
+                } else if (!bl || !((PatrolEntity)this.entity).getPatrolTarget().isWithinDistance(((Entity)this.entity).getPos(), 10.0)) {
+                    Vec3d lv2 = Vec3d.ofBottomCenter(((PatrolEntity)this.entity).getPatrolTarget());
+                    Vec3d lv3 = ((Entity)this.entity).getPos();
                     Vec3d lv4 = lv3.subtract(lv2);
                     lv2 = lv4.rotateY(90.0f).multiply(0.4).add(lv2);
                     Vec3d lv5 = lv2.subtract(lv3).normalize().multiply(10.0).add(lv3);
                     BlockPos lv6 = new BlockPos(lv5);
-                    if (!lv.startMovingTo((lv6 = ((PatrolEntity)this.actor).world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv6)).getX(), lv6.getY(), lv6.getZ(), bl ? this.fellowSpeed : this.leaderSpeed)) {
+                    if (!lv.startMovingTo((lv6 = ((PatrolEntity)this.entity).world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv6)).getX(), lv6.getY(), lv6.getZ(), bl ? this.followSpeed : this.leaderSpeed)) {
                         this.wander();
-                        this.field_20701 = ((PatrolEntity)this.actor).world.getTime() + 200L;
+                        this.nextPatrolSearchTime = ((PatrolEntity)this.entity).world.getTime() + 200L;
                     } else if (bl) {
                         for (PatrolEntity lv7 : list) {
                             lv7.setPatrolTarget(lv6);
                         }
                     }
                 } else {
-                    ((PatrolEntity)this.actor).setRandomPatrolTarget();
+                    ((PatrolEntity)this.entity).setRandomPatrolTarget();
                 }
             }
         }
 
-        private List<PatrolEntity> method_22333() {
-            return ((PatrolEntity)this.actor).world.getEntities(PatrolEntity.class, ((Entity)this.actor).getBoundingBox().expand(16.0), arg -> arg.hasNoRaid() && !arg.isPartOf((Entity)this.actor));
+        private List<PatrolEntity> findPatrolTargets() {
+            return ((PatrolEntity)this.entity).world.getEntities(PatrolEntity.class, ((Entity)this.entity).getBoundingBox().expand(16.0), arg -> arg.hasNoRaid() && !arg.isPartOf((Entity)this.entity));
         }
 
         private boolean wander() {
-            Random random = ((LivingEntity)this.actor).getRandom();
-            BlockPos lv = ((PatrolEntity)this.actor).world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ((Entity)this.actor).getBlockPos().add(-8 + random.nextInt(16), 0, -8 + random.nextInt(16)));
-            return ((MobEntity)this.actor).getNavigation().startMovingTo(lv.getX(), lv.getY(), lv.getZ(), this.leaderSpeed);
+            Random random = ((LivingEntity)this.entity).getRandom();
+            BlockPos lv = ((PatrolEntity)this.entity).world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, ((Entity)this.entity).getBlockPos().add(-8 + random.nextInt(16), 0, -8 + random.nextInt(16)));
+            return ((MobEntity)this.entity).getNavigation().startMovingTo(lv.getX(), lv.getY(), lv.getZ(), this.leaderSpeed);
         }
     }
 }

@@ -32,8 +32,8 @@ extends MobEntityRenderer<ParrotEntity, ParrotEntityModel> {
 
     @Override
     public float getAnimationProgress(ParrotEntity arg, float f) {
-        float g = MathHelper.lerp(f, arg.field_6829, arg.field_6818);
-        float h = MathHelper.lerp(f, arg.field_6827, arg.field_6819);
+        float g = MathHelper.lerp(f, arg.prevFlapProgress, arg.flapProgress);
+        float h = MathHelper.lerp(f, arg.prevMaxWingDeviation, arg.maxWingDeviation);
         return (MathHelper.sin(g) + 1.0f) * h;
     }
 }

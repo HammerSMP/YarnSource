@@ -32,9 +32,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class BucketItem
 extends Item {
@@ -122,7 +122,7 @@ extends Item {
         Material lv2 = lv.getMaterial();
         boolean bl = lv.canBucketPlace(this.fluid);
         if (lv.isAir() || bl || lv.getBlock() instanceof FluidFillable && ((FluidFillable)((Object)lv.getBlock())).canFillWithFluid(arg2, arg3, lv, this.fluid)) {
-            if (arg2.dimension.doesWaterVaporize() && this.fluid.isIn(FluidTags.WATER)) {
+            if (arg2.method_27983().method_27999() && this.fluid.isIn(FluidTags.WATER)) {
                 int i = arg3.getX();
                 int j = arg3.getY();
                 int k = arg3.getZ();
@@ -149,7 +149,7 @@ extends Item {
         return this.placeFluid(arg, arg2, arg4.getBlockPos().offset(arg4.getSide()), null);
     }
 
-    protected void playEmptyingSound(@Nullable PlayerEntity arg, IWorld arg2, BlockPos arg3) {
+    protected void playEmptyingSound(@Nullable PlayerEntity arg, WorldAccess arg2, BlockPos arg3) {
         SoundEvent lv = this.fluid.isIn(FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_EMPTY_LAVA : SoundEvents.ITEM_BUCKET_EMPTY;
         arg2.playSound(arg, arg3, lv, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }

@@ -32,8 +32,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class LavaFluid
@@ -127,13 +127,13 @@ extends FlowableFluid {
     }
 
     @Override
-    protected void beforeBreakingBlock(IWorld arg, BlockPos arg2, BlockState arg3) {
+    protected void beforeBreakingBlock(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         this.playExtinguishEvent(arg, arg2);
     }
 
     @Override
     public int getFlowSpeed(WorldView arg) {
-        return arg.getDimension().doesWaterVaporize() ? 4 : 2;
+        return arg.method_27983().method_27999() ? 4 : 2;
     }
 
     @Override
@@ -148,7 +148,7 @@ extends FlowableFluid {
 
     @Override
     public int getLevelDecreasePerBlock(WorldView arg) {
-        return arg.getDimension().doesWaterVaporize() ? 1 : 2;
+        return arg.method_27983().method_27999() ? 1 : 2;
     }
 
     @Override
@@ -158,7 +158,7 @@ extends FlowableFluid {
 
     @Override
     public int getTickRate(WorldView arg) {
-        return arg.getDimension().isNether() ? 10 : 30;
+        return arg.method_27983().method_27998() ? 10 : 30;
     }
 
     @Override
@@ -170,7 +170,7 @@ extends FlowableFluid {
         return i;
     }
 
-    private void playExtinguishEvent(IWorld arg, BlockPos arg2) {
+    private void playExtinguishEvent(WorldAccess arg, BlockPos arg2) {
         arg.syncWorldEvent(1501, arg2, 0);
     }
 
@@ -180,7 +180,7 @@ extends FlowableFluid {
     }
 
     @Override
-    protected void flow(IWorld arg, BlockPos arg2, BlockState arg3, Direction arg4, FluidState arg5) {
+    protected void flow(WorldAccess arg, BlockPos arg2, BlockState arg3, Direction arg4, FluidState arg5) {
         if (arg4 == Direction.DOWN) {
             FluidState lv = arg.getFluidState(arg2);
             if (this.isIn(FluidTags.LAVA) && lv.matches(FluidTags.WATER)) {

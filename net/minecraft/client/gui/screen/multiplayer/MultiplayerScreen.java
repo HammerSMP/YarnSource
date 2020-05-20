@@ -201,7 +201,7 @@ extends Screen {
         this.tooltipText = null;
         this.renderBackground(arg);
         this.serverListWidget.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(arg, i, j, f);
         if (this.tooltipText != null) {
             this.renderTooltip(arg, this.tooltipText, i, j);

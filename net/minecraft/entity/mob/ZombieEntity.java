@@ -23,7 +23,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.BreakDoorGoal;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
@@ -67,9 +67,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class ZombieEntity
 extends HostileEntity {
@@ -304,7 +304,7 @@ extends HostileEntity {
                     if (this.world.isPlayerInRange(m, n, o, 7.0) || !this.world.intersectsEntities(lv2) || !this.world.doesNotCollide(lv2) || this.world.containsFluid(lv2.getBoundingBox())) continue;
                     this.world.spawnEntity(lv2);
                     lv2.setTarget(lv);
-                    lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnType.REINFORCEMENT, null, null);
+                    lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.REINFORCEMENT, null, null);
                     this.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).addPersistentModifier(new EntityAttributeModifier("Zombie reinforcement caller charge", -0.05f, EntityAttributeModifier.Operation.ADDITION));
                     lv2.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).addPersistentModifier(new EntityAttributeModifier("Zombie reinforcement callee charge", -0.05f, EntityAttributeModifier.Operation.ADDITION));
                     break;
@@ -405,7 +405,7 @@ extends HostileEntity {
             ZombieVillagerEntity lv2 = EntityType.ZOMBIE_VILLAGER.create(this.world);
             lv2.copyPositionAndRotation(lv);
             lv.remove();
-            lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnType.CONVERSION, new ZombieData(false), null);
+            lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.CONVERSION, new ZombieData(false), null);
             lv2.setVillagerData(lv.getVillagerData());
             lv2.setGossipData((Tag)lv.getGossip().serialize(NbtOps.INSTANCE).getValue());
             lv2.setOfferData(lv.getOffers().toTag());
@@ -442,7 +442,7 @@ extends HostileEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
         float f = arg2.getClampedLocalDifficulty();
         this.setCanPickUpLoot(this.random.nextFloat() < 0.55f * f);
@@ -463,7 +463,7 @@ extends HostileEntity {
                 } else if ((double)arg.getRandom().nextFloat() < 0.05) {
                     ChickenEntity lv3 = EntityType.CHICKEN.create(this.world);
                     lv3.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-                    lv3.initialize(arg, arg2, SpawnType.JOCKEY, null, null);
+                    lv3.initialize(arg, arg2, SpawnReason.JOCKEY, null, null);
                     lv3.setHasJockey(true);
                     this.startRiding(lv3);
                     arg.spawnEntity(lv3);
@@ -534,7 +534,7 @@ extends HostileEntity {
         }
 
         @Override
-        public void tickStepping(IWorld arg, BlockPos arg2) {
+        public void tickStepping(WorldAccess arg, BlockPos arg2) {
             arg.playSound(null, arg2, SoundEvents.ENTITY_ZOMBIE_DESTROY_EGG, SoundCategory.HOSTILE, 0.5f, 0.9f + ZombieEntity.this.random.nextFloat() * 0.2f);
         }
 

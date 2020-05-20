@@ -61,7 +61,7 @@ extends JsonDataLoader {
         });
         ImmutableMap map2 = builder.build();
         LootTableReporter lv = new LootTableReporter(LootContextTypes.GENERIC, ((Map)map2)::get, arg -> null);
-        map2.forEach((arg2, arg3) -> arg3.check(lv.withCondition("{" + arg2 + "}", (Identifier)arg2)));
+        map2.forEach((arg2, arg3) -> arg3.validate(lv.withCondition("{" + arg2 + "}", (Identifier)arg2)));
         lv.getMessages().forEach((string, string2) -> LOGGER.warn("Found validation problem in " + string + ": " + string2));
         this.conditions = map2;
     }

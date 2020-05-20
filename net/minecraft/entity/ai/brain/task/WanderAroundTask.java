@@ -43,11 +43,15 @@ extends Task<MobEntity> {
     protected boolean shouldRun(ServerWorld arg, MobEntity arg2) {
         Brain<?> lv = arg2.getBrain();
         WalkTarget lv2 = lv.getOptionalMemory(MemoryModuleType.WALK_TARGET).get();
-        if (!this.hasReached(arg2, lv2) && this.hasFinishedPath(arg2, lv2, arg.getTime())) {
+        boolean bl = this.hasReached(arg2, lv2);
+        if (!bl && this.hasFinishedPath(arg2, lv2, arg.getTime())) {
             this.lookTargetPos = lv2.getLookTarget().getBlockPos();
             return true;
         }
         lv.forget(MemoryModuleType.WALK_TARGET);
+        if (bl) {
+            lv.forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+        }
         return false;
     }
 
@@ -116,7 +120,7 @@ extends Task<MobEntity> {
             if (this.path != null) {
                 return true;
             }
-            Vec3d lv3 = TargetFinder.findTargetTowards((MobEntityWithAi)arg, 10, 7, Vec3d.method_24955(lv));
+            Vec3d lv3 = TargetFinder.findTargetTowards((MobEntityWithAi)arg, 10, 7, Vec3d.ofBottomCenter(lv));
             if (lv3 != null) {
                 this.path = arg.getNavigation().findPathTo(lv3.x, lv3.y, lv3.z, 0);
                 return this.path != null;

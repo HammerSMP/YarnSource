@@ -32,8 +32,8 @@ extends MobEntityRenderer<ChickenEntity, ChickenEntityModel<ChickenEntity>> {
 
     @Override
     protected float getAnimationProgress(ChickenEntity arg, float f) {
-        float g = MathHelper.lerp(f, arg.field_6736, arg.field_6741);
-        float h = MathHelper.lerp(f, arg.field_6738, arg.field_6743);
+        float g = MathHelper.lerp(f, arg.prevFlapProgress, arg.flapProgress);
+        float h = MathHelper.lerp(f, arg.prevMaxWingDeviation, arg.maxWingDeviation);
         return (MathHelper.sin(g) + 1.0f) * h;
     }
 }

@@ -11,10 +11,10 @@ import java.util.Random;
 import java.util.function.Function;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 
@@ -25,7 +25,7 @@ extends Feature<OreFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, OreFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, OreFeatureConfig arg5) {
         int i = random.nextInt(arg5.size + 1);
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int j = 0; j < i; ++j) {
@@ -47,7 +47,7 @@ extends Feature<OreFeatureConfig> {
         return Math.round((random.nextFloat() - random.nextFloat()) * (float)i);
     }
 
-    private boolean checkAir(IWorld arg, BlockPos arg2) {
+    private boolean checkAir(WorldAccess arg, BlockPos arg2) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Direction lv2 : Direction.values()) {
             lv.set(arg2, lv2);

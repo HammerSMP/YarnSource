@@ -27,7 +27,7 @@ import net.minecraft.util.Util;
 public class KeyBinding
 implements Comparable<KeyBinding> {
     private static final Map<String, KeyBinding> keysById = Maps.newHashMap();
-    private static final Map<InputUtil.KeyCode, KeyBinding> keysByCode = Maps.newHashMap();
+    private static final Map<InputUtil.Key, KeyBinding> keyToBindings = Maps.newHashMap();
     private static final Set<String> keyCategories = Sets.newHashSet();
     private static final Map<String, Integer> categoryOrderMap = Util.make(Maps.newHashMap(), hashMap -> {
         hashMap.put("key.categories.movement", 1);
@@ -38,22 +38,22 @@ implements Comparable<KeyBinding> {
         hashMap.put("key.categories.ui", 6);
         hashMap.put("key.categories.misc", 7);
     });
-    private final String id;
-    private final InputUtil.KeyCode defaultKeyCode;
+    private final String translationKey;
+    private final InputUtil.Key defaultKey;
     private final String category;
-    private InputUtil.KeyCode keyCode;
+    private InputUtil.Key boundKey;
     private boolean pressed;
     private int timesPressed;
 
-    public static void onKeyPressed(InputUtil.KeyCode arg) {
-        KeyBinding lv = keysByCode.get(arg);
+    public static void onKeyPressed(InputUtil.Key arg) {
+        KeyBinding lv = keyToBindings.get(arg);
         if (lv != null) {
             ++lv.timesPressed;
         }
     }
 
-    public static void setKeyPressed(InputUtil.KeyCode arg, boolean bl) {
-        KeyBinding lv = keysByCode.get(arg);
+    public static void setKeyPressed(InputUtil.Key arg, boolean bl) {
+        KeyBinding lv = keyToBindings.get(arg);
         if (lv != null) {
             lv.setPressed(bl);
         }
@@ -61,8 +61,8 @@ implements Comparable<KeyBinding> {
 
     public static void updatePressedStates() {
         for (KeyBinding lv : keysById.values()) {
-            if (lv.keyCode.getCategory() != InputUtil.Type.KEYSYM || lv.keyCode.getKeyCode() == InputUtil.UNKNOWN_KEYCODE.getKeyCode()) continue;
-            lv.setPressed(InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), lv.keyCode.getKeyCode()));
+            if (lv.boundKey.getCategory() != InputUtil.Type.KEYSYM || lv.boundKey.getCode() == InputUtil.UNKNOWN_KEY.getCode()) continue;
+            lv.setPressed(InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), lv.boundKey.getCode()));
         }
     }
 
@@ -73,9 +73,9 @@ implements Comparable<KeyBinding> {
     }
 
     public static void updateKeysByCode() {
-        keysByCode.clear();
+        keyToBindings.clear();
         for (KeyBinding lv : keysById.values()) {
-            keysByCode.put(lv.keyCode, lv);
+            keyToBindings.put(lv.boundKey, lv);
         }
     }
 
@@ -84,11 +84,11 @@ implements Comparable<KeyBinding> {
     }
 
     public KeyBinding(String string, InputUtil.Type arg, int i, String string2) {
-        this.id = string;
-        this.defaultKeyCode = this.keyCode = arg.createFromCode(i);
+        this.translationKey = string;
+        this.defaultKey = this.boundKey = arg.createFromCode(i);
         this.category = string2;
         keysById.put(string, this);
-        keysByCode.put(this.keyCode, this);
+        keyToBindings.put(this.boundKey, this);
         keyCategories.add(string2);
     }
 
@@ -113,22 +113,22 @@ implements Comparable<KeyBinding> {
         this.setPressed(false);
     }
 
-    public String getId() {
-        return this.id;
+    public String getTranslationKey() {
+        return this.translationKey;
     }
 
-    public InputUtil.KeyCode getDefaultKeyCode() {
-        return this.defaultKeyCode;
+    public InputUtil.Key getDefaultKey() {
+        return this.defaultKey;
     }
 
-    public void setKeyCode(InputUtil.KeyCode arg) {
-        this.keyCode = arg;
+    public void setBoundKey(InputUtil.Key arg) {
+        this.boundKey = arg;
     }
 
     @Override
     public int compareTo(KeyBinding arg) {
         if (this.category.equals(arg.category)) {
-            return I18n.translate(this.id, new Object[0]).compareTo(I18n.translate(arg.id, new Object[0]));
+            return I18n.translate(this.translationKey, new Object[0]).compareTo(I18n.translate(arg.translationKey, new Object[0]));
         }
         return categoryOrderMap.get(this.category).compareTo(categoryOrderMap.get(arg.category));
     }
@@ -138,38 +138,38 @@ implements Comparable<KeyBinding> {
         if (lv == null) {
             return () -> new TranslatableText(string);
         }
-        return lv::getLocalizedName;
+        return lv::getBoundKeyLocalizedText;
     }
 
     public boolean equals(KeyBinding arg) {
-        return this.keyCode.equals(arg.keyCode);
+        return this.boundKey.equals(arg.boundKey);
     }
 
-    public boolean isNotBound() {
-        return this.keyCode.equals(InputUtil.UNKNOWN_KEYCODE);
+    public boolean isUnbound() {
+        return this.boundKey.equals(InputUtil.UNKNOWN_KEY);
     }
 
     public boolean matchesKey(int i, int j) {
-        if (i == InputUtil.UNKNOWN_KEYCODE.getKeyCode()) {
-            return this.keyCode.getCategory() == InputUtil.Type.SCANCODE && this.keyCode.getKeyCode() == j;
+        if (i == InputUtil.UNKNOWN_KEY.getCode()) {
+            return this.boundKey.getCategory() == InputUtil.Type.SCANCODE && this.boundKey.getCode() == j;
         }
-        return this.keyCode.getCategory() == InputUtil.Type.KEYSYM && this.keyCode.getKeyCode() == i;
+        return this.boundKey.getCategory() == InputUtil.Type.KEYSYM && this.boundKey.getCode() == i;
     }
 
     public boolean matchesMouse(int i) {
-        return this.keyCode.getCategory() == InputUtil.Type.MOUSE && this.keyCode.getKeyCode() == i;
+        return this.boundKey.getCategory() == InputUtil.Type.MOUSE && this.boundKey.getCode() == i;
     }
 
-    public Text getLocalizedName() {
-        return this.keyCode.method_27445();
+    public Text getBoundKeyLocalizedText() {
+        return this.boundKey.getLocalizedText();
     }
 
     public boolean isDefault() {
-        return this.keyCode.equals(this.defaultKeyCode);
+        return this.boundKey.equals(this.defaultKey);
     }
 
-    public String getName() {
-        return this.keyCode.getName();
+    public String getBoundKeyTranslationKey() {
+        return this.boundKey.getTranslationKey();
     }
 
     public void setPressed(boolean bl) {

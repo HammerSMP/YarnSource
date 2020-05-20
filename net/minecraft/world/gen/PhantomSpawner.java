@@ -7,7 +7,7 @@ import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -37,7 +37,7 @@ public class PhantomSpawner {
             return 0;
         }
         this.ticksUntilNextSpawn += (60 + random.nextInt(60)) * 20;
-        if (arg.getAmbientDarkness() < 5 && arg.dimension.hasSkyLight()) {
+        if (arg.getAmbientDarkness() < 5 && arg.method_27983().hasSkyLight()) {
             return 0;
         }
         int i = 0;
@@ -48,7 +48,7 @@ public class PhantomSpawner {
             LocalDifficulty lv3;
             if (playerEntity.isSpectator()) continue;
             BlockPos lv2 = playerEntity.getBlockPos();
-            if (arg.dimension.hasSkyLight() && (lv2.getY() < arg.getSeaLevel() || !arg.isSkyVisible(lv2)) || !(lv3 = arg.getLocalDifficulty(lv2)).isHarderThan(random.nextFloat() * 3.0f)) continue;
+            if (arg.method_27983().hasSkyLight() && (lv2.getY() < arg.getSeaLevel() || !arg.isSkyVisible(lv2)) || !(lv3 = arg.getLocalDifficulty(lv2)).isHarderThan(random.nextFloat() * 3.0f)) continue;
             ServerStatHandler lv4 = ((ServerPlayerEntity)playerEntity).getStatHandler();
             int j = MathHelper.clamp(lv4.getStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST)), 1, Integer.MAX_VALUE);
             int k = 24000;
@@ -58,7 +58,7 @@ public class PhantomSpawner {
             for (int m = 0; m < l; ++m) {
                 PhantomEntity lv9 = EntityType.PHANTOM.create(arg);
                 lv9.refreshPositionAndAngles(lv5, 0.0f, 0.0f);
-                lv8 = lv9.initialize(arg, lv3, SpawnType.NATURAL, lv8, null);
+                lv8 = lv9.initialize(arg, lv3, SpawnReason.NATURAL, lv8, null);
                 arg.spawnEntity(lv9);
             }
             i += l;

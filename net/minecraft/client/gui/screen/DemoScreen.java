@@ -57,10 +57,10 @@ extends Screen {
         int l = (this.height - 166) / 2 + 8;
         this.textRenderer.draw(arg, this.title, (float)k, (float)l, 0x1F1F1F);
         GameOptions lv = this.client.options;
-        this.textRenderer.draw(arg, new TranslatableText("demo.help.movementShort", lv.keyForward.getLocalizedName(), lv.keyLeft.getLocalizedName(), lv.keyBack.getLocalizedName(), lv.keyRight.getLocalizedName()), (float)k, (float)(l += 12), 0x4F4F4F);
+        this.textRenderer.draw(arg, new TranslatableText("demo.help.movementShort", lv.keyForward.getBoundKeyLocalizedText(), lv.keyLeft.getBoundKeyLocalizedText(), lv.keyBack.getBoundKeyLocalizedText(), lv.keyRight.getBoundKeyLocalizedText()), (float)k, (float)(l += 12), 0x4F4F4F);
         this.textRenderer.draw(arg, new TranslatableText("demo.help.movementMouse"), (float)k, (float)(l + 12), 0x4F4F4F);
-        this.textRenderer.draw(arg, new TranslatableText("demo.help.jump", lv.keyJump.getLocalizedName()), (float)k, (float)(l + 24), 0x4F4F4F);
-        this.textRenderer.draw(arg, new TranslatableText("demo.help.inventory", lv.keyInventory.getLocalizedName()), (float)k, (float)(l + 36), 0x4F4F4F);
+        this.textRenderer.draw(arg, new TranslatableText("demo.help.jump", lv.keyJump.getBoundKeyLocalizedText()), (float)k, (float)(l + 24), 0x4F4F4F);
+        this.textRenderer.draw(arg, new TranslatableText("demo.help.inventory", lv.keyInventory.getBoundKeyLocalizedText()), (float)k, (float)(l + 36), 0x4F4F4F);
         this.textRenderer.drawTrimmed(new TranslatableText("demo.help.fullWrapped"), k, l + 68, 218, 0x1F1F1F);
         super.render(arg, i, j, f);
     }

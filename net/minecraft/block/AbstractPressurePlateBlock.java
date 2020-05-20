@@ -17,8 +17,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class AbstractPressurePlateBlock
@@ -46,7 +46,7 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
             return Blocks.AIR.getDefaultState();
         }
@@ -99,19 +99,19 @@ extends Block {
         }
     }
 
-    protected abstract void playPressSound(IWorld var1, BlockPos var2);
+    protected abstract void playPressSound(WorldAccess var1, BlockPos var2);
 
-    protected abstract void playDepressSound(IWorld var1, BlockPos var2);
+    protected abstract void playDepressSound(WorldAccess var1, BlockPos var2);
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (bl || arg.isOf(arg4.getBlock())) {
             return;
         }
         if (this.getRedstoneOutput(arg) > 0) {
             this.updateNeighbors(arg2, arg3);
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     protected void updateNeighbors(World arg, BlockPos arg2) {

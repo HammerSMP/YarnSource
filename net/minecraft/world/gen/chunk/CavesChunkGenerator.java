@@ -1,27 +1,40 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.gen.chunk;
 
 import java.util.List;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityCategory;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.CavesChunkGeneratorConfig;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 
 public class CavesChunkGenerator
 extends SurfaceChunkGenerator<CavesChunkGeneratorConfig> {
     private final double[] noiseFalloff = this.buildNoiseFalloff();
+    private final CavesChunkGeneratorConfig generatorConfig;
 
-    public CavesChunkGenerator(IWorld arg, BiomeSource arg2, CavesChunkGeneratorConfig arg3) {
-        super(arg, arg2, 4, 8, 128, arg3, false);
+    public CavesChunkGenerator(BiomeSource arg, long l, CavesChunkGeneratorConfig arg2) {
+        super(arg, l, arg2, 4, 8, 128, false);
+        this.generatorConfig = arg2;
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public ChunkGenerator create(long l) {
+        return new CavesChunkGenerator(this.biomeSource.create(l), l, this.generatorConfig);
     }
 
     @Override
@@ -62,21 +75,11 @@ extends SurfaceChunkGenerator<CavesChunkGeneratorConfig> {
     }
 
     @Override
-    public List<Biome.SpawnEntry> getEntitySpawnList(StructureAccessor arg, EntityCategory arg2, BlockPos arg3) {
-        if (arg2 == EntityCategory.MONSTER) {
-            if (Feature.NETHER_BRIDGE.isInsideStructure(this.world, arg, arg3)) {
-                return Feature.NETHER_BRIDGE.getMonsterSpawns();
-            }
-            if (Feature.NETHER_BRIDGE.isApproximatelyInsideStructure(this.world, arg, arg3) && this.world.getBlockState(arg3.down()).isOf(Blocks.NETHER_BRICKS)) {
-                return Feature.NETHER_BRIDGE.getMonsterSpawns();
-            }
+    public List<Biome.SpawnEntry> getEntitySpawnList(Biome arg, StructureAccessor arg2, SpawnGroup arg3, BlockPos arg4) {
+        if (arg3 == SpawnGroup.MONSTER && Feature.NETHER_BRIDGE.isInsideStructure(arg2, arg4)) {
+            return Feature.NETHER_BRIDGE.getMonsterSpawns();
         }
-        return super.getEntitySpawnList(arg, arg2, arg3);
-    }
-
-    @Override
-    public int getSpawnHeight() {
-        return this.world.getSeaLevel() + 1;
+        return super.getEntitySpawnList(arg, arg2, arg3, arg4);
     }
 
     @Override

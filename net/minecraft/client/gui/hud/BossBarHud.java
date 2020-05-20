@@ -47,7 +47,7 @@ extends DrawableHelper {
             this.client.getTextureManager().bindTexture(BAR_TEX);
             this.renderBossBar(arg, k, l, lv);
             Text lv2 = lv.getName();
-            int m = this.client.textRenderer.getStringWidth(lv2);
+            int m = this.client.textRenderer.getWidth(lv2);
             int n = i / 2 - m / 2;
             int o = l - 9;
             this.client.textRenderer.drawWithShadow(arg, lv2, (float)n, (float)o, 0xFFFFFF);

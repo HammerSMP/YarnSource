@@ -5,6 +5,8 @@
  *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.biome.source;
 
@@ -14,18 +16,25 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.biome.source.FixedBiomeSourceConfig;
 
 public class FixedBiomeSource
 extends BiomeSource {
     private final Biome biome;
 
-    public FixedBiomeSource(FixedBiomeSourceConfig arg) {
-        super((Set<Biome>)ImmutableSet.of((Object)arg.getBiome()));
-        this.biome = arg.getBiome();
+    public FixedBiomeSource(Biome arg) {
+        super((Set<Biome>)ImmutableSet.of((Object)arg));
+        this.biome = arg;
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public BiomeSource create(long l) {
+        return this;
     }
 
     @Override

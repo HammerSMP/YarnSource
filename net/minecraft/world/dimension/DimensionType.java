@@ -27,26 +27,30 @@ import net.minecraft.world.dimension.TheNetherDimension;
 
 public class DimensionType
 implements DynamicSerializable {
-    public static final DimensionType OVERWORLD = DimensionType.register("overworld", new DimensionType(1, "", "", OverworldDimension::new, true, HorizontalVoronoiBiomeAccessType.INSTANCE));
-    public static final DimensionType THE_NETHER = DimensionType.register("the_nether", new DimensionType(0, "_nether", "DIM-1", TheNetherDimension::new, false, VoronoiBiomeAccessType.INSTANCE));
-    public static final DimensionType THE_END = DimensionType.register("the_end", new DimensionType(2, "_end", "DIM1", TheEndDimension::new, false, VoronoiBiomeAccessType.INSTANCE));
+    public static final DimensionType OVERWORLD = DimensionType.register("overworld", new DimensionType(1, "", "", OverworldDimension::new, true, false, false, HorizontalVoronoiBiomeAccessType.INSTANCE));
+    public static final DimensionType THE_NETHER = DimensionType.register("the_nether", new DimensionType(0, "_nether", "DIM-1", TheNetherDimension::new, false, true, true, VoronoiBiomeAccessType.INSTANCE));
+    public static final DimensionType THE_END = DimensionType.register("the_end", new DimensionType(2, "_end", "DIM1", TheEndDimension::new, false, false, false, VoronoiBiomeAccessType.INSTANCE));
     private final int id;
     private final String suffix;
     private final String saveDir;
     private final BiFunction<World, DimensionType, ? extends Dimension> factory;
     private final boolean hasSkyLight;
+    private final boolean field_24504;
+    private final boolean field_24505;
     private final BiomeAccessType biomeAccessType;
 
     private static DimensionType register(String string, DimensionType arg) {
         return Registry.register(Registry.DIMENSION_TYPE, arg.id, string, arg);
     }
 
-    protected DimensionType(int i, String string, String string2, BiFunction<World, DimensionType, ? extends Dimension> biFunction, boolean bl, BiomeAccessType arg) {
+    protected DimensionType(int i, String string, String string2, BiFunction<World, DimensionType, ? extends Dimension> biFunction, boolean bl, boolean bl2, boolean bl3, BiomeAccessType arg) {
         this.id = i;
         this.suffix = string;
         this.saveDir = string2;
         this.factory = biFunction;
         this.hasSkyLight = bl;
+        this.field_24504 = bl2;
+        this.field_24505 = bl3;
         this.biomeAccessType = arg;
     }
 
@@ -98,6 +102,14 @@ implements DynamicSerializable {
 
     public boolean hasSkyLight() {
         return this.hasSkyLight;
+    }
+
+    public boolean method_27998() {
+        return this.field_24504;
+    }
+
+    public boolean method_27999() {
+        return this.field_24505;
     }
 
     public BiomeAccessType getBiomeAccessType() {

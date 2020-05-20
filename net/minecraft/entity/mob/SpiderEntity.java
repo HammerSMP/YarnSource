@@ -16,7 +16,7 @@ import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
@@ -46,9 +46,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class SpiderEntity
 extends HostileEntity {
@@ -91,7 +91,7 @@ extends HostileEntity {
     public void tick() {
         super.tick();
         if (!this.world.isClient) {
-            this.setCanClimb(this.horizontalCollision);
+            this.setClimbingWall(this.horizontalCollision);
         }
     }
 
@@ -121,7 +121,7 @@ extends HostileEntity {
 
     @Override
     public boolean isClimbing() {
-        return this.getCanClimb();
+        return this.isClimbingWall();
     }
 
     @Override
@@ -144,11 +144,11 @@ extends HostileEntity {
         return super.canHaveStatusEffect(arg);
     }
 
-    public boolean getCanClimb() {
+    public boolean isClimbingWall() {
         return (this.dataTracker.get(SPIDER_FLAGS) & 1) != 0;
     }
 
-    public void setCanClimb(boolean bl) {
+    public void setClimbingWall(boolean bl) {
         byte b = this.dataTracker.get(SPIDER_FLAGS);
         b = bl ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE);
         this.dataTracker.set(SPIDER_FLAGS, b);
@@ -156,7 +156,7 @@ extends HostileEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         StatusEffect lv2;
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
         if (arg.getRandom().nextInt(100) == 0) {

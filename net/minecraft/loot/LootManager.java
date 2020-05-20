@@ -66,13 +66,13 @@ extends JsonDataLoader {
         builder.put((Object)LootTables.EMPTY, (Object)LootTable.EMPTY);
         ImmutableMap immutableMap = builder.build();
         LootTableReporter lv = new LootTableReporter(LootContextTypes.GENERIC, this.conditionManager::get, ((ImmutableMap)immutableMap)::get);
-        immutableMap.forEach((arg2, arg3) -> LootManager.check(lv, arg2, arg3));
+        immutableMap.forEach((arg2, arg3) -> LootManager.validate(lv, arg2, arg3));
         lv.getMessages().forEach((string, string2) -> LOGGER.warn("Found validation problem in " + string + ": " + string2));
         this.tables = immutableMap;
     }
 
-    public static void check(LootTableReporter arg, Identifier arg2, LootTable arg3) {
-        arg3.check(arg.withContextType(arg3.getType()).withTable("{" + arg2 + "}", arg2));
+    public static void validate(LootTableReporter arg, Identifier arg2, LootTable arg3) {
+        arg3.validate(arg.withContextType(arg3.getType()).withTable("{" + arg2 + "}", arg2));
     }
 
     public static JsonElement toJson(LootTable arg) {

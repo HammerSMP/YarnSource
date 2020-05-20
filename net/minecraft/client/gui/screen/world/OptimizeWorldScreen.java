@@ -82,20 +82,20 @@ extends Screen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
         int k = this.width / 2 - 150;
         int l = this.width / 2 + 150;
         int m = this.height / 4 + 100;
         int n = m + 10;
         this.textRenderer.getClass();
-        this.drawStringWithShadow(arg, this.textRenderer, this.updater.getStatus(), this.width / 2, m - 9 - 2, 0xA0A0A0);
+        this.drawCenteredText(arg, this.textRenderer, this.updater.getStatus(), this.width / 2, m - 9 - 2, 0xA0A0A0);
         if (this.updater.getTotalChunkCount() > 0) {
             OptimizeWorldScreen.fill(arg, k - 1, m - 1, l + 1, n + 1, -16777216);
-            this.drawString(arg, this.textRenderer, I18n.translate("optimizeWorld.info.converted", this.updater.getUpgradedChunkCount()), k, 40, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.converted", this.updater.getUpgradedChunkCount()), k, 40, 0xA0A0A0);
             this.textRenderer.getClass();
-            this.drawString(arg, this.textRenderer, I18n.translate("optimizeWorld.info.skipped", this.updater.getSkippedChunkCount()), k, 40 + 9 + 3, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.skipped", this.updater.getSkippedChunkCount()), k, 40 + 9 + 3, 0xA0A0A0);
             this.textRenderer.getClass();
-            this.drawString(arg, this.textRenderer, I18n.translate("optimizeWorld.info.total", this.updater.getTotalChunkCount()), k, 40 + (9 + 3) * 2, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.total", this.updater.getTotalChunkCount()), k, 40 + (9 + 3) * 2, 0xA0A0A0);
             int o = 0;
             for (DimensionType lv : DimensionType.getAll()) {
                 int p = MathHelper.floor(this.updater.getProgress(lv) * (float)(l - k));

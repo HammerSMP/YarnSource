@@ -121,11 +121,11 @@ implements Wearable {
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getModifiers(EquipmentSlot arg) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
         if (arg == this.slot) {
             return this.attributeModifiers;
         }
-        return super.getModifiers(arg);
+        return super.getAttributeModifiers(arg);
     }
 
     public int getProtection() {

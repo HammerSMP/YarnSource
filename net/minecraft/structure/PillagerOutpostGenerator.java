@@ -31,7 +31,7 @@ import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 public class PillagerOutpostGenerator {
-    public static void addPieces(ChunkGenerator<?> arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4) {
+    public static void addPieces(ChunkGenerator arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4) {
         StructurePoolBasedGenerator.addPieces(new Identifier("pillager_outpost/base_plates"), 7, Piece::new, arg, arg2, arg3, list, arg4, true, true);
     }
 

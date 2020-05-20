@@ -32,8 +32,8 @@ import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class WaterFluid
@@ -78,7 +78,7 @@ extends FlowableFluid {
     }
 
     @Override
-    protected void beforeBreakingBlock(IWorld arg, BlockPos arg2, BlockState arg3) {
+    protected void beforeBreakingBlock(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         BlockEntity lv = arg3.getBlock().hasBlockEntity() ? arg.getBlockEntity(arg2) : null;
         Block.dropStacks(arg3, arg.getWorld(), arg2, lv);
     }

@@ -15,7 +15,7 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.Goal;
@@ -42,13 +42,13 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.ChunkRandom;
-import net.minecraft.world.level.LevelGeneratorType;
 
 public class SlimeEntity
 extends MobEntity
@@ -278,18 +278,18 @@ implements Monster {
         return this.getSize() == 1 ? this.getType().getLootTableId() : LootTables.EMPTY;
     }
 
-    public static boolean canSpawn(EntityType<SlimeEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
-        if (arg2.getLevelProperties().getGeneratorType() == LevelGeneratorType.FLAT && random.nextInt(4) != 1) {
-            return false;
-        }
+    public static boolean canSpawn(EntityType<SlimeEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         if (arg2.getDifficulty() != Difficulty.PEACEFUL) {
             boolean bl;
             Biome lv = arg2.getBiome(arg4);
             if (lv == Biomes.SWAMP && arg4.getY() > 50 && arg4.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < arg2.getMoonSize() && arg2.getLightLevel(arg4) <= random.nextInt(8)) {
                 return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
             }
+            if (!(arg2 instanceof ServerWorldAccess)) {
+                return false;
+            }
             ChunkPos lv2 = new ChunkPos(arg4);
-            boolean bl2 = bl = ChunkRandom.getSlimeRandom(lv2.x, lv2.z, arg2.getSeed(), 987234911L).nextInt(10) == 0;
+            boolean bl2 = bl = ChunkRandom.getSlimeRandom(lv2.x, lv2.z, ((ServerWorldAccess)arg2).getSeed(), 987234911L).nextInt(10) == 0;
             if (random.nextInt(10) == 0 && bl && arg4.getY() < 40) {
                 return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
             }
@@ -320,7 +320,7 @@ implements Monster {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         int i = this.random.nextInt(3);
         if (i < 2 && this.random.nextFloat() < 0.5f * arg2.getClampedLocalDifficulty()) {
             ++i;
@@ -330,7 +330,7 @@ implements Monster {
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
 
-    private float method_24353() {
+    private float getJumpSoundPitch() {
         float f = this.isSmall() ? 1.4f : 0.8f;
         return ((this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f) * f;
     }
@@ -508,7 +508,7 @@ implements Monster {
                     }
                     this.slime.getJumpControl().setActive();
                     if (this.slime.makesJumpSound()) {
-                        this.slime.playSound(this.slime.getJumpSound(), this.slime.getSoundVolume(), this.slime.method_24353());
+                        this.slime.playSound(this.slime.getJumpSound(), this.slime.getSoundVolume(), this.slime.getJumpSoundPitch());
                     }
                 } else {
                     this.slime.sidewaysSpeed = 0.0f;

@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -70,8 +69,8 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.border.WorldBorder;
@@ -83,12 +82,11 @@ import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
-import net.minecraft.world.level.LevelGeneratorType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class World
-implements IWorld,
+implements WorldAccess,
 AutoCloseable {
     protected static final Logger LOGGER = LogManager.getLogger();
     private static final Direction[] DIRECTIONS = Direction.values();
@@ -97,6 +95,7 @@ AutoCloseable {
     protected final List<BlockEntity> pendingBlockEntities = Lists.newArrayList();
     protected final List<BlockEntity> unloadedBlockEntities = Lists.newArrayList();
     private final Thread thread;
+    private final boolean field_24496;
     private int ambientDarkness;
     protected int lcgBlockSeed = new Random().nextInt();
     protected final int unusedIncrement = 1013904223;
@@ -105,8 +104,7 @@ AutoCloseable {
     protected float thunderGradientPrev;
     protected float thunderGradient;
     public final Random random = new Random();
-    public final Dimension dimension;
-    protected final ChunkManager chunkManager;
+    private final Dimension dimension;
     protected final class_5269 properties;
     private final Supplier<Profiler> profiler;
     public final boolean isClient;
@@ -114,15 +112,15 @@ AutoCloseable {
     private final WorldBorder border;
     private final BiomeAccess biomeAccess;
 
-    protected World(class_5269 arg, DimensionType arg2, BiFunction<World, Dimension, ChunkManager> biFunction, Supplier<Profiler> supplier, boolean bl) {
+    protected World(class_5269 arg, DimensionType arg2, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
         this.profiler = supplier;
         this.properties = arg;
         this.dimension = arg2.create(this);
-        this.chunkManager = biFunction.apply(this, this.dimension);
         this.isClient = bl;
-        this.border = this.dimension.createWorldBorder();
+        this.border = this.getDimension().createWorldBorder();
         this.thread = Thread.currentThread();
-        this.biomeAccess = new BiomeAccess(this, bl ? arg.getSeed() : class_5217.method_27418(arg.getSeed()), arg2.getBiomeAccessType());
+        this.biomeAccess = new BiomeAccess(this, l, arg2.getBiomeAccessType());
+        this.field_24496 = bl2;
     }
 
     @Override
@@ -212,7 +210,7 @@ AutoCloseable {
 
     @Override
     public Chunk getChunk(int i, int j, ChunkStatus arg, boolean bl) {
-        Chunk lv = this.chunkManager.getChunk(i, j, arg, bl);
+        Chunk lv = this.getChunkManager().getChunk(i, j, arg, bl);
         if (lv == null && bl) {
             throw new IllegalStateException("Should always be able to create a chunk!");
         }
@@ -224,7 +222,7 @@ AutoCloseable {
         if (World.isHeightInvalid(arg)) {
             return false;
         }
-        if (!this.isClient && this.properties.getGeneratorType() == LevelGeneratorType.DEBUG_ALL_BLOCK_STATES) {
+        if (!this.isClient && this.method_27982()) {
             return false;
         }
         WorldChunk lv = this.getWorldChunk(arg);
@@ -389,11 +387,11 @@ AutoCloseable {
     }
 
     public boolean isDay() {
-        return this.dimension.getType() == DimensionType.OVERWORLD && this.ambientDarkness < 4;
+        return this.method_27983() == DimensionType.OVERWORLD && this.ambientDarkness < 4;
     }
 
     public boolean isNight() {
-        return this.dimension.getType() == DimensionType.OVERWORLD && !this.isDay();
+        return this.method_27983() == DimensionType.OVERWORLD && !this.isDay();
     }
 
     @Override
@@ -467,23 +465,25 @@ AutoCloseable {
         this.iteratingTickingBlockEntities = true;
         Iterator<BlockEntity> iterator = this.tickingBlockEntities.iterator();
         while (iterator.hasNext()) {
-            BlockPos lv3;
             BlockEntity lv2 = iterator.next();
-            if (!lv2.isRemoved() && lv2.hasWorld() && this.chunkManager.shouldTickBlock(lv3 = lv2.getPos()) && this.getWorldBorder().contains(lv3)) {
-                try {
-                    lv.push(() -> String.valueOf(BlockEntityType.getId(lv2.getType())));
-                    if (lv2.getType().supports(this.getBlockState(lv3).getBlock())) {
-                        ((Tickable)((Object)lv2)).tick();
-                    } else {
-                        lv2.markInvalid();
+            if (!lv2.isRemoved() && lv2.hasWorld()) {
+                BlockPos lv3 = lv2.getPos();
+                if (this.getChunkManager().shouldTickBlock(lv3) && this.getWorldBorder().contains(lv3)) {
+                    try {
+                        lv.push(() -> String.valueOf(BlockEntityType.getId(lv2.getType())));
+                        if (lv2.getType().supports(this.getBlockState(lv3).getBlock())) {
+                            ((Tickable)((Object)lv2)).tick();
+                        } else {
+                            lv2.markInvalid();
+                        }
+                        lv.pop();
                     }
-                    lv.pop();
-                }
-                catch (Throwable throwable) {
-                    CrashReport lv4 = CrashReport.create(throwable, "Ticking block entity");
-                    CrashReportSection lv5 = lv4.addElement("Block entity being ticked");
-                    lv2.populateCrashReport(lv5);
-                    throw new CrashException(lv4);
+                    catch (Throwable throwable) {
+                        CrashReport lv4 = CrashReport.create(throwable, "Ticking block entity");
+                        CrashReportSection lv5 = lv4.addElement("Block entity being ticked");
+                        lv2.populateCrashReport(lv5);
+                        throw new CrashException(lv4);
+                    }
                 }
             }
             if (!lv2.isRemoved()) continue;
@@ -525,12 +525,12 @@ AutoCloseable {
     }
 
     public boolean isAreaNotEmpty(Box arg) {
-        int i = MathHelper.floor(arg.x1);
-        int j = MathHelper.ceil(arg.x2);
-        int k = MathHelper.floor(arg.y1);
-        int l = MathHelper.ceil(arg.y2);
-        int m = MathHelper.floor(arg.z1);
-        int n = MathHelper.ceil(arg.z2);
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.ceil(arg.maxX);
+        int k = MathHelper.floor(arg.minY);
+        int l = MathHelper.ceil(arg.maxY);
+        int m = MathHelper.floor(arg.minZ);
+        int n = MathHelper.ceil(arg.maxZ);
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int o = i; o < j; ++o) {
             for (int p = k; p < l; ++p) {
@@ -546,12 +546,12 @@ AutoCloseable {
 
     public boolean doesAreaContainFireSource(Box arg) {
         int n;
-        int i = MathHelper.floor(arg.x1);
-        int j = MathHelper.ceil(arg.x2);
-        int k = MathHelper.floor(arg.y1);
-        int l = MathHelper.ceil(arg.y2);
-        int m = MathHelper.floor(arg.z1);
-        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(arg.z2))) {
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.ceil(arg.maxX);
+        int k = MathHelper.floor(arg.minY);
+        int l = MathHelper.ceil(arg.maxY);
+        int m = MathHelper.floor(arg.minZ);
+        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(arg.maxZ))) {
             BlockPos.Mutable lv = new BlockPos.Mutable();
             for (int o = i; o < j; ++o) {
                 for (int p = k; p < l; ++p) {
@@ -570,12 +570,12 @@ AutoCloseable {
     @Environment(value=EnvType.CLIENT)
     public BlockState getBlockState(Box arg, Block arg2) {
         int n;
-        int i = MathHelper.floor(arg.x1);
-        int j = MathHelper.ceil(arg.x2);
-        int k = MathHelper.floor(arg.y1);
-        int l = MathHelper.ceil(arg.y2);
-        int m = MathHelper.floor(arg.z1);
-        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(arg.z2))) {
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.ceil(arg.maxX);
+        int k = MathHelper.floor(arg.minY);
+        int l = MathHelper.ceil(arg.maxY);
+        int m = MathHelper.floor(arg.minZ);
+        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(arg.maxZ))) {
             BlockPos.Mutable lv = new BlockPos.Mutable();
             for (int o = i; o < j; ++o) {
                 for (int p = k; p < l; ++p) {
@@ -591,12 +591,12 @@ AutoCloseable {
     }
 
     public boolean containsBlockWithMaterial(Box arg, Material arg22) {
-        int i = MathHelper.floor(arg.x1);
-        int j = MathHelper.ceil(arg.x2);
-        int k = MathHelper.floor(arg.y1);
-        int l = MathHelper.ceil(arg.y2);
-        int m = MathHelper.floor(arg.z1);
-        int n = MathHelper.ceil(arg.z2);
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.ceil(arg.maxX);
+        int k = MathHelper.floor(arg.minY);
+        int l = MathHelper.ceil(arg.maxY);
+        int m = MathHelper.floor(arg.minZ);
+        int n = MathHelper.ceil(arg.maxZ);
         MaterialPredicate lv = MaterialPredicate.create(arg22);
         return BlockPos.stream(i, k, m, j - 1, l - 1, n - 1).anyMatch(arg2 -> lv.test(this.getBlockState((BlockPos)arg2)));
     }
@@ -621,7 +621,7 @@ AutoCloseable {
 
     @Environment(value=EnvType.CLIENT)
     public String getDebugString() {
-        return this.chunkManager.getDebugString();
+        return this.getChunkManager().getDebugString();
     }
 
     @Override
@@ -697,7 +697,7 @@ AutoCloseable {
         if (World.isHeightInvalid(arg)) {
             return false;
         }
-        return this.chunkManager.isChunkLoaded(arg.getX() >> 4, arg.getZ() >> 4);
+        return this.getChunkManager().isChunkLoaded(arg.getX() >> 4, arg.getZ() >> 4);
     }
 
     public boolean isDirectionSolid(BlockPos arg, Entity arg2, Direction arg3) {
@@ -737,7 +737,7 @@ AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        this.chunkManager.close();
+        this.getChunkManager().close();
     }
 
     @Override
@@ -750,10 +750,10 @@ AutoCloseable {
     public List<Entity> getEntities(@Nullable Entity arg, Box arg2, @Nullable Predicate<? super Entity> predicate) {
         this.getProfiler().visit("getEntities");
         ArrayList list = Lists.newArrayList();
-        int i = MathHelper.floor((arg2.x1 - 2.0) / 16.0);
-        int j = MathHelper.floor((arg2.x2 + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.z1 - 2.0) / 16.0);
-        int l = MathHelper.floor((arg2.z2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
+        int j = MathHelper.floor((arg2.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
+        int l = MathHelper.floor((arg2.maxZ + 2.0) / 16.0);
         for (int m = i; m <= j; ++m) {
             for (int n = k; n <= l; ++n) {
                 WorldChunk lv = this.getChunkManager().getWorldChunk(m, n, false);
@@ -766,10 +766,10 @@ AutoCloseable {
 
     public <T extends Entity> List<T> getEntities(@Nullable EntityType<T> arg, Box arg2, Predicate<? super T> predicate) {
         this.getProfiler().visit("getEntities");
-        int i = MathHelper.floor((arg2.x1 - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg2.x2 + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.z1 - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg2.z2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((arg2.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((arg2.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         for (int m = i; m < j; ++m) {
             for (int n = k; n < l; ++n) {
@@ -784,10 +784,10 @@ AutoCloseable {
     @Override
     public <T extends Entity> List<T> getEntities(Class<? extends T> arg, Box arg2, @Nullable Predicate<? super T> predicate) {
         this.getProfiler().visit("getEntities");
-        int i = MathHelper.floor((arg2.x1 - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg2.x2 + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.z1 - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg2.z2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((arg2.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((arg2.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m < j; ++m) {
@@ -803,10 +803,10 @@ AutoCloseable {
     @Override
     public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> arg, Box arg2, @Nullable Predicate<? super T> predicate) {
         this.getProfiler().visit("getLoadedEntities");
-        int i = MathHelper.floor((arg2.x1 - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg2.x2 + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.z1 - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg2.z2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((arg2.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((arg2.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m < j; ++m) {
@@ -836,10 +836,6 @@ AutoCloseable {
     @Override
     public World getWorld() {
         return this;
-    }
-
-    public LevelGeneratorType getGeneratorType() {
-        return this.properties.getGeneratorType();
     }
 
     public int getReceivedStrongRedstonePower(BlockPos arg) {
@@ -918,11 +914,6 @@ AutoCloseable {
         this.properties.setTime(l);
     }
 
-    @Override
-    public long getSeed() {
-        return this.properties.getSeed();
-    }
-
     public long getTime() {
         return this.properties.getTime();
     }
@@ -947,11 +938,6 @@ AutoCloseable {
     }
 
     public void sendEntityStatus(Entity arg, byte b) {
-    }
-
-    @Override
-    public ChunkManager getChunkManager() {
-        return this.chunkManager;
     }
 
     public void addSyncedBlockEvent(BlockPos arg, Block arg2, int i, int j) {
@@ -988,7 +974,7 @@ AutoCloseable {
     }
 
     public boolean isThundering() {
-        if (!this.dimension.hasSkyLight() || this.dimension.isNether()) {
+        if (!this.method_27983().hasSkyLight() || this.method_27983().method_27998()) {
             return false;
         }
         return (double)this.getThunderGradient(1.0f) > 0.9;
@@ -1030,8 +1016,8 @@ AutoCloseable {
     public CrashReportSection addDetailsToCrashReport(CrashReport arg) {
         CrashReportSection lv = arg.addElement("Affected level", 1);
         lv.add("All players", () -> this.getPlayers().size() + " total; " + this.getPlayers());
-        lv.add("Chunk stats", this.chunkManager::getDebugString);
-        lv.add("Level dimension", () -> this.dimension.getType().toString());
+        lv.add("Chunk stats", this.getChunkManager()::getDebugString);
+        lv.add("Level dimension", () -> this.method_27983().toString());
         try {
             this.properties.populateCrashReport(lv);
         }
@@ -1097,6 +1083,11 @@ AutoCloseable {
     }
 
     @Override
+    public DimensionType method_27983() {
+        return this.dimension.getType();
+    }
+
+    @Override
     public Random getRandom() {
         return this.random;
     }
@@ -1131,6 +1122,10 @@ AutoCloseable {
     @Override
     public BiomeAccess getBiomeAccess() {
         return this.biomeAccess;
+    }
+
+    public final boolean method_27982() {
+        return this.field_24496;
     }
 
     @Override

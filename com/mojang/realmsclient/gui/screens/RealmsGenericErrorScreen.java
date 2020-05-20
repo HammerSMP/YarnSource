@@ -72,8 +72,8 @@ extends RealmsScreen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        this.drawStringWithShadow(arg, this.textRenderer, this.line1, this.width / 2, 80, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, this.line2, this.width / 2, 100, 0xFF0000);
+        this.drawCenteredText(arg, this.textRenderer, this.line1, this.width / 2, 80, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.line2, this.width / 2, 100, 0xFF0000);
         super.render(arg, i, j, f);
     }
 }

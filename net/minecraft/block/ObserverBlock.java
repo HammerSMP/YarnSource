@@ -18,8 +18,8 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class ObserverBlock
 extends FacingBlock {
@@ -57,14 +57,14 @@ extends FacingBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.get(FACING) == arg2 && !arg.get(POWERED).booleanValue()) {
             this.scheduleTick(arg4, arg5);
         }
         return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
     }
 
-    private void scheduleTick(IWorld arg, BlockPos arg2) {
+    private void scheduleTick(WorldAccess arg, BlockPos arg2) {
         if (!arg.isClient() && !arg.getBlockTickScheduler().isScheduled(arg2, this)) {
             arg.getBlockTickScheduler().schedule(arg2, this, 2);
         }
@@ -108,7 +108,7 @@ extends FacingBlock {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }

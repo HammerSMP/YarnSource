@@ -13,10 +13,10 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.decorator.CarvingMaskDecorator;
 import net.minecraft.world.gen.decorator.CarvingMaskDecoratorConfig;
 import net.minecraft.world.gen.decorator.ChanceDecoratorConfig;
@@ -130,16 +130,16 @@ public abstract class Decorator<DC extends DecoratorConfig> {
         return new ConfiguredDecorator<DC>(this, arg);
     }
 
-    protected <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, DC arg52, ConfiguredFeature<FC, F> arg6) {
+    protected <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DC arg52, ConfiguredFeature<FC, F> arg6) {
         AtomicBoolean atomicBoolean = new AtomicBoolean(false);
         this.getPositions(arg, arg3, random, arg52, arg4).forEach(arg5 -> {
-            boolean bl = arg6.generate(arg, arg2, (ChunkGenerator<ChunkGeneratorConfig>)arg3, random, (BlockPos)arg5);
+            boolean bl = arg6.generate(arg, arg2, arg3, random, (BlockPos)arg5);
             atomicBoolean.set(atomicBoolean.get() || bl);
         });
         return atomicBoolean.get();
     }
 
-    public abstract Stream<BlockPos> getPositions(IWorld var1, ChunkGenerator<? extends ChunkGeneratorConfig> var2, Random var3, DC var4, BlockPos var5);
+    public abstract Stream<BlockPos> getPositions(WorldAccess var1, ChunkGenerator var2, Random var3, DC var4, BlockPos var5);
 
     public String toString() {
         return this.getClass().getSimpleName() + "@" + Integer.toHexString(this.hashCode());

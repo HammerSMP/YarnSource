@@ -73,7 +73,7 @@ public class RecipeBookGhostSlots {
             }
             ItemStack lv2 = lv.getCurrentItemStack();
             ItemRenderer lv3 = arg2.getItemRenderer();
-            lv3.renderGuiItem(arg2.player, lv2, l, m);
+            lv3.method_27953(lv2, l, m);
             RenderSystem.depthFunc(516);
             DrawableHelper.fill(arg, l, m, l + 16, m + 16, 0x30FFFFFF);
             RenderSystem.depthFunc(515);

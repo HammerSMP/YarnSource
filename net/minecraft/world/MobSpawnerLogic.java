@@ -20,8 +20,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.SpawnRestriction;
-import net.minecraft.entity.SpawnType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -62,7 +62,7 @@ public abstract class MobSpawnerLogic {
         }
         catch (InvalidIdentifierException lv) {
             BlockPos lv2 = this.getPos();
-            LOGGER.warn("Invalid entity id '{}' at spawner {}:[{},{},{}]", (Object)string, (Object)this.getWorld().dimension.getType(), (Object)lv2.getX(), (Object)lv2.getY(), (Object)lv2.getZ());
+            LOGGER.warn("Invalid entity id '{}' at spawner {}:[{},{},{}]", (Object)string, (Object)this.getWorld().method_27983(), (Object)lv2.getX(), (Object)lv2.getY(), (Object)lv2.getZ());
             return null;
         }
     }
@@ -116,7 +116,7 @@ public abstract class MobSpawnerLogic {
                 double g = j >= 1 ? lv4.getDouble(0) : (double)lv2.getX() + (lv.random.nextDouble() - lv.random.nextDouble()) * (double)this.spawnRange + 0.5;
                 double h = j >= 2 ? lv4.getDouble(1) : (double)(lv2.getY() + lv.random.nextInt(3) - 1);
                 double d = k = j >= 3 ? lv4.getDouble(2) : (double)lv2.getZ() + (lv.random.nextDouble() - lv.random.nextDouble()) * (double)this.spawnRange + 0.5;
-                if (!lv.doesNotCollide(optional.get().createSimpleBoundingBox(g, h, k)) || !SpawnRestriction.canSpawn(optional.get(), lv.getWorld(), SpawnType.SPAWNER, new BlockPos(g, h, k), lv.getRandom())) continue;
+                if (!lv.doesNotCollide(optional.get().createSimpleBoundingBox(g, h, k)) || !SpawnRestriction.canSpawn(optional.get(), lv.getWorld(), SpawnReason.SPAWNER, new BlockPos(g, h, k), lv.getRandom())) continue;
                 Entity lv5 = EntityType.loadEntityWithPassengers(lv3, lv, arg -> {
                     arg.refreshPositionAndAngles(g, h, k, arg.yaw, arg.pitch);
                     return arg;
@@ -133,9 +133,9 @@ public abstract class MobSpawnerLogic {
                 lv5.refreshPositionAndAngles(lv5.getX(), lv5.getY(), lv5.getZ(), lv.random.nextFloat() * 360.0f, 0.0f);
                 if (lv5 instanceof MobEntity) {
                     MobEntity lv6 = (MobEntity)lv5;
-                    if (!lv6.canSpawn(lv, SpawnType.SPAWNER) || !lv6.canSpawn(lv)) continue;
+                    if (!lv6.canSpawn(lv, SpawnReason.SPAWNER) || !lv6.canSpawn(lv)) continue;
                     if (this.spawnEntry.getEntityTag().getSize() == 1 && this.spawnEntry.getEntityTag().contains("id", 8)) {
-                        ((MobEntity)lv5).initialize(lv, lv.getLocalDifficulty(lv5.getBlockPos()), SpawnType.SPAWNER, null, null);
+                        ((MobEntity)lv5).initialize(lv, lv.getLocalDifficulty(lv5.getBlockPos()), SpawnReason.SPAWNER, null, null);
                     }
                 }
                 this.spawnEntity(lv5);
@@ -230,7 +230,7 @@ public abstract class MobSpawnerLogic {
         if (this.renderedEntity == null) {
             this.renderedEntity = EntityType.loadEntityWithPassengers(this.spawnEntry.getEntityTag(), this.getWorld(), Function.identity());
             if (this.spawnEntry.getEntityTag().getSize() == 1 && this.spawnEntry.getEntityTag().contains("id", 8) && this.renderedEntity instanceof MobEntity) {
-                ((MobEntity)this.renderedEntity).initialize(this.getWorld(), this.getWorld().getLocalDifficulty(this.renderedEntity.getBlockPos()), SpawnType.SPAWNER, null, null);
+                ((MobEntity)this.renderedEntity).initialize(this.getWorld(), this.getWorld().getLocalDifficulty(this.renderedEntity.getBlockPos()), SpawnReason.SPAWNER, null, null);
             }
         }
         return this.renderedEntity;

@@ -14,10 +14,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.decorator.Decorator;
 import net.minecraft.world.gen.decorator.NoiseHeightmapDecoratorConfig;
 
@@ -28,7 +27,7 @@ extends Decorator<NoiseHeightmapDecoratorConfig> {
     }
 
     @Override
-    public Stream<BlockPos> getPositions(IWorld arg, ChunkGenerator<? extends ChunkGeneratorConfig> arg2, Random random, NoiseHeightmapDecoratorConfig arg3, BlockPos arg4) {
+    public Stream<BlockPos> getPositions(WorldAccess arg, ChunkGenerator arg2, Random random, NoiseHeightmapDecoratorConfig arg3, BlockPos arg4) {
         double d = Biome.FOLIAGE_NOISE.sample((double)arg4.getX() / 200.0, (double)arg4.getZ() / 200.0, false);
         int i2 = d < arg3.noiseLevel ? arg3.belowNoise : arg3.aboveNoise;
         return IntStream.range(0, i2).mapToObj(i -> {

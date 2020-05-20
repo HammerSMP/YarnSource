@@ -18,7 +18,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.IllagerEntity;
 import net.minecraft.loot.LootTables;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +35,7 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 
 public class WoodlandMansionGenerator {
     public static void addPieces(StructureManager arg, BlockPos arg2, BlockRotation arg3, List<Piece> list, Random random) {
@@ -945,7 +945,7 @@ public class WoodlandMansionGenerator {
          * WARNING - void declaration
          */
         @Override
-        protected void handleMetadata(String string, BlockPos arg, IWorld arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
             if (string.startsWith("Chest")) {
                 BlockRotation lv = this.placementData.getRotation();
                 BlockState lv2 = Blocks.CHEST.getDefaultState();
@@ -976,7 +976,7 @@ public class WoodlandMansionGenerator {
                 }
                 lv5.setPersistent();
                 lv5.refreshPositionAndAngles(arg, 0.0f, 0.0f);
-                lv5.initialize(arg2, arg2.getLocalDifficulty(lv5.getBlockPos()), SpawnType.STRUCTURE, null, null);
+                lv5.initialize(arg2, arg2.getLocalDifficulty(lv5.getBlockPos()), SpawnReason.STRUCTURE, null, null);
                 arg2.spawnEntity((Entity)lv5);
                 arg2.setBlockState(arg, Blocks.AIR.getDefaultState(), 2);
             }

@@ -34,7 +34,7 @@ import net.minecraft.world.border.WorldBorder;
 
 public class WorldBorderCommand {
     private static final SimpleCommandExceptionType CENTER_FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.worldborder.center.failed"));
-    private static final SimpleCommandExceptionType SET_FAILED_NOCHANGE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.worldborder.set.failed.nochange"));
+    private static final SimpleCommandExceptionType SET_FAILED_NO_CHANGE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.worldborder.set.failed.nochange"));
     private static final SimpleCommandExceptionType SET_FAILED_SMALL_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.worldborder.set.failed.small."));
     private static final SimpleCommandExceptionType SET_FAILED_BIG_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.worldborder.set.failed.big."));
     private static final SimpleCommandExceptionType WARNING_TIME_FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.worldborder.warning.time.failed"));
@@ -106,7 +106,7 @@ public class WorldBorderCommand {
         WorldBorder lv = arg.getWorld().getWorldBorder();
         double e = lv.getSize();
         if (e == d) {
-            throw SET_FAILED_NOCHANGE_EXCEPTION.create();
+            throw SET_FAILED_NO_CHANGE_EXCEPTION.create();
         }
         if (d < 1.0) {
             throw SET_FAILED_SMALL_EXCEPTION.create();

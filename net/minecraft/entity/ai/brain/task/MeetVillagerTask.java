@@ -32,7 +32,7 @@ extends Task<LivingEntity> {
     protected boolean shouldRun(ServerWorld arg2, LivingEntity arg22) {
         Brain<?> lv = arg22.getBrain();
         Optional<GlobalPos> optional = lv.getOptionalMemory(MemoryModuleType.MEETING_POINT);
-        return arg2.getRandom().nextInt(100) == 0 && optional.isPresent() && Objects.equals(arg2.getDimension().getType(), optional.get().getDimension()) && optional.get().getPos().isWithinDistance(arg22.getPos(), 4.0) && lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().stream().anyMatch(arg -> EntityType.VILLAGER.equals(arg.getType()));
+        return arg2.getRandom().nextInt(100) == 0 && optional.isPresent() && Objects.equals(arg2.method_27983(), optional.get().getDimension()) && optional.get().getPos().isWithinDistance(arg22.getPos(), 4.0) && lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().stream().anyMatch(arg -> EntityType.VILLAGER.equals(arg.getType()));
     }
 
     @Override

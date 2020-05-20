@@ -10,6 +10,7 @@ package net.minecraft.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -19,13 +20,11 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.PresetsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -33,25 +32,23 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
-import net.minecraft.world.level.LevelGeneratorOptions;
-import net.minecraft.world.level.LevelGeneratorType;
 
 @Environment(value=EnvType.CLIENT)
 public class CustomizeFlatLevelScreen
 extends Screen {
-    private final CreateWorldScreen parent;
-    private FlatChunkGeneratorConfig config = FlatChunkGeneratorConfig.getDefaultConfig();
+    private final Screen parent;
+    private final Consumer<FlatChunkGeneratorConfig> field_24565;
+    private FlatChunkGeneratorConfig config;
     private Text tileText;
     private Text heightText;
     private SuperflatLayersListWidget layers;
     private ButtonWidget widgetButtonRemoveLayer;
 
-    public CustomizeFlatLevelScreen(CreateWorldScreen arg, LevelGeneratorOptions arg2) {
+    public CustomizeFlatLevelScreen(Screen arg, Consumer<FlatChunkGeneratorConfig> consumer, FlatChunkGeneratorConfig arg2) {
         super(new TranslatableText("createWorld.customize.flat.title"));
         this.parent = arg;
-        if (arg2.getType() == LevelGeneratorType.FLAT) {
-            this.config = FlatChunkGeneratorConfig.fromDynamic(arg2.getDynamic());
-        }
+        this.field_24565 = consumer;
+        this.config = arg2;
     }
 
     public String getConfigString() {
@@ -86,7 +83,7 @@ extends Screen {
             this.method_2145();
         }));
         this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, ScreenTexts.DONE, arg -> {
-            this.parent.generatorOptions = LevelGeneratorType.FLAT.loadOptions(this.config.toDynamic(NbtOps.INSTANCE));
+            this.field_24565.accept(this.config);
             this.client.openScreen(this.parent);
             this.config.updateLayerBlocks();
             this.method_2145();
@@ -118,10 +115,10 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.layers.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
         int k = this.width / 2 - 92 - 16;
-        this.method_27535(arg, this.textRenderer, this.tileText, k, 32, 0xFFFFFF);
-        this.method_27535(arg, this.textRenderer, this.heightText, k + 2 + 213 - this.textRenderer.getStringWidth(this.heightText), 32, 0xFFFFFF);
+        this.drawTextWithShadow(arg, this.textRenderer, this.tileText, k, 32, 0xFFFFFF);
+        this.drawTextWithShadow(arg, this.textRenderer, this.heightText, k + 2 + 213 - this.textRenderer.getWidth(this.heightText), 32, 0xFFFFFF);
         super.render(arg, i, j, f);
     }
 

@@ -489,11 +489,11 @@ public class EntityRenderDispatcher {
                 i = 1.0f;
             }
             Box lv4 = lv3.getBoundingBox();
-            double j = (double)arg4.getX() + lv4.x1;
-            double k = (double)arg4.getX() + lv4.x2;
-            double l = (double)arg4.getY() + lv4.y1;
-            double m = (double)arg4.getZ() + lv4.z1;
-            double n = (double)arg4.getZ() + lv4.z2;
+            double j = (double)arg4.getX() + lv4.minX;
+            double k = (double)arg4.getX() + lv4.maxX;
+            double l = (double)arg4.getY() + lv4.minY;
+            double m = (double)arg4.getZ() + lv4.minZ;
+            double n = (double)arg4.getZ() + lv4.maxZ;
             float o = (float)(j - d);
             float p = (float)(k - d);
             float q = (float)(l - e);

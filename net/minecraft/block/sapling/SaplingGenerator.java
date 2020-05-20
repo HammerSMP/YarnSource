@@ -13,7 +13,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
@@ -22,7 +22,7 @@ public abstract class SaplingGenerator {
     @Nullable
     protected abstract ConfiguredFeature<TreeFeatureConfig, ?> createTreeFeature(Random var1, boolean var2);
 
-    public boolean generate(ServerWorld arg, ChunkGenerator<?> arg2, BlockPos arg3, BlockState arg4, Random random) {
+    public boolean generate(ServerWorld arg, ChunkGenerator arg2, BlockPos arg3, BlockState arg4, Random random) {
         ConfiguredFeature<TreeFeatureConfig, ?> lv = this.createTreeFeature(random, this.method_24282(arg, arg3));
         if (lv == null) {
             return false;
@@ -36,7 +36,7 @@ public abstract class SaplingGenerator {
         return false;
     }
 
-    private boolean method_24282(IWorld arg, BlockPos arg2) {
+    private boolean method_24282(WorldAccess arg, BlockPos arg2) {
         for (BlockPos lv : BlockPos.Mutable.iterate(arg2.down().north(2).west(2), arg2.up().south(2).east(2))) {
             if (!arg.getBlockState(lv).isIn(BlockTags.FLOWERS)) continue;
             return true;

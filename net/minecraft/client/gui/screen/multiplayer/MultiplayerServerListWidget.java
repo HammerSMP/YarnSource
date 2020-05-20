@@ -186,7 +186,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 this.client.textRenderer.draw(arg, list.get(p), (float)(k + 32 + 3), (float)(j + 12 + 9 * p), 0x808080);
             }
             Text lv = bl4 ? this.server.version.shallowCopy().formatted(Formatting.DARK_RED) : this.server.playerCountLabel;
-            int q = this.client.textRenderer.getStringWidth(lv);
+            int q = this.client.textRenderer.getWidth(lv);
             this.client.textRenderer.draw(arg, lv, (float)(k + l - q - 15 - 2), (float)(j + 1), 0x808080);
             int r = 0;
             if (bl4) {

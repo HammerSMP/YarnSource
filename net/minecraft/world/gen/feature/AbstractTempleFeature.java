@@ -8,7 +8,6 @@ package net.minecraft.world.gen.feature;
 
 import com.mojang.datafixers.Dynamic;
 import java.util.function.Function;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
@@ -20,13 +19,13 @@ extends StructureFeature<C> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getTempleDistance();
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getTempleSpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getTempleSeparation();
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getTempleSeparation();
     }
 
     @Override

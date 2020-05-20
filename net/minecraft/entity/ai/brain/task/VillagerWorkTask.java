@@ -39,7 +39,7 @@ extends Task<VillagerEntity> {
         }
         this.lastCheckedTime = arg.getTime();
         GlobalPos lv = arg2.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).get();
-        return Objects.equals(lv.getDimension(), arg.getDimension().getType()) && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
+        return Objects.equals(lv.getDimension(), arg.method_27983()) && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
     }
 
     @Override
@@ -64,7 +64,7 @@ extends Task<VillagerEntity> {
             return false;
         }
         GlobalPos lv = optional.get();
-        return Objects.equals(lv.getDimension(), arg.getDimension().getType()) && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
+        return Objects.equals(lv.getDimension(), arg.method_27983()) && lv.getPos().isWithinDistance(arg2.getPos(), 1.73);
     }
 
     @Override

@@ -28,9 +28,9 @@ import net.minecraft.world.World;
 public class EvokerFangsEntity
 extends Entity {
     private int warmup;
-    private boolean field_7610;
+    private boolean startedAttack;
     private int ticksLeft = 22;
-    private boolean hasAttacked;
+    private boolean playingAnimation;
     private LivingEntity owner;
     private UUID ownerUuid;
 
@@ -84,7 +84,7 @@ extends Entity {
     public void tick() {
         super.tick();
         if (this.world.isClient) {
-            if (this.hasAttacked) {
+            if (this.playingAnimation) {
                 --this.ticksLeft;
                 if (this.ticksLeft == 14) {
                     for (int i = 0; i < 12; ++i) {
@@ -105,9 +105,9 @@ extends Entity {
                     this.damage(lv);
                 }
             }
-            if (!this.field_7610) {
+            if (!this.startedAttack) {
                 this.world.sendEntityStatus(this, (byte)4);
-                this.field_7610 = true;
+                this.startedAttack = true;
             }
             if (--this.ticksLeft < 0) {
                 this.remove();
@@ -135,7 +135,7 @@ extends Entity {
     public void handleStatus(byte b) {
         super.handleStatus(b);
         if (b == 4) {
-            this.hasAttacked = true;
+            this.playingAnimation = true;
             if (!this.isSilent()) {
                 this.world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_EVOKER_FANGS_ATTACK, this.getSoundCategory(), 1.0f, this.random.nextFloat() * 0.2f + 0.85f, false);
             }
@@ -144,7 +144,7 @@ extends Entity {
 
     @Environment(value=EnvType.CLIENT)
     public float getAnimationProgress(float f) {
-        if (!this.hasAttacked) {
+        if (!this.playingAnimation) {
             return 0.0f;
         }
         int i = this.ticksLeft - 2;

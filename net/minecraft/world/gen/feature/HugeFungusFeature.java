@@ -18,10 +18,10 @@ import net.minecraft.block.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.HugeFungusFeatureConfig;
 import net.minecraft.world.gen.feature.WeepingVinesFeature;
@@ -33,7 +33,7 @@ extends Feature<HugeFungusFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, HugeFungusFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, HugeFungusFeatureConfig arg5) {
         Block lv = arg5.validBaseBlock.getBlock();
         BlockPos lv2 = null;
         if (arg5.planted) {
@@ -64,18 +64,18 @@ extends Feature<HugeFungusFeatureConfig> {
         return true;
     }
 
-    public static boolean method_24866(IWorld arg2, BlockPos arg22) {
+    public static boolean method_24866(WorldAccess arg2, BlockPos arg22) {
         return arg2.testBlockState(arg22, arg -> {
             Material lv = arg.getMaterial();
             return lv == Material.REPLACEABLE_PLANT;
         });
     }
 
-    private static boolean method_24868(IWorld arg, BlockPos arg2) {
+    private static boolean method_24868(WorldAccess arg, BlockPos arg2) {
         return arg.getBlockState(arg2).isAir() || !arg.getFluidState(arg2).isEmpty() || HugeFungusFeature.method_24866(arg, arg2);
     }
 
-    private void generateStem(IWorld arg, Random random, HugeFungusFeatureConfig arg2, BlockPos arg3, int i, boolean bl) {
+    private void generateStem(WorldAccess arg, Random random, HugeFungusFeatureConfig arg2, BlockPos arg3, int i, boolean bl) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         BlockState lv2 = arg2.stemState;
         int j = bl ? 1 : 0;
@@ -103,7 +103,7 @@ extends Feature<HugeFungusFeatureConfig> {
         }
     }
 
-    private void generateHat(IWorld arg, Random random, HugeFungusFeatureConfig arg2, BlockPos arg3, int i, boolean bl) {
+    private void generateHat(WorldAccess arg, Random random, HugeFungusFeatureConfig arg2, BlockPos arg3, int i, boolean bl) {
         int k;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         boolean bl2 = arg2.hatState.isOf(Blocks.NETHER_WART_BLOCK);
@@ -148,7 +148,7 @@ extends Feature<HugeFungusFeatureConfig> {
         }
     }
 
-    private void generateHatBlock(IWorld arg, Random random, HugeFungusFeatureConfig arg2, BlockPos.Mutable arg3, float f, float g, float h) {
+    private void generateHatBlock(WorldAccess arg, Random random, HugeFungusFeatureConfig arg2, BlockPos.Mutable arg3, float f, float g, float h) {
         if (random.nextFloat() < f) {
             this.setBlockState(arg, arg3, arg2.decorationState);
         } else if (random.nextFloat() < g) {
@@ -159,7 +159,7 @@ extends Feature<HugeFungusFeatureConfig> {
         }
     }
 
-    private void tryGenerateVines(IWorld arg, Random random, BlockPos arg2, BlockState arg3, boolean bl) {
+    private void tryGenerateVines(WorldAccess arg, Random random, BlockPos arg2, BlockState arg3, boolean bl) {
         if (arg.getBlockState(arg2.down()).isOf(arg3.getBlock())) {
             this.setBlockState(arg, arg2, arg3);
         } else if ((double)random.nextFloat() < 0.15) {
@@ -171,7 +171,7 @@ extends Feature<HugeFungusFeatureConfig> {
     }
 
     @Nullable
-    private static BlockPos.Mutable getStartPos(IWorld arg, BlockPos arg2, Block arg3) {
+    private static BlockPos.Mutable getStartPos(WorldAccess arg, BlockPos arg2, Block arg3) {
         BlockPos.Mutable lv = arg2.mutableCopy();
         for (int i = arg2.getY(); i >= 1; --i) {
             lv.setY(i);
@@ -182,7 +182,7 @@ extends Feature<HugeFungusFeatureConfig> {
         return null;
     }
 
-    private static void generateVines(BlockPos arg, IWorld arg2, Random random) {
+    private static void generateVines(BlockPos arg, WorldAccess arg2, Random random) {
         BlockPos.Mutable lv = arg.mutableCopy().move(Direction.DOWN);
         if (!arg2.isAir(lv)) {
             return;

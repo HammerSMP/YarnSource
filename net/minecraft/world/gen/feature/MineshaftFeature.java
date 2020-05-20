@@ -32,8 +32,8 @@ extends StructureFeature<MineshaftFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator<?> arg2, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
-        arg3.setCarverSeed(arg2.getSeed(), i, j);
+    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+        arg3.setCarverSeed(l, i, j);
         MineshaftFeatureConfig lv = arg2.getStructureConfig(arg4, this);
         double d = lv.probability;
         return arg3.nextDouble() < d;
@@ -61,7 +61,7 @@ extends StructureFeature<MineshaftFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             MineshaftFeatureConfig lv = arg.getStructureConfig(arg3, Feature.MINESHAFT);
             MineshaftGenerator.MineshaftRoom lv2 = new MineshaftGenerator.MineshaftRoom(0, this.random, (i << 4) + 2, (j << 4) + 2, lv.type);
             this.children.add(lv2);

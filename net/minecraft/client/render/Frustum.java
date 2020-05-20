@@ -50,7 +50,7 @@ public class Frustum {
     }
 
     public boolean isVisible(Box arg) {
-        return this.isVisible(arg.x1, arg.y1, arg.z1, arg.x2, arg.y2, arg.z2);
+        return this.isVisible(arg.minX, arg.minY, arg.minZ, arg.maxX, arg.maxY, arg.maxZ);
     }
 
     private boolean isVisible(double d, double e, double f, double g, double h, double i) {

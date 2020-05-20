@@ -61,8 +61,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class BeehiveBlock
 extends BlockWithEntity {
@@ -118,7 +118,6 @@ extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState arg, World arg22, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         ItemStack lv = arg4.getStackInHand(arg5);
-        ItemStack lv2 = lv.copy();
         int i = arg.get(HONEY_LEVEL);
         boolean bl = false;
         if (i >= 5) {
@@ -139,16 +138,13 @@ extends BlockWithEntity {
             }
         }
         if (bl) {
-            if (!CampfireBlock.isLitCampfireInRange(arg22, arg3, 5)) {
+            if (!CampfireBlock.isLitCampfireInRange(arg22, arg3)) {
                 if (this.hasBees(arg22, arg3)) {
                     this.angerNearbyBees(arg22, arg3);
                 }
                 this.takeHoney(arg22, arg, arg3, arg4, BeehiveBlockEntity.BeeState.EMERGENCY);
             } else {
                 this.takeHoney(arg22, arg, arg3);
-                if (arg4 instanceof ServerPlayerEntity) {
-                    Criteria.SAFELY_HARVEST_HONEY.test((ServerPlayerEntity)arg4, arg3, lv2);
-                }
             }
             return ActionResult.SUCCESS;
         }
@@ -280,7 +276,7 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         BlockEntity lv;
         if (arg4.getBlockState(arg6).getBlock() instanceof FireBlock && (lv = arg4.getBlockEntity(arg5)) instanceof BeehiveBlockEntity) {
             BeehiveBlockEntity lv2 = (BeehiveBlockEntity)lv;

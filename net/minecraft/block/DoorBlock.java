@@ -43,8 +43,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class DoorBlock
@@ -85,7 +85,7 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         DoubleBlockHalf lv = arg.get(HALF);
         if (arg2.getAxis() == Direction.Axis.Y && lv == DoubleBlockHalf.LOWER == (arg2 == Direction.UP)) {
             if (arg3.isOf(this) && arg3.get(HALF) != lv) {

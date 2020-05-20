@@ -6,8 +6,8 @@ package net.minecraft.world.gen;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.SpawnRestriction;
-import net.minecraft.entity.SpawnType;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -47,7 +47,7 @@ public class CatSpawner {
             if (arg.isNearOccupiedPointOfInterest(lv2, 2)) {
                 return this.spawnInHouse(arg, lv2);
             }
-            if (Feature.SWAMP_HUT.isInsideStructure(arg, arg.getStructureAccessor(), lv2)) {
+            if (Feature.SWAMP_HUT.isInsideStructure(arg.getStructureAccessor(), lv2)) {
                 return this.spawnInSwampHut(arg, lv2);
             }
         }
@@ -77,7 +77,7 @@ public class CatSpawner {
         if (lv == null) {
             return 0;
         }
-        lv.initialize(arg2, arg2.getLocalDifficulty(arg), SpawnType.NATURAL, null, null);
+        lv.initialize(arg2, arg2.getLocalDifficulty(arg), SpawnReason.NATURAL, null, null);
         lv.refreshPositionAndAngles(arg, 0.0f, 0.0f);
         arg2.spawnEntity(lv);
         return 1;

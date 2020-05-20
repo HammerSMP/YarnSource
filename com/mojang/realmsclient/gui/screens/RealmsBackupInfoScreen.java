@@ -131,9 +131,9 @@ extends RealmsScreen {
         protected void renderItem(MatrixStack arg, int i, int j, int k, int l, int m, int n, float f) {
             String string = (String)RealmsBackupInfoScreen.this.keys.get(i);
             TextRenderer lv = this.client.textRenderer;
-            this.drawString(arg, lv, string, this.width / 2 - 40, k, 0xA0A0A0);
+            this.drawStringWithShadow(arg, lv, string, this.width / 2 - 40, k, 0xA0A0A0);
             String string2 = ((RealmsBackupInfoScreen)RealmsBackupInfoScreen.this).backup.changeList.get(string);
-            this.method_27535(arg, lv, RealmsBackupInfoScreen.this.checkForSpecificMetadata(string, string2), this.width / 2 - 40, k + 12, 0xFFFFFF);
+            this.drawTextWithShadow(arg, lv, RealmsBackupInfoScreen.this.checkForSpecificMetadata(string, string2), this.width / 2 - 40, k + 12, 0xFFFFFF);
         }
 
         @Override

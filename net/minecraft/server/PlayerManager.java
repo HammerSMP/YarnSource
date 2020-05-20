@@ -96,6 +96,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.WorldSaveHandler;
+import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderListener;
 import net.minecraft.world.dimension.DimensionType;
@@ -158,7 +159,7 @@ public abstract class PlayerManager {
         GameRules lv6 = lv3.getGameRules();
         boolean bl = lv6.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
         boolean bl2 = lv6.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv5.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), class_5217.method_27418(lv4.getSeed()), lv4.isHardcore(), lv3.dimension.getType(), this.getMaxPlayerCount(), lv4.getGeneratorType(), this.viewDistance, bl2, !bl));
+        lv5.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv3.getSeed()), lv4.isHardcore(), lv3.method_27983(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv3.method_27982(), lv3.method_28125()));
         lv5.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
         lv5.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
         lv5.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
@@ -427,7 +428,7 @@ public abstract class PlayerManager {
             lv4.updatePosition(lv4.getX(), lv4.getY() + 1.0, lv4.getZ());
         }
         class_5217 lv7 = lv4.world.getLevelProperties();
-        lv4.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv4.dimension, class_5217.method_27418(lv7.getSeed()), lv7.getGeneratorType(), lv4.interactionManager.getGameMode(), bl));
+        lv4.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv4.dimension, BiomeAccess.hashSeed(lv4.getServerWorld().getSeed()), lv4.interactionManager.getGameMode(), lv4.getServerWorld().method_27982(), lv4.getServerWorld().method_28125(), bl));
         lv4.networkHandler.requestTeleport(lv4.getX(), lv4.getY(), lv4.getZ(), lv4.yaw, lv4.pitch);
         lv4.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv5.method_27911()));
         lv4.networkHandler.sendPacket(new DifficultyS2CPacket(lv7.getDifficulty(), lv7.isDifficultyLocked()));

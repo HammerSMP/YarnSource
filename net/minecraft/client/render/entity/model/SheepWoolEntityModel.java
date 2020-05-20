@@ -44,8 +44,8 @@ extends QuadrupedEntityModel<T> {
     @Override
     public void animateModel(T arg, float f, float g, float h) {
         super.animateModel(arg, f, g, h);
-        this.head.pivotY = 6.0f + ((SheepEntity)arg).method_6628(h) * 9.0f;
-        this.field_3541 = ((SheepEntity)arg).method_6641(h);
+        this.head.pivotY = 6.0f + ((SheepEntity)arg).getNeckAngle(h) * 9.0f;
+        this.field_3541 = ((SheepEntity)arg).getHeadAngle(h);
     }
 
     @Override

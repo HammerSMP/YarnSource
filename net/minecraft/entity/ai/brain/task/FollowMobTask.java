@@ -10,9 +10,9 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.function.Predicate;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.EntityLookTarget;
 import net.minecraft.entity.ai.brain.MemoryModuleState;
@@ -25,8 +25,8 @@ extends Task<LivingEntity> {
     private final Predicate<LivingEntity> predicate;
     private final float maxDistanceSquared;
 
-    public FollowMobTask(EntityCategory arg, float f) {
-        this((LivingEntity arg2) -> arg.equals((Object)arg2.getType().getCategory()), f);
+    public FollowMobTask(SpawnGroup arg, float f) {
+        this((LivingEntity arg2) -> arg.equals((Object)arg2.getType().getSpawnGroup()), f);
     }
 
     public FollowMobTask(EntityType<?> arg, float f) {

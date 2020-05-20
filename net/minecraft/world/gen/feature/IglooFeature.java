@@ -55,7 +55,7 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             DefaultFeatureConfig lv = arg.getStructureConfig(arg3, Feature.IGLOO);
             int k = i * 16;
             int l = j * 16;

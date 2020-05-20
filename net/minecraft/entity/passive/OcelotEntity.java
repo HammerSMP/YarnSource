@@ -19,7 +19,7 @@ import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.AttackGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
@@ -54,9 +54,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class OcelotEntity
@@ -167,13 +167,13 @@ extends AnimalEntity {
         return SoundEvents.ENTITY_OCELOT_DEATH;
     }
 
-    private float method_22329() {
+    private float getAttackDamage() {
         return (float)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
     }
 
     @Override
     public boolean tryAttack(Entity arg) {
-        return arg.damage(DamageSource.mob(this), this.method_22329());
+        return arg.damage(DamageSource.mob(this), this.getAttackDamage());
     }
 
     @Override
@@ -249,7 +249,7 @@ extends AnimalEntity {
         return TAMING_INGREDIENT.test(arg);
     }
 
-    public static boolean canSpawn(EntityType<OcelotEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<OcelotEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return random.nextInt(3) != 0;
     }
 
@@ -270,7 +270,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
             ((PassiveEntity.PassiveData)arg4).setBabyChance(1.0f);

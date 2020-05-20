@@ -26,7 +26,7 @@ import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.command.CommandManager;
@@ -71,7 +71,7 @@ public class SummonCommand {
             throw FAILED_EXCEPTION.create();
         }
         if (bl && lv5 instanceof MobEntity) {
-            ((MobEntity)lv5).initialize(arg.getWorld(), arg.getWorld().getLocalDifficulty(lv5.getBlockPos()), SpawnType.COMMAND, null, null);
+            ((MobEntity)lv5).initialize(arg.getWorld(), arg.getWorld().getLocalDifficulty(lv5.getBlockPos()), SpawnReason.COMMAND, null, null);
         }
         arg.sendFeedback(new TranslatableText("commands.summon.success", lv5.getDisplayName()), true);
         return 1;

@@ -26,7 +26,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.CrossbowAttackGoal;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -60,9 +60,9 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class PillagerEntity
@@ -101,7 +101,7 @@ implements CrossbowUser {
     }
 
     @Override
-    public boolean method_25938(RangedWeaponItem arg) {
+    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
         return arg == Items.CROSSBOW;
     }
 
@@ -175,7 +175,7 @@ implements CrossbowUser {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.initEquipment(arg2);
         this.updateEnchantments(arg2);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
@@ -236,6 +236,7 @@ implements CrossbowUser {
         } else {
             Item lv2 = lv.getItem();
             if (this.method_7111(lv2)) {
+                this.method_27964(arg);
                 ItemStack lv3 = this.inventory.addStack(lv);
                 if (lv3.isEmpty()) {
                     arg.remove();

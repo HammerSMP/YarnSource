@@ -13,10 +13,10 @@ import java.util.function.Function;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
 
@@ -27,7 +27,7 @@ extends Feature<OreFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, OreFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, OreFeatureConfig arg5) {
         float f = random.nextFloat() * (float)Math.PI;
         float g = (float)arg5.size / 8.0f;
         int i = MathHelper.ceil(((float)arg5.size / 16.0f * 2.0f + 1.0f) / 2.0f);
@@ -52,7 +52,7 @@ extends Feature<OreFeatureConfig> {
         return false;
     }
 
-    protected boolean generateVeinPart(IWorld arg, Random random, OreFeatureConfig arg2, double d, double e, double f, double g, double h, double i, int j, int k, int l, int m, int n) {
+    protected boolean generateVeinPart(WorldAccess arg, Random random, OreFeatureConfig arg2, double d, double e, double f, double g, double h, double i, int j, int k, int l, int m, int n) {
         int o = 0;
         BitSet bitSet = new BitSet(m * n * m);
         BlockPos.Mutable lv = new BlockPos.Mutable();

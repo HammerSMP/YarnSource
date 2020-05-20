@@ -16,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
@@ -31,13 +30,13 @@ extends StructureFeature<BastionRemnantFeatureConfig> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getNetherStructureSpacing();
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getNetherStructureSpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getNetherStructureSeparation();
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getNetherStructureSeparation();
     }
 
     @Override
@@ -46,7 +45,7 @@ extends StructureFeature<BastionRemnantFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator<?> arg2, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
         return arg3.nextInt(6) >= 2;
     }
 
@@ -72,7 +71,7 @@ extends StructureFeature<BastionRemnantFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             BastionRemnantFeatureConfig lv = arg.getStructureConfig(arg3, Feature.BASTION_REMNANT);
             BlockPos lv2 = new BlockPos(i * 16, 33, j * 16);
             BastionRemnantGenerator.addPieces(arg, arg2, lv2, this.children, this.random, lv);

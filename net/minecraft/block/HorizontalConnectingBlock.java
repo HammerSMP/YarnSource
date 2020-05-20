@@ -47,6 +47,9 @@ implements Waterloggable {
         super(arg);
         this.collisionShapes = this.createShapes(f, g, j, 0.0f, j);
         this.boundingShapes = this.createShapes(f, g, h, 0.0f, i);
+        for (BlockState lv : this.stateManager.getStates()) {
+            this.getShapeIndex(lv);
+        }
     }
 
     protected VoxelShape[] createShapes(float f, float g, float h, float i, float j) {

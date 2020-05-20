@@ -80,7 +80,7 @@ extends PathNodeMaker {
         if (this.entity.getPathfindingPenalty(lv5) < 0.0f) {
             Box lv6 = this.entity.getBoundingBox();
             BlockPos.Mutable lv7 = lv;
-            if (this.method_27139(lv7.set(lv6.x1, (double)i, lv6.z1)) || this.method_27139(lv7.set(lv6.x1, (double)i, lv6.z2)) || this.method_27139(lv7.set(lv6.x2, (double)i, lv6.z1)) || this.method_27139(lv7.set(lv6.x2, (double)i, lv6.z2))) {
+            if (this.method_27139(lv7.set(lv6.minX, (double)i, lv6.minZ)) || this.method_27139(lv7.set(lv6.minX, (double)i, lv6.maxZ)) || this.method_27139(lv7.set(lv6.maxX, (double)i, lv6.minZ)) || this.method_27139(lv7.set(lv6.maxX, (double)i, lv6.maxZ))) {
                 return this.method_27137(lv7);
             }
         }

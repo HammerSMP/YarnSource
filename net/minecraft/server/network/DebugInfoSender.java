@@ -28,8 +28,8 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -74,7 +74,7 @@ public class DebugInfoSender {
     public static void sendNeighborUpdate(World arg, BlockPos arg2) {
     }
 
-    public static void sendStructureStart(IWorld arg, StructureStart arg2) {
+    public static void sendStructureStart(WorldAccess arg, StructureStart arg2) {
     }
 
     public static void sendGoalSelector(World arg, MobEntity arg2, GoalSelector arg3) {

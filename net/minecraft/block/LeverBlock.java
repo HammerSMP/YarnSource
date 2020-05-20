@@ -30,8 +30,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class LeverBlock
 extends WallMountedBlock {
@@ -106,7 +106,7 @@ extends WallMountedBlock {
         return arg;
     }
 
-    private static void spawnParticles(BlockState arg, IWorld arg2, BlockPos arg3, float f) {
+    private static void spawnParticles(BlockState arg, WorldAccess arg2, BlockPos arg3, float f) {
         Direction lv = arg.get(FACING).getOpposite();
         Direction lv2 = LeverBlock.getDirection(arg).getOpposite();
         double d = (double)arg3.getX() + 0.5 + 0.1 * (double)lv.getOffsetX() + 0.2 * (double)lv2.getOffsetX();
@@ -124,14 +124,14 @@ extends WallMountedBlock {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (bl || arg.isOf(arg4.getBlock())) {
             return;
         }
         if (arg.get(POWERED).booleanValue()) {
             this.updateNeighbors(arg, arg2, arg3);
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override

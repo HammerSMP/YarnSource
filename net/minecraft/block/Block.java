@@ -64,8 +64,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.logging.log4j.LogManager;
@@ -146,7 +146,7 @@ implements ItemConvertible {
         return this == arg;
     }
 
-    public static BlockState postProcessState(BlockState arg, IWorld arg2, BlockPos arg3) {
+    public static BlockState postProcessState(BlockState arg, WorldAccess arg2, BlockPos arg3) {
         BlockState lv = arg;
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
         for (Direction lv3 : FACINGS) {
@@ -156,7 +156,7 @@ implements ItemConvertible {
         return lv;
     }
 
-    public static void replaceBlock(BlockState arg, BlockState arg2, IWorld arg3, BlockPos arg4, int i) {
+    public static void replaceBlock(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
         if (arg2 != arg) {
             if (arg2.isAir()) {
                 if (!arg3.isClient()) {
@@ -212,7 +212,7 @@ implements ItemConvertible {
 
     public static boolean hasTopRim(BlockView arg, BlockPos arg2) {
         BlockState lv = arg.getBlockState(arg2);
-        return !VoxelShapes.matchesAnywhere(lv.getSidesShape(arg, arg2).getFace(Direction.UP), SOLID_MEDIUM_SQUARE_SHAPE, BooleanBiFunction.ONLY_SECOND);
+        return lv.isFullCube(arg, arg2) && lv.isSideSolidFullSquare(arg, arg2, Direction.UP) || !VoxelShapes.matchesAnywhere(lv.getSidesShape(arg, arg2).getFace(Direction.UP), SOLID_MEDIUM_SQUARE_SHAPE, BooleanBiFunction.ONLY_SECOND);
     }
 
     public static boolean sideCoversSmallSquare(WorldView arg, BlockPos arg2, Direction arg3) {
@@ -241,16 +241,16 @@ implements ItemConvertible {
     public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
     }
 
-    public void onBroken(IWorld arg, BlockPos arg2, BlockState arg3) {
+    public void onBroken(WorldAccess arg, BlockPos arg2, BlockState arg3) {
     }
 
     public static List<ItemStack> getDroppedStacks(BlockState arg, ServerWorld arg2, BlockPos arg3, @Nullable BlockEntity arg4) {
-        LootContext.Builder lv = new LootContext.Builder(arg2).setRandom(arg2.random).put(LootContextParameters.POSITION, arg3).put(LootContextParameters.TOOL, ItemStack.EMPTY).putNullable(LootContextParameters.BLOCK_ENTITY, arg4);
+        LootContext.Builder lv = new LootContext.Builder(arg2).random(arg2.random).parameter(LootContextParameters.POSITION, arg3).parameter(LootContextParameters.TOOL, ItemStack.EMPTY).optionalParameter(LootContextParameters.BLOCK_ENTITY, arg4);
         return arg.getDroppedStacks(lv);
     }
 
     public static List<ItemStack> getDroppedStacks(BlockState arg, ServerWorld arg2, BlockPos arg3, @Nullable BlockEntity arg4, @Nullable Entity arg5, ItemStack arg6) {
-        LootContext.Builder lv = new LootContext.Builder(arg2).setRandom(arg2.random).put(LootContextParameters.POSITION, arg3).put(LootContextParameters.TOOL, arg6).putNullable(LootContextParameters.THIS_ENTITY, arg5).putNullable(LootContextParameters.BLOCK_ENTITY, arg4);
+        LootContext.Builder lv = new LootContext.Builder(arg2).random(arg2.random).parameter(LootContextParameters.POSITION, arg3).parameter(LootContextParameters.TOOL, arg6).optionalParameter(LootContextParameters.THIS_ENTITY, arg5).optionalParameter(LootContextParameters.BLOCK_ENTITY, arg4);
         return arg.getDroppedStacks(lv);
     }
 

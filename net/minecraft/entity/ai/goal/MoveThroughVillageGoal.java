@@ -83,7 +83,7 @@ extends Goal {
         this.targetPath = lv4.findPathTo(this.target, 0);
         lv4.setCanPathThroughDoors(bl);
         if (this.targetPath == null) {
-            Vec3d lv5 = TargetFinder.findTargetTowards(this.mob, 10, 7, Vec3d.method_24955(this.target));
+            Vec3d lv5 = TargetFinder.findTargetTowards(this.mob, 10, 7, Vec3d.ofBottomCenter(this.target));
             if (lv5 == null) {
                 return false;
             }

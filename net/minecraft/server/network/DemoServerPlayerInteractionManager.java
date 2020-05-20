@@ -3,10 +3,10 @@
  */
 package net.minecraft.server.network;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
@@ -80,7 +80,7 @@ extends ServerPlayerInteractionManager {
     }
 
     @Override
-    public ActionResult interactItem(PlayerEntity arg, World arg2, ItemStack arg3, Hand arg4) {
+    public ActionResult interactItem(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4) {
         if (this.demoEnded) {
             this.sendDemoReminder();
             return ActionResult.PASS;
@@ -89,7 +89,7 @@ extends ServerPlayerInteractionManager {
     }
 
     @Override
-    public ActionResult interactBlock(PlayerEntity arg, World arg2, ItemStack arg3, Hand arg4, BlockHitResult arg5) {
+    public ActionResult interactBlock(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4, BlockHitResult arg5) {
         if (this.demoEnded) {
             this.sendDemoReminder();
             return ActionResult.PASS;

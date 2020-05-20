@@ -15,25 +15,26 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelGeneratorType;
 
 public class PlayerRespawnS2CPacket
 implements Packet<ClientPlayPacketListener> {
     private DimensionType dimension;
     private long sha256Seed;
     private GameMode gameMode;
-    private LevelGeneratorType generatorType;
-    private boolean field_24451;
+    private boolean debugWorld;
+    private boolean flatWorld;
+    private boolean keepPlayerAttributes;
 
     public PlayerRespawnS2CPacket() {
     }
 
-    public PlayerRespawnS2CPacket(DimensionType arg, long l, LevelGeneratorType arg2, GameMode arg3, boolean bl) {
+    public PlayerRespawnS2CPacket(DimensionType arg, long l, GameMode arg2, boolean bl, boolean bl2, boolean bl3) {
         this.dimension = arg;
         this.sha256Seed = l;
-        this.gameMode = arg3;
-        this.generatorType = arg2;
-        this.field_24451 = bl;
+        this.gameMode = arg2;
+        this.debugWorld = bl;
+        this.flatWorld = bl2;
+        this.keepPlayerAttributes = bl3;
     }
 
     @Override
@@ -46,11 +47,9 @@ implements Packet<ClientPlayPacketListener> {
         this.dimension = DimensionType.byRawId(arg.readInt());
         this.sha256Seed = arg.readLong();
         this.gameMode = GameMode.byId(arg.readUnsignedByte());
-        this.generatorType = LevelGeneratorType.getTypeFromName(arg.readString(16));
-        if (this.generatorType == null) {
-            this.generatorType = LevelGeneratorType.DEFAULT;
-        }
-        this.field_24451 = arg.readBoolean();
+        this.debugWorld = arg.readBoolean();
+        this.flatWorld = arg.readBoolean();
+        this.keepPlayerAttributes = arg.readBoolean();
     }
 
     @Override
@@ -58,8 +57,9 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeInt(this.dimension.getRawId());
         arg.writeLong(this.sha256Seed);
         arg.writeByte(this.gameMode.getId());
-        arg.writeString(this.generatorType.getName());
-        arg.writeBoolean(this.field_24451);
+        arg.writeBoolean(this.debugWorld);
+        arg.writeBoolean(this.flatWorld);
+        arg.writeBoolean(this.keepPlayerAttributes);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -78,13 +78,18 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public LevelGeneratorType getGeneratorType() {
-        return this.generatorType;
+    public boolean isDebugWorld() {
+        return this.debugWorld;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean method_27904() {
-        return this.field_24451;
+    public boolean isFlatWorld() {
+        return this.flatWorld;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public boolean shouldKeepPlayerAttributes() {
+        return this.keepPlayerAttributes;
     }
 }
 

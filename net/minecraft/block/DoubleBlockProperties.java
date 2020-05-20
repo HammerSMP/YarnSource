@@ -11,10 +11,10 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 
 public class DoubleBlockProperties {
-    public static <S extends BlockEntity> PropertySource<S> toPropertySource(BlockEntityType<S> arg, Function<BlockState, Type> function, Function<BlockState, Direction> function2, DirectionProperty arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BiPredicate<IWorld, BlockPos> biPredicate) {
+    public static <S extends BlockEntity> PropertySource<S> toPropertySource(BlockEntityType<S> arg, Function<BlockState, Type> function, Function<BlockState, Direction> function2, DirectionProperty arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BiPredicate<WorldAccess, BlockPos> biPredicate) {
         Type lv5;
         boolean bl2;
         S lv = arg.get(arg4, arg5);

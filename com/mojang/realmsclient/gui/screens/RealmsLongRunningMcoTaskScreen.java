@@ -11,12 +11,12 @@
 package com.mojang.realmsclient.gui.screens;
 
 import com.google.common.collect.Sets;
+import com.mojang.realmsclient.client.Errable;
 import com.mojang.realmsclient.exception.RealmsDefaultUncaughtExceptionHandler;
 import com.mojang.realmsclient.gui.LongRunningTask;
 import java.util.HashSet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5221;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 @Environment(value=EnvType.CLIENT)
 public class RealmsLongRunningMcoTaskScreen
 extends RealmsScreen
-implements class_5221 {
+implements Errable {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Screen parent;
     private volatile String title = "";
@@ -88,7 +88,7 @@ implements class_5221 {
             this.drawCenteredString(arg, this.textRenderer, symbols[this.animTicks % symbols.length], this.width / 2, RealmsLongRunningMcoTaskScreen.row(8), 0x808080);
         }
         if (this.error) {
-            this.drawStringWithShadow(arg, this.textRenderer, this.errorMessage, this.width / 2, RealmsLongRunningMcoTaskScreen.row(8), 0xFF0000);
+            this.drawCenteredText(arg, this.textRenderer, this.errorMessage, this.width / 2, RealmsLongRunningMcoTaskScreen.row(8), 0xFF0000);
         }
         super.render(arg, i, j, f);
     }

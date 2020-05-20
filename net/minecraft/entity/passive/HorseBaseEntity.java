@@ -17,6 +17,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5275;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -27,7 +28,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Saddleable;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
@@ -69,10 +70,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public abstract class HorseBaseEntity
 extends AnimalEntity
@@ -86,7 +86,7 @@ Saddleable {
     private int eatingGrassTicks;
     private int eatingTicks;
     private int angryTicks;
-    public int field_6957;
+    public int tailWagTicks;
     public int field_6958;
     protected boolean inAir;
     protected BasicInventory items;
@@ -99,13 +99,13 @@ Saddleable {
     private float lastAngryAnimationProgress;
     private float eatingAnimationProgress;
     private float lastEatingAnimationProgress;
-    protected boolean field_6964 = true;
+    protected boolean playExtraHorseSounds = true;
     protected int soundTicks;
 
     protected HorseBaseEntity(EntityType<? extends HorseBaseEntity> arg, World arg2) {
         super((EntityType<? extends AnimalEntity>)arg, arg2);
         this.stepHeight = 1.0f;
-        this.method_6721();
+        this.onChestedStatusChanged();
     }
 
     @Override
@@ -264,7 +264,7 @@ Saddleable {
         return 2;
     }
 
-    protected void method_6721() {
+    protected void onChestedStatusChanged() {
         BasicInventory lv = this.items;
         this.items = new BasicInventory(this.getInventorySize());
         if (lv != null) {
@@ -284,7 +284,7 @@ Saddleable {
         if (this.world.isClient) {
             return;
         }
-        this.setHorseFlag(4, !this.items.getStack(0).isEmpty() && this.canBeSaddled());
+        this.setHorseFlag(4, !this.items.getStack(0).isEmpty());
     }
 
     @Override
@@ -340,7 +340,7 @@ Saddleable {
         if (lv.isOf(Blocks.SNOW)) {
             lv2 = lv.getSoundGroup();
         }
-        if (this.hasPassengers() && this.field_6964) {
+        if (this.hasPassengers() && this.playExtraHorseSounds) {
             ++this.soundTicks;
             if (this.soundTicks > 5 && this.soundTicks % 3 == 0) {
                 this.playWalkSound(lv2);
@@ -468,8 +468,8 @@ Saddleable {
         return false;
     }
 
-    private void method_6759() {
-        this.field_6957 = 1;
+    private void wagTail() {
+        this.tailWagTicks = 1;
     }
 
     @Override
@@ -488,7 +488,7 @@ Saddleable {
     @Override
     public void tickMovement() {
         if (this.random.nextInt(200) == 0) {
-            this.method_6759();
+            this.wagTail();
         }
         super.tickMovement();
         if (this.world.isClient || !this.isAlive()) {
@@ -531,8 +531,8 @@ Saddleable {
             this.angryTicks = 0;
             this.setAngry(false);
         }
-        if (this.field_6957 > 0 && ++this.field_6957 > 8) {
-            this.field_6957 = 0;
+        if (this.tailWagTicks > 0 && ++this.tailWagTicks > 8) {
+            this.tailWagTicks = 0;
         }
         if (this.field_6958 > 0) {
             ++this.field_6958;
@@ -914,25 +914,43 @@ Saddleable {
         return this.getPassengerList().get(0);
     }
 
+    @Nullable
+    private Vec3d method_27930(Vec3d arg, LivingEntity arg2) {
+        double d = this.getX() + arg.x;
+        double e = this.getBoundingBox().minY;
+        double f = this.getZ() + arg.z;
+        BlockPos.Mutable lv = new BlockPos.Mutable();
+        block0: for (EntityPose lv2 : arg2.getPoses()) {
+            lv.set(d, e, f);
+            double g = this.getBoundingBox().maxY + 0.75;
+            do {
+                Vec3d lv4;
+                Box lv3;
+                double h = this.world.method_26372(lv);
+                if ((double)lv.getY() + h > g) continue block0;
+                if (class_5275.method_27932(h) && class_5275.method_27933(this.world, arg2, (lv3 = arg2.method_24833(lv2)).offset(lv4 = new Vec3d(d, (double)lv.getY() + h, f)))) {
+                    arg2.setPose(lv2);
+                    return lv4;
+                }
+                lv.move(Direction.UP);
+            } while ((double)lv.getY() < g);
+        }
+        return null;
+    }
+
     @Override
     public Vec3d method_24829(LivingEntity arg) {
         Vec3d lv = HorseBaseEntity.method_24826(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.RIGHT ? 90.0f : -90.0f));
-        double d = this.getX() + lv.x;
-        double e = this.getBoundingBox().y1;
-        double f = this.getZ() + lv.z;
-        Box lv2 = arg.method_24833(arg.method_26081()).offset(d, e, f);
-        BlockPos.Mutable lv3 = new BlockPos.Mutable(d, e, f);
-        double g = this.getBoundingBox().y2 + 0.75;
-        do {
-            Box lv4;
-            double h = this.world.method_26372(lv3);
-            if ((double)lv3.getY() + h > g) break;
-            if (!Double.isInfinite(h) && h < 1.0 && this.world.getBlockCollisions(arg, lv4 = lv2.offset(d, (double)lv3.getY() + h, f)).allMatch(VoxelShape::isEmpty)) {
-                return new Vec3d(d, (double)lv3.getY() + h, f);
-            }
-            lv3.move(Direction.UP);
-        } while ((double)lv3.getY() < g);
-        return new Vec3d(this.getX(), this.getY(), this.getZ());
+        Vec3d lv2 = this.method_27930(lv, arg);
+        if (lv2 != null) {
+            return lv2;
+        }
+        Vec3d lv3 = HorseBaseEntity.method_24826(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.LEFT ? 90.0f : -90.0f));
+        Vec3d lv4 = this.method_27930(lv3, arg);
+        if (lv4 != null) {
+            return lv4;
+        }
+        return this.getPos();
     }
 
     protected void initAttributes() {
@@ -940,7 +958,7 @@ Saddleable {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
             ((PassiveEntity.PassiveData)arg4).setBabyChance(0.2f);

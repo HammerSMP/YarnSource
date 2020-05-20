@@ -36,7 +36,7 @@ import net.minecraft.util.math.ColumnPos;
 import net.minecraft.world.dimension.DimensionType;
 
 public class ForceLoadCommand {
-    private static final Dynamic2CommandExceptionType TOOBIG_EXCEPTION = new Dynamic2CommandExceptionType((object, object2) -> new TranslatableText("commands.forceload.toobig", object, object2));
+    private static final Dynamic2CommandExceptionType TOO_BIG_EXCEPTION = new Dynamic2CommandExceptionType((object, object2) -> new TranslatableText("commands.forceload.toobig", object, object2));
     private static final Dynamic2CommandExceptionType QUERY_FAILURE_EXCEPTION = new Dynamic2CommandExceptionType((object, object2) -> new TranslatableText("commands.forceload.query.failure", object, object2));
     private static final SimpleCommandExceptionType ADDED_FAILURE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.forceload.added.failure"));
     private static final SimpleCommandExceptionType REMOVED_FAILURE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.forceload.removed.failure"));
@@ -47,7 +47,7 @@ public class ForceLoadCommand {
 
     private static int executeQuery(ServerCommandSource arg, ColumnPos arg2) throws CommandSyntaxException {
         ChunkPos lv = new ChunkPos(arg2.x >> 4, arg2.z >> 4);
-        DimensionType lv2 = arg.getWorld().getDimension().getType();
+        DimensionType lv2 = arg.getWorld().method_27983();
         boolean bl = arg.getMinecraftServer().getWorld(lv2).getForcedChunks().contains(lv.toLong());
         if (bl) {
             arg.sendFeedback(new TranslatableText("commands.forceload.query.success", lv, lv2), false);
@@ -57,7 +57,7 @@ public class ForceLoadCommand {
     }
 
     private static int executeQuery(ServerCommandSource arg) {
-        DimensionType lv = arg.getWorld().getDimension().getType();
+        DimensionType lv = arg.getWorld().method_27983();
         LongSet longSet = arg.getMinecraftServer().getWorld(lv).getForcedChunks();
         int i = longSet.size();
         if (i > 0) {
@@ -74,7 +74,7 @@ public class ForceLoadCommand {
     }
 
     private static int executeRemoveAll(ServerCommandSource arg) {
-        DimensionType lv = arg.getWorld().getDimension().getType();
+        DimensionType lv = arg.getWorld().method_27983();
         ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
         LongSet longSet = lv2.getForcedChunks();
         longSet.forEach(l -> lv2.setChunkForced(ChunkPos.getPackedX(l), ChunkPos.getPackedZ(l), false));
@@ -96,9 +96,9 @@ public class ForceLoadCommand {
         int n = j >> 4;
         long q = ((long)(o - m) + 1L) * ((long)(p - n) + 1L);
         if (q > 256L) {
-            throw TOOBIG_EXCEPTION.create((Object)256, (Object)q);
+            throw TOO_BIG_EXCEPTION.create((Object)256, (Object)q);
         }
-        DimensionType lv = arg.getWorld().getDimension().getType();
+        DimensionType lv = arg.getWorld().method_27983();
         ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
         ChunkPos lv3 = null;
         int r = 0;

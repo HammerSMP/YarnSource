@@ -36,7 +36,7 @@ public class PardonIpCommand {
     }
 
     private static int pardonIp(ServerCommandSource arg, String string) throws CommandSyntaxException {
-        Matcher matcher = BanIpCommand.field_13466.matcher(string);
+        Matcher matcher = BanIpCommand.PATTERN.matcher(string);
         if (!matcher.matches()) {
             throw INVALID_IP_EXCEPTION.create();
         }

@@ -37,7 +37,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
 public class BanIpCommand {
-    public static final Pattern field_13466 = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    public static final Pattern PATTERN = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
     private static final SimpleCommandExceptionType INVALID_IP_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.banip.invalid"));
     private static final SimpleCommandExceptionType ALREADY_BANNED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.banip.failed"));
 
@@ -46,7 +46,7 @@ public class BanIpCommand {
     }
 
     private static int checkIp(ServerCommandSource arg, String string, @Nullable Text arg2) throws CommandSyntaxException {
-        Matcher matcher = field_13466.matcher(string);
+        Matcher matcher = PATTERN.matcher(string);
         if (matcher.matches()) {
             return BanIpCommand.banIp(arg, string, arg2);
         }

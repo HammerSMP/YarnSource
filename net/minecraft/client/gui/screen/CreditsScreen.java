@@ -211,7 +211,7 @@ extends Screen {
             if ((float)n + g + 12.0f + 8.0f > 0.0f && (float)n + g < (float)this.height) {
                 Text lv = this.credits.get(o);
                 if (this.field_24261.contains(o)) {
-                    this.textRenderer.drawWithShadow(arg, lv, (float)(l + (274 - this.textRenderer.getStringWidth(lv)) / 2), (float)n, 0xFFFFFF);
+                    this.textRenderer.drawWithShadow(arg, lv, (float)(l + (274 - this.textRenderer.getWidth(lv)) / 2), (float)n, 0xFFFFFF);
                 } else {
                     this.textRenderer.random.setSeed((long)((float)((long)o * 4238972211L) + this.time / 4.0f));
                     this.textRenderer.drawWithShadow(arg, lv, (float)l, (float)n, 0xFFFFFF);

@@ -65,7 +65,7 @@ public class LootTable {
         this.combinedFunction = LootFunctions.join(args2);
     }
 
-    public static Consumer<ItemStack> limitedConsumer(Consumer<ItemStack> consumer) {
+    public static Consumer<ItemStack> processStacks(Consumer<ItemStack> consumer) {
         return arg -> {
             if (arg.getCount() < arg.getMaxCount()) {
                 consumer.accept((ItemStack)arg);
@@ -80,25 +80,25 @@ public class LootTable {
         };
     }
 
-    public void drop(LootContext arg, Consumer<ItemStack> consumer) {
-        if (arg.addDrop(this)) {
+    public void generateUnprocessedLoot(LootContext arg, Consumer<ItemStack> consumer) {
+        if (arg.markActive(this)) {
             Consumer<ItemStack> consumer2 = LootFunction.apply(this.combinedFunction, consumer, arg);
             for (LootPool lv : this.pools) {
-                lv.drop(consumer2, arg);
+                lv.addGeneratedLoot(consumer2, arg);
             }
-            arg.removeDrop(this);
+            arg.markInactive(this);
         } else {
             LOGGER.warn("Detected infinite loop in loot tables");
         }
     }
 
-    public void dropLimited(LootContext arg, Consumer<ItemStack> consumer) {
-        this.drop(arg, LootTable.limitedConsumer(consumer));
+    public void generateLoot(LootContext arg, Consumer<ItemStack> consumer) {
+        this.generateUnprocessedLoot(arg, LootTable.processStacks(consumer));
     }
 
-    public List<ItemStack> getDrops(LootContext arg) {
+    public List<ItemStack> generateLoot(LootContext arg) {
         ArrayList list = Lists.newArrayList();
-        this.dropLimited(arg, list::add);
+        this.generateLoot(arg, list::add);
         return list;
     }
 
@@ -106,17 +106,17 @@ public class LootTable {
         return this.type;
     }
 
-    public void check(LootTableReporter arg) {
+    public void validate(LootTableReporter arg) {
         for (int i = 0; i < this.pools.length; ++i) {
-            this.pools[i].check(arg.makeChild(".pools[" + i + "]"));
+            this.pools[i].validate(arg.makeChild(".pools[" + i + "]"));
         }
         for (int j = 0; j < this.functions.length; ++j) {
-            this.functions[j].check(arg.makeChild(".functions[" + j + "]"));
+            this.functions[j].validate(arg.makeChild(".functions[" + j + "]"));
         }
     }
 
     public void supplyInventory(Inventory arg, LootContext arg2) {
-        List<ItemStack> list = this.getDrops(arg2);
+        List<ItemStack> list = this.generateLoot(arg2);
         Random random = arg2.getRandom();
         List<Integer> list2 = this.getFreeSlots(arg, random);
         this.shuffle(list, list2.size(), random);
@@ -228,18 +228,18 @@ public class LootTable {
         private final List<LootFunction> functions = Lists.newArrayList();
         private LootContextType type = GENERIC;
 
-        public Builder withPool(LootPool.Builder arg) {
+        public Builder pool(LootPool.Builder arg) {
             this.pools.add(arg.build());
             return this;
         }
 
-        public Builder withType(LootContextType arg) {
+        public Builder type(LootContextType arg) {
             this.type = arg;
             return this;
         }
 
         @Override
-        public Builder withFunction(LootFunction.Builder arg) {
+        public Builder apply(LootFunction.Builder arg) {
             this.functions.add(arg.build());
             return this;
         }
@@ -249,7 +249,7 @@ public class LootTable {
             return this;
         }
 
-        public LootTable create() {
+        public LootTable build() {
             return new LootTable(this.type, this.pools.toArray(new LootPool[0]), this.functions.toArray(new LootFunction[0]));
         }
 
@@ -259,8 +259,8 @@ public class LootTable {
         }
 
         @Override
-        public /* synthetic */ Object withFunction(LootFunction.Builder arg) {
-            return this.withFunction(arg);
+        public /* synthetic */ Object apply(LootFunction.Builder arg) {
+            return this.apply(arg);
         }
     }
 }

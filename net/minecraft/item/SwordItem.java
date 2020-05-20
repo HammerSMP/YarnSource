@@ -58,7 +58,7 @@ implements Vanishable {
             return 15.0f;
         }
         Material lv = arg2.getMaterial();
-        if (lv == Material.PLANT || lv == Material.REPLACEABLE_PLANT || lv == Material.UNUSED_PLANT || arg2.isIn(BlockTags.LEAVES) || lv == Material.PUMPKIN) {
+        if (lv == Material.PLANT || lv == Material.REPLACEABLE_PLANT || lv == Material.UNUSED_PLANT || arg2.isIn(BlockTags.LEAVES) || lv == Material.GOURD) {
             return 1.5f;
         }
         return 1.0f;
@@ -84,11 +84,11 @@ implements Vanishable {
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getModifiers(EquipmentSlot arg) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
         if (arg == EquipmentSlot.MAINHAND) {
             return this.field_23745;
         }
-        return super.getModifiers(arg);
+        return super.getAttributeModifiers(arg);
     }
 }
 

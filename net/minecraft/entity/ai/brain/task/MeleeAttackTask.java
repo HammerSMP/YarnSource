@@ -34,7 +34,7 @@ extends Task<MobEntity> {
     }
 
     private boolean method_25942(MobEntity arg) {
-        return arg.isHolding(arg2 -> arg2 instanceof RangedWeaponItem && arg.method_25938((RangedWeaponItem)arg2));
+        return arg.isHolding(arg2 -> arg2 instanceof RangedWeaponItem && arg.canUseRangedWeapon((RangedWeaponItem)arg2));
     }
 
     @Override

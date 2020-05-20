@@ -156,8 +156,8 @@ extends RealmsScreen {
         if (this.extracting && !this.finished) {
             this.status = new TranslatableText("mco.download.extracting");
         }
-        this.drawStringWithShadow(arg, this.textRenderer, this.downloadTitle, this.width / 2, 20, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.downloadTitle, this.width / 2, 20, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
         if (this.showDots) {
             this.drawDots(arg);
         }
@@ -166,13 +166,13 @@ extends RealmsScreen {
             this.drawDownloadSpeed(arg);
         }
         if (this.field_20494 != null) {
-            this.drawStringWithShadow(arg, this.textRenderer, this.field_20494, this.width / 2, 110, 0xFF0000);
+            this.drawCenteredText(arg, this.textRenderer, this.field_20494, this.width / 2, 110, 0xFF0000);
         }
         super.render(arg, i, j, f);
     }
 
     private void drawDots(MatrixStack arg) {
-        int i = this.textRenderer.getStringWidth(this.status);
+        int i = this.textRenderer.getWidth(this.status);
         if (this.animTick % 10 == 0) {
             ++this.dotIndex;
         }

@@ -49,12 +49,12 @@ implements DebugRenderer.Renderer {
             VoxelShape lv5 = lv4.getOutlineShape(lv, lv3);
             for (Box lv6 : lv5.getBoundingBoxes()) {
                 Box lv7 = lv6.offset(lv3).expand(0.002).offset(-d, -e, -f);
-                double g = lv7.x1;
-                double h = lv7.y1;
-                double i = lv7.z1;
-                double j = lv7.x2;
-                double k = lv7.y2;
-                double l = lv7.z2;
+                double g = lv7.minX;
+                double h = lv7.minY;
+                double i = lv7.minZ;
+                double j = lv7.maxX;
+                double k = lv7.maxY;
+                double l = lv7.maxZ;
                 float m = 1.0f;
                 float n = 0.0f;
                 float o = 0.0f;

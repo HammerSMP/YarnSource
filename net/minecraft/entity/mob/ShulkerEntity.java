@@ -20,13 +20,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.PistonHeadBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
-import net.minecraft.entity.SpawnType;
 import net.minecraft.entity.ai.control.BodyControl;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.Goal;
@@ -58,8 +56,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 
 public class ShulkerEntity
@@ -71,29 +67,14 @@ implements Monster {
     protected static final TrackedData<Optional<BlockPos>> ATTACHED_BLOCK = DataTracker.registerData(ShulkerEntity.class, TrackedDataHandlerRegistry.OPTIONA_BLOCK_POS);
     protected static final TrackedData<Byte> PEEK_AMOUNT = DataTracker.registerData(ShulkerEntity.class, TrackedDataHandlerRegistry.BYTE);
     protected static final TrackedData<Byte> COLOR = DataTracker.registerData(ShulkerEntity.class, TrackedDataHandlerRegistry.BYTE);
-    private float field_7339;
-    private float field_7337;
-    private BlockPos field_7345;
-    private int field_7340;
+    private float prevOpenProgress;
+    private float openProgress;
+    private BlockPos prevAttachedBlock = null;
+    private int teleportLerpTimer;
 
     public ShulkerEntity(EntityType<? extends ShulkerEntity> arg, World arg2) {
         super((EntityType<? extends GolemEntity>)arg, arg2);
-        this.prevBodyYaw = 180.0f;
-        this.bodyYaw = 180.0f;
-        this.field_7345 = null;
         this.experiencePoints = 5;
-    }
-
-    @Override
-    @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        this.bodyYaw = 180.0f;
-        this.prevBodyYaw = 180.0f;
-        this.yaw = 180.0f;
-        this.prevYaw = 180.0f;
-        this.headYaw = 180.0f;
-        this.prevHeadYaw = 180.0f;
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
 
     @Override
@@ -124,7 +105,7 @@ implements Monster {
 
     @Override
     public void playAmbientSound() {
-        if (!this.method_7124()) {
+        if (!this.isClosed()) {
             super.playAmbientSound();
         }
     }
@@ -136,7 +117,7 @@ implements Monster {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource arg) {
-        if (this.method_7124()) {
+        if (this.isClosed()) {
             return SoundEvents.ENTITY_SHULKER_HURT_CLOSED;
         }
         return SoundEvents.ENTITY_SHULKER_HURT;
@@ -204,7 +185,7 @@ implements Monster {
             this.yaw = f = this.getVehicle().yaw;
             this.bodyYaw = f;
             this.prevBodyYaw = f;
-            this.field_7340 = 0;
+            this.teleportLerpTimer = 0;
         } else if (!this.world.isClient) {
             Direction lv5;
             BlockState lv2 = this.world.getBlockState(lv);
@@ -215,7 +196,7 @@ implements Monster {
                         lv = lv.offset(lv3);
                         this.dataTracker.set(ATTACHED_BLOCK, Optional.of(lv));
                     } else {
-                        this.method_7127();
+                        this.tryTeleport();
                     }
                 } else if (lv2.isOf(Blocks.PISTON_HEAD)) {
                     Direction lv4 = lv2.get(PistonHeadBlock.FACING);
@@ -223,40 +204,40 @@ implements Monster {
                         lv = lv.offset(lv4);
                         this.dataTracker.set(ATTACHED_BLOCK, Optional.of(lv));
                     } else {
-                        this.method_7127();
+                        this.tryTeleport();
                     }
                 } else {
-                    this.method_7127();
+                    this.tryTeleport();
                 }
             }
-            if (!this.method_24350(lv, lv5 = this.getAttachedFace())) {
-                Direction lv6 = this.method_24351(lv);
+            if (!this.canStay(lv, lv5 = this.getAttachedFace())) {
+                Direction lv6 = this.findAttachSide(lv);
                 if (lv6 != null) {
                     this.dataTracker.set(ATTACHED_FACE, lv6);
                 } else {
-                    this.method_7127();
+                    this.tryTeleport();
                 }
             }
         }
         float g = (float)this.getPeekAmount() * 0.01f;
-        this.field_7339 = this.field_7337;
-        if (this.field_7337 > g) {
-            this.field_7337 = MathHelper.clamp(this.field_7337 - 0.05f, g, 1.0f);
-        } else if (this.field_7337 < g) {
-            this.field_7337 = MathHelper.clamp(this.field_7337 + 0.05f, 0.0f, g);
+        this.prevOpenProgress = this.openProgress;
+        if (this.openProgress > g) {
+            this.openProgress = MathHelper.clamp(this.openProgress - 0.05f, g, 1.0f);
+        } else if (this.openProgress < g) {
+            this.openProgress = MathHelper.clamp(this.openProgress + 0.05f, 0.0f, g);
         }
         if (lv != null) {
             List<Entity> list;
             if (this.world.isClient) {
-                if (this.field_7340 > 0 && this.field_7345 != null) {
-                    --this.field_7340;
+                if (this.teleportLerpTimer > 0 && this.prevAttachedBlock != null) {
+                    --this.teleportLerpTimer;
                 } else {
-                    this.field_7345 = lv;
+                    this.prevAttachedBlock = lv;
                 }
             }
             this.resetPosition((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
-            double d = 0.5 - (double)MathHelper.sin((0.5f + this.field_7337) * (float)Math.PI) * 0.5;
-            double e = 0.5 - (double)MathHelper.sin((0.5f + this.field_7339) * (float)Math.PI) * 0.5;
+            double d = 0.5 - (double)MathHelper.sin((0.5f + this.openProgress) * (float)Math.PI) * 0.5;
+            double e = 0.5 - (double)MathHelper.sin((0.5f + this.prevOpenProgress) * (float)Math.PI) * 0.5;
             Direction lv7 = this.getAttachedFace().getOpposite();
             this.setBoundingBox(new Box(this.getX() - 0.5, this.getY(), this.getZ() - 0.5, this.getX() + 0.5, this.getY() + 1.0, this.getZ() + 0.5).stretch((double)lv7.getOffsetX() * d, (double)lv7.getOffsetY() * d, (double)lv7.getOffsetZ() * d));
             double h = d - e;
@@ -272,7 +253,7 @@ implements Monster {
     @Override
     public void move(MovementType arg, Vec3d arg2) {
         if (arg == MovementType.SHULKER_BOX) {
-            this.method_7127();
+            this.tryTeleport();
         } else {
             super.move(arg, arg2);
         }
@@ -294,19 +275,19 @@ implements Monster {
     }
 
     @Nullable
-    protected Direction method_24351(BlockPos arg) {
+    protected Direction findAttachSide(BlockPos arg) {
         for (Direction lv : Direction.values()) {
-            if (!this.method_24350(arg, lv)) continue;
+            if (!this.canStay(arg, lv)) continue;
             return lv;
         }
         return null;
     }
 
-    private boolean method_24350(BlockPos arg, Direction arg2) {
+    private boolean canStay(BlockPos arg, Direction arg2) {
         return this.world.isDirectionSolid(arg.offset(arg2), this, arg2.getOpposite()) && this.world.doesNotCollide(this, ShulkerLidCollisions.getLidCollisionBox(arg, arg2.getOpposite()));
     }
 
-    protected boolean method_7127() {
+    protected boolean tryTeleport() {
         if (this.isAiDisabled() || !this.isAlive()) {
             return true;
         }
@@ -314,7 +295,7 @@ implements Monster {
         for (int i = 0; i < 5; ++i) {
             Direction lv3;
             BlockPos lv2 = lv.add(8 - this.random.nextInt(17), 8 - this.random.nextInt(17), 8 - this.random.nextInt(17));
-            if (lv2.getY() <= 0 || !this.world.isAir(lv2) || !this.world.getWorldBorder().contains(lv2) || !this.world.doesNotCollide(this, new Box(lv2)) || (lv3 = this.method_24351(lv2)) == null) continue;
+            if (lv2.getY() <= 0 || !this.world.isAir(lv2) || !this.world.getWorldBorder().contains(lv2) || !this.world.doesNotCollide(this, new Box(lv2)) || (lv3 = this.findAttachSide(lv2)) == null) continue;
             this.dataTracker.set(ATTACHED_FACE, lv3);
             this.playSound(SoundEvents.ENTITY_SHULKER_TELEPORT, 1.0f, 1.0f);
             this.dataTracker.set(ATTACHED_BLOCK, Optional.of(lv2));
@@ -329,19 +310,20 @@ implements Monster {
     public void tickMovement() {
         super.tickMovement();
         this.setVelocity(Vec3d.ZERO);
-        this.prevBodyYaw = 180.0f;
-        this.bodyYaw = 180.0f;
-        this.yaw = 180.0f;
+        if (!this.isAiDisabled()) {
+            this.prevBodyYaw = 0.0f;
+            this.bodyYaw = 0.0f;
+        }
     }
 
     @Override
     public void onTrackedDataSet(TrackedData<?> arg) {
         BlockPos lv;
         if (ATTACHED_BLOCK.equals(arg) && this.world.isClient && !this.hasVehicle() && (lv = this.getAttachedBlock()) != null) {
-            if (this.field_7345 == null) {
-                this.field_7345 = lv;
+            if (this.prevAttachedBlock == null) {
+                this.prevAttachedBlock = lv;
             } else {
-                this.field_7340 = 6;
+                this.teleportLerpTimer = 6;
             }
             this.resetPosition((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
@@ -357,19 +339,19 @@ implements Monster {
     @Override
     public boolean damage(DamageSource arg, float f) {
         Entity lv;
-        if (this.method_7124() && (lv = arg.getSource()) instanceof PersistentProjectileEntity) {
+        if (this.isClosed() && (lv = arg.getSource()) instanceof PersistentProjectileEntity) {
             return false;
         }
         if (super.damage(arg, f)) {
             if ((double)this.getHealth() < (double)this.getMaximumHealth() * 0.5 && this.random.nextInt(4) == 0) {
-                this.method_7127();
+                this.tryTeleport();
             }
             return true;
         }
         return false;
     }
 
-    private boolean method_7124() {
+    private boolean isClosed() {
         return this.getPeekAmount() == 0;
     }
 
@@ -410,18 +392,18 @@ implements Monster {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float method_7116(float f) {
-        return MathHelper.lerp(f, this.field_7339, this.field_7337);
+    public float getOpenProgress(float f) {
+        return MathHelper.lerp(f, this.prevOpenProgress, this.openProgress);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public int method_7113() {
-        return this.field_7340;
+    public int getTeleportLerpTimer() {
+        return this.teleportLerpTimer;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public BlockPos method_7120() {
-        return this.field_7345;
+    public BlockPos getPrevAttachedBlock() {
+        return this.prevAttachedBlock;
     }
 
     @Override
@@ -449,8 +431,8 @@ implements Monster {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean method_7117() {
-        return this.field_7345 != null && this.getAttachedBlock() != null;
+    public boolean hasAttachedBlock() {
+        return this.prevAttachedBlock != null && this.getAttachedBlock() != null;
     }
 
     @Nullable

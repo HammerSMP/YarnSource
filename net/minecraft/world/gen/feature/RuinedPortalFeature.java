@@ -29,7 +29,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.AbstractTempleFeature;
@@ -58,13 +57,13 @@ extends AbstractTempleFeature<RuinedPortalFeatureConfig> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getRuinedPortalSpacing(arg == DimensionType.THE_NETHER);
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getRuinedPortalSpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getRuinedPortalSeparation(arg == DimensionType.THE_NETHER);
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getRuinedPortalSeparation();
     }
 
     @Override
@@ -81,7 +80,7 @@ extends AbstractTempleFeature<RuinedPortalFeatureConfig> {
         return arg2.getTemperature(arg) < 0.15f;
     }
 
-    private static int method_27211(Random random, ChunkGenerator<?> arg, RuinedPortalFeaturePiece.VerticalPlacement arg22, boolean bl, int i, int j, BlockBox arg3) {
+    private static int method_27211(Random random, ChunkGenerator arg, RuinedPortalFeaturePiece.VerticalPlacement arg22, boolean bl, int i, int j, BlockBox arg3) {
         int t;
         if (arg22 == RuinedPortalFeaturePiece.VerticalPlacement.IN_NETHER) {
             if (bl) {
@@ -162,7 +161,7 @@ extends AbstractTempleFeature<RuinedPortalFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             Identifier lv11;
             RuinedPortalFeaturePiece.VerticalPlacement lv9;
             RuinedPortalFeatureConfig lv = arg.getStructureConfig(arg3, Feature.RUINED_PORTAL);

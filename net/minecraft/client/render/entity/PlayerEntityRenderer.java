@@ -223,10 +223,5 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
             super.setupTransforms(arg, arg2, f, g, h);
         }
     }
-
-    @Override
-    public /* synthetic */ Vec3d getPositionOffset(Entity arg, float f) {
-        return this.getPositionOffset((AbstractClientPlayerEntity)arg, f);
-    }
 }
 

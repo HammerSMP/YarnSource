@@ -38,13 +38,13 @@ extends MiningToolItem {
             return i >= 1;
         }
         Material lv = arg.getMaterial();
-        return lv == Material.STONE || lv == Material.METAL || lv == Material.ANVIL || arg.isOf(Blocks.NETHER_GOLD_ORE);
+        return lv == Material.STONE || lv == Material.METAL || lv == Material.REPAIR_STATION || arg.isOf(Blocks.NETHER_GOLD_ORE);
     }
 
     @Override
     public float getMiningSpeedMultiplier(ItemStack arg, BlockState arg2) {
         Material lv = arg2.getMaterial();
-        if (lv == Material.METAL || lv == Material.ANVIL || lv == Material.STONE) {
+        if (lv == Material.METAL || lv == Material.REPAIR_STATION || lv == Material.STONE) {
             return this.miningSpeed;
         }
         return super.getMiningSpeedMultiplier(arg, arg2);

@@ -32,7 +32,7 @@ public class VillageGenerator {
         TaigaVillageData.init();
     }
 
-    public static void addPieces(ChunkGenerator<?> arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4, StructurePoolFeatureConfig arg5) {
+    public static void addPieces(ChunkGenerator arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4, StructurePoolFeatureConfig arg5) {
         VillageGenerator.init();
         StructurePoolBasedGenerator.addPieces(arg5.startPool, arg5.size, Piece::new, arg, arg2, arg3, list, arg4, true, true);
     }

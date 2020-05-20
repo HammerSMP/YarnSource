@@ -46,10 +46,10 @@ implements LootFunction {
     protected abstract ItemStack process(ItemStack var1, LootContext var2);
 
     @Override
-    public void check(LootTableReporter arg) {
-        LootFunction.super.check(arg);
+    public void validate(LootTableReporter arg) {
+        LootFunction.super.validate(arg);
         for (int i = 0; i < this.conditions.length; ++i) {
-            this.conditions[i].check(arg.makeChild(".conditions[" + i + "]"));
+            this.conditions[i].validate(arg.makeChild(".conditions[" + i + "]"));
         }
     }
 
@@ -119,7 +119,7 @@ implements LootFunction {
         private final List<LootCondition> conditionList = Lists.newArrayList();
 
         @Override
-        public T withCondition(LootCondition.Builder arg) {
+        public T conditionally(LootCondition.Builder arg) {
             this.conditionList.add(arg.build());
             return this.getThisBuilder();
         }
@@ -141,8 +141,8 @@ implements LootFunction {
         }
 
         @Override
-        public /* synthetic */ Object withCondition(LootCondition.Builder arg) {
-            return this.withCondition(arg);
+        public /* synthetic */ Object conditionally(LootCondition.Builder arg) {
+            return this.conditionally(arg);
         }
     }
 }

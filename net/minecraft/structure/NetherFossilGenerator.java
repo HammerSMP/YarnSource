@@ -20,7 +20,8 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
@@ -38,7 +39,7 @@ public class NetherFossilGenerator {
         private final BlockRotation structureRotation;
 
         public Piece(StructureManager arg, Identifier arg2, BlockPos arg3, BlockRotation arg4) {
-            super(StructurePieceType.NE_FOS, 0);
+            super(StructurePieceType.NETHER_FOSSIL, 0);
             this.template = arg2;
             this.pos = arg3;
             this.structureRotation = arg4;
@@ -46,7 +47,7 @@ public class NetherFossilGenerator {
         }
 
         public Piece(StructureManager arg, CompoundTag arg2) {
-            super(StructurePieceType.NE_FOS, arg2);
+            super(StructurePieceType.NETHER_FOSSIL, arg2);
             this.template = new Identifier(arg2.getString("Template"));
             this.structureRotation = BlockRotation.valueOf(arg2.getString("Rot"));
             this.initializeStructureData(arg);
@@ -66,11 +67,11 @@ public class NetherFossilGenerator {
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, IWorld arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
         }
 
         @Override
-        public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+        public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
             arg4.encompass(this.structure.calculateBoundingBox(this.placementData, this.pos));
             return super.generate(arg, arg2, arg3, random, arg4, arg5, arg6);
         }

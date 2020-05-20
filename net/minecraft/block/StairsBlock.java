@@ -43,8 +43,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.explosion.Explosion;
 
 public class StairsBlock
@@ -124,7 +124,7 @@ implements Waterloggable {
     }
 
     @Override
-    public void onBroken(IWorld arg, BlockPos arg2, BlockState arg3) {
+    public void onBroken(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         this.baseBlock.onBroken(arg, arg2, arg3);
     }
 
@@ -143,11 +143,11 @@ implements Waterloggable {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }
-        this.baseBlockState.onBlockRemoved(arg2, arg3, arg4, bl);
+        this.baseBlockState.onStateReplaced(arg2, arg3, arg4, bl);
     }
 
     @Override
@@ -190,7 +190,7 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
         }

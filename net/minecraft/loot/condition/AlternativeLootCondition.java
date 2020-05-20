@@ -38,10 +38,10 @@ implements LootCondition {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
-        LootCondition.super.check(arg);
+    public void validate(LootTableReporter arg) {
+        LootCondition.super.validate(arg);
         for (int i = 0; i < this.terms.length; ++i) {
-            this.terms[i].check(arg.makeChild(".term[" + i + "]"));
+            this.terms[i].validate(arg.makeChild(".term[" + i + "]"));
         }
     }
 
@@ -88,7 +88,7 @@ implements LootCondition {
         }
 
         @Override
-        public Builder withCondition(LootCondition.Builder arg) {
+        public Builder or(LootCondition.Builder arg) {
             this.terms.add(arg.build());
             return this;
         }

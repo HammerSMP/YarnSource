@@ -48,7 +48,7 @@ extends Goal {
             if (((RaiderEntity)this.actor).age % 20 == 0) {
                 this.includeFreeRaiders(lv);
             }
-            if (!((MobEntityWithAi)this.actor).isNavigating() && (lv2 = TargetFinder.findTargetTowards(this.actor, 15, 4, Vec3d.method_24955(lv.getCenter()))) != null) {
+            if (!((MobEntityWithAi)this.actor).isNavigating() && (lv2 = TargetFinder.findTargetTowards(this.actor, 15, 4, Vec3d.ofBottomCenter(lv.getCenter()))) != null) {
                 ((MobEntity)this.actor).getNavigation().startMovingTo(lv2.x, lv2.y, lv2.z, 1.0);
             }
         }

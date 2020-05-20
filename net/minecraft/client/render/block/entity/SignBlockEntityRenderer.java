@@ -84,7 +84,7 @@ extends BlockEntityRenderer<SignBlockEntity> {
                 return list.isEmpty() ? LiteralText.EMPTY : list.get(0);
             });
             if (lv5 == null) continue;
-            float t = -lv4.getStringWidth(lv5) / 2;
+            float t = -lv4.getWidth(lv5) / 2;
             lv4.draw(lv5, t, (float)(s * 10 - 20), q, false, arg22.peek().getModel(), arg3, false, 0, i);
         }
         arg22.pop();

@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.annotations.VisibleForTesting
+ *  com.google.common.collect.Lists
  *  com.mojang.datafixers.DataFixer
  *  com.mojang.datafixers.util.Either
  *  javax.annotation.Nullable
@@ -12,11 +13,14 @@
 package net.minecraft.server.world;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -61,7 +65,6 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.poi.PointOfInterestStorage;
 
@@ -69,7 +72,7 @@ public class ServerChunkManager
 extends ChunkManager {
     private static final List<ChunkStatus> CHUNK_STATUSES = ChunkStatus.createOrderedList();
     private final ChunkTicketManager ticketManager;
-    private final ChunkGenerator<?> chunkGenerator;
+    private final ChunkGenerator chunkGenerator;
     private final ServerWorld world;
     private final Thread serverThread;
     private final ServerLightingProvider lightProvider;
@@ -85,12 +88,12 @@ extends ChunkManager {
     @Nullable
     private SpawnHelper.Info spawnEntry;
 
-    public ServerChunkManager(ServerWorld arg, LevelStorage.Session arg2, DataFixer dataFixer, StructureManager arg3, Executor executor, ChunkGenerator<?> arg4, int i, boolean bl, WorldGenerationProgressListener arg5, Supplier<PersistentStateManager> supplier) {
+    public ServerChunkManager(ServerWorld arg, LevelStorage.Session arg2, DataFixer dataFixer, StructureManager arg3, Executor executor, ChunkGenerator arg4, int i, boolean bl, WorldGenerationProgressListener arg5, Supplier<PersistentStateManager> supplier) {
         this.world = arg;
         this.mainThreadExecutor = new MainThreadExecutor(arg);
         this.chunkGenerator = arg4;
         this.serverThread = Thread.currentThread();
-        File file = arg2.method_27424(arg.getDimension().getType());
+        File file = arg2.method_27424(arg.method_27983());
         File file2 = new File(file, "data");
         file2.mkdirs();
         this.persistentStateManager = new PersistentStateManager(file2, dataFixer);
@@ -315,7 +318,6 @@ extends ChunkManager {
         this.threadedAnvilChunkStorage.close();
     }
 
-    @Override
     public void tick(BooleanSupplier booleanSupplier) {
         this.world.getProfiler().push("purge");
         this.ticketManager.purge();
@@ -333,7 +335,7 @@ extends ChunkManager {
         long m = l - this.lastMobSpawningTime;
         this.lastMobSpawningTime = l;
         class_5217 lv = this.world.getLevelProperties();
-        boolean bl = lv.getGeneratorType() == LevelGeneratorType.DEBUG_ALL_BLOCK_STATES;
+        boolean bl = this.world.method_27982();
         boolean bl2 = this.world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING);
         if (!bl) {
             SpawnHelper.Info lv2;
@@ -344,7 +346,9 @@ extends ChunkManager {
             int j = this.ticketManager.getSpawningChunkCount();
             this.spawnEntry = lv2 = SpawnHelper.setupSpawn(j, this.world.iterateEntities(), (arg_0, arg_1) -> this.ifChunkLoaded(arg_0, arg_1));
             this.world.getProfiler().pop();
-            this.threadedAnvilChunkStorage.entryIterator().forEach(arg2 -> {
+            ArrayList list = Lists.newArrayList(this.threadedAnvilChunkStorage.entryIterator());
+            Collections.shuffle(list);
+            list.forEach(arg2 -> {
                 Optional optional = arg2.getEntityTickingFuture().getNow(ChunkHolder.UNLOADED_WORLD_CHUNK).left();
                 if (!optional.isPresent()) {
                     return;
@@ -390,7 +394,7 @@ extends ChunkManager {
         return this.mainThreadExecutor.getTaskCount();
     }
 
-    public ChunkGenerator<?> getChunkGenerator() {
+    public ChunkGenerator getChunkGenerator() {
         return this.chunkGenerator;
     }
 
@@ -491,7 +495,7 @@ extends ChunkManager {
     final class MainThreadExecutor
     extends ThreadExecutor<Runnable> {
         private MainThreadExecutor(World arg2) {
-            super("Chunk source main thread executor for " + Registry.DIMENSION_TYPE.getId(arg2.getDimension().getType()));
+            super("Chunk source main thread executor for " + Registry.DIMENSION_TYPE.getId(arg2.method_27983()));
         }
 
         @Override

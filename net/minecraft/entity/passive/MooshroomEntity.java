@@ -19,7 +19,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.Shearable;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -40,8 +40,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -65,7 +65,7 @@ implements Shearable {
         return arg2.getBrightness(arg) - 0.5f;
     }
 
-    public static boolean canSpawn(EntityType<MooshroomEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<MooshroomEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg2.getBlockState(arg4.down()).isOf(Blocks.MYCELIUM) && arg2.getBaseLightLevel(arg4, 0) > 8;
     }
 

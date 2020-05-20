@@ -90,10 +90,10 @@ extends Screen {
         this.fillGradient(arg, 0, 0, this.width, this.height, 0x60500000, -1602211792);
         RenderSystem.pushMatrix();
         RenderSystem.scalef(2.0f, 2.0f, 2.0f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2 / 2, 30, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2 / 2, 30, 0xFFFFFF);
         RenderSystem.popMatrix();
         if (this.message != null) {
-            this.drawStringWithShadow(arg, this.textRenderer, this.message, this.width / 2, 85, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, this.message, this.width / 2, 85, 0xFFFFFF);
         }
         this.drawCenteredString(arg, this.textRenderer, I18n.translate("deathScreen.score", new Object[0]) + ": " + (Object)((Object)Formatting.YELLOW) + this.client.player.getScore(), this.width / 2, 100, 0xFFFFFF);
         if (this.message != null && j > 85) {
@@ -111,7 +111,7 @@ extends Screen {
         if (this.message == null) {
             return null;
         }
-        int j = this.client.textRenderer.getStringWidth(this.message);
+        int j = this.client.textRenderer.getWidth(this.message);
         int k = this.width / 2 - j / 2;
         int l = this.width / 2 + j / 2;
         if (i < k || i > l) {

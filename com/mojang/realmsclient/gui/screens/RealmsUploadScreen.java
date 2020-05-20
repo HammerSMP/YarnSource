@@ -152,7 +152,7 @@ extends RealmsScreen {
             this.status = new TranslatableText("mco.upload.verifying");
             this.cancelButton.active = false;
         }
-        this.drawStringWithShadow(arg, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
         if (this.showDots) {
             this.drawDots(arg);
         }
@@ -162,14 +162,14 @@ extends RealmsScreen {
         }
         if (this.field_20503 != null) {
             for (int k = 0; k < this.field_20503.length; ++k) {
-                this.drawStringWithShadow(arg, this.textRenderer, this.field_20503[k], this.width / 2, 110 + 12 * k, 0xFF0000);
+                this.drawCenteredText(arg, this.textRenderer, this.field_20503[k], this.width / 2, 110 + 12 * k, 0xFF0000);
             }
         }
         super.render(arg, i, j, f);
     }
 
     private void drawDots(MatrixStack arg) {
-        int i = this.textRenderer.getStringWidth(this.status);
+        int i = this.textRenderer.getWidth(this.status);
         this.textRenderer.draw(arg, DOTS[this.animTick / 10 % DOTS.length], (float)(this.width / 2 + i / 2 + 5), 50.0f, 0xFFFFFF);
     }
 

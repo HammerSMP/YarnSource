@@ -148,11 +148,11 @@ implements Vanishable {
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getModifiers(EquipmentSlot arg) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
         if (arg == EquipmentSlot.MAINHAND) {
             return this.field_23746;
         }
-        return super.getModifiers(arg);
+        return super.getAttributeModifiers(arg);
     }
 
     @Override

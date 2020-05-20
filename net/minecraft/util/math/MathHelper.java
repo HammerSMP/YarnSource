@@ -243,13 +243,13 @@ public class MathHelper {
         return MathHelper.abs(MathHelper.subtractAngles(f, g));
     }
 
-    public static float capRotation(float f, float g, float h) {
+    public static float stepAngleTowards(float f, float g, float h) {
         float i = MathHelper.subtractAngles(f, g);
         float j = MathHelper.clamp(i, -h, h);
         return g - j;
     }
 
-    public static float method_15348(float f, float g, float h) {
+    public static float stepTowards(float f, float g, float h) {
         h = MathHelper.abs(h);
         if (f < g) {
             return MathHelper.clamp(f + h, f, g);
@@ -257,9 +257,9 @@ public class MathHelper {
         return MathHelper.clamp(f - h, g, f);
     }
 
-    public static float method_15388(float f, float g, float h) {
+    public static float stepUnwrappedAngleTowards(float f, float g, float h) {
         float i = MathHelper.subtractAngles(f, g);
-        return MathHelper.method_15348(f, f + i, h);
+        return MathHelper.stepTowards(f, f + i, h);
     }
 
     @Environment(value=EnvType.CLIENT)

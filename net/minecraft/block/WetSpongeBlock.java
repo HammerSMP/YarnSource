@@ -29,7 +29,7 @@ extends Block {
 
     @Override
     public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg2.getDimension().doesWaterVaporize()) {
+        if (arg2.method_27983().method_27999()) {
             arg2.setBlockState(arg3, Blocks.SPONGE.getDefaultState(), 3);
             arg2.syncWorldEvent(2009, arg3, 0);
             arg2.playSound(null, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 1.0f, (1.0f + arg2.getRandom().nextFloat() * 0.2f) * 0.7f);

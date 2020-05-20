@@ -48,7 +48,7 @@ extends Task<VillagerEntity> {
         Optional<GlobalPos> optional2 = arg2.getBrain().getOptionalMemory(this.primaryPosition);
         if (optional.isPresent() && optional2.isPresent() && !(list = optional.get()).isEmpty()) {
             this.chosenPosition = list.get(arg.getRandom().nextInt(list.size()));
-            return this.chosenPosition != null && Objects.equals(arg.getDimension().getType(), this.chosenPosition.getDimension()) && optional2.get().getPos().isWithinDistance(arg2.getPos(), (double)this.primaryPositionActivationDistance);
+            return this.chosenPosition != null && Objects.equals(arg.method_27983(), this.chosenPosition.getDimension()) && optional2.get().getPos().isWithinDistance(arg2.getPos(), (double)this.primaryPositionActivationDistance);
         }
         return false;
     }

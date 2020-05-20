@@ -259,11 +259,11 @@ extends RealmsScreen {
         if (this.noTemplatesMessage != null) {
             this.method_21414(arg, i, j, this.noTemplatesMessage);
         }
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 13, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 13, 0xFFFFFF);
         if (this.displayWarning) {
             Text[] lvs = this.warning;
             for (int k = 0; k < lvs.length; ++k) {
-                int l = this.textRenderer.getStringWidth(lvs[k]);
+                int l = this.textRenderer.getWidth(lvs[k]);
                 int m = this.width / 2 - l / 2;
                 int n = RealmsSelectWorldTemplateScreen.row(-1 + k);
                 if (i < m || i > m + l || j < n) continue;
@@ -282,7 +282,7 @@ extends RealmsScreen {
                         p = 0x3366BB;
                     }
                 }
-                this.drawStringWithShadow(arg, this.textRenderer, lv, this.width / 2, RealmsSelectWorldTemplateScreen.row(-1 + o), p);
+                this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, RealmsSelectWorldTemplateScreen.row(-1 + o), p);
             }
         }
         super.render(arg, i, j, f);

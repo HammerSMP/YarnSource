@@ -68,7 +68,7 @@ extends RealmsScreen {
         int k = this.height / 2 - this.textHeight / 2;
         if (this.lines != null) {
             for (Text lv : this.lines) {
-                this.drawStringWithShadow(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+                this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
                 this.textRenderer.getClass();
                 k += 9;
             }

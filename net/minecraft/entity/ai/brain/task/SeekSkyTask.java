@@ -51,7 +51,7 @@ extends Task<LivingEntity> {
         for (int i = 0; i < 10; ++i) {
             BlockPos lv2 = lv.add(random.nextInt(20) - 10, random.nextInt(6) - 3, random.nextInt(20) - 10);
             if (!SeekSkyTask.isSkyVisible(arg, arg2, lv2)) continue;
-            return Vec3d.method_24955(lv2);
+            return Vec3d.ofBottomCenter(lv2);
         }
         return null;
     }

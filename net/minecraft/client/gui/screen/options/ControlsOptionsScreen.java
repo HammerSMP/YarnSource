@@ -43,7 +43,7 @@ extends GameOptionsScreen {
         this.children.add(this.keyBindingListWidget);
         this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, new TranslatableText("controls.resetAll"), arg -> {
             for (KeyBinding lv : this.gameOptions.keysAll) {
-                lv.setKeyCode(lv.getDefaultKeyCode());
+                lv.setBoundKey(lv.getDefaultKey());
             }
             KeyBinding.updateKeysByCode();
         }));
@@ -65,9 +65,9 @@ extends GameOptionsScreen {
     public boolean keyPressed(int i, int j, int k) {
         if (this.focusedBinding != null) {
             if (i == 256) {
-                this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.UNKNOWN_KEYCODE);
+                this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.UNKNOWN_KEY);
             } else {
-                this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.getKeyCode(i, j));
+                this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.fromKeyCode(i, j));
             }
             this.focusedBinding = null;
             this.time = Util.getMeasuringTimeMs();
@@ -81,7 +81,7 @@ extends GameOptionsScreen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.keyBindingListWidget.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
         boolean bl = false;
         for (KeyBinding lv : this.gameOptions.keysAll) {
             if (lv.isDefault()) continue;

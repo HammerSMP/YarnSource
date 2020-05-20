@@ -15,7 +15,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.passive.FishEntity;
 import net.minecraft.entity.passive.TropicalFishEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,8 +30,8 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class FishBucketItem
 extends BucketItem {
@@ -50,12 +50,12 @@ extends BucketItem {
     }
 
     @Override
-    protected void playEmptyingSound(@Nullable PlayerEntity arg, IWorld arg2, BlockPos arg3) {
+    protected void playEmptyingSound(@Nullable PlayerEntity arg, WorldAccess arg2, BlockPos arg3) {
         arg2.playSound(arg, arg3, SoundEvents.ITEM_BUCKET_EMPTY_FISH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
     }
 
     private void spawnFish(World arg, ItemStack arg2, BlockPos arg3) {
-        Entity lv = this.fishType.spawnFromItemStack(arg, arg2, null, arg3, SpawnType.BUCKET, true, false);
+        Entity lv = this.fishType.spawnFromItemStack(arg, arg2, null, arg3, SpawnReason.BUCKET, true, false);
         if (lv != null) {
             ((FishEntity)lv).setFromBucket(true);
         }

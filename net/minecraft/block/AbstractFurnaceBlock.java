@@ -67,17 +67,17 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }
         BlockEntity lv = arg2.getBlockEntity(arg3);
         if (lv instanceof AbstractFurnaceBlockEntity) {
             ItemScatterer.spawn(arg2, arg3, (Inventory)((AbstractFurnaceBlockEntity)lv));
-            ((AbstractFurnaceBlockEntity)lv).method_27354(arg2, Vec3d.method_24953(arg3));
+            ((AbstractFurnaceBlockEntity)lv).method_27354(arg2, Vec3d.ofCenter(arg3));
             arg2.updateComparators(arg3, this);
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override

@@ -50,10 +50,10 @@ public class AdvancementRewards {
 
     public void apply(ServerPlayerEntity arg) {
         arg.addExperience(this.experience);
-        LootContext lv = new LootContext.Builder(arg.getServerWorld()).put(LootContextParameters.THIS_ENTITY, arg).put(LootContextParameters.POSITION, arg.getBlockPos()).setRandom(arg.getRandom()).build(LootContextTypes.ADVANCEMENT_REWARD);
+        LootContext lv = new LootContext.Builder(arg.getServerWorld()).parameter(LootContextParameters.THIS_ENTITY, arg).parameter(LootContextParameters.POSITION, arg.getBlockPos()).random(arg.getRandom()).build(LootContextTypes.ADVANCEMENT_REWARD);
         boolean bl = false;
         for (Identifier lv2 : this.loot) {
-            for (ItemStack lv3 : arg.server.getLootManager().getTable(lv2).getDrops(lv)) {
+            for (ItemStack lv3 : arg.server.getLootManager().getTable(lv2).generateLoot(lv)) {
                 if (arg.giveItemStack(lv3)) {
                     arg.world.playSound(null, arg.getX(), arg.getY(), arg.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2f, ((arg.getRandom().nextFloat() - arg.getRandom().nextFloat()) * 0.7f + 1.0f) * 2.0f);
                     bl = true;

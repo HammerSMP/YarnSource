@@ -25,7 +25,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.Shearable;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.EatGrassGoal;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
@@ -65,9 +65,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class SheepEntity
 extends AnimalEntity
@@ -218,7 +218,7 @@ implements Shearable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float method_6628(float f) {
+    public float getNeckAngle(float f) {
         if (this.eatGrassTimer <= 0) {
             return 0.0f;
         }
@@ -232,7 +232,7 @@ implements Shearable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float method_6641(float f) {
+    public float getHeadAngle(float f) {
         if (this.eatGrassTimer > 4 && this.eatGrassTimer <= 36) {
             float g = ((float)(this.eatGrassTimer - 4) - f) / 32.0f;
             return 0.62831855f + 0.21991149f * MathHelper.sin(g * 28.7f);
@@ -365,7 +365,7 @@ implements Shearable {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setColor(SheepEntity.generateDefaultColor(arg.getRandom()));
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }

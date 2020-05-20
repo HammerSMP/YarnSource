@@ -41,11 +41,11 @@ extends LongRunningTask {
         }
         catch (RealmsServiceException lv2) {
             LOGGER.error("Couldn't create world");
-            this.method_27453(lv2.toString());
+            this.error(lv2.toString());
         }
         catch (Exception exception) {
             LOGGER.error("Could not create world");
-            this.method_27453(exception.getLocalizedMessage());
+            this.error(exception.getLocalizedMessage());
         }
     }
 }

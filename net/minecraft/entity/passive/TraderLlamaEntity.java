@@ -16,7 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.Goal;
@@ -26,9 +26,9 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.WanderingTraderEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class TraderLlamaEntity
 extends LlamaEntity {
@@ -83,12 +83,12 @@ extends LlamaEntity {
     public void tickMovement() {
         super.tickMovement();
         if (!this.world.isClient) {
-            this.method_20501();
+            this.tryDespawn();
         }
     }
 
-    private void method_20501() {
-        if (!this.method_20502()) {
+    private void tryDespawn() {
+        if (!this.canDespawn()) {
             return;
         }
         int n = this.despawnDelay = this.heldByTrader() ? ((WanderingTraderEntity)this.getHoldingEntity()).getDespawnDelay() - 1 : this.despawnDelay - 1;
@@ -98,7 +98,7 @@ extends LlamaEntity {
         }
     }
 
-    private boolean method_20502() {
+    private boolean canDespawn() {
         return !this.isTame() && !this.leashedByPlayer() && !this.hasPlayerRider();
     }
 
@@ -112,8 +112,8 @@ extends LlamaEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 == SpawnType.EVENT) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+        if (arg3 == SpawnReason.EVENT) {
             this.setBreedingAge(0);
         }
         if (arg4 == null) {

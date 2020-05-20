@@ -13,23 +13,23 @@ public class Boxes {
         double g = Math.max(e, 0.0);
         switch (arg2) {
             case WEST: {
-                return new Box(arg.x1 + f, arg.y1, arg.z1, arg.x1 + g, arg.y2, arg.z2);
+                return new Box(arg.minX + f, arg.minY, arg.minZ, arg.minX + g, arg.maxY, arg.maxZ);
             }
             case EAST: {
-                return new Box(arg.x2 + f, arg.y1, arg.z1, arg.x2 + g, arg.y2, arg.z2);
+                return new Box(arg.maxX + f, arg.minY, arg.minZ, arg.maxX + g, arg.maxY, arg.maxZ);
             }
             case DOWN: {
-                return new Box(arg.x1, arg.y1 + f, arg.z1, arg.x2, arg.y1 + g, arg.z2);
+                return new Box(arg.minX, arg.minY + f, arg.minZ, arg.maxX, arg.minY + g, arg.maxZ);
             }
             default: {
-                return new Box(arg.x1, arg.y2 + f, arg.z1, arg.x2, arg.y2 + g, arg.z2);
+                return new Box(arg.minX, arg.maxY + f, arg.minZ, arg.maxX, arg.maxY + g, arg.maxZ);
             }
             case NORTH: {
-                return new Box(arg.x1, arg.y1, arg.z1 + f, arg.x2, arg.y2, arg.z1 + g);
+                return new Box(arg.minX, arg.minY, arg.minZ + f, arg.maxX, arg.maxY, arg.minZ + g);
             }
             case SOUTH: 
         }
-        return new Box(arg.x1, arg.y1, arg.z2 + f, arg.x2, arg.y2, arg.z2 + g);
+        return new Box(arg.minX, arg.minY, arg.maxZ + f, arg.maxX, arg.maxY, arg.maxZ + g);
     }
 }
 

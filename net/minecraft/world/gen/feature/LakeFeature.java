@@ -14,12 +14,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.SingleStateFeatureConfig;
 
@@ -32,14 +31,14 @@ extends Feature<SingleStateFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, SingleStateFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SingleStateFeatureConfig arg5) {
         while (arg4.getY() > 5 && arg.isAir(arg4)) {
             arg4 = arg4.down();
         }
         if (arg4.getY() <= 4) {
             return false;
         }
-        if (arg2.getStructuresWithChildren(ChunkSectionPos.from(arg4 = arg4.down(4)), Feature.VILLAGE, arg).findAny().isPresent()) {
+        if (arg2.getStructuresWithChildren(ChunkSectionPos.from(arg4 = arg4.down(4)), Feature.VILLAGE).findAny().isPresent()) {
             return false;
         }
         boolean[] bls = new boolean[2048];

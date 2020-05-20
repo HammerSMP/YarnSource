@@ -31,7 +31,7 @@ implements Element {
     }
 
     public void render(Screen arg, MatrixStack arg2) {
-        arg.drawStringWithShadow(arg2, MinecraftClient.getInstance().textRenderer, this.text, this.x, this.y, this.color);
+        arg.drawCenteredText(arg2, MinecraftClient.getInstance().textRenderer, this.text, this.x, this.y, this.color);
     }
 
     public String getText() {

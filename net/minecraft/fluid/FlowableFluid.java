@@ -42,8 +42,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class FlowableFluid
@@ -121,7 +121,7 @@ extends Fluid {
         return lv.isSideSolidFullSquare(arg, arg2, arg3);
     }
 
-    protected void tryFlow(IWorld arg, BlockPos arg2, FluidState arg3) {
+    protected void tryFlow(WorldAccess arg, BlockPos arg2, FluidState arg3) {
         if (arg3.isEmpty()) {
             return;
         }
@@ -139,7 +139,7 @@ extends Fluid {
         }
     }
 
-    private void method_15744(IWorld arg, BlockPos arg2, FluidState arg3, BlockState arg4) {
+    private void method_15744(WorldAccess arg, BlockPos arg2, FluidState arg3, BlockState arg4) {
         int i = arg3.getLevel() - this.getLevelDecreasePerBlock(arg);
         if (arg3.get(FALLING).booleanValue()) {
             i = 7;
@@ -235,7 +235,7 @@ extends Fluid {
 
     protected abstract boolean isInfinite();
 
-    protected void flow(IWorld arg, BlockPos arg2, BlockState arg3, Direction arg4, FluidState arg5) {
+    protected void flow(WorldAccess arg, BlockPos arg2, BlockState arg3, Direction arg4, FluidState arg5) {
         if (arg3.getBlock() instanceof FluidFillable) {
             ((FluidFillable)((Object)arg3.getBlock())).tryFillWithFluid(arg, arg2, arg3, arg5);
         } else {
@@ -246,7 +246,7 @@ extends Fluid {
         }
     }
 
-    protected abstract void beforeBreakingBlock(IWorld var1, BlockPos var2, BlockState var3);
+    protected abstract void beforeBreakingBlock(WorldAccess var1, BlockPos var2, BlockState var3);
 
     private static short method_15747(BlockPos arg, BlockPos arg2) {
         int i = arg2.getX() - arg.getX();
@@ -359,7 +359,7 @@ extends Fluid {
             return false;
         }
         Material lv2 = arg3.getMaterial();
-        if (lv2 == Material.PORTAL || lv2 == Material.STRUCTURE_VOID || lv2 == Material.UNDERWATER_PLANT || lv2 == Material.SEAGRASS) {
+        if (lv2 == Material.PORTAL || lv2 == Material.STRUCTURE_VOID || lv2 == Material.UNDERWATER_PLANT || lv2 == Material.REPLACEABLE_UNDERWATER_PLANT) {
             return false;
         }
         return !lv2.blocksMovement();

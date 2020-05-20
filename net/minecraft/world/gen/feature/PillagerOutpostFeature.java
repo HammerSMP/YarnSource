@@ -52,18 +52,18 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator<?> arg2, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
         int k = i >> 4;
-        int l = j >> 4;
-        arg3.setSeed((long)(k ^ l << 4) ^ arg2.getSeed());
+        int m = j >> 4;
+        arg3.setSeed((long)(k ^ m << 4) ^ l);
         arg3.nextInt();
         if (arg3.nextInt(5) != 0) {
             return false;
         }
-        for (int m = i - 10; m <= i + 10; ++m) {
-            for (int n = j - 10; n <= j + 10; ++n) {
-                Biome lv = arg.getBiome(new BlockPos((m << 4) + 9, 0, (n << 4) + 9));
-                if (!Feature.VILLAGE.method_27217(arg, arg2, arg3, m, n, lv)) continue;
+        for (int n = i - 10; n <= i + 10; ++n) {
+            for (int o = j - 10; o <= j + 10; ++o) {
+                Biome lv = arg.getBiome(new BlockPos((n << 4) + 9, 0, (o << 4) + 9));
+                if (!Feature.VILLAGE.method_27217(arg, arg2, l, arg3, n, o, lv)) continue;
                 return false;
             }
         }
@@ -87,7 +87,7 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             BlockPos lv = new BlockPos(i * 16, 0, j * 16);
             PillagerOutpostGenerator.addPieces(arg, arg2, lv, this.children, this.random);
             this.setBoundingBoxFromChildren();

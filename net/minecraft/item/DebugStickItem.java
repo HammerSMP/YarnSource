@@ -26,8 +26,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class DebugStickItem
 extends Item {
@@ -59,7 +59,7 @@ extends Item {
         return ActionResult.SUCCESS;
     }
 
-    private void use(PlayerEntity arg, BlockState arg2, IWorld arg3, BlockPos arg4, boolean bl, ItemStack arg5) {
+    private void use(PlayerEntity arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, boolean bl, ItemStack arg5) {
         if (!arg.isCreativeLevelTwoOp()) {
             return;
         }

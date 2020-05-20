@@ -39,6 +39,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.FatalErrorScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.ProgressScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
@@ -270,7 +271,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                             EditWorldScreen.backupLevel(lv);
                         }
                         catch (IOException iOException) {
-                            SystemToast.method_27023(this.client, string);
+                            SystemToast.addWorldAccessFailureToast(this.client, string);
                             LOGGER.error("Failed to backup level {}", (Object)string, (Object)iOException);
                         }
                     }
@@ -305,7 +306,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                         lv2.deleteSessionLock();
                     }
                     catch (IOException iOException) {
-                        SystemToast.method_27025(this.client, string);
+                        SystemToast.addWorldDeleteFailureToast(this.client, string);
                         LOGGER.error("Failed to delete world {}", (Object)string, (Object)iOException);
                     }
                     WorldListWidget.this.filter(() -> this.screen.searchBox.getText(), true);
@@ -332,7 +333,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 }, lv));
             }
             catch (IOException iOException) {
-                SystemToast.method_27023(this.client, string);
+                SystemToast.addWorldAccessFailureToast(this.client, string);
                 LOGGER.error("Failed to access level {}", (Object)string, (Object)iOException);
                 WorldListWidget.this.filter(() -> this.screen.searchBox.getText(), true);
             }
@@ -341,15 +342,14 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         public void recreate() {
             try {
                 this.client.openScreen(new ProgressScreen());
-                CreateWorldScreen lv = new CreateWorldScreen(this.screen);
-                try (LevelStorage.Session lv2 = this.client.getLevelStorage().createSession(this.level.getName());){
-                    class_5219 lv3 = lv2.readLevelProperties();
-                    if (lv3 != null) {
-                        lv.recreateLevel(lv3);
+                try (LevelStorage.Session lv = this.client.getLevelStorage().createSession(this.level.getName());){
+                    class_5219 lv2 = lv.readLevelProperties();
+                    if (lv2 != null) {
+                        CreateWorldScreen lv3 = new CreateWorldScreen((Screen)this.screen, lv2);
                         if (this.level.isLegacyCustomizedWorld()) {
-                            this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? lv : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
+                            this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? lv3 : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
                         } else {
-                            this.client.openScreen(lv);
+                            this.client.openScreen(lv3);
                         }
                     }
                 }

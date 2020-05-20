@@ -128,7 +128,7 @@ extends Screen {
         }
         catch (IOException iOException) {
             field_23776.error("Failed to access world '{}'", (Object)this.field_23777.getDirectoryName(), (Object)iOException);
-            SystemToast.method_27023(this.client, this.field_23777.getDirectoryName());
+            SystemToast.addWorldAccessFailureToast(this.client, this.field_23777.getDirectoryName());
             this.callback.accept(true);
         }
     }
@@ -157,8 +157,8 @@ extends Screen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
-        this.drawString(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 40, 0xA0A0A0);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 40, 0xA0A0A0);
         this.levelNameTextField.render(arg, i, j, f);
         super.render(arg, i, j, f);
     }

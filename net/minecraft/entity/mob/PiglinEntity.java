@@ -25,7 +25,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
@@ -61,9 +61,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.dimension.DimensionType;
 
 public class PiglinEntity
@@ -76,7 +76,7 @@ implements CrossbowUser {
     private static final EntityAttributeModifier BABY_SPEED_BOOST_MODIFIER = new EntityAttributeModifier(BABY_SPEED_BOOST_MODIFIER_ID, "Baby speed boost", (double)0.2f, EntityAttributeModifier.Operation.MULTIPLY_BASE);
     private int conversionTicks = 0;
     private final BasicInventory inventory = new BasicInventory(8);
-    private boolean field_23738 = false;
+    private boolean cannotHunt = false;
     protected static final ImmutableList<SensorType<? extends Sensor<? super PiglinEntity>>> SENSOR_TYPES = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.INTERACTABLE_DOORS, SensorType.PIGLIN_SPECIFIC_SENSOR);
     protected static final ImmutableList<MemoryModuleType<?>> MEMORY_MODULE_TYPES = ImmutableList.of(MemoryModuleType.LOOK_TARGET, MemoryModuleType.INTERACTABLE_DOORS, MemoryModuleType.OPENED_DOORS, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEAREST_ADULT_PIGLINS, MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, (Object[])new MemoryModuleType[]{MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.PATH, MemoryModuleType.ANGRY_AT, MemoryModuleType.AVOID_TARGET, MemoryModuleType.ADMIRING_ITEM, MemoryModuleType.ADMIRING_DISABLED, MemoryModuleType.CELEBRATE_LOCATION, MemoryModuleType.HUNTED_RECENTLY, MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, MemoryModuleType.NEAREST_VISIBLE_BABY_PIGLIN, MemoryModuleType.NEAREST_VISIBLE_WITHER_SKELETON, MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, MemoryModuleType.RIDE_TARGET, MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, MemoryModuleType.ATE_RECENTLY, MemoryModuleType.NEAREST_REPELLENT});
 
@@ -98,7 +98,7 @@ implements CrossbowUser {
         if (this.isImmuneToZombification()) {
             arg.putBoolean("IsImmuneToZombification", true);
         }
-        if (this.field_23738) {
+        if (this.cannotHunt) {
             arg.putBoolean("CannotHunt", true);
         }
         arg.putInt("TimeInOverworld", this.conversionTicks);
@@ -125,8 +125,8 @@ implements CrossbowUser {
         return this.inventory.addStack(arg);
     }
 
-    protected boolean method_27085(ItemStack arg) {
-        return this.inventory.method_27070(arg);
+    protected boolean canInsertIntoInventory(ItemStack arg) {
+        return this.inventory.canInsert(arg);
     }
 
     @Override
@@ -149,14 +149,14 @@ implements CrossbowUser {
         return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 16.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35f).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5.0);
     }
 
-    public static boolean canSpawn(EntityType<PiglinEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<PiglinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return !arg2.getBlockState(arg4.down()).isOf(Blocks.NETHER_WART_BLOCK);
     }
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 != SpawnType.STRUCTURE) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+        if (arg3 != SpawnReason.STRUCTURE) {
             if (arg.getRandom().nextFloat() < 0.2f) {
                 this.setBaby(true);
             } else if (this.isAdult()) {
@@ -249,15 +249,15 @@ implements CrossbowUser {
     }
 
     private void setCannotHunt(boolean bl) {
-        this.field_23738 = bl;
+        this.cannotHunt = bl;
     }
 
-    protected boolean method_26952() {
-        return !this.field_23738;
+    protected boolean canHunt() {
+        return !this.cannotHunt;
     }
 
     public boolean canConvert() {
-        return this.world.getDimension().getType() == DimensionType.OVERWORLD && !this.isImmuneToZombification() && !this.isAiDisabled();
+        return this.world.method_27983() != DimensionType.THE_NETHER && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
     @Override
@@ -285,7 +285,7 @@ implements CrossbowUser {
             return;
         }
         lv.copyPositionAndRotation(this);
-        lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnType.CONVERSION, new ZombieEntity.ZombieData(this.isBaby()), null);
+        lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, new ZombieEntity.ZombieData(this.isBaby()), null);
         lv.setBaby(this.isBaby());
         lv.setAiDisabled(this.isAiDisabled());
         PiglinBrain.method_25948(this);
@@ -374,7 +374,7 @@ implements CrossbowUser {
     }
 
     @Override
-    public boolean method_25938(RangedWeaponItem arg) {
+    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
         return arg == Items.CROSSBOW;
     }
 
@@ -383,9 +383,9 @@ implements CrossbowUser {
     }
 
     protected void equipToOffHand(ItemStack arg) {
-        if (arg.getItem() == PiglinBrain.field_23826) {
+        if (arg.getItem() == PiglinBrain.BARTERING_ITEM) {
             this.equipStack(EquipmentSlot.OFFHAND, arg);
-            this.method_25939(EquipmentSlot.OFFHAND);
+            this.updateDropChances(EquipmentSlot.OFFHAND);
         } else {
             this.equipLootStack(EquipmentSlot.OFFHAND, arg);
         }
@@ -399,28 +399,28 @@ implements CrossbowUser {
     protected boolean method_24846(ItemStack arg) {
         EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
         ItemStack lv2 = this.getEquippedStack(lv);
-        return this.isBetterItemFor(arg, lv2);
+        return this.prefersNewEquipment(arg, lv2);
     }
 
     @Override
-    protected boolean isBetterItemFor(ItemStack arg, ItemStack arg2) {
-        if (PiglinBrain.isGoldenItem(arg.getItem()) && PiglinBrain.isGoldenItem(arg2.getItem())) {
-            return super.method_26320(arg, arg2);
-        }
-        if (PiglinBrain.isGoldenItem(arg.getItem())) {
+    protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
+        boolean bl = PiglinBrain.isGoldenItem(arg.getItem());
+        boolean bl2 = PiglinBrain.isGoldenItem(arg2.getItem());
+        if (bl && !bl2) {
             return true;
         }
-        if (PiglinBrain.isGoldenItem(arg2.getItem())) {
+        if (!bl && bl2) {
             return false;
         }
-        if (this.isAdult() && arg2.getItem() == Items.CROSSBOW) {
+        if (this.isAdult() && arg.getItem() != Items.CROSSBOW && arg2.getItem() == Items.CROSSBOW) {
             return false;
         }
-        return super.isBetterItemFor(arg, arg2);
+        return super.prefersNewEquipment(arg, arg2);
     }
 
     @Override
     protected void loot(ItemEntity arg) {
+        this.method_27964(arg);
         PiglinBrain.loot(this, arg);
     }
 

@@ -42,7 +42,7 @@ import net.minecraft.entity.InteractionObserver;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleState;
@@ -100,9 +100,9 @@ import net.minecraft.village.VillagerDataContainer;
 import net.minecraft.village.VillagerGossips;
 import net.minecraft.village.VillagerProfession;
 import net.minecraft.village.VillagerType;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 
@@ -611,11 +611,11 @@ VillagerDataContainer {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 == SpawnType.BREEDING) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+        if (arg3 == SpawnReason.BREEDING) {
             this.setVillagerData(this.getVillagerData().withProfession(VillagerProfession.NONE));
         }
-        if (arg3 == SpawnType.COMMAND || arg3 == SpawnType.SPAWN_EGG || arg3 == SpawnType.SPAWNER || arg3 == SpawnType.DISPENSER) {
+        if (arg3 == SpawnReason.COMMAND || arg3 == SpawnReason.SPAWN_EGG || arg3 == SpawnReason.SPAWNER || arg3 == SpawnReason.DISPENSER) {
             this.setVillagerData(this.getVillagerData().withType(VillagerType.forBiome(arg.getBiome(this.getBlockPos()))));
         }
         return super.initialize(arg, arg2, arg3, arg4, arg5);
@@ -633,7 +633,7 @@ VillagerDataContainer {
             lv3 = ((VillagerEntity)arg).getVillagerData().getType();
         }
         VillagerEntity lv4 = new VillagerEntity(EntityType.VILLAGER, this.world, lv3);
-        lv4.initialize(this.world, this.world.getLocalDifficulty(lv4.getBlockPos()), SpawnType.BREEDING, null, null);
+        lv4.initialize(this.world, this.world.getLocalDifficulty(lv4.getBlockPos()), SpawnReason.BREEDING, null, null);
         return lv4;
     }
 
@@ -641,7 +641,7 @@ VillagerDataContainer {
     public void onStruckByLightning(LightningEntity arg) {
         WitchEntity lv = EntityType.WITCH.create(this.world);
         lv.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
-        lv.initialize(this.world, this.world.getLocalDifficulty(lv.getBlockPos()), SpawnType.CONVERSION, null, null);
+        lv.initialize(this.world, this.world.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, null, null);
         lv.setAiDisabled(this.isAiDisabled());
         if (this.hasCustomName()) {
             lv.setCustomName(this.getCustomName());
@@ -656,10 +656,11 @@ VillagerDataContainer {
         ItemStack lv = arg.getStack();
         if (this.canGather(lv)) {
             BasicInventory lv2 = this.getInventory();
-            boolean bl = lv2.method_27070(lv);
+            boolean bl = lv2.canInsert(lv);
             if (!bl) {
                 return;
             }
+            this.method_27964(arg);
             this.sendPickup(arg, lv.getCount());
             ItemStack lv3 = lv2.addStack(lv);
             if (lv3.isEmpty()) {
@@ -673,7 +674,7 @@ VillagerDataContainer {
     @Override
     public boolean canGather(ItemStack arg) {
         Item lv = arg.getItem();
-        return (GATHERABLE_ITEMS.contains(lv) || this.getVillagerData().getProfession().getGatherableItems().contains((Object)lv)) && this.getInventory().method_27070(arg);
+        return (GATHERABLE_ITEMS.contains(lv) || this.getVillagerData().getProfession().getGatherableItems().contains((Object)lv)) && this.getInventory().canInsert(arg);
     }
 
     public boolean wantsToStartBreeding() {
@@ -762,10 +763,6 @@ VillagerDataContainer {
     }
 
     public boolean canSummonGolem(long l) {
-        VillagerData lv = this.getVillagerData();
-        if (lv.getProfession() == VillagerProfession.NONE || lv.getProfession() == VillagerProfession.NITWIT) {
-            return false;
-        }
         if (!this.hasRecentlyWorkedAndSlept(this.world.getTime())) {
             return false;
         }
@@ -787,8 +784,8 @@ VillagerDataContainer {
                 f += (double)j;
                 break;
             }
-            if ((lv4 = EntityType.IRON_GOLEM.create(this.world, null, null, null, lv3 = lv.add(d, f, e), SpawnType.MOB_SUMMONED, false, false)) == null) continue;
-            if (lv4.canSpawn(this.world, SpawnType.MOB_SUMMONED) && lv4.canSpawn(this.world)) {
+            if ((lv4 = EntityType.IRON_GOLEM.create(this.world, null, null, null, lv3 = lv.add(d, f, e), SpawnReason.MOB_SUMMONED, false, false)) == null) continue;
+            if (lv4.canSpawn(this.world, SpawnReason.MOB_SUMMONED) && lv4.canSpawn(this.world)) {
                 this.world.spawnEntity(lv4);
                 return lv4;
             }
@@ -829,7 +826,7 @@ VillagerDataContainer {
         return this.gossip;
     }
 
-    public void method_21650(Tag arg) {
+    public void setGossipDataFromTag(Tag arg) {
         this.gossip.deserialize(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg));
     }
 
@@ -853,9 +850,8 @@ VillagerDataContainer {
 
     private boolean hasRecentlyWorkedAndSlept(long l) {
         Optional<Timestamp> optional = this.brain.getOptionalMemory(MemoryModuleType.LAST_SLEPT);
-        Optional<Timestamp> optional2 = this.brain.getOptionalMemory(MemoryModuleType.LAST_WORKED_AT_POI);
-        if (optional.isPresent() && optional2.isPresent()) {
-            return l - optional.get().getTime() < 24000L && l - optional2.get().getTime() < 36000L;
+        if (optional.isPresent()) {
+            return l - optional.get().getTime() < 24000L;
         }
         return false;
     }

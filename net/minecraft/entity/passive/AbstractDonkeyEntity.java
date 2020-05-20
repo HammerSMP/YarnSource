@@ -28,7 +28,7 @@ extends HorseBaseEntity {
 
     protected AbstractDonkeyEntity(EntityType<? extends AbstractDonkeyEntity> arg, World arg2) {
         super((EntityType<? extends HorseBaseEntity>)arg, arg2);
-        this.field_6964 = false;
+        this.playExtraHorseSounds = false;
     }
 
     @Override
@@ -108,7 +108,7 @@ extends HorseBaseEntity {
         this.setHasChest(arg.getBoolean("ChestedHorse"));
         if (this.hasChest()) {
             ListTag lv = arg.getList("Items", 10);
-            this.method_6721();
+            this.onChestedStatusChanged();
             for (int i = 0; i < lv.size(); ++i) {
                 CompoundTag lv2 = lv.getCompound(i);
                 int j = lv2.getByte("Slot") & 0xFF;
@@ -124,12 +124,12 @@ extends HorseBaseEntity {
         if (i == 499) {
             if (this.hasChest() && arg.isEmpty()) {
                 this.setHasChest(false);
-                this.method_6721();
+                this.onChestedStatusChanged();
                 return true;
             }
             if (!this.hasChest() && arg.getItem() == Blocks.CHEST.asItem()) {
                 this.setHasChest(true);
-                this.method_6721();
+                this.onChestedStatusChanged();
                 return true;
             }
         }
@@ -162,7 +162,7 @@ extends HorseBaseEntity {
                     this.setHasChest(true);
                     this.playAddChestSound();
                     bl = true;
-                    this.method_6721();
+                    this.onChestedStatusChanged();
                 }
                 if (!this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE) {
                     this.openInventory(arg);
@@ -187,7 +187,7 @@ extends HorseBaseEntity {
         this.playSound(SoundEvents.ENTITY_DONKEY_CHEST, 1.0f, (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
     }
 
-    public int method_6702() {
+    public int getInventoryColumns() {
         return 5;
     }
 }

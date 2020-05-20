@@ -22,7 +22,7 @@ import net.minecraft.world.gen.feature.TreeFeatureConfig;
 public abstract class LargeTreeSaplingGenerator
 extends SaplingGenerator {
     @Override
-    public boolean generate(ServerWorld arg, ChunkGenerator<?> arg2, BlockPos arg3, BlockState arg4, Random random) {
+    public boolean generate(ServerWorld arg, ChunkGenerator arg2, BlockPos arg3, BlockState arg4, Random random) {
         for (int i = 0; i >= -1; --i) {
             for (int j = 0; j >= -1; --j) {
                 if (!LargeTreeSaplingGenerator.canGenerateLargeTree(arg4, arg, arg3, i, j)) continue;
@@ -35,7 +35,7 @@ extends SaplingGenerator {
     @Nullable
     protected abstract ConfiguredFeature<TreeFeatureConfig, ?> createLargeTreeFeature(Random var1);
 
-    public boolean generateLargeTree(ServerWorld arg, ChunkGenerator<?> arg2, BlockPos arg3, BlockState arg4, Random random, int i, int j) {
+    public boolean generateLargeTree(ServerWorld arg, ChunkGenerator arg2, BlockPos arg3, BlockState arg4, Random random, int i, int j) {
         ConfiguredFeature<TreeFeatureConfig, ?> lv = this.createLargeTreeFeature(random);
         if (lv == null) {
             return false;

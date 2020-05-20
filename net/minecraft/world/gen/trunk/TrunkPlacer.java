@@ -25,8 +25,8 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ModifiableTestableWorld;
 import net.minecraft.world.ModifiableWorld;
 import net.minecraft.world.TestableWorld;
-import net.minecraft.world.gen.feature.AbstractTreeFeature;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.foliage.FoliagePlacer;
 import net.minecraft.world.gen.trunk.TrunkPlacerType;
@@ -51,7 +51,7 @@ public abstract class TrunkPlacer {
     }
 
     protected static void method_27404(ModifiableWorld arg, BlockPos arg2, BlockState arg3, BlockBox arg4) {
-        AbstractTreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, arg2, arg3);
+        TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, arg2, arg3);
         arg4.encompass(new BlockBox(arg2, arg2));
     }
 
@@ -64,12 +64,12 @@ public abstract class TrunkPlacer {
 
     protected static void method_27400(ModifiableTestableWorld arg, BlockPos arg2) {
         if (!TrunkPlacer.method_27403(arg, arg2)) {
-            AbstractTreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, arg2, Blocks.DIRT.getDefaultState());
+            TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, arg2, Blocks.DIRT.getDefaultState());
         }
     }
 
     protected static boolean method_27402(ModifiableTestableWorld arg, Random random, BlockPos arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
-        if (AbstractTreeFeature.canReplace(arg, arg2)) {
+        if (TreeFeature.canReplace(arg, arg2)) {
             TrunkPlacer.method_27404(arg, arg2, arg4.trunkProvider.getBlockState(random, arg2), arg3);
             set.add(arg2.toImmutable());
             return true;
@@ -78,7 +78,7 @@ public abstract class TrunkPlacer {
     }
 
     protected static void method_27401(ModifiableTestableWorld arg, Random random, BlockPos.Mutable arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
-        if (AbstractTreeFeature.canTreeReplace(arg, arg2)) {
+        if (TreeFeature.canTreeReplace(arg, arg2)) {
             TrunkPlacer.method_27402(arg, random, arg2, set, arg3, arg4);
         }
     }

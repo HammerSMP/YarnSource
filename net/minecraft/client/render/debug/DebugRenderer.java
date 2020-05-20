@@ -166,7 +166,7 @@ public class DebugRenderer {
     }
 
     public static void drawBox(Box arg, float f, float g, float h, float i) {
-        DebugRenderer.drawBox(arg.x1, arg.y1, arg.z1, arg.x2, arg.y2, arg.z2, f, g, h, i);
+        DebugRenderer.drawBox(arg.minX, arg.minY, arg.minZ, arg.maxX, arg.maxY, arg.maxZ, f, g, h, i);
     }
 
     public static void drawBox(double d, double e, double f, double g, double h, double i, float j, float k, float l, float m) {

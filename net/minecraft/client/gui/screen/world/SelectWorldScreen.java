@@ -88,7 +88,7 @@ extends Screen {
         this.tooltipText = null;
         this.levelList.render(arg, i, j, f);
         this.searchBox.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
         super.render(arg, i, j, f);
         if (this.tooltipText != null) {
             this.renderTooltip(arg, this.tooltipText, i, j);

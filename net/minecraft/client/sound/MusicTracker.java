@@ -12,11 +12,11 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5195;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
+import net.minecraft.sound.MusicSound;
 import net.minecraft.util.math.MathHelper;
 
 @Environment(value=EnvType.CLIENT)
@@ -32,9 +32,9 @@ public class MusicTracker {
     }
 
     public void tick() {
-        class_5195 lv = this.client.getMusicType();
+        MusicSound lv = this.client.getMusicType();
         if (this.current != null) {
-            if (!lv.method_27279().getId().equals(this.current.getId()) && lv.method_27282()) {
+            if (!lv.getEvent().getId().equals(this.current.getId()) && lv.method_27282()) {
                 this.client.getSoundManager().stop(this.current);
                 this.timeUntilNextSong = MathHelper.nextInt(this.random, 0, lv.method_27280() / 2);
             }
@@ -49,8 +49,8 @@ public class MusicTracker {
         }
     }
 
-    public void play(class_5195 arg) {
-        this.current = PositionedSoundInstance.music(arg.method_27279());
+    public void play(MusicSound arg) {
+        this.current = PositionedSoundInstance.music(arg.getEvent());
         if (this.current.getSound() != SoundManager.MISSING_SOUND) {
             this.client.getSoundManager().play(this.current);
         }
@@ -65,11 +65,11 @@ public class MusicTracker {
         }
     }
 
-    public boolean isPlayingType(class_5195 arg) {
+    public boolean isPlayingType(MusicSound arg) {
         if (this.current == null) {
             return false;
         }
-        return arg.method_27279().getId().equals(this.current.getId());
+        return arg.getEvent().getId().equals(this.current.getId());
     }
 }
 

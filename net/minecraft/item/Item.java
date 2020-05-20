@@ -302,7 +302,7 @@ implements ItemConvertible {
         return false;
     }
 
-    public Multimap<EntityAttribute, EntityAttributeModifier> getModifiers(EquipmentSlot arg) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
         return ImmutableMultimap.of();
     }
 

@@ -15,7 +15,7 @@ implements LookTarget {
 
     public BlockPosLookTarget(BlockPos arg) {
         this.blockPos = arg;
-        this.pos = Vec3d.method_24953(arg);
+        this.pos = Vec3d.ofCenter(arg);
     }
 
     @Override

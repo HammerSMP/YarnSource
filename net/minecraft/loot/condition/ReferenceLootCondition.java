@@ -31,17 +31,17 @@ implements LootCondition {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
+    public void validate(LootTableReporter arg) {
         if (arg.hasCondition(this.id)) {
             arg.report("Condition " + this.id + " is recursively called");
             return;
         }
-        LootCondition.super.check(arg);
+        LootCondition.super.validate(arg);
         LootCondition lv = arg.getCondition(this.id);
         if (lv == null) {
             arg.report("Unknown condition table called " + this.id);
         } else {
-            lv.check(arg.withTable(".{" + this.id + "}", this.id));
+            lv.validate(arg.withTable(".{" + this.id + "}", this.id));
         }
     }
 

@@ -18,10 +18,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DeltaFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -43,7 +43,7 @@ extends Feature<DeltaFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, DeltaFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DeltaFeatureConfig arg5) {
         BlockPos lv = DeltaFeature.method_27102(arg, arg4.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1));
         if (lv == null) {
             return false;
@@ -71,7 +71,7 @@ extends Feature<DeltaFeatureConfig> {
         return bl;
     }
 
-    private static boolean method_27103(IWorld arg, BlockPos arg2, DeltaFeatureConfig arg3) {
+    private static boolean method_27103(WorldAccess arg, BlockPos arg2, DeltaFeatureConfig arg3) {
         BlockState lv = arg.getBlockState(arg2);
         if (lv.isOf(arg3.contents.getBlock())) {
             return false;
@@ -88,7 +88,7 @@ extends Feature<DeltaFeatureConfig> {
     }
 
     @Nullable
-    private static BlockPos method_27102(IWorld arg, BlockPos.Mutable arg2) {
+    private static BlockPos method_27102(WorldAccess arg, BlockPos.Mutable arg2) {
         while (arg2.getY() > 1) {
             if (arg.getBlockState(arg2).isAir()) {
                 BlockState lv = arg.getBlockState(arg2.move(Direction.DOWN));

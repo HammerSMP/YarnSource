@@ -58,7 +58,7 @@ extends AbstractPressableButtonWidget {
         CheckboxWidget.drawTexture(arg, this.x, this.y, this.isFocused() ? 20.0f : 0.0f, this.checked ? 20.0f : 0.0f, 20, this.height, 64, 64);
         this.renderBg(arg, lv, i, j);
         if (this.field_24253) {
-            this.method_27535(arg, lv2, this.getMessage(), this.x + 24, this.y + (this.height - 8) / 2, 0xE0E0E0 | MathHelper.ceil(this.alpha * 255.0f) << 24);
+            this.drawTextWithShadow(arg, lv2, this.getMessage(), this.x + 24, this.y + (this.height - 8) / 2, 0xE0E0E0 | MathHelper.ceil(this.alpha * 255.0f) << 24);
         }
     }
 }

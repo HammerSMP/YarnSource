@@ -60,8 +60,8 @@ extends RealmsScreen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.drawCenteredString(arg, this.textRenderer, this.type.text, this.width / 2, RealmsLongConfirmationScreen.row(2), this.type.colorCode);
-        this.drawStringWithShadow(arg, this.textRenderer, this.line2, this.width / 2, RealmsLongConfirmationScreen.row(4), 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, this.line3, this.width / 2, RealmsLongConfirmationScreen.row(6), 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.line2, this.width / 2, RealmsLongConfirmationScreen.row(4), 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.line3, this.width / 2, RealmsLongConfirmationScreen.row(6), 0xFFFFFF);
         super.render(arg, i, j, f);
     }
 

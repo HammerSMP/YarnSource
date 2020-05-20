@@ -32,7 +32,7 @@ implements Vanishable {
     private final Set<Block> effectiveBlocks;
     protected final float miningSpeed;
     private final float attackDamage;
-    private final Multimap<EntityAttribute, EntityAttributeModifier> field_23742;
+    private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 
     protected MiningToolItem(float f, float g, ToolMaterial arg, Set<Block> set, Item.Settings arg2) {
         super(arg, arg2);
@@ -42,7 +42,7 @@ implements Vanishable {
         ImmutableMultimap.Builder builder = ImmutableMultimap.builder();
         builder.put((Object)EntityAttributes.GENERIC_ATTACK_DAMAGE, (Object)new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_UUID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
         builder.put((Object)EntityAttributes.GENERIC_ATTACK_SPEED, (Object)new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_UUID, "Tool modifier", (double)g, EntityAttributeModifier.Operation.ADDITION));
-        this.field_23742 = builder.build();
+        this.attributeModifiers = builder.build();
     }
 
     @Override
@@ -65,14 +65,14 @@ implements Vanishable {
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getModifiers(EquipmentSlot arg) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
         if (arg == EquipmentSlot.MAINHAND) {
-            return this.field_23742;
+            return this.attributeModifiers;
         }
-        return super.getModifiers(arg);
+        return super.getAttributeModifiers(arg);
     }
 
-    public float method_26366() {
+    public float getAttackDamage() {
         return this.attackDamage;
     }
 }

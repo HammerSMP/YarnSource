@@ -15,8 +15,6 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelGeneratorOptions;
-import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraft.world.timer.Timer;
 
 public class UnmodifiableLevelProperties
@@ -29,11 +27,6 @@ implements class_5268 {
         this.field_24178 = arg;
         this.field_24179 = arg2;
         this.properties = arg3;
-    }
-
-    @Override
-    public long getSeed() {
-        return this.field_24179.getSeed();
     }
 
     @Override
@@ -101,15 +94,15 @@ implements class_5268 {
     }
 
     @Override
-    public void method_27416(int i) {
+    public void setSpawnX(int i) {
     }
 
     @Override
-    public void method_27417(int i) {
+    public void setSpawnY(int i) {
     }
 
     @Override
-    public void method_27419(int i) {
+    public void setSpawnZ(int i) {
     }
 
     @Override
@@ -141,27 +134,12 @@ implements class_5268 {
     }
 
     @Override
-    public boolean method_27420() {
-        return this.properties.method_27420();
-    }
-
-    @Override
     public void setGameMode(GameMode arg) {
     }
 
     @Override
     public boolean isHardcore() {
         return this.field_24179.isHardcore();
-    }
-
-    @Override
-    public LevelGeneratorType getGeneratorType() {
-        return this.properties.getGeneratorType();
-    }
-
-    @Override
-    public LevelGeneratorOptions method_27421() {
-        return this.properties.method_27421();
     }
 
     @Override
@@ -209,12 +187,12 @@ implements class_5268 {
 
     @Override
     public void setWorldData(CompoundTag arg) {
-        this.field_24179.method_27435(this.field_24178, arg);
+        this.field_24179.setWorldData(this.field_24178, arg);
     }
 
     @Override
     public CompoundTag getWorldData() {
-        return this.field_24179.method_27434(this.field_24178);
+        return this.field_24179.getWorldData(this.field_24178);
     }
 
     @Override

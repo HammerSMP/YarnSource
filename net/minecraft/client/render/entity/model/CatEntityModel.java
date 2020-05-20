@@ -45,7 +45,7 @@ extends OcelotEntityModel<T> {
             this.rightBackLeg.pivotY = 18.0f;
         }
         super.animateModel(arg, f, g, h);
-        if (((TameableEntity)arg).isSitting()) {
+        if (((TameableEntity)arg).isInSittingPose()) {
             this.torso.pitch = 0.7853982f;
             this.torso.pivotY += -4.0f;
             this.torso.pivotZ += 5.0f;

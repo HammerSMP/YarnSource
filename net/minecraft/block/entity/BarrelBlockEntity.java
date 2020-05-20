@@ -76,7 +76,7 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    protected ScreenHandler createContainer(int i, PlayerInventory arg) {
+    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
         return GenericContainerScreenHandler.createGeneric9x3(i, arg, this);
     }
 

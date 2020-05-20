@@ -159,12 +159,12 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.drawCenteredString(arg, this.textRenderer, I18n.translate("advMode.setCommand", new Object[0]), this.width / 2, 20, 0xFFFFFF);
-        this.drawString(arg, this.textRenderer, I18n.translate("advMode.command", new Object[0]), this.width / 2 - 150, 40, 0xA0A0A0);
+        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("advMode.command", new Object[0]), this.width / 2 - 150, 40, 0xA0A0A0);
         this.consoleCommandTextField.render(arg, i, j, f);
         int k = 75;
         if (!this.previousOutputTextField.getText().isEmpty()) {
             this.textRenderer.getClass();
-            this.drawString(arg, this.textRenderer, I18n.translate("advMode.previousOutput", new Object[0]), this.width / 2 - 150, (k += 5 * 9 + 1 + this.getTrackOutputButtonHeight() - 135) + 4, 0xA0A0A0);
+            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("advMode.previousOutput", new Object[0]), this.width / 2 - 150, (k += 5 * 9 + 1 + this.getTrackOutputButtonHeight() - 135) + 4, 0xA0A0A0);
             this.previousOutputTextField.render(arg, i, j, f);
         }
         super.render(arg, i, j, f);

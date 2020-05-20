@@ -17,7 +17,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,8 +30,8 @@ import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class AnimalEntity
@@ -106,7 +106,7 @@ extends PassiveEntity {
         this.lovingPlayer = arg.containsUuidNew("LoveCause") ? arg.getUuidNew("LoveCause") : null;
     }
 
-    public static boolean isValidNaturalSpawn(EntityType<? extends AnimalEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean isValidNaturalSpawn(EntityType<? extends AnimalEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg2.getBlockState(arg4.down()).isOf(Blocks.GRASS_BLOCK) && arg2.getBaseLightLevel(arg4, 0) > 8;
     }
 

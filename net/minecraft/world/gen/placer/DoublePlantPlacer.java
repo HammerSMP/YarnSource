@@ -17,7 +17,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.TallPlantBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.placer.BlockPlacer;
 import net.minecraft.world.gen.placer.BlockPlacerType;
 
@@ -32,7 +32,7 @@ extends BlockPlacer {
     }
 
     @Override
-    public void method_23403(IWorld arg, BlockPos arg2, BlockState arg3, Random random) {
+    public void method_23403(WorldAccess arg, BlockPos arg2, BlockState arg3, Random random) {
         ((TallPlantBlock)arg3.getBlock()).placeAt(arg, arg2, 2);
     }
 

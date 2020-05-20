@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
 import net.minecraft.loot.condition.LootCondition;
@@ -45,7 +46,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Vec3d;
 
 public class EntityPredicate {
-    public static final EntityPredicate ANY = new EntityPredicate(EntityTypePredicate.ANY, DistancePredicate.ANY, LocationPredicate.ANY, EntityEffectPredicate.EMPTY, NbtPredicate.ANY, EntityFlagsPredicate.ANY, EntityEquipmentPredicate.ANY, PlayerPredicate.ANY, FishingHookPredicate.ANY, null, null);
+    public static final EntityPredicate ANY = new EntityPredicate(EntityTypePredicate.ANY, DistancePredicate.ANY, LocationPredicate.ANY, EntityEffectPredicate.EMPTY, NbtPredicate.ANY, EntityFlagsPredicate.ANY, EntityEquipmentPredicate.ANY, PlayerPredicate.ANY, FishingHookPredicate.ANY, ANY, ANY, null, null);
     private final EntityTypePredicate type;
     private final DistancePredicate distance;
     private final LocationPredicate location;
@@ -55,12 +56,14 @@ public class EntityPredicate {
     private final EntityEquipmentPredicate equipment;
     private final PlayerPredicate player;
     private final FishingHookPredicate fishingHook;
+    private final EntityPredicate vehicle;
+    private final EntityPredicate targetedEntity;
     @Nullable
     private final String team;
     @Nullable
     private final Identifier catType;
 
-    private EntityPredicate(EntityTypePredicate arg, DistancePredicate arg2, LocationPredicate arg3, EntityEffectPredicate arg4, NbtPredicate arg5, EntityFlagsPredicate arg6, EntityEquipmentPredicate arg7, PlayerPredicate arg8, FishingHookPredicate arg9, @Nullable String string, @Nullable Identifier arg10) {
+    private EntityPredicate(EntityTypePredicate arg, DistancePredicate arg2, LocationPredicate arg3, EntityEffectPredicate arg4, NbtPredicate arg5, EntityFlagsPredicate arg6, EntityEquipmentPredicate arg7, PlayerPredicate arg8, FishingHookPredicate arg9, EntityPredicate arg10, EntityPredicate arg11, @Nullable String string, @Nullable Identifier arg12) {
         this.type = arg;
         this.distance = arg2;
         this.location = arg3;
@@ -70,8 +73,10 @@ public class EntityPredicate {
         this.equipment = arg7;
         this.player = arg8;
         this.fishingHook = arg9;
+        this.vehicle = arg10;
+        this.targetedEntity = arg11;
         this.team = string;
-        this.catType = arg10;
+        this.catType = arg12;
     }
 
     public boolean test(ServerPlayerEntity arg, @Nullable Entity arg2) {
@@ -113,6 +118,12 @@ public class EntityPredicate {
         if (!this.fishingHook.test(arg3)) {
             return false;
         }
+        if (!this.vehicle.test(arg, arg2, arg3.getVehicle())) {
+            return false;
+        }
+        if (!this.targetedEntity.test(arg, arg2, arg3 instanceof MobEntity ? ((MobEntity)arg3).getTarget() : null)) {
+            return false;
+        }
         if (!(this.team == null || (lv = arg3.getScoreboardTeam()) != null && this.team.equals(lv.getName()))) {
             return false;
         }
@@ -133,9 +144,11 @@ public class EntityPredicate {
         EntityEquipmentPredicate lv7 = EntityEquipmentPredicate.fromJson(jsonObject.get("equipment"));
         PlayerPredicate lv8 = PlayerPredicate.fromJson(jsonObject.get("player"));
         FishingHookPredicate lv9 = FishingHookPredicate.fromJson(jsonObject.get("fishing_hook"));
+        EntityPredicate lv10 = EntityPredicate.fromJson(jsonObject.get("vehicle"));
+        EntityPredicate lv11 = EntityPredicate.fromJson(jsonObject.get("targeted_entity"));
         String string = JsonHelper.getString(jsonObject, "team", null);
-        Identifier lv10 = jsonObject.has("catType") ? new Identifier(JsonHelper.getString(jsonObject, "catType")) : null;
-        return new Builder().type(lv).distance(lv2).location(lv3).effects(lv4).nbt(lv5).flags(lv6).equipment(lv7).player(lv8).fishHook(lv9).team(string).catType(lv10).build();
+        Identifier lv12 = jsonObject.has("catType") ? new Identifier(JsonHelper.getString(jsonObject, "catType")) : null;
+        return new Builder().type(lv).distance(lv2).location(lv3).effects(lv4).nbt(lv5).flags(lv6).equipment(lv7).player(lv8).fishHook(lv9).team(string).vehicle(lv10).targetedEntity(lv11).catType(lv12).build();
     }
 
     public JsonElement toJson() {
@@ -152,6 +165,8 @@ public class EntityPredicate {
         jsonObject.add("equipment", this.equipment.toJson());
         jsonObject.add("player", this.player.toJson());
         jsonObject.add("fishing_hook", this.fishingHook.toJson());
+        jsonObject.add("vehicle", this.vehicle.toJson());
+        jsonObject.add("targeted_entity", this.targetedEntity.toJson());
         jsonObject.addProperty("team", this.team);
         if (this.catType != null) {
             jsonObject.addProperty("catType", this.catType.toString());
@@ -160,7 +175,7 @@ public class EntityPredicate {
     }
 
     public static LootContext createAdvancementEntityLootContext(ServerPlayerEntity arg, Entity arg2) {
-        return new LootContext.Builder(arg.getServerWorld()).put(LootContextParameters.THIS_ENTITY, arg2).put(LootContextParameters.POSITION, arg2.getBlockPos()).put(LootContextParameters.ORIGIN, arg.getPos()).setRandom(arg.getRandom()).build(LootContextTypes.ADVANCEMENT_ENTITY);
+        return new LootContext.Builder(arg.getServerWorld()).parameter(LootContextParameters.THIS_ENTITY, arg2).parameter(LootContextParameters.POSITION, arg2.getBlockPos()).parameter(LootContextParameters.ORIGIN, arg.getPos()).random(arg.getRandom()).build(LootContextTypes.ADVANCEMENT_ENTITY);
     }
 
     public static class Extended {
@@ -171,6 +186,10 @@ public class EntityPredicate {
         private Extended(LootCondition[] args) {
             this.conditions = args;
             this.combinedCondition = LootConditions.joinAnd(args);
+        }
+
+        public static Extended create(LootCondition ... args) {
+            return new Extended(args);
         }
 
         public static Extended getInJson(JsonObject jsonObject, String string, AdvancementEntityPredicateDeserializer arg) {
@@ -241,6 +260,8 @@ public class EntityPredicate {
         private EntityEquipmentPredicate equipment = EntityEquipmentPredicate.ANY;
         private PlayerPredicate player = PlayerPredicate.ANY;
         private FishingHookPredicate fishHook = FishingHookPredicate.ANY;
+        private EntityPredicate vehicle = ANY;
+        private EntityPredicate targetedEntity = ANY;
         private String team;
         private Identifier catType;
 
@@ -308,6 +329,16 @@ public class EntityPredicate {
             return this;
         }
 
+        public Builder vehicle(EntityPredicate arg) {
+            this.vehicle = arg;
+            return this;
+        }
+
+        public Builder targetedEntity(EntityPredicate arg) {
+            this.targetedEntity = arg;
+            return this;
+        }
+
         public Builder team(@Nullable String string) {
             this.team = string;
             return this;
@@ -319,7 +350,7 @@ public class EntityPredicate {
         }
 
         public EntityPredicate build() {
-            return new EntityPredicate(this.type, this.distance, this.location, this.effects, this.nbt, this.flags, this.equipment, this.player, this.fishHook, this.team, this.catType);
+            return new EntityPredicate(this.type, this.distance, this.location, this.effects, this.nbt, this.flags, this.equipment, this.player, this.fishHook, this.vehicle, this.targetedEntity, this.team, this.catType);
         }
     }
 }

@@ -82,7 +82,7 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.tooltip = null;
         this.ruleListWidget.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
         super.render(arg, i, j, f);
         if (this.tooltip != null) {
             this.renderTooltip(arg, this.tooltip, i, j);
@@ -258,7 +258,7 @@ extends Screen {
 
         @Override
         public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            EditGameRulesScreen.this.drawStringWithShadow(arg, ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer, this.name, k + l / 2, j + 5, 0xFFFFFF);
+            EditGameRulesScreen.this.drawCenteredText(arg, ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer, this.name, k + l / 2, j + 5, 0xFFFFFF);
         }
 
         @Override

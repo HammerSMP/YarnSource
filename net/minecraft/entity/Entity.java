@@ -2,12 +2,9 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableList
- *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Sets
- *  com.google.common.collect.UnmodifiableIterator
  *  it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap
  *  it.unimi.dsi.fastutil.objects.Object2DoubleMap
  *  javax.annotation.Nullable
@@ -18,12 +15,9 @@
  */
 package net.minecraft.entity;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.collect.UnmodifiableIterator;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import java.util.Arrays;
@@ -50,7 +44,6 @@ import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.HoneyBlock;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
@@ -68,7 +61,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.fluid.Fluid;
@@ -140,7 +132,6 @@ CommandOutput {
     protected static final Logger LOGGER = LogManager.getLogger();
     private static final AtomicInteger MAX_ENTITY_ID = new AtomicInteger();
     private static final List<ItemStack> EMPTY_STACK_LIST = Collections.emptyList();
-    private static final ImmutableMap<EntityPose, ImmutableList<Integer>> POSE_HEIGHTS = ImmutableMap.of((Object)((Object)EntityPose.STANDING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.CROUCHING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.SWIMMING), (Object)ImmutableList.of((Object)0, (Object)1));
     private static final Box NULL_BOX = new Box(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     private static double renderDistanceMultiplier = 1.0;
     private final EntityType<?> type;
@@ -233,7 +224,7 @@ CommandOutput {
         this.blockPos = BlockPos.ORIGIN;
         this.updatePosition(0.0, 0.0, 0.0);
         if (arg2 != null) {
-            this.dimension = arg2.dimension.getType();
+            this.dimension = arg2.method_27983();
         }
         this.dataTracker = new DataTracker(this);
         this.dataTracker.startTracking(FLAGS, (byte)0);
@@ -405,7 +396,7 @@ CommandOutput {
         this.prevPitch = this.pitch;
         this.prevYaw = this.yaw;
         this.tickNetherPortal();
-        if (this.method_27298()) {
+        if (this.shouldSpawnSprintingParticles()) {
             this.spawnSprintingParticles();
         }
         this.updateWaterState();
@@ -621,7 +612,7 @@ CommandOutput {
     }
 
     protected BlockPos getVelocityAffectingPos() {
-        return new BlockPos(this.pos.x, this.getBoundingBox().y1 - 0.5000001, this.pos.z);
+        return new BlockPos(this.pos.x, this.getBoundingBox().minY - 0.5000001, this.pos.z);
     }
 
     protected Vec3d adjustMovementForSneaking(Vec3d arg, MovementType arg2) {
@@ -757,7 +748,7 @@ CommandOutput {
 
     public void moveToBoundingBoxCenter() {
         Box lv = this.getBoundingBox();
-        this.setPos((lv.x1 + lv.x2) / 2.0, lv.y1, (lv.z1 + lv.z2) / 2.0);
+        this.setPos((lv.minX + lv.maxX) / 2.0, lv.minY, (lv.minZ + lv.maxZ) / 2.0);
     }
 
     protected SoundEvent getSwimSound() {
@@ -774,8 +765,8 @@ CommandOutput {
 
     protected void checkBlockCollision() {
         Box lv = this.getBoundingBox();
-        BlockPos lv2 = new BlockPos(lv.x1 + 0.001, lv.y1 + 0.001, lv.z1 + 0.001);
-        BlockPos lv3 = new BlockPos(lv.x2 - 0.001, lv.y2 - 0.001, lv.z2 - 0.001);
+        BlockPos lv2 = new BlockPos(lv.minX + 0.001, lv.minY + 0.001, lv.minZ + 0.001);
+        BlockPos lv3 = new BlockPos(lv.maxX - 0.001, lv.maxY - 0.001, lv.maxZ - 0.001);
         BlockPos.Mutable lv4 = new BlockPos.Mutable();
         if (this.world.isRegionLoaded(lv2, lv3)) {
             for (int i = lv2.getX(); i <= lv3.getX(); ++i) {
@@ -922,7 +913,7 @@ CommandOutput {
         if (this.isTouchingWater()) {
             return true;
         }
-        double d = this.world.getDimension().isNether() ? 0.007 : 0.0023333333333333335;
+        double d = this.world.method_27983().method_27998() ? 0.007 : 0.0023333333333333335;
         return this.updateMovementInFluid(FluidTags.LAVA, d);
     }
 
@@ -979,7 +970,7 @@ CommandOutput {
         return this.world.getBlockState(this.getLandingPos());
     }
 
-    public boolean method_27298() {
+    public boolean shouldSpawnSprintingParticles() {
         return this.isSprinting() && !this.isTouchingWater() && !this.isSpectator() && !this.isInSneakingPose() && !this.isInLava() && this.isAlive();
     }
 
@@ -1336,10 +1327,6 @@ CommandOutput {
             this.pitch = lv3.getFloat(1);
             this.prevYaw = this.yaw;
             this.prevPitch = this.pitch;
-            if (lv3.isEmpty() && this instanceof ShulkerEntity) {
-                this.yaw = 180.0f;
-                this.prevYaw = 180.0f;
-            }
             this.setHeadYaw(this.yaw);
             this.setYaw(this.yaw);
             this.fallDistance = arg.getFloat("FallDistance");
@@ -1643,7 +1630,7 @@ CommandOutput {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
                 this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
-                this.changeDimension(this.world.dimension.getType() == DimensionType.THE_NETHER ? DimensionType.OVERWORLD : DimensionType.THE_NETHER);
+                this.changeDimension(this.world.method_27983() == DimensionType.THE_NETHER ? DimensionType.OVERWORLD : DimensionType.THE_NETHER);
                 this.world.getProfiler().pop();
             }
             this.inNetherPortal = false;
@@ -2190,7 +2177,7 @@ CommandOutput {
             return;
         }
         Box lv4 = this.getBoundingBox();
-        this.setBoundingBox(new Box(lv4.x1, lv4.y1, lv4.z1, lv4.x1 + (double)lv3.width, lv4.y1 + (double)lv3.height, lv4.z1 + (double)lv3.width));
+        this.setBoundingBox(new Box(lv4.minX, lv4.minY, lv4.minZ, lv4.minX + (double)lv3.width, lv4.minY + (double)lv3.height, lv4.minZ + (double)lv3.width));
         if (lv3.width > lv.width && !this.firstUpdate && !this.world.isClient) {
             float f = lv.width - lv3.width;
             this.move(MovementType.SELF, new Vec3d(f, 0.0, f));
@@ -2426,51 +2413,8 @@ CommandOutput {
         return new Vec3d((double)h * g / (double)j, 0.0, (double)i * g / (double)j);
     }
 
-    public Vec3d method_24829(LivingEntity arg2) {
-        Direction lv = this.getMovementDirection();
-        if (lv.getAxis() == Direction.Axis.Y) {
-            return new Vec3d(this.getX(), this.getBoundingBox().y2, this.getZ());
-        }
-        Direction lv2 = lv.rotateYClockwise();
-        int[][] is = new int[][]{{lv2.getOffsetX(), lv2.getOffsetZ()}, {-lv2.getOffsetX(), -lv2.getOffsetZ()}, {-lv.getOffsetX() + lv2.getOffsetX(), -lv.getOffsetZ() + lv2.getOffsetZ()}, {-lv.getOffsetX() - lv2.getOffsetX(), -lv.getOffsetZ() - lv2.getOffsetZ()}, {lv.getOffsetX() + lv2.getOffsetX(), lv.getOffsetZ() + lv2.getOffsetZ()}, {lv.getOffsetX() - lv2.getOffsetX(), lv.getOffsetZ() - lv2.getOffsetZ()}, {-lv.getOffsetX(), -lv.getOffsetZ()}, {lv.getOffsetX(), lv.getOffsetZ()}};
-        BlockPos lv3 = this.getBlockPos();
-        BlockPos.Mutable lv4 = new BlockPos.Mutable();
-        ImmutableList<EntityPose> immutableList = arg2.getPoses();
-        for (EntityPose lv5 : immutableList) {
-            EntityDimensions lv6 = arg2.getDimensions(lv5);
-            float f = Math.min(lv6.width, 1.0f) / 2.0f;
-            float g = 0.5f - f;
-            float h = 0.5f + f;
-            UnmodifiableIterator unmodifiableIterator = ((ImmutableList)POSE_HEIGHTS.get((Object)lv5)).iterator();
-            while (unmodifiableIterator.hasNext()) {
-                int i = (Integer)unmodifiableIterator.next();
-                for (int[] js : is) {
-                    lv4.set(lv3.getX() + js[0], lv3.getY() + i, lv3.getZ() + js[1]);
-                    double d = this.world.method_26097(lv4, arg -> {
-                        if (arg.isIn(BlockTags.CLIMBABLE)) {
-                            return true;
-                        }
-                        return arg.getBlock() instanceof TrapdoorBlock && arg.get(TrapdoorBlock.OPEN) != false;
-                    });
-                    if (Double.isInfinite(d) || d >= 1.0) continue;
-                    double e = (double)lv4.getY() + d;
-                    Box lv7 = new Box((float)lv4.getX() + g, e, (float)lv4.getZ() + g, (float)lv4.getX() + h, e + (double)lv6.height, (float)lv4.getZ() + h);
-                    if (!this.world.getBlockCollisions(arg2, lv7).allMatch(VoxelShape::isEmpty)) continue;
-                    arg2.setPose(lv5);
-                    return Vec3d.method_26410(lv4, d);
-                }
-            }
-        }
-        double j = this.getBoundingBox().y2;
-        lv4.set((double)lv3.getX(), j, (double)lv3.getZ());
-        for (EntityPose lv8 : immutableList) {
-            double k = arg2.getDimensions((EntityPose)lv8).height;
-            double l = (double)lv4.getY() + this.world.method_26096(lv4, j - (double)lv4.getY() + k);
-            if (!(j + k <= l)) continue;
-            arg2.setPose(lv8);
-            break;
-        }
-        return new Vec3d(this.getX(), j, this.getZ());
+    public Vec3d method_24829(LivingEntity arg) {
+        return new Vec3d(this.getX(), this.getBoundingBox().maxY, this.getZ());
     }
 
     @Nullable
@@ -2533,12 +2477,12 @@ CommandOutput {
     public boolean updateMovementInFluid(Tag<Fluid> arg, double d) {
         int n;
         Box lv = this.getBoundingBox().contract(0.001);
-        int i = MathHelper.floor(lv.x1);
-        int j = MathHelper.ceil(lv.x2);
-        int k = MathHelper.floor(lv.y1);
-        int l = MathHelper.ceil(lv.y2);
-        int m = MathHelper.floor(lv.z1);
-        if (!this.world.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(lv.z2))) {
+        int i = MathHelper.floor(lv.minX);
+        int j = MathHelper.ceil(lv.maxX);
+        int k = MathHelper.floor(lv.minY);
+        int l = MathHelper.ceil(lv.maxY);
+        int m = MathHelper.floor(lv.minZ);
+        if (!this.world.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(lv.maxZ))) {
             return false;
         }
         double e = 0.0;
@@ -2553,9 +2497,9 @@ CommandOutput {
                     double f;
                     lv3.set(p, q, r);
                     FluidState lv4 = this.world.getFluidState(lv3);
-                    if (!lv4.matches(arg) || !((f = (double)((float)q + lv4.getHeight(this.world, lv3))) >= lv.y1)) continue;
+                    if (!lv4.matches(arg) || !((f = (double)((float)q + lv4.getHeight(this.world, lv3))) >= lv.minY)) continue;
                     bl2 = true;
-                    e = Math.max(f - lv.y1, e);
+                    e = Math.max(f - lv.minY, e);
                     if (!bl) continue;
                     Vec3d lv5 = lv4.getVelocity(this.world, lv3);
                     if (e < 0.4) {

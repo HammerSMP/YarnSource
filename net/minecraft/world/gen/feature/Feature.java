@@ -25,16 +25,14 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.ModifiableWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.TestableWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.ProbabilityConfig;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.AbstractPileFeature;
-import net.minecraft.world.gen.feature.AbstractTreeFeature;
 import net.minecraft.world.gen.feature.BambooFeature;
 import net.minecraft.world.gen.feature.BasaltColumnsFeature;
 import net.minecraft.world.gen.feature.BasaltColumnsFeatureConfig;
@@ -135,6 +133,7 @@ import net.minecraft.world.gen.feature.StrongholdFeature;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 import net.minecraft.world.gen.feature.SwampHutFeature;
+import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.feature.TwistingVinesFeature;
 import net.minecraft.world.gen.feature.VillageFeature;
@@ -163,7 +162,7 @@ public abstract class Feature<FC extends FeatureConfig> {
     public static final StructureFeature<DefaultFeatureConfig> NETHER_FOSSIL = Feature.register("nether_fossil", new NetherFossilFeature((Function<Dynamic<?>, ? extends DefaultFeatureConfig>)((Function<Dynamic<?>, DefaultFeatureConfig>)DefaultFeatureConfig::deserialize)));
     public static final StructureFeature<BastionRemnantFeatureConfig> BASTION_REMNANT = Feature.register("bastion_remnant", new BastionRemnantFeature((Function<Dynamic<?>, ? extends BastionRemnantFeatureConfig>)((Function<Dynamic<?>, BastionRemnantFeatureConfig>)BastionRemnantFeatureConfig::deserialize)));
     public static final Feature<DefaultFeatureConfig> NO_OP = Feature.register("no_op", new NoOpFeature((Function<Dynamic<?>, ? extends DefaultFeatureConfig>)((Function<Dynamic<?>, DefaultFeatureConfig>)DefaultFeatureConfig::deserialize)));
-    public static final Feature<TreeFeatureConfig> TREE = Feature.register("tree", new AbstractTreeFeature((Function<Dynamic<?>, ? extends TreeFeatureConfig>)((Function<Dynamic<?>, TreeFeatureConfig>)TreeFeatureConfig::deserialize)));
+    public static final Feature<TreeFeatureConfig> TREE = Feature.register("tree", new TreeFeature((Function<Dynamic<?>, ? extends TreeFeatureConfig>)((Function<Dynamic<?>, TreeFeatureConfig>)TreeFeatureConfig::deserialize)));
     public static final FlowerFeature<RandomPatchFeatureConfig> FLOWER = Feature.register("flower", new DefaultFlowerFeature((Function<Dynamic<?>, ? extends RandomPatchFeatureConfig>)((Function<Dynamic<?>, RandomPatchFeatureConfig>)RandomPatchFeatureConfig::deserialize)));
     public static final Feature<RandomPatchFeatureConfig> RANDOM_PATCH = Feature.register("random_patch", new RandomPatchFeature((Function<Dynamic<?>, ? extends RandomPatchFeatureConfig>)((Function<Dynamic<?>, RandomPatchFeatureConfig>)RandomPatchFeatureConfig::deserialize)));
     public static final Feature<BlockPileFeatureConfig> BLOCK_PILE = Feature.register("block_pile", new AbstractPileFeature((Function<Dynamic<?>, ? extends BlockPileFeatureConfig>)((Function<Dynamic<?>, BlockPileFeatureConfig>)BlockPileFeatureConfig::deserialize)));
@@ -258,7 +257,7 @@ public abstract class Feature<FC extends FeatureConfig> {
         arg.setBlockState(arg2, arg3, 3);
     }
 
-    public abstract boolean generate(IWorld var1, StructureAccessor var2, ChunkGenerator<? extends ChunkGeneratorConfig> var3, Random var4, BlockPos var5, FC var6);
+    public abstract boolean generate(ServerWorldAccess var1, StructureAccessor var2, ChunkGenerator var3, Random var4, BlockPos var5, FC var6);
 
     public List<Biome.SpawnEntry> getMonsterSpawns() {
         return Collections.emptyList();

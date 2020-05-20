@@ -26,7 +26,7 @@ import net.minecraft.util.dynamic.DynamicDeserializer;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
@@ -73,7 +73,7 @@ extends StructurePoolElement {
     }
 
     @Override
-    public boolean generate(StructureManager arg, IWorld arg2, StructureAccessor arg3, ChunkGenerator<?> arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
+    public boolean generate(StructureManager arg, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
         for (StructurePoolElement lv : this.elements) {
             if (lv.generate(arg, arg2, arg3, arg4, arg5, arg6, arg7, arg8, random, bl)) continue;
             return false;

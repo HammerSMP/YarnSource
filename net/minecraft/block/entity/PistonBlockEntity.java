@@ -190,7 +190,7 @@ implements Tickable {
     }
 
     private static boolean method_23671(Box arg, Entity arg2) {
-        return arg2.getPistonBehavior() == PistonBehavior.NORMAL && arg2.isOnGround() && arg2.getX() >= arg.x1 && arg2.getX() <= arg.x2 && arg2.getZ() >= arg.z1 && arg2.getZ() <= arg.z2;
+        return arg2.getPistonBehavior() == PistonBehavior.NORMAL && arg2.isOnGround() && arg2.getX() >= arg.minX && arg2.getX() <= arg.maxX && arg2.getZ() >= arg.minZ && arg2.getZ() <= arg.maxZ;
     }
 
     private boolean isPushingHoneyBlock() {
@@ -204,23 +204,23 @@ implements Tickable {
     private static double getIntersectionSize(Box arg, Direction arg2, Box arg3) {
         switch (arg2) {
             case EAST: {
-                return arg.x2 - arg3.x1;
+                return arg.maxX - arg3.minX;
             }
             case WEST: {
-                return arg3.x2 - arg.x1;
+                return arg3.maxX - arg.minX;
             }
             default: {
-                return arg.y2 - arg3.y1;
+                return arg.maxY - arg3.minY;
             }
             case DOWN: {
-                return arg3.y2 - arg.y1;
+                return arg3.maxY - arg.minY;
             }
             case SOUTH: {
-                return arg.z2 - arg3.z1;
+                return arg.maxZ - arg3.minZ;
             }
             case NORTH: 
         }
-        return arg3.z2 - arg.z1;
+        return arg3.maxZ - arg.minZ;
     }
 
     private Box offsetHeadBox(Box arg) {

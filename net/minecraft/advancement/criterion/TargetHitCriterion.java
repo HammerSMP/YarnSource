@@ -56,8 +56,8 @@ extends AbstractCriterion<Conditions> {
             this.projectile = arg3;
         }
 
-        public static Conditions create(NumberRange.IntRange arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, EntityPredicate.Extended.EMPTY);
+        public static Conditions create(NumberRange.IntRange arg, EntityPredicate.Extended arg2) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, arg, arg2);
         }
 
         @Override

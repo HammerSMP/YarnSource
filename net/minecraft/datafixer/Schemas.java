@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5196;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.AddTrappedChestFix;
 import net.minecraft.datafixer.fix.AdvancementRenameFix;
@@ -34,6 +33,7 @@ import net.minecraft.datafixer.fix.BeehiveRenameFix;
 import net.minecraft.datafixer.fix.BiomeFormatFix;
 import net.minecraft.datafixer.fix.BiomeRenameFix;
 import net.minecraft.datafixer.fix.BiomesFix;
+import net.minecraft.datafixer.fix.BitStorageAlignFix;
 import net.minecraft.datafixer.fix.BlockEntityBannerColorFix;
 import net.minecraft.datafixer.fix.BlockEntityBlockStateFix;
 import net.minecraft.datafixer.fix.BlockEntityCustomNameToTextFix;
@@ -76,6 +76,7 @@ import net.minecraft.datafixer.fix.EntityRavagerRenameFix;
 import net.minecraft.datafixer.fix.EntityRedundantChanceTagsFix;
 import net.minecraft.datafixer.fix.EntityRidingToPassengerFix;
 import net.minecraft.datafixer.fix.EntityShulkerColorFix;
+import net.minecraft.datafixer.fix.EntityShulkerRotationFix;
 import net.minecraft.datafixer.fix.EntitySkeletonSplitFix;
 import net.minecraft.datafixer.fix.EntityStringUuidFix;
 import net.minecraft.datafixer.fix.EntityTheRenameningBlock;
@@ -137,6 +138,7 @@ import net.minecraft.datafixer.fix.StriderGravityFix;
 import net.minecraft.datafixer.fix.StructureReferenceFix;
 import net.minecraft.datafixer.fix.SwimStatsRenameFix;
 import net.minecraft.datafixer.fix.TeamDisplayNameFix;
+import net.minecraft.datafixer.fix.VillagerFollowRangeFix;
 import net.minecraft.datafixer.fix.VillagerGossipFix;
 import net.minecraft.datafixer.fix.VillagerProfessionFix;
 import net.minecraft.datafixer.fix.VillagerTradeFix;
@@ -207,7 +209,7 @@ public class Schemas {
     private static DataFixer create() {
         DataFixerBuilder dataFixerBuilder = new DataFixerBuilder(SharedConstants.getGameVersion().getWorldVersion());
         Schemas.build(dataFixerBuilder);
-        return dataFixerBuilder.build(Util.getServerWorkerExecutor());
+        return dataFixerBuilder.build(Util.method_28124());
     }
 
     public static DataFixer getFixer() {
@@ -508,7 +510,7 @@ public class Schemas {
         Schema schema113 = dataFixerBuilder.addSchema(2523, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer((DataFix)new RenameItemStackAttributesFix(schema113));
         Schema schema114 = dataFixerBuilder.addSchema(2527, EMPTY_IDENTIFIER_NORMALIZE);
-        dataFixerBuilder.addFixer((DataFix)new class_5196(schema114));
+        dataFixerBuilder.addFixer((DataFix)new BitStorageAlignFix(schema114));
         Schema schema115 = dataFixerBuilder.addSchema(2528, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer(ItemNameFix.create(schema115, "Rename soul fire torch and soul fire lantern", string -> (String)ImmutableMap.of((Object)"minecraft:soul_fire_torch", (Object)"minecraft:soul_torch", (Object)"minecraft:soul_fire_lantern", (Object)"minecraft:soul_lantern").getOrDefault(string, string)));
         dataFixerBuilder.addFixer(BlockNameFix.create(schema115, "Rename soul fire torch and soul fire lantern", string -> (String)ImmutableMap.of((Object)"minecraft:soul_fire_torch", (Object)"minecraft:soul_torch", (Object)"minecraft:soul_fire_wall_torch", (Object)"minecraft:soul_wall_torch", (Object)"minecraft:soul_fire_lantern", (Object)"minecraft:soul_lantern").getOrDefault(string, string)));
@@ -516,6 +518,10 @@ public class Schemas {
         dataFixerBuilder.addFixer((DataFix)new StriderGravityFix(schema116, false));
         Schema schema117 = dataFixerBuilder.addSchema(2531, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer((DataFix)new RedstoneConnectionsFix(schema117));
+        Schema schema118 = dataFixerBuilder.addSchema(2533, EMPTY_IDENTIFIER_NORMALIZE);
+        dataFixerBuilder.addFixer((DataFix)new VillagerFollowRangeFix(schema118));
+        Schema schema119 = dataFixerBuilder.addSchema(2535, EMPTY_IDENTIFIER_NORMALIZE);
+        dataFixerBuilder.addFixer((DataFix)new EntityShulkerRotationFix(schema119));
     }
 }
 

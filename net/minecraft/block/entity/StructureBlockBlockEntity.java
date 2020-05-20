@@ -101,9 +101,9 @@ extends BlockEntity {
         this.setStructureName(arg2.getString("name"));
         this.author = arg2.getString("author");
         this.metadata = arg2.getString("metadata");
-        int i = MathHelper.clamp(arg2.getInt("posX"), -32, 32);
-        int j = MathHelper.clamp(arg2.getInt("posY"), -32, 32);
-        int k = MathHelper.clamp(arg2.getInt("posZ"), -32, 32);
+        int i = MathHelper.clamp(arg2.getInt("posX"), -48, 48);
+        int j = MathHelper.clamp(arg2.getInt("posY"), -48, 48);
+        int k = MathHelper.clamp(arg2.getInt("posZ"), -48, 48);
         this.offset = new BlockPos(i, j, k);
         int l = MathHelper.clamp(arg2.getInt("sizeX"), 0, 48);
         int m = MathHelper.clamp(arg2.getInt("sizeY"), 0, 48);

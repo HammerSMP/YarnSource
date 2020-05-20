@@ -23,7 +23,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.MovementType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.control.DolphinLookControl;
@@ -67,9 +67,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biomes;
 
 public class DolphinEntity
@@ -89,7 +89,7 @@ extends WaterCreatureEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setAir(this.getMaxAir());
         this.pitch = 0.0f;
         return super.initialize(arg, arg2, arg3, arg4, arg5);
@@ -236,6 +236,7 @@ extends WaterCreatureEntity {
     protected void loot(ItemEntity arg) {
         ItemStack lv;
         if (this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty() && this.canPickupItem(lv = arg.getStack())) {
+            this.method_27964(arg);
             this.equipStack(EquipmentSlot.MAINHAND, lv);
             this.handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2.0f;
             this.sendPickup(arg, lv.getCount());
@@ -311,7 +312,7 @@ extends WaterCreatureEntity {
         return super.interactMob(arg, arg2);
     }
 
-    public static boolean canSpawn(EntityType<DolphinEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<DolphinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg4.getY() > 45 && arg4.getY() < arg2.getSeaLevel() && (arg2.getBiome(arg4) != Biomes.OCEAN || arg2.getBiome(arg4) != Biomes.DEEP_OCEAN) && arg2.getFluidState(arg4).matches(FluidTags.WATER);
     }
 
@@ -372,7 +373,7 @@ extends WaterCreatureEntity {
     static class LeadToNearbyTreasureGoal
     extends Goal {
         private final DolphinEntity dolphin;
-        private boolean field_6753;
+        private boolean noPathToStructure;
 
         LeadToNearbyTreasureGoal(DolphinEntity arg) {
             this.dolphin = arg;
@@ -392,7 +393,7 @@ extends WaterCreatureEntity {
         @Override
         public boolean shouldContinue() {
             BlockPos lv = this.dolphin.getTreasurePos();
-            return !new BlockPos((double)lv.getX(), this.dolphin.getY(), (double)lv.getZ()).isWithinDistance(this.dolphin.getPos(), 4.0) && !this.field_6753 && this.dolphin.getAir() >= 100;
+            return !new BlockPos((double)lv.getX(), this.dolphin.getY(), (double)lv.getZ()).isWithinDistance(this.dolphin.getPos(), 4.0) && !this.noPathToStructure && this.dolphin.getAir() >= 100;
         }
 
         /*
@@ -404,7 +405,7 @@ extends WaterCreatureEntity {
                 return;
             }
             ServerWorld lv = (ServerWorld)this.dolphin.world;
-            this.field_6753 = false;
+            this.noPathToStructure = false;
             this.dolphin.getNavigation().stop();
             BlockPos lv2 = this.dolphin.getBlockPos();
             String string = (double)lv.random.nextFloat() >= 0.5 ? "Ocean_Ruin" : "Shipwreck";
@@ -412,7 +413,7 @@ extends WaterCreatureEntity {
             if (lv3 == null) {
                 BlockPos lv4 = lv.locateStructure(string.equals("Ocean_Ruin") ? "Shipwreck" : "Ocean_Ruin", lv2, 50, false);
                 if (lv4 == null) {
-                    this.field_6753 = true;
+                    this.noPathToStructure = true;
                     return;
                 }
                 this.dolphin.setTreasurePos(lv4);
@@ -425,7 +426,7 @@ extends WaterCreatureEntity {
         @Override
         public void stop() {
             BlockPos lv = this.dolphin.getTreasurePos();
-            if (new BlockPos((double)lv.getX(), this.dolphin.getY(), (double)lv.getZ()).isWithinDistance(this.dolphin.getPos(), 4.0) || this.field_6753) {
+            if (new BlockPos((double)lv.getX(), this.dolphin.getY(), (double)lv.getZ()).isWithinDistance(this.dolphin.getPos(), 4.0) || this.noPathToStructure) {
                 this.dolphin.setHasFish(false);
             }
         }
@@ -435,7 +436,7 @@ extends WaterCreatureEntity {
             World lv = this.dolphin.world;
             if (this.dolphin.isNearTarget() || this.dolphin.getNavigation().isIdle()) {
                 BlockPos lv4;
-                Vec3d lv2 = Vec3d.method_24953(this.dolphin.getTreasurePos());
+                Vec3d lv2 = Vec3d.ofCenter(this.dolphin.getTreasurePos());
                 Vec3d lv3 = TargetFinder.findTargetTowards(this.dolphin, 16, 1, lv2, 0.3926991f);
                 if (lv3 == null) {
                     lv3 = TargetFinder.findTargetTowards(this.dolphin, 8, 4, lv2);
@@ -444,7 +445,7 @@ extends WaterCreatureEntity {
                     lv3 = TargetFinder.findTargetTowards(this.dolphin, 8, 5, lv2);
                 }
                 if (lv3 == null) {
-                    this.field_6753 = true;
+                    this.noPathToStructure = true;
                     return;
                 }
                 this.dolphin.getLookControl().lookAt(lv3.x, lv3.y, lv3.z, this.dolphin.getBodyYawSpeed() + 20, this.dolphin.getLookPitchSpeed());

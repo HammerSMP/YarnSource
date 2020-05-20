@@ -50,7 +50,7 @@ extends BlockWithEntity {
     @Override
     public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
         if (!arg2.isClient && !arg4.hasVehicle() && !arg4.hasPassengers() && arg4.canUsePortals() && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(arg4.getBoundingBox().offset(-arg3.getX(), -arg3.getY(), -arg3.getZ())), arg.getOutlineShape(arg2, arg3), BooleanBiFunction.AND)) {
-            arg4.changeDimension(arg2.dimension.getType() == DimensionType.THE_END ? DimensionType.OVERWORLD : DimensionType.THE_END);
+            arg4.changeDimension(arg2.method_27983() == DimensionType.THE_END ? DimensionType.OVERWORLD : DimensionType.THE_END);
         }
     }
 

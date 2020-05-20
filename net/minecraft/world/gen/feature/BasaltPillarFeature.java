@@ -13,11 +13,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -28,7 +28,7 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
         if (!arg.isAir(arg4) || arg.isAir(arg4.up())) {
             return false;
         }
@@ -72,13 +72,13 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    private void tryPlaceBasalt(IWorld arg, Random random, BlockPos arg2) {
+    private void tryPlaceBasalt(WorldAccess arg, Random random, BlockPos arg2) {
         if (random.nextBoolean()) {
             arg.setBlockState(arg2, Blocks.BASALT.getDefaultState(), 2);
         }
     }
 
-    private boolean stopOrPlaceBasalt(IWorld arg, Random random, BlockPos arg2) {
+    private boolean stopOrPlaceBasalt(WorldAccess arg, Random random, BlockPos arg2) {
         if (random.nextInt(10) != 0) {
             arg.setBlockState(arg2, Blocks.BASALT.getDefaultState(), 2);
             return true;

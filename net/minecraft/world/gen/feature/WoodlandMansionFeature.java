@@ -23,10 +23,9 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -41,13 +40,13 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getMansionDistance();
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getMansionSpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getMansionSeparation();
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getMansionSeparation();
     }
 
     @Override
@@ -61,7 +60,7 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator<?> arg2, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
+    protected boolean shouldStartAt(BiomeAccess arg, ChunkGenerator arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5) {
         Set<Biome> set = arg2.getBiomeSource().getBiomesInArea(i * 16 + 9, arg2.getSeaLevel(), j * 16 + 9, 32);
         for (Biome lv : set) {
             if (arg2.hasStructure(lv, this)) continue;
@@ -92,7 +91,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             BlockRotation lv = BlockRotation.random(this.random);
             int k = 5;
             int l = 5;
@@ -122,7 +121,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void generateStructure(IWorld arg, StructureAccessor arg2, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5) {
+        public void generateStructure(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5) {
             super.generateStructure(arg, arg2, arg3, random, arg4, arg5);
             int i = this.boundingBox.minY;
             for (int j = arg4.minX; j <= arg4.maxX; ++j) {

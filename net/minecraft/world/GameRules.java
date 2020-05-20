@@ -100,6 +100,7 @@ public class GameRules {
         this.rules = (Map)RULE_TYPES.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> ((RuleType)entry.getValue()).createRule()));
     }
 
+    @Environment(value=EnvType.CLIENT)
     private GameRules(Map<RuleKey<?>, Rule<?>> map) {
         this.rules = map;
     }
@@ -122,6 +123,7 @@ public class GameRules {
         });
     }
 
+    @Environment(value=EnvType.CLIENT)
     public GameRules copy() {
         return new GameRules((Map)this.rules.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> ((Rule)entry.getValue()).copy())));
     }
@@ -206,6 +208,7 @@ public class GameRules {
         }
 
         @Override
+        @Environment(value=EnvType.CLIENT)
         protected BooleanRule copy() {
             return new BooleanRule(this.type, this.value);
         }
@@ -217,6 +220,7 @@ public class GameRules {
         }
 
         @Override
+        @Environment(value=EnvType.CLIENT)
         protected /* synthetic */ Rule copy() {
             return this.copy();
         }
@@ -305,6 +309,7 @@ public class GameRules {
         }
 
         @Override
+        @Environment(value=EnvType.CLIENT)
         protected IntRule copy() {
             return new IntRule(this.type, this.value);
         }
@@ -316,6 +321,7 @@ public class GameRules {
         }
 
         @Override
+        @Environment(value=EnvType.CLIENT)
         protected /* synthetic */ Rule copy() {
             return this.copy();
         }
@@ -362,6 +368,7 @@ public class GameRules {
 
         protected abstract T getThis();
 
+        @Environment(value=EnvType.CLIENT)
         protected abstract T copy();
 
         public abstract void setValue(T var1, @Nullable MinecraftServer var2);

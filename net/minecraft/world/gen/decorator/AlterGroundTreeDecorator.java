@@ -19,8 +19,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.ModifiableTestableWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.decorator.TreeDecorator;
 import net.minecraft.world.gen.decorator.TreeDecoratorType;
 import net.minecraft.world.gen.feature.Feature;
@@ -40,7 +40,7 @@ extends TreeDecorator {
     }
 
     @Override
-    public void generate(IWorld arg3, Random random, List<BlockPos> list, List<BlockPos> list2, Set<BlockPos> set, BlockBox arg22) {
+    public void generate(WorldAccess arg3, Random random, List<BlockPos> list, List<BlockPos> list2, Set<BlockPos> set, BlockBox arg22) {
         int i = list.get(0).getY();
         list.stream().filter(arg -> arg.getY() == i).forEach(arg2 -> {
             this.method_23462(arg3, random, arg2.west().north());

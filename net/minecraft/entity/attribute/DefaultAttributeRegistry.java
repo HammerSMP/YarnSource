@@ -11,9 +11,9 @@ package net.minecraft.entity.attribute;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import net.minecraft.SharedConstants;
-import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
@@ -90,7 +90,7 @@ public class DefaultAttributeRegistry {
     }
 
     public static void checkMissing() {
-        Registry.ENTITY_TYPE.stream().filter(arg -> arg.getCategory() != EntityCategory.MISC).filter(arg -> !DefaultAttributeRegistry.hasDefinitionFor(arg)).map(Registry.ENTITY_TYPE::getId).forEach(arg -> {
+        Registry.ENTITY_TYPE.stream().filter(arg -> arg.getSpawnGroup() != SpawnGroup.MISC).filter(arg -> !DefaultAttributeRegistry.hasDefinitionFor(arg)).map(Registry.ENTITY_TYPE::getId).forEach(arg -> {
             if (SharedConstants.isDevelopment) {
                 throw new IllegalStateException("Entity " + arg + " has no attributes");
             }

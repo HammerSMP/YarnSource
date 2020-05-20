@@ -29,8 +29,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.dimension.DimensionType;
 
 public class MapState
@@ -202,7 +202,7 @@ extends PersistentState {
     /*
      * WARNING - void declaration
      */
-    private void addIcon(MapIcon.Type arg, @Nullable IWorld arg2, String string, double d, double e, double f, @Nullable Text arg3) {
+    private void addIcon(MapIcon.Type arg, @Nullable WorldAccess arg2, String string, double d, double e, double f, @Nullable Text arg3) {
         void o;
         int i = 1 << this.scale;
         float g = (float)(d - (double)this.xCenter) / (float)i;
@@ -272,7 +272,7 @@ extends PersistentState {
         return lv;
     }
 
-    public void addBanner(IWorld arg, BlockPos arg2) {
+    public void addBanner(WorldAccess arg, BlockPos arg2) {
         float f = (float)arg2.getX() + 0.5f;
         float g = (float)arg2.getZ() + 0.5f;
         int i = 1 << this.scale;

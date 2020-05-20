@@ -36,8 +36,8 @@ import net.minecraft.util.EightWayDirection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.WorldChunk;
@@ -113,7 +113,7 @@ public class UpgradeData {
         }
     }
 
-    private static BlockState applyAdjacentBlock(BlockState arg, Direction arg2, IWorld arg3, BlockPos arg4, BlockPos arg5) {
+    private static BlockState applyAdjacentBlock(BlockState arg, Direction arg2, WorldAccess arg3, BlockPos arg4, BlockPos arg5) {
         return BLOCK_TO_LOGIC.getOrDefault(arg.getBlock(), BuiltinLogic.DEFAULT).getUpdatedState(arg, arg2, arg3.getBlockState(arg5), arg3, arg4, arg5);
     }
 
@@ -184,7 +184,7 @@ public class UpgradeData {
         BLACKLIST(new Block[]{Blocks.OBSERVER, Blocks.NETHER_PORTAL, Blocks.WHITE_CONCRETE_POWDER, Blocks.ORANGE_CONCRETE_POWDER, Blocks.MAGENTA_CONCRETE_POWDER, Blocks.LIGHT_BLUE_CONCRETE_POWDER, Blocks.YELLOW_CONCRETE_POWDER, Blocks.LIME_CONCRETE_POWDER, Blocks.PINK_CONCRETE_POWDER, Blocks.GRAY_CONCRETE_POWDER, Blocks.LIGHT_GRAY_CONCRETE_POWDER, Blocks.CYAN_CONCRETE_POWDER, Blocks.PURPLE_CONCRETE_POWDER, Blocks.BLUE_CONCRETE_POWDER, Blocks.BROWN_CONCRETE_POWDER, Blocks.GREEN_CONCRETE_POWDER, Blocks.RED_CONCRETE_POWDER, Blocks.BLACK_CONCRETE_POWDER, Blocks.ANVIL, Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL, Blocks.DRAGON_EGG, Blocks.GRAVEL, Blocks.SAND, Blocks.RED_SAND, Blocks.OAK_SIGN, Blocks.SPRUCE_SIGN, Blocks.BIRCH_SIGN, Blocks.ACACIA_SIGN, Blocks.JUNGLE_SIGN, Blocks.DARK_OAK_SIGN, Blocks.OAK_WALL_SIGN, Blocks.SPRUCE_WALL_SIGN, Blocks.BIRCH_WALL_SIGN, Blocks.ACACIA_WALL_SIGN, Blocks.JUNGLE_WALL_SIGN, Blocks.DARK_OAK_WALL_SIGN}){
 
             @Override
-            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
                 return arg;
             }
         }
@@ -192,7 +192,7 @@ public class UpgradeData {
         DEFAULT(new Block[0]){
 
             @Override
-            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
                 return arg.getStateForNeighborUpdate(arg2, arg4.getBlockState(arg6), arg4, arg5, arg6);
             }
         }
@@ -200,7 +200,7 @@ public class UpgradeData {
         CHEST(new Block[]{Blocks.CHEST, Blocks.TRAPPED_CHEST}){
 
             @Override
-            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
                 if (arg3.isOf(arg.getBlock()) && arg2.getAxis().isHorizontal() && arg.get(ChestBlock.CHEST_TYPE) == ChestType.SINGLE && arg3.get(ChestBlock.CHEST_TYPE) == ChestType.SINGLE) {
                     Direction lv = arg.get(ChestBlock.FACING);
                     if (arg2.getAxis() != lv.getAxis() && lv == arg3.get(ChestBlock.FACING)) {
@@ -224,7 +224,7 @@ public class UpgradeData {
             private final ThreadLocal<List<ObjectSet<BlockPos>>> distanceToPositions = ThreadLocal.withInitial(() -> Lists.newArrayListWithCapacity((int)7));
 
             @Override
-            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
                 BlockState lv = arg.getStateForNeighborUpdate(arg2, arg4.getBlockState(arg6), arg4, arg5, arg6);
                 if (arg != lv) {
                     int i = lv.get(Properties.DISTANCE_1_7);
@@ -240,7 +240,7 @@ public class UpgradeData {
             }
 
             @Override
-            public void postUpdate(IWorld arg) {
+            public void postUpdate(WorldAccess arg) {
                 BlockPos.Mutable lv = new BlockPos.Mutable();
                 List<ObjectSet<BlockPos>> list = this.distanceToPositions.get();
                 for (int i = 2; i < list.size(); ++i) {
@@ -267,7 +267,7 @@ public class UpgradeData {
         STEM_BLOCK(new Block[]{Blocks.MELON_STEM, Blocks.PUMPKIN_STEM}){
 
             @Override
-            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+            public BlockState getUpdatedState(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
                 GourdBlock lv;
                 if (arg.get(StemBlock.AGE) == 7 && arg3.isOf(lv = ((StemBlock)arg.getBlock()).getGourdBlock())) {
                     return (BlockState)lv.getAttachedStem().getDefaultState().with(HorizontalFacingBlock.FACING, arg2);
@@ -297,9 +297,9 @@ public class UpgradeData {
     }
 
     public static interface Logic {
-        public BlockState getUpdatedState(BlockState var1, Direction var2, BlockState var3, IWorld var4, BlockPos var5, BlockPos var6);
+        public BlockState getUpdatedState(BlockState var1, Direction var2, BlockState var3, WorldAccess var4, BlockPos var5, BlockPos var6);
 
-        default public void postUpdate(IWorld arg) {
+        default public void postUpdate(WorldAccess arg) {
         }
     }
 }

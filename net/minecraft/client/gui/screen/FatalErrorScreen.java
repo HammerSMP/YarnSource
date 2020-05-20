@@ -34,8 +34,8 @@ extends Screen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.fillGradient(arg, 0, 0, this.width, this.height, -12574688, -11530224);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 90, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, this.message, this.width / 2, 110, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 90, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.message, this.width / 2, 110, 0xFFFFFF);
         super.render(arg, i, j, f);
     }
 

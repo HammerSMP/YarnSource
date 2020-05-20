@@ -33,13 +33,13 @@ extends LootEntry {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
-        super.check(arg);
+    public void validate(LootTableReporter arg) {
+        super.validate(arg);
         if (this.children.length == 0) {
             arg.report("Empty children list");
         }
         for (int i = 0; i < this.children.length; ++i) {
-            this.children[i].check(arg.makeChild(".entry[" + i + "]"));
+            this.children[i].validate(arg.makeChild(".entry[" + i + "]"));
         }
     }
 

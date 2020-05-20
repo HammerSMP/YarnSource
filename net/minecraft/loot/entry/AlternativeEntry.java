@@ -45,8 +45,8 @@ extends CombinedEntry {
     }
 
     @Override
-    public void check(LootTableReporter arg) {
-        super.check(arg);
+    public void validate(LootTableReporter arg) {
+        super.validate(arg);
         for (int i = 0; i < this.children.length - 1; ++i) {
             if (!ArrayUtils.isEmpty((Object[])this.children[i].conditions)) continue;
             arg.report("Unreachable entry!");
@@ -73,7 +73,7 @@ extends CombinedEntry {
         }
 
         @Override
-        public Builder withChild(LootEntry.Builder<?> arg) {
+        public Builder alternatively(LootEntry.Builder<?> arg) {
             this.children.add(arg.build());
             return this;
         }

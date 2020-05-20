@@ -2,11 +2,13 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.hash.Hashing
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.biome.source;
 
+import com.google.common.hash.Hashing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.math.BlockPos;
@@ -24,6 +26,10 @@ public class BiomeAccess {
         this.storage = arg;
         this.seed = l;
         this.type = arg2;
+    }
+
+    public static long hashSeed(long l) {
+        return Hashing.sha256().hashLong(l).asLong();
     }
 
     public BiomeAccess withSource(BiomeSource arg) {

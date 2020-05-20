@@ -15,7 +15,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.AbstractTempleFeature;
@@ -50,13 +49,13 @@ extends AbstractTempleFeature<ShipwreckFeatureConfig> {
     }
 
     @Override
-    protected int getSpacing(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getShipwreckSpacing();
+    protected int getSpacing(ChunkGeneratorConfig arg) {
+        return arg.getShipwreckSpacing();
     }
 
     @Override
-    protected int getSeparation(DimensionType arg, ChunkGeneratorConfig arg2) {
-        return arg2.getShipwreckSeparation();
+    protected int getSeparation(ChunkGeneratorConfig arg) {
+        return arg.getShipwreckSeparation();
     }
 
     public static class Start
@@ -66,7 +65,7 @@ extends AbstractTempleFeature<ShipwreckFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             ShipwreckFeatureConfig lv = arg.getStructureConfig(arg3, Feature.SHIPWRECK);
             BlockRotation lv2 = BlockRotation.random(this.random);
             BlockPos lv3 = new BlockPos(i * 16, 90, j * 16);

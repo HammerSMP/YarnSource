@@ -122,8 +122,8 @@ extends Task<VillagerEntity> {
         VillagerProfession lv = arg.getVillagerData().getProfession();
         if (GIFTS.containsKey(lv)) {
             LootTable lv2 = arg.world.getServer().getLootManager().getTable(GIFTS.get(lv));
-            LootContext.Builder lv3 = new LootContext.Builder((ServerWorld)arg.world).put(LootContextParameters.POSITION, arg.getBlockPos()).put(LootContextParameters.THIS_ENTITY, arg).setRandom(arg.getRandom());
-            return lv2.getDrops(lv3.build(LootContextTypes.GIFT));
+            LootContext.Builder lv3 = new LootContext.Builder((ServerWorld)arg.world).parameter(LootContextParameters.POSITION, arg.getBlockPos()).parameter(LootContextParameters.THIS_ENTITY, arg).random(arg.getRandom());
+            return lv2.generateLoot(lv3.build(LootContextTypes.GIFT));
         }
         return ImmutableList.of((Object)new ItemStack(Items.WHEAT_SEEDS));
     }

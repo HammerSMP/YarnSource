@@ -13,9 +13,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.decorator.CountDecoratorConfig;
 import net.minecraft.world.gen.decorator.Decorator;
 
@@ -26,7 +25,7 @@ extends Decorator<CountDecoratorConfig> {
     }
 
     @Override
-    public Stream<BlockPos> getPositions(IWorld arg, ChunkGenerator<? extends ChunkGeneratorConfig> arg2, Random random, CountDecoratorConfig arg3, BlockPos arg4) {
+    public Stream<BlockPos> getPositions(WorldAccess arg, ChunkGenerator arg2, Random random, CountDecoratorConfig arg3, BlockPos arg4) {
         return IntStream.range(0, arg3.count).mapToObj(i -> {
             int j = random.nextInt(16) + arg4.getX();
             int k = random.nextInt(16) + arg4.getZ();

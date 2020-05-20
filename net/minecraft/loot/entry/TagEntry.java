@@ -39,7 +39,7 @@ extends LeafEntry {
     }
 
     @Override
-    public void drop(Consumer<ItemStack> consumer, LootContext arg2) {
+    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg2) {
         this.name.values().forEach(arg -> consumer.accept(new ItemStack((ItemConvertible)arg)));
     }
 
@@ -49,7 +49,7 @@ extends LeafEntry {
                 consumer.accept(new LeafEntry.Choice(){
 
                     @Override
-                    public void drop(Consumer<ItemStack> consumer, LootContext arg) {
+                    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
                         consumer.accept(new ItemStack(lv));
                     }
                 });

@@ -3,30 +3,38 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.biome.source;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.SimplexNoiseSampler;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.biome.source.TheEndBiomeSourceConfig;
 import net.minecraft.world.gen.ChunkRandom;
 
 public class TheEndBiomeSource
 extends BiomeSource {
     private final SimplexNoiseSampler noise;
-    private final ChunkRandom random;
     private static final Set<Biome> BIOMES = ImmutableSet.of((Object)Biomes.THE_END, (Object)Biomes.END_HIGHLANDS, (Object)Biomes.END_MIDLANDS, (Object)Biomes.SMALL_END_ISLANDS, (Object)Biomes.END_BARRENS);
 
-    public TheEndBiomeSource(TheEndBiomeSourceConfig arg) {
+    public TheEndBiomeSource(long l) {
         super(BIOMES);
-        this.random = new ChunkRandom(arg.getSeed());
-        this.random.consume(17292);
-        this.noise = new SimplexNoiseSampler(this.random);
+        ChunkRandom lv = new ChunkRandom(l);
+        lv.consume(17292);
+        this.noise = new SimplexNoiseSampler(lv);
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public BiomeSource create(long l) {
+        return new TheEndBiomeSource(l);
     }
 
     @Override
@@ -36,7 +44,7 @@ extends BiomeSource {
         if ((long)l * (long)l + (long)m * (long)m <= 4096L) {
             return Biomes.THE_END;
         }
-        float f = this.getNoiseRange(l * 2 + 1, m * 2 + 1);
+        float f = this.getNoiseAt(l * 2 + 1, m * 2 + 1);
         if (f > 40.0f) {
             return Biomes.END_HIGHLANDS;
         }
@@ -50,7 +58,7 @@ extends BiomeSource {
     }
 
     @Override
-    public float getNoiseRange(int i, int j) {
+    public float getNoiseAt(int i, int j) {
         int k = i / 2;
         int l = j / 2;
         int m = i % 2;

@@ -8,11 +8,14 @@ package net.minecraft.entity.passive;
 
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5275;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemSteerable;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.Saddleable;
 import net.minecraft.entity.SaddledComponent;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
@@ -44,6 +47,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -184,6 +189,29 @@ Saddleable {
         if (arg != null) {
             this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PIG_SADDLE, arg, 0.5f, 1.0f);
         }
+    }
+
+    @Override
+    public Vec3d method_24829(LivingEntity arg) {
+        Direction lv = this.getMovementDirection();
+        if (lv.getAxis() == Direction.Axis.Y) {
+            return super.method_24829(arg);
+        }
+        int[][] is = class_5275.method_27934(lv);
+        BlockPos lv2 = this.getBlockPos();
+        BlockPos.Mutable lv3 = new BlockPos.Mutable();
+        for (EntityPose lv4 : arg.getPoses()) {
+            Box lv5 = arg.method_24833(lv4);
+            for (int[] js : is) {
+                Vec3d lv6;
+                lv3.set(lv2.getX() + js[0], lv2.getY(), lv2.getZ() + js[1]);
+                double d = this.world.method_26372(lv3);
+                if (!class_5275.method_27932(d) || !class_5275.method_27933(this.world, arg, lv5.offset(lv6 = Vec3d.ofCenter(lv3, d)))) continue;
+                arg.setPose(lv4);
+                return lv6;
+            }
+        }
+        return super.method_24829(arg);
     }
 
     @Override

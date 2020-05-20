@@ -123,7 +123,7 @@ extends BlockEntity {
         this.target = new Identifier(arg2.getString("target"));
         this.pool = new Identifier(arg2.getString("pool"));
         this.finalState = arg2.getString("final_state");
-        this.joint = Joint.byName(arg2.getString("joint")).orElseGet(() -> JigsawBlock.method_26378(arg).getAxis().isHorizontal() ? Joint.ALIGNED : Joint.ROLLABLE);
+        this.joint = Joint.byName(arg2.getString("joint")).orElseGet(() -> JigsawBlock.getFacing(arg).getAxis().isHorizontal() ? Joint.ALIGNED : Joint.ROLLABLE);
     }
 
     @Override
@@ -138,7 +138,7 @@ extends BlockEntity {
     }
 
     public void generate(ServerWorld arg, int i) {
-        ChunkGenerator<?> lv = arg.getChunkManager().getChunkGenerator();
+        ChunkGenerator lv = arg.getChunkManager().getChunkGenerator();
         StructureManager lv2 = arg.getStructureManager();
         StructureAccessor lv3 = arg.getStructureAccessor();
         Random random = arg.getRandom();

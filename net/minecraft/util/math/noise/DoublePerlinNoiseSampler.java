@@ -1,9 +1,14 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
  */
 package net.minecraft.util.math.noise;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.stream.IntStream;
 import net.minecraft.util.math.noise.OctavePerlinNoiseSampler;
 import net.minecraft.world.gen.ChunkRandom;
 
@@ -11,6 +16,10 @@ public class DoublePerlinNoiseSampler {
     private final double amplitude;
     private final OctavePerlinNoiseSampler firstSampler;
     private final OctavePerlinNoiseSampler secondSampler;
+
+    public DoublePerlinNoiseSampler(ChunkRandom arg, IntStream intStream) {
+        this(arg, (List)intStream.boxed().collect(ImmutableList.toImmutableList()));
+    }
 
     public DoublePerlinNoiseSampler(ChunkRandom arg, List<Integer> list) {
         this.firstSampler = new OctavePerlinNoiseSampler(arg, list);

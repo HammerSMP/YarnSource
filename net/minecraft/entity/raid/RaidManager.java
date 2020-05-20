@@ -28,7 +28,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.PersistentState;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.poi.PointOfInterest;
 import net.minecraft.world.poi.PointOfInterestStorage;
@@ -42,7 +41,7 @@ extends PersistentState {
     private int currentTime;
 
     public RaidManager(ServerWorld arg) {
-        super(RaidManager.nameFor(arg.dimension));
+        super(RaidManager.nameFor(arg.method_27983()));
         this.world = arg;
         this.nextAvailableId = 1;
         this.markDirty();
@@ -75,7 +74,7 @@ extends PersistentState {
 
     public static boolean isValidRaiderFor(RaiderEntity arg, Raid arg2) {
         if (arg != null && arg2 != null && arg2.getWorld() != null) {
-            return arg.isAlive() && arg.canJoinRaid() && arg.getDespawnCounter() <= 2400 && arg.world.getDimension().getType() == arg2.getWorld().getDimension().getType();
+            return arg.isAlive() && arg.canJoinRaid() && arg.getDespawnCounter() <= 2400 && arg.world.method_27983() == arg2.getWorld().method_27983();
         }
         return false;
     }
@@ -89,7 +88,7 @@ extends PersistentState {
         if (this.world.getGameRules().getBoolean(GameRules.DISABLE_RAIDS)) {
             return null;
         }
-        DimensionType lv = arg.world.getDimension().getType();
+        DimensionType lv = arg.world.method_27983();
         if (lv == DimensionType.THE_NETHER) {
             return null;
         }
@@ -164,8 +163,8 @@ extends PersistentState {
         return arg;
     }
 
-    public static String nameFor(Dimension arg) {
-        return "raids" + arg.getType().getSuffix();
+    public static String nameFor(DimensionType arg) {
+        return "raids" + arg.getSuffix();
     }
 
     private int nextId() {

@@ -431,8 +431,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                         if (k == j) {
                             ItemStack lv3 = new ItemStack(Items.PAPER);
                             lv3.getOrCreateSubTag("CustomCreativeLock");
-                            Text lv4 = this.client.options.keysHotbar[j].getLocalizedName();
-                            Text lv5 = this.client.options.keySaveToolbarActivator.getLocalizedName();
+                            Text lv4 = this.client.options.keysHotbar[j].getBoundKeyLocalizedText();
+                            Text lv5 = this.client.options.keySaveToolbarActivator.getBoundKeyLocalizedText();
                             lv3.setCustomName(new TranslatableText("inventory.hotbarInfo", lv5, lv4));
                             ((CreativeScreenHandler)this.handler).itemList.add(lv3);
                             continue;
@@ -582,11 +582,11 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             }
             this.searchResultTags.forEach((arg2, arg3) -> {
                 if (arg3.contains(lv)) {
-                    list2.add(1, new LiteralText("#" + arg2).formatted(Formatting.BOLD, Formatting.DARK_PURPLE));
+                    list2.add(1, new LiteralText("#" + arg2).formatted(Formatting.DARK_PURPLE));
                 }
             });
             if (lv2 != null) {
-                list2.add(1, new TranslatableText(lv2.getTranslationKey()).formatted(Formatting.BOLD, Formatting.BLUE));
+                list2.add(1, new TranslatableText(lv2.getTranslationKey()).formatted(Formatting.BLUE));
             }
             this.renderTooltip(arg, list2, i, j);
         } else {
@@ -704,8 +704,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             for (int k = 0; k < PlayerInventory.getHotbarSize(); ++k) {
                 lv3.set(k, lv.inventory.getStack(k).copy());
             }
-            Text lv5 = arg.options.keysHotbar[i].getLocalizedName();
-            Text lv6 = arg.options.keyLoadToolbarActivator.getLocalizedName();
+            Text lv5 = arg.options.keysHotbar[i].getBoundKeyLocalizedText();
+            Text lv6 = arg.options.keyLoadToolbarActivator.getBoundKeyLocalizedText();
             arg.inGameHud.setOverlayMessage(new TranslatableText("inventory.hotbarSaved", lv6, lv5), false);
             lv2.save();
         }

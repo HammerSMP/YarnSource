@@ -61,7 +61,7 @@ implements Vanishable {
                 return;
             }
             Optional<DimensionType> optional = CompassItem.getLodestoneDimension(lv);
-            if (optional.isPresent() && optional.get().equals(arg2.dimension.getType()) && lv.contains("LodestonePos") && !((ServerWorld)arg2).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos((CompoundTag)lv.get("LodestonePos")))) {
+            if (optional.isPresent() && optional.get().equals(arg2.method_27983()) && lv.contains("LodestonePos") && !((ServerWorld)arg2).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos((CompoundTag)lv.get("LodestonePos")))) {
                 lv.remove("LodestonePos");
             }
         }
@@ -75,7 +75,7 @@ implements Vanishable {
             arg.world.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             boolean bl2 = bl = !arg.player.abilities.creativeMode && arg.stack.getCount() == 1;
             if (bl) {
-                this.method_27315(arg.world.dimension, lv, arg.stack.getOrCreateTag());
+                this.method_27315(arg.world.getDimension(), lv, arg.stack.getOrCreateTag());
             } else {
                 ItemStack lv2 = new ItemStack(Items.COMPASS, 1);
                 CompoundTag lv3 = arg.stack.hasTag() ? arg.stack.getTag().copy() : new CompoundTag();
@@ -83,7 +83,7 @@ implements Vanishable {
                 if (!arg.player.abilities.creativeMode) {
                     arg.stack.decrement(1);
                 }
-                this.method_27315(arg.world.dimension, lv, lv3);
+                this.method_27315(arg.world.getDimension(), lv, lv3);
                 if (!arg.player.inventory.insertStack(lv2)) {
                     arg.player.dropItem(lv2, false);
                 }

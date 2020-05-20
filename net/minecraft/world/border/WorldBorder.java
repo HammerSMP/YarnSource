@@ -46,7 +46,7 @@ public class WorldBorder {
     }
 
     public boolean contains(Box arg) {
-        return arg.x2 > this.getBoundWest() && arg.x1 < this.getBoundEast() && arg.z2 > this.getBoundNorth() && arg.z1 < this.getBoundSouth();
+        return arg.maxX > this.getBoundWest() && arg.minX < this.getBoundEast() && arg.maxZ > this.getBoundNorth() && arg.minZ < this.getBoundSouth();
     }
 
     public double getDistanceInsideBorder(Entity arg) {

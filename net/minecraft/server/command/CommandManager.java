@@ -92,7 +92,7 @@ import net.minecraft.server.command.StopSoundCommand;
 import net.minecraft.server.command.SummonCommand;
 import net.minecraft.server.command.TagCommand;
 import net.minecraft.server.command.TeamCommand;
-import net.minecraft.server.command.TeammsgCommand;
+import net.minecraft.server.command.TeamMsgCommand;
 import net.minecraft.server.command.TeleportCommand;
 import net.minecraft.server.command.TellRawCommand;
 import net.minecraft.server.command.TestCommand;
@@ -179,7 +179,7 @@ public class CommandManager {
         SummonCommand.register(this.dispatcher);
         TagCommand.register(this.dispatcher);
         TeamCommand.register(this.dispatcher);
-        TeammsgCommand.register(this.dispatcher);
+        TeamMsgCommand.register(this.dispatcher);
         TeleportCommand.register(this.dispatcher);
         TellRawCommand.register(this.dispatcher);
         TimeCommand.register(this.dispatcher);

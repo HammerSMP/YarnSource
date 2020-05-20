@@ -26,8 +26,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class LeavesBlock
 extends Block {
@@ -68,7 +68,7 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         int i = LeavesBlock.getDistanceFromLog(arg3) + 1;
         if (i != 1 || arg.get(DISTANCE) != i) {
             arg4.getBlockTickScheduler().schedule(arg5, this, 1);
@@ -76,7 +76,7 @@ extends Block {
         return arg;
     }
 
-    private static BlockState updateDistanceFromLogs(BlockState arg, IWorld arg2, BlockPos arg3) {
+    private static BlockState updateDistanceFromLogs(BlockState arg, WorldAccess arg2, BlockPos arg3) {
         int i = 7;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Direction lv2 : Direction.values()) {

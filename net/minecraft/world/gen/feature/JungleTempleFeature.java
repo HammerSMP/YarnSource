@@ -52,7 +52,7 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             JungleTempleGenerator lv = new JungleTempleGenerator(this.random, i * 16, j * 16);
             this.children.add(lv);
             this.setBoundingBoxFromChildren();

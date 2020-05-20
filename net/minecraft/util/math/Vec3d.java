@@ -32,19 +32,19 @@ implements Position {
         return new Vec3d(d, e, f);
     }
 
-    public static Vec3d method_24953(Vec3i arg) {
+    public static Vec3d ofCenter(Vec3i arg) {
         return new Vec3d((double)arg.getX() + 0.5, (double)arg.getY() + 0.5, (double)arg.getZ() + 0.5);
     }
 
-    public static Vec3d method_24954(Vec3i arg) {
+    public static Vec3d of(Vec3i arg) {
         return new Vec3d(arg.getX(), arg.getY(), arg.getZ());
     }
 
-    public static Vec3d method_24955(Vec3i arg) {
+    public static Vec3d ofBottomCenter(Vec3i arg) {
         return new Vec3d((double)arg.getX() + 0.5, arg.getY(), (double)arg.getZ() + 0.5);
     }
 
-    public static Vec3d method_26410(Vec3i arg, double d) {
+    public static Vec3d ofCenter(Vec3i arg, double d) {
         return new Vec3d((double)arg.getX() + 0.5, (double)arg.getY() + d, (double)arg.getZ() + 0.5);
     }
 

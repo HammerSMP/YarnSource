@@ -116,15 +116,15 @@ public abstract class DrawableHelper {
         arg2.drawWithShadow(arg, string, (float)(i - arg2.getWidth(string) / 2), (float)j, k);
     }
 
-    public void drawStringWithShadow(MatrixStack arg, TextRenderer arg2, Text arg3, int i, int j, int k) {
-        arg2.drawWithShadow(arg, arg3, (float)(i - arg2.getStringWidth(arg3) / 2), (float)j, k);
+    public void drawCenteredText(MatrixStack arg, TextRenderer arg2, Text arg3, int i, int j, int k) {
+        arg2.drawWithShadow(arg, arg3, (float)(i - arg2.getWidth(arg3) / 2), (float)j, k);
     }
 
-    public void drawString(MatrixStack arg, TextRenderer arg2, String string, int i, int j, int k) {
+    public void drawStringWithShadow(MatrixStack arg, TextRenderer arg2, String string, int i, int j, int k) {
         arg2.drawWithShadow(arg, string, (float)i, (float)j, k);
     }
 
-    public void method_27535(MatrixStack arg, TextRenderer arg2, Text arg3, int i, int j, int k) {
+    public void drawTextWithShadow(MatrixStack arg, TextRenderer arg2, Text arg3, int i, int j, int k) {
         arg2.drawWithShadow(arg, arg3, (float)i, (float)j, k);
     }
 

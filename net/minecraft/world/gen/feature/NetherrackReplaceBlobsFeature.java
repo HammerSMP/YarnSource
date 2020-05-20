@@ -16,10 +16,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NetherrackReplaceBlobsFeatureConfig;
 
@@ -30,7 +30,7 @@ extends Feature<NetherrackReplaceBlobsFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, NetherrackReplaceBlobsFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, NetherrackReplaceBlobsFeatureConfig arg5) {
         Block lv = arg5.target.getBlock();
         BlockPos lv2 = NetherrackReplaceBlobsFeature.method_27107(arg, arg4.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), lv);
         if (lv2 == null) {
@@ -50,7 +50,7 @@ extends Feature<NetherrackReplaceBlobsFeatureConfig> {
     }
 
     @Nullable
-    private static BlockPos method_27107(IWorld arg, BlockPos.Mutable arg2, Block arg3) {
+    private static BlockPos method_27107(WorldAccess arg, BlockPos.Mutable arg2, Block arg3) {
         while (arg2.getY() > 1) {
             BlockState lv = arg.getBlockState(arg2);
             if (lv.isOf(arg3)) {

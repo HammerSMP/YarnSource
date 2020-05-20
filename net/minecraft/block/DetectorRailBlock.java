@@ -126,7 +126,7 @@ extends AbstractRailBlock {
         if (arg4.isOf(arg.getBlock())) {
             return;
         }
-        this.updatePoweredStatus(arg2, arg3, this.method_24417(arg, arg2, arg3, bl));
+        this.updatePoweredStatus(arg2, arg3, this.updateCurves(arg, arg2, arg3, bl));
     }
 
     @Override

@@ -95,9 +95,9 @@ public class Explosion {
 
     public static float getExposure(Vec3d arg, Entity arg2) {
         Box lv = arg2.getBoundingBox();
-        double d = 1.0 / ((lv.x2 - lv.x1) * 2.0 + 1.0);
-        double e = 1.0 / ((lv.y2 - lv.y1) * 2.0 + 1.0);
-        double f = 1.0 / ((lv.z2 - lv.z1) * 2.0 + 1.0);
+        double d = 1.0 / ((lv.maxX - lv.minX) * 2.0 + 1.0);
+        double e = 1.0 / ((lv.maxY - lv.minY) * 2.0 + 1.0);
+        double f = 1.0 / ((lv.maxZ - lv.minZ) * 2.0 + 1.0);
         double g = (1.0 - Math.floor(1.0 / d) * d) / 2.0;
         double h = (1.0 - Math.floor(1.0 / f) * f) / 2.0;
         if (d < 0.0 || e < 0.0 || f < 0.0) {
@@ -113,8 +113,8 @@ public class Explosion {
                 while (m <= 1.0f) {
                     double p;
                     double o;
-                    double n = MathHelper.lerp((double)k, lv.x1, lv.x2);
-                    Vec3d lv2 = new Vec3d(n + g, o = MathHelper.lerp((double)l, lv.y1, lv.y2), (p = MathHelper.lerp((double)m, lv.z1, lv.z2)) + h);
+                    double n = MathHelper.lerp((double)k, lv.minX, lv.maxX);
+                    Vec3d lv2 = new Vec3d(n + g, o = MathHelper.lerp((double)l, lv.minY, lv.maxY), (p = MathHelper.lerp((double)m, lv.minZ, lv.maxZ)) + h);
                     if (arg2.world.rayTrace(new RayTraceContext(lv2, arg, RayTraceContext.ShapeType.OUTLINE, RayTraceContext.FluidHandling.NONE, arg2)).getType() == HitResult.Type.MISS) {
                         ++i;
                     }
@@ -226,9 +226,9 @@ public class Explosion {
                 this.world.getProfiler().push("explosion_blocks");
                 if (lv3.shouldDropItemsOnExplosion(this) && this.world instanceof ServerWorld) {
                     BlockEntity lv5 = lv3.hasBlockEntity() ? this.world.getBlockEntity(lv) : null;
-                    LootContext.Builder lv6 = new LootContext.Builder((ServerWorld)this.world).setRandom(this.world.random).put(LootContextParameters.POSITION, lv).put(LootContextParameters.TOOL, ItemStack.EMPTY).putNullable(LootContextParameters.BLOCK_ENTITY, lv5).putNullable(LootContextParameters.THIS_ENTITY, this.entity);
+                    LootContext.Builder lv6 = new LootContext.Builder((ServerWorld)this.world).random(this.world.random).parameter(LootContextParameters.POSITION, lv).parameter(LootContextParameters.TOOL, ItemStack.EMPTY).optionalParameter(LootContextParameters.BLOCK_ENTITY, lv5).optionalParameter(LootContextParameters.THIS_ENTITY, this.entity);
                     if (this.destructionType == DestructionType.DESTROY) {
-                        lv6.put(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(this.power));
+                        lv6.parameter(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(this.power));
                     }
                     lv2.getDroppedStacks(lv6).forEach(arg2 -> Explosion.method_24023((ObjectArrayList<Pair<ItemStack, BlockPos>>)objectArrayList, arg2, lv4));
                 }

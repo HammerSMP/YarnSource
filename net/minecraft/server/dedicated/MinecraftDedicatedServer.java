@@ -403,7 +403,7 @@ implements DedicatedServer {
     @Override
     public boolean isSpawnProtected(ServerWorld arg, BlockPos arg2, PlayerEntity arg3) {
         int j;
-        if (arg.dimension.getType() != DimensionType.OVERWORLD) {
+        if (arg.method_27983() != DimensionType.OVERWORLD) {
             return false;
         }
         if (this.getPlayerManager().getOpList().isEmpty()) {

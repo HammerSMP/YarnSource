@@ -6,6 +6,8 @@
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.biome.source;
 
@@ -18,6 +20,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -35,6 +39,9 @@ implements BiomeAccess.Storage {
     protected BiomeSource(Set<Biome> set) {
         this.biomes = set;
     }
+
+    @Environment(value=EnvType.CLIENT)
+    public abstract BiomeSource create(long var1);
 
     public List<Biome> getSpawnBiomes() {
         return SPAWN_BIOMES;
@@ -102,7 +109,7 @@ implements BiomeAccess.Storage {
         return lv;
     }
 
-    public float getNoiseRange(int i, int j) {
+    public float getNoiseAt(int i, int j) {
         return 0.0f;
     }
 

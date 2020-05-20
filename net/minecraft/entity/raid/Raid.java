@@ -31,8 +31,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.SpawnRestriction;
-import net.minecraft.entity.SpawnType;
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -378,7 +378,7 @@ public class Raid {
             Set<RaiderEntity> set2 = iterator.next();
             for (RaiderEntity lv : set2) {
                 BlockPos lv2 = lv.getBlockPos();
-                if (lv.removed || lv.dimension != this.world.getDimension().getType() || this.center.getSquaredDistance(lv2) >= 12544.0) {
+                if (lv.removed || lv.dimension != this.world.method_27983() || this.center.getSquaredDistance(lv2) >= 12544.0) {
                     set.add(lv);
                     continue;
                 }
@@ -404,7 +404,7 @@ public class Raid {
         Collection<ServerPlayerEntity> collection = this.bar.getPlayers();
         for (ServerPlayerEntity lv : this.world.getPlayers()) {
             Vec3d lv2 = lv.getPos();
-            Vec3d lv3 = Vec3d.method_24953(arg);
+            Vec3d lv3 = Vec3d.ofCenter(arg);
             float g = MathHelper.sqrt((lv3.x - lv2.x) * (lv3.x - lv2.x) + (lv3.z - lv2.z) * (lv3.z - lv2.z));
             double d = lv2.x + (double)(13.0f / g) * (lv3.x - lv2.x);
             double e = lv2.z + (double)(13.0f / g) * (lv3.z - lv2.z);
@@ -459,7 +459,7 @@ public class Raid {
             arg.setOutOfRaidCounter(0);
             if (!bl && arg2 != null) {
                 arg.updatePosition((double)arg2.getX() + 0.5, (double)arg2.getY() + 1.0, (double)arg2.getZ() + 0.5);
-                arg.initialize(this.world, this.world.getLocalDifficulty(arg2), SpawnType.EVENT, null, null);
+                arg.initialize(this.world, this.world.getLocalDifficulty(arg2), SpawnReason.EVENT, null, null);
                 arg.addBonusForWave(i, false);
                 arg.setOnGround(true);
                 this.world.spawnEntity(arg);

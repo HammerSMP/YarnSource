@@ -344,8 +344,8 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public boolean method_27298() {
-        return !this.abilities.flying && super.method_27298();
+    public boolean shouldSpawnSprintingParticles() {
+        return !this.abilities.flying && super.shouldSpawnSprintingParticles();
     }
 
     @Override
@@ -452,7 +452,7 @@ extends AbstractClientPlayerEntity {
     private boolean cannotFitAt(BlockPos arg) {
         Box lv = this.getBoundingBox();
         BlockPos.Mutable lv2 = arg.mutableCopy();
-        for (int i = MathHelper.floor(lv.y1); i < MathHelper.ceil(lv.y2); ++i) {
+        for (int i = MathHelper.floor(lv.minY); i < MathHelper.ceil(lv.maxY); ++i) {
             lv2.setY(i);
             if (this.doesNotSuffocate(lv2)) continue;
             return true;
@@ -869,7 +869,7 @@ extends AbstractClientPlayerEntity {
             return;
         }
         ShapeContext lv7 = ShapeContext.of(this);
-        BlockPos lv8 = new BlockPos(this.getX(), this.getBoundingBox().y2, this.getZ());
+        BlockPos lv8 = new BlockPos(this.getX(), this.getBoundingBox().maxY, this.getZ());
         BlockState lv9 = this.world.getBlockState(lv8);
         if (!lv9.getCollisionShape(this.world, lv8, lv7).isEmpty()) {
             return;
@@ -902,7 +902,7 @@ extends AbstractClientPlayerEntity {
         while (iterator.hasNext()) {
             Box lv20 = (Box)iterator.next();
             if (!lv20.intersects(lv16, lv17) && !lv20.intersects(lv18, lv19)) continue;
-            u = (float)lv20.y2;
+            u = (float)lv20.maxY;
             Vec3d lv21 = lv20.getCenter();
             BlockPos lv22 = new BlockPos(lv21);
             int v = 1;

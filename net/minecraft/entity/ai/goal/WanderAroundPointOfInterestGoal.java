@@ -18,8 +18,8 @@ import net.minecraft.util.math.Vec3d;
 
 public class WanderAroundPointOfInterestGoal
 extends WanderAroundGoal {
-    public WanderAroundPointOfInterestGoal(MobEntityWithAi arg, double d) {
-        super(arg, d, 10);
+    public WanderAroundPointOfInterestGoal(MobEntityWithAi arg, double d, boolean bl) {
+        super(arg, d, 10, bl);
     }
 
     @Override
@@ -40,7 +40,7 @@ extends WanderAroundGoal {
         ChunkSectionPos lv3 = ChunkSectionPos.from(lv2);
         ChunkSectionPos lv4 = LookTargetUtil.getPosClosestToOccupiedPointOfInterest(lv, lv3, 2);
         if (lv4 != lv3) {
-            return TargetFinder.findTargetTowards(this.mob, 10, 7, Vec3d.method_24955(lv4.getCenterPos()));
+            return TargetFinder.findTargetTowards(this.mob, 10, 7, Vec3d.ofBottomCenter(lv4.getCenterPos()));
         }
         return null;
     }

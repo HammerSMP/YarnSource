@@ -65,7 +65,7 @@ extends Goal {
         }
         EntityNavigation lv = this.mob.getNavigation();
         if (lv.isIdle() && !this.targetPosition.isWithinDistance(this.mob.getPos(), 10.0)) {
-            Vec3d lv2 = Vec3d.method_24955(this.targetPosition);
+            Vec3d lv2 = Vec3d.ofBottomCenter(this.targetPosition);
             Vec3d lv3 = this.mob.getPos();
             Vec3d lv4 = lv3.subtract(lv2);
             lv2 = lv4.multiply(0.4).add(lv2);

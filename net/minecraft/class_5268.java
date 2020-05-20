@@ -10,7 +10,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.level.LevelGeneratorType;
 import net.minecraft.world.timer.Timer;
 
 public interface class_5268
@@ -32,18 +31,12 @@ extends class_5269 {
         class_5269.super.populateCrashReport(arg);
         arg.add("Level name", this::getLevelName);
         arg.add("Level game mode", () -> String.format("Game mode: %s (ID %d). Hardcore: %b. Cheats: %b", this.getGameMode().getName(), this.getGameMode().getId(), this.isHardcore(), this.areCommandsAllowed()));
-        arg.add("Level generator", () -> {
-            LevelGeneratorType lv = this.method_27421().getType();
-            return String.format("ID %02d - %s, ver %d. Features enabled: %b", lv.getId(), lv.getName(), lv.getVersion(), this.method_27420());
-        });
         arg.add("Level weather", () -> String.format("Rain time: %d (now: %b), thunder time: %d (now: %b)", this.getRainTime(), this.isRaining(), this.getThunderTime(), this.isThundering()));
     }
 
     public int getClearWeatherTime();
 
     public void setClearWeatherTime(int var1);
-
-    public boolean method_27420();
 
     public CompoundTag getWorldData();
 

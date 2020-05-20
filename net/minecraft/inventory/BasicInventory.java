@@ -101,7 +101,7 @@ RecipeInputProvider {
         return lv;
     }
 
-    public boolean method_27070(ItemStack arg) {
+    public boolean canInsert(ItemStack arg) {
         boolean bl = false;
         for (ItemStack lv : this.stacks) {
             if (!lv.isEmpty() && (!this.canCombine(lv, arg) || lv.getCount() >= lv.getMaxCount())) continue;

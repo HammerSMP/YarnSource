@@ -79,7 +79,7 @@ extends AnimalEntity {
             }
         }
         this.sitting = arg.getBoolean("Sitting");
-        this.setSitting(this.sitting);
+        this.setInSittingPose(this.sitting);
     }
 
     @Override
@@ -130,11 +130,11 @@ extends AnimalEntity {
     protected void onTamedChanged() {
     }
 
-    public boolean isSitting() {
+    public boolean isInSittingPose() {
         return (this.dataTracker.get(TAMEABLE_FLAGS) & 1) != 0;
     }
 
-    public void setSitting(boolean bl) {
+    public void setInSittingPose(boolean bl) {
         byte b = this.dataTracker.get(TAMEABLE_FLAGS);
         if (bl) {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 1));
@@ -221,11 +221,11 @@ extends AnimalEntity {
         super.onDeath(arg);
     }
 
-    public boolean method_24345() {
+    public boolean isSitting() {
         return this.sitting;
     }
 
-    public void method_24346(boolean bl) {
+    public void setSitting(boolean bl) {
         this.sitting = bl;
     }
 }

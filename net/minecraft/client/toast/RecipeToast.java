@@ -49,24 +49,24 @@ implements Toast {
         ItemStack lv2 = lv.getRecipeKindIcon();
         RenderSystem.pushMatrix();
         RenderSystem.scalef(0.6f, 0.6f, 1.0f);
-        arg2.getGame().getItemRenderer().renderGuiItem(null, lv2, 3, 3);
+        arg2.getGame().getItemRenderer().method_27953(lv2, 3, 3);
         RenderSystem.popMatrix();
-        arg2.getGame().getItemRenderer().renderGuiItem(null, lv.getOutput(), 8, 8);
+        arg2.getGame().getItemRenderer().method_27953(lv.getOutput(), 8, 8);
         return l - this.startTime >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
     }
 
-    public void addRecipe(Recipe<?> arg) {
+    public void addRecipes(Recipe<?> arg) {
         if (this.recipes.add(arg)) {
             this.justUpdated = true;
         }
     }
 
     public static void show(ToastManager arg, Recipe<?> arg2) {
-        RecipeToast lv = arg.getToast(RecipeToast.class, field_2208);
+        RecipeToast lv = arg.getToast(RecipeToast.class, TYPE);
         if (lv == null) {
             arg.add(new RecipeToast(arg2));
         } else {
-            lv.addRecipe(arg2);
+            lv.addRecipes(arg2);
         }
     }
 }

@@ -56,7 +56,7 @@ extends Task<VillagerEntity> {
                 Vec3d lv = null;
                 int j = 1000;
                 for (i = 0; i < 1000 && (lv == null || this.exceedsMaxRange(arg, arg2, GlobalPos.create(arg2.dimension, new BlockPos(lv)))); ++i) {
-                    lv = TargetFinder.findTargetTowards(arg2, 15, 7, Vec3d.method_24955(arg4.getPos()));
+                    lv = TargetFinder.findTargetTowards(arg2, 15, 7, Vec3d.ofBottomCenter(arg4.getPos()));
                 }
                 if (i == 1000) {
                     this.giveUp(arg2, l);
@@ -78,11 +78,11 @@ extends Task<VillagerEntity> {
     }
 
     private boolean exceedsMaxRange(ServerWorld arg, VillagerEntity arg2, GlobalPos arg3) {
-        return arg3.getDimension() != arg.getDimension().getType() || arg3.getPos().getManhattanDistance(arg2.getBlockPos()) > this.maxRange;
+        return arg3.getDimension() != arg.method_27983() || arg3.getPos().getManhattanDistance(arg2.getBlockPos()) > this.maxRange;
     }
 
     private boolean reachedDestination(ServerWorld arg, VillagerEntity arg2, GlobalPos arg3) {
-        return arg3.getDimension() == arg.getDimension().getType() && arg3.getPos().getManhattanDistance(arg2.getBlockPos()) <= this.completionRange;
+        return arg3.getDimension() == arg.method_27983() && arg3.getPos().getManhattanDistance(arg2.getBlockPos()) <= this.completionRange;
     }
 }
 

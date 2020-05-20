@@ -46,8 +46,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class ComposterBlock
 extends Block
@@ -243,13 +243,13 @@ implements InventoryProvider {
         return lv2;
     }
 
-    private static BlockState emptyComposter(BlockState arg, IWorld arg2, BlockPos arg3) {
+    private static BlockState emptyComposter(BlockState arg, WorldAccess arg2, BlockPos arg3) {
         BlockState lv = (BlockState)arg.with(LEVEL, 0);
         arg2.setBlockState(arg3, lv, 3);
         return lv;
     }
 
-    private static BlockState addToComposter(BlockState arg, IWorld arg2, BlockPos arg3, ItemStack arg4) {
+    private static BlockState addToComposter(BlockState arg, WorldAccess arg2, BlockPos arg3, ItemStack arg4) {
         int i = arg.get(LEVEL);
         float f = ITEM_TO_LEVEL_INCREASE_CHANCE.getFloat((Object)arg4.getItem());
         if (i == 0 && f > 0.0f || arg2.getRandom().nextDouble() < (double)f) {
@@ -293,7 +293,7 @@ implements InventoryProvider {
     }
 
     @Override
-    public SidedInventory getInventory(BlockState arg, IWorld arg2, BlockPos arg3) {
+    public SidedInventory getInventory(BlockState arg, WorldAccess arg2, BlockPos arg3) {
         int i = arg.get(LEVEL);
         if (i == 8) {
             return new FullComposterInventory(arg, arg2, arg3, new ItemStack(Items.BONE_MEAL));
@@ -308,11 +308,11 @@ implements InventoryProvider {
     extends BasicInventory
     implements SidedInventory {
         private final BlockState state;
-        private final IWorld world;
+        private final WorldAccess world;
         private final BlockPos pos;
         private boolean dirty;
 
-        public ComposterInventory(BlockState arg, IWorld arg2, BlockPos arg3) {
+        public ComposterInventory(BlockState arg, WorldAccess arg2, BlockPos arg3) {
             super(1);
             this.state = arg;
             this.world = arg2;
@@ -363,11 +363,11 @@ implements InventoryProvider {
     extends BasicInventory
     implements SidedInventory {
         private final BlockState state;
-        private final IWorld world;
+        private final WorldAccess world;
         private final BlockPos pos;
         private boolean dirty;
 
-        public FullComposterInventory(BlockState arg, IWorld arg2, BlockPos arg3, ItemStack arg4) {
+        public FullComposterInventory(BlockState arg, WorldAccess arg2, BlockPos arg3, ItemStack arg4) {
             super(arg4);
             this.state = arg;
             this.world = arg2;

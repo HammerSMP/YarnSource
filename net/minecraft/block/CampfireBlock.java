@@ -58,8 +58,8 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class CampfireBlock
 extends BlockWithEntity
@@ -103,7 +103,7 @@ implements Waterloggable {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }
@@ -111,7 +111,7 @@ implements Waterloggable {
         if (lv instanceof CampfireBlockEntity) {
             ItemScatterer.spawn(arg2, arg3, ((CampfireBlockEntity)lv).getItemsBeingCooked());
         }
-        super.onBlockRemoved(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
     }
 
     @Override
@@ -124,7 +124,7 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
         }
@@ -165,7 +165,7 @@ implements Waterloggable {
     }
 
     @Override
-    public boolean tryFillWithFluid(IWorld arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
         if (!arg3.get(Properties.WATERLOGGED).booleanValue() && arg4.getFluid() == Fluids.WATER) {
             boolean bl = arg3.get(LIT);
             if (bl) {
@@ -210,9 +210,9 @@ implements Waterloggable {
         }
     }
 
-    public static boolean isLitCampfireInRange(World arg, BlockPos arg2, int i) {
-        for (int j = 1; j <= i; ++j) {
-            BlockPos lv = arg2.down(j);
+    public static boolean isLitCampfireInRange(World arg, BlockPos arg2) {
+        for (int i = 1; i <= 5; ++i) {
+            BlockPos lv = arg2.down(i);
             BlockState lv2 = arg.getBlockState(lv);
             if (CampfireBlock.isLitCampfire(lv2)) {
                 return true;

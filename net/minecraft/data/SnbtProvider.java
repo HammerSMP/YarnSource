@@ -5,6 +5,7 @@
  *  com.google.common.collect.Lists
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
  *  javax.annotation.Nullable
+ *  org.apache.commons.io.FileUtils
  *  org.apache.commons.io.IOUtils
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -15,9 +16,12 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -36,12 +40,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.util.Util;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SnbtProvider
 implements DataProvider {
+    @Nullable
+    private static final Path field_24615 = null;
     private static final Logger LOGGER = LogManager.getLogger();
     private final DataGenerator root;
     private final List<Tweaker> write = Lists.newArrayList();
@@ -91,12 +98,19 @@ implements DataProvider {
     @Nullable
     private CompressedData toCompressedNbt(Path path, String string) {
         try (BufferedReader bufferedReader = Files.newBufferedReader(path);){
+            String string5;
             String string2 = IOUtils.toString((Reader)bufferedReader);
+            CompoundTag lv = this.write(string, StringNbtReader.parse(string2));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            NbtIo.writeCompressed(this.write(string, StringNbtReader.parse(string2)), byteArrayOutputStream);
+            NbtIo.writeCompressed(lv, byteArrayOutputStream);
             byte[] bs = byteArrayOutputStream.toByteArray();
             String string3 = SHA1.hashBytes(bs).toString();
-            CompressedData compressedData = new CompressedData(string, bs, string3);
+            if (field_24615 != null) {
+                String string4 = lv.toText("    ", 0).getString() + "\n";
+            } else {
+                string5 = null;
+            }
+            CompressedData compressedData = new CompressedData(string, bs, string5, string3);
             return compressedData;
         }
         catch (CommandSyntaxException commandSyntaxException) {
@@ -110,18 +124,27 @@ implements DataProvider {
     }
 
     private void write(DataCache arg, CompressedData arg2, Path path) {
-        Path path2 = path.resolve(arg2.name + ".nbt");
+        if (arg2.field_24616 != null) {
+            Path path2 = field_24615.resolve(arg2.name + ".snbt");
+            try {
+                FileUtils.write((File)path2.toFile(), (CharSequence)arg2.field_24616, (Charset)StandardCharsets.UTF_8);
+            }
+            catch (IOException iOException) {
+                LOGGER.error("Couldn't write structure SNBT {} at {}", (Object)arg2.name, (Object)path2, (Object)iOException);
+            }
+        }
+        Path path3 = path.resolve(arg2.name + ".nbt");
         try {
-            if (!Objects.equals(arg.getOldSha1(path2), arg2.sha1) || !Files.exists(path2, new LinkOption[0])) {
-                Files.createDirectories(path2.getParent(), new FileAttribute[0]);
-                try (OutputStream outputStream = Files.newOutputStream(path2, new OpenOption[0]);){
+            if (!Objects.equals(arg.getOldSha1(path3), arg2.sha1) || !Files.exists(path3, new LinkOption[0])) {
+                Files.createDirectories(path3.getParent(), new FileAttribute[0]);
+                try (OutputStream outputStream = Files.newOutputStream(path3, new OpenOption[0]);){
                     outputStream.write(arg2.bytes);
                 }
             }
-            arg.updateSha1(path2, arg2.sha1);
+            arg.updateSha1(path3, arg2.sha1);
         }
-        catch (IOException iOException) {
-            LOGGER.error("Couldn't write structure {} at {}", (Object)arg2.name, (Object)path2, (Object)iOException);
+        catch (IOException iOException2) {
+            LOGGER.error("Couldn't write structure {} at {}", (Object)arg2.name, (Object)path3, (Object)iOException2);
         }
     }
 
@@ -133,12 +156,15 @@ implements DataProvider {
     static class CompressedData {
         private final String name;
         private final byte[] bytes;
+        @Nullable
+        private final String field_24616;
         private final String sha1;
 
-        public CompressedData(String string, byte[] bs, String string2) {
+        public CompressedData(String string, byte[] bs, @Nullable String string2, String string3) {
             this.name = string;
             this.bytes = bs;
-            this.sha1 = string2;
+            this.field_24616 = string2;
+            this.sha1 = string3;
         }
     }
 }

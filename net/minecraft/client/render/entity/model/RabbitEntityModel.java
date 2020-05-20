@@ -137,7 +137,7 @@ extends EntityModel<T> {
         this.head.yaw = i * ((float)Math.PI / 180);
         this.rightEar.yaw = this.nose.yaw - 0.2617994f;
         this.leftEar.yaw = this.nose.yaw + 0.2617994f;
-        this.field_3531 = MathHelper.sin(((RabbitEntity)arg).method_6605(k) * (float)Math.PI);
+        this.field_3531 = MathHelper.sin(((RabbitEntity)arg).getJumpProgress(k) * (float)Math.PI);
         this.leftBackLeg.pitch = (this.field_3531 * 50.0f - 21.0f) * ((float)Math.PI / 180);
         this.rightBackLeg.pitch = (this.field_3531 * 50.0f - 21.0f) * ((float)Math.PI / 180);
         this.leftFoot.pitch = this.field_3531 * 50.0f * ((float)Math.PI / 180);
@@ -149,7 +149,7 @@ extends EntityModel<T> {
     @Override
     public void animateModel(T arg, float f, float g, float h) {
         super.animateModel(arg, f, g, h);
-        this.field_3531 = MathHelper.sin(((RabbitEntity)arg).method_6605(h) * (float)Math.PI);
+        this.field_3531 = MathHelper.sin(((RabbitEntity)arg).getJumpProgress(h) * (float)Math.PI);
     }
 }
 

@@ -23,7 +23,8 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.ShipwreckFeatureConfig;
@@ -76,7 +77,7 @@ public class ShipwreckGenerator {
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, IWorld arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
             if ("map_chest".equals(string)) {
                 LootableContainerBlockEntity.setLootTable(arg2, random, arg.down(), LootTables.SHIPWRECK_MAP_CHEST);
             } else if ("treasure_chest".equals(string)) {
@@ -87,7 +88,7 @@ public class ShipwreckGenerator {
         }
 
         @Override
-        public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<?> arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+        public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
             int i = 256;
             int j = 0;
             BlockPos lv = this.structure.getSize();

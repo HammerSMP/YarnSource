@@ -6,7 +6,7 @@ package net.minecraft.entity.mob;
 import java.util.Random;
 import java.util.function.Predicate;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -22,9 +22,9 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class HostileEntity
@@ -100,7 +100,7 @@ implements Monster {
         return 0.5f - arg2.getBrightness(arg);
     }
 
-    public static boolean isSpawnDark(IWorld arg, BlockPos arg2, Random random) {
+    public static boolean isSpawnDark(WorldAccess arg, BlockPos arg2, Random random) {
         if (arg.getLightLevel(LightType.SKY, arg2) > random.nextInt(32)) {
             return false;
         }
@@ -108,11 +108,11 @@ implements Monster {
         return i <= random.nextInt(8);
     }
 
-    public static boolean canSpawnInDark(EntityType<? extends HostileEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawnInDark(EntityType<? extends HostileEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg2.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.isSpawnDark(arg2, arg4, random) && HostileEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
     }
 
-    public static boolean canSpawnIgnoreLightLevel(EntityType<? extends HostileEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawnIgnoreLightLevel(EntityType<? extends HostileEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg2.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
     }
 
@@ -126,7 +126,7 @@ implements Monster {
     }
 
     @Override
-    protected boolean method_27071() {
+    protected boolean shouldDropLoot() {
         return true;
     }
 

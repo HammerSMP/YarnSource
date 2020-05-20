@@ -64,8 +64,8 @@ extends ScreenHandler {
         });
         if (arg3 instanceof AbstractDonkeyEntity && ((AbstractDonkeyEntity)arg3).hasChest()) {
             for (int l = 0; l < 3; ++l) {
-                for (int m = 0; m < ((AbstractDonkeyEntity)arg3).method_6702(); ++m) {
-                    this.addSlot(new Slot(arg2, 2 + m + l * ((AbstractDonkeyEntity)arg3).method_6702(), 80 + m * 18, 18 + l * 18));
+                for (int m = 0; m < ((AbstractDonkeyEntity)arg3).getInventoryColumns(); ++m) {
+                    this.addSlot(new Slot(arg2, 2 + m + l * ((AbstractDonkeyEntity)arg3).getInventoryColumns(), 80 + m * 18, 18 + l * 18));
                 }
             }
         }

@@ -15,7 +15,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelGeneratorType;
 
 public class GameJoinS2CPacket
 implements Packet<ClientPlayPacketListener> {
@@ -25,25 +24,27 @@ implements Packet<ClientPlayPacketListener> {
     private GameMode gameMode;
     private DimensionType dimension;
     private int maxPlayers;
-    private LevelGeneratorType generatorType;
     private int chunkLoadDistance;
     private boolean reducedDebugInfo;
-    private boolean showsDeathScreen;
+    private boolean showDeathScreen;
+    private boolean debugWorld;
+    private boolean flatWorld;
 
     public GameJoinS2CPacket() {
     }
 
-    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, DimensionType arg2, int j, LevelGeneratorType arg3, int k, boolean bl2, boolean bl3) {
+    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, DimensionType arg2, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
         this.playerEntityId = i;
         this.dimension = arg2;
         this.seed = l;
         this.gameMode = arg;
         this.maxPlayers = j;
         this.hardcore = bl;
-        this.generatorType = arg3;
         this.chunkLoadDistance = k;
         this.reducedDebugInfo = bl2;
-        this.showsDeathScreen = bl3;
+        this.showDeathScreen = bl3;
+        this.debugWorld = bl4;
+        this.flatWorld = bl5;
     }
 
     @Override
@@ -55,13 +56,11 @@ implements Packet<ClientPlayPacketListener> {
         this.dimension = DimensionType.byRawId(arg.readInt());
         this.seed = arg.readLong();
         this.maxPlayers = arg.readUnsignedByte();
-        this.generatorType = LevelGeneratorType.getTypeFromName(arg.readString(16));
-        if (this.generatorType == null) {
-            this.generatorType = LevelGeneratorType.DEFAULT;
-        }
         this.chunkLoadDistance = arg.readVarInt();
         this.reducedDebugInfo = arg.readBoolean();
-        this.showsDeathScreen = arg.readBoolean();
+        this.showDeathScreen = arg.readBoolean();
+        this.debugWorld = arg.readBoolean();
+        this.flatWorld = arg.readBoolean();
     }
 
     @Override
@@ -75,10 +74,11 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeInt(this.dimension.getRawId());
         arg.writeLong(this.seed);
         arg.writeByte(this.maxPlayers);
-        arg.writeString(this.generatorType.getName());
         arg.writeVarInt(this.chunkLoadDistance);
         arg.writeBoolean(this.reducedDebugInfo);
-        arg.writeBoolean(this.showsDeathScreen);
+        arg.writeBoolean(this.showDeathScreen);
+        arg.writeBoolean(this.debugWorld);
+        arg.writeBoolean(this.flatWorld);
     }
 
     @Override
@@ -112,11 +112,6 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public LevelGeneratorType getGeneratorType() {
-        return this.generatorType;
-    }
-
-    @Environment(value=EnvType.CLIENT)
     public int getChunkLoadDistance() {
         return this.chunkLoadDistance;
     }
@@ -128,7 +123,17 @@ implements Packet<ClientPlayPacketListener> {
 
     @Environment(value=EnvType.CLIENT)
     public boolean showsDeathScreen() {
-        return this.showsDeathScreen;
+        return this.showDeathScreen;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public boolean isDebugWorld() {
+        return this.debugWorld;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public boolean isFlatWorld() {
+        return this.flatWorld;
     }
 }
 

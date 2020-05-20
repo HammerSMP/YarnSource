@@ -45,18 +45,18 @@ public class InputUtil {
     @Nullable
     private static final MethodHandle GLFW_RAW_MOUSE_MOTION_SUPPORTED_HANDLE;
     private static final int GLFW_RAW_MOUSE_MOTION;
-    public static final KeyCode UNKNOWN_KEYCODE;
+    public static final Key UNKNOWN_KEY;
 
-    public static KeyCode getKeyCode(int i, int j) {
+    public static Key fromKeyCode(int i, int j) {
         if (i == -1) {
             return Type.SCANCODE.createFromCode(j);
         }
         return Type.KEYSYM.createFromCode(i);
     }
 
-    public static KeyCode fromName(String string) {
-        if (KeyCode.NAMES.containsKey(string)) {
-            return (KeyCode)KeyCode.NAMES.get(string);
+    public static Key fromTranslationKey(String string) {
+        if (Key.KEYS.containsKey(string)) {
+            return (Key)Key.KEYS.get(string);
         }
         for (Type lv : Type.values()) {
             if (!string.startsWith(lv.name)) continue;
@@ -118,39 +118,39 @@ public class InputUtil {
         }
         GLFW_RAW_MOUSE_MOTION_SUPPORTED_HANDLE = methodHandle;
         GLFW_RAW_MOUSE_MOTION = i;
-        UNKNOWN_KEYCODE = Type.KEYSYM.createFromCode(-1);
+        UNKNOWN_KEY = Type.KEYSYM.createFromCode(-1);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static final class KeyCode {
-        private final String name;
+    public static final class Key {
+        private final String translationKey;
         private final Type type;
-        private final int keyCode;
-        private final Lazy<Text> field_24196;
-        private static final Map<String, KeyCode> NAMES = Maps.newHashMap();
+        private final int code;
+        private final Lazy<Text> localizedText;
+        private static final Map<String, Key> KEYS = Maps.newHashMap();
 
-        private KeyCode(String string, Type arg, int i) {
-            this.name = string;
+        private Key(String string, Type arg, int i) {
+            this.translationKey = string;
             this.type = arg;
-            this.keyCode = i;
-            this.field_24196 = new Lazy<Text>(() -> (Text)arg.field_24197.apply(i, string));
-            NAMES.put(string, this);
+            this.code = i;
+            this.localizedText = new Lazy<Text>(() -> (Text)arg.textTranslator.apply(i, string));
+            KEYS.put(string, this);
         }
 
         public Type getCategory() {
             return this.type;
         }
 
-        public int getKeyCode() {
-            return this.keyCode;
+        public int getCode() {
+            return this.code;
         }
 
-        public String getName() {
-            return this.name;
+        public String getTranslationKey() {
+            return this.translationKey;
         }
 
-        public Text method_27445() {
-            return this.field_24196.get();
+        public Text getLocalizedText() {
+            return this.localizedText.get();
         }
 
         public boolean equals(Object object) {
@@ -160,16 +160,16 @@ public class InputUtil {
             if (object == null || this.getClass() != object.getClass()) {
                 return false;
             }
-            KeyCode lv = (KeyCode)object;
-            return this.keyCode == lv.keyCode && this.type == lv.type;
+            Key lv = (Key)object;
+            return this.code == lv.code && this.type == lv.type;
         }
 
         public int hashCode() {
-            return Objects.hash(new Object[]{this.type, this.keyCode});
+            return Objects.hash(new Object[]{this.type, this.code});
         }
 
         public String toString() {
-            return this.name;
+            return this.translationKey;
         }
     }
 
@@ -185,28 +185,28 @@ public class InputUtil {
         }),
         MOUSE("key.mouse", (integer, string) -> new TranslatableText((String)string));
 
-        private final Int2ObjectMap<KeyCode> map = new Int2ObjectOpenHashMap();
+        private final Int2ObjectMap<Key> map = new Int2ObjectOpenHashMap();
         private final String name;
-        private final BiFunction<Integer, String, Text> field_24197;
+        private final BiFunction<Integer, String, Text> textTranslator;
 
         private static void mapKey(Type arg, String string, int i) {
-            KeyCode lv = new KeyCode(string, arg, i);
+            Key lv = new Key(string, arg, i);
             arg.map.put(i, (Object)lv);
         }
 
         private Type(String string2, BiFunction<Integer, String, Text> biFunction) {
             this.name = string2;
-            this.field_24197 = biFunction;
+            this.textTranslator = biFunction;
         }
 
-        public KeyCode createFromCode(int i2) {
-            return (KeyCode)this.map.computeIfAbsent(i2, i -> {
+        public Key createFromCode(int i2) {
+            return (Key)this.map.computeIfAbsent(i2, i -> {
                 int j = i;
                 if (this == MOUSE) {
                     ++j;
                 }
                 String string = this.name + "." + j;
-                return new KeyCode(string, this, i);
+                return new Key(string, this, i);
             });
         }
 

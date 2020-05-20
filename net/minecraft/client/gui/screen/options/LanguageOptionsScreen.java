@@ -69,7 +69,7 @@ extends GameOptionsScreen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.languageSelectionList.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 16, 0xFFFFFF);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 16, 0xFFFFFF);
         this.drawCenteredString(arg, this.textRenderer, "(" + I18n.translate("options.languageWarning", new Object[0]) + ")", this.width / 2, this.height - 56, 0x808080);
         super.render(arg, i, j, f);
     }

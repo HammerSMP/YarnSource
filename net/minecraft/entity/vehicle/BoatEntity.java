@@ -16,7 +16,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LilyPadBlock;
+import net.minecraft.class_5275;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -181,10 +183,10 @@ extends Entity {
     @Override
     public void pushAwayFrom(Entity arg) {
         if (arg instanceof BoatEntity) {
-            if (arg.getBoundingBox().y1 < this.getBoundingBox().y2) {
+            if (arg.getBoundingBox().minY < this.getBoundingBox().maxY) {
                 super.pushAwayFrom(arg);
             }
-        } else if (arg.getBoundingBox().y1 <= this.getBoundingBox().y1) {
+        } else if (arg.getBoundingBox().minY <= this.getBoundingBox().minY) {
             super.pushAwayFrom(arg);
         }
     }
@@ -381,7 +383,7 @@ extends Entity {
     private Location checkLocation() {
         Location lv = this.getUnderWaterLocation();
         if (lv != null) {
-            this.waterLevel = this.getBoundingBox().y2;
+            this.waterLevel = this.getBoundingBox().maxY;
             return lv;
         }
         if (this.checkBoatInWater()) {
@@ -397,12 +399,12 @@ extends Entity {
 
     public float method_7544() {
         Box lv = this.getBoundingBox();
-        int i = MathHelper.floor(lv.x1);
-        int j = MathHelper.ceil(lv.x2);
-        int k = MathHelper.floor(lv.y2);
-        int l = MathHelper.ceil(lv.y2 - this.fallVelocity);
-        int m = MathHelper.floor(lv.z1);
-        int n = MathHelper.ceil(lv.z2);
+        int i = MathHelper.floor(lv.minX);
+        int j = MathHelper.ceil(lv.maxX);
+        int k = MathHelper.floor(lv.maxY);
+        int l = MathHelper.ceil(lv.maxY - this.fallVelocity);
+        int m = MathHelper.floor(lv.minZ);
+        int n = MathHelper.ceil(lv.maxZ);
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
         block0: for (int o = k; o < l; ++o) {
             float f = 0.0f;
@@ -424,13 +426,13 @@ extends Entity {
 
     public float method_7548() {
         Box lv = this.getBoundingBox();
-        Box lv2 = new Box(lv.x1, lv.y1 - 0.001, lv.z1, lv.x2, lv.y1, lv.z2);
-        int i = MathHelper.floor(lv2.x1) - 1;
-        int j = MathHelper.ceil(lv2.x2) + 1;
-        int k = MathHelper.floor(lv2.y1) - 1;
-        int l = MathHelper.ceil(lv2.y2) + 1;
-        int m = MathHelper.floor(lv2.z1) - 1;
-        int n = MathHelper.ceil(lv2.z2) + 1;
+        Box lv2 = new Box(lv.minX, lv.minY - 0.001, lv.minZ, lv.maxX, lv.minY, lv.maxZ);
+        int i = MathHelper.floor(lv2.minX) - 1;
+        int j = MathHelper.ceil(lv2.maxX) + 1;
+        int k = MathHelper.floor(lv2.minY) - 1;
+        int l = MathHelper.ceil(lv2.maxY) + 1;
+        int m = MathHelper.floor(lv2.minZ) - 1;
+        int n = MathHelper.ceil(lv2.maxZ) + 1;
         VoxelShape lv3 = VoxelShapes.cuboid(lv2);
         float f = 0.0f;
         int o = 0;
@@ -454,12 +456,12 @@ extends Entity {
 
     private boolean checkBoatInWater() {
         Box lv = this.getBoundingBox();
-        int i = MathHelper.floor(lv.x1);
-        int j = MathHelper.ceil(lv.x2);
-        int k = MathHelper.floor(lv.y1);
-        int l = MathHelper.ceil(lv.y1 + 0.001);
-        int m = MathHelper.floor(lv.z1);
-        int n = MathHelper.ceil(lv.z2);
+        int i = MathHelper.floor(lv.minX);
+        int j = MathHelper.ceil(lv.maxX);
+        int k = MathHelper.floor(lv.minY);
+        int l = MathHelper.ceil(lv.minY + 0.001);
+        int m = MathHelper.floor(lv.minZ);
+        int n = MathHelper.ceil(lv.maxZ);
         boolean bl = false;
         this.waterLevel = Double.MIN_VALUE;
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
@@ -471,7 +473,7 @@ extends Entity {
                     if (!lv3.matches(FluidTags.WATER)) continue;
                     float f = (float)p + lv3.getHeight(this.world, lv2);
                     this.waterLevel = Math.max((double)f, this.waterLevel);
-                    bl |= lv.y1 < (double)f;
+                    bl |= lv.minY < (double)f;
                 }
             }
         }
@@ -481,13 +483,13 @@ extends Entity {
     @Nullable
     private Location getUnderWaterLocation() {
         Box lv = this.getBoundingBox();
-        double d = lv.y2 + 0.001;
-        int i = MathHelper.floor(lv.x1);
-        int j = MathHelper.ceil(lv.x2);
-        int k = MathHelper.floor(lv.y2);
+        double d = lv.maxY + 0.001;
+        int i = MathHelper.floor(lv.minX);
+        int j = MathHelper.ceil(lv.maxX);
+        int k = MathHelper.floor(lv.maxY);
         int l = MathHelper.ceil(d);
-        int m = MathHelper.floor(lv.z1);
-        int n = MathHelper.ceil(lv.z2);
+        int m = MathHelper.floor(lv.minZ);
+        int n = MathHelper.ceil(lv.maxZ);
         boolean bl = false;
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
         for (int o = i; o < j; ++o) {
@@ -599,27 +601,28 @@ extends Entity {
 
     @Override
     public Vec3d method_24829(LivingEntity arg) {
-        double f;
         double e;
-        Vec3d lv = BoatEntity.method_24826(Math.sqrt((double)(this.getWidth() * this.getWidth()) * 2.0), arg.getWidth(), this.yaw);
+        Vec3d lv = BoatEntity.method_24826(this.getWidth() * MathHelper.SQUARE_ROOT_OF_TWO, arg.getWidth(), this.yaw);
         double d = this.getX() + lv.x;
-        BlockPos lv2 = new BlockPos(d, e = this.getBoundingBox().y2 + 0.001, f = this.getZ() + lv.z);
+        BlockPos lv2 = new BlockPos(d, this.getBoundingBox().maxY, e = this.getZ() + lv.z);
         BlockPos lv3 = lv2.down();
         if (!this.world.isWater(lv3)) {
-            Box lv6;
-            double h;
-            Box lv4 = arg.method_24833(arg.method_26081()).offset(d, e, f);
-            double g = this.world.method_26372(lv2);
-            if (!Double.isInfinite(g) && g < 1.0) {
-                Box lv5 = lv4.offset(d, (double)lv2.getY() + g, f);
-                if (this.world.getBlockCollisions(arg, lv5).allMatch(VoxelShape::isEmpty)) {
-                    return new Vec3d(d, (double)lv2.getY() + g, f);
+            for (EntityPose lv4 : arg.getPoses()) {
+                Vec3d lv7;
+                Vec3d lv6;
+                Box lv5 = arg.method_24833(lv4);
+                double f = this.world.method_26372(lv2);
+                if (class_5275.method_27932(f) && class_5275.method_27933(this.world, arg, lv5.offset(lv6 = new Vec3d(d, (double)lv2.getY() + f, e)))) {
+                    arg.setPose(lv4);
+                    return lv6;
                 }
-            } else if (g < 1.0 && !Double.isInfinite(h = this.world.method_26372(lv3)) && h <= 0.5 && this.world.getBlockCollisions(arg, lv6 = lv4.offset(d, (double)lv3.getY() + h, f)).allMatch(VoxelShape::isEmpty)) {
-                return new Vec3d(d, (double)lv3.getY() + h, f);
+                double g = this.world.method_26372(lv3);
+                if (!class_5275.method_27932(g) || !class_5275.method_27933(this.world, arg, lv5.offset(lv7 = new Vec3d(d, (double)lv3.getY() + g, e)))) continue;
+                arg.setPose(lv4);
+                return lv7;
             }
         }
-        return new Vec3d(this.getX(), e, this.getZ());
+        return super.method_24829(arg);
     }
 
     protected void copyEntityData(Entity arg) {

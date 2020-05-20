@@ -41,8 +41,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class PistonExtensionBlock
 extends BlockWithEntity {
@@ -65,7 +65,7 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void onBlockRemoved(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
+    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
         if (arg.isOf(arg4.getBlock())) {
             return;
         }
@@ -76,7 +76,7 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void onBroken(IWorld arg, BlockPos arg2, BlockState arg3) {
+    public void onBroken(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         BlockPos lv = arg2.offset(arg3.get(FACING).getOpposite());
         BlockState lv2 = arg.getBlockState(lv);
         if (lv2.getBlock() instanceof PistonBlock && lv2.get(PistonBlock.EXTENDED).booleanValue()) {

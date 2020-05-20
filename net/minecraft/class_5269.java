@@ -8,16 +8,16 @@ import net.minecraft.util.math.BlockPos;
 
 public interface class_5269
 extends class_5217 {
-    public void method_27416(int var1);
+    public void setSpawnX(int var1);
 
-    public void method_27417(int var1);
+    public void setSpawnY(int var1);
 
-    public void method_27419(int var1);
+    public void setSpawnZ(int var1);
 
     default public void setSpawnPos(BlockPos arg) {
-        this.method_27416(arg.getX());
-        this.method_27417(arg.getY());
-        this.method_27419(arg.getZ());
+        this.setSpawnX(arg.getX());
+        this.setSpawnY(arg.getY());
+        this.setSpawnZ(arg.getZ());
     }
 
     public void setTime(long var1);

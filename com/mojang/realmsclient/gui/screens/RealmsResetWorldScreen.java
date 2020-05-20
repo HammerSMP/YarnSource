@@ -189,7 +189,7 @@ extends RealmsScreenWithCallback {
         }
         DrawableHelper.drawTexture(arg, i, j + 12, 0.0f, 0.0f, 60, 60, 60, 60);
         int k = bl ? 0xA0A0A0 : 0xFFFFFF;
-        this.drawStringWithShadow(arg, this.textRenderer, arg2, i + 30, j, k);
+        this.drawCenteredText(arg, this.textRenderer, arg2, i + 30, j, k);
     }
 
     @Override

@@ -38,7 +38,6 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 
@@ -105,9 +104,9 @@ extends Screen {
         this.listWidget.render(arg, i, j, f);
         RenderSystem.pushMatrix();
         RenderSystem.translatef(0.0f, 0.0f, 400.0f);
-        this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        this.method_27535(arg, this.textRenderer, this.shareText, 50, 30, 0xA0A0A0);
-        this.method_27535(arg, this.textRenderer, this.listText, 50, 70, 0xA0A0A0);
+        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawTextWithShadow(arg, this.textRenderer, this.shareText, 50, 30, 0xA0A0A0);
+        this.drawTextWithShadow(arg, this.textRenderer, this.listText, 50, 70, 0xA0A0A0);
         RenderSystem.popMatrix();
         this.customPresetField.render(arg, i, j, f);
         super.render(arg, i, j, f);
@@ -124,7 +123,7 @@ extends Screen {
     }
 
     private static void addPreset(Text arg, ItemConvertible arg2, Biome arg3, List<String> list, FlatChunkGeneratorLayer ... args) {
-        FlatChunkGeneratorConfig lv = ChunkGeneratorType.FLAT.createConfig();
+        FlatChunkGeneratorConfig lv = new FlatChunkGeneratorConfig();
         for (int i = args.length - 1; i >= 0; --i) {
             lv.getLayers().add(args[i]);
         }

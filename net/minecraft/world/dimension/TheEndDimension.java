@@ -3,16 +3,11 @@
  * 
  * Could not load the following classes:
  *  javax.annotation.Nullable
- *  net.fabricmc.api.EnvType
- *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.dimension;
 
 import java.util.Random;
 import javax.annotation.Nullable;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.block.Blocks;
 import net.minecraft.class_5217;
 import net.minecraft.class_5268;
 import net.minecraft.entity.boss.dragon.EnderDragonFight;
@@ -20,14 +15,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.source.BiomeSourceType;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorType;
-import net.minecraft.world.gen.chunk.FloatingIslandsChunkGeneratorConfig;
 
 public class TheEndDimension
 extends Dimension {
@@ -51,36 +41,8 @@ extends Dimension {
     }
 
     @Override
-    public ChunkGenerator<?> createChunkGenerator() {
-        FloatingIslandsChunkGeneratorConfig lv = ChunkGeneratorType.FLOATING_ISLANDS.createConfig();
-        lv.setDefaultBlock(Blocks.END_STONE.getDefaultState());
-        lv.setDefaultFluid(Blocks.AIR.getDefaultState());
-        lv.withCenter(this.getForcedSpawnPoint());
-        return ChunkGeneratorType.FLOATING_ISLANDS.create(this.world, BiomeSourceType.THE_END.applyConfig(BiomeSourceType.THE_END.getConfig(this.world.getSeed())), lv);
-    }
-
-    @Override
     public float getSkyAngle(long l, float f) {
         return 0.0f;
-    }
-
-    @Override
-    @Nullable
-    @Environment(value=EnvType.CLIENT)
-    public float[] getBackgroundColor(float f, float g) {
-        return null;
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public Vec3d modifyFogColor(Vec3d arg, float f) {
-        return arg.multiply(0.15f);
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public boolean hasGround() {
-        return false;
     }
 
     @Override
@@ -94,15 +56,9 @@ extends Dimension {
     }
 
     @Override
-    @Environment(value=EnvType.CLIENT)
-    public float getCloudHeight() {
-        return 8.0f;
-    }
-
-    @Override
     @Nullable
-    public BlockPos getSpawningBlockInChunk(ChunkPos arg, boolean bl) {
-        Random random = new Random(this.world.getSeed());
+    public BlockPos getSpawningBlockInChunk(long l, ChunkPos arg, boolean bl) {
+        Random random = new Random(l);
         BlockPos lv = new BlockPos(arg.getStartX() + random.nextInt(15), 0, arg.getEndZ() + random.nextInt(15));
         return this.world.getTopNonAirState(lv).getMaterial().blocksMovement() ? lv : null;
     }
@@ -114,14 +70,8 @@ extends Dimension {
 
     @Override
     @Nullable
-    public BlockPos getTopSpawningBlockPosition(int i, int j, boolean bl) {
-        return this.getSpawningBlockInChunk(new ChunkPos(i >> 4, j >> 4), bl);
-    }
-
-    @Override
-    @Environment(value=EnvType.CLIENT)
-    public boolean isFogThick(int i, int j) {
-        return false;
+    public BlockPos getTopSpawningBlockPosition(long l, int i, int j, boolean bl) {
+        return this.getSpawningBlockInChunk(l, new ChunkPos(i >> 4, j >> 4), bl);
     }
 
     @Override

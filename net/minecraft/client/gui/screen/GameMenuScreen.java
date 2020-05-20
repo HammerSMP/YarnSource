@@ -100,9 +100,9 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         if (this.showMenu) {
             this.renderBackground(arg);
-            this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
         } else {
-            this.drawStringWithShadow(arg, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
+            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
         }
         super.render(arg, i, j, f);
     }

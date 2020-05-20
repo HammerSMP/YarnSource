@@ -55,7 +55,7 @@ public class LookControl {
             this.entity.headYaw = this.changeAngle(this.entity.headYaw, this.entity.bodyYaw, 10.0f);
         }
         if (!this.entity.getNavigation().isIdle()) {
-            this.entity.headYaw = MathHelper.capRotation(this.entity.headYaw, this.entity.bodyYaw, this.entity.getBodyYawSpeed());
+            this.entity.headYaw = MathHelper.stepAngleTowards(this.entity.headYaw, this.entity.bodyYaw, this.entity.getBodyYawSpeed());
         }
     }
 
@@ -103,7 +103,7 @@ public class LookControl {
         if (arg instanceof LivingEntity) {
             return arg.getEyeY();
         }
-        return (arg.getBoundingBox().y1 + arg.getBoundingBox().y2) / 2.0;
+        return (arg.getBoundingBox().minY + arg.getBoundingBox().maxY) / 2.0;
     }
 }
 

@@ -56,8 +56,8 @@ import net.minecraft.text.TranslatableText;
 
 public class ScoreboardCommand {
     private static final SimpleCommandExceptionType OBJECTIVES_ADD_DUPLICATE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.objectives.add.duplicate"));
-    private static final SimpleCommandExceptionType OBJECTIVES_DISPLAY_ALREADYEMPTY_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.objectives.display.alreadyEmpty"));
-    private static final SimpleCommandExceptionType OBJECTIVES_DISPLAY_ALREADYSET_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.objectives.display.alreadySet"));
+    private static final SimpleCommandExceptionType OBJECTIVES_DISPLAY_ALREADY_EMPTY_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.objectives.display.alreadyEmpty"));
+    private static final SimpleCommandExceptionType OBJECTIVES_DISPLAY_ALREADY_SET_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.objectives.display.alreadySet"));
     private static final SimpleCommandExceptionType PLAYERS_ENABLE_FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.players.enable.failed"));
     private static final SimpleCommandExceptionType PLAYERS_ENABLE_INVALID_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.scoreboard.players.enable.invalid"));
     private static final Dynamic2CommandExceptionType PLAYERS_GET_NULL_EXCEPTION = new Dynamic2CommandExceptionType((object, object2) -> new TranslatableText("commands.scoreboard.players.get.null", object, object2));
@@ -241,7 +241,7 @@ public class ScoreboardCommand {
     private static int executeClearDisplay(ServerCommandSource arg, int i) throws CommandSyntaxException {
         ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
         if (lv.getObjectiveForSlot(i) == null) {
-            throw OBJECTIVES_DISPLAY_ALREADYEMPTY_EXCEPTION.create();
+            throw OBJECTIVES_DISPLAY_ALREADY_EMPTY_EXCEPTION.create();
         }
         ((Scoreboard)lv).setObjectiveSlot(i, null);
         arg.sendFeedback(new TranslatableText("commands.scoreboard.objectives.display.cleared", Scoreboard.getDisplaySlotNames()[i]), true);
@@ -251,7 +251,7 @@ public class ScoreboardCommand {
     private static int executeSetDisplay(ServerCommandSource arg, int i, ScoreboardObjective arg2) throws CommandSyntaxException {
         ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
         if (lv.getObjectiveForSlot(i) == arg2) {
-            throw OBJECTIVES_DISPLAY_ALREADYSET_EXCEPTION.create();
+            throw OBJECTIVES_DISPLAY_ALREADY_SET_EXCEPTION.create();
         }
         ((Scoreboard)lv).setObjectiveSlot(i, arg2);
         arg.sendFeedback(new TranslatableText("commands.scoreboard.objectives.display.set", Scoreboard.getDisplaySlotNames()[i], arg2.getDisplayName()), true);

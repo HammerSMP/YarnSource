@@ -52,7 +52,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class TeleportCommand {
-    private static final SimpleCommandExceptionType field_22255 = new SimpleCommandExceptionType((Message)new TranslatableText("commands.teleport.invalidPosition"));
+    private static final SimpleCommandExceptionType INVALID_POSITION_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.teleport.invalidPosition"));
 
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
         LiteralCommandNode literalCommandNode = commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("teleport").requires(arg -> arg.hasPermissionLevel(2))).then(((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.entities()).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("location", Vec3ArgumentType.vec3()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntities((CommandContext<ServerCommandSource>)commandContext, "targets"), ((ServerCommandSource)commandContext.getSource()).getWorld(), Vec3ArgumentType.getPosArgument((CommandContext<ServerCommandSource>)commandContext, "location"), null, null))).then(CommandManager.argument("rotation", RotationArgumentType.rotation()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntities((CommandContext<ServerCommandSource>)commandContext, "targets"), ((ServerCommandSource)commandContext.getSource()).getWorld(), Vec3ArgumentType.getPosArgument((CommandContext<ServerCommandSource>)commandContext, "location"), RotationArgumentType.getRotation((CommandContext<ServerCommandSource>)commandContext, "rotation"), null)))).then(((LiteralArgumentBuilder)CommandManager.literal("facing").then(CommandManager.literal("entity").then(((RequiredArgumentBuilder)CommandManager.argument("facingEntity", EntityArgumentType.entity()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntities((CommandContext<ServerCommandSource>)commandContext, "targets"), ((ServerCommandSource)commandContext.getSource()).getWorld(), Vec3ArgumentType.getPosArgument((CommandContext<ServerCommandSource>)commandContext, "location"), null, new LookTarget(EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "facingEntity"), EntityAnchorArgumentType.EntityAnchor.FEET)))).then(CommandManager.argument("facingAnchor", EntityAnchorArgumentType.entityAnchor()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntities((CommandContext<ServerCommandSource>)commandContext, "targets"), ((ServerCommandSource)commandContext.getSource()).getWorld(), Vec3ArgumentType.getPosArgument((CommandContext<ServerCommandSource>)commandContext, "location"), null, new LookTarget(EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "facingEntity"), EntityAnchorArgumentType.getEntityAnchor((CommandContext<ServerCommandSource>)commandContext, "facingAnchor")))))))).then(CommandManager.argument("facingLocation", Vec3ArgumentType.vec3()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntities((CommandContext<ServerCommandSource>)commandContext, "targets"), ((ServerCommandSource)commandContext.getSource()).getWorld(), Vec3ArgumentType.getPosArgument((CommandContext<ServerCommandSource>)commandContext, "location"), null, new LookTarget(Vec3ArgumentType.getVec3((CommandContext<ServerCommandSource>)commandContext, "facingLocation")))))))).then(CommandManager.argument("destination", EntityArgumentType.entity()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntities((CommandContext<ServerCommandSource>)commandContext, "targets"), EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "destination")))))).then(CommandManager.argument("location", Vec3ArgumentType.vec3()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), Collections.singleton(((ServerCommandSource)commandContext.getSource()).getEntityOrThrow()), ((ServerCommandSource)commandContext.getSource()).getWorld(), Vec3ArgumentType.getPosArgument((CommandContext<ServerCommandSource>)commandContext, "location"), DefaultPosArgument.zero(), null)))).then(CommandManager.argument("destination", EntityArgumentType.entity()).executes(commandContext -> TeleportCommand.execute((ServerCommandSource)commandContext.getSource(), Collections.singleton(((ServerCommandSource)commandContext.getSource()).getEntityOrThrow()), EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "destination")))));
@@ -113,7 +113,7 @@ public class TeleportCommand {
     private static void teleport(ServerCommandSource arg, Entity arg2, ServerWorld arg3, double d, double e, double f, Set<PlayerPositionLookS2CPacket.Flag> set, float g, float h, @Nullable LookTarget arg4) throws CommandSyntaxException {
         BlockPos lv = new BlockPos(d, e, f);
         if (!World.method_25953(lv)) {
-            throw field_22255.create();
+            throw INVALID_POSITION_EXCEPTION.create();
         }
         if (arg2 instanceof ServerPlayerEntity) {
             ChunkPos lv2 = new ChunkPos(new BlockPos(d, e, f));
@@ -137,7 +137,7 @@ public class TeleportCommand {
                 arg2.setHeadYaw(i);
             } else {
                 arg2.detach();
-                arg2.dimension = arg3.dimension.getType();
+                arg2.dimension = arg3.method_27983();
                 Entity lv3 = arg2;
                 arg2 = lv3.getType().create(arg3);
                 if (arg2 != null) {
@@ -162,25 +162,25 @@ public class TeleportCommand {
 
     static class LookTarget {
         private final Vec3d targetPos;
-        private final Entity targetEntity;
-        private final EntityAnchorArgumentType.EntityAnchor targetEntityAnchor;
+        private final Entity target;
+        private final EntityAnchorArgumentType.EntityAnchor targetAnchor;
 
         public LookTarget(Entity arg, EntityAnchorArgumentType.EntityAnchor arg2) {
-            this.targetEntity = arg;
-            this.targetEntityAnchor = arg2;
+            this.target = arg;
+            this.targetAnchor = arg2;
             this.targetPos = arg2.positionAt(arg);
         }
 
         public LookTarget(Vec3d arg) {
-            this.targetEntity = null;
+            this.target = null;
             this.targetPos = arg;
-            this.targetEntityAnchor = null;
+            this.targetAnchor = null;
         }
 
         public void look(ServerCommandSource arg, Entity arg2) {
-            if (this.targetEntity != null) {
+            if (this.target != null) {
                 if (arg2 instanceof ServerPlayerEntity) {
-                    ((ServerPlayerEntity)arg2).method_14222(arg.getEntityAnchor(), this.targetEntity, this.targetEntityAnchor);
+                    ((ServerPlayerEntity)arg2).method_14222(arg.getEntityAnchor(), this.target, this.targetAnchor);
                 } else {
                     arg2.lookAt(arg.getEntityAnchor(), this.targetPos);
                 }

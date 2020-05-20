@@ -75,7 +75,6 @@ import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
-import net.minecraft.world.level.LevelGeneratorType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -185,7 +184,7 @@ implements Chunk {
         int i = arg.getX();
         int j = arg.getY();
         int k = arg.getZ();
-        if (this.world.getGeneratorType() == LevelGeneratorType.DEBUG_ALL_BLOCK_STATES) {
+        if (this.world.method_27982()) {
             BlockState lv = null;
             if (j == 60) {
                 lv = Blocks.BARRIER.getDefaultState();
@@ -261,7 +260,7 @@ implements Chunk {
             this.world.getChunkManager().getLightingProvider().updateSectionStatus(arg, bl3);
         }
         if (!this.world.isClient) {
-            lv2.onBlockRemoved(this.world, arg, arg2, bl);
+            lv2.onStateReplaced(this.world, arg, arg2, bl);
         } else if (lv4 != lv3 && lv4 instanceof BlockEntityProvider) {
             this.world.removeBlockEntity(arg);
         }
@@ -437,8 +436,8 @@ implements Chunk {
     }
 
     public void getEntities(@Nullable Entity arg, Box arg2, List<Entity> list, @Nullable Predicate<? super Entity> predicate) {
-        int i = MathHelper.floor((arg2.y1 - 2.0) / 16.0);
-        int j = MathHelper.floor((arg2.y2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minY - 2.0) / 16.0);
+        int j = MathHelper.floor((arg2.maxY + 2.0) / 16.0);
         i = MathHelper.clamp(i, 0, this.entitySections.length - 1);
         j = MathHelper.clamp(j, 0, this.entitySections.length - 1);
         for (int k = i; k <= j; ++k) {
@@ -458,8 +457,8 @@ implements Chunk {
     }
 
     public <T extends Entity> void getEntities(@Nullable EntityType<?> arg, Box arg2, List<? super T> list, Predicate<? super T> predicate) {
-        int i = MathHelper.floor((arg2.y1 - 2.0) / 16.0);
-        int j = MathHelper.floor((arg2.y2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minY - 2.0) / 16.0);
+        int j = MathHelper.floor((arg2.maxY + 2.0) / 16.0);
         i = MathHelper.clamp(i, 0, this.entitySections.length - 1);
         j = MathHelper.clamp(j, 0, this.entitySections.length - 1);
         for (int k = i; k <= j; ++k) {
@@ -473,8 +472,8 @@ implements Chunk {
     }
 
     public <T extends Entity> void getEntities(Class<? extends T> arg, Box arg2, List<T> list, @Nullable Predicate<? super T> predicate) {
-        int i = MathHelper.floor((arg2.y1 - 2.0) / 16.0);
-        int j = MathHelper.floor((arg2.y2 + 2.0) / 16.0);
+        int i = MathHelper.floor((arg2.minY - 2.0) / 16.0);
+        int j = MathHelper.floor((arg2.maxY + 2.0) / 16.0);
         i = MathHelper.clamp(i, 0, this.entitySections.length - 1);
         j = MathHelper.clamp(j, 0, this.entitySections.length - 1);
         for (int k = i; k <= j; ++k) {

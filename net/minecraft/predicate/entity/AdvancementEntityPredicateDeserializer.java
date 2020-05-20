@@ -37,7 +37,7 @@ public class AdvancementEntityPredicateDeserializer {
         LootCondition[] lvs = (LootCondition[])this.gson.fromJson((JsonElement)jsonArray, LootCondition[].class);
         LootTableReporter lv = new LootTableReporter(arg2, this.conditionManager::get, arg -> null);
         for (LootCondition lv2 : lvs) {
-            lv2.check(lv);
+            lv2.validate(lv);
             lv.getMessages().forEach((string2, string3) -> LOGGER.warn("Found validation problem in advancement trigger {}/{}: {}", (Object)string, string2, string3));
         }
         return lvs;

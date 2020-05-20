@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.DynamicOps;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
@@ -452,7 +451,7 @@ extends Entity {
         return !this.isBaby();
     }
 
-    protected boolean method_27071() {
+    protected boolean shouldDropLoot() {
         return !this.isBaby();
     }
 
@@ -1088,7 +1087,7 @@ extends Entity {
             j = 0;
         }
         boolean bl2 = bl = this.playerHitTimer > 0;
-        if (this.method_27071() && this.world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) {
+        if (this.shouldDropLoot() && this.world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) {
             this.dropLoot(arg, bl);
             this.dropEquipment(arg, j, bl);
         }
@@ -1120,13 +1119,13 @@ extends Entity {
         Identifier lv = this.getLootTable();
         LootTable lv2 = this.world.getServer().getLootManager().getTable(lv);
         LootContext.Builder lv3 = this.getLootContextBuilder(bl, arg);
-        lv2.dropLimited(lv3.build(LootContextTypes.ENTITY), this::dropStack);
+        lv2.generateLoot(lv3.build(LootContextTypes.ENTITY), this::dropStack);
     }
 
     protected LootContext.Builder getLootContextBuilder(boolean bl, DamageSource arg) {
-        LootContext.Builder lv = new LootContext.Builder((ServerWorld)this.world).setRandom(this.random).put(LootContextParameters.THIS_ENTITY, this).put(LootContextParameters.POSITION, this.getBlockPos()).put(LootContextParameters.DAMAGE_SOURCE, arg).putNullable(LootContextParameters.KILLER_ENTITY, arg.getAttacker()).putNullable(LootContextParameters.DIRECT_KILLER_ENTITY, arg.getSource());
+        LootContext.Builder lv = new LootContext.Builder((ServerWorld)this.world).random(this.random).parameter(LootContextParameters.THIS_ENTITY, this).parameter(LootContextParameters.POSITION, this.getBlockPos()).parameter(LootContextParameters.DAMAGE_SOURCE, arg).optionalParameter(LootContextParameters.KILLER_ENTITY, arg.getAttacker()).optionalParameter(LootContextParameters.DIRECT_KILLER_ENTITY, arg.getSource());
         if (bl && this.attackingPlayer != null) {
-            lv = lv.put(LootContextParameters.LAST_DAMAGE_PLAYER, this.attackingPlayer).setLuck(this.attackingPlayer.getLuck());
+            lv = lv.parameter(LootContextParameters.LAST_DAMAGE_PLAYER, this.attackingPlayer).luck(this.attackingPlayer.getLuck());
         }
         return lv;
     }
@@ -1629,7 +1628,7 @@ extends Entity {
         } else {
             lv2 = arg.method_24829(this);
         }
-        this.updatePosition(lv2.x, lv2.y, lv2.z);
+        this.requestTeleport(lv2.x, lv2.y, lv2.z);
     }
 
     @Override
@@ -2092,7 +2091,7 @@ extends Entity {
 
     private void initAi() {
         boolean bl = this.getFlag(7);
-        if (bl && !this.onGround && !this.hasVehicle()) {
+        if (bl && !this.onGround && !this.hasVehicle() && !this.hasStatusEffect(StatusEffects.LEVITATION)) {
             ItemStack lv = this.getEquippedStack(EquipmentSlot.CHEST);
             if (lv.getItem() == Items.ELYTRA && ElytraItem.isUsable(lv)) {
                 bl = true;
@@ -2549,10 +2548,6 @@ extends Entity {
 
     public ImmutableList<EntityPose> getPoses() {
         return ImmutableList.of((Object)((Object)EntityPose.STANDING));
-    }
-
-    public EntityPose method_26081() {
-        return this.getPoses().stream().min(Comparator.comparing(arg -> Float.valueOf(this.getDimensions((EntityPose)arg).height))).orElse(EntityPose.STANDING);
     }
 
     public Box method_24833(EntityPose arg) {

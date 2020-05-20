@@ -26,6 +26,7 @@ import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.ColorResolver;
 
 public interface WorldView
@@ -71,6 +72,8 @@ BiomeAccess.Storage {
     public int getSeaLevel();
 
     public Dimension getDimension();
+
+    public DimensionType method_27983();
 
     default public BlockPos getTopPosition(Heightmap.Type arg, BlockPos arg2) {
         return new BlockPos(arg2.getX(), this.getTopY(arg, arg2.getX(), arg2.getZ()), arg2.getZ());
@@ -131,12 +134,12 @@ BiomeAccess.Storage {
     }
 
     default public boolean containsFluid(Box arg) {
-        int i = MathHelper.floor(arg.x1);
-        int j = MathHelper.ceil(arg.x2);
-        int k = MathHelper.floor(arg.y1);
-        int l = MathHelper.ceil(arg.y2);
-        int m = MathHelper.floor(arg.z1);
-        int n = MathHelper.ceil(arg.z2);
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.ceil(arg.maxX);
+        int k = MathHelper.floor(arg.minY);
+        int l = MathHelper.ceil(arg.maxY);
+        int m = MathHelper.floor(arg.minZ);
+        int n = MathHelper.ceil(arg.maxZ);
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int o = i; o < j; ++o) {
             for (int p = k; p < l; ++p) {

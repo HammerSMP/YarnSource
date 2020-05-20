@@ -23,8 +23,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class FenceGateBlock
 extends HorizontalFacingBlock {
@@ -56,7 +56,7 @@ extends HorizontalFacingBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         Direction.Axis lv = arg2.getAxis();
         if (arg.get(FACING).rotateYClockwise().getAxis() == lv) {
             boolean bl = this.isWall(arg3) || this.isWall(arg4.getBlockState(arg5.offset(arg2.getOpposite())));

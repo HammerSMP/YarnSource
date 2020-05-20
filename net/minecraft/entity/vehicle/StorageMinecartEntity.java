@@ -7,6 +7,7 @@
 package net.minecraft.entity.vehicle;
 
 import javax.annotation.Nullable;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -23,6 +24,7 @@ import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -179,10 +181,13 @@ NamedScreenHandlerFactory {
     public void generateLoot(@Nullable PlayerEntity arg) {
         if (this.lootTableId != null && this.world.getServer() != null) {
             LootTable lv = this.world.getServer().getLootManager().getTable(this.lootTableId);
+            if (arg instanceof ServerPlayerEntity) {
+                Criteria.PLAYER_GENERATES_CONTAINER_LOOT.test((ServerPlayerEntity)arg, this.lootTableId);
+            }
             this.lootTableId = null;
-            LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).put(LootContextParameters.POSITION, this.getBlockPos()).setRandom(this.lootSeed);
+            LootContext.Builder lv2 = new LootContext.Builder((ServerWorld)this.world).parameter(LootContextParameters.POSITION, this.getBlockPos()).random(this.lootSeed);
             if (arg != null) {
-                lv2.setLuck(arg.getLuck()).put(LootContextParameters.THIS_ENTITY, arg);
+                lv2.luck(arg.getLuck()).parameter(LootContextParameters.THIS_ENTITY, arg);
             }
             lv.supplyInventory(this, lv2.build(LootContextTypes.CHEST));
         }

@@ -54,7 +54,7 @@ extends BlockWithEntity {
     }
 
     public static void updateState(BlockState arg, World arg2, BlockPos arg3) {
-        if (!arg2.dimension.hasSkyLight()) {
+        if (!arg2.method_27983().hasSkyLight()) {
             return;
         }
         int i = arg2.getLightLevel(LightType.SKY, arg3) - arg2.getAmbientDarkness();

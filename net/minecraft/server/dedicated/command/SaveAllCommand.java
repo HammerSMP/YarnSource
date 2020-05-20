@@ -21,7 +21,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
 
 public class SaveAllCommand {
-    private static final SimpleCommandExceptionType SAVE_FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.save.failed"));
+    private static final SimpleCommandExceptionType FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.save.failed"));
 
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
         commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("save-all").requires(arg -> arg.hasPermissionLevel(4))).executes(commandContext -> SaveAllCommand.saveAll((ServerCommandSource)commandContext.getSource(), false))).then(CommandManager.literal("flush").executes(commandContext -> SaveAllCommand.saveAll((ServerCommandSource)commandContext.getSource(), true))));
@@ -33,7 +33,7 @@ public class SaveAllCommand {
         minecraftServer.getPlayerManager().saveAllPlayerData();
         boolean bl2 = minecraftServer.save(true, bl, true);
         if (!bl2) {
-            throw SAVE_FAILED_EXCEPTION.create();
+            throw FAILED_EXCEPTION.create();
         }
         arg.sendFeedback(new TranslatableText("commands.save.success"), true);
         return 1;

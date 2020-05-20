@@ -18,7 +18,6 @@ import net.minecraft.structure.StructureStart;
 import net.minecraft.structure.SwampHutGenerator;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -66,8 +65,8 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
         return CREATURE_SPAWNS;
     }
 
-    public boolean method_14029(IWorld arg, StructureAccessor arg2, BlockPos arg3) {
-        StructureStart lv = this.isInsideStructure(arg, arg2, arg3, true);
+    public boolean method_14029(StructureAccessor arg, BlockPos arg2) {
+        StructureStart lv = this.isInsideStructure(arg, arg2, true);
         if (!lv.hasChildren() || !(lv instanceof Start)) {
             return false;
         }
@@ -82,7 +81,7 @@ extends AbstractTempleFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator<?> arg, StructureManager arg2, int i, int j, Biome arg3) {
+        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3) {
             SwampHutGenerator lv = new SwampHutGenerator(this.random, i * 16, j * 16);
             this.children.add(lv);
             this.setBoundingBoxFromChildren();

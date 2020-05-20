@@ -15,7 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -31,8 +31,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class BatEntity
 extends AmbientEntity {
@@ -209,7 +209,7 @@ extends AmbientEntity {
         arg.putByte("BatFlags", this.dataTracker.get(BAT_FLAGS));
     }
 
-    public static boolean canSpawn(EntityType<BatEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<BatEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         if (arg4.getY() >= arg2.getSeaLevel()) {
             return false;
         }

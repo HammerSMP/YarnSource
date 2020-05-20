@@ -64,7 +64,7 @@ implements SoundInstanceListener {
                 iterator.remove();
                 continue;
             }
-            j = Math.max(j, this.client.textRenderer.getStringWidth(lv5.getText()));
+            j = Math.max(j, this.client.textRenderer.getWidth(lv5.getText()));
         }
         j += this.client.textRenderer.getWidth("<") + this.client.textRenderer.getWidth(" ") + this.client.textRenderer.getWidth(">") + this.client.textRenderer.getWidth(" ");
         for (SubtitleEntry lv6 : this.entries) {
@@ -79,7 +79,7 @@ implements SoundInstanceListener {
             int m = 9;
             int n = m / 2;
             float f = 1.0f;
-            int o = this.client.textRenderer.getStringWidth(lv7);
+            int o = this.client.textRenderer.getWidth(lv7);
             int p = MathHelper.floor(MathHelper.clampedLerp(255.0, 75.0, (float)(Util.getMeasuringTimeMs() - lv6.getTime()) / 3000.0f));
             int q = p << 16 | p << 8 | p;
             RenderSystem.pushMatrix();

@@ -30,8 +30,8 @@ extends FallibleItemDispenserBehavior {
         World lv = arg.getWorld();
         if (!lv.isClient()) {
             BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
-            boolean bl = this.success = ShearsDispenserBehavior.tryShearBlock((ServerWorld)lv, lv2) || ShearsDispenserBehavior.tryShearEntity((ServerWorld)lv, lv2);
-            if (this.success && arg2.damage(1, lv.getRandom(), null)) {
+            this.setSuccess(ShearsDispenserBehavior.tryShearBlock((ServerWorld)lv, lv2) || ShearsDispenserBehavior.tryShearEntity((ServerWorld)lv, lv2));
+            if (this.isSuccess() && arg2.damage(1, lv.getRandom(), null)) {
                 arg2.setCount(0);
             }
         }

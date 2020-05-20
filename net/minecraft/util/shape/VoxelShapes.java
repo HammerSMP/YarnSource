@@ -69,11 +69,11 @@ public final class VoxelShapes {
     }
 
     public static VoxelShape cuboid(Box arg) {
-        int i = VoxelShapes.findRequiredBitResolution(arg.x1, arg.x2);
-        int j = VoxelShapes.findRequiredBitResolution(arg.y1, arg.y2);
-        int k = VoxelShapes.findRequiredBitResolution(arg.z1, arg.z2);
+        int i = VoxelShapes.findRequiredBitResolution(arg.minX, arg.maxX);
+        int j = VoxelShapes.findRequiredBitResolution(arg.minY, arg.maxY);
+        int k = VoxelShapes.findRequiredBitResolution(arg.minZ, arg.maxZ);
         if (i < 0 || j < 0 || k < 0) {
-            return new ArrayVoxelShape(VoxelShapes.FULL_CUBE.voxels, new double[]{arg.x1, arg.x2}, new double[]{arg.y1, arg.y2}, new double[]{arg.z1, arg.z2});
+            return new ArrayVoxelShape(VoxelShapes.FULL_CUBE.voxels, new double[]{arg.minX, arg.maxX}, new double[]{arg.minY, arg.maxY}, new double[]{arg.minZ, arg.maxZ});
         }
         if (i == 0 && j == 0 && k == 0) {
             return arg.contains(0.5, 0.5, 0.5) ? VoxelShapes.fullCube() : VoxelShapes.empty();
@@ -81,12 +81,12 @@ public final class VoxelShapes {
         int l = 1 << i;
         int m = 1 << j;
         int n = 1 << k;
-        int o = (int)Math.round(arg.x1 * (double)l);
-        int p = (int)Math.round(arg.x2 * (double)l);
-        int q = (int)Math.round(arg.y1 * (double)m);
-        int r = (int)Math.round(arg.y2 * (double)m);
-        int s = (int)Math.round(arg.z1 * (double)n);
-        int t = (int)Math.round(arg.z2 * (double)n);
+        int o = (int)Math.round(arg.minX * (double)l);
+        int p = (int)Math.round(arg.maxX * (double)l);
+        int q = (int)Math.round(arg.minY * (double)m);
+        int r = (int)Math.round(arg.maxY * (double)m);
+        int s = (int)Math.round(arg.minZ * (double)n);
+        int t = (int)Math.round(arg.maxZ * (double)n);
         BitSetVoxelSet lv = new BitSetVoxelSet(l, m, n, o, q, s, p, r, t);
         for (long u = (long)o; u < (long)p; ++u) {
             for (long v = (long)q; v < (long)r; ++v) {

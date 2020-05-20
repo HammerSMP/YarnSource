@@ -19,6 +19,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -28,7 +29,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.control.BodyControl;
 import net.minecraft.entity.ai.control.JumpControl;
 import net.minecraft.entity.ai.control.LookControl;
@@ -70,6 +71,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.packet.s2c.play.EntityAttachS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.DebugInfoSender;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.Tag;
@@ -81,9 +83,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class MobEntity
@@ -210,7 +212,7 @@ extends LivingEntity {
         return arg != EntityType.GHAST;
     }
 
-    public boolean method_25938(RangedWeaponItem arg) {
+    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
         return false;
     }
 
@@ -302,12 +304,12 @@ extends LivingEntity {
         if (!this.world.isClient) {
             this.updateLeash();
             if (this.age % 5 == 0) {
-                this.method_20417();
+                this.updateGoalControls();
             }
         }
     }
 
-    protected void method_20417() {
+    protected void updateGoalControls() {
         boolean bl = !(this.getPrimaryPassenger() instanceof MobEntity);
         boolean bl2 = !(this.getVehicle() instanceof BoatEntity);
         this.goalSelector.setControlEnabled(Goal.Control.MOVE, bl);
@@ -436,7 +438,7 @@ extends LivingEntity {
 
     @Override
     protected LootContext.Builder getLootContextBuilder(boolean bl, DamageSource arg) {
-        return super.getLootContextBuilder(bl, arg).setRandom(this.lootTableSeed, this.random);
+        return super.getLootContextBuilder(bl, arg).random(this.lootTableSeed, this.random);
     }
 
     @Override
@@ -483,15 +485,24 @@ extends LivingEntity {
     protected void loot(ItemEntity arg) {
         ItemStack lv = arg.getStack();
         if (this.tryEquip(lv)) {
+            this.method_27964(arg);
             this.sendPickup(arg, lv.getCount());
             arg.remove();
+        }
+    }
+
+    protected void method_27964(ItemEntity arg) {
+        PlayerEntity lv;
+        PlayerEntity playerEntity = lv = arg.getThrower() != null ? this.world.getPlayerByUuid(arg.getThrower()) : null;
+        if (lv instanceof ServerPlayerEntity) {
+            Criteria.THROWN_ITEM_PICKED_UP_BY_ENTITY.test((ServerPlayerEntity)lv, arg.getStack(), this);
         }
     }
 
     public boolean tryEquip(ItemStack arg) {
         EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
         ItemStack lv2 = this.getEquippedStack(lv);
-        boolean bl = this.isBetterItemFor(arg, lv2);
+        boolean bl = this.prefersNewEquipment(arg, lv2);
         if (bl && this.canPickupItem(arg)) {
             double d = this.getDropChance(lv);
             if (!lv2.isEmpty() && (double)Math.max(this.random.nextFloat() - 0.1f, 0.0f) < d) {
@@ -506,11 +517,11 @@ extends LivingEntity {
 
     protected void equipLootStack(EquipmentSlot arg, ItemStack arg2) {
         this.equipStack(arg, arg2);
-        this.method_25939(arg);
+        this.updateDropChances(arg);
         this.persistent = true;
     }
 
-    public void method_25939(EquipmentSlot arg) {
+    public void updateDropChances(EquipmentSlot arg) {
         switch (arg.getType()) {
             case HAND: {
                 this.handDropChances[arg.getEntitySlotId()] = 2.0f;
@@ -522,7 +533,7 @@ extends LivingEntity {
         }
     }
 
-    protected boolean isBetterItemFor(ItemStack arg, ItemStack arg2) {
+    protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
         if (arg2.isEmpty()) {
             return true;
         }
@@ -535,10 +546,10 @@ extends LivingEntity {
             if (lv.getAttackDamage() != lv2.getAttackDamage()) {
                 return lv.getAttackDamage() > lv2.getAttackDamage();
             }
-            return this.method_26320(arg, arg2);
+            return this.prefersNewDamageableItem(arg, arg2);
         }
         if (arg.getItem() instanceof BowItem && arg2.getItem() instanceof BowItem) {
-            return this.method_26320(arg, arg2);
+            return this.prefersNewDamageableItem(arg, arg2);
         }
         if (arg.getItem() instanceof ArmorItem) {
             if (EnchantmentHelper.hasBindingCurse(arg2)) {
@@ -555,7 +566,7 @@ extends LivingEntity {
             if (lv3.method_26353() != lv4.method_26353()) {
                 return lv3.method_26353() > lv4.method_26353();
             }
-            return this.method_26320(arg, arg2);
+            return this.prefersNewDamageableItem(arg, arg2);
         }
         if (arg.getItem() instanceof MiningToolItem) {
             if (arg2.getItem() instanceof BlockItem) {
@@ -564,16 +575,16 @@ extends LivingEntity {
             if (arg2.getItem() instanceof MiningToolItem) {
                 MiningToolItem lv5 = (MiningToolItem)arg.getItem();
                 MiningToolItem lv6 = (MiningToolItem)arg2.getItem();
-                if (lv5.method_26366() != lv6.method_26366()) {
-                    return lv5.method_26366() > lv6.method_26366();
+                if (lv5.getAttackDamage() != lv6.getAttackDamage()) {
+                    return lv5.getAttackDamage() > lv6.getAttackDamage();
                 }
-                return this.method_26320(arg, arg2);
+                return this.prefersNewDamageableItem(arg, arg2);
             }
         }
         return false;
     }
 
-    public boolean method_26320(ItemStack arg, ItemStack arg2) {
+    public boolean prefersNewDamageableItem(ItemStack arg, ItemStack arg2) {
         if (arg.getDamage() < arg2.getDamage() || arg.hasTag() && !arg2.hasTag()) {
             return true;
         }
@@ -618,10 +629,10 @@ extends LivingEntity {
             int i;
             int j;
             double d = lv.squaredDistanceTo(this);
-            if (d > (double)(j = (i = this.getType().getImmediateDespawnRange()) * i) && this.canImmediatelyDespawn(d)) {
+            if (d > (double)(j = (i = this.getType().getSpawnGroup().getImmediateDespawnRange()) * i) && this.canImmediatelyDespawn(d)) {
                 this.remove();
             }
-            int k = this.getType().getDespawnStartRange();
+            int k = this.getType().getSpawnGroup().getDespawnStartRange();
             int l = k * k;
             if (this.despawnCounter > 600 && this.random.nextInt(800) == 0 && d > (double)l && this.canImmediatelyDespawn(d)) {
                 this.remove();
@@ -688,7 +699,7 @@ extends LivingEntity {
             LivingEntity lv = (LivingEntity)arg;
             double h = lv.getEyeY() - this.getEyeY();
         } else {
-            i = (arg.getBoundingBox().y1 + arg.getBoundingBox().y2) / 2.0 - this.getEyeY();
+            i = (arg.getBoundingBox().minY + arg.getBoundingBox().maxY) / 2.0 - this.getEyeY();
         }
         double j = MathHelper.sqrt(d * d + e * e);
         float k = (float)(MathHelper.atan2(e, d) * 57.2957763671875) - 90.0f;
@@ -708,12 +719,12 @@ extends LivingEntity {
         return f + i;
     }
 
-    public static boolean canMobSpawn(EntityType<? extends MobEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
+    public static boolean canMobSpawn(EntityType<? extends MobEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         BlockPos lv = arg4.down();
-        return arg3 == SpawnType.SPAWNER || arg2.getBlockState(lv).allowsSpawning(arg2, lv, arg);
+        return arg3 == SpawnReason.SPAWNER || arg2.getBlockState(lv).allowsSpawning(arg2, lv, arg);
     }
 
-    public boolean canSpawn(IWorld arg, SpawnType arg2) {
+    public boolean canSpawn(WorldAccess arg, SpawnReason arg2) {
         return true;
     }
 
@@ -942,7 +953,7 @@ extends LivingEntity {
     }
 
     @Nullable
-    public EntityData initialize(IWorld arg, LocalDifficulty arg2, SpawnType arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).addPersistentModifier(new EntityAttributeModifier("Random spawn bonus", this.random.nextGaussian() * 0.05, EntityAttributeModifier.Operation.MULTIPLY_BASE));
         if (this.random.nextFloat() < 0.05f) {
             this.setLeftHanded(true);
@@ -1258,7 +1269,7 @@ extends LivingEntity {
             }
             if (arg instanceof PlayerEntity) {
                 PlayerEntity lv;
-                this.method_24521(lv, this.getMainHandStack(), (lv = (PlayerEntity)arg).isUsingItem() ? lv.getActiveItem() : ItemStack.EMPTY);
+                this.disablePlayerShield(lv, this.getMainHandStack(), (lv = (PlayerEntity)arg).isUsingItem() ? lv.getActiveItem() : ItemStack.EMPTY);
             }
             this.dealDamage(this, arg);
             this.onAttacking(arg);
@@ -1266,7 +1277,7 @@ extends LivingEntity {
         return bl;
     }
 
-    private void method_24521(PlayerEntity arg, ItemStack arg2, ItemStack arg3) {
+    private void disablePlayerShield(PlayerEntity arg, ItemStack arg2, ItemStack arg3) {
         if (!arg2.isEmpty() && !arg3.isEmpty() && arg2.getItem() instanceof AxeItem && arg3.getItem() == Items.SHIELD) {
             float f = 0.25f + (float)EnchantmentHelper.getEfficiency(this) * 0.05f;
             if (this.random.nextFloat() < f) {

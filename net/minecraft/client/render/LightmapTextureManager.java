@@ -120,7 +120,7 @@ implements AutoCloseable {
                 float t = r * ((r * 0.6f + 0.4f) * 0.6f + 0.4f);
                 float u = r * (r * r * 0.6f + 0.4f);
                 lv3.set(s, t, u);
-                if (lv.dimension.getType() == DimensionType.THE_END) {
+                if (lv.method_27983() == DimensionType.THE_END) {
                     lv3.lerp(new Vector3f(0.99f, 1.12f, 1.0f), 0.25f);
                 } else {
                     Vector3f lv4 = lv2.copy();
@@ -165,7 +165,7 @@ implements AutoCloseable {
     }
 
     private float getBrightness(World arg, int i) {
-        return arg.dimension.getBrightness(i);
+        return arg.getDimension().getBrightness(i);
     }
 
     public static int pack(int i, int j) {

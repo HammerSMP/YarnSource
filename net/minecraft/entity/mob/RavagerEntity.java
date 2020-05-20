@@ -84,7 +84,7 @@ extends RaiderEntity {
     }
 
     @Override
-    protected void method_20417() {
+    protected void updateGoalControls() {
         boolean bl = !(this.getPrimaryPassenger() instanceof MobEntity) || this.getPrimaryPassenger().getType().isIn(EntityTypeTags.RAIDERS);
         boolean bl2 = !(this.getVehicle() instanceof BoatEntity);
         this.goalSelector.setControlEnabled(Goal.Control.MOVE, bl);
@@ -163,7 +163,7 @@ extends RaiderEntity {
         if (this.horizontalCollision && this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
             boolean bl = false;
             Box lv = this.getBoundingBox().expand(0.2);
-            for (BlockPos lv2 : BlockPos.iterate(MathHelper.floor(lv.x1), MathHelper.floor(lv.y1), MathHelper.floor(lv.z1), MathHelper.floor(lv.x2), MathHelper.floor(lv.y2), MathHelper.floor(lv.z2))) {
+            for (BlockPos lv2 : BlockPos.iterate(MathHelper.floor(lv.minX), MathHelper.floor(lv.minY), MathHelper.floor(lv.minZ), MathHelper.floor(lv.maxX), MathHelper.floor(lv.maxY), MathHelper.floor(lv.maxZ))) {
                 BlockState lv3 = this.world.getBlockState(lv2);
                 Block lv4 = lv3.getBlock();
                 if (!(lv4 instanceof LeavesBlock)) continue;

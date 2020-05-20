@@ -135,6 +135,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -196,7 +197,7 @@ implements ScreenHandlerListener {
 
     private void moveToSpawn(ServerWorld arg) {
         BlockPos lv = arg.method_27911();
-        if (arg.dimension.hasSkyLight() && arg.getServer().method_27728().getGameMode() != GameMode.ADVENTURE) {
+        if (arg.method_27983().hasSkyLight() && arg.getServer().method_27728().getGameMode() != GameMode.ADVENTURE) {
             long l;
             long m;
             int i = Math.max(0, this.server.getSpawnRadius(arg));
@@ -214,7 +215,7 @@ implements ScreenHandlerListener {
                 int q = (o + n * p) % k;
                 int r = q % (i * 2 + 1);
                 int s = q / (i * 2 + 1);
-                BlockPos lv2 = arg.getDimension().getTopSpawningBlockPosition(lv.getX() + r - i, lv.getZ() + s - i, false);
+                BlockPos lv2 = arg.getDimension().getTopSpawningBlockPosition(arg.getSeed(), lv.getX() + r - i, lv.getZ() + s - i, false);
                 if (lv2 == null) continue;
                 this.refreshPositionAndAngles(lv2, 0.0f, 0.0f);
                 if (!arg.doesNotCollide(this)) {
@@ -579,7 +580,7 @@ implements ScreenHandlerListener {
         this.dimension = arg;
         ServerWorld lv3 = this.server.getWorld(arg);
         class_5217 lv4 = lv3.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg, class_5217.method_27418(lv4.getSeed()), lv4.getGeneratorType(), this.interactionManager.getGameMode(), true));
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg, BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.method_27982(), lv3.method_28125(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
         PlayerManager lv5 = this.server.getPlayerManager();
         lv5.sendCommandTree(this);
@@ -661,8 +662,8 @@ implements ScreenHandlerListener {
     }
 
     private void dimensionChanged(ServerWorld arg) {
-        DimensionType lv = arg.dimension.getType();
-        DimensionType lv2 = this.world.dimension.getType();
+        DimensionType lv = arg.method_27983();
+        DimensionType lv2 = this.world.method_27983();
         Criteria.CHANGED_DIMENSION.trigger(this, lv, lv2);
         if (lv == DimensionType.THE_NETHER && lv2 == DimensionType.OVERWORLD && this.enteredNetherPos != null) {
             Criteria.NETHER_TRAVEL.trigger(this, this.enteredNetherPos);
@@ -702,7 +703,7 @@ implements ScreenHandlerListener {
         if (this.isSleeping() || !this.isAlive()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OTHER_PROBLEM));
         }
-        if (!this.world.dimension.hasVisibleSky()) {
+        if (!this.world.getDimension().hasVisibleSky()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_HERE));
         }
         if (!this.isBedTooFarAway(arg2, lv)) {
@@ -711,14 +712,14 @@ implements ScreenHandlerListener {
         if (this.isBedObstructed(arg2, lv)) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OBSTRUCTED));
         }
-        this.setSpawnPoint(this.world.getDimension().getType(), arg2, false, true);
+        this.setSpawnPoint(this.world.method_27983(), arg2, false, true);
         if (this.world.isDay()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_NOW));
         }
         if (!this.isCreative()) {
             double d = 8.0;
             double e = 5.0;
-            Vec3d lv2 = Vec3d.method_24955(arg2);
+            Vec3d lv2 = Vec3d.ofBottomCenter(arg2);
             List<HostileEntity> list = this.world.getEntities(HostileEntity.class, new Box(lv2.getX() - 8.0, lv2.getY() - 5.0, lv2.getZ() - 8.0, lv2.getX() + 8.0, lv2.getY() + 5.0, lv2.getZ() + 8.0), arg -> arg.isAngryAt(this));
             if (!list.isEmpty()) {
                 return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_SAFE));
@@ -743,7 +744,7 @@ implements ScreenHandlerListener {
     }
 
     private boolean isBedTooFarAway(BlockPos arg) {
-        Vec3d lv = Vec3d.method_24955(arg);
+        Vec3d lv = Vec3d.ofBottomCenter(arg);
         return Math.abs(this.getX() - lv.getX()) <= 3.0 && Math.abs(this.getY() - lv.getY()) <= 2.0 && Math.abs(this.getZ() - lv.getZ()) <= 3.0;
     }
 
@@ -911,7 +912,7 @@ implements ScreenHandlerListener {
         this.closeCurrentScreen();
     }
 
-    public void method_14241() {
+    public void updateCursorStack() {
         if (this.field_13991) {
             return;
         }
@@ -1274,9 +1275,9 @@ implements ScreenHandlerListener {
             this.networkHandler.requestTeleport(d, e, f, g, h);
         } else {
             ServerWorld lv = this.getServerWorld();
-            this.dimension = arg.dimension.getType();
+            this.dimension = arg.method_27983();
             class_5217 lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(this.dimension, class_5217.method_27418(lv2.getSeed()), lv2.getGeneratorType(), this.interactionManager.getGameMode(), true));
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(this.dimension, BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.method_27982(), arg.method_28125(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);

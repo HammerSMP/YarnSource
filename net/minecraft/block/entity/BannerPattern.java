@@ -65,7 +65,7 @@ public enum BannerPattern {
     MOJANG("mojang", "moj", true),
     PIGLIN("piglin", "pig", true);
 
-    private static final BannerPattern[] field_24418;
+    private static final BannerPattern[] VALUES;
     public static final int COUNT;
     public static final int field_24417;
     public static final int LOOM_APPLICABLE_COUNT;
@@ -109,9 +109,9 @@ public enum BannerPattern {
     }
 
     static {
-        field_24418 = BannerPattern.values();
-        COUNT = field_24418.length;
-        field_24417 = (int)Arrays.stream(field_24418).filter(arg -> arg.field_24419).count();
+        VALUES = BannerPattern.values();
+        COUNT = VALUES.length;
+        field_24417 = (int)Arrays.stream(VALUES).filter(arg -> arg.field_24419).count();
         LOOM_APPLICABLE_COUNT = COUNT - field_24417 - 1;
     }
 

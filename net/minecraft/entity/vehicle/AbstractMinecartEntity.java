@@ -2,7 +2,10 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Maps
+ *  com.google.common.collect.UnmodifiableIterator
  *  com.mojang.datafixers.util.Pair
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
@@ -10,7 +13,10 @@
  */
 package net.minecraft.entity.vehicle;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.UnmodifiableIterator;
 import com.mojang.datafixers.util.Pair;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +28,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
+import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.enums.RailShape;
+import net.minecraft.class_5275;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -65,6 +76,7 @@ extends Entity {
     private static final TrackedData<Integer> CUSTOM_BLOCK_ID = DataTracker.registerData(AbstractMinecartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> CUSTOM_BLOCK_OFFSET = DataTracker.registerData(AbstractMinecartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Boolean> CUSTOM_BLOCK_PRESENT = DataTracker.registerData(AbstractMinecartEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final ImmutableMap<EntityPose, ImmutableList<Integer>> field_24464 = ImmutableMap.of((Object)((Object)EntityPose.STANDING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.CROUCHING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.SWIMMING), (Object)ImmutableList.of((Object)0, (Object)1));
     private boolean field_7660;
     private static final Map<RailShape, Pair<Vec3i, Vec3i>> field_7664 = Util.make(Maps.newEnumMap(RailShape.class), enumMap -> {
         Vec3i lv = Direction.WEST.getVector();
@@ -167,6 +179,50 @@ extends Entity {
     @Override
     public double getMountedHeightOffset() {
         return 0.0;
+    }
+
+    @Override
+    public Vec3d method_24829(LivingEntity arg2) {
+        Direction lv = this.getMovementDirection();
+        if (lv.getAxis() == Direction.Axis.Y) {
+            return super.method_24829(arg2);
+        }
+        int[][] is = class_5275.method_27934(lv);
+        BlockPos lv2 = this.getBlockPos();
+        BlockPos.Mutable lv3 = new BlockPos.Mutable();
+        ImmutableList<EntityPose> immutableList = arg2.getPoses();
+        for (EntityPose lv4 : immutableList) {
+            EntityDimensions lv5 = arg2.getDimensions(lv4);
+            float f = Math.min(lv5.width, 1.0f) / 2.0f;
+            UnmodifiableIterator unmodifiableIterator = ((ImmutableList)field_24464.get((Object)lv4)).iterator();
+            while (unmodifiableIterator.hasNext()) {
+                int i = (Integer)unmodifiableIterator.next();
+                for (int[] js : is) {
+                    Vec3d lv7;
+                    Box lv6;
+                    lv3.set(lv2.getX() + js[0], lv2.getY() + i, lv2.getZ() + js[1]);
+                    double d = this.world.method_26097(lv3, arg -> {
+                        if (arg.isIn(BlockTags.CLIMBABLE)) {
+                            return true;
+                        }
+                        return arg.getBlock() instanceof TrapdoorBlock && arg.get(TrapdoorBlock.OPEN) != false;
+                    });
+                    if (!class_5275.method_27932(d) || !class_5275.method_27933(this.world, arg2, (lv6 = new Box(-f, d, -f, f, d + (double)lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
+                    arg2.setPose(lv4);
+                    return lv7;
+                }
+            }
+        }
+        double e = this.getBoundingBox().maxY;
+        lv3.set((double)lv2.getX(), e, (double)lv2.getZ());
+        for (EntityPose lv8 : immutableList) {
+            double g = arg2.getDimensions((EntityPose)lv8).height;
+            double h = (double)lv3.getY() + this.world.method_26096(lv3, e - (double)lv3.getY() + g);
+            if (!(e + g <= h)) continue;
+            arg2.setPose(lv8);
+            break;
+        }
+        return super.method_24829(arg2);
     }
 
     @Override

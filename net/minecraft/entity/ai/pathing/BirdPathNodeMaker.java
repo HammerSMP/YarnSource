@@ -57,10 +57,10 @@ extends LandPathNodeMaker {
         }
         if (this.entity.getPathfindingPenalty(lv4 = this.getNodeType(this.entity, (lv3 = this.entity.getBlockPos()).getX(), j, lv3.getZ())) < 0.0f) {
             HashSet set = Sets.newHashSet();
-            set.add(new BlockPos(this.entity.getBoundingBox().x1, (double)j, this.entity.getBoundingBox().z1));
-            set.add(new BlockPos(this.entity.getBoundingBox().x1, (double)j, this.entity.getBoundingBox().z2));
-            set.add(new BlockPos(this.entity.getBoundingBox().x2, (double)j, this.entity.getBoundingBox().z1));
-            set.add(new BlockPos(this.entity.getBoundingBox().x2, (double)j, this.entity.getBoundingBox().z2));
+            set.add(new BlockPos(this.entity.getBoundingBox().minX, (double)j, this.entity.getBoundingBox().minZ));
+            set.add(new BlockPos(this.entity.getBoundingBox().minX, (double)j, this.entity.getBoundingBox().maxZ));
+            set.add(new BlockPos(this.entity.getBoundingBox().maxX, (double)j, this.entity.getBoundingBox().minZ));
+            set.add(new BlockPos(this.entity.getBoundingBox().maxX, (double)j, this.entity.getBoundingBox().maxZ));
             for (BlockPos lv5 : set) {
                 PathNodeType lv6 = this.getNodeType(this.entity, lv5);
                 if (!(this.entity.getPathfindingPenalty(lv6) >= 0.0f)) continue;

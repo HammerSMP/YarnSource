@@ -15,11 +15,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.ChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -30,11 +30,11 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(IWorld arg, StructureAccessor arg2, ChunkGenerator<? extends ChunkGeneratorConfig> arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
         return TwistingVinesFeature.method_26265(arg, random, arg4, 8, 4, 8);
     }
 
-    public static boolean method_26265(IWorld arg, Random random, BlockPos arg2, int i, int j, int k) {
+    public static boolean method_26265(WorldAccess arg, Random random, BlockPos arg2, int i, int j, int k) {
         if (TwistingVinesFeature.isNotSuitable(arg, arg2)) {
             return false;
         }
@@ -42,7 +42,7 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    private static void generateVinesInArea(IWorld arg, Random random, BlockPos arg2, int i, int j, int k) {
+    private static void generateVinesInArea(WorldAccess arg, Random random, BlockPos arg2, int i, int j, int k) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int l = 0; l < i * i; ++l) {
             lv.set(arg2).move(MathHelper.nextInt(random, -i, i), MathHelper.nextInt(random, -j, j), MathHelper.nextInt(random, -i, i));
@@ -60,7 +60,7 @@ extends Feature<DefaultFeatureConfig> {
         }
     }
 
-    private static boolean method_27220(IWorld arg, BlockPos.Mutable arg2) {
+    private static boolean method_27220(WorldAccess arg, BlockPos.Mutable arg2) {
         do {
             arg2.move(0, -1, 0);
             if (!World.isHeightInvalid(arg2)) continue;
@@ -70,7 +70,7 @@ extends Feature<DefaultFeatureConfig> {
         return true;
     }
 
-    public static void generateVineColumn(IWorld arg, Random random, BlockPos.Mutable arg2, int i, int j, int k) {
+    public static void generateVineColumn(WorldAccess arg, Random random, BlockPos.Mutable arg2, int i, int j, int k) {
         for (int l = 1; l <= i; ++l) {
             if (arg.isAir(arg2)) {
                 if (l == i || !arg.isAir(arg2.up())) {
@@ -83,7 +83,7 @@ extends Feature<DefaultFeatureConfig> {
         }
     }
 
-    private static boolean isNotSuitable(IWorld arg, BlockPos arg2) {
+    private static boolean isNotSuitable(WorldAccess arg, BlockPos arg2) {
         if (!arg.isAir(arg2)) {
             return true;
         }

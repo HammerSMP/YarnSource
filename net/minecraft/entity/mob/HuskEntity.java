@@ -7,7 +7,7 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,8 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class HuskEntity
 extends ZombieEntity {
@@ -25,8 +25,8 @@ extends ZombieEntity {
         super((EntityType<? extends ZombieEntity>)arg, arg2);
     }
 
-    public static boolean canSpawn(EntityType<HuskEntity> arg, IWorld arg2, SpawnType arg3, BlockPos arg4, Random random) {
-        return HuskEntity.canSpawnInDark(arg, arg2, arg3, arg4, random) && (arg3 == SpawnType.SPAWNER || arg2.isSkyVisible(arg4));
+    public static boolean canSpawn(EntityType<HuskEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+        return HuskEntity.canSpawnInDark(arg, arg2, arg3, arg4, random) && (arg3 == SpawnReason.SPAWNER || arg2.isSkyVisible(arg4));
     }
 
     @Override

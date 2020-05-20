@@ -53,8 +53,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
@@ -120,7 +120,7 @@ implements BlockEntityProvider {
     }
 
     public static boolean isOverworld(World arg, BlockPos arg2) {
-        return arg.dimension.getType() == DimensionType.OVERWORLD;
+        return arg.method_27983() == DimensionType.OVERWORLD;
     }
 
     private boolean isFree(World arg, BlockPos arg2) {
@@ -155,7 +155,7 @@ implements BlockEntityProvider {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, IWorld arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         if (arg2 == BedBlock.getDirectionTowardsOtherPart(arg.get(PART), arg.get(FACING))) {
             if (arg3.isOf(this) && arg3.get(PART) != arg.get(PART)) {
                 return (BlockState)arg.with(OCCUPIED, arg3.get(OCCUPIED));
