@@ -20,6 +20,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -109,24 +110,24 @@ extends DrawableHelper {
         int t = i / 2 - (s * o + (o - 1) * 5) / 2;
         int u = 10;
         int v = s * o + (o - 1) * 5;
-        List<Text> list2 = null;
+        List<class_5348> list2 = null;
         if (this.header != null) {
             list2 = this.client.textRenderer.wrapLines(this.header, i - 50);
-            for (Text text : list2) {
-                v = Math.max(v, this.client.textRenderer.getWidth(text));
+            for (class_5348 class_53482 : list2) {
+                v = Math.max(v, this.client.textRenderer.getWidth(class_53482));
             }
         }
-        List<Text> list3 = null;
+        List<class_5348> list3 = null;
         if (this.footer != null) {
             list3 = this.client.textRenderer.wrapLines(this.footer, i - 50);
-            for (Text lv4 : list3) {
+            for (class_5348 lv4 : list3) {
                 v = Math.max(v, this.client.textRenderer.getWidth(lv4));
             }
         }
         if (list2 != null) {
             this.client.textRenderer.getClass();
             PlayerListHud.fill(arg, i / 2 - v / 2 - 1, u - 1, i / 2 + v / 2 + 1, u + list2.size() * 9, Integer.MIN_VALUE);
-            for (Text lv5 : list2) {
+            for (class_5348 lv5 : list2) {
                 int w = this.client.textRenderer.getWidth(lv5);
                 this.client.textRenderer.drawWithShadow(arg, lv5, (float)(i / 2 - w / 2), (float)u, -1);
                 this.client.textRenderer.getClass();
@@ -174,7 +175,7 @@ extends DrawableHelper {
         if (list3 != null) {
             this.client.textRenderer.getClass();
             PlayerListHud.fill(arg, i / 2 - v / 2 - 1, (u += n * 9 + 1) - 1, i / 2 + v / 2 + 1, u + list3.size() * 9, Integer.MIN_VALUE);
-            for (Text lv8 : list3) {
+            for (class_5348 lv8 : list3) {
                 int aj = this.client.textRenderer.getWidth(lv8);
                 this.client.textRenderer.drawWithShadow(arg, lv8, (float)(i / 2 - aj / 2), (float)u, -1);
                 this.client.textRenderer.getClass();

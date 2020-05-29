@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5284;
-import net.minecraft.class_5285;
 import net.minecraft.client.gui.screen.CustomizeBuffetLevelScreen;
 import net.minecraft.client.gui.screen.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -29,7 +27,9 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.biome.source.VanillaLayeredBiomeSource;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
@@ -41,7 +41,7 @@ public abstract class class_5317 {
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, class_5284.class_5307.OVERWORLD.method_28568());
+            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     private static final class_5317 field_25054 = new class_5317("flat"){
@@ -55,74 +55,74 @@ public abstract class class_5317 {
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, class_5284.class_5307.OVERWORLD.method_28568());
+            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     public static final class_5317 field_25051 = new class_5317("amplified"){
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, class_5284.class_5307.AMPLIFIED.method_28568());
+            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.AMPLIFIED.getChunkGeneratorType());
         }
     };
     private static final class_5317 field_25056 = new class_5317("single_biome_surface"){
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, class_5284.class_5307.OVERWORLD.method_28568());
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     private static final class_5317 field_25057 = new class_5317("single_biome_caves"){
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, class_5284.class_5307.NETHER.method_28568());
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType());
         }
     };
     private static final class_5317 field_25058 = new class_5317("single_biome_floating_islands"){
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, class_5284.class_5307.END.method_28568());
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.END.getChunkGeneratorType());
         }
     };
     private static final class_5317 field_25059 = new class_5317("debug_all_block_states"){
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return DebugChunkGenerator.generator;
+            return DebugChunkGenerator.INSTANCE;
         }
     };
     protected static final List<class_5317> field_25052 = Lists.newArrayList((Object[])new class_5317[]{field_25050, field_25054, field_25055, field_25051, field_25056, field_25057, field_25058, field_25059});
     protected static final Map<Optional<class_5317>, class_5293> field_25053 = ImmutableMap.of(Optional.of(field_25054), (arg, arg2) -> {
-        ChunkGenerator lv = arg2.method_28032();
-        return new CustomizeFlatLevelScreen(arg, arg3 -> arg.field_24588.method_28086(new class_5285(arg2.method_28028(), arg2.method_28029(), arg2.method_28030(), class_5285.method_28608(arg2.method_28609(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
-    }, Optional.of(field_25056), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.field_24588.method_28086(class_5317.method_29079(arg2, field_25056, arg3)), class_5317.method_29083(arg2)), Optional.of(field_25057), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.field_24588.method_28086(class_5317.method_29079(arg2, field_25057, arg3)), class_5317.method_29083(arg2)), Optional.of(field_25058), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.field_24588.method_28086(class_5317.method_29079(arg2, field_25058, arg3)), class_5317.method_29083(arg2)));
+        ChunkGenerator lv = arg2.getChunkGenerator();
+        return new CustomizeFlatLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(new GeneratorOptions(arg2.getSeed(), arg2.shouldGenerateStructures(), arg2.hasBonusChest(), GeneratorOptions.method_28608(arg2.method_28609(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
+    }, Optional.of(field_25056), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(class_5317.method_29079(arg2, field_25056, arg3)), class_5317.method_29083(arg2)), Optional.of(field_25057), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(class_5317.method_29079(arg2, field_25057, arg3)), class_5317.method_29083(arg2)), Optional.of(field_25058), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(class_5317.method_29079(arg2, field_25058, arg3)), class_5317.method_29083(arg2)));
     private final Text field_25060;
 
     private class_5317(String string) {
         this.field_25060 = new TranslatableText("generator." + string);
     }
 
-    private static class_5285 method_29079(class_5285 arg, class_5317 arg2, Biome arg3) {
-        class_5284 lv4;
+    private static GeneratorOptions method_29079(GeneratorOptions arg, class_5317 arg2, Biome arg3) {
+        ChunkGeneratorType lv4;
         FixedBiomeSource lv = new FixedBiomeSource(arg3);
         if (arg2 == field_25057) {
-            class_5284 lv2 = class_5284.class_5307.NETHER.method_28568();
+            ChunkGeneratorType lv2 = ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType();
         } else if (arg2 == field_25058) {
-            class_5284 lv3 = class_5284.class_5307.END.method_28568();
+            ChunkGeneratorType lv3 = ChunkGeneratorType.Preset.END.getChunkGeneratorType();
         } else {
-            lv4 = class_5284.class_5307.OVERWORLD.method_28568();
+            lv4 = ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType();
         }
-        return new class_5285(arg.method_28028(), arg.method_28029(), arg.method_28030(), class_5285.method_28608(arg.method_28609(), new SurfaceChunkGenerator(lv, arg.method_28028(), lv4)));
+        return new GeneratorOptions(arg.getSeed(), arg.shouldGenerateStructures(), arg.hasBonusChest(), GeneratorOptions.method_28608(arg.method_28609(), new SurfaceChunkGenerator(lv, arg.getSeed(), lv4)));
     }
 
-    private static Biome method_29083(class_5285 arg) {
-        return arg.method_28032().getBiomeSource().method_28443().stream().findFirst().orElse(Biomes.OCEAN);
+    private static Biome method_29083(GeneratorOptions arg) {
+        return arg.getChunkGenerator().getBiomeSource().method_28443().stream().findFirst().orElse(Biomes.OCEAN);
     }
 
-    public static Optional<class_5317> method_29078(class_5285 arg) {
-        ChunkGenerator lv = arg.method_28032();
+    public static Optional<class_5317> method_29078(GeneratorOptions arg) {
+        ChunkGenerator lv = arg.getChunkGenerator();
         if (lv instanceof FlatChunkGenerator) {
             return Optional.of(field_25054);
         }
@@ -136,15 +136,15 @@ public abstract class class_5317 {
         return this.field_25060;
     }
 
-    public class_5285 method_29077(long l, boolean bl, boolean bl2) {
-        return new class_5285(l, bl, bl2, class_5285.method_28608(DimensionType.method_28517(l), this.method_29076(l)));
+    public GeneratorOptions method_29077(long l, boolean bl, boolean bl2) {
+        return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_28608(DimensionType.method_28517(l), this.method_29076(l)));
     }
 
     protected abstract ChunkGenerator method_29076(long var1);
 
     @Environment(value=EnvType.CLIENT)
     public static interface class_5293 {
-        public Screen createEditScreen(CreateWorldScreen var1, class_5285 var2);
+        public Screen createEditScreen(CreateWorldScreen var1, GeneratorOptions var2);
     }
 }
 

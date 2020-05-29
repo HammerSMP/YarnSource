@@ -10,12 +10,12 @@ package net.minecraft.server.dedicated;
 
 import com.mojang.authlib.GameProfile;
 import java.io.IOException;
-import net.minecraft.class_5318;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import net.minecraft.server.dedicated.ServerPropertiesHandler;
 import net.minecraft.world.WorldSaveHandler;
+import net.minecraft.world.dimension.DimensionTracker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +23,7 @@ public class DedicatedPlayerManager
 extends PlayerManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public DedicatedPlayerManager(MinecraftDedicatedServer arg, class_5318.class_5319 arg2, WorldSaveHandler arg3) {
+    public DedicatedPlayerManager(MinecraftDedicatedServer arg, DimensionTracker.Modifiable arg2, WorldSaveHandler arg3) {
         super(arg, arg2, arg3, arg.getProperties().maxPlayers);
         ServerPropertiesHandler lv = arg.getProperties();
         this.setViewDistance(lv.viewDistance);

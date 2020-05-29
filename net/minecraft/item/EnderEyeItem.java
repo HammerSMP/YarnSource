@@ -62,15 +62,15 @@ extends Item {
             }
             lv.syncGlobalEvent(1038, lv6.add(1, 0, 1), 0);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
         BlockPos lv3;
         ItemStack lv = arg2.getStackInHand(arg3);
-        HitResult lv2 = EnderEyeItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.NONE);
-        if (lv2.getType() == HitResult.Type.BLOCK && arg.getBlockState(((BlockHitResult)lv2).getBlockPos()).isOf(Blocks.END_PORTAL_FRAME)) {
+        BlockHitResult lv2 = EnderEyeItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.NONE);
+        if (((HitResult)lv2).getType() == HitResult.Type.BLOCK && arg.getBlockState(lv2.getBlockPos()).isOf(Blocks.END_PORTAL_FRAME)) {
             return TypedActionResult.pass(lv);
         }
         arg2.setCurrentHand(arg3);

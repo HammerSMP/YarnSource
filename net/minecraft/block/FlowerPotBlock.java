@@ -80,7 +80,7 @@ extends Block {
                 }
                 arg2.setBlockState(arg3, Blocks.FLOWER_POT.getDefaultState(), 3);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         return ActionResult.CONSUME;
     }

@@ -13,6 +13,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ModifiableTestableWorld;
@@ -23,17 +24,17 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class LargeOakFoliagePlacer
 extends BlobFoliagePlacer {
-    public static final Codec<LargeOakFoliagePlacer> field_24930 = RecordCodecBuilder.create(instance -> LargeOakFoliagePlacer.method_28838(instance).apply((Applicative)instance, LargeOakFoliagePlacer::new));
+    public static final Codec<LargeOakFoliagePlacer> CODEC = RecordCodecBuilder.create(instance -> LargeOakFoliagePlacer.method_28838(instance).apply((Applicative)instance, LargeOakFoliagePlacer::new));
 
     public LargeOakFoliagePlacer(int i, int j, int k, int l, int m) {
         super(i, j, k, l, m, FoliagePlacerType.FANCY_FOLIAGE_PLACER);
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l) {
+    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
         for (int m = l; m >= l - j; --m) {
             int n = k + (m == l || m == l - j ? 0 : 1);
-            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk());
+            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk(), arg4);
         }
     }
 

@@ -412,7 +412,6 @@ RecipeGridAligner<Ingredient> {
             lv.setLanguage(lv2);
             this.client.options.language = lv2.getCode();
             this.client.reloadResources();
-            this.client.textRenderer.setRightToLeft(lv.isRightToLeft());
             this.client.options.write();
         }
     }

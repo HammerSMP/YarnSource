@@ -62,7 +62,7 @@ public abstract class MobSpawnerLogic {
         }
         catch (InvalidIdentifierException lv) {
             BlockPos lv2 = this.getPos();
-            LOGGER.warn("Invalid entity id '{}' at spawner {}:[{},{},{}]", (Object)string, (Object)this.getWorld().method_27983().method_29177(), (Object)lv2.getX(), (Object)lv2.getY(), (Object)lv2.getZ());
+            LOGGER.warn("Invalid entity id '{}' at spawner {}:[{},{},{}]", (Object)string, (Object)this.getWorld().method_27983().getValue(), (Object)lv2.getX(), (Object)lv2.getY(), (Object)lv2.getZ());
             return null;
         }
     }

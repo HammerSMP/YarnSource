@@ -9,7 +9,6 @@ import net.minecraft.item.AutomaticItemPlacementContext;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -24,7 +23,7 @@ extends FallibleItemDispenserBehavior {
             Direction lv2 = arg.getBlockState().get(DispenserBlock.FACING);
             BlockPos lv3 = arg.getBlockPos().offset(lv2);
             Direction lv4 = arg.getWorld().isAir(lv3.down()) ? lv2 : Direction.UP;
-            this.setSuccess(((BlockItem)lv).place(new AutomaticItemPlacementContext(arg.getWorld(), lv3, lv2, arg2, lv4)) == ActionResult.SUCCESS);
+            this.setSuccess(((BlockItem)lv).place(new AutomaticItemPlacementContext(arg.getWorld(), lv3, lv2, arg2, lv4)).isAccepted());
         }
         return arg2;
     }

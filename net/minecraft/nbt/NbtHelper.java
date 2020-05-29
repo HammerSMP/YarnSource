@@ -56,8 +56,8 @@ public final class NbtHelper {
         if (arg.contains("Name", 8)) {
             string = arg.getString("Name");
         }
-        if (arg.containsUuidNew("Id")) {
-            uUID = arg.getUuidNew("Id");
+        if (arg.containsUuid("Id")) {
+            uUID = arg.getUuid("Id");
         }
         try {
             GameProfile gameProfile = new GameProfile(uUID, string);
@@ -88,7 +88,7 @@ public final class NbtHelper {
             arg.putString("Name", gameProfile.getName());
         }
         if (gameProfile.getId() != null) {
-            arg.putUuidNew("Id", gameProfile.getId());
+            arg.putUuid("Id", gameProfile.getId());
         }
         if (!gameProfile.getProperties().isEmpty()) {
             CompoundTag lv = new CompoundTag();

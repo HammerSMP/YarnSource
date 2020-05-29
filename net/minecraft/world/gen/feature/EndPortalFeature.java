@@ -21,7 +21,7 @@ extends Feature<DefaultFeatureConfig> {
     private final boolean open;
 
     public EndPortalFeature(boolean bl) {
-        super(DefaultFeatureConfig.field_24893);
+        super(DefaultFeatureConfig.CODEC);
         this.open = bl;
     }
 

@@ -19,12 +19,10 @@ import java.lang.invoke.LambdaMetafactory;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5219;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.RotatingCubeMapRenderer;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -51,6 +49,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -142,7 +141,7 @@ extends Screen {
 
     private void initWidgetsNormal(int i2, int j2) {
         this.addButton(new ButtonWidget(this.width / 2 - 100, i2, 200, 20, new TranslatableText("menu.singleplayer"), arg -> this.client.openScreen(new SelectWorldScreen(this))));
-        boolean bl = this.client.method_29043();
+        boolean bl = this.client.isMultiplayerEnabled();
         ButtonWidget.class_5316 lv = bl ? ButtonWidget.field_25035 : (arg, arg2, i, j) -> {
             if (!arg.active) {
                 this.renderTooltip(arg2, this.client.textRenderer.wrapLines(new TranslatableText("title.multiplayer.disabled"), Math.max(this.width / 2 - 43, 170)), i, j);
@@ -157,7 +156,7 @@ extends Screen {
         this.buttonResetDemo = this.addButton(new ButtonWidget(this.width / 2 - 100, i + j * 1, 200, 20, new TranslatableText("menu.resetdemo"), arg -> {
             LevelStorage lv = this.client.getLevelStorage();
             try (LevelStorage.Session lv2 = lv.createSession("Demo_World");){
-                class_5219 lv3 = lv2.readLevelProperties();
+                SaveProperties lv3 = lv2.readLevelProperties();
                 if (lv3 != null) {
                     this.client.openScreen(new ConfirmScreen(this::onDemoDeletionConfirmed, new TranslatableText("selectWorld.deleteQuestion"), new TranslatableText("selectWorld.deleteWarning", lv3.getLevelName()), new TranslatableText("selectWorld.deleteButton"), ScreenTexts.CANCEL));
                 }
@@ -168,7 +167,7 @@ extends Screen {
             }
         }));
         try (LevelStorage.Session lv = this.client.getLevelStorage().createSession("Demo_World");){
-            class_5219 lv2 = lv.readLevelProperties();
+            SaveProperties lv2 = lv.readLevelProperties();
             if (lv2 == null) {
                 this.buttonResetDemo.active = false;
             }
@@ -208,7 +207,7 @@ extends Screen {
         this.client.getTextureManager().bindTexture(MINECRAFT_TITLE_TEXTURE);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, h);
         if (this.isMinceraft) {
-            this.method_29063(l, 30, (integer, integer2) -> {
+            this.method_29343(l, 30, (integer, integer2) -> {
                 this.drawTexture(arg, integer + 0, (int)integer2, 0, 0, 99, 44);
                 this.drawTexture(arg, integer + 99, (int)integer2, 129, 0, 27, 44);
                 this.drawTexture(arg, integer + 99 + 26, (int)integer2, 126, 0, 3, 44);
@@ -216,7 +215,7 @@ extends Screen {
                 this.drawTexture(arg, integer + 155, (int)integer2, 0, 45, 155, 44);
             });
         } else {
-            this.method_29063(l, 30, (integer, integer2) -> {
+            this.method_29343(l, 30, (integer, integer2) -> {
                 this.drawTexture(arg, integer + 0, (int)integer2, 0, 0, 155, 44);
                 this.drawTexture(arg, integer + 155, (int)integer2, 0, 45, 155, 44);
             });
@@ -250,14 +249,6 @@ extends Screen {
         if (this.areRealmsNotificationsEnabled() && h >= 1.0f) {
             this.realmsNotificationGui.render(arg, i, j, f);
         }
-    }
-
-    private void method_29063(int i, int j, BiConsumer<Integer, Integer> biConsumer) {
-        biConsumer.accept(i + 1, j);
-        biConsumer.accept(i - 1, j);
-        biConsumer.accept(i, j + 1);
-        biConsumer.accept(i, j - 1);
-        biConsumer.accept(i, j);
     }
 
     @Override

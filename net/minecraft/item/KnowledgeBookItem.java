@@ -61,7 +61,7 @@ extends Item {
             arg2.unlockRecipes(list);
             arg2.incrementStat(Stats.USED.getOrCreateStat(this));
         }
-        return TypedActionResult.success(lv);
+        return TypedActionResult.method_29237(lv, arg.isClient());
     }
 }
 

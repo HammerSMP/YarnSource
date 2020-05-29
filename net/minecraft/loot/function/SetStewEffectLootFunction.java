@@ -28,15 +28,17 @@ import com.google.gson.JsonSyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SuspiciousStewItem;
 import net.minecraft.loot.UniformLootTableRange;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -45,9 +47,14 @@ public class SetStewEffectLootFunction
 extends ConditionalLootFunction {
     private final Map<StatusEffect, UniformLootTableRange> effects;
 
-    private SetStewEffectLootFunction(LootCondition[] args, Map<StatusEffect, UniformLootTableRange> map) {
+    private SetStewEffectLootFunction(class_5341[] args, Map<StatusEffect, UniformLootTableRange> map) {
         super(args);
         this.effects = ImmutableMap.copyOf(map);
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.SET_STEW_EFFECT;
     }
 
     @Override
@@ -73,10 +80,6 @@ extends ConditionalLootFunction {
 
     public static class Factory
     extends ConditionalLootFunction.Factory<SetStewEffectLootFunction> {
-        public Factory() {
-            super(new Identifier("set_stew_effect"), SetStewEffectLootFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, SetStewEffectLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -97,7 +100,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetStewEffectLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public SetStewEffectLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             HashMap map = Maps.newHashMap();
             if (jsonObject.has("effects")) {
                 JsonArray jsonArray = JsonHelper.getArray(jsonObject, "effects");
@@ -112,7 +115,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

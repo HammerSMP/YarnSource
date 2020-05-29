@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.command.arguments.ItemStackArgument;
 import net.minecraft.command.arguments.ItemStringReader;
+import net.minecraft.tag.ItemTags;
 
 public class ItemStackArgumentType
 implements ArgumentType<ItemStackArgument> {
@@ -50,7 +51,7 @@ implements ArgumentType<ItemStackArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder);
+        return lv.getSuggestions(suggestionsBuilder, ItemTags.getContainer());
     }
 
     public Collection<String> getExamples() {

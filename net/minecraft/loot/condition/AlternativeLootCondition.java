@@ -15,21 +15,27 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.List;
 import java.util.function.Predicate;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class AlternativeLootCondition
-implements LootCondition {
-    private final LootCondition[] terms;
+implements class_5341 {
+    private final class_5341[] terms;
     private final Predicate<LootContext> predicate;
 
-    private AlternativeLootCondition(LootCondition[] args) {
+    private AlternativeLootCondition(class_5341[] args) {
         this.terms = args;
         this.predicate = LootConditions.joinOr(args);
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.ALTERNATIVE;
     }
 
     @Override
@@ -39,13 +45,13 @@ implements LootCondition {
 
     @Override
     public void validate(LootTableReporter arg) {
-        LootCondition.super.validate(arg);
+        class_5341.super.validate(arg);
         for (int i = 0; i < this.terms.length; ++i) {
             this.terms[i].validate(arg.makeChild(".term[" + i + "]"));
         }
     }
 
-    public static Builder builder(LootCondition.Builder ... args) {
+    public static Builder builder(class_5341.Builder ... args) {
         return new Builder(args);
     }
 
@@ -55,11 +61,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<AlternativeLootCondition> {
-        public Factory() {
-            super(new Identifier("alternative"), AlternativeLootCondition.class);
-        }
-
+    implements class_5335<AlternativeLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, AlternativeLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("terms", jsonSerializationContext.serialize((Object)arg.terms));
@@ -67,35 +69,35 @@ implements LootCondition {
 
         @Override
         public AlternativeLootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            LootCondition[] lvs = JsonHelper.deserialize(jsonObject, "terms", jsonDeserializationContext, LootCondition[].class);
+            class_5341[] lvs = JsonHelper.deserialize(jsonObject, "terms", jsonDeserializationContext, class_5341[].class);
             return new AlternativeLootCondition(lvs);
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }
 
     public static class Builder
-    implements LootCondition.Builder {
-        private final List<LootCondition> terms = Lists.newArrayList();
+    implements class_5341.Builder {
+        private final List<class_5341> terms = Lists.newArrayList();
 
-        public Builder(LootCondition.Builder ... args) {
-            for (LootCondition.Builder lv : args) {
+        public Builder(class_5341.Builder ... args) {
+            for (class_5341.Builder lv : args) {
                 this.terms.add(lv.build());
             }
         }
 
         @Override
-        public Builder or(LootCondition.Builder arg) {
+        public Builder or(class_5341.Builder arg) {
             this.terms.add(arg.build());
             return this;
         }
 
         @Override
-        public LootCondition build() {
-            return new AlternativeLootCondition(this.terms.toArray(new LootCondition[0]));
+        public class_5341 build() {
+            return new AlternativeLootCondition(this.terms.toArray(new class_5341[0]));
         }
     }
 }

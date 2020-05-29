@@ -25,7 +25,7 @@ import net.minecraft.structure.rule.RuleTest;
 import net.minecraft.util.math.BlockPos;
 
 public class StructureProcessorRule {
-    public static final Codec<StructureProcessorRule> field_25008 = RecordCodecBuilder.create(instance -> instance.group((App)RuleTest.field_25012.fieldOf("input_predicate").forGetter(arg -> arg.inputPredicate), (App)RuleTest.field_25012.fieldOf("location_predicate").forGetter(arg -> arg.locationPredicate), (App)PosRuleTest.field_25007.fieldOf("position_predicate").forGetter(arg -> arg.positionPredicate), (App)BlockState.field_24734.fieldOf("output_state").forGetter(arg -> arg.outputState), (App)CompoundTag.field_25128.optionalFieldOf("output_nbt").forGetter(arg -> Optional.ofNullable(arg.tag))).apply((Applicative)instance, StructureProcessorRule::new));
+    public static final Codec<StructureProcessorRule> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)RuleTest.field_25012.fieldOf("input_predicate").forGetter(arg -> arg.inputPredicate), (App)RuleTest.field_25012.fieldOf("location_predicate").forGetter(arg -> arg.locationPredicate), (App)PosRuleTest.field_25007.fieldOf("position_predicate").forGetter(arg -> arg.positionPredicate), (App)BlockState.field_24734.fieldOf("output_state").forGetter(arg -> arg.outputState), (App)CompoundTag.field_25128.optionalFieldOf("output_nbt").forGetter(arg -> Optional.ofNullable(arg.tag))).apply((Applicative)instance, StructureProcessorRule::new));
     private final RuleTest inputPredicate;
     private final RuleTest locationPredicate;
     private final PosRuleTest positionPredicate;

@@ -17,18 +17,17 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
-import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public class EndPortalBlock
 extends BlockWithEntity {
@@ -51,7 +50,7 @@ extends BlockWithEntity {
     @Override
     public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
         if (!arg2.isClient && !arg4.hasVehicle() && !arg4.hasPassengers() && arg4.canUsePortals() && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(arg4.getBoundingBox().offset(-arg3.getX(), -arg3.getY(), -arg3.getZ())), arg.getOutlineShape(arg2, arg3), BooleanBiFunction.AND)) {
-            class_5321<DimensionType> lv = arg2.getDimension().method_28543() ? DimensionType.field_24753 : DimensionType.field_24755;
+            RegistryKey<World> lv = arg2.getDimension().isEnd() ? World.field_25179 : World.field_25181;
             arg4.changeDimension(lv);
         }
     }

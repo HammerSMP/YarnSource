@@ -22,7 +22,6 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.block.CampfireBlock;
-import net.minecraft.class_5321;
 import net.minecraft.predicate.BlockPredicate;
 import net.minecraft.predicate.FluidPredicate;
 import net.minecraft.predicate.LightPredicate;
@@ -32,8 +31,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,14 +49,14 @@ public class LocationPredicate {
     @Nullable
     private final StructureFeature<?> feature;
     @Nullable
-    private final class_5321<DimensionType> dimension;
+    private final RegistryKey<World> dimension;
     @Nullable
     private final Boolean smokey;
     private final LightPredicate light;
     private final BlockPredicate block;
     private final FluidPredicate fluid;
 
-    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable class_5321<DimensionType> arg6, @Nullable Boolean arg7, LightPredicate arg8, BlockPredicate arg9, FluidPredicate arg10) {
+    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable RegistryKey<World> arg6, @Nullable Boolean arg7, LightPredicate arg8, BlockPredicate arg9, FluidPredicate arg10) {
         this.x = arg;
         this.y = arg2;
         this.z = arg3;
@@ -73,7 +73,7 @@ public class LocationPredicate {
         return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, arg, null, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
-    public static LocationPredicate dimension(class_5321<DimensionType> arg) {
+    public static LocationPredicate dimension(RegistryKey<World> arg) {
         return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, null, arg, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
@@ -131,7 +131,7 @@ public class LocationPredicate {
             jsonObject.add("position", (JsonElement)jsonObject2);
         }
         if (this.dimension != null) {
-            DimensionType.field_24751.encodeStart((DynamicOps)JsonOps.INSTANCE, this.dimension).resultOrPartial(((Logger)field_24732)::error).ifPresent(jsonElement -> jsonObject.add("dimension", jsonElement));
+            World.field_25178.encodeStart((DynamicOps)JsonOps.INSTANCE, this.dimension).resultOrPartial(((Logger)field_24732)::error).ifPresent(jsonElement -> jsonObject.add("dimension", jsonElement));
         }
         if (this.feature != null) {
             jsonObject.addProperty("feature", this.feature.getName());
@@ -157,8 +157,8 @@ public class LocationPredicate {
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject2.get("x"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject2.get("y"));
         NumberRange.FloatRange lv3 = NumberRange.FloatRange.fromJson(jsonObject2.get("z"));
-        class_5321 lv4 = jsonObject.has("dimension") ? (class_5321)Identifier.field_25139.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonObject.get("dimension")).resultOrPartial(((Logger)field_24732)::error).map(arg -> class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, arg)).orElse(null) : null;
-        StructureFeature lv5 = jsonObject.has("feature") ? (StructureFeature)StructureFeature.field_24842.get((Object)JsonHelper.getString(jsonObject, "feature")) : null;
+        RegistryKey lv4 = jsonObject.has("dimension") ? (RegistryKey)Identifier.field_25139.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonObject.get("dimension")).resultOrPartial(((Logger)field_24732)::error).map(arg -> RegistryKey.of(Registry.DIMENSION, arg)).orElse(null) : null;
+        StructureFeature lv5 = jsonObject.has("feature") ? (StructureFeature)StructureFeature.STRUCTURES.get((Object)JsonHelper.getString(jsonObject, "feature")) : null;
         Biome lv6 = null;
         if (jsonObject.has("biome")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "biome"));
@@ -180,7 +180,7 @@ public class LocationPredicate {
         @Nullable
         private StructureFeature<?> feature;
         @Nullable
-        private class_5321<DimensionType> dimension;
+        private RegistryKey<World> dimension;
         @Nullable
         private Boolean smokey;
         private LightPredicate light = LightPredicate.ANY;

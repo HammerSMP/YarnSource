@@ -287,7 +287,7 @@ extends LivingEntity {
     }
 
     protected boolean updateWaterSubmersionState() {
-        this.isSubmergedInWater = this.isSubmergedIn(FluidTags.WATER, true);
+        this.isSubmergedInWater = this.isSubmergedIn(FluidTags.WATER);
         return this.isSubmergedInWater;
     }
 
@@ -445,17 +445,10 @@ extends LivingEntity {
         double d = this.getX();
         double e = this.getY();
         double f = this.getZ();
-        float g = this.yaw;
-        float h = this.pitch;
         super.tickRiding();
         this.prevStrideDistance = this.strideDistance;
         this.strideDistance = 0.0f;
         this.increaseRidingMotionStats(this.getX() - d, this.getY() - e, this.getZ() - f);
-        if (this.getVehicle() instanceof PigEntity) {
-            this.pitch = h;
-            this.yaw = g;
-            this.bodyYaw = ((PigEntity)this.getVehicle()).bodyYaw;
-        }
     }
 
     @Override
@@ -693,7 +686,7 @@ extends LivingEntity {
     }
 
     public boolean isUsingEffectiveTool(BlockState arg) {
-        return arg.getMaterial().canBreakByHand() || this.inventory.isUsingEffectiveTool(arg);
+        return !arg.method_29291() || this.inventory.getMainHandStack().isEffectiveOn(arg);
     }
 
     @Override
@@ -870,8 +863,8 @@ extends LivingEntity {
     }
 
     @Override
-    protected boolean method_27303() {
-        return !this.abilities.flying && super.method_27303();
+    protected boolean isOnSoulSpeedBlock() {
+        return !this.abilities.flying && super.isOnSoulSpeedBlock();
     }
 
     public void openEditSignScreen(SignBlockEntity arg) {
@@ -1324,7 +1317,7 @@ extends LivingEntity {
                 this.increaseStat(Stats.SWIM_ONE_CM, i);
                 this.addExhaustion(0.01f * (float)i * 0.01f);
             }
-        } else if (this.isSubmergedIn(FluidTags.WATER, true)) {
+        } else if (this.isSubmergedIn(FluidTags.WATER)) {
             int j = Math.round(MathHelper.sqrt(d * d + e * e + f * f) * 100.0f);
             if (j > 0) {
                 this.increaseStat(Stats.WALK_UNDER_WATER_ONE_CM, j);

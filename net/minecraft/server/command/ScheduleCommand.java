@@ -49,7 +49,7 @@ import net.minecraft.world.timer.Timer;
 public class ScheduleCommand {
     private static final SimpleCommandExceptionType SAME_TICK_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.schedule.same_tick"));
     private static final DynamicCommandExceptionType CLEARED_FAILURE_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("commands.schedule.cleared.failure", object));
-    private static final SuggestionProvider<ServerCommandSource> SUGGESTION_PROVIDER = (commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().method_27728().method_27859().getScheduledEvents().method_22592(), suggestionsBuilder);
+    private static final SuggestionProvider<ServerCommandSource> SUGGESTION_PROVIDER = (commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().method_27728().getMainWorldProperties().getScheduledEvents().method_22592(), suggestionsBuilder);
 
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
         commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("schedule").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.literal("function").then(CommandManager.argument("function", FunctionArgumentType.function()).suggests(FunctionCommand.SUGGESTION_PROVIDER).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("time", TimeArgumentType.time()).executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), true))).then(CommandManager.literal("append").executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), false)))).then(CommandManager.literal("replace").executes(commandContext -> ScheduleCommand.execute((ServerCommandSource)commandContext.getSource(), FunctionArgumentType.getFunctionOrTag((CommandContext<ServerCommandSource>)commandContext, "function"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"time"), true))))))).then(CommandManager.literal("clear").then(CommandManager.argument("function", StringArgumentType.greedyString()).suggests(SUGGESTION_PROVIDER).executes(commandContext -> ScheduleCommand.method_22833((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"function"))))));
@@ -61,7 +61,7 @@ public class ScheduleCommand {
         }
         long l = arg.getWorld().getTime() + (long)i;
         Identifier lv = (Identifier)pair.getFirst();
-        Timer<MinecraftServer> lv2 = arg.getMinecraftServer().method_27728().method_27859().getScheduledEvents();
+        Timer<MinecraftServer> lv2 = arg.getMinecraftServer().method_27728().getMainWorldProperties().getScheduledEvents();
         ((Either)pair.getSecond()).ifLeft(arg4 -> {
             String string = lv.toString();
             if (bl) {
@@ -81,7 +81,7 @@ public class ScheduleCommand {
     }
 
     private static int method_22833(ServerCommandSource arg, String string) throws CommandSyntaxException {
-        int i = arg.getMinecraftServer().method_27728().method_27859().getScheduledEvents().method_22593(string);
+        int i = arg.getMinecraftServer().method_27728().getMainWorldProperties().getScheduledEvents().method_22593(string);
         if (i == 0) {
             throw CLEARED_FAILURE_EXCEPTION.create((Object)string);
         }

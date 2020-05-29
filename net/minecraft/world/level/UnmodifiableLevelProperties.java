@@ -4,26 +4,26 @@
 package net.minecraft.world.level;
 
 import java.util.UUID;
-import net.minecraft.class_5219;
-import net.minecraft.class_5268;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.timer.Timer;
 
 public class UnmodifiableLevelProperties
-implements class_5268 {
-    private final DimensionType field_24178;
-    private final class_5219 field_24179;
-    private final class_5268 properties;
+implements ServerWorldProperties {
+    private final DimensionType dimensionType;
+    private final SaveProperties field_24179;
+    private final ServerWorldProperties properties;
 
-    public UnmodifiableLevelProperties(DimensionType arg, class_5219 arg2, class_5268 arg3) {
-        this.field_24178 = arg;
+    public UnmodifiableLevelProperties(DimensionType arg, SaveProperties arg2, ServerWorldProperties arg3) {
+        this.dimensionType = arg;
         this.field_24179 = arg2;
         this.properties = arg3;
     }
@@ -161,12 +161,12 @@ implements class_5268 {
     }
 
     @Override
-    public WorldBorder.class_5200 method_27422() {
-        return this.properties.method_27422();
+    public WorldBorder.Properties getWorldBorder() {
+        return this.properties.getWorldBorder();
     }
 
     @Override
-    public void method_27415(WorldBorder.class_5200 arg) {
+    public void setWorldBorder(WorldBorder.Properties arg) {
     }
 
     @Override

@@ -79,10 +79,10 @@ extends BlockWithEntity {
             if (arg2.isClient) {
                 return ActionResult.SUCCESS;
             }
-            BlockState lv = (BlockState)arg.method_28493(INVERTED);
+            BlockState lv = (BlockState)arg.cycle(INVERTED);
             arg2.setBlockState(arg3, lv, 4);
             DaylightDetectorBlock.updateState(lv, arg2, arg3);
-            return ActionResult.SUCCESS;
+            return ActionResult.CONSUME;
         }
         return super.onUse(arg, arg2, arg3, arg4, arg5, arg6);
     }

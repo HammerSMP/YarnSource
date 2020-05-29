@@ -167,15 +167,15 @@ implements Tag {
         this.tags.put(string, LongTag.of(l));
     }
 
-    public void putUuidNew(String string, UUID uUID) {
+    public void putUuid(String string, UUID uUID) {
         this.tags.put(string, NbtHelper.fromUuidNew(uUID));
     }
 
-    public UUID getUuidNew(String string) {
+    public UUID getUuid(String string) {
         return NbtHelper.toUuidNew(this.get(string));
     }
 
-    public boolean containsUuidNew(String string) {
+    public boolean containsUuid(String string) {
         Tag lv = this.get(string);
         return lv != null && lv.getReader() == IntArrayTag.READER && ((IntArrayTag)lv).getIntArray().length == 4;
     }

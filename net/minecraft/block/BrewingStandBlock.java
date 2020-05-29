@@ -74,7 +74,7 @@ extends BlockWithEntity {
             arg4.openHandledScreen((BrewingStandBlockEntity)lv);
             arg4.incrementStat(Stats.INTERACT_WITH_BREWINGSTAND);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override

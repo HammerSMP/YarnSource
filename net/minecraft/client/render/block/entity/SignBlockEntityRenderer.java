@@ -16,6 +16,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SignBlock;
 import net.minecraft.block.WallSignBlock;
 import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.class_5348;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.ModelPart;
@@ -29,9 +30,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
-import net.minecraft.text.Text;
 import net.minecraft.util.SignType;
 
 @Environment(value=EnvType.CLIENT)
@@ -79,9 +78,9 @@ extends BlockEntityRenderer<SignBlockEntity> {
         int q = NativeImage.method_24031(0, p, o, n);
         int r = 20;
         for (int s = 0; s < 4; ++s) {
-            Text lv5 = arg.getTextBeingEditedOnRow(s, arg2 -> {
-                List<Text> list = lv4.getTextHandler().wrapLines((Text)arg2, 90, Style.EMPTY);
-                return list.isEmpty() ? LiteralText.EMPTY : list.get(0);
+            class_5348 lv5 = arg.getTextBeingEditedOnRow(s, arg2 -> {
+                List<class_5348> list = lv4.getTextHandler().wrapLines((class_5348)arg2, 90, Style.EMPTY);
+                return list.isEmpty() ? class_5348.field_25310 : list.get(0);
             });
             if (lv5 == null) continue;
             float t = -lv4.getWidth(lv5) / 2;

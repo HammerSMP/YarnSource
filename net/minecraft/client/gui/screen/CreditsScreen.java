@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.BufferBuilder;
@@ -35,9 +36,7 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.Resource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.IOUtils;
@@ -55,7 +54,7 @@ extends Screen {
     private final boolean endCredits;
     private final Runnable finishAction;
     private float time;
-    private List<Text> credits;
+    private List<class_5348> credits;
     private IntSet field_24261;
     private int creditsHeight;
     private float speed = 0.5f;
@@ -118,11 +117,11 @@ extends Screen {
                         string = string2 + (Object)((Object)Formatting.WHITE) + (Object)((Object)Formatting.OBFUSCATED) + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3;
                     }
                     this.credits.addAll(this.client.textRenderer.getTextHandler().wrapLines(string, 274, Style.EMPTY));
-                    this.credits.add(LiteralText.EMPTY);
+                    this.credits.add(class_5348.field_25310);
                 }
                 inputStream.close();
                 for (int k = 0; k < 8; ++k) {
-                    this.credits.add(LiteralText.EMPTY);
+                    this.credits.add(class_5348.field_25310);
                 }
             }
             InputStream inputStream2 = this.client.getResourceManager().getResource(new Identifier("texts/credits.txt")).getInputStream();
@@ -136,14 +135,14 @@ extends Screen {
                 } else {
                     bl2 = false;
                 }
-                List<Text> list = this.client.textRenderer.getTextHandler().wrapLines(string4, 274, Style.EMPTY);
-                for (Text lv2 : list) {
+                List<class_5348> list = this.client.textRenderer.getTextHandler().wrapLines(string4, 274, Style.EMPTY);
+                for (class_5348 lv2 : list) {
                     if (bl2) {
                         this.field_24261.add(this.credits.size());
                     }
                     this.credits.add(lv2);
                 }
-                this.credits.add(LiteralText.EMPTY);
+                this.credits.add(class_5348.field_25310);
             }
             inputStream2.close();
             this.creditsHeight = this.credits.size() * 12;
@@ -197,8 +196,12 @@ extends Screen {
         this.client.getTextureManager().bindTexture(MINECRAFT_TITLE_TEXTURE);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableAlphaTest();
-        this.drawTexture(arg, l, m, 0, 0, 155, 44);
-        this.drawTexture(arg, l + 155, m, 0, 45, 155, 44);
+        RenderSystem.enableBlend();
+        this.method_29343(l, m, (integer, integer2) -> {
+            this.drawTexture(arg, integer + 0, (int)integer2, 0, 0, 155, 44);
+            this.drawTexture(arg, integer + 155, (int)integer2, 0, 45, 155, 44);
+        });
+        RenderSystem.disableBlend();
         this.client.getTextureManager().bindTexture(EDITION_TITLE_TEXTURE);
         CreditsScreen.drawTexture(arg, l + 88, m + 37, 0.0f, 0.0f, 98, 14, 128, 16);
         RenderSystem.disableAlphaTest();
@@ -209,7 +212,7 @@ extends Screen {
                 RenderSystem.translatef(0.0f, -h, 0.0f);
             }
             if ((float)n + g + 12.0f + 8.0f > 0.0f && (float)n + g < (float)this.height) {
-                Text lv = this.credits.get(o);
+                class_5348 lv = this.credits.get(o);
                 if (this.field_24261.contains(o)) {
                     this.textRenderer.drawWithShadow(arg, lv, (float)(l + (274 - this.textRenderer.getWidth(lv)) / 2), (float)n, 0xFFFFFF);
                 } else {

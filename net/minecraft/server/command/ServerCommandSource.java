@@ -23,11 +23,11 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import net.minecraft.class_5318;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -46,7 +46,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 
 public class ServerCommandSource
 implements CommandSource {
@@ -280,8 +282,8 @@ implements CommandSource {
     }
 
     @Override
-    public class_5318 method_29038() {
-        return this.server.method_29174();
+    public Set<RegistryKey<World>> method_29310() {
+        return this.server.method_29435();
     }
 }
 

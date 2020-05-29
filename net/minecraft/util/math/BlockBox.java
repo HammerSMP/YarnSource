@@ -131,6 +131,10 @@ public class BlockBox {
         return new BlockBox(this.minX + i, this.minY + j, this.minZ + k, this.maxX + i, this.maxY + j, this.maxZ + k);
     }
 
+    public void method_29299(Vec3i arg) {
+        this.offset(arg.getX(), arg.getY(), arg.getZ());
+    }
+
     public boolean contains(Vec3i arg) {
         return arg.getX() >= this.minX && arg.getX() <= this.maxX && arg.getZ() >= this.minZ && arg.getZ() <= this.maxZ && arg.getY() >= this.minY && arg.getY() <= this.maxY;
     }

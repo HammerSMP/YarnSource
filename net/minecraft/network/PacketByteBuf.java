@@ -76,7 +76,7 @@ extends ByteBuf {
         return 5;
     }
 
-    public <T> T method_29171(Codec<T> codec) throws IOException {
+    public <T> T decode(Codec<T> codec) throws IOException {
         CompoundTag lv = this.readCompoundTag();
         DataResult dataResult = codec.parse((DynamicOps)NbtOps.INSTANCE, (Object)lv);
         if (dataResult.error().isPresent()) {
@@ -85,7 +85,7 @@ extends ByteBuf {
         return dataResult.result().get();
     }
 
-    public <T> void method_29172(Codec<T> codec, T object) throws IOException {
+    public <T> void encode(Codec<T> codec, T object) throws IOException {
         DataResult dataResult = codec.encodeStart((DynamicOps)NbtOps.INSTANCE, object);
         if (dataResult.error().isPresent()) {
             throw new IOException("Failed to encode: " + ((DataResult.PartialResult)dataResult.error().get()).message() + " " + object);

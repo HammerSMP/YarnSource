@@ -17,7 +17,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5321;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.debug.DebugRenderer;
@@ -29,8 +28,9 @@ import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
 
 @Environment(value=EnvType.CLIENT)
 public class ChunkLoadingDebugRenderer
@@ -87,7 +87,7 @@ implements DebugRenderer.Renderer {
 
         private ChunkLoadingStatus(IntegratedServer arg2, double d, double e) {
             ClientWorld lv = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world;
-            class_5321<DimensionType> lv2 = lv.method_27983();
+            RegistryKey<World> lv2 = lv.method_27983();
             int i = (int)d >> 4;
             int j = (int)e >> 4;
             ImmutableMap.Builder builder = ImmutableMap.builder();

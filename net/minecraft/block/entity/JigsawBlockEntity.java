@@ -137,7 +137,7 @@ extends BlockEntity {
         return this.toTag(new CompoundTag());
     }
 
-    public void generate(ServerWorld arg, int i) {
+    public void generate(ServerWorld arg, int i, boolean bl) {
         ChunkGenerator lv = arg.getChunkManager().getChunkGenerator();
         StructureManager lv2 = arg.getStructureManager();
         StructureAccessor lv3 = arg.getStructureAccessor();
@@ -150,7 +150,7 @@ extends BlockEntity {
         RuntimeStructurePiece lv7 = new RuntimeStructurePiece(lv2, lv6, lv4, 1, BlockRotation.NONE, new BlockBox(lv4, lv4));
         StructurePoolBasedGenerator.method_27230(lv7, i, RuntimeStructurePiece::new, lv, lv2, list, random);
         for (PoolStructurePiece lv8 : list) {
-            lv8.method_27236(arg, lv3, lv, random, BlockBox.infinite(), lv4, true);
+            lv8.method_27236(arg, lv3, lv, random, BlockBox.infinite(), lv4, bl);
         }
     }
 

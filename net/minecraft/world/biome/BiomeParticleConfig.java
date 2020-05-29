@@ -22,7 +22,7 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 
 public class BiomeParticleConfig {
-    public static final Codec<BiomeParticleConfig> field_24675 = RecordCodecBuilder.create(instance -> instance.group((App)ParticleTypes.field_25125.fieldOf("options").forGetter(arg -> arg.field_24676), (App)Codec.FLOAT.fieldOf("probability").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, BiomeParticleConfig::new));
+    public static final Codec<BiomeParticleConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ParticleTypes.field_25125.fieldOf("options").forGetter(arg -> arg.field_24676), (App)Codec.FLOAT.fieldOf("probability").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, BiomeParticleConfig::new));
     private final ParticleEffect field_24676;
     private final float chance;
 

@@ -13,15 +13,17 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import javax.annotation.Nullable;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.loot.UniformLootTableRange;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class TimeCheckLootCondition
-implements LootCondition {
+implements class_5341 {
     @Nullable
     private final Long period;
     private final UniformLootTableRange value;
@@ -29,6 +31,11 @@ implements LootCondition {
     private TimeCheckLootCondition(@Nullable Long arg, UniformLootTableRange arg2) {
         this.period = arg;
         this.value = arg2;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.TIME_CHECK;
     }
 
     @Override
@@ -47,11 +54,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<TimeCheckLootCondition> {
-        public Factory() {
-            super(new Identifier("time_check"), TimeCheckLootCondition.class);
-        }
-
+    implements class_5335<TimeCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, TimeCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("period", (Number)arg.period);
@@ -66,7 +69,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

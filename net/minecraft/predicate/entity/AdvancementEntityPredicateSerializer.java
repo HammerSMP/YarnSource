@@ -9,14 +9,14 @@ package net.minecraft.predicate.entity;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import net.minecraft.class_5341;
 import net.minecraft.loot.LootGsons;
-import net.minecraft.loot.condition.LootCondition;
 
 public class AdvancementEntityPredicateSerializer {
     public static final AdvancementEntityPredicateSerializer INSTANCE = new AdvancementEntityPredicateSerializer();
     private final Gson gson = LootGsons.getConditionGsonBuilder().create();
 
-    public final JsonElement conditionsToJson(LootCondition[] args) {
+    public final JsonElement conditionsToJson(class_5341[] args) {
         return this.gson.toJsonTree((Object)args);
     }
 }

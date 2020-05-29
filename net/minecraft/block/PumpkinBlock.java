@@ -43,7 +43,7 @@ extends GourdBlock {
                 arg22.spawnEntity(lv4);
                 lv.damage(1, arg4, arg2 -> arg2.sendToolBreakStatus(arg5));
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg22.isClient);
         }
         return super.onUse(arg, arg22, arg3, arg4, arg5, arg6);
     }

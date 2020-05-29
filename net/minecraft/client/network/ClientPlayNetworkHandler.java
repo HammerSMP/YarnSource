@@ -4,6 +4,7 @@
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
+ *  com.google.common.collect.Sets
  *  com.mojang.authlib.GameProfile
  *  com.mojang.brigadier.CommandDispatcher
  *  io.netty.buffer.Unpooled
@@ -17,6 +18,7 @@ package net.minecraft.client.network;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import io.netty.buffer.Unpooled;
@@ -28,9 +30,11 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
@@ -38,7 +42,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BeaconBlockEntity;
 import net.minecraft.block.entity.BedBlockEntity;
@@ -53,8 +56,6 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
-import net.minecraft.class_5318;
-import net.minecraft.class_5321;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -161,7 +162,7 @@ import net.minecraft.entity.vehicle.HopperMinecartEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.entity.vehicle.SpawnerMinecartEntity;
 import net.minecraft.entity.vehicle.TntMinecartEntity;
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -309,13 +310,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.PositionImpl;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.LightType;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.logging.log4j.LogManager;
@@ -330,7 +334,7 @@ implements ClientPlayPacketListener {
     private final Screen loginScreen;
     private MinecraftClient client;
     private ClientWorld world;
-    private ClientWorld.class_5271 worldProperties;
+    private ClientWorld.Properties worldProperties;
     private boolean positionLookSetup;
     private final Map<UUID, PlayerListEntry> playerListEntries = Maps.newHashMap();
     private final ClientAdvancementManager advancementHandler;
@@ -342,7 +346,8 @@ implements ClientPlayPacketListener {
     private CommandDispatcher<CommandSource> commandDispatcher = new CommandDispatcher();
     private final RecipeManager recipeManager = new RecipeManager();
     private final UUID sessionId = UUID.randomUUID();
-    private class_5318 field_25063 = class_5318.method_29117();
+    private Set<RegistryKey<World>> field_25273;
+    private DimensionTracker dimensionTracker = DimensionTracker.create();
 
     public ClientPlayNetworkHandler(MinecraftClient arg, Screen arg2, ClientConnection arg3, GameProfile gameProfile) {
         this.client = arg;
@@ -367,7 +372,7 @@ implements ClientPlayPacketListener {
 
     @Override
     public void onGameJoin(GameJoinS2CPacket arg) {
-        ClientWorld.class_5271 lv2;
+        ClientWorld.Properties lv4;
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         this.client.interactionManager = new ClientPlayerInteractionManager(this.client, this);
         if (!this.connection.isLocal()) {
@@ -376,16 +381,21 @@ implements ClientPlayPacketListener {
             FluidTags.markReady();
             EntityTypeTags.markReady();
         }
-        this.field_25063 = arg.getDimension();
-        DimensionType lv = this.field_25063.method_29116().get(arg.method_29176());
+        ArrayList arrayList = Lists.newArrayList(arg.method_29443());
+        Collections.shuffle(arrayList);
+        this.field_25273 = Sets.newLinkedHashSet((Iterable)arrayList);
+        this.dimensionTracker = arg.getDimension();
+        RegistryKey<DimensionType> lv = arg.method_29444();
+        RegistryKey<World> lv2 = arg.getDimensionId();
+        DimensionType lv3 = this.dimensionTracker.getRegistry().get(lv);
         this.chunkLoadDistance = arg.getChunkLoadDistance();
         boolean bl = arg.isDebugWorld();
         boolean bl2 = arg.isFlatWorld();
-        this.worldProperties = lv2 = new ClientWorld.class_5271(Difficulty.NORMAL, arg.isHardcore(), bl2);
-        this.world = new ClientWorld(this, lv2, lv, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSeed());
+        this.worldProperties = lv4 = new ClientWorld.Properties(Difficulty.NORMAL, arg.isHardcore(), bl2);
+        this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSeed());
         this.client.joinWorld(this.world);
         if (this.client.player == null) {
-            this.client.player = this.client.interactionManager.createPlayer(this.world, new StatHandler(), new ClientRecipeBook(this.world.getRecipeManager()));
+            this.client.player = this.client.interactionManager.method_29357(this.world, new StatHandler(), new ClientRecipeBook(this.world.getRecipeManager()));
             this.client.player.yaw = -180.0f;
             if (this.client.getServer() != null) {
                 this.client.getServer().setLocalPlayerUuid(this.client.player.getUuid());
@@ -707,6 +717,9 @@ implements ClientPlayPacketListener {
             n = 0.0;
             lv.lastRenderZ = o = arg.getZ();
         }
+        if (lv.age > 0 && lv.getVehicle() != null) {
+            lv.method_29239();
+        }
         lv.setPos(g, k, o);
         lv.prevX = g;
         lv.prevY = k;
@@ -986,41 +999,42 @@ implements ClientPlayPacketListener {
     @Override
     public void onPlayerRespawn(PlayerRespawnS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        class_5321 lv = class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, arg.getDimension());
-        DimensionType lv2 = this.field_25063.method_29116().method_29107(lv);
-        ClientPlayerEntity lv3 = this.client.player;
-        int i = lv3.getEntityId();
+        RegistryKey<DimensionType> lv = arg.method_29445();
+        RegistryKey<World> lv2 = arg.getDimension();
+        DimensionType lv3 = this.dimensionTracker.getRegistry().get(lv);
+        ClientPlayerEntity lv4 = this.client.player;
+        int i = lv4.getEntityId();
         this.positionLookSetup = false;
-        if (lv != lv3.world.method_27983()) {
-            ClientWorld.class_5271 lv5;
-            Scoreboard lv4 = this.world.getScoreboard();
+        if (lv2 != lv4.world.method_27983()) {
+            ClientWorld.Properties lv6;
+            Scoreboard lv5 = this.world.getScoreboard();
             boolean bl = arg.isDebugWorld();
             boolean bl2 = arg.isFlatWorld();
-            this.worldProperties = lv5 = new ClientWorld.class_5271(this.worldProperties.getDifficulty(), this.worldProperties.isHardcore(), bl2);
-            this.world = new ClientWorld(this, lv5, lv2, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
-            this.world.setScoreboard(lv4);
+            this.worldProperties = lv6 = new ClientWorld.Properties(this.worldProperties.getDifficulty(), this.worldProperties.isHardcore(), bl2);
+            this.world = new ClientWorld(this, lv6, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
+            this.world.setScoreboard(lv5);
             this.client.joinWorld(this.world);
             this.client.openScreen(new DownloadingTerrainScreen());
         }
         this.world.finishRemovingEntities();
-        String string = lv3.getServerBrand();
+        String string = lv4.getServerBrand();
         this.client.cameraEntity = null;
-        ClientPlayerEntity lv6 = this.client.interactionManager.createPlayer(this.world, lv3.getStatHandler(), lv3.getRecipeBook());
-        lv6.setEntityId(i);
-        this.client.player = lv6;
-        this.client.cameraEntity = lv6;
-        lv6.getDataTracker().writeUpdatedEntries(lv3.getDataTracker().getAllEntries());
+        ClientPlayerEntity lv7 = this.client.interactionManager.createPlayer(this.world, lv4.getStatHandler(), lv4.getRecipeBook(), lv4.isSneaking(), lv4.isSprinting());
+        lv7.setEntityId(i);
+        this.client.player = lv7;
+        this.client.cameraEntity = lv7;
+        lv7.getDataTracker().writeUpdatedEntries(lv4.getDataTracker().getAllEntries());
         if (arg.shouldKeepPlayerAttributes()) {
-            lv6.getAttributes().setFrom(lv3.getAttributes());
+            lv7.getAttributes().setFrom(lv4.getAttributes());
         }
-        lv6.afterSpawn();
-        lv6.setServerBrand(string);
-        this.world.addPlayer(i, lv6);
-        lv6.yaw = -180.0f;
-        lv6.input = new KeyboardInput(this.client.options);
-        this.client.interactionManager.copyAbilities(lv6);
-        lv6.setReducedDebugInfo(lv3.getReducedDebugInfo());
-        lv6.setShowsDeathScreen(lv3.showsDeathScreen());
+        lv7.afterSpawn();
+        lv7.setServerBrand(string);
+        this.world.addPlayer(i, lv7);
+        lv7.yaw = -180.0f;
+        lv7.input = new KeyboardInput(this.client.options);
+        this.client.interactionManager.copyAbilities(lv7);
+        lv7.setReducedDebugInfo(lv4.getReducedDebugInfo());
+        lv7.setShowsDeathScreen(lv4.showsDeathScreen());
         if (this.client.currentScreen instanceof DeathScreen) {
             this.client.openScreen(null);
         }
@@ -1042,7 +1056,7 @@ implements ClientPlayPacketListener {
         if (lv instanceof HorseBaseEntity) {
             ClientPlayerEntity lv2 = this.client.player;
             HorseBaseEntity lv3 = (HorseBaseEntity)lv;
-            BasicInventory lv4 = new BasicInventory(arg.getSlotCount());
+            SimpleInventory lv4 = new SimpleInventory(arg.getSlotCount());
             HorseScreenHandler lv5 = new HorseScreenHandler(arg.getSyncId(), lv2.inventory, lv4, lv3);
             lv2.currentScreenHandler = lv5;
             this.client.openScreen(new HorseScreen(lv5, lv2.inventory, lv3));
@@ -1400,11 +1414,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         this.tagManager = arg.getTagManager();
         if (!this.connection.isLocal()) {
-            BlockTags.setContainer(this.tagManager.blocks());
-            ItemTags.setContainer(this.tagManager.items());
-            FluidTags.setContainer(this.tagManager.fluids());
-            EntityTypeTags.setContainer(this.tagManager.entityTypes());
-            Blocks.refreshShapeCache();
+            this.tagManager.method_29226();
         }
         this.client.getSearchableContainer(SearchManager.ITEM_TAG).reload();
     }
@@ -1425,8 +1435,8 @@ implements ClientPlayPacketListener {
     @Override
     public void onDifficulty(DifficultyS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.worldProperties.method_27875(arg.getDifficulty());
-        this.worldProperties.method_27876(arg.isDifficultyLocked());
+        this.worldProperties.setDifficulty(arg.getDifficulty());
+        this.worldProperties.setDifficultyLocked(arg.isDifficultyLocked());
     }
 
     @Override
@@ -1713,7 +1723,7 @@ implements ClientPlayPacketListener {
                 }
                 this.client.debugRenderer.caveDebugRenderer.method_3704(lv5, list, list2);
             } else if (CustomPayloadS2CPacket.DEBUG_STRUCTURES.equals(lv)) {
-                DimensionType lv6 = this.field_25063.method_29116().get(lv2.readIdentifier());
+                DimensionType lv6 = this.dimensionTracker.getRegistry().get(lv2.readIdentifier());
                 BlockBox lv7 = new BlockBox(lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt());
                 int m = lv2.readInt();
                 ArrayList list3 = Lists.newArrayList();
@@ -1810,61 +1820,66 @@ implements ClientPlayPacketListener {
                 }
                 int al = lv2.readInt();
                 for (int am = 0; am < al; ++am) {
+                    BlockPos lv18 = lv2.readBlockPos();
+                    lv16.field_25287.add(lv18);
+                }
+                int an = lv2.readInt();
+                for (int ao = 0; ao < an; ++ao) {
                     String string9 = lv2.readString();
                     lv16.field_19375.add(string9);
                 }
                 this.client.debugRenderer.villageDebugRenderer.addBrain(lv16);
             } else if (CustomPayloadS2CPacket.DEBUG_BEE.equals(lv)) {
-                double an = lv2.readDouble();
-                double ao = lv2.readDouble();
                 double ap = lv2.readDouble();
-                PositionImpl lv18 = new PositionImpl(an, ao, ap);
+                double aq = lv2.readDouble();
+                double ar = lv2.readDouble();
+                PositionImpl lv19 = new PositionImpl(ap, aq, ar);
                 UUID uUID2 = lv2.readUuid();
-                int aq = lv2.readInt();
+                int as = lv2.readInt();
                 boolean bl4 = lv2.readBoolean();
-                BlockPos lv19 = null;
-                if (bl4) {
-                    lv19 = lv2.readBlockPos();
-                }
-                boolean bl5 = lv2.readBoolean();
                 BlockPos lv20 = null;
-                if (bl5) {
+                if (bl4) {
                     lv20 = lv2.readBlockPos();
                 }
-                int ar = lv2.readInt();
+                boolean bl5 = lv2.readBoolean();
+                BlockPos lv21 = null;
+                if (bl5) {
+                    lv21 = lv2.readBlockPos();
+                }
+                int at = lv2.readInt();
                 boolean bl6 = lv2.readBoolean();
-                Path lv21 = null;
+                Path lv22 = null;
                 if (bl6) {
-                    lv21 = Path.fromBuffer(lv2);
+                    lv22 = Path.fromBuffer(lv2);
                 }
-                BeeDebugRenderer.Bee lv22 = new BeeDebugRenderer.Bee(uUID2, aq, lv18, lv21, lv19, lv20, ar);
-                int as = lv2.readInt();
-                for (int at = 0; at < as; ++at) {
-                    String string10 = lv2.readString();
-                    lv22.labels.add(string10);
-                }
+                BeeDebugRenderer.Bee lv23 = new BeeDebugRenderer.Bee(uUID2, as, lv19, lv22, lv20, lv21, at);
                 int au = lv2.readInt();
                 for (int av = 0; av < au; ++av) {
-                    BlockPos lv23 = lv2.readBlockPos();
-                    lv22.blacklist.add(lv23);
+                    String string10 = lv2.readString();
+                    lv23.labels.add(string10);
                 }
-                this.client.debugRenderer.beeDebugRenderer.addBee(lv22);
-            } else if (CustomPayloadS2CPacket.DEBUG_HIVE.equals(lv)) {
-                BlockPos lv24 = lv2.readBlockPos();
-                String string11 = lv2.readString();
                 int aw = lv2.readInt();
-                int ax = lv2.readInt();
+                for (int ax = 0; ax < aw; ++ax) {
+                    BlockPos lv24 = lv2.readBlockPos();
+                    lv23.blacklist.add(lv24);
+                }
+                this.client.debugRenderer.beeDebugRenderer.addBee(lv23);
+            } else if (CustomPayloadS2CPacket.DEBUG_HIVE.equals(lv)) {
+                BlockPos lv25 = lv2.readBlockPos();
+                String string11 = lv2.readString();
+                int ay = lv2.readInt();
+                int az = lv2.readInt();
                 boolean bl7 = lv2.readBoolean();
-                BeeDebugRenderer.Hive lv25 = new BeeDebugRenderer.Hive(lv24, string11, aw, ax, bl7, this.world.getTime());
-                this.client.debugRenderer.beeDebugRenderer.addHive(lv25);
+                BeeDebugRenderer.Hive lv26 = new BeeDebugRenderer.Hive(lv25, string11, ay, az, bl7, this.world.getTime());
+                this.client.debugRenderer.beeDebugRenderer.addHive(lv26);
             } else if (CustomPayloadS2CPacket.DEBUG_GAME_TEST_CLEAR.equals(lv)) {
                 this.client.debugRenderer.gameTestDebugRenderer.clear();
             } else if (CustomPayloadS2CPacket.DEBUG_GAME_TEST_ADD_MARKER.equals(lv)) {
-                BlockPos lv26 = lv2.readBlockPos();
-                int ay = lv2.readInt();
+                BlockPos lv27 = lv2.readBlockPos();
+                int ba = lv2.readInt();
                 String string12 = lv2.readString();
-                int az = lv2.readInt();
-                this.client.debugRenderer.gameTestDebugRenderer.addMarker(lv26, ay, string12, az);
+                int bb = lv2.readInt();
+                this.client.debugRenderer.gameTestDebugRenderer.addMarker(lv27, ba, string12, bb);
             } else {
                 LOGGER.warn("Unknown custom packed identifier: {}", (Object)lv);
             }
@@ -2145,8 +2160,12 @@ implements ClientPlayPacketListener {
         return this.sessionId;
     }
 
-    public class_5318 method_29091() {
-        return this.field_25063;
+    public Set<RegistryKey<World>> method_29356() {
+        return this.field_25273;
+    }
+
+    public DimensionTracker method_29091() {
+        return this.dimensionTracker;
     }
 }
 

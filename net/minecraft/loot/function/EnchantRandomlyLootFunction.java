@@ -33,15 +33,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.MathHelper;
@@ -54,9 +56,14 @@ extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<Enchantment> enchantments;
 
-    private EnchantRandomlyLootFunction(LootCondition[] args, Collection<Enchantment> collection) {
+    private EnchantRandomlyLootFunction(class_5341[] args, Collection<Enchantment> collection) {
         super(args);
         this.enchantments = ImmutableList.copyOf(collection);
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.ENCHANT_RANDOMLY;
     }
 
     @Override
@@ -89,15 +96,11 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> builder() {
-        return EnchantRandomlyLootFunction.builder(args -> new EnchantRandomlyLootFunction((LootCondition[])args, (Collection<Enchantment>)ImmutableList.of()));
+        return EnchantRandomlyLootFunction.builder(args -> new EnchantRandomlyLootFunction((class_5341[])args, (Collection<Enchantment>)ImmutableList.of()));
     }
 
     public static class Factory
     extends ConditionalLootFunction.Factory<EnchantRandomlyLootFunction> {
-        public Factory() {
-            super(new Identifier("enchant_randomly"), EnchantRandomlyLootFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, EnchantRandomlyLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -115,7 +118,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public EnchantRandomlyLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public EnchantRandomlyLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             ArrayList list = Lists.newArrayList();
             if (jsonObject.has("enchantments")) {
                 JsonArray jsonArray = JsonHelper.getArray(jsonObject, "enchantments");
@@ -129,7 +132,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

@@ -19,7 +19,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class RandomRandomFeatureConfig
 implements FeatureConfig {
-    public static final Codec<RandomRandomFeatureConfig> field_24903 = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.field_24833.listOf().fieldOf("features").forGetter(arg -> arg.features), (App)Codec.INT.fieldOf("count").withDefault((Object)0).forGetter(arg -> arg.count)).apply((Applicative)instance, RandomRandomFeatureConfig::new));
+    public static final Codec<RandomRandomFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.field_24833.listOf().fieldOf("features").forGetter(arg -> arg.features), (App)Codec.INT.fieldOf("count").withDefault((Object)0).forGetter(arg -> arg.count)).apply((Applicative)instance, RandomRandomFeatureConfig::new));
     public final List<ConfiguredFeature<?, ?>> features;
     public final int count;
 

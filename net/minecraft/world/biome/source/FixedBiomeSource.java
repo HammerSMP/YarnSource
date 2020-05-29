@@ -42,7 +42,7 @@ extends BiomeSource {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource create(long l) {
+    public BiomeSource withSeed(long l) {
         return this;
     }
 

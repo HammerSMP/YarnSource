@@ -53,6 +53,7 @@ extends Feature<DefaultFeatureConfig> {
         this.tryPlaceBasalt(arg, random, lv2.set(lv, Direction.SOUTH));
         this.tryPlaceBasalt(arg, random, lv2.set(lv, Direction.WEST));
         this.tryPlaceBasalt(arg, random, lv2.set(lv, Direction.EAST));
+        lv.move(Direction.DOWN);
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
         for (int i = -3; i < 4; ++i) {
             for (int j = -3; j < 4; ++j) {

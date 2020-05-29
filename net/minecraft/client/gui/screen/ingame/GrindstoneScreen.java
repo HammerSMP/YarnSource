@@ -27,12 +27,6 @@ extends HandledScreen<GrindstoneScreenHandler> {
     }
 
     @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, 8.0f, 6.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 96 + 2), 0x404040);
-    }
-
-    @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         this.drawBackground(arg, f, i, j);

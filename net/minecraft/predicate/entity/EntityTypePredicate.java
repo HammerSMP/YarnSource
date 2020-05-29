@@ -17,8 +17,8 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import javax.annotation.Nullable;
+import net.minecraft.class_5323;
 import net.minecraft.entity.EntityType;
-import net.minecraft.tag.EntityTypeTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -50,7 +50,7 @@ public abstract class EntityTypePredicate {
         String string = JsonHelper.asString(jsonElement, "type");
         if (string.startsWith("#")) {
             Identifier lv = new Identifier(string.substring(1));
-            return new Tagged(EntityTypeTags.getContainer().getOrCreate(lv));
+            return new Tagged(class_5323.method_29223().method_29222().getOrCreate(lv));
         }
         Identifier lv2 = new Identifier(string);
         EntityType lv3 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown entity type '" + lv2 + "', valid types are: " + COMMA_JOINER.join(Registry.ENTITY_TYPE.getIds())));
@@ -80,7 +80,7 @@ public abstract class EntityTypePredicate {
 
         @Override
         public JsonElement toJson() {
-            return new JsonPrimitive("#" + EntityTypeTags.getContainer().checkId(this.tag));
+            return new JsonPrimitive("#" + class_5323.method_29223().method_29222().checkId(this.tag));
         }
     }
 

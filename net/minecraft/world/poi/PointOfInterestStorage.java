@@ -98,7 +98,7 @@ extends SerializingRegionBasedStorage<PointOfInterestSet> {
     }
 
     public Optional<BlockPos> getNearestPosition(Predicate<PointOfInterestType> predicate, BlockPos arg, int i, OccupationStatus arg22) {
-        return this.getInCircle(predicate, arg, i, arg22).map(PointOfInterest::getPos).sorted(Comparator.comparingDouble(arg2 -> arg2.getSquaredDistance(arg))).findFirst();
+        return this.getInCircle(predicate, arg, i, arg22).map(PointOfInterest::getPos).min(Comparator.comparingDouble(arg2 -> arg2.getSquaredDistance(arg)));
     }
 
     public Optional<BlockPos> getPosition(Predicate<PointOfInterestType> predicate, Predicate<BlockPos> predicate2, BlockPos arg2, int i) {
@@ -172,7 +172,7 @@ extends SerializingRegionBasedStorage<PointOfInterestSet> {
     }
 
     private static boolean shouldScan(ChunkSection arg) {
-        return PointOfInterestType.getAllAssociatedStates().anyMatch(arg::method_19523);
+        return arg.method_19523(PointOfInterestType.field_25162::contains);
     }
 
     private void scanAndPopulate(ChunkSection arg, ChunkSectionPos arg2, BiConsumer<BlockPos, PointOfInterestType> biConsumer) {

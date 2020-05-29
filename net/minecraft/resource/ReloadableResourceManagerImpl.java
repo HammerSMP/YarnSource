@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resource.NamespaceResourceManager;
@@ -52,15 +53,15 @@ implements ReloadableResourceManager {
     private final List<ResourceReloadListener> listeners = Lists.newArrayList();
     private final List<ResourceReloadListener> initialListeners = Lists.newArrayList();
     private final Set<String> namespaces = Sets.newLinkedHashSet();
+    private final List<ResourcePack> field_25145 = Lists.newArrayList();
     private final ResourceType type;
-    private final Thread mainThread;
 
-    public ReloadableResourceManagerImpl(ResourceType arg, Thread thread) {
+    public ReloadableResourceManagerImpl(ResourceType arg) {
         this.type = arg;
-        this.mainThread = thread;
     }
 
     public void addPack(ResourcePack arg) {
+        this.field_25145.add(arg);
         for (String string : arg.getNamespaces(this.type)) {
             this.namespaces.add(string);
             NamespaceResourceManager lv = this.namespaceManagers.get(string);
@@ -120,12 +121,7 @@ implements ReloadableResourceManager {
     private void clear() {
         this.namespaceManagers.clear();
         this.namespaces.clear();
-    }
-
-    @Override
-    public CompletableFuture<Unit> beginReload(Executor executor, Executor executor2, List<ResourcePack> list, CompletableFuture<Unit> completableFuture) {
-        ResourceReloadMonitor lv = this.beginMonitoredReload(executor, executor2, completableFuture, list);
-        return lv.whenComplete();
+        this.field_25145.clear();
     }
 
     @Override
@@ -159,6 +155,12 @@ implements ReloadableResourceManager {
             }
         }
         return this.beginReloadInner(executor, executor2, this.listeners, completableFuture);
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public Stream<ResourcePack> method_29213() {
+        return this.field_25145.stream();
     }
 
     static class FailedResourceReloadMonitor

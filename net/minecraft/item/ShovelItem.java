@@ -59,6 +59,7 @@ extends MiningToolItem {
                 if (!lv.isClient()) {
                     lv.syncWorldEvent(null, 1009, lv2, 0);
                 }
+                CampfireBlock.method_29288(lv, lv2, lv3);
                 lv6 = (BlockState)lv3.with(CampfireBlock.LIT, false);
             }
             if (lv6 != null) {
@@ -68,7 +69,7 @@ extends MiningToolItem {
                         arg.getStack().damage(1, lv4, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
                     }
                 }
-                return ActionResult.SUCCESS;
+                return ActionResult.method_29236(lv.isClient);
             }
             return ActionResult.PASS;
         }

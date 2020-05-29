@@ -16,6 +16,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ModifiableTestableWorld;
@@ -43,11 +44,11 @@ public abstract class FoliagePlacer {
 
     protected abstract FoliagePlacerType<?> method_28843();
 
-    public void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, TreeNode arg3, int j, int k, Set<BlockPos> set) {
-        this.generate(arg, random, arg2, i, arg3, j, k, set, this.method_27386(random));
+    public void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, TreeNode arg3, int j, int k, Set<BlockPos> set, BlockBox arg4) {
+        this.generate(arg, random, arg2, i, arg3, j, k, set, this.method_27386(random), arg4);
     }
 
-    protected abstract void generate(ModifiableTestableWorld var1, Random var2, TreeFeatureConfig var3, int var4, TreeNode var5, int var6, int var7, Set<BlockPos> var8, int var9);
+    protected abstract void generate(ModifiableTestableWorld var1, Random var2, TreeFeatureConfig var3, int var4, TreeNode var5, int var6, int var7, Set<BlockPos> var8, int var9, BlockBox var10);
 
     public abstract int getHeight(Random var1, int var2, TreeFeatureConfig var3);
 
@@ -74,7 +75,7 @@ public abstract class FoliagePlacer {
         return this.isInvalidForLeaves(random, o, j, p, l, bl);
     }
 
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, BlockPos arg3, int i, Set<BlockPos> set, int j, boolean bl) {
+    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, BlockPos arg3, int i, Set<BlockPos> set, int j, boolean bl, BlockBox arg4) {
         int k = bl ? 1 : 0;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int l = -i; l <= i + k; ++l) {
@@ -83,6 +84,7 @@ public abstract class FoliagePlacer {
                 lv.set(arg3, l, j, m);
                 if (!TreeFeature.canReplace(arg, lv)) continue;
                 arg.setBlockState(lv, arg2.leavesProvider.getBlockState(random, lv), 19);
+                arg4.encompass(new BlockBox(lv, lv));
                 set.add(lv.toImmutable());
             }
         }

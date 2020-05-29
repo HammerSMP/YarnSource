@@ -11,8 +11,6 @@ package net.minecraft.item;
 import com.mojang.serialization.DynamicOps;
 import java.util.Optional;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5318;
-import net.minecraft.class_5321;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -28,8 +26,8 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.poi.PointOfInterestType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,8 +51,8 @@ implements Vanishable {
         return CompassItem.hasLodestone(arg) || super.hasEnchantmentGlint(arg);
     }
 
-    public static Optional<class_5321<DimensionType>> getLodestoneDimension(CompoundTag arg) {
-        return DimensionType.field_24751.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("LodestoneDimension")).result();
+    public static Optional<RegistryKey<World>> getLodestoneDimension(CompoundTag arg) {
+        return World.field_25178.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("LodestoneDimension")).result();
     }
 
     @Override
@@ -67,7 +65,7 @@ implements Vanishable {
             if (lv.contains("LodestoneTracked") && !lv.getBoolean("LodestoneTracked")) {
                 return;
             }
-            Optional<class_5321<DimensionType>> optional = CompassItem.getLodestoneDimension(lv);
+            Optional<RegistryKey<World>> optional = CompassItem.getLodestoneDimension(lv);
             if (optional.isPresent() && optional.get() == arg2.method_27983() && lv.contains("LodestonePos") && !((ServerWorld)arg2).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos(lv.getCompound("LodestonePos")))) {
                 lv.remove("LodestonePos");
             }
@@ -82,7 +80,7 @@ implements Vanishable {
             arg.world.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             boolean bl2 = bl = !arg.player.abilities.creativeMode && arg.stack.getCount() == 1;
             if (bl) {
-                this.method_27315(arg.world.method_28380(), arg.world.getDimension(), lv, arg.stack.getOrCreateTag());
+                this.method_27315(arg.world.method_27983(), lv, arg.stack.getOrCreateTag());
             } else {
                 ItemStack lv2 = new ItemStack(Items.COMPASS, 1);
                 CompoundTag lv3 = arg.stack.hasTag() ? arg.stack.getTag().copy() : new CompoundTag();
@@ -90,20 +88,20 @@ implements Vanishable {
                 if (!arg.player.abilities.creativeMode) {
                     arg.stack.decrement(1);
                 }
-                this.method_27315(arg.world.method_28380(), arg.world.getDimension(), lv, lv3);
+                this.method_27315(arg.world.method_27983(), lv, lv3);
                 if (!arg.player.inventory.insertStack(lv2)) {
                     arg.player.dropItem(lv2, false);
                 }
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg.world.isClient);
         }
         return super.useOnBlock(arg);
     }
 
-    private void method_27315(class_5318 arg, DimensionType arg22, BlockPos arg3, CompoundTag arg4) {
-        arg4.put("LodestonePos", NbtHelper.fromBlockPos(arg3));
-        arg.method_29116().encodeStart(NbtOps.INSTANCE, arg22).resultOrPartial(((Logger)field_24670)::error).ifPresent(arg2 -> arg4.put("LodestoneDimension", (Tag)arg2));
-        arg4.putBoolean("LodestoneTracked", true);
+    private void method_27315(RegistryKey<World> arg, BlockPos arg22, CompoundTag arg3) {
+        arg3.put("LodestonePos", NbtHelper.fromBlockPos(arg22));
+        World.field_25178.encodeStart((DynamicOps)NbtOps.INSTANCE, arg).resultOrPartial(((Logger)field_24670)::error).ifPresent(arg2 -> arg3.put("LodestoneDimension", (Tag)arg2));
+        arg3.putBoolean("LodestoneTracked", true);
     }
 
     @Override

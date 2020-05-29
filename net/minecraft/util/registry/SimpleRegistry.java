@@ -11,6 +11,8 @@
  *  com.mojang.serialization.Lifecycle
  *  com.mojang.serialization.MapCodec
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  *  org.apache.commons.lang3.Validate
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -26,16 +28,19 @@ import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapCodec;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import javax.annotation.Nullable;
-import net.minecraft.class_5321;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.Int2ObjectBiMap;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,26 +49,26 @@ public class SimpleRegistry<T>
 extends MutableRegistry<T> {
     protected static final Logger LOGGER = LogManager.getLogger();
     protected final Int2ObjectBiMap<T> indexedEntries = new Int2ObjectBiMap(256);
-    protected final BiMap<Identifier, T> entries = HashBiMap.create();
-    protected final BiMap<class_5321<T>, T> field_25067 = HashBiMap.create();
+    protected final BiMap<Identifier, T> entriesById = HashBiMap.create();
+    protected final BiMap<RegistryKey<T>, T> entriesByKey = HashBiMap.create();
     protected Object[] randomEntries;
     private int nextId;
 
-    public SimpleRegistry(class_5321<Registry<T>> arg, Lifecycle lifecycle) {
+    public SimpleRegistry(RegistryKey<Registry<T>> arg, Lifecycle lifecycle) {
         super(arg, lifecycle);
     }
 
     @Override
-    public <V extends T> V set(int i, class_5321<T> arg, V object) {
+    public <V extends T> V set(int i, RegistryKey<T> arg, V object) {
         this.indexedEntries.put(object, i);
         Validate.notNull(arg);
         Validate.notNull(object);
         this.randomEntries = null;
-        if (this.field_25067.containsKey(arg)) {
+        if (this.entriesByKey.containsKey(arg)) {
             LOGGER.debug("Adding duplicate key '{}' to registry", arg);
         }
-        this.entries.put((Object)arg.method_29177(), object);
-        this.field_25067.put(arg, object);
+        this.entriesById.put((Object)arg.getValue(), object);
+        this.entriesByKey.put(arg, object);
         if (this.nextId <= i) {
             this.nextId = i + 1;
         }
@@ -71,23 +76,20 @@ extends MutableRegistry<T> {
     }
 
     @Override
-    public <V extends T> V add(class_5321<T> arg, V object) {
+    public <V extends T> V add(RegistryKey<T> arg, V object) {
         return this.set(this.nextId, arg, object);
     }
 
     @Override
     @Nullable
     public Identifier getId(T object) {
-        return (Identifier)this.entries.inverse().get(object);
+        return (Identifier)this.entriesById.inverse().get(object);
     }
 
     @Override
-    public class_5321<T> method_29113(T object) {
-        class_5321 lv = (class_5321)this.field_25067.inverse().get(object);
-        if (lv == null) {
-            throw new IllegalStateException("Unregistered registry element: " + object + " in " + this);
-        }
-        return lv;
+    @Environment(value=EnvType.CLIENT)
+    public Optional<RegistryKey<T>> getKey(T object) {
+        return Optional.ofNullable(this.entriesByKey.inverse().get(object));
     }
 
     @Override
@@ -97,8 +99,9 @@ extends MutableRegistry<T> {
 
     @Override
     @Nullable
-    public T method_29107(@Nullable class_5321<T> arg) {
-        return (T)this.field_25067.get(arg);
+    @Environment(value=EnvType.CLIENT)
+    public T get(@Nullable RegistryKey<T> arg) {
+        return (T)this.entriesByKey.get(arg);
     }
 
     @Override
@@ -115,23 +118,23 @@ extends MutableRegistry<T> {
     @Override
     @Nullable
     public T get(@Nullable Identifier arg) {
-        return (T)this.entries.get((Object)arg);
+        return (T)this.entriesById.get((Object)arg);
     }
 
     @Override
     public Optional<T> getOrEmpty(@Nullable Identifier arg) {
-        return Optional.ofNullable(this.entries.get((Object)arg));
+        return Optional.ofNullable(this.entriesById.get((Object)arg));
     }
 
     @Override
     public Set<Identifier> getIds() {
-        return Collections.unmodifiableSet(this.entries.keySet());
+        return Collections.unmodifiableSet(this.entriesById.keySet());
     }
 
     @Nullable
     public T getRandom(Random random) {
         if (this.randomEntries == null) {
-            Set collection = this.entries.values();
+            Set collection = this.entriesById.values();
             if (collection.isEmpty()) {
                 return null;
             }
@@ -142,30 +145,25 @@ extends MutableRegistry<T> {
 
     @Override
     public boolean containsId(Identifier arg) {
-        return this.entries.containsKey((Object)arg);
+        return this.entriesById.containsKey((Object)arg);
     }
 
     @Override
-    public boolean method_29112(class_5321<T> arg) {
-        return this.field_25067.containsKey(arg);
+    public boolean containsId(int i) {
+        return this.indexedEntries.containsId(i);
     }
 
-    @Override
-    public boolean method_29111(int i) {
-        return this.indexedEntries.method_28138(i);
-    }
-
-    public static <T> Codec<SimpleRegistry<T>> method_29098(class_5321<Registry<T>> arg2, Lifecycle lifecycle, Codec<T> codec) {
-        return Codec.mapPair((MapCodec)Identifier.field_25139.xmap(class_5321.method_29178(arg2), class_5321::method_29177).fieldOf("key"), (MapCodec)codec.fieldOf("element")).codec().listOf().xmap(list -> {
+    public static <T> Codec<SimpleRegistry<T>> method_29098(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, Codec<T> codec) {
+        return Codec.mapPair((MapCodec)Identifier.field_25139.xmap(RegistryKey.createKeyFactory(arg2), RegistryKey::getValue).fieldOf("key"), (MapCodec)codec.fieldOf("element")).codec().listOf().xmap(list -> {
             SimpleRegistry lv = new SimpleRegistry(arg2, lifecycle);
             for (Pair pair : list) {
-                lv.add((class_5321)pair.getFirst(), pair.getSecond());
+                lv.add((RegistryKey)pair.getFirst(), pair.getSecond());
             }
             return lv;
         }, arg -> {
             ImmutableList.Builder builder = ImmutableList.builder();
-            for (Object object : arg) {
-                builder.add((Object)Pair.of(arg.method_29113(object), object));
+            for (Map.Entry entry : arg.entriesByKey.entrySet()) {
+                builder.add((Object)Pair.of(entry.getKey(), entry.getValue()));
             }
             return builder.build();
         });

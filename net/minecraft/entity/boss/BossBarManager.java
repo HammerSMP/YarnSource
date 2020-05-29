@@ -13,18 +13,12 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class BossBarManager {
-    private final MinecraftServer server;
     private final Map<Identifier, CommandBossBar> commandBossBars = Maps.newHashMap();
-
-    public BossBarManager(MinecraftServer minecraftServer) {
-        this.server = minecraftServer;
-    }
 
     @Nullable
     public CommandBossBar get(Identifier arg) {

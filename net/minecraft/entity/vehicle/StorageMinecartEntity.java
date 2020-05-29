@@ -8,7 +8,6 @@ package net.minecraft.entity.vehicle;
 
 import javax.annotation.Nullable;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -31,9 +30,9 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public abstract class StorageMinecartEntity
 extends AbstractMinecartEntity
@@ -125,7 +124,7 @@ NamedScreenHandlerFactory {
 
     @Override
     @Nullable
-    public Entity changeDimension(class_5321<DimensionType> arg) {
+    public Entity changeDimension(RegistryKey<World> arg) {
         this.field_7733 = false;
         return super.changeDimension(arg);
     }

@@ -2,21 +2,25 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.base.Suppliers
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Maps
+ *  it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
  */
 package net.minecraft.world.poi;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,7 +32,8 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.village.VillagerProfession;
 
 public class PointOfInterestType {
-    private static final Predicate<PointOfInterestType> IS_USED_BY_PROFESSION = arg -> Registry.VILLAGER_PROFESSION.stream().map(VillagerProfession::getWorkStation).collect(Collectors.toSet()).contains(arg);
+    private static final Supplier<Set<PointOfInterestType>> field_25163 = Suppliers.memoize(() -> Registry.VILLAGER_PROFESSION.stream().map(VillagerProfession::getWorkStation).collect(Collectors.toSet()));
+    public static final Predicate<PointOfInterestType> IS_USED_BY_PROFESSION = arg -> field_25163.get().contains(arg);
     public static final Predicate<PointOfInterestType> ALWAYS_TRUE = arg -> true;
     private static final Set<BlockState> BED_STATES = (Set)ImmutableList.of((Object)Blocks.RED_BED, (Object)Blocks.BLACK_BED, (Object)Blocks.BLUE_BED, (Object)Blocks.BROWN_BED, (Object)Blocks.CYAN_BED, (Object)Blocks.GRAY_BED, (Object)Blocks.GREEN_BED, (Object)Blocks.LIGHT_BLUE_BED, (Object)Blocks.LIGHT_GRAY_BED, (Object)Blocks.LIME_BED, (Object)Blocks.MAGENTA_BED, (Object)Blocks.ORANGE_BED, (Object[])new Block[]{Blocks.PINK_BED, Blocks.PURPLE_BED, Blocks.WHITE_BED, Blocks.YELLOW_BED}).stream().flatMap(arg -> arg.getStateManager().getStates().stream()).filter(arg -> arg.get(BedBlock.PART) == BedPart.HEAD).collect(ImmutableSet.toImmutableSet());
     private static final Map<BlockState, PointOfInterestType> BLOCK_STATE_TO_POINT_OF_INTEREST_TYPE = Maps.newHashMap();
@@ -53,6 +58,7 @@ public class PointOfInterestType {
     public static final PointOfInterestType BEE_NEST = PointOfInterestType.register("bee_nest", PointOfInterestType.getAllStatesOf(Blocks.BEE_NEST), 0, 1);
     public static final PointOfInterestType NETHER_PORTAL = PointOfInterestType.register("nether_portal", PointOfInterestType.getAllStatesOf(Blocks.NETHER_PORTAL), 0, 1);
     public static final PointOfInterestType LODESTONE = PointOfInterestType.register("lodestone", PointOfInterestType.getAllStatesOf(Blocks.LODESTONE), 0, 1);
+    protected static final Set<BlockState> field_25162 = new ObjectOpenHashSet(BLOCK_STATE_TO_POINT_OF_INTEREST_TYPE.keySet());
     private final String id;
     private final Set<BlockState> blockStates;
     private final int ticketCount;
@@ -115,10 +121,6 @@ public class PointOfInterestType {
 
     public static Optional<PointOfInterestType> from(BlockState arg) {
         return Optional.ofNullable(BLOCK_STATE_TO_POINT_OF_INTEREST_TYPE.get(arg));
-    }
-
-    public static Stream<BlockState> getAllAssociatedStates() {
-        return BLOCK_STATE_TO_POINT_OF_INTEREST_TYPE.keySet().stream();
     }
 }
 

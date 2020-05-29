@@ -46,7 +46,6 @@ import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.class_5321;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.ProtectionEnchantment;
@@ -114,7 +113,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -195,6 +194,7 @@ CommandOutput {
     public int chunkX;
     public int chunkY;
     public int chunkZ;
+    private boolean field_25154;
     public long trackedX;
     public long trackedY;
     public long trackedZ;
@@ -911,7 +911,7 @@ CommandOutput {
         if (this.isTouchingWater()) {
             return true;
         }
-        double d = this.world.getDimension().method_27998() ? 0.007 : 0.0023333333333333335;
+        double d = this.world.getDimension().hasCeiling() ? 0.007 : 0.0023333333333333335;
         return this.updateMovementInFluid(FluidTags.LAVA, d);
     }
 
@@ -931,7 +931,7 @@ CommandOutput {
     }
 
     private void updateSubmergedInWaterState() {
-        this.submergedInWater = this.isSubmergedIn(FluidTags.WATER, true);
+        this.submergedInWater = this.isSubmergedIn(FluidTags.WATER);
     }
 
     protected void onSwimmingStart() {
@@ -985,20 +985,7 @@ CommandOutput {
     }
 
     public boolean isSubmergedIn(Tag<Fluid> arg) {
-        return this.isSubmergedIn(arg, false);
-    }
-
-    public boolean isSubmergedIn(Tag<Fluid> arg, boolean bl) {
-        if (this.getVehicle() instanceof BoatEntity) {
-            return false;
-        }
-        double d = this.getEyeY();
-        BlockPos lv = new BlockPos(this.getX(), d, this.getZ());
-        if (bl && !this.world.isChunkLoaded(lv.getX() >> 4, lv.getZ() >> 4)) {
-            return false;
-        }
-        FluidState lv2 = this.world.getFluidState(lv);
-        return lv2.matches(arg) && d < (double)((float)lv.getY() + (lv2.getHeight(this.world, lv) + 0.11111111f));
+        return (double)this.getStandingEyeHeight() < this.getFluidHeight(arg);
     }
 
     public void setInLava() {
@@ -1049,6 +1036,10 @@ CommandOutput {
         this.pitch = MathHelper.clamp(h, -90.0f, 90.0f) % 360.0f;
         this.prevYaw = this.yaw;
         this.prevPitch = this.pitch;
+    }
+
+    public void positAfterTeleport(double d, double e, double f) {
+        this.refreshPositionAndAngles(d, e, f, this.yaw, this.pitch);
     }
 
     public void refreshPositionAndAngles(BlockPos arg, float f, float g) {
@@ -1254,7 +1245,11 @@ CommandOutput {
 
     public CompoundTag toTag(CompoundTag arg) {
         try {
-            arg.put("Pos", this.toListTag(this.getX(), this.getY(), this.getZ()));
+            if (this.vehicle != null) {
+                arg.put("Pos", this.toListTag(this.vehicle.getX(), this.vehicle.getY(), this.vehicle.getZ()));
+            } else {
+                arg.put("Pos", this.toListTag(this.getX(), this.getY(), this.getZ()));
+            }
             Vec3d lv = this.getVelocity();
             arg.put("Motion", this.toListTag(lv.x, lv.y, lv.z));
             arg.put("Rotation", this.toListTag(this.yaw, this.pitch));
@@ -1264,7 +1259,7 @@ CommandOutput {
             arg.putBoolean("OnGround", this.onGround);
             arg.putBoolean("Invulnerable", this.invulnerable);
             arg.putInt("PortalCooldown", this.netherPortalCooldown);
-            arg.putUuidNew("UUID", this.getUuid());
+            arg.putUuid("UUID", this.getUuid());
             Text lv2 = this.getCustomName();
             if (lv2 != null) {
                 arg.putString("CustomName", Text.Serializer.toJson(lv2));
@@ -1332,8 +1327,8 @@ CommandOutput {
             this.onGround = arg.getBoolean("OnGround");
             this.invulnerable = arg.getBoolean("Invulnerable");
             this.netherPortalCooldown = arg.getInt("PortalCooldown");
-            if (arg.containsUuidNew("UUID")) {
-                this.uuid = arg.getUuidNew("UUID");
+            if (arg.containsUuid("UUID")) {
+                this.uuid = arg.getUuid("UUID");
                 this.uuidString = this.uuid.toString();
             }
             if (!(Double.isFinite(this.getX()) && Double.isFinite(this.getY()) && Double.isFinite(this.getZ()))) {
@@ -1475,11 +1470,12 @@ CommandOutput {
         this.updatePassengerPosition(arg, Entity::updatePosition);
     }
 
-    public void updatePassengerPosition(Entity arg, PositionUpdater arg2) {
+    private void updatePassengerPosition(Entity arg, PositionUpdater arg2) {
         if (!this.hasPassenger(arg)) {
             return;
         }
-        arg2.accept(arg, this.getX(), this.getY() + this.getMountedHeightOffset() + arg.getHeightOffset(), this.getZ());
+        double d = this.getY() + this.getMountedHeightOffset() + arg.getHeightOffset();
+        arg2.accept(arg, this.getX(), d, this.getZ());
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -1524,11 +1520,11 @@ CommandOutput {
     }
 
     protected boolean canStartRiding(Entity arg) {
-        return this.ridingCooldown <= 0;
+        return !this.isSneaking() && this.ridingCooldown <= 0;
     }
 
     protected boolean wouldPoseNotCollide(EntityPose arg) {
-        return this.world.doesNotCollide(this, this.calculateBoundsForPose(arg));
+        return this.world.doesNotCollide(this, this.calculateBoundsForPose(arg).contract(1.0E-7));
     }
 
     public void removeAllPassengers() {
@@ -1537,12 +1533,16 @@ CommandOutput {
         }
     }
 
-    public void stopRiding() {
+    public void method_29239() {
         if (this.vehicle != null) {
             Entity lv = this.vehicle;
             this.vehicle = null;
             lv.removePassenger(this);
         }
+    }
+
+    public void stopRiding() {
+        this.method_29239();
     }
 
     protected void addPassenger(Entity arg) {
@@ -1624,7 +1624,7 @@ CommandOutput {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
                 this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
-                class_5321<DimensionType> lv = this.world.getDimension().method_28542() ? DimensionType.field_24753 : DimensionType.field_24754;
+                RegistryKey<World> lv = this.world.getDimension().isNether() ? World.field_25179 : World.field_25180;
                 this.changeDimension(lv);
                 this.world.getProfiler().pop();
             }
@@ -1930,7 +1930,7 @@ CommandOutput {
     }
 
     public String toString() {
-        return String.format(Locale.ROOT, "%s['%s'/%d, l='%s', x=%.2f, y=%.2f, z=%.2f]", this.getClass().getSimpleName(), this.getName().asString(), this.entityId, this.world == null ? "~NULL~" : this.world.toString(), this.getX(), this.getY(), this.getZ());
+        return String.format(Locale.ROOT, "%s['%s'/%d, l='%s', x=%.2f, y=%.2f, z=%.2f]", this.getClass().getSimpleName(), this.getName().getString(), this.entityId, this.world == null ? "~NULL~" : this.world.toString(), this.getX(), this.getY(), this.getZ());
     }
 
     public boolean isInvulnerableTo(DamageSource arg) {
@@ -1960,35 +1960,34 @@ CommandOutput {
     }
 
     @Nullable
-    public Entity changeDimension(class_5321<DimensionType> arg) {
-        BlockPos lv11;
+    public Entity changeDimension(RegistryKey<World> arg) {
+        BlockPos lv10;
         if (this.world.isClient || this.removed) {
             return null;
         }
         this.world.getProfiler().push("changeDimension");
         MinecraftServer minecraftServer = this.getServer();
-        class_5321<DimensionType> lv = this.world.method_27983();
+        RegistryKey<World> lv = this.world.method_27983();
         ServerWorld lv2 = minecraftServer.getWorld(lv);
         ServerWorld lv3 = minecraftServer.getWorld(arg);
         this.detach();
         this.world.getProfiler().push("reposition");
         Vec3d lv4 = this.getVelocity();
         float f = 0.0f;
-        if (lv == DimensionType.field_24755 && arg == DimensionType.field_24753) {
-            BlockPos lv5 = lv3.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv3.method_27911());
-        } else if (arg == DimensionType.field_24755) {
+        if (lv == World.field_25181 && arg == World.field_25179) {
+            BlockPos lv5 = lv3.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv3.getSpawnPos());
+        } else if (arg == World.field_25181) {
             BlockPos lv6 = ServerWorld.field_25144;
         } else {
             double d = this.getX();
             double e = this.getZ();
-            Registry<DimensionType> lv7 = minecraftServer.method_29174().method_29116();
-            DimensionType lv8 = lv7.method_29107(lv);
-            DimensionType lv9 = lv7.method_29107(arg);
+            DimensionType lv7 = lv2.getDimension();
+            DimensionType lv8 = lv3.getDimension();
             double g = 8.0;
-            if (!lv8.method_28539() && lv9.method_28539()) {
+            if (!lv7.isShrunk() && lv8.isShrunk()) {
                 d /= 8.0;
                 e /= 8.0;
-            } else if (lv8.method_28539() && !lv9.method_28539()) {
+            } else if (lv7.isShrunk() && !lv8.isShrunk()) {
                 d *= 8.0;
                 e *= 8.0;
             }
@@ -1998,24 +1997,24 @@ CommandOutput {
             double k = Math.min(2.9999872E7, lv3.getWorldBorder().getBoundSouth() - 16.0);
             d = MathHelper.clamp(d, h, j);
             e = MathHelper.clamp(e, i, k);
-            Vec3d lv10 = this.getLastNetherPortalDirectionVector();
-            lv11 = new BlockPos(d, this.getY(), e);
-            BlockPattern.TeleportTarget lv12 = lv3.getPortalForcer().getPortal(lv11, lv4, this.getLastNetherPortalDirection(), lv10.x, lv10.y, this instanceof PlayerEntity);
-            if (lv12 == null) {
+            Vec3d lv9 = this.getLastNetherPortalDirectionVector();
+            lv10 = new BlockPos(d, this.getY(), e);
+            BlockPattern.TeleportTarget lv11 = lv3.getPortalForcer().getPortal(lv10, lv4, this.getLastNetherPortalDirection(), lv9.x, lv9.y, this instanceof PlayerEntity);
+            if (lv11 == null) {
                 return null;
             }
-            lv11 = new BlockPos(lv12.pos);
-            lv4 = lv12.velocity;
-            f = lv12.yaw;
+            lv10 = new BlockPos(lv11.pos);
+            lv4 = lv11.velocity;
+            f = lv11.yaw;
         }
         this.world.getProfiler().swap("reloading");
-        Object lv13 = this.getType().create(lv3);
-        if (lv13 != null) {
-            ((Entity)lv13).copyFrom(this);
-            ((Entity)lv13).refreshPositionAndAngles(lv11, ((Entity)lv13).yaw + f, ((Entity)lv13).pitch);
-            ((Entity)lv13).setVelocity(lv4);
-            lv3.onDimensionChanged((Entity)lv13);
-            if (arg == DimensionType.field_24755) {
+        Object lv12 = this.getType().create(lv3);
+        if (lv12 != null) {
+            ((Entity)lv12).copyFrom(this);
+            ((Entity)lv12).refreshPositionAndAngles(lv10, ((Entity)lv12).yaw + f, ((Entity)lv12).pitch);
+            ((Entity)lv12).setVelocity(lv4);
+            lv3.onDimensionChanged((Entity)lv12);
+            if (arg == World.field_25181) {
                 ServerWorld.method_29200(lv3);
             }
         }
@@ -2024,7 +2023,7 @@ CommandOutput {
         lv2.resetIdleTimeout();
         lv3.resetIdleTimeout();
         this.world.getProfiler().pop();
-        return lv13;
+        return lv12;
     }
 
     public boolean canUsePortals() {
@@ -2150,7 +2149,9 @@ CommandOutput {
         this.streamPassengersRecursively().forEach(arg2 -> {
             lv.checkChunk((Entity)arg2);
             arg2.teleportRequested = true;
-            arg2.updatePositionsRecursively(Entity::positAfterTeleport);
+            for (Entity lv : arg2.passengerList) {
+                arg2.updatePassengerPosition(lv, Entity::positAfterTeleport);
+            }
         });
     }
 
@@ -2311,6 +2312,12 @@ CommandOutput {
         return bl;
     }
 
+    public boolean method_29240() {
+        boolean bl = this.field_25154;
+        this.field_25154 = false;
+        return bl;
+    }
+
     @Nullable
     public Entity getPrimaryPassenger() {
         return null;
@@ -2391,12 +2398,6 @@ CommandOutput {
         return false;
     }
 
-    public void updatePositionsRecursively(PositionUpdater arg) {
-        for (Entity lv : this.passengerList) {
-            this.updatePassengerPosition(lv, arg);
-        }
-    }
-
     public boolean isLogicalSideForUpdatingMovement() {
         Entity lv = this.getPrimaryPassenger();
         if (lv instanceof PlayerEntity) {
@@ -2405,7 +2406,7 @@ CommandOutput {
         return !this.world.isClient;
     }
 
-    protected static Vec3d method_24826(double d, double e, float f) {
+    protected static Vec3d getPassengerDismountOffset(double d, double e, float f) {
         double g = (d + e + (double)1.0E-5f) / 2.0;
         float h = -MathHelper.sin(f * ((float)Math.PI / 180));
         float i = MathHelper.cos(f * ((float)Math.PI / 180));
@@ -2413,7 +2414,7 @@ CommandOutput {
         return new Vec3d((double)h * g / (double)j, 0.0, (double)i * g / (double)j);
     }
 
-    public Vec3d method_24829(LivingEntity arg) {
+    public Vec3d updatePassengerForDismount(LivingEntity arg) {
         return new Vec3d(this.getX(), this.getBoundingBox().maxY, this.getZ());
     }
 
@@ -2527,6 +2528,10 @@ CommandOutput {
         return this.fluidHeight.getDouble(arg);
     }
 
+    public double method_29241() {
+        return (double)this.getStandingEyeHeight() < 0.4 ? 0.0 : 0.4;
+    }
+
     public final float getWidth() {
         return this.dimensions.width;
     }
@@ -2610,14 +2615,11 @@ CommandOutput {
             if (i != this.blockPos.getX() || j != this.blockPos.getY() || k != this.blockPos.getZ()) {
                 this.blockPos = new BlockPos(i, j, k);
             }
+            this.field_25154 = true;
         }
     }
 
     public void checkDespawn() {
-    }
-
-    public void positAfterTeleport(double d, double e, double f) {
-        this.refreshPositionAndAngles(d, e, f, this.yaw, this.pitch);
     }
 
     @FunctionalInterface

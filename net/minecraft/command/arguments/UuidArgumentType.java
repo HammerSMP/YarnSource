@@ -9,7 +9,7 @@
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
  *  com.mojang.brigadier.exceptions.SimpleCommandExceptionType
  */
-package net.minecraft;
+package net.minecraft.command.arguments;
 
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
@@ -25,23 +25,23 @@ import java.util.regex.Pattern;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
 
-public class class_5242
+public class UuidArgumentType
 implements ArgumentType<UUID> {
-    public static final SimpleCommandExceptionType field_24318 = new SimpleCommandExceptionType((Message)new TranslatableText("argument.uuid.invalid"));
-    private static final Collection<String> field_24319 = Arrays.asList("dd12be42-52a9-4a91-a8a1-11c01849e498");
-    private static final Pattern field_24320 = Pattern.compile("^([-A-Fa-f0-9]+)");
+    public static final SimpleCommandExceptionType INVALID_UUID = new SimpleCommandExceptionType((Message)new TranslatableText("argument.uuid.invalid"));
+    private static final Collection<String> EXAMPLES = Arrays.asList("dd12be42-52a9-4a91-a8a1-11c01849e498");
+    private static final Pattern VALID_CHARACTERS = Pattern.compile("^([-A-Fa-f0-9]+)");
 
-    public static UUID method_27645(CommandContext<ServerCommandSource> commandContext, String string) {
+    public static UUID getUuid(CommandContext<ServerCommandSource> commandContext, String string) {
         return (UUID)commandContext.getArgument(string, UUID.class);
     }
 
-    public static class_5242 method_27643() {
-        return new class_5242();
+    public static UuidArgumentType uuid() {
+        return new UuidArgumentType();
     }
 
     public UUID parse(StringReader stringReader) throws CommandSyntaxException {
         String string = stringReader.getRemaining();
-        Matcher matcher = field_24320.matcher(string);
+        Matcher matcher = VALID_CHARACTERS.matcher(string);
         if (matcher.find()) {
             String string2 = matcher.group(1);
             try {
@@ -53,11 +53,11 @@ implements ArgumentType<UUID> {
                 // empty catch block
             }
         }
-        throw field_24318.create();
+        throw INVALID_UUID.create();
     }
 
     public Collection<String> getExamples() {
-        return field_24319;
+        return EXAMPLES;
     }
 
     public /* synthetic */ Object parse(StringReader stringReader) throws CommandSyntaxException {

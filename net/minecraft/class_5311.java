@@ -28,8 +28,8 @@ import net.minecraft.world.gen.feature.StructureFeature;
 
 public class class_5311 {
     public static final Codec<class_5311> field_24821 = RecordCodecBuilder.create(instance -> instance.group((App)class_5313.field_24913.optionalFieldOf("stronghold").forGetter(arg -> Optional.ofNullable(arg.field_24825)), (App)Codec.simpleMap(Registry.STRUCTURE_FEATURE, class_5314.field_24917, Registry.STRUCTURE_FEATURE).fieldOf("structures").forGetter(arg -> arg.field_24824)).apply((Applicative)instance, class_5311::new));
-    public static final ImmutableMap<StructureFeature<?>, class_5314> field_24822 = ImmutableMap.builder().put(StructureFeature.VILLAGE, (Object)new class_5314(32, 8, 10387312)).put(StructureFeature.DESERT_PYRAMID, (Object)new class_5314(32, 8, 14357617)).put(StructureFeature.IGLOO, (Object)new class_5314(32, 8, 14357618)).put(StructureFeature.JUNGLE_PYRAMID, (Object)new class_5314(32, 8, 14357619)).put((Object)StructureFeature.field_24851, (Object)new class_5314(32, 8, 14357620)).put(StructureFeature.PILLAGER_OUTPOST, (Object)new class_5314(32, 8, 165745296)).put(StructureFeature.STRONGHOLD, (Object)new class_5314(1, 0, 0)).put(StructureFeature.MONUMENT, (Object)new class_5314(32, 5, 10387313)).put(StructureFeature.END_CITY, (Object)new class_5314(20, 11, 10387313)).put(StructureFeature.MANSION, (Object)new class_5314(80, 20, 10387319)).put(StructureFeature.RUINED_PORTAL, (Object)new class_5314(40, 15, 34222645)).put(StructureFeature.SHIPWRECK, (Object)new class_5314(24, 4, 165745295)).put(StructureFeature.OCEAN_RUIN, (Object)new class_5314(20, 8, 14357621)).put(StructureFeature.BASTION_REMNANT, (Object)new class_5314(30, 4, 30084232)).put(StructureFeature.FORTRESS, (Object)new class_5314(30, 4, 30084232)).put(StructureFeature.NETHER_FOSSIL, (Object)new class_5314(2, 1, 14357921)).build();
-    public static final class_5313 field_24823 = new class_5313(32, 3, 128);
+    public static final ImmutableMap<StructureFeature<?>, class_5314> field_24822 = ImmutableMap.builder().put(StructureFeature.VILLAGE, (Object)new class_5314(32, 8, 10387312)).put(StructureFeature.DESERT_PYRAMID, (Object)new class_5314(32, 8, 14357617)).put(StructureFeature.IGLOO, (Object)new class_5314(32, 8, 14357618)).put(StructureFeature.JUNGLE_PYRAMID, (Object)new class_5314(32, 8, 14357619)).put((Object)StructureFeature.field_24851, (Object)new class_5314(32, 8, 14357620)).put(StructureFeature.PILLAGER_OUTPOST, (Object)new class_5314(32, 8, 165745296)).put(StructureFeature.STRONGHOLD, (Object)new class_5314(1, 0, 0)).put(StructureFeature.MONUMENT, (Object)new class_5314(32, 5, 10387313)).put(StructureFeature.END_CITY, (Object)new class_5314(20, 11, 10387313)).put(StructureFeature.MANSION, (Object)new class_5314(80, 20, 10387319)).put(StructureFeature.BURIED_TREASURE, (Object)new class_5314(1, 0, 0)).put(StructureFeature.MINESHAFT, (Object)new class_5314(1, 0, 0)).put(StructureFeature.RUINED_PORTAL, (Object)new class_5314(40, 15, 34222645)).put(StructureFeature.SHIPWRECK, (Object)new class_5314(24, 4, 165745295)).put(StructureFeature.OCEAN_RUIN, (Object)new class_5314(20, 8, 14357621)).put(StructureFeature.BASTION_REMNANT, (Object)new class_5314(30, 4, 30084232)).put(StructureFeature.FORTRESS, (Object)new class_5314(30, 4, 30084232)).put(StructureFeature.NETHER_FOSSIL, (Object)new class_5314(2, 1, 14357921)).build();
+    public static final class_5313 field_24823;
     private final Map<StructureFeature<?>, class_5314> field_24824;
     @Nullable
     private final class_5313 field_24825;
@@ -55,6 +55,14 @@ public class class_5311 {
     @Nullable
     public class_5313 method_28602() {
         return this.field_24825;
+    }
+
+    static {
+        for (StructureFeature structureFeature : Registry.STRUCTURE_FEATURE) {
+            if (field_24822.containsKey((Object)structureFeature)) continue;
+            throw new IllegalStateException("Structure feature without default settings: " + Registry.STRUCTURE_FEATURE.getId(structureFeature));
+        }
+        field_24823 = new class_5313(32, 3, 128);
     }
 }
 

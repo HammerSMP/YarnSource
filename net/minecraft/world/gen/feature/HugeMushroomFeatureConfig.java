@@ -18,7 +18,7 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 
 public class HugeMushroomFeatureConfig
 implements FeatureConfig {
-    public static final Codec<HugeMushroomFeatureConfig> field_24885 = RecordCodecBuilder.create(instance -> instance.group((App)BlockStateProvider.field_24937.fieldOf("cap_provider").forGetter(arg -> arg.capProvider), (App)BlockStateProvider.field_24937.fieldOf("stem_provider").forGetter(arg -> arg.stemProvider), (App)Codec.INT.fieldOf("foliage_radius").withDefault((Object)2).forGetter(arg -> arg.capSize)).apply((Applicative)instance, HugeMushroomFeatureConfig::new));
+    public static final Codec<HugeMushroomFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockStateProvider.field_24937.fieldOf("cap_provider").forGetter(arg -> arg.capProvider), (App)BlockStateProvider.field_24937.fieldOf("stem_provider").forGetter(arg -> arg.stemProvider), (App)Codec.INT.fieldOf("foliage_radius").withDefault((Object)2).forGetter(arg -> arg.capSize)).apply((Applicative)instance, HugeMushroomFeatureConfig::new));
     public final BlockStateProvider capProvider;
     public final BlockStateProvider stemProvider;
     public final int capSize;

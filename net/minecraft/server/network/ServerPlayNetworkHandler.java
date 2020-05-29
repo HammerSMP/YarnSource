@@ -151,8 +151,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.CommandBlockExecutor;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -620,7 +620,7 @@ implements ServerPlayPacketListener {
         BlockEntity lv2 = this.player.world.getBlockEntity(lv);
         if (lv2 instanceof JigsawBlockEntity) {
             JigsawBlockEntity lv3 = (JigsawBlockEntity)lv2;
-            lv3.generate(this.server.getWorld(this.player.world.method_27983()), arg.getMaxDepth());
+            lv3.generate(this.server.getWorld(this.player.world.method_27983()), arg.getMaxDepth(), arg.method_29446());
         }
     }
 
@@ -885,7 +885,7 @@ implements ServerPlayPacketListener {
         if (lv5.getY() < this.server.getWorldHeight()) {
             if (this.requestedTeleportPos == null && this.player.squaredDistanceTo((double)lv5.getX() + 0.5, (double)lv5.getY() + 0.5, (double)lv5.getZ() + 0.5) < 64.0 && lv.canPlayerModifyAt(this.player, lv5)) {
                 ActionResult lv7 = this.player.interactionManager.interactBlock(this.player, lv, lv3, lv2, lv4);
-                if (lv6 == Direction.UP && lv7 != ActionResult.SUCCESS && lv5.getY() >= this.server.getWorldHeight() - 1 && ServerPlayNetworkHandler.method_27913(this.player, lv3)) {
+                if (lv6 == Direction.UP && !lv7.isAccepted() && lv5.getY() >= this.server.getWorldHeight() - 1 && ServerPlayNetworkHandler.method_27913(this.player, lv3)) {
                     MutableText lv8 = new TranslatableText("build.tooHigh", this.server.getWorldHeight()).formatted(Formatting.RED);
                     this.player.networkHandler.sendPacket(new GameMessageS2CPacket(lv8, MessageType.GAME_INFO, Util.field_25140));
                 } else if (lv7.shouldSwingHand()) {
@@ -1126,7 +1126,7 @@ implements ServerPlayPacketListener {
                 if (this.player.notInAnyWorld) {
                     this.player.notInAnyWorld = false;
                     this.player = this.server.getPlayerManager().respawnPlayer(this.player, true);
-                    Criteria.CHANGED_DIMENSION.trigger(this.player, DimensionType.field_24755, DimensionType.field_24753);
+                    Criteria.CHANGED_DIMENSION.trigger(this.player, World.field_25181, World.field_25179);
                     break;
                 }
                 if (this.player.getHealth() > 0.0f) {

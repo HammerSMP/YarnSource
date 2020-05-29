@@ -13,9 +13,10 @@ import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.damage.NetherBedDamageSource;
 import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
+import net.minecraft.entity.projectile.AbstractFireballEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.WitherSkullEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.Vec3d;
@@ -82,11 +83,15 @@ public class DamageSource {
         return new ProjectileDamageSource("fireworks", arg, arg2).setExplosive();
     }
 
-    public static DamageSource explosiveProjectile(ExplosiveProjectileEntity arg, @Nullable Entity arg2) {
+    public static DamageSource explosiveProjectile(AbstractFireballEntity arg, @Nullable Entity arg2) {
         if (arg2 == null) {
             return new ProjectileDamageSource("onFire", arg, arg).setFire().setProjectile();
         }
         return new ProjectileDamageSource("fireball", arg, arg2).setFire().setProjectile();
+    }
+
+    public static DamageSource method_29238(WitherSkullEntity arg, Entity arg2) {
+        return new ProjectileDamageSource("witherSkull", arg, arg2).setProjectile();
     }
 
     public static DamageSource thrownProjectile(Entity arg, @Nullable Entity arg2) {
@@ -102,10 +107,7 @@ public class DamageSource {
     }
 
     public static DamageSource explosion(@Nullable Explosion arg) {
-        if (arg != null && arg.getCausingEntity() != null) {
-            return new EntityDamageSource("explosion.player", arg.getCausingEntity()).setScaledWithDifficulty().setExplosive();
-        }
-        return new DamageSource("explosion").setScaledWithDifficulty().setExplosive();
+        return DamageSource.explosion(arg != null ? arg.getCausingEntity() : null);
     }
 
     public static DamageSource explosion(@Nullable LivingEntity arg) {

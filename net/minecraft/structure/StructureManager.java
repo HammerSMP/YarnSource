@@ -24,36 +24,32 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Map;
 import javax.annotation.Nullable;
-import net.minecraft.class_5218;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloadListener;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.structure.Structure;
 import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class StructureManager
-implements SynchronousResourceReloadListener {
+public class StructureManager {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Map<Identifier, Structure> structures = Maps.newHashMap();
     private final DataFixer dataFixer;
-    private final MinecraftServer server;
+    private ResourceManager field_25189;
     private final Path generatedPath;
 
-    public StructureManager(MinecraftServer minecraftServer, LevelStorage.Session arg, DataFixer dataFixer) {
-        this.server = minecraftServer;
+    public StructureManager(ResourceManager arg, LevelStorage.Session arg2, DataFixer dataFixer) {
+        this.field_25189 = arg;
         this.dataFixer = dataFixer;
-        this.generatedPath = arg.getDirectory(class_5218.GENERATED).normalize();
-        minecraftServer.getDataManager().registerListener(this);
+        this.generatedPath = arg2.getDirectory(WorldSavePath.GENERATED).normalize();
     }
 
     public Structure getStructureOrBlank(Identifier arg) {
@@ -73,8 +69,8 @@ implements SynchronousResourceReloadListener {
         });
     }
 
-    @Override
-    public void apply(ResourceManager arg) {
+    public void method_29300(ResourceManager arg) {
+        this.field_25189 = arg;
         this.structures.clear();
     }
 
@@ -86,7 +82,7 @@ implements SynchronousResourceReloadListener {
     @Nullable
     private Structure loadStructureFromResource(Identifier arg) {
         Identifier lv = new Identifier(arg.getNamespace(), "structures/" + arg.getPath() + ".nbt");
-        try (Resource lv2 = this.server.getDataManager().getResource(lv);){
+        try (Resource lv2 = this.field_25189.getResource(lv);){
             Structure structure = this.readStructure(lv2.getInputStream());
             return structure;
         }

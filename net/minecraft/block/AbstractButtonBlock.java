@@ -104,7 +104,7 @@ extends WallMountedBlock {
         }
         this.powerOn(arg, arg2, arg3);
         this.playClickSound(arg4, arg2, arg3, true);
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(arg2.isClient);
     }
 
     public void powerOn(BlockState arg, World arg2, BlockPos arg3) {

@@ -33,7 +33,6 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5217;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.server.WorldGenerationProgressListener;
@@ -58,6 +57,7 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -333,8 +333,8 @@ extends ChunkManager {
         long l = this.world.getTime();
         long m = l - this.lastMobSpawningTime;
         this.lastMobSpawningTime = l;
-        class_5217 lv = this.world.getLevelProperties();
-        boolean bl = this.world.method_27982();
+        WorldProperties lv = this.world.getLevelProperties();
+        boolean bl = this.world.isDebugWorld();
         boolean bl2 = this.world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING);
         if (!bl) {
             SpawnHelper.Info lv2;
@@ -406,7 +406,17 @@ extends ChunkManager {
         int i = arg.getX() >> 4;
         ChunkHolder lv = this.getChunkHolder(ChunkPos.toLong(i, j = arg.getZ() >> 4));
         if (lv != null) {
-            lv.markForBlockUpdate(arg.getX() & 0xF, arg.getY(), arg.getZ() & 0xF);
+            lv.markForBlockUpdate(this, arg.getX() & 0xF, arg.getY(), arg.getZ() & 0xF);
+        }
+    }
+
+    protected void method_29482(int i, int j) {
+        for (int k = -1; k <= 1; ++k) {
+            for (int l = -1; l <= 1; ++l) {
+                ChunkHolder lv;
+                if (k == 0 && l == 0 || (lv = this.getChunkHolder(ChunkPos.toLong(i + k, j + l))) == null) continue;
+                lv.method_29481();
+            }
         }
     }
 
@@ -494,7 +504,7 @@ extends ChunkManager {
     final class MainThreadExecutor
     extends ThreadExecutor<Runnable> {
         private MainThreadExecutor(World arg2) {
-            super("Chunk source main thread executor for " + arg2.method_27983().method_29177());
+            super("Chunk source main thread executor for " + arg2.method_27983().getValue());
         }
 
         @Override

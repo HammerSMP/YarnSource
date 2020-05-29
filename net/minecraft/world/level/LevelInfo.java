@@ -9,10 +9,10 @@ package net.minecraft.world.level;
 
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicLike;
-import net.minecraft.class_5285;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.gen.GeneratorOptions;
 
 public final class LevelInfo {
     private final String name;
@@ -21,9 +21,9 @@ public final class LevelInfo {
     private final Difficulty difficulty;
     private final boolean hardcore;
     private final GameRules gameRules;
-    private final class_5285 generatorOptions;
+    private final GeneratorOptions generatorOptions;
 
-    public LevelInfo(String string, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, class_5285 arg4) {
+    public LevelInfo(String string, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, GeneratorOptions arg4) {
         this.name = string;
         this.gameMode = arg;
         this.structures = bl;
@@ -33,7 +33,7 @@ public final class LevelInfo {
         this.generatorOptions = arg4;
     }
 
-    public static LevelInfo method_28383(Dynamic<?> dynamic, class_5285 arg) {
+    public static LevelInfo method_28383(Dynamic<?> dynamic, GeneratorOptions arg) {
         GameMode lv;
         return new LevelInfo(dynamic.get("LevelName").asString(""), lv, dynamic.get("hardcore").asBoolean(false), dynamic.get("Difficulty").asNumber().map(number -> Difficulty.byOrdinal(number.byteValue())).result().orElse(Difficulty.NORMAL), dynamic.get("allowCommands").asBoolean((lv = GameMode.byId(dynamic.get("GameType").asInt(0))) == GameMode.CREATIVE), new GameRules((DynamicLike<?>)dynamic.get("GameRules")), arg);
     }
@@ -62,7 +62,7 @@ public final class LevelInfo {
         return this.gameRules;
     }
 
-    public class_5285 getGeneratorOptions() {
+    public GeneratorOptions getGeneratorOptions() {
         return this.generatorOptions;
     }
 

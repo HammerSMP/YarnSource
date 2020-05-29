@@ -10,6 +10,7 @@ package com.mojang.realmsclient.gui.screens;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -46,9 +47,9 @@ extends RealmsScreen {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        List<Text> list = this.client.textRenderer.wrapLines(new TranslatableText("mco.account.privacyinfo"), (int)Math.round((double)this.width * 0.9));
+        List<class_5348> list = this.client.textRenderer.wrapLines(new TranslatableText("mco.account.privacyinfo"), (int)Math.round((double)this.width * 0.9));
         int k = 15;
-        for (Text lv : list) {
+        for (class_5348 lv : list) {
             this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             k += 15;
         }

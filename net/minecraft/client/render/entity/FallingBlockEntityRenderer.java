@@ -48,7 +48,7 @@ extends EntityRenderer<FallingBlockEntity> {
         BlockPos lv3 = new BlockPos(arg.getX(), arg.getBoundingBox().maxY, arg.getZ());
         arg2.translate(-0.5, 0.0, -0.5);
         BlockRenderManager lv4 = MinecraftClient.getInstance().getBlockRenderManager();
-        lv4.getModelRenderer().render(lv2, lv4.getModel(lv), lv, lv3, arg2, arg3.getBuffer(RenderLayers.getBlockLayer(lv)), false, new Random(), lv.getRenderingSeed(arg.getFallingBlockPos()), OverlayTexture.DEFAULT_UV);
+        lv4.getModelRenderer().render(lv2, lv4.getModel(lv), lv, lv3, arg2, arg3.getBuffer(RenderLayers.method_29359(lv)), false, new Random(), lv.getRenderingSeed(arg.getFallingBlockPos()), OverlayTexture.DEFAULT_UV);
         arg2.pop();
         super.render(arg, f, g, arg2, arg3, i);
     }

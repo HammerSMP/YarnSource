@@ -41,7 +41,7 @@ extends Item {
             if (lv != null) {
                 arg.getStack().damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(lv2.isClient());
         }
         BlockPos lv5 = lv3.offset(arg.getSide());
         if (FlintAndSteelItem.canIgnite(lv2.getBlockState(lv5), lv2, lv5)) {
@@ -53,13 +53,13 @@ extends Item {
                 Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)lv, lv5, lv7);
                 lv7.damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(lv2.isClient());
         }
         return ActionResult.FAIL;
     }
 
     public static boolean isIgnitable(BlockState arg2) {
-        return arg2.method_27851(BlockTags.CAMPFIRES, arg -> arg.method_28498(Properties.WATERLOGGED) && arg.method_28498(Properties.LIT)) && arg2.get(Properties.WATERLOGGED) == false && arg2.get(Properties.LIT) == false;
+        return arg2.method_27851(BlockTags.CAMPFIRES, arg -> arg.contains(Properties.WATERLOGGED) && arg.contains(Properties.LIT)) && arg2.get(Properties.WATERLOGGED) == false && arg2.get(Properties.LIT) == false;
     }
 
     public static boolean canIgnite(BlockState arg, WorldAccess arg2, BlockPos arg3) {

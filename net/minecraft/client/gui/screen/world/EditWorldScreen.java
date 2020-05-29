@@ -24,8 +24,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5218;
-import net.minecraft.class_5219;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -39,7 +37,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -72,7 +72,7 @@ extends Screen {
             FileUtils.deleteQuietly((File)this.field_23777.getIconFile());
             arg.active = false;
         }));
-        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 24 + 5, 200, 20, new TranslatableText("selectWorld.edit.openFolder"), arg -> Util.getOperatingSystem().open(this.field_23777.getDirectory(class_5218.field_24188).toFile())));
+        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 24 + 5, 200, 20, new TranslatableText("selectWorld.edit.openFolder"), arg -> Util.getOperatingSystem().open(this.field_23777.getDirectory(WorldSavePath.ROOT).toFile())));
         this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 48 + 5, 200, 20, new TranslatableText("selectWorld.edit.backup"), arg -> {
             boolean bl = EditWorldScreen.backupLevel(this.field_23777);
             this.callback.accept(!bl);
@@ -104,7 +104,7 @@ extends Screen {
         this.saveButton = this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 144 + 5, 98, 20, new TranslatableText("selectWorld.edit.save"), arg -> this.commit()));
         this.addButton(new ButtonWidget(this.width / 2 + 2, this.height / 4 + 144 + 5, 98, 20, ScreenTexts.CANCEL, arg -> this.callback.accept(false)));
         lv.active = this.field_23777.getIconFile().isFile();
-        class_5219 lv2 = this.field_23777.readLevelProperties();
+        SaveProperties lv2 = this.field_23777.readLevelProperties();
         String string2 = lv2 == null ? "" : lv2.getLevelName();
         this.levelNameTextField = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 38, 200, 20, new TranslatableText("selectWorld.enterName"));
         this.levelNameTextField.setText(string2);

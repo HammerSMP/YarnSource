@@ -38,6 +38,8 @@ import net.minecraft.server.world.ServerTickScheduler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructureManager;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
@@ -50,23 +52,52 @@ import org.apache.commons.io.IOUtils;
 public class StructureTestUtil {
     public static String testStructuresDirectoryName = "gameteststructures";
 
+    public static BlockRotation method_29408(int i) {
+        switch (i) {
+            case 0: {
+                return BlockRotation.NONE;
+            }
+            case 1: {
+                return BlockRotation.CLOCKWISE_90;
+            }
+            case 2: {
+                return BlockRotation.CLOCKWISE_180;
+            }
+            case 3: {
+                return BlockRotation.COUNTERCLOCKWISE_90;
+            }
+        }
+        throw new IllegalArgumentException("rotationSteps must be a value from 0-3. Got value " + i);
+    }
+
     public static Box getStructureBoundingBox(StructureBlockBlockEntity arg) {
-        BlockPos lv = arg.getPos().add(arg.getOffset());
-        return new Box(lv, lv.add(arg.getSize()));
+        BlockPos lv = arg.getPos();
+        BlockPos lv2 = lv.add(arg.getSize().add(-1, -1, -1));
+        BlockPos lv3 = Structure.transformAround(lv2, BlockMirror.NONE, arg.getRotation(), lv);
+        return new Box(lv, lv3);
     }
 
-    public static void placeStartButton(BlockPos arg, ServerWorld arg2) {
-        arg2.setBlockState(arg, Blocks.COMMAND_BLOCK.getDefaultState());
-        CommandBlockBlockEntity lv = (CommandBlockBlockEntity)arg2.getBlockEntity(arg);
-        lv.getCommandExecutor().setCommand("test runthis");
-        arg2.setBlockState(arg.add(0, 0, -1), Blocks.STONE_BUTTON.getDefaultState());
+    public static BlockBox method_29410(StructureBlockBlockEntity arg) {
+        BlockPos lv = arg.getPos();
+        BlockPos lv2 = lv.add(arg.getSize().add(-1, -1, -1));
+        BlockPos lv3 = Structure.transformAround(lv2, BlockMirror.NONE, arg.getRotation(), lv);
+        return new BlockBox(lv, lv3);
     }
 
-    public static void createTestArea(String string, BlockPos arg, BlockPos arg2, int i, ServerWorld arg3) {
-        BlockBox lv = StructureTestUtil.createArea(arg, arg2, i);
-        StructureTestUtil.clearArea(lv, arg.getY(), arg3);
-        arg3.setBlockState(arg, Blocks.STRUCTURE_BLOCK.getDefaultState());
-        StructureBlockBlockEntity lv2 = (StructureBlockBlockEntity)arg3.getBlockEntity(arg);
+    public static void placeStartButton(BlockPos arg, BlockPos arg2, BlockRotation arg3, ServerWorld arg4) {
+        BlockPos lv = Structure.transformAround(arg.add(arg2), BlockMirror.NONE, arg3, arg);
+        arg4.setBlockState(lv, Blocks.COMMAND_BLOCK.getDefaultState());
+        CommandBlockBlockEntity lv2 = (CommandBlockBlockEntity)arg4.getBlockEntity(lv);
+        lv2.getCommandExecutor().setCommand("test runthis");
+        BlockPos lv3 = Structure.transformAround(lv.add(0, 0, -1), BlockMirror.NONE, arg3, lv);
+        arg4.setBlockState(lv3, Blocks.STONE_BUTTON.getDefaultState().rotate(arg3));
+    }
+
+    public static void createTestArea(String string, BlockPos arg, BlockPos arg2, BlockRotation arg3, ServerWorld arg4) {
+        BlockBox lv = StructureTestUtil.method_29409(arg, arg2, arg3);
+        StructureTestUtil.clearArea(lv, arg.getY(), arg4);
+        arg4.setBlockState(arg, Blocks.STRUCTURE_BLOCK.getDefaultState());
+        StructureBlockBlockEntity lv2 = (StructureBlockBlockEntity)arg4.getBlockEntity(arg);
         lv2.setIgnoreEntities(false);
         lv2.setStructureName(new Identifier(string));
         lv2.setSize(arg2);
@@ -74,14 +105,30 @@ public class StructureTestUtil {
         lv2.setShowBoundingBox(true);
     }
 
-    public static StructureBlockBlockEntity method_22250(String string, BlockPos arg, int i, ServerWorld arg2, boolean bl) {
-        BlockBox lv = StructureTestUtil.createArea(arg, StructureTestUtil.createStructure(string, arg2).getSize(), i);
-        StructureTestUtil.forceLoadNearbyChunks(arg, arg2);
-        StructureTestUtil.clearArea(lv, arg.getY(), arg2);
-        StructureBlockBlockEntity lv2 = StructureTestUtil.placeStructure(string, arg, arg2, bl);
-        ((ServerTickScheduler)arg2.getBlockTickScheduler()).getScheduledTicks(lv, true, false);
-        arg2.clearUpdatesInArea(lv);
-        return lv2;
+    /*
+     * WARNING - void declaration
+     */
+    public static StructureBlockBlockEntity method_22250(String string, BlockPos arg, BlockRotation arg2, int i, ServerWorld arg3, boolean bl) {
+        void lv7;
+        BlockPos lv = StructureTestUtil.createStructure(string, arg3).getSize();
+        BlockBox lv2 = StructureTestUtil.method_29409(arg, lv, arg2);
+        if (arg2 == BlockRotation.NONE) {
+            BlockPos lv3 = arg;
+        } else if (arg2 == BlockRotation.CLOCKWISE_90) {
+            BlockPos lv4 = arg.add(lv.getZ() - 1, 0, 0);
+        } else if (arg2 == BlockRotation.CLOCKWISE_180) {
+            BlockPos lv5 = arg.add(lv.getX() - 1, 0, lv.getZ() - 1);
+        } else if (arg2 == BlockRotation.COUNTERCLOCKWISE_90) {
+            BlockPos lv6 = arg.add(0, 0, lv.getX() - 1);
+        } else {
+            throw new IllegalArgumentException("Invalid rotation: " + (Object)((Object)arg2));
+        }
+        StructureTestUtil.forceLoadNearbyChunks(arg, arg3);
+        StructureTestUtil.clearArea(lv2, arg.getY(), arg3);
+        StructureBlockBlockEntity lv8 = StructureTestUtil.placeStructure(string, (BlockPos)lv7, arg2, arg3, bl);
+        ((ServerTickScheduler)arg3.getBlockTickScheduler()).getScheduledTicks(lv2, true, false);
+        arg3.clearUpdatesInArea(lv2);
+        return lv8;
     }
 
     private static void forceLoadNearbyChunks(BlockPos arg, ServerWorld arg2) {
@@ -96,18 +143,24 @@ public class StructureTestUtil {
     }
 
     public static void clearArea(BlockBox arg3, int i, ServerWorld arg22) {
-        BlockPos.stream(arg3).forEach(arg2 -> StructureTestUtil.method_22368(i, arg2, arg22));
-        ((ServerTickScheduler)arg22.getBlockTickScheduler()).getScheduledTicks(arg3, true, false);
-        arg22.clearUpdatesInArea(arg3);
-        Box lv = new Box(arg3.minX, arg3.minY, arg3.minZ, arg3.maxX, arg3.maxY, arg3.maxZ);
-        List<Entity> list = arg22.getEntities(Entity.class, lv, arg -> !(arg instanceof PlayerEntity));
+        BlockBox lv = new BlockBox(arg3.minX - 2, arg3.minY - 3, arg3.minZ - 3, arg3.maxX + 3, arg3.maxY + 20, arg3.maxZ + 3);
+        BlockPos.stream(lv).forEach(arg2 -> StructureTestUtil.method_22368(i, arg2, arg22));
+        ((ServerTickScheduler)arg22.getBlockTickScheduler()).getScheduledTicks(lv, true, false);
+        arg22.clearUpdatesInArea(lv);
+        Box lv2 = new Box(lv.minX, lv.minY, lv.minZ, lv.maxX, lv.maxY, lv.maxZ);
+        List<Entity> list = arg22.getEntities(Entity.class, lv2, arg -> !(arg instanceof PlayerEntity));
         list.forEach(Entity::remove);
     }
 
-    public static BlockBox createArea(BlockPos arg, BlockPos arg2, int i) {
-        BlockPos lv = arg.add(-i, -3, -i);
-        BlockPos lv2 = arg.add(arg2).add(i - 1, 30, i - 1);
-        return BlockBox.create(lv.getX(), lv.getY(), lv.getZ(), lv2.getX(), lv2.getY(), lv2.getZ());
+    public static BlockBox method_29409(BlockPos arg, BlockPos arg2, BlockRotation arg3) {
+        BlockPos lv = arg.add(arg2).add(-1, -1, -1);
+        BlockPos lv2 = Structure.transformAround(lv, BlockMirror.NONE, arg3, arg);
+        BlockBox lv3 = BlockBox.create(arg.getX(), arg.getY(), arg.getZ(), lv2.getX(), lv2.getY(), lv2.getZ());
+        int i = Math.min(lv3.minX, lv3.maxX);
+        int j = Math.min(lv3.minZ, lv3.maxZ);
+        BlockPos lv4 = new BlockPos(arg.getX() - i, 0, arg.getZ() - j);
+        lv3.method_29299(lv4);
+        return lv3;
     }
 
     public static Optional<BlockPos> findContainingStructureBlock(BlockPos arg, int i, ServerWorld arg2) {
@@ -154,17 +207,18 @@ public class StructureTestUtil {
         return lv.createStructure(lv3);
     }
 
-    private static StructureBlockBlockEntity placeStructure(String string, BlockPos arg, ServerWorld arg2, boolean bl) {
-        arg2.setBlockState(arg, Blocks.STRUCTURE_BLOCK.getDefaultState());
-        StructureBlockBlockEntity lv = (StructureBlockBlockEntity)arg2.getBlockEntity(arg);
+    private static StructureBlockBlockEntity placeStructure(String string, BlockPos arg, BlockRotation arg2, ServerWorld arg3, boolean bl) {
+        arg3.setBlockState(arg, Blocks.STRUCTURE_BLOCK.getDefaultState());
+        StructureBlockBlockEntity lv = (StructureBlockBlockEntity)arg3.getBlockEntity(arg);
         lv.setMode(StructureBlockMode.LOAD);
+        lv.setRotation(arg2);
         lv.setIgnoreEntities(false);
         lv.setStructureName(new Identifier(string));
         lv.loadStructure(bl);
         if (lv.getSize() != BlockPos.ORIGIN) {
             return lv;
         }
-        Structure lv2 = StructureTestUtil.createStructure(string, arg2);
+        Structure lv2 = StructureTestUtil.createStructure(string, arg3);
         lv.place(bl, lv2);
         if (lv.getSize() == BlockPos.ORIGIN) {
             throw new RuntimeException("Failed to load structure " + string);
@@ -188,23 +242,30 @@ public class StructureTestUtil {
     }
 
     private static void method_22368(int i, BlockPos arg, ServerWorld arg2) {
-        BlockState lv3;
-        FlatChunkGeneratorConfig lv = FlatChunkGeneratorConfig.getDefaultConfig();
-        BlockState[] lvs = lv.getLayerBlocks();
-        if (arg.getY() < i) {
-            BlockState lv2 = lvs[arg.getY() - 1];
-        } else {
-            lv3 = Blocks.AIR.getDefaultState();
+        BlockState lv = null;
+        FlatChunkGeneratorConfig lv2 = FlatChunkGeneratorConfig.getDefaultConfig();
+        if (lv2 instanceof FlatChunkGeneratorConfig) {
+            BlockState[] lvs = lv2.getLayerBlocks();
+            if (arg.getY() < i && arg.getY() <= lvs.length) {
+                lv = lvs[arg.getY() - 1];
+            }
+        } else if (arg.getY() == i - 1) {
+            lv = arg2.getBiome(arg).getSurfaceConfig().getTopMaterial();
+        } else if (arg.getY() < i - 1) {
+            lv = arg2.getBiome(arg).getSurfaceConfig().getUnderMaterial();
         }
-        BlockStateArgument lv4 = new BlockStateArgument(lv3, Collections.emptySet(), null);
-        lv4.setBlockState(arg2, arg, 2);
-        arg2.updateNeighbors(arg, lv3.getBlock());
+        if (lv == null) {
+            lv = Blocks.AIR.getDefaultState();
+        }
+        BlockStateArgument lv3 = new BlockStateArgument(lv, Collections.emptySet(), null);
+        lv3.setBlockState(arg2, arg, 2);
+        arg2.updateNeighbors(arg, lv.getBlock());
     }
 
     private static boolean isInStructureBounds(BlockPos arg, BlockPos arg2, ServerWorld arg3) {
         StructureBlockBlockEntity lv = (StructureBlockBlockEntity)arg3.getBlockEntity(arg);
-        Box lv2 = StructureTestUtil.getStructureBoundingBox(lv);
-        return lv2.contains(Vec3d.of(arg2));
+        Box lv2 = StructureTestUtil.getStructureBoundingBox(lv).expand(1.0);
+        return lv2.contains(Vec3d.ofCenter(arg2));
     }
 }
 

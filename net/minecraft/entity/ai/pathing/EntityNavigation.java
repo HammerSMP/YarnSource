@@ -211,8 +211,11 @@ public abstract class EntityNavigation {
         Vec3d lv = this.getPos();
         this.nodeReachProximity = this.entity.getWidth() > 0.75f ? this.entity.getWidth() / 2.0f : 0.75f - this.entity.getWidth() / 2.0f;
         Vec3i lv2 = this.currentPath.getCurrentPosition();
-        boolean bl2 = bl = Math.abs(this.entity.getX() - (double)((float)lv2.getX() + 0.5f)) < (double)this.nodeReachProximity && Math.abs(this.entity.getZ() - (double)((float)lv2.getZ() + 0.5f)) < (double)this.nodeReachProximity && Math.abs(this.entity.getY() - (double)lv2.getY()) < 1.0;
-        if (bl || this.method_27799(lv)) {
+        double d = Math.abs(this.entity.getX() - (double)((float)lv2.getX() + 0.5f));
+        double e = Math.abs(this.entity.getY() - (double)lv2.getY());
+        double f = Math.abs(this.entity.getZ() - (double)((float)lv2.getZ() + 0.5f));
+        boolean bl2 = bl = d < (double)this.nodeReachProximity && f < (double)this.nodeReachProximity && e < 1.0;
+        if (bl || this.entity.method_29244(this.currentPath.method_29301().type) && this.method_27799(lv)) {
             this.currentPath.setCurrentNodeIndex(this.currentPath.getCurrentNodeIndex() + 1);
         }
         this.checkTimeouts(lv);

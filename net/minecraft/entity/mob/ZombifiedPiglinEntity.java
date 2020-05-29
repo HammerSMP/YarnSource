@@ -42,8 +42,8 @@ import net.minecraft.world.WorldView;
 
 public class ZombifiedPiglinEntity
 extends ZombieEntity {
-    private static final UUID ATTACKING_SPEED_BOOST_UUID = UUID.fromString("49455A49-7EC5-45BA-B886-3B90B23A1718");
-    private static final EntityAttributeModifier ATTACKING_SPEED_BOOST = new EntityAttributeModifier(ATTACKING_SPEED_BOOST_UUID, "Attacking speed boost", 0.05, EntityAttributeModifier.Operation.ADDITION);
+    private static final UUID ATTACKING_SPEED_BOOST_ID = UUID.fromString("49455A49-7EC5-45BA-B886-3B90B23A1718");
+    private static final EntityAttributeModifier ATTACKING_SPEED_BOOST = new EntityAttributeModifier(ATTACKING_SPEED_BOOST_ID, "Attacking speed boost", 0.05, EntityAttributeModifier.Operation.ADDITION);
     private int anger;
     private int angrySoundDelay;
     private UUID angerTarget;
@@ -126,7 +126,7 @@ extends ZombieEntity {
         super.writeCustomDataToTag(arg);
         arg.putShort("Anger", (short)this.anger);
         if (this.angerTarget != null) {
-            arg.putUuidNew("HurtBy", this.angerTarget);
+            arg.putUuid("HurtBy", this.angerTarget);
         }
     }
 
@@ -134,8 +134,8 @@ extends ZombieEntity {
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
         this.anger = arg.getShort("Anger");
-        if (arg.containsUuidNew("HurtBy")) {
-            this.angerTarget = arg.getUuidNew("HurtBy");
+        if (arg.containsUuid("HurtBy")) {
+            this.angerTarget = arg.getUuid("HurtBy");
             PlayerEntity lv = this.world.getPlayerByUuid(this.angerTarget);
             this.setAttacker(lv);
             if (lv != null) {

@@ -23,7 +23,7 @@ implements TimerCallback<MinecraftServer> {
     @Override
     public void call(MinecraftServer minecraftServer, Timer<MinecraftServer> arg, long l) {
         CommandFunctionManager lv = minecraftServer.getCommandFunctionManager();
-        Tag<CommandFunction> lv2 = lv.getTags().getOrCreate(this.name);
+        Tag<CommandFunction> lv2 = lv.method_29462(this.name);
         for (CommandFunction lv3 : lv2.values()) {
             lv.execute(lv3, lv.getTaggedFunctionSource());
         }

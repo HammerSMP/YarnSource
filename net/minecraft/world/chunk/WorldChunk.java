@@ -75,6 +75,7 @@ import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
+import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -91,8 +92,8 @@ implements Chunk {
     private final UpgradeData upgradeData;
     private final Map<BlockPos, BlockEntity> blockEntities = Maps.newHashMap();
     private final TypeFilterableList<Entity>[] entitySections;
-    private final Map<String, StructureStart<?>> structureStarts = Maps.newHashMap();
-    private final Map<String, LongSet> structureReferences = Maps.newHashMap();
+    private final Map<StructureFeature<?>, StructureStart<?>> structureStarts = Maps.newHashMap();
+    private final Map<StructureFeature<?>, LongSet> structureReferences = Maps.newHashMap();
     private final ShortList[] postProcessingLists = new ShortList[16];
     private TickScheduler<Block> blockTickScheduler;
     private TickScheduler<Fluid> fluidTickScheduler;
@@ -184,7 +185,7 @@ implements Chunk {
         int i = arg.getX();
         int j = arg.getY();
         int k = arg.getZ();
-        if (this.world.method_27982()) {
+        if (this.world.isDebugWorld()) {
             BlockState lv = null;
             if (j == 60) {
                 lv = Blocks.BARRIER.getDefaultState();
@@ -590,43 +591,43 @@ implements Chunk {
 
     @Override
     @Nullable
-    public StructureStart<?> getStructureStart(String string) {
-        return this.structureStarts.get(string);
+    public StructureStart<?> getStructureStart(StructureFeature<?> arg) {
+        return this.structureStarts.get(arg);
     }
 
     @Override
-    public void setStructureStart(String string, StructureStart<?> arg) {
-        this.structureStarts.put(string, arg);
+    public void setStructureStart(StructureFeature<?> arg, StructureStart<?> arg2) {
+        this.structureStarts.put(arg, arg2);
     }
 
     @Override
-    public Map<String, StructureStart<?>> getStructureStarts() {
+    public Map<StructureFeature<?>, StructureStart<?>> getStructureStarts() {
         return this.structureStarts;
     }
 
     @Override
-    public void setStructureStarts(Map<String, StructureStart<?>> map) {
+    public void setStructureStarts(Map<StructureFeature<?>, StructureStart<?>> map) {
         this.structureStarts.clear();
         this.structureStarts.putAll(map);
     }
 
     @Override
-    public LongSet getStructureReferences(String string2) {
-        return this.structureReferences.computeIfAbsent(string2, string -> new LongOpenHashSet());
+    public LongSet getStructureReferences(StructureFeature<?> arg2) {
+        return this.structureReferences.computeIfAbsent(arg2, arg -> new LongOpenHashSet());
     }
 
     @Override
-    public void addStructureReference(String string2, long l) {
-        this.structureReferences.computeIfAbsent(string2, string -> new LongOpenHashSet()).add(l);
+    public void addStructureReference(StructureFeature<?> arg2, long l) {
+        this.structureReferences.computeIfAbsent(arg2, arg -> new LongOpenHashSet()).add(l);
     }
 
     @Override
-    public Map<String, LongSet> getStructureReferences() {
+    public Map<StructureFeature<?>, LongSet> getStructureReferences() {
         return this.structureReferences;
     }
 
     @Override
-    public void setStructureReferences(Map<String, LongSet> map) {
+    public void setStructureReferences(Map<StructureFeature<?>, LongSet> map) {
         this.structureReferences.clear();
         this.structureReferences.putAll(map);
     }

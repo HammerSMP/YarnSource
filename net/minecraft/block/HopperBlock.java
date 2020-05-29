@@ -144,7 +144,7 @@ extends BlockWithEntity {
             arg4.openHandledScreen((HopperBlockEntity)lv);
             arg4.incrementStat(Stats.INSPECT_HOPPER);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override

@@ -3,12 +3,12 @@
  * 
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
+ *  org.apache.commons.lang3.mutable.MutableBoolean
  */
 package net.minecraft.world.gen.decorator;
 
 import com.mojang.serialization.Codec;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -71,6 +71,7 @@ import net.minecraft.world.gen.decorator.WaterLakeDecorator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 
 public abstract class Decorator<DC extends DecoratorConfig> {
     public static final Decorator<NopeDecoratorConfig> NOPE = Decorator.register("nope", new NopeDecorator(NopeDecoratorConfig.field_24891));
@@ -79,25 +80,25 @@ public abstract class Decorator<DC extends DecoratorConfig> {
     public static final Decorator<CountDecoratorConfig> COUNT_HEIGHTMAP_32 = Decorator.register("count_heightmap_32", new CountHeightmap32Decorator(CountDecoratorConfig.field_24985));
     public static final Decorator<CountDecoratorConfig> COUNT_HEIGHTMAP_DOUBLE = Decorator.register("count_heightmap_double", new CountHeightmapDoubleDecorator(CountDecoratorConfig.field_24985));
     public static final Decorator<CountDecoratorConfig> COUNT_HEIGHT_64 = Decorator.register("count_height_64", new CountHeight64Decorator(CountDecoratorConfig.field_24985));
-    public static final Decorator<NoiseHeightmapDecoratorConfig> NOISE_HEIGHTMAP_32 = Decorator.register("noise_heightmap_32", new NoiseHeightmap32Decorator(NoiseHeightmapDecoratorConfig.field_24890));
-    public static final Decorator<NoiseHeightmapDecoratorConfig> NOISE_HEIGHTMAP_DOUBLE = Decorator.register("noise_heightmap_double", new NoiseHeightmapDoubleDecorator(NoiseHeightmapDecoratorConfig.field_24890));
+    public static final Decorator<NoiseHeightmapDecoratorConfig> NOISE_HEIGHTMAP_32 = Decorator.register("noise_heightmap_32", new NoiseHeightmap32Decorator(NoiseHeightmapDecoratorConfig.CODEC));
+    public static final Decorator<NoiseHeightmapDecoratorConfig> NOISE_HEIGHTMAP_DOUBLE = Decorator.register("noise_heightmap_double", new NoiseHeightmapDoubleDecorator(NoiseHeightmapDecoratorConfig.CODEC));
     public static final Decorator<ChanceDecoratorConfig> CHANCE_HEIGHTMAP = Decorator.register("chance_heightmap", new ChanceHeightmapDecorator(ChanceDecoratorConfig.field_24980));
     public static final Decorator<ChanceDecoratorConfig> CHANCE_HEIGHTMAP_DOUBLE = Decorator.register("chance_heightmap_double", new ChanceHeightmapDoubleDecorator(ChanceDecoratorConfig.field_24980));
     public static final Decorator<ChanceDecoratorConfig> CHANCE_PASSTHROUGH = Decorator.register("chance_passthrough", new ChancePassthroughDecorator(ChanceDecoratorConfig.field_24980));
     public static final Decorator<ChanceDecoratorConfig> CHANCE_TOP_SOLID_HEIGHTMAP = Decorator.register("chance_top_solid_heightmap", new ChanceTopSolidHeightmapDecorator(ChanceDecoratorConfig.field_24980));
-    public static final Decorator<CountExtraChanceDecoratorConfig> COUNT_EXTRA_HEIGHTMAP = Decorator.register("count_extra_heightmap", new CountExtraHeightmapDecorator(CountExtraChanceDecoratorConfig.field_24986));
-    public static final Decorator<RangeDecoratorConfig> COUNT_RANGE = Decorator.register("count_range", new CountRangeDecorator(RangeDecoratorConfig.field_24879));
-    public static final Decorator<RangeDecoratorConfig> COUNT_BIASED_RANGE = Decorator.register("count_biased_range", new CountBiasedRangeDecorator(RangeDecoratorConfig.field_24879));
-    public static final Decorator<RangeDecoratorConfig> COUNT_VERY_BIASED_RANGE = Decorator.register("count_very_biased_range", new CountVeryBiasedRangeDecorator(RangeDecoratorConfig.field_24879));
-    public static final Decorator<RangeDecoratorConfig> RANDOM_COUNT_RANGE = Decorator.register("random_count_range", new RandomCountRangeDecorator(RangeDecoratorConfig.field_24879));
-    public static final Decorator<ChanceRangeDecoratorConfig> CHANCE_RANGE = Decorator.register("chance_range", new ChanceRangeDecorator(ChanceRangeDecoratorConfig.field_24876));
-    public static final Decorator<CountChanceDecoratorConfig> COUNT_CHANCE_HEIGHTMAP = Decorator.register("count_chance_heightmap", new CountChanceHeightmapDecorator(CountChanceDecoratorConfig.field_24984));
-    public static final Decorator<CountChanceDecoratorConfig> COUNT_CHANCE_HEIGHTMAP_DOUBLE = Decorator.register("count_chance_heightmap_double", new CountChanceHeightmapDoubleDecorator(CountChanceDecoratorConfig.field_24984));
+    public static final Decorator<CountExtraChanceDecoratorConfig> COUNT_EXTRA_HEIGHTMAP = Decorator.register("count_extra_heightmap", new CountExtraHeightmapDecorator(CountExtraChanceDecoratorConfig.CODEC));
+    public static final Decorator<RangeDecoratorConfig> COUNT_RANGE = Decorator.register("count_range", new CountRangeDecorator(RangeDecoratorConfig.CODEC));
+    public static final Decorator<RangeDecoratorConfig> COUNT_BIASED_RANGE = Decorator.register("count_biased_range", new CountBiasedRangeDecorator(RangeDecoratorConfig.CODEC));
+    public static final Decorator<RangeDecoratorConfig> COUNT_VERY_BIASED_RANGE = Decorator.register("count_very_biased_range", new CountVeryBiasedRangeDecorator(RangeDecoratorConfig.CODEC));
+    public static final Decorator<RangeDecoratorConfig> RANDOM_COUNT_RANGE = Decorator.register("random_count_range", new RandomCountRangeDecorator(RangeDecoratorConfig.CODEC));
+    public static final Decorator<ChanceRangeDecoratorConfig> CHANCE_RANGE = Decorator.register("chance_range", new ChanceRangeDecorator(ChanceRangeDecoratorConfig.CODEC));
+    public static final Decorator<CountChanceDecoratorConfig> COUNT_CHANCE_HEIGHTMAP = Decorator.register("count_chance_heightmap", new CountChanceHeightmapDecorator(CountChanceDecoratorConfig.CODEC));
+    public static final Decorator<CountChanceDecoratorConfig> COUNT_CHANCE_HEIGHTMAP_DOUBLE = Decorator.register("count_chance_heightmap_double", new CountChanceHeightmapDoubleDecorator(CountChanceDecoratorConfig.CODEC));
     public static final Decorator<CountDepthDecoratorConfig> COUNT_DEPTH_AVERAGE = Decorator.register("count_depth_average", new CountDepthAverageDecorator(CountDepthDecoratorConfig.field_24982));
     public static final Decorator<NopeDecoratorConfig> TOP_SOLID_HEIGHTMAP = Decorator.register("top_solid_heightmap", new HeightmapDecorator(NopeDecoratorConfig.field_24891));
-    public static final Decorator<HeightmapRangeDecoratorConfig> TOP_SOLID_HEIGHTMAP_RANGE = Decorator.register("top_solid_heightmap_range", new HeightmapRangeDecorator(HeightmapRangeDecoratorConfig.field_24989));
-    public static final Decorator<TopSolidHeightmapNoiseBiasedDecoratorConfig> TOP_SOLID_HEIGHTMAP_NOISE_BIASED = Decorator.register("top_solid_heightmap_noise_biased", new HeightmapNoiseBiasedDecorator(TopSolidHeightmapNoiseBiasedDecoratorConfig.field_24987));
-    public static final Decorator<CarvingMaskDecoratorConfig> CARVING_MASK = Decorator.register("carving_mask", new CarvingMaskDecorator(CarvingMaskDecoratorConfig.field_24979));
+    public static final Decorator<HeightmapRangeDecoratorConfig> TOP_SOLID_HEIGHTMAP_RANGE = Decorator.register("top_solid_heightmap_range", new HeightmapRangeDecorator(HeightmapRangeDecoratorConfig.CODEC));
+    public static final Decorator<TopSolidHeightmapNoiseBiasedDecoratorConfig> TOP_SOLID_HEIGHTMAP_NOISE_BIASED = Decorator.register("top_solid_heightmap_noise_biased", new HeightmapNoiseBiasedDecorator(TopSolidHeightmapNoiseBiasedDecoratorConfig.CODEC));
+    public static final Decorator<CarvingMaskDecoratorConfig> CARVING_MASK = Decorator.register("carving_mask", new CarvingMaskDecorator(CarvingMaskDecoratorConfig.CODEC));
     public static final Decorator<CountDecoratorConfig> FOREST_ROCK = Decorator.register("forest_rock", new ForestRockDecorator(CountDecoratorConfig.field_24985));
     public static final Decorator<CountDecoratorConfig> FIRE = Decorator.register("fire", new HellFireDecorator(CountDecoratorConfig.field_24985));
     public static final Decorator<CountDecoratorConfig> MAGMA = Decorator.register("magma", new MagmaDecorator(CountDecoratorConfig.field_24985));
@@ -130,12 +131,13 @@ public abstract class Decorator<DC extends DecoratorConfig> {
     }
 
     protected <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DC arg52, ConfiguredFeature<FC, F> arg6) {
-        AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+        MutableBoolean mutableBoolean = new MutableBoolean();
         this.getPositions(arg, arg3, random, arg52, arg4).forEach(arg5 -> {
-            boolean bl = arg6.generate(arg, arg2, arg3, random, (BlockPos)arg5);
-            atomicBoolean.set(atomicBoolean.get() || bl);
+            if (arg6.generate(arg, arg2, arg3, random, (BlockPos)arg5)) {
+                mutableBoolean.setTrue();
+            }
         });
-        return atomicBoolean.get();
+        return mutableBoolean.isTrue();
     }
 
     public abstract Stream<BlockPos> getPositions(WorldAccess var1, ChunkGenerator var2, Random var3, DC var4, BlockPos var5);

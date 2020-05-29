@@ -22,7 +22,6 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.class_5217;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -45,6 +44,7 @@ import net.minecraft.world.MultiTickScheduler;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.TickScheduler;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.border.WorldBorder;
@@ -65,7 +65,7 @@ implements ServerWorldAccess {
     private final int width;
     private final ServerWorld world;
     private final long seed;
-    private final class_5217 levelProperties;
+    private final WorldProperties levelProperties;
     private final Random random;
     private final DimensionType dimension;
     private final TickScheduler<Block> blockTickScheduler = new MultiTickScheduler<Block>(arg -> this.getChunk((BlockPos)arg).getBlockTickScheduler());
@@ -285,7 +285,7 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public class_5217 getLevelProperties() {
+    public WorldProperties getLevelProperties() {
         return this.levelProperties;
     }
 

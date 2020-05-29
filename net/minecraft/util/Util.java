@@ -76,6 +76,7 @@ import net.minecraft.datafixer.Schemas;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -423,6 +424,27 @@ public class Util {
             return DataResult.error((String)string);
         }
         return DataResult.success((Object)is);
+    }
+
+    public static void method_29476() {
+        Thread thread = new Thread("Timer hack thread"){
+
+            @Override
+            public void run() {
+                try {
+                    do {
+                        Thread.sleep(Integer.MAX_VALUE);
+                    } while (true);
+                }
+                catch (InterruptedException interruptedException) {
+                    LOGGER.warn("Timer hack thread interrupted, that really should not happen");
+                    return;
+                }
+            }
+        };
+        thread.setDaemon(true);
+        thread.setUncaughtExceptionHandler(new UncaughtExceptionLogger(LOGGER));
+        thread.start();
     }
 
     static enum IdentityHashStrategy implements Hash.Strategy<Object>

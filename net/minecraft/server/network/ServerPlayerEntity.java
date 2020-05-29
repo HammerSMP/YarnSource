@@ -35,9 +35,6 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.class_5217;
-import net.minecraft.class_5321;
-import net.minecraft.class_5322;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.datafixer.NbtOps;
@@ -110,6 +107,7 @@ import net.minecraft.server.network.ServerItemCooldownManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.network.ServerRecipeBook;
+import net.minecraft.server.network.SpawnLocating;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -138,10 +136,12 @@ import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
@@ -175,14 +175,14 @@ implements ScreenHandlerListener {
     private Entity cameraEntity;
     private boolean inTeleportationState;
     private boolean seenCredits;
-    private final ServerRecipeBook recipeBook;
+    private final ServerRecipeBook recipeBook = new ServerRecipeBook();
     private Vec3d levitationStartPos;
     private int levitationStartTick;
     private boolean disconnected;
     @Nullable
     private Vec3d enteredNetherPos;
     private ChunkSectionPos cameraPosition = ChunkSectionPos.from(0, 0, 0);
-    private class_5321<DimensionType> spawnPointDimension = DimensionType.field_24753;
+    private RegistryKey<World> spawnPointDimension = World.field_25179;
     private BlockPos spawnPointPosition;
     private boolean spawnPointSet;
     private int screenHandlerSyncId;
@@ -191,11 +191,10 @@ implements ScreenHandlerListener {
     public boolean notInAnyWorld;
 
     public ServerPlayerEntity(MinecraftServer minecraftServer, ServerWorld arg, GameProfile gameProfile, ServerPlayerInteractionManager arg2) {
-        super(arg, arg.method_27911(), gameProfile);
+        super(arg, arg.getSpawnPos(), gameProfile);
         arg2.player = this;
         this.interactionManager = arg2;
         this.server = minecraftServer;
-        this.recipeBook = new ServerRecipeBook(minecraftServer.getRecipeManager());
         this.statHandler = minecraftServer.getPlayerManager().createStatHandler(this);
         this.advancementTracker = minecraftServer.getPlayerManager().getAdvancementTracker(this);
         this.stepHeight = 1.0f;
@@ -203,7 +202,7 @@ implements ScreenHandlerListener {
     }
 
     private void moveToSpawn(ServerWorld arg) {
-        BlockPos lv = arg.method_27911();
+        BlockPos lv = arg.getSpawnPos();
         if (arg.getDimension().hasSkyLight() && arg.getServer().method_27728().getGameMode() != GameMode.ADVENTURE) {
             long l;
             long m;
@@ -216,13 +215,13 @@ implements ScreenHandlerListener {
                 i = 1;
             }
             int k = (m = (l = (long)(i * 2 + 1)) * l) > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)m;
-            int n = this.method_14244(k);
+            int n = this.calculateSpawnOffsetMultiplier(k);
             int o = new Random().nextInt(k);
             for (int p = 0; p < k; ++p) {
                 int q = (o + n * p) % k;
                 int r = q % (i * 2 + 1);
                 int s = q / (i * 2 + 1);
-                BlockPos lv2 = class_5322.method_29197(arg, lv, i, r, s);
+                BlockPos lv2 = SpawnLocating.findPlayerSpawn(arg, lv, i, r, s);
                 if (lv2 == null) continue;
                 this.refreshPositionAndAngles(lv2, 0.0f, 0.0f);
                 if (!arg.doesNotCollide(this)) {
@@ -238,7 +237,7 @@ implements ScreenHandlerListener {
         }
     }
 
-    private int method_14244(int i) {
+    private int calculateSpawnOffsetMultiplier(int i) {
         return i <= 16 ? i - 1 : 17;
     }
 
@@ -258,7 +257,7 @@ implements ScreenHandlerListener {
         }
         this.seenCredits = arg.getBoolean("seenCredits");
         if (arg.contains("recipeBook", 10)) {
-            this.recipeBook.fromTag(arg.getCompound("recipeBook"));
+            this.recipeBook.fromTag(arg.getCompound("recipeBook"), this.server.getRecipeManager());
         }
         if (this.isSleeping()) {
             this.wakeUp();
@@ -267,7 +266,7 @@ implements ScreenHandlerListener {
             this.spawnPointPosition = new BlockPos(arg.getInt("SpawnX"), arg.getInt("SpawnY"), arg.getInt("SpawnZ"));
             this.spawnPointSet = arg.getBoolean("SpawnForced");
             if (arg.contains("SpawnDimension")) {
-                this.spawnPointDimension = DimensionType.field_24751.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(DimensionType.field_24753);
+                this.spawnPointDimension = World.field_25178.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(World.field_25179);
             }
         }
     }
@@ -290,18 +289,18 @@ implements ScreenHandlerListener {
             CompoundTag lv4 = new CompoundTag();
             CompoundTag lv5 = new CompoundTag();
             lv2.saveToTag(lv5);
-            lv4.putUuidNew("Attach", lv3.getUuid());
+            lv4.putUuid("Attach", lv3.getUuid());
             lv4.put("Entity", lv5);
             arg.put("RootVehicle", lv4);
         }
         arg.put("recipeBook", this.recipeBook.toTag());
-        arg.putString("Dimension", this.world.method_27983().method_29177().toString());
+        arg.putString("Dimension", this.world.method_27983().getValue().toString());
         if (this.spawnPointPosition != null) {
             arg.putInt("SpawnX", this.spawnPointPosition.getX());
             arg.putInt("SpawnY", this.spawnPointPosition.getY());
             arg.putInt("SpawnZ", this.spawnPointPosition.getZ());
             arg.putBoolean("SpawnForced", this.spawnPointSet);
-            Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.method_29177()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("SpawnDimension", (Tag)arg2));
+            Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.getValue()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("SpawnDimension", (Tag)arg2));
         }
     }
 
@@ -570,11 +569,11 @@ implements ScreenHandlerListener {
 
     @Override
     @Nullable
-    public Entity changeDimension(class_5321<DimensionType> arg) {
+    public Entity changeDimension(RegistryKey<World> arg) {
         float h;
         this.inTeleportationState = true;
-        class_5321<DimensionType> lv = this.world.method_27983();
-        if (lv == DimensionType.field_24755 && arg == DimensionType.field_24753) {
+        RegistryKey<World> lv = this.world.method_27983();
+        if (lv == World.field_25181 && arg == World.field_25179) {
             this.detach();
             this.getServerWorld().removePlayer(this);
             if (!this.notInAnyWorld) {
@@ -586,8 +585,8 @@ implements ScreenHandlerListener {
         }
         ServerWorld lv2 = this.server.getWorld(lv);
         ServerWorld lv3 = this.server.getWorld(arg);
-        class_5217 lv4 = lv3.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.method_29177(), BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.method_27982(), lv3.method_28125(), true));
+        WorldProperties lv4 = lv3.getLevelProperties();
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv3.method_29287(), arg, BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.isDebugWorld(), lv3.method_28125(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
         PlayerManager lv5 = this.server.getPlayerManager();
         lv5.sendCommandTree(this);
@@ -599,7 +598,7 @@ implements ScreenHandlerListener {
         float g = this.pitch;
         float i = h = this.yaw;
         lv2.getProfiler().push("moving");
-        if (lv == DimensionType.field_24753 && arg == DimensionType.field_24755) {
+        if (lv == World.field_25179 && arg == World.field_25181) {
             BlockPos lv6 = ServerWorld.field_25144;
             d = lv6.getX();
             e = lv6.getY();
@@ -607,17 +606,16 @@ implements ScreenHandlerListener {
             h = 90.0f;
             g = 0.0f;
         } else {
-            if (lv == DimensionType.field_24753 && arg == DimensionType.field_24754) {
+            if (lv == World.field_25179 && arg == World.field_25180) {
                 this.enteredNetherPos = this.getPos();
             }
-            Registry<DimensionType> lv7 = this.server.method_29174().method_29116();
-            DimensionType lv8 = lv7.method_29107(lv);
-            DimensionType lv9 = lv7.method_29107(arg);
+            DimensionType lv7 = lv2.getDimension();
+            DimensionType lv8 = lv3.getDimension();
             double j = 8.0;
-            if (!lv8.method_28539() && lv9.method_28539()) {
+            if (!lv7.isShrunk() && lv8.isShrunk()) {
                 d /= 8.0;
                 f /= 8.0;
-            } else if (lv8.method_28539() && !lv9.method_28539()) {
+            } else if (lv7.isShrunk() && !lv8.isShrunk()) {
                 d *= 8.0;
                 f *= 8.0;
             }
@@ -632,7 +630,7 @@ implements ScreenHandlerListener {
         d = MathHelper.clamp(d, k, m);
         f = MathHelper.clamp(f, l, n);
         this.refreshPositionAndAngles(d, e, f, h, g);
-        if (arg == DimensionType.field_24755) {
+        if (arg == World.field_25181) {
             int o = MathHelper.floor(this.getX());
             int p = MathHelper.floor(this.getY()) - 1;
             int q = MathHelper.floor(this.getZ());
@@ -652,8 +650,8 @@ implements ScreenHandlerListener {
         this.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(this.abilities));
         lv5.sendWorldInfo(this, lv3);
         lv5.sendPlayerStatus(this);
-        for (StatusEffectInstance lv10 : this.getStatusEffects()) {
-            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv10));
+        for (StatusEffectInstance lv9 : this.getStatusEffects()) {
+            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv9));
         }
         this.networkHandler.sendPacket(new WorldEventS2CPacket(1032, BlockPos.ORIGIN, 0, false));
         this.syncedExperience = -1;
@@ -665,13 +663,13 @@ implements ScreenHandlerListener {
     private void dimensionChanged(ServerWorld arg) {
         DimensionType lv = arg.getDimension();
         DimensionType lv2 = this.world.getDimension();
-        class_5321<DimensionType> lv3 = arg.method_27983();
-        class_5321<DimensionType> lv4 = this.world.method_27983();
+        RegistryKey<World> lv3 = arg.method_27983();
+        RegistryKey<World> lv4 = this.world.method_27983();
         Criteria.CHANGED_DIMENSION.trigger(this, lv3, lv4);
-        if (lv.method_28542() && lv2.method_28541() && this.enteredNetherPos != null) {
+        if (lv.isNether() && lv2.isOverworld() && this.enteredNetherPos != null) {
             Criteria.NETHER_TRAVEL.trigger(this, this.enteredNetherPos);
         }
-        if (lv4 != DimensionType.field_24754) {
+        if (lv4 != World.field_25180) {
             this.enteredNetherPos = null;
         }
     }
@@ -706,7 +704,7 @@ implements ScreenHandlerListener {
         if (this.isSleeping() || !this.isAlive()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OTHER_PROBLEM));
         }
-        if (!this.world.getDimension().method_28537()) {
+        if (!this.world.getDimension().isNatural()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_HERE));
         }
         if (!this.isBedTooFarAway(arg2, lv)) {
@@ -800,9 +798,9 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    protected void applyFrostWalker(BlockPos arg) {
+    protected void applyMovementEffects(BlockPos arg) {
         if (!this.isSpectator()) {
-            super.applyFrostWalker(arg);
+            super.applyMovementEffects(arg);
         }
     }
 
@@ -1277,8 +1275,8 @@ implements ScreenHandlerListener {
             this.networkHandler.requestTeleport(d, e, f, g, h);
         } else {
             ServerWorld lv = this.getServerWorld();
-            class_5217 lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.method_27983().method_29177(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.method_27982(), arg.method_28125(), true));
+            WorldProperties lv2 = arg.getLevelProperties();
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.method_29287(), arg.method_27983(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.isDebugWorld(), arg.method_28125(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);
@@ -1299,7 +1297,7 @@ implements ScreenHandlerListener {
         return this.spawnPointPosition;
     }
 
-    public class_5321<DimensionType> getSpawnPointDimension() {
+    public RegistryKey<World> getSpawnPointDimension() {
         return this.spawnPointDimension;
     }
 
@@ -1307,7 +1305,7 @@ implements ScreenHandlerListener {
         return this.spawnPointSet;
     }
 
-    public void setSpawnPoint(class_5321<DimensionType> arg, BlockPos arg2, boolean bl, boolean bl2) {
+    public void setSpawnPoint(RegistryKey<World> arg, BlockPos arg2, boolean bl, boolean bl2) {
         if (arg2 != null) {
             boolean bl3;
             boolean bl4 = bl3 = arg2.equals(this.spawnPointPosition) && arg.equals(this.spawnPointDimension);
@@ -1319,7 +1317,7 @@ implements ScreenHandlerListener {
             this.spawnPointSet = bl;
         } else {
             this.spawnPointPosition = null;
-            this.spawnPointDimension = DimensionType.field_24753;
+            this.spawnPointDimension = World.field_25179;
             this.spawnPointSet = false;
         }
     }

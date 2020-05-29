@@ -14,20 +14,27 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.item.ItemPredicate;
-import net.minecraft.util.Identifier;
 
 public class MatchToolLootCondition
-implements LootCondition {
+implements class_5341 {
     private final ItemPredicate predicate;
 
     public MatchToolLootCondition(ItemPredicate arg) {
         this.predicate = arg;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.MATCH_TOOL;
     }
 
     @Override
@@ -41,7 +48,7 @@ implements LootCondition {
         return lv != null && this.predicate.test(lv);
     }
 
-    public static LootCondition.Builder builder(ItemPredicate.Builder arg) {
+    public static class_5341.Builder builder(ItemPredicate.Builder arg) {
         return () -> new MatchToolLootCondition(arg.build());
     }
 
@@ -51,11 +58,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<MatchToolLootCondition> {
-        protected Factory() {
-            super(new Identifier("match_tool"), MatchToolLootCondition.class);
-        }
-
+    implements class_5335<MatchToolLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, MatchToolLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());
@@ -68,7 +71,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

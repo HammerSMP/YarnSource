@@ -94,13 +94,13 @@ implements Waterloggable {
         if (this.material == Material.METAL) {
             return ActionResult.PASS;
         }
-        arg = (BlockState)arg.method_28493(OPEN);
+        arg = (BlockState)arg.cycle(OPEN);
         arg2.setBlockState(arg3, arg, 2);
         if (arg.get(WATERLOGGED).booleanValue()) {
             arg2.getFluidTickScheduler().schedule(arg3, Fluids.WATER, Fluids.WATER.getTickRate(arg2));
         }
         this.playToggleSound(arg4, arg2, arg3, arg.get(OPEN));
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(arg2.isClient);
     }
 
     protected void playToggleSound(@Nullable PlayerEntity arg, World arg2, BlockPos arg3, boolean bl) {

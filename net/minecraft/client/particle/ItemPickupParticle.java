@@ -19,6 +19,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -38,9 +39,16 @@ extends Particle {
     private ItemPickupParticle(EntityRenderDispatcher arg, BufferBuilderStorage arg2, ClientWorld arg3, Entity arg4, Entity arg5, Vec3d arg6) {
         super(arg3, arg4.getX(), arg4.getY(), arg4.getZ(), arg6.x, arg6.y, arg6.z);
         this.bufferStorage = arg2;
-        this.itemEntity = arg4;
+        this.itemEntity = this.method_29358(arg4);
         this.interactingEntity = arg5;
         this.dispatcher = arg;
+    }
+
+    private Entity method_29358(Entity arg) {
+        if (!(arg instanceof ItemEntity)) {
+            return arg;
+        }
+        return ((ItemEntity)arg).method_29271();
     }
 
     @Override

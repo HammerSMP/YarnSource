@@ -167,6 +167,10 @@ extends LivingEntity {
         this.pathfindingPenalties.put(arg, Float.valueOf(f));
     }
 
+    public boolean method_29244(PathNodeType arg) {
+        return arg != PathNodeType.DANGER_FIRE && arg != PathNodeType.DANGER_CACTUS && arg != PathNodeType.DANGER_OTHER;
+    }
+
     protected BodyControl createBodyControl() {
         return new BodyControl(this);
     }
@@ -366,7 +370,7 @@ extends LivingEntity {
             CompoundTag lv9 = new CompoundTag();
             if (this.holdingEntity instanceof LivingEntity) {
                 UUID uUID = this.holdingEntity.getUuid();
-                lv9.putUuidNew("UUID", uUID);
+                lv9.putUuid("UUID", uUID);
             } else if (this.holdingEntity instanceof AbstractDecorationEntity) {
                 BlockPos lv10 = ((AbstractDecorationEntity)this.holdingEntity).getDecorationBlockPos();
                 lv9.putInt("X", lv10.getX());
@@ -496,7 +500,7 @@ extends LivingEntity {
         PlayerEntity lv;
         PlayerEntity playerEntity = lv = arg.getThrower() != null ? this.world.getPlayerByUuid(arg.getThrower()) : null;
         if (lv instanceof ServerPlayerEntity) {
-            Criteria.THROWN_ITEM_PICKED_UP_BY_ENTITY.test((ServerPlayerEntity)lv, arg.getStack(), this);
+            Criteria.THROWN_ITEM_PICKED_UP_BY_ENTITY.trigger((ServerPlayerEntity)lv, arg.getStack(), this);
         }
     }
 
@@ -1072,6 +1076,36 @@ extends LivingEntity {
         return this.positionTargetRange != -1.0f;
     }
 
+    @Nullable
+    protected <T extends MobEntity> T method_29243(EntityType<T> arg) {
+        if (this.removed) {
+            return null;
+        }
+        MobEntity lv = (MobEntity)arg.create(this.world);
+        lv.copyPositionAndRotation(this);
+        lv.setCanPickUpLoot(this.canPickUpLoot());
+        lv.setBaby(this.isBaby());
+        lv.setAiDisabled(this.isAiDisabled());
+        if (this.hasCustomName()) {
+            lv.setCustomName(this.getCustomName());
+            lv.setCustomNameVisible(this.isCustomNameVisible());
+        }
+        if (this.isPersistent()) {
+            lv.setPersistent();
+        }
+        lv.setInvulnerable(this.isInvulnerable());
+        for (EquipmentSlot lv2 : EquipmentSlot.values()) {
+            ItemStack lv3 = this.getEquippedStack(lv2);
+            if (lv3.isEmpty()) continue;
+            lv.equipStack(lv2, lv3.copy());
+            lv.setEquipmentDropChance(lv2, this.getDropChance(lv2));
+            lv3.setCount(0);
+        }
+        this.world.spawnEntity(lv);
+        this.remove();
+        return (T)lv;
+    }
+
     protected void updateLeash() {
         if (this.leashTag != null) {
             this.deserializeLeashTag();
@@ -1149,8 +1183,8 @@ extends LivingEntity {
 
     private void deserializeLeashTag() {
         if (this.leashTag != null && this.world instanceof ServerWorld) {
-            if (this.leashTag.containsUuidNew("UUID")) {
-                UUID uUID = this.leashTag.getUuidNew("UUID");
+            if (this.leashTag.containsUuid("UUID")) {
+                UUID uUID = this.leashTag.getUuid("UUID");
                 Entity lv = ((ServerWorld)this.world).getEntity(uUID);
                 if (lv != null) {
                     this.attachLeash(lv, true);

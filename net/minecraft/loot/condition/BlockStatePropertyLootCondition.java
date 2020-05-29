@@ -18,7 +18,10 @@ import com.google.gson.JsonSyntaxException;
 import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
@@ -28,13 +31,18 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
 
 public class BlockStatePropertyLootCondition
-implements LootCondition {
+implements class_5341 {
     private final Block block;
     private final StatePredicate properties;
 
     private BlockStatePropertyLootCondition(Block arg, StatePredicate arg2) {
         this.block = arg;
         this.properties = arg2;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.BLOCK_STATE_PROPERTY;
     }
 
     @Override
@@ -58,11 +66,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<BlockStatePropertyLootCondition> {
-        protected Factory() {
-            super(new Identifier("block_state_property"), BlockStatePropertyLootCondition.class);
-        }
-
+    implements class_5335<BlockStatePropertyLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, BlockStatePropertyLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("block", Registry.BLOCK.getId(arg.block).toString());
@@ -81,13 +85,13 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }
 
     public static class Builder
-    implements LootCondition.Builder {
+    implements class_5341.Builder {
         private final Block block;
         private StatePredicate propertyValues = StatePredicate.ANY;
 
@@ -101,7 +105,7 @@ implements LootCondition {
         }
 
         @Override
-        public LootCondition build() {
+        public class_5341 build() {
             return new BlockStatePropertyLootCondition(this.block, this.propertyValues);
         }
     }

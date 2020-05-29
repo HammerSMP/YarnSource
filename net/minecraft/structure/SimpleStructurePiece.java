@@ -69,7 +69,7 @@ extends StructurePiece {
     public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
         this.placementData.setBoundingBox(arg4);
         this.boundingBox = this.structure.calculateBoundingBox(this.placementData, this.pos);
-        if (this.structure.place(arg, this.pos, arg6, this.placementData, 2)) {
+        if (this.structure.place(arg, this.pos, arg6, this.placementData, random, 2)) {
             List<Structure.StructureBlockInfo> list = this.structure.getInfosForBlock(this.pos, this.placementData, Blocks.STRUCTURE_BLOCK);
             for (Structure.StructureBlockInfo lv : list) {
                 StructureBlockMode lv2;

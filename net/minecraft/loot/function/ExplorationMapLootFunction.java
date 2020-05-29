@@ -17,20 +17,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Locale;
 import java.util.Set;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.map.MapIcon;
 import net.minecraft.item.map.MapState;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.StructureFeature;
@@ -48,13 +49,18 @@ extends ConditionalLootFunction {
     private final int searchRadius;
     private final boolean skipExistingChunks;
 
-    private ExplorationMapLootFunction(LootCondition[] args, StructureFeature<?> arg, MapIcon.Type arg2, byte b, int i, boolean bl) {
+    private ExplorationMapLootFunction(class_5341[] args, StructureFeature<?> arg, MapIcon.Type arg2, byte b, int i, boolean bl) {
         super(args);
         this.destination = arg;
         this.decoration = arg2;
         this.zoom = b;
         this.searchRadius = i;
         this.skipExistingChunks = bl;
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.EXPLORATION_MAP;
     }
 
     @Override
@@ -86,10 +92,6 @@ extends ConditionalLootFunction {
 
     public static class Factory
     extends ConditionalLootFunction.Factory<ExplorationMapLootFunction> {
-        protected Factory() {
-            super(new Identifier("exploration_map"), ExplorationMapLootFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, ExplorationMapLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -111,7 +113,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public ExplorationMapLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public ExplorationMapLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             StructureFeature<?> lv = Factory.method_29039(jsonObject);
             String string = jsonObject.has("decoration") ? JsonHelper.getString(jsonObject, "decoration") : "mansion";
             MapIcon.Type lv2 = DEFAULT_DECORATION;
@@ -130,14 +132,14 @@ extends ConditionalLootFunction {
         private static StructureFeature<?> method_29039(JsonObject jsonObject) {
             String string;
             StructureFeature lv;
-            if (jsonObject.has("destination") && (lv = (StructureFeature)StructureFeature.field_24842.get((Object)(string = JsonHelper.getString(jsonObject, "destination")).toLowerCase(Locale.ROOT))) != null) {
+            if (jsonObject.has("destination") && (lv = (StructureFeature)StructureFeature.STRUCTURES.get((Object)(string = JsonHelper.getString(jsonObject, "destination")).toLowerCase(Locale.ROOT))) != null) {
                 return lv;
             }
             return field_25032;
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

@@ -55,7 +55,7 @@ extends Entity {
     @Override
     protected void writeCustomDataToTag(CompoundTag arg) {
         if (this.ownerUuid != null) {
-            arg.putUuidNew("Owner", this.ownerUuid);
+            arg.putUuid("Owner", this.ownerUuid);
         }
         if (this.field_23740) {
             arg.putBoolean("LeftOwner", true);
@@ -64,8 +64,8 @@ extends Entity {
 
     @Override
     protected void readCustomDataFromTag(CompoundTag arg) {
-        if (arg.containsUuidNew("Owner")) {
-            this.ownerUuid = arg.getUuidNew("Owner");
+        if (arg.containsUuid("Owner")) {
+            this.ownerUuid = arg.getUuid("Owner");
         }
         this.field_23740 = arg.getBoolean("LeftOwner");
     }

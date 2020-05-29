@@ -20,7 +20,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class NetherrackReplaceBlobsFeatureConfig
 implements FeatureConfig {
-    public static final Codec<NetherrackReplaceBlobsFeatureConfig> field_24905 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Vec3i.field_25123.fieldOf("minimum_reach").forGetter(arg -> arg.minReachPos), (App)Vec3i.field_25123.fieldOf("maximum_reach").forGetter(arg -> arg.maxReachPos)).apply((Applicative)instance, NetherrackReplaceBlobsFeatureConfig::new));
+    public static final Codec<NetherrackReplaceBlobsFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Vec3i.field_25123.fieldOf("minimum_reach").forGetter(arg -> arg.minReachPos), (App)Vec3i.field_25123.fieldOf("maximum_reach").forGetter(arg -> arg.maxReachPos)).apply((Applicative)instance, NetherrackReplaceBlobsFeatureConfig::new));
     public final BlockState target;
     public final BlockState state;
     public final Vec3i minReachPos;

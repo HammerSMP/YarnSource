@@ -318,8 +318,8 @@ extends Entity {
         this.radiusOnUse = arg.getFloat("RadiusOnUse");
         this.radiusGrowth = arg.getFloat("RadiusPerTick");
         this.setRadius(arg.getFloat("Radius"));
-        if (arg.containsUuidNew("Owner")) {
-            this.ownerUuid = arg.getUuidNew("Owner");
+        if (arg.containsUuid("Owner")) {
+            this.ownerUuid = arg.getUuid("Owner");
         }
         if (arg.contains("Particle", 8)) {
             try {
@@ -358,7 +358,7 @@ extends Entity {
         arg.putFloat("Radius", this.getRadius());
         arg.putString("Particle", this.getParticleType().asString());
         if (this.ownerUuid != null) {
-            arg.putUuidNew("Owner", this.ownerUuid);
+            arg.putUuid("Owner", this.ownerUuid);
         }
         if (this.customColor) {
             arg.putInt("Color", this.getColor());

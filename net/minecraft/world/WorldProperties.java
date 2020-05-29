@@ -1,13 +1,13 @@
 /*
  * Decompiled with CFR 0.149.
  */
-package net.minecraft;
+package net.minecraft.world;
 
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 
-public interface class_5217 {
+public interface WorldProperties {
     public int getSpawnX();
 
     public int getSpawnY();

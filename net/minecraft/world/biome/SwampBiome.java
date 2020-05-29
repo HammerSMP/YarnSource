@@ -30,6 +30,7 @@ extends Biome {
         this.addStructureFeature(DefaultBiomeFeatures.field_24688);
         this.addStructureFeature(DefaultBiomeFeatures.field_24683);
         DefaultBiomeFeatures.addLandCarvers(this);
+        DefaultBiomeFeatures.addFossils(this);
         DefaultBiomeFeatures.addDefaultLakes(this);
         DefaultBiomeFeatures.addDungeons(this);
         DefaultBiomeFeatures.addMineables(this);
@@ -40,7 +41,6 @@ extends Biome {
         DefaultBiomeFeatures.addSwampVegetation(this);
         DefaultBiomeFeatures.addSprings(this);
         this.addFeature(GenerationStep.Feature.VEGETAL_DECORATION, Feature.SEAGRASS.configure(new SeagrassFeatureConfig(64, 0.6)).createDecoratedFeature(Decorator.TOP_SOLID_HEIGHTMAP.configure(DecoratorConfig.DEFAULT)));
-        DefaultBiomeFeatures.addFossils(this);
         DefaultBiomeFeatures.addFrozenTopLayer(this);
         this.addSpawn(SpawnGroup.CREATURE, new Biome.SpawnEntry(EntityType.SHEEP, 12, 4, 4));
         this.addSpawn(SpawnGroup.CREATURE, new Biome.SpawnEntry(EntityType.PIG, 10, 4, 4));

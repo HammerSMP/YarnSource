@@ -269,6 +269,7 @@ public class ServerPlayerInteractionManager {
 
     public ActionResult interactBlock(ServerPlayerEntity arg, World arg2, ItemStack arg3, Hand arg4, BlockHitResult arg5) {
         ActionResult lv8;
+        ActionResult lv5;
         BlockPos lv = arg5.getBlockPos();
         BlockState lv2 = arg2.getBlockState(lv);
         if (this.gameMode == GameMode.SPECTATOR) {
@@ -282,14 +283,9 @@ public class ServerPlayerInteractionManager {
         boolean bl = !arg.getMainHandStack().isEmpty() || !arg.getOffHandStack().isEmpty();
         boolean bl2 = arg.shouldCancelInteraction() && bl;
         ItemStack lv4 = arg3.copy();
-        if (!bl2) {
-            ActionResult lv5 = lv2.onUse(arg2, arg, arg4, arg5);
-            if (lv5 == ActionResult.SUCCESS) {
-                Criteria.ITEM_USED_ON_BLOCK.test(arg, lv, lv4);
-            }
-            if (lv5.isAccepted()) {
-                return lv5;
-            }
+        if (!bl2 && (lv5 = lv2.onUse(arg2, arg, arg4, arg5)).isAccepted()) {
+            Criteria.ITEM_USED_ON_BLOCK.test(arg, lv, lv4);
+            return lv5;
         }
         if (arg3.isEmpty() || arg.getItemCooldownManager().isCoolingDown(arg3.getItem())) {
             return ActionResult.PASS;
@@ -302,7 +298,7 @@ public class ServerPlayerInteractionManager {
         } else {
             lv8 = arg3.useOnBlock(lv6);
         }
-        if (lv8 == ActionResult.SUCCESS) {
+        if (lv8.isAccepted()) {
             Criteria.ITEM_USED_ON_BLOCK.test(arg, lv, lv4);
         }
         return lv8;

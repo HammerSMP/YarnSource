@@ -53,7 +53,7 @@ implements BiomeAccess.Storage {
     protected abstract Codec<? extends BiomeSource> method_28442();
 
     @Environment(value=EnvType.CLIENT)
-    public abstract BiomeSource create(long var1);
+    public abstract BiomeSource withSeed(long var1);
 
     public List<Biome> getSpawnBiomes() {
         return SPAWN_BIOMES;
@@ -141,9 +141,9 @@ implements BiomeAccess.Storage {
 
     static {
         Registry.register(Registry.BIOME_SOURCE, "fixed", FixedBiomeSource.field_24717);
-        Registry.register(Registry.BIOME_SOURCE, "multi_noise", MultiNoiseBiomeSource.field_24719);
+        Registry.register(Registry.BIOME_SOURCE, "multi_noise", MultiNoiseBiomeSource.CODEC);
         Registry.register(Registry.BIOME_SOURCE, "checkerboard", CheckerboardBiomeSource.field_24715);
-        Registry.register(Registry.BIOME_SOURCE, "vanilla_layered", VanillaLayeredBiomeSource.field_24727);
+        Registry.register(Registry.BIOME_SOURCE, "vanilla_layered", VanillaLayeredBiomeSource.CODEC);
         Registry.register(Registry.BIOME_SOURCE, "the_end", TheEndBiomeSource.field_24730);
         field_24713 = Registry.BIOME_SOURCE.dispatchStable(BiomeSource::method_28442, Function.identity());
         SPAWN_BIOMES = Lists.newArrayList((Object[])new Biome[]{Biomes.FOREST, Biomes.PLAINS, Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.WOODED_HILLS, Biomes.JUNGLE, Biomes.JUNGLE_HILLS});

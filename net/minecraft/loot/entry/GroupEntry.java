@@ -3,15 +3,22 @@
  */
 package net.minecraft.loot.entry;
 
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.class_5338;
+import net.minecraft.class_5341;
 import net.minecraft.loot.entry.CombinedEntry;
 import net.minecraft.loot.entry.EntryCombiner;
+import net.minecraft.loot.entry.LootEntries;
 import net.minecraft.loot.entry.LootEntry;
 
 public class GroupEntry
 extends CombinedEntry {
-    GroupEntry(LootEntry[] args, LootCondition[] args2) {
+    GroupEntry(LootEntry[] args, class_5341[] args2) {
         super(args, args2);
+    }
+
+    @Override
+    public class_5338 method_29318() {
+        return LootEntries.SEQUENCE;
     }
 
     @Override
@@ -24,18 +31,13 @@ extends CombinedEntry {
                 return args[0];
             }
             case 2: {
-                EntryCombiner lv = args[0];
-                EntryCombiner lv2 = args[1];
-                return (arg3, consumer) -> {
-                    lv.expand(arg3, consumer);
-                    lv2.expand(arg3, consumer);
-                    return true;
-                };
+                return args[0].and(args[1]);
             }
         }
         return (arg, consumer) -> {
             for (EntryCombiner lv : args) {
-                lv.expand(arg, consumer);
+                if (lv.expand(arg, consumer)) continue;
+                return false;
             }
             return true;
         };

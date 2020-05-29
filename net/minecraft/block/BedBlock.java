@@ -119,7 +119,7 @@ implements BlockEntityProvider {
     }
 
     public static boolean isOverworld(World arg, BlockPos arg2) {
-        return arg.getDimension().method_28541();
+        return arg.getDimension().isOverworld();
     }
 
     private boolean isFree(World arg, BlockPos arg2) {

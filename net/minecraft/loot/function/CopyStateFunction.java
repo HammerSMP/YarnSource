@@ -23,13 +23,15 @@ import java.util.HashSet;
 import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Property;
@@ -42,10 +44,15 @@ extends ConditionalLootFunction {
     private final Block block;
     private final Set<Property<?>> properties;
 
-    private CopyStateFunction(LootCondition[] args, Block arg, Set<Property<?>> set) {
+    private CopyStateFunction(class_5341[] args, Block arg, Set<Property<?>> set) {
         super(args);
         this.block = arg;
         this.properties = set;
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.COPY_STATE;
     }
 
     @Override
@@ -65,7 +72,7 @@ extends ConditionalLootFunction {
                 lv4 = new CompoundTag();
                 lv2.put("BlockStateTag", lv4);
             }
-            this.properties.stream().filter(lv::method_28498).forEach(arg3 -> lv4.putString(arg3.getName(), CopyStateFunction.method_21893(lv, arg3)));
+            this.properties.stream().filter(lv::contains).forEach(arg3 -> lv4.putString(arg3.getName(), CopyStateFunction.method_21893(lv, arg3)));
         }
         return arg;
     }
@@ -81,10 +88,6 @@ extends ConditionalLootFunction {
 
     public static class Factory
     extends ConditionalLootFunction.Factory<CopyStateFunction> {
-        public Factory() {
-            super(new Identifier("copy_state"), CopyStateFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, CopyStateFunction arg2, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg2, jsonSerializationContext);
@@ -95,7 +98,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public CopyStateFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public CopyStateFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "block"));
             Block lv2 = (Block)Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new IllegalArgumentException("Can't find block " + lv));
             StateManager<Block, BlockState> lv3 = lv2.getStateManager();
@@ -108,7 +111,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

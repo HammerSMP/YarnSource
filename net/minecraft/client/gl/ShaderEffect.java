@@ -141,7 +141,7 @@ implements AutoCloseable {
     private void parsePass(TextureManager arg, JsonElement jsonElement) throws IOException {
         JsonArray jsonArray2;
         JsonObject jsonObject;
-        block16: {
+        block21: {
             jsonObject = JsonHelper.asObject(jsonElement, "pass");
             String string = JsonHelper.getString(jsonObject, "name");
             String string2 = JsonHelper.getString(jsonObject, "intarget");
@@ -156,27 +156,39 @@ implements AutoCloseable {
             }
             PostProcessShader lv3 = this.addPass(string, lv, lv2);
             JsonArray jsonArray = JsonHelper.getArray(jsonObject, "auxtargets", null);
-            if (jsonArray == null) break block16;
+            if (jsonArray == null) break block21;
             int i = 0;
             for (JsonElement jsonElement2 : jsonArray) {
-                block15: {
+                block20: {
                     try {
                         Framebuffer lv4;
+                        boolean bl2;
                         String string4;
-                        block17: {
+                        block22: {
+                            String string7;
                             JsonObject jsonObject2 = JsonHelper.asObject(jsonElement2, "auxtarget");
                             string4 = JsonHelper.getString(jsonObject2, "name");
                             String string5 = JsonHelper.getString(jsonObject2, "id");
-                            lv4 = this.getTarget(string5);
-                            if (lv4 != null) break block17;
-                            Identifier lv5 = new Identifier("textures/effect/" + string5 + ".png");
+                            if (string5.endsWith(":depth")) {
+                                boolean bl = true;
+                                String string6 = string5.substring(0, string5.lastIndexOf(58));
+                            } else {
+                                bl2 = false;
+                                string7 = string5;
+                            }
+                            lv4 = this.getTarget(string7);
+                            if (lv4 != null) break block22;
+                            if (bl2) {
+                                throw new ShaderParseException("Render target '" + string7 + "' can't be used as depth buffer");
+                            }
+                            Identifier lv5 = new Identifier("textures/effect/" + string7 + ".png");
                             Resource lv6 = null;
                             try {
                                 lv6 = this.resourceManager.getResource(lv5);
                             }
                             catch (FileNotFoundException fileNotFoundException) {
                                 try {
-                                    throw new ShaderParseException("Render target or texture '" + string5 + "' does not exist");
+                                    throw new ShaderParseException("Render target or texture '" + string7 + "' does not exist");
                                 }
                                 catch (Throwable throwable) {
                                     IOUtils.closeQuietly(lv6);
@@ -188,8 +200,8 @@ implements AutoCloseable {
                             AbstractTexture lv7 = arg.getTexture(lv5);
                             int j = JsonHelper.getInt(jsonObject2, "width");
                             int k = JsonHelper.getInt(jsonObject2, "height");
-                            boolean bl = JsonHelper.getBoolean(jsonObject2, "bilinear");
-                            if (bl) {
+                            boolean bl3 = JsonHelper.getBoolean(jsonObject2, "bilinear");
+                            if (bl3) {
                                 RenderSystem.texParameter(3553, 10241, 9729);
                                 RenderSystem.texParameter(3553, 10240, 9729);
                             } else {
@@ -197,9 +209,13 @@ implements AutoCloseable {
                                 RenderSystem.texParameter(3553, 10240, 9728);
                             }
                             lv3.addAuxTarget(string4, lv7.getGlId(), j, k);
-                            break block15;
+                            break block20;
                         }
-                        lv3.addAuxTarget(string4, lv4, lv4.textureWidth, lv4.textureHeight);
+                        if (bl2) {
+                            lv3.addAuxTarget(string4, lv4.depthAttachment, lv4.textureWidth, lv4.textureHeight);
+                        } else {
+                            lv3.addAuxTarget(string4, lv4, lv4.textureWidth, lv4.textureHeight);
+                        }
                     }
                     catch (Exception exception) {
                         ShaderParseException lv8 = ShaderParseException.wrap(exception);

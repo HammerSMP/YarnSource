@@ -18,10 +18,10 @@ public final class Material {
     public static final Material WATER = Builder.method_15808(new Builder(MaterialColor.WATER).allowsMovement()).notSolid().destroyedByPiston().replaceable().liquid().build();
     public static final Material BUBBLE_COLUMN = Builder.method_15808(new Builder(MaterialColor.WATER).allowsMovement()).notSolid().destroyedByPiston().replaceable().liquid().build();
     public static final Material LAVA = Builder.method_15808(new Builder(MaterialColor.LAVA).allowsMovement()).notSolid().destroyedByPiston().replaceable().liquid().build();
-    public static final Material SNOW_LAYER = Builder.method_15808(new Builder(MaterialColor.WHITE).allowsMovement()).notSolid().destroyedByPiston().replaceable().requiresTool().build();
+    public static final Material SNOW_LAYER = Builder.method_15808(new Builder(MaterialColor.WHITE).allowsMovement()).notSolid().destroyedByPiston().replaceable().build();
     public static final Material FIRE = Builder.method_15808(new Builder(MaterialColor.AIR).allowsMovement()).notSolid().destroyedByPiston().replaceable().build();
     public static final Material SUPPORTED = Builder.method_15808(new Builder(MaterialColor.AIR).allowsMovement()).notSolid().destroyedByPiston().build();
-    public static final Material COBWEB = Builder.method_15808(new Builder(MaterialColor.WEB).allowsMovement()).destroyedByPiston().requiresTool().build();
+    public static final Material COBWEB = Builder.method_15808(new Builder(MaterialColor.WEB).allowsMovement()).destroyedByPiston().build();
     public static final Material REDSTONE_LAMP = new Builder(MaterialColor.AIR).build();
     public static final Material ORGANIC_PRODUCT = new Builder(MaterialColor.CLAY).build();
     public static final Material SOIL = new Builder(MaterialColor.DIRT).build();
@@ -40,11 +40,11 @@ public final class Material {
     public static final Material GLASS = Builder.method_15808(new Builder(MaterialColor.AIR)).build();
     public static final Material ICE = Builder.method_15808(new Builder(MaterialColor.ICE)).build();
     public static final Material CACTUS = Builder.method_15808(new Builder(MaterialColor.FOLIAGE)).destroyedByPiston().build();
-    public static final Material STONE = new Builder(MaterialColor.STONE).requiresTool().build();
-    public static final Material METAL = new Builder(MaterialColor.IRON).requiresTool().build();
-    public static final Material SNOW_BLOCK = new Builder(MaterialColor.WHITE).requiresTool().build();
-    public static final Material REPAIR_STATION = new Builder(MaterialColor.IRON).requiresTool().blocksPistons().build();
-    public static final Material BARRIER = new Builder(MaterialColor.AIR).requiresTool().blocksPistons().build();
+    public static final Material STONE = new Builder(MaterialColor.STONE).build();
+    public static final Material METAL = new Builder(MaterialColor.IRON).build();
+    public static final Material SNOW_BLOCK = new Builder(MaterialColor.WHITE).build();
+    public static final Material REPAIR_STATION = new Builder(MaterialColor.IRON).blocksPistons().build();
+    public static final Material BARRIER = new Builder(MaterialColor.AIR).blocksPistons().build();
     public static final Material PISTON = new Builder(MaterialColor.STONE).blocksPistons().build();
     public static final Material UNUSED_PLANT = new Builder(MaterialColor.FOLIAGE).destroyedByPiston().build();
     public static final Material GOURD = new Builder(MaterialColor.FOLIAGE).destroyedByPiston().build();
@@ -54,21 +54,19 @@ public final class Material {
     private final PistonBehavior pistonBehavior;
     private final boolean blocksMovement;
     private final boolean burnable;
-    private final boolean breakByHand;
     private final boolean liquid;
     private final boolean blocksLight;
     private final boolean replaceable;
     private final boolean solid;
 
-    public Material(MaterialColor arg, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, boolean bl7, PistonBehavior arg2) {
+    public Material(MaterialColor arg, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, PistonBehavior arg2) {
         this.color = arg;
         this.liquid = bl;
         this.solid = bl2;
         this.blocksMovement = bl3;
         this.blocksLight = bl4;
-        this.breakByHand = bl5;
-        this.burnable = bl6;
-        this.replaceable = bl7;
+        this.burnable = bl5;
+        this.replaceable = bl6;
         this.pistonBehavior = arg2;
     }
 
@@ -96,10 +94,6 @@ public final class Material {
         return this.blocksLight;
     }
 
-    public boolean canBreakByHand() {
-        return this.breakByHand;
-    }
-
     public PistonBehavior getPistonBehavior() {
         return this.pistonBehavior;
     }
@@ -112,7 +106,6 @@ public final class Material {
         private PistonBehavior pistonBehavior = PistonBehavior.NORMAL;
         private boolean blocksMovement = true;
         private boolean burnable;
-        private boolean breakByHand = true;
         private boolean liquid;
         private boolean replaceable;
         private boolean solid = true;
@@ -143,11 +136,6 @@ public final class Material {
             return this;
         }
 
-        protected Builder requiresTool() {
-            this.breakByHand = false;
-            return this;
-        }
-
         protected Builder burnable() {
             this.burnable = true;
             return this;
@@ -169,7 +157,7 @@ public final class Material {
         }
 
         public Material build() {
-            return new Material(this.color, this.liquid, this.solid, this.blocksMovement, this.blocksLight, this.breakByHand, this.burnable, this.replaceable, this.pistonBehavior);
+            return new Material(this.color, this.liquid, this.solid, this.blocksMovement, this.blocksLight, this.burnable, this.replaceable, this.pistonBehavior);
         }
 
         static /* synthetic */ Builder method_15808(Builder arg) {

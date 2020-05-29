@@ -13,12 +13,16 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public class PlayerRespawnS2CPacket
 implements Packet<ClientPlayPacketListener> {
-    private Identifier dimension;
+    private RegistryKey<DimensionType> field_25322;
+    private RegistryKey<World> dimension;
     private long sha256Seed;
     private GameMode gameMode;
     private boolean debugWorld;
@@ -28,10 +32,11 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerRespawnS2CPacket() {
     }
 
-    public PlayerRespawnS2CPacket(Identifier arg, long l, GameMode arg2, boolean bl, boolean bl2, boolean bl3) {
-        this.dimension = arg;
+    public PlayerRespawnS2CPacket(RegistryKey<DimensionType> arg, RegistryKey<World> arg2, long l, GameMode arg3, boolean bl, boolean bl2, boolean bl3) {
+        this.field_25322 = arg;
+        this.dimension = arg2;
         this.sha256Seed = l;
-        this.gameMode = arg2;
+        this.gameMode = arg3;
         this.debugWorld = bl;
         this.flatWorld = bl2;
         this.keepPlayerAttributes = bl3;
@@ -44,7 +49,8 @@ implements Packet<ClientPlayPacketListener> {
 
     @Override
     public void read(PacketByteBuf arg) throws IOException {
-        this.dimension = arg.readIdentifier();
+        this.field_25322 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
+        this.dimension = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
         this.sha256Seed = arg.readLong();
         this.gameMode = GameMode.byId(arg.readUnsignedByte());
         this.debugWorld = arg.readBoolean();
@@ -54,7 +60,8 @@ implements Packet<ClientPlayPacketListener> {
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
-        arg.writeIdentifier(this.dimension);
+        arg.writeIdentifier(this.field_25322.getValue());
+        arg.writeIdentifier(this.dimension.getValue());
         arg.writeLong(this.sha256Seed);
         arg.writeByte(this.gameMode.getId());
         arg.writeBoolean(this.debugWorld);
@@ -63,7 +70,12 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Identifier getDimension() {
+    public RegistryKey<DimensionType> method_29445() {
+        return this.field_25322;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public RegistryKey<World> getDimension() {
         return this.dimension;
     }
 

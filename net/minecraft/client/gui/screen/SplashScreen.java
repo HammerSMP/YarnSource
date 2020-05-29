@@ -84,25 +84,28 @@ extends Overlay {
             SplashScreen.fill(arg, 0, 0, k, l, field_25041);
             r = 1.0f;
         }
-        int s = (this.client.getWindow().getScaledWidth() - 322) / 2;
-        int t = (this.client.getWindow().getScaledHeight() + 161) / 4;
+        int s = (int)((double)this.client.getWindow().getScaledWidth() * 0.5);
+        int t = (int)((double)this.client.getWindow().getScaledHeight() * 0.5);
+        double d = Math.min((double)this.client.getWindow().getScaledWidth() * 0.75, (double)this.client.getWindow().getScaledHeight()) * 0.25;
+        int u = (int)(d * 0.5);
+        double e = d * 4.0;
+        int v = (int)(e * 0.5);
         this.client.getTextureManager().bindTexture(LOGO);
         RenderSystem.enableBlend();
         RenderSystem.blendEquation(32774);
         RenderSystem.blendFunc(770, 1);
         RenderSystem.alphaFunc(516, 0.0f);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, r);
-        float u = 0.0625f;
-        SplashScreen.drawTexture(arg, s, t, 161, 80, -0.0625f, 0.0f, 161, 80, 161, 161);
-        SplashScreen.drawTexture(arg, s + 161, t, 161, 80, 0.0625f, 80.5f, 161, 80, 161, 161);
+        SplashScreen.drawTexture(arg, s - v, t - u, v, (int)d, -0.0625f, 0.0f, 120, 60, 120, 120);
+        SplashScreen.drawTexture(arg, s, t - u, v, (int)d, 0.0625f, 60.0f, 120, 60, 120, 120);
         RenderSystem.defaultBlendFunc();
         RenderSystem.defaultAlphaFunc();
         RenderSystem.disableBlend();
-        float v = this.reloadMonitor.getProgress();
-        this.progress = MathHelper.clamp(this.progress * 0.95f + v * 0.050000012f, 0.0f, 1.0f);
+        int w = (int)((double)this.client.getWindow().getScaledHeight() * 0.8325);
+        float x = this.reloadMonitor.getProgress();
+        this.progress = MathHelper.clamp(this.progress * 0.95f + x * 0.050000012f, 0.0f, 1.0f);
         if (g < 1.0f) {
-            int w = l * 648 / 801;
-            this.renderProgressBar(arg, k / 2 - 161, w, k / 2 + 161, w + 12, 1.0f - MathHelper.clamp(g, 0.0f, 1.0f));
+            this.renderProgressBar(arg, k / 2 - v, w - 5, k / 2 + v, w + 5, 1.0f - MathHelper.clamp(g, 0.0f, 1.0f));
         }
         if (g >= 2.0f) {
             this.client.setOverlay(null);
@@ -126,8 +129,10 @@ extends Overlay {
         int m = MathHelper.ceil((float)(k - i - 2) * this.progress);
         int n = Math.round(f * 255.0f);
         int o = BackgroundHelper.ColorMixer.getArgb(n, 255, 255, 255);
-        SplashScreen.fill(arg, i, j, k, l, o);
-        SplashScreen.fill(arg, i + 1, j + 1, k - 1, l - 1, field_25042 | n << 24);
+        SplashScreen.fill(arg, i, j, k, j + 1, o);
+        SplashScreen.fill(arg, i, l, k, l - 1, o);
+        SplashScreen.fill(arg, i, j, i + 1, l, o);
+        SplashScreen.fill(arg, k, j, k - 1, l, o);
         SplashScreen.fill(arg, i + 2, j + 2, i + m, l - 2, o);
     }
 

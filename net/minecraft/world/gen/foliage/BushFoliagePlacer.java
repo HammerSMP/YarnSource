@@ -13,6 +13,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ModifiableTestableWorld;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
@@ -22,7 +23,7 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class BushFoliagePlacer
 extends BlobFoliagePlacer {
-    public static final Codec<BushFoliagePlacer> field_24928 = RecordCodecBuilder.create(instance -> BushFoliagePlacer.method_28838(instance).apply((Applicative)instance, BushFoliagePlacer::new));
+    public static final Codec<BushFoliagePlacer> CODEC = RecordCodecBuilder.create(instance -> BushFoliagePlacer.method_28838(instance).apply((Applicative)instance, BushFoliagePlacer::new));
 
     public BushFoliagePlacer(int i, int j, int k, int l, int m) {
         super(i, j, k, l, m, FoliagePlacerType.BUSH_FOLIAGE_PLACER);
@@ -34,10 +35,10 @@ extends BlobFoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l) {
+    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
         for (int m = l; m >= l - j; --m) {
             int n = k + arg3.getFoliageRadius() - 1 - m;
-            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk());
+            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk(), arg4);
         }
     }
 

@@ -71,10 +71,12 @@ implements Waterloggable {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     private static final VoxelShape field_21580 = Block.createCuboidShape(6.0, 0.0, 6.0, 10.0, 16.0, 10.0);
     private final boolean field_23881;
+    private final int field_25182;
 
-    public CampfireBlock(boolean bl, AbstractBlock.Settings arg) {
+    public CampfireBlock(boolean bl, int i, AbstractBlock.Settings arg) {
         super(arg);
         this.field_23881 = bl;
+        this.field_25182 = i;
         this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(LIT, true)).with(SIGNAL_FIRE, false)).with(WATERLOGGED, false)).with(FACING, Direction.NORTH));
     }
 
@@ -97,7 +99,7 @@ implements Waterloggable {
     @Override
     public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
         if (!arg4.isFireImmune() && arg.get(LIT).booleanValue() && arg4 instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)arg4)) {
-            arg4.damage(DamageSource.IN_FIRE, 1.0f);
+            arg4.damage(DamageSource.IN_FIRE, this.field_25182);
         }
         super.onEntityCollision(arg, arg2, arg3, arg4);
     }
@@ -164,22 +166,27 @@ implements Waterloggable {
         }
     }
 
+    public static void method_29288(WorldAccess arg, BlockPos arg2, BlockState arg3) {
+        BlockEntity lv;
+        if (arg.isClient()) {
+            for (int i = 0; i < 20; ++i) {
+                CampfireBlock.spawnSmokeParticle(arg.getWorld(), arg2, arg3.get(SIGNAL_FIRE), true);
+            }
+        }
+        if ((lv = arg.getBlockEntity(arg2)) instanceof CampfireBlockEntity) {
+            ((CampfireBlockEntity)lv).spawnItemsBeingCooked();
+        }
+    }
+
     @Override
     public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
         if (!arg3.get(Properties.WATERLOGGED).booleanValue() && arg4.getFluid() == Fluids.WATER) {
             boolean bl = arg3.get(LIT);
             if (bl) {
-                if (arg.isClient()) {
-                    for (int i = 0; i < 20; ++i) {
-                        CampfireBlock.spawnSmokeParticle(arg.getWorld(), arg2, arg3.get(SIGNAL_FIRE), true);
-                    }
-                } else {
+                if (!arg.isClient()) {
                     arg.playSound(null, arg2, SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 }
-                BlockEntity lv = arg.getBlockEntity(arg2);
-                if (lv instanceof CampfireBlockEntity) {
-                    ((CampfireBlockEntity)lv).spawnItemsBeingCooked();
-                }
+                CampfireBlock.method_29288(arg, arg2, arg3);
             }
             arg.setBlockState(arg2, (BlockState)((BlockState)arg3.with(WATERLOGGED, true)).with(LIT, false), 3);
             arg.getFluidTickScheduler().schedule(arg2, arg4.getFluid(), arg4.getFluid().getTickRate(arg));
@@ -226,7 +233,7 @@ implements Waterloggable {
     }
 
     public static boolean isLitCampfire(BlockState arg) {
-        return arg.getBlock().isIn(BlockTags.CAMPFIRES) && arg.method_28498(LIT) && arg.get(LIT) != false;
+        return arg.contains(LIT) && arg.isIn(BlockTags.CAMPFIRES) && arg.get(LIT) != false;
     }
 
     @Override

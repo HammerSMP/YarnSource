@@ -41,7 +41,7 @@ extends State<Fluid, FluidState> {
     }
 
     public Fluid getFluid() {
-        return (Fluid)this.field_24739;
+        return (Fluid)this.owner;
     }
 
     public boolean isStill() {

@@ -15,7 +15,6 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import java.util.Collection;
 import java.util.Collections;
-import net.minecraft.class_5321;
 import net.minecraft.command.arguments.BlockPosArgumentType;
 import net.minecraft.command.arguments.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -23,7 +22,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class SpawnPointCommand {
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
@@ -31,11 +31,11 @@ public class SpawnPointCommand {
     }
 
     private static int execute(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, BlockPos arg2) {
-        class_5321<DimensionType> lv = arg.getWorld().method_27983();
+        RegistryKey<World> lv = arg.getWorld().method_27983();
         for (ServerPlayerEntity lv2 : collection) {
             lv2.setSpawnPoint(lv, arg2, true, false);
         }
-        String string = lv.method_29177().toString();
+        String string = lv.getValue().toString();
         if (collection.size() == 1) {
             arg.sendFeedback(new TranslatableText("commands.spawnpoint.success.single", arg2.getX(), arg2.getY(), arg2.getZ(), string, collection.iterator().next().getDisplayName()), true);
         } else {

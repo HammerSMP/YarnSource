@@ -305,8 +305,12 @@ public class ClientPlayerInteractionManager {
         return lv2.getResult();
     }
 
-    public ClientPlayerEntity createPlayer(ClientWorld arg, StatHandler arg2, ClientRecipeBook arg3) {
-        return new ClientPlayerEntity(this.client, arg, this.networkHandler, arg2, arg3);
+    public ClientPlayerEntity method_29357(ClientWorld arg, StatHandler arg2, ClientRecipeBook arg3) {
+        return this.createPlayer(arg, arg2, arg3, false, false);
+    }
+
+    public ClientPlayerEntity createPlayer(ClientWorld arg, StatHandler arg2, ClientRecipeBook arg3, boolean bl, boolean bl2) {
+        return new ClientPlayerEntity(this.client, arg, this.networkHandler, arg2, arg3, bl, bl2);
     }
 
     public void attackEntity(PlayerEntity arg, Entity arg2) {
@@ -418,11 +422,12 @@ public class ClientPlayerInteractionManager {
 
     public void processPlayerActionResponse(ClientWorld arg, BlockPos arg2, BlockState arg3, PlayerActionC2SPacket.Action arg4, boolean bl) {
         PosAndRot lv = (PosAndRot)this.unacknowledgedPlayerActions.remove((Object)Pair.of((Object)arg2, (Object)((Object)arg4)));
-        if (lv == null || !bl || arg4 != PlayerActionC2SPacket.Action.START_DESTROY_BLOCK && arg.getBlockState(arg2) != arg3) {
+        BlockState lv2 = arg.getBlockState(arg2);
+        if ((lv == null || !bl || arg4 != PlayerActionC2SPacket.Action.START_DESTROY_BLOCK && lv2 != arg3) && lv2 != arg3) {
             arg.setBlockStateWithoutNeighborUpdates(arg2, arg3);
             if (lv != null) {
-                Vec3d lv2 = lv.getPos();
-                this.client.player.updatePositionAndAngles(lv2.x, lv2.y, lv2.z, lv.getYaw(), lv.getPitch());
+                Vec3d lv3 = lv.getPos();
+                this.client.player.updatePositionAndAngles(lv3.x, lv3.y, lv3.z, lv.getYaw(), lv.getPitch());
             }
         }
         while (this.unacknowledgedPlayerActions.size() >= 50) {

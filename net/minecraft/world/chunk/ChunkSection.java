@@ -8,6 +8,7 @@
  */
 package net.minecraft.world.chunk;
 
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -156,8 +157,8 @@ public class ChunkSection {
         return 2 + this.container.getPacketSize();
     }
 
-    public boolean method_19523(BlockState arg) {
-        return this.container.method_19526(arg);
+    public boolean method_19523(Predicate<BlockState> predicate) {
+        return this.container.method_19526(predicate);
     }
 }
 

@@ -39,6 +39,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.Bootstrap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.WindowSettings;
@@ -141,6 +142,9 @@ public class Main {
         String string8 = (String)Main.getOption(optionSet, optionSpec);
         Integer integer = (Integer)Main.getOption(optionSet, optionSpec2);
         CrashReport.initCrashReport();
+        Bootstrap.initialize();
+        Bootstrap.logMissing();
+        Util.method_29476();
         Session lv = new Session((String)optionSpec10.value(optionSet), string6, (String)optionSpec12.value(optionSet), (String)optionSpec21.value(optionSet));
         RunArgs lv2 = new RunArgs(new RunArgs.Network(lv, propertyMap, propertyMap2, proxy), new WindowSettings(i, j, optionalInt, optionalInt2, bl), new RunArgs.Directories(file, file3, file2, string7), new RunArgs.Game(bl2, string4, string5, bl3, bl4), new RunArgs.AutoConnect(string8, integer));
         Thread thread = new Thread("Client Shutdown Thread"){

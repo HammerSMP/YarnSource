@@ -7,6 +7,7 @@
  *  com.google.gson.JsonArray
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonObject
+ *  it.unimi.dsi.fastutil.ints.IntArrayList
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -23,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -287,21 +289,20 @@ AutoCloseable {
 
     private void finalizeUniformsAndSamplers() {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        int i = 0;
-        int j = 0;
-        while (i < this.samplerNames.size()) {
+        IntArrayList intList = new IntArrayList();
+        for (int i = 0; i < this.samplerNames.size(); ++i) {
             String string = this.samplerNames.get(i);
-            int k = GlUniform.getUniformLocation(this.programRef, string);
-            if (k == -1) {
-                LOGGER.warn("Shader {}could not find sampler named {} in the specified shader program.", (Object)this.name, (Object)string);
+            int j = GlUniform.getUniformLocation(this.programRef, string);
+            if (j == -1) {
+                LOGGER.warn("Shader {} could not find sampler named {} in the specified shader program.", (Object)this.name, (Object)string);
                 this.samplerBinds.remove(string);
-                this.samplerNames.remove(j);
-                --j;
-            } else {
-                this.samplerShaderLocs.add(k);
+                intList.add(i);
+                continue;
             }
-            ++i;
-            ++j;
+            this.samplerShaderLocs.add(j);
+        }
+        for (int k = intList.size() - 1; k >= 0; --k) {
+            this.samplerNames.remove(intList.getInt(k));
         }
         for (GlUniform lv : this.uniformData) {
             String string2 = lv.getName();

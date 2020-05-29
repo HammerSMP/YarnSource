@@ -16,8 +16,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LilyPadBlock;
-import net.minecraft.class_5275;
+import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -99,6 +100,11 @@ extends Entity {
         this.prevX = d;
         this.prevY = e;
         this.prevZ = f;
+    }
+
+    @Override
+    protected float getEyeHeight(EntityPose arg, EntityDimensions arg2) {
+        return arg2.height;
     }
 
     @Override
@@ -600,9 +606,9 @@ extends Entity {
     }
 
     @Override
-    public Vec3d method_24829(LivingEntity arg) {
+    public Vec3d updatePassengerForDismount(LivingEntity arg) {
         double e;
-        Vec3d lv = BoatEntity.method_24826(this.getWidth() * MathHelper.SQUARE_ROOT_OF_TWO, arg.getWidth(), this.yaw);
+        Vec3d lv = BoatEntity.getPassengerDismountOffset(this.getWidth() * MathHelper.SQUARE_ROOT_OF_TWO, arg.getWidth(), this.yaw);
         double d = this.getX() + lv.x;
         BlockPos lv2 = new BlockPos(d, this.getBoundingBox().maxY, e = this.getZ() + lv.z);
         BlockPos lv3 = lv2.down();
@@ -610,19 +616,19 @@ extends Entity {
             for (EntityPose lv4 : arg.getPoses()) {
                 Vec3d lv7;
                 Vec3d lv6;
-                Box lv5 = arg.method_24833(lv4);
-                double f = this.world.method_26372(lv2);
-                if (class_5275.method_27932(f) && class_5275.method_27933(this.world, arg, lv5.offset(lv6 = new Vec3d(d, (double)lv2.getY() + f, e)))) {
+                Box lv5 = arg.getBoundingBox(lv4);
+                double f = this.world.getCollisionHeightAt(lv2);
+                if (Dismounting.canDismountInBlock(f) && Dismounting.canPlaceEntityAt(this.world, arg, lv5.offset(lv6 = new Vec3d(d, (double)lv2.getY() + f, e)))) {
                     arg.setPose(lv4);
                     return lv6;
                 }
-                double g = this.world.method_26372(lv3);
-                if (!class_5275.method_27932(g) || !class_5275.method_27933(this.world, arg, lv5.offset(lv7 = new Vec3d(d, (double)lv3.getY() + g, e)))) continue;
+                double g = this.world.getCollisionHeightAt(lv3);
+                if (!Dismounting.canDismountInBlock(g) || !Dismounting.canPlaceEntityAt(this.world, arg, lv5.offset(lv7 = new Vec3d(d, (double)lv3.getY() + g, e)))) continue;
                 arg.setPose(lv4);
                 return lv7;
             }
         }
-        return super.method_24829(arg);
+        return super.updatePassengerForDismount(arg);
     }
 
     protected void copyEntityData(Entity arg) {

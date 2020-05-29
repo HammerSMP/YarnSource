@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
-import net.minecraft.class_5217;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -32,6 +31,7 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ModifiableTestableWorld;
 import net.minecraft.world.TickScheduler;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.dimension.DimensionType;
@@ -59,7 +59,7 @@ ModifiableTestableWorld {
 
     public World getWorld();
 
-    public class_5217 getLevelProperties();
+    public WorldProperties getLevelProperties();
 
     public LocalDifficulty getLocalDifficulty(BlockPos var1);
 
@@ -86,7 +86,7 @@ ModifiableTestableWorld {
     public void syncWorldEvent(@Nullable PlayerEntity var1, int var2, BlockPos var3, int var4);
 
     default public int getDimensionHeight() {
-        return this.getDimension().method_27998() ? 128 : 256;
+        return this.getDimension().hasCeiling() ? 128 : 256;
     }
 
     default public void syncWorldEvent(int i, BlockPos arg, int j) {

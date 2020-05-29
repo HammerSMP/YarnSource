@@ -17,7 +17,7 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class ChanceRangeDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<ChanceRangeDecoratorConfig> field_24876 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("chance").forGetter(arg -> Float.valueOf(arg.chance)), (App)Codec.INT.fieldOf("bottom_offset").withDefault((Object)0).forGetter(arg -> arg.bottomOffset), (App)Codec.INT.fieldOf("top_offset").withDefault((Object)0).forGetter(arg -> arg.topOffset), (App)Codec.INT.fieldOf("top").withDefault((Object)0).forGetter(arg -> arg.top)).apply((Applicative)instance, ChanceRangeDecoratorConfig::new));
+    public static final Codec<ChanceRangeDecoratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("chance").forGetter(arg -> Float.valueOf(arg.chance)), (App)Codec.INT.fieldOf("bottom_offset").withDefault((Object)0).forGetter(arg -> arg.bottomOffset), (App)Codec.INT.fieldOf("top_offset").withDefault((Object)0).forGetter(arg -> arg.topOffset), (App)Codec.INT.fieldOf("top").withDefault((Object)0).forGetter(arg -> arg.top)).apply((Applicative)instance, ChanceRangeDecoratorConfig::new));
     public final float chance;
     public final int bottomOffset;
     public final int topOffset;

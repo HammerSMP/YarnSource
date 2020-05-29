@@ -13,14 +13,16 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import javax.annotation.Nullable;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class WeatherCheckLootCondition
-implements LootCondition {
+implements class_5341 {
     @Nullable
     private final Boolean raining;
     @Nullable
@@ -29,6 +31,11 @@ implements LootCondition {
     private WeatherCheckLootCondition(@Nullable Boolean arg, @Nullable Boolean arg2) {
         this.raining = arg;
         this.thundering = arg2;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.WEATHER_CHECK;
     }
 
     @Override
@@ -46,11 +53,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<WeatherCheckLootCondition> {
-        public Factory() {
-            super(new Identifier("weather_check"), WeatherCheckLootCondition.class);
-        }
-
+    implements class_5335<WeatherCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, WeatherCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("raining", arg.raining);
@@ -65,7 +68,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

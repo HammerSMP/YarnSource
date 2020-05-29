@@ -35,10 +35,10 @@ extends Task<LivingEntity> {
         if (lv2 != null) {
             if (!lv2.hasSpawned() || lv2.isPreRaid()) {
                 lv.setDefaultActivity(Activity.PRE_RAID);
-                lv.method_24526(Activity.PRE_RAID);
+                lv.doExclusively(Activity.PRE_RAID);
             } else {
                 lv.setDefaultActivity(Activity.RAID);
-                lv.method_24526(Activity.RAID);
+                lv.doExclusively(Activity.RAID);
             }
         }
     }

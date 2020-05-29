@@ -18,18 +18,16 @@ import net.minecraft.tag.FluidTags;
 
 public class StayAboveWaterTask
 extends Task<MobEntity> {
-    private final float minWaterHeight;
     private final float chance;
 
-    public StayAboveWaterTask(float f, float g) {
+    public StayAboveWaterTask(float f) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of());
-        this.minWaterHeight = f;
-        this.chance = g;
+        this.chance = f;
     }
 
     @Override
     protected boolean shouldRun(ServerWorld arg, MobEntity arg2) {
-        return arg2.isTouchingWater() && arg2.getFluidHeight(FluidTags.WATER) > (double)this.minWaterHeight || arg2.isInLava();
+        return arg2.isTouchingWater() && arg2.getFluidHeight(FluidTags.WATER) > arg2.method_29241() || arg2.isInLava();
     }
 
     @Override

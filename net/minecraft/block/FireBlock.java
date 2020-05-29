@@ -114,6 +114,7 @@ extends AbstractFireBlock {
     @Override
     public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
         boolean bl2;
+        arg2.getBlockTickScheduler().schedule(arg3, this, FireBlock.method_26155(arg2.random));
         if (!arg2.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             return;
         }
@@ -121,7 +122,7 @@ extends AbstractFireBlock {
             arg2.removeBlock(arg3, false);
         }
         BlockState lv = arg2.getBlockState(arg3.down());
-        boolean bl = arg2.getDimension().method_28543() && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
+        boolean bl = arg2.getDimension().isEnd() && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
         int i = arg.get(AGE);
         if (!bl && arg2.isRaining() && this.isRainingAround(arg2, arg3) && random.nextFloat() < 0.2f + (float)i * 0.03f) {
             arg2.removeBlock(arg3, false);
@@ -133,7 +134,6 @@ extends AbstractFireBlock {
             arg2.setBlockState(arg3, arg, 4);
         }
         if (!bl) {
-            arg2.getBlockTickScheduler().schedule(arg3, this, FireBlock.method_26155(arg2.random));
             if (!this.areBlocksAroundFlammable(arg2, arg3)) {
                 BlockPos lv2 = arg3.down();
                 if (!arg2.getBlockState(lv2).isSideSolidFullSquare(arg2, lv2, Direction.UP) || i > 3) {
@@ -182,14 +182,14 @@ extends AbstractFireBlock {
     }
 
     private int getSpreadChance(BlockState arg) {
-        if (arg.method_28498(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
+        if (arg.contains(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
             return 0;
         }
         return this.spreadChances.getInt((Object)arg.getBlock());
     }
 
     private int getBurnChance(BlockState arg) {
-        if (arg.method_28498(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
+        if (arg.contains(Properties.WATERLOGGED) && arg.get(Properties.WATERLOGGED).booleanValue()) {
             return 0;
         }
         return this.burnChances.getInt((Object)arg.getBlock());

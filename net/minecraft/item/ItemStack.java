@@ -101,7 +101,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class ItemStack {
-    public static final Codec<ItemStack> field_24671 = RecordCodecBuilder.create(instance -> instance.group((App)Registry.ITEM.fieldOf("id").forGetter(arg -> arg.item), (App)Codec.INT.fieldOf("Count").forGetter(arg -> arg.count), (App)CompoundTag.field_25128.optionalFieldOf("tag").forGetter(arg -> Optional.ofNullable(arg.tag))).apply((Applicative)instance, ItemStack::new));
+    public static final Codec<ItemStack> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Registry.ITEM.fieldOf("id").forGetter(arg -> arg.item), (App)Codec.INT.fieldOf("Count").forGetter(arg -> arg.count), (App)CompoundTag.field_25128.optionalFieldOf("tag").forGetter(arg -> Optional.ofNullable(arg.tag))).apply((Applicative)instance, ItemStack::new));
     private static final Logger LOGGER = LogManager.getLogger();
     public static final ItemStack EMPTY = new ItemStack((ItemConvertible)null);
     public static final DecimalFormat MODIFIER_FORMAT = Util.make(new DecimalFormat("#.##"), decimalFormat -> decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ROOT)));
@@ -195,7 +195,7 @@ public final class ItemStack {
         }
         Item lv4 = this.getItem();
         ActionResult lv5 = lv4.useOnBlock(arg);
-        if (lv != null && lv5 == ActionResult.SUCCESS) {
+        if (lv != null && lv5.isAccepted()) {
             lv.incrementStat(Stats.USED.getOrCreateStat(lv4));
         }
         return lv5;
@@ -597,11 +597,11 @@ public final class ItemStack {
                 double d = lv6.getValue();
                 boolean bl = false;
                 if (arg != null) {
-                    if (lv6.getId() == Item.ATTACK_DAMAGE_MODIFIER_UUID) {
+                    if (lv6.getId() == Item.ATTACK_DAMAGE_MODIFIER_ID) {
                         d += arg.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
                         d += (double)EnchantmentHelper.getAttackDamage(this, EntityGroup.DEFAULT);
                         bl = true;
-                    } else if (lv6.getId() == Item.ATTACK_SPEED_MODIFIER_UUID) {
+                    } else if (lv6.getId() == Item.ATTACK_SPEED_MODIFIER_ID) {
                         d += arg.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_SPEED);
                         bl = true;
                     }

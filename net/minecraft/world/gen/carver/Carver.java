@@ -4,6 +4,7 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
  *  com.mojang.serialization.Codec
+ *  org.apache.commons.lang3.mutable.MutableBoolean
  */
 package net.minecraft.world.gen.carver;
 
@@ -12,7 +13,6 @@ import com.mojang.serialization.Codec;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -35,13 +35,14 @@ import net.minecraft.world.gen.carver.NetherCaveCarver;
 import net.minecraft.world.gen.carver.RavineCarver;
 import net.minecraft.world.gen.carver.UnderwaterCaveCarver;
 import net.minecraft.world.gen.carver.UnderwaterRavineCarver;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 
 public abstract class Carver<C extends CarverConfig> {
-    public static final Carver<ProbabilityConfig> CAVE = Carver.register("cave", new CaveCarver(ProbabilityConfig.field_24899, 256));
-    public static final Carver<ProbabilityConfig> NETHER_CAVE = Carver.register("nether_cave", new NetherCaveCarver(ProbabilityConfig.field_24899));
-    public static final Carver<ProbabilityConfig> CANYON = Carver.register("canyon", new RavineCarver(ProbabilityConfig.field_24899));
-    public static final Carver<ProbabilityConfig> UNDERWATER_CANYON = Carver.register("underwater_canyon", new UnderwaterRavineCarver(ProbabilityConfig.field_24899));
-    public static final Carver<ProbabilityConfig> UNDERWATER_CAVE = Carver.register("underwater_cave", new UnderwaterCaveCarver(ProbabilityConfig.field_24899));
+    public static final Carver<ProbabilityConfig> CAVE = Carver.register("cave", new CaveCarver(ProbabilityConfig.CODEC, 256));
+    public static final Carver<ProbabilityConfig> NETHER_CAVE = Carver.register("nether_cave", new NetherCaveCarver(ProbabilityConfig.CODEC));
+    public static final Carver<ProbabilityConfig> CANYON = Carver.register("canyon", new RavineCarver(ProbabilityConfig.CODEC));
+    public static final Carver<ProbabilityConfig> UNDERWATER_CANYON = Carver.register("underwater_canyon", new UnderwaterRavineCarver(ProbabilityConfig.CODEC));
+    public static final Carver<ProbabilityConfig> UNDERWATER_CAVE = Carver.register("underwater_cave", new UnderwaterCaveCarver(ProbabilityConfig.CODEC));
     protected static final BlockState AIR = Blocks.AIR.getDefaultState();
     protected static final BlockState CAVE_AIR = Blocks.CAVE_AIR.getDefaultState();
     protected static final FluidState WATER = Fluids.WATER.getDefaultState();
@@ -95,18 +96,18 @@ public abstract class Carver<C extends CarverConfig> {
                 int y = x + k * 16;
                 double z = ((double)y + 0.5 - f) / g;
                 if (w * w + z * z >= 1.0) continue;
-                AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+                MutableBoolean mutableBoolean = new MutableBoolean(false);
                 for (int aa = r; aa > q; --aa) {
                     double ab = ((double)aa - 0.5 - e) / h;
                     if (this.isPositionExcluded(w, ab, z, aa)) continue;
-                    bl |= this.carveAtPoint(arg, function, bitSet, random, lv, lv2, lv3, i, j, k, v, y, u, aa, x, atomicBoolean);
+                    bl |= this.carveAtPoint(arg, function, bitSet, random, lv, lv2, lv3, i, j, k, v, y, u, aa, x, mutableBoolean);
                 }
             }
         }
         return bl;
     }
 
-    protected boolean carveAtPoint(Chunk arg, Function<BlockPos, Biome> function, BitSet bitSet, Random random, BlockPos.Mutable arg2, BlockPos.Mutable arg3, BlockPos.Mutable arg4, int i, int j, int k, int l, int m, int n, int o, int p, AtomicBoolean atomicBoolean) {
+    protected boolean carveAtPoint(Chunk arg, Function<BlockPos, Biome> function, BitSet bitSet, Random random, BlockPos.Mutable arg2, BlockPos.Mutable arg3, BlockPos.Mutable arg4, int i, int j, int k, int l, int m, int n, int o, int p, MutableBoolean mutableBoolean) {
         int q = n | p << 4 | o << 8;
         if (bitSet.get(q)) {
             return false;
@@ -116,7 +117,7 @@ public abstract class Carver<C extends CarverConfig> {
         BlockState lv = arg.getBlockState(arg2);
         BlockState lv2 = arg.getBlockState(arg3.set(arg2, Direction.UP));
         if (lv.isOf(Blocks.GRASS_BLOCK) || lv.isOf(Blocks.MYCELIUM)) {
-            atomicBoolean.set(true);
+            mutableBoolean.setTrue();
         }
         if (!this.canCarveBlock(lv, lv2)) {
             return false;
@@ -125,7 +126,7 @@ public abstract class Carver<C extends CarverConfig> {
             arg.setBlockState(arg2, LAVA.getBlockState(), false);
         } else {
             arg.setBlockState(arg2, CAVE_AIR, false);
-            if (atomicBoolean.get()) {
+            if (mutableBoolean.isTrue()) {
                 arg4.set(arg2, Direction.DOWN);
                 if (arg.getBlockState(arg4).isOf(Blocks.DIRT)) {
                     arg.setBlockState(arg4, function.apply(arg2).getSurfaceConfig().getTopMaterial(), false);

@@ -5,10 +5,10 @@
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.ImmutableMap$Builder
+ *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
  *  com.google.common.util.concurrent.ThreadFactoryBuilder
  *  com.mojang.datafixers.DataFixer
- *  com.mojang.datafixers.util.Pair
  *  it.unimi.dsi.fastutil.objects.Object2FloatMap
  *  it.unimi.dsi.fastutil.objects.Object2FloatMaps
  *  it.unimi.dsi.fastutil.objects.Object2FloatOpenCustomHashMap
@@ -21,10 +21,10 @@ package net.minecraft.world.updater;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMaps;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenCustomHashMap;
@@ -33,23 +33,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.concurrent.ThreadFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5219;
-import net.minecraft.class_5321;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.SaveProperties;
+import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.storage.RegionFile;
 import net.minecraft.world.storage.VersionedChunkStorage;
@@ -60,7 +59,7 @@ public class WorldUpdater {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final ThreadFactory UPDATE_THREAD_FACTORY = new ThreadFactoryBuilder().setDaemon(true).build();
     private final String levelName;
-    private final ImmutableMap<class_5321<DimensionType>, DimensionType> field_24654;
+    private final ImmutableSet<RegistryKey<World>> field_24654;
     private final boolean eraseCache;
     private final LevelStorage.Session field_24083;
     private final Thread updateThread;
@@ -71,19 +70,19 @@ public class WorldUpdater {
     private volatile int totalChunkCount;
     private volatile int upgradedChunkCount;
     private volatile int skippedChunkCount;
-    private final Object2FloatMap<DimensionType> dimensionProgress = Object2FloatMaps.synchronize((Object2FloatMap)new Object2FloatOpenCustomHashMap(Util.identityHashStrategy()));
+    private final Object2FloatMap<RegistryKey<World>> dimensionProgress = Object2FloatMaps.synchronize((Object2FloatMap)new Object2FloatOpenCustomHashMap(Util.identityHashStrategy()));
     private volatile Text status = new TranslatableText("optimizeWorld.stage.counting");
     private static final Pattern REGION_FILE_PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
     private final PersistentStateManager persistentStateManager;
 
-    public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, class_5219 arg2, boolean bl) {
+    public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, SaveProperties arg2, boolean bl) {
         this.levelName = arg2.getLevelName();
-        this.field_24654 = (ImmutableMap)arg2.method_28057().method_28609().entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> (DimensionType)((Pair)entry.getValue()).getFirst()));
+        this.field_24654 = (ImmutableSet)arg2.method_28057().method_28609().keySet().stream().collect(ImmutableSet.toImmutableSet());
         this.eraseCache = bl;
         this.field_24084 = dataFixer;
         this.field_24083 = arg;
         arg.method_27425(arg2);
-        this.persistentStateManager = new PersistentStateManager(new File(this.field_24083.method_27424(DimensionType.field_24753), "data"), dataFixer);
+        this.persistentStateManager = new PersistentStateManager(new File(this.field_24083.method_27424(World.field_25179), "data"), dataFixer);
         this.updateThread = UPDATE_THREAD_FACTORY.newThread(this::updateWorld);
         this.updateThread.setUncaughtExceptionHandler((thread, throwable) -> {
             LOGGER.error("Error upgrading world", throwable);
@@ -106,9 +105,9 @@ public class WorldUpdater {
     private void updateWorld() {
         this.totalChunkCount = 0;
         ImmutableMap.Builder builder = ImmutableMap.builder();
-        for (Map.Entry entry : this.field_24654.entrySet()) {
-            List<ChunkPos> list = this.getChunkPositions((class_5321)entry.getKey());
-            builder.put(entry.getValue(), list.listIterator());
+        for (RegistryKey lv : this.field_24654) {
+            List<ChunkPos> list = this.getChunkPositions(lv);
+            builder.put((Object)lv, list.listIterator());
             this.totalChunkCount += list.size();
         }
         if (this.totalChunkCount == 0) {
@@ -118,9 +117,9 @@ public class WorldUpdater {
         float f = this.totalChunkCount;
         ImmutableMap immutableMap = builder.build();
         ImmutableMap.Builder builder2 = ImmutableMap.builder();
-        for (Map.Entry entry2 : this.field_24654.entrySet()) {
-            File file = this.field_24083.method_27424((class_5321)entry2.getKey());
-            builder2.put(entry2.getValue(), (Object)new VersionedChunkStorage(new File(file, "region"), this.field_24084, true));
+        for (RegistryKey lv2 : this.field_24654) {
+            File file = this.field_24083.method_27424(lv2);
+            builder2.put((Object)lv2, (Object)new VersionedChunkStorage(new File(file, "region"), this.field_24084, true));
         }
         ImmutableMap immutableMap2 = builder2.build();
         long l = Util.getMeasuringTimeMs();
@@ -128,45 +127,45 @@ public class WorldUpdater {
         while (this.keepUpgradingChunks) {
             boolean bl = false;
             float g = 0.0f;
-            for (DimensionType lv : this.field_24654.values()) {
-                ListIterator listIterator = (ListIterator)immutableMap.get((Object)lv);
-                VersionedChunkStorage lv2 = (VersionedChunkStorage)immutableMap2.get((Object)lv);
+            for (RegistryKey lv3 : this.field_24654) {
+                ListIterator listIterator = (ListIterator)immutableMap.get((Object)lv3);
+                VersionedChunkStorage lv4 = (VersionedChunkStorage)immutableMap2.get((Object)lv3);
                 if (listIterator.hasNext()) {
-                    ChunkPos lv3 = (ChunkPos)listIterator.next();
+                    ChunkPos lv5 = (ChunkPos)listIterator.next();
                     boolean bl2 = false;
                     try {
-                        CompoundTag lv4 = lv2.getNbt(lv3);
-                        if (lv4 != null) {
+                        CompoundTag lv6 = lv4.getNbt(lv5);
+                        if (lv6 != null) {
                             boolean bl3;
-                            int i = VersionedChunkStorage.getDataVersion(lv4);
-                            CompoundTag lv5 = lv2.updateChunkTag(lv, () -> this.persistentStateManager, lv4);
-                            CompoundTag lv6 = lv5.getCompound("Level");
-                            ChunkPos lv7 = new ChunkPos(lv6.getInt("xPos"), lv6.getInt("zPos"));
-                            if (!lv7.equals(lv3)) {
-                                LOGGER.warn("Chunk {} has invalid position {}", (Object)lv3, (Object)lv7);
+                            int i = VersionedChunkStorage.getDataVersion(lv6);
+                            CompoundTag lv7 = lv4.updateChunkTag(lv3, () -> this.persistentStateManager, lv6);
+                            CompoundTag lv8 = lv7.getCompound("Level");
+                            ChunkPos lv9 = new ChunkPos(lv8.getInt("xPos"), lv8.getInt("zPos"));
+                            if (!lv9.equals(lv5)) {
+                                LOGGER.warn("Chunk {} has invalid position {}", (Object)lv5, (Object)lv9);
                             }
                             boolean bl4 = bl3 = i < SharedConstants.getGameVersion().getWorldVersion();
                             if (this.eraseCache) {
-                                bl3 = bl3 || lv6.contains("Heightmaps");
-                                lv6.remove("Heightmaps");
-                                bl3 = bl3 || lv6.contains("isLightOn");
-                                lv6.remove("isLightOn");
+                                bl3 = bl3 || lv8.contains("Heightmaps");
+                                lv8.remove("Heightmaps");
+                                bl3 = bl3 || lv8.contains("isLightOn");
+                                lv8.remove("isLightOn");
                             }
                             if (bl3) {
-                                lv2.setTagAt(lv3, lv5);
+                                lv4.setTagAt(lv5, lv7);
                                 bl2 = true;
                             }
                         }
                     }
-                    catch (CrashException lv8) {
-                        Throwable throwable = lv8.getCause();
+                    catch (CrashException lv10) {
+                        Throwable throwable = lv10.getCause();
                         if (throwable instanceof IOException) {
-                            LOGGER.error("Error upgrading chunk {}", (Object)lv3, (Object)throwable);
+                            LOGGER.error("Error upgrading chunk {}", (Object)lv5, (Object)throwable);
                         }
-                        throw lv8;
+                        throw lv10;
                     }
                     catch (IOException iOException) {
-                        LOGGER.error("Error upgrading chunk {}", (Object)lv3, (Object)iOException);
+                        LOGGER.error("Error upgrading chunk {}", (Object)lv5, (Object)iOException);
                     }
                     if (bl2) {
                         ++this.upgradedChunkCount;
@@ -176,7 +175,7 @@ public class WorldUpdater {
                     bl = true;
                 }
                 float h = (float)listIterator.nextIndex() / f;
-                this.dimensionProgress.put((Object)lv, h);
+                this.dimensionProgress.put((Object)lv3, h);
                 g += h;
             }
             this.progress = g;
@@ -184,9 +183,9 @@ public class WorldUpdater {
             this.keepUpgradingChunks = false;
         }
         this.status = new TranslatableText("optimizeWorld.stage.finished");
-        for (VersionedChunkStorage lv9 : immutableMap2.values()) {
+        for (VersionedChunkStorage lv11 : immutableMap2.values()) {
             try {
-                lv9.close();
+                lv11.close();
             }
             catch (IOException iOException2) {
                 LOGGER.error("Error upgrading chunk", (Throwable)iOException2);
@@ -198,7 +197,7 @@ public class WorldUpdater {
         this.isDone = true;
     }
 
-    private List<ChunkPos> getChunkPositions(class_5321<DimensionType> arg) {
+    private List<ChunkPos> getChunkPositions(RegistryKey<World> arg) {
         File file2 = this.field_24083.method_27424(arg);
         File file22 = new File(file2, "region");
         File[] files = file22.listFiles((file, string) -> string.endsWith(".mca"));
@@ -232,13 +231,13 @@ public class WorldUpdater {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ImmutableMap<class_5321<DimensionType>, DimensionType> method_28304() {
+    public ImmutableSet<RegistryKey<World>> method_28304() {
         return this.field_24654;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getProgress(DimensionType arg) {
-        return this.dimensionProgress.getFloat((Object)arg);
+    public float getProgress(RegistryKey<World> arg) {
+        return this.dimensionProgress.getFloat(arg);
     }
 
     @Environment(value=EnvType.CLIENT)

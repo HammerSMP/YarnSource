@@ -22,7 +22,7 @@ import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class RandomFeatureEntry<FC extends FeatureConfig> {
-    public static final Codec<RandomFeatureEntry<?>> field_24864 = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.field_24833.fieldOf("feature").forGetter(arg -> arg.feature), (App)Codec.FLOAT.fieldOf("chance").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, RandomFeatureEntry::new));
+    public static final Codec<RandomFeatureEntry<?>> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.field_24833.fieldOf("feature").forGetter(arg -> arg.feature), (App)Codec.FLOAT.fieldOf("chance").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, RandomFeatureEntry::new));
     public final ConfiguredFeature<FC, ?> feature;
     public final float chance;
 

@@ -125,7 +125,7 @@ extends BlockWithEntity {
         BlockEntity lv = arg2.getBlockEntity(arg3);
         if (lv instanceof CommandBlockBlockEntity && arg4.isCreativeLevelTwoOp()) {
             arg4.openCommandBlockScreen((CommandBlockBlockEntity)lv);
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         return ActionResult.PASS;
     }

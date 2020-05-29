@@ -87,7 +87,7 @@ extends WallMountedBlock {
     @Override
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         if (arg2.isClient) {
-            BlockState lv = (BlockState)arg.method_28493(POWERED);
+            BlockState lv = (BlockState)arg.cycle(POWERED);
             if (lv.get(POWERED).booleanValue()) {
                 LeverBlock.spawnParticles(lv, arg2, arg3, 1.0f);
             }
@@ -96,11 +96,11 @@ extends WallMountedBlock {
         BlockState lv2 = this.method_21846(arg, arg2, arg3);
         float f = lv2.get(POWERED) != false ? 0.6f : 0.5f;
         arg2.playSound(null, arg3, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3f, f);
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     public BlockState method_21846(BlockState arg, World arg2, BlockPos arg3) {
-        arg = (BlockState)arg.method_28493(POWERED);
+        arg = (BlockState)arg.cycle(POWERED);
         arg2.setBlockState(arg3, arg, 3);
         this.updateNeighbors(arg, arg2, arg3);
         return arg;

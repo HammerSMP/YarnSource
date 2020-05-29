@@ -126,7 +126,7 @@ extends HorizontalFacingBlock {
             arg2.setBlockState(arg3, arg, 10);
         }
         arg2.syncWorldEvent(arg4, arg.get(OPEN) != false ? 1008 : 1014, arg3, 0);
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(arg2.isClient);
     }
 
     @Override

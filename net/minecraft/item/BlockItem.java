@@ -52,7 +52,7 @@ extends Item {
     @Override
     public ActionResult useOnBlock(ItemUsageContext arg) {
         ActionResult lv = this.place(new ItemPlacementContext(arg));
-        if (lv != ActionResult.SUCCESS && this.isFood()) {
+        if (!lv.isAccepted() && this.isFood()) {
             return this.use(arg.world, arg.player, arg.hand).getResult();
         }
         return lv;
@@ -90,7 +90,7 @@ extends Item {
         BlockSoundGroup lv9 = lv7.getSoundGroup();
         lv4.playSound(lv5, lv3, this.getPlaceSound(lv7), SoundCategory.BLOCKS, (lv9.getVolume() + 1.0f) / 2.0f, lv9.getPitch() * 0.8f);
         lv6.decrement(1);
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(lv4.isClient);
     }
 
     protected SoundEvent getPlaceSound(BlockState arg) {

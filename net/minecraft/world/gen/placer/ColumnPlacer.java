@@ -23,7 +23,7 @@ import net.minecraft.world.gen.placer.BlockPlacerType;
 
 public class ColumnPlacer
 extends BlockPlacer {
-    public static final Codec<ColumnPlacer> field_24867 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("min_size").forGetter(arg -> arg.minSize), (App)Codec.INT.fieldOf("extra_size").forGetter(arg -> arg.extraSize)).apply((Applicative)instance, ColumnPlacer::new));
+    public static final Codec<ColumnPlacer> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("min_size").forGetter(arg -> arg.minSize), (App)Codec.INT.fieldOf("extra_size").forGetter(arg -> arg.extraSize)).apply((Applicative)instance, ColumnPlacer::new));
     private final int minSize;
     private final int extraSize;
 

@@ -82,14 +82,14 @@ public class EntityAttributeModifier {
         lv.putString("Name", this.getName());
         lv.putDouble("Amount", this.value);
         lv.putInt("Operation", this.operation.getId());
-        lv.putUuidNew("UUID", this.uuid);
+        lv.putUuid("UUID", this.uuid);
         return lv;
     }
 
     @Nullable
     public static EntityAttributeModifier fromTag(CompoundTag arg) {
         try {
-            UUID uUID = arg.getUuidNew("UUID");
+            UUID uUID = arg.getUuid("UUID");
             Operation lv = Operation.fromId(arg.getInt("Operation"));
             return new EntityAttributeModifier(uUID, arg.getString("Name"), arg.getDouble("Amount"), lv);
         }

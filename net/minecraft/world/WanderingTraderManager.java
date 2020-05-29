@@ -9,7 +9,6 @@ package net.minecraft.world;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nullable;
-import net.minecraft.class_5268;
 import net.minecraft.class_5304;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -26,18 +25,19 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 
 public class WanderingTraderManager
 implements class_5304 {
     private final Random random = new Random();
-    private final class_5268 field_24387;
+    private final ServerWorldProperties field_24387;
     private int spawnTimer;
     private int spawnDelay;
     private int spawnChance;
 
-    public WanderingTraderManager(class_5268 arg) {
+    public WanderingTraderManager(ServerWorldProperties arg) {
         this.field_24387 = arg;
         this.spawnTimer = 1200;
         this.spawnDelay = arg.getWanderingTraderSpawnDelay();

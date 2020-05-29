@@ -44,10 +44,9 @@ implements Drawable {
     protected int right;
     protected int left;
     protected boolean centerListVertically = true;
-    protected int yDrag = -2;
     private double scrollAmount;
-    protected boolean renderSelection = true;
-    protected boolean renderHeader;
+    private boolean renderSelection = true;
+    private boolean renderHeader;
     protected int headerHeight;
     private boolean scrolling;
     private E selected;
@@ -61,6 +60,10 @@ implements Drawable {
         this.itemHeight = m;
         this.left = 0;
         this.right = i;
+    }
+
+    public void method_29344(boolean bl) {
+        this.renderSelection = bl;
     }
 
     protected void setRenderHeader(boolean bl, int i) {
@@ -185,52 +188,60 @@ implements Drawable {
             this.renderHeader(arg, m, n, lv);
         }
         this.renderList(arg, m, n, i, j, f);
+        this.client.getTextureManager().bindTexture(DrawableHelper.BACKGROUND_TEXTURE);
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(519);
+        float h = 32.0f;
+        int o = -100;
+        lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
+        lv2.vertex(this.left, this.top, -100.0).texture(0.0f, (float)this.top / 32.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left + this.width, this.top, -100.0).texture((float)this.width / 32.0f, (float)this.top / 32.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left + this.width, 0.0, -100.0).texture((float)this.width / 32.0f, 0.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left, 0.0, -100.0).texture(0.0f, 0.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left, this.height, -100.0).texture(0.0f, (float)this.height / 32.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left + this.width, this.height, -100.0).texture((float)this.width / 32.0f, (float)this.height / 32.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left + this.width, this.bottom, -100.0).texture((float)this.width / 32.0f, (float)this.bottom / 32.0f).color(64, 64, 64, 255).next();
+        lv2.vertex(this.left, this.bottom, -100.0).texture(0.0f, (float)this.bottom / 32.0f).color(64, 64, 64, 255).next();
+        lv.draw();
+        RenderSystem.depthFunc(515);
         RenderSystem.disableDepthTest();
-        this.renderHoleBackground(0, this.top, 255, 255);
-        this.renderHoleBackground(this.bottom, this.height, 255, 255);
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
         RenderSystem.disableAlphaTest();
         RenderSystem.shadeModel(7425);
         RenderSystem.disableTexture();
-        int o = 4;
+        int p = 4;
         lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
         lv2.vertex(this.left, this.top + 4, 0.0).texture(0.0f, 1.0f).color(0, 0, 0, 0).next();
         lv2.vertex(this.right, this.top + 4, 0.0).texture(1.0f, 1.0f).color(0, 0, 0, 0).next();
         lv2.vertex(this.right, this.top, 0.0).texture(1.0f, 0.0f).color(0, 0, 0, 255).next();
         lv2.vertex(this.left, this.top, 0.0).texture(0.0f, 0.0f).color(0, 0, 0, 255).next();
-        lv.draw();
-        lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
         lv2.vertex(this.left, this.bottom, 0.0).texture(0.0f, 1.0f).color(0, 0, 0, 255).next();
         lv2.vertex(this.right, this.bottom, 0.0).texture(1.0f, 1.0f).color(0, 0, 0, 255).next();
         lv2.vertex(this.right, this.bottom - 4, 0.0).texture(1.0f, 0.0f).color(0, 0, 0, 0).next();
         lv2.vertex(this.left, this.bottom - 4, 0.0).texture(0.0f, 0.0f).color(0, 0, 0, 0).next();
         lv.draw();
-        int p = this.getMaxScroll();
-        if (p > 0) {
-            int q = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
-            q = MathHelper.clamp(q, 32, this.bottom - this.top - 8);
-            int r = (int)this.getScrollAmount() * (this.bottom - this.top - q) / p + this.top;
-            if (r < this.top) {
-                r = this.top;
+        int q = this.getMaxScroll();
+        if (q > 0) {
+            int r = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getMaxPosition());
+            r = MathHelper.clamp(r, 32, this.bottom - this.top - 8);
+            int s = (int)this.getScrollAmount() * (this.bottom - this.top - r) / q + this.top;
+            if (s < this.top) {
+                s = this.top;
             }
             lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
             lv2.vertex(k, this.bottom, 0.0).texture(0.0f, 1.0f).color(0, 0, 0, 255).next();
             lv2.vertex(l, this.bottom, 0.0).texture(1.0f, 1.0f).color(0, 0, 0, 255).next();
             lv2.vertex(l, this.top, 0.0).texture(1.0f, 0.0f).color(0, 0, 0, 255).next();
             lv2.vertex(k, this.top, 0.0).texture(0.0f, 0.0f).color(0, 0, 0, 255).next();
-            lv.draw();
-            lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            lv2.vertex(k, r + q, 0.0).texture(0.0f, 1.0f).color(128, 128, 128, 255).next();
-            lv2.vertex(l, r + q, 0.0).texture(1.0f, 1.0f).color(128, 128, 128, 255).next();
-            lv2.vertex(l, r, 0.0).texture(1.0f, 0.0f).color(128, 128, 128, 255).next();
-            lv2.vertex(k, r, 0.0).texture(0.0f, 0.0f).color(128, 128, 128, 255).next();
-            lv.draw();
-            lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-            lv2.vertex(k, r + q - 1, 0.0).texture(0.0f, 1.0f).color(192, 192, 192, 255).next();
-            lv2.vertex(l - 1, r + q - 1, 0.0).texture(1.0f, 1.0f).color(192, 192, 192, 255).next();
-            lv2.vertex(l - 1, r, 0.0).texture(1.0f, 0.0f).color(192, 192, 192, 255).next();
-            lv2.vertex(k, r, 0.0).texture(0.0f, 0.0f).color(192, 192, 192, 255).next();
+            lv2.vertex(k, s + r, 0.0).texture(0.0f, 1.0f).color(128, 128, 128, 255).next();
+            lv2.vertex(l, s + r, 0.0).texture(1.0f, 1.0f).color(128, 128, 128, 255).next();
+            lv2.vertex(l, s, 0.0).texture(1.0f, 0.0f).color(128, 128, 128, 255).next();
+            lv2.vertex(k, s, 0.0).texture(0.0f, 0.0f).color(128, 128, 128, 255).next();
+            lv2.vertex(k, s + r - 1, 0.0).texture(0.0f, 1.0f).color(192, 192, 192, 255).next();
+            lv2.vertex(l - 1, s + r - 1, 0.0).texture(1.0f, 1.0f).color(192, 192, 192, 255).next();
+            lv2.vertex(l - 1, s, 0.0).texture(1.0f, 0.0f).color(192, 192, 192, 255).next();
+            lv2.vertex(k, s, 0.0).texture(0.0f, 0.0f).color(192, 192, 192, 255).next();
             lv.draw();
         }
         this.renderDecorations(arg, i, j);
@@ -258,7 +269,6 @@ implements Drawable {
 
     private void scroll(int i) {
         this.setScrollAmount(this.getScrollAmount() + (double)i);
-        this.yDrag = -2;
     }
 
     public double getScrollAmount() {
@@ -420,20 +430,6 @@ implements Drawable {
 
     protected boolean isFocused() {
         return false;
-    }
-
-    protected void renderHoleBackground(int i, int j, int k, int l) {
-        Tessellator lv = Tessellator.getInstance();
-        BufferBuilder lv2 = lv.getBuffer();
-        this.client.getTextureManager().bindTexture(DrawableHelper.BACKGROUND_TEXTURE);
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        float f = 32.0f;
-        lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        lv2.vertex(this.left, j, 0.0).texture(0.0f, (float)j / 32.0f).color(64, 64, 64, l).next();
-        lv2.vertex(this.left + this.width, j, 0.0).texture((float)this.width / 32.0f, (float)j / 32.0f).color(64, 64, 64, l).next();
-        lv2.vertex(this.left + this.width, i, 0.0).texture((float)this.width / 32.0f, (float)i / 32.0f).color(64, 64, 64, k).next();
-        lv2.vertex(this.left, i, 0.0).texture(0.0f, (float)i / 32.0f).color(64, 64, 64, k).next();
-        lv.draw();
     }
 
     protected E remove(int i) {

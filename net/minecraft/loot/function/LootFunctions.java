@@ -1,31 +1,12 @@
 /*
  * Decompiled with CFR 0.149.
- * 
- * Could not load the following classes:
- *  com.google.common.collect.Maps
- *  com.google.gson.JsonDeserializationContext
- *  com.google.gson.JsonDeserializer
- *  com.google.gson.JsonElement
- *  com.google.gson.JsonObject
- *  com.google.gson.JsonParseException
- *  com.google.gson.JsonSerializationContext
- *  com.google.gson.JsonSerializer
- *  com.google.gson.JsonSyntaxException
  */
 package net.minecraft.loot.function;
 
-import com.google.common.collect.Maps;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.JsonSyntaxException;
-import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.function.BiFunction;
+import net.minecraft.class_5330;
+import net.minecraft.class_5335;
+import net.minecraft.class_5339;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ApplyBonusLootFunction;
@@ -51,40 +32,38 @@ import net.minecraft.loot.function.SetNameLootFunction;
 import net.minecraft.loot.function.SetNbtLootFunction;
 import net.minecraft.loot.function.SetStewEffectLootFunction;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.util.registry.Registry;
 
 public class LootFunctions {
-    private static final Map<Identifier, LootFunction.Factory<?>> byId = Maps.newHashMap();
-    private static final Map<Class<? extends LootFunction>, LootFunction.Factory<?>> byClass = Maps.newHashMap();
     public static final BiFunction<ItemStack, LootContext, ItemStack> NOOP = (arg, arg2) -> arg;
+    public static final class_5339 SET_COUNT = LootFunctions.method_29323("set_count", new SetCountLootFunction.Factory());
+    public static final class_5339 ENCHANT_WITH_LEVELS = LootFunctions.method_29323("enchant_with_levels", new EnchantWithLevelsLootFunction.Factory());
+    public static final class_5339 ENCHANT_RANDOMLY = LootFunctions.method_29323("enchant_randomly", new EnchantRandomlyLootFunction.Factory());
+    public static final class_5339 SET_NBT = LootFunctions.method_29323("set_nbt", new SetNbtLootFunction.Builder());
+    public static final class_5339 FURNACE_SMELT = LootFunctions.method_29323("furnace_smelt", new FurnaceSmeltLootFunction.class_5340());
+    public static final class_5339 LOOTING_ENCHANT = LootFunctions.method_29323("looting_enchant", new LootingEnchantLootFunction.Factory());
+    public static final class_5339 SET_DAMAGE = LootFunctions.method_29323("set_damage", new SetDamageLootFunction.Factory());
+    public static final class_5339 SET_ATTRIBUTES = LootFunctions.method_29323("set_attributes", new SetAttributesLootFunction.Factory());
+    public static final class_5339 SET_NAME = LootFunctions.method_29323("set_name", new SetNameLootFunction.Factory());
+    public static final class_5339 EXPLORATION_MAP = LootFunctions.method_29323("exploration_map", new ExplorationMapLootFunction.Factory());
+    public static final class_5339 SET_STEW_EFFECT = LootFunctions.method_29323("set_stew_effect", new SetStewEffectLootFunction.Factory());
+    public static final class_5339 COPY_NAME = LootFunctions.method_29323("copy_name", new CopyNameLootFunction.Factory());
+    public static final class_5339 SET_CONTENTS = LootFunctions.method_29323("set_contents", new SetContentsLootFunction.Factory());
+    public static final class_5339 LIMIT_COUNT = LootFunctions.method_29323("limit_count", new LimitCountLootFunction.Factory());
+    public static final class_5339 APPLY_BONUS = LootFunctions.method_29323("apply_bonus", new ApplyBonusLootFunction.Factory());
+    public static final class_5339 SET_LOOT_TABLE = LootFunctions.method_29323("set_loot_table", new SetLootTableLootFunction.Factory());
+    public static final class_5339 EXPLOSION_DECAY = LootFunctions.method_29323("explosion_decay", new ExplosionDecayLootFunction.Factory());
+    public static final class_5339 SET_LORE = LootFunctions.method_29323("set_lore", new SetLoreLootFunction.Factory());
+    public static final class_5339 FILL_PLAYER_HEAD = LootFunctions.method_29323("fill_player_head", new FillPlayerHeadLootFunction.Factory());
+    public static final class_5339 COPY_NBT = LootFunctions.method_29323("copy_nbt", new CopyNbtLootFunction.Factory());
+    public static final class_5339 COPY_STATE = LootFunctions.method_29323("copy_state", new CopyStateFunction.Factory());
 
-    public static <T extends LootFunction> void register(LootFunction.Factory<? extends T> arg) {
-        Identifier lv = arg.getId();
-        Class<T> lv2 = arg.getFunctionClass();
-        if (byId.containsKey(lv)) {
-            throw new IllegalArgumentException("Can't re-register item function name " + lv);
-        }
-        if (byClass.containsKey(lv2)) {
-            throw new IllegalArgumentException("Can't re-register item function class " + lv2.getName());
-        }
-        byId.put(lv, arg);
-        byClass.put(lv2, arg);
+    private static class_5339 method_29323(String string, class_5335<? extends LootFunction> arg) {
+        return Registry.register(Registry.field_25294, new Identifier(string), new class_5339(arg));
     }
 
-    public static LootFunction.Factory<?> get(Identifier arg) {
-        LootFunction.Factory<?> lv = byId.get(arg);
-        if (lv == null) {
-            throw new IllegalArgumentException("Unknown loot item function '" + arg + "'");
-        }
-        return lv;
-    }
-
-    public static <T extends LootFunction> LootFunction.Factory<T> getFactory(T arg) {
-        LootFunction.Factory<?> lv = byClass.get(arg.getClass());
-        if (lv == null) {
-            throw new IllegalArgumentException("Unknown loot item function " + arg);
-        }
-        return lv;
+    public static Object method_29322() {
+        return class_5330.method_29306(Registry.field_25294, "function", "function", LootFunction::method_29321).method_29307();
     }
 
     public static BiFunction<ItemStack, LootContext, ItemStack> join(BiFunction<ItemStack, LootContext, ItemStack>[] biFunctions) {
@@ -107,66 +86,6 @@ public class LootFunctions {
             }
             return arg;
         };
-    }
-
-    static {
-        LootFunctions.register(new SetCountLootFunction.Factory());
-        LootFunctions.register(new EnchantWithLevelsLootFunction.Factory());
-        LootFunctions.register(new EnchantRandomlyLootFunction.Factory());
-        LootFunctions.register(new SetNbtLootFunction.Builder());
-        LootFunctions.register(new FurnaceSmeltLootFunction.Factory());
-        LootFunctions.register(new LootingEnchantLootFunction.Factory());
-        LootFunctions.register(new SetDamageLootFunction.Factory());
-        LootFunctions.register(new SetAttributesLootFunction.Factory());
-        LootFunctions.register(new SetNameLootFunction.Factory());
-        LootFunctions.register(new ExplorationMapLootFunction.Factory());
-        LootFunctions.register(new SetStewEffectLootFunction.Factory());
-        LootFunctions.register(new CopyNameLootFunction.Factory());
-        LootFunctions.register(new SetContentsLootFunction.Factory());
-        LootFunctions.register(new LimitCountLootFunction.Factory());
-        LootFunctions.register(new ApplyBonusLootFunction.Factory());
-        LootFunctions.register(new SetLootTableLootFunction.Factory());
-        LootFunctions.register(new ExplosionDecayLootFunction.Factory());
-        LootFunctions.register(new SetLoreLootFunction.Factory());
-        LootFunctions.register(new FillPlayerHeadLootFunction.Factory());
-        LootFunctions.register(new CopyNbtLootFunction.Factory());
-        LootFunctions.register(new CopyStateFunction.Factory());
-    }
-
-    public static class Factory
-    implements JsonDeserializer<LootFunction>,
-    JsonSerializer<LootFunction> {
-        /*
-         * WARNING - void declaration
-         */
-        public LootFunction deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            void lv3;
-            JsonObject jsonObject = JsonHelper.asObject(jsonElement, "function");
-            Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "function"));
-            try {
-                LootFunction.Factory<?> lv2 = LootFunctions.get(lv);
-            }
-            catch (IllegalArgumentException illegalArgumentException) {
-                throw new JsonSyntaxException("Unknown function '" + lv + "'");
-            }
-            return lv3.fromJson(jsonObject, jsonDeserializationContext);
-        }
-
-        public JsonElement serialize(LootFunction arg, Type type, JsonSerializationContext jsonSerializationContext) {
-            LootFunction.Factory<LootFunction> lv = LootFunctions.getFactory(arg);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("function", lv.getId().toString());
-            lv.toJson(jsonObject, arg, jsonSerializationContext);
-            return jsonObject;
-        }
-
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((LootFunction)object, type, jsonSerializationContext);
-        }
-
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
-        }
     }
 }
 

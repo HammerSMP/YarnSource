@@ -6,6 +6,7 @@
  *  com.google.gson.JsonDeserializationContext
  *  com.google.gson.JsonObject
  *  com.google.gson.JsonSerializationContext
+ *  org.apache.commons.lang3.ArrayUtils
  */
 package net.minecraft.loot.entry;
 
@@ -15,21 +16,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.List;
 import java.util.function.Predicate;
+import net.minecraft.class_5335;
+import net.minecraft.class_5338;
+import net.minecraft.class_5341;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditionConsumingBuilder;
 import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.AlternativeEntry;
 import net.minecraft.loot.entry.EntryCombiner;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
+import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class LootEntry
 implements EntryCombiner {
-    protected final LootCondition[] conditions;
+    protected final class_5341[] conditions;
     private final Predicate<LootContext> conditionPredicate;
 
-    protected LootEntry(LootCondition[] args) {
+    protected LootEntry(class_5341[] args) {
         this.conditions = args;
         this.conditionPredicate = LootConditions.joinAnd(args);
     }
@@ -44,36 +48,47 @@ implements EntryCombiner {
         return this.conditionPredicate.test(arg);
     }
 
-    public static abstract class Serializer<T extends LootEntry> {
-        private final Identifier id;
-        private final Class<T> type;
+    public abstract class_5338 method_29318();
 
-        protected Serializer(Identifier arg, Class<T> arg2) {
-            this.id = arg;
-            this.type = arg2;
+    public static abstract class class_5337<T extends LootEntry>
+    implements class_5335<T> {
+        @Override
+        public final void toJson(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
+            if (!ArrayUtils.isEmpty((Object[])((LootEntry)arg).conditions)) {
+                jsonObject.add("conditions", jsonSerializationContext.serialize((Object)((LootEntry)arg).conditions));
+            }
+            this.method_422(jsonObject, arg, jsonSerializationContext);
         }
 
-        public Identifier getIdentifier() {
-            return this.id;
+        @Override
+        public final T fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+            class_5341[] lvs = JsonHelper.deserialize(jsonObject, "conditions", new class_5341[0], jsonDeserializationContext, class_5341[].class);
+            return this.fromJson(jsonObject, jsonDeserializationContext, lvs);
         }
 
-        public Class<T> getType() {
-            return this.type;
+        public abstract void method_422(JsonObject var1, T var2, JsonSerializationContext var3);
+
+        public abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, class_5341[] var3);
+
+        @Override
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+            return this.fromJson(jsonObject, jsonDeserializationContext);
         }
 
-        public abstract void toJson(JsonObject var1, T var2, JsonSerializationContext var3);
-
-        public abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, LootCondition[] var3);
+        @Override
+        public /* synthetic */ void toJson(JsonObject jsonObject, Object object, JsonSerializationContext jsonSerializationContext) {
+            this.toJson(jsonObject, (T)((LootEntry)object), jsonSerializationContext);
+        }
     }
 
     public static abstract class Builder<T extends Builder<T>>
     implements LootConditionConsumingBuilder<T> {
-        private final List<LootCondition> conditions = Lists.newArrayList();
+        private final List<class_5341> conditions = Lists.newArrayList();
 
         protected abstract T getThisBuilder();
 
         @Override
-        public T conditionally(LootCondition.Builder arg) {
+        public T conditionally(class_5341.Builder arg) {
             this.conditions.add(arg.build());
             return this.getThisBuilder();
         }
@@ -83,8 +98,8 @@ implements EntryCombiner {
             return this.getThisBuilder();
         }
 
-        protected LootCondition[] getConditions() {
-            return this.conditions.toArray(new LootCondition[0]);
+        protected class_5341[] getConditions() {
+            return this.conditions.toArray(new class_5341[0]);
         }
 
         public AlternativeEntry.Builder alternatively(Builder<?> arg) {
@@ -99,7 +114,7 @@ implements EntryCombiner {
         }
 
         @Override
-        public /* synthetic */ Object conditionally(LootCondition.Builder arg) {
+        public /* synthetic */ Object conditionally(class_5341.Builder arg) {
             return this.conditionally(arg);
         }
     }

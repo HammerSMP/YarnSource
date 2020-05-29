@@ -17,7 +17,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class BasaltColumnsFeatureConfig
 implements FeatureConfig {
-    public static final Codec<BasaltColumnsFeatureConfig> field_24877 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("minimum_reach").forGetter(arg -> arg.minReach), (App)Codec.INT.fieldOf("maximum_reach").forGetter(arg -> arg.maxReach), (App)Codec.INT.fieldOf("minimum_height").forGetter(arg -> arg.minHeight), (App)Codec.INT.fieldOf("maximum_height").forGetter(arg -> arg.maxHeight)).apply((Applicative)instance, BasaltColumnsFeatureConfig::new));
+    public static final Codec<BasaltColumnsFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("minimum_reach").forGetter(arg -> arg.minReach), (App)Codec.INT.fieldOf("maximum_reach").forGetter(arg -> arg.maxReach), (App)Codec.INT.fieldOf("minimum_height").forGetter(arg -> arg.minHeight), (App)Codec.INT.fieldOf("maximum_height").forGetter(arg -> arg.maxHeight)).apply((Applicative)instance, BasaltColumnsFeatureConfig::new));
     public final int minReach;
     public final int maxReach;
     public final int minHeight;

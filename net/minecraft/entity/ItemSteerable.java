@@ -48,7 +48,7 @@ public interface ItemSteerable {
             this.setMovementInput(new Vec3d(0.0, 0.0, 1.0));
             arg.bodyTrackingIncrements = 0;
         } else {
-            arg.setVelocity(Vec3d.ZERO);
+            arg.method_29242(arg, false);
         }
         return true;
     }

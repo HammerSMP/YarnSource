@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.class_5328;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -92,8 +93,7 @@ extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        arg2.setCurrentHand(arg3);
-        return TypedActionResult.success(arg2.getStackInHand(arg3));
+        return class_5328.method_29282(arg, arg2, arg3);
     }
 
     @Override

@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.ImmutableMap$Builder
  *  it.unimi.dsi.fastutil.longs.Long2LongMap
  *  it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap
  */
@@ -35,11 +36,24 @@ extends Task<MobEntityWithAi> {
     private final Long2LongMap foundPositionsToExpiry = new Long2LongOpenHashMap();
     private int tries;
 
-    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, boolean bl) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(arg2, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
+    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, MemoryModuleType<GlobalPos> arg3, boolean bl) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)FindPointOfInterestTask.method_29245(arg2, arg3));
         this.poiType = arg;
-        this.targetMemoryModuleType = arg2;
+        this.targetMemoryModuleType = arg3;
         this.onlyRunIfChild = bl;
+    }
+
+    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, boolean bl) {
+        this(arg, arg2, arg2, bl);
+    }
+
+    private static ImmutableMap<MemoryModuleType<?>, MemoryModuleState> method_29245(MemoryModuleType<GlobalPos> arg, MemoryModuleType<GlobalPos> arg2) {
+        ImmutableMap.Builder builder = ImmutableMap.builder();
+        builder.put(arg, (Object)MemoryModuleState.VALUE_ABSENT);
+        if (arg2 != arg) {
+            builder.put(arg2, (Object)MemoryModuleState.VALUE_ABSENT);
+        }
+        return builder.build();
     }
 
     @Override

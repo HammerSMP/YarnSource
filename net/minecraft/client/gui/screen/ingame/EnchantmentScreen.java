@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.ingame.EnchantingPhrases;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.DiffuseLighting;
@@ -29,7 +30,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -55,12 +55,6 @@ extends HandledScreen<EnchantmentScreenHandler> {
 
     public EnchantmentScreen(EnchantmentScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
-    }
-
-    @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, 12.0f, 5.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 96 + 2), 0x404040);
     }
 
     @Override
@@ -157,7 +151,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
             }
             String string = "" + u;
             int v = 86 - this.textRenderer.getWidth(string);
-            MutableText lv4 = EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, v);
+            class_5348 lv4 = EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, v);
             int w = 6839882;
             if (!(q >= r + 1 && this.client.player.experienceLevel >= u || this.client.player.abilities.creativeMode)) {
                 this.drawTexture(arg, s, l + 14 + 19 * r, 0, 185, 108, 19);

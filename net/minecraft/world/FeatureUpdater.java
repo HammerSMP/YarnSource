@@ -25,9 +25,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.ChunkUpdateState;
 import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class FeatureUpdater {
@@ -85,7 +86,7 @@ public class FeatureUpdater {
         CompoundTag lv3 = lv.getCompound("Structures");
         CompoundTag lv4 = lv3.getCompound("References");
         for (String string : this.field_17659) {
-            StructureFeature lv5 = (StructureFeature)StructureFeature.field_24842.get((Object)string.toLowerCase(Locale.ROOT));
+            StructureFeature lv5 = (StructureFeature)StructureFeature.STRUCTURES.get((Object)string.toLowerCase(Locale.ROOT));
             if (lv4.contains(string, 12) || lv5 == null) continue;
             int i = 8;
             LongArrayList longList = new LongArrayList();
@@ -182,15 +183,15 @@ public class FeatureUpdater {
         }
     }
 
-    public static FeatureUpdater create(DimensionType arg, @Nullable PersistentStateManager arg2) {
-        if (arg.method_28541()) {
+    public static FeatureUpdater create(RegistryKey<World> arg, @Nullable PersistentStateManager arg2) {
+        if (arg == World.field_25179) {
             return new FeatureUpdater(arg2, (List<String>)ImmutableList.of((Object)"Monument", (Object)"Stronghold", (Object)"Village", (Object)"Mineshaft", (Object)"Temple", (Object)"Mansion"), (List<String>)ImmutableList.of((Object)"Village", (Object)"Mineshaft", (Object)"Mansion", (Object)"Igloo", (Object)"Desert_Pyramid", (Object)"Jungle_Pyramid", (Object)"Swamp_Hut", (Object)"Stronghold", (Object)"Monument"));
         }
-        if (arg.method_28542()) {
+        if (arg == World.field_25180) {
             ImmutableList list = ImmutableList.of((Object)"Fortress");
             return new FeatureUpdater(arg2, (List<String>)list, (List<String>)list);
         }
-        if (arg.method_28543()) {
+        if (arg == World.field_25181) {
             ImmutableList list2 = ImmutableList.of((Object)"EndCity");
             return new FeatureUpdater(arg2, (List<String>)list2, (List<String>)list2);
         }

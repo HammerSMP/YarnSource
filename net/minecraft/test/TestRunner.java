@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
+ *  com.google.common.collect.Maps
  *  com.mojang.datafixers.util.Pair
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -10,10 +11,13 @@
 package net.minecraft.test;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import net.minecraft.block.entity.StructureBlockBlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.GameTestBatch;
@@ -23,7 +27,9 @@ import net.minecraft.test.TestListener;
 import net.minecraft.test.TestManager;
 import net.minecraft.test.TestSet;
 import net.minecraft.test.TestUtil;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,27 +38,29 @@ public class TestRunner {
     private final BlockPos pos;
     private final ServerWorld world;
     private final TestManager testManager;
+    private final int sizeZ;
     private final List<GameTest> tests = Lists.newArrayList();
+    private final Map<GameTest, BlockPos> field_25300 = Maps.newHashMap();
     private final List<Pair<GameTestBatch, Collection<GameTest>>> batches = Lists.newArrayList();
     private TestSet currentBatchTests;
     private int currentBatchIndex = 0;
     private BlockPos.Mutable reusablePos;
-    private int sizeZ = 0;
 
-    public TestRunner(Collection<GameTestBatch> collection, BlockPos arg, ServerWorld arg22, TestManager arg3) {
+    public TestRunner(Collection<GameTestBatch> collection, BlockPos arg, BlockRotation arg2, ServerWorld arg32, TestManager arg4, int i) {
         this.reusablePos = arg.mutableCopy();
         this.pos = arg;
-        this.world = arg22;
-        this.testManager = arg3;
-        collection.forEach(arg2 -> {
+        this.world = arg32;
+        this.testManager = arg4;
+        this.sizeZ = i;
+        collection.forEach(arg3 -> {
             ArrayList collection = Lists.newArrayList();
-            Collection<TestFunction> collection2 = arg2.getTestFunctions();
+            Collection<TestFunction> collection2 = arg3.getTestFunctions();
             for (TestFunction lv : collection2) {
-                GameTest lv2 = new GameTest(lv, arg22);
+                GameTest lv2 = new GameTest(lv, arg2, arg32);
                 collection.add(lv2);
                 this.tests.add(lv2);
             }
-            this.batches.add((Pair<GameTestBatch, Collection<GameTest>>)Pair.of((Object)arg2, (Object)collection));
+            this.batches.add((Pair<GameTestBatch, Collection<GameTest>>)Pair.of((Object)arg3, (Object)collection));
         });
     }
 
@@ -73,7 +81,7 @@ public class TestRunner {
         Pair<GameTestBatch, Collection<GameTest>> pair = this.batches.get(this.currentBatchIndex);
         GameTestBatch lv = (GameTestBatch)pair.getFirst();
         Collection collection = (Collection)pair.getSecond();
-        this.method_23632(collection);
+        this.method_29401(collection);
         lv.setWorld(this.world);
         String string = lv.getId();
         LOGGER.info("Running test batch '" + string + "' (" + collection.size() + " tests)...");
@@ -90,7 +98,8 @@ public class TestRunner {
                     TestRunner.this.onTestCompleted(arg);
                 }
             });
-            TestUtil.startTest(arg, this.testManager);
+            BlockPos lv = this.field_25300.get(arg);
+            TestUtil.startTest(arg, lv, this.testManager);
         });
     }
 
@@ -100,21 +109,21 @@ public class TestRunner {
         }
     }
 
-    private void method_23632(Collection<GameTest> collection) {
+    private void method_29401(Collection<GameTest> collection) {
         int i = 0;
-        for (GameTest lv : collection) {
-            BlockPos lv2 = new BlockPos(this.reusablePos);
-            lv.setPos(lv2);
-            StructureTestUtil.method_22250(lv.getStructureName(), lv2, 2, this.world, true);
-            BlockPos lv3 = lv.getSize();
-            int j = lv3 == null ? 1 : lv3.getX();
-            int k = lv3 == null ? 1 : lv3.getZ();
-            this.sizeZ = Math.max(this.sizeZ, k);
-            this.reusablePos.move(j + 4, 0, 0);
-            if (i++ % 8 != 0) continue;
-            this.reusablePos.move(0, 0, this.sizeZ + 5);
+        Box lv = new Box(this.reusablePos);
+        for (GameTest lv2 : collection) {
+            BlockPos lv3 = new BlockPos(this.reusablePos);
+            StructureBlockBlockEntity lv4 = StructureTestUtil.method_22250(lv2.getStructureName(), lv3, lv2.method_29402(), 2, this.world, true);
+            Box lv5 = StructureTestUtil.getStructureBoundingBox(lv4);
+            lv2.setPos(lv4.getPos());
+            this.field_25300.put(lv2, new BlockPos(this.reusablePos));
+            lv = lv.union(lv5);
+            this.reusablePos.move((int)lv5.getXLength() + 5, 0, 0);
+            if (i++ % this.sizeZ != this.sizeZ - 1) continue;
+            this.reusablePos.move(0, 0, (int)lv.getZLength() + 6);
             this.reusablePos.setX(this.pos.getX());
-            this.sizeZ = 0;
+            lv = new Box(this.reusablePos);
         }
     }
 }

@@ -56,6 +56,7 @@ import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -76,8 +77,8 @@ implements Chunk {
     private final List<CompoundTag> entities = Lists.newArrayList();
     private final List<BlockPos> lightSources = Lists.newArrayList();
     private final ShortList[] postProcessingLists = new ShortList[16];
-    private final Map<String, StructureStart<?>> structureStarts = Maps.newHashMap();
-    private final Map<String, LongSet> structureReferences = Maps.newHashMap();
+    private final Map<StructureFeature<?>, StructureStart<?>> structureStarts = Maps.newHashMap();
+    private final Map<StructureFeature<?>, LongSet> structureReferences = Maps.newHashMap();
     private final UpgradeData upgradeData;
     private final ChunkTickScheduler<Block> blockTickScheduler;
     private final ChunkTickScheduler<Fluid> fluidTickScheduler;
@@ -314,46 +315,46 @@ implements Chunk {
 
     @Override
     @Nullable
-    public StructureStart<?> getStructureStart(String string) {
-        return this.structureStarts.get(string);
+    public StructureStart<?> getStructureStart(StructureFeature<?> arg) {
+        return this.structureStarts.get(arg);
     }
 
     @Override
-    public void setStructureStart(String string, StructureStart<?> arg) {
-        this.structureStarts.put(string, arg);
+    public void setStructureStart(StructureFeature<?> arg, StructureStart<?> arg2) {
+        this.structureStarts.put(arg, arg2);
         this.shouldSave = true;
     }
 
     @Override
-    public Map<String, StructureStart<?>> getStructureStarts() {
+    public Map<StructureFeature<?>, StructureStart<?>> getStructureStarts() {
         return Collections.unmodifiableMap(this.structureStarts);
     }
 
     @Override
-    public void setStructureStarts(Map<String, StructureStart<?>> map) {
+    public void setStructureStarts(Map<StructureFeature<?>, StructureStart<?>> map) {
         this.structureStarts.clear();
         this.structureStarts.putAll(map);
         this.shouldSave = true;
     }
 
     @Override
-    public LongSet getStructureReferences(String string2) {
-        return this.structureReferences.computeIfAbsent(string2, string -> new LongOpenHashSet());
+    public LongSet getStructureReferences(StructureFeature<?> arg2) {
+        return this.structureReferences.computeIfAbsent(arg2, arg -> new LongOpenHashSet());
     }
 
     @Override
-    public void addStructureReference(String string2, long l) {
-        this.structureReferences.computeIfAbsent(string2, string -> new LongOpenHashSet()).add(l);
+    public void addStructureReference(StructureFeature<?> arg2, long l) {
+        this.structureReferences.computeIfAbsent(arg2, arg -> new LongOpenHashSet()).add(l);
         this.shouldSave = true;
     }
 
     @Override
-    public Map<String, LongSet> getStructureReferences() {
+    public Map<StructureFeature<?>, LongSet> getStructureReferences() {
         return Collections.unmodifiableMap(this.structureReferences);
     }
 
     @Override
-    public void setStructureReferences(Map<String, LongSet> map) {
+    public void setStructureReferences(Map<StructureFeature<?>, LongSet> map) {
         this.structureReferences.clear();
         this.structureReferences.putAll(map);
         this.shouldSave = true;

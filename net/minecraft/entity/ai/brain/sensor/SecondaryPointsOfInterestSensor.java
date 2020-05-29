@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Set;
-import net.minecraft.class_5321;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
@@ -19,7 +18,8 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.dynamic.GlobalPos;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class SecondaryPointsOfInterestSensor
 extends Sensor<VillagerEntity> {
@@ -29,7 +29,7 @@ extends Sensor<VillagerEntity> {
 
     @Override
     protected void sense(ServerWorld arg, VillagerEntity arg2) {
-        class_5321<DimensionType> lv = arg.method_27983();
+        RegistryKey<World> lv = arg.method_27983();
         BlockPos lv2 = arg2.getBlockPos();
         ArrayList list = Lists.newArrayList();
         int i = 4;

@@ -33,11 +33,14 @@ import net.minecraft.util.UserCache;
 public class SkullBlockEntity
 extends BlockEntity
 implements Tickable {
+    @Nullable
+    private static UserCache userCache;
+    @Nullable
+    private static MinecraftSessionService sessionService;
+    @Nullable
     private GameProfile owner;
     private int ticksPowered;
     private boolean powered;
-    private static UserCache userCache;
-    private static MinecraftSessionService sessionService;
 
     public SkullBlockEntity() {
         super(BlockEntityType.SKULL);
@@ -121,7 +124,8 @@ implements Tickable {
         this.markDirty();
     }
 
-    public static GameProfile loadProperties(GameProfile gameProfile) {
+    @Nullable
+    public static GameProfile loadProperties(@Nullable GameProfile gameProfile) {
         if (gameProfile == null || ChatUtil.isEmpty(gameProfile.getName())) {
             return gameProfile;
         }

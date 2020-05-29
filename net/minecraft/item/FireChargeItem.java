@@ -27,7 +27,7 @@ extends Item {
         BlockPos lv2 = arg2.getBlockPos();
         BlockState lv3 = lv.getBlockState(lv2);
         boolean bl = false;
-        if (lv3.method_27851(BlockTags.CAMPFIRES, arg -> arg.method_28498(CampfireBlock.LIT) && arg.method_28498(CampfireBlock.WATERLOGGED))) {
+        if (lv3.method_27851(BlockTags.CAMPFIRES, arg -> arg.contains(CampfireBlock.LIT) && arg.contains(CampfireBlock.WATERLOGGED))) {
             if (!lv3.get(CampfireBlock.LIT).booleanValue() && !lv3.get(CampfireBlock.WATERLOGGED).booleanValue()) {
                 this.playUseSound(lv, lv2);
                 lv.setBlockState(lv2, (BlockState)lv3.with(CampfireBlock.LIT, true));
@@ -40,7 +40,7 @@ extends Item {
         }
         if (bl) {
             arg2.getStack().decrement(1);
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(lv.isClient);
         }
         return ActionResult.FAIL;
     }

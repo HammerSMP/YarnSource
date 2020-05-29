@@ -37,7 +37,7 @@ public class WorldBorder {
     private double centerZ;
     private int maxWorldBorderRadius = 29999984;
     private Area area = new StaticArea(6.0E7);
-    public static final class_5200 field_24122 = new class_5200(0.0, 0.0, 0.2, 5.0, 5, 15, 6.0E7, 0L, 0.0);
+    public static final Properties DEFAULT_BORDER = new Properties(0.0, 0.0, 0.2, 5.0, 5, 15, 6.0E7, 0L, 0.0);
 
     public boolean contains(BlockPos arg) {
         return (double)(arg.getX() + 1) > this.getBoundWest() && (double)arg.getX() < this.getBoundEast() && (double)(arg.getZ() + 1) > this.getBoundNorth() && (double)arg.getZ() < this.getBoundSouth();
@@ -203,117 +203,117 @@ public class WorldBorder {
         this.area = this.area.getAreaInstance();
     }
 
-    public class_5200 method_27355() {
-        return new class_5200(this);
+    public Properties write() {
+        return new Properties(this);
     }
 
-    public void load(class_5200 arg) {
-        this.setCenter(arg.method_27356(), arg.method_27359());
-        this.setDamagePerBlock(arg.method_27360());
-        this.setBuffer(arg.method_27361());
-        this.setWarningBlocks(arg.method_27362());
-        this.setWarningTime(arg.method_27363());
-        if (arg.method_27365() > 0L) {
-            this.interpolateSize(arg.method_27364(), arg.method_27366(), arg.method_27365());
+    public void load(Properties arg) {
+        this.setCenter(arg.getCenterX(), arg.getCenterZ());
+        this.setDamagePerBlock(arg.getDamagePerBlock());
+        this.setBuffer(arg.getBuffer());
+        this.setWarningBlocks(arg.getWarningBlocks());
+        this.setWarningTime(arg.getWarningTime());
+        if (arg.getTargetRemainingTime() > 0L) {
+            this.interpolateSize(arg.getSize(), arg.getTargetSize(), arg.getTargetRemainingTime());
         } else {
-            this.setSize(arg.method_27364());
+            this.setSize(arg.getSize());
         }
     }
 
-    public static class class_5200 {
-        private final double field_24123;
-        private final double field_24124;
-        private final double field_24125;
-        private final double field_24126;
-        private final int field_24127;
-        private final int field_24128;
-        private final double field_24129;
-        private final long field_24130;
-        private final double field_24131;
+    public static class Properties {
+        private final double centerX;
+        private final double centerZ;
+        private final double damagePerBlock;
+        private final double buffer;
+        private final int warningBlocks;
+        private final int warningTime;
+        private final double size;
+        private final long targetRemainingTime;
+        private final double targetSize;
 
-        private class_5200(double d, double e, double f, double g, int i, int j, double h, long l, double k) {
-            this.field_24123 = d;
-            this.field_24124 = e;
-            this.field_24125 = f;
-            this.field_24126 = g;
-            this.field_24127 = i;
-            this.field_24128 = j;
-            this.field_24129 = h;
-            this.field_24130 = l;
-            this.field_24131 = k;
+        private Properties(double d, double e, double f, double g, int i, int j, double h, long l, double k) {
+            this.centerX = d;
+            this.centerZ = e;
+            this.damagePerBlock = f;
+            this.buffer = g;
+            this.warningBlocks = i;
+            this.warningTime = j;
+            this.size = h;
+            this.targetRemainingTime = l;
+            this.targetSize = k;
         }
 
-        private class_5200(WorldBorder arg) {
-            this.field_24123 = arg.getCenterX();
-            this.field_24124 = arg.getCenterZ();
-            this.field_24125 = arg.getDamagePerBlock();
-            this.field_24126 = arg.getBuffer();
-            this.field_24127 = arg.getWarningBlocks();
-            this.field_24128 = arg.getWarningTime();
-            this.field_24129 = arg.getSize();
-            this.field_24130 = arg.getTargetRemainingTime();
-            this.field_24131 = arg.getTargetSize();
+        private Properties(WorldBorder arg) {
+            this.centerX = arg.getCenterX();
+            this.centerZ = arg.getCenterZ();
+            this.damagePerBlock = arg.getDamagePerBlock();
+            this.buffer = arg.getBuffer();
+            this.warningBlocks = arg.getWarningBlocks();
+            this.warningTime = arg.getWarningTime();
+            this.size = arg.getSize();
+            this.targetRemainingTime = arg.getTargetRemainingTime();
+            this.targetSize = arg.getTargetSize();
         }
 
-        public double method_27356() {
-            return this.field_24123;
+        public double getCenterX() {
+            return this.centerX;
         }
 
-        public double method_27359() {
-            return this.field_24124;
+        public double getCenterZ() {
+            return this.centerZ;
         }
 
-        public double method_27360() {
-            return this.field_24125;
+        public double getDamagePerBlock() {
+            return this.damagePerBlock;
         }
 
-        public double method_27361() {
-            return this.field_24126;
+        public double getBuffer() {
+            return this.buffer;
         }
 
-        public int method_27362() {
-            return this.field_24127;
+        public int getWarningBlocks() {
+            return this.warningBlocks;
         }
 
-        public int method_27363() {
-            return this.field_24128;
+        public int getWarningTime() {
+            return this.warningTime;
         }
 
-        public double method_27364() {
-            return this.field_24129;
+        public double getSize() {
+            return this.size;
         }
 
-        public long method_27365() {
-            return this.field_24130;
+        public long getTargetRemainingTime() {
+            return this.targetRemainingTime;
         }
 
-        public double method_27366() {
-            return this.field_24131;
+        public double getTargetSize() {
+            return this.targetSize;
         }
 
-        public static class_5200 method_27358(DynamicLike<?> dynamicLike, class_5200 arg) {
-            double d = dynamicLike.get("BorderCenterX").asDouble(arg.field_24123);
-            double e = dynamicLike.get("BorderCenterZ").asDouble(arg.field_24124);
-            double f = dynamicLike.get("BorderSize").asDouble(arg.field_24129);
-            long l = dynamicLike.get("BorderSizeLerpTime").asLong(arg.field_24130);
-            double g = dynamicLike.get("BorderSizeLerpTarget").asDouble(arg.field_24131);
-            double h = dynamicLike.get("BorderSafeZone").asDouble(arg.field_24126);
-            double i = dynamicLike.get("BorderDamagePerBlock").asDouble(arg.field_24125);
-            int j = dynamicLike.get("BorderWarningBlocks").asInt(arg.field_24127);
-            int k = dynamicLike.get("BorderWarningTime").asInt(arg.field_24128);
-            return new class_5200(d, e, i, h, j, k, f, l, g);
+        public static Properties fromDynamic(DynamicLike<?> dynamicLike, Properties arg) {
+            double d = dynamicLike.get("BorderCenterX").asDouble(arg.centerX);
+            double e = dynamicLike.get("BorderCenterZ").asDouble(arg.centerZ);
+            double f = dynamicLike.get("BorderSize").asDouble(arg.size);
+            long l = dynamicLike.get("BorderSizeLerpTime").asLong(arg.targetRemainingTime);
+            double g = dynamicLike.get("BorderSizeLerpTarget").asDouble(arg.targetSize);
+            double h = dynamicLike.get("BorderSafeZone").asDouble(arg.buffer);
+            double i = dynamicLike.get("BorderDamagePerBlock").asDouble(arg.damagePerBlock);
+            int j = dynamicLike.get("BorderWarningBlocks").asInt(arg.warningBlocks);
+            int k = dynamicLike.get("BorderWarningTime").asInt(arg.warningTime);
+            return new Properties(d, e, i, h, j, k, f, l, g);
         }
 
-        public void method_27357(CompoundTag arg) {
-            arg.putDouble("BorderCenterX", this.field_24123);
-            arg.putDouble("BorderCenterZ", this.field_24124);
-            arg.putDouble("BorderSize", this.field_24129);
-            arg.putLong("BorderSizeLerpTime", this.field_24130);
-            arg.putDouble("BorderSafeZone", this.field_24126);
-            arg.putDouble("BorderDamagePerBlock", this.field_24125);
-            arg.putDouble("BorderSizeLerpTarget", this.field_24131);
-            arg.putDouble("BorderWarningBlocks", this.field_24127);
-            arg.putDouble("BorderWarningTime", this.field_24128);
+        public void toTag(CompoundTag arg) {
+            arg.putDouble("BorderCenterX", this.centerX);
+            arg.putDouble("BorderCenterZ", this.centerZ);
+            arg.putDouble("BorderSize", this.size);
+            arg.putLong("BorderSizeLerpTime", this.targetRemainingTime);
+            arg.putDouble("BorderSafeZone", this.buffer);
+            arg.putDouble("BorderDamagePerBlock", this.damagePerBlock);
+            arg.putDouble("BorderSizeLerpTarget", this.targetSize);
+            arg.putDouble("BorderWarningBlocks", this.warningBlocks);
+            arg.putDouble("BorderWarningTime", this.warningTime);
         }
     }
 

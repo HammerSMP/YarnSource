@@ -6,22 +6,22 @@
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
-package net.minecraft;
+package net.minecraft.world;
 
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5268;
-import net.minecraft.class_5285;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
+import net.minecraft.world.level.ServerWorldProperties;
 
-public interface class_5219 {
+public interface SaveProperties {
     public Set<String> getDisabledDataPacks();
 
     public Set<String> getEnabledDataPacks();
@@ -58,7 +58,7 @@ public interface class_5219 {
 
     public void setCustomBossEvents(@Nullable CompoundTag var1);
 
-    public class_5268 method_27859();
+    public ServerWorldProperties getMainWorldProperties();
 
     @Environment(value=EnvType.CLIENT)
     public LevelInfo getLevelInfo();
@@ -93,6 +93,6 @@ public interface class_5219 {
 
     public void method_29037(CompoundTag var1);
 
-    public class_5285 method_28057();
+    public GeneratorOptions method_28057();
 }
 

@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
+ *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.ParseResults
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
@@ -11,6 +12,7 @@
 package net.minecraft.server.function;
 
 import com.google.common.collect.Lists;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -41,7 +43,7 @@ public class CommandFunction {
         return this.elements;
     }
 
-    public static CommandFunction create(Identifier arg, CommandFunctionManager arg2, List<String> list) {
+    public static CommandFunction create(Identifier arg, CommandDispatcher<ServerCommandSource> commandDispatcher, ServerCommandSource arg2, List<String> list) {
         ArrayList list2 = Lists.newArrayListWithCapacity((int)list.size());
         for (int i = 0; i < list.size(); ++i) {
             int j = i + 1;
@@ -57,7 +59,7 @@ public class CommandFunction {
                 throw new IllegalArgumentException("Unknown or invalid command '" + string + "' on line " + j + " (did you mean '" + string2 + "'? Do not use a preceding forwards slash.)");
             }
             try {
-                ParseResults parseResults = arg2.getServer().getCommandManager().getDispatcher().parse(stringReader, (Object)arg2.getCommandFunctionSource());
+                ParseResults parseResults = commandDispatcher.parse(stringReader, (Object)arg2);
                 if (parseResults.getReader().canRead()) {
                     throw CommandManager.getException(parseResults);
                 }

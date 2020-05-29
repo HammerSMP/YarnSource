@@ -32,11 +32,6 @@ import org.apache.logging.log4j.Logger;
 public class ServerRecipeBook
 extends RecipeBook {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final RecipeManager manager;
-
-    public ServerRecipeBook(RecipeManager arg) {
-        this.manager = arg;
-    }
 
     public int unlockRecipes(Collection<Recipe<?>> collection, ServerPlayerEntity arg) {
         ArrayList list = Lists.newArrayList();
@@ -95,7 +90,7 @@ extends RecipeBook {
         return lv;
     }
 
-    public void fromTag(CompoundTag arg) {
+    public void fromTag(CompoundTag arg, RecipeManager arg2) {
         this.guiOpen = arg.getBoolean("isGuiOpen");
         this.filteringCraftable = arg.getBoolean("isFilteringCraftable");
         this.furnaceGuiOpen = arg.getBoolean("isFurnaceGuiOpen");
@@ -105,17 +100,17 @@ extends RecipeBook {
         this.smokerGuiOpen = arg.getBoolean("isSmokerGuiOpen");
         this.smokerFilteringCraftable = arg.getBoolean("isSmokerFilteringCraftable");
         ListTag lv = arg.getList("recipes", 8);
-        this.handleList(lv, this::add);
+        this.handleList(lv, this::add, arg2);
         ListTag lv2 = arg.getList("toBeDisplayed", 8);
-        this.handleList(lv2, this::display);
+        this.handleList(lv2, this::display, arg2);
     }
 
-    private void handleList(ListTag arg, Consumer<Recipe<?>> consumer) {
+    private void handleList(ListTag arg, Consumer<Recipe<?>> consumer, RecipeManager arg2) {
         for (int i = 0; i < arg.size(); ++i) {
             String string = arg.getString(i);
             try {
                 Identifier lv = new Identifier(string);
-                Optional<Recipe<?>> optional = this.manager.get(lv);
+                Optional<Recipe<?>> optional = arg2.get(lv);
                 if (!optional.isPresent()) {
                     LOGGER.error("Tried to load unrecognized recipe: {} removed now.", (Object)lv);
                     continue;

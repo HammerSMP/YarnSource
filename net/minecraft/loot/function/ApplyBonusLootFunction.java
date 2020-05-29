@@ -22,14 +22,16 @@ import com.google.gson.JsonSerializationContext;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -40,10 +42,15 @@ extends ConditionalLootFunction {
     private final Enchantment enchantment;
     private final Formula formula;
 
-    private ApplyBonusLootFunction(LootCondition[] args, Enchantment arg, Formula arg2) {
+    private ApplyBonusLootFunction(class_5341[] args, Enchantment arg, Formula arg2) {
         super(args);
         this.enchantment = arg;
         this.formula = arg2;
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.APPLY_BONUS;
     }
 
     @Override
@@ -63,19 +70,19 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> binomialWithBonusCount(Enchantment arg, float f, int i) {
-        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((LootCondition[])args, arg, new BinomialWithBonusCount(i, f)));
+        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((class_5341[])args, arg, new BinomialWithBonusCount(i, f)));
     }
 
     public static ConditionalLootFunction.Builder<?> oreDrops(Enchantment arg) {
-        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((LootCondition[])args, arg, new OreDrops()));
+        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((class_5341[])args, arg, new OreDrops()));
     }
 
     public static ConditionalLootFunction.Builder<?> uniformBonusCount(Enchantment arg) {
-        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((LootCondition[])args, arg, new UniformBonusCount(1)));
+        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((class_5341[])args, arg, new UniformBonusCount(1)));
     }
 
     public static ConditionalLootFunction.Builder<?> uniformBonusCount(Enchantment arg, int i) {
-        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((LootCondition[])args, arg, new UniformBonusCount(i)));
+        return ApplyBonusLootFunction.builder(args -> new ApplyBonusLootFunction((class_5341[])args, arg, new UniformBonusCount(i)));
     }
 
     static {
@@ -86,10 +93,6 @@ extends ConditionalLootFunction {
 
     public static class Factory
     extends ConditionalLootFunction.Factory<ApplyBonusLootFunction> {
-        public Factory() {
-            super(new Identifier("apply_bonus"), ApplyBonusLootFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, ApplyBonusLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -103,7 +106,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public ApplyBonusLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public ApplyBonusLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             Formula lv6;
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "enchantment"));
             Enchantment lv2 = Registry.ENCHANTMENT.getOrEmpty(lv).orElseThrow(() -> new JsonParseException("Invalid enchantment id: " + lv));
@@ -121,7 +124,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

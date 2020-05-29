@@ -73,11 +73,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5218;
-import net.minecraft.class_5219;
-import net.minecraft.class_5285;
 import net.minecraft.class_5315;
-import net.minecraft.class_5321;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.Schemas;
@@ -89,8 +85,13 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.Util;
+import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.SaveProperties;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.AnvilLevelStorage;
@@ -125,7 +126,7 @@ public class LevelStorage {
         return new LevelStorage(path, path.resolve("../backups"), Schemas.getFixer());
     }
 
-    private static Pair<class_5285, Lifecycle> method_29010(Dynamic<?> dynamic, DataFixer dataFixer, int i) {
+    private static Pair<GeneratorOptions, Lifecycle> method_29010(Dynamic<?> dynamic, DataFixer dataFixer, int i) {
         Dynamic dynamic2 = dynamic.get("WorldGenSettings").orElseEmptyMap();
         for (String string : field_25020) {
             Optional optional = dynamic.get(string).result();
@@ -133,8 +134,8 @@ public class LevelStorage {
             dynamic2 = dynamic2.set(string, (Dynamic)optional.get());
         }
         Dynamic dynamic3 = dataFixer.update(TypeReferences.CHUNK_GENERATOR_SETTINGS, dynamic2, i, SharedConstants.getGameVersion().getWorldVersion());
-        DataResult dataResult = class_5285.field_24826.parse(dynamic3);
-        return Pair.of((Object)dataResult.resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)LOGGER)::error)).orElseGet(class_5285::method_28009), (Object)dataResult.lifecycle());
+        DataResult dataResult = GeneratorOptions.CODEC.parse(dynamic3);
+        return Pair.of((Object)dataResult.resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)LOGGER)::error)).orElseGet(GeneratorOptions::getDefaultOptions), (Object)dataResult.lifecycle());
     }
 
     /*
@@ -186,7 +187,7 @@ public class LevelStorage {
     }
 
     @Nullable
-    private static class_5219 readLevelProperties(File file, DataFixer dataFixer) {
+    private static SaveProperties readLevelProperties(File file, DataFixer dataFixer) {
         try {
             CompoundTag lv = NbtIo.readCompressed(new FileInputStream(file));
             CompoundTag lv2 = lv.getCompound("Data");
@@ -194,9 +195,9 @@ public class LevelStorage {
             lv2.remove("Player");
             int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
             Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
-            Pair<class_5285, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
+            Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
             class_5315 lv4 = class_5315.method_29023(dynamic);
-            LevelInfo lv5 = LevelInfo.method_28383(dynamic, (class_5285)pair.getFirst());
+            LevelInfo lv5 = LevelInfo.method_28383(dynamic, (GeneratorOptions)pair.getFirst());
             return LevelProperties.method_29029((Dynamic<Tag>)dynamic, dataFixer, i, lv3, lv5, lv4);
         }
         catch (Exception exception) {
@@ -219,8 +220,8 @@ public class LevelStorage {
                 if (j == 19132 || j == 19133) {
                     boolean bl2 = j != this.getCurrentVersion();
                     File file3 = new File(file, "icon.png");
-                    Pair<class_5285, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
-                    LevelInfo lv4 = LevelInfo.method_28383(dynamic, (class_5285)pair.getFirst());
+                    Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
+                    LevelInfo lv4 = LevelInfo.method_28383(dynamic, (GeneratorOptions)pair.getFirst());
                     return new LevelSummary(lv4, lv3, file.getName(), bl2, bl, file3, (Lifecycle)pair.getSecond());
                 }
                 return null;
@@ -269,7 +270,7 @@ public class LevelStorage {
         private final SessionLock lock;
         private final Path directory;
         private final String directoryName;
-        private final Map<class_5218, Path> field_24190 = Maps.newHashMap();
+        private final Map<WorldSavePath, Path> field_24190 = Maps.newHashMap();
 
         public Session(String string) throws IOException {
             this.directoryName = string;
@@ -281,11 +282,11 @@ public class LevelStorage {
             return this.directoryName;
         }
 
-        public Path getDirectory(class_5218 arg2) {
-            return this.field_24190.computeIfAbsent(arg2, arg -> this.directory.resolve(arg.method_27423()));
+        public Path getDirectory(WorldSavePath arg2) {
+            return this.field_24190.computeIfAbsent(arg2, arg -> this.directory.resolve(arg.getRelativePath()));
         }
 
-        public File method_27424(class_5321<DimensionType> arg) {
+        public File method_27424(RegistryKey<World> arg) {
             return DimensionType.getSaveDirectory(arg, this.directory.toFile());
         }
 
@@ -301,7 +302,7 @@ public class LevelStorage {
         }
 
         public boolean needsConversion() {
-            class_5219 lv = this.readLevelProperties();
+            SaveProperties lv = this.readLevelProperties();
             return lv != null && lv.getVersion() != LevelStorage.this.getCurrentVersion();
         }
 
@@ -311,16 +312,16 @@ public class LevelStorage {
         }
 
         @Nullable
-        public class_5219 readLevelProperties() {
+        public SaveProperties readLevelProperties() {
             this.checkValid();
-            return (class_5219)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.readLevelProperties(file, dataFixer));
+            return (SaveProperties)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.readLevelProperties(file, dataFixer));
         }
 
-        public void method_27425(class_5219 arg) {
+        public void method_27425(SaveProperties arg) {
             this.method_27426(arg, null);
         }
 
-        public void method_27426(class_5219 arg, @Nullable CompoundTag arg2) {
+        public void method_27426(SaveProperties arg, @Nullable CompoundTag arg2) {
             File file = this.directory.toFile();
             CompoundTag lv = arg.cloneWorldTag(arg2);
             CompoundTag lv2 = new CompoundTag();
@@ -461,7 +462,7 @@ public class LevelStorage {
             if (lv == null) {
                 return DataResult.error((String)"Could not parse level data!");
             }
-            DataResult dataResult = class_5285.field_24826.encodeStart((DynamicOps)JsonOps.INSTANCE, (Object)lv.method_29021());
+            DataResult dataResult = GeneratorOptions.CODEC.encodeStart((DynamicOps)JsonOps.INSTANCE, (Object)lv.method_29021());
             return dataResult.flatMap(jsonElement -> {
                 Path path = this.directory.resolve("worldgen_settings_export.json");
                 try (JsonWriter jsonWriter = field_25021.newJsonWriter((Writer)Files.newBufferedWriter(path, StandardCharsets.UTF_8, new OpenOption[0]));){

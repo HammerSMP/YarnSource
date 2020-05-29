@@ -23,17 +23,17 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.class_5321;
 import net.minecraft.server.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class DimensionArgumentType
 implements ArgumentType<Identifier> {
-    private static final Collection<String> EXAMPLES = Stream.of(DimensionType.field_24753, DimensionType.field_24754).map(arg -> arg.method_29177().toString()).collect(Collectors.toList());
+    private static final Collection<String> EXAMPLES = Stream.of(World.field_25179, World.field_25180).map(arg -> arg.getValue().toString()).collect(Collectors.toList());
     private static final DynamicCommandExceptionType INVALID_DIMENSION_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("argument.dimension.invalid", object));
 
     public Identifier parse(StringReader stringReader) throws CommandSyntaxException {
@@ -42,7 +42,7 @@ implements ArgumentType<Identifier> {
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
         if (commandContext.getSource() instanceof CommandSource) {
-            return CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).method_29038().method_29116().getIds().stream(), suggestionsBuilder);
+            return CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).method_29310().stream().map(RegistryKey::getValue), suggestionsBuilder);
         }
         return Suggestions.empty();
     }
@@ -55,10 +55,10 @@ implements ArgumentType<Identifier> {
         return new DimensionArgumentType();
     }
 
-    public static class_5321<DimensionType> getDimensionArgument(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
+    public static RegistryKey<World> getDimensionArgument(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
         Identifier lv = (Identifier)commandContext.getArgument(string, Identifier.class);
-        class_5321<DimensionType> lv2 = class_5321.method_29179(Registry.DIMENSION_TYPE_KEY, lv);
-        if (!((ServerCommandSource)commandContext.getSource()).getMinecraftServer().method_29174().method_29116().method_29112(lv2)) {
+        RegistryKey<World> lv2 = RegistryKey.of(Registry.DIMENSION, lv);
+        if (((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getWorld(lv2) == null) {
             throw INVALID_DIMENSION_EXCEPTION.create((Object)lv);
         }
         return lv2;

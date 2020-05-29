@@ -12,12 +12,14 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.function.Consumer;
+import net.minecraft.class_5338;
+import net.minecraft.class_5341;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.LeafEntry;
+import net.minecraft.loot.entry.LootEntries;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -27,9 +29,14 @@ public class ItemEntry
 extends LeafEntry {
     private final Item item;
 
-    private ItemEntry(Item arg, int i, int j, LootCondition[] args, LootFunction[] args2) {
+    private ItemEntry(Item arg, int i, int j, class_5341[] args, LootFunction[] args2) {
         super(i, j, args, args2);
         this.item = arg;
+    }
+
+    @Override
+    public class_5338 method_29318() {
+        return LootEntries.ITEM;
     }
 
     @Override
@@ -38,18 +45,14 @@ extends LeafEntry {
     }
 
     public static LeafEntry.Builder<?> builder(ItemConvertible arg) {
-        return ItemEntry.builder((int i, int j, LootCondition[] args, LootFunction[] args2) -> new ItemEntry(arg.asItem(), i, j, args, args2));
+        return ItemEntry.builder((int i, int j, class_5341[] args, LootFunction[] args2) -> new ItemEntry(arg.asItem(), i, j, args, args2));
     }
 
     public static class Serializer
     extends LeafEntry.Serializer<ItemEntry> {
-        public Serializer() {
-            super(new Identifier("item"), ItemEntry.class);
-        }
-
         @Override
-        public void toJson(JsonObject jsonObject, ItemEntry arg, JsonSerializationContext jsonSerializationContext) {
-            super.toJson(jsonObject, arg, jsonSerializationContext);
+        public void method_422(JsonObject jsonObject, ItemEntry arg, JsonSerializationContext jsonSerializationContext) {
+            super.method_422(jsonObject, arg, jsonSerializationContext);
             Identifier lv = Registry.ITEM.getId(arg.item);
             if (lv == null) {
                 throw new IllegalArgumentException("Can't serialize unknown item " + arg.item);
@@ -58,13 +61,13 @@ extends LeafEntry {
         }
 
         @Override
-        protected ItemEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
+        protected ItemEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, class_5341[] args, LootFunction[] args2) {
             Item lv = JsonHelper.getItem(jsonObject, "name");
             return new ItemEntry(lv, i, j, args, args2);
         }
 
         @Override
-        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
+        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, class_5341[] args, LootFunction[] args2) {
             return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, args2);
         }
     }

@@ -11,8 +11,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -24,7 +24,7 @@ extends ScreenHandler {
     private final int rows;
 
     private GenericContainerScreenHandler(ScreenHandlerType<?> arg, int i, PlayerInventory arg2, int j) {
-        this(arg, i, arg2, new BasicInventory(9 * j), j);
+        this(arg, i, arg2, new SimpleInventory(9 * j), j);
     }
 
     public static GenericContainerScreenHandler createGeneric9x1(int i, PlayerInventory arg) {

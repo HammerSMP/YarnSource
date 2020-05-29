@@ -29,16 +29,16 @@ extends HandledScreen<BrewingStandScreenHandler> {
     }
 
     @Override
+    protected void init() {
+        super.init();
+        this.field_25267 = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
+    }
+
+    @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         super.render(arg, i, j, f);
         this.drawMouseoverTooltip(arg, i, j);
-    }
-
-    @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, (float)(this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2), 6.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 96 + 2), 0x404040);
     }
 
     @Override

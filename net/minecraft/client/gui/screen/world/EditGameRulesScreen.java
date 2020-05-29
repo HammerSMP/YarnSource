@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
@@ -49,7 +50,7 @@ extends Screen {
     private final Set<AbstractRuleWidget> invalidRuleWidgets = Sets.newHashSet();
     private ButtonWidget doneButton;
     @Nullable
-    private List<Text> tooltip;
+    private List<class_5348> tooltip;
     private final GameRules gameRules;
 
     public EditGameRulesScreen(GameRules arg, Consumer<Optional<GameRules>> consumer) {
@@ -89,7 +90,7 @@ extends Screen {
         }
     }
 
-    private void setTooltipDescription(@Nullable List<Text> list) {
+    private void setTooltipDescription(@Nullable List<class_5348> list) {
         this.tooltip = list;
     }
 
@@ -144,7 +145,7 @@ extends Screen {
                         list2 = ImmutableList.of((Object)lv2, (Object)lv4);
                         string4 = lv4.getString();
                     }
-                    map.computeIfAbsent(arg23.getCategory(), arg -> Maps.newHashMap()).put(arg23, arg22.create(lv, (List<Text>)list2, string4, lv3));
+                    map.computeIfAbsent(arg23.getCategory(), arg -> Maps.newHashMap()).put(arg23, arg22.create(lv, (List<class_5348>)list2, string4, lv3));
                 }
             });
             map.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry2 -> {
@@ -170,7 +171,7 @@ extends Screen {
         private final TextFieldWidget valueWidget;
         private final List<? extends Element> children;
 
-        public IntRuleWidget(Text arg2, List<Text> list, String string2, GameRules.IntRule arg3) {
+        public IntRuleWidget(Text arg2, List<class_5348> list, String string2, GameRules.IntRule arg3) {
             super(list);
             this.name = arg2;
             this.valueWidget = new TextFieldWidget(((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer, 10, 5, 42, 20, arg2.shallowCopy().append("\n").append(string2).append("\n"));
@@ -204,7 +205,7 @@ extends Screen {
     @FunctionalInterface
     @Environment(value=EnvType.CLIENT)
     static interface RuleWidgetFactory<T extends GameRules.Rule<T>> {
-        public AbstractRuleWidget create(Text var1, List<Text> var2, String var3, T var4);
+        public AbstractRuleWidget create(Text var1, List<class_5348> var2, String var3, T var4);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -213,7 +214,7 @@ extends Screen {
         private final ButtonWidget toggleButton;
         private final List<? extends Element> children;
 
-        public BooleanRuleWidget(Text arg2, List<Text> list, final String string, GameRules.BooleanRule arg32) {
+        public BooleanRuleWidget(Text arg2, List<class_5348> list, final String string, GameRules.BooleanRule arg32) {
             super(list);
             this.toggleButton = new ButtonWidget(10, 5, 220, 20, this.createBooleanRuleText(arg2, arg32.get()), arg3 -> {
                 boolean bl = !arg32.get();
@@ -271,9 +272,9 @@ extends Screen {
     public abstract class AbstractRuleWidget
     extends ElementListWidget.Entry<AbstractRuleWidget> {
         @Nullable
-        private final List<Text> description;
+        private final List<class_5348> description;
 
-        public AbstractRuleWidget(@Nullable List<Text> list) {
+        public AbstractRuleWidget(@Nullable List<class_5348> list) {
             this.description = list;
         }
     }

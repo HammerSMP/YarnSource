@@ -30,9 +30,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5219;
-import net.minecraft.class_5268;
-import net.minecraft.class_5285;
 import net.minecraft.class_5315;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.NbtOps;
@@ -49,17 +46,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
+import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.timer.Timer;
 import net.minecraft.world.timer.TimerCallbackSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LevelProperties
-implements class_5268,
-class_5219 {
-    private static final Logger field_25029 = LogManager.getLogger();
+implements ServerWorldProperties,
+SaveProperties {
+    private static final Logger LOGGER = LogManager.getLogger();
     private LevelInfo field_25030;
     private int spawnX;
     private int spawnY;
@@ -80,7 +80,7 @@ class_5219 {
     private int thunderTime;
     private boolean initialized;
     private boolean difficultyLocked;
-    private WorldBorder.class_5200 field_24193;
+    private WorldBorder.Properties worldBorder;
     private final Set<String> disabledDataPacks;
     private final Set<String> enabledDataPacks;
     private CompoundTag field_25031;
@@ -94,7 +94,7 @@ class_5219 {
     private boolean modded;
     private final Timer<MinecraftServer> scheduledEvents;
 
-    private LevelProperties(@Nullable DataFixer dataFixer, int i, @Nullable CompoundTag arg, boolean bl, int j, int k, int l, long m, long n, int o, int p, int q, boolean bl2, int r, boolean bl3, boolean bl4, boolean bl5, WorldBorder.class_5200 arg2, int s, int t, @Nullable UUID uUID, LinkedHashSet<String> linkedHashSet, LinkedHashSet<String> linkedHashSet2, Set<String> set, Timer<MinecraftServer> arg3, @Nullable CompoundTag arg4, CompoundTag arg5, LevelInfo arg6) {
+    private LevelProperties(@Nullable DataFixer dataFixer, int i, @Nullable CompoundTag arg, boolean bl, int j, int k, int l, long m, long n, int o, int p, int q, boolean bl2, int r, boolean bl3, boolean bl4, boolean bl5, WorldBorder.Properties arg2, int s, int t, @Nullable UUID uUID, LinkedHashSet<String> linkedHashSet, LinkedHashSet<String> linkedHashSet2, Set<String> set, Timer<MinecraftServer> arg3, @Nullable CompoundTag arg4, CompoundTag arg5, LevelInfo arg6) {
         this.dataFixer = dataFixer;
         this.modded = bl;
         this.field_25030 = arg6;
@@ -111,7 +111,7 @@ class_5219 {
         this.thundering = bl3;
         this.initialized = bl4;
         this.difficultyLocked = bl5;
-        this.field_24193 = arg2;
+        this.worldBorder = arg2;
         this.wanderingTraderSpawnDelay = s;
         this.wanderingTraderSpawnChance = t;
         this.wanderingTraderId = uUID;
@@ -126,14 +126,14 @@ class_5219 {
     }
 
     public LevelProperties(LevelInfo arg) {
-        this(null, SharedConstants.getGameVersion().getWorldVersion(), null, false, 0, 0, 0, 0L, 0L, 19133, 0, 0, false, 0, false, false, false, WorldBorder.field_24122, 0, 0, null, Sets.newLinkedHashSet(), Sets.newLinkedHashSet(), Sets.newHashSet(), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE), null, new CompoundTag(), arg.method_28385());
+        this(null, SharedConstants.getGameVersion().getWorldVersion(), null, false, 0, 0, 0, 0L, 0L, 19133, 0, 0, false, 0, false, false, false, WorldBorder.DEFAULT_BORDER, 0, 0, null, Sets.newLinkedHashSet(), Sets.newLinkedHashSet(), Sets.newHashSet(), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE), null, new CompoundTag(), arg.method_28385());
     }
 
     public static LevelProperties method_29029(Dynamic<Tag> dynamic2, DataFixer dataFixer, int i, @Nullable CompoundTag arg, LevelInfo arg2, class_5315 arg3) {
         long l = dynamic2.get("Time").asLong(0L);
         OptionalDynamic optionalDynamic = dynamic2.get("DataPacks");
         CompoundTag lv = (CompoundTag)dynamic2.get("DragonFight").result().map(Dynamic::getValue).orElseGet(() -> (Tag)dynamic2.get("DimensionData").get("1").get("DragonFight").orElseEmptyMap().getValue());
-        return new LevelProperties(dataFixer, i, arg, dynamic2.get("WasModded").asBoolean(false), dynamic2.get("SpawnX").asInt(0), dynamic2.get("SpawnY").asInt(0), dynamic2.get("SpawnZ").asInt(0), l, dynamic2.get("DayTime").asLong(l), arg3.method_29022(), dynamic2.get("clearWeatherTime").asInt(0), dynamic2.get("rainTime").asInt(0), dynamic2.get("raining").asBoolean(false), dynamic2.get("thunderTime").asInt(0), dynamic2.get("thundering").asBoolean(false), dynamic2.get("initialized").asBoolean(true), dynamic2.get("DifficultyLocked").asBoolean(false), WorldBorder.class_5200.method_27358(dynamic2, WorldBorder.field_24122), dynamic2.get("WanderingTraderSpawnDelay").asInt(0), dynamic2.get("WanderingTraderSpawnChance").asInt(0), dynamic2.get("WanderingTraderId").read(DynamicSerializableUuid.field_25122).result().map(DynamicSerializableUuid::getUuid).orElse(null), dynamic2.get("ServerBrands").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), optionalDynamic.get("Enabled").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), optionalDynamic.get("Disabled").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toSet()), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE, dynamic2.get("ScheduledEvents").asStream()), (CompoundTag)dynamic2.get("CustomBossEvents").orElseEmptyMap().getValue(), lv, arg2);
+        return new LevelProperties(dataFixer, i, arg, dynamic2.get("WasModded").asBoolean(false), dynamic2.get("SpawnX").asInt(0), dynamic2.get("SpawnY").asInt(0), dynamic2.get("SpawnZ").asInt(0), l, dynamic2.get("DayTime").asLong(l), arg3.method_29022(), dynamic2.get("clearWeatherTime").asInt(0), dynamic2.get("rainTime").asInt(0), dynamic2.get("raining").asBoolean(false), dynamic2.get("thunderTime").asInt(0), dynamic2.get("thundering").asBoolean(false), dynamic2.get("initialized").asBoolean(true), dynamic2.get("DifficultyLocked").asBoolean(false), WorldBorder.Properties.fromDynamic(dynamic2, WorldBorder.DEFAULT_BORDER), dynamic2.get("WanderingTraderSpawnDelay").asInt(0), dynamic2.get("WanderingTraderSpawnChance").asInt(0), dynamic2.get("WanderingTraderId").read(DynamicSerializableUuid.field_25122).result().map(DynamicSerializableUuid::getUuid).orElse(null), dynamic2.get("ServerBrands").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), optionalDynamic.get("Enabled").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), optionalDynamic.get("Disabled").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toSet()), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE, dynamic2.get("ScheduledEvents").asStream()), (CompoundTag)dynamic2.get("CustomBossEvents").orElseEmptyMap().getValue(), lv, arg2);
     }
 
     @Override
@@ -158,7 +158,7 @@ class_5219 {
         lv2.putBoolean("Snapshot", !SharedConstants.getGameVersion().isStable());
         arg.put("Version", lv2);
         arg.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-        class_5285.field_24826.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.field_25030.getGeneratorOptions()).resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)field_25029)::error)).ifPresent(arg2 -> arg.put("WorldGenSettings", (Tag)arg2));
+        GeneratorOptions.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.field_25030.getGeneratorOptions()).resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)LOGGER)::error)).ifPresent(arg2 -> arg.put("WorldGenSettings", (Tag)arg2));
         arg.putInt("GameType", this.field_25030.getGameMode().getId());
         arg.putInt("SpawnX", this.spawnX);
         arg.putInt("SpawnY", this.spawnY);
@@ -176,7 +176,7 @@ class_5219 {
         arg.putBoolean("hardcore", this.field_25030.hasStructures());
         arg.putBoolean("allowCommands", this.field_25030.isHardcore());
         arg.putBoolean("initialized", this.initialized);
-        this.field_24193.method_27357(arg);
+        this.worldBorder.toTag(arg);
         arg.putByte("Difficulty", (byte)this.field_25030.getDifficulty().getId());
         arg.putBoolean("DifficultyLocked", this.difficultyLocked);
         arg.put("GameRules", this.field_25030.getGameRules().toNbt());
@@ -203,7 +203,7 @@ class_5219 {
         arg.putInt("WanderingTraderSpawnDelay", this.wanderingTraderSpawnDelay);
         arg.putInt("WanderingTraderSpawnChance", this.wanderingTraderSpawnChance);
         if (this.wanderingTraderId != null) {
-            arg.putUuidNew("WanderingTraderId", this.wanderingTraderId);
+            arg.putUuid("WanderingTraderId", this.wanderingTraderId);
         }
     }
 
@@ -379,13 +379,13 @@ class_5219 {
     }
 
     @Override
-    public WorldBorder.class_5200 method_27422() {
-        return this.field_24193;
+    public WorldBorder.Properties getWorldBorder() {
+        return this.worldBorder;
     }
 
     @Override
-    public void method_27415(WorldBorder.class_5200 arg) {
-        this.field_24193 = arg;
+    public void setWorldBorder(WorldBorder.Properties arg) {
+        this.worldBorder = arg;
     }
 
     @Override
@@ -415,12 +415,12 @@ class_5219 {
 
     @Override
     public void populateCrashReport(CrashReportSection arg) {
-        class_5268.super.populateCrashReport(arg);
-        class_5219.super.populateCrashReport(arg);
+        ServerWorldProperties.super.populateCrashReport(arg);
+        SaveProperties.super.populateCrashReport(arg);
     }
 
     @Override
-    public class_5285 method_28057() {
+    public GeneratorOptions method_28057() {
         return this.field_25030.getGeneratorOptions();
     }
 
@@ -497,7 +497,7 @@ class_5219 {
     }
 
     @Override
-    public class_5268 method_27859() {
+    public ServerWorldProperties getMainWorldProperties() {
         return this;
     }
 

@@ -18,9 +18,7 @@ import net.minecraft.block.FireBlock;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.SoulFireBlock;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -132,7 +130,7 @@ extends Block {
 
     @Override
     public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (!(arg4.isFireImmune() || arg4 instanceof LivingEntity && EnchantmentHelper.hasFrostWalker((LivingEntity)arg4))) {
+        if (!arg4.isFireImmune()) {
             arg4.setFireTicks(arg4.getFireTicks() + 1);
             if (arg4.getFireTicks() == 0) {
                 arg4.setOnFireFor(8);
@@ -147,7 +145,7 @@ extends Block {
         if (arg4.isOf(arg.getBlock())) {
             return;
         }
-        if ((arg2.getDimension().method_28541() || arg2.getDimension().method_28542()) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
+        if ((arg2.getDimension().isOverworld() || arg2.getDimension().isNether()) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
             return;
         }
         if (!arg.canPlaceAt(arg2, arg3)) {

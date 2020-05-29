@@ -90,25 +90,25 @@ extends Feature<TreeFeatureConfig> {
         return TreeFeature.isAirOrLeaves(arg, arg2) || TreeFeature.isReplaceablePlant(arg, arg2) || TreeFeature.isWater(arg, arg2);
     }
 
-    private boolean generate(ModifiableTestableWorld arg, Random random, BlockPos arg2, Set<BlockPos> set, Set<BlockPos> set2, BlockBox arg32, TreeFeatureConfig arg4) {
+    private boolean generate(ModifiableTestableWorld arg, Random random, BlockPos arg2, Set<BlockPos> set, Set<BlockPos> set2, BlockBox arg3, TreeFeatureConfig arg42) {
         BlockPos lv2;
-        int i = arg4.trunkPlacer.getHeight(random);
-        int j = arg4.foliagePlacer.getHeight(random, i, arg4);
+        int i = arg42.trunkPlacer.getHeight(random);
+        int j = arg42.foliagePlacer.getHeight(random, i, arg42);
         int k = i - j;
-        int l = arg4.foliagePlacer.getRadius(random, k);
-        if (!arg4.skipFluidCheck) {
+        int l = arg42.foliagePlacer.getRadius(random, k);
+        if (!arg42.skipFluidCheck) {
             int q;
             int m = arg.getTopPosition(Heightmap.Type.OCEAN_FLOOR, arg2).getY();
             int n = arg.getTopPosition(Heightmap.Type.WORLD_SURFACE, arg2).getY();
-            if (n - m > arg4.baseHeight) {
+            if (n - m > arg42.baseHeight) {
                 return false;
             }
-            if (arg4.heightmap == Heightmap.Type.OCEAN_FLOOR) {
+            if (arg42.heightmap == Heightmap.Type.OCEAN_FLOOR) {
                 int o = m;
-            } else if (arg4.heightmap == Heightmap.Type.WORLD_SURFACE) {
+            } else if (arg42.heightmap == Heightmap.Type.WORLD_SURFACE) {
                 int p = n;
             } else {
-                q = arg.getTopPosition(arg4.heightmap, arg2).getY();
+                q = arg.getTopPosition(arg42.heightmap, arg2).getY();
             }
             BlockPos lv = new BlockPos(arg2.getX(), q, arg2.getZ());
         } else {
@@ -121,14 +121,14 @@ extends Feature<TreeFeatureConfig> {
             return false;
         }
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
-        OptionalInt optionalInt = arg4.featureSize.getMinClippedHeight();
+        OptionalInt optionalInt = arg42.featureSize.getMinClippedHeight();
         int r = i;
         for (int s = 0; s <= i + 1; ++s) {
-            int t = arg4.featureSize.method_27378(i, s);
+            int t = arg42.featureSize.method_27378(i, s);
             block1: for (int u = -t; u <= t; ++u) {
                 for (int v = -t; v <= t; ++v) {
                     lv3.set(lv2, u, s, v);
-                    if (TreeFeature.canTreeReplace(arg, lv3) && (arg4.ignoreVines || !TreeFeature.isVine(arg, lv3))) continue;
+                    if (TreeFeature.canTreeReplace(arg, lv3) && (arg42.ignoreVines || !TreeFeature.isVine(arg, lv3))) continue;
                     if (optionalInt.isPresent() && s - 1 >= optionalInt.getAsInt() + 1) {
                         r = s - 2;
                         continue block1;
@@ -138,8 +138,8 @@ extends Feature<TreeFeatureConfig> {
             }
         }
         int w = r;
-        List<FoliagePlacer.TreeNode> list = arg4.trunkPlacer.generate(arg, random, w, lv2, set, arg32, arg4);
-        list.forEach(arg3 -> arg.foliagePlacer.generate(arg, random, arg4, w, (FoliagePlacer.TreeNode)arg3, j, l, set2));
+        List<FoliagePlacer.TreeNode> list = arg42.trunkPlacer.generate(arg, random, w, lv2, set, arg3, arg42);
+        list.forEach(arg4 -> arg.foliagePlacer.generate(arg, random, arg42, w, (FoliagePlacer.TreeNode)arg4, j, l, set2, arg3));
         return true;
     }
 
@@ -189,7 +189,7 @@ extends Feature<TreeFeatureConfig> {
             for (Direction lv5 : Direction.values()) {
                 BlockState lv6;
                 lv2.set(lv4, lv5);
-                if (set.contains(lv2) || !(lv6 = arg.getBlockState(lv2)).method_28498(Properties.DISTANCE_1_7)) continue;
+                if (set.contains(lv2) || !(lv6 = arg.getBlockState(lv2)).contains(Properties.DISTANCE_1_7)) continue;
                 ((Set)list.get(0)).add(lv2.toImmutable());
                 TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, lv2, (BlockState)lv6.with(Properties.DISTANCE_1_7, 1));
                 if (!arg2.contains(lv2)) continue;
@@ -207,7 +207,7 @@ extends Feature<TreeFeatureConfig> {
                     int l;
                     BlockState lv9;
                     lv2.set(lv7, lv8);
-                    if (set3.contains(lv2) || set4.contains(lv2) || !(lv9 = arg.getBlockState(lv2)).method_28498(Properties.DISTANCE_1_7) || (l = lv9.get(Properties.DISTANCE_1_7).intValue()) <= k + 1) continue;
+                    if (set3.contains(lv2) || set4.contains(lv2) || !(lv9 = arg.getBlockState(lv2)).contains(Properties.DISTANCE_1_7) || (l = lv9.get(Properties.DISTANCE_1_7).intValue()) <= k + 1) continue;
                     BlockState lv10 = (BlockState)lv9.with(Properties.DISTANCE_1_7, k + 1);
                     TreeFeature.setBlockStateWithoutUpdatingNeighbors(arg, lv2, lv10);
                     if (arg2.contains(lv2)) {

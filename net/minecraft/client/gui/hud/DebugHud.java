@@ -213,7 +213,7 @@ extends DrawableHelper {
         if (string8 != null) {
             list.add(string8);
         }
-        list.add(this.client.world.method_27983().method_29177() + " FC: " + longSet.size());
+        list.add(this.client.world.method_27983().getValue() + " FC: " + longSet.size());
         list.add("");
         list.add(String.format(Locale.ROOT, "XYZ: %.3f / %.5f / %.3f", this.client.getCameraEntity().getX(), this.client.getCameraEntity().getY(), this.client.getCameraEntity().getZ()));
         list.add(String.format("Block: %d %d %d", lv3.getX(), lv3.getY(), lv3.getZ()));

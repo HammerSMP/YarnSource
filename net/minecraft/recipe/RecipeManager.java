@@ -7,6 +7,7 @@
  *  com.google.common.collect.Maps
  *  com.google.gson.Gson
  *  com.google.gson.GsonBuilder
+ *  com.google.gson.JsonElement
  *  com.google.gson.JsonObject
  *  com.google.gson.JsonParseException
  *  com.google.gson.JsonSyntaxException
@@ -21,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
@@ -64,13 +66,13 @@ extends JsonDataLoader {
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonObject> map, ResourceManager arg2, Profiler arg22) {
+    protected void apply(Map<Identifier, JsonElement> map, ResourceManager arg2, Profiler arg22) {
         this.errored = false;
         HashMap map2 = Maps.newHashMap();
-        for (Map.Entry<Identifier, JsonObject> entry2 : map.entrySet()) {
+        for (Map.Entry<Identifier, JsonElement> entry2 : map.entrySet()) {
             Identifier lv = entry2.getKey();
             try {
-                Recipe<?> lv2 = RecipeManager.deserialize(lv, entry2.getValue());
+                Recipe<?> lv2 = RecipeManager.deserialize(lv, JsonHelper.asObject(entry2.getValue(), "top element"));
                 map2.computeIfAbsent(lv2.getType(), arg -> ImmutableMap.builder()).put((Object)lv, lv2);
             }
             catch (JsonParseException | IllegalArgumentException runtimeException) {

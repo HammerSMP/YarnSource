@@ -35,8 +35,8 @@ import net.minecraft.world.gen.chunk.VerticalBlockSample;
 
 public class DebugChunkGenerator
 extends ChunkGenerator {
-    public static final DebugChunkGenerator generator = new DebugChunkGenerator();
-    public static final Codec<DebugChunkGenerator> field_24768 = Codec.unit(() -> generator).stable();
+    public static final DebugChunkGenerator INSTANCE = new DebugChunkGenerator();
+    public static final Codec<DebugChunkGenerator> field_24768 = Codec.unit(() -> INSTANCE).stable();
     private static final List<BlockState> BLOCK_STATES = StreamSupport.stream(Registry.BLOCK.spliterator(), false).flatMap(arg -> arg.getStateManager().getStates().stream()).collect(Collectors.toList());
     private static final int X_SIDE_LENGTH = MathHelper.ceil(MathHelper.sqrt(BLOCK_STATES.size()));
     private static final int Z_SIDE_LENGTH = MathHelper.ceil((float)BLOCK_STATES.size() / (float)X_SIDE_LENGTH);
@@ -54,7 +54,7 @@ extends ChunkGenerator {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ChunkGenerator create(long l) {
+    public ChunkGenerator withSeed(long l) {
         return this;
     }
 

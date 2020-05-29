@@ -1,12 +1,15 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  org.apache.commons.lang3.mutable.MutableInt
  */
 package net.minecraft.block.entity;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.gui.hud.BackgroundHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -21,6 +24,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 public class BellBlockEntity
 extends BlockEntity
@@ -125,7 +129,7 @@ implements Tickable {
             return;
         }
         BlockPos lv = this.getPos();
-        AtomicInteger atomicInteger = new AtomicInteger(16700985);
+        MutableInt mutableInt = new MutableInt(16700985);
         int i = (int)this.hearingEntities.stream().filter(arg2 -> lv.isWithinDistance(arg2.getPos(), 48.0)).count();
         this.hearingEntities.stream().filter(this::isRaiderEntity).forEach(arg3 -> {
             float f = 1.0f;
@@ -134,11 +138,11 @@ implements Tickable {
             double e = (double)((float)lv.getZ() + 0.5f) + (double)(1.0f / g) * (arg3.getZ() - (double)lv.getZ());
             int j = MathHelper.clamp((i - 21) / -2, 3, 15);
             for (int k = 0; k < j; ++k) {
-                atomicInteger.addAndGet(5);
-                double h = (double)(atomicInteger.get() >> 16 & 0xFF) / 255.0;
-                double l = (double)(atomicInteger.get() >> 8 & 0xFF) / 255.0;
-                double m = (double)(atomicInteger.get() & 0xFF) / 255.0;
-                arg.addParticle(ParticleTypes.ENTITY_EFFECT, d, (float)lv.getY() + 0.5f, e, h, l, m);
+                int l = mutableInt.addAndGet(5);
+                double h = (double)BackgroundHelper.ColorMixer.getRed(l) / 255.0;
+                double m = (double)BackgroundHelper.ColorMixer.getGreen(l) / 255.0;
+                double n = (double)BackgroundHelper.ColorMixer.getBlue(l) / 255.0;
+                arg.addParticle(ParticleTypes.ENTITY_EFFECT, d, (float)lv.getY() + 0.5f, e, h, m, n);
             }
         });
     }

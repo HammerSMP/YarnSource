@@ -1,13 +1,13 @@
 /*
  * Decompiled with CFR 0.149.
  */
-package net.minecraft;
+package net.minecraft.world;
 
-import net.minecraft.class_5217;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldProperties;
 
-public interface class_5269
-extends class_5217 {
+public interface MutableWorldProperties
+extends WorldProperties {
     public void setSpawnX(int var1);
 
     public void setSpawnY(int var1);

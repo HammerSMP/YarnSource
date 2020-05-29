@@ -6,7 +6,6 @@
  *  com.google.common.collect.ImmutableMap$Builder
  *  com.google.gson.Gson
  *  com.google.gson.JsonElement
- *  com.google.gson.JsonObject
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
@@ -15,7 +14,6 @@ package net.minecraft.loot;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.loot.LootGsons;
@@ -48,15 +46,15 @@ extends JsonDataLoader {
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonObject> map, ResourceManager arg4, Profiler arg22) {
+    protected void apply(Map<Identifier, JsonElement> map, ResourceManager arg4, Profiler arg22) {
         ImmutableMap.Builder builder = ImmutableMap.builder();
-        JsonObject jsonObject2 = map.remove(LootTables.EMPTY);
-        if (jsonObject2 != null) {
+        JsonElement jsonElement2 = map.remove(LootTables.EMPTY);
+        if (jsonElement2 != null) {
             LOGGER.warn("Datapack tried to redefine {} loot table, ignoring", (Object)LootTables.EMPTY);
         }
-        map.forEach((arg, jsonObject) -> {
+        map.forEach((arg, jsonElement) -> {
             try {
-                LootTable lv = (LootTable)GSON.fromJson((JsonElement)jsonObject, LootTable.class);
+                LootTable lv = (LootTable)GSON.fromJson(jsonElement, LootTable.class);
                 builder.put(arg, (Object)lv);
             }
             catch (Exception exception) {

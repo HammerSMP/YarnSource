@@ -41,7 +41,7 @@ extends BlockWithEntity {
             this.removeRecord(arg2, arg3);
             arg = (BlockState)arg.with(HAS_RECORD, false);
             arg2.setBlockState(arg3, arg, 2);
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         return ActionResult.PASS;
     }

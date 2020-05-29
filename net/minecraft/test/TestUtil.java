@@ -6,6 +6,7 @@
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Streams
+ *  org.apache.commons.lang3.mutable.MutableInt
  */
 package net.minecraft.test;
 
@@ -16,7 +17,6 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.block.Block;
@@ -30,6 +30,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.structure.Structure;
 import net.minecraft.test.FailureLoggingTestCompletionListener;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.GameTestBatch;
@@ -42,17 +43,20 @@ import net.minecraft.test.TestListener;
 import net.minecraft.test.TestManager;
 import net.minecraft.test.TestRunner;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 public class TestUtil {
     public static TestCompletionListener field_20573 = new FailureLoggingTestCompletionListener();
 
-    public static void startTest(GameTest arg, TestManager arg2) {
+    public static void startTest(GameTest arg, BlockPos arg2, TestManager arg3) {
         arg.startCountdown();
-        arg2.start(arg);
+        arg3.start(arg);
         arg.addListener(new TestListener(){
 
             @Override
@@ -67,17 +71,17 @@ public class TestUtil {
                 TestUtil.handleTestFail(arg);
             }
         });
-        arg.init(2);
+        arg.init(arg2, 2);
     }
 
-    public static Collection<GameTest> runTestBatches(Collection<GameTestBatch> collection, BlockPos arg, ServerWorld arg2, TestManager arg3) {
-        TestRunner lv = new TestRunner(collection, arg, arg2, arg3);
+    public static Collection<GameTest> runTestBatches(Collection<GameTestBatch> collection, BlockPos arg, BlockRotation arg2, ServerWorld arg3, TestManager arg4, int i) {
+        TestRunner lv = new TestRunner(collection, arg, arg2, arg3, arg4, i);
         lv.run();
         return lv.getTests();
     }
 
-    public static Collection<GameTest> runTestFunctions(Collection<TestFunction> collection, BlockPos arg, ServerWorld arg2, TestManager arg3) {
-        return TestUtil.runTestBatches(TestUtil.createBatches(collection), arg, arg2, arg3);
+    public static Collection<GameTest> runTestFunctions(Collection<TestFunction> collection, BlockPos arg, BlockRotation arg2, ServerWorld arg3, TestManager arg4, int i) {
+        return TestUtil.runTestBatches(TestUtil.createBatches(collection), arg, arg2, arg3, arg4, i);
     }
 
     public static Collection<GameTestBatch> createBatches(Collection<TestFunction> collection) {
@@ -90,15 +94,15 @@ public class TestUtil {
         return map.keySet().stream().flatMap(string -> {
             Collection collection = (Collection)map.get(string);
             Consumer<ServerWorld> consumer = TestFunctions.getWorldSetter(string);
-            AtomicInteger atomicInteger = new AtomicInteger();
-            return Streams.stream((Iterable)Iterables.partition((Iterable)collection, (int)100)).map(list -> new GameTestBatch(string + ":" + atomicInteger.incrementAndGet(), collection, consumer));
+            MutableInt mutableInt = new MutableInt();
+            return Streams.stream((Iterable)Iterables.partition((Iterable)collection, (int)100)).map(list -> new GameTestBatch(string + ":" + mutableInt.incrementAndGet(), collection, consumer));
         }).collect(Collectors.toList());
     }
 
     private static void handleTestFail(GameTest arg) {
         Throwable throwable = arg.getThrowable();
-        String string = arg.getStructurePath() + " failed! " + Util.getInnermostMessage(throwable);
-        TestUtil.sendMessage(arg.getWorld(), Formatting.RED, string);
+        String string = (arg.isRequired() ? "" : "(optional) ") + arg.getStructurePath() + " failed! " + Util.getInnermostMessage(throwable);
+        TestUtil.sendMessage(arg.getWorld(), arg.isRequired() ? Formatting.RED : Formatting.YELLOW, string);
         if (throwable instanceof PositionedException) {
             PositionedException lv = (PositionedException)throwable;
             TestUtil.addDebugMarker(arg.getWorld(), lv.getPos(), lv.getDebugMessage());
@@ -109,14 +113,15 @@ public class TestUtil {
     private static void createBeacon(GameTest arg, Block arg2) {
         ServerWorld lv = arg.getWorld();
         BlockPos lv2 = arg.getPos();
-        BlockPos lv3 = lv2.add(-1, -1, -1);
-        lv.setBlockState(lv3, Blocks.BEACON.getDefaultState());
-        BlockPos lv4 = lv3.add(0, 1, 0);
-        lv.setBlockState(lv4, arg2.getDefaultState());
+        BlockPos lv3 = new BlockPos(-1, -1, -1);
+        BlockPos lv4 = Structure.transformAround(lv2.add(lv3), BlockMirror.NONE, arg.method_29402(), lv2);
+        lv.setBlockState(lv4, Blocks.BEACON.getDefaultState().rotate(arg.method_29402()));
+        BlockPos lv5 = lv4.add(0, 1, 0);
+        lv.setBlockState(lv5, arg2.getDefaultState());
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
-                BlockPos lv5 = lv3.add(i, -1, j);
-                lv.setBlockState(lv5, Blocks.IRON_BLOCK.getDefaultState());
+                BlockPos lv6 = lv4.add(i, -1, j);
+                lv.setBlockState(lv6, Blocks.IRON_BLOCK.getDefaultState());
             }
         }
     }
@@ -124,11 +129,12 @@ public class TestUtil {
     private static void createLectern(GameTest arg, String string) {
         ServerWorld lv = arg.getWorld();
         BlockPos lv2 = arg.getPos();
-        BlockPos lv3 = lv2.add(-1, 1, -1);
-        lv.setBlockState(lv3, Blocks.LECTERN.getDefaultState());
-        BlockState lv4 = lv.getBlockState(lv3);
-        ItemStack lv5 = TestUtil.createBook(arg.getStructurePath(), arg.isRequired(), string);
-        LecternBlock.putBookIfAbsent(lv, lv3, lv4, lv5);
+        BlockPos lv3 = new BlockPos(-1, 1, -1);
+        BlockPos lv4 = Structure.transformAround(lv2.add(lv3), BlockMirror.NONE, arg.method_29402(), lv2);
+        lv.setBlockState(lv4, Blocks.LECTERN.getDefaultState().rotate(arg.method_29402()));
+        BlockState lv5 = lv.getBlockState(lv4);
+        ItemStack lv6 = TestUtil.createBook(arg.getStructurePath(), arg.isRequired(), string);
+        LecternBlock.putBookIfAbsent(lv, lv4, lv5, lv6);
     }
 
     private static ItemStack createBook(String string2, boolean bl, String string22) {
@@ -164,7 +170,7 @@ public class TestUtil {
         BlockPos.stream(lv, lv2).filter(arg2 -> arg.getBlockState((BlockPos)arg2).isOf(Blocks.STRUCTURE_BLOCK)).forEach(arg2 -> {
             StructureBlockBlockEntity lv = (StructureBlockBlockEntity)arg.getBlockEntity((BlockPos)arg2);
             BlockPos lv2 = lv.getPos();
-            BlockBox lv3 = StructureTestUtil.createArea(lv2, lv.getSize(), 2);
+            BlockBox lv3 = StructureTestUtil.method_29410(lv);
             StructureTestUtil.clearArea(lv3, lv2.getY(), arg);
         });
     }

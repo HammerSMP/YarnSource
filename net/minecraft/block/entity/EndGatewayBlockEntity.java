@@ -157,7 +157,7 @@ implements Tickable {
             return;
         }
         this.teleportCooldown = 100;
-        if (this.exitPortalPos == null && this.world.getDimension().method_28543()) {
+        if (this.exitPortalPos == null && this.world.getDimension().isEnd()) {
             this.createPortal((ServerWorld)this.world);
         }
         if (this.exitPortalPos != null) {

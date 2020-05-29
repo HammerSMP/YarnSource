@@ -38,20 +38,20 @@ extends Item {
             AreaEffectCloudEntity lv2 = list.get(0);
             lv2.setRadius(lv2.getRadius() - 0.5f);
             arg2.playSound(null, arg22.getX(), arg22.getY(), arg22.getZ(), SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-            return TypedActionResult.success(this.fill(lv, arg22, new ItemStack(Items.DRAGON_BREATH)));
+            return TypedActionResult.method_29237(this.fill(lv, arg22, new ItemStack(Items.DRAGON_BREATH)), arg2.isClient());
         }
-        HitResult lv3 = GlassBottleItem.rayTrace(arg2, arg22, RayTraceContext.FluidHandling.SOURCE_ONLY);
-        if (lv3.getType() == HitResult.Type.MISS) {
+        BlockHitResult lv3 = GlassBottleItem.rayTrace(arg2, arg22, RayTraceContext.FluidHandling.SOURCE_ONLY);
+        if (((HitResult)lv3).getType() == HitResult.Type.MISS) {
             return TypedActionResult.pass(lv);
         }
-        if (lv3.getType() == HitResult.Type.BLOCK) {
-            BlockPos lv4 = ((BlockHitResult)lv3).getBlockPos();
+        if (((HitResult)lv3).getType() == HitResult.Type.BLOCK) {
+            BlockPos lv4 = lv3.getBlockPos();
             if (!arg2.canPlayerModifyAt(arg22, lv4)) {
                 return TypedActionResult.pass(lv);
             }
             if (arg2.getFluidState(lv4).matches(FluidTags.WATER)) {
                 arg2.playSound(arg22, arg22.getX(), arg22.getY(), arg22.getZ(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-                return TypedActionResult.success(this.fill(lv, arg22, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)));
+                return TypedActionResult.method_29237(this.fill(lv, arg22, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)), arg2.isClient());
             }
         }
         return TypedActionResult.pass(lv);

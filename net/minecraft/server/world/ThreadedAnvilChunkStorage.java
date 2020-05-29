@@ -750,7 +750,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         if (lv == null) {
             return null;
         }
-        return this.updateChunkTag(this.world.getDimension(), this.persistentStateManagerFactory, lv);
+        return this.updateChunkTag(this.world.method_27983(), this.persistentStateManagerFactory, lv);
     }
 
     boolean isTooFarFromPlayersToSpawnMobs(ChunkPos arg) {

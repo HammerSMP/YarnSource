@@ -31,7 +31,7 @@ public class ParticleTypes {
     public static final DefaultParticleType LANDING_LAVA = ParticleTypes.register("landing_lava", false);
     public static final DefaultParticleType DRIPPING_WATER = ParticleTypes.register("dripping_water", false);
     public static final DefaultParticleType FALLING_WATER = ParticleTypes.register("falling_water", false);
-    public static final ParticleType<DustParticleEffect> DUST = ParticleTypes.register("dust", DustParticleEffect.PARAMETERS_FACTORY, arg -> DustParticleEffect.field_25124);
+    public static final ParticleType<DustParticleEffect> DUST = ParticleTypes.register("dust", DustParticleEffect.PARAMETERS_FACTORY, arg -> DustParticleEffect.CODEC);
     public static final DefaultParticleType EFFECT = ParticleTypes.register("effect", false);
     public static final DefaultParticleType ELDER_GUARDIAN = ParticleTypes.register("elder_guardian", true);
     public static final DefaultParticleType ENCHANTED_HIT = ParticleTypes.register("enchanted_hit", false);

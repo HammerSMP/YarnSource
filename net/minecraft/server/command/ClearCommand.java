@@ -41,8 +41,7 @@ public class ClearCommand {
     private static int execute(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, Predicate<ItemStack> predicate, int i) throws CommandSyntaxException {
         int j = 0;
         for (ServerPlayerEntity lv : collection) {
-            j += lv.inventory.clearItem(predicate, i);
-            lv.playerScreenHandler.clearCraftingSlots();
+            j += lv.inventory.method_29280(predicate, i, lv.playerScreenHandler.method_29281());
             lv.currentScreenHandler.sendContentUpdates();
             lv.playerScreenHandler.onContentChanged(lv.inventory);
             lv.updateCursorStack();

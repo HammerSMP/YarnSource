@@ -17,16 +17,15 @@ import com.google.gson.JsonSerializationContext;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootChoice;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.LootEntry;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.function.LootFunctionConsumingBuilder;
 import net.minecraft.loot.function.LootFunctions;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,7 +44,7 @@ extends LootEntry {
         }
     };
 
-    protected LeafEntry(int i, int j, LootCondition[] args, LootFunction[] args2) {
+    protected LeafEntry(int i, int j, class_5341[] args, LootFunction[] args2) {
         super(args);
         this.weight = i;
         this.quality = j;
@@ -77,13 +76,9 @@ extends LootEntry {
     }
 
     public static abstract class Serializer<T extends LeafEntry>
-    extends LootEntry.Serializer<T> {
-        public Serializer(Identifier arg, Class<T> arg2) {
-            super(arg, arg2);
-        }
-
+    extends LootEntry.class_5337<T> {
         @Override
-        public void toJson(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
+        public void method_422(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
             if (((LeafEntry)arg).weight != 1) {
                 jsonObject.addProperty("weight", (Number)((LeafEntry)arg).weight);
             }
@@ -96,17 +91,17 @@ extends LootEntry {
         }
 
         @Override
-        public final T fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public final T fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             int i = JsonHelper.getInt(jsonObject, "weight", 1);
             int j = JsonHelper.getInt(jsonObject, "quality", 0);
             LootFunction[] lvs = JsonHelper.deserialize(jsonObject, "functions", new LootFunction[0], jsonDeserializationContext, LootFunction[].class);
             return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, lvs);
         }
 
-        protected abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, int var3, int var4, LootCondition[] var5, LootFunction[] var6);
+        protected abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, int var3, int var4, class_5341[] var5, LootFunction[] var6);
 
         @Override
-        public /* synthetic */ LootEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ LootEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }
@@ -137,7 +132,7 @@ extends LootEntry {
 
     @FunctionalInterface
     public static interface Factory {
-        public LeafEntry build(int var1, int var2, LootCondition[] var3, LootFunction[] var4);
+        public LeafEntry build(int var1, int var2, class_5341[] var3, LootFunction[] var4);
     }
 
     public static abstract class Builder<T extends Builder<T>>

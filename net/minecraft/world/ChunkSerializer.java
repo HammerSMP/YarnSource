@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -338,35 +339,35 @@ public class ChunkSerializer {
         }
     }
 
-    private static CompoundTag writeStructures(ChunkPos arg, Map<String, StructureStart<?>> map, Map<String, LongSet> map2) {
+    private static CompoundTag writeStructures(ChunkPos arg, Map<StructureFeature<?>, StructureStart<?>> map, Map<StructureFeature<?>, LongSet> map2) {
         CompoundTag lv = new CompoundTag();
         CompoundTag lv2 = new CompoundTag();
-        for (Map.Entry<String, StructureStart<?>> entry : map.entrySet()) {
-            lv2.put(entry.getKey(), entry.getValue().toTag(arg.x, arg.z));
+        for (Map.Entry<StructureFeature<?>, StructureStart<?>> entry : map.entrySet()) {
+            lv2.put(entry.getKey().getName(), entry.getValue().toTag(arg.x, arg.z));
         }
         lv.put("Starts", lv2);
         CompoundTag lv3 = new CompoundTag();
-        for (Map.Entry<String, LongSet> entry2 : map2.entrySet()) {
-            lv3.put(entry2.getKey(), new LongArrayTag(entry2.getValue()));
+        for (Map.Entry<StructureFeature<?>, LongSet> entry2 : map2.entrySet()) {
+            lv3.put(entry2.getKey().getName(), new LongArrayTag(entry2.getValue()));
         }
         lv.put("References", lv3);
         return lv;
     }
 
-    private static Map<String, StructureStart<?>> readStructureStarts(StructureManager arg, CompoundTag arg2, long l) {
+    private static Map<StructureFeature<?>, StructureStart<?>> readStructureStarts(StructureManager arg, CompoundTag arg2, long l) {
         HashMap map = Maps.newHashMap();
         CompoundTag lv = arg2.getCompound("Starts");
         for (String string : lv.getKeys()) {
-            map.put(string, StructureFeature.method_28660(arg, lv.getCompound(string), l));
+            map.put(StructureFeature.STRUCTURES.get((Object)string.toLowerCase(Locale.ROOT)), StructureFeature.method_28660(arg, lv.getCompound(string), l));
         }
         return map;
     }
 
-    private static Map<String, LongSet> readStructureReferences(ChunkPos arg, CompoundTag arg2) {
+    private static Map<StructureFeature<?>, LongSet> readStructureReferences(ChunkPos arg, CompoundTag arg2) {
         HashMap map = Maps.newHashMap();
         CompoundTag lv = arg2.getCompound("References");
         for (String string : lv.getKeys()) {
-            map.put(string, new LongOpenHashSet(Arrays.stream(lv.getLongArray(string)).filter(l -> {
+            map.put(StructureFeature.STRUCTURES.get((Object)string.toLowerCase(Locale.ROOT)), new LongOpenHashSet(Arrays.stream(lv.getLongArray(string)).filter(l -> {
                 ChunkPos lv = new ChunkPos(l);
                 if (lv.method_24022(arg) > 8) {
                     LOGGER.warn("Found invalid structure reference [ {} @ {} ] for chunk {}.", (Object)string, (Object)lv, (Object)arg);

@@ -39,10 +39,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.block.RespawnAnchorBlock;
-import net.minecraft.class_5217;
-import net.minecraft.class_5218;
-import net.minecraft.class_5318;
-import net.minecraft.class_5321;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -99,14 +95,19 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.Util;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.WorldSaveHandler;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderListener;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -129,14 +130,14 @@ public abstract class PlayerManager {
     private final Map<UUID, PlayerAdvancementTracker> advancementTrackers = Maps.newHashMap();
     private final WorldSaveHandler saveHandler;
     private boolean whitelistEnabled;
-    private final class_5318.class_5319 field_24626;
+    private final DimensionTracker.Modifiable field_24626;
     protected final int maxPlayers;
     private int viewDistance;
     private GameMode gameMode;
     private boolean cheatsAllowed;
     private int latencyUpdateTimer;
 
-    public PlayerManager(MinecraftServer minecraftServer, class_5318.class_5319 arg, WorldSaveHandler arg2, int i) {
+    public PlayerManager(MinecraftServer minecraftServer, DimensionTracker.Modifiable arg, WorldSaveHandler arg2, int i) {
         this.server = minecraftServer;
         this.field_24626 = arg;
         this.maxPlayers = i;
@@ -155,7 +156,7 @@ public abstract class PlayerManager {
         String string = gameProfile2 == null ? gameProfile.getName() : gameProfile2.getName();
         lv.add(gameProfile);
         CompoundTag lv2 = this.loadPlayerData(arg22);
-        class_5321<DimensionType> lv3 = lv2 != null ? DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2.get("Dimension"))).resultOrPartial(((Logger)LOGGER)::error).orElse(DimensionType.field_24753) : DimensionType.field_24753;
+        RegistryKey<World> lv3 = lv2 != null ? DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2.get("Dimension"))).resultOrPartial(((Logger)LOGGER)::error).orElse(World.field_25179) : World.field_25179;
         ServerWorld lv4 = this.server.getWorld(lv3);
         arg22.setWorld(lv4);
         arg22.interactionManager.setWorld((ServerWorld)arg22.world);
@@ -164,13 +165,13 @@ public abstract class PlayerManager {
             string2 = arg.getAddress().toString();
         }
         LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {})", (Object)arg22.getName().getString(), (Object)string2, (Object)arg22.getEntityId(), (Object)arg22.getX(), (Object)arg22.getY(), (Object)arg22.getZ());
-        class_5217 lv5 = lv4.getLevelProperties();
+        WorldProperties lv5 = lv4.getLevelProperties();
         this.setGameMode(arg22, null, lv4);
         ServerPlayNetworkHandler lv6 = new ServerPlayNetworkHandler(this.server, arg, arg22);
         GameRules lv7 = lv4.getGameRules();
         boolean bl = lv7.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
         boolean bl2 = lv7.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv6.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv4.getSeed()), lv5.isHardcore(), this.field_24626, lv4.method_27983().method_29177(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv4.method_27982(), lv4.method_28125()));
+        lv6.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv4.getSeed()), lv5.isHardcore(), this.server.method_29435(), this.field_24626, lv4.method_29287(), lv4.method_27983(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv4.isDebugWorld(), lv4.method_28125()));
         lv6.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
         lv6.sendPacket(new DifficultyS2CPacket(lv5.getDifficulty(), lv5.isDifficultyLocked()));
         lv6.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
@@ -211,8 +212,8 @@ public abstract class PlayerManager {
             return arg2;
         })) != null) {
             Object uUID2;
-            if (lv11.containsUuidNew("Attach")) {
-                UUID uUID = lv11.getUuidNew("Attach");
+            if (lv11.containsUuid("Attach")) {
+                UUID uUID = lv11.getUuid("Attach");
             } else {
                 uUID2 = null;
             }
@@ -375,7 +376,7 @@ public abstract class PlayerManager {
     }
 
     public ServerPlayerEntity createPlayer(GameProfile gameProfile) {
-        ServerPlayerInteractionManager lv5;
+        ServerPlayerInteractionManager lv6;
         UUID uUID = PlayerEntity.getUuidFromProfile(gameProfile);
         ArrayList list = Lists.newArrayList();
         for (int i = 0; i < this.players.size(); ++i) {
@@ -390,12 +391,13 @@ public abstract class PlayerManager {
         for (ServerPlayerEntity lv3 : list) {
             lv3.networkHandler.disconnect(new TranslatableText("multiplayer.disconnect.duplicate_login"));
         }
+        ServerWorld lv4 = this.server.getWorld(World.field_25179);
         if (this.server.isDemo()) {
-            DemoServerPlayerInteractionManager lv4 = new DemoServerPlayerInteractionManager(this.server.getWorld(DimensionType.field_24753));
+            DemoServerPlayerInteractionManager lv5 = new DemoServerPlayerInteractionManager(lv4);
         } else {
-            lv5 = new ServerPlayerInteractionManager(this.server.getWorld(DimensionType.field_24753));
+            lv6 = new ServerPlayerInteractionManager(lv4);
         }
-        return new ServerPlayerEntity(this.server, this.server.getWorld(DimensionType.field_24753), gameProfile, lv5);
+        return new ServerPlayerEntity(this.server, lv4, gameProfile, lv6);
     }
 
     public ServerPlayerEntity respawnPlayer(ServerPlayerEntity arg, boolean bl) {
@@ -410,7 +412,7 @@ public abstract class PlayerManager {
         } else {
             optional2 = Optional.empty();
         }
-        class_5321<DimensionType> lv2 = optional2.isPresent() ? arg.getSpawnPointDimension() : DimensionType.field_24753;
+        RegistryKey<World> lv2 = optional2.isPresent() ? arg.getSpawnPointDimension() : World.field_25179;
         ServerWorld lv3 = this.server.getWorld(lv2);
         if (this.server.isDemo()) {
             DemoServerPlayerInteractionManager lv4 = new DemoServerPlayerInteractionManager(lv3);
@@ -438,10 +440,10 @@ public abstract class PlayerManager {
         while (!lv3.doesNotCollide(lv6) && lv6.getY() < 256.0) {
             lv6.updatePosition(lv6.getX(), lv6.getY() + 1.0, lv6.getZ());
         }
-        class_5217 lv8 = lv6.world.getLevelProperties();
-        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.method_27983().method_29177(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.getServerWorld().method_27982(), lv6.getServerWorld().method_28125(), bl));
+        WorldProperties lv8 = lv6.world.getLevelProperties();
+        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.method_29287(), lv6.world.method_27983(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.getServerWorld().isDebugWorld(), lv6.getServerWorld().method_28125(), bl));
         lv6.networkHandler.requestTeleport(lv6.getX(), lv6.getY(), lv6.getZ(), lv6.yaw, lv6.pitch);
-        lv6.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv3.method_27911()));
+        lv6.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv3.getSpawnPos()));
         lv6.networkHandler.sendPacket(new DifficultyS2CPacket(lv8.getDifficulty(), lv8.isDifficultyLocked()));
         lv6.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(lv6.experienceProgress, lv6.totalExperience, lv6.experienceLevel));
         this.sendWorldInfo(lv6, lv3);
@@ -476,7 +478,7 @@ public abstract class PlayerManager {
         }
     }
 
-    public void sendToDimension(Packet<?> arg, class_5321<DimensionType> arg2) {
+    public void sendToDimension(Packet<?> arg, RegistryKey<World> arg2) {
         for (int i = 0; i < this.players.size(); ++i) {
             ServerPlayerEntity lv = this.players.get(i);
             if (lv.world.method_27983() != arg2) continue;
@@ -574,7 +576,7 @@ public abstract class PlayerManager {
         return null;
     }
 
-    public void sendToAround(@Nullable PlayerEntity arg, double d, double e, double f, double g, class_5321<DimensionType> arg2, Packet<?> arg3) {
+    public void sendToAround(@Nullable PlayerEntity arg, double d, double e, double f, double g, RegistryKey<World> arg2, Packet<?> arg3) {
         for (int i = 0; i < this.players.size(); ++i) {
             double k;
             double j;
@@ -611,10 +613,10 @@ public abstract class PlayerManager {
     }
 
     public void sendWorldInfo(ServerPlayerEntity arg, ServerWorld arg2) {
-        WorldBorder lv = this.server.getWorld(DimensionType.field_24753).getWorldBorder();
+        WorldBorder lv = this.server.getWorld(World.field_25179).getWorldBorder();
         arg.networkHandler.sendPacket(new WorldBorderS2CPacket(lv, WorldBorderS2CPacket.Type.INITIALIZE));
         arg.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(arg2.getTime(), arg2.getTimeOfDay(), arg2.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)));
-        arg.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(arg2.method_27911()));
+        arg.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(arg2.getSpawnPos()));
         if (arg2.isRaining()) {
             arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(1, 0.0f));
             arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(7, arg2.getRainGradient(1.0f)));
@@ -701,7 +703,7 @@ public abstract class PlayerManager {
         ServerStatHandler serverStatHandler = lv = uUID == null ? null : this.statisticsMap.get(uUID);
         if (lv == null) {
             File file3;
-            File file = this.server.method_27050(class_5218.STATS).toFile();
+            File file = this.server.method_27050(WorldSavePath.STATS).toFile();
             File file2 = new File(file, uUID + ".json");
             if (!file2.exists() && (file3 = new File(file, arg.getName().getString() + ".json")).exists() && file3.isFile()) {
                 file3.renameTo(file2);
@@ -716,9 +718,9 @@ public abstract class PlayerManager {
         UUID uUID = arg.getUuid();
         PlayerAdvancementTracker lv = this.advancementTrackers.get(uUID);
         if (lv == null) {
-            File file = this.server.method_27050(class_5218.ADVANCEMENTS).toFile();
+            File file = this.server.method_27050(WorldSavePath.ADVANCEMENTS).toFile();
             File file2 = new File(file, uUID + ".json");
-            lv = new PlayerAdvancementTracker(this.server, file2, arg);
+            lv = new PlayerAdvancementTracker(this.server.getDataFixer(), this, this.server.getAdvancementLoader(), file2, arg);
             this.advancementTrackers.put(uUID, lv);
         }
         lv.setOwner(arg);
@@ -749,7 +751,7 @@ public abstract class PlayerManager {
 
     public void onDataPacksReloaded() {
         for (PlayerAdvancementTracker lv : this.advancementTrackers.values()) {
-            lv.reload();
+            lv.reload(this.server.getAdvancementLoader());
         }
         this.sendToAll(new SynchronizeTagsS2CPacket(this.server.getTagManager()));
         SynchronizeRecipesS2CPacket lv2 = new SynchronizeRecipesS2CPacket(this.server.getRecipeManager().values());

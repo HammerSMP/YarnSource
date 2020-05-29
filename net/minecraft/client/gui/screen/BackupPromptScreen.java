@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -27,7 +28,7 @@ extends Screen {
     protected final Callback callback;
     private final Text subtitle;
     private final boolean showEraseCacheCheckbox;
-    private final List<Text> wrappedText = Lists.newArrayList();
+    private final List<class_5348> wrappedText = Lists.newArrayList();
     private CheckboxWidget eraseCacheCheckbox;
 
     public BackupPromptScreen(Screen arg, Callback arg2, Text arg3, Text arg4, boolean bl) {
@@ -59,7 +60,7 @@ extends Screen {
         this.renderBackground(arg);
         this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
         int k = 70;
-        for (Text lv : this.wrappedText) {
+        for (class_5348 lv : this.wrappedText) {
             this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;

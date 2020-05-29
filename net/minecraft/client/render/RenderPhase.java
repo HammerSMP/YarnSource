@@ -39,7 +39,9 @@ public abstract class RenderPhase {
     protected static final Transparency LIGHTNING_TRANSPARENCY = new Transparency("lightning_transparency", () -> {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        MinecraftClient.getInstance().worldRenderer.method_29363().beginWrite(false);
     }, () -> {
+        MinecraftClient.getInstance().getFramebuffer().beginWrite(false);
         RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
     });
@@ -59,8 +61,16 @@ public abstract class RenderPhase {
     });
     protected static final Transparency TRANSLUCENT_TRANSPARENCY = new Transparency("translucent_transparency", () -> {
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
     }, () -> RenderSystem.disableBlend());
+    protected static final Transparency field_25284 = new Transparency("item_transparency", () -> {
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+        MinecraftClient.getInstance().worldRenderer.method_29361().beginWrite(false);
+    }, () -> {
+        MinecraftClient.getInstance().getFramebuffer().beginWrite(false);
+        RenderSystem.disableBlend();
+    });
     protected static final Alpha ZERO_ALPHA = new Alpha(0.0f);
     protected static final Alpha ONE_TENTH_ALPHA = new Alpha(0.003921569f);
     protected static final Alpha HALF_ALPHA = new Alpha(0.5f);
@@ -121,6 +131,10 @@ public abstract class RenderPhase {
     });
     protected static final Target MAIN_TARGET = new Target("main_target", () -> {}, () -> {});
     protected static final Target OUTLINE_TARGET = new Target("outline_target", () -> MinecraftClient.getInstance().worldRenderer.getEntityOutlinesFramebuffer().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target field_25280 = new Target("translucent_target", () -> MinecraftClient.getInstance().worldRenderer.method_29360().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target field_25281 = new Target("particles_target", () -> MinecraftClient.getInstance().worldRenderer.method_29362().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target field_25282 = new Target("weather_target", () -> MinecraftClient.getInstance().worldRenderer.method_29363().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target field_25283 = new Target("clouds_target", () -> MinecraftClient.getInstance().worldRenderer.method_29364().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
     protected static final LineWidth FULL_LINEWIDTH = new LineWidth(OptionalDouble.of(1.0));
 
     public RenderPhase(String string, Runnable runnable, Runnable runnable2) {

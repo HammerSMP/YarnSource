@@ -27,7 +27,6 @@ import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.ai.brain.sensor.SensorType;
-import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -41,7 +40,6 @@ import net.minecraft.entity.mob.HoglinBrain;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.mob.ZoglinEntity;
-import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -74,8 +72,6 @@ Hoglin {
     public HoglinEntity(EntityType<? extends HoglinEntity> arg, World arg2) {
         super((EntityType<? extends AnimalEntity>)arg, arg2);
         this.experiencePoints = 5;
-        this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, 16.0f);
-        this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0f);
     }
 
     @Override
@@ -118,13 +114,13 @@ Hoglin {
         return bl;
     }
 
-    protected Brain.class_5303<HoglinEntity> method_28306() {
-        return Brain.method_28311(MEMORY_MODULE_TYPES, SENSOR_TYPES);
+    protected Brain.Profile<HoglinEntity> createBrainProfile() {
+        return Brain.createProfile(MEMORY_MODULE_TYPES, SENSOR_TYPES);
     }
 
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return HoglinBrain.create(this.method_28306().method_28335(dynamic));
+        return HoglinBrain.create(this.createBrainProfile().deserialize(dynamic));
     }
 
     public Brain<HoglinEntity> getBrain() {
@@ -198,6 +194,11 @@ Hoglin {
     }
 
     @Override
+    public double getMountedHeightOffset() {
+        return (double)this.getHeight() - (this.isBaby() ? 0.2 : 0.15);
+    }
+
+    @Override
     public boolean interactMob(PlayerEntity arg, Hand arg2) {
         boolean bl = super.interactMob(arg, arg2);
         if (bl) {
@@ -234,23 +235,7 @@ Hoglin {
     }
 
     private void zombify(ServerWorld arg) {
-        ZoglinEntity lv = EntityType.ZOGLIN.create(arg);
-        if (lv == null) {
-            return;
-        }
-        lv.copyPositionAndRotation(this);
-        lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, new ZombieEntity.ZombieData(this.isBaby()), null);
-        lv.setBaby(this.isBaby());
-        lv.setAiDisabled(this.isAiDisabled());
-        if (this.hasCustomName()) {
-            lv.setCustomName(this.getCustomName());
-            lv.setCustomNameVisible(this.isCustomNameVisible());
-        }
-        if (this.isPersistent()) {
-            lv.setPersistent();
-        }
-        this.remove();
-        arg.spawnEntity(lv);
+        ZoglinEntity lv = this.method_29243(EntityType.ZOGLIN);
         lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
     }
 
@@ -289,7 +274,7 @@ Hoglin {
         this.setCannotBeHunted(arg.getBoolean("CannotBeHunted"));
     }
 
-    private void setImmuneToZombification(boolean bl) {
+    public void setImmuneToZombification(boolean bl) {
         this.getDataTracker().set(BABY, bl);
     }
 
@@ -298,7 +283,7 @@ Hoglin {
     }
 
     public boolean canConvert() {
-        return !this.world.getDimension().method_28542() && !this.isImmuneToZombification() && !this.isAiDisabled();
+        return !this.world.getDimension().isNether() && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
     private void setCannotBeHunted(boolean bl) {

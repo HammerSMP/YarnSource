@@ -15,7 +15,7 @@ import net.minecraft.block.ComposterBlock;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.task.VillagerWorkTask;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -47,7 +47,7 @@ extends VillagerWorkTask {
         int i = 20;
         int j = 10;
         int[] is = new int[COMPOSTABLES.size()];
-        BasicInventory lv = arg2.getInventory();
+        SimpleInventory lv = arg2.getInventory();
         int k = lv.size();
         for (int l = k - 1; l >= 0 && i > 0; --l) {
             int o;
@@ -67,7 +67,7 @@ extends VillagerWorkTask {
     }
 
     private void craftAndDropBread(VillagerEntity arg) {
-        BasicInventory lv = arg.getInventory();
+        SimpleInventory lv = arg.getInventory();
         if (lv.count(Items.BREAD) > 36) {
             return;
         }

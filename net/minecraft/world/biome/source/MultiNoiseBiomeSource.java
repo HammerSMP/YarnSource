@@ -48,8 +48,8 @@ import net.minecraft.world.gen.ChunkRandom;
 
 public class MultiNoiseBiomeSource
 extends BiomeSource {
-    public static final MapCodec<MultiNoiseBiomeSource> field_24718 = RecordCodecBuilder.mapCodec(instance2 -> instance2.group((App)Codec.LONG.fieldOf("seed").forGetter(arg -> arg.field_24720), (App)RecordCodecBuilder.create(instance -> instance.group((App)Biome.MixedNoisePoint.field_24679.fieldOf("parameters").forGetter(Pair::getFirst), (App)Registry.BIOME.fieldOf("biome").forGetter(Pair::getSecond)).apply((Applicative)instance, Pair::of)).listOf().fieldOf("biomes").forGetter(arg -> arg.biomePoints)).apply((Applicative)instance2, MultiNoiseBiomeSource::new));
-    public static final Codec<MultiNoiseBiomeSource> field_24719 = Codec.mapEither(class_5305.field_24722, field_24718).xmap(either -> (MultiNoiseBiomeSource)either.map(pair -> ((class_5305)pair.getFirst()).method_28469((Long)pair.getSecond()), Function.identity()), arg -> arg.field_24721.map(arg2 -> Either.left((Object)Pair.of((Object)arg2, (Object)arg.field_24720))).orElseGet(() -> Either.right((Object)arg))).codec();
+    public static final MapCodec<MultiNoiseBiomeSource> field_24718 = RecordCodecBuilder.mapCodec(instance2 -> instance2.group((App)Codec.LONG.fieldOf("seed").forGetter(arg -> arg.field_24720), (App)RecordCodecBuilder.create(instance -> instance.group((App)Biome.MixedNoisePoint.CODEC.fieldOf("parameters").forGetter(Pair::getFirst), (App)Registry.BIOME.fieldOf("biome").forGetter(Pair::getSecond)).apply((Applicative)instance, Pair::of)).listOf().fieldOf("biomes").forGetter(arg -> arg.biomePoints)).apply((Applicative)instance2, MultiNoiseBiomeSource::new));
+    public static final Codec<MultiNoiseBiomeSource> CODEC = Codec.mapEither(class_5305.field_24722, field_24718).xmap(either -> (MultiNoiseBiomeSource)either.map(pair -> ((class_5305)pair.getFirst()).method_28469((Long)pair.getSecond()), Function.identity()), arg -> arg.field_24721.map(arg2 -> Either.left((Object)Pair.of((Object)arg2, (Object)arg.field_24720))).orElseGet(() -> Either.right((Object)arg))).codec();
     private final DoublePerlinNoiseSampler temperatureNoise;
     private final DoublePerlinNoiseSampler humidityNoise;
     private final DoublePerlinNoiseSampler altitudeNoise;
@@ -86,12 +86,12 @@ extends BiomeSource {
 
     @Override
     protected Codec<? extends BiomeSource> method_28442() {
-        return field_24719;
+        return CODEC;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource create(long l) {
+    public BiomeSource withSeed(long l) {
         return new MultiNoiseBiomeSource(l, this.biomePoints, this.field_24721);
     }
 

@@ -266,16 +266,16 @@ extends FacingBlock {
             map.put(lv3, lv4);
         }
         List<BlockPos> list3 = lv2.getBrokenBlocks();
-        int j = list.size() + list3.size();
-        BlockState[] lvs = new BlockState[j];
+        BlockState[] lvs = new BlockState[list.size() + list3.size()];
         Direction lv5 = bl ? arg3 : arg3.getOpposite();
+        int j = 0;
         for (int k = list3.size() - 1; k >= 0; --k) {
             BlockPos lv6 = list3.get(k);
             BlockState blockState = arg.getBlockState(lv6);
             BlockEntity lv8 = blockState.getBlock().hasBlockEntity() ? arg.getBlockEntity(lv6) : null;
             PistonBlock.dropStacks(blockState, arg, lv6, lv8);
             arg.setBlockState(lv6, Blocks.AIR.getDefaultState(), 18);
-            lvs[--j] = blockState;
+            lvs[j++] = blockState;
         }
         for (int l = list.size() - 1; l >= 0; --l) {
             BlockPos lv9 = list.get(l);
@@ -284,7 +284,7 @@ extends FacingBlock {
             map.remove(lv9);
             arg.setBlockState(lv9, (BlockState)Blocks.MOVING_PISTON.getDefaultState().with(FACING, arg3), 68);
             arg.setBlockEntity(lv9, PistonExtensionBlock.createBlockEntityPiston((BlockState)list2.get(l), arg3, bl, false));
-            lvs[--j] = blockState;
+            lvs[j++] = blockState;
         }
         if (bl) {
             PistonType lv11 = this.sticky ? PistonType.STICKY : PistonType.DEFAULT;
@@ -305,6 +305,7 @@ extends FacingBlock {
             lv14.updateNeighbors(arg, lv16, 2);
             lv14.prepare(arg, lv16, 2);
         }
+        j = 0;
         for (int m = list3.size() - 1; m >= 0; --m) {
             BlockState blockState = lvs[j++];
             BlockPos lv19 = list3.get(m);

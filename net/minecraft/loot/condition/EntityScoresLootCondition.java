@@ -22,24 +22,31 @@ import com.google.gson.JsonSerializationContext;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.entity.Entity;
 import net.minecraft.loot.UniformLootTableRange;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class EntityScoresLootCondition
-implements LootCondition {
+implements class_5341 {
     private final Map<String, UniformLootTableRange> scores;
     private final LootContext.EntityTarget target;
 
     private EntityScoresLootCondition(Map<String, UniformLootTableRange> map, LootContext.EntityTarget arg) {
         this.scores = ImmutableMap.copyOf(map);
         this.target = arg;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.ENTITY_SCORES;
     }
 
     @Override
@@ -79,11 +86,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<EntityScoresLootCondition> {
-        protected Factory() {
-            super(new Identifier("entity_scores"), EntityScoresLootCondition.class);
-        }
-
+    implements class_5335<EntityScoresLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, EntityScoresLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             JsonObject jsonObject2 = new JsonObject();
@@ -105,7 +108,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

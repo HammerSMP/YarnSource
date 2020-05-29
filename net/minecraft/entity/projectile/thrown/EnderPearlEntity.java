@@ -14,7 +14,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
-import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -30,9 +29,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public class EnderPearlEntity
 extends ThrownItemEntity {
@@ -131,7 +130,7 @@ extends ThrownItemEntity {
 
     @Override
     @Nullable
-    public Entity changeDimension(class_5321<DimensionType> arg) {
+    public Entity changeDimension(RegistryKey<World> arg) {
         Entity lv = this.getOwner();
         if (lv != null && lv.world.method_27983() != arg) {
             this.setOwner(null);

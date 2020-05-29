@@ -139,9 +139,9 @@ import org.apache.logging.log4j.Logger;
 
 public abstract class LivingEntity
 extends Entity {
-    private static final UUID ATTR_SPRINTING_SPEED_BOOST_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D");
-    private static final UUID SOUL_SPEED_BOOST_ATTRIBUTE_MODIFIER_ID = UUID.fromString("87f46a96-686f-4796-b035-22e16ee9e038");
-    private static final EntityAttributeModifier ATTR_SPRINTING_SPEED_BOOST = new EntityAttributeModifier(ATTR_SPRINTING_SPEED_BOOST_ID, "Sprinting speed boost", (double)0.3f, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
+    private static final UUID SPRINTING_SPEED_BOOST_ID = UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D");
+    private static final UUID SOUL_SPEED_BOOST_ID = UUID.fromString("87f46a96-686f-4796-b035-22e16ee9e038");
+    private static final EntityAttributeModifier SPRINTING_SPEED_BOOST = new EntityAttributeModifier(SPRINTING_SPEED_BOOST_ID, "Sprinting speed boost", (double)0.3f, EntityAttributeModifier.Operation.MULTIPLY_TOTAL);
     protected static final TrackedData<Byte> LIVING_FLAGS = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Float> HEALTH = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.FLOAT);
     private static final TrackedData<Integer> POTION_SWIRLS_COLOR = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -240,12 +240,12 @@ extends Entity {
         return this.brain;
     }
 
-    protected Brain.class_5303<?> method_28306() {
-        return Brain.method_28311(ImmutableList.of(), ImmutableList.of());
+    protected Brain.Profile<?> createBrainProfile() {
+        return Brain.createProfile(ImmutableList.of(), ImmutableList.of());
     }
 
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return this.method_28306().method_28335(dynamic);
+        return this.createBrainProfile().deserialize(dynamic);
     }
 
     @Override
@@ -304,8 +304,8 @@ extends Entity {
         if (this.firstUpdate) {
             this.getSleepingPosition().ifPresent(this::setPositionInBed);
         }
-        if (this.method_27302()) {
-            this.method_25937();
+        if (this.shouldGetSoulSpeedBoost()) {
+            this.applySoulSpeedClientEffects();
         }
         super.baseTick();
         this.world.getProfiler().push("livingEntityBaseTick");
@@ -348,7 +348,7 @@ extends Entity {
             }
             if (!this.world.isClient && !Objects.equal((Object)this.lastBlockPos, (Object)(lv2 = this.getBlockPos()))) {
                 this.lastBlockPos = lv2;
-                this.applyFrostWalker(lv2);
+                this.applyMovementEffects(lv2);
             }
         }
         if (this.isAlive() && this.isWet()) {
@@ -387,30 +387,30 @@ extends Entity {
         this.world.getProfiler().pop();
     }
 
-    public boolean method_27302() {
-        return this.age % 5 == 0 && this.getVelocity().x != 0.0 && this.getVelocity().z != 0.0 && !this.isSpectator() && EnchantmentHelper.hasSoulSpeed(this) && this.method_27303();
+    public boolean shouldGetSoulSpeedBoost() {
+        return this.age % 5 == 0 && this.getVelocity().x != 0.0 && this.getVelocity().z != 0.0 && !this.isSpectator() && EnchantmentHelper.hasSoulSpeed(this) && this.isOnSoulSpeedBlock();
     }
 
-    protected void method_25937() {
+    protected void applySoulSpeedClientEffects() {
         Vec3d lv = this.getVelocity();
         this.world.addParticle(ParticleTypes.SOUL, this.getX() + (this.random.nextDouble() - 0.5) * (double)this.getWidth(), this.getY() + 0.1, this.getZ() + (this.random.nextDouble() - 0.5) * (double)this.getWidth(), lv.x * -0.2, 0.1, lv.z * -0.2);
         float f = this.random.nextFloat() * 0.4f + this.random.nextFloat() > 0.9f ? 0.6f : 0.0f;
         this.playSound(SoundEvents.PARTICLE_SOUL_ESCAPE, f, 0.6f + this.random.nextFloat() * 0.4f);
     }
 
-    protected boolean method_27303() {
+    protected boolean isOnSoulSpeedBlock() {
         return this.getLandingBlockState().isIn(BlockTags.SOUL_SPEED_BLOCKS);
     }
 
     @Override
     protected float getVelocityMultiplier() {
-        if (this.method_27303() && EnchantmentHelper.getEquipmentLevel(Enchantments.SOUL_SPEED, this) > 0) {
+        if (this.isOnSoulSpeedBlock() && EnchantmentHelper.getEquipmentLevel(Enchantments.SOUL_SPEED, this) > 0) {
             return 1.0f;
         }
         return super.getVelocityMultiplier();
     }
 
-    protected void applyFrostWalker(BlockPos arg2) {
+    protected void applyMovementEffects(BlockPos arg2) {
         int i = EnchantmentHelper.getEquipmentLevel(Enchantments.FROST_WALKER, this);
         if (i > 0) {
             FrostWalkerEnchantment.freezeWater(this, this.world, arg2, i);
@@ -418,11 +418,11 @@ extends Entity {
         if (!this.getLandingBlockState().isAir()) {
             int j;
             EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-            if (lv.getModifier(SOUL_SPEED_BOOST_ATTRIBUTE_MODIFIER_ID) != null) {
-                lv.removeModifier(SOUL_SPEED_BOOST_ATTRIBUTE_MODIFIER_ID);
+            if (lv.getModifier(SOUL_SPEED_BOOST_ID) != null) {
+                lv.removeModifier(SOUL_SPEED_BOOST_ID);
             }
-            if ((j = EnchantmentHelper.getEquipmentLevel(Enchantments.SOUL_SPEED, this)) > 0 && this.method_27303()) {
-                lv.addTemporaryModifier(new EntityAttributeModifier(SOUL_SPEED_BOOST_ATTRIBUTE_MODIFIER_ID, "Soul speed boost", (double)(0.03f * (1.0f + (float)j * 0.35f)), EntityAttributeModifier.Operation.ADDITION));
+            if ((j = EnchantmentHelper.getEquipmentLevel(Enchantments.SOUL_SPEED, this)) > 0 && this.isOnSoulSpeedBlock()) {
+                lv.addTemporaryModifier(new EntityAttributeModifier(SOUL_SPEED_BOOST_ID, "Soul speed boost", (double)(0.03f * (1.0f + (float)j * 0.35f)), EntityAttributeModifier.Operation.ADDITION));
                 if (this.getRandom().nextFloat() < 0.04f) {
                     ItemStack lv2 = this.getEquippedStack(EquipmentSlot.FEET);
                     lv2.damage(1, this, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.FEET));
@@ -560,7 +560,7 @@ extends Entity {
             arg.putInt("SleepingY", arg2.getY());
             arg.putInt("SleepingZ", arg2.getZ());
         });
-        DataResult<Tag> dataResult = this.brain.method_28310(NbtOps.INSTANCE);
+        DataResult<Tag> dataResult = this.brain.encode(NbtOps.INSTANCE);
         dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("Brain", (Tag)arg2));
     }
 
@@ -1602,11 +1602,11 @@ extends Entity {
     public void setSprinting(boolean bl) {
         super.setSprinting(bl);
         EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (lv.getModifier(ATTR_SPRINTING_SPEED_BOOST_ID) != null) {
-            lv.removeModifier(ATTR_SPRINTING_SPEED_BOOST);
+        if (lv.getModifier(SPRINTING_SPEED_BOOST_ID) != null) {
+            lv.removeModifier(SPRINTING_SPEED_BOOST);
         }
         if (bl) {
-            lv.addTemporaryModifier(ATTR_SPRINTING_SPEED_BOOST);
+            lv.addTemporaryModifier(SPRINTING_SPEED_BOOST);
         }
     }
 
@@ -1637,7 +1637,7 @@ extends Entity {
         if (arg.removed || this.world.getBlockState(arg.getBlockPos()).getBlock().isIn(BlockTags.PORTALS)) {
             Vec3d lv = new Vec3d(arg.getX(), arg.getY() + (double)arg.getHeight(), arg.getZ());
         } else {
-            lv2 = arg.method_24829(this);
+            lv2 = arg.updatePassengerForDismount(this);
         }
         this.requestTeleport(lv2.x, lv2.y, lv2.z);
     }
@@ -1684,8 +1684,6 @@ extends Entity {
     }
 
     public void travel(Vec3d arg) {
-        double x;
-        double y;
         if (this.canMoveVoluntarily() || this.isLogicalSideForUpdatingMovement()) {
             boolean bl;
             double d = 0.08;
@@ -1792,14 +1790,20 @@ extends Entity {
                 this.setVelocity(lv8.x * (double)u, v * (double)0.98f, lv8.z * (double)u);
             }
         }
-        this.lastLimbDistance = this.limbDistance;
-        double w = this.getX() - this.prevX;
-        float z = MathHelper.sqrt(w * w + (y = this instanceof Flutterer ? this.getY() - this.prevY : 0.0) * y + (x = this.getZ() - this.prevZ) * x) * 4.0f;
-        if (z > 1.0f) {
-            z = 1.0f;
+        this.method_29242(this, this instanceof Flutterer);
+    }
+
+    public void method_29242(LivingEntity arg, boolean bl) {
+        double f;
+        double e;
+        arg.lastLimbDistance = arg.limbDistance;
+        double d = arg.getX() - arg.prevX;
+        float g = MathHelper.sqrt(d * d + (e = bl ? arg.getY() - arg.prevY : 0.0) * e + (f = arg.getZ() - arg.prevZ) * f) * 4.0f;
+        if (g > 1.0f) {
+            g = 1.0f;
         }
-        this.limbDistance += (z - this.limbDistance) * 0.4f;
-        this.limbAngle += this.limbDistance;
+        arg.limbDistance += (g - arg.limbDistance) * 0.4f;
+        arg.limbAngle += arg.limbDistance;
     }
 
     public Vec3d method_26318(Vec3d arg, float f) {
@@ -2069,14 +2073,14 @@ extends Entity {
         this.world.getProfiler().pop();
         this.world.getProfiler().push("jump");
         if (this.jumping) {
-            boolean bl;
             double k = this.getFluidHeight(FluidTags.WATER);
-            boolean bl2 = bl = this.isTouchingWater() && k > 0.0;
-            if (bl && (!this.onGround || k > 0.4)) {
+            boolean bl = this.isTouchingWater() && k > 0.0;
+            double l = this.method_29241();
+            if (bl && (!this.onGround || k > l)) {
                 this.swimUpward(FluidTags.WATER);
             } else if (this.isInLava()) {
                 this.swimUpward(FluidTags.LAVA);
-            } else if ((this.onGround || bl && k <= 0.4) && this.jumpingCooldown == 0) {
+            } else if ((this.onGround || bl && k <= l) && this.jumpingCooldown == 0) {
                 this.jump();
                 this.jumpingCooldown = 10;
             }
@@ -2561,7 +2565,7 @@ extends Entity {
         return ImmutableList.of((Object)((Object)EntityPose.STANDING));
     }
 
-    public Box method_24833(EntityPose arg) {
+    public Box getBoundingBox(EntityPose arg) {
         EntityDimensions lv = this.getDimensions(arg);
         return new Box(-lv.width / 2.0f, 0.0, -lv.width / 2.0f, lv.width / 2.0f, lv.height, lv.width / 2.0f);
     }

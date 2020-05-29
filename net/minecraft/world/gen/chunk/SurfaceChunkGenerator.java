@@ -33,7 +33,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5284;
 import net.minecraft.class_5309;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.structure.JigsawJunction;
@@ -66,12 +65,13 @@ import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public final class SurfaceChunkGenerator
 extends ChunkGenerator {
-    public static final Codec<SurfaceChunkGenerator> field_24773 = RecordCodecBuilder.create(instance -> instance.group((App)BiomeSource.field_24713.fieldOf("biome_source").forGetter(arg -> arg.biomeSource), (App)Codec.LONG.fieldOf("seed").stable().forGetter(arg -> arg.field_24778), (App)class_5284.field_24781.fieldOf("settings").forGetter(arg -> arg.field_24774)).apply((Applicative)instance, instance.stable((Object)((Function3)SurfaceChunkGenerator::new))));
+    public static final Codec<SurfaceChunkGenerator> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BiomeSource.field_24713.fieldOf("biome_source").forGetter(arg -> arg.biomeSource), (App)Codec.LONG.fieldOf("seed").stable().forGetter(arg -> arg.field_24778), (App)ChunkGeneratorType.field_24781.fieldOf("settings").forGetter(arg -> arg.field_24774)).apply((Applicative)instance, instance.stable((Object)((Function3)SurfaceChunkGenerator::new))));
     private static final float[] field_16649 = Util.make(new float[13824], fs -> {
         for (int i = 0; i < 24; ++i) {
             for (int j = 0; j < 24; ++j) {
@@ -106,14 +106,14 @@ extends ChunkGenerator {
     protected final BlockState defaultBlock;
     protected final BlockState defaultFluid;
     private final long field_24778;
-    protected final class_5284 field_24774;
+    protected final ChunkGeneratorType field_24774;
     private final int field_24779;
 
-    public SurfaceChunkGenerator(BiomeSource arg, long l, class_5284 arg2) {
+    public SurfaceChunkGenerator(BiomeSource arg, long l, ChunkGeneratorType arg2) {
         this(arg, arg, l, arg2);
     }
 
-    private SurfaceChunkGenerator(BiomeSource arg, BiomeSource arg2, long l, class_5284 arg3) {
+    private SurfaceChunkGenerator(BiomeSource arg, BiomeSource arg2, long l, ChunkGeneratorType arg3) {
         super(arg, arg2, arg3.getConfig(), l);
         this.field_24778 = l;
         this.field_24774 = arg3;
@@ -144,16 +144,16 @@ extends ChunkGenerator {
 
     @Override
     protected Codec<? extends ChunkGenerator> method_28506() {
-        return field_24773;
+        return CODEC;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ChunkGenerator create(long l) {
-        return new SurfaceChunkGenerator(this.biomeSource.create(l), l, this.field_24774);
+    public ChunkGenerator withSeed(long l) {
+        return new SurfaceChunkGenerator(this.biomeSource.withSeed(l), l, this.field_24774);
     }
 
-    public boolean method_28548(long l, class_5284.class_5307 arg) {
+    public boolean method_28548(long l, ChunkGeneratorType.Preset arg) {
         return this.field_24778 == l && this.field_24774.method_28555(arg);
     }
 

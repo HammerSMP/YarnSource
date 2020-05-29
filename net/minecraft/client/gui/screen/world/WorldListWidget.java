@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5219;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
@@ -60,6 +59,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -355,7 +355,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             try {
                 this.client.openScreen(new ProgressScreen());
                 try (LevelStorage.Session lv = this.client.getLevelStorage().createSession(this.level.getName());){
-                    class_5219 lv2 = lv.readLevelProperties();
+                    SaveProperties lv2 = lv.readLevelProperties();
                     if (lv2 != null) {
                         CreateWorldScreen lv3 = new CreateWorldScreen((Screen)this.screen, lv2);
                         if (this.level.method_29020()) {

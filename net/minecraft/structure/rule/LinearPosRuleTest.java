@@ -21,7 +21,7 @@ import net.minecraft.util.math.MathHelper;
 
 public class LinearPosRuleTest
 extends PosRuleTest {
-    public static final Codec<LinearPosRuleTest> field_25004 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("min_chance").withDefault((Object)Float.valueOf(0.0f)).forGetter(arg -> Float.valueOf(arg.minChance)), (App)Codec.FLOAT.fieldOf("max_chance").withDefault((Object)Float.valueOf(0.0f)).forGetter(arg -> Float.valueOf(arg.maxChance)), (App)Codec.INT.fieldOf("min_dist").withDefault((Object)0).forGetter(arg -> arg.minDistance), (App)Codec.INT.fieldOf("max_dist").withDefault((Object)0).forGetter(arg -> arg.maxDistance)).apply((Applicative)instance, LinearPosRuleTest::new));
+    public static final Codec<LinearPosRuleTest> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("min_chance").withDefault((Object)Float.valueOf(0.0f)).forGetter(arg -> Float.valueOf(arg.minChance)), (App)Codec.FLOAT.fieldOf("max_chance").withDefault((Object)Float.valueOf(0.0f)).forGetter(arg -> Float.valueOf(arg.maxChance)), (App)Codec.INT.fieldOf("min_dist").withDefault((Object)0).forGetter(arg -> arg.minDistance), (App)Codec.INT.fieldOf("max_dist").withDefault((Object)0).forGetter(arg -> arg.maxDistance)).apply((Applicative)instance, LinearPosRuleTest::new));
     private final float minChance;
     private final float maxChance;
     private final int minDistance;

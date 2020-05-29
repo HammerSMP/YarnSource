@@ -4,7 +4,7 @@
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  */
-package net.minecraft;
+package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.class_5314;
@@ -19,12 +19,12 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
-public class class_5312<FC extends FeatureConfig, F extends StructureFeature<FC>> {
-    public static final Codec<class_5312<?, ?>> field_24834 = Registry.STRUCTURE_FEATURE.dispatch("name", arg -> arg.field_24835, StructureFeature::method_28665);
+public class ConfiguredStructureFeature<FC extends FeatureConfig, F extends StructureFeature<FC>> {
+    public static final Codec<ConfiguredStructureFeature<?, ?>> field_24834 = Registry.STRUCTURE_FEATURE.dispatch("name", arg -> arg.field_24835, StructureFeature::method_28665);
     public final F field_24835;
     public final FC field_24836;
 
-    public class_5312(F arg, FC arg2) {
+    public ConfiguredStructureFeature(F arg, FC arg2) {
         this.field_24835 = arg;
         this.field_24836 = arg2;
     }

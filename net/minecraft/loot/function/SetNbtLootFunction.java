@@ -15,22 +15,28 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class SetNbtLootFunction
 extends ConditionalLootFunction {
     private final CompoundTag tag;
 
-    private SetNbtLootFunction(LootCondition[] args, CompoundTag arg) {
+    private SetNbtLootFunction(class_5341[] args, CompoundTag arg) {
         super(args);
         this.tag = arg;
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.SET_NBT;
     }
 
     @Override
@@ -40,15 +46,11 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> builder(CompoundTag arg) {
-        return SetNbtLootFunction.builder((LootCondition[] args) -> new SetNbtLootFunction((LootCondition[])args, arg));
+        return SetNbtLootFunction.builder((class_5341[] args) -> new SetNbtLootFunction((class_5341[])args, arg));
     }
 
     public static class Builder
     extends ConditionalLootFunction.Factory<SetNbtLootFunction> {
-        public Builder() {
-            super(new Identifier("set_nbt"), SetNbtLootFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, SetNbtLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -56,7 +58,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetNbtLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public SetNbtLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             try {
                 CompoundTag lv = StringNbtReader.parse(JsonHelper.getString(jsonObject, "tag"));
                 return new SetNbtLootFunction(args, lv);
@@ -67,7 +69,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

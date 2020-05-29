@@ -79,7 +79,7 @@ extends Item {
             lv6.markDirty();
             lv.updateListeners(lv3, lv5, lv5, 3);
             lv2.decrement(1);
-            return ActionResult.SUCCESS;
+            return ActionResult.CONSUME;
         }
         if (lv5.getCollisionShape(lv, lv3).isEmpty()) {
             BlockPos lv9 = lv3;
@@ -90,20 +90,20 @@ extends Item {
         if (lv11.spawnFromItemStack(lv, lv2, arg.getPlayer(), lv10, SpawnReason.SPAWN_EGG, true, !Objects.equals(lv3, lv10) && lv4 == Direction.UP) != null) {
             lv2.decrement(1);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
         ItemStack lv = arg2.getStackInHand(arg3);
-        HitResult lv2 = SpawnEggItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.SOURCE_ONLY);
-        if (lv2.getType() != HitResult.Type.BLOCK) {
+        BlockHitResult lv2 = SpawnEggItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.SOURCE_ONLY);
+        if (((HitResult)lv2).getType() != HitResult.Type.BLOCK) {
             return TypedActionResult.pass(lv);
         }
         if (arg.isClient) {
             return TypedActionResult.success(lv);
         }
-        BlockHitResult lv3 = (BlockHitResult)lv2;
+        BlockHitResult lv3 = lv2;
         BlockPos lv4 = lv3.getBlockPos();
         if (!(arg.getBlockState(lv4).getBlock() instanceof FluidBlock)) {
             return TypedActionResult.pass(lv);
@@ -119,7 +119,7 @@ extends Item {
             lv.decrement(1);
         }
         arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        return TypedActionResult.success(lv);
+        return TypedActionResult.consume(lv);
     }
 
     public boolean isOfSameEntityType(@Nullable CompoundTag arg, EntityType<?> arg2) {

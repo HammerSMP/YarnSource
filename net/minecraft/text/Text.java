@@ -48,6 +48,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.text.KeybindText;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -59,13 +60,11 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.LowercaseEnumTypeAdapterFactory;
-import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
 
 public interface Text
-extends Message {
-    public static final Optional<Unit> TERMINATE_VISIT = Optional.of(Unit.INSTANCE);
-
+extends Message,
+class_5348 {
     public Style getStyle();
 
     public String asString();
@@ -84,7 +83,7 @@ extends Message {
         this.visit(string -> {
             int j = i - stringBuilder.length();
             if (j <= 0) {
-                return TERMINATE_VISIT;
+                return field_25309;
             }
             stringBuilder.append(string.length() <= j ? string : string.substring(0, j));
             return Optional.empty();
@@ -98,8 +97,9 @@ extends Message {
 
     public MutableText shallowCopy();
 
+    @Override
     @Environment(value=EnvType.CLIENT)
-    default public <T> Optional<T> visit(StyledVisitor<T> arg, Style arg2) {
+    default public <T> Optional<T> visit(class_5348.StyledVisitor<T> arg, Style arg2) {
         Style lv = this.getStyle().withParent(arg2);
         Optional<T> optional = this.visitSelf(arg, lv);
         if (optional.isPresent()) {
@@ -113,7 +113,8 @@ extends Message {
         return Optional.empty();
     }
 
-    default public <T> Optional<T> visit(Visitor<T> arg) {
+    @Override
+    default public <T> Optional<T> visit(class_5348.Visitor<T> arg) {
         Optional<T> optional = this.visitSelf(arg);
         if (optional.isPresent()) {
             return optional;
@@ -127,11 +128,11 @@ extends Message {
     }
 
     @Environment(value=EnvType.CLIENT)
-    default public <T> Optional<T> visitSelf(StyledVisitor<T> arg, Style arg2) {
+    default public <T> Optional<T> visitSelf(class_5348.StyledVisitor<T> arg, Style arg2) {
         return arg.accept(arg2, this.asString());
     }
 
-    default public <T> Optional<T> visitSelf(Visitor<T> arg) {
+    default public <T> Optional<T> visitSelf(class_5348.Visitor<T> arg) {
         return arg.accept(this.asString());
     }
 
@@ -375,15 +376,6 @@ extends Message {
         public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             return this.deserialize(jsonElement, type, jsonDeserializationContext);
         }
-    }
-
-    public static interface Visitor<T> {
-        public Optional<T> accept(String var1);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public static interface StyledVisitor<T> {
-        public Optional<T> accept(Style var1, String var2);
     }
 }
 

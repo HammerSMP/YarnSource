@@ -280,7 +280,7 @@ implements Waterloggable {
             arg4.incrementStat(this.getOpenStat());
             PiglinBrain.onGoldBlockBroken(arg4);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     protected Stat<Identifier> getOpenStat() {

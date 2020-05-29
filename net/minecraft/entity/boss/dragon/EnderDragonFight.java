@@ -91,13 +91,12 @@ public class EnderDragonFight {
     private EnderDragonSpawnState dragonSpawnState;
     private int spawnStateTimer;
     private List<EndCrystalEntity> crystals;
-    private boolean field_24506;
 
-    public EnderDragonFight(ServerWorld arg, CompoundTag arg2) {
+    public EnderDragonFight(ServerWorld arg, long l, CompoundTag arg2) {
         this.world = arg;
         if (arg2.contains("DragonKilled", 99)) {
-            if (arg2.containsUuidNew("Dragon")) {
-                this.dragonUuid = arg2.getUuidNew("Dragon");
+            if (arg2.containsUuid("Dragon")) {
+                this.dragonUuid = arg2.getUuid("Dragon");
             }
             this.dragonKilled = arg2.getBoolean("DragonKilled");
             this.previouslyKilled = arg2.getBoolean("PreviouslyKilled");
@@ -117,7 +116,8 @@ public class EnderDragonFight {
                 this.gateways.add(lv.getInt(i));
             }
         } else {
-            this.field_24506 = true;
+            this.gateways.addAll((Collection<Integer>)ContiguousSet.create((Range)Range.closedOpen((Comparable)Integer.valueOf(0), (Comparable)Integer.valueOf(20)), (DiscreteDomain)DiscreteDomain.integers()));
+            Collections.shuffle(this.gateways, new Random(l));
         }
         this.endPortalPattern = BlockPatternBuilder.start().aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ").aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ").aisle("       ", "       ", "       ", "   #   ", "       ", "       ", "       ").aisle("  ###  ", " #   # ", "#     #", "#  #  #", "#     #", " #   # ", "  ###  ").aisle("       ", "  ###  ", " ##### ", " ##### ", " ##### ", "  ###  ", "       ").where('#', CachedBlockPosition.matchesBlockState(BlockPredicate.make(Blocks.BEDROCK))).build();
     }
@@ -125,7 +125,7 @@ public class EnderDragonFight {
     public CompoundTag toTag() {
         CompoundTag lv = new CompoundTag();
         if (this.dragonUuid != null) {
-            lv.putUuidNew("Dragon", this.dragonUuid);
+            lv.putUuid("Dragon", this.dragonUuid);
         }
         lv.putBoolean("DragonKilled", this.dragonKilled);
         lv.putBoolean("PreviouslyKilled", this.previouslyKilled);
@@ -328,11 +328,6 @@ public class EnderDragonFight {
     }
 
     private void generateNewEndGateway() {
-        if (this.field_24506) {
-            this.field_24506 = false;
-            this.gateways.addAll((Collection<Integer>)ContiguousSet.create((Range)Range.closedOpen((Comparable)Integer.valueOf(0), (Comparable)Integer.valueOf(20)), (DiscreteDomain)DiscreteDomain.integers()));
-            Collections.shuffle(this.gateways, new Random(this.world.getSeed()));
-        }
         if (this.gateways.isEmpty()) {
             return;
         }

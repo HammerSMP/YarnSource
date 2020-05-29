@@ -50,12 +50,12 @@ extends JsonDataLoader {
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonObject> map, ResourceManager arg2, Profiler arg22) {
+    protected void apply(Map<Identifier, JsonElement> map, ResourceManager arg2, Profiler arg22) {
         HashMap map2 = Maps.newHashMap();
-        map.forEach((arg, jsonObject) -> {
+        map.forEach((arg, jsonElement) -> {
             try {
-                JsonObject jsonObject2 = JsonHelper.asObject((JsonElement)jsonObject, "advancement");
-                Advancement.Task lv = Advancement.Task.fromJson(jsonObject2, new AdvancementEntityPredicateDeserializer((Identifier)arg, this.conditionManager));
+                JsonObject jsonObject = JsonHelper.asObject(jsonElement, "advancement");
+                Advancement.Task lv = Advancement.Task.fromJson(jsonObject, new AdvancementEntityPredicateDeserializer((Identifier)arg, this.conditionManager));
                 map2.put(arg, lv);
             }
             catch (JsonParseException | IllegalArgumentException runtimeException) {

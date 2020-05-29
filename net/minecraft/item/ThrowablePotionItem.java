@@ -32,7 +32,7 @@ extends PotionItem {
         if (!arg2.abilities.creativeMode) {
             lv.decrement(1);
         }
-        return TypedActionResult.success(lv);
+        return TypedActionResult.method_29237(lv, arg.isClient());
     }
 }
 

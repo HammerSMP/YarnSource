@@ -108,7 +108,7 @@ implements Fertilizable {
             SweetBerryBushBlock.dropStack(arg2, arg3, new ItemStack(Items.SWEET_BERRIES, j + (bl ? 1 : 0)));
             arg2.playSound(null, arg3, SoundEvents.ITEM_SWEET_BERRIES_PICK_FROM_BUSH, SoundCategory.BLOCKS, 1.0f, 0.8f + arg2.random.nextFloat() * 0.4f);
             arg2.setBlockState(arg3, (BlockState)arg.with(AGE, 1), 2);
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         return super.onUse(arg, arg2, arg3, arg4, arg5, arg6);
     }

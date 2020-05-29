@@ -1,30 +1,11 @@
 /*
  * Decompiled with CFR 0.149.
- * 
- * Could not load the following classes:
- *  com.google.common.collect.Maps
- *  com.google.gson.JsonDeserializationContext
- *  com.google.gson.JsonDeserializer
- *  com.google.gson.JsonElement
- *  com.google.gson.JsonObject
- *  com.google.gson.JsonParseException
- *  com.google.gson.JsonSerializationContext
- *  com.google.gson.JsonSerializer
- *  org.apache.commons.lang3.ArrayUtils
  */
 package net.minecraft.loot.entry;
 
-import com.google.common.collect.Maps;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import java.lang.reflect.Type;
-import java.util.Map;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.class_5330;
+import net.minecraft.class_5335;
+import net.minecraft.class_5338;
 import net.minecraft.loot.entry.AlternativeEntry;
 import net.minecraft.loot.entry.CombinedEntry;
 import net.minecraft.loot.entry.DynamicEntry;
@@ -36,69 +17,24 @@ import net.minecraft.loot.entry.LootTableEntry;
 import net.minecraft.loot.entry.SequenceEntry;
 import net.minecraft.loot.entry.TagEntry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import org.apache.commons.lang3.ArrayUtils;
+import net.minecraft.util.registry.Registry;
 
 public class LootEntries {
-    private static final Map<Identifier, LootEntry.Serializer<?>> idSerializers = Maps.newHashMap();
-    private static final Map<Class<?>, LootEntry.Serializer<?>> classSerializers = Maps.newHashMap();
+    public static final class_5338 EMPTY = LootEntries.method_29317("empty", new EmptyEntry.Serializer());
+    public static final class_5338 ITEM = LootEntries.method_29317("item", new ItemEntry.Serializer());
+    public static final class_5338 LOOT_TABLE = LootEntries.method_29317("loot_table", new LootTableEntry.Serializer());
+    public static final class_5338 DYNAMIC = LootEntries.method_29317("dynamic", new DynamicEntry.Serializer());
+    public static final class_5338 TAG = LootEntries.method_29317("tag", new TagEntry.Serializer());
+    public static final class_5338 ALTERNATIVES = LootEntries.method_29317("alternatives", CombinedEntry.createSerializer(AlternativeEntry::new));
+    public static final class_5338 SEQUENCE = LootEntries.method_29317("sequence", CombinedEntry.createSerializer(GroupEntry::new));
+    public static final class_5338 GROUP = LootEntries.method_29317("group", CombinedEntry.createSerializer(SequenceEntry::new));
 
-    private static void register(LootEntry.Serializer<?> arg) {
-        idSerializers.put(arg.getIdentifier(), arg);
-        classSerializers.put(arg.getType(), arg);
+    private static class_5338 method_29317(String string, class_5335<? extends LootEntry> arg) {
+        return Registry.register(Registry.field_25293, new Identifier(string), new class_5338(arg));
     }
 
-    static {
-        LootEntries.register(CombinedEntry.createSerializer(new Identifier("alternatives"), AlternativeEntry.class, AlternativeEntry::new));
-        LootEntries.register(CombinedEntry.createSerializer(new Identifier("sequence"), SequenceEntry.class, SequenceEntry::new));
-        LootEntries.register(CombinedEntry.createSerializer(new Identifier("group"), GroupEntry.class, GroupEntry::new));
-        LootEntries.register(new EmptyEntry.Serializer());
-        LootEntries.register(new ItemEntry.Serializer());
-        LootEntries.register(new LootTableEntry.Serializer());
-        LootEntries.register(new DynamicEntry.Serializer());
-        LootEntries.register(new TagEntry.Serializer());
-    }
-
-    public static class Serializer
-    implements JsonDeserializer<LootEntry>,
-    JsonSerializer<LootEntry> {
-        public LootEntry deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
-            JsonObject jsonObject = JsonHelper.asObject(jsonElement, "entry");
-            Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "type"));
-            LootEntry.Serializer lv2 = (LootEntry.Serializer)idSerializers.get(lv);
-            if (lv2 == null) {
-                throw new JsonParseException("Unknown item type: " + lv);
-            }
-            LootCondition[] lvs = JsonHelper.deserialize(jsonObject, "conditions", new LootCondition[0], jsonDeserializationContext, LootCondition[].class);
-            return lv2.fromJson(jsonObject, jsonDeserializationContext, lvs);
-        }
-
-        public JsonElement serialize(LootEntry arg, Type type, JsonSerializationContext jsonSerializationContext) {
-            JsonObject jsonObject = new JsonObject();
-            LootEntry.Serializer<LootEntry> lv = Serializer.getSerializer(arg.getClass());
-            jsonObject.addProperty("type", lv.getIdentifier().toString());
-            if (!ArrayUtils.isEmpty((Object[])arg.conditions)) {
-                jsonObject.add("conditions", jsonSerializationContext.serialize((Object)arg.conditions));
-            }
-            lv.toJson(jsonObject, arg, jsonSerializationContext);
-            return jsonObject;
-        }
-
-        private static LootEntry.Serializer<LootEntry> getSerializer(Class<?> arg) {
-            LootEntry.Serializer lv = (LootEntry.Serializer)classSerializers.get(arg);
-            if (lv == null) {
-                throw new JsonParseException("Unknown item type: " + arg);
-            }
-            return lv;
-        }
-
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((LootEntry)object, type, jsonSerializationContext);
-        }
-
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
-        }
+    public static Object method_29316() {
+        return class_5330.method_29306(Registry.field_25293, "entry", "type", LootEntry::method_29318).method_29307();
     }
 }
 

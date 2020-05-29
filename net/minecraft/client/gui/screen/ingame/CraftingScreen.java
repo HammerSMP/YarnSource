@@ -50,6 +50,7 @@ implements RecipeBookProvider {
             this.x = this.recipeBook.findLeftEdge(this.isNarrow, this.width, this.backgroundWidth);
             ((TexturedButtonWidget)arg).setPos(this.x + 5, this.height / 2 - 49);
         }));
+        this.field_25267 = 29;
     }
 
     @Override
@@ -71,12 +72,6 @@ implements RecipeBookProvider {
         }
         this.drawMouseoverTooltip(arg, i, j);
         this.recipeBook.drawTooltip(arg, this.x, this.y, i, j);
-    }
-
-    @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, 28.0f, 6.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 96 + 2), 0x404040);
     }
 
     @Override

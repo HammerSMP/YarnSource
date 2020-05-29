@@ -17,7 +17,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class SeagrassFeatureConfig
 implements FeatureConfig {
-    public static final Codec<SeagrassFeatureConfig> field_24907 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.DOUBLE.fieldOf("probability").forGetter(arg -> arg.tallSeagrassProbability)).apply((Applicative)instance, SeagrassFeatureConfig::new));
+    public static final Codec<SeagrassFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.DOUBLE.fieldOf("probability").forGetter(arg -> arg.tallSeagrassProbability)).apply((Applicative)instance, SeagrassFeatureConfig::new));
     public final int count;
     public final double tallSeagrassProbability;
 

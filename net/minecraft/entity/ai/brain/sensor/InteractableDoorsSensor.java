@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Set;
-import net.minecraft.class_5321;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -20,13 +19,14 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.dynamic.GlobalPos;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class InteractableDoorsSensor
 extends Sensor<LivingEntity> {
     @Override
     protected void sense(ServerWorld arg, LivingEntity arg2) {
-        class_5321<DimensionType> lv = arg.method_27983();
+        RegistryKey<World> lv = arg.method_27983();
         BlockPos lv2 = arg2.getBlockPos();
         ArrayList list = Lists.newArrayList();
         for (int i = -1; i <= 1; ++i) {

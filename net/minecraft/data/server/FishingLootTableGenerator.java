@@ -6,6 +6,7 @@ package net.minecraft.data.server;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5341;
 import net.minecraft.item.Items;
 import net.minecraft.loot.ConstantLootTableRange;
 import net.minecraft.loot.LootPool;
@@ -14,7 +15,6 @@ import net.minecraft.loot.LootTables;
 import net.minecraft.loot.UniformLootTableRange;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
 import net.minecraft.loot.condition.LocationCheckLootCondition;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.entry.LeafEntry;
@@ -34,13 +34,13 @@ import net.minecraft.world.biome.Biomes;
 
 public class FishingLootTableGenerator
 implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
-    public static final LootCondition.Builder NEEDS_JUNGLE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.JUNGLE));
-    public static final LootCondition.Builder NEEDS_JUNGLE_HILLS_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.JUNGLE_HILLS));
-    public static final LootCondition.Builder NEEDS_JUNGLE_EDGE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.JUNGLE_EDGE));
-    public static final LootCondition.Builder NEEDS_BAMBOO_JUNGLE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.BAMBOO_JUNGLE));
-    public static final LootCondition.Builder NEEDS_MODIFIED_JUNGLE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.MODIFIED_JUNGLE));
-    public static final LootCondition.Builder NEEDS_MODIFIED_JUNGLE_EDGE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.MODIFIED_JUNGLE_EDGE));
-    public static final LootCondition.Builder NEEDS_BAMBOO_JUNGLE_HILLS_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.BAMBOO_JUNGLE_HILLS));
+    public static final class_5341.Builder NEEDS_JUNGLE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.JUNGLE));
+    public static final class_5341.Builder NEEDS_JUNGLE_HILLS_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.JUNGLE_HILLS));
+    public static final class_5341.Builder NEEDS_JUNGLE_EDGE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.JUNGLE_EDGE));
+    public static final class_5341.Builder NEEDS_BAMBOO_JUNGLE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.BAMBOO_JUNGLE));
+    public static final class_5341.Builder NEEDS_MODIFIED_JUNGLE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.MODIFIED_JUNGLE));
+    public static final class_5341.Builder NEEDS_MODIFIED_JUNGLE_EDGE_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.MODIFIED_JUNGLE_EDGE));
+    public static final class_5341.Builder NEEDS_BAMBOO_JUNGLE_HILLS_BIOME = LocationCheckLootCondition.builder(LocationPredicate.Builder.create().biome(Biomes.BAMBOO_JUNGLE_HILLS));
 
     @Override
     public void accept(BiConsumer<Identifier, LootTable.Builder> biConsumer) {

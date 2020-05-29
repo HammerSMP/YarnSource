@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import net.minecraft.class_5341;
 import net.minecraft.loot.LootTable;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContextAware;
 import net.minecraft.loot.context.LootContextType;
 import net.minecraft.util.Identifier;
@@ -28,17 +28,17 @@ public class LootTableReporter {
     private final Multimap<String, String> messages;
     private final Supplier<String> nameFactory;
     private final LootContextType contextType;
-    private final Function<Identifier, LootCondition> conditionGetter;
+    private final Function<Identifier, class_5341> conditionGetter;
     private final Set<Identifier> conditions;
     private final Function<Identifier, LootTable> tableGetter;
     private final Set<Identifier> tables;
     private String name;
 
-    public LootTableReporter(LootContextType arg, Function<Identifier, LootCondition> function, Function<Identifier, LootTable> function2) {
+    public LootTableReporter(LootContextType arg, Function<Identifier, class_5341> function, Function<Identifier, LootTable> function2) {
         this((Multimap<String, String>)HashMultimap.create(), () -> "", arg, function, (Set<Identifier>)ImmutableSet.of(), function2, (Set<Identifier>)ImmutableSet.of());
     }
 
-    public LootTableReporter(Multimap<String, String> multimap, Supplier<String> supplier, LootContextType arg, Function<Identifier, LootCondition> function, Set<Identifier> set, Function<Identifier, LootTable> function2, Set<Identifier> set2) {
+    public LootTableReporter(Multimap<String, String> multimap, Supplier<String> supplier, LootContextType arg, Function<Identifier, class_5341> function, Set<Identifier> set, Function<Identifier, LootTable> function2, Set<Identifier> set2) {
         this.messages = multimap;
         this.nameFactory = supplier;
         this.contextType = arg;
@@ -95,7 +95,7 @@ public class LootTableReporter {
     }
 
     @Nullable
-    public LootCondition getCondition(Identifier arg) {
+    public class_5341 getCondition(Identifier arg) {
         return this.conditionGetter.apply(arg);
     }
 

@@ -32,13 +32,13 @@ import java.util.function.Predicate;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.advancement.criterion.CriterionProgress;
+import net.minecraft.class_5341;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.command.FloatRangeArgument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
@@ -429,7 +429,7 @@ public class EntitySelectorOptions {
                     return false;
                 }
                 ServerWorld lv = (ServerWorld)arg2.world;
-                LootCondition lv2 = lv.getServer().getPredicateManager().get(lv);
+                class_5341 lv2 = lv.getServer().getPredicateManager().get(lv);
                 if (lv2 == null) {
                     return false;
                 }

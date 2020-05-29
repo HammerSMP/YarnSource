@@ -30,7 +30,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.enums.RailShape;
-import net.minecraft.class_5275;
+import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -182,12 +182,12 @@ extends Entity {
     }
 
     @Override
-    public Vec3d method_24829(LivingEntity arg2) {
+    public Vec3d updatePassengerForDismount(LivingEntity arg2) {
         Direction lv = this.getMovementDirection();
         if (lv.getAxis() == Direction.Axis.Y) {
-            return super.method_24829(arg2);
+            return super.updatePassengerForDismount(arg2);
         }
-        int[][] is = class_5275.method_27934(lv);
+        int[][] is = Dismounting.getDismountOffsets(lv);
         BlockPos lv2 = this.getBlockPos();
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
         ImmutableList<EntityPose> immutableList = arg2.getPoses();
@@ -201,13 +201,13 @@ extends Entity {
                     Vec3d lv7;
                     Box lv6;
                     lv3.set(lv2.getX() + js[0], lv2.getY() + i, lv2.getZ() + js[1]);
-                    double d = this.world.method_26097(lv3, arg -> {
+                    double d = this.world.getCollisionHeightAt(lv3, arg -> {
                         if (arg.isIn(BlockTags.CLIMBABLE)) {
                             return true;
                         }
                         return arg.getBlock() instanceof TrapdoorBlock && arg.get(TrapdoorBlock.OPEN) != false;
                     });
-                    if (!class_5275.method_27932(d) || !class_5275.method_27933(this.world, arg2, (lv6 = new Box(-f, d, -f, f, d + (double)lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
+                    if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, arg2, (lv6 = new Box(-f, d, -f, f, d + (double)lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
                     arg2.setPose(lv4);
                     return lv7;
                 }
@@ -222,7 +222,7 @@ extends Entity {
             arg2.setPose(lv8);
             break;
         }
-        return super.method_24829(arg2);
+        return super.updatePassengerForDismount(arg2);
     }
 
     @Override

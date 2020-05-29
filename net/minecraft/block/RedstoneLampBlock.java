@@ -49,7 +49,7 @@ extends Block {
             if (bl2) {
                 arg2.getBlockTickScheduler().schedule(arg3, this, 4);
             } else {
-                arg2.setBlockState(arg3, (BlockState)arg.method_28493(LIT), 2);
+                arg2.setBlockState(arg3, (BlockState)arg.cycle(LIT), 2);
             }
         }
     }
@@ -57,7 +57,7 @@ extends Block {
     @Override
     public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
         if (arg.get(LIT).booleanValue() && !arg2.isReceivingRedstonePower(arg3)) {
-            arg2.setBlockState(arg3, (BlockState)arg.method_28493(LIT), 2);
+            arg2.setBlockState(arg3, (BlockState)arg.cycle(LIT), 2);
         }
     }
 

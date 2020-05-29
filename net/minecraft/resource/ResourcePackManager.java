@@ -3,81 +3,86 @@
  * 
  * Could not load the following classes:
  *  com.google.common.base.Functions
- *  com.google.common.collect.Lists
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Maps
- *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
  */
 package net.minecraft.resource;
 
 import com.google.common.base.Functions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProvider;
 
 public class ResourcePackManager<T extends ResourcePackProfile>
 implements AutoCloseable {
-    private final Set<ResourcePackProvider> providers = Sets.newHashSet();
-    private final Map<String, T> profiles = Maps.newLinkedHashMap();
-    private final List<T> enabled = Lists.newLinkedList();
+    private final Set<ResourcePackProvider> providers;
+    private Map<String, T> profiles = ImmutableMap.of();
+    private List<T> enabled = ImmutableList.of();
     private final ResourcePackProfile.Factory<T> profileFactory;
 
-    public ResourcePackManager(ResourcePackProfile.Factory<T> arg) {
+    public ResourcePackManager(ResourcePackProfile.Factory<T> arg, ResourcePackProvider ... args) {
         this.profileFactory = arg;
+        this.providers = ImmutableSet.copyOf((Object[])args);
     }
 
     public void scanPacks() {
+        List list = (List)this.enabled.stream().map(ResourcePackProfile::getName).collect(ImmutableList.toImmutableList());
         this.close();
-        Set set = this.enabled.stream().map(ResourcePackProfile::getName).collect(Collectors.toCollection(LinkedHashSet::new));
-        this.profiles.clear();
-        this.enabled.clear();
+        this.profiles = this.method_29212();
+        this.enabled = this.method_29208(list);
+    }
+
+    private Map<String, T> method_29212() {
+        TreeMap map = Maps.newTreeMap();
         for (ResourcePackProvider lv : this.providers) {
-            lv.register(this.profiles, this.profileFactory);
+            lv.register(map, this.profileFactory);
         }
-        this.sort();
-        this.enabled.addAll(set.stream().map(this.profiles::get).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedHashSet::new)));
-        for (ResourcePackProfile lv2 : this.profiles.values()) {
-            if (!lv2.isAlwaysEnabled() || this.enabled.contains(lv2)) continue;
-            lv2.getInitialPosition().insert(this.enabled, lv2, Functions.identity(), false);
-        }
+        return ImmutableMap.copyOf((Map)map);
     }
 
-    private void sort() {
-        ArrayList list = Lists.newArrayList(this.profiles.entrySet());
-        this.profiles.clear();
-        list.stream().sorted(Map.Entry.comparingByKey()).forEachOrdered(entry -> {
-            ResourcePackProfile cfr_ignored_0 = (ResourcePackProfile)this.profiles.put((String)entry.getKey(), (T)entry.getValue());
-        });
+    public void setEnabledProfiles(Collection<String> collection) {
+        this.enabled = this.method_29208(collection);
     }
 
-    public void setEnabledProfiles(Collection<T> collection) {
-        this.enabled.clear();
-        this.enabled.addAll(collection);
+    private List<T> method_29208(Collection<String> collection) {
+        List list = this.method_29209(collection).collect(Collectors.toList());
         for (ResourcePackProfile lv : this.profiles.values()) {
-            if (!lv.isAlwaysEnabled() || this.enabled.contains(lv)) continue;
-            lv.getInitialPosition().insert(this.enabled, lv, Functions.identity(), false);
+            if (!lv.isAlwaysEnabled() || list.contains(lv)) continue;
+            lv.getInitialPosition().insert(list, lv, Functions.identity(), false);
         }
+        return ImmutableList.copyOf(list);
+    }
+
+    private Stream<T> method_29209(Collection<String> collection) {
+        return collection.stream().map(this.profiles::get).filter(Objects::nonNull);
+    }
+
+    public Collection<String> method_29206() {
+        return this.profiles.keySet();
     }
 
     public Collection<T> getProfiles() {
         return this.profiles.values();
     }
 
-    public Collection<T> getDisabledProfiles() {
-        ArrayList collection = Lists.newArrayList(this.profiles.values());
-        collection.removeAll(this.enabled);
-        return collection;
+    public Collection<String> method_29210() {
+        return (Collection)this.enabled.stream().map(ResourcePackProfile::getName).collect(ImmutableSet.toImmutableSet());
     }
 
     public Collection<T> getEnabledProfiles() {
@@ -89,13 +94,17 @@ implements AutoCloseable {
         return (T)((ResourcePackProfile)this.profiles.get(string));
     }
 
-    public void registerProvider(ResourcePackProvider arg) {
-        this.providers.add(arg);
-    }
-
     @Override
     public void close() {
         this.profiles.values().forEach(ResourcePackProfile::close);
+    }
+
+    public boolean method_29207(String string) {
+        return this.profiles.containsKey(string);
+    }
+
+    public List<ResourcePack> method_29211() {
+        return (List)this.enabled.stream().map(ResourcePackProfile::createResourcePack).collect(ImmutableList.toImmutableList());
     }
 }
 

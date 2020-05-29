@@ -49,13 +49,13 @@ extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
         ItemStack lv = arg2.getStackInHand(arg3);
-        HitResult lv2 = BucketItem.rayTrace(arg, arg2, this.fluid == Fluids.EMPTY ? RayTraceContext.FluidHandling.SOURCE_ONLY : RayTraceContext.FluidHandling.NONE);
-        if (lv2.getType() == HitResult.Type.MISS) {
+        BlockHitResult lv2 = BucketItem.rayTrace(arg, arg2, this.fluid == Fluids.EMPTY ? RayTraceContext.FluidHandling.SOURCE_ONLY : RayTraceContext.FluidHandling.NONE);
+        if (((HitResult)lv2).getType() == HitResult.Type.MISS) {
             return TypedActionResult.pass(lv);
         }
-        if (lv2.getType() == HitResult.Type.BLOCK) {
+        if (((HitResult)lv2).getType() == HitResult.Type.BLOCK) {
             BlockPos lv11;
-            BlockHitResult lv3 = (BlockHitResult)lv2;
+            BlockHitResult lv3 = lv2;
             BlockPos lv4 = lv3.getBlockPos();
             Direction lv5 = lv3.getSide();
             BlockPos lv6 = lv4.offset(lv5);
@@ -72,7 +72,7 @@ extends Item {
                     if (!arg.isClient) {
                         Criteria.FILLED_BUCKET.trigger((ServerPlayerEntity)arg2, new ItemStack(lv8.getBucketItem()));
                     }
-                    return TypedActionResult.success(lv9);
+                    return TypedActionResult.method_29237(lv9, arg.isClient());
                 }
                 return TypedActionResult.fail(lv);
             }
@@ -84,7 +84,7 @@ extends Item {
                     Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)arg2, lv11, lv);
                 }
                 arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-                return TypedActionResult.success(this.getEmptiedStack(lv, arg2));
+                return TypedActionResult.method_29237(this.getEmptiedStack(lv, arg2), arg.isClient());
             }
             return TypedActionResult.fail(lv);
         }
@@ -128,7 +128,7 @@ extends Item {
         if (!bl2) {
             return arg4 != null && this.placeFluid(arg, arg2, arg4.getBlockPos().offset(arg4.getSide()), null);
         }
-        if (arg2.getDimension().method_27999() && this.fluid.isIn(FluidTags.WATER)) {
+        if (arg2.getDimension().isUltrawarm() && this.fluid.isIn(FluidTags.WATER)) {
             int i = arg3.getX();
             int j = arg3.getY();
             int k = arg3.getZ();

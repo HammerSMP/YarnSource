@@ -16,10 +16,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
@@ -28,13 +31,18 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
 
 public class TableBonusLootCondition
-implements LootCondition {
+implements class_5341 {
     private final Enchantment enchantment;
     private final float[] chances;
 
     private TableBonusLootCondition(Enchantment arg, float[] fs) {
         this.enchantment = arg;
         this.chances = fs;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.TABLE_BONUS;
     }
 
     @Override
@@ -50,7 +58,7 @@ implements LootCondition {
         return arg.getRandom().nextFloat() < f;
     }
 
-    public static LootCondition.Builder builder(Enchantment arg, float ... fs) {
+    public static class_5341.Builder builder(Enchantment arg, float ... fs) {
         return () -> new TableBonusLootCondition(arg, fs);
     }
 
@@ -60,11 +68,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<TableBonusLootCondition> {
-        public Factory() {
-            super(new Identifier("table_bonus"), TableBonusLootCondition.class);
-        }
-
+    implements class_5335<TableBonusLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, TableBonusLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("enchantment", Registry.ENCHANTMENT.getId(arg.enchantment).toString());
@@ -80,7 +84,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

@@ -20,7 +20,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.sound.SoundEvent;
 
 public class MusicSound {
-    public static final Codec<MusicSound> field_24627 = RecordCodecBuilder.create(instance -> instance.group((App)SoundEvent.field_24628.fieldOf("sound").forGetter(arg -> arg.event), (App)Codec.INT.fieldOf("min_delay").forGetter(arg -> arg.field_24058), (App)Codec.INT.fieldOf("max_delay").forGetter(arg -> arg.field_24059), (App)Codec.BOOL.fieldOf("replace_current_music").forGetter(arg -> arg.field_24060)).apply((Applicative)instance, MusicSound::new));
+    public static final Codec<MusicSound> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)SoundEvent.field_24628.fieldOf("sound").forGetter(arg -> arg.event), (App)Codec.INT.fieldOf("min_delay").forGetter(arg -> arg.field_24058), (App)Codec.INT.fieldOf("max_delay").forGetter(arg -> arg.field_24059), (App)Codec.BOOL.fieldOf("replace_current_music").forGetter(arg -> arg.field_24060)).apply((Applicative)instance, MusicSound::new));
     private final SoundEvent event;
     private final int field_24058;
     private final int field_24059;

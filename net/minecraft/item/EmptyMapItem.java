@@ -31,12 +31,12 @@ extends NetworkSyncedItem {
         arg2.incrementStat(Stats.USED.getOrCreateStat(this));
         arg2.playSound(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1.0f, 1.0f);
         if (lv2.isEmpty()) {
-            return TypedActionResult.success(lv);
+            return TypedActionResult.method_29237(lv, arg.isClient());
         }
         if (!arg2.inventory.insertStack(lv.copy())) {
             arg2.dropItem(lv, false);
         }
-        return TypedActionResult.success(lv2);
+        return TypedActionResult.method_29237(lv2, arg.isClient());
     }
 }
 

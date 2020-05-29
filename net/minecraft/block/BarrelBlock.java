@@ -60,7 +60,7 @@ extends BlockWithEntity {
             arg4.incrementStat(Stats.OPEN_BARREL);
             PiglinBrain.onGoldBlockBroken(arg4);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override

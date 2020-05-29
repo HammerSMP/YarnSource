@@ -29,7 +29,7 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class DarkOakTrunkPlacer
 extends TrunkPlacer {
-    public static final Codec<DarkOakTrunkPlacer> field_24966 = RecordCodecBuilder.create(instance -> DarkOakTrunkPlacer.method_28904(instance).apply((Applicative)instance, DarkOakTrunkPlacer::new));
+    public static final Codec<DarkOakTrunkPlacer> CODEC = RecordCodecBuilder.create(instance -> DarkOakTrunkPlacer.method_28904(instance).apply((Applicative)instance, DarkOakTrunkPlacer::new));
 
     public DarkOakTrunkPlacer(int i, int j, int k) {
         super(i, j, k);

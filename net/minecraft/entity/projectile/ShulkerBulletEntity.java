@@ -88,7 +88,7 @@ extends ProjectileEntity {
     protected void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
         if (this.target != null) {
-            arg.putUuidNew("Target", this.target.getUuid());
+            arg.putUuid("Target", this.target.getUuid());
         }
         if (this.direction != null) {
             arg.putInt("Dir", this.direction.getId());
@@ -109,8 +109,8 @@ extends ProjectileEntity {
         if (arg.contains("Dir", 99)) {
             this.direction = Direction.byId(arg.getInt("Dir"));
         }
-        if (arg.containsUuidNew("Target")) {
-            this.targetUuid = arg.getUuidNew("Target");
+        if (arg.containsUuid("Target")) {
+            this.targetUuid = arg.getUuid("Target");
         }
     }
 

@@ -55,7 +55,7 @@ extends AnimalEntity {
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
         if (this.getOwnerUuid() != null) {
-            arg.putUuidNew("Owner", this.getOwnerUuid());
+            arg.putUuid("Owner", this.getOwnerUuid());
         }
         arg.putBoolean("Sitting", this.sitting);
     }
@@ -64,8 +64,8 @@ extends AnimalEntity {
     public void readCustomDataFromTag(CompoundTag arg) {
         UUID uUID2;
         super.readCustomDataFromTag(arg);
-        if (arg.containsUuidNew("Owner")) {
-            UUID uUID = arg.getUuidNew("Owner");
+        if (arg.containsUuid("Owner")) {
+            UUID uUID = arg.getUuid("Owner");
         } else {
             String string = arg.getString("Owner");
             uUID2 = ServerConfigHandler.getPlayerUuidByName(this.getServer(), string);

@@ -160,7 +160,7 @@ public final class SpawnHelper {
         if (d <= 576.0) {
             return false;
         }
-        if (arg.method_27911().isWithinDistance(new Vec3d((float)arg3.getX() + 0.5f, arg3.getY(), (float)arg3.getZ() + 0.5f), 24.0)) {
+        if (arg.getSpawnPos().isWithinDistance(new Vec3d((float)arg3.getX() + 0.5f, arg3.getY(), (float)arg3.getZ() + 0.5f), 24.0)) {
             return false;
         }
         ChunkPos lv = new ChunkPos(arg3);

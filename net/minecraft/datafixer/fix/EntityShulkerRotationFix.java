@@ -23,7 +23,7 @@ extends ChoiceFix {
         super(schema, false, "EntityShulkerRotationFix", TypeReferences.ENTITY, "minecraft:shulker");
     }
 
-    public Dynamic<?> fixShulkerRotation(Dynamic<?> dynamic2) {
+    public Dynamic<?> fixRotation(Dynamic<?> dynamic2) {
         List list = dynamic2.get("Rotation").asList(dynamic -> dynamic.asDouble(180.0));
         if (!list.isEmpty()) {
             list.set(0, (Double)list.get(0) - 180.0);
@@ -34,7 +34,7 @@ extends ChoiceFix {
 
     @Override
     protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixShulkerRotation);
+        return typed.update(DSL.remainderFinder(), this::fixRotation);
     }
 }
 

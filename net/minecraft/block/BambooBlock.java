@@ -138,7 +138,7 @@ implements Fertilizable {
             arg4.getBlockTickScheduler().schedule(arg5, this, 1);
         }
         if (arg2 == Direction.UP && arg3.isOf(Blocks.BAMBOO) && arg3.get(AGE) > arg.get(AGE)) {
-            arg4.setBlockState(arg5, (BlockState)arg.method_28493(AGE), 2);
+            arg4.setBlockState(arg5, (BlockState)arg.cycle(AGE), 2);
         }
         return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
     }

@@ -33,6 +33,7 @@ extends ForgingScreen<AnvilScreenHandler> {
 
     public AnvilScreen(AnvilScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3, TEXTURE);
+        this.field_25267 = 60;
     }
 
     @Override
@@ -91,8 +92,7 @@ extends ForgingScreen<AnvilScreenHandler> {
     @Override
     protected void drawForeground(MatrixStack arg, int i, int j) {
         RenderSystem.disableBlend();
-        this.textRenderer.draw(arg, this.title, 60.0f, 6.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 96 + 2), 0x404040);
+        super.drawForeground(arg, i, j);
         int k = ((AnvilScreenHandler)this.handler).getLevelCost();
         if (k > 0) {
             int l = 8453920;

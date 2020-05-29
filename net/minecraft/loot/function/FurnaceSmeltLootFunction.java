@@ -12,14 +12,15 @@ package net.minecraft.loot.function;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import java.util.Optional;
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
-import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,8 +28,13 @@ public class FurnaceSmeltLootFunction
 extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private FurnaceSmeltLootFunction(LootCondition[] args) {
+    private FurnaceSmeltLootFunction(class_5341[] args) {
         super(args);
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.FURNACE_SMELT;
     }
 
     @Override
@@ -37,7 +43,7 @@ extends ConditionalLootFunction {
         if (arg.isEmpty()) {
             return arg;
         }
-        Optional<SmeltingRecipe> optional = arg2.getWorld().getRecipeManager().getFirstMatch(RecipeType.SMELTING, new BasicInventory(arg), arg2.getWorld());
+        Optional<SmeltingRecipe> optional = arg2.getWorld().getRecipeManager().getFirstMatch(RecipeType.SMELTING, new SimpleInventory(arg), arg2.getWorld());
         if (optional.isPresent() && !(lv = optional.get().getOutput()).isEmpty()) {
             ItemStack lv2 = lv.copy();
             lv2.setCount(arg.getCount());
@@ -51,19 +57,15 @@ extends ConditionalLootFunction {
         return FurnaceSmeltLootFunction.builder(FurnaceSmeltLootFunction::new);
     }
 
-    public static class Factory
+    public static class class_5340
     extends ConditionalLootFunction.Factory<FurnaceSmeltLootFunction> {
-        protected Factory() {
-            super(new Identifier("furnace_smelt"), FurnaceSmeltLootFunction.class);
-        }
-
         @Override
-        public FurnaceSmeltLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public FurnaceSmeltLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return new FurnaceSmeltLootFunction(args);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

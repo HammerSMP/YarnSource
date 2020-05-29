@@ -17,9 +17,10 @@ import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.FeatureUpdater;
 import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.storage.StorageIoWorker;
 
 public class VersionedChunkStorage
@@ -34,7 +35,7 @@ implements AutoCloseable {
         this.worker = new StorageIoWorker(file, bl, "chunk");
     }
 
-    public CompoundTag updateChunkTag(DimensionType arg, Supplier<PersistentStateManager> supplier, CompoundTag arg2) {
+    public CompoundTag updateChunkTag(RegistryKey<World> arg, Supplier<PersistentStateManager> supplier, CompoundTag arg2) {
         int i = VersionedChunkStorage.getDataVersion(arg2);
         int j = 1493;
         if (i < 1493 && (arg2 = NbtHelper.update(this.dataFixer, DataFixTypes.CHUNK, arg2, i, 1493)).getCompound("Level").getBoolean("hasLegacyStructureData")) {

@@ -4,7 +4,7 @@
  * Could not load the following classes:
  *  javax.annotation.Nullable
  */
-package net.minecraft;
+package net.minecraft.server.network;
 
 import java.util.Random;
 import javax.annotation.Nullable;
@@ -17,9 +17,9 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.WorldChunk;
 
-public class class_5322 {
+public class SpawnLocating {
     @Nullable
-    private static BlockPos method_29194(ServerWorld arg, int i, int j, boolean bl) {
+    private static BlockPos findOverworldSpawn(ServerWorld arg, int i, int j, boolean bl) {
         BlockPos.Mutable lv = new BlockPos.Mutable(i, 0, j);
         Biome lv2 = arg.getBiome(lv);
         BlockState lv3 = lv2.getSurfaceConfig().getTopMaterial();
@@ -45,7 +45,7 @@ public class class_5322 {
     }
 
     @Nullable
-    private static BlockPos method_29195(ServerWorld arg, long l, int i, int j) {
+    private static BlockPos findEndSpawn(ServerWorld arg, long l, int i, int j) {
         ChunkPos lv = new ChunkPos(i >> 4, j >> 4);
         Random random = new Random(l);
         BlockPos lv2 = new BlockPos(lv.getStartX() + random.nextInt(15), 0, lv.getEndZ() + random.nextInt(15));
@@ -53,10 +53,10 @@ public class class_5322 {
     }
 
     @Nullable
-    public static BlockPos method_29196(ServerWorld arg, ChunkPos arg2, boolean bl) {
+    public static BlockPos findServerSpawnPoint(ServerWorld arg, ChunkPos arg2, boolean bl) {
         for (int i = arg2.getStartX(); i <= arg2.getEndX(); ++i) {
             for (int j = arg2.getStartZ(); j <= arg2.getEndZ(); ++j) {
-                BlockPos lv = class_5322.method_29194(arg, i, j, bl);
+                BlockPos lv = SpawnLocating.findOverworldSpawn(arg, i, j, bl);
                 if (lv == null) continue;
                 return lv;
             }
@@ -65,12 +65,12 @@ public class class_5322 {
     }
 
     @Nullable
-    protected static BlockPos method_29197(ServerWorld arg, BlockPos arg2, int i, int j, int k) {
-        if (arg.getDimension().method_28541()) {
-            return class_5322.method_29194(arg, arg2.getX() + j - i, arg2.getZ() + k - i, false);
+    protected static BlockPos findPlayerSpawn(ServerWorld arg, BlockPos arg2, int i, int j, int k) {
+        if (arg.getDimension().isOverworld()) {
+            return SpawnLocating.findOverworldSpawn(arg, arg2.getX() + j - i, arg2.getZ() + k - i, false);
         }
-        if (arg.getDimension().method_28543()) {
-            return class_5322.method_29195(arg, arg.getSeed(), arg2.getX() + j - i, arg2.getZ() + k - i);
+        if (arg.getDimension().isEnd()) {
+            return SpawnLocating.findEndSpawn(arg, arg.getSeed(), arg2.getX() + j - i, arg2.getZ() + k - i);
         }
         return null;
     }

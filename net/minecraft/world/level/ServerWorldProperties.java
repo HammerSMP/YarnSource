@@ -1,18 +1,18 @@
 /*
  * Decompiled with CFR 0.149.
  */
-package net.minecraft;
+package net.minecraft.world.level;
 
 import java.util.UUID;
-import net.minecraft.class_5269;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.timer.Timer;
 
-public interface class_5268
-extends class_5269 {
+public interface ServerWorldProperties
+extends MutableWorldProperties {
     public String getLevelName();
 
     public void setThundering(boolean var1);
@@ -27,7 +27,7 @@ extends class_5269 {
 
     @Override
     default public void populateCrashReport(CrashReportSection arg) {
-        class_5269.super.populateCrashReport(arg);
+        MutableWorldProperties.super.populateCrashReport(arg);
         arg.add("Level name", this::getLevelName);
         arg.add("Level game mode", () -> String.format("Game mode: %s (ID %d). Hardcore: %b. Cheats: %b", this.getGameMode().getName(), this.getGameMode().getId(), this.isHardcore(), this.areCommandsAllowed()));
         arg.add("Level weather", () -> String.format("Rain time: %d (now: %b), thunder time: %d (now: %b)", this.getRainTime(), this.isRaining(), this.getThunderTime(), this.isThundering()));
@@ -49,9 +49,9 @@ extends class_5269 {
 
     public GameMode getGameMode();
 
-    public void method_27415(WorldBorder.class_5200 var1);
+    public void setWorldBorder(WorldBorder.Properties var1);
 
-    public WorldBorder.class_5200 method_27422();
+    public WorldBorder.Properties getWorldBorder();
 
     public boolean isInitialized();
 

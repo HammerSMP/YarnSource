@@ -71,21 +71,21 @@ implements Monster,
 Hoglin {
     private static final TrackedData<Boolean> BABY = DataTracker.registerData(ZoglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private int movementCooldownTicks;
-    protected static final ImmutableList<? extends SensorType<? extends Sensor<? super ZoglinEntity>>> field_23731 = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS);
-    protected static final ImmutableList<? extends MemoryModuleType<?>> field_23733 = ImmutableList.of(MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.LOOK_TARGET, MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.PATH, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN);
+    protected static final ImmutableList<? extends SensorType<? extends Sensor<? super ZoglinEntity>>> USED_SENSORS = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS);
+    protected static final ImmutableList<? extends MemoryModuleType<?>> USED_MEMORY_MODULES = ImmutableList.of(MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.LOOK_TARGET, MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.PATH, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN);
 
     public ZoglinEntity(EntityType<? extends ZoglinEntity> arg, World arg2) {
         super((EntityType<? extends HostileEntity>)arg, arg2);
         this.experiencePoints = 5;
     }
 
-    protected Brain.class_5303<ZoglinEntity> method_28306() {
-        return Brain.method_28311(field_23733, field_23731);
+    protected Brain.Profile<ZoglinEntity> createBrainProfile() {
+        return Brain.createProfile(USED_MEMORY_MODULES, USED_SENSORS);
     }
 
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        Brain<ZoglinEntity> lv = this.method_28306().method_28335(dynamic);
+        Brain<ZoglinEntity> lv = this.createBrainProfile().deserialize(dynamic);
         ZoglinEntity.method_26928(lv);
         ZoglinEntity.method_26929(lv);
         ZoglinEntity.method_26930(lv);

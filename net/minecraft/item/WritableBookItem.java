@@ -35,7 +35,7 @@ extends Item {
         World lv = arg.getWorld();
         BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
         if (lv3.isOf(Blocks.LECTERN)) {
-            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, arg.getStack()) ? ActionResult.SUCCESS : ActionResult.PASS;
+            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, arg.getStack()) ? ActionResult.method_29236(lv.isClient) : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }
@@ -45,7 +45,7 @@ extends Item {
         ItemStack lv = arg2.getStackInHand(arg3);
         arg2.openEditBookScreen(lv, arg3);
         arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        return TypedActionResult.success(lv);
+        return TypedActionResult.method_29237(lv, arg.isClient());
     }
 
     public static boolean isValid(@Nullable CompoundTag arg) {

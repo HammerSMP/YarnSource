@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.text.BaseText;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -41,13 +42,13 @@ extends BaseText {
     }
 
     @Override
-    public <T> Optional<T> visitSelf(Text.Visitor<T> arg) {
+    public <T> Optional<T> visitSelf(class_5348.Visitor<T> arg) {
         return this.getTranslated().visit(arg);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public <T> Optional<T> visitSelf(Text.StyledVisitor<T> arg, Style arg2) {
+    public <T> Optional<T> visitSelf(class_5348.StyledVisitor<T> arg, Style arg2) {
         return this.getTranslated().visit(arg, arg2);
     }
 

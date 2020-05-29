@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.AbstractParentElement;
@@ -45,6 +46,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashException;
@@ -135,22 +137,26 @@ Drawable {
         return arg.getTooltip(this.client.player, this.client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
     }
 
-    public void renderTooltip(MatrixStack arg, Text arg2, int i, int j) {
+    public void renderTooltip(MatrixStack arg, class_5348 arg2, int i, int j) {
         this.renderTooltip(arg, Arrays.asList(arg2), i, j);
     }
 
-    public void renderTooltip(MatrixStack arg, List<Text> list, int i, int j) {
+    /*
+     * WARNING - void declaration
+     */
+    public void renderTooltip(MatrixStack arg, List<? extends class_5348> list, int i, int j) {
+        int n;
         if (list.isEmpty()) {
             return;
         }
         int k = 0;
-        for (Text lv : list) {
-            int l = this.textRenderer.getWidth(lv);
+        for (class_5348 class_53482 : list) {
+            int l = this.textRenderer.getWidth(class_53482);
             if (l <= k) continue;
             k = l;
         }
         int m = i + 12;
-        int n = j - 12;
+        int n2 = j - 12;
         int o = k;
         int p = 8;
         if (list.size() > 1) {
@@ -159,28 +165,27 @@ Drawable {
         if (m + k > this.width) {
             m -= 28 + k;
         }
-        if (n + p + 6 > this.height) {
+        if (n2 + p + 6 > this.height) {
             n = this.height - p - 6;
         }
         arg.push();
-        this.itemRenderer.zOffset = 300.0f;
         int q = -267386864;
         int r = 0x505000FF;
         int s = 1344798847;
-        int t = 300;
+        int t = 400;
         Tessellator lv2 = Tessellator.getInstance();
         BufferBuilder lv3 = lv2.getBuffer();
         lv3.begin(7, VertexFormats.POSITION_COLOR);
         Matrix4f lv4 = arg.peek().getModel();
-        Screen.fillGradient(lv4, lv3, m - 3, n - 4, m + o + 3, n - 3, 300, -267386864, -267386864);
-        Screen.fillGradient(lv4, lv3, m - 3, n + p + 3, m + o + 3, n + p + 4, 300, -267386864, -267386864);
-        Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n + p + 3, 300, -267386864, -267386864);
-        Screen.fillGradient(lv4, lv3, m - 4, n - 3, m - 3, n + p + 3, 300, -267386864, -267386864);
-        Screen.fillGradient(lv4, lv3, m + o + 3, n - 3, m + o + 4, n + p + 3, 300, -267386864, -267386864);
-        Screen.fillGradient(lv4, lv3, m - 3, n - 3 + 1, m - 3 + 1, n + p + 3 - 1, 300, 0x505000FF, 1344798847);
-        Screen.fillGradient(lv4, lv3, m + o + 2, n - 3 + 1, m + o + 3, n + p + 3 - 1, 300, 0x505000FF, 1344798847);
-        Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n - 3 + 1, 300, 0x505000FF, 0x505000FF);
-        Screen.fillGradient(lv4, lv3, m - 3, n + p + 2, m + o + 3, n + p + 3, 300, 1344798847, 1344798847);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 4, m + o + 3, n - 3, 400, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 3, n + p + 3, m + o + 3, n + p + 4, 400, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n + p + 3, 400, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 4, n - 3, m - 3, n + p + 3, 400, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m + o + 3, n - 3, m + o + 4, n + p + 3, 400, -267386864, -267386864);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 3 + 1, m - 3 + 1, n + p + 3 - 1, 400, 0x505000FF, 1344798847);
+        Screen.fillGradient(lv4, lv3, m + o + 2, n - 3 + 1, m + o + 3, n + p + 3 - 1, 400, 0x505000FF, 1344798847);
+        Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n - 3 + 1, 400, 0x505000FF, 0x505000FF);
+        Screen.fillGradient(lv4, lv3, m - 3, n + p + 2, m + o + 3, n + p + 3, 400, 1344798847, 1344798847);
         RenderSystem.enableDepthTest();
         RenderSystem.disableTexture();
         RenderSystem.enableBlend();
@@ -192,27 +197,27 @@ Drawable {
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
         VertexConsumerProvider.Immediate lv5 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        arg.translate(0.0, 0.0, this.itemRenderer.zOffset);
+        arg.translate(0.0, 0.0, 400.0);
         for (int u = 0; u < list.size(); ++u) {
-            Text lv6 = list.get(u);
+            class_5348 lv6 = list.get(u);
             if (lv6 != null) {
-                this.textRenderer.draw(lv6, (float)m, (float)n, -1, true, lv4, (VertexConsumerProvider)lv5, false, 0, 0xF000F0);
+                void var7_11;
+                this.textRenderer.draw(lv6, (float)m, (float)var7_11, -1, true, lv4, (VertexConsumerProvider)lv5, false, 0, 0xF000F0);
             }
             if (u == 0) {
-                n += 2;
+                var7_11 += 2;
             }
-            n += 10;
+            var7_11 += 10;
         }
         lv5.draw();
         arg.pop();
-        this.itemRenderer.zOffset = 0.0f;
     }
 
-    protected void renderTextHoverEffect(MatrixStack arg, @Nullable Text arg2, int i, int j) {
-        if (arg2 == null || arg2.getStyle().getHoverEvent() == null) {
+    protected void renderTextHoverEffect(MatrixStack arg, @Nullable Style arg2, int i, int j) {
+        if (arg2 == null || arg2.getHoverEvent() == null) {
             return;
         }
-        HoverEvent lv = arg2.getStyle().getHoverEvent();
+        HoverEvent lv = arg2.getHoverEvent();
         HoverEvent.ItemStackContent lv2 = lv.getValue(HoverEvent.Action.SHOW_ITEM);
         if (lv2 != null) {
             this.renderTooltip(arg, lv2.asStack(), i, j);
@@ -234,14 +239,14 @@ Drawable {
     protected void insertText(String string, boolean bl) {
     }
 
-    public boolean handleTextClick(Text arg) {
+    public boolean handleTextClick(@Nullable Style arg) {
         if (arg == null) {
             return false;
         }
-        ClickEvent lv = arg.getStyle().getClickEvent();
+        ClickEvent lv = arg.getClickEvent();
         if (Screen.hasShiftDown()) {
-            if (arg.getStyle().getInsertion() != null) {
-                this.insertText(arg.getStyle().getInsertion(), false);
+            if (arg.getInsertion() != null) {
+                this.insertText(arg.getInsertion(), false);
             }
         } else if (lv != null) {
             block21: {

@@ -94,7 +94,7 @@ extends BlockWithEntity {
             return ActionResult.SUCCESS;
         }
         arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override

@@ -26,6 +26,7 @@ extends HandledScreen<HopperScreenHandler> {
         super(arg, arg2, arg3);
         this.passEvents = false;
         this.backgroundHeight = 133;
+        this.field_25270 = this.backgroundHeight - 94;
     }
 
     @Override
@@ -33,12 +34,6 @@ extends HandledScreen<HopperScreenHandler> {
         this.renderBackground(arg);
         super.render(arg, i, j, f);
         this.drawMouseoverTooltip(arg, i, j);
-    }
-
-    @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, 8.0f, 6.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 96 + 2), 0x404040);
     }
 
     @Override

@@ -54,7 +54,7 @@ implements IndexedIterable<K> {
         return this.ids[i];
     }
 
-    public boolean method_28138(int i) {
+    public boolean containsId(int i) {
         return this.get(i) != null;
     }
 

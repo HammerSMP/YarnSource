@@ -17,6 +17,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
@@ -148,7 +149,7 @@ extends Screen {
             if (lv.method_27146(d, e)) {
                 return true;
             }
-            Text lv2 = lv.getText(d, e);
+            Style lv2 = lv.getText(d, e);
             if (lv2 != null && this.handleTextClick(lv2)) {
                 return true;
             }
@@ -194,8 +195,8 @@ extends Screen {
         ChatScreen.fill(arg, 2, this.height - 14, this.width - 2, this.height - 2, this.client.options.getTextBackgroundColor(Integer.MIN_VALUE));
         this.chatField.render(arg, i, j, f);
         this.commandSuggestor.render(arg, i, j);
-        Text lv = this.client.inGameHud.getChatHud().getText(i, j);
-        if (lv != null && lv.getStyle().getHoverEvent() != null) {
+        Style lv = this.client.inGameHud.getChatHud().getText(i, j);
+        if (lv != null && lv.getHoverEvent() != null) {
             this.renderTextHoverEffect(arg, lv, i, j);
         }
         super.render(arg, i, j, f);

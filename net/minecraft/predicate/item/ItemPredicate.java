@@ -23,6 +23,7 @@ import com.google.gson.JsonSyntaxException;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.minecraft.class_5323;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.EnchantedBookItem;
@@ -35,7 +36,6 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.item.EnchantmentPredicate;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -136,7 +136,7 @@ public class ItemPredicate {
         Tag<Item> lv6 = null;
         if (jsonObject.has("tag")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv6 = ItemTags.getContainer().get(lv7);
+            lv6 = class_5323.method_29223().method_29220().get(lv7);
             if (lv6 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv7 + "'");
             }
@@ -160,7 +160,7 @@ public class ItemPredicate {
             jsonObject.addProperty("item", Registry.ITEM.getId(this.item).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", ItemTags.getContainer().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", class_5323.method_29223().method_29220().checkId(this.tag).toString());
         }
         jsonObject.add("count", this.count.toJson());
         jsonObject.add("durability", this.durability.toJson());

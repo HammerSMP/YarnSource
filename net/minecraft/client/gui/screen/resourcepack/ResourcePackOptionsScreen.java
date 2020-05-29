@@ -43,17 +43,18 @@ extends GameOptionsScreen {
     @Override
     protected void init() {
         this.addButton(new ButtonWidget(this.width / 2 - 154, this.height - 48, 150, 20, new TranslatableText("resourcePack.openFolder"), arg -> Util.getOperatingSystem().open(this.client.getResourcePackDir())));
-        this.addButton(new ButtonWidget(this.width / 2 + 4, this.height - 48, 150, 20, ScreenTexts.DONE, arg -> {
+        ResourcePackManager<ClientResourcePackProfile> lv = this.client.getResourcePackManager();
+        this.addButton(new ButtonWidget(this.width / 2 + 4, this.height - 48, 150, 20, ScreenTexts.DONE, arg2 -> {
             if (this.dirty) {
                 ArrayList list = Lists.newArrayList();
                 for (ResourcePackListWidget.ResourcePackEntry lv : this.enabledPacks.children()) {
-                    list.add(lv.getPack());
+                    list.add(lv.getPack().getName());
                 }
                 Collections.reverse(list);
-                this.client.getResourcePackManager().setEnabledProfiles(list);
+                lv.setEnabledProfiles(list);
                 this.gameOptions.resourcePacks.clear();
                 this.gameOptions.incompatibleResourcePacks.clear();
-                for (ClientResourcePackProfile lv2 : list) {
+                for (ClientResourcePackProfile lv2 : lv.getEnabledProfiles()) {
                     if (lv2.isPinned()) continue;
                     this.gameOptions.resourcePacks.add(lv2.getName());
                     if (lv2.getCompatibility().isCompatible()) continue;
@@ -66,18 +67,18 @@ extends GameOptionsScreen {
                 this.client.openScreen(this.parent);
             }
         }));
-        AvailableResourcePackListWidget lv = this.availablePacks;
-        SelectedResourcePackListWidget lv2 = this.enabledPacks;
+        AvailableResourcePackListWidget lv2 = this.availablePacks;
+        SelectedResourcePackListWidget lv3 = this.enabledPacks;
         this.availablePacks = new AvailableResourcePackListWidget(this.client, 200, this.height);
         this.availablePacks.setLeftPos(this.width / 2 - 4 - 200);
-        if (lv != null) {
-            this.availablePacks.children().addAll(lv.children());
+        if (lv2 != null) {
+            this.availablePacks.children().addAll(lv2.children());
         }
         this.children.add(this.availablePacks);
         this.enabledPacks = new SelectedResourcePackListWidget(this.client, 200, this.height);
         this.enabledPacks.setLeftPos(this.width / 2 + 4);
-        if (lv2 != null) {
-            lv2.children().forEach(arg -> {
+        if (lv3 != null) {
+            lv3.children().forEach(arg -> {
                 this.enabledPacks.children().add((ResourcePackListWidget.ResourcePackEntry)arg);
                 arg.method_24232(this.enabledPacks);
             });
@@ -86,14 +87,13 @@ extends GameOptionsScreen {
         if (!this.dirty) {
             this.availablePacks.children().clear();
             this.enabledPacks.children().clear();
-            ResourcePackManager<ClientResourcePackProfile> lv3 = this.client.getResourcePackManager();
-            lv3.scanPacks();
-            ArrayList list = Lists.newArrayList(lv3.getProfiles());
-            list.removeAll(lv3.getEnabledProfiles());
+            lv.scanPacks();
+            ArrayList list = Lists.newArrayList(lv.getProfiles());
+            list.removeAll(lv.getEnabledProfiles());
             for (ClientResourcePackProfile lv4 : list) {
                 this.availablePacks.add(new ResourcePackListWidget.ResourcePackEntry(this.availablePacks, this, lv4));
             }
-            for (ClientResourcePackProfile lv5 : Lists.reverse((List)Lists.newArrayList(lv3.getEnabledProfiles()))) {
+            for (ClientResourcePackProfile lv5 : Lists.reverse((List)Lists.newArrayList(lv.getEnabledProfiles()))) {
                 this.enabledPacks.add(new ResourcePackListWidget.ResourcePackEntry(this.enabledPacks, this, lv5));
             }
         }

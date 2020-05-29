@@ -15,7 +15,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.class_5275;
+import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityPose;
@@ -219,8 +219,8 @@ Saddleable {
     }
 
     @Override
-    public Vec3d method_24829(LivingEntity arg) {
-        Vec3d[] lvs = new Vec3d[]{StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw - 22.5f), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw + 22.5f), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw - 45.0f), StriderEntity.method_24826(this.getWidth(), arg.getWidth(), arg.yaw + 45.0f)};
+    public Vec3d updatePassengerForDismount(LivingEntity arg) {
+        Vec3d[] lvs = new Vec3d[]{StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw - 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw + 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw - 45.0f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw + 45.0f)};
         LinkedHashSet set = Sets.newLinkedHashSet();
         double d = this.getBoundingBox().maxY;
         double e = this.getBoundingBox().minY - 0.5;
@@ -237,8 +237,8 @@ Saddleable {
             for (EntityPose lv4 : arg.getPoses()) {
                 Vec3d lv6;
                 Box lv5;
-                double g = this.world.method_26372(lv3);
-                if (!class_5275.method_27932(g) || !class_5275.method_27933(this.world, arg, (lv5 = arg.method_24833(lv4)).offset(lv6 = Vec3d.ofCenter(lv3, g)))) continue;
+                double g = this.world.getCollisionHeightAt(lv3);
+                if (!Dismounting.canDismountInBlock(g) || !Dismounting.canPlaceEntityAt(this.world, arg, (lv5 = arg.getBoundingBox(lv4)).offset(lv6 = Vec3d.ofCenter(lv3, g)))) continue;
                 arg.setPose(lv4);
                 return lv6;
             }

@@ -50,7 +50,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -61,8 +61,8 @@ import net.minecraft.world.World;
 public class Item
 implements ItemConvertible {
     public static final Map<Block, Item> BLOCK_ITEMS = Maps.newHashMap();
-    protected static final UUID ATTACK_DAMAGE_MODIFIER_UUID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-    protected static final UUID ATTACK_SPEED_MODIFIER_UUID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
+    protected static final UUID ATTACK_DAMAGE_MODIFIER_ID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
+    protected static final UUID ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
     protected static final Random RANDOM = new Random();
     protected final ItemGroup group;
     private final Rarity rarity;
@@ -262,7 +262,7 @@ implements ItemConvertible {
         return this.getMaxCount() == 1 && this.isDamageable();
     }
 
-    protected static HitResult rayTrace(World arg, PlayerEntity arg2, RayTraceContext.FluidHandling arg3) {
+    protected static BlockHitResult rayTrace(World arg, PlayerEntity arg2, RayTraceContext.FluidHandling arg3) {
         float f = arg2.pitch;
         float g = arg2.yaw;
         Vec3d lv = arg2.getCameraPosVec(1.0f);

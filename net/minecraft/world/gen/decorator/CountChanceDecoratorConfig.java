@@ -17,7 +17,7 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class CountChanceDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<CountChanceDecoratorConfig> field_24984 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.FLOAT.fieldOf("chance").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, CountChanceDecoratorConfig::new));
+    public static final Codec<CountChanceDecoratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.FLOAT.fieldOf("chance").forGetter(arg -> Float.valueOf(arg.chance))).apply((Applicative)instance, CountChanceDecoratorConfig::new));
     public final int count;
     public final float chance;
 

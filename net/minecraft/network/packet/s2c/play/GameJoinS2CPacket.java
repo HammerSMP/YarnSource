@@ -2,20 +2,26 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.Sets
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.network.packet.s2c.play;
 
+import com.google.common.collect.Sets;
 import java.io.IOException;
+import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5318;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.world.dimension.DimensionType;
 
 public class GameJoinS2CPacket
 implements Packet<ClientPlayPacketListener> {
@@ -23,8 +29,10 @@ implements Packet<ClientPlayPacketListener> {
     private long seed;
     private boolean hardcore;
     private GameMode gameMode;
-    private class_5318.class_5319 dimension;
-    private Identifier field_25134;
+    private Set<RegistryKey<World>> field_25320;
+    private DimensionTracker.Modifiable dimensionTracker;
+    private RegistryKey<DimensionType> field_25321;
+    private RegistryKey<World> dimensionId;
     private int maxPlayers;
     private int chunkLoadDistance;
     private boolean reducedDebugInfo;
@@ -35,10 +43,12 @@ implements Packet<ClientPlayPacketListener> {
     public GameJoinS2CPacket() {
     }
 
-    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, class_5318.class_5319 arg2, Identifier arg3, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
+    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, Set<RegistryKey<World>> set, DimensionTracker.Modifiable arg2, RegistryKey<DimensionType> arg3, RegistryKey<World> arg4, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
         this.playerEntityId = i;
-        this.dimension = arg2;
-        this.field_25134 = arg3;
+        this.field_25320 = set;
+        this.dimensionTracker = arg2;
+        this.field_25321 = arg3;
+        this.dimensionId = arg4;
         this.seed = l;
         this.gameMode = arg;
         this.maxPlayers = j;
@@ -56,8 +66,14 @@ implements Packet<ClientPlayPacketListener> {
         int i = arg.readUnsignedByte();
         this.hardcore = (i & 8) == 8;
         this.gameMode = GameMode.byId(i &= 0xFFFFFFF7);
-        this.dimension = arg.method_29171(class_5318.class_5319.field_25119);
-        this.field_25134 = arg.readIdentifier();
+        int j = arg.readVarInt();
+        this.field_25320 = Sets.newHashSet();
+        for (int k = 0; k < j; ++k) {
+            this.field_25320.add(RegistryKey.of(Registry.DIMENSION, arg.readIdentifier()));
+        }
+        this.dimensionTracker = arg.decode(DimensionTracker.Modifiable.CODEC);
+        this.field_25321 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
+        this.dimensionId = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
         this.seed = arg.readLong();
         this.maxPlayers = arg.readUnsignedByte();
         this.chunkLoadDistance = arg.readVarInt();
@@ -75,8 +91,13 @@ implements Packet<ClientPlayPacketListener> {
             i |= 8;
         }
         arg.writeByte(i);
-        arg.method_29172(class_5318.class_5319.field_25119, this.dimension);
-        arg.writeIdentifier(this.field_25134);
+        arg.writeVarInt(this.field_25320.size());
+        for (RegistryKey<World> lv : this.field_25320) {
+            arg.writeIdentifier(lv.getValue());
+        }
+        arg.encode(DimensionTracker.Modifiable.CODEC, this.dimensionTracker);
+        arg.writeIdentifier(this.field_25321.getValue());
+        arg.writeIdentifier(this.dimensionId.getValue());
         arg.writeLong(this.seed);
         arg.writeByte(this.maxPlayers);
         arg.writeVarInt(this.chunkLoadDistance);
@@ -112,13 +133,23 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public class_5318 getDimension() {
-        return this.dimension;
+    public Set<RegistryKey<World>> method_29443() {
+        return this.field_25320;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Identifier method_29176() {
-        return this.field_25134;
+    public DimensionTracker getDimension() {
+        return this.dimensionTracker;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public RegistryKey<DimensionType> method_29444() {
+        return this.field_25321;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public RegistryKey<World> getDimensionId() {
+        return this.dimensionId;
     }
 
     @Environment(value=EnvType.CLIENT)

@@ -21,19 +21,19 @@ import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.util.collection.DefaultedList;
 
-public class BasicInventory
+public class SimpleInventory
 implements Inventory,
 RecipeInputProvider {
     private final int size;
     private final DefaultedList<ItemStack> stacks;
     private List<InventoryChangedListener> listeners;
 
-    public BasicInventory(int i) {
+    public SimpleInventory(int i) {
         this.size = i;
         this.stacks = DefaultedList.ofSize(i, ItemStack.EMPTY);
     }
 
-    public BasicInventory(ItemStack ... args) {
+    public SimpleInventory(ItemStack ... args) {
         this.size = args.length;
         this.stacks = DefaultedList.copyOf(ItemStack.EMPTY, args);
     }

@@ -541,7 +541,6 @@ extends Screen {
         if (string.isEmpty()) {
             return class_5233.field_24271;
         }
-        String string2 = this.textRenderer.isRightToLeft() ? this.textRenderer.mirror(string) : string;
         int i = this.field_24269.getSelectionStart();
         int j = this.field_24269.getSelectionEnd();
         IntArrayList intList = new IntArrayList();
@@ -549,15 +548,15 @@ extends Screen {
         MutableInt mutableInt = new MutableInt();
         MutableBoolean mutableBoolean = new MutableBoolean();
         TextHandler lv = this.textRenderer.getTextHandler();
-        lv.wrapLines(string2, 114, Style.EMPTY, true, (arg_0, arg_1, arg_2) -> this.method_27586(mutableInt, string2, mutableBoolean, (IntList)intList, list, arg_0, arg_1, arg_2));
+        lv.wrapLines(string, 114, Style.EMPTY, true, (arg_0, arg_1, arg_2) -> this.method_27586(mutableInt, string, mutableBoolean, (IntList)intList, list, arg_0, arg_1, arg_2));
         int[] is = intList.toIntArray();
-        boolean bl2 = bl = i == string2.length();
+        boolean bl2 = bl = i == string.length();
         if (bl && mutableBoolean.isTrue()) {
             this.textRenderer.getClass();
             class_5234 lv2 = new class_5234(0, list.size() * 9);
         } else {
             int k = BookEditScreen.method_27591(is, i);
-            int l = this.textRenderer.getWidth(string2.substring(is[k], i));
+            int l = this.textRenderer.getWidth(string.substring(is[k], i));
             this.textRenderer.getClass();
             lv3 = new class_5234(l, k * 9);
         }
@@ -571,24 +570,24 @@ extends Screen {
                 this.textRenderer.getClass();
                 int q = o * 9;
                 int r = is[o];
-                list2.add(this.method_27585(string2, lv, m, n, q, r));
+                list2.add(this.method_27585(string, lv, m, n, q, r));
             } else {
-                int s = o + 1 > is.length ? string2.length() : is[o + 1];
+                int s = o + 1 > is.length ? string.length() : is[o + 1];
                 this.textRenderer.getClass();
-                list2.add(this.method_27585(string2, lv, m, s, o * 9, is[o]));
+                list2.add(this.method_27585(string, lv, m, s, o * 9, is[o]));
                 for (int t = o + 1; t < p; ++t) {
                     this.textRenderer.getClass();
                     int u = t * 9;
-                    String string3 = string2.substring(is[t], is[t + 1]);
-                    int v = (int)lv.getWidth(string3);
+                    String string2 = string.substring(is[t], is[t + 1]);
+                    int v = (int)lv.getWidth(string2);
                     this.textRenderer.getClass();
                     list2.add(this.method_27583(new class_5234(0, u), new class_5234(v, u + 9)));
                 }
                 this.textRenderer.getClass();
-                list2.add(this.method_27585(string2, lv, is[p], n, p * 9, is[p]));
+                list2.add(this.method_27585(string, lv, is[p], n, p * 9, is[p]));
             }
         }
-        return new class_5233(string2, lv3, bl, is, list.toArray(new Position[0]), list2.toArray(new Rect2i[0]));
+        return new class_5233(string, lv3, bl, is, list.toArray(new Position[0]), list2.toArray(new Rect2i[0]));
     }
 
     private static int method_27591(int[] is, int i) {

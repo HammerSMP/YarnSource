@@ -140,7 +140,7 @@ implements FeatureRendererContext<T, M> {
     protected RenderLayer getRenderLayer(T arg, boolean bl, boolean bl2, boolean bl3) {
         Identifier lv = this.getTexture(arg);
         if (bl2) {
-            return RenderLayer.getEntityTranslucent(lv);
+            return RenderLayer.method_29379(lv);
         }
         if (bl) {
             return ((Model)this.model).getLayer(lv);

@@ -136,7 +136,7 @@ extends Feature<EndSpikeFeatureConfig> {
     }
 
     public static class Spike {
-        public static final Codec<Spike> field_24841 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("centerX").withDefault((Object)0).forGetter(arg -> arg.centerX), (App)Codec.INT.fieldOf("centerZ").withDefault((Object)0).forGetter(arg -> arg.centerZ), (App)Codec.INT.fieldOf("radius").withDefault((Object)0).forGetter(arg -> arg.radius), (App)Codec.INT.fieldOf("height").withDefault((Object)0).forGetter(arg -> arg.height), (App)Codec.BOOL.fieldOf("guarded").withDefault((Object)false).forGetter(arg -> arg.guarded)).apply((Applicative)instance, Spike::new));
+        public static final Codec<Spike> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("centerX").withDefault((Object)0).forGetter(arg -> arg.centerX), (App)Codec.INT.fieldOf("centerZ").withDefault((Object)0).forGetter(arg -> arg.centerZ), (App)Codec.INT.fieldOf("radius").withDefault((Object)0).forGetter(arg -> arg.radius), (App)Codec.INT.fieldOf("height").withDefault((Object)0).forGetter(arg -> arg.height), (App)Codec.BOOL.fieldOf("guarded").withDefault((Object)false).forGetter(arg -> arg.guarded)).apply((Applicative)instance, Spike::new));
         private final int centerX;
         private final int centerZ;
         private final int radius;

@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
+ *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -13,6 +14,7 @@
 package net.minecraft.world;
 
 import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,10 +34,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.class_5217;
-import net.minecraft.class_5269;
-import net.minecraft.class_5318;
-import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -55,6 +53,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.RegistryTagManager;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -66,13 +65,16 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.border.WorldBorder;
@@ -90,6 +92,10 @@ public abstract class World
 implements WorldAccess,
 AutoCloseable {
     protected static final Logger LOGGER = LogManager.getLogger();
+    public static final Codec<RegistryKey<World>> field_25178 = Identifier.field_25139.xmap(RegistryKey.createKeyFactory(Registry.DIMENSION), RegistryKey::getValue);
+    public static final RegistryKey<World> field_25179 = RegistryKey.of(Registry.DIMENSION, new Identifier("overworld"));
+    public static final RegistryKey<World> field_25180 = RegistryKey.of(Registry.DIMENSION, new Identifier("the_nether"));
+    public static final RegistryKey<World> field_25181 = RegistryKey.of(Registry.DIMENSION, new Identifier("the_end"));
     private static final Direction[] DIRECTIONS = Direction.values();
     public final List<BlockEntity> blockEntities = Lists.newArrayList();
     public final List<BlockEntity> tickingBlockEntities = Lists.newArrayList();
@@ -106,19 +112,23 @@ AutoCloseable {
     protected float thunderGradient;
     public final Random random = new Random();
     private final DimensionType dimension;
-    protected final class_5269 properties;
+    protected final MutableWorldProperties properties;
     private final Supplier<Profiler> profiler;
     public final boolean isClient;
     protected boolean iteratingTickingBlockEntities;
     private final WorldBorder border;
     private final BiomeAccess biomeAccess;
+    private final RegistryKey<World> field_25176;
+    private final RegistryKey<DimensionType> field_25177;
 
-    protected World(class_5269 arg, DimensionType arg2, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
+    protected World(MutableWorldProperties arg, RegistryKey<World> arg2, RegistryKey<DimensionType> arg3, DimensionType arg4, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
         this.profiler = supplier;
         this.properties = arg;
-        this.dimension = arg2;
+        this.dimension = arg4;
+        this.field_25176 = arg2;
+        this.field_25177 = arg3;
         this.isClient = bl;
-        this.border = arg2.method_28539() ? new WorldBorder(){
+        this.border = arg4.isShrunk() ? new WorldBorder(){
 
             @Override
             public double getCenterX() {
@@ -131,7 +141,7 @@ AutoCloseable {
             }
         } : new WorldBorder();
         this.thread = Thread.currentThread();
-        this.biomeAccess = new BiomeAccess(this, l, arg2.getBiomeAccessType());
+        this.biomeAccess = new BiomeAccess(this, l, arg4.getBiomeAccessType());
         this.field_24496 = bl2;
     }
 
@@ -177,11 +187,11 @@ AutoCloseable {
         return i < 0 || i >= 256;
     }
 
-    public double method_26372(BlockPos arg2) {
-        return this.method_26097(arg2, arg -> false);
+    public double getCollisionHeightAt(BlockPos arg2) {
+        return this.getCollisionHeightAt(arg2, arg -> false);
     }
 
-    public double method_26097(BlockPos arg, Predicate<BlockState> predicate) {
+    public double getCollisionHeightAt(BlockPos arg, Predicate<BlockState> predicate) {
         VoxelShape lv2;
         BlockState lv = this.getBlockState(arg);
         VoxelShape voxelShape = lv2 = predicate.test(lv) ? VoxelShapes.empty() : lv.getCollisionShape(this, arg);
@@ -234,7 +244,7 @@ AutoCloseable {
         if (World.isHeightInvalid(arg)) {
             return false;
         }
-        if (!this.isClient && this.method_27982()) {
+        if (!this.isClient && this.isDebugWorld()) {
             return false;
         }
         WorldChunk lv = this.getWorldChunk(arg);
@@ -399,11 +409,11 @@ AutoCloseable {
     }
 
     public boolean isDay() {
-        return this.getDimension().method_28541() && this.ambientDarkness < 4;
+        return this.getDimension().isOverworld() && this.ambientDarkness < 4;
     }
 
     public boolean isNight() {
-        return this.getDimension().method_28541() && !this.isDay();
+        return this.getDimension().isOverworld() && !this.isDay();
     }
 
     @Override
@@ -942,7 +952,7 @@ AutoCloseable {
     }
 
     @Override
-    public class_5217 getLevelProperties() {
+    public WorldProperties getLevelProperties() {
         return this.properties;
     }
 
@@ -971,7 +981,7 @@ AutoCloseable {
     }
 
     public boolean isThundering() {
-        if (!this.getDimension().hasSkyLight() || this.getDimension().method_27998()) {
+        if (!this.getDimension().hasSkyLight() || this.getDimension().hasCeiling()) {
             return false;
         }
         return (double)this.getThunderGradient(1.0f) > 0.9;
@@ -1014,7 +1024,7 @@ AutoCloseable {
         CrashReportSection lv = arg.addElement("Affected level", 1);
         lv.add("All players", () -> this.getPlayers().size() + " total; " + this.getPlayers());
         lv.add("Chunk stats", this.getChunkManager()::getDebugString);
-        lv.add("Level dimension", () -> this.method_27983().method_29177().toString());
+        lv.add("Level dimension", () -> this.method_27983().getValue().toString());
         try {
             this.properties.populateCrashReport(lv);
         }
@@ -1079,8 +1089,12 @@ AutoCloseable {
         return this.dimension;
     }
 
-    public class_5321<DimensionType> method_27983() {
-        return this.method_28380().method_29116().method_29113(this.dimension);
+    public RegistryKey<DimensionType> method_29287() {
+        return this.field_25177;
+    }
+
+    public RegistryKey<World> method_27983() {
+        return this.field_25176;
     }
 
     @Override
@@ -1120,11 +1134,9 @@ AutoCloseable {
         return this.biomeAccess;
     }
 
-    public final boolean method_27982() {
+    public final boolean isDebugWorld() {
         return this.field_24496;
     }
-
-    public abstract class_5318 method_28380();
 
     @Override
     public /* synthetic */ Chunk getChunk(int i, int j) {

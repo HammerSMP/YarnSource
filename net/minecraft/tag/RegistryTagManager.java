@@ -1,12 +1,19 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  com.google.common.collect.HashMultimap
  */
 package net.minecraft.tag;
 
+import com.google.common.collect.HashMultimap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.class_5323;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -73,11 +80,24 @@ implements ResourceReloadListener {
             this.items.applyReload((Map)completableFuture2.join());
             this.fluids.applyReload((Map)completableFuture3.join());
             this.entityTypes.applyReload((Map)completableFuture4.join());
-            BlockTags.setContainer(this.blocks);
-            ItemTags.setContainer(this.items);
-            FluidTags.setContainer(this.fluids);
-            EntityTypeTags.setContainer(this.entityTypes);
+            class_5323.method_29219(this.blocks, this.items, this.fluids, this.entityTypes);
+            HashMultimap multimap = HashMultimap.create();
+            multimap.putAll((Object)"blocks", BlockTags.method_29214(this.blocks));
+            multimap.putAll((Object)"items", ItemTags.method_29217(this.items));
+            multimap.putAll((Object)"fluids", FluidTags.method_29216(this.fluids));
+            multimap.putAll((Object)"entity_types", EntityTypeTags.method_29215(this.entityTypes));
+            if (!multimap.isEmpty()) {
+                throw new IllegalStateException("Missing required tags: " + multimap.entries().stream().map(entry -> (String)entry.getKey() + ":" + entry.getValue()).sorted().collect(Collectors.joining(",")));
+            }
         }, executor2);
+    }
+
+    public void method_29226() {
+        BlockTags.setContainer(this.blocks);
+        ItemTags.setContainer(this.items);
+        FluidTags.setContainer(this.fluids);
+        EntityTypeTags.setContainer(this.entityTypes);
+        Blocks.refreshShapeCache();
     }
 }
 

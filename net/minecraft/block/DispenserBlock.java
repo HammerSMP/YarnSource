@@ -79,7 +79,7 @@ extends BlockWithEntity {
                 arg4.incrementStat(Stats.INSPECT_DISPENSER);
             }
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     protected void dispense(World arg, BlockPos arg2) {

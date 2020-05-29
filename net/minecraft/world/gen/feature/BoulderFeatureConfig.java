@@ -18,7 +18,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class BoulderFeatureConfig
 implements FeatureConfig {
-    public static final Codec<BoulderFeatureConfig> field_24872 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("start_radius").withDefault((Object)0).forGetter(arg -> arg.startRadius)).apply((Applicative)instance, BoulderFeatureConfig::new));
+    public static final Codec<BoulderFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("start_radius").withDefault((Object)0).forGetter(arg -> arg.startRadius)).apply((Applicative)instance, BoulderFeatureConfig::new));
     public final BlockState state;
     public final int startRadius;
 

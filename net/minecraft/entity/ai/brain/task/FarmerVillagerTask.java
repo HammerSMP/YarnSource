@@ -25,7 +25,7 @@ import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
@@ -39,7 +39,6 @@ public class FarmerVillagerTask
 extends Task<VillagerEntity> {
     @Nullable
     private BlockPos currentTarget;
-    private boolean ableToPlant;
     private long nextResponseTime;
     private int ticksRan;
     private final List<BlockPos> targetPositions = Lists.newArrayList();
@@ -56,7 +55,6 @@ extends Task<VillagerEntity> {
         if (arg2.getVillagerData().getProfession() != VillagerProfession.FARMER) {
             return false;
         }
-        this.ableToPlant = arg2.hasSeedToPlant();
         BlockPos.Mutable lv = arg2.getBlockPos().mutableCopy();
         this.targetPositions.clear();
         for (int i = -1; i <= 1; ++i) {
@@ -69,7 +67,7 @@ extends Task<VillagerEntity> {
             }
         }
         this.currentTarget = this.chooseRandomTarget(arg);
-        return this.ableToPlant && this.currentTarget != null;
+        return this.currentTarget != null;
     }
 
     @Nullable
@@ -81,7 +79,7 @@ extends Task<VillagerEntity> {
         BlockState lv = arg2.getBlockState(arg);
         Block lv2 = lv.getBlock();
         Block lv3 = arg2.getBlockState(arg.down()).getBlock();
-        return lv2 instanceof CropBlock && ((CropBlock)lv2).isMature(lv) || lv.isAir() && lv3 instanceof FarmlandBlock && this.ableToPlant;
+        return lv2 instanceof CropBlock && ((CropBlock)lv2).isMature(lv) || lv.isAir() && lv3 instanceof FarmlandBlock;
     }
 
     @Override
@@ -112,8 +110,8 @@ extends Task<VillagerEntity> {
             if (lv2 instanceof CropBlock && ((CropBlock)lv2).isMature(lv)) {
                 arg.breakBlock(this.currentTarget, true, arg2);
             }
-            if (lv.isAir() && lv3 instanceof FarmlandBlock && this.ableToPlant) {
-                BasicInventory lv4 = arg2.getInventory();
+            if (lv.isAir() && lv3 instanceof FarmlandBlock && arg2.hasSeedToPlant()) {
+                SimpleInventory lv4 = arg2.getInventory();
                 for (int i = 0; i < lv4.size(); ++i) {
                     ItemStack lv5 = lv4.getStack(i);
                     boolean bl = false;

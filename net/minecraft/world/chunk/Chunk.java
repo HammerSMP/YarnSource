@@ -33,6 +33,7 @@ import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 
 public interface Chunk
@@ -77,9 +78,9 @@ StructureHolder {
 
     public void setLastSaveTime(long var1);
 
-    public Map<String, StructureStart<?>> getStructureStarts();
+    public Map<StructureFeature<?>, StructureStart<?>> getStructureStarts();
 
-    public void setStructureStarts(Map<String, StructureStart<?>> var1);
+    public void setStructureStarts(Map<StructureFeature<?>, StructureStart<?>> var1);
 
     default public boolean method_12228(int i, int j) {
         if (i < 0) {

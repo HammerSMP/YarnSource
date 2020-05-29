@@ -22,6 +22,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -99,7 +100,7 @@ extends Screen {
         if (this.message != null && j > 85) {
             this.textRenderer.getClass();
             if (j < 85 + 9) {
-                Text lv = this.getTextComponentUnderMouse(i);
+                Style lv = this.getTextComponentUnderMouse(i);
                 this.renderTextHoverEffect(arg, lv, i, j);
             }
         }
@@ -107,7 +108,7 @@ extends Screen {
     }
 
     @Nullable
-    public Text getTextComponentUnderMouse(int i) {
+    private Style getTextComponentUnderMouse(int i) {
         if (this.message == null) {
             return null;
         }
@@ -123,9 +124,9 @@ extends Screen {
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         if (this.message != null && e > 85.0) {
-            Text lv;
+            Style lv;
             this.textRenderer.getClass();
-            if (e < (double)(85 + 9) && (lv = this.getTextComponentUnderMouse((int)d)) != null && lv.getStyle().getClickEvent() != null && lv.getStyle().getClickEvent().getAction() == ClickEvent.Action.OPEN_URL) {
+            if (e < (double)(85 + 9) && (lv = this.getTextComponentUnderMouse((int)d)) != null && lv.getClickEvent() != null && lv.getClickEvent().getAction() == ClickEvent.Action.OPEN_URL) {
                 this.handleTextClick(lv);
                 return false;
             }

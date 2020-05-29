@@ -18,6 +18,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,6 +42,8 @@ extends PassiveEntity {
 
     protected AnimalEntity(EntityType<? extends AnimalEntity> arg, World arg2) {
         super((EntityType<? extends PassiveEntity>)arg, arg2);
+        this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, 16.0f);
+        this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0f);
     }
 
     @Override
@@ -90,7 +93,7 @@ extends PassiveEntity {
         super.writeCustomDataToTag(arg);
         arg.putInt("InLove", this.loveTicks);
         if (this.lovingPlayer != null) {
-            arg.putUuidNew("LoveCause", this.lovingPlayer);
+            arg.putUuid("LoveCause", this.lovingPlayer);
         }
     }
 
@@ -103,7 +106,7 @@ extends PassiveEntity {
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
         this.loveTicks = arg.getInt("InLove");
-        this.lovingPlayer = arg.containsUuidNew("LoveCause") ? arg.getUuidNew("LoveCause") : null;
+        this.lovingPlayer = arg.containsUuid("LoveCause") ? arg.getUuid("LoveCause") : null;
     }
 
     public static boolean isValidNaturalSpawn(EntityType<? extends AnimalEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
@@ -168,6 +171,10 @@ extends PassiveEntity {
 
     public void setLoveTicks(int i) {
         this.loveTicks = i;
+    }
+
+    public int method_29270() {
+        return this.loveTicks;
     }
 
     @Nullable

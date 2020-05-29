@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
-import net.minecraft.class_5312;
 import net.minecraft.class_5314;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -50,6 +49,7 @@ import net.minecraft.world.gen.feature.BastionRemnantFeature;
 import net.minecraft.world.gen.feature.BastionRemnantFeatureConfig;
 import net.minecraft.world.gen.feature.BuriedTreasureFeature;
 import net.minecraft.world.gen.feature.BuriedTreasureFeatureConfig;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.DesertPyramidFeature;
 import net.minecraft.world.gen.feature.EndCityFeature;
@@ -77,42 +77,42 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class StructureFeature<C extends FeatureConfig> {
-    public static final BiMap<String, StructureFeature<?>> field_24842 = HashBiMap.create();
-    private static final Map<StructureFeature<?>, GenerationStep.Feature> field_24862 = Maps.newHashMap();
+    public static final BiMap<String, StructureFeature<?>> STRUCTURES = HashBiMap.create();
+    private static final Map<StructureFeature<?>, GenerationStep.Feature> STRUCTURE_TO_GENERATION_STEP = Maps.newHashMap();
     private static final Logger LOGGER = LogManager.getLogger();
-    public static final StructureFeature<DefaultFeatureConfig> PILLAGER_OUTPOST = StructureFeature.method_28661("Pillager_Outpost", new PillagerOutpostFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<MineshaftFeatureConfig> MINESHAFT = StructureFeature.method_28661("Mineshaft", new MineshaftFeature(MineshaftFeatureConfig.field_24888), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> MANSION = StructureFeature.method_28661("Mansion", new WoodlandMansionFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> JUNGLE_PYRAMID = StructureFeature.method_28661("Jungle_Pyramid", new JungleTempleFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> DESERT_PYRAMID = StructureFeature.method_28661("Desert_Pyramid", new DesertPyramidFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> IGLOO = StructureFeature.method_28661("Igloo", new IglooFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<RuinedPortalFeatureConfig> RUINED_PORTAL = StructureFeature.method_28661("Ruined_Portal", new RuinedPortalFeature(RuinedPortalFeatureConfig.field_24906), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<ShipwreckFeatureConfig> SHIPWRECK = StructureFeature.method_28661("Shipwreck", new ShipwreckFeature(ShipwreckFeatureConfig.field_24908), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final SwampHutFeature field_24851 = StructureFeature.method_28661("Swamp_Hut", new SwampHutFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> STRONGHOLD = StructureFeature.method_28661("Stronghold", new StrongholdFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> MONUMENT = StructureFeature.method_28661("Monument", new OceanMonumentFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<OceanRuinFeatureConfig> OCEAN_RUIN = StructureFeature.method_28661("Ocean_Ruin", new OceanRuinFeature(OceanRuinFeatureConfig.field_24895), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> FORTRESS = StructureFeature.method_28661("Fortress", new NetherFortressFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.UNDERGROUND_DECORATION);
-    public static final StructureFeature<DefaultFeatureConfig> END_CITY = StructureFeature.method_28661("EndCity", new EndCityFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<BuriedTreasureFeatureConfig> BURIED_TREASURE = StructureFeature.method_28661("Buried_Treasure", new BuriedTreasureFeature(BuriedTreasureFeatureConfig.field_24875), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
-    public static final StructureFeature<StructurePoolFeatureConfig> VILLAGE = StructureFeature.method_28661("Village", new VillageFeature(StructurePoolFeatureConfig.field_24886), GenerationStep.Feature.SURFACE_STRUCTURES);
-    public static final StructureFeature<DefaultFeatureConfig> NETHER_FOSSIL = StructureFeature.method_28661("Nether_Fossil", new NetherFossilFeature(DefaultFeatureConfig.field_24893), GenerationStep.Feature.UNDERGROUND_DECORATION);
-    public static final StructureFeature<BastionRemnantFeatureConfig> BASTION_REMNANT = StructureFeature.method_28661("Bastion_Remnant", new BastionRemnantFeature(BastionRemnantFeatureConfig.field_24889), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> PILLAGER_OUTPOST = StructureFeature.register("Pillager_Outpost", new PillagerOutpostFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<MineshaftFeatureConfig> MINESHAFT = StructureFeature.register("Mineshaft", new MineshaftFeature(MineshaftFeatureConfig.field_24888), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> MANSION = StructureFeature.register("Mansion", new WoodlandMansionFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> JUNGLE_PYRAMID = StructureFeature.register("Jungle_Pyramid", new JungleTempleFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> DESERT_PYRAMID = StructureFeature.register("Desert_Pyramid", new DesertPyramidFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> IGLOO = StructureFeature.register("Igloo", new IglooFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<RuinedPortalFeatureConfig> RUINED_PORTAL = StructureFeature.register("Ruined_Portal", new RuinedPortalFeature(RuinedPortalFeatureConfig.field_24906), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<ShipwreckFeatureConfig> SHIPWRECK = StructureFeature.register("Shipwreck", new ShipwreckFeature(ShipwreckFeatureConfig.field_24908), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final SwampHutFeature field_24851 = StructureFeature.register("Swamp_Hut", new SwampHutFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> STRONGHOLD = StructureFeature.register("Stronghold", new StrongholdFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.STRONGHOLDS);
+    public static final StructureFeature<DefaultFeatureConfig> MONUMENT = StructureFeature.register("Monument", new OceanMonumentFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<OceanRuinFeatureConfig> OCEAN_RUIN = StructureFeature.register("Ocean_Ruin", new OceanRuinFeature(OceanRuinFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> FORTRESS = StructureFeature.register("Fortress", new NetherFortressFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.UNDERGROUND_DECORATION);
+    public static final StructureFeature<DefaultFeatureConfig> END_CITY = StructureFeature.register("EndCity", new EndCityFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<BuriedTreasureFeatureConfig> BURIED_TREASURE = StructureFeature.register("Buried_Treasure", new BuriedTreasureFeature(BuriedTreasureFeatureConfig.field_24875), GenerationStep.Feature.UNDERGROUND_STRUCTURES);
+    public static final StructureFeature<StructurePoolFeatureConfig> VILLAGE = StructureFeature.register("Village", new VillageFeature(StructurePoolFeatureConfig.CODEC), GenerationStep.Feature.SURFACE_STRUCTURES);
+    public static final StructureFeature<DefaultFeatureConfig> NETHER_FOSSIL = StructureFeature.register("Nether_Fossil", new NetherFossilFeature(DefaultFeatureConfig.CODEC), GenerationStep.Feature.UNDERGROUND_DECORATION);
+    public static final StructureFeature<BastionRemnantFeatureConfig> BASTION_REMNANT = StructureFeature.register("Bastion_Remnant", new BastionRemnantFeature(BastionRemnantFeatureConfig.field_24889), GenerationStep.Feature.SURFACE_STRUCTURES);
     public static final List<StructureFeature<?>> field_24861 = ImmutableList.of(PILLAGER_OUTPOST, VILLAGE, NETHER_FOSSIL);
-    private final Codec<class_5312<C, StructureFeature<C>>> field_24863;
+    private final Codec<ConfiguredStructureFeature<C, StructureFeature<C>>> field_24863;
 
-    private static <F extends StructureFeature<?>> F method_28661(String string, F arg, GenerationStep.Feature arg2) {
-        field_24842.put((Object)string.toLowerCase(Locale.ROOT), arg);
-        field_24862.put(arg, arg2);
+    private static <F extends StructureFeature<?>> F register(String string, F arg, GenerationStep.Feature arg2) {
+        STRUCTURES.put((Object)string.toLowerCase(Locale.ROOT), arg);
+        STRUCTURE_TO_GENERATION_STEP.put(arg, arg2);
         return (F)Registry.register(Registry.STRUCTURE_FEATURE, string.toLowerCase(Locale.ROOT), arg);
     }
 
     public StructureFeature(Codec<C> codec) {
-        this.field_24863 = codec.fieldOf("config").xmap(arg -> new class_5312<FeatureConfig, StructureFeature>(this, (FeatureConfig)arg), arg -> arg.field_24836).codec();
+        this.field_24863 = codec.fieldOf("config").xmap(arg -> new ConfiguredStructureFeature<FeatureConfig, StructureFeature>(this, (FeatureConfig)arg), arg -> arg.field_24836).codec();
     }
 
     public GenerationStep.Feature method_28663() {
-        return field_24862.get(this);
+        return STRUCTURE_TO_GENERATION_STEP.get(this);
     }
 
     public static void method_28664() {
@@ -161,12 +161,12 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         }
     }
 
-    public Codec<class_5312<C, StructureFeature<C>>> method_28665() {
+    public Codec<ConfiguredStructureFeature<C, StructureFeature<C>>> method_28665() {
         return this.field_24863;
     }
 
-    public class_5312<C, ? extends StructureFeature<C>> method_28659(C arg) {
-        return new class_5312<C, StructureFeature>(this, arg);
+    public ConfiguredStructureFeature<C, ? extends StructureFeature<C>> configure(C arg) {
+        return new ConfiguredStructureFeature<C, StructureFeature>(this, arg);
     }
 
     @Nullable
@@ -249,7 +249,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
     public abstract StructureStartFactory<C> getStructureStartFactory();
 
     public String getName() {
-        return (String)field_24842.inverse().get((Object)this);
+        return (String)STRUCTURES.inverse().get((Object)this);
     }
 
     public List<Biome.SpawnEntry> getMonsterSpawns() {

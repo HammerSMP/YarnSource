@@ -25,7 +25,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class OreFeatureConfig
 implements FeatureConfig {
-    public static final Codec<OreFeatureConfig> field_24896 = RecordCodecBuilder.create(instance -> instance.group((App)Target.field_24898.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("size").withDefault((Object)0).forGetter(arg -> arg.size)).apply((Applicative)instance, OreFeatureConfig::new));
+    public static final Codec<OreFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Target.field_24898.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.field_24734.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("size").withDefault((Object)0).forGetter(arg -> arg.size)).apply((Applicative)instance, OreFeatureConfig::new));
     public final Target target;
     public final int size;
     public final BlockState state;

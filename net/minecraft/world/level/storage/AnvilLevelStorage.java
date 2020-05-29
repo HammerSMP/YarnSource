@@ -17,17 +17,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import net.minecraft.class_5218;
-import net.minecraft.class_5219;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.ProgressListener;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.SaveProperties;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.biome.source.VanillaLayeredBiomeSource;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.storage.AlphaChunkIo;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.storage.RegionFile;
@@ -44,9 +44,9 @@ public class AnvilLevelStorage {
         ArrayList list = Lists.newArrayList();
         ArrayList list2 = Lists.newArrayList();
         ArrayList list3 = Lists.newArrayList();
-        File file = arg.method_27424(DimensionType.field_24753);
-        File file2 = arg.method_27424(DimensionType.field_24754);
-        File file3 = arg.method_27424(DimensionType.field_24755);
+        File file = arg.method_27424(World.field_25179);
+        File file2 = arg.method_27424(World.field_25180);
+        File file3 = arg.method_27424(World.field_25181);
         LOGGER.info("Scanning folders...");
         AnvilLevelStorage.addRegionFiles(file, list);
         if (file2.exists()) {
@@ -57,9 +57,9 @@ public class AnvilLevelStorage {
         }
         int i = list.size() + list2.size() + list3.size();
         LOGGER.info("Total conversion count is {}", (Object)i);
-        class_5219 lv = arg.readLevelProperties();
-        long l2 = l = lv != null ? lv.method_28057().method_28028() : 0L;
-        if (lv != null && lv.method_28057().method_28034()) {
+        SaveProperties lv = arg.readLevelProperties();
+        long l2 = l = lv != null ? lv.method_28057().getSeed() : 0L;
+        if (lv != null && lv.method_28057().isFlatWorld()) {
             FixedBiomeSource lv2 = new FixedBiomeSource(Biomes.PLAINS);
         } else {
             lv3 = new VanillaLayeredBiomeSource(l, false, false);
@@ -73,7 +73,7 @@ public class AnvilLevelStorage {
     }
 
     private static void makeMcrLevelDatBackup(LevelStorage.Session arg) {
-        File file = arg.getDirectory(class_5218.LEVEL_DAT).toFile();
+        File file = arg.getDirectory(WorldSavePath.LEVEL_DAT).toFile();
         if (!file.exists()) {
             LOGGER.warn("Unable to create level.dat_mcr backup");
             return;

@@ -39,6 +39,7 @@ extends HandledScreen<MerchantScreenHandler> {
     public MerchantScreen(MerchantScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
         this.backgroundWidth = 276;
+        this.field_25269 = 107;
     }
 
     private void syncRecipeIndex() {
@@ -67,23 +68,21 @@ extends HandledScreen<MerchantScreenHandler> {
     @Override
     protected void drawForeground(MatrixStack arg, int i, int j) {
         int k = ((MerchantScreenHandler)this.handler).getLevelProgress();
-        int l = this.backgroundHeight - 94;
         if (k > 0 && k <= 5 && ((MerchantScreenHandler)this.handler).isLevelled()) {
             String string = "- " + I18n.translate("merchant.level." + k, new Object[0]);
-            int m = this.textRenderer.getWidth(this.title);
-            int n = this.textRenderer.getWidth(string);
-            int o = m + n + 3;
-            int p = 49 + this.backgroundWidth / 2 - o / 2;
-            this.textRenderer.draw(arg, this.title, (float)p, 6.0f, 0x404040);
-            this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 107.0f, (float)l, 0x404040);
-            this.textRenderer.draw(arg, string, (float)(p + m + 3), 6.0f, 0x404040);
+            int l = this.textRenderer.getWidth(this.title);
+            int m = this.textRenderer.getWidth(string);
+            int n = l + m + 3;
+            int o = 49 + this.backgroundWidth / 2 - n / 2;
+            this.textRenderer.draw(arg, this.title, (float)o, 6.0f, 0x404040);
+            this.textRenderer.draw(arg, string, (float)(o + l + 3), 6.0f, 0x404040);
         } else {
             this.textRenderer.draw(arg, this.title, (float)(49 + this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2), 6.0f, 0x404040);
-            this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 107.0f, (float)l, 0x404040);
         }
+        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), (float)this.field_25269, (float)this.field_25270, 0x404040);
         String string2 = I18n.translate("merchant.trades", new Object[0]);
-        int q = this.textRenderer.getWidth(string2);
-        this.textRenderer.draw(arg, string2, (float)(5 - q / 2 + 48), 6.0f, 0x404040);
+        int p = this.textRenderer.getWidth(string2);
+        this.textRenderer.draw(arg, string2, (float)(5 - p / 2 + 48), 6.0f, 0x404040);
     }
 
     @Override
@@ -121,7 +120,7 @@ extends HandledScreen<MerchantScreenHandler> {
             return;
         }
         int n = 100;
-        float f = 100 / (VillagerData.getUpperLevelExperience(k) - m);
+        float f = 100.0f / (float)(VillagerData.getUpperLevelExperience(k) - m);
         int o = Math.min(MathHelper.floor(f * (float)(l - m)), 100);
         MerchantScreen.drawTexture(arg, i + 136, j + 16, this.getZOffset(), 0.0f, 191.0f, o + 1, 5, 256, 512);
         int p = ((MerchantScreenHandler)this.handler).getTraderRewardedExperience();
@@ -175,11 +174,11 @@ extends HandledScreen<MerchantScreenHandler> {
                 int p = m + 2;
                 this.method_20222(arg, lv4, lv3, n, p);
                 if (!lv5.isEmpty()) {
-                    this.itemRenderer.renderGuiItem(lv5, k + 5 + 35, p);
+                    this.itemRenderer.method_27953(lv5, k + 5 + 35, p);
                     this.itemRenderer.renderGuiItemOverlay(this.textRenderer, lv5, k + 5 + 35, p);
                 }
                 this.method_20223(arg, lv2, k, p);
-                this.itemRenderer.renderGuiItem(lv6, k + 5 + 68, p);
+                this.itemRenderer.method_27953(lv6, k + 5 + 68, p);
                 this.itemRenderer.renderGuiItemOverlay(this.textRenderer, lv6, k + 5 + 68, p);
                 this.itemRenderer.zOffset = 0.0f;
                 m += 20;
@@ -216,7 +215,7 @@ extends HandledScreen<MerchantScreenHandler> {
     }
 
     private void method_20222(MatrixStack arg, ItemStack arg2, ItemStack arg3, int i, int j) {
-        this.itemRenderer.renderGuiItem(arg2, i, j);
+        this.itemRenderer.method_27953(arg2, i, j);
         if (arg3.getCount() == arg2.getCount()) {
             this.itemRenderer.renderGuiItemOverlay(this.textRenderer, arg2, i, j);
         } else {

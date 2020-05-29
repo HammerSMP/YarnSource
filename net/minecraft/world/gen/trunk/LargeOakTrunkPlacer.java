@@ -33,7 +33,7 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class LargeOakTrunkPlacer
 extends TrunkPlacer {
-    public static final Codec<LargeOakTrunkPlacer> field_24967 = RecordCodecBuilder.create(instance -> LargeOakTrunkPlacer.method_28904(instance).apply((Applicative)instance, LargeOakTrunkPlacer::new));
+    public static final Codec<LargeOakTrunkPlacer> CODEC = RecordCodecBuilder.create(instance -> LargeOakTrunkPlacer.method_28904(instance).apply((Applicative)instance, LargeOakTrunkPlacer::new));
 
     public LargeOakTrunkPlacer(int i, int j, int k) {
         super(i, j, k);

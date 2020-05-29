@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -23,19 +22,21 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Npc;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
 import net.minecraft.village.Trader;
@@ -43,7 +44,6 @@ import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.dimension.DimensionType;
 
 public abstract class AbstractTraderEntity
 extends PassiveEntity
@@ -54,10 +54,12 @@ Trader {
     private PlayerEntity customer;
     @Nullable
     protected TraderOfferList offers;
-    private final BasicInventory inventory = new BasicInventory(8);
+    private final SimpleInventory inventory = new SimpleInventory(8);
 
     public AbstractTraderEntity(EntityType<? extends AbstractTraderEntity> arg, World arg2) {
         super((EntityType<? extends PassiveEntity>)arg, arg2);
+        this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, 16.0f);
+        this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0f);
     }
 
     @Override
@@ -188,7 +190,7 @@ Trader {
 
     @Override
     @Nullable
-    public Entity changeDimension(class_5321<DimensionType> arg) {
+    public Entity changeDimension(RegistryKey<World> arg) {
         this.resetCustomer();
         return super.changeDimension(arg);
     }
@@ -218,7 +220,7 @@ Trader {
         return false;
     }
 
-    public BasicInventory getInventory() {
+    public SimpleInventory getInventory() {
         return this.inventory;
     }
 

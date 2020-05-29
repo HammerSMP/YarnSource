@@ -42,7 +42,7 @@ import net.minecraft.world.WorldAccess;
 
 public class HorseEntity
 extends HorseBaseEntity {
-    private static final UUID HORSE_ARMOR_BONUS_UUID = UUID.fromString("556E1665-8B10-40C8-8F9D-CF9B1667F295");
+    private static final UUID HORSE_ARMOR_BONUS_ID = UUID.fromString("556E1665-8B10-40C8-8F9D-CF9B1667F295");
     private static final TrackedData<Integer> VARIANT = DataTracker.registerData(HorseEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     public HorseEntity(EntityType<? extends HorseEntity> arg, World arg2) {
@@ -113,6 +113,9 @@ extends HorseBaseEntity {
 
     @Override
     protected void updateSaddle() {
+        if (this.world.isClient) {
+            return;
+        }
         super.updateSaddle();
         this.setArmorTypeFromStack(this.items.getStack(1));
         this.setEquipmentDropChance(EquipmentSlot.CHEST, 0.0f);
@@ -122,9 +125,9 @@ extends HorseBaseEntity {
         this.equipArmor(arg);
         if (!this.world.isClient) {
             int i;
-            this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).removeModifier(HORSE_ARMOR_BONUS_UUID);
+            this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).removeModifier(HORSE_ARMOR_BONUS_ID);
             if (this.canEquip(arg) && (i = ((HorseArmorItem)arg.getItem()).getBonus()) != 0) {
-                this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).addTemporaryModifier(new EntityAttributeModifier(HORSE_ARMOR_BONUS_UUID, "Horse armor bonus", (double)i, EntityAttributeModifier.Operation.ADDITION));
+                this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).addTemporaryModifier(new EntityAttributeModifier(HORSE_ARMOR_BONUS_ID, "Horse armor bonus", (double)i, EntityAttributeModifier.Operation.ADDITION));
             }
         }
     }

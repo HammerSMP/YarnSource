@@ -64,13 +64,13 @@ extends StructureProcessor {
         }
         BlockState lv2 = arg5.state;
         BlockState lv3 = lv.getDefaultState();
-        if (lv2.method_28498(StairsBlock.FACING)) {
+        if (lv2.contains(StairsBlock.FACING)) {
             lv3 = (BlockState)lv3.with(StairsBlock.FACING, lv2.get(StairsBlock.FACING));
         }
-        if (lv2.method_28498(StairsBlock.HALF)) {
+        if (lv2.contains(StairsBlock.HALF)) {
             lv3 = (BlockState)lv3.with(StairsBlock.HALF, lv2.get(StairsBlock.HALF));
         }
-        if (lv2.method_28498(SlabBlock.TYPE)) {
+        if (lv2.contains(SlabBlock.TYPE)) {
             lv3 = (BlockState)lv3.with(SlabBlock.TYPE, lv2.get(SlabBlock.TYPE));
         }
         return new Structure.StructureBlockInfo(arg5.pos, lv3, arg5.tag);

@@ -126,7 +126,7 @@ extends ChunkManager {
         return lv;
     }
 
-    public void method_28102(BooleanSupplier booleanSupplier) {
+    public void tick(BooleanSupplier booleanSupplier) {
     }
 
     public void setChunkMapCenter(int i, int j) {

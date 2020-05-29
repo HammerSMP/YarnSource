@@ -76,12 +76,13 @@ extends Feature<DefaultFeatureConfig> {
             for (int w = 3; w >= -1; --w) {
                 for (int x = p; x <= q; ++x) {
                     BlockPos lv3 = arg4.add(v, w, x);
+                    BlockState lv4 = arg.getBlockState(lv3);
                     if (v == k || w == -1 || x == p || v == l || w == 4 || x == q) {
                         if (lv3.getY() >= 0 && !arg.getBlockState(lv3.down()).getMaterial().isSolid()) {
                             arg.setBlockState(lv3, AIR, 2);
                             continue;
                         }
-                        if (!arg.getBlockState(lv3).getMaterial().isSolid() || arg.getBlockState(lv3).isOf(Blocks.CHEST)) continue;
+                        if (!lv4.getMaterial().isSolid() || lv4.isOf(Blocks.CHEST)) continue;
                         if (w == -1 && random.nextInt(4) != 0) {
                             arg.setBlockState(lv3, Blocks.MOSSY_COBBLESTONE.getDefaultState(), 2);
                             continue;
@@ -89,7 +90,7 @@ extends Feature<DefaultFeatureConfig> {
                         arg.setBlockState(lv3, Blocks.COBBLESTONE.getDefaultState(), 2);
                         continue;
                     }
-                    if (arg.getBlockState(lv3).isOf(Blocks.CHEST)) continue;
+                    if (lv4.isOf(Blocks.CHEST) || lv4.isOf(Blocks.SPAWNER)) continue;
                     arg.setBlockState(lv3, AIR, 2);
                 }
             }
@@ -99,23 +100,23 @@ extends Feature<DefaultFeatureConfig> {
                 int ac;
                 int ab;
                 int aa = arg4.getX() + random.nextInt(j * 2 + 1) - j;
-                BlockPos lv4 = new BlockPos(aa, ab = arg4.getY(), ac = arg4.getZ() + random.nextInt(o * 2 + 1) - o);
-                if (!arg.isAir(lv4)) continue;
+                BlockPos lv5 = new BlockPos(aa, ab = arg4.getY(), ac = arg4.getZ() + random.nextInt(o * 2 + 1) - o);
+                if (!arg.isAir(lv5)) continue;
                 int ad = 0;
-                for (Direction lv5 : Direction.Type.HORIZONTAL) {
-                    if (!arg.getBlockState(lv4.offset(lv5)).getMaterial().isSolid()) continue;
+                for (Direction lv6 : Direction.Type.HORIZONTAL) {
+                    if (!arg.getBlockState(lv5.offset(lv6)).getMaterial().isSolid()) continue;
                     ++ad;
                 }
                 if (ad != 1) continue;
-                arg.setBlockState(lv4, StructurePiece.method_14916(arg, lv4, Blocks.CHEST.getDefaultState()), 2);
-                LootableContainerBlockEntity.setLootTable(arg, random, lv4, LootTables.SIMPLE_DUNGEON_CHEST);
+                arg.setBlockState(lv5, StructurePiece.method_14916(arg, lv5, Blocks.CHEST.getDefaultState()), 2);
+                LootableContainerBlockEntity.setLootTable(arg, random, lv5, LootTables.SIMPLE_DUNGEON_CHEST);
                 continue block6;
             }
         }
         arg.setBlockState(arg4, Blocks.SPAWNER.getDefaultState(), 2);
-        BlockEntity lv6 = arg.getBlockEntity(arg4);
-        if (lv6 instanceof MobSpawnerBlockEntity) {
-            ((MobSpawnerBlockEntity)lv6).getLogic().setEntityId(this.getMobSpawnerEntity(random));
+        BlockEntity lv7 = arg.getBlockEntity(arg4);
+        if (lv7 instanceof MobSpawnerBlockEntity) {
+            ((MobSpawnerBlockEntity)lv7).getLogic().setEntityId(this.getMobSpawnerEntity(random));
         } else {
             LOGGER.error("Failed to fetch mob spawner entity at ({}, {}, {})", (Object)arg4.getX(), (Object)arg4.getY(), (Object)arg4.getZ());
         }

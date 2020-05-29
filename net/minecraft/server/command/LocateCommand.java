@@ -33,7 +33,7 @@ public class LocateCommand {
 
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
         LiteralArgumentBuilder literalArgumentBuilder = (LiteralArgumentBuilder)CommandManager.literal("locate").requires(arg -> arg.hasPermissionLevel(2));
-        for (Map.Entry entry : StructureFeature.field_24842.entrySet()) {
+        for (Map.Entry entry : StructureFeature.STRUCTURES.entrySet()) {
             literalArgumentBuilder = (LiteralArgumentBuilder)literalArgumentBuilder.then(CommandManager.literal((String)entry.getKey()).executes(commandContext -> LocateCommand.execute((ServerCommandSource)commandContext.getSource(), (StructureFeature)entry.getValue())));
         }
         commandDispatcher.register(literalArgumentBuilder);

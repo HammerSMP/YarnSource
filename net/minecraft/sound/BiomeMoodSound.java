@@ -21,7 +21,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 public class BiomeMoodSound {
-    public static final Codec<BiomeMoodSound> field_24674 = RecordCodecBuilder.create(instance -> instance.group((App)SoundEvent.field_24628.fieldOf("sound").forGetter(arg -> arg.event), (App)Codec.INT.fieldOf("tick_delay").forGetter(arg -> arg.cultivationTicks), (App)Codec.INT.fieldOf("block_search_extent").forGetter(arg -> arg.spawnRange), (App)Codec.DOUBLE.fieldOf("offset").forGetter(arg -> arg.extraDistance)).apply((Applicative)instance, BiomeMoodSound::new));
+    public static final Codec<BiomeMoodSound> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)SoundEvent.field_24628.fieldOf("sound").forGetter(arg -> arg.event), (App)Codec.INT.fieldOf("tick_delay").forGetter(arg -> arg.cultivationTicks), (App)Codec.INT.fieldOf("block_search_extent").forGetter(arg -> arg.spawnRange), (App)Codec.DOUBLE.fieldOf("offset").forGetter(arg -> arg.extraDistance)).apply((Applicative)instance, BiomeMoodSound::new));
     public static final BiomeMoodSound CAVE = new BiomeMoodSound(SoundEvents.AMBIENT_CAVE, 6000, 8, 2.0);
     private SoundEvent event;
     private int cultivationTicks;

@@ -21,17 +21,18 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
+import net.minecraft.class_5339;
+import net.minecraft.class_5341;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.function.ConditionalLootFunction;
+import net.minecraft.loot.function.LootFunctions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,10 +44,15 @@ extends ConditionalLootFunction {
     @Nullable
     private final LootContext.EntityTarget entity;
 
-    private SetNameLootFunction(LootCondition[] args, @Nullable Text arg, @Nullable LootContext.EntityTarget arg2) {
+    private SetNameLootFunction(class_5341[] args, @Nullable Text arg, @Nullable LootContext.EntityTarget arg2) {
         super(args);
         this.name = arg;
         this.entity = arg2;
+    }
+
+    @Override
+    public class_5339 method_29321() {
+        return LootFunctions.SET_NAME;
     }
 
     @Override
@@ -81,10 +87,6 @@ extends ConditionalLootFunction {
 
     public static class Factory
     extends ConditionalLootFunction.Factory<SetNameLootFunction> {
-        public Factory() {
-            super(new Identifier("set_name"), SetNameLootFunction.class);
-        }
-
         @Override
         public void toJson(JsonObject jsonObject, SetNameLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -97,14 +99,14 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetNameLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public SetNameLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             MutableText lv = Text.Serializer.fromJson(jsonObject.get("name"));
             LootContext.EntityTarget lv2 = JsonHelper.deserialize(jsonObject, "entity", null, jsonDeserializationContext, LootContext.EntityTarget.class);
             return new SetNameLootFunction(args, lv, lv2);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

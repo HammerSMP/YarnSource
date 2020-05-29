@@ -54,7 +54,7 @@ implements ParticleEffect {
     private final ItemStack stack;
 
     public static Codec<ItemStackParticleEffect> method_29136(ParticleType<ItemStackParticleEffect> arg3) {
-        return ItemStack.field_24671.xmap(arg2 -> new ItemStackParticleEffect(arg3, (ItemStack)arg2), arg -> arg.stack);
+        return ItemStack.CODEC.xmap(arg2 -> new ItemStackParticleEffect(arg3, (ItemStack)arg2), arg -> arg.stack);
     }
 
     public ItemStackParticleEffect(ParticleType<ItemStackParticleEffect> arg, ItemStack arg2) {

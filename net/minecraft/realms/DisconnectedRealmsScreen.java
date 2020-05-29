@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
@@ -28,7 +29,7 @@ extends RealmsScreen {
     private final String title;
     private final Text reason;
     @Nullable
-    private List<Text> lines;
+    private List<class_5348> lines;
     private final Screen parent;
     private int textHeight;
 
@@ -67,7 +68,7 @@ extends RealmsScreen {
         this.drawCenteredString(arg, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.textHeight / 2 - 9 * 2, 0xAAAAAA);
         int k = this.height / 2 - this.textHeight / 2;
         if (this.lines != null) {
-            for (Text lv : this.lines) {
+            for (class_5348 lv : this.lines) {
                 this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
                 this.textRenderer.getClass();
                 k += 9;

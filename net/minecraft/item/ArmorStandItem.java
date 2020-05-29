@@ -48,7 +48,7 @@ extends Item {
             lv2.playSound(null, lv6.getX(), lv6.getY(), lv6.getZ(), SoundEvents.ENTITY_ARMOR_STAND_PLACE, SoundCategory.BLOCKS, 0.75f, 0.8f);
         }
         lv5.decrement(1);
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(lv2.isClient);
     }
 
     private void setRotations(ArmorStandEntity arg, Random random) {

@@ -44,8 +44,8 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -70,7 +70,7 @@ import net.minecraft.util.registry.Registry;
 public class CreativeInventoryScreen
 extends AbstractInventoryScreen<CreativeScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
-    private static final BasicInventory inventory = new BasicInventory(45);
+    private static final SimpleInventory inventory = new SimpleInventory(45);
     private static int selectedTab = ItemGroup.BUILDING_BLOCKS.getIndex();
     private float scrollPosition;
     private boolean scrolling;
@@ -674,7 +674,6 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             m += this.backgroundHeight - 4;
         }
         this.drawTexture(arg, l, m, j, k, 28, 32);
-        this.setZOffset(100);
         this.itemRenderer.zOffset = 100.0f;
         int n2 = bl2 ? 1 : -1;
         RenderSystem.enableRescaleNormal();
@@ -682,7 +681,6 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
         this.itemRenderer.renderGuiItem(lv, l += 6, m += 8 + n2);
         this.itemRenderer.renderGuiItemOverlay(this.textRenderer, lv, l, m);
         this.itemRenderer.zOffset = 0.0f;
-        this.setZOffset(0);
     }
 
     public int getSelectedTab() {

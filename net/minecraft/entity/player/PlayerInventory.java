@@ -159,33 +159,14 @@ Nameable {
         }
     }
 
-    public int clearItem(Predicate<ItemStack> predicate, int i) {
+    public int method_29280(Predicate<ItemStack> predicate, int i, Inventory arg) {
         int j = 0;
-        for (int k = 0; k < this.size(); ++k) {
-            ItemStack lv = this.getStack(k);
-            if (lv.isEmpty() || !predicate.test(lv)) continue;
-            int l = i <= 0 ? lv.getCount() : Math.min(i - j, lv.getCount());
-            j += l;
-            if (i == 0) continue;
-            lv.decrement(l);
-            if (lv.isEmpty()) {
-                this.setStack(k, ItemStack.EMPTY);
-            }
-            if (i <= 0 || j < i) continue;
-            return j;
-        }
-        if (!this.cursorStack.isEmpty() && predicate.test(this.cursorStack)) {
-            int m = i <= 0 ? this.cursorStack.getCount() : Math.min(i - j, this.cursorStack.getCount());
-            j += m;
-            if (i != 0) {
-                this.cursorStack.decrement(m);
-                if (this.cursorStack.isEmpty()) {
-                    this.cursorStack = ItemStack.EMPTY;
-                }
-                if (i > 0 && j >= i) {
-                    return j;
-                }
-            }
+        boolean bl = i == 0;
+        j += Inventories.method_29234(this, predicate, i - j, bl);
+        j += Inventories.method_29234(arg, predicate, i - j, bl);
+        j += Inventories.method_29235(this.cursorStack, predicate, i - j, bl);
+        if (this.cursorStack.isEmpty()) {
+            this.cursorStack = ItemStack.EMPTY;
         }
         return j;
     }
@@ -467,10 +448,6 @@ Nameable {
     @Override
     public Text getName() {
         return new TranslatableText("container.inventory");
-    }
-
-    public boolean isUsingEffectiveTool(BlockState arg) {
-        return this.getStack(this.selectedSlot).isEffectiveOn(arg);
     }
 
     @Environment(value=EnvType.CLIENT)

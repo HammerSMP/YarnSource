@@ -35,6 +35,10 @@ extends HitResult {
         return new BlockHitResult(this.missed, this.pos, arg, this.blockPos, this.insideBlock);
     }
 
+    public BlockHitResult method_29328(BlockPos arg) {
+        return new BlockHitResult(this.missed, this.pos, this.side, arg, this.insideBlock);
+    }
+
     public BlockPos getBlockPos() {
         return this.blockPos;
     }

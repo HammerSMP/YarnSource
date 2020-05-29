@@ -90,7 +90,7 @@ extends SimpleStructurePiece {
         this.rotation = BlockRotation.valueOf(arg2.getString("Rotation"));
         this.mirror = BlockMirror.valueOf(arg2.getString("Mirror"));
         this.verticalPlacement = VerticalPlacement.getFromId(arg2.getString("VerticalPlacement"));
-        this.properties = (Properties)Properties.field_24993.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg2.get("Properties"))).getOrThrow(true, ((Logger)field_24992)::error);
+        this.properties = (Properties)Properties.CODEC.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg2.get("Properties"))).getOrThrow(true, ((Logger)field_24992)::error);
         Structure lv = arg.getStructureOrBlank(this.template);
         this.processProperties(lv, new BlockPos(lv.getSize().getX() / 2, 0, lv.getSize().getZ() / 2));
     }
@@ -102,7 +102,7 @@ extends SimpleStructurePiece {
         arg.putString("Rotation", this.rotation.name());
         arg.putString("Mirror", this.mirror.name());
         arg.putString("VerticalPlacement", this.verticalPlacement.getId());
-        Properties.field_24993.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.properties).resultOrPartial(((Logger)field_24992)::error).ifPresent(arg2 -> arg.put("Properties", (Tag)arg2));
+        Properties.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.properties).resultOrPartial(((Logger)field_24992)::error).ifPresent(arg2 -> arg.put("Properties", (Tag)arg2));
     }
 
     private void processProperties(Structure arg, BlockPos arg2) {
@@ -288,7 +288,7 @@ extends SimpleStructurePiece {
     }
 
     public static class Properties {
-        public static final Codec<Properties> field_24993 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.BOOL.fieldOf("cold").forGetter(arg -> arg.cold), (App)Codec.FLOAT.fieldOf("mossiness").forGetter(arg -> Float.valueOf(arg.mossiness)), (App)Codec.BOOL.fieldOf("air_pocket").forGetter(arg -> arg.airPocket), (App)Codec.BOOL.fieldOf("overgrown").forGetter(arg -> arg.overgrown), (App)Codec.BOOL.fieldOf("vines").forGetter(arg -> arg.vines), (App)Codec.BOOL.fieldOf("replace_with_blackstone").forGetter(arg -> arg.replaceWithBlackstone)).apply((Applicative)instance, Properties::new));
+        public static final Codec<Properties> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.BOOL.fieldOf("cold").forGetter(arg -> arg.cold), (App)Codec.FLOAT.fieldOf("mossiness").forGetter(arg -> Float.valueOf(arg.mossiness)), (App)Codec.BOOL.fieldOf("air_pocket").forGetter(arg -> arg.airPocket), (App)Codec.BOOL.fieldOf("overgrown").forGetter(arg -> arg.overgrown), (App)Codec.BOOL.fieldOf("vines").forGetter(arg -> arg.vines), (App)Codec.BOOL.fieldOf("replace_with_blackstone").forGetter(arg -> arg.replaceWithBlackstone)).apply((Applicative)instance, Properties::new));
         public boolean cold;
         public float mossiness = 0.2f;
         public boolean airPocket;

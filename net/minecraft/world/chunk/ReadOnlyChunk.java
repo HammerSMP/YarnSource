@@ -35,6 +35,7 @@ import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.feature.StructureFeature;
 
 public class ReadOnlyChunk
 extends ProtoChunk {
@@ -126,39 +127,39 @@ extends ProtoChunk {
 
     @Override
     @Nullable
-    public StructureStart<?> getStructureStart(String string) {
-        return this.wrapped.getStructureStart(string);
+    public StructureStart<?> getStructureStart(StructureFeature<?> arg) {
+        return this.wrapped.getStructureStart(arg);
     }
 
     @Override
-    public void setStructureStart(String string, StructureStart<?> arg) {
+    public void setStructureStart(StructureFeature<?> arg, StructureStart<?> arg2) {
     }
 
     @Override
-    public Map<String, StructureStart<?>> getStructureStarts() {
+    public Map<StructureFeature<?>, StructureStart<?>> getStructureStarts() {
         return this.wrapped.getStructureStarts();
     }
 
     @Override
-    public void setStructureStarts(Map<String, StructureStart<?>> map) {
+    public void setStructureStarts(Map<StructureFeature<?>, StructureStart<?>> map) {
     }
 
     @Override
-    public LongSet getStructureReferences(String string) {
-        return this.wrapped.getStructureReferences(string);
+    public LongSet getStructureReferences(StructureFeature<?> arg) {
+        return this.wrapped.getStructureReferences(arg);
     }
 
     @Override
-    public void addStructureReference(String string, long l) {
+    public void addStructureReference(StructureFeature<?> arg, long l) {
     }
 
     @Override
-    public Map<String, LongSet> getStructureReferences() {
+    public Map<StructureFeature<?>, LongSet> getStructureReferences() {
         return this.wrapped.getStructureReferences();
     }
 
     @Override
-    public void setStructureReferences(Map<String, LongSet> map) {
+    public void setStructureReferences(Map<StructureFeature<?>, LongSet> map) {
     }
 
     @Override

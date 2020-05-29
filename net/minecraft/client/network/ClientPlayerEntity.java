@@ -129,12 +129,14 @@ extends AbstractClientPlayerEntity {
     private int underwaterVisibilityTicks;
     private boolean showsDeathScreen = true;
 
-    public ClientPlayerEntity(MinecraftClient arg, ClientWorld arg2, ClientPlayNetworkHandler arg3, StatHandler arg4, ClientRecipeBook arg5) {
+    public ClientPlayerEntity(MinecraftClient arg, ClientWorld arg2, ClientPlayNetworkHandler arg3, StatHandler arg4, ClientRecipeBook arg5, boolean bl, boolean bl2) {
         super(arg2, arg3.getProfile());
+        this.client = arg;
         this.networkHandler = arg3;
         this.statHandler = arg4;
         this.recipeBook = arg5;
-        this.client = arg;
+        this.lastIsHoldingSneakKey = bl;
+        this.lastSprinting = bl2;
         this.tickables.add(new AmbientSoundPlayer(this, arg.getSoundManager()));
         this.tickables.add(new BubbleColumnSoundPlayer(this));
         this.tickables.add(new BiomeEffectSoundPlayer(this, arg.getSoundManager(), arg2.getBiomeAccess()));
@@ -348,8 +350,8 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public boolean method_27302() {
-        return !this.abilities.flying && super.method_27302();
+    public boolean shouldGetSoulSpeedBoost() {
+        return !this.abilities.flying && super.shouldGetSoulSpeedBoost();
     }
 
     protected void startRidingJump() {

@@ -35,18 +35,13 @@ extends HandledScreen<StonecutterScreenHandler> {
     public StonecutterScreen(StonecutterScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
         arg.setContentsChangedListener(this::onInventoryChange);
+        --this.field_25268;
     }
 
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         super.render(arg, i, j, f);
         this.drawMouseoverTooltip(arg, i, j);
-    }
-
-    @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, 8.0f, 4.0f, 0x404040);
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), 8.0f, (float)(this.backgroundHeight - 94), 0x404040);
     }
 
     @Override

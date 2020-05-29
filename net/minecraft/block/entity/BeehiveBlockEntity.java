@@ -90,7 +90,7 @@ implements Tickable {
 
     private List<Entity> tryReleaseBee(BlockState arg, BeeState arg2) {
         ArrayList list = Lists.newArrayList();
-        this.bees.removeIf(arg3 -> this.releaseBee(arg, ((Bee)arg3).entityData, list, arg2));
+        this.bees.removeIf(arg3 -> this.releaseBee(arg, (Bee)arg3, list, arg2));
         return list;
     }
 
@@ -134,40 +134,35 @@ implements Tickable {
         arg.remove();
     }
 
-    private boolean releaseBee(BlockState arg2, CompoundTag arg22, @Nullable List<Entity> list, BeeState arg3) {
+    private boolean releaseBee(BlockState arg2, Bee arg22, @Nullable List<Entity> list, BeeState arg3) {
         boolean bl;
-        BlockPos lv = this.getPos();
         if ((this.world.isNight() || this.world.isRaining()) && arg3 != BeeState.EMERGENCY) {
             return false;
         }
-        arg22.remove("Passengers");
-        arg22.remove("Leash");
-        arg22.remove("UUID");
-        Direction lv2 = arg2.get(BeehiveBlock.FACING);
-        BlockPos lv3 = lv.offset(lv2);
-        boolean bl2 = bl = !this.world.getBlockState(lv3).getCollisionShape(this.world, lv3).isEmpty();
+        BlockPos lv = this.getPos();
+        CompoundTag lv2 = arg22.entityData;
+        lv2.remove("Passengers");
+        lv2.remove("Leash");
+        lv2.remove("UUID");
+        Direction lv3 = arg2.get(BeehiveBlock.FACING);
+        BlockPos lv4 = lv.offset(lv3);
+        boolean bl2 = bl = !this.world.getBlockState(lv4).getCollisionShape(this.world, lv4).isEmpty();
         if (bl && arg3 != BeeState.EMERGENCY) {
             return false;
         }
-        Entity lv4 = EntityType.loadEntityWithPassengers(arg22, this.world, arg -> arg);
-        if (lv4 != null) {
-            float f = lv4.getWidth();
-            double d = bl ? 0.0 : 0.55 + (double)(f / 2.0f);
-            double e = (double)lv.getX() + 0.5 + d * (double)lv2.getOffsetX();
-            double g = (double)lv.getY() + 0.5 - (double)(lv4.getHeight() / 2.0f);
-            double h = (double)lv.getZ() + 0.5 + d * (double)lv2.getOffsetZ();
-            lv4.refreshPositionAndAngles(e, g, h, lv4.yaw, lv4.pitch);
-            if (!lv4.getType().isIn(EntityTypeTags.BEEHIVE_INHABITORS)) {
+        Entity lv5 = EntityType.loadEntityWithPassengers(lv2, this.world, arg -> arg);
+        if (lv5 != null) {
+            if (!lv5.getType().isIn(EntityTypeTags.BEEHIVE_INHABITORS)) {
                 return false;
             }
-            if (lv4 instanceof BeeEntity) {
-                BeeEntity lv5 = (BeeEntity)lv4;
-                if (this.hasFlowerPos() && !lv5.hasFlower() && this.world.random.nextFloat() < 0.9f) {
-                    lv5.setFlowerPos(this.flowerPos);
+            if (lv5 instanceof BeeEntity) {
+                BeeEntity lv6 = (BeeEntity)lv5;
+                if (this.hasFlowerPos() && !lv6.hasFlower() && this.world.random.nextFloat() < 0.9f) {
+                    lv6.setFlowerPos(this.flowerPos);
                 }
                 if (arg3 == BeeState.HONEY_DELIVERED) {
                     int i;
-                    lv5.onHoneyDelivered();
+                    lv6.onHoneyDelivered();
                     if (arg2.getBlock().isIn(BlockTags.BEEHIVES) && (i = BeehiveBlockEntity.getHoneyLevel(arg2)) < 5) {
                         int j;
                         int n = j = this.world.random.nextInt(100) == 0 ? 2 : 1;
@@ -177,14 +172,22 @@ implements Tickable {
                         this.world.setBlockState(this.getPos(), (BlockState)arg2.with(BeehiveBlock.HONEY_LEVEL, i + j));
                     }
                 }
-                lv5.resetPollinationTicks();
+                int k = arg22.ticksInHive;
+                lv6.growUp(k);
+                lv6.setLoveTicks(Math.max(0, lv6.method_29270() - k));
+                lv6.resetPollinationTicks();
                 if (list != null) {
-                    list.add(lv5);
+                    list.add(lv6);
                 }
+                float f = lv5.getWidth();
+                double d = bl ? 0.0 : 0.55 + (double)(f / 2.0f);
+                double e = (double)lv.getX() + 0.5 + d * (double)lv3.getOffsetX();
+                double g = (double)lv.getY() + 0.5 - (double)(lv5.getHeight() / 2.0f);
+                double h = (double)lv.getZ() + 0.5 + d * (double)lv3.getOffsetZ();
+                lv5.refreshPositionAndAngles(e, g, h, lv5.yaw, lv5.pitch);
             }
-            BlockPos lv6 = this.getPos();
-            this.world.playSound(null, (double)lv6.getX(), (double)lv6.getY(), lv6.getZ(), SoundEvents.BLOCK_BEEHIVE_EXIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
-            return this.world.spawnEntity(lv4);
+            this.world.playSound(null, lv, SoundEvents.BLOCK_BEEHIVE_EXIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            return this.world.spawnEntity(lv5);
         }
         return false;
     }
@@ -199,9 +202,8 @@ implements Tickable {
         while (iterator.hasNext()) {
             Bee lv2 = iterator.next();
             if (lv2.ticksInHive > lv2.minOccupationTIcks) {
-                CompoundTag lv3;
-                BeeState lv4 = (lv3 = lv2.entityData).getBoolean("HasNectar") ? BeeState.HONEY_DELIVERED : BeeState.BEE_RELEASED;
-                if (!this.releaseBee(lv, lv3, null, lv4)) continue;
+                BeeState lv3 = lv2.entityData.getBoolean("HasNectar") ? BeeState.HONEY_DELIVERED : BeeState.BEE_RELEASED;
+                if (!this.releaseBee(lv, lv2, null, lv3)) continue;
                 iterator.remove();
                 continue;
             }

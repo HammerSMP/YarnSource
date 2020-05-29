@@ -24,8 +24,8 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -208,11 +208,11 @@ implements InventoryProvider {
                     lv.decrement(1);
                 }
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (i == 8) {
             ComposterBlock.emptyFullComposter(arg, arg2, arg3);
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         return ActionResult.PASS;
     }
@@ -267,7 +267,7 @@ implements InventoryProvider {
     @Override
     public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
         if (arg.get(LEVEL) == 7) {
-            arg2.setBlockState(arg3, (BlockState)arg.method_28493(LEVEL), 3);
+            arg2.setBlockState(arg3, (BlockState)arg.cycle(LEVEL), 3);
             arg2.playSound(null, arg3, SoundEvents.BLOCK_COMPOSTER_READY, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
     }
@@ -305,7 +305,7 @@ implements InventoryProvider {
     }
 
     static class ComposterInventory
-    extends BasicInventory
+    extends SimpleInventory
     implements SidedInventory {
         private final BlockState state;
         private final WorldAccess world;
@@ -360,7 +360,7 @@ implements InventoryProvider {
     }
 
     static class FullComposterInventory
-    extends BasicInventory
+    extends SimpleInventory
     implements SidedInventory {
         private final BlockState state;
         private final WorldAccess world;
@@ -410,7 +410,7 @@ implements InventoryProvider {
     }
 
     static class DummyInventory
-    extends BasicInventory
+    extends SimpleInventory
     implements SidedInventory {
         public DummyInventory() {
             super(0);

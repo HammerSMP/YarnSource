@@ -34,15 +34,12 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5217;
-import net.minecraft.class_5269;
-import net.minecraft.class_5294;
-import net.minecraft.class_5318;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.particle.FireworksSparkParticle;
+import net.minecraft.client.render.SkyProperties;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.sound.EntityTrackingSoundInstance;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -79,13 +76,16 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.TickScheduler;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkManager;
@@ -101,8 +101,8 @@ extends World {
     private final Int2ObjectMap<Entity> regularEntities = new Int2ObjectOpenHashMap();
     private final ClientPlayNetworkHandler netHandler;
     private final WorldRenderer worldRenderer;
-    private final class_5271 field_24430;
-    private final class_5294 field_24606;
+    private final Properties clientWorldProperties;
+    private final SkyProperties skyProperties;
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final List<AbstractClientPlayerEntity> players = Lists.newArrayList();
     private Scoreboard scoreboard = new Scoreboard();
@@ -113,29 +113,29 @@ extends World {
         object2ObjectArrayMap.put((Object)BiomeColors.FOLIAGE_COLOR, (Object)new BiomeColorCache());
         object2ObjectArrayMap.put((Object)BiomeColors.WATER_COLOR, (Object)new BiomeColorCache());
     });
-    private final ClientChunkManager field_24605;
+    private final ClientChunkManager chunkManager;
 
-    public ClientWorld(ClientPlayNetworkHandler arg, class_5271 arg2, DimensionType arg3, int i, Supplier<Profiler> supplier, WorldRenderer arg4, boolean bl, long l) {
-        super(arg2, arg3, supplier, true, bl, l);
-        this.field_24605 = new ClientChunkManager(this, i);
-        this.field_24430 = arg2;
+    public ClientWorld(ClientPlayNetworkHandler arg, Properties arg2, RegistryKey<World> arg3, RegistryKey<DimensionType> arg4, DimensionType arg5, int i, Supplier<Profiler> supplier, WorldRenderer arg6, boolean bl, long l) {
+        super(arg2, arg3, arg4, arg5, supplier, true, bl, l);
+        this.chunkManager = new ClientChunkManager(this, i);
+        this.clientWorldProperties = arg2;
         this.netHandler = arg;
-        this.worldRenderer = arg4;
-        this.field_24606 = class_5294.method_28111(arg.method_29091().method_29116().method_29113(arg3));
+        this.worldRenderer = arg6;
+        this.skyProperties = SkyProperties.byDimensionType(arg.method_29091().getRegistry().getKey(arg5));
         this.setSpawnPos(new BlockPos(8, 64, 8));
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
     }
 
-    public class_5294 method_28103() {
-        return this.field_24606;
+    public SkyProperties getSkyProperties() {
+        return this.skyProperties;
     }
 
     public void tick(BooleanSupplier booleanSupplier) {
         this.getWorldBorder().tick();
         this.method_29090();
         this.getProfiler().push("blocks");
-        this.field_24605.method_28102(booleanSupplier);
+        this.chunkManager.tick(booleanSupplier);
         this.getProfiler().pop();
     }
 
@@ -147,7 +147,7 @@ extends World {
     }
 
     public void method_29089(long l) {
-        this.field_24430.setTime(l);
+        this.clientWorldProperties.setTime(l);
     }
 
     public void setTimeOfDay(long l) {
@@ -157,7 +157,7 @@ extends World {
         } else {
             this.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(true, null);
         }
-        this.field_24430.setTimeOfDay(l);
+        this.clientWorldProperties.setTimeOfDay(l);
     }
 
     public Iterable<Entity> getEntities() {
@@ -202,6 +202,7 @@ extends World {
 
     public void tickEntity(Entity arg) {
         if (!(arg instanceof PlayerEntity) && !this.getChunkManager().shouldTickEntity(arg)) {
+            this.checkChunk(arg);
             return;
         }
         arg.resetPosition(arg.getX(), arg.getY(), arg.getZ());
@@ -244,7 +245,10 @@ extends World {
         }
     }
 
-    public void checkChunk(Entity arg) {
+    private void checkChunk(Entity arg) {
+        if (!arg.method_29240()) {
+            return;
+        }
         this.getProfiler().push("chunkCheck");
         int i = MathHelper.floor(arg.getX() / 16.0);
         int j = MathHelper.floor(arg.getY() / 16.0);
@@ -256,6 +260,9 @@ extends World {
             if (arg.teleportRequested() || this.isChunkLoaded(i, k)) {
                 this.getChunk(i, k).addEntity(arg);
             } else {
+                if (arg.updateNeeded) {
+                    LOGGER.warn("Entity {} left loaded chunk area", (Object)arg);
+                }
                 arg.updateNeeded = false;
             }
         }
@@ -264,7 +271,7 @@ extends World {
 
     public void unloadBlockEntities(WorldChunk arg) {
         this.unloadedBlockEntities.addAll(arg.getBlockEntities().values());
-        this.field_24605.getLightingProvider().setLightEnabled(arg.getPos(), false);
+        this.chunkManager.getLightingProvider().setLightEnabled(arg.getPos(), false);
     }
 
     public void resetChunkColor(int i, int j) {
@@ -505,7 +512,7 @@ extends World {
 
     @Override
     public ClientChunkManager getChunkManager() {
-        return this.field_24605;
+        return this.chunkManager;
     }
 
     @Override
@@ -532,11 +539,6 @@ extends World {
     @Override
     public RegistryTagManager getTagManager() {
         return this.netHandler.getTagManager();
-    }
-
-    @Override
-    public class_5318 method_28380() {
-        return this.netHandler.method_29091();
     }
 
     @Override
@@ -705,7 +707,7 @@ extends World {
 
     @Override
     public float getBrightness(Direction arg, boolean bl) {
-        boolean bl2 = this.getDimension().method_28542();
+        boolean bl2 = this.getDimension().isNether();
         if (!bl) {
             return bl2 ? 0.9f : 1.0f;
         }
@@ -772,12 +774,12 @@ extends World {
     }
 
     @Override
-    public class_5271 getLevelProperties() {
-        return this.field_24430;
+    public Properties getLevelProperties() {
+        return this.clientWorldProperties;
     }
 
     @Override
-    public /* synthetic */ class_5217 getLevelProperties() {
+    public /* synthetic */ WorldProperties getLevelProperties() {
         return this.getLevelProperties();
     }
 
@@ -787,80 +789,80 @@ extends World {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static class class_5271
-    implements class_5269 {
-        private final boolean field_24433;
-        private final GameRules field_24434;
-        private final boolean field_24607;
-        private int field_24435;
-        private int field_24436;
-        private int field_24437;
-        private long field_24438;
-        private long field_24439;
-        private boolean field_24440;
-        private Difficulty field_24441;
-        private boolean field_24442;
+    public static class Properties
+    implements MutableWorldProperties {
+        private final boolean hardcore;
+        private final GameRules gameRules;
+        private final boolean flatWorld;
+        private int spawnX;
+        private int spawnY;
+        private int spawnZ;
+        private long time;
+        private long timeOfDay;
+        private boolean raining;
+        private Difficulty difficulty;
+        private boolean difficultyLocked;
 
-        public class_5271(Difficulty arg, boolean bl, boolean bl2) {
-            this.field_24441 = arg;
-            this.field_24433 = bl;
-            this.field_24607 = bl2;
-            this.field_24434 = new GameRules();
+        public Properties(Difficulty arg, boolean bl, boolean bl2) {
+            this.difficulty = arg;
+            this.hardcore = bl;
+            this.flatWorld = bl2;
+            this.gameRules = new GameRules();
         }
 
         @Override
         public int getSpawnX() {
-            return this.field_24435;
+            return this.spawnX;
         }
 
         @Override
         public int getSpawnY() {
-            return this.field_24436;
+            return this.spawnY;
         }
 
         @Override
         public int getSpawnZ() {
-            return this.field_24437;
+            return this.spawnZ;
         }
 
         @Override
         public long getTime() {
-            return this.field_24438;
+            return this.time;
         }
 
         @Override
         public long getTimeOfDay() {
-            return this.field_24439;
+            return this.timeOfDay;
         }
 
         @Override
         public void setSpawnX(int i) {
-            this.field_24435 = i;
+            this.spawnX = i;
         }
 
         @Override
         public void setSpawnY(int i) {
-            this.field_24436 = i;
+            this.spawnY = i;
         }
 
         @Override
         public void setSpawnZ(int i) {
-            this.field_24437 = i;
+            this.spawnZ = i;
         }
 
         public void setTime(long l) {
-            this.field_24438 = l;
+            this.time = l;
         }
 
         public void setTimeOfDay(long l) {
-            this.field_24439 = l;
+            this.timeOfDay = l;
         }
 
         @Override
         public void setSpawnPos(BlockPos arg) {
-            this.field_24435 = arg.getX();
-            this.field_24436 = arg.getY();
-            this.field_24437 = arg.getZ();
+            this.spawnX = arg.getX();
+            this.spawnY = arg.getY();
+            this.spawnZ = arg.getZ();
         }
 
         @Override
@@ -870,56 +872,56 @@ extends World {
 
         @Override
         public boolean isRaining() {
-            return this.field_24440;
+            return this.raining;
         }
 
         @Override
         public void setRaining(boolean bl) {
-            this.field_24440 = bl;
+            this.raining = bl;
         }
 
         @Override
         public boolean isHardcore() {
-            return this.field_24433;
+            return this.hardcore;
         }
 
         @Override
         public GameRules getGameRules() {
-            return this.field_24434;
+            return this.gameRules;
         }
 
         @Override
         public Difficulty getDifficulty() {
-            return this.field_24441;
+            return this.difficulty;
         }
 
         @Override
         public boolean isDifficultyLocked() {
-            return this.field_24442;
+            return this.difficultyLocked;
         }
 
         @Override
         public void populateCrashReport(CrashReportSection arg) {
-            class_5269.super.populateCrashReport(arg);
+            MutableWorldProperties.super.populateCrashReport(arg);
         }
 
-        public void method_27875(Difficulty arg) {
-            this.field_24441 = arg;
+        public void setDifficulty(Difficulty arg) {
+            this.difficulty = arg;
         }
 
-        public void method_27876(boolean bl) {
-            this.field_24442 = bl;
+        public void setDifficultyLocked(boolean bl) {
+            this.difficultyLocked = bl;
         }
 
-        public double method_28105() {
-            if (this.field_24607) {
+        public double getSkyDarknessHeight() {
+            if (this.flatWorld) {
                 return 0.0;
             }
             return 63.0;
         }
 
-        public double method_28106() {
-            if (this.field_24607) {
+        public double getHorizonShadingRatio() {
+            if (this.flatWorld) {
                 return 1.0;
             }
             return 0.03125;

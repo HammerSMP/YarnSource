@@ -42,6 +42,7 @@ import net.minecraft.block.TntBlock;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.SlabType;
+import net.minecraft.class_5341;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -55,7 +56,6 @@ import net.minecraft.loot.LootTables;
 import net.minecraft.loot.UniformLootTableRange;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditionConsumingBuilder;
 import net.minecraft.loot.condition.MatchToolLootCondition;
 import net.minecraft.loot.condition.RandomChanceLootCondition;
@@ -89,11 +89,11 @@ import net.minecraft.util.registry.Registry;
 
 public class BlockLootTableGenerator
 implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
-    private static final LootCondition.Builder WITH_SILK_TOUCH = MatchToolLootCondition.builder(ItemPredicate.Builder.create().enchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, NumberRange.IntRange.atLeast(1))));
-    private static final LootCondition.Builder WITHOUT_SILK_TOUCH = WITH_SILK_TOUCH.invert();
-    private static final LootCondition.Builder WITH_SHEARS = MatchToolLootCondition.builder(ItemPredicate.Builder.create().item(Items.SHEARS));
-    private static final LootCondition.Builder WITH_SILK_TOUCH_OR_SHEARS = WITH_SHEARS.or(WITH_SILK_TOUCH);
-    private static final LootCondition.Builder WITHOUT_SILK_TOUCH_NOR_SHEARS = WITH_SILK_TOUCH_OR_SHEARS.invert();
+    private static final class_5341.Builder WITH_SILK_TOUCH = MatchToolLootCondition.builder(ItemPredicate.Builder.create().enchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, NumberRange.IntRange.atLeast(1))));
+    private static final class_5341.Builder WITHOUT_SILK_TOUCH = WITH_SILK_TOUCH.invert();
+    private static final class_5341.Builder WITH_SHEARS = MatchToolLootCondition.builder(ItemPredicate.Builder.create().item(Items.SHEARS));
+    private static final class_5341.Builder WITH_SILK_TOUCH_OR_SHEARS = WITH_SHEARS.or(WITH_SILK_TOUCH);
+    private static final class_5341.Builder WITHOUT_SILK_TOUCH_NOR_SHEARS = WITH_SILK_TOUCH_OR_SHEARS.invert();
     private static final Set<Item> EXPLOSION_IMMUNE = (Set)Stream.of(Blocks.DRAGON_EGG, Blocks.BEACON, Blocks.CONDUIT, Blocks.SKELETON_SKULL, Blocks.WITHER_SKELETON_SKULL, Blocks.PLAYER_HEAD, Blocks.ZOMBIE_HEAD, Blocks.CREEPER_HEAD, Blocks.DRAGON_HEAD, Blocks.SHULKER_BOX, Blocks.BLACK_SHULKER_BOX, Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.LIGHT_GRAY_SHULKER_BOX, Blocks.LIME_SHULKER_BOX, Blocks.MAGENTA_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.WHITE_SHULKER_BOX, Blocks.YELLOW_SHULKER_BOX).map(ItemConvertible::asItem).collect(ImmutableSet.toImmutableSet());
     private static final float[] SAPLING_DROP_CHANCE = new float[]{0.05f, 0.0625f, 0.083333336f, 0.1f};
     private static final float[] JUNGLE_SAPLING_DROP_CHANCE = new float[]{0.025f, 0.027777778f, 0.03125f, 0.041666668f, 0.1f};
@@ -117,7 +117,7 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
         return LootTable.builder().pool(BlockLootTableGenerator.addSurvivesExplosionCondition(arg, LootPool.builder().rolls(ConstantLootTableRange.create(1)).with(ItemEntry.builder(arg))));
     }
 
-    private static LootTable.Builder drops(Block arg, LootCondition.Builder arg2, LootEntry.Builder<?> arg3) {
+    private static LootTable.Builder drops(Block arg, class_5341.Builder arg2, LootEntry.Builder<?> arg3) {
         return LootTable.builder().pool(LootPool.builder().rolls(ConstantLootTableRange.create(1)).with(((LeafEntry.Builder)ItemEntry.builder(arg).conditionally(arg2)).alternatively(arg3)));
     }
 
@@ -213,7 +213,7 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
         return BlockLootTableGenerator.leavesDrop(arg, arg2, fs).pool(LootPool.builder().rolls(ConstantLootTableRange.create(1)).conditionally(WITHOUT_SILK_TOUCH_NOR_SHEARS).with((LootEntry.Builder<?>)((LeafEntry.Builder)BlockLootTableGenerator.addSurvivesExplosionCondition(arg, ItemEntry.builder(Items.APPLE))).conditionally(TableBonusLootCondition.builder(Enchantments.FORTUNE, 0.005f, 0.0055555557f, 0.00625f, 0.008333334f, 0.025f))));
     }
 
-    private static LootTable.Builder cropDrops(Block arg, Item arg2, Item arg3, LootCondition.Builder arg4) {
+    private static LootTable.Builder cropDrops(Block arg, Item arg2, Item arg3, class_5341.Builder arg4) {
         return BlockLootTableGenerator.applyExplosionDecay(arg, LootTable.builder().pool(LootPool.builder().with(((LeafEntry.Builder)ItemEntry.builder(arg2).conditionally(arg4)).alternatively(ItemEntry.builder(arg3)))).pool(LootPool.builder().conditionally(arg4).with((LootEntry.Builder<?>)ItemEntry.builder(arg3).apply(ApplyBonusLootFunction.binomialWithBonusCount(Enchantments.FORTUNE, 0.5714286f, 3)))));
     }
 
@@ -582,13 +582,11 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
         this.addDrop(Blocks.LODESTONE);
         this.addDrop(Blocks.WARPED_STEM);
         this.addDrop(Blocks.WARPED_HYPHAE);
-        this.addDrop(Blocks.WARPED_NYLIUM);
         this.addDrop(Blocks.WARPED_FUNGUS);
         this.addDrop(Blocks.WARPED_WART_BLOCK);
         this.addDrop(Blocks.WARPED_ROOTS);
         this.addDrop(Blocks.CRIMSON_STEM);
         this.addDrop(Blocks.CRIMSON_HYPHAE);
-        this.addDrop(Blocks.CRIMSON_NYLIUM);
         this.addDrop(Blocks.CRIMSON_FUNGUS);
         this.addDrop(Blocks.SHROOMLIGHT);
         this.addDrop(Blocks.CRIMSON_ROOTS);
@@ -641,6 +639,8 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
         this.addDrop(Blocks.BUBBLE_CORAL_BLOCK, (Block arg) -> BlockLootTableGenerator.drops(arg, Blocks.DEAD_BUBBLE_CORAL_BLOCK));
         this.addDrop(Blocks.FIRE_CORAL_BLOCK, (Block arg) -> BlockLootTableGenerator.drops(arg, Blocks.DEAD_FIRE_CORAL_BLOCK));
         this.addDrop(Blocks.HORN_CORAL_BLOCK, (Block arg) -> BlockLootTableGenerator.drops(arg, Blocks.DEAD_HORN_CORAL_BLOCK));
+        this.addDrop(Blocks.CRIMSON_NYLIUM, (Block arg) -> BlockLootTableGenerator.drops(arg, Blocks.NETHERRACK));
+        this.addDrop(Blocks.WARPED_NYLIUM, (Block arg) -> BlockLootTableGenerator.drops(arg, Blocks.NETHERRACK));
         this.addDrop(Blocks.BOOKSHELF, (Block arg) -> BlockLootTableGenerator.drops(arg, Items.BOOK, ConstantLootTableRange.create(3)));
         this.addDrop(Blocks.CLAY, (Block arg) -> BlockLootTableGenerator.drops(arg, Items.CLAY_BALL, ConstantLootTableRange.create(4)));
         this.addDrop(Blocks.ENDER_CHEST, (Block arg) -> BlockLootTableGenerator.drops(arg, Blocks.OBSIDIAN, ConstantLootTableRange.create(8)));

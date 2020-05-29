@@ -14,8 +14,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
@@ -27,7 +27,7 @@ import net.minecraft.tag.ItemTags;
 
 public class BeaconScreenHandler
 extends ScreenHandler {
-    private final Inventory payment = new BasicInventory(1){
+    private final Inventory payment = new SimpleInventory(1){
 
         @Override
         public boolean isValid(int i, ItemStack arg) {

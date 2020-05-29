@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import net.minecraft.class_5321;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,8 +37,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
@@ -50,7 +51,7 @@ extends PersistentState {
     private static final Logger field_25019 = LogManager.getLogger();
     public int xCenter;
     public int zCenter;
-    public class_5321<DimensionType> dimension;
+    public RegistryKey<World> dimension;
     public boolean showIcons;
     public boolean unlimitedTracking;
     public byte scale;
@@ -66,7 +67,7 @@ extends PersistentState {
         super(string);
     }
 
-    public void init(int i, int j, int k, boolean bl, boolean bl2, class_5321<DimensionType> arg) {
+    public void init(int i, int j, int k, boolean bl, boolean bl2, RegistryKey<World> arg) {
         this.scale = (byte)k;
         this.calculateCenter(i, j, this.scale);
         this.dimension = arg;
@@ -85,7 +86,7 @@ extends PersistentState {
 
     @Override
     public void fromTag(CompoundTag arg) {
-        this.dimension = (class_5321)DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("dimension"))).resultOrPartial(((Logger)field_25019)::error).orElseThrow(() -> new IllegalArgumentException("Invalid map dimension: " + arg.get("dimension")));
+        this.dimension = (RegistryKey)DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("dimension"))).resultOrPartial(((Logger)field_25019)::error).orElseThrow(() -> new IllegalArgumentException("Invalid map dimension: " + arg.get("dimension")));
         this.xCenter = arg.getInt("xCenter");
         this.zCenter = arg.getInt("zCenter");
         this.scale = (byte)MathHelper.clamp(arg.getByte("scale"), 0, 4);
@@ -112,7 +113,7 @@ extends PersistentState {
 
     @Override
     public CompoundTag toTag(CompoundTag arg) {
-        Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.dimension.method_29177()).resultOrPartial(((Logger)field_25019)::error).ifPresent(arg2 -> arg.put("dimension", (Tag)arg2));
+        Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.dimension.getValue()).resultOrPartial(((Logger)field_25019)::error).ifPresent(arg2 -> arg.put("dimension", (Tag)arg2));
         arg.putInt("xCenter", this.xCenter);
         arg.putInt("zCenter", this.zCenter);
         arg.putByte("scale", this.scale);
@@ -220,7 +221,7 @@ extends PersistentState {
         int j = 63;
         if (g >= -63.0f && h >= -63.0f && g <= 63.0f && h <= 63.0f) {
             byte k = (byte)((f += f < 0.0 ? -8.0 : 8.0) * 16.0 / 360.0);
-            if (this.dimension == DimensionType.field_24754 && arg2 != null) {
+            if (this.dimension == World.field_25180 && arg2 != null) {
                 int l = (int)(arg2.getLevelProperties().getTimeOfDay() / 10L);
                 k = (byte)(l * l * 34187121 + l * 121 >> 15 & 0xF);
             }

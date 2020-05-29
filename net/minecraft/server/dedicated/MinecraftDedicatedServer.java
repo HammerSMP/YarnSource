@@ -35,16 +35,17 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.entity.SkullBlockEntity;
-import net.minecraft.class_5219;
+import net.minecraft.class_5350;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.network.NetworkEncryptionUtils;
+import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.dedicated.DedicatedPlayerManager;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -69,7 +70,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.SaveProperties;
+import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,32 +89,10 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(LevelStorage.Session arg, class_5219 arg2, ServerPropertiesLoader arg3, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg4, WorldGenerationProgressListenerFactory arg5) {
-        super(arg, arg2, Proxy.NO_PROXY, dataFixer, new CommandManager(true), minecraftSessionService, gameProfileRepository, arg4, arg5);
-        this.propertiesLoader = arg3;
+    public MinecraftDedicatedServer(LevelStorage.Session arg, ResourcePackManager<ResourcePackProfile> arg2, class_5350 arg3, SaveProperties arg4, ServerPropertiesLoader arg5, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+        super(arg, arg4, arg2, Proxy.NO_PROXY, dataFixer, arg3, minecraftSessionService, gameProfileRepository, arg6, arg7);
+        this.propertiesLoader = arg5;
         this.rconCommandOutput = new ServerCommandOutput(this);
-        new Thread("Server Infinisleeper"){
-            {
-                this.setDaemon(true);
-                this.setUncaughtExceptionHandler(new UncaughtExceptionLogger(LOGGER));
-                this.start();
-            }
-
-            @Override
-            public void run() {
-                do {
-                    try {
-                        do {
-                            Thread.sleep(Integer.MAX_VALUE);
-                        } while (true);
-                    }
-                    catch (InterruptedException interruptedException) {
-                        continue;
-                    }
-                    break;
-                } while (true);
-            }
-        };
     }
 
     @Override
@@ -403,7 +383,7 @@ implements DedicatedServer {
     @Override
     public boolean isSpawnProtected(ServerWorld arg, BlockPos arg2, PlayerEntity arg3) {
         int j;
-        if (arg.method_27983() != DimensionType.field_24753) {
+        if (arg.method_27983() != World.field_25179) {
             return false;
         }
         if (this.getPlayerManager().getOpList().isEmpty()) {
@@ -415,7 +395,7 @@ implements DedicatedServer {
         if (this.getSpawnProtectionRadius() <= 0) {
             return false;
         }
-        BlockPos lv = arg.method_27911();
+        BlockPos lv = arg.getSpawnPos();
         int i = MathHelper.abs(arg2.getX() - lv.getX());
         int k = Math.max(i, j = MathHelper.abs(arg2.getZ() - lv.getZ()));
         return k <= this.getSpawnProtectionRadius();

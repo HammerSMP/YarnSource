@@ -76,7 +76,7 @@ extends ExplosiveProjectileEntity {
         Entity lv2 = this.getOwner();
         if (lv2 instanceof LivingEntity) {
             LivingEntity lv3 = (LivingEntity)lv2;
-            if (lv.damage(DamageSource.mob(lv3), 8.0f)) {
+            if (lv.damage(DamageSource.method_29238(this, lv3), 8.0f)) {
                 if (lv.isAlive()) {
                     this.dealDamage(lv3, lv);
                 } else {

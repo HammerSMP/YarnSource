@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import net.minecraft.command.arguments.BlockArgumentParser;
 import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.tag.BlockTags;
 
 public class BlockStateArgumentType
 implements ArgumentType<BlockStateArgument> {
@@ -51,7 +52,7 @@ implements ArgumentType<BlockStateArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder);
+        return lv.getSuggestions(suggestionsBuilder, BlockTags.getContainer());
     }
 
     public Collection<String> getExamples() {

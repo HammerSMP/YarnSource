@@ -26,7 +26,7 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class GiantTrunkPlacer
 extends TrunkPlacer {
-    public static final Codec<GiantTrunkPlacer> field_24969 = RecordCodecBuilder.create(instance -> GiantTrunkPlacer.method_28904(instance).apply((Applicative)instance, GiantTrunkPlacer::new));
+    public static final Codec<GiantTrunkPlacer> CODEC = RecordCodecBuilder.create(instance -> GiantTrunkPlacer.method_28904(instance).apply((Applicative)instance, GiantTrunkPlacer::new));
 
     public GiantTrunkPlacer(int i, int j, int k) {
         super(i, j, k);

@@ -15,11 +15,11 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import javax.annotation.Nullable;
+import net.minecraft.class_5323;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.predicate.StatePredicate;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -71,7 +71,7 @@ public class FluidPredicate {
         Tag<Fluid> lv3 = null;
         if (jsonObject.has("tag")) {
             Identifier lv4 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv3 = FluidTags.getContainer().get(lv4);
+            lv3 = class_5323.method_29223().method_29221().get(lv4);
             if (lv3 == null) {
                 throw new JsonSyntaxException("Unknown fluid tag '" + lv4 + "'");
             }
@@ -89,7 +89,7 @@ public class FluidPredicate {
             jsonObject.addProperty("fluid", Registry.FLUID.getId(this.fluid).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", FluidTags.getContainer().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", class_5323.method_29223().method_29221().checkId(this.tag).toString());
         }
         jsonObject.add("state", this.state.toJson());
         return jsonObject;

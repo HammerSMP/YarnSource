@@ -22,8 +22,8 @@ import org.apache.logging.log4j.Logger;
 
 public class TopSolidHeightmapNoiseBiasedDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<TopSolidHeightmapNoiseBiasedDecoratorConfig> field_24987 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("noise_to_count_ratio").forGetter(arg -> arg.noiseToCountRatio), (App)Codec.DOUBLE.fieldOf("noise_factor").forGetter(arg -> arg.noiseFactor), (App)Codec.DOUBLE.fieldOf("noise_offset").withDefault((Object)0.0).forGetter(arg -> arg.noiseOffset), (App)Heightmap.Type.field_24772.fieldOf("heightmap").forGetter(arg -> arg.heightmap)).apply((Applicative)instance, TopSolidHeightmapNoiseBiasedDecoratorConfig::new));
-    private static final Logger field_24988 = LogManager.getLogger();
+    public static final Codec<TopSolidHeightmapNoiseBiasedDecoratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("noise_to_count_ratio").forGetter(arg -> arg.noiseToCountRatio), (App)Codec.DOUBLE.fieldOf("noise_factor").forGetter(arg -> arg.noiseFactor), (App)Codec.DOUBLE.fieldOf("noise_offset").withDefault((Object)0.0).forGetter(arg -> arg.noiseOffset), (App)Heightmap.Type.field_24772.fieldOf("heightmap").forGetter(arg -> arg.heightmap)).apply((Applicative)instance, TopSolidHeightmapNoiseBiasedDecoratorConfig::new));
+    private static final Logger LOGGER = LogManager.getLogger();
     public final int noiseToCountRatio;
     public final double noiseFactor;
     public final double noiseOffset;

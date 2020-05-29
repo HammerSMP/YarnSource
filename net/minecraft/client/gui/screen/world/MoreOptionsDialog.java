@@ -19,7 +19,7 @@
  *  org.apache.logging.log4j.Logger
  *  org.lwjgl.util.tinyfd.TinyFileDialogs
  */
-package net.minecraft;
+package net.minecraft.client.gui.screen.world;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -40,7 +40,6 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5285;
 import net.minecraft.class_5317;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -59,59 +58,60 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.world.gen.GeneratorOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 @Environment(value=EnvType.CLIENT)
-public class class_5292
+public class MoreOptionsDialog
 implements TickableElement,
 Drawable {
     private static final Logger field_25046 = LogManager.getLogger();
     private static final Text field_25047 = new TranslatableText("generator.custom");
-    private static final Text field_24591 = new TranslatableText("generator.amplified.info");
-    private TextRenderer field_24592;
-    private int field_24593;
-    private TextFieldWidget field_24594;
-    private ButtonWidget field_24595;
-    public ButtonWidget field_24589;
-    private ButtonWidget field_24596;
-    private ButtonWidget field_24597;
+    private static final Text AMPLIFIED_INFO_TEXT = new TranslatableText("generator.amplified.info");
+    private TextRenderer textRenderer;
+    private int parentWidth;
+    private TextFieldWidget seedTextField;
+    private ButtonWidget mapFeaturesButton;
+    public ButtonWidget bonusItemsButton;
+    private ButtonWidget mapTypeButton;
+    private ButtonWidget customizeTypeButton;
     private ButtonWidget field_25048;
-    private class_5285 field_24598;
+    private GeneratorOptions generatorOptions;
     private Optional<class_5317> field_25049;
-    private String field_24600;
+    private String seedText;
 
-    public class_5292() {
-        this.field_24598 = class_5285.method_28009();
+    public MoreOptionsDialog() {
+        this.generatorOptions = GeneratorOptions.getDefaultOptions();
         this.field_25049 = Optional.of(class_5317.field_25050);
-        this.field_24600 = "";
+        this.seedText = "";
     }
 
-    public class_5292(class_5285 arg) {
-        this.field_24598 = arg;
+    public MoreOptionsDialog(GeneratorOptions arg) {
+        this.generatorOptions = arg;
         this.field_25049 = class_5317.method_29078(arg);
-        this.field_24600 = Long.toString(arg.method_28028());
+        this.seedText = Long.toString(arg.getSeed());
     }
 
     public void method_28092(final CreateWorldScreen arg4, MinecraftClient arg22, TextRenderer arg33) {
-        this.field_24592 = arg33;
-        this.field_24593 = arg4.width;
-        this.field_24594 = new TextFieldWidget(this.field_24592, this.field_24593 / 2 - 100, 60, 200, 20, new TranslatableText("selectWorld.enterSeed"));
-        this.field_24594.setText(this.field_24600);
-        this.field_24594.setChangedListener(string -> {
-            this.field_24600 = this.field_24594.getText();
+        this.textRenderer = arg33;
+        this.parentWidth = arg4.width;
+        this.seedTextField = new TextFieldWidget(this.textRenderer, this.parentWidth / 2 - 100, 60, 200, 20, new TranslatableText("selectWorld.enterSeed"));
+        this.seedTextField.setText(this.seedText);
+        this.seedTextField.setChangedListener(string -> {
+            this.seedText = this.seedTextField.getText();
         });
-        arg4.addChild(this.field_24594);
-        this.field_24595 = arg4.addButton(new ButtonWidget(this.field_24593 / 2 - 155, 100, 150, 20, new TranslatableText("selectWorld.mapFeatures"), arg -> {
-            this.field_24598 = this.field_24598.method_28037();
+        arg4.addChild(this.seedTextField);
+        this.mapFeaturesButton = arg4.addButton(new ButtonWidget(this.parentWidth / 2 - 155, 100, 150, 20, new TranslatableText("selectWorld.mapFeatures"), arg -> {
+            this.generatorOptions = this.generatorOptions.toggleGenerateStructures();
             arg.queueNarration(250);
         }){
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(class_5292.this.field_24598.method_28029()));
+                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(MoreOptionsDialog.this.generatorOptions.shouldGenerateStructures()));
             }
 
             @Override
@@ -119,8 +119,8 @@ Drawable {
                 return super.getNarrationMessage().append(". ").append(new TranslatableText("selectWorld.mapFeatures.info"));
             }
         });
-        this.field_24595.visible = false;
-        this.field_24596 = arg4.addButton(new ButtonWidget(this.field_24593 / 2 + 5, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
+        this.mapFeaturesButton.visible = false;
+        this.mapTypeButton = arg4.addButton(new ButtonWidget(this.parentWidth / 2 + 5, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
             while (this.field_25049.isPresent()) {
                 int i = class_5317.field_25052.indexOf(this.field_25049.get()) + 1;
                 if (i >= class_5317.field_25052.size()) {
@@ -128,47 +128,47 @@ Drawable {
                 }
                 class_5317 lv = class_5317.field_25052.get(i);
                 this.field_25049 = Optional.of(lv);
-                this.field_24598 = lv.method_29077(this.field_24598.method_28028(), this.field_24598.method_28029(), this.field_24598.method_28030());
-                if (this.field_24598.method_28033() && !Screen.hasShiftDown()) continue;
+                this.generatorOptions = lv.method_29077(this.generatorOptions.getSeed(), this.generatorOptions.shouldGenerateStructures(), this.generatorOptions.hasBonusChest());
+                if (this.generatorOptions.isDebugWorld() && !Screen.hasShiftDown()) continue;
             }
-            arg4.method_28084();
+            arg4.setMoreOptionsOpen();
             arg2.queueNarration(250);
         }){
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(class_5292.this.field_25049.map(class_5317::method_29075).orElse(field_25047));
+                return super.getMessage().shallowCopy().append(" ").append(MoreOptionsDialog.this.field_25049.map(class_5317::method_29075).orElse(field_25047));
             }
 
             @Override
             protected MutableText getNarrationMessage() {
-                if (Objects.equals(class_5292.this.field_25049, Optional.of(class_5317.field_25051))) {
-                    return super.getNarrationMessage().append(". ").append(field_24591);
+                if (Objects.equals(MoreOptionsDialog.this.field_25049, Optional.of(class_5317.field_25051))) {
+                    return super.getNarrationMessage().append(". ").append(AMPLIFIED_INFO_TEXT);
                 }
                 return super.getNarrationMessage();
             }
         });
-        this.field_24596.visible = false;
-        this.field_24596.active = this.field_25049.isPresent();
-        this.field_24597 = arg4.addButton(new ButtonWidget(arg4.width / 2 + 5, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
+        this.mapTypeButton.visible = false;
+        this.mapTypeButton.active = this.field_25049.isPresent();
+        this.customizeTypeButton = arg4.addButton(new ButtonWidget(arg4.width / 2 + 5, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
             class_5317.class_5293 lv = class_5317.field_25053.get(this.field_25049);
             if (lv != null) {
-                arg22.openScreen(lv.createEditScreen(arg4, this.field_24598));
+                arg22.openScreen(lv.createEditScreen(arg4, this.generatorOptions));
             }
         }));
-        this.field_24597.visible = false;
-        this.field_24589 = arg4.addButton(new ButtonWidget(arg4.width / 2 - 155, 151, 150, 20, new TranslatableText("selectWorld.bonusItems"), arg -> {
-            this.field_24598 = this.field_24598.method_28038();
+        this.customizeTypeButton.visible = false;
+        this.bonusItemsButton = arg4.addButton(new ButtonWidget(arg4.width / 2 - 155, 151, 150, 20, new TranslatableText("selectWorld.bonusItems"), arg -> {
+            this.generatorOptions = this.generatorOptions.toggleBonusChest();
             arg.queueNarration(250);
         }){
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(class_5292.this.field_24598.method_28030() && !arg4.hardcore));
+                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(MoreOptionsDialog.this.generatorOptions.hasBonusChest() && !arg4.hardcore));
             }
         });
-        this.field_24589.visible = false;
-        this.field_25048 = arg4.addButton(new ButtonWidget(this.field_24593 / 2 - 155, 185, 150, 20, new TranslatableText("selectWorld.import_worldgen_settings"), arg32 -> {
+        this.bonusItemsButton.visible = false;
+        this.field_25048 = arg4.addButton(new ButtonWidget(this.parentWidth / 2 - 155, 185, 150, 20, new TranslatableText("selectWorld.import_worldgen_settings"), arg32 -> {
             DataResult dataResult3;
             TranslatableText lv = new TranslatableText("selectWorld.import_worldgen_settings.select_file");
             String string = TinyFileDialogs.tinyfd_openFileDialog((CharSequence)lv.getString(), null, null, null, (boolean)false);
@@ -178,7 +178,7 @@ Drawable {
             JsonParser jsonParser = new JsonParser();
             try (BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(string, new String[0]));){
                 JsonElement jsonElement = jsonParser.parse((Reader)bufferedReader);
-                DataResult dataResult = class_5285.field_24826.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonElement);
+                DataResult dataResult = GeneratorOptions.CODEC.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonElement);
             }
             catch (JsonIOException | JsonSyntaxException | IOException exception) {
                 dataResult3 = DataResult.error((String)("Failed to parse file: " + exception.getMessage()));
@@ -195,11 +195,11 @@ Drawable {
                 BooleanConsumer booleanConsumer = bl -> {
                     arg22.openScreen(arg4);
                     if (bl) {
-                        this.method_29073((class_5285)arg3);
+                        this.method_29073((GeneratorOptions)arg3);
                     }
                 };
                 if (lifecycle == Lifecycle.stable()) {
-                    this.method_29073((class_5285)arg3);
+                    this.method_29073((GeneratorOptions)arg3);
                 } else if (lifecycle == Lifecycle.experimental()) {
                     arg22.openScreen(new ConfirmScreen(booleanConsumer, new TranslatableText("selectWorld.import_worldgen_settings.experimental.title"), new TranslatableText("selectWorld.import_worldgen_settings.experimental.question")));
                 } else {
@@ -210,35 +210,35 @@ Drawable {
         this.field_25048.visible = false;
     }
 
-    private void method_29073(class_5285 arg) {
-        this.field_24598 = arg;
+    private void method_29073(GeneratorOptions arg) {
+        this.generatorOptions = arg;
         this.field_25049 = class_5317.method_29078(arg);
-        this.field_24600 = Long.toString(arg.method_28028());
-        this.field_24594.setText(this.field_24600);
-        this.field_24596.active = this.field_25049.isPresent();
+        this.seedText = Long.toString(arg.getSeed());
+        this.seedTextField.setText(this.seedText);
+        this.mapTypeButton.active = this.field_25049.isPresent();
     }
 
     @Override
     public void tick() {
-        this.field_24594.tick();
+        this.seedTextField.tick();
     }
 
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
-        if (this.field_24595.visible) {
-            this.field_24592.drawWithShadow(arg, I18n.translate("selectWorld.mapFeatures.info", new Object[0]), (float)(this.field_24593 / 2 - 150), 122.0f, -6250336);
+        if (this.mapFeaturesButton.visible) {
+            this.textRenderer.drawWithShadow(arg, I18n.translate("selectWorld.mapFeatures.info", new Object[0]), (float)(this.parentWidth / 2 - 150), 122.0f, -6250336);
         }
-        this.field_24594.render(arg, i, j, f);
+        this.seedTextField.render(arg, i, j, f);
         if (this.field_25049.equals(Optional.of(class_5317.field_25051))) {
-            this.field_24592.drawTrimmed(field_24591, this.field_24596.x + 2, this.field_24596.y + 22, this.field_24596.getWidth(), 0xA0A0A0);
+            this.textRenderer.drawTrimmed(AMPLIFIED_INFO_TEXT, this.mapTypeButton.x + 2, this.mapTypeButton.y + 22, this.mapTypeButton.getWidth(), 0xA0A0A0);
         }
     }
 
-    protected void method_28086(class_5285 arg) {
-        this.field_24598 = arg;
+    protected void setGeneratorOptions(GeneratorOptions arg) {
+        this.generatorOptions = arg;
     }
 
-    private static OptionalLong method_28095(String string) {
+    private static OptionalLong tryParseLong(String string) {
         try {
             return OptionalLong.of(Long.parseLong(string));
         }
@@ -247,40 +247,40 @@ Drawable {
         }
     }
 
-    public class_5285 method_28096(boolean bl) {
+    public GeneratorOptions getGeneratorOptions(boolean bl) {
         OptionalLong optionalLong4;
-        String string = this.field_24594.getText();
+        String string = this.seedTextField.getText();
         if (StringUtils.isEmpty((CharSequence)string)) {
             OptionalLong optionalLong = OptionalLong.empty();
         } else {
-            OptionalLong optionalLong2 = class_5292.method_28095(string);
+            OptionalLong optionalLong2 = MoreOptionsDialog.tryParseLong(string);
             if (optionalLong2.isPresent() && optionalLong2.getAsLong() != 0L) {
                 OptionalLong optionalLong3 = optionalLong2;
             } else {
                 optionalLong4 = OptionalLong.of(string.hashCode());
             }
         }
-        return this.field_24598.method_28024(bl, optionalLong4);
+        return this.generatorOptions.withHardcore(bl, optionalLong4);
     }
 
-    public boolean method_28085() {
-        return this.field_24598.method_28033();
+    public boolean isDebugWorld() {
+        return this.generatorOptions.isDebugWorld();
     }
 
-    public void method_28101(boolean bl) {
-        this.field_24596.visible = bl;
-        if (this.field_24598.method_28033()) {
-            this.field_24595.visible = false;
-            this.field_24589.visible = false;
-            this.field_24597.visible = false;
+    public void setVisible(boolean bl) {
+        this.mapTypeButton.visible = bl;
+        if (this.generatorOptions.isDebugWorld()) {
+            this.mapFeaturesButton.visible = false;
+            this.bonusItemsButton.visible = false;
+            this.customizeTypeButton.visible = false;
             this.field_25048.visible = false;
         } else {
-            this.field_24595.visible = bl;
-            this.field_24589.visible = bl;
-            this.field_24597.visible = bl && class_5317.field_25053.containsKey(this.field_25049);
+            this.mapFeaturesButton.visible = bl;
+            this.bonusItemsButton.visible = bl;
+            this.customizeTypeButton.visible = bl && class_5317.field_25053.containsKey(this.field_25049);
             this.field_25048.visible = bl;
         }
-        this.field_24594.setVisible(bl);
+        this.seedTextField.setVisible(bl);
     }
 }
 

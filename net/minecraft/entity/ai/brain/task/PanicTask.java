@@ -39,7 +39,7 @@ extends Task<VillagerEntity> {
                 lv.forget(MemoryModuleType.BREED_TARGET);
                 lv.forget(MemoryModuleType.INTERACTION_TARGET);
             }
-            lv.method_24526(Activity.PANIC);
+            lv.doExclusively(Activity.PANIC);
         }
     }
 

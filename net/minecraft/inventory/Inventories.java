@@ -4,6 +4,8 @@
 package net.minecraft.inventory;
 
 import java.util.List;
+import java.util.function.Predicate;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -52,6 +54,31 @@ public class Inventories {
             if (j < 0 || j >= arg2.size()) continue;
             arg2.set(j, ItemStack.fromTag(lv2));
         }
+    }
+
+    public static int method_29234(Inventory arg, Predicate<ItemStack> predicate, int i, boolean bl) {
+        int j = 0;
+        for (int k = 0; k < arg.size(); ++k) {
+            ItemStack lv = arg.getStack(k);
+            int l = Inventories.method_29235(lv, predicate, i - j, bl);
+            if (l > 0 && !bl && lv.isEmpty()) {
+                arg.setStack(k, ItemStack.EMPTY);
+            }
+            j += l;
+        }
+        return j;
+    }
+
+    public static int method_29235(ItemStack arg, Predicate<ItemStack> predicate, int i, boolean bl) {
+        if (arg.isEmpty() || !predicate.test(arg)) {
+            return 0;
+        }
+        if (bl) {
+            return arg.getCount();
+        }
+        int j = i < 0 ? arg.getCount() : Math.min(i, arg.getCount());
+        arg.decrement(j);
+        return j;
     }
 }
 

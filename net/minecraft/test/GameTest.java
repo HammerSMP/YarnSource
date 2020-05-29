@@ -27,10 +27,12 @@ import net.minecraft.test.TestFunction;
 import net.minecraft.test.TestListener;
 import net.minecraft.test.TickLimitExceededException;
 import net.minecraft.test.TimedTaskRunner;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GameTest {
     private final TestFunction testFunction;
+    @Nullable
     private BlockPos pos;
     private final ServerWorld world;
     private final Collection<TestListener> listeners = Lists.newArrayList();
@@ -42,18 +44,15 @@ public class GameTest {
     private boolean started = false;
     private final Stopwatch stopwatch = Stopwatch.createUnstarted();
     private boolean completed = false;
+    private final BlockRotation field_25301;
     @Nullable
     private Throwable throwable;
 
-    public GameTest(TestFunction arg, ServerWorld arg2) {
+    public GameTest(TestFunction arg, BlockRotation arg2, ServerWorld arg3) {
         this.testFunction = arg;
-        this.world = arg2;
+        this.world = arg3;
         this.ticksLeft = arg.getTickLimit();
-    }
-
-    public GameTest(TestFunction arg, BlockPos arg2, ServerWorld arg3) {
-        this(arg, arg3);
-        this.setPos(arg2);
+        this.field_25301 = arg.method_29424().rotate(arg2);
     }
 
     void setPos(BlockPos arg) {
@@ -123,20 +122,6 @@ public class GameTest {
         return this.pos;
     }
 
-    @Nullable
-    public BlockPos getSize() {
-        StructureBlockBlockEntity lv = this.getBlockEntity();
-        if (lv == null) {
-            return null;
-        }
-        return lv.getSize();
-    }
-
-    @Nullable
-    private StructureBlockBlockEntity getBlockEntity() {
-        return (StructureBlockBlockEntity)this.world.getBlockEntity(this.pos);
-    }
-
     public ServerWorld getWorld() {
         return this.world;
     }
@@ -183,10 +168,11 @@ public class GameTest {
         this.listeners.add(arg);
     }
 
-    public void init(int i) {
-        StructureBlockBlockEntity lv = StructureTestUtil.method_22250(this.testFunction.getStructureName(), this.pos, i, this.world, false);
+    public void init(BlockPos arg2, int i) {
+        StructureBlockBlockEntity lv = StructureTestUtil.method_22250(this.getStructureName(), arg2, this.method_29402(), i, this.world, false);
+        this.setPos(lv.getPos());
         lv.setStructureName(this.getStructurePath());
-        StructureTestUtil.placeStartButton(this.pos.add(1, 0, -1), this.world);
+        StructureTestUtil.placeStartButton(this.pos, new BlockPos(1, 0, -1), this.method_29402(), this.world);
         this.listeners.forEach(arg -> arg.onStarted(this));
     }
 
@@ -200,6 +186,14 @@ public class GameTest {
 
     public String getStructureName() {
         return this.testFunction.getStructureName();
+    }
+
+    public BlockRotation method_29402() {
+        return this.field_25301;
+    }
+
+    public TestFunction method_29403() {
+        return this.testFunction;
     }
 }
 

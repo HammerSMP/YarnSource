@@ -19,7 +19,7 @@ import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.task.LookTargetUtil;
 import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -82,7 +82,7 @@ extends Task<VillagerEntity> {
     }
 
     private static void giveHalfOfStack(VillagerEntity arg, Set<Item> set, LivingEntity arg2) {
-        BasicInventory lv = arg.getInventory();
+        SimpleInventory lv = arg.getInventory();
         ItemStack lv2 = ItemStack.EMPTY;
         for (int i = 0; i < lv.size(); ++i) {
             int k;

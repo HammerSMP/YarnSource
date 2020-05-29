@@ -35,7 +35,7 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void test(ServerPlayerEntity arg, ItemStack arg2, Entity arg3) {
+    public void trigger(ServerPlayerEntity arg, ItemStack arg2, Entity arg3) {
         LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg3);
         this.test(arg, arg4 -> arg4.test(arg, arg2, lv));
     }

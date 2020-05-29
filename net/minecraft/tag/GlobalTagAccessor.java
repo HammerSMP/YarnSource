@@ -2,17 +2,23 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
+ *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.tag;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -45,6 +51,12 @@ public class GlobalTagAccessor<T> {
 
     public TagContainer<T> getContainer() {
         return this.currentContainer;
+    }
+
+    public Set<Identifier> method_29224(TagContainer<T> arg) {
+        Set set = this.tags.stream().map(CachedTag::getId).collect(Collectors.toSet());
+        ImmutableSet immutableSet = ImmutableSet.copyOf(arg.getKeys());
+        return Sets.difference(set, (Set)immutableSet);
     }
 
     static class CachedTag<T>

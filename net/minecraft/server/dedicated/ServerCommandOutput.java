@@ -12,10 +12,11 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 
 public class ServerCommandOutput
 implements CommandOutput {
+    private static final LiteralText field_25146 = new LiteralText("Rcon");
     private final StringBuffer buffer = new StringBuffer();
     private final MinecraftServer server;
 
@@ -32,8 +33,8 @@ implements CommandOutput {
     }
 
     public ServerCommandSource createReconCommandSource() {
-        ServerWorld lv = this.server.getWorld(DimensionType.field_24753);
-        return new ServerCommandSource(this, Vec3d.of(lv.method_27911()), Vec2f.ZERO, lv, 4, "Recon", new LiteralText("Rcon"), this.server, null);
+        ServerWorld lv = this.server.getWorld(World.field_25179);
+        return new ServerCommandSource(this, Vec3d.of(lv.getSpawnPos()), Vec2f.ZERO, lv, 4, "Rcon", field_25146, this.server, null);
     }
 
     @Override

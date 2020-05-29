@@ -29,7 +29,7 @@ import net.minecraft.util.math.BlockBox;
 
 public class LegacySinglePoolElement
 extends SinglePoolElement {
-    public static final Codec<LegacySinglePoolElement> field_24949 = RecordCodecBuilder.create(instance -> instance.group(LegacySinglePoolElement.method_28882(), LegacySinglePoolElement.method_28880(), LegacySinglePoolElement.method_28883()).apply((Applicative)instance, LegacySinglePoolElement::new));
+    public static final Codec<LegacySinglePoolElement> CODEC = RecordCodecBuilder.create(instance -> instance.group(LegacySinglePoolElement.method_28882(), LegacySinglePoolElement.method_28880(), LegacySinglePoolElement.method_28883()).apply((Applicative)instance, LegacySinglePoolElement::new));
 
     @Deprecated
     public LegacySinglePoolElement(String string, List<StructureProcessor> list) {

@@ -86,7 +86,7 @@ implements VillagerDataContainer {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        VillagerData.field_24669.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("VillagerData", (Tag)arg2));
+        VillagerData.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("VillagerData", (Tag)arg2));
         if (this.offerData != null) {
             arg.put("Offers", this.offerData);
         }
@@ -95,7 +95,7 @@ implements VillagerDataContainer {
         }
         arg.putInt("ConversionTime", this.isConverting() ? this.conversionTimer : -1);
         if (this.converter != null) {
-            arg.putUuidNew("ConversionPlayer", this.converter);
+            arg.putUuid("ConversionPlayer", this.converter);
         }
         arg.putInt("Xp", this.xp);
     }
@@ -104,7 +104,7 @@ implements VillagerDataContainer {
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
         if (arg.contains("VillagerData", 10)) {
-            DataResult dataResult = VillagerData.field_24669.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData")));
+            DataResult dataResult = VillagerData.CODEC.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData")));
             dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(this::setVillagerData);
         }
         if (arg.contains("Offers", 10)) {
@@ -114,7 +114,7 @@ implements VillagerDataContainer {
             this.gossipData = arg.getList("Gossips", 10);
         }
         if (arg.contains("ConversionTime", 99) && arg.getInt("ConversionTime") > -1) {
-            this.setConverting(arg.containsUuidNew("ConversionPlayer") ? arg.getUuidNew("ConversionPlayer") : null, arg.getInt("ConversionTime"));
+            this.setConverting(arg.containsUuid("ConversionPlayer") ? arg.getUuid("ConversionPlayer") : null, arg.getInt("ConversionTime"));
         }
         if (arg.contains("Xp", 3)) {
             this.xp = arg.getInt("Xp");

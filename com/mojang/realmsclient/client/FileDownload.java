@@ -45,10 +45,10 @@ import java.util.regex.Pattern;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5218;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -315,7 +315,7 @@ public class FileDownload {
             Throwable throwable = null;
             try (LevelStorage.Session lv2 = arg.createSession(string3);){
                 lv2.save(string3.trim());
-                Path path = lv2.getDirectory(class_5218.LEVEL_DAT);
+                Path path = lv2.getDirectory(WorldSavePath.LEVEL_DAT);
                 FileDownload.readNbtFile(path.toFile());
             }
             catch (Throwable path) {
@@ -337,7 +337,7 @@ public class FileDownload {
             }
             try (LevelStorage.Session lv3 = arg.createSession(string3);){
                 lv3.save(string3.trim());
-                Path path2 = lv3.getDirectory(class_5218.LEVEL_DAT);
+                Path path2 = lv3.getDirectory(WorldSavePath.LEVEL_DAT);
                 FileDownload.readNbtFile(path2.toFile());
             }
             catch (IOException iOException2) {

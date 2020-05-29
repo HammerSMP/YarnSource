@@ -43,7 +43,8 @@ extends PlantBlock {
     @Override
     protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
         FluidState lv = arg2.getFluidState(arg3);
-        return lv.getFluid() == Fluids.WATER || arg.getMaterial() == Material.ICE;
+        FluidState lv2 = arg2.getFluidState(arg3.up());
+        return (lv.getFluid() == Fluids.WATER || arg.getMaterial() == Material.ICE) && lv2.getFluid() == Fluids.EMPTY;
     }
 }
 

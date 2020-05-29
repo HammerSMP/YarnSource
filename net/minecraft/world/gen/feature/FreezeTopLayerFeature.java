@@ -45,7 +45,7 @@ extends Feature<DefaultFeatureConfig> {
                 if (!lv3.canSetSnow(arg, lv)) continue;
                 arg.setBlockState(lv, Blocks.SNOW.getDefaultState(), 2);
                 BlockState lv4 = arg.getBlockState(lv2);
-                if (!lv4.method_28498(SnowyBlock.SNOWY)) continue;
+                if (!lv4.contains(SnowyBlock.SNOWY)) continue;
                 arg.setBlockState(lv2, (BlockState)lv4.with(SnowyBlock.SNOWY, true), 2);
             }
         }

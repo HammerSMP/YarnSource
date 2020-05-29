@@ -14,13 +14,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementFrame;
+import net.minecraft.class_5348;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 @Environment(value=EnvType.CLIENT)
@@ -41,7 +41,7 @@ implements Toast {
         arg2.drawTexture(arg, 0, 0, 0, 0, this.method_29049(), this.method_29050());
         if (lv != null) {
             int i;
-            List<Text> list = arg2.getGame().textRenderer.wrapLines(lv.getTitle(), 125);
+            List<class_5348> list = arg2.getGame().textRenderer.wrapLines(lv.getTitle(), 125);
             int n = i = lv.getFrame() == AdvancementFrame.CHALLENGE ? 0xFF88FF : 0xFFFF00;
             if (list.size() == 1) {
                 arg2.getGame().textRenderer.draw(arg, I18n.translate("advancements.toast." + lv.getFrame().getId(), new Object[0]), 30.0f, 7.0f, i | 0xFF000000);
@@ -56,7 +56,7 @@ implements Toast {
                     int m = MathHelper.floor(MathHelper.clamp((float)(l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000;
                     arg2.getGame().textRenderer.getClass();
                     int n2 = this.method_29050() / 2 - list.size() * 9 / 2;
-                    for (Text lv2 : list) {
+                    for (class_5348 lv2 : list) {
                         arg2.getGame().textRenderer.draw(arg, lv2, 30.0f, (float)n2, 0xFFFFFF | m);
                         arg2.getGame().textRenderer.getClass();
                         n2 += 9;

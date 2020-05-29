@@ -14,12 +14,12 @@ import net.minecraft.util.StringIdentifiable;
 
 public enum SpawnGroup implements StringIdentifiable
 {
-    MONSTER("monster", 70, false, 128),
-    CREATURE("creature", 10, true),
-    AMBIENT("ambient", 15, true, 128),
-    WATER_CREATURE("water_creature", 5, true, 128),
-    WATER_AMBIENT("water_ambient", 20, true, 64),
-    MISC("misc", -1, true);
+    MONSTER("monster", 70, false, false, 128),
+    CREATURE("creature", 10, true, true, 128),
+    AMBIENT("ambient", 15, true, false, 128),
+    WATER_CREATURE("water_creature", 5, true, false, 128),
+    WATER_AMBIENT("water_ambient", 20, true, false, 64),
+    MISC("misc", -1, true, true, 128);
 
     public static final Codec<SpawnGroup> field_24655;
     private static final Map<String, SpawnGroup> BY_NAME;
@@ -30,19 +30,11 @@ public enum SpawnGroup implements StringIdentifiable
     private final int despawnStartRange = 32;
     private final int immediateDespawnRange;
 
-    private SpawnGroup(String string2, int j, boolean bl) {
+    private SpawnGroup(String string2, int j, boolean bl, boolean bl2, int k) {
         this.name = string2;
         this.capacity = j;
         this.peaceful = bl;
-        this.animal = true;
-        this.immediateDespawnRange = Integer.MAX_VALUE;
-    }
-
-    private SpawnGroup(String string2, int j, boolean bl, int k) {
-        this.name = string2;
-        this.capacity = j;
-        this.peaceful = bl;
-        this.animal = false;
+        this.animal = bl2;
         this.immediateDespawnRange = k;
     }
 

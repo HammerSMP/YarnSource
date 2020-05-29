@@ -28,7 +28,7 @@ extends Task<LivingEntity> {
         Brain<?> lv = arg2.getBrain();
         Raid lv2 = arg.getRaidAt(arg2.getBlockPos());
         if (lv2 == null) {
-            lv.method_24526(Activity.HIDE);
+            lv.doExclusively(Activity.HIDE);
         }
     }
 }

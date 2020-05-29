@@ -26,6 +26,7 @@ public class TestFunctions {
     private static final Collection<TestFunction> TEST_FUNCTIONS = Lists.newArrayList();
     private static final Set<String> testClasses = Sets.newHashSet();
     private static final Map<String, Consumer<ServerWorld>> WORLD_SETTERS = Maps.newHashMap();
+    private static final Collection<TestFunction> field_25302 = Sets.newHashSet();
 
     public static Collection<TestFunction> getTestFunctions(String string) {
         return TEST_FUNCTIONS.stream().filter(arg -> TestFunctions.isInClass(arg, string)).collect(Collectors.toList());
@@ -62,6 +63,18 @@ public class TestFunctions {
 
     private static boolean isInClass(TestFunction arg, String string) {
         return arg.getStructurePath().toLowerCase().startsWith(string.toLowerCase() + ".");
+    }
+
+    public static Collection<TestFunction> method_29405() {
+        return field_25302;
+    }
+
+    public static void method_29404(TestFunction arg) {
+        field_25302.add(arg);
+    }
+
+    public static void method_29406() {
+        field_25302.clear();
     }
 }
 

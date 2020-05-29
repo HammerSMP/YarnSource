@@ -54,7 +54,7 @@ extends Item {
             lv.spawnEntity(lv5);
             lv2.decrement(1);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(lv.isClient);
     }
 
     @Override
@@ -67,7 +67,7 @@ extends Item {
                     lv.decrement(1);
                 }
             }
-            return TypedActionResult.success(arg2.getStackInHand(arg3));
+            return TypedActionResult.method_29237(arg2.getStackInHand(arg3), arg.isClient());
         }
         return TypedActionResult.pass(arg2.getStackInHand(arg3));
     }

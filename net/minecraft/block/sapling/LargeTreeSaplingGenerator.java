@@ -40,6 +40,7 @@ extends SaplingGenerator {
         if (lv == null) {
             return false;
         }
+        ((TreeFeatureConfig)lv.config).ignoreFluidCheck();
         BlockState lv2 = Blocks.AIR.getDefaultState();
         arg.setBlockState(arg3.add(i, 0, j), lv2, 4);
         arg.setBlockState(arg3.add(i + 1, 0, j), lv2, 4);

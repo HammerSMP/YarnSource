@@ -14,7 +14,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5321;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -37,8 +36,8 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public class ItemEntity
 extends Entity {
@@ -48,10 +47,11 @@ extends Entity {
     private int health = 5;
     private UUID thrower;
     private UUID owner;
-    public final float hoverHeight = (float)(Math.random() * Math.PI * 2.0);
+    public final float hoverHeight;
 
     public ItemEntity(EntityType<? extends ItemEntity> arg, World arg2) {
         super(arg, arg2);
+        this.hoverHeight = (float)(Math.random() * Math.PI * 2.0);
     }
 
     public ItemEntity(World arg, double d, double e, double f) {
@@ -64,6 +64,15 @@ extends Entity {
     public ItemEntity(World arg, double d, double e, double f, ItemStack arg2) {
         this(arg, d, e, f);
         this.setStack(arg2);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    private ItemEntity(ItemEntity arg) {
+        super(arg.getType(), arg.world);
+        this.setStack(arg.getStack().copy());
+        this.copyPositionAndRotation(arg);
+        this.age = arg.age;
+        this.hoverHeight = arg.hoverHeight;
     }
 
     @Override
@@ -246,10 +255,10 @@ extends Entity {
         arg.putShort("Age", (short)this.age);
         arg.putShort("PickupDelay", (short)this.pickupDelay);
         if (this.getThrower() != null) {
-            arg.putUuidNew("Thrower", this.getThrower());
+            arg.putUuid("Thrower", this.getThrower());
         }
         if (this.getOwner() != null) {
-            arg.putUuidNew("Owner", this.getOwner());
+            arg.putUuid("Owner", this.getOwner());
         }
         if (!this.getStack().isEmpty()) {
             arg.put("Item", this.getStack().toTag(new CompoundTag()));
@@ -263,11 +272,11 @@ extends Entity {
         if (arg.contains("PickupDelay")) {
             this.pickupDelay = arg.getShort("PickupDelay");
         }
-        if (arg.containsUuidNew("Owner")) {
-            this.owner = arg.getUuidNew("Owner");
+        if (arg.containsUuid("Owner")) {
+            this.owner = arg.getUuid("Owner");
         }
-        if (arg.containsUuidNew("Thrower")) {
-            this.thrower = arg.getUuidNew("Thrower");
+        if (arg.containsUuid("Thrower")) {
+            this.thrower = arg.getUuid("Thrower");
         }
         CompoundTag lv = arg.getCompound("Item");
         this.setStack(ItemStack.fromTag(lv));
@@ -310,7 +319,7 @@ extends Entity {
 
     @Override
     @Nullable
-    public Entity changeDimension(class_5321<DimensionType> arg) {
+    public Entity changeDimension(RegistryKey<World> arg) {
         Entity lv = super.changeDimension(arg);
         if (!this.world.isClient && lv instanceof ItemEntity) {
             ((ItemEntity)lv).tryMerge();
@@ -394,6 +403,11 @@ extends Entity {
     @Override
     public Packet<?> createSpawnPacket() {
         return new EntitySpawnS2CPacket(this);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public ItemEntity method_29271() {
+        return new ItemEntity(this);
     }
 }
 

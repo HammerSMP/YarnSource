@@ -50,6 +50,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.pattern.CachedBlockPosition;
+import net.minecraft.class_5341;
 import net.minecraft.command.DataCommandObject;
 import net.minecraft.command.arguments.BlockPosArgumentType;
 import net.minecraft.command.arguments.BlockPredicateArgumentType;
@@ -66,7 +67,6 @@ import net.minecraft.command.arguments.SwizzleArgumentType;
 import net.minecraft.command.arguments.Vec3ArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.CommandBossBar;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
@@ -245,7 +245,7 @@ public class ExecuteCommand {
         return arg.test(lv2.getPlayerScore(string, lv).getScore());
     }
 
-    private static boolean testLootCondition(ServerCommandSource arg, LootCondition arg2) {
+    private static boolean testLootCondition(ServerCommandSource arg, class_5341 arg2) {
         ServerWorld lv = arg.getWorld();
         LootContext.Builder lv2 = new LootContext.Builder(lv).parameter(LootContextParameters.POSITION, new BlockPos(arg.getPosition())).optionalParameter(LootContextParameters.THIS_ENTITY, arg.getEntity());
         return arg2.test(lv2.build(LootContextTypes.COMMAND));

@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
@@ -13,6 +14,7 @@
  */
 package net.minecraft.client.render.debug;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -149,10 +151,18 @@ implements DebugRenderer.Renderer {
 
     private void drawPointOfInterestInfo(PointOfInterest arg) {
         int i = 0;
-        if (this.getVillagerNames(arg).size() < 4) {
-            VillageDebugRenderer.drawString("" + this.getVillagerNames(arg), arg, i, -256);
+        Set<String> set = this.getVillagerNames(arg);
+        if (set.size() < 4) {
+            VillageDebugRenderer.drawString("Owners: " + set, arg, i, -256);
         } else {
-            VillageDebugRenderer.drawString("" + this.getVillagerNames(arg).size() + " ticket holders", arg, i, -256);
+            VillageDebugRenderer.drawString("" + set.size() + " ticket holders", arg, i, -256);
+        }
+        ++i;
+        Set<String> set2 = this.method_29385(arg);
+        if (set2.size() < 4) {
+            VillageDebugRenderer.drawString("Candidates: " + set2, arg, i, -23296);
+        } else {
+            VillageDebugRenderer.drawString("" + set2.size() + " potential owners", arg, i, -23296);
         }
         VillageDebugRenderer.drawString("Free tickets: " + arg.freeTicketCount, arg, ++i, -256);
         VillageDebugRenderer.drawString(arg.field_18932, arg, ++i, -1);
@@ -248,6 +258,10 @@ implements DebugRenderer.Renderer {
         return this.getBrains(arg.pos).stream().map(NameGenerator::name).collect(Collectors.toSet());
     }
 
+    private Set<String> method_29385(PointOfInterest arg) {
+        return this.method_29386(arg.pos).stream().map(NameGenerator::name).collect(Collectors.toSet());
+    }
+
     private boolean isTargeted(Brain arg) {
         return Objects.equals(this.targetedEntity, arg.uuid);
     }
@@ -263,10 +277,14 @@ implements DebugRenderer.Renderer {
         return this.brains.values().stream().filter(arg2 -> ((Brain)arg2).isPointOfInterest(arg)).map(Brain::getUuid).collect(Collectors.toSet());
     }
 
+    private Collection<UUID> method_29386(BlockPos arg) {
+        return this.brains.values().stream().filter(arg2 -> ((Brain)arg2).method_29388(arg)).map(Brain::getUuid).collect(Collectors.toSet());
+    }
+
     private Map<BlockPos, List<String>> getGhostPointsOfInterest() {
         HashMap map = Maps.newHashMap();
         for (Brain lv : this.brains.values()) {
-            for (BlockPos lv2 : lv.pointsOfInterest) {
+            for (BlockPos lv2 : Iterables.concat(lv.pointsOfInterest, lv.field_25287)) {
                 if (this.pointsOfInterest.containsKey(lv2)) continue;
                 List list = (List)map.get(lv2);
                 if (list == null) {
@@ -303,6 +321,7 @@ implements DebugRenderer.Renderer {
         public final List<String> field_19374 = Lists.newArrayList();
         public final List<String> field_19375 = Lists.newArrayList();
         public final Set<BlockPos> pointsOfInterest = Sets.newHashSet();
+        public final Set<BlockPos> field_25287 = Sets.newHashSet();
 
         public Brain(UUID uUID, int i, String string, String string2, int j, float f, float g, Position arg, String string3, @Nullable Path arg2, boolean bl) {
             this.uuid = uUID;
@@ -320,6 +339,10 @@ implements DebugRenderer.Renderer {
 
         private boolean isPointOfInterest(BlockPos arg) {
             return this.pointsOfInterest.stream().anyMatch(arg::equals);
+        }
+
+        private boolean method_29388(BlockPos arg) {
+            return this.field_25287.contains(arg);
         }
 
         public UUID getUuid() {

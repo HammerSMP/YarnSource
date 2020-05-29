@@ -28,7 +28,7 @@ import net.minecraft.world.gen.chunk.VerticalBlockSample;
 
 public class FlatChunkGenerator
 extends ChunkGenerator {
-    public static final Codec<FlatChunkGenerator> field_24769 = FlatChunkGeneratorConfig.field_24975.fieldOf("settings").xmap(FlatChunkGenerator::new, FlatChunkGenerator::method_28545).codec();
+    public static final Codec<FlatChunkGenerator> field_24769 = FlatChunkGeneratorConfig.CODEC.fieldOf("settings").xmap(FlatChunkGenerator::new, FlatChunkGenerator::method_28545).codec();
     private final FlatChunkGeneratorConfig generatorConfig;
 
     public FlatChunkGenerator(FlatChunkGeneratorConfig arg) {
@@ -43,7 +43,7 @@ extends ChunkGenerator {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ChunkGenerator create(long l) {
+    public ChunkGenerator withSeed(long l) {
         return this;
     }
 

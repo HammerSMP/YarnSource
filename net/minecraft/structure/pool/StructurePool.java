@@ -44,8 +44,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class StructurePool {
-    private static final Logger field_24955 = LogManager.getLogger();
-    public static final Codec<StructurePool> field_24954 = RecordCodecBuilder.create(instance -> instance.group((App)Identifier.field_25139.fieldOf("name").forGetter(StructurePool::getId), (App)Identifier.field_25139.fieldOf("fallback").forGetter(StructurePool::getTerminatorsId), (App)Codec.mapPair((MapCodec)StructurePoolElement.field_24953.fieldOf("element"), (MapCodec)Codec.INT.fieldOf("weight")).codec().listOf().promotePartial(Util.method_29188("Pool element: ", ((Logger)field_24955)::error)).fieldOf("elements").forGetter(arg -> arg.elementCounts), (App)Projection.field_24956.fieldOf("projection").forGetter(arg -> arg.projection)).apply((Applicative)instance, StructurePool::new));
+    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Codec<StructurePool> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Identifier.field_25139.fieldOf("name").forGetter(StructurePool::getId), (App)Identifier.field_25139.fieldOf("fallback").forGetter(StructurePool::getTerminatorsId), (App)Codec.mapPair((MapCodec)StructurePoolElement.field_24953.fieldOf("element"), (MapCodec)Codec.INT.fieldOf("weight")).codec().listOf().promotePartial(Util.method_29188("Pool element: ", ((Logger)LOGGER)::error)).fieldOf("elements").forGetter(arg -> arg.elementCounts), (App)Projection.field_24956.fieldOf("projection").forGetter(arg -> arg.projection)).apply((Applicative)instance, StructurePool::new));
     public static final StructurePool EMPTY = new StructurePool(new Identifier("empty"), new Identifier("empty"), (List<Pair<StructurePoolElement, Integer>>)ImmutableList.of(), Projection.RIGID);
     public static final StructurePool INVALID = new StructurePool(new Identifier("invalid"), new Identifier("invalid"), (List<Pair<StructurePoolElement, Integer>>)ImmutableList.of(), Projection.RIGID);
     private final Identifier id;

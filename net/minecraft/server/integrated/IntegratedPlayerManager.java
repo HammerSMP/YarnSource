@@ -12,7 +12,6 @@ import com.mojang.authlib.GameProfile;
 import java.net.SocketAddress;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5318;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -21,13 +20,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.WorldSaveHandler;
+import net.minecraft.world.dimension.DimensionTracker;
 
 @Environment(value=EnvType.CLIENT)
 public class IntegratedPlayerManager
 extends PlayerManager {
     private CompoundTag userData;
 
-    public IntegratedPlayerManager(IntegratedServer arg, class_5318.class_5319 arg2, WorldSaveHandler arg3) {
+    public IntegratedPlayerManager(IntegratedServer arg, DimensionTracker.Modifiable arg2, WorldSaveHandler arg3) {
         super(arg, arg2, arg3, 8);
         this.setViewDistance(10);
     }

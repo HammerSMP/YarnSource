@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
@@ -27,6 +28,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidFillable;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -180,16 +182,16 @@ public class Structure {
         return Structure.transformAround(arg2, arg.getMirror(), arg.getRotation(), arg.getPosition());
     }
 
-    public void place(WorldAccess arg, BlockPos arg2, StructurePlacementData arg3) {
+    public void place(WorldAccess arg, BlockPos arg2, StructurePlacementData arg3, Random random) {
         arg3.calculateBoundingBox();
-        this.placeAndNotifyListeners(arg, arg2, arg3);
+        this.placeAndNotifyListeners(arg, arg2, arg3, random);
     }
 
-    public void placeAndNotifyListeners(WorldAccess arg, BlockPos arg2, StructurePlacementData arg3) {
-        this.place(arg, arg2, arg2, arg3, 2);
+    public void placeAndNotifyListeners(WorldAccess arg, BlockPos arg2, StructurePlacementData arg3, Random random) {
+        this.place(arg, arg2, arg2, arg3, random, 2);
     }
 
-    public boolean place(WorldAccess arg, BlockPos arg2, BlockPos arg3, StructurePlacementData arg4, int i) {
+    public boolean place(WorldAccess arg, BlockPos arg2, BlockPos arg3, StructurePlacementData arg4, Random random, int i) {
         if (this.blockInfoLists.isEmpty()) {
             return false;
         }
@@ -230,6 +232,9 @@ public class Structure {
                 lv2.tag.putInt("x", lv3.getX());
                 lv2.tag.putInt("y", lv3.getY());
                 lv2.tag.putInt("z", lv3.getZ());
+                if (lv7 instanceof LootableContainerBlockEntity) {
+                    lv2.tag.putLong("LootTable", random.nextLong());
+                }
                 lv7.fromTag(lv2.state, lv2.tag);
                 lv7.applyMirror(arg4.getMirror());
                 lv7.applyRotation(arg4.getRotation());
@@ -405,7 +410,7 @@ public class Structure {
         return bl ? new BlockPos(i, j, k) : arg;
     }
 
-    private static Vec3d transformAround(Vec3d arg, BlockMirror arg2, BlockRotation arg3, BlockPos arg4) {
+    public static Vec3d transformAround(Vec3d arg, BlockMirror arg2, BlockRotation arg3, BlockPos arg4) {
         double d = arg.x;
         double e = arg.y;
         double f = arg.z;

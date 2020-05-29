@@ -28,7 +28,7 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class ForkingTrunkPlacer
 extends TrunkPlacer {
-    public static final Codec<ForkingTrunkPlacer> field_24968 = RecordCodecBuilder.create(instance -> ForkingTrunkPlacer.method_28904(instance).apply((Applicative)instance, ForkingTrunkPlacer::new));
+    public static final Codec<ForkingTrunkPlacer> CODEC = RecordCodecBuilder.create(instance -> ForkingTrunkPlacer.method_28904(instance).apply((Applicative)instance, ForkingTrunkPlacer::new));
 
     public ForkingTrunkPlacer(int i, int j, int k) {
         super(i, j, k);

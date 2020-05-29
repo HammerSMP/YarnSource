@@ -32,7 +32,7 @@ import net.minecraft.util.registry.Registry;
 public class DustParticleEffect
 implements ParticleEffect {
     public static final DustParticleEffect RED = new DustParticleEffect(1.0f, 0.0f, 0.0f, 1.0f);
-    public static final Codec<DustParticleEffect> field_25124 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("r").forGetter(arg -> Float.valueOf(arg.red)), (App)Codec.FLOAT.fieldOf("g").forGetter(arg -> Float.valueOf(arg.green)), (App)Codec.FLOAT.fieldOf("b").forGetter(arg -> Float.valueOf(arg.blue)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale))).apply((Applicative)instance, DustParticleEffect::new));
+    public static final Codec<DustParticleEffect> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("r").forGetter(arg -> Float.valueOf(arg.red)), (App)Codec.FLOAT.fieldOf("g").forGetter(arg -> Float.valueOf(arg.green)), (App)Codec.FLOAT.fieldOf("b").forGetter(arg -> Float.valueOf(arg.blue)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale))).apply((Applicative)instance, DustParticleEffect::new));
     public static final ParticleEffect.Factory<DustParticleEffect> PARAMETERS_FACTORY = new ParticleEffect.Factory<DustParticleEffect>(){
 
         @Override

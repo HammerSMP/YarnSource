@@ -17,7 +17,7 @@ import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 
 public class BastionRemnantFeatureConfig
 implements FeatureConfig {
-    public static final Codec<BastionRemnantFeatureConfig> field_24889 = StructurePoolFeatureConfig.field_24886.listOf().xmap(BastionRemnantFeatureConfig::new, arg -> arg.possibleConfigs);
+    public static final Codec<BastionRemnantFeatureConfig> field_24889 = StructurePoolFeatureConfig.CODEC.listOf().xmap(BastionRemnantFeatureConfig::new, arg -> arg.possibleConfigs);
     private final List<StructurePoolFeatureConfig> possibleConfigs;
 
     public BastionRemnantFeatureConfig(Map<String, Integer> map) {

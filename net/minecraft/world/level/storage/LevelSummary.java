@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5285;
 import net.minecraft.class_5315;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -25,6 +24,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ChatUtil;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import org.apache.commons.lang3.StringUtils;
 
@@ -110,10 +110,10 @@ implements Comparable<LevelSummary> {
     }
 
     public boolean method_29020() {
-        return this.field_25022.getGeneratorOptions().method_28035() && this.field_25023.method_29026() < 1466;
+        return this.field_25022.getGeneratorOptions().isLegacyCustomizedType() && this.field_25023.method_29026() < 1466;
     }
 
-    protected class_5285 method_29021() {
+    protected GeneratorOptions method_29021() {
         return this.field_25022.getGeneratorOptions();
     }
 

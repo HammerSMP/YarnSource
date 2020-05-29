@@ -17,8 +17,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5275;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -49,9 +49,9 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryChangedListener;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -89,7 +89,7 @@ Saddleable {
     public int tailWagTicks;
     public int field_6958;
     protected boolean inAir;
-    protected BasicInventory items;
+    protected SimpleInventory items;
     protected int temper;
     protected float jumpStrength;
     private boolean jumping;
@@ -266,8 +266,8 @@ Saddleable {
     }
 
     protected void onChestedStatusChanged() {
-        BasicInventory lv = this.items;
-        this.items = new BasicInventory(this.getInventorySize());
+        SimpleInventory lv = this.items;
+        this.items = new SimpleInventory(this.getInventorySize());
         if (lv != null) {
             lv.removeListener(this);
             int i = Math.min(lv.size(), this.items.size());
@@ -631,7 +631,6 @@ Saddleable {
 
     @Override
     public void travel(Vec3d arg) {
-        double l;
         if (!this.isAlive()) {
             return;
         }
@@ -686,14 +685,7 @@ Saddleable {
             this.jumpStrength = 0.0f;
             this.setInAir(false);
         }
-        this.lastLimbDistance = this.limbDistance;
-        double k = this.getX() - this.prevX;
-        float m = MathHelper.sqrt(k * k + (l = this.getZ() - this.prevZ) * l) * 4.0f;
-        if (m > 1.0f) {
-            m = 1.0f;
-        }
-        this.limbDistance += (m - this.limbDistance) * 0.4f;
-        this.limbAngle += this.limbDistance;
+        this.method_29242(this, false);
     }
 
     protected void playJumpSound() {
@@ -708,7 +700,7 @@ Saddleable {
         arg.putInt("Temper", this.getTemper());
         arg.putBoolean("Tame", this.isTame());
         if (this.getOwnerUuid() != null) {
-            arg.putUuidNew("Owner", this.getOwnerUuid());
+            arg.putUuid("Owner", this.getOwnerUuid());
         }
         if (!this.items.getStack(0).isEmpty()) {
             arg.put("SaddleItem", this.items.getStack(0).toTag(new CompoundTag()));
@@ -724,8 +716,8 @@ Saddleable {
         this.setBred(arg.getBoolean("Bred"));
         this.setTemper(arg.getInt("Temper"));
         this.setTame(arg.getBoolean("Tame"));
-        if (arg.containsUuidNew("Owner")) {
-            UUID uUID = arg.getUuidNew("Owner");
+        if (arg.containsUuid("Owner")) {
+            UUID uUID = arg.getUuid("Owner");
         } else {
             String string = arg.getString("Owner");
             uUID2 = ServerConfigHandler.getPlayerUuidByName(this.getServer(), string);
@@ -932,9 +924,9 @@ Saddleable {
             do {
                 Vec3d lv4;
                 Box lv3;
-                double h = this.world.method_26372(lv);
+                double h = this.world.getCollisionHeightAt(lv);
                 if ((double)lv.getY() + h > g) continue block0;
-                if (class_5275.method_27932(h) && class_5275.method_27933(this.world, arg2, (lv3 = arg2.method_24833(lv2)).offset(lv4 = new Vec3d(d, (double)lv.getY() + h, f)))) {
+                if (Dismounting.canDismountInBlock(h) && Dismounting.canPlaceEntityAt(this.world, arg2, (lv3 = arg2.getBoundingBox(lv2)).offset(lv4 = new Vec3d(d, (double)lv.getY() + h, f)))) {
                     arg2.setPose(lv2);
                     return lv4;
                 }
@@ -945,13 +937,13 @@ Saddleable {
     }
 
     @Override
-    public Vec3d method_24829(LivingEntity arg) {
-        Vec3d lv = HorseBaseEntity.method_24826(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.RIGHT ? 90.0f : -90.0f));
+    public Vec3d updatePassengerForDismount(LivingEntity arg) {
+        Vec3d lv = HorseBaseEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.RIGHT ? 90.0f : -90.0f));
         Vec3d lv2 = this.method_27930(lv, arg);
         if (lv2 != null) {
             return lv2;
         }
-        Vec3d lv3 = HorseBaseEntity.method_24826(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.LEFT ? 90.0f : -90.0f));
+        Vec3d lv3 = HorseBaseEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), this.yaw + (arg.getMainArm() == Arm.LEFT ? 90.0f : -90.0f));
         Vec3d lv4 = this.method_27930(lv3, arg);
         if (lv4 != null) {
             return lv4;

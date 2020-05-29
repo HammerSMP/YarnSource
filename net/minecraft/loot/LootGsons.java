@@ -7,12 +7,12 @@
 package net.minecraft.loot;
 
 import com.google.gson.GsonBuilder;
+import net.minecraft.class_5341;
 import net.minecraft.loot.BinomialLootTableRange;
 import net.minecraft.loot.ConstantLootTableRange;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.UniformLootTableRange;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.LootEntries;
@@ -23,11 +23,11 @@ import net.minecraft.loot.operator.BoundedIntUnaryOperator;
 
 public class LootGsons {
     public static GsonBuilder getConditionGsonBuilder() {
-        return new GsonBuilder().registerTypeAdapter(UniformLootTableRange.class, (Object)new UniformLootTableRange.Serializer()).registerTypeAdapter(BinomialLootTableRange.class, (Object)new BinomialLootTableRange.Serializer()).registerTypeAdapter(ConstantLootTableRange.class, (Object)new ConstantLootTableRange.Serializer()).registerTypeHierarchyAdapter(LootCondition.class, (Object)new LootConditions.Factory()).registerTypeHierarchyAdapter(LootContext.EntityTarget.class, (Object)new LootContext.EntityTarget.Serializer());
+        return new GsonBuilder().registerTypeAdapter(UniformLootTableRange.class, (Object)new UniformLootTableRange.Serializer()).registerTypeAdapter(BinomialLootTableRange.class, (Object)new BinomialLootTableRange.Serializer()).registerTypeAdapter(ConstantLootTableRange.class, (Object)new ConstantLootTableRange.Serializer()).registerTypeHierarchyAdapter(class_5341.class, LootConditions.method_29326()).registerTypeHierarchyAdapter(LootContext.EntityTarget.class, (Object)new LootContext.EntityTarget.Serializer());
     }
 
     public static GsonBuilder getFunctionGsonBuilder() {
-        return LootGsons.getConditionGsonBuilder().registerTypeAdapter(BoundedIntUnaryOperator.class, (Object)new BoundedIntUnaryOperator.Serializer()).registerTypeHierarchyAdapter(LootEntry.class, (Object)new LootEntries.Serializer()).registerTypeHierarchyAdapter(LootFunction.class, (Object)new LootFunctions.Factory());
+        return LootGsons.getConditionGsonBuilder().registerTypeAdapter(BoundedIntUnaryOperator.class, (Object)new BoundedIntUnaryOperator.Serializer()).registerTypeHierarchyAdapter(LootEntry.class, LootEntries.method_29316()).registerTypeHierarchyAdapter(LootFunction.class, LootFunctions.method_29322());
     }
 
     public static GsonBuilder getTableGsonBuilder() {

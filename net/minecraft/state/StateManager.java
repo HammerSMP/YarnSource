@@ -74,7 +74,7 @@ public class StateManager<O, S extends State<O, S>> {
             list3.add(lv);
         });
         for (State lv2 : list3) {
-            lv2.method_28496(map2);
+            lv2.createWithTable(map2);
         }
         this.states = ImmutableList.copyOf((Collection)list3);
     }

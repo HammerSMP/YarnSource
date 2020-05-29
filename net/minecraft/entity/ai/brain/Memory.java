@@ -24,7 +24,7 @@ public class Memory<T> {
         this.expiry = l;
     }
 
-    public void method_24913() {
+    public void tick() {
         if (this.method_24914()) {
             --this.expiry;
         }

@@ -72,21 +72,21 @@ public abstract class SurfaceBuilder<C extends SurfaceConfig> {
     public static final TernarySurfaceConfig CRIMSON_NYLIUM_CONFIG = new TernarySurfaceConfig(CRIMSON_NYLIUM, NETHERRACK, NETHER_WART_BLOCK);
     public static final TernarySurfaceConfig WARPED_NYLIUM_CONFIG = new TernarySurfaceConfig(WARPED_NYLIUM, NETHERRACK, WARPED_WART_BLOCK);
     public static final TernarySurfaceConfig BASALT_DELTA_CONFIG = new TernarySurfaceConfig(BLACKSTONE, BASALT, MAGMA_BLOCK);
-    public static final SurfaceBuilder<TernarySurfaceConfig> DEFAULT = SurfaceBuilder.register("default", new DefaultSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> MOUNTAIN = SurfaceBuilder.register("mountain", new MountainSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> SHATTERED_SAVANNA = SurfaceBuilder.register("shattered_savanna", new ShatteredSavannaSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> GRAVELLY_MOUNTAIN = SurfaceBuilder.register("gravelly_mountain", new GravellyMountainSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> GIANT_TREE_TAIGA = SurfaceBuilder.register("giant_tree_taiga", new GiantTreeTaigaSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> SWAMP = SurfaceBuilder.register("swamp", new SwampSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> BADLANDS = SurfaceBuilder.register("badlands", new BadlandsSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> WOODED_BADLANDS = SurfaceBuilder.register("wooded_badlands", new WoodedBadlandsSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> ERODED_BADLANDS = SurfaceBuilder.register("eroded_badlands", new ErodedBadlandsSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> FROZEN_OCEAN = SurfaceBuilder.register("frozen_ocean", new FrozenOceanSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> NETHER = SurfaceBuilder.register("nether", new NetherSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> NETHER_FOREST = SurfaceBuilder.register("nether_forest", new NetherForestSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> SOUL_SAND_VALLEY = SurfaceBuilder.register("soul_sand_valley", new SoulSandValleySurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> BASALT_DELTAS = SurfaceBuilder.register("basalt_deltas", new BasaltDeltasSurfaceBuilder(TernarySurfaceConfig.field_25017));
-    public static final SurfaceBuilder<TernarySurfaceConfig> NOPE = SurfaceBuilder.register("nope", new NopeSurfaceBuilder(TernarySurfaceConfig.field_25017));
+    public static final SurfaceBuilder<TernarySurfaceConfig> DEFAULT = SurfaceBuilder.register("default", new DefaultSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> MOUNTAIN = SurfaceBuilder.register("mountain", new MountainSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> SHATTERED_SAVANNA = SurfaceBuilder.register("shattered_savanna", new ShatteredSavannaSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> GRAVELLY_MOUNTAIN = SurfaceBuilder.register("gravelly_mountain", new GravellyMountainSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> GIANT_TREE_TAIGA = SurfaceBuilder.register("giant_tree_taiga", new GiantTreeTaigaSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> SWAMP = SurfaceBuilder.register("swamp", new SwampSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> BADLANDS = SurfaceBuilder.register("badlands", new BadlandsSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> WOODED_BADLANDS = SurfaceBuilder.register("wooded_badlands", new WoodedBadlandsSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> ERODED_BADLANDS = SurfaceBuilder.register("eroded_badlands", new ErodedBadlandsSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> FROZEN_OCEAN = SurfaceBuilder.register("frozen_ocean", new FrozenOceanSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> NETHER = SurfaceBuilder.register("nether", new NetherSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> NETHER_FOREST = SurfaceBuilder.register("nether_forest", new NetherForestSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> SOUL_SAND_VALLEY = SurfaceBuilder.register("soul_sand_valley", new SoulSandValleySurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> BASALT_DELTAS = SurfaceBuilder.register("basalt_deltas", new BasaltDeltasSurfaceBuilder(TernarySurfaceConfig.CODEC));
+    public static final SurfaceBuilder<TernarySurfaceConfig> NOPE = SurfaceBuilder.register("nope", new NopeSurfaceBuilder(TernarySurfaceConfig.CODEC));
     private final Codec<ConfiguredSurfaceBuilder<C>> field_25016;
 
     private static <C extends SurfaceConfig, F extends SurfaceBuilder<C>> F register(String string, F arg) {

@@ -88,7 +88,7 @@ extends Block {
                 this.setLevel(arg2, arg3, arg, 3);
                 arg2.playSound(null, arg3, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (lv2 == Items.BUCKET) {
             if (i == 3 && !arg2.isClient) {
@@ -104,7 +104,7 @@ extends Block {
                 this.setLevel(arg2, arg3, arg, 0);
                 arg2.playSound(null, arg3, SoundEvents.ITEM_BUCKET_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (lv2 == Items.GLASS_BOTTLE) {
             if (i > 0 && !arg2.isClient) {
@@ -123,7 +123,7 @@ extends Block {
                 arg2.playSound(null, arg3, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 this.setLevel(arg2, arg3, arg, i - 1);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (lv2 == Items.POTION && PotionUtil.getPotion(lv) == Potions.WATER) {
             if (i < 3 && !arg2.isClient) {
@@ -138,7 +138,7 @@ extends Block {
                 arg2.playSound(null, arg3, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 this.setLevel(arg2, arg3, arg, i + 1);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (i > 0 && lv2 instanceof DyeableItem && (lv5 = (DyeableItem)((Object)lv2)).hasColor(lv) && !arg2.isClient) {
             lv5.removeColor(lv);
@@ -164,7 +164,7 @@ extends Block {
                     ((ServerPlayerEntity)arg4).openHandledScreen(arg4.playerScreenHandler);
                 }
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (i > 0 && lv2 instanceof BlockItem) {
             Block lv7 = ((BlockItem)lv2).getBlock();
@@ -199,7 +199,7 @@ extends Block {
         }
         BlockState lv = arg.getBlockState(arg2);
         if (lv.get(LEVEL) < 3) {
-            arg.setBlockState(arg2, (BlockState)lv.method_28493(LEVEL), 2);
+            arg.setBlockState(arg2, (BlockState)lv.cycle(LEVEL), 2);
         }
     }
 

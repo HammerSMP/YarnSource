@@ -373,6 +373,7 @@ public abstract class AbstractBlock {
         private final Material material;
         private final MaterialColor materialColor;
         private final float hardness;
+        private final boolean field_25184;
         private final boolean opaque;
         private final ContextPredicate solidBlockPredicate;
         private final ContextPredicate suffocationPredicate;
@@ -391,6 +392,7 @@ public abstract class AbstractBlock {
             this.material = lv.material;
             this.materialColor = (MaterialColor)lv.materialColorFactory.apply(this.asBlockState());
             this.hardness = lv.hardness;
+            this.field_25184 = lv.field_25185;
             this.opaque = lv.opaque;
             this.solidBlockPredicate = lv.solidBlockPredicate;
             this.suffocationPredicate = lv.suffocationPredicate;
@@ -406,7 +408,7 @@ public abstract class AbstractBlock {
         }
 
         public Block getBlock() {
-            return (Block)this.field_24739;
+            return (Block)this.owner;
         }
 
         public Material getMaterial() {
@@ -734,6 +736,10 @@ public abstract class AbstractBlock {
 
         protected abstract BlockState asBlockState();
 
+        public boolean method_29291() {
+            return this.field_25184;
+        }
+
         static final class ShapeCache {
             private static final Direction[] DIRECTIONS = Direction.values();
             protected final boolean fullOpaque;
@@ -782,6 +788,7 @@ public abstract class AbstractBlock {
         private ToIntFunction<BlockState> luminance = arg -> 0;
         private float resistance;
         private float hardness;
+        private boolean field_25185;
         private boolean randomTicks;
         private float slipperiness = 0.6f;
         private float velocityMultiplier = 1.0f;
@@ -837,6 +844,7 @@ public abstract class AbstractBlock {
             lv.dynamicBounds = arg.settings.dynamicBounds;
             lv.opaque = arg.settings.opaque;
             lv.isAir = arg.settings.isAir;
+            lv.field_25185 = arg.settings.field_25185;
             return lv;
         }
 
@@ -943,6 +951,11 @@ public abstract class AbstractBlock {
 
         public Settings emissiveLighting(ContextPredicate arg) {
             this.emissiveLightingPredicate = arg;
+            return this;
+        }
+
+        public Settings method_29292() {
+            this.field_25185 = true;
             return this;
         }
     }

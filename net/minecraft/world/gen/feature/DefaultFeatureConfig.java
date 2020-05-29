@@ -11,7 +11,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DefaultFeatureConfig
 implements FeatureConfig {
-    public static final Codec<DefaultFeatureConfig> field_24893 = Codec.unit(() -> field_24894);
-    public static final DefaultFeatureConfig field_24894 = new DefaultFeatureConfig();
+    public static final Codec<DefaultFeatureConfig> CODEC = Codec.unit(() -> INSTANCE);
+    public static final DefaultFeatureConfig INSTANCE = new DefaultFeatureConfig();
 }
 

@@ -26,7 +26,7 @@ import net.minecraft.world.gen.trunk.TrunkPlacerType;
 
 public class StraightTrunkPlacer
 extends TrunkPlacer {
-    public static final Codec<StraightTrunkPlacer> field_24971 = RecordCodecBuilder.create(instance -> StraightTrunkPlacer.method_28904(instance).apply((Applicative)instance, StraightTrunkPlacer::new));
+    public static final Codec<StraightTrunkPlacer> CODEC = RecordCodecBuilder.create(instance -> StraightTrunkPlacer.method_28904(instance).apply((Applicative)instance, StraightTrunkPlacer::new));
 
     public StraightTrunkPlacer(int i, int j, int k) {
         super(i, j, k);

@@ -17,7 +17,7 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class CountExtraChanceDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<CountExtraChanceDecoratorConfig> field_24986 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.FLOAT.fieldOf("extra_chance").forGetter(arg -> Float.valueOf(arg.extraChance)), (App)Codec.INT.fieldOf("extra_count").forGetter(arg -> arg.extraCount)).apply((Applicative)instance, CountExtraChanceDecoratorConfig::new));
+    public static final Codec<CountExtraChanceDecoratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.FLOAT.fieldOf("extra_chance").forGetter(arg -> Float.valueOf(arg.extraChance)), (App)Codec.INT.fieldOf("extra_count").forGetter(arg -> arg.extraCount)).apply((Applicative)instance, CountExtraChanceDecoratorConfig::new));
     public final int count;
     public final float extraChance;
     public final int extraCount;

@@ -4,6 +4,7 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
  *  com.mojang.serialization.Codec
+ *  org.apache.commons.lang3.mutable.MutableBoolean
  */
 package net.minecraft.world.gen.carver;
 
@@ -11,7 +12,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import java.util.BitSet;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -21,6 +21,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ProbabilityConfig;
 import net.minecraft.world.gen.carver.RavineCarver;
 import net.minecraft.world.gen.carver.UnderwaterCaveCarver;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 
 public class UnderwaterRavineCarver
 extends RavineCarver {
@@ -35,7 +36,7 @@ extends RavineCarver {
     }
 
     @Override
-    protected boolean carveAtPoint(Chunk arg, Function<BlockPos, Biome> function, BitSet bitSet, Random random, BlockPos.Mutable arg2, BlockPos.Mutable arg3, BlockPos.Mutable arg4, int i, int j, int k, int l, int m, int n, int o, int p, AtomicBoolean atomicBoolean) {
+    protected boolean carveAtPoint(Chunk arg, Function<BlockPos, Biome> function, BitSet bitSet, Random random, BlockPos.Mutable arg2, BlockPos.Mutable arg3, BlockPos.Mutable arg4, int i, int j, int k, int l, int m, int n, int o, int p, MutableBoolean mutableBoolean) {
         return UnderwaterCaveCarver.carveAtPoint(this, arg, bitSet, random, arg2, i, j, k, l, m, n, o, p);
     }
 }

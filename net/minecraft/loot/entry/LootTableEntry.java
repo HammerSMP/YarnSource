@@ -12,12 +12,14 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.function.Consumer;
+import net.minecraft.class_5338;
+import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.entry.LeafEntry;
+import net.minecraft.loot.entry.LootEntries;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -26,9 +28,14 @@ public class LootTableEntry
 extends LeafEntry {
     private final Identifier id;
 
-    private LootTableEntry(Identifier arg, int i, int j, LootCondition[] args, LootFunction[] args2) {
+    private LootTableEntry(Identifier arg, int i, int j, class_5341[] args, LootFunction[] args2) {
         super(i, j, args, args2);
         this.id = arg;
+    }
+
+    @Override
+    public class_5338 method_29318() {
+        return LootEntries.LOOT_TABLE;
     }
 
     @Override
@@ -53,29 +60,25 @@ extends LeafEntry {
     }
 
     public static LeafEntry.Builder<?> builder(Identifier arg) {
-        return LootTableEntry.builder((int i, int j, LootCondition[] args, LootFunction[] args2) -> new LootTableEntry(arg, i, j, args, args2));
+        return LootTableEntry.builder((int i, int j, class_5341[] args, LootFunction[] args2) -> new LootTableEntry(arg, i, j, args, args2));
     }
 
     public static class Serializer
     extends LeafEntry.Serializer<LootTableEntry> {
-        public Serializer() {
-            super(new Identifier("loot_table"), LootTableEntry.class);
-        }
-
         @Override
-        public void toJson(JsonObject jsonObject, LootTableEntry arg, JsonSerializationContext jsonSerializationContext) {
-            super.toJson(jsonObject, arg, jsonSerializationContext);
+        public void method_422(JsonObject jsonObject, LootTableEntry arg, JsonSerializationContext jsonSerializationContext) {
+            super.method_422(jsonObject, arg, jsonSerializationContext);
             jsonObject.addProperty("name", arg.id.toString());
         }
 
         @Override
-        protected LootTableEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
+        protected LootTableEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, class_5341[] args, LootFunction[] args2) {
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "name"));
             return new LootTableEntry(lv, i, j, args, args2);
         }
 
         @Override
-        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
+        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, class_5341[] args, LootFunction[] args2) {
             return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, args2);
         }
     }

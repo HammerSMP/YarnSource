@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -25,7 +26,7 @@ import net.minecraft.text.Text;
 public class ConfirmScreen
 extends Screen {
     private final Text message;
-    private final List<Text> messageSplit = Lists.newArrayList();
+    private final List<class_5348> messageSplit = Lists.newArrayList();
     protected Text yesTranslated;
     protected Text noTranslated;
     private int buttonEnableTimer;
@@ -62,7 +63,7 @@ extends Screen {
         this.renderBackground(arg);
         this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
         int k = 90;
-        for (Text lv : this.messageSplit) {
+        for (class_5348 lv : this.messageSplit) {
             this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;

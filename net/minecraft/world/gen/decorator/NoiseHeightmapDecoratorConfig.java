@@ -17,7 +17,7 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class NoiseHeightmapDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<NoiseHeightmapDecoratorConfig> field_24890 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.DOUBLE.fieldOf("noise_level").forGetter(arg -> arg.noiseLevel), (App)Codec.INT.fieldOf("below_noise").forGetter(arg -> arg.belowNoise), (App)Codec.INT.fieldOf("above_noise").forGetter(arg -> arg.aboveNoise)).apply((Applicative)instance, NoiseHeightmapDecoratorConfig::new));
+    public static final Codec<NoiseHeightmapDecoratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.DOUBLE.fieldOf("noise_level").forGetter(arg -> arg.noiseLevel), (App)Codec.INT.fieldOf("below_noise").forGetter(arg -> arg.belowNoise), (App)Codec.INT.fieldOf("above_noise").forGetter(arg -> arg.aboveNoise)).apply((Applicative)instance, NoiseHeightmapDecoratorConfig::new));
     public final double noiseLevel;
     public final int belowNoise;
     public final int aboveNoise;

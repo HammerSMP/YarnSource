@@ -58,20 +58,16 @@ extends Feature<HugeFungusFeatureConfig> {
         }
         boolean bl = !arg5.planted && random.nextFloat() < 0.06f;
         arg.setBlockState(arg4, Blocks.AIR.getDefaultState(), 4);
-        this.generateHat(arg, random, arg5, lv2, i, bl);
         this.generateStem(arg, random, arg5, lv2, i, bl);
+        this.generateHat(arg, random, arg5, lv2, i, bl);
         return true;
     }
 
-    public static boolean method_24866(WorldAccess arg2, BlockPos arg22) {
+    private static boolean method_24866(WorldAccess arg2, BlockPos arg22, boolean bl) {
         return arg2.testBlockState(arg22, arg -> {
             Material lv = arg.getMaterial();
-            return lv == Material.REPLACEABLE_PLANT;
+            return arg.isAir() || arg.isOf(Blocks.WATER) || arg.isOf(Blocks.LAVA) || lv == Material.REPLACEABLE_PLANT || bl && lv == Material.PLANT;
         });
-    }
-
-    private static boolean method_24868(WorldAccess arg, BlockPos arg2) {
-        return arg.getBlockState(arg2).isAir() || !arg.getFluidState(arg2).isEmpty() || HugeFungusFeature.method_24866(arg, arg2);
     }
 
     private void generateStem(WorldAccess arg, Random random, HugeFungusFeatureConfig arg2, BlockPos arg3, int i, boolean bl) {
@@ -83,7 +79,7 @@ extends Feature<HugeFungusFeatureConfig> {
                 boolean bl2 = bl && MathHelper.abs(k) == j && MathHelper.abs(l) == j;
                 for (int m = 0; m < i; ++m) {
                     lv.set(arg3, k, m, l);
-                    if (!HugeFungusFeature.method_24868(arg, lv)) continue;
+                    if (!HugeFungusFeature.method_24866(arg, lv, true)) continue;
                     if (arg2.planted) {
                         if (!arg.getBlockState((BlockPos)lv.down()).isAir()) {
                             arg.breakBlock(lv, true);
@@ -124,7 +120,7 @@ extends Feature<HugeFungusFeatureConfig> {
                     boolean bl6 = bl3 && bl4;
                     boolean bl7 = l < k + 3;
                     lv.set(arg3, n2, l, o);
-                    if (!HugeFungusFeature.method_24868(arg, lv)) continue;
+                    if (!HugeFungusFeature.method_24866(arg, lv, false)) continue;
                     if (arg2.planted && !arg.getBlockState((BlockPos)lv.down()).isAir()) {
                         arg.breakBlock(lv, true);
                     }

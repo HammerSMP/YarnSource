@@ -18,7 +18,7 @@ import net.minecraft.world.gen.surfacebuilder.SurfaceConfig;
 
 public class TernarySurfaceConfig
 implements SurfaceConfig {
-    public static final Codec<TernarySurfaceConfig> field_25017 = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("top_material").forGetter(arg -> arg.topMaterial), (App)BlockState.field_24734.fieldOf("under_material").forGetter(arg -> arg.underMaterial), (App)BlockState.field_24734.fieldOf("underwater_material").forGetter(arg -> arg.underwaterMaterial)).apply((Applicative)instance, TernarySurfaceConfig::new));
+    public static final Codec<TernarySurfaceConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("top_material").forGetter(arg -> arg.topMaterial), (App)BlockState.field_24734.fieldOf("under_material").forGetter(arg -> arg.underMaterial), (App)BlockState.field_24734.fieldOf("underwater_material").forGetter(arg -> arg.underwaterMaterial)).apply((Applicative)instance, TernarySurfaceConfig::new));
     private final BlockState topMaterial;
     private final BlockState underMaterial;
     private final BlockState underwaterMaterial;

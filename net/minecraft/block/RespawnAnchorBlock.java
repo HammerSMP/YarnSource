@@ -51,12 +51,15 @@ extends Block {
     @Override
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         ItemStack lv = arg4.getStackInHand(arg5);
-        if (lv.getItem() == Items.GLOWSTONE && arg.get(CHARGES) < 4) {
+        if (arg5 == Hand.MAIN_HAND && !RespawnAnchorBlock.method_29289(lv) && RespawnAnchorBlock.method_29289(arg4.getStackInHand(Hand.OFF_HAND))) {
+            return ActionResult.PASS;
+        }
+        if (RespawnAnchorBlock.method_29289(lv) && RespawnAnchorBlock.method_29290(arg)) {
             RespawnAnchorBlock.charge(arg2, arg3, arg);
             if (!arg4.abilities.creativeMode) {
                 lv.decrement(1);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.method_29236(arg2.isClient);
         }
         if (arg.get(CHARGES) == 0) {
             return ActionResult.PASS;
@@ -68,17 +71,25 @@ extends Block {
                 arg2.playSound(null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 return ActionResult.SUCCESS;
             }
-            return arg.get(CHARGES) < 4 ? ActionResult.PASS : ActionResult.CONSUME;
+            return RespawnAnchorBlock.method_29290(arg) ? ActionResult.PASS : ActionResult.CONSUME;
         }
         if (!arg2.isClient) {
             arg2.removeBlock(arg3, false);
             arg2.createExplosion(null, DamageSource.netherBed(), (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
         }
-        return ActionResult.SUCCESS;
+        return ActionResult.method_29236(arg2.isClient);
+    }
+
+    private static boolean method_29289(ItemStack arg) {
+        return arg.getItem() == Items.GLOWSTONE;
+    }
+
+    private static boolean method_29290(BlockState arg) {
+        return arg.get(CHARGES) < 4;
     }
 
     public static boolean method_27353(World arg) {
-        return arg.getDimension().method_28542();
+        return arg.getDimension().isNether();
     }
 
     public static void charge(World arg, BlockPos arg2, BlockState arg3) {

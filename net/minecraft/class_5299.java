@@ -234,7 +234,7 @@ extends DataFix {
     }
 
     static final class class_5300 {
-        public static final Codec<class_5300> field_24648 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("spacing").forGetter(arg -> arg.field_24649), (App)Codec.INT.fieldOf("separation").forGetter(arg -> arg.field_24650), (App)Codec.INT.fieldOf("salt").forGetter(arg -> arg.field_24651)).apply((Applicative)instance, class_5300::new));
+        public static final Codec<class_5300> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("spacing").forGetter(arg -> arg.field_24649), (App)Codec.INT.fieldOf("separation").forGetter(arg -> arg.field_24650), (App)Codec.INT.fieldOf("salt").forGetter(arg -> arg.field_24651)).apply((Applicative)instance, class_5300::new));
         private final int field_24649;
         private final int field_24650;
         private final int field_24651;
@@ -246,7 +246,7 @@ extends DataFix {
         }
 
         public <T> Dynamic<T> method_28288(DynamicOps<T> dynamicOps) {
-            return new Dynamic(dynamicOps, field_24648.encodeStart(dynamicOps, (Object)this).result().orElse(dynamicOps.emptyMap()));
+            return new Dynamic(dynamicOps, CODEC.encodeStart(dynamicOps, (Object)this).result().orElse(dynamicOps.emptyMap()));
         }
     }
 }

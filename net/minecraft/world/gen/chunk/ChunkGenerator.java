@@ -16,14 +16,12 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.class_5311;
-import net.minecraft.class_5312;
 import net.minecraft.class_5313;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.server.network.DebugInfoSender;
@@ -54,6 +52,7 @@ import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public abstract class ChunkGenerator {
@@ -118,7 +117,7 @@ public abstract class ChunkGenerator {
     protected abstract Codec<? extends ChunkGenerator> method_28506();
 
     @Environment(value=EnvType.CLIENT)
-    public abstract ChunkGenerator create(long var1);
+    public abstract ChunkGenerator withSeed(long var1);
 
     public void populateBiomes(Chunk arg) {
         ChunkPos lv = arg.getPos();
@@ -226,12 +225,12 @@ public abstract class ChunkGenerator {
         ChunkPos lv = arg2.getPos();
         Biome lv2 = this.biomeSource.getBiomeForNoiseGen((lv.x << 2) + 2, 0, (lv.z << 2) + 2);
         this.method_28508(DefaultBiomeFeatures.field_24697, arg, arg2, arg3, l, lv, lv2);
-        for (class_5312<?, ?> lv3 : lv2.method_28413()) {
+        for (ConfiguredStructureFeature<?, ?> lv3 : lv2.method_28413()) {
             this.method_28508(lv3, arg, arg2, arg3, l, lv, lv2);
         }
     }
 
-    private void method_28508(class_5312<?, ?> arg, StructureAccessor arg2, Chunk arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6) {
+    private void method_28508(ConfiguredStructureFeature<?, ?> arg, StructureAccessor arg2, Chunk arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6) {
         StructureStart<?> lv = arg2.getStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.field_24835, arg3);
         int i = lv != null ? lv.getReferences() : 0;
         StructureStart<?> lv2 = arg.method_28622(this, this.biomeSource, arg4, l, arg5, arg6, i, this.config.method_28600((StructureFeature<?>)arg.field_24835));
@@ -248,8 +247,7 @@ public abstract class ChunkGenerator {
         for (int n = j - 8; n <= j + 8; ++n) {
             for (int o = k - 8; o <= k + 8; ++o) {
                 long p = ChunkPos.toLong(n, o);
-                for (Map.Entry<String, StructureStart<?>> entry : arg.getChunk(n, o).getStructureStarts().entrySet()) {
-                    StructureStart<?> lv2 = entry.getValue();
+                for (StructureStart<?> lv2 : arg.getChunk(n, o).getStructureStarts().values()) {
                     if (lv2 == StructureStart.DEFAULT || !lv2.getBoundingBox().intersectsXZ(l, m, l + 15, m + 15)) continue;
                     arg2.addStructureReference(lv, lv2.getFeature(), p, arg3);
                     DebugInfoSender.sendStructureStart(arg, lv2);
@@ -282,7 +280,7 @@ public abstract class ChunkGenerator {
     }
 
     static {
-        Registry.register(Registry.CHUNK_GENERATOR, "noise", SurfaceChunkGenerator.field_24773);
+        Registry.register(Registry.CHUNK_GENERATOR, "noise", SurfaceChunkGenerator.CODEC);
         Registry.register(Registry.CHUNK_GENERATOR, "flat", FlatChunkGenerator.field_24769);
         Registry.register(Registry.CHUNK_GENERATOR, "debug", DebugChunkGenerator.field_24768);
         field_24746 = Registry.CHUNK_GENERATOR.dispatchStable(ChunkGenerator::method_28506, Function.identity());

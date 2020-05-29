@@ -11,6 +11,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -157,13 +158,13 @@ extends AlwaysSelectedEntryListWidget<ResourcePackEntry> {
                 }
             }
             if ((r = this.client.textRenderer.getWidth(lv2)) > 157) {
-                MutableText lv4 = this.client.textRenderer.trimToWidth(lv2, 157 - this.client.textRenderer.getWidth("...")).append("...");
+                class_5348 lv4 = class_5348.method_29433(this.client.textRenderer.trimToWidth(lv2, 157 - this.client.textRenderer.getWidth("...")), class_5348.method_29430("..."));
                 this.client.textRenderer.drawWithShadow(arg, lv4, (float)(k + 32 + 2), (float)(j + 1), 0xFFFFFF);
             } else {
                 this.client.textRenderer.drawWithShadow(arg, lv2, (float)(k + 32 + 2), (float)(j + 1), 0xFFFFFF);
             }
             this.client.textRenderer.drawWithShadow(arg, lv2, (float)(k + 32 + 2), (float)(j + 1), 0xFFFFFF);
-            List<Text> list = this.client.textRenderer.wrapLines(lv3, 157);
+            List<class_5348> list = this.client.textRenderer.wrapLines(lv3, 157);
             for (int s = 0; s < 2 && s < list.size(); ++s) {
                 this.client.textRenderer.drawWithShadow(arg, list.get(s), (float)(k + 32 + 2), (float)(j + 12 + 10 * s), 0x808080);
             }

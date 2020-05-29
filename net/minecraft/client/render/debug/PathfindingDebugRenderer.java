@@ -98,8 +98,8 @@ implements DebugRenderer.Renderer {
             for (int k = 0; k < arg.getLength(); ++k) {
                 PathNode lv5 = arg.getNode(k);
                 if (!(PathfindingDebugRenderer.getManhattanDistance(lv5.getPos(), d, e, g) <= 80.0f)) continue;
-                DebugRenderer.drawString(String.format("%s", new Object[]{lv5.type}), (double)lv5.x + 0.5, (double)lv5.y + 0.75, (double)lv5.z + 0.5, -1);
-                DebugRenderer.drawString(String.format(Locale.ROOT, "%.2f", Float.valueOf(lv5.penalty)), (double)lv5.x + 0.5, (double)lv5.y + 0.25, (double)lv5.z + 0.5, -1);
+                DebugRenderer.drawString(String.format("%s", new Object[]{lv5.type}), (double)lv5.x + 0.5, (double)lv5.y + 0.75, (double)lv5.z + 0.5, -1, 0.02f, true, 0.0f, true);
+                DebugRenderer.drawString(String.format(Locale.ROOT, "%.2f", Float.valueOf(lv5.penalty)), (double)lv5.x + 0.5, (double)lv5.y + 0.25, (double)lv5.z + 0.5, -1, 0.02f, true, 0.0f, true);
             }
         }
     }

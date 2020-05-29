@@ -9,17 +9,24 @@ package net.minecraft.loot.entry;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import net.minecraft.class_5338;
+import net.minecraft.class_5341;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.entry.CombinedEntry;
 import net.minecraft.loot.entry.EntryCombiner;
+import net.minecraft.loot.entry.LootEntries;
 import net.minecraft.loot.entry.LootEntry;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class AlternativeEntry
 extends CombinedEntry {
-    AlternativeEntry(LootEntry[] args, LootCondition[] args2) {
+    AlternativeEntry(LootEntry[] args, class_5341[] args2) {
         super(args, args2);
+    }
+
+    @Override
+    public class_5338 method_29318() {
+        return LootEntries.ALTERNATIVES;
     }
 
     @Override

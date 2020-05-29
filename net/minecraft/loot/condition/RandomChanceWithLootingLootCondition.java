@@ -14,24 +14,31 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class RandomChanceWithLootingLootCondition
-implements LootCondition {
+implements class_5341 {
     private final float chance;
     private final float lootingMultiplier;
 
     private RandomChanceWithLootingLootCondition(float f, float g) {
         this.chance = f;
         this.lootingMultiplier = g;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.RANDOM_CHANCE_WITH_LOOTING;
     }
 
     @Override
@@ -49,7 +56,7 @@ implements LootCondition {
         return arg.getRandom().nextFloat() < this.chance + (float)i * this.lootingMultiplier;
     }
 
-    public static LootCondition.Builder builder(float f, float g) {
+    public static class_5341.Builder builder(float f, float g) {
         return () -> new RandomChanceWithLootingLootCondition(f, g);
     }
 
@@ -59,11 +66,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<RandomChanceWithLootingLootCondition> {
-        protected Factory() {
-            super(new Identifier("random_chance_with_looting"), RandomChanceWithLootingLootCondition.class);
-        }
-
+    implements class_5335<RandomChanceWithLootingLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, RandomChanceWithLootingLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("chance", (Number)Float.valueOf(arg.chance));
@@ -76,7 +79,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

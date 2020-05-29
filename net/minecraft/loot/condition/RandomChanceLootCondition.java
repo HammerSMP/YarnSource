@@ -11,13 +11,15 @@ package net.minecraft.loot.condition;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public class RandomChanceLootCondition
-implements LootCondition {
+implements class_5341 {
     private final float chance;
 
     private RandomChanceLootCondition(float f) {
@@ -25,11 +27,16 @@ implements LootCondition {
     }
 
     @Override
+    public class_5342 method_29325() {
+        return LootConditions.RANDOM_CHANCE;
+    }
+
+    @Override
     public boolean test(LootContext arg) {
         return arg.getRandom().nextFloat() < this.chance;
     }
 
-    public static LootCondition.Builder builder(float f) {
+    public static class_5341.Builder builder(float f) {
         return () -> new RandomChanceLootCondition(f);
     }
 
@@ -39,11 +46,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<RandomChanceLootCondition> {
-        protected Factory() {
-            super(new Identifier("random_chance"), RandomChanceLootCondition.class);
-        }
-
+    implements class_5335<RandomChanceLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, RandomChanceLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("chance", (Number)Float.valueOf(arg.chance));
@@ -55,7 +58,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

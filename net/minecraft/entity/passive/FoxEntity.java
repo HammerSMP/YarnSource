@@ -285,7 +285,9 @@ extends AnimalEntity {
         if (bl) {
             this.setBreedingAge(-24000);
         }
-        this.addTypeSpecificGoals();
+        if (arg instanceof ServerWorld) {
+            this.addTypeSpecificGoals();
+        }
         this.initEquipment(arg2);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
@@ -368,7 +370,9 @@ extends AnimalEntity {
         this.setType(Type.byName(arg.getString("Type")));
         this.setSitting(arg.getBoolean("Sitting"));
         this.setCrouching(arg.getBoolean("Crouching"));
-        this.addTypeSpecificGoals();
+        if (this.world instanceof ServerWorld) {
+            this.addTypeSpecificGoals();
+        }
     }
 
     public boolean isSitting() {

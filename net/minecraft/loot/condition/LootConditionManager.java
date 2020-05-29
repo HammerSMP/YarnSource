@@ -6,7 +6,6 @@
  *  com.google.common.collect.ImmutableMap$Builder
  *  com.google.gson.Gson
  *  com.google.gson.JsonElement
- *  com.google.gson.JsonObject
  *  javax.annotation.Nullable
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -16,14 +15,17 @@ package net.minecraft.loot.condition;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
 import net.minecraft.loot.LootGsons;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceManager;
@@ -36,24 +38,29 @@ public class LootConditionManager
 extends JsonDataLoader {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON = LootGsons.getConditionGsonBuilder().create();
-    private Map<Identifier, LootCondition> conditions = ImmutableMap.of();
+    private Map<Identifier, class_5341> conditions = ImmutableMap.of();
 
     public LootConditionManager() {
         super(GSON, "predicates");
     }
 
     @Nullable
-    public LootCondition get(Identifier arg) {
+    public class_5341 get(Identifier arg) {
         return this.conditions.get(arg);
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonObject> map, ResourceManager arg4, Profiler arg22) {
+    protected void apply(Map<Identifier, JsonElement> map, ResourceManager arg4, Profiler arg22) {
         ImmutableMap.Builder builder = ImmutableMap.builder();
-        map.forEach((arg, jsonObject) -> {
+        map.forEach((arg, jsonElement) -> {
             try {
-                LootCondition lv = (LootCondition)GSON.fromJson((JsonElement)jsonObject, LootCondition.class);
-                builder.put(arg, (Object)lv);
+                if (jsonElement.isJsonArray()) {
+                    class_5341[] lvs = (class_5341[])GSON.fromJson(jsonElement, class_5341[].class);
+                    builder.put(arg, (Object)new class_5334(lvs));
+                } else {
+                    class_5341 lv = (class_5341)GSON.fromJson(jsonElement, class_5341.class);
+                    builder.put(arg, (Object)lv);
+                }
             }
             catch (Exception exception) {
                 LOGGER.error("Couldn't parse loot table {}", arg, (Object)exception);
@@ -68,6 +75,40 @@ extends JsonDataLoader {
 
     public Set<Identifier> getIds() {
         return Collections.unmodifiableSet(this.conditions.keySet());
+    }
+
+    static class class_5334
+    implements class_5341 {
+        private final class_5341[] field_25202;
+        private final Predicate<LootContext> field_25203;
+
+        private class_5334(class_5341[] args) {
+            this.field_25202 = args;
+            this.field_25203 = LootConditions.joinAnd(args);
+        }
+
+        @Override
+        public final boolean test(LootContext arg) {
+            return this.field_25203.test(arg);
+        }
+
+        @Override
+        public void validate(LootTableReporter arg) {
+            class_5341.super.validate(arg);
+            for (int i = 0; i < this.field_25202.length; ++i) {
+                this.field_25202[i].validate(arg.makeChild(".term[" + i + "]"));
+            }
+        }
+
+        @Override
+        public class_5342 method_29325() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public /* synthetic */ boolean test(Object object) {
+            return this.test((LootContext)object);
+        }
     }
 }
 

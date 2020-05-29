@@ -16,8 +16,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.screen.GameModeSelectionScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.GameModeSwitcherScreen;
 import net.minecraft.client.gui.screen.options.AccessibilityScreen;
 import net.minecraft.client.gui.screen.options.ChatOptionsScreen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
@@ -128,7 +128,7 @@ public class Keyboard {
                 if (!this.client.player.hasPermissionLevel(2)) {
                     this.debugWarn("debug.gamemodes.error", new Object[0]);
                 } else {
-                    this.client.openScreen(new GameModeSwitcherScreen());
+                    this.client.openScreen(new GameModeSelectionScreen());
                 }
                 return true;
             }
@@ -171,7 +171,7 @@ public class Keyboard {
                     return false;
                 }
                 this.debugWarn("debug.copy_location.message", new Object[0]);
-                this.setClipboard(String.format(Locale.ROOT, "/execute in %s run tp @s %.2f %.2f %.2f %.2f %.2f", this.client.player.world.method_27983().method_29177(), this.client.player.getX(), this.client.player.getY(), this.client.player.getZ(), Float.valueOf(this.client.player.yaw), Float.valueOf(this.client.player.pitch)));
+                this.setClipboard(String.format(Locale.ROOT, "/execute in %s run tp @s %.2f %.2f %.2f %.2f %.2f", this.client.player.world.method_27983().getValue(), this.client.player.getX(), this.client.player.getY(), this.client.player.getZ(), Float.valueOf(this.client.player.yaw), Float.valueOf(this.client.player.pitch)));
                 return true;
             }
         }

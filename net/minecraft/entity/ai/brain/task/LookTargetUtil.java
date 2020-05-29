@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -18,6 +19,7 @@ import net.minecraft.entity.ai.brain.EntityLookTarget;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
@@ -137,6 +139,10 @@ public class LookTargetUtil {
     public static Optional<LivingEntity> getEntity(LivingEntity arg, MemoryModuleType<DynamicSerializableUuid> arg2) {
         Optional<DynamicSerializableUuid> optional = arg.getBrain().getOptionalMemory(arg2);
         return optional.map(DynamicSerializableUuid::getUuid).map(uUID -> (LivingEntity)((ServerWorld)arg.world).getEntity((UUID)uUID));
+    }
+
+    public static Stream<VillagerEntity> method_29248(VillagerEntity arg, Predicate<VillagerEntity> predicate) {
+        return arg.getBrain().getOptionalMemory(MemoryModuleType.MOBS).map(list -> list.stream().filter(arg2 -> arg2 instanceof VillagerEntity && arg2 != arg).map(arg -> (VillagerEntity)arg).filter(LivingEntity::isAlive).filter(predicate)).orElseGet(Stream::empty);
     }
 }
 

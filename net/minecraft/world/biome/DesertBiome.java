@@ -23,6 +23,7 @@ extends Biome {
         this.addStructureFeature(DefaultBiomeFeatures.field_24707);
         this.addStructureFeature(DefaultBiomeFeatures.field_24687);
         this.addStructureFeature(DefaultBiomeFeatures.field_24692);
+        DefaultBiomeFeatures.addFossils(this);
         DefaultBiomeFeatures.method_28440(this);
         this.addStructureFeature(DefaultBiomeFeatures.field_24712);
         DefaultBiomeFeatures.addLandCarvers(this);

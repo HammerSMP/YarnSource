@@ -26,14 +26,15 @@ import java.util.function.BooleanSupplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5219;
+import net.minecraft.class_5350;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.NetworkEncryptionUtils;
+import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.server.LanServerPinger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.integrated.IntegratedPlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.UserCache;
@@ -41,6 +42,7 @@ import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.SaveProperties;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,8 +57,8 @@ extends MinecraftServer {
     private LanServerPinger lanPinger;
     private UUID localPlayerUuid;
 
-    public IntegratedServer(MinecraftClient arg, LevelStorage.Session arg2, class_5219 arg3, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg4, WorldGenerationProgressListenerFactory arg5) {
-        super(arg2, arg3, arg.getNetworkProxy(), arg.getDataFixer(), new CommandManager(false), minecraftSessionService, gameProfileRepository, arg4, arg5);
+    public IntegratedServer(MinecraftClient arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, class_5350 arg4, SaveProperties arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+        super(arg2, arg5, arg3, arg.getNetworkProxy(), arg.getDataFixer(), arg4, minecraftSessionService, gameProfileRepository, arg6, arg7);
         this.setServerName(arg.getSession().getUsername());
         this.setDemo(arg.isDemo());
         this.setWorldHeight(256);

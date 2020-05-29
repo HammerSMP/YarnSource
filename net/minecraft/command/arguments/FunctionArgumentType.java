@@ -76,7 +76,7 @@ implements ArgumentType<FunctionArgument> {
     }
 
     private static Tag<CommandFunction> getFunctionTag(CommandContext<ServerCommandSource> commandContext, Identifier arg) throws CommandSyntaxException {
-        Tag<CommandFunction> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getCommandFunctionManager().getTags().get(arg);
+        Tag<CommandFunction> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getCommandFunctionManager().method_29462(arg);
         if (lv == null) {
             throw UNKNOWN_FUNCTION_TAG_EXCEPTION.create((Object)arg.toString());
         }

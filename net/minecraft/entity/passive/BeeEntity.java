@@ -120,7 +120,6 @@ implements Flutterer {
         this.moveControl = new FlightMoveControl(this, 20, true);
         this.lookControl = new BeeLookControl(this);
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0f);
-        this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0f);
         this.setPathfindingPenalty(PathNodeType.WATER, -1.0f);
         this.setPathfindingPenalty(PathNodeType.COCOA, -1.0f);
         this.setPathfindingPenalty(PathNodeType.FENCE, -1.0f);
@@ -178,7 +177,7 @@ implements Flutterer {
         arg.putInt("CropsGrownSincePollination", this.cropsGrownSincePollination);
         arg.putInt("Anger", this.getAnger());
         if (this.targetPlayer != null) {
-            arg.putUuidNew("HurtBy", this.targetPlayer);
+            arg.putUuid("HurtBy", this.targetPlayer);
         }
     }
 
@@ -199,8 +198,8 @@ implements Flutterer {
         this.ticksSincePollination = arg.getInt("TicksSincePollination");
         this.cannotEnterHiveTicks = arg.getInt("CannotEnterHiveTicks");
         this.cropsGrownSincePollination = arg.getInt("CropsGrownSincePollination");
-        if (arg.containsUuidNew("HurtBy")) {
-            this.targetPlayer = arg.getUuidNew("HurtBy");
+        if (arg.containsUuid("HurtBy")) {
+            this.targetPlayer = arg.getUuid("HurtBy");
             PlayerEntity lv = this.world.getPlayerByUuid(this.targetPlayer);
             this.setAttacker(lv);
             if (lv != null) {

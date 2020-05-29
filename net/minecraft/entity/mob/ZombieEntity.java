@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.SpawnRestriction;
 import net.minecraft.entity.ai.goal.BreakDoorGoal;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
@@ -68,6 +69,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
@@ -249,33 +251,11 @@ extends HostileEntity {
     }
 
     protected void convertTo(EntityType<? extends ZombieEntity> arg) {
-        if (this.removed) {
-            return;
+        ZombieEntity lv = this.method_29243(arg);
+        if (lv != null) {
+            lv.applyAttributeModifiers(lv.world.getLocalDifficulty(lv.getBlockPos()).getClampedLocalDifficulty());
+            lv.setCanBreakDoors(lv.shouldBreakDoors() && this.canBreakDoors());
         }
-        ZombieEntity lv = arg.create(this.world);
-        lv.copyPositionAndRotation(this);
-        lv.setCanPickUpLoot(this.canPickUpLoot());
-        lv.setCanBreakDoors(lv.shouldBreakDoors() && this.canBreakDoors());
-        lv.applyAttributeModifiers(lv.world.getLocalDifficulty(lv.getBlockPos()).getClampedLocalDifficulty());
-        lv.setBaby(this.isBaby());
-        lv.setAiDisabled(this.isAiDisabled());
-        for (EquipmentSlot lv2 : EquipmentSlot.values()) {
-            ItemStack lv3 = this.getEquippedStack(lv2);
-            if (lv3.isEmpty()) continue;
-            lv.equipStack(lv2, lv3.copy());
-            lv.setEquipmentDropChance(lv2, this.getDropChance(lv2));
-            lv3.setCount(0);
-        }
-        if (this.hasCustomName()) {
-            lv.setCustomName(this.getCustomName());
-            lv.setCustomNameVisible(this.isCustomNameVisible());
-        }
-        if (this.isPersistent()) {
-            lv.setPersistent();
-        }
-        lv.setInvulnerable(this.isInvulnerable());
-        this.world.spawnEntity(lv);
-        this.remove();
     }
 
     protected boolean burnsInDaylight() {
@@ -295,11 +275,13 @@ extends HostileEntity {
                 int k = MathHelper.floor(this.getZ());
                 ZombieEntity lv2 = new ZombieEntity(this.world);
                 for (int l = 0; l < 50; ++l) {
-                    int o;
-                    int n;
                     int m = i + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
-                    BlockPos lv3 = new BlockPos(m, (n = j + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1)) - 1, o = k + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1));
-                    if (!this.world.getBlockState(lv3).hasSolidTopSurface(this.world, lv3, lv2) || this.world.getLightLevel(new BlockPos(m, n, o)) >= 10) continue;
+                    int n = j + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
+                    int o = k + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
+                    BlockPos lv3 = new BlockPos(m, n, o);
+                    EntityType<?> lv4 = lv2.getType();
+                    SpawnRestriction.Location lv5 = SpawnRestriction.getLocation(lv4);
+                    if (!SpawnHelper.canSpawn(lv5, this.world, lv3, lv4) || !SpawnRestriction.canSpawn(lv4, this.world, SpawnReason.REINFORCEMENT, lv3, this.world.random)) continue;
                     lv2.updatePosition(m, n, o);
                     if (this.world.isPlayerInRange(m, n, o, 7.0) || !this.world.intersectsEntities(lv2) || !this.world.doesNotCollide(lv2) || this.world.containsFluid(lv2.getBoundingBox())) continue;
                     this.world.spawnEntity(lv2);
@@ -416,7 +398,7 @@ extends HostileEntity {
                 lv2.setCustomName(lv.getCustomName());
                 lv2.setCustomNameVisible(lv.isCustomNameVisible());
             }
-            if (this.isPersistent()) {
+            if (lv.isPersistent()) {
                 lv2.setPersistent();
             }
             lv2.setInvulnerable(this.isInvulnerable());

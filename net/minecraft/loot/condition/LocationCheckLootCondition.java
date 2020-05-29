@@ -11,22 +11,29 @@ package net.minecraft.loot.condition;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.class_5335;
+import net.minecraft.class_5341;
+import net.minecraft.class_5342;
+import net.minecraft.loot.condition.LootConditions;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.entity.LocationPredicate;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
 
 public class LocationCheckLootCondition
-implements LootCondition {
+implements class_5341 {
     private final LocationPredicate predicate;
     private final BlockPos offset;
 
-    public LocationCheckLootCondition(LocationPredicate arg, BlockPos arg2) {
+    private LocationCheckLootCondition(LocationPredicate arg, BlockPos arg2) {
         this.predicate = arg;
         this.offset = arg2;
+    }
+
+    @Override
+    public class_5342 method_29325() {
+        return LootConditions.LOCATION_CHECK;
     }
 
     @Override
@@ -35,7 +42,7 @@ implements LootCondition {
         return lv != null && this.predicate.test(arg.getWorld(), lv.getX() + this.offset.getX(), lv.getY() + this.offset.getY(), lv.getZ() + this.offset.getZ());
     }
 
-    public static LootCondition.Builder builder(LocationPredicate.Builder arg) {
+    public static class_5341.Builder builder(LocationPredicate.Builder arg) {
         return () -> new LocationCheckLootCondition(arg.build(), BlockPos.ORIGIN);
     }
 
@@ -45,11 +52,7 @@ implements LootCondition {
     }
 
     public static class Factory
-    extends LootCondition.Factory<LocationCheckLootCondition> {
-        public Factory() {
-            super(new Identifier("location_check"), LocationCheckLootCondition.class);
-        }
-
+    implements class_5335<LocationCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, LocationCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());
@@ -74,7 +77,7 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ LootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return this.fromJson(jsonObject, jsonDeserializationContext);
         }
     }

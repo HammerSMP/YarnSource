@@ -115,7 +115,7 @@ implements Wearable {
         if (lv3.isEmpty()) {
             arg2.equipStack(lv2, lv.copy());
             lv.setCount(0);
-            return TypedActionResult.success(lv);
+            return TypedActionResult.method_29237(lv, arg.isClient());
         }
         return TypedActionResult.fail(lv);
     }

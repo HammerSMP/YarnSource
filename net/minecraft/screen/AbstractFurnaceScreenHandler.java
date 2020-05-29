@@ -12,8 +12,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.FurnaceInputSlotFiller;
@@ -39,7 +39,7 @@ extends AbstractRecipeScreenHandler<Inventory> {
     private final RecipeType<? extends AbstractCookingRecipe> recipeType;
 
     protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, int i, PlayerInventory arg3) {
-        this(arg, arg2, i, arg3, new BasicInventory(3), new ArrayPropertyDelegate(4));
+        this(arg, arg2, i, arg3, new SimpleInventory(3), new ArrayPropertyDelegate(4));
     }
 
     protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, int i, PlayerInventory arg3, Inventory arg4, PropertyDelegate arg5) {
@@ -141,7 +141,7 @@ extends AbstractRecipeScreenHandler<Inventory> {
     }
 
     protected boolean isSmeltable(ItemStack arg) {
-        return this.world.getRecipeManager().getFirstMatch(this.recipeType, new BasicInventory(arg), this.world).isPresent();
+        return this.world.getRecipeManager().getFirstMatch(this.recipeType, new SimpleInventory(arg), this.world).isPresent();
     }
 
     protected boolean isFuel(ItemStack arg) {

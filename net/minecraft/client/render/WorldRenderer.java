@@ -83,6 +83,7 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OutlineVertexConsumerProvider;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.TransformingVertexConsumer;
@@ -189,8 +190,22 @@ AutoCloseable {
     private final Int2ObjectMap<BlockBreakingInfo> blockBreakingInfos = new Int2ObjectOpenHashMap();
     private final Long2ObjectMap<SortedSet<BlockBreakingInfo>> blockBreakingProgressions = new Long2ObjectOpenHashMap();
     private final Map<BlockPos, SoundInstance> playingSongs = Maps.newHashMap();
+    @Nullable
     private Framebuffer entityOutlinesFramebuffer;
+    @Nullable
     private ShaderEffect entityOutlineShader;
+    @Nullable
+    private Framebuffer field_25274;
+    @Nullable
+    private Framebuffer field_25275;
+    @Nullable
+    private Framebuffer field_25276;
+    @Nullable
+    private Framebuffer field_25277;
+    @Nullable
+    private Framebuffer field_25278;
+    @Nullable
+    private ShaderEffect field_25279;
     private double lastCameraChunkUpdateX = Double.MIN_VALUE;
     private double lastCameraChunkUpdateY = Double.MIN_VALUE;
     private double lastCameraChunkUpdateZ = Double.MIN_VALUE;
@@ -257,6 +272,7 @@ AutoCloseable {
         int k = MathHelper.floor(g);
         Tessellator lv2 = Tessellator.getInstance();
         BufferBuilder lv3 = lv2.getBuffer();
+        RenderSystem.enableAlphaTest();
         RenderSystem.disableCull();
         RenderSystem.normal3f(0.0f, 1.0f, 0.0f);
         RenderSystem.enableBlend();
@@ -351,6 +367,7 @@ AutoCloseable {
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
         RenderSystem.defaultAlphaFunc();
+        RenderSystem.disableAlphaTest();
         arg.disable();
     }
 
@@ -398,6 +415,9 @@ AutoCloseable {
         if (this.entityOutlineShader != null) {
             this.entityOutlineShader.close();
         }
+        if (this.field_25279 != null) {
+            this.field_25279.close();
+        }
     }
 
     @Override
@@ -407,6 +427,7 @@ AutoCloseable {
         RenderSystem.texParameter(3553, 10243, 10497);
         RenderSystem.bindTexture(0);
         this.loadEntityOutlineShader();
+        this.method_29365();
     }
 
     public void loadEntityOutlineShader() {
@@ -425,9 +446,31 @@ AutoCloseable {
             this.entityOutlinesFramebuffer = null;
         }
         catch (JsonSyntaxException jsonSyntaxException) {
-            LOGGER.warn("Failed to load shader: {}", (Object)lv, (Object)jsonSyntaxException);
+            LOGGER.warn("Failed to parse shader: {}", (Object)lv, (Object)jsonSyntaxException);
             this.entityOutlineShader = null;
             this.entityOutlinesFramebuffer = null;
+        }
+    }
+
+    private void method_29365() {
+        if (this.field_25279 != null) {
+            this.field_25279.close();
+        }
+        Identifier lv = new Identifier("shaders/post/transparency.json");
+        try {
+            this.field_25279 = new ShaderEffect(this.client.getTextureManager(), this.client.getResourceManager(), this.client.getFramebuffer(), lv);
+            this.field_25279.setupDimensions(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
+            this.field_25274 = this.field_25279.getSecondaryTarget("translucent");
+            this.field_25275 = this.field_25279.getSecondaryTarget("itemEntity");
+            this.field_25276 = this.field_25279.getSecondaryTarget("particles");
+            this.field_25277 = this.field_25279.getSecondaryTarget("weather");
+            this.field_25278 = this.field_25279.getSecondaryTarget("clouds");
+        }
+        catch (IOException iOException) {
+            throw new class_5347("Failed to load shader: " + lv, iOException);
+        }
+        catch (JsonSyntaxException jsonSyntaxException) {
+            throw new class_5347("Failed to parse shader: " + lv, jsonSyntaxException);
         }
     }
 
@@ -608,6 +651,9 @@ AutoCloseable {
         this.scheduleTerrainUpdate();
         if (this.entityOutlineShader != null) {
             this.entityOutlineShader.setupDimensions(i, j);
+        }
+        if (this.field_25279 != null) {
+            this.field_25279.setupDimensions(i, j);
         }
     }
 
@@ -804,7 +850,7 @@ AutoCloseable {
         BackgroundRenderer.render(arg2, f, this.client.world, this.client.options.viewDistance, arg32.getSkyDarkness(f));
         RenderSystem.clear(16640, MinecraftClient.IS_SYSTEM_MAC);
         float h = arg32.getViewDistance();
-        boolean bl5 = bl3 = this.client.world.method_28103().method_28110(MathHelper.floor(d), MathHelper.floor(e)) || this.client.inGameHud.getBossBarHud().shouldThickenFog();
+        boolean bl5 = bl3 = this.client.world.getSkyProperties().useThickFog(MathHelper.floor(d), MathHelper.floor(e)) || this.client.inGameHud.getBossBarHud().shouldThickenFog();
         if (this.client.options.viewDistance >= 4) {
             BackgroundRenderer.applyFog(arg2, BackgroundRenderer.FogType.FOG_SKY, h, bl3);
             lv.swap("sky");
@@ -832,7 +878,7 @@ AutoCloseable {
         this.renderLayer(RenderLayer.getSolid(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutoutMipped(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutout(), arg, d, e, g);
-        if (this.world.getDimension().method_28542()) {
+        if (this.world.getDimension().isNether()) {
             DiffuseLighting.enableForLevel(arg.peek().getModel());
         } else {
             DiffuseLighting.method_27869(arg.peek().getModel());
@@ -842,6 +888,11 @@ AutoCloseable {
         this.regularEntityCount = 0;
         this.blockEntityCount = 0;
         lv.swap("entities");
+        if (this.field_25275 != null) {
+            this.field_25275.clear(MinecraftClient.IS_SYSTEM_MAC);
+            this.field_25275.method_29329(this.client.getFramebuffer());
+            this.client.getFramebuffer().beginWrite(false);
+        }
         if (this.canDrawEntityOutlines()) {
             this.entityOutlinesFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.client.getFramebuffer().beginWrite(false);
@@ -955,11 +1006,12 @@ AutoCloseable {
         RenderSystem.pushMatrix();
         RenderSystem.multMatrix(arg.peek().getModel());
         this.client.debugRenderer.render(arg, lv6, d, e, g);
-        this.renderWorldBorder(arg2);
         RenderSystem.popMatrix();
         lv6.draw(TexturedRenderLayers.getEntityTranslucentCull());
         lv6.draw(TexturedRenderLayers.getBannerPatterns());
         lv6.draw(TexturedRenderLayers.getShieldPatterns());
+        lv6.draw(RenderLayer.method_27948());
+        lv6.draw(RenderLayer.method_27949());
         lv6.draw(RenderLayer.getGlint());
         lv6.draw(RenderLayer.getEntityGlint());
         lv6.draw(RenderLayer.getWaterMask());
@@ -967,20 +1019,53 @@ AutoCloseable {
         lv6.draw(RenderLayer.getLines());
         lv6.draw();
         lv.swap("translucent");
+        if (this.field_25274 != null) {
+            this.field_25274.clear(MinecraftClient.IS_SYSTEM_MAC);
+            this.field_25274.method_29329(this.client.getFramebuffer());
+        }
         this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
         lv.swap("particles");
+        if (this.field_25276 != null) {
+            this.field_25276.clear(MinecraftClient.IS_SYSTEM_MAC);
+            this.field_25276.method_29329(this.client.getFramebuffer());
+            RenderPhase.field_25281.startDrawing();
+        }
         this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
+        if (this.field_25276 != null) {
+            RenderPhase.field_25281.endDrawing();
+        }
         RenderSystem.pushMatrix();
         RenderSystem.multMatrix(arg.peek().getModel());
         lv.swap("cloudsLayers");
         if (this.client.options.getCloudRenderMode() != CloudRenderMode.OFF) {
             lv.swap("clouds");
+            if (this.field_25278 != null) {
+                this.field_25278.clear(MinecraftClient.IS_SYSTEM_MAC);
+                RenderPhase.field_25283.startDrawing();
+            }
             this.renderClouds(arg, f, d, e, g);
+            if (this.field_25278 != null) {
+                RenderPhase.field_25283.endDrawing();
+            }
         }
-        RenderSystem.depthMask(false);
         lv.swap("weather");
+        if (this.field_25277 != null) {
+            this.field_25277.clear(MinecraftClient.IS_SYSTEM_MAC);
+            RenderPhase.field_25282.startDrawing();
+        } else {
+            RenderSystem.depthMask(false);
+        }
         this.renderWeather(arg4, f, d, e, g);
-        RenderSystem.depthMask(true);
+        this.renderWorldBorder(arg2);
+        if (this.field_25277 != null) {
+            RenderPhase.field_25282.endDrawing();
+        } else {
+            RenderSystem.depthMask(true);
+        }
+        if (this.field_25279 != null) {
+            this.field_25279.render(f);
+            this.client.getFramebuffer().beginWrite(false);
+        }
         this.renderChunkDebugInfo(arg2);
         RenderSystem.shadeModel(7424);
         RenderSystem.depthMask(true);
@@ -1262,11 +1347,11 @@ AutoCloseable {
     }
 
     public void renderSky(MatrixStack arg, float f) {
-        if (this.client.world.getDimension().method_28543()) {
+        if (this.client.world.getDimension().isEnd()) {
             this.renderEndSky(arg);
             return;
         }
-        if (!this.client.world.method_28103().method_28114()) {
+        if (!this.client.world.getSkyProperties().shouldRenderSky()) {
             return;
         }
         RenderSystem.disableTexture();
@@ -1288,7 +1373,7 @@ AutoCloseable {
         RenderSystem.disableAlphaTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        float[] fs = this.world.method_28103().method_28109(this.world.getSkyAngle(f), f);
+        float[] fs = this.world.getSkyProperties().getSkyColor(this.world.getSkyAngle(f), f);
         if (fs != null) {
             RenderSystem.disableTexture();
             RenderSystem.shadeModel(7425);
@@ -1365,7 +1450,7 @@ AutoCloseable {
         arg.pop();
         RenderSystem.disableTexture();
         RenderSystem.color3f(0.0f, 0.0f, 0.0f);
-        double d = this.client.player.getCameraPosVec((float)f).y - this.world.getLevelProperties().method_28105();
+        double d = this.client.player.getCameraPosVec((float)f).y - this.world.getLevelProperties().getSkyDarknessHeight();
         if (d < 0.0) {
             arg.push();
             arg.translate(0.0, 12.0, 0.0);
@@ -1376,7 +1461,7 @@ AutoCloseable {
             this.skyVertexFormat.endDrawing();
             arg.pop();
         }
-        if (this.world.method_28103().method_28113()) {
+        if (this.world.getSkyProperties().isAlternateSkyColor()) {
             RenderSystem.color3f(g * 0.2f + 0.04f, h * 0.2f + 0.04f, i * 0.6f + 0.1f);
         } else {
             RenderSystem.color3f(g, h, i);
@@ -1387,7 +1472,7 @@ AutoCloseable {
     }
 
     public void renderClouds(MatrixStack arg, float f, double d, double e, double g) {
-        float h = this.world.method_28103().method_28108();
+        float h = this.world.getSkyProperties().getCloudsHeight();
         if (Float.isNaN(h)) {
             return;
         }
@@ -1396,7 +1481,7 @@ AutoCloseable {
         RenderSystem.enableAlphaTest();
         RenderSystem.enableDepthTest();
         RenderSystem.defaultAlphaFunc();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.enableFog();
         float i = 12.0f;
         float j = 4.0f;
@@ -1587,7 +1672,7 @@ AutoCloseable {
         RenderSystem.enableDepthTest();
         RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
         this.textureManager.bindTexture(FORCEFIELD);
-        RenderSystem.depthMask(false);
+        RenderSystem.depthMask(true);
         RenderSystem.pushMatrix();
         int i = lv2.getStage().getColor();
         float j = (float)(i >> 16 & 0xFF) / 255.0f;
@@ -2332,8 +2417,42 @@ AutoCloseable {
         return i << 20 | j << 4;
     }
 
+    @Nullable
     public Framebuffer getEntityOutlinesFramebuffer() {
         return this.entityOutlinesFramebuffer;
+    }
+
+    @Nullable
+    public Framebuffer method_29360() {
+        return this.field_25274;
+    }
+
+    @Nullable
+    public Framebuffer method_29361() {
+        return this.field_25275;
+    }
+
+    @Nullable
+    public Framebuffer method_29362() {
+        return this.field_25276;
+    }
+
+    @Nullable
+    public Framebuffer method_29363() {
+        return this.field_25277;
+    }
+
+    @Nullable
+    public Framebuffer method_29364() {
+        return this.field_25278;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public static class class_5347
+    extends RuntimeException {
+        public class_5347(String string, Throwable throwable) {
+            super(string, throwable);
+        }
     }
 
     @Environment(value=EnvType.CLIENT)

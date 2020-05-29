@@ -46,7 +46,7 @@ extends BlockWithEntity {
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         BlockEntity lv = arg2.getBlockEntity(arg3);
         if (lv instanceof StructureBlockBlockEntity) {
-            return ((StructureBlockBlockEntity)lv).openScreen(arg4) ? ActionResult.SUCCESS : ActionResult.PASS;
+            return ((StructureBlockBlockEntity)lv).openScreen(arg4) ? ActionResult.method_29236(arg2.isClient) : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }

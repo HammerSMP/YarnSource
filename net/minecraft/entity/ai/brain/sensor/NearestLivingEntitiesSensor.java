@@ -20,7 +20,7 @@ import net.minecraft.server.world.ServerWorld;
 
 public class NearestLivingEntitiesSensor
 extends Sensor<LivingEntity> {
-    private static final TargetPredicate CLOSE_ENTITY_PREDICATE = new TargetPredicate().setBaseMaxDistance(16.0).includeTeammates().ignoreEntityTargetRules().includeHidden();
+    private static final TargetPredicate CLOSE_ENTITY_PREDICATE = new TargetPredicate().setBaseMaxDistance(16.0).includeTeammates().ignoreEntityTargetRules();
 
     @Override
     protected void sense(ServerWorld arg, LivingEntity arg22) {
@@ -28,7 +28,7 @@ extends Sensor<LivingEntity> {
         list.sort(Comparator.comparingDouble(arg22::squaredDistanceTo));
         Brain<?> lv = arg22.getBrain();
         lv.remember(MemoryModuleType.MOBS, list);
-        lv.remember(MemoryModuleType.VISIBLE_MOBS, list.stream().filter(arg2 -> CLOSE_ENTITY_PREDICATE.test(arg22, (LivingEntity)arg2)).filter(arg22::canSee).collect(Collectors.toList()));
+        lv.remember(MemoryModuleType.VISIBLE_MOBS, list.stream().filter(arg2 -> CLOSE_ENTITY_PREDICATE.test(arg22, (LivingEntity)arg2)).collect(Collectors.toList()));
     }
 
     @Override

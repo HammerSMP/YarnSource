@@ -17,7 +17,7 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class HeightmapRangeDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<HeightmapRangeDecoratorConfig> field_24989 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("min").forGetter(arg -> arg.min), (App)Codec.INT.fieldOf("max").forGetter(arg -> arg.max)).apply((Applicative)instance, HeightmapRangeDecoratorConfig::new));
+    public static final Codec<HeightmapRangeDecoratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("min").forGetter(arg -> arg.min), (App)Codec.INT.fieldOf("max").forGetter(arg -> arg.max)).apply((Applicative)instance, HeightmapRangeDecoratorConfig::new));
     public final int min;
     public final int max;
 

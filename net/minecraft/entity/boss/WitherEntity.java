@@ -393,6 +393,7 @@ RangedAttackMob {
         double l = e - h;
         double m = f - j;
         WitherSkullEntity lv = new WitherSkullEntity(this.world, this, k, l, m);
+        lv.setOwner(this);
         if (bl) {
             lv.setCharged(true);
         }

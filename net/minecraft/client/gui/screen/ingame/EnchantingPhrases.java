@@ -10,9 +10,9 @@ package net.minecraft.client.gui.screen.ingame;
 import java.util.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -32,7 +32,7 @@ public class EnchantingPhrases {
         return INSTANCE;
     }
 
-    public MutableText generatePhrase(TextRenderer arg, int i) {
+    public class_5348 generatePhrase(TextRenderer arg, int i) {
         StringBuilder stringBuilder = new StringBuilder();
         int j = this.random.nextInt(2) + 3;
         for (int k = 0; k < j; ++k) {

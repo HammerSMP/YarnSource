@@ -163,7 +163,7 @@ extends WallMountedBlock {
         }
         arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
         arg4.incrementStat(Stats.INTERACT_WITH_GRINDSTONE);
-        return ActionResult.SUCCESS;
+        return ActionResult.CONSUME;
     }
 
     @Override

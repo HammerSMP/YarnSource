@@ -9,6 +9,7 @@ package net.minecraft.test;
 
 import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestListener;
@@ -16,7 +17,7 @@ import net.minecraft.test.TestListener;
 public class TestSet {
     private final Collection<GameTest> tests = Lists.newArrayList();
     @Nullable
-    private TestListener listener;
+    private Collection<TestListener> field_25303 = Lists.newArrayList();
 
     public TestSet() {
     }
@@ -27,14 +28,26 @@ public class TestSet {
 
     public void add(GameTest arg) {
         this.tests.add(arg);
-        if (this.listener != null) {
-            arg.addListener(this.listener);
-        }
+        this.field_25303.forEach(arg::addListener);
     }
 
     public void addListener(TestListener arg) {
-        this.listener = arg;
+        this.field_25303.add(arg);
         this.tests.forEach(arg2 -> arg2.addListener(arg));
+    }
+
+    public void method_29407(final Consumer<GameTest> consumer) {
+        this.addListener(new TestListener(){
+
+            @Override
+            public void onStarted(GameTest arg) {
+            }
+
+            @Override
+            public void onFailed(GameTest arg) {
+                consumer.accept(arg);
+            }
+        });
     }
 
     public int getFailedRequiredTestCount() {

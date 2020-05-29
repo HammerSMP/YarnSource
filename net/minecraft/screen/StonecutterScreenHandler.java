@@ -15,9 +15,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.BasicInventory;
 import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeType;
@@ -43,7 +43,7 @@ extends ScreenHandler {
     final Slot inputSlot;
     final Slot outputSlot;
     private Runnable contentsChangedListener = () -> {};
-    public final Inventory input = new BasicInventory(1){
+    public final Inventory input = new SimpleInventory(1){
 
         @Override
         public void markDirty() {
@@ -195,7 +195,7 @@ extends ScreenHandler {
                 }
             } else {
                 ItemStack[] arritemStack = new ItemStack[]{lv3};
-                if (this.world.getRecipeManager().getFirstMatch(RecipeType.STONECUTTING, new BasicInventory(arritemStack), this.world).isPresent() ? !this.insertItem(lv3, 0, 1, false) : (i >= 2 && i < 29 ? !this.insertItem(lv3, 29, 38, false) : i >= 29 && i < 38 && !this.insertItem(lv3, 2, 29, false))) {
+                if (this.world.getRecipeManager().getFirstMatch(RecipeType.STONECUTTING, new SimpleInventory(arritemStack), this.world).isPresent() ? !this.insertItem(lv3, 0, 1, false) : (i >= 2 && i < 29 ? !this.insertItem(lv3, 29, 38, false) : i >= 29 && i < 38 && !this.insertItem(lv3, 2, 29, false))) {
                     return ItemStack.EMPTY;
                 }
             }
