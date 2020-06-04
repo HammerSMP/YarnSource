@@ -669,8 +669,8 @@ extends AnimalEntity {
     extends RevengeGoal {
         private final PandaEntity panda;
 
-        public PandaRevengeGoal(PandaEntity arg, Class<?> ... args) {
-            super(arg, args);
+        public PandaRevengeGoal(PandaEntity arg, Class<?> ... classs) {
+            super(arg, classs);
             this.panda = arg;
         }
 
@@ -786,8 +786,8 @@ extends AnimalEntity {
     extends FleeEntityGoal<T> {
         private final PandaEntity panda;
 
-        public PandaFleeGoal(PandaEntity arg, Class<T> arg2, float f, double d, double e) {
-            super(arg, arg2, f, d, e, EntityPredicates.EXCEPT_SPECTATOR::test);
+        public PandaFleeGoal(PandaEntity arg, Class<T> class_, float f, double d, double e) {
+            super(arg, class_, f, d, e, EntityPredicates.EXCEPT_SPECTATOR::test);
             this.panda = arg;
         }
 
@@ -937,8 +937,8 @@ extends AnimalEntity {
     extends net.minecraft.entity.ai.goal.LookAtEntityGoal {
         private final PandaEntity panda;
 
-        public LookAtEntityGoal(PandaEntity arg, Class<? extends LivingEntity> arg2, float f) {
-            super(arg, arg2, f);
+        public LookAtEntityGoal(PandaEntity arg, Class<? extends LivingEntity> class_, float f) {
+            super(arg, class_, f);
             this.panda = arg;
         }
 

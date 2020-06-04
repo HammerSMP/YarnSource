@@ -13,10 +13,10 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.class_5349;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.function.CommandFunction;
+import net.minecraft.server.function.FunctionLoader;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
@@ -30,9 +30,9 @@ public class CommandFunctionManager {
     private final List<Entry> pending = Lists.newArrayList();
     private final List<CommandFunction> tickFunctions = Lists.newArrayList();
     private boolean needToRunLoadFunctions;
-    private class_5349 field_25333;
+    private FunctionLoader field_25333;
 
-    public CommandFunctionManager(MinecraftServer minecraftServer, class_5349 arg) {
+    public CommandFunctionManager(MinecraftServer minecraftServer, FunctionLoader arg) {
         this.server = minecraftServer;
         this.field_25333 = arg;
     }
@@ -49,7 +49,7 @@ public class CommandFunctionManager {
         this.method_29460(this.tickFunctions, TICK_FUNCTION);
         if (this.needToRunLoadFunctions) {
             this.needToRunLoadFunctions = false;
-            List<CommandFunction> collection = this.field_25333.method_29458().getOrCreate(LOAD_FUNCTION).values();
+            List<CommandFunction> collection = this.field_25333.getTags().getOrCreate(LOAD_FUNCTION).values();
             this.method_29460(collection, LOAD_FUNCTION);
         }
     }
@@ -107,10 +107,10 @@ public class CommandFunctionManager {
         }
     }
 
-    public void method_29461(class_5349 arg) {
+    public void method_29461(FunctionLoader arg) {
         this.field_25333 = arg;
         this.tickFunctions.clear();
-        this.tickFunctions.addAll(arg.method_29458().getOrCreate(TICK_FUNCTION).values());
+        this.tickFunctions.addAll(arg.getTags().getOrCreate(TICK_FUNCTION).values());
         this.needToRunLoadFunctions = true;
     }
 
@@ -119,19 +119,19 @@ public class CommandFunctionManager {
     }
 
     public Optional<CommandFunction> getFunction(Identifier arg) {
-        return this.field_25333.method_29456(arg);
+        return this.field_25333.get(arg);
     }
 
     public Tag<CommandFunction> method_29462(Identifier arg) {
-        return this.field_25333.method_29459(arg);
+        return this.field_25333.getOrCreateTag(arg);
     }
 
     public Iterable<Identifier> method_29463() {
-        return this.field_25333.method_29447().keySet();
+        return this.field_25333.getFunctions().keySet();
     }
 
     public Iterable<Identifier> method_29464() {
-        return this.field_25333.method_29458().getKeys();
+        return this.field_25333.getTags().getKeys();
     }
 
     public static class Entry {

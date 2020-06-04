@@ -18,7 +18,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class RandomBooleanFeatureConfig
 implements FeatureConfig {
-    public static final Codec<RandomBooleanFeatureConfig> field_24900 = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.field_24833.fieldOf("feature_true").forGetter(arg -> arg.featureTrue), (App)ConfiguredFeature.field_24833.fieldOf("feature_false").forGetter(arg -> arg.featureFalse)).apply((Applicative)instance, RandomBooleanFeatureConfig::new));
+    public static final Codec<RandomBooleanFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.CODEC.fieldOf("feature_true").forGetter(arg -> arg.featureTrue), (App)ConfiguredFeature.CODEC.fieldOf("feature_false").forGetter(arg -> arg.featureFalse)).apply((Applicative)instance, RandomBooleanFeatureConfig::new));
     public final ConfiguredFeature<?, ?> featureTrue;
     public final ConfiguredFeature<?, ?> featureFalse;
 

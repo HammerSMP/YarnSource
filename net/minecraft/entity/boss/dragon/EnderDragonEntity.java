@@ -109,7 +109,7 @@ implements Monster {
         this.partWingRight = new EnderDragonPart(this, "wing", 4.0f, 2.0f);
         this.partWingLeft = new EnderDragonPart(this, "wing", 4.0f, 2.0f);
         this.parts = new EnderDragonPart[]{this.partHead, this.partNeck, this.partBody, this.partTail1, this.partTail2, this.partTail3, this.partWingRight, this.partWingLeft};
-        this.setHealth(this.getMaximumHealth());
+        this.setHealth(this.getMaxHealth());
         this.noClip = true;
         this.ignoreCameraFrustum = true;
         this.fight = arg2 instanceof ServerWorld ? ((ServerWorld)arg2).method_29198() : null;
@@ -319,7 +319,7 @@ implements Monster {
         if (this.connectedCrystal != null) {
             if (this.connectedCrystal.removed) {
                 this.connectedCrystal = null;
-            } else if (this.age % 10 == 0 && this.getHealth() < this.getMaximumHealth()) {
+            } else if (this.age % 10 == 0 && this.getHealth() < this.getMaxHealth()) {
                 this.setHealth(this.getHealth() + 1.0f);
             }
         }
@@ -415,7 +415,7 @@ implements Monster {
             }
             if (this.phaseManager.getCurrent().isSittingOrHovering()) {
                 this.field_7029 = (int)((float)this.field_7029 + (g - this.getHealth()));
-                if ((float)this.field_7029 > 0.25f * this.getMaximumHealth()) {
+                if ((float)this.field_7029 > 0.25f * this.getMaxHealth()) {
                     this.field_7029 = 0;
                     this.phaseManager.setPhase(PhaseType.TAKEOFF);
                 }

@@ -24,7 +24,7 @@ public class Realms {
     public static void narrateNow(String string) {
         NarratorManager lv = NarratorManager.INSTANCE;
         lv.clear();
-        lv.onChatMessage(MessageType.SYSTEM, new LiteralText(Realms.fixNarrationNewlines(string)), Util.field_25140);
+        lv.onChatMessage(MessageType.SYSTEM, new LiteralText(Realms.fixNarrationNewlines(string)), Util.NIL_UUID);
     }
 
     private static String fixNarrationNewlines(String string) {

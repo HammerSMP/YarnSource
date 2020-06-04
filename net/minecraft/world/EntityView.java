@@ -30,8 +30,8 @@ public interface EntityView {
 
     public <T extends Entity> List<T> getEntities(Class<? extends T> var1, Box var2, @Nullable Predicate<? super T> var3);
 
-    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> arg, Box arg2, @Nullable Predicate<? super T> predicate) {
-        return this.getEntities(arg, arg2, predicate);
+    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
+        return this.getEntities(class_, arg, predicate);
     }
 
     public List<? extends PlayerEntity> getPlayers();
@@ -51,12 +51,12 @@ public interface EntityView {
         return true;
     }
 
-    default public <T extends Entity> List<T> getNonSpectatingEntities(Class<? extends T> arg, Box arg2) {
-        return this.getEntities(arg, arg2, EntityPredicates.EXCEPT_SPECTATOR);
+    default public <T extends Entity> List<T> getNonSpectatingEntities(Class<? extends T> class_, Box arg) {
+        return this.getEntities(class_, arg, EntityPredicates.EXCEPT_SPECTATOR);
     }
 
-    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> arg, Box arg2) {
-        return this.getEntitiesIncludingUngeneratedChunks(arg, arg2, EntityPredicates.EXCEPT_SPECTATOR);
+    default public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> class_, Box arg) {
+        return this.getEntitiesIncludingUngeneratedChunks(class_, arg, EntityPredicates.EXCEPT_SPECTATOR);
     }
 
     default public Stream<VoxelShape> getEntityCollisions(@Nullable Entity arg, Box arg22, Predicate<Entity> predicate) {
@@ -118,13 +118,13 @@ public interface EntityView {
     }
 
     @Nullable
-    default public <T extends LivingEntity> T getClosestEntity(Class<? extends T> arg, TargetPredicate arg2, @Nullable LivingEntity arg3, double d, double e, double f, Box arg4) {
-        return this.getClosestEntity(this.getEntities(arg, arg4, null), arg2, arg3, d, e, f);
+    default public <T extends LivingEntity> T getClosestEntity(Class<? extends T> class_, TargetPredicate arg, @Nullable LivingEntity arg2, double d, double e, double f, Box arg3) {
+        return this.getClosestEntity(this.getEntities(class_, arg3, null), arg, arg2, d, e, f);
     }
 
     @Nullable
-    default public <T extends LivingEntity> T getClosestEntityIncludingUngeneratedChunks(Class<? extends T> arg, TargetPredicate arg2, @Nullable LivingEntity arg3, double d, double e, double f, Box arg4) {
-        return this.getClosestEntity(this.getEntitiesIncludingUngeneratedChunks(arg, arg4, null), arg2, arg3, d, e, f);
+    default public <T extends LivingEntity> T getClosestEntityIncludingUngeneratedChunks(Class<? extends T> class_, TargetPredicate arg, @Nullable LivingEntity arg2, double d, double e, double f, Box arg3) {
+        return this.getClosestEntity(this.getEntitiesIncludingUngeneratedChunks(class_, arg3, null), arg, arg2, d, e, f);
     }
 
     @Nullable
@@ -150,11 +150,11 @@ public interface EntityView {
         return list;
     }
 
-    default public <T extends LivingEntity> List<T> getTargets(Class<? extends T> arg, TargetPredicate arg2, LivingEntity arg3, Box arg4) {
-        List<T> list = this.getEntities(arg, arg4, null);
+    default public <T extends LivingEntity> List<T> getTargets(Class<? extends T> class_, TargetPredicate arg, LivingEntity arg2, Box arg3) {
+        List<T> list = this.getEntities(class_, arg3, null);
         ArrayList list2 = Lists.newArrayList();
         for (LivingEntity lv : list) {
-            if (!arg2.test(arg3, lv)) continue;
+            if (!arg.test(arg2, lv)) continue;
             list2.add(lv);
         }
         return list2;

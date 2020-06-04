@@ -87,7 +87,7 @@ implements DebugRenderer.Renderer {
 
         private ChunkLoadingStatus(IntegratedServer arg2, double d, double e) {
             ClientWorld lv = ((ChunkLoadingDebugRenderer)ChunkLoadingDebugRenderer.this).client.world;
-            RegistryKey<World> lv2 = lv.method_27983();
+            RegistryKey<World> lv2 = lv.getRegistryKey();
             int i = (int)d >> 4;
             int j = (int)e >> 4;
             ImmutableMap.Builder builder = ImmutableMap.builder();

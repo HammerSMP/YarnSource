@@ -135,7 +135,7 @@ implements ResourcePackProvider {
                     return Util.completeExceptionally(new RuntimeException("Hash check failure for file " + file + ", see log"));
                 }
                 return this.loadServerPack(file);
-            })).whenComplete((arg, throwable) -> {
+            })).whenComplete((void_, throwable) -> {
                 if (throwable != null) {
                     LOGGER.warn("Pack application failed: {}, deleting file {}", (Object)throwable.getMessage(), (Object)file);
                     ClientBuiltinResourcePackProvider.delete(file);

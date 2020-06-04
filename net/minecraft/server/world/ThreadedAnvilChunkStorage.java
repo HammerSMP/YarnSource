@@ -159,9 +159,9 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     private int watchDistance;
 
     public ThreadedAnvilChunkStorage(ServerWorld arg, LevelStorage.Session arg2, DataFixer dataFixer, StructureManager arg3, Executor executor, ThreadExecutor<Runnable> arg4, ChunkProvider arg5, ChunkGenerator arg6, WorldGenerationProgressListener arg7, Supplier<PersistentStateManager> supplier, int i, boolean bl) {
-        super(new File(arg2.method_27424(arg.method_27983()), "region"), dataFixer, bl);
+        super(new File(arg2.method_27424(arg.getRegistryKey()), "region"), dataFixer, bl);
         this.structureManager = arg3;
-        this.saveDir = arg2.method_27424(arg.method_27983());
+        this.saveDir = arg2.method_27424(arg.getRegistryKey());
         this.world = arg;
         this.chunkGenerator = arg6;
         this.mainThreadExecutor = arg4;
@@ -420,7 +420,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
                 this.serverLightingProvider.tick();
                 this.worldGenerationProgressListener.setChunkStatus(arg2.getPos(), null);
             }
-        }, this.field_19343::add)).whenComplete((arg2, throwable) -> {
+        }, this.field_19343::add)).whenComplete((void_, throwable) -> {
             if (throwable != null) {
                 LOGGER.error("Failed to save chunk " + arg.getPos(), throwable);
             }
@@ -750,7 +750,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         if (lv == null) {
             return null;
         }
-        return this.updateChunkTag(this.world.method_27983(), this.persistentStateManagerFactory, lv);
+        return this.updateChunkTag(this.world.getRegistryKey(), this.persistentStateManagerFactory, lv);
     }
 
     boolean isTooFarFromPlayersToSpawnMobs(ChunkPos arg) {

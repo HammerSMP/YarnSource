@@ -11,15 +11,15 @@ package net.minecraft.loot.condition;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class RandomChanceLootCondition
-implements class_5341 {
+implements LootCondition {
     private final float chance;
 
     private RandomChanceLootCondition(float f) {
@@ -27,8 +27,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.RANDOM_CHANCE;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.RANDOM_CHANCE;
     }
 
     @Override
@@ -36,7 +36,7 @@ implements class_5341 {
         return arg.getRandom().nextFloat() < this.chance;
     }
 
-    public static class_5341.Builder builder(float f) {
+    public static LootCondition.Builder builder(float f) {
         return () -> new RandomChanceLootCondition(f);
     }
 
@@ -46,7 +46,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<RandomChanceLootCondition> {
+    implements JsonSerializable<RandomChanceLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, RandomChanceLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("chance", (Number)Float.valueOf(arg.chance));

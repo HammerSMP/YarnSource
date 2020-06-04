@@ -23,8 +23,8 @@ public abstract class Property<T extends Comparable<T>> {
     private Integer field_24744;
     private final Codec<T> field_24745 = Codec.STRING.comapFlatMap(string -> this.parse((String)string).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unable to read property: " + this + " with value: " + string))), this::name);
 
-    protected Property(String string2, Class<T> arg) {
-        this.field_24742 = arg;
+    protected Property(String string2, Class<T> class_) {
+        this.field_24742 = class_;
         this.field_24743 = string2;
     }
 

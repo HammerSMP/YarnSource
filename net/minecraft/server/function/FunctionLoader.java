@@ -11,7 +11,7 @@
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
-package net.minecraft;
+package net.minecraft.server.function;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -46,67 +46,67 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class class_5349
+public class FunctionLoader
 implements ResourceReloadListener {
-    private static final Logger field_25326 = LogManager.getLogger();
-    private static final int field_25327 = "functions/".length();
-    private static final int field_25328 = ".mcfunction".length();
-    private volatile Map<Identifier, CommandFunction> field_25329 = ImmutableMap.of();
-    private final TagContainer<CommandFunction> field_25330 = new TagContainer(this::method_29456, "tags/functions", "function");
-    private final int field_25331;
-    private final CommandDispatcher<ServerCommandSource> field_25332;
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final int PATH_PREFIX_LENGHT = "functions/".length();
+    private static final int PATH_SUFFIX_LENGHT = ".mcfunction".length();
+    private volatile Map<Identifier, CommandFunction> functions = ImmutableMap.of();
+    private final TagContainer<CommandFunction> tags = new TagContainer(this::get, "tags/functions", "function");
+    private final int level;
+    private final CommandDispatcher<ServerCommandSource> commandDispatcher;
 
-    public Optional<CommandFunction> method_29456(Identifier arg) {
-        return Optional.ofNullable(this.field_25329.get(arg));
+    public Optional<CommandFunction> get(Identifier arg) {
+        return Optional.ofNullable(this.functions.get(arg));
     }
 
-    public Map<Identifier, CommandFunction> method_29447() {
-        return this.field_25329;
+    public Map<Identifier, CommandFunction> getFunctions() {
+        return this.functions;
     }
 
-    public TagContainer<CommandFunction> method_29458() {
-        return this.field_25330;
+    public TagContainer<CommandFunction> getTags() {
+        return this.tags;
     }
 
-    public Tag<CommandFunction> method_29459(Identifier arg) {
-        return this.field_25330.getOrCreate(arg);
+    public Tag<CommandFunction> getOrCreateTag(Identifier arg) {
+        return this.tags.getOrCreate(arg);
     }
 
-    public class_5349(int i, CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        this.field_25331 = i;
-        this.field_25332 = commandDispatcher;
+    public FunctionLoader(int i, CommandDispatcher<ServerCommandSource> commandDispatcher) {
+        this.level = i;
+        this.commandDispatcher = commandDispatcher;
     }
 
     @Override
     public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.field_25330.prepareReload(arg2, executor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.tags.prepareReload(arg2, executor);
         CompletionStage completableFuture2 = CompletableFuture.supplyAsync(() -> arg2.findResources("functions", string -> string.endsWith(".mcfunction")), executor).thenCompose(collection -> {
             HashMap map = Maps.newHashMap();
-            ServerCommandSource lv = new ServerCommandSource(CommandOutput.DUMMY, Vec3d.ZERO, Vec2f.ZERO, null, this.field_25331, "", LiteralText.EMPTY, null, null);
+            ServerCommandSource lv = new ServerCommandSource(CommandOutput.DUMMY, Vec3d.ZERO, Vec2f.ZERO, null, this.level, "", LiteralText.EMPTY, null, null);
             for (Identifier lv2 : collection) {
                 String string = lv2.getPath();
-                Identifier lv3 = new Identifier(lv2.getNamespace(), string.substring(field_25327, string.length() - field_25328));
+                Identifier lv3 = new Identifier(lv2.getNamespace(), string.substring(PATH_PREFIX_LENGHT, string.length() - PATH_SUFFIX_LENGHT));
                 map.put(lv3, CompletableFuture.supplyAsync(() -> {
-                    List<String> list = class_5349.method_29450(arg2, lv2);
-                    return CommandFunction.create(lv3, this.field_25332, lv, list);
+                    List<String> list = FunctionLoader.readLines(arg2, lv2);
+                    return CommandFunction.create(lv3, this.commandDispatcher, lv, list);
                 }, executor));
             }
             CompletableFuture[] completableFutures = map.values().toArray(new CompletableFuture[0]);
-            return CompletableFuture.allOf(completableFutures).handle((arg, throwable) -> map);
+            return CompletableFuture.allOf(completableFutures).handle((void_, throwable) -> map);
         });
         return ((CompletableFuture)((CompletableFuture)completableFuture.thenCombine(completableFuture2, Pair::of)).thenCompose(arg::whenPrepared)).thenAcceptAsync(pair -> {
             Map map = (Map)pair.getSecond();
             ImmutableMap.Builder builder = ImmutableMap.builder();
             map.forEach((arg, completableFuture) -> ((CompletableFuture)completableFuture.handle((arg2, throwable) -> {
                 if (throwable != null) {
-                    field_25326.error("Failed to load function {}", arg, throwable);
+                    LOGGER.error("Failed to load function {}", arg, throwable);
                 } else {
                     builder.put(arg, arg2);
                 }
                 return null;
             })).join());
-            this.field_25329 = builder.build();
-            this.field_25330.applyReload((Map)pair.getFirst());
+            this.functions = builder.build();
+            this.tags.applyReload((Map)pair.getFirst());
         }, executor2);
     }
 
@@ -115,7 +115,7 @@ implements ResourceReloadListener {
      * Enabled unnecessary exception pruning
      * Enabled aggressive exception aggregation
      */
-    private static List<String> method_29450(ResourceManager arg, Identifier arg2) {
+    private static List<String> readLines(ResourceManager arg, Identifier arg2) {
         try (Resource lv = arg.getResource(arg2);){
             List list = IOUtils.readLines((InputStream)lv.getInputStream(), (Charset)StandardCharsets.UTF_8);
             return list;

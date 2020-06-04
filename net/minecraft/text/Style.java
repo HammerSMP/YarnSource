@@ -61,17 +61,17 @@ public class Style {
     @Nullable
     private final Identifier font;
 
-    private Style(@Nullable TextColor arg, @Nullable Boolean arg2, @Nullable Boolean arg3, @Nullable Boolean arg4, @Nullable Boolean arg5, @Nullable Boolean arg6, @Nullable ClickEvent arg7, @Nullable HoverEvent arg8, @Nullable String string, @Nullable Identifier arg9) {
+    private Style(@Nullable TextColor arg, @Nullable Boolean boolean_, @Nullable Boolean boolean2, @Nullable Boolean boolean3, @Nullable Boolean boolean4, @Nullable Boolean boolean5, @Nullable ClickEvent arg2, @Nullable HoverEvent arg3, @Nullable String string, @Nullable Identifier arg4) {
         this.color = arg;
-        this.bold = arg2;
-        this.italic = arg3;
-        this.underlined = arg4;
-        this.strikethrough = arg5;
-        this.obfuscated = arg6;
-        this.clickEvent = arg7;
-        this.hoverEvent = arg8;
+        this.bold = boolean_;
+        this.italic = boolean2;
+        this.underlined = boolean3;
+        this.strikethrough = boolean4;
+        this.obfuscated = boolean5;
+        this.clickEvent = arg2;
+        this.hoverEvent = arg3;
         this.insertion = string;
-        this.font = arg9;
+        this.font = arg4;
     }
 
     @Nullable
@@ -130,12 +130,12 @@ public class Style {
         return this.withColor(arg != null ? TextColor.fromFormatting(arg) : null);
     }
 
-    public Style withBold(@Nullable Boolean arg) {
-        return new Style(this.color, arg, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+    public Style withBold(@Nullable Boolean boolean_) {
+        return new Style(this.color, boolean_, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style withItalic(@Nullable Boolean arg) {
-        return new Style(this.color, this.bold, arg, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+    public Style withItalic(@Nullable Boolean boolean_) {
+        return new Style(this.color, this.bold, boolean_, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
     public Style withClickEvent(@Nullable ClickEvent arg) {
@@ -157,30 +157,30 @@ public class Style {
 
     public Style withFormatting(Formatting arg) {
         TextColor lv = this.color;
-        Boolean lv2 = this.bold;
-        Boolean lv3 = this.italic;
-        Boolean lv4 = this.strikethrough;
-        Boolean lv5 = this.underlined;
-        Boolean lv6 = this.obfuscated;
+        Boolean boolean_ = this.bold;
+        Boolean boolean2 = this.italic;
+        Boolean boolean3 = this.strikethrough;
+        Boolean boolean4 = this.underlined;
+        Boolean boolean5 = this.obfuscated;
         switch (arg) {
             case OBFUSCATED: {
-                lv6 = true;
+                boolean5 = true;
                 break;
             }
             case BOLD: {
-                lv2 = true;
+                boolean_ = true;
                 break;
             }
             case STRIKETHROUGH: {
-                lv4 = true;
+                boolean3 = true;
                 break;
             }
             case UNDERLINE: {
-                lv5 = true;
+                boolean4 = true;
                 break;
             }
             case ITALIC: {
-                lv3 = true;
+                boolean2 = true;
                 break;
             }
             case RESET: {
@@ -190,91 +190,91 @@ public class Style {
                 lv = TextColor.fromFormatting(arg);
             }
         }
-        return new Style(lv, lv2, lv3, lv5, lv4, lv6, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+        return new Style(lv, boolean_, boolean2, boolean4, boolean3, boolean5, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
     @Environment(value=EnvType.CLIENT)
     public Style withExclusiveFormatting(Formatting arg) {
         TextColor lv = this.color;
-        Boolean lv2 = this.bold;
-        Boolean lv3 = this.italic;
-        Boolean lv4 = this.strikethrough;
-        Boolean lv5 = this.underlined;
-        Boolean lv6 = this.obfuscated;
+        Boolean boolean_ = this.bold;
+        Boolean boolean2 = this.italic;
+        Boolean boolean3 = this.strikethrough;
+        Boolean boolean4 = this.underlined;
+        Boolean boolean5 = this.obfuscated;
         switch (arg) {
             case OBFUSCATED: {
-                lv6 = true;
+                boolean5 = true;
                 break;
             }
             case BOLD: {
-                lv2 = true;
+                boolean_ = true;
                 break;
             }
             case STRIKETHROUGH: {
-                lv4 = true;
+                boolean3 = true;
                 break;
             }
             case UNDERLINE: {
-                lv5 = true;
+                boolean4 = true;
                 break;
             }
             case ITALIC: {
-                lv3 = true;
+                boolean2 = true;
                 break;
             }
             case RESET: {
                 return EMPTY;
             }
             default: {
-                lv6 = false;
-                lv2 = false;
-                lv4 = false;
-                lv5 = false;
-                lv3 = false;
+                boolean5 = false;
+                boolean_ = false;
+                boolean3 = false;
+                boolean4 = false;
+                boolean2 = false;
                 lv = TextColor.fromFormatting(arg);
             }
         }
-        return new Style(lv, lv2, lv3, lv5, lv4, lv6, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+        return new Style(lv, boolean_, boolean2, boolean4, boolean3, boolean5, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
     public Style withFormatting(Formatting ... args) {
         TextColor lv = this.color;
-        Boolean lv2 = this.bold;
-        Boolean lv3 = this.italic;
-        Boolean lv4 = this.strikethrough;
-        Boolean lv5 = this.underlined;
-        Boolean lv6 = this.obfuscated;
-        block8: for (Formatting lv7 : args) {
-            switch (lv7) {
+        Boolean boolean_ = this.bold;
+        Boolean boolean2 = this.italic;
+        Boolean boolean3 = this.strikethrough;
+        Boolean boolean4 = this.underlined;
+        Boolean boolean5 = this.obfuscated;
+        block8: for (Formatting lv2 : args) {
+            switch (lv2) {
                 case OBFUSCATED: {
-                    lv6 = true;
+                    boolean5 = true;
                     continue block8;
                 }
                 case BOLD: {
-                    lv2 = true;
+                    boolean_ = true;
                     continue block8;
                 }
                 case STRIKETHROUGH: {
-                    lv4 = true;
+                    boolean3 = true;
                     continue block8;
                 }
                 case UNDERLINE: {
-                    lv5 = true;
+                    boolean4 = true;
                     continue block8;
                 }
                 case ITALIC: {
-                    lv3 = true;
+                    boolean2 = true;
                     continue block8;
                 }
                 case RESET: {
                     return EMPTY;
                 }
                 default: {
-                    lv = TextColor.fromFormatting(lv7);
+                    lv = TextColor.fromFormatting(lv2);
                 }
             }
         }
-        return new Style(lv, lv2, lv3, lv5, lv4, lv6, this.clickEvent, this.hoverEvent, this.insertion, this.font);
+        return new Style(lv, boolean_, boolean2, boolean4, boolean3, boolean5, this.clickEvent, this.hoverEvent, this.insertion, this.font);
     }
 
     public Style withParent(Style arg) {
@@ -316,17 +316,17 @@ public class Style {
                 if (jsonObject == null) {
                     return null;
                 }
-                Boolean lv = Serializer.parseNullableBoolean(jsonObject, "bold");
-                Boolean lv2 = Serializer.parseNullableBoolean(jsonObject, "italic");
-                Boolean lv3 = Serializer.parseNullableBoolean(jsonObject, "underlined");
-                Boolean lv4 = Serializer.parseNullableBoolean(jsonObject, "strikethrough");
-                Boolean lv5 = Serializer.parseNullableBoolean(jsonObject, "obfuscated");
-                TextColor lv6 = Serializer.parseColor(jsonObject);
+                Boolean boolean_ = Serializer.parseNullableBoolean(jsonObject, "bold");
+                Boolean boolean2 = Serializer.parseNullableBoolean(jsonObject, "italic");
+                Boolean boolean3 = Serializer.parseNullableBoolean(jsonObject, "underlined");
+                Boolean boolean4 = Serializer.parseNullableBoolean(jsonObject, "strikethrough");
+                Boolean boolean5 = Serializer.parseNullableBoolean(jsonObject, "obfuscated");
+                TextColor lv = Serializer.parseColor(jsonObject);
                 String string = Serializer.parseInsertion(jsonObject);
-                ClickEvent lv7 = Serializer.getClickEvent(jsonObject);
-                HoverEvent lv8 = Serializer.getHoverEvent(jsonObject);
-                Identifier lv9 = Serializer.getFont(jsonObject);
-                return new Style(lv6, lv, lv2, lv3, lv4, lv5, lv7, lv8, string, lv9);
+                ClickEvent lv2 = Serializer.getClickEvent(jsonObject);
+                HoverEvent lv3 = Serializer.getHoverEvent(jsonObject);
+                Identifier lv4 = Serializer.getFont(jsonObject);
+                return new Style(lv, boolean_, boolean2, boolean3, boolean4, boolean5, lv2, lv3, string, lv4);
             }
             return null;
         }

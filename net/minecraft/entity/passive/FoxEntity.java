@@ -651,8 +651,8 @@ extends AnimalEntity {
 
     class LookAtEntityGoal
     extends net.minecraft.entity.ai.goal.LookAtEntityGoal {
-        public LookAtEntityGoal(MobEntity arg2, Class<? extends LivingEntity> arg3, float f) {
-            super(arg2, arg3, f);
+        public LookAtEntityGoal(MobEntity arg2, Class<? extends LivingEntity> class_, float f) {
+            super(arg2, class_, f);
         }
 
         @Override
@@ -1157,8 +1157,8 @@ extends AnimalEntity {
         private LivingEntity friend;
         private int lastAttackedTime;
 
-        public DefendFriendGoal(Class<LivingEntity> arg2, boolean bl, boolean bl2, @Nullable Predicate<LivingEntity> predicate) {
-            super(FoxEntity.this, arg2, 10, bl, bl2, predicate);
+        public DefendFriendGoal(Class<LivingEntity> class_, boolean bl, boolean bl2, @Nullable Predicate<LivingEntity> predicate) {
+            super(FoxEntity.this, class_, 10, bl, bl2, predicate);
         }
 
         @Override

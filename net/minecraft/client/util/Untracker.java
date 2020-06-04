@@ -25,13 +25,13 @@ public class Untracker {
     private static final MethodHandle ALLOCATOR_UNTRACK = GLX.make(() -> {
         try {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-            Class<?> lv = Class.forName("org.lwjgl.system.MemoryManage$DebugAllocator");
-            Method method = lv.getDeclaredMethod("untrack", Long.TYPE);
+            Class<?> class_ = Class.forName("org.lwjgl.system.MemoryManage$DebugAllocator");
+            Method method = class_.getDeclaredMethod("untrack", Long.TYPE);
             method.setAccessible(true);
             Field field = Class.forName("org.lwjgl.system.MemoryUtil$LazyInit").getDeclaredField("ALLOCATOR");
             field.setAccessible(true);
             Object object = field.get(null);
-            if (lv.isInstance(object)) {
+            if (class_.isInstance(object)) {
                 return lookup.unreflect(method);
             }
             return null;

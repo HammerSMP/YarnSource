@@ -114,19 +114,19 @@ extends Screen {
         public RuleListWidget(final GameRules arg2) {
             super(EditGameRulesScreen.this.client, EditGameRulesScreen.this.width, EditGameRulesScreen.this.height, 43, EditGameRulesScreen.this.height - 32, 24);
             final HashMap map = Maps.newHashMap();
-            GameRules.forEachType(new GameRules.RuleTypeConsumer(){
+            GameRules.forEachType(new GameRules.TypeConsumer(){
 
                 @Override
-                public void acceptBoolean(GameRules.RuleKey<GameRules.BooleanRule> arg3, GameRules.RuleType<GameRules.BooleanRule> arg22) {
+                public void acceptBoolean(GameRules.Key<GameRules.BooleanRule> arg3, GameRules.Type<GameRules.BooleanRule> arg22) {
                     this.createRuleWidget(arg3, (arg, list, string, arg2) -> new BooleanRuleWidget(arg, list, string, (GameRules.BooleanRule)arg2));
                 }
 
                 @Override
-                public void acceptInt(GameRules.RuleKey<GameRules.IntRule> arg3, GameRules.RuleType<GameRules.IntRule> arg22) {
+                public void acceptInt(GameRules.Key<GameRules.IntRule> arg3, GameRules.Type<GameRules.IntRule> arg22) {
                     this.createRuleWidget(arg3, (arg, list, string, arg2) -> new IntRuleWidget(arg, list, string, (GameRules.IntRule)arg2));
                 }
 
-                private <T extends GameRules.Rule<T>> void createRuleWidget(GameRules.RuleKey<T> arg23, RuleWidgetFactory<T> arg22) {
+                private <T extends GameRules.Rule<T>> void createRuleWidget(GameRules.Key<T> arg23, RuleWidgetFactory<T> arg22) {
                     String string4;
                     ImmutableList list2;
                     TranslatableText lv = new TranslatableText(arg23.getTranslationKey());
@@ -149,8 +149,8 @@ extends Screen {
                 }
             });
             map.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry2 -> {
-                this.addEntry(new RuleCategoryWidget(new TranslatableText(((GameRules.RuleCategory)((Object)((Object)entry2.getKey()))).getCategory()).formatted(Formatting.BOLD, Formatting.YELLOW)));
-                ((Map)entry2.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.comparing(GameRules.RuleKey::getName))).forEach(entry -> this.addEntry((EntryListWidget.Entry)entry.getValue()));
+                this.addEntry(new RuleCategoryWidget(new TranslatableText(((GameRules.Category)((Object)((Object)entry2.getKey()))).getCategory()).formatted(Formatting.BOLD, Formatting.YELLOW)));
+                ((Map)entry2.getValue()).entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.comparing(GameRules.Key::getName))).forEach(entry -> this.addEntry((EntryListWidget.Entry)entry.getValue()));
             });
         }
 

@@ -37,8 +37,8 @@ extends Property<Boolean> {
     }
 
     @Override
-    public String name(Boolean arg) {
-        return arg.toString();
+    public String name(Boolean boolean_) {
+        return boolean_.toString();
     }
 
     @Override

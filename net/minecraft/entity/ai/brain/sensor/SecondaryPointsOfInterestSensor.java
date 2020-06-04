@@ -29,7 +29,7 @@ extends Sensor<VillagerEntity> {
 
     @Override
     protected void sense(ServerWorld arg, VillagerEntity arg2) {
-        RegistryKey<World> lv = arg.method_27983();
+        RegistryKey<World> lv = arg.getRegistryKey();
         BlockPos lv2 = arg2.getBlockPos();
         ArrayList list = Lists.newArrayList();
         int i = 4;

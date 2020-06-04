@@ -86,7 +86,7 @@ extends Task<MobEntityWithAi> {
             BlockPos lv3 = lv2.getTarget();
             lv.getType(lv3).ifPresent(arg5 -> {
                 lv.getPosition(this.poiType.getCompletionCondition(), arg2 -> arg2.equals(lv3), lv3, 1);
-                arg22.getBrain().remember(this.targetMemoryModuleType, GlobalPos.create(arg2.method_27983(), lv3));
+                arg22.getBrain().remember(this.targetMemoryModuleType, GlobalPos.create(arg2.getRegistryKey(), lv3));
                 DebugInfoSender.sendPointOfInterest(arg2, lv3);
             });
         } else if (this.tries < 5) {

@@ -81,20 +81,20 @@ public class Framebuffer {
         }
     }
 
-    public void method_29329(Framebuffer arg) {
+    public void copyDepthFrom(Framebuffer arg) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
-        if (GlStateManager.method_29330()) {
+        if (GlStateManager.supportsGl30()) {
             GlStateManager.bindFramebuffer(36008, arg.fbo);
             GlStateManager.bindFramebuffer(36009, this.fbo);
-            GlStateManager.method_29332(0, 0, arg.textureWidth, arg.textureHeight, 0, 0, this.textureWidth, this.textureHeight, 256, 9728);
+            GlStateManager.blitFramebuffer(0, 0, arg.textureWidth, arg.textureHeight, 0, 0, this.textureWidth, this.textureHeight, 256, 9728);
         } else {
             GlStateManager.bindFramebuffer(FramebufferInfo.FRAME_BUFFER, this.fbo);
-            int i = GlStateManager.method_29333();
+            int i = GlStateManager.getFramebufferDepthAttachment();
             if (i != 0) {
-                int j = GlStateManager.method_29334();
+                int j = GlStateManager.getActiveBoundTexture();
                 GlStateManager.bindTexture(i);
                 GlStateManager.bindFramebuffer(FramebufferInfo.FRAME_BUFFER, arg.fbo);
-                GlStateManager.method_29331(3553, 0, 0, 0, 0, 0, Math.min(this.textureWidth, arg.textureWidth), Math.min(this.textureHeight, arg.textureHeight));
+                GlStateManager.copyTexSubImage2d(3553, 0, 0, 0, 0, 0, Math.min(this.textureWidth, arg.textureWidth), Math.min(this.textureHeight, arg.textureHeight));
                 GlStateManager.bindTexture(j);
             }
         }

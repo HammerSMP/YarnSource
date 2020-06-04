@@ -11,27 +11,27 @@ package net.minecraft.loot.function;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTableRange;
 import net.minecraft.loot.LootTableRanges;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 
 public class SetCountLootFunction
 extends ConditionalLootFunction {
     private final LootTableRange countRange;
 
-    private SetCountLootFunction(class_5341[] args, LootTableRange arg) {
+    private SetCountLootFunction(LootCondition[] args, LootTableRange arg) {
         super(args);
         this.countRange = arg;
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.SET_COUNT;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.SET_COUNT;
     }
 
     @Override
@@ -41,7 +41,7 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> builder(LootTableRange arg) {
-        return SetCountLootFunction.builder((class_5341[] args) -> new SetCountLootFunction((class_5341[])args, arg));
+        return SetCountLootFunction.builder((LootCondition[] args) -> new SetCountLootFunction((LootCondition[])args, arg));
     }
 
     public static class Factory
@@ -53,13 +53,13 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetCountLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public SetCountLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             LootTableRange lv = LootTableRanges.fromJson(jsonObject.get("count"), jsonDeserializationContext);
             return new SetCountLootFunction(args, lv);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

@@ -170,7 +170,7 @@ extends Entity {
     public float lastLimbDistance;
     public float limbDistance;
     public float limbAngle;
-    public final int defaultMaximumHealth = 20;
+    public final int defaultMaxHealth = 20;
     public final float randomLargeSeed;
     public final float randomSmallSeed;
     public float bodyYaw;
@@ -225,7 +225,7 @@ extends Entity {
     protected LivingEntity(EntityType<? extends LivingEntity> arg, World arg2) {
         super(arg, arg2);
         this.attributes = new AttributeContainer(DefaultAttributeRegistry.get(arg));
-        this.setHealth(this.getMaximumHealth());
+        this.setHealth(this.getMaxHealth());
         this.inanimate = true;
         this.randomSmallSeed = (float)((Math.random() + 1.0) * (double)0.01f);
         this.refreshPosition();
@@ -831,7 +831,7 @@ extends Entity {
     }
 
     public void setHealth(float f) {
-        this.dataTracker.set(HEALTH, Float.valueOf(MathHelper.clamp(f, 0.0f, this.getMaximumHealth())));
+        this.dataTracker.set(HEALTH, Float.valueOf(MathHelper.clamp(f, 0.0f, this.getMaxHealth())));
     }
 
     @Override
@@ -1343,7 +1343,7 @@ extends Entity {
         return null;
     }
 
-    public final float getMaximumHealth() {
+    public final float getMaxHealth() {
         return (float)this.getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH);
     }
 

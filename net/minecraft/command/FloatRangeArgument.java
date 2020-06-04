@@ -27,9 +27,9 @@ public class FloatRangeArgument {
     private final Float min;
     private final Float max;
 
-    public FloatRangeArgument(@Nullable Float arg, @Nullable Float arg2) {
-        this.min = arg;
-        this.max = arg2;
+    public FloatRangeArgument(@Nullable Float float_, @Nullable Float float2) {
+        this.min = float_;
+        this.max = float2;
     }
 
     @Nullable
@@ -43,17 +43,17 @@ public class FloatRangeArgument {
     }
 
     public static FloatRangeArgument parse(StringReader stringReader, boolean bl, Function<Float, Float> function) throws CommandSyntaxException {
-        Float lv3;
+        Float float3;
         if (!stringReader.canRead()) {
             throw NumberRange.EXCEPTION_EMPTY.createWithContext((ImmutableStringReader)stringReader);
         }
         int i = stringReader.getCursor();
-        Float lv = FloatRangeArgument.mapFloat(FloatRangeArgument.parseFloat(stringReader, bl), function);
+        Float float_ = FloatRangeArgument.mapFloat(FloatRangeArgument.parseFloat(stringReader, bl), function);
         if (stringReader.canRead(2) && stringReader.peek() == '.' && stringReader.peek(1) == '.') {
             stringReader.skip();
             stringReader.skip();
-            Float lv2 = FloatRangeArgument.mapFloat(FloatRangeArgument.parseFloat(stringReader, bl), function);
-            if (lv == null && lv2 == null) {
+            Float float2 = FloatRangeArgument.mapFloat(FloatRangeArgument.parseFloat(stringReader, bl), function);
+            if (float_ == null && float2 == null) {
                 stringReader.setCursor(i);
                 throw NumberRange.EXCEPTION_EMPTY.createWithContext((ImmutableStringReader)stringReader);
             }
@@ -62,13 +62,13 @@ public class FloatRangeArgument {
                 stringReader.setCursor(i);
                 throw ONLY_INTS_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
             }
-            lv3 = lv;
+            float3 = float_;
         }
-        if (lv == null && lv3 == null) {
+        if (float_ == null && float3 == null) {
             stringReader.setCursor(i);
             throw NumberRange.EXCEPTION_EMPTY.createWithContext((ImmutableStringReader)stringReader);
         }
-        return new FloatRangeArgument(lv, lv3);
+        return new FloatRangeArgument(float_, float3);
     }
 
     @Nullable
@@ -104,8 +104,8 @@ public class FloatRangeArgument {
     }
 
     @Nullable
-    private static Float mapFloat(@Nullable Float arg, Function<Float, Float> function) {
-        return arg == null ? null : function.apply(arg);
+    private static Float mapFloat(@Nullable Float float_, Function<Float, Float> function) {
+        return float_ == null ? null : function.apply(float_);
     }
 }
 

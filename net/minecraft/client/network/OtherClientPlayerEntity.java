@@ -90,7 +90,7 @@ extends AbstractClientPlayerEntity {
     @Override
     public void sendSystemMessage(Text arg, UUID uUID) {
         MinecraftClient lv = MinecraftClient.getInstance();
-        if (!lv.method_29042(uUID)) {
+        if (!lv.shouldBlockMessages(uUID)) {
             lv.inGameHud.getChatHud().addMessage(arg);
         }
     }

@@ -22,20 +22,20 @@ import com.google.gson.JsonSerializationContext;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.entity.Entity;
 import net.minecraft.loot.UniformLootTableRange;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class EntityScoresLootCondition
-implements class_5341 {
+implements LootCondition {
     private final Map<String, UniformLootTableRange> scores;
     private final LootContext.EntityTarget target;
 
@@ -45,8 +45,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.ENTITY_SCORES;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.ENTITY_SCORES;
     }
 
     @Override
@@ -86,7 +86,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<EntityScoresLootCondition> {
+    implements JsonSerializable<EntityScoresLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, EntityScoresLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             JsonObject jsonObject2 = new JsonObject();

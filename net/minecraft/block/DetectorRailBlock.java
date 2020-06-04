@@ -96,7 +96,7 @@ extends AbstractRailBlock {
             this.updateNearbyRails(arg, arg2, lv, true);
             arg.updateNeighborsAlways(arg2, this);
             arg.updateNeighborsAlways(arg2.down(), this);
-            arg.checkBlockRerender(arg2, arg3, lv);
+            arg.scheduleBlockRerenderIfNeeded(arg2, arg3, lv);
         }
         if (!bl2 && bl) {
             BlockState lv2 = (BlockState)arg3.with(POWERED, false);
@@ -104,7 +104,7 @@ extends AbstractRailBlock {
             this.updateNearbyRails(arg, arg2, lv2, false);
             arg.updateNeighborsAlways(arg2, this);
             arg.updateNeighborsAlways(arg2.down(), this);
-            arg.checkBlockRerender(arg2, arg3, lv2);
+            arg.scheduleBlockRerenderIfNeeded(arg2, arg3, lv2);
         }
         if (bl2) {
             arg.getBlockTickScheduler().schedule(arg2, this, 20);
@@ -154,8 +154,8 @@ extends AbstractRailBlock {
         return 0;
     }
 
-    protected <T extends AbstractMinecartEntity> List<T> getCarts(World arg, BlockPos arg2, Class<T> arg3, @Nullable Predicate<Entity> predicate) {
-        return arg.getEntities(arg3, this.getCartDetectionBox(arg2), predicate);
+    protected <T extends AbstractMinecartEntity> List<T> getCarts(World arg, BlockPos arg2, Class<T> class_, @Nullable Predicate<Entity> predicate) {
+        return arg.getEntities(class_, this.getCartDetectionBox(arg2), predicate);
     }
 
     private Box getCartDetectionBox(BlockPos arg) {

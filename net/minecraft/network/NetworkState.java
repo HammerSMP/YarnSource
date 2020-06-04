@@ -229,11 +229,11 @@ public enum NetworkState {
                 throw new Error("Invalid protocol ID " + Integer.toString(i));
             }
             NetworkState.STATES[i - -1] = lv;
-            lv.packetHandlers.forEach((arg22, arg3) -> arg3.getPacketTypes().forEach(arg2 -> {
-                if (HANDLER_STATE_MAP.containsKey(arg2) && HANDLER_STATE_MAP.get(arg2) != lv) {
-                    throw new IllegalStateException("Packet " + arg2 + " is already assigned to protocol " + (Object)((Object)HANDLER_STATE_MAP.get(arg2)) + " - can't reassign to " + (Object)((Object)lv));
+            lv.packetHandlers.forEach((arg2, arg3) -> arg3.getPacketTypes().forEach(class_ -> {
+                if (HANDLER_STATE_MAP.containsKey(class_) && HANDLER_STATE_MAP.get(class_) != lv) {
+                    throw new IllegalStateException("Packet " + class_ + " is already assigned to protocol " + (Object)((Object)HANDLER_STATE_MAP.get(class_)) + " - can't reassign to " + (Object)((Object)lv));
                 }
-                HANDLER_STATE_MAP.put((Class<Packet<?>>)arg2, lv);
+                HANDLER_STATE_MAP.put((Class<Packet<?>>)class_, lv);
             }));
         }
     }
@@ -257,11 +257,11 @@ public enum NetworkState {
         private PacketHandler() {
         }
 
-        public <P extends Packet<T>> PacketHandler<T> register(Class<P> arg, Supplier<P> supplier) {
+        public <P extends Packet<T>> PacketHandler<T> register(Class<P> class_, Supplier<P> supplier) {
             int i = this.packetFactories.size();
-            int j = this.packetIds.put(arg, i);
+            int j = this.packetIds.put(class_, i);
             if (j != -1) {
-                String string = "Packet " + arg + " is already registered to ID " + j;
+                String string = "Packet " + class_ + " is already registered to ID " + j;
                 LogManager.getLogger().fatal(string);
                 throw new IllegalArgumentException(string);
             }
@@ -270,8 +270,8 @@ public enum NetworkState {
         }
 
         @Nullable
-        public Integer getId(Class<?> arg) {
-            int i = this.packetIds.getInt(arg);
+        public Integer getId(Class<?> class_) {
+            int i = this.packetIds.getInt(class_);
             return i == -1 ? null : Integer.valueOf(i);
         }
 

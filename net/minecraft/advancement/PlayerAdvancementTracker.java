@@ -219,7 +219,7 @@ public class PlayerAdvancementTracker {
             if (!bl2 && lv.isDone()) {
                 arg.getRewards().apply(this.owner);
                 if (arg.getDisplay() != null && arg.getDisplay().shouldAnnounceToChat() && this.owner.world.getGameRules().getBoolean(GameRules.ANNOUNCE_ADVANCEMENTS)) {
-                    this.field_25325.broadcastChatMessage(new TranslatableText("chat.type.advancement." + arg.getDisplay().getFrame().getId(), this.owner.getDisplayName(), arg.toHoverableText()), MessageType.SYSTEM, Util.field_25140);
+                    this.field_25325.broadcastChatMessage(new TranslatableText("chat.type.advancement." + arg.getDisplay().getFrame().getId(), this.owner.getDisplayName(), arg.toHoverableText()), MessageType.SYSTEM, Util.NIL_UUID);
                 }
             }
         }

@@ -12,7 +12,7 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 
 public class BlockPileFeatureConfig
 implements FeatureConfig {
-    public static final Codec<BlockPileFeatureConfig> field_24873 = BlockStateProvider.field_24937.fieldOf("state_provider").xmap(BlockPileFeatureConfig::new, arg -> arg.stateProvider).codec();
+    public static final Codec<BlockPileFeatureConfig> CODEC = BlockStateProvider.CODEC.fieldOf("state_provider").xmap(BlockPileFeatureConfig::new, arg -> arg.stateProvider).codec();
     public final BlockStateProvider stateProvider;
 
     public BlockPileFeatureConfig(BlockStateProvider arg) {

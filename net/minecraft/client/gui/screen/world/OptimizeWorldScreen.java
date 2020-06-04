@@ -35,9 +35,9 @@ import net.minecraft.world.updater.WorldUpdater;
 public class OptimizeWorldScreen
 extends Screen {
     private static final Object2IntMap<RegistryKey<World>> DIMENSION_COLORS = (Object2IntMap)Util.make(new Object2IntOpenCustomHashMap(Util.identityHashStrategy()), object2IntOpenCustomHashMap -> {
-        object2IntOpenCustomHashMap.put(World.field_25179, -13408734);
-        object2IntOpenCustomHashMap.put(World.field_25180, -10075085);
-        object2IntOpenCustomHashMap.put(World.field_25181, -8943531);
+        object2IntOpenCustomHashMap.put(World.OVERWORLD, -13408734);
+        object2IntOpenCustomHashMap.put(World.NETHER, -10075085);
+        object2IntOpenCustomHashMap.put(World.END, -8943531);
         object2IntOpenCustomHashMap.defaultReturnValue(-2236963);
     });
     private final BooleanConsumer callback;

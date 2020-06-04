@@ -81,30 +81,30 @@ public class StrongholdGenerator {
         return bl;
     }
 
-    private static Piece method_14847(Class<? extends Piece> arg, List<StructurePiece> list, Random random, int i, int j, int k, @Nullable Direction arg2, int l) {
+    private static Piece method_14847(Class<? extends Piece> class_, List<StructurePiece> list, Random random, int i, int j, int k, @Nullable Direction arg, int l) {
         Piece lv = null;
-        if (arg == Corridor.class) {
-            lv = Corridor.method_14867(list, random, i, j, k, arg2, l);
-        } else if (arg == PrisonHall.class) {
-            lv = PrisonHall.method_14864(list, random, i, j, k, arg2, l);
-        } else if (arg == LeftTurn.class) {
-            lv = LeftTurn.method_14859(list, random, i, j, k, arg2, l);
-        } else if (arg == RightTurn.class) {
-            lv = RightTurn.method_16652(list, random, i, j, k, arg2, l);
-        } else if (arg == SquareRoom.class) {
-            lv = SquareRoom.method_14865(list, random, i, j, k, arg2, l);
-        } else if (arg == Stairs.class) {
-            lv = Stairs.method_14868(list, random, i, j, k, arg2, l);
-        } else if (arg == SpiralStaircase.class) {
-            lv = SpiralStaircase.method_14866(list, random, i, j, k, arg2, l);
-        } else if (arg == FiveWayCrossing.class) {
-            lv = FiveWayCrossing.method_14858(list, random, i, j, k, arg2, l);
-        } else if (arg == ChestCorridor.class) {
-            lv = ChestCorridor.method_14856(list, random, i, j, k, arg2, l);
-        } else if (arg == Library.class) {
-            lv = Library.method_14860(list, random, i, j, k, arg2, l);
-        } else if (arg == PortalRoom.class) {
-            lv = PortalRoom.method_14863(list, i, j, k, arg2, l);
+        if (class_ == Corridor.class) {
+            lv = Corridor.method_14867(list, random, i, j, k, arg, l);
+        } else if (class_ == PrisonHall.class) {
+            lv = PrisonHall.method_14864(list, random, i, j, k, arg, l);
+        } else if (class_ == LeftTurn.class) {
+            lv = LeftTurn.method_14859(list, random, i, j, k, arg, l);
+        } else if (class_ == RightTurn.class) {
+            lv = RightTurn.method_16652(list, random, i, j, k, arg, l);
+        } else if (class_ == SquareRoom.class) {
+            lv = SquareRoom.method_14865(list, random, i, j, k, arg, l);
+        } else if (class_ == Stairs.class) {
+            lv = Stairs.method_14868(list, random, i, j, k, arg, l);
+        } else if (class_ == SpiralStaircase.class) {
+            lv = SpiralStaircase.method_14866(list, random, i, j, k, arg, l);
+        } else if (class_ == FiveWayCrossing.class) {
+            lv = FiveWayCrossing.method_14858(list, random, i, j, k, arg, l);
+        } else if (class_ == ChestCorridor.class) {
+            lv = ChestCorridor.method_14856(list, random, i, j, k, arg, l);
+        } else if (class_ == Library.class) {
+            lv = Library.method_14860(list, random, i, j, k, arg, l);
+        } else if (class_ == PortalRoom.class) {
+            lv = PortalRoom.method_14863(list, i, j, k, arg, l);
         }
         return lv;
     }
@@ -1297,8 +1297,8 @@ public class StrongholdGenerator {
         public int generatedCount;
         public final int limit;
 
-        public PieceSetting(Class<? extends Piece> arg, int i, int j) {
-            this.pieceType = arg;
+        public PieceSetting(Class<? extends Piece> class_, int i, int j) {
+            this.pieceType = class_;
             this.field_15278 = i;
             this.limit = j;
         }

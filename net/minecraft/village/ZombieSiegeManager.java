@@ -7,7 +7,6 @@
 package net.minecraft.village;
 
 import javax.annotation.Nullable;
-import net.minecraft.class_5304;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -20,9 +19,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.Spawner;
 
 public class ZombieSiegeManager
-implements class_5304 {
+implements Spawner {
     private boolean spawned;
     private State state = State.SIEGE_DONE;
     private int remaining;

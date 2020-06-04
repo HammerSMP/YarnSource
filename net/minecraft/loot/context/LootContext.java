@@ -26,10 +26,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import net.minecraft.class_5341;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextType;
@@ -43,12 +43,12 @@ public class LootContext {
     private final ServerWorld world;
     private final Function<Identifier, LootTable> tableGetter;
     private final Set<LootTable> activeTables = Sets.newLinkedHashSet();
-    private final Function<Identifier, class_5341> conditionGetter;
-    private final Set<class_5341> conditions = Sets.newLinkedHashSet();
+    private final Function<Identifier, LootCondition> conditionGetter;
+    private final Set<LootCondition> conditions = Sets.newLinkedHashSet();
     private final Map<LootContextParameter<?>, Object> parameters;
     private final Map<Identifier, Dropper> drops;
 
-    private LootContext(Random random, float f, ServerWorld arg, Function<Identifier, LootTable> function, Function<Identifier, class_5341> function2, Map<LootContextParameter<?>, Object> map, Map<Identifier, Dropper> map2) {
+    private LootContext(Random random, float f, ServerWorld arg, Function<Identifier, LootTable> function, Function<Identifier, LootCondition> function2, Map<LootContextParameter<?>, Object> map, Map<Identifier, Dropper> map2) {
         this.random = random;
         this.luck = f;
         this.world = arg;
@@ -82,11 +82,11 @@ public class LootContext {
         this.activeTables.remove(arg);
     }
 
-    public boolean addCondition(class_5341 arg) {
+    public boolean addCondition(LootCondition arg) {
         return this.conditions.add(arg);
     }
 
-    public void removeCondition(class_5341 arg) {
+    public void removeCondition(LootCondition arg) {
         this.conditions.remove(arg);
     }
 
@@ -94,7 +94,7 @@ public class LootContext {
         return this.tableGetter.apply(arg);
     }
 
-    public class_5341 getCondition(Identifier arg) {
+    public LootCondition getCondition(Identifier arg) {
         return this.conditionGetter.apply(arg);
     }
 

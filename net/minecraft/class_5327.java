@@ -70,7 +70,7 @@ extends Task<VillagerEntity> {
         this.method_29261(arg2);
         if (!bl) {
             LookTargetUtil.walkTowards((LivingEntity)arg3, arg4, this.field_25158, 1);
-            arg3.getBrain().remember(MemoryModuleType.POTENTIAL_JOB_SITE, GlobalPos.create(arg.method_27983(), arg4));
+            arg3.getBrain().remember(MemoryModuleType.POTENTIAL_JOB_SITE, GlobalPos.create(arg.getRegistryKey(), arg4));
             DebugInfoSender.sendPointOfInterest(arg, arg4);
         }
     }

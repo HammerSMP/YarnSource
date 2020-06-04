@@ -293,17 +293,17 @@ extends SimpleChannelInboundHandler<Packet<?>> {
 
     @Environment(value=EnvType.CLIENT)
     public static ClientConnection connect(InetAddress inetAddress, int i, boolean bl) {
-        Lazy<NioEventLoopGroup> lv5;
-        Class<NioSocketChannel> lv4;
+        Lazy<NioEventLoopGroup> lv3;
+        Class<NioSocketChannel> class2;
         final ClientConnection lv = new ClientConnection(NetworkSide.CLIENTBOUND);
         if (Epoll.isAvailable() && bl) {
-            Class<EpollSocketChannel> lv2 = EpollSocketChannel.class;
-            Lazy<EpollEventLoopGroup> lv3 = CLIENT_IO_GROUP_EPOLL;
+            Class<EpollSocketChannel> class_ = EpollSocketChannel.class;
+            Lazy<EpollEventLoopGroup> lv2 = CLIENT_IO_GROUP_EPOLL;
         } else {
-            lv4 = NioSocketChannel.class;
-            lv5 = CLIENT_IO_GROUP;
+            class2 = NioSocketChannel.class;
+            lv3 = CLIENT_IO_GROUP;
         }
-        ((Bootstrap)((Bootstrap)((Bootstrap)new Bootstrap().group((EventLoopGroup)lv5.get())).handler((ChannelHandler)new ChannelInitializer<Channel>(){
+        ((Bootstrap)((Bootstrap)((Bootstrap)new Bootstrap().group((EventLoopGroup)lv3.get())).handler((ChannelHandler)new ChannelInitializer<Channel>(){
 
             protected void initChannel(Channel channel) throws Exception {
                 try {
@@ -314,7 +314,7 @@ extends SimpleChannelInboundHandler<Packet<?>> {
                 }
                 channel.pipeline().addLast("timeout", (ChannelHandler)new ReadTimeoutHandler(30)).addLast("splitter", (ChannelHandler)new SplitterHandler()).addLast("decoder", (ChannelHandler)new DecoderHandler(NetworkSide.CLIENTBOUND)).addLast("prepender", (ChannelHandler)new SizePrepender()).addLast("encoder", (ChannelHandler)new PacketEncoder(NetworkSide.SERVERBOUND)).addLast("packet_handler", (ChannelHandler)lv);
             }
-        })).channel(lv4)).connect(inetAddress, i).syncUninterruptibly();
+        })).channel(class2)).connect(inetAddress, i).syncUninterruptibly();
         return lv;
     }
 

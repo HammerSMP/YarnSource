@@ -59,7 +59,7 @@ extends NetworkSyncedItem {
 
     public static ItemStack createMap(World arg, int i, int j, byte b, boolean bl, boolean bl2) {
         ItemStack lv = new ItemStack(Items.FILLED_MAP);
-        FilledMapItem.createMapState(lv, arg, i, j, b, bl, bl2, arg.method_27983());
+        FilledMapItem.createMapState(lv, arg, i, j, b, bl, bl2, arg.getRegistryKey());
         return lv;
     }
 
@@ -72,7 +72,7 @@ extends NetworkSyncedItem {
     public static MapState getOrCreateMapState(ItemStack arg, World arg2) {
         MapState lv = FilledMapItem.getMapState(arg, arg2);
         if (lv == null && arg2 instanceof ServerWorld) {
-            lv = FilledMapItem.createMapState(arg, arg2, arg2.getLevelProperties().getSpawnX(), arg2.getLevelProperties().getSpawnZ(), 3, false, false, arg2.method_27983());
+            lv = FilledMapItem.createMapState(arg, arg2, arg2.getLevelProperties().getSpawnX(), arg2.getLevelProperties().getSpawnZ(), 3, false, false, arg2.getRegistryKey());
         }
         return lv;
     }
@@ -96,7 +96,7 @@ extends NetworkSyncedItem {
     }
 
     public void updateColors(World arg, Entity arg2, MapState arg3) {
-        if (arg.method_27983() != arg3.dimension || !(arg2 instanceof PlayerEntity)) {
+        if (arg.getRegistryKey() != arg3.dimension || !(arg2 instanceof PlayerEntity)) {
             return;
         }
         int i = 1 << arg3.scale;
@@ -218,7 +218,7 @@ extends NetworkSyncedItem {
         if (lv == null) {
             return;
         }
-        if (arg.method_27983() != lv.dimension) {
+        if (arg.getRegistryKey() != lv.dimension) {
             return;
         }
         int i = 1 << lv.scale;

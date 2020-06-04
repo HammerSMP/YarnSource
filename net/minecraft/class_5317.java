@@ -96,7 +96,7 @@ public abstract class class_5317 {
     protected static final List<class_5317> field_25052 = Lists.newArrayList((Object[])new class_5317[]{field_25050, field_25054, field_25055, field_25051, field_25056, field_25057, field_25058, field_25059});
     protected static final Map<Optional<class_5317>, class_5293> field_25053 = ImmutableMap.of(Optional.of(field_25054), (arg, arg2) -> {
         ChunkGenerator lv = arg2.getChunkGenerator();
-        return new CustomizeFlatLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(new GeneratorOptions(arg2.getSeed(), arg2.shouldGenerateStructures(), arg2.hasBonusChest(), GeneratorOptions.method_28608(arg2.method_28609(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
+        return new CustomizeFlatLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(new GeneratorOptions(arg2.getSeed(), arg2.shouldGenerateStructures(), arg2.hasBonusChest(), GeneratorOptions.method_28608(arg2.getDimensionMap(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
     }, Optional.of(field_25056), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(class_5317.method_29079(arg2, field_25056, arg3)), class_5317.method_29083(arg2)), Optional.of(field_25057), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(class_5317.method_29079(arg2, field_25057, arg3)), class_5317.method_29083(arg2)), Optional.of(field_25058), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(class_5317.method_29079(arg2, field_25058, arg3)), class_5317.method_29083(arg2)));
     private final Text field_25060;
 
@@ -114,7 +114,7 @@ public abstract class class_5317 {
         } else {
             lv4 = ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType();
         }
-        return new GeneratorOptions(arg.getSeed(), arg.shouldGenerateStructures(), arg.hasBonusChest(), GeneratorOptions.method_28608(arg.method_28609(), new SurfaceChunkGenerator(lv, arg.getSeed(), lv4)));
+        return new GeneratorOptions(arg.getSeed(), arg.shouldGenerateStructures(), arg.hasBonusChest(), GeneratorOptions.method_28608(arg.getDimensionMap(), new SurfaceChunkGenerator(lv, arg.getSeed(), lv4)));
     }
 
     private static Biome method_29083(GeneratorOptions arg) {

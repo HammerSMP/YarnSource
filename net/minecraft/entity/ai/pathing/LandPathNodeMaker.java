@@ -175,7 +175,7 @@ extends PathNodeMaker {
     public static double getFeetY(BlockView arg, BlockPos arg2) {
         VoxelShape lv2;
         BlockPos lv;
-        return (double)lv.getY() + ((lv2 = arg.getBlockState(lv = arg2.down()).getCollisionShape(arg, lv)).isEmpty() ? 0.0 : lv2.getMaximum(Direction.Axis.Y));
+        return (double)lv.getY() + ((lv2 = arg.getBlockState(lv = arg2.down()).getCollisionShape(arg, lv)).isEmpty() ? 0.0 : lv2.getMax(Direction.Axis.Y));
     }
 
     @Nullable

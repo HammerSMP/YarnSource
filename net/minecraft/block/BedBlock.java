@@ -262,7 +262,7 @@ implements BlockEntityProvider {
 
     public static Optional<Vec3d> canWakeUpAt(EntityType<?> arg, WorldView arg2, BlockPos arg3) {
         VoxelShape lv = arg2.getBlockState(arg3).getCollisionShape(arg2, arg3);
-        if (lv.getMaximum(Direction.Axis.Y) > 0.4375) {
+        if (lv.getMax(Direction.Axis.Y) > 0.4375) {
             return Optional.empty();
         }
         BlockPos.Mutable lv2 = arg3.mutableCopy();
@@ -273,7 +273,7 @@ implements BlockEntityProvider {
         if (lv3.isEmpty()) {
             return Optional.empty();
         }
-        double d = (double)lv2.getY() + lv3.getMaximum(Direction.Axis.Y) + 2.0E-7;
+        double d = (double)lv2.getY() + lv3.getMax(Direction.Axis.Y) + 2.0E-7;
         if ((double)arg3.getY() - d > 2.0) {
             return Optional.empty();
         }

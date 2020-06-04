@@ -131,11 +131,11 @@ implements ProfileResult {
 
     private Map<String, CounterInfo> setupCounters() {
         TreeMap map = Maps.newTreeMap();
-        this.locationInfos.forEach((string, arg2) -> {
-            Object2LongMap<String> object2LongMap = arg2.getCounts();
+        this.locationInfos.forEach((string, arg) -> {
+            Object2LongMap<String> object2LongMap = arg.getCounts();
             if (!object2LongMap.isEmpty()) {
                 List list = SPLITTER.splitToList((CharSequence)string);
-                object2LongMap.forEach((string2, arg) -> map.computeIfAbsent(string2, string -> new CounterInfo()).add(list.iterator(), (long)arg));
+                object2LongMap.forEach((string2, long_) -> map.computeIfAbsent(string2, string -> new CounterInfo()).add(list.iterator(), (long)long_));
             }
         });
         return map;
@@ -224,7 +224,7 @@ implements ProfileResult {
     private void appendTiming(int i, String string2, StringBuilder stringBuilder) {
         List<ProfilerTiming> list = this.getTimings(string2);
         Object2LongMap<String> object2LongMap = this.locationInfos.get(string2).getCounts();
-        object2LongMap.forEach((string, arg) -> ProfileResultImpl.indent(stringBuilder, i).append('#').append((String)string).append(' ').append(arg).append('/').append(arg / (long)this.tickDuration).append('\n'));
+        object2LongMap.forEach((string, long_) -> ProfileResultImpl.indent(stringBuilder, i).append('#').append((String)string).append(' ').append(long_).append('/').append(long_ / (long)this.tickDuration).append('\n'));
         if (list.size() < 3) {
             return;
         }

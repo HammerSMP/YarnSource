@@ -171,10 +171,10 @@ public final class VoxelShapes {
         boolean bl = arg3.apply(true, false);
         boolean bl2 = arg3.apply(false, true);
         for (Direction.Axis lv : AxisCycleDirection.AXES) {
-            if (arg.getMaximum(lv) < arg2.getMinimum(lv) - 1.0E-7) {
+            if (arg.getMax(lv) < arg2.getMin(lv) - 1.0E-7) {
                 return bl || bl2;
             }
-            if (!(arg2.getMaximum(lv) < arg.getMinimum(lv) - 1.0E-7)) continue;
+            if (!(arg2.getMax(lv) < arg.getMin(lv) - 1.0E-7)) continue;
             return bl || bl2;
         }
         PairList lv2 = VoxelShapes.createListPair(1, arg.getPointPositions(Direction.Axis.X), arg2.getPointPositions(Direction.Axis.X), bl, bl2);
@@ -275,7 +275,7 @@ public final class VoxelShapes {
         VoxelShape lv3 = lv2 == Direction.AxisDirection.POSITIVE ? arg : arg2;
         VoxelShape lv4 = lv2 == Direction.AxisDirection.POSITIVE ? arg2 : arg;
         BooleanBiFunction lv5 = lv2 == Direction.AxisDirection.POSITIVE ? BooleanBiFunction.ONLY_FIRST : BooleanBiFunction.ONLY_SECOND;
-        return DoubleMath.fuzzyEquals((double)lv3.getMaximum(lv), (double)1.0, (double)1.0E-7) && DoubleMath.fuzzyEquals((double)lv4.getMinimum(lv), (double)0.0, (double)1.0E-7) && !VoxelShapes.matchesAnywhere(new SlicedVoxelShape(lv3, lv, lv3.voxels.getSize(lv) - 1), new SlicedVoxelShape(lv4, lv, 0), lv5);
+        return DoubleMath.fuzzyEquals((double)lv3.getMax(lv), (double)1.0, (double)1.0E-7) && DoubleMath.fuzzyEquals((double)lv4.getMin(lv), (double)0.0, (double)1.0E-7) && !VoxelShapes.matchesAnywhere(new SlicedVoxelShape(lv3, lv, lv3.voxels.getSize(lv) - 1), new SlicedVoxelShape(lv4, lv, 0), lv5);
     }
 
     public static VoxelShape extrudeFace(VoxelShape arg, Direction arg2) {
@@ -286,10 +286,10 @@ public final class VoxelShapes {
         }
         Direction.Axis lv = arg2.getAxis();
         if (arg2.getDirection() == Direction.AxisDirection.POSITIVE) {
-            boolean bl = DoubleMath.fuzzyEquals((double)arg.getMaximum(lv), (double)1.0, (double)1.0E-7);
+            boolean bl = DoubleMath.fuzzyEquals((double)arg.getMax(lv), (double)1.0, (double)1.0E-7);
             int i = arg.voxels.getSize(lv) - 1;
         } else {
-            bl2 = DoubleMath.fuzzyEquals((double)arg.getMinimum(lv), (double)0.0, (double)1.0E-7);
+            bl2 = DoubleMath.fuzzyEquals((double)arg.getMin(lv), (double)0.0, (double)1.0E-7);
             j = 0;
         }
         if (!bl2) {
@@ -307,10 +307,10 @@ public final class VoxelShapes {
         Direction.AxisDirection lv2 = arg3.getDirection();
         VoxelShape lv3 = lv2 == Direction.AxisDirection.POSITIVE ? arg : arg2;
         VoxelShape voxelShape = lv4 = lv2 == Direction.AxisDirection.POSITIVE ? arg2 : arg;
-        if (!DoubleMath.fuzzyEquals((double)lv3.getMaximum(lv), (double)1.0, (double)1.0E-7)) {
+        if (!DoubleMath.fuzzyEquals((double)lv3.getMax(lv), (double)1.0, (double)1.0E-7)) {
             lv3 = VoxelShapes.empty();
         }
-        if (!DoubleMath.fuzzyEquals((double)lv4.getMinimum(lv), (double)0.0, (double)1.0E-7)) {
+        if (!DoubleMath.fuzzyEquals((double)lv4.getMin(lv), (double)0.0, (double)1.0E-7)) {
             lv4 = VoxelShapes.empty();
         }
         return !VoxelShapes.matchesAnywhere(VoxelShapes.fullCube(), VoxelShapes.combine(new SlicedVoxelShape(lv3, lv, lv3.voxels.getSize(lv) - 1), new SlicedVoxelShape(lv4, lv, 0), BooleanBiFunction.OR), BooleanBiFunction.ONLY_FIRST);

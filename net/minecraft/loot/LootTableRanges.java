@@ -34,11 +34,11 @@ public class LootTableRanges {
         }
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         String string = JsonHelper.getString(jsonObject, "type", LootTableRange.UNIFORM.toString());
-        Class<? extends LootTableRange> lv = types.get(new Identifier(string));
-        if (lv == null) {
+        Class<? extends LootTableRange> class_ = types.get(new Identifier(string));
+        if (class_ == null) {
             throw new JsonParseException("Unknown generator: " + string);
         }
-        return (LootTableRange)jsonDeserializationContext.deserialize((JsonElement)jsonObject, lv);
+        return (LootTableRange)jsonDeserializationContext.deserialize((JsonElement)jsonObject, class_);
     }
 
     public static JsonElement toJson(LootTableRange arg, JsonSerializationContext jsonSerializationContext) {

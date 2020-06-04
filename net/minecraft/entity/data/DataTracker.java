@@ -54,27 +54,27 @@ public class DataTracker {
         this.trackedEntity = arg;
     }
 
-    public static <T> TrackedData<T> registerData(Class<? extends Entity> arg, TrackedDataHandler<T> arg2) {
+    public static <T> TrackedData<T> registerData(Class<? extends Entity> class_, TrackedDataHandler<T> arg) {
         int k;
         if (LOGGER.isDebugEnabled()) {
             try {
-                Class<?> lv = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
-                if (!lv.equals(arg)) {
-                    LOGGER.debug("defineId called for: {} from {}", arg, lv, (Object)new RuntimeException());
+                Class<?> class2 = Class.forName(Thread.currentThread().getStackTrace()[2].getClassName());
+                if (!class2.equals(class_)) {
+                    LOGGER.debug("defineId called for: {} from {}", class_, class2, (Object)new RuntimeException());
                 }
             }
-            catch (ClassNotFoundException lv) {
+            catch (ClassNotFoundException class2) {
                 // empty catch block
             }
         }
-        if (trackedEntities.containsKey(arg)) {
-            int i = trackedEntities.get(arg) + 1;
+        if (trackedEntities.containsKey(class_)) {
+            int i = trackedEntities.get(class_) + 1;
         } else {
             int j = 0;
-            Class<? extends Entity> lv2 = arg;
-            while (lv2 != Entity.class) {
-                if (!trackedEntities.containsKey(lv2 = lv2.getSuperclass())) continue;
-                j = trackedEntities.get(lv2) + 1;
+            Class<? extends Entity> class3 = class_;
+            while (class3 != Entity.class) {
+                if (!trackedEntities.containsKey(class3 = class3.getSuperclass())) continue;
+                j = trackedEntities.get(class3) + 1;
                 break;
             }
             k = j;
@@ -82,8 +82,8 @@ public class DataTracker {
         if (k > 254) {
             throw new IllegalArgumentException("Data value id is too big with " + k + "! (Max is " + 254 + ")");
         }
-        trackedEntities.put(arg, k);
-        return arg2.create(k);
+        trackedEntities.put(class_, k);
+        return arg.create(k);
     }
 
     public <T> void startTracking(TrackedData<T> arg, T object) {

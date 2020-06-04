@@ -17,33 +17,33 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTableReporter;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.entry.LootEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.collection.DefaultedList;
 
 public class SetContentsLootFunction
 extends ConditionalLootFunction {
-    private final List<LootEntry> entries;
+    private final List<LootPoolEntry> entries;
 
-    private SetContentsLootFunction(class_5341[] args, List<LootEntry> list) {
+    private SetContentsLootFunction(LootCondition[] args, List<LootPoolEntry> list) {
         super(args);
         this.entries = ImmutableList.copyOf(list);
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.SET_CONTENTS;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.SET_CONTENTS;
     }
 
     @Override
@@ -81,27 +81,27 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetContentsLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
-            LootEntry[] lvs = JsonHelper.deserialize(jsonObject, "entries", jsonDeserializationContext, LootEntry[].class);
+        public SetContentsLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
+            LootPoolEntry[] lvs = JsonHelper.deserialize(jsonObject, "entries", jsonDeserializationContext, LootPoolEntry[].class);
             return new SetContentsLootFunction(args, Arrays.asList(lvs));
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }
 
     public static class Builer
     extends ConditionalLootFunction.Builder<Builer> {
-        private final List<LootEntry> entries = Lists.newArrayList();
+        private final List<LootPoolEntry> entries = Lists.newArrayList();
 
         @Override
         protected Builer getThisBuilder() {
             return this;
         }
 
-        public Builer withEntry(LootEntry.Builder<?> arg) {
+        public Builer withEntry(LootPoolEntry.Builder<?> arg) {
             this.entries.add(arg.build());
             return this;
         }

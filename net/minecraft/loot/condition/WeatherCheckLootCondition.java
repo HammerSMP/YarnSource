@@ -13,29 +13,29 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import javax.annotation.Nullable;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class WeatherCheckLootCondition
-implements class_5341 {
+implements LootCondition {
     @Nullable
     private final Boolean raining;
     @Nullable
     private final Boolean thundering;
 
-    private WeatherCheckLootCondition(@Nullable Boolean arg, @Nullable Boolean arg2) {
-        this.raining = arg;
-        this.thundering = arg2;
+    private WeatherCheckLootCondition(@Nullable Boolean boolean_, @Nullable Boolean boolean2) {
+        this.raining = boolean_;
+        this.thundering = boolean2;
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.WEATHER_CHECK;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.WEATHER_CHECK;
     }
 
     @Override
@@ -53,7 +53,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<WeatherCheckLootCondition> {
+    implements JsonSerializable<WeatherCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, WeatherCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("raining", arg.raining);
@@ -62,9 +62,9 @@ implements class_5341 {
 
         @Override
         public WeatherCheckLootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            Boolean lv = jsonObject.has("raining") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "raining")) : null;
-            Boolean lv2 = jsonObject.has("thundering") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "thundering")) : null;
-            return new WeatherCheckLootCondition(lv, lv2);
+            Boolean boolean_ = jsonObject.has("raining") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "raining")) : null;
+            Boolean boolean2 = jsonObject.has("thundering") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "thundering")) : null;
+            return new WeatherCheckLootCondition(boolean_, boolean2);
         }
 
         @Override

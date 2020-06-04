@@ -191,7 +191,7 @@ public class ModelPredicateProviderRegistry {
                 Optional<RegistryKey<World>> optional;
                 boolean bl = arg2.contains("LodestonePos");
                 boolean bl2 = arg2.contains("LodestoneDimension");
-                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.method_27983() == optional.get()) {
+                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.getRegistryKey() == optional.get()) {
                     return NbtHelper.toBlockPos(arg2.getCompound("LodestonePos"));
                 }
                 return null;

@@ -22,9 +22,9 @@ extends TrackTargetGoal {
     private final Class<?>[] noRevengeTypes;
     private Class<?>[] noHelpTypes;
 
-    public RevengeGoal(MobEntityWithAi arg, Class<?> ... args) {
+    public RevengeGoal(MobEntityWithAi arg, Class<?> ... classs) {
         super(arg, true);
-        this.noRevengeTypes = args;
+        this.noRevengeTypes = classs;
         this.setControls(EnumSet.of(Goal.Control.TARGET));
     }
 
@@ -35,16 +35,16 @@ extends TrackTargetGoal {
         if (i == this.lastAttackedTime || lv == null) {
             return false;
         }
-        for (Class<?> lv2 : this.noRevengeTypes) {
-            if (!lv2.isAssignableFrom(lv.getClass())) continue;
+        for (Class<?> class_ : this.noRevengeTypes) {
+            if (!class_.isAssignableFrom(lv.getClass())) continue;
             return false;
         }
         return this.canTrack(lv, VALID_AVOIDABLES_PREDICATE);
     }
 
-    public RevengeGoal setGroupRevenge(Class<?> ... args) {
+    public RevengeGoal setGroupRevenge(Class<?> ... classs) {
         this.groupRevenge = true;
-        this.noHelpTypes = args;
+        this.noHelpTypes = classs;
         return this;
     }
 
@@ -67,8 +67,8 @@ extends TrackTargetGoal {
             if (this.mob == lv || lv.getTarget() != null || this.mob instanceof TameableEntity && ((TameableEntity)this.mob).getOwner() != ((TameableEntity)lv).getOwner() || lv.isTeammate(this.mob.getAttacker())) continue;
             if (this.noHelpTypes != null) {
                 boolean bl = false;
-                for (Class<?> lv2 : this.noHelpTypes) {
-                    if (lv.getClass() != lv2) continue;
+                for (Class<?> class_ : this.noHelpTypes) {
+                    if (lv.getClass() != class_) continue;
                     bl = true;
                     break;
                 }

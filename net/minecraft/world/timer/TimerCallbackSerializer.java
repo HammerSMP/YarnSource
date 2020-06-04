@@ -39,8 +39,8 @@ public class TimerCallbackSerializer<C> {
         return this;
     }
 
-    private <T extends TimerCallback<C>> TimerCallback.Serializer<C, T> getSerializer(Class<?> arg) {
-        return this.serializersByClass.get(arg);
+    private <T extends TimerCallback<C>> TimerCallback.Serializer<C, T> getSerializer(Class<?> class_) {
+        return this.serializersByClass.get(class_);
     }
 
     public <T extends TimerCallback<C>> CompoundTag serialize(T arg) {

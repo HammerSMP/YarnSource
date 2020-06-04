@@ -912,7 +912,7 @@ extends AbstractClientPlayerEntity {
                 BlockPos lv23 = lv22.up(v);
                 BlockState lv24 = this.world.getBlockState(lv23);
                 VoxelShape lv25 = lv24.getCollisionShape(this.world, lv23, lv7);
-                if (!lv25.isEmpty() && (double)(u = (float)lv25.getMaximum(Direction.Axis.Y) + (float)lv23.getY()) - this.getY() > (double)q) {
+                if (!lv25.isEmpty() && (double)(u = (float)lv25.getMax(Direction.Axis.Y) + (float)lv23.getY()) - this.getY() > (double)q) {
                     return;
                 }
                 if (v > 1 && !(lv26 = this.world.getBlockState(lv8 = lv8.up())).getCollisionShape(this.world, lv8, lv7).isEmpty()) {

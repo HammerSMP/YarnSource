@@ -273,23 +273,23 @@ public class JsonHelper {
         return jsonArray;
     }
 
-    public static <T> T deserialize(@Nullable JsonElement jsonElement, String string, JsonDeserializationContext jsonDeserializationContext, Class<? extends T> arg) {
+    public static <T> T deserialize(@Nullable JsonElement jsonElement, String string, JsonDeserializationContext jsonDeserializationContext, Class<? extends T> class_) {
         if (jsonElement != null) {
-            return (T)jsonDeserializationContext.deserialize(jsonElement, arg);
+            return (T)jsonDeserializationContext.deserialize(jsonElement, class_);
         }
         throw new JsonSyntaxException("Missing " + string);
     }
 
-    public static <T> T deserialize(JsonObject jsonObject, String string, JsonDeserializationContext jsonDeserializationContext, Class<? extends T> arg) {
+    public static <T> T deserialize(JsonObject jsonObject, String string, JsonDeserializationContext jsonDeserializationContext, Class<? extends T> class_) {
         if (jsonObject.has(string)) {
-            return JsonHelper.deserialize(jsonObject.get(string), string, jsonDeserializationContext, arg);
+            return JsonHelper.deserialize(jsonObject.get(string), string, jsonDeserializationContext, class_);
         }
         throw new JsonSyntaxException("Missing " + string);
     }
 
-    public static <T> T deserialize(JsonObject jsonObject, String string, T object, JsonDeserializationContext jsonDeserializationContext, Class<? extends T> arg) {
+    public static <T> T deserialize(JsonObject jsonObject, String string, T object, JsonDeserializationContext jsonDeserializationContext, Class<? extends T> class_) {
         if (jsonObject.has(string)) {
-            return JsonHelper.deserialize(jsonObject.get(string), string, jsonDeserializationContext, arg);
+            return JsonHelper.deserialize(jsonObject.get(string), string, jsonDeserializationContext, class_);
         }
         return object;
     }
@@ -321,11 +321,11 @@ public class JsonHelper {
     }
 
     @Nullable
-    public static <T> T deserialize(Gson gson, Reader reader, Class<T> arg, boolean bl) {
+    public static <T> T deserialize(Gson gson, Reader reader, Class<T> class_, boolean bl) {
         try {
             JsonReader jsonReader = new JsonReader(reader);
             jsonReader.setLenient(bl);
-            return (T)gson.getAdapter(arg).read(jsonReader);
+            return (T)gson.getAdapter(class_).read(jsonReader);
         }
         catch (IOException iOException) {
             throw new JsonParseException((Throwable)iOException);
@@ -351,8 +351,8 @@ public class JsonHelper {
     }
 
     @Nullable
-    public static <T> T deserialize(Gson gson, String string, Class<T> arg, boolean bl) {
-        return JsonHelper.deserialize(gson, (Reader)new StringReader(string), arg, bl);
+    public static <T> T deserialize(Gson gson, String string, Class<T> class_, boolean bl) {
+        return JsonHelper.deserialize(gson, (Reader)new StringReader(string), class_, bl);
     }
 
     @Nullable
@@ -367,13 +367,13 @@ public class JsonHelper {
     }
 
     @Nullable
-    public static <T> T deserialize(Gson gson, Reader reader, Class<T> arg) {
-        return JsonHelper.deserialize(gson, reader, arg, false);
+    public static <T> T deserialize(Gson gson, Reader reader, Class<T> class_) {
+        return JsonHelper.deserialize(gson, reader, class_, false);
     }
 
     @Nullable
-    public static <T> T deserialize(Gson gson, String string, Class<T> arg) {
-        return JsonHelper.deserialize(gson, string, arg, false);
+    public static <T> T deserialize(Gson gson, String string, Class<T> class_) {
+        return JsonHelper.deserialize(gson, string, class_, false);
     }
 
     public static JsonObject deserialize(String string, boolean bl) {

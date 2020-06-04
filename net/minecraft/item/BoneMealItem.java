@@ -135,7 +135,7 @@ extends Item {
             d = 3.0;
             double f = 1.0;
         } else {
-            g = lv.getOutlineShape(arg, arg2).getMaximum(Direction.Axis.Y);
+            g = lv.getOutlineShape(arg, arg2).getMax(Direction.Axis.Y);
         }
         arg.addParticle(ParticleTypes.HAPPY_VILLAGER, (double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5, 0.0, 0.0, 0.0);
         for (int j = 0; j < i; ++j) {

@@ -10,31 +10,31 @@ package net.minecraft.loot.function;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import java.util.Random;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 
 public class ExplosionDecayLootFunction
 extends ConditionalLootFunction {
-    private ExplosionDecayLootFunction(class_5341[] args) {
+    private ExplosionDecayLootFunction(LootCondition[] args) {
         super(args);
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.EXPLOSION_DECAY;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.EXPLOSION_DECAY;
     }
 
     @Override
     public ItemStack process(ItemStack arg, LootContext arg2) {
-        Float lv = arg2.get(LootContextParameters.EXPLOSION_RADIUS);
-        if (lv != null) {
+        Float float_ = arg2.get(LootContextParameters.EXPLOSION_RADIUS);
+        if (float_ != null) {
             Random random = arg2.getRandom();
-            float f = 1.0f / lv.floatValue();
+            float f = 1.0f / float_.floatValue();
             int i = arg.getCount();
             int j = 0;
             for (int k = 0; k < i; ++k) {
@@ -53,12 +53,12 @@ extends ConditionalLootFunction {
     public static class Factory
     extends ConditionalLootFunction.Factory<ExplosionDecayLootFunction> {
         @Override
-        public ExplosionDecayLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public ExplosionDecayLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return new ExplosionDecayLootFunction(args);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

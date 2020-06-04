@@ -30,13 +30,13 @@ extends Goal {
     protected final Predicate<LivingEntity> inclusionSelector;
     private final TargetPredicate withinRangePredicate;
 
-    public FleeEntityGoal(MobEntityWithAi arg2, Class<T> arg22, float f, double d, double e) {
-        this(arg2, arg22, arg -> true, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
+    public FleeEntityGoal(MobEntityWithAi arg2, Class<T> class_, float f, double d, double e) {
+        this(arg2, class_, arg -> true, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
     }
 
-    public FleeEntityGoal(MobEntityWithAi arg, Class<T> arg2, Predicate<LivingEntity> predicate, float f, double d, double e, Predicate<LivingEntity> predicate2) {
+    public FleeEntityGoal(MobEntityWithAi arg, Class<T> class_, Predicate<LivingEntity> predicate, float f, double d, double e, Predicate<LivingEntity> predicate2) {
         this.mob = arg;
-        this.classToFleeFrom = arg2;
+        this.classToFleeFrom = class_;
         this.extraInclusionSelector = predicate;
         this.fleeDistance = f;
         this.slowSpeed = d;
@@ -47,8 +47,8 @@ extends Goal {
         this.withinRangePredicate = new TargetPredicate().setBaseMaxDistance(f).setPredicate(predicate2.and(predicate));
     }
 
-    public FleeEntityGoal(MobEntityWithAi arg2, Class<T> arg22, float f, double d, double e, Predicate<LivingEntity> predicate) {
-        this(arg2, arg22, arg -> true, f, d, e, predicate);
+    public FleeEntityGoal(MobEntityWithAi arg2, Class<T> class_, float f, double d, double e, Predicate<LivingEntity> predicate) {
+        this(arg2, class_, arg -> true, f, d, e, predicate);
     }
 
     @Override

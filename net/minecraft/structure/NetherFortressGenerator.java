@@ -38,36 +38,36 @@ public class NetherFortressGenerator {
     private static final PieceData[] field_14493 = new PieceData[]{new PieceData(SmallCorridor.class, 25, 0, true), new PieceData(CorridorCrossing.class, 15, 5), new PieceData(CorridorRightTurn.class, 5, 10), new PieceData(CorridorLeftTurn.class, 5, 10), new PieceData(CorridorStairs.class, 10, 3, true), new PieceData(CorridorBalcony.class, 7, 2), new PieceData(CorridorNetherWartsRoom.class, 5, 2)};
 
     private static Piece generatePiece(PieceData arg, List<StructurePiece> list, Random random, int i, int j, int k, Direction arg2, int l) {
-        Class<? extends Piece> lv = arg.pieceType;
-        Piece lv2 = null;
-        if (lv == Bridge.class) {
-            lv2 = Bridge.method_14798(list, random, i, j, k, arg2, l);
-        } else if (lv == BridgeCrossing.class) {
-            lv2 = BridgeCrossing.method_14796(list, i, j, k, arg2, l);
-        } else if (lv == BridgeSmallCrossing.class) {
-            lv2 = BridgeSmallCrossing.method_14817(list, i, j, k, arg2, l);
-        } else if (lv == BridgeStairs.class) {
-            lv2 = BridgeStairs.method_14818(list, i, j, k, l, arg2);
-        } else if (lv == BridgePlatform.class) {
-            lv2 = BridgePlatform.method_14807(list, i, j, k, l, arg2);
-        } else if (lv == CorridorExit.class) {
-            lv2 = CorridorExit.method_14801(list, random, i, j, k, arg2, l);
-        } else if (lv == SmallCorridor.class) {
-            lv2 = SmallCorridor.method_14804(list, i, j, k, arg2, l);
-        } else if (lv == CorridorRightTurn.class) {
-            lv2 = CorridorRightTurn.method_14805(list, random, i, j, k, arg2, l);
-        } else if (lv == CorridorLeftTurn.class) {
-            lv2 = CorridorLeftTurn.method_14803(list, random, i, j, k, arg2, l);
-        } else if (lv == CorridorStairs.class) {
-            lv2 = CorridorStairs.method_14799(list, i, j, k, arg2, l);
-        } else if (lv == CorridorBalcony.class) {
-            lv2 = CorridorBalcony.method_14800(list, i, j, k, arg2, l);
-        } else if (lv == CorridorCrossing.class) {
-            lv2 = CorridorCrossing.method_14802(list, i, j, k, arg2, l);
-        } else if (lv == CorridorNetherWartsRoom.class) {
-            lv2 = CorridorNetherWartsRoom.method_14806(list, i, j, k, arg2, l);
+        Class<? extends Piece> class_ = arg.pieceType;
+        Piece lv = null;
+        if (class_ == Bridge.class) {
+            lv = Bridge.method_14798(list, random, i, j, k, arg2, l);
+        } else if (class_ == BridgeCrossing.class) {
+            lv = BridgeCrossing.method_14796(list, i, j, k, arg2, l);
+        } else if (class_ == BridgeSmallCrossing.class) {
+            lv = BridgeSmallCrossing.method_14817(list, i, j, k, arg2, l);
+        } else if (class_ == BridgeStairs.class) {
+            lv = BridgeStairs.method_14818(list, i, j, k, l, arg2);
+        } else if (class_ == BridgePlatform.class) {
+            lv = BridgePlatform.method_14807(list, i, j, k, l, arg2);
+        } else if (class_ == CorridorExit.class) {
+            lv = CorridorExit.method_14801(list, random, i, j, k, arg2, l);
+        } else if (class_ == SmallCorridor.class) {
+            lv = SmallCorridor.method_14804(list, i, j, k, arg2, l);
+        } else if (class_ == CorridorRightTurn.class) {
+            lv = CorridorRightTurn.method_14805(list, random, i, j, k, arg2, l);
+        } else if (class_ == CorridorLeftTurn.class) {
+            lv = CorridorLeftTurn.method_14803(list, random, i, j, k, arg2, l);
+        } else if (class_ == CorridorStairs.class) {
+            lv = CorridorStairs.method_14799(list, i, j, k, arg2, l);
+        } else if (class_ == CorridorBalcony.class) {
+            lv = CorridorBalcony.method_14800(list, i, j, k, arg2, l);
+        } else if (class_ == CorridorCrossing.class) {
+            lv = CorridorCrossing.method_14802(list, i, j, k, arg2, l);
+        } else if (class_ == CorridorNetherWartsRoom.class) {
+            lv = CorridorNetherWartsRoom.method_14806(list, i, j, k, arg2, l);
         }
-        return lv2;
+        return lv;
     }
 
     public static class CorridorBalcony
@@ -1177,15 +1177,15 @@ public class NetherFortressGenerator {
         public final int field_14499;
         public final boolean field_14500;
 
-        public PieceData(Class<? extends Piece> arg, int i, int j, boolean bl) {
-            this.pieceType = arg;
+        public PieceData(Class<? extends Piece> class_, int i, int j, boolean bl) {
+            this.pieceType = class_;
             this.field_14503 = i;
             this.field_14499 = j;
             this.field_14500 = bl;
         }
 
-        public PieceData(Class<? extends Piece> arg, int i, int j) {
-            this(arg, i, j, false);
+        public PieceData(Class<? extends Piece> class_, int i, int j) {
+            this(class_, i, j, false);
         }
 
         public boolean method_14816(int i) {

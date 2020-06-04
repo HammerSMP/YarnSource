@@ -172,8 +172,8 @@ extends ForgingScreenHandler {
                         continue;
                     }
                     bl22 = true;
-                    if (u > lv4.getMaximumLevel()) {
-                        u = lv4.getMaximumLevel();
+                    if (u > lv4.getMaxLevel()) {
+                        u = lv4.getMaxLevel();
                     }
                     map.put(lv4, u);
                     int v = 0;

@@ -302,8 +302,8 @@ extends AnimalEntity {
     extends FleeEntityGoal<T> {
         private final OcelotEntity ocelot;
 
-        public FleeGoal(OcelotEntity arg, Class<T> arg2, float f, double d, double e) {
-            super(arg, arg2, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
+        public FleeGoal(OcelotEntity arg, Class<T> class_, float f, double d, double e) {
+            super(arg, class_, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
             this.ocelot = arg;
         }
 

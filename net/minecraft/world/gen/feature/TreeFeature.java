@@ -100,7 +100,7 @@ extends Feature<TreeFeatureConfig> {
             int q;
             int m = arg.getTopPosition(Heightmap.Type.OCEAN_FLOOR, arg2).getY();
             int n = arg.getTopPosition(Heightmap.Type.WORLD_SURFACE, arg2).getY();
-            if (n - m > arg42.baseHeight) {
+            if (n - m > arg42.maxWaterDepth) {
                 return false;
             }
             if (arg42.heightmap == Heightmap.Type.OCEAN_FLOOR) {
@@ -121,10 +121,10 @@ extends Feature<TreeFeatureConfig> {
             return false;
         }
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
-        OptionalInt optionalInt = arg42.featureSize.getMinClippedHeight();
+        OptionalInt optionalInt = arg42.minimumSize.getMinClippedHeight();
         int r = i;
         for (int s = 0; s <= i + 1; ++s) {
-            int t = arg42.featureSize.method_27378(i, s);
+            int t = arg42.minimumSize.method_27378(i, s);
             block1: for (int u = -t; u <= t; ++u) {
                 for (int v = -t; v <= t; ++v) {
                     lv3.set(lv2, u, s, v);

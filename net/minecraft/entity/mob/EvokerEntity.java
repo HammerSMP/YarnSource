@@ -334,7 +334,7 @@ extends SpellcastingIllagerEntity {
                 BlockState lv3;
                 if (!(lv3 = EvokerEntity.this.world.getBlockState(lv2 = lv.down())).isSideSolidFullSquare(EvokerEntity.this.world, lv2, Direction.UP)) continue;
                 if (!EvokerEntity.this.world.isAir(lv) && !(lv5 = (lv4 = EvokerEntity.this.world.getBlockState(lv)).getCollisionShape(EvokerEntity.this.world, lv)).isEmpty()) {
-                    j = lv5.getMaximum(Direction.Axis.Y);
+                    j = lv5.getMax(Direction.Axis.Y);
                 }
                 bl = true;
                 break;

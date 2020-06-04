@@ -63,7 +63,7 @@ public abstract class RenderPhase {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
     }, () -> RenderSystem.disableBlend());
-    protected static final Transparency field_25284 = new Transparency("item_transparency", () -> {
+    protected static final Transparency ITEM_TRANSPARENCY = new Transparency("item_transparency", () -> {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         MinecraftClient.getInstance().worldRenderer.method_29361().beginWrite(false);
@@ -131,10 +131,10 @@ public abstract class RenderPhase {
     });
     protected static final Target MAIN_TARGET = new Target("main_target", () -> {}, () -> {});
     protected static final Target OUTLINE_TARGET = new Target("outline_target", () -> MinecraftClient.getInstance().worldRenderer.getEntityOutlinesFramebuffer().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
-    protected static final Target field_25280 = new Target("translucent_target", () -> MinecraftClient.getInstance().worldRenderer.method_29360().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
-    protected static final Target field_25281 = new Target("particles_target", () -> MinecraftClient.getInstance().worldRenderer.method_29362().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
-    protected static final Target field_25282 = new Target("weather_target", () -> MinecraftClient.getInstance().worldRenderer.method_29363().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
-    protected static final Target field_25283 = new Target("clouds_target", () -> MinecraftClient.getInstance().worldRenderer.method_29364().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target TRANSLUCENT_TARGET = new Target("translucent_target", () -> MinecraftClient.getInstance().worldRenderer.method_29360().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target PARTICLES_TARGET = new Target("particles_target", () -> MinecraftClient.getInstance().worldRenderer.getParticlesFramebuffer().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target WEATHER_TARGET = new Target("weather_target", () -> MinecraftClient.getInstance().worldRenderer.method_29363().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
+    protected static final Target CLOUDS_TARGET = new Target("clouds_target", () -> MinecraftClient.getInstance().worldRenderer.method_29364().beginWrite(false), () -> MinecraftClient.getInstance().getFramebuffer().beginWrite(false));
     protected static final LineWidth FULL_LINEWIDTH = new LineWidth(OptionalDouble.of(1.0));
 
     public RenderPhase(String string, Runnable runnable, Runnable runnable2) {
@@ -306,7 +306,7 @@ public abstract class RenderPhase {
     @Environment(value=EnvType.CLIENT)
     public static class DepthTest
     extends RenderPhase {
-        private final String field_22242;
+        private final String depthFunction;
         private final int func;
 
         public DepthTest(String string, int i) {
@@ -321,7 +321,7 @@ public abstract class RenderPhase {
                     RenderSystem.depthFunc(515);
                 }
             });
-            this.field_22242 = string;
+            this.depthFunction = string;
             this.func = i;
         }
 
@@ -344,7 +344,7 @@ public abstract class RenderPhase {
 
         @Override
         public String toString() {
-            return this.name + '[' + this.field_22242 + ']';
+            return this.name + '[' + this.depthFunction + ']';
         }
     }
 

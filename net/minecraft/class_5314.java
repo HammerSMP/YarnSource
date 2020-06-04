@@ -19,7 +19,7 @@ import java.util.function.Function;
 import net.minecraft.class_5324;
 
 public class class_5314 {
-    public static final Codec<class_5314> field_24917 = RecordCodecBuilder.create(instance -> instance.group((App)class_5324.method_29229(0, 4096).fieldOf("spacing").forGetter(arg -> arg.field_24918), (App)class_5324.method_29229(0, 4096).fieldOf("separation").forGetter(arg -> arg.field_24919), (App)class_5324.method_29229(0, Integer.MAX_VALUE).fieldOf("salt").forGetter(arg -> arg.field_24920)).apply((Applicative)instance, class_5314::new)).comapFlatMap(arg -> {
+    public static final Codec<class_5314> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)class_5324.method_29229(0, 4096).fieldOf("spacing").forGetter(arg -> arg.field_24918), (App)class_5324.method_29229(0, 4096).fieldOf("separation").forGetter(arg -> arg.field_24919), (App)class_5324.method_29229(0, Integer.MAX_VALUE).fieldOf("salt").forGetter(arg -> arg.field_24920)).apply((Applicative)instance, class_5314::new)).comapFlatMap(arg -> {
         if (arg.field_24918 <= arg.field_24919) {
             return DataResult.error((String)"Spacing has to be smaller than separation");
         }

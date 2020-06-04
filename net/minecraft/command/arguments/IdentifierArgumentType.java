@@ -18,8 +18,8 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import java.util.Arrays;
 import java.util.Collection;
 import net.minecraft.advancement.Advancement;
-import net.minecraft.class_5341;
 import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
@@ -55,10 +55,10 @@ implements ArgumentType<Identifier> {
         return lv.get(lv2).orElseThrow(() -> UNKNOWN_RECIPE_EXCEPTION.create((Object)lv2));
     }
 
-    public static class_5341 method_23727(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
+    public static LootCondition method_23727(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
         Identifier lv = (Identifier)commandContext.getArgument(string, Identifier.class);
         LootConditionManager lv2 = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPredicateManager();
-        class_5341 lv3 = lv2.get(lv);
+        LootCondition lv3 = lv2.get(lv);
         if (lv3 == null) {
             throw field_21506.create((Object)lv);
         }

@@ -384,8 +384,8 @@ public class ChunkSerializer {
         for (ShortList shortList : shortLists) {
             ListTag lv2 = new ListTag();
             if (shortList != null) {
-                for (Short lv3 : shortList) {
-                    lv2.add(ShortTag.of(lv3));
+                for (Short short_ : shortList) {
+                    lv2.add(ShortTag.of(short_));
                 }
             }
             lv.add(lv2);

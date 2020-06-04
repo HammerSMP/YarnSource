@@ -21,8 +21,8 @@ public class CheckedGson {
         return this.GSON.toJson((Object)arg);
     }
 
-    public <T extends RealmsSerializable> T fromJson(String string, Class<T> arg) {
-        return (T)((RealmsSerializable)this.GSON.fromJson(string, arg));
+    public <T extends RealmsSerializable> T fromJson(String string, Class<T> class_) {
+        return (T)((RealmsSerializable)this.GSON.fromJson(string, class_));
     }
 }
 

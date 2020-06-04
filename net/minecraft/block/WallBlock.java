@@ -88,22 +88,22 @@ implements Waterloggable {
         VoxelShape lv8 = Block.createCuboidShape(0.0, i, n, o, k, o);
         VoxelShape lv9 = Block.createCuboidShape(n, i, n, 16.0, k, o);
         ImmutableMap.Builder builder = ImmutableMap.builder();
-        for (Boolean lv10 : UP.getValues()) {
-            for (WallShape lv11 : EAST_SHAPE.getValues()) {
-                for (WallShape lv12 : NORTH_SHAPE.getValues()) {
-                    for (WallShape lv13 : WEST_SHAPE.getValues()) {
-                        for (WallShape lv14 : SOUTH_SHAPE.getValues()) {
-                            VoxelShape lv15 = VoxelShapes.empty();
-                            lv15 = WallBlock.method_24426(lv15, lv11, lv5, lv9);
-                            lv15 = WallBlock.method_24426(lv15, lv13, lv4, lv8);
-                            lv15 = WallBlock.method_24426(lv15, lv12, lv2, lv6);
-                            lv15 = WallBlock.method_24426(lv15, lv14, lv3, lv7);
-                            if (lv10.booleanValue()) {
-                                lv15 = VoxelShapes.union(lv15, lv);
+        for (Boolean boolean_ : UP.getValues()) {
+            for (WallShape lv10 : EAST_SHAPE.getValues()) {
+                for (WallShape lv11 : NORTH_SHAPE.getValues()) {
+                    for (WallShape lv12 : WEST_SHAPE.getValues()) {
+                        for (WallShape lv13 : SOUTH_SHAPE.getValues()) {
+                            VoxelShape lv14 = VoxelShapes.empty();
+                            lv14 = WallBlock.method_24426(lv14, lv10, lv5, lv9);
+                            lv14 = WallBlock.method_24426(lv14, lv12, lv4, lv8);
+                            lv14 = WallBlock.method_24426(lv14, lv11, lv2, lv6);
+                            lv14 = WallBlock.method_24426(lv14, lv13, lv3, lv7);
+                            if (boolean_.booleanValue()) {
+                                lv14 = VoxelShapes.union(lv14, lv);
                             }
-                            BlockState lv16 = (BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(UP, lv10)).with(EAST_SHAPE, lv11)).with(WEST_SHAPE, lv13)).with(NORTH_SHAPE, lv12)).with(SOUTH_SHAPE, lv14);
-                            builder.put(lv16.with(WATERLOGGED, false), (Object)lv15);
-                            builder.put(lv16.with(WATERLOGGED, true), (Object)lv15);
+                            BlockState lv15 = (BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(UP, boolean_)).with(EAST_SHAPE, lv10)).with(WEST_SHAPE, lv12)).with(NORTH_SHAPE, lv11)).with(SOUTH_SHAPE, lv13);
+                            builder.put(lv15.with(WATERLOGGED, false), (Object)lv14);
+                            builder.put(lv15.with(WATERLOGGED, true), (Object)lv14);
                         }
                     }
                 }

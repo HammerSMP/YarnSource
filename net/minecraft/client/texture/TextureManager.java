@@ -167,8 +167,8 @@ AutoCloseable {
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg22, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        return ((CompletableFuture)CompletableFuture.allOf(TitleScreen.loadTexturesAsync(this, executor), this.loadTextureAsync(AbstractButtonWidget.WIDGETS_LOCATION, executor)).thenCompose(arg::whenPrepared)).thenAcceptAsync(arg2 -> {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
+        return ((CompletableFuture)CompletableFuture.allOf(TitleScreen.loadTexturesAsync(this, executor), this.loadTextureAsync(AbstractButtonWidget.WIDGETS_LOCATION, executor)).thenCompose(arg::whenPrepared)).thenAcceptAsync(void_ -> {
             MissingSprite.getMissingSpriteTexture();
             RealmsMainScreen.method_23765(this.resourceContainer);
             Iterator<Map.Entry<Identifier, AbstractTexture>> iterator = this.textures.entrySet().iterator();
@@ -180,7 +180,7 @@ AutoCloseable {
                     iterator.remove();
                     continue;
                 }
-                lv2.registerTexture(this, arg22, lv, executor2);
+                lv2.registerTexture(this, arg2, lv, executor2);
             }
         }, runnable -> RenderSystem.recordRenderCall(runnable::run));
     }

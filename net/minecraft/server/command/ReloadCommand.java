@@ -29,7 +29,7 @@ public class ReloadCommand {
     private static final Logger field_25343 = LogManager.getLogger();
 
     public static void method_29480(Collection<String> collection, ServerCommandSource arg) {
-        arg.getMinecraftServer().method_29439(collection).exceptionally(throwable -> {
+        arg.getMinecraftServer().reloadResources(collection).exceptionally(throwable -> {
             field_25343.warn("Failed to execute reload", throwable);
             arg.sendError(new TranslatableText("commands.reload.failure"));
             return null;
@@ -51,7 +51,7 @@ public class ReloadCommand {
             ServerCommandSource lv = (ServerCommandSource)commandContext.getSource();
             MinecraftServer minecraftServer = lv.getMinecraftServer();
             ResourcePackManager<ResourcePackProfile> lv2 = minecraftServer.getDataPackManager();
-            SaveProperties lv3 = minecraftServer.method_27728();
+            SaveProperties lv3 = minecraftServer.getSaveProperties();
             Collection<String> collection = lv2.method_29210();
             Collection<String> collection2 = ReloadCommand.method_29478(lv2, lv3, collection);
             lv.sendFeedback(new TranslatableText("commands.reload.success"), true);

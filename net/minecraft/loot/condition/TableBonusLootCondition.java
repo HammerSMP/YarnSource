@@ -16,22 +16,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 import net.minecraft.util.registry.Registry;
 
 public class TableBonusLootCondition
-implements class_5341 {
+implements LootCondition {
     private final Enchantment enchantment;
     private final float[] chances;
 
@@ -41,8 +41,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.TABLE_BONUS;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.TABLE_BONUS;
     }
 
     @Override
@@ -58,7 +58,7 @@ implements class_5341 {
         return arg.getRandom().nextFloat() < f;
     }
 
-    public static class_5341.Builder builder(Enchantment arg, float ... fs) {
+    public static LootCondition.Builder builder(Enchantment arg, float ... fs) {
         return () -> new TableBonusLootCondition(arg, fs);
     }
 
@@ -68,7 +68,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<TableBonusLootCondition> {
+    implements JsonSerializable<TableBonusLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, TableBonusLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("enchantment", Registry.ENCHANTMENT.getId(arg.enchantment).toString());

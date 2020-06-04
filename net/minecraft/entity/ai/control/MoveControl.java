@@ -95,7 +95,7 @@ public class MoveControl {
             BlockState lv2 = this.entity.world.getBlockState(lv);
             Block lv3 = lv2.getBlock();
             VoxelShape lv4 = lv2.getCollisionShape(this.entity.world, lv);
-            if (o > (double)this.entity.stepHeight && d * d + e * e < (double)Math.max(1.0f, this.entity.getWidth()) || !lv4.isEmpty() && this.entity.getY() < lv4.getMaximum(Direction.Axis.Y) + (double)lv.getY() && !lv3.isIn(BlockTags.DOORS) && !lv3.isIn(BlockTags.FENCES)) {
+            if (o > (double)this.entity.stepHeight && d * d + e * e < (double)Math.max(1.0f, this.entity.getWidth()) || !lv4.isEmpty() && this.entity.getY() < lv4.getMax(Direction.Axis.Y) + (double)lv.getY() && !lv3.isIn(BlockTags.DOORS) && !lv3.isIn(BlockTags.FENCES)) {
                 this.entity.getJumpControl().setActive();
                 this.state = State.JUMPING;
             }

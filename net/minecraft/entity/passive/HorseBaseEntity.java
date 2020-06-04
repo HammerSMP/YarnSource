@@ -431,7 +431,7 @@ Saddleable {
                 this.lovePlayer(arg);
             }
         }
-        if (this.getHealth() < this.getMaximumHealth() && f > 0.0f) {
+        if (this.getHealth() < this.getMaxHealth() && f > 0.0f) {
             this.heal(f);
             bl = true;
         }
@@ -737,7 +737,7 @@ Saddleable {
     }
 
     protected boolean canBreed() {
-        return !this.hasPassengers() && !this.hasVehicle() && this.isTame() && !this.isBaby() && this.getHealth() >= this.getMaximumHealth() && this.isInLove();
+        return !this.hasPassengers() && !this.hasVehicle() && this.isTame() && !this.isBaby() && this.getHealth() >= this.getMaxHealth() && this.isInLove();
     }
 
     @Override

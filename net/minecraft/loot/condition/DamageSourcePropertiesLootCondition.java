@@ -14,20 +14,20 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.entity.DamageSourcePredicate;
+import net.minecraft.util.JsonSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class DamageSourcePropertiesLootCondition
-implements class_5341 {
+implements LootCondition {
     private final DamageSourcePredicate predicate;
 
     private DamageSourcePropertiesLootCondition(DamageSourcePredicate arg) {
@@ -35,8 +35,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.DAMAGE_SOURCE_PROPERTIES;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.DAMAGE_SOURCE_PROPERTIES;
     }
 
     @Override
@@ -51,7 +51,7 @@ implements class_5341 {
         return lv2 != null && lv != null && this.predicate.test(arg.getWorld(), Vec3d.of(lv2), lv);
     }
 
-    public static class_5341.Builder builder(DamageSourcePredicate.Builder arg) {
+    public static LootCondition.Builder builder(DamageSourcePredicate.Builder arg) {
         return () -> new DamageSourcePropertiesLootCondition(arg.build());
     }
 
@@ -61,7 +61,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<DamageSourcePropertiesLootCondition> {
+    implements JsonSerializable<DamageSourcePropertiesLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, DamageSourcePropertiesLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());

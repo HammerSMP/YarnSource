@@ -132,7 +132,7 @@ extends ThrownItemEntity {
     @Nullable
     public Entity changeDimension(RegistryKey<World> arg) {
         Entity lv = this.getOwner();
-        if (lv != null && lv.world.method_27983() != arg) {
+        if (lv != null && lv.world.getRegistryKey() != arg) {
             this.setOwner(null);
         }
         return super.changeDimension(arg);

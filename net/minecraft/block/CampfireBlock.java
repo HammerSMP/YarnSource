@@ -69,14 +69,14 @@ implements Waterloggable {
     public static final BooleanProperty SIGNAL_FIRE = Properties.SIGNAL_FIRE;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    private static final VoxelShape field_21580 = Block.createCuboidShape(6.0, 0.0, 6.0, 10.0, 16.0, 10.0);
-    private final boolean field_23881;
-    private final int field_25182;
+    private static final VoxelShape SMOKEY_SHAPE = Block.createCuboidShape(6.0, 0.0, 6.0, 10.0, 16.0, 10.0);
+    private final boolean emitsParticles;
+    private final int fireDamage;
 
     public CampfireBlock(boolean bl, int i, AbstractBlock.Settings arg) {
         super(arg);
-        this.field_23881 = bl;
-        this.field_25182 = i;
+        this.emitsParticles = bl;
+        this.fireDamage = i;
         this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(LIT, true)).with(SIGNAL_FIRE, false)).with(WATERLOGGED, false)).with(FACING, Direction.NORTH));
     }
 
@@ -99,7 +99,7 @@ implements Waterloggable {
     @Override
     public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
         if (!arg4.isFireImmune() && arg.get(LIT).booleanValue() && arg4 instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)arg4)) {
-            arg4.damage(DamageSource.IN_FIRE, this.field_25182);
+            arg4.damage(DamageSource.IN_FIRE, this.fireDamage);
         }
         super.onEntityCollision(arg, arg2, arg3, arg4);
     }
@@ -159,14 +159,14 @@ implements Waterloggable {
         if (random.nextInt(10) == 0) {
             arg2.playSound((float)arg3.getX() + 0.5f, (double)((float)arg3.getY() + 0.5f), (double)((float)arg3.getZ() + 0.5f), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.5f + random.nextFloat(), random.nextFloat() * 0.7f + 0.6f, false);
         }
-        if (this.field_23881 && random.nextInt(5) == 0) {
+        if (this.emitsParticles && random.nextInt(5) == 0) {
             for (int i = 0; i < random.nextInt(1) + 1; ++i) {
                 arg2.addParticle(ParticleTypes.LAVA, (float)arg3.getX() + 0.5f, (float)arg3.getY() + 0.5f, (float)arg3.getZ() + 0.5f, random.nextFloat() / 2.0f, 5.0E-5, random.nextFloat() / 2.0f);
             }
         }
     }
 
-    public static void method_29288(WorldAccess arg, BlockPos arg2, BlockState arg3) {
+    public static void extinguish(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         BlockEntity lv;
         if (arg.isClient()) {
             for (int i = 0; i < 20; ++i) {
@@ -186,7 +186,7 @@ implements Waterloggable {
                 if (!arg.isClient()) {
                     arg.playSound(null, arg2, SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 }
-                CampfireBlock.method_29288(arg, arg2, arg3);
+                CampfireBlock.extinguish(arg, arg2, arg3);
             }
             arg.setBlockState(arg2, (BlockState)((BlockState)arg3.with(WATERLOGGED, true)).with(LIT, false), 3);
             arg.getFluidTickScheduler().schedule(arg2, arg4.getFluid(), arg4.getFluid().getTickRate(arg));
@@ -224,7 +224,7 @@ implements Waterloggable {
             if (CampfireBlock.isLitCampfire(lv2)) {
                 return true;
             }
-            boolean bl = VoxelShapes.matchesAnywhere(field_21580, lv2.getCollisionShape(arg, arg2, ShapeContext.absent()), BooleanBiFunction.AND);
+            boolean bl = VoxelShapes.matchesAnywhere(SMOKEY_SHAPE, lv2.getCollisionShape(arg, arg2, ShapeContext.absent()), BooleanBiFunction.AND);
             if (!bl) continue;
             BlockState lv3 = arg.getBlockState(lv.down());
             return CampfireBlock.isLitCampfire(lv3);

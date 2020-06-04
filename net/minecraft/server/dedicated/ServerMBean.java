@@ -102,11 +102,11 @@ implements DynamicMBean {
         private final String description;
         private final Class<?> type;
 
-        private Entry(String string, Supplier<Object> supplier, String string2, Class<?> arg) {
+        private Entry(String string, Supplier<Object> supplier, String string2, Class<?> class_) {
             this.name = string;
             this.getter = supplier;
             this.description = string2;
-            this.type = arg;
+            this.type = class_;
         }
 
         private MBeanAttributeInfo createInfo() {

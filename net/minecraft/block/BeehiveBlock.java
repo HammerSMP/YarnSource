@@ -189,16 +189,16 @@ extends BlockWithEntity {
             return;
         }
         VoxelShape lv = arg3.getCollisionShape(arg, arg2);
-        double d = lv.getMaximum(Direction.Axis.Y);
+        double d = lv.getMax(Direction.Axis.Y);
         if (d >= 1.0 && !arg3.isIn(BlockTags.IMPERMEABLE)) {
-            double e = lv.getMinimum(Direction.Axis.Y);
+            double e = lv.getMin(Direction.Axis.Y);
             if (e > 0.0) {
                 this.addHoneyParticle(arg, arg2, lv, (double)arg2.getY() + e - 0.05);
             } else {
                 BlockPos lv2 = arg2.down();
                 BlockState lv3 = arg.getBlockState(lv2);
                 VoxelShape lv4 = lv3.getCollisionShape(arg, lv2);
-                double f = lv4.getMaximum(Direction.Axis.Y);
+                double f = lv4.getMax(Direction.Axis.Y);
                 if ((f < 1.0 || !lv3.isFullCube(arg, lv2)) && lv3.getFluidState().isEmpty()) {
                     this.addHoneyParticle(arg, arg2, lv, (double)arg2.getY() - 0.05);
                 }
@@ -208,7 +208,7 @@ extends BlockWithEntity {
 
     @Environment(value=EnvType.CLIENT)
     private void addHoneyParticle(World arg, BlockPos arg2, VoxelShape arg3, double d) {
-        this.addHoneyParticle(arg, (double)arg2.getX() + arg3.getMinimum(Direction.Axis.X), (double)arg2.getX() + arg3.getMaximum(Direction.Axis.X), (double)arg2.getZ() + arg3.getMinimum(Direction.Axis.Z), (double)arg2.getZ() + arg3.getMaximum(Direction.Axis.Z), d);
+        this.addHoneyParticle(arg, (double)arg2.getX() + arg3.getMin(Direction.Axis.X), (double)arg2.getX() + arg3.getMax(Direction.Axis.X), (double)arg2.getZ() + arg3.getMin(Direction.Axis.Z), (double)arg2.getZ() + arg3.getMax(Direction.Axis.Z), d);
     }
 
     @Environment(value=EnvType.CLIENT)

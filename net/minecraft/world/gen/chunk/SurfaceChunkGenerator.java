@@ -533,12 +533,12 @@ extends ChunkGenerator {
 
     @Override
     public List<Biome.SpawnEntry> getEntitySpawnList(Biome arg, StructureAccessor arg2, SpawnGroup arg3, BlockPos arg4) {
-        if (arg2.method_28388(arg4, true, StructureFeature.field_24851).hasChildren()) {
+        if (arg2.method_28388(arg4, true, StructureFeature.SWAMP_HUT).hasChildren()) {
             if (arg3 == SpawnGroup.MONSTER) {
-                return StructureFeature.field_24851.getMonsterSpawns();
+                return StructureFeature.SWAMP_HUT.getMonsterSpawns();
             }
             if (arg3 == SpawnGroup.CREATURE) {
-                return StructureFeature.field_24851.getCreatureSpawns();
+                return StructureFeature.SWAMP_HUT.getCreatureSpawns();
             }
         }
         if (arg3 == SpawnGroup.MONSTER) {

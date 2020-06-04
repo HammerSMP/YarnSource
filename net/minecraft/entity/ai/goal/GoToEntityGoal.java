@@ -11,8 +11,8 @@ import net.minecraft.entity.mob.MobEntity;
 
 public class GoToEntityGoal
 extends LookAtEntityGoal {
-    public GoToEntityGoal(MobEntity arg, Class<? extends LivingEntity> arg2, float f, float g) {
-        super(arg, arg2, f, g);
+    public GoToEntityGoal(MobEntity arg, Class<? extends LivingEntity> class_, float f, float g) {
+        super(arg, class_, f, g);
         this.setControls(EnumSet.of(Goal.Control.LOOK, Goal.Control.MOVE));
     }
 }

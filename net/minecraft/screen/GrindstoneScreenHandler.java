@@ -98,7 +98,7 @@ extends ScreenHandler {
                     Enchantment lv = entry.getKey();
                     Integer integer = entry.getValue();
                     if (lv.isCursed()) continue;
-                    i += lv.getMinimumPower(integer);
+                    i += lv.getMinPower(integer);
                 }
                 return i;
             }

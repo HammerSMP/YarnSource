@@ -403,20 +403,20 @@ extends World {
             return;
         }
         VoxelShape lv = arg2.getCollisionShape(this, arg);
-        double d = lv.getMaximum(Direction.Axis.Y);
+        double d = lv.getMax(Direction.Axis.Y);
         if (d < 1.0) {
             if (bl) {
                 this.addParticle(arg.getX(), arg.getX() + 1, arg.getZ(), arg.getZ() + 1, (double)(arg.getY() + 1) - 0.05, arg3);
             }
         } else if (!arg2.isIn(BlockTags.IMPERMEABLE)) {
-            double e = lv.getMinimum(Direction.Axis.Y);
+            double e = lv.getMin(Direction.Axis.Y);
             if (e > 0.0) {
                 this.addParticle(arg, arg3, lv, (double)arg.getY() + e - 0.05);
             } else {
                 BlockPos lv2 = arg.down();
                 BlockState lv3 = this.getBlockState(lv2);
                 VoxelShape lv4 = lv3.getCollisionShape(this, lv2);
-                double f = lv4.getMaximum(Direction.Axis.Y);
+                double f = lv4.getMax(Direction.Axis.Y);
                 if (f < 1.0 && lv3.getFluidState().isEmpty()) {
                     this.addParticle(arg, arg3, lv, (double)arg.getY() - 0.05);
                 }
@@ -425,7 +425,7 @@ extends World {
     }
 
     private void addParticle(BlockPos arg, ParticleEffect arg2, VoxelShape arg3, double d) {
-        this.addParticle((double)arg.getX() + arg3.getMinimum(Direction.Axis.X), (double)arg.getX() + arg3.getMaximum(Direction.Axis.X), (double)arg.getZ() + arg3.getMinimum(Direction.Axis.Z), (double)arg.getZ() + arg3.getMaximum(Direction.Axis.Z), d, arg2);
+        this.addParticle((double)arg.getX() + arg3.getMin(Direction.Axis.X), (double)arg.getX() + arg3.getMax(Direction.Axis.X), (double)arg.getZ() + arg3.getMin(Direction.Axis.Z), (double)arg.getZ() + arg3.getMax(Direction.Axis.Z), d, arg2);
     }
 
     private void addParticle(double d, double e, double f, double g, double h, ParticleEffect arg) {
@@ -547,8 +547,8 @@ extends World {
     }
 
     @Override
-    public void checkBlockRerender(BlockPos arg, BlockState arg2, BlockState arg3) {
-        this.worldRenderer.checkBlockRerender(arg, arg2, arg3);
+    public void scheduleBlockRerenderIfNeeded(BlockPos arg, BlockState arg2, BlockState arg3) {
+        this.worldRenderer.scheduleBlockRerenderIfNeeded(arg, arg2, arg3);
     }
 
     public void scheduleBlockRenders(int i, int j, int k) {

@@ -56,17 +56,17 @@ public class LocationPredicate {
     private final BlockPredicate block;
     private final FluidPredicate fluid;
 
-    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable RegistryKey<World> arg6, @Nullable Boolean arg7, LightPredicate arg8, BlockPredicate arg9, FluidPredicate arg10) {
+    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable RegistryKey<World> arg6, @Nullable Boolean boolean_, LightPredicate arg7, BlockPredicate arg8, FluidPredicate arg9) {
         this.x = arg;
         this.y = arg2;
         this.z = arg3;
         this.biome = arg4;
         this.feature = arg5;
         this.dimension = arg6;
-        this.smokey = arg7;
-        this.light = arg8;
-        this.block = arg9;
-        this.fluid = arg10;
+        this.smokey = boolean_;
+        this.light = arg7;
+        this.block = arg8;
+        this.fluid = arg9;
     }
 
     public static LocationPredicate biome(Biome arg) {
@@ -95,7 +95,7 @@ public class LocationPredicate {
         if (!this.z.test(h)) {
             return false;
         }
-        if (this.dimension != null && this.dimension != arg.method_27983()) {
+        if (this.dimension != null && this.dimension != arg.getRegistryKey()) {
             return false;
         }
         BlockPos lv = new BlockPos(f, g, h);
@@ -131,7 +131,7 @@ public class LocationPredicate {
             jsonObject.add("position", (JsonElement)jsonObject2);
         }
         if (this.dimension != null) {
-            World.field_25178.encodeStart((DynamicOps)JsonOps.INSTANCE, this.dimension).resultOrPartial(((Logger)field_24732)::error).ifPresent(jsonElement -> jsonObject.add("dimension", jsonElement));
+            World.CODEC.encodeStart((DynamicOps)JsonOps.INSTANCE, this.dimension).resultOrPartial(((Logger)field_24732)::error).ifPresent(jsonElement -> jsonObject.add("dimension", jsonElement));
         }
         if (this.feature != null) {
             jsonObject.addProperty("feature", this.feature.getName());
@@ -164,11 +164,11 @@ public class LocationPredicate {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "biome"));
             lv6 = Registry.BIOME.getOrEmpty(lv7).orElseThrow(() -> new JsonSyntaxException("Unknown biome '" + lv7 + "'"));
         }
-        Boolean lv8 = jsonObject.has("smokey") ? Boolean.valueOf(jsonObject.get("smokey").getAsBoolean()) : null;
-        LightPredicate lv9 = LightPredicate.fromJson(jsonObject.get("light"));
-        BlockPredicate lv10 = BlockPredicate.fromJson(jsonObject.get("block"));
-        FluidPredicate lv11 = FluidPredicate.fromJson(jsonObject.get("fluid"));
-        return new LocationPredicate(lv, lv2, lv3, lv6, lv5, lv4, lv8, lv9, lv10, lv11);
+        Boolean boolean_ = jsonObject.has("smokey") ? Boolean.valueOf(jsonObject.get("smokey").getAsBoolean()) : null;
+        LightPredicate lv8 = LightPredicate.fromJson(jsonObject.get("light"));
+        BlockPredicate lv9 = BlockPredicate.fromJson(jsonObject.get("block"));
+        FluidPredicate lv10 = FluidPredicate.fromJson(jsonObject.get("fluid"));
+        return new LocationPredicate(lv, lv2, lv3, lv6, lv5, lv4, boolean_, lv8, lv9, lv10);
     }
 
     public static class Builder {
@@ -201,8 +201,8 @@ public class LocationPredicate {
             return this;
         }
 
-        public Builder smokey(Boolean arg) {
-            this.smokey = arg;
+        public Builder smokey(Boolean boolean_) {
+            this.smokey = boolean_;
             return this;
         }
 

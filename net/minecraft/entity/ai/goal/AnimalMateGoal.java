@@ -28,10 +28,10 @@ extends Goal {
         this(arg, d, arg.getClass());
     }
 
-    public AnimalMateGoal(AnimalEntity arg, double d, Class<? extends AnimalEntity> arg2) {
+    public AnimalMateGoal(AnimalEntity arg, double d, Class<? extends AnimalEntity> class_) {
         this.animal = arg;
         this.world = arg.world;
-        this.entityClass = arg2;
+        this.entityClass = class_;
         this.chance = d;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }

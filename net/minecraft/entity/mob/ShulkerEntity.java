@@ -343,7 +343,7 @@ implements Monster {
             return false;
         }
         if (super.damage(arg, f)) {
-            if ((double)this.getHealth() < (double)this.getMaximumHealth() * 0.5 && this.random.nextInt(4) == 0) {
+            if ((double)this.getHealth() < (double)this.getMaxHealth() * 0.5 && this.random.nextInt(4) == 0) {
                 this.tryTeleport();
             }
             return true;
@@ -438,11 +438,11 @@ implements Monster {
     @Nullable
     @Environment(value=EnvType.CLIENT)
     public DyeColor getColor() {
-        Byte lv = this.dataTracker.get(COLOR);
-        if (lv == 16 || lv > 15) {
+        Byte byte_ = this.dataTracker.get(COLOR);
+        if (byte_ == 16 || byte_ > 15) {
             return null;
         }
-        return DyeColor.byId(lv.byteValue());
+        return DyeColor.byId(byte_.byteValue());
     }
 
     static class SearchForTargetGoal

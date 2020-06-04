@@ -33,7 +33,7 @@ implements CommandOutput {
     }
 
     public ServerCommandSource createReconCommandSource() {
-        ServerWorld lv = this.server.getWorld(World.field_25179);
+        ServerWorld lv = this.server.getWorld(World.OVERWORLD);
         return new ServerCommandSource(this, Vec3d.of(lv.getSpawnPos()), Vec2f.ZERO, lv, 4, "Rcon", field_25146, this.server, null);
     }
 

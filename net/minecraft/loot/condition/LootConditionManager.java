@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.loot.LootGsons;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.resource.JsonDataLoader;
@@ -38,14 +38,14 @@ public class LootConditionManager
 extends JsonDataLoader {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON = LootGsons.getConditionGsonBuilder().create();
-    private Map<Identifier, class_5341> conditions = ImmutableMap.of();
+    private Map<Identifier, LootCondition> conditions = ImmutableMap.of();
 
     public LootConditionManager() {
         super(GSON, "predicates");
     }
 
     @Nullable
-    public class_5341 get(Identifier arg) {
+    public LootCondition get(Identifier arg) {
         return this.conditions.get(arg);
     }
 
@@ -55,10 +55,10 @@ extends JsonDataLoader {
         map.forEach((arg, jsonElement) -> {
             try {
                 if (jsonElement.isJsonArray()) {
-                    class_5341[] lvs = (class_5341[])GSON.fromJson(jsonElement, class_5341[].class);
+                    LootCondition[] lvs = (LootCondition[])GSON.fromJson(jsonElement, LootCondition[].class);
                     builder.put(arg, (Object)new class_5334(lvs));
                 } else {
-                    class_5341 lv = (class_5341)GSON.fromJson(jsonElement, class_5341.class);
+                    LootCondition lv = (LootCondition)GSON.fromJson(jsonElement, LootCondition.class);
                     builder.put(arg, (Object)lv);
                 }
             }
@@ -78,13 +78,13 @@ extends JsonDataLoader {
     }
 
     static class class_5334
-    implements class_5341 {
-        private final class_5341[] field_25202;
+    implements LootCondition {
+        private final LootCondition[] field_25202;
         private final Predicate<LootContext> field_25203;
 
-        private class_5334(class_5341[] args) {
+        private class_5334(LootCondition[] args) {
             this.field_25202 = args;
-            this.field_25203 = LootConditions.joinAnd(args);
+            this.field_25203 = LootConditionTypes.joinAnd(args);
         }
 
         @Override
@@ -94,14 +94,14 @@ extends JsonDataLoader {
 
         @Override
         public void validate(LootTableReporter arg) {
-            class_5341.super.validate(arg);
+            LootCondition.super.validate(arg);
             for (int i = 0; i < this.field_25202.length; ++i) {
                 this.field_25202[i].validate(arg.makeChild(".term[" + i + "]"));
             }
         }
 
         @Override
-        public class_5342 method_29325() {
+        public LootConditionType method_29325() {
             throw new UnsupportedOperationException();
         }
 

@@ -14,18 +14,18 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.item.ItemPredicate;
+import net.minecraft.util.JsonSerializable;
 
 public class MatchToolLootCondition
-implements class_5341 {
+implements LootCondition {
     private final ItemPredicate predicate;
 
     public MatchToolLootCondition(ItemPredicate arg) {
@@ -33,8 +33,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.MATCH_TOOL;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.MATCH_TOOL;
     }
 
     @Override
@@ -48,7 +48,7 @@ implements class_5341 {
         return lv != null && this.predicate.test(lv);
     }
 
-    public static class_5341.Builder builder(ItemPredicate.Builder arg) {
+    public static LootCondition.Builder builder(ItemPredicate.Builder arg) {
         return () -> new MatchToolLootCondition(arg.build());
     }
 
@@ -58,7 +58,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<MatchToolLootCondition> {
+    implements JsonSerializable<MatchToolLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, MatchToolLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());

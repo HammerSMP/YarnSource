@@ -14,24 +14,24 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.util.JsonSerializable;
 
 public class KilledByPlayerLootCondition
-implements class_5341 {
+implements LootCondition {
     private static final KilledByPlayerLootCondition INSTANCE = new KilledByPlayerLootCondition();
 
     private KilledByPlayerLootCondition() {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.KILLED_BY_PLAYER;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.KILLED_BY_PLAYER;
     }
 
     @Override
@@ -44,7 +44,7 @@ implements class_5341 {
         return arg.hasParameter(LootContextParameters.LAST_DAMAGE_PLAYER);
     }
 
-    public static class_5341.Builder builder() {
+    public static LootCondition.Builder builder() {
         return () -> INSTANCE;
     }
 
@@ -54,7 +54,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<KilledByPlayerLootCondition> {
+    implements JsonSerializable<KilledByPlayerLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, KilledByPlayerLootCondition arg, JsonSerializationContext jsonSerializationContext) {
         }

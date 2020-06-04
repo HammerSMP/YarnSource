@@ -25,9 +25,9 @@ extends AbstractCollection<T> {
     private final Class<T> elementType;
     private final List<T> allElements = Lists.newArrayList();
 
-    public TypeFilterableList(Class<T> arg) {
-        this.elementType = arg;
-        this.elementsByType.put(arg, this.allElements);
+    public TypeFilterableList(Class<T> class_) {
+        this.elementType = class_;
+        this.elementsByType.put(class_, this.allElements);
     }
 
     @Override
@@ -56,11 +56,11 @@ extends AbstractCollection<T> {
         return this.getAllOfType(object.getClass()).contains(object);
     }
 
-    public <S> Collection<S> getAllOfType(Class<S> arg2) {
-        if (!this.elementType.isAssignableFrom(arg2)) {
-            throw new IllegalArgumentException("Don't know how to search for " + arg2);
+    public <S> Collection<S> getAllOfType(Class<S> class_2) {
+        if (!this.elementType.isAssignableFrom(class_2)) {
+            throw new IllegalArgumentException("Don't know how to search for " + class_2);
         }
-        List list = this.elementsByType.computeIfAbsent(arg2, arg -> this.allElements.stream().filter(arg::isInstance).collect(Collectors.toList()));
+        List list = this.elementsByType.computeIfAbsent(class_2, class_ -> this.allElements.stream().filter(class_::isInstance).collect(Collectors.toList()));
         return Collections.unmodifiableCollection(list);
     }
 

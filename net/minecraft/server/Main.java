@@ -40,10 +40,10 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import net.minecraft.Bootstrap;
-import net.minecraft.class_5350;
 import net.minecraft.datafixer.Schemas;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressLogger;
 import net.minecraft.server.dedicated.EulaReader;
@@ -123,7 +123,7 @@ public class Main {
             String string = (String)Optional.ofNullable(optionSet.valueOf((OptionSpec)optionSpec11)).orElse(lv.getPropertiesHandler().levelName);
             LevelStorage lv4 = LevelStorage.create(file.toPath());
             LevelStorage.Session lv5 = lv4.createSession(string);
-            MinecraftServer.method_27725(lv5);
+            MinecraftServer.convertLevel(lv5);
             if (optionSet.has((OptionSpec)optionSpec5)) {
                 Main.method_29173(lv5, Schemas.getFixer(), optionSet.has((OptionSpec)optionSpec6), () -> true);
             }
@@ -140,10 +140,10 @@ public class Main {
             if (bl = optionSet.has((OptionSpec)optionSpec7)) {
                 LOGGER.warn("Safe mode active, only vanilla datapack will be loaded");
             }
-            ResourcePackManager<ResourcePackProfile> lv10 = MinecraftServer.method_29438(lv5.getDirectory(WorldSavePath.DATAPACKS), lv6, bl);
-            CompletableFuture<class_5350> completableFuture = class_5350.method_29466(lv10.method_29211(), true, lv.getPropertiesHandler().functionPermissionLevel, Util.getServerWorkerExecutor(), Runnable::run);
+            ResourcePackManager<ResourcePackProfile> lv10 = MinecraftServer.createResourcePackManager(lv5.getDirectory(WorldSavePath.DATAPACKS), lv6, bl);
+            CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv10.method_29211(), true, lv.getPropertiesHandler().functionPermissionLevel, Util.getServerWorkerExecutor(), Runnable::run);
             try {
-                class_5350 lv11 = completableFuture.get();
+                ServerResourceManager lv11 = completableFuture.get();
             }
             catch (Exception exception) {
                 LOGGER.warn("Failed to load datapacks, can't proceed with server load. You can either fix your datapacks or reset to vanilla with --safeMode", (Throwable)exception);
@@ -151,7 +151,7 @@ public class Main {
                 return;
             }
             lv12.method_29475();
-            final MinecraftDedicatedServer lv13 = new MinecraftDedicatedServer(lv5, lv10, (class_5350)lv12, lv6, lv, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, lv3, WorldGenerationProgressLogger::new);
+            final MinecraftDedicatedServer lv13 = new MinecraftDedicatedServer(lv5, lv10, (ServerResourceManager)lv12, lv6, lv, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, lv3, WorldGenerationProgressLogger::new);
             lv13.setServerName((String)optionSet.valueOf((OptionSpec)optionSpec9));
             lv13.setServerPort((Integer)optionSet.valueOf((OptionSpec)optionSpec12));
             lv13.setDemo(optionSet.has((OptionSpec)optionSpec3));

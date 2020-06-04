@@ -184,14 +184,14 @@ public class FeatureUpdater {
     }
 
     public static FeatureUpdater create(RegistryKey<World> arg, @Nullable PersistentStateManager arg2) {
-        if (arg == World.field_25179) {
+        if (arg == World.OVERWORLD) {
             return new FeatureUpdater(arg2, (List<String>)ImmutableList.of((Object)"Monument", (Object)"Stronghold", (Object)"Village", (Object)"Mineshaft", (Object)"Temple", (Object)"Mansion"), (List<String>)ImmutableList.of((Object)"Village", (Object)"Mineshaft", (Object)"Mansion", (Object)"Igloo", (Object)"Desert_Pyramid", (Object)"Jungle_Pyramid", (Object)"Swamp_Hut", (Object)"Stronghold", (Object)"Monument"));
         }
-        if (arg == World.field_25180) {
+        if (arg == World.NETHER) {
             ImmutableList list = ImmutableList.of((Object)"Fortress");
             return new FeatureUpdater(arg2, (List<String>)list, (List<String>)list);
         }
-        if (arg == World.field_25181) {
+        if (arg == World.END) {
             ImmutableList list2 = ImmutableList.of((Object)"EndCity");
             return new FeatureUpdater(arg2, (List<String>)list2, (List<String>)list2);
         }

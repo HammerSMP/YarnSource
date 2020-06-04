@@ -175,7 +175,7 @@ extends GolemEntity {
     }
 
     public Crack getCrack() {
-        return Crack.from(this.getHealth() / this.getMaximumHealth());
+        return Crack.from(this.getHealth() / this.getMaxHealth());
     }
 
     @Override

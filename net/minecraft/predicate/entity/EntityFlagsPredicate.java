@@ -30,12 +30,12 @@ public class EntityFlagsPredicate {
     @Nullable
     private final Boolean isBaby;
 
-    public EntityFlagsPredicate(@Nullable Boolean arg, @Nullable Boolean arg2, @Nullable Boolean arg3, @Nullable Boolean arg4, @Nullable Boolean arg5) {
-        this.isOnFire = arg;
-        this.isSneaking = arg2;
-        this.isSprinting = arg3;
-        this.isSwimming = arg4;
-        this.isBaby = arg5;
+    public EntityFlagsPredicate(@Nullable Boolean boolean_, @Nullable Boolean boolean2, @Nullable Boolean boolean3, @Nullable Boolean boolean4, @Nullable Boolean boolean5) {
+        this.isOnFire = boolean_;
+        this.isSneaking = boolean2;
+        this.isSprinting = boolean3;
+        this.isSwimming = boolean4;
+        this.isBaby = boolean5;
     }
 
     public boolean test(Entity arg) {
@@ -64,17 +64,17 @@ public class EntityFlagsPredicate {
             return ANY;
         }
         JsonObject jsonObject = JsonHelper.asObject(jsonElement, "entity flags");
-        Boolean lv = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_on_fire");
-        Boolean lv2 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_sneaking");
-        Boolean lv3 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_sprinting");
-        Boolean lv4 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_swimming");
-        Boolean lv5 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_baby");
-        return new EntityFlagsPredicate(lv, lv2, lv3, lv4, lv5);
+        Boolean boolean_ = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_on_fire");
+        Boolean boolean2 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_sneaking");
+        Boolean boolean3 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_sprinting");
+        Boolean boolean4 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_swimming");
+        Boolean boolean5 = EntityFlagsPredicate.nullableBooleanFromJson(jsonObject, "is_baby");
+        return new EntityFlagsPredicate(boolean_, boolean2, boolean3, boolean4, boolean5);
     }
 
-    private void nullableBooleanToJson(JsonObject jsonObject, String string, @Nullable Boolean arg) {
-        if (arg != null) {
-            jsonObject.addProperty(string, arg);
+    private void nullableBooleanToJson(JsonObject jsonObject, String string, @Nullable Boolean boolean_) {
+        if (boolean_ != null) {
+            jsonObject.addProperty(string, boolean_);
         }
     }
 
@@ -107,8 +107,8 @@ public class EntityFlagsPredicate {
             return new Builder();
         }
 
-        public Builder onFire(@Nullable Boolean arg) {
-            this.isOnFire = arg;
+        public Builder onFire(@Nullable Boolean boolean_) {
+            this.isOnFire = boolean_;
             return this;
         }
 

@@ -368,7 +368,7 @@ extends TameableEntity {
             this.setCatType(this.random.nextInt(10));
         }
         World lv = arg.getWorld();
-        if (lv instanceof ServerWorld && ((ServerWorld)lv).getStructureAccessor().method_28388(this.getBlockPos(), true, StructureFeature.field_24851).hasChildren()) {
+        if (lv instanceof ServerWorld && ((ServerWorld)lv).getStructureAccessor().method_28388(this.getBlockPos(), true, StructureFeature.SWAMP_HUT).hasChildren()) {
             this.setCatType(10);
             this.setPersistent();
         }
@@ -578,8 +578,8 @@ extends TameableEntity {
     extends FleeEntityGoal<T> {
         private final CatEntity cat;
 
-        public CatFleeGoal(CatEntity arg, Class<T> arg2, float f, double d, double e) {
-            super(arg, arg2, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
+        public CatFleeGoal(CatEntity arg, Class<T> class_, float f, double d, double e) {
+            super(arg, class_, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
             this.cat = arg;
         }
 

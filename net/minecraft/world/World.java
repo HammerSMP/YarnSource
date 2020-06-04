@@ -92,17 +92,17 @@ public abstract class World
 implements WorldAccess,
 AutoCloseable {
     protected static final Logger LOGGER = LogManager.getLogger();
-    public static final Codec<RegistryKey<World>> field_25178 = Identifier.field_25139.xmap(RegistryKey.createKeyFactory(Registry.DIMENSION), RegistryKey::getValue);
-    public static final RegistryKey<World> field_25179 = RegistryKey.of(Registry.DIMENSION, new Identifier("overworld"));
-    public static final RegistryKey<World> field_25180 = RegistryKey.of(Registry.DIMENSION, new Identifier("the_nether"));
-    public static final RegistryKey<World> field_25181 = RegistryKey.of(Registry.DIMENSION, new Identifier("the_end"));
+    public static final Codec<RegistryKey<World>> CODEC = Identifier.field_25139.xmap(RegistryKey.createKeyFactory(Registry.DIMENSION), RegistryKey::getValue);
+    public static final RegistryKey<World> OVERWORLD = RegistryKey.of(Registry.DIMENSION, new Identifier("overworld"));
+    public static final RegistryKey<World> NETHER = RegistryKey.of(Registry.DIMENSION, new Identifier("the_nether"));
+    public static final RegistryKey<World> END = RegistryKey.of(Registry.DIMENSION, new Identifier("the_end"));
     private static final Direction[] DIRECTIONS = Direction.values();
     public final List<BlockEntity> blockEntities = Lists.newArrayList();
     public final List<BlockEntity> tickingBlockEntities = Lists.newArrayList();
     protected final List<BlockEntity> pendingBlockEntities = Lists.newArrayList();
     protected final List<BlockEntity> unloadedBlockEntities = Lists.newArrayList();
     private final Thread thread;
-    private final boolean field_24496;
+    private final boolean debugWorld;
     private int ambientDarkness;
     protected int lcgBlockSeed = new Random().nextInt();
     protected final int unusedIncrement = 1013904223;
@@ -118,15 +118,15 @@ AutoCloseable {
     protected boolean iteratingTickingBlockEntities;
     private final WorldBorder border;
     private final BiomeAccess biomeAccess;
-    private final RegistryKey<World> field_25176;
-    private final RegistryKey<DimensionType> field_25177;
+    private final RegistryKey<World> registryKey;
+    private final RegistryKey<DimensionType> dimensionRegistryKey;
 
     protected World(MutableWorldProperties arg, RegistryKey<World> arg2, RegistryKey<DimensionType> arg3, DimensionType arg4, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
         this.profiler = supplier;
         this.properties = arg;
         this.dimension = arg4;
-        this.field_25176 = arg2;
-        this.field_25177 = arg3;
+        this.registryKey = arg2;
+        this.dimensionRegistryKey = arg3;
         this.isClient = bl;
         this.border = arg4.isShrunk() ? new WorldBorder(){
 
@@ -142,7 +142,7 @@ AutoCloseable {
         } : new WorldBorder();
         this.thread = Thread.currentThread();
         this.biomeAccess = new BiomeAccess(this, l, arg4.getBiomeAccessType());
-        this.field_24496 = bl2;
+        this.debugWorld = bl2;
     }
 
     @Override
@@ -199,13 +199,13 @@ AutoCloseable {
             BlockPos lv3 = arg.down();
             BlockState lv4 = this.getBlockState(lv3);
             VoxelShape lv5 = predicate.test(lv4) ? VoxelShapes.empty() : lv4.getCollisionShape(this, lv3);
-            double d = lv5.getMaximum(Direction.Axis.Y);
+            double d = lv5.getMax(Direction.Axis.Y);
             if (d >= 1.0) {
                 return d - 1.0;
             }
             return Double.NEGATIVE_INFINITY;
         }
-        return lv2.getMaximum(Direction.Axis.Y);
+        return lv2.getMax(Direction.Axis.Y);
     }
 
     public double method_26096(BlockPos arg, double d) {
@@ -214,7 +214,7 @@ AutoCloseable {
         for (int j = 0; j < i; ++j) {
             VoxelShape lv2 = this.getBlockState(lv).getCollisionShape(this, lv);
             if (!lv2.isEmpty()) {
-                return (double)j + lv2.getMinimum(Direction.Axis.Y);
+                return (double)j + lv2.getMin(Direction.Axis.Y);
             }
             lv.move(Direction.UP);
         }
@@ -259,7 +259,7 @@ AutoCloseable {
             }
             if (lv4 == arg2) {
                 if (lv3 != lv4) {
-                    this.checkBlockRerender(arg, lv3, lv4);
+                    this.scheduleBlockRerenderIfNeeded(arg, lv3, lv4);
                 }
                 if ((i & 2) != 0 && (!this.isClient || (i & 4) == 0) && (this.isClient || lv.getLevelType() != null && lv.getLevelType().isAfter(ChunkHolder.LevelType.TICKING))) {
                     this.updateListeners(arg, lv3, arg2, i);
@@ -315,7 +315,7 @@ AutoCloseable {
 
     public abstract void updateListeners(BlockPos var1, BlockState var2, BlockState var3, int var4);
 
-    public void checkBlockRerender(BlockPos arg, BlockState arg2, BlockState arg3) {
+    public void scheduleBlockRerenderIfNeeded(BlockPos arg, BlockState arg2, BlockState arg3) {
     }
 
     public void updateNeighborsAlways(BlockPos arg, Block arg2) {
@@ -804,38 +804,38 @@ AutoCloseable {
     }
 
     @Override
-    public <T extends Entity> List<T> getEntities(Class<? extends T> arg, Box arg2, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntities(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
         this.getProfiler().visit("getEntities");
-        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg2.maxX + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg2.maxZ + 2.0) / 16.0);
+        int i = MathHelper.floor((arg.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((arg.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((arg.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((arg.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m < j; ++m) {
             for (int n = k; n < l; ++n) {
                 WorldChunk lv2 = lv.getWorldChunk(m, n, false);
                 if (lv2 == null) continue;
-                lv2.getEntities(arg, arg2, list, predicate);
+                lv2.getEntities(class_, arg, list, predicate);
             }
         }
         return list;
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> arg, Box arg2, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
         this.getProfiler().visit("getLoadedEntities");
-        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg2.maxX + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg2.maxZ + 2.0) / 16.0);
+        int i = MathHelper.floor((arg.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((arg.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((arg.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((arg.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m < j; ++m) {
             for (int n = k; n < l; ++n) {
                 WorldChunk lv2 = lv.getWorldChunk(m, n);
                 if (lv2 == null) continue;
-                lv2.getEntities(arg, arg2, list, predicate);
+                lv2.getEntities(class_, arg, list, predicate);
             }
         }
         return list;
@@ -1024,7 +1024,7 @@ AutoCloseable {
         CrashReportSection lv = arg.addElement("Affected level", 1);
         lv.add("All players", () -> this.getPlayers().size() + " total; " + this.getPlayers());
         lv.add("Chunk stats", this.getChunkManager()::getDebugString);
-        lv.add("Level dimension", () -> this.method_27983().getValue().toString());
+        lv.add("Level dimension", () -> this.getRegistryKey().getValue().toString());
         try {
             this.properties.populateCrashReport(lv);
         }
@@ -1089,12 +1089,12 @@ AutoCloseable {
         return this.dimension;
     }
 
-    public RegistryKey<DimensionType> method_29287() {
-        return this.field_25177;
+    public RegistryKey<DimensionType> getDimensionRegistryKey() {
+        return this.dimensionRegistryKey;
     }
 
-    public RegistryKey<World> method_27983() {
-        return this.field_25176;
+    public RegistryKey<World> getRegistryKey() {
+        return this.registryKey;
     }
 
     @Override
@@ -1135,7 +1135,7 @@ AutoCloseable {
     }
 
     public final boolean isDebugWorld() {
-        return this.field_24496;
+        return this.debugWorld;
     }
 
     @Override

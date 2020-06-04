@@ -28,17 +28,17 @@ extends Enchantment {
     }
 
     @Override
-    public int getMinimumPower(int i) {
+    public int getMinPower(int i) {
         return field_9063[this.typeIndex] + (i - 1) * field_9066[this.typeIndex];
     }
 
     @Override
-    public int getMaximumPower(int i) {
-        return this.getMinimumPower(i) + field_9064[this.typeIndex];
+    public int getMaxPower(int i) {
+        return this.getMinPower(i) + field_9064[this.typeIndex];
     }
 
     @Override
-    public int getMaximumLevel() {
+    public int getMaxLevel() {
         return 5;
     }
 

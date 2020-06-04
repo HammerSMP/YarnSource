@@ -163,7 +163,7 @@ extends PersistentState {
                 this.icons.remove(string);
                 continue;
             }
-            if (arg2.isInFrame() || lv2.player.world.method_27983() != this.dimension || !this.showIcons) continue;
+            if (arg2.isInFrame() || lv2.player.world.getRegistryKey() != this.dimension || !this.showIcons) continue;
             this.addIcon(MapIcon.Type.PLAYER, lv2.player.world, string, lv2.player.getX(), lv2.player.getZ(), lv2.player.yaw, null);
         }
         if (arg2.isInFrame() && this.showIcons) {
@@ -221,7 +221,7 @@ extends PersistentState {
         int j = 63;
         if (g >= -63.0f && h >= -63.0f && g <= 63.0f && h <= 63.0f) {
             byte k = (byte)((f += f < 0.0 ? -8.0 : 8.0) * 16.0 / 360.0);
-            if (this.dimension == World.field_25180 && arg2 != null) {
+            if (this.dimension == World.NETHER && arg2 != null) {
                 int l = (int)(arg2.getLevelProperties().getTimeOfDay() / 10L);
                 k = (byte)(l * l * 34187121 + l * 121 >> 15 & 0xF);
             }

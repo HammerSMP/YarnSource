@@ -37,13 +37,13 @@ import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5323;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -177,7 +177,7 @@ implements Predicate<ItemStack> {
         }
         if (jsonObject.has("tag")) {
             Identifier lv3 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            Tag<Item> lv4 = class_5323.method_29223().method_29220().get(lv3);
+            Tag<Item> lv4 = TagContainers.instance().items().get(lv3);
             if (lv4 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv3 + "'");
             }
@@ -211,7 +211,7 @@ implements Predicate<ItemStack> {
         @Override
         public JsonObject toJson() {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("tag", class_5323.method_29223().method_29220().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", TagContainers.instance().items().checkId(this.tag).toString());
             return jsonObject;
         }
     }

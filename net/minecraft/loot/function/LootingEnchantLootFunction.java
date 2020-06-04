@@ -14,19 +14,19 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.UniformLootTableRange;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.util.JsonHelper;
 
 public class LootingEnchantLootFunction
@@ -34,15 +34,15 @@ extends ConditionalLootFunction {
     private final UniformLootTableRange countRange;
     private final int limit;
 
-    private LootingEnchantLootFunction(class_5341[] args, UniformLootTableRange arg, int i) {
+    private LootingEnchantLootFunction(LootCondition[] args, UniformLootTableRange arg, int i) {
         super(args);
         this.countRange = arg;
         this.limit = i;
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.LOOTING_ENCHANT;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.LOOTING_ENCHANT;
     }
 
     @Override
@@ -87,13 +87,13 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public LootingEnchantLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public LootingEnchantLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             int i = JsonHelper.getInt(jsonObject, "limit", 0);
             return new LootingEnchantLootFunction(args, JsonHelper.deserialize(jsonObject, "count", jsonDeserializationContext, UniformLootTableRange.class), i);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

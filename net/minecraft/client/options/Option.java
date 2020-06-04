@@ -32,8 +32,8 @@ import net.minecraft.util.math.MathHelper;
 
 @Environment(value=EnvType.CLIENT)
 public abstract class Option {
-    public static final DoubleOption BIOME_BLEND_RADIUS = new DoubleOption("options.biomeBlendRadius", 0.0, 7.0, 1.0f, arg -> arg.biomeBlendRadius, (arg, arg2) -> {
-        arg.biomeBlendRadius = MathHelper.clamp((int)arg2.doubleValue(), 0, 7);
+    public static final DoubleOption BIOME_BLEND_RADIUS = new DoubleOption("options.biomeBlendRadius", 0.0, 7.0, 1.0f, arg -> arg.biomeBlendRadius, (arg, double_) -> {
+        arg.biomeBlendRadius = MathHelper.clamp((int)double_.doubleValue(), 0, 7);
         MinecraftClient.getInstance().worldRenderer.reload();
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
@@ -41,29 +41,29 @@ public abstract class Option {
         int i = (int)d * 2 + 1;
         return lv.append(new TranslatableText("options.biomeBlendRadius." + i));
     });
-    public static final DoubleOption CHAT_HEIGHT_FOCUSED = new DoubleOption("options.chat.height.focused", 0.0, 1.0, 0.0f, arg -> arg.chatHeightFocused, (arg, arg2) -> {
-        arg.chatHeightFocused = arg2;
+    public static final DoubleOption CHAT_HEIGHT_FOCUSED = new DoubleOption("options.chat.height.focused", 0.0, 1.0, 0.0f, arg -> arg.chatHeightFocused, (arg, double_) -> {
+        arg.chatHeightFocused = double_;
         MinecraftClient.getInstance().inGameHud.getChatHud().reset();
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         return arg2.getDisplayPrefix().append(ChatHud.getHeight(d) + "px");
     });
-    public static final DoubleOption SATURATION = new DoubleOption("options.chat.height.unfocused", 0.0, 1.0, 0.0f, arg -> arg.chatHeightUnfocused, (arg, arg2) -> {
-        arg.chatHeightUnfocused = arg2;
+    public static final DoubleOption SATURATION = new DoubleOption("options.chat.height.unfocused", 0.0, 1.0, 0.0f, arg -> arg.chatHeightUnfocused, (arg, double_) -> {
+        arg.chatHeightUnfocused = double_;
         MinecraftClient.getInstance().inGameHud.getChatHud().reset();
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         return arg2.getDisplayPrefix().append(ChatHud.getHeight(d) + "px");
     });
-    public static final DoubleOption CHAT_OPACITY = new DoubleOption("options.chat.opacity", 0.0, 1.0, 0.0f, arg -> arg.chatOpacity, (arg, arg2) -> {
-        arg.chatOpacity = arg2;
+    public static final DoubleOption CHAT_OPACITY = new DoubleOption("options.chat.opacity", 0.0, 1.0, 0.0f, arg -> arg.chatOpacity, (arg, double_) -> {
+        arg.chatOpacity = double_;
         MinecraftClient.getInstance().inGameHud.getChatHud().reset();
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         return arg2.getDisplayPrefix().append((int)(d * 90.0 + 10.0) + "%");
     });
-    public static final DoubleOption CHAT_SCALE = new DoubleOption("options.chat.scale", 0.0, 1.0, 0.0f, arg -> arg.chatScale, (arg, arg2) -> {
-        arg.chatScale = arg2;
+    public static final DoubleOption CHAT_SCALE = new DoubleOption("options.chat.scale", 0.0, 1.0, 0.0f, arg -> arg.chatScale, (arg, double_) -> {
+        arg.chatScale = double_;
         MinecraftClient.getInstance().inGameHud.getChatHud().reset();
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
@@ -73,18 +73,18 @@ public abstract class Option {
         }
         return lv.append((int)(d * 100.0) + "%");
     });
-    public static final DoubleOption CHAT_WIDTH = new DoubleOption("options.chat.width", 0.0, 1.0, 0.0f, arg -> arg.chatWidth, (arg, arg2) -> {
-        arg.chatWidth = arg2;
+    public static final DoubleOption CHAT_WIDTH = new DoubleOption("options.chat.width", 0.0, 1.0, 0.0f, arg -> arg.chatWidth, (arg, double_) -> {
+        arg.chatWidth = double_;
         MinecraftClient.getInstance().inGameHud.getChatHud().reset();
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         return arg2.getDisplayPrefix().append(ChatHud.getWidth(d) + "px");
     });
-    public static final DoubleOption CHAT_LINE_SPACING = new DoubleOption("options.chat.line_spacing", 0.0, 1.0, 0.0f, arg -> arg.chatLineSpacing, (arg, arg2) -> {
-        arg.chatLineSpacing = arg2;
+    public static final DoubleOption CHAT_LINE_SPACING = new DoubleOption("options.chat.line_spacing", 0.0, 1.0, 0.0f, arg -> arg.chatLineSpacing, (arg, double_) -> {
+        arg.chatLineSpacing = double_;
     }, (arg, arg2) -> arg2.getDisplayPrefix().append((int)(arg2.getRatio(arg2.get((GameOptions)arg)) * 100.0) + "%"));
-    public static final DoubleOption CHAT_DELAY_INSTANT = new DoubleOption("options.chat.delay_instant", 0.0, 6.0, 0.1f, arg -> arg.chatDelay, (arg, arg2) -> {
-        arg.chatDelay = arg2;
+    public static final DoubleOption CHAT_DELAY_INSTANT = new DoubleOption("options.chat.delay_instant", 0.0, 6.0, 0.1f, arg -> arg.chatDelay, (arg, double_) -> {
+        arg.chatDelay = double_;
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
         if (d <= 0.0) {
@@ -92,8 +92,8 @@ public abstract class Option {
         }
         return new TranslatableText("options.chat.delay", String.format("%.1f", d));
     });
-    public static final DoubleOption FOV = new DoubleOption("options.fov", 30.0, 110.0, 1.0f, arg -> arg.fov, (arg, arg2) -> {
-        arg.fov = arg2;
+    public static final DoubleOption FOV = new DoubleOption("options.fov", 30.0, 110.0, 1.0f, arg -> arg.fov, (arg, double_) -> {
+        arg.fov = double_;
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
         MutableText lv = arg2.getDisplayPrefix();
@@ -105,8 +105,8 @@ public abstract class Option {
         }
         return lv.append(Integer.toString((int)d));
     });
-    public static final DoubleOption FRAMERATE_LIMIT = new DoubleOption("options.framerateLimit", 10.0, 260.0, 10.0f, arg -> arg.maxFps, (arg, arg2) -> {
-        arg.maxFps = (int)arg2.doubleValue();
+    public static final DoubleOption FRAMERATE_LIMIT = new DoubleOption("options.framerateLimit", 10.0, 260.0, 10.0f, arg -> arg.maxFps, (arg, double_) -> {
+        arg.maxFps = (int)double_.doubleValue();
         MinecraftClient.getInstance().getWindow().setFramerateLimit(arg.maxFps);
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
@@ -116,8 +116,8 @@ public abstract class Option {
         }
         return lv.append(new TranslatableText("options.framerate", (int)d));
     });
-    public static final DoubleOption GAMMA = new DoubleOption("options.gamma", 0.0, 1.0, 0.0f, arg -> arg.gamma, (arg, arg2) -> {
-        arg.gamma = arg2;
+    public static final DoubleOption GAMMA = new DoubleOption("options.gamma", 0.0, 1.0, 0.0f, arg -> arg.gamma, (arg, double_) -> {
+        arg.gamma = double_;
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         MutableText lv = arg2.getDisplayPrefix();
@@ -129,8 +129,8 @@ public abstract class Option {
         }
         return lv.append("+" + (int)(d * 100.0) + "%");
     });
-    public static final DoubleOption MIPMAP_LEVELS = new DoubleOption("options.mipmapLevels", 0.0, 4.0, 1.0f, arg -> arg.mipmapLevels, (arg, arg2) -> {
-        arg.mipmapLevels = (int)arg2.doubleValue();
+    public static final DoubleOption MIPMAP_LEVELS = new DoubleOption("options.mipmapLevels", 0.0, 4.0, 1.0f, arg -> arg.mipmapLevels, (arg, double_) -> {
+        arg.mipmapLevels = (int)double_.doubleValue();
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
         MutableText lv = arg2.getDisplayPrefix();
@@ -139,34 +139,34 @@ public abstract class Option {
         }
         return lv.append(Integer.toString((int)d));
     });
-    public static final DoubleOption MOUSE_WHEEL_SENSITIVITY = new LogarithmicOption("options.mouseWheelSensitivity", 0.01, 10.0, 0.01f, arg -> arg.mouseWheelSensitivity, (arg, arg2) -> {
-        arg.mouseWheelSensitivity = arg2;
+    public static final DoubleOption MOUSE_WHEEL_SENSITIVITY = new LogarithmicOption("options.mouseWheelSensitivity", 0.01, 10.0, 0.01f, arg -> arg.mouseWheelSensitivity, (arg, double_) -> {
+        arg.mouseWheelSensitivity = double_;
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         return arg2.getDisplayPrefix().append(String.format("%.2f", arg2.getValue(d)));
     });
-    public static final BooleanOption RAW_MOUSE_INPUT = new BooleanOption("options.rawMouseInput", arg -> arg.rawMouseInput, (arg, arg2) -> {
-        arg.rawMouseInput = arg2;
+    public static final BooleanOption RAW_MOUSE_INPUT = new BooleanOption("options.rawMouseInput", arg -> arg.rawMouseInput, (arg, boolean_) -> {
+        arg.rawMouseInput = boolean_;
         Window lv = MinecraftClient.getInstance().getWindow();
         if (lv != null) {
-            lv.setRawMouseMotion((boolean)arg2);
+            lv.setRawMouseMotion((boolean)boolean_);
         }
     });
-    public static final DoubleOption RENDER_DISTANCE = new DoubleOption("options.renderDistance", 2.0, 16.0, 1.0f, arg -> arg.viewDistance, (arg, arg2) -> {
-        arg.viewDistance = (int)arg2.doubleValue();
+    public static final DoubleOption RENDER_DISTANCE = new DoubleOption("options.renderDistance", 2.0, 16.0, 1.0f, arg -> arg.viewDistance, (arg, double_) -> {
+        arg.viewDistance = (int)double_.doubleValue();
         MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate();
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
         return arg2.getDisplayPrefix().append(new TranslatableText("options.chunks", (int)d));
     });
-    public static final DoubleOption ENTITY_DISTANCE_SCALING = new DoubleOption("options.entityDistanceScaling", 0.5, 5.0, 0.25f, arg -> arg.entityDistanceScaling, (arg, arg2) -> {
-        arg.entityDistanceScaling = (float)arg2.doubleValue();
+    public static final DoubleOption ENTITY_DISTANCE_SCALING = new DoubleOption("options.entityDistanceScaling", 0.5, 5.0, 0.25f, arg -> arg.entityDistanceScaling, (arg, double_) -> {
+        arg.entityDistanceScaling = (float)double_.doubleValue();
     }, (arg, arg2) -> {
         double d = arg2.get((GameOptions)arg);
         return arg2.getDisplayPrefix().append(new TranslatableText("options.entityDistancePercent", (int)(d * 100.0)));
     });
-    public static final DoubleOption SENSITIVITY = new DoubleOption("options.sensitivity", 0.0, 1.0, 0.0f, arg -> arg.mouseSensitivity, (arg, arg2) -> {
-        arg.mouseSensitivity = arg2;
+    public static final DoubleOption SENSITIVITY = new DoubleOption("options.sensitivity", 0.0, 1.0, 0.0f, arg -> arg.mouseSensitivity, (arg, double_) -> {
+        arg.mouseSensitivity = double_;
     }, (arg, arg2) -> {
         double d = arg2.getRatio(arg2.get((GameOptions)arg));
         MutableText lv = arg2.getDisplayPrefix();
@@ -178,8 +178,8 @@ public abstract class Option {
         }
         return lv.append((int)(d * 200.0) + "%");
     });
-    public static final DoubleOption TEXT_BACKGROUND_OPACITY = new DoubleOption("options.accessibility.text_background_opacity", 0.0, 1.0, 0.0f, arg -> arg.textBackgroundOpacity, (arg, arg2) -> {
-        arg.textBackgroundOpacity = arg2;
+    public static final DoubleOption TEXT_BACKGROUND_OPACITY = new DoubleOption("options.accessibility.text_background_opacity", 0.0, 1.0, 0.0f, arg -> arg.textBackgroundOpacity, (arg, double_) -> {
+        arg.textBackgroundOpacity = double_;
         MinecraftClient.getInstance().inGameHud.getChatHud().reset();
     }, (arg, arg2) -> arg2.getDisplayPrefix().append((int)(arg2.getRatio(arg2.get((GameOptions)arg)) * 100.0) + "%"));
     public static final CyclingOption AO = new CyclingOption("options.ao", (arg, integer) -> {
@@ -231,59 +231,59 @@ public abstract class Option {
     public static final CyclingOption TEXT_BACKGROUND = new CyclingOption("options.accessibility.text_background", (arg, integer) -> {
         arg.backgroundForChatOnly = !arg.backgroundForChatOnly;
     }, (arg, arg2) -> arg2.getDisplayPrefix().append(new TranslatableText(arg.backgroundForChatOnly ? "options.accessibility.text_background.chat" : "options.accessibility.text_background.everywhere")));
-    public static final BooleanOption AUTO_JUMP = new BooleanOption("options.autoJump", arg -> arg.autoJump, (arg, arg2) -> {
-        arg.autoJump = arg2;
+    public static final BooleanOption AUTO_JUMP = new BooleanOption("options.autoJump", arg -> arg.autoJump, (arg, boolean_) -> {
+        arg.autoJump = boolean_;
     });
-    public static final BooleanOption AUTO_SUGGESTIONS = new BooleanOption("options.autoSuggestCommands", arg -> arg.autoSuggestions, (arg, arg2) -> {
-        arg.autoSuggestions = arg2;
+    public static final BooleanOption AUTO_SUGGESTIONS = new BooleanOption("options.autoSuggestCommands", arg -> arg.autoSuggestions, (arg, boolean_) -> {
+        arg.autoSuggestions = boolean_;
     });
-    public static final BooleanOption CHAT_COLOR = new BooleanOption("options.chat.color", arg -> arg.chatColors, (arg, arg2) -> {
-        arg.chatColors = arg2;
+    public static final BooleanOption CHAT_COLOR = new BooleanOption("options.chat.color", arg -> arg.chatColors, (arg, boolean_) -> {
+        arg.chatColors = boolean_;
     });
-    public static final BooleanOption CHAT_LINKS = new BooleanOption("options.chat.links", arg -> arg.chatLinks, (arg, arg2) -> {
-        arg.chatLinks = arg2;
+    public static final BooleanOption CHAT_LINKS = new BooleanOption("options.chat.links", arg -> arg.chatLinks, (arg, boolean_) -> {
+        arg.chatLinks = boolean_;
     });
-    public static final BooleanOption CHAT_LINKS_PROMPT = new BooleanOption("options.chat.links.prompt", arg -> arg.chatLinksPrompt, (arg, arg2) -> {
-        arg.chatLinksPrompt = arg2;
+    public static final BooleanOption CHAT_LINKS_PROMPT = new BooleanOption("options.chat.links.prompt", arg -> arg.chatLinksPrompt, (arg, boolean_) -> {
+        arg.chatLinksPrompt = boolean_;
     });
-    public static final BooleanOption DISCRETE_MOUSE_SCROLL = new BooleanOption("options.discrete_mouse_scroll", arg -> arg.discreteMouseScroll, (arg, arg2) -> {
-        arg.discreteMouseScroll = arg2;
+    public static final BooleanOption DISCRETE_MOUSE_SCROLL = new BooleanOption("options.discrete_mouse_scroll", arg -> arg.discreteMouseScroll, (arg, boolean_) -> {
+        arg.discreteMouseScroll = boolean_;
     });
-    public static final BooleanOption VSYNC = new BooleanOption("options.vsync", arg -> arg.enableVsync, (arg, arg2) -> {
-        arg.enableVsync = arg2;
+    public static final BooleanOption VSYNC = new BooleanOption("options.vsync", arg -> arg.enableVsync, (arg, boolean_) -> {
+        arg.enableVsync = boolean_;
         if (MinecraftClient.getInstance().getWindow() != null) {
             MinecraftClient.getInstance().getWindow().setVsync(arg.enableVsync);
         }
     });
-    public static final BooleanOption ENTITY_SHADOWS = new BooleanOption("options.entityShadows", arg -> arg.entityShadows, (arg, arg2) -> {
-        arg.entityShadows = arg2;
+    public static final BooleanOption ENTITY_SHADOWS = new BooleanOption("options.entityShadows", arg -> arg.entityShadows, (arg, boolean_) -> {
+        arg.entityShadows = boolean_;
     });
-    public static final BooleanOption FORCE_UNICODE_FONT = new BooleanOption("options.forceUnicodeFont", arg -> arg.forceUnicodeFont, (arg, arg2) -> {
-        arg.forceUnicodeFont = arg2;
+    public static final BooleanOption FORCE_UNICODE_FONT = new BooleanOption("options.forceUnicodeFont", arg -> arg.forceUnicodeFont, (arg, boolean_) -> {
+        arg.forceUnicodeFont = boolean_;
         MinecraftClient lv = MinecraftClient.getInstance();
         if (lv.getWindow() != null) {
-            lv.initFont((boolean)arg2);
+            lv.initFont((boolean)boolean_);
         }
     });
-    public static final BooleanOption INVERT_MOUSE = new BooleanOption("options.invertMouse", arg -> arg.invertYMouse, (arg, arg2) -> {
-        arg.invertYMouse = arg2;
+    public static final BooleanOption INVERT_MOUSE = new BooleanOption("options.invertMouse", arg -> arg.invertYMouse, (arg, boolean_) -> {
+        arg.invertYMouse = boolean_;
     });
-    public static final BooleanOption REALMS_NOTIFICATIONS = new BooleanOption("options.realmsNotifications", arg -> arg.realmsNotifications, (arg, arg2) -> {
-        arg.realmsNotifications = arg2;
+    public static final BooleanOption REALMS_NOTIFICATIONS = new BooleanOption("options.realmsNotifications", arg -> arg.realmsNotifications, (arg, boolean_) -> {
+        arg.realmsNotifications = boolean_;
     });
-    public static final BooleanOption REDUCED_DEBUG_INFO = new BooleanOption("options.reducedDebugInfo", arg -> arg.reducedDebugInfo, (arg, arg2) -> {
-        arg.reducedDebugInfo = arg2;
+    public static final BooleanOption REDUCED_DEBUG_INFO = new BooleanOption("options.reducedDebugInfo", arg -> arg.reducedDebugInfo, (arg, boolean_) -> {
+        arg.reducedDebugInfo = boolean_;
     });
-    public static final BooleanOption SUBTITLES = new BooleanOption("options.showSubtitles", arg -> arg.showSubtitles, (arg, arg2) -> {
-        arg.showSubtitles = arg2;
+    public static final BooleanOption SUBTITLES = new BooleanOption("options.showSubtitles", arg -> arg.showSubtitles, (arg, boolean_) -> {
+        arg.showSubtitles = boolean_;
     });
     public static final BooleanOption SNOOPER = new BooleanOption("options.snooper", arg -> {
         if (arg.snooperEnabled) {
             // empty if block
         }
         return false;
-    }, (arg, arg2) -> {
-        arg.snooperEnabled = arg2;
+    }, (arg, boolean_) -> {
+        arg.snooperEnabled = boolean_;
     });
     public static final CyclingOption SNEAK_TOGGLED = new CyclingOption("key.sneak", (arg, integer) -> {
         arg.sneakToggled = !arg.sneakToggled;
@@ -291,19 +291,19 @@ public abstract class Option {
     public static final CyclingOption SPRINT_TOGGLED = new CyclingOption("key.sprint", (arg, integer) -> {
         arg.sprintToggled = !arg.sprintToggled;
     }, (arg, arg2) -> arg2.getDisplayPrefix().append(new TranslatableText(arg.sprintToggled ? "options.key.toggle" : "options.key.hold")));
-    public static final BooleanOption TOUCHSCREEN = new BooleanOption("options.touchscreen", arg -> arg.touchscreen, (arg, arg2) -> {
-        arg.touchscreen = arg2;
+    public static final BooleanOption TOUCHSCREEN = new BooleanOption("options.touchscreen", arg -> arg.touchscreen, (arg, boolean_) -> {
+        arg.touchscreen = boolean_;
     });
-    public static final BooleanOption FULLSCREEN = new BooleanOption("options.fullscreen", arg -> arg.fullscreen, (arg, arg2) -> {
-        arg.fullscreen = arg2;
+    public static final BooleanOption FULLSCREEN = new BooleanOption("options.fullscreen", arg -> arg.fullscreen, (arg, boolean_) -> {
+        arg.fullscreen = boolean_;
         MinecraftClient lv = MinecraftClient.getInstance();
         if (lv.getWindow() != null && lv.getWindow().isFullscreen() != arg.fullscreen) {
             lv.getWindow().toggleFullscreen();
             arg.fullscreen = lv.getWindow().isFullscreen();
         }
     });
-    public static final BooleanOption VIEW_BOBBING = new BooleanOption("options.viewBobbing", arg -> arg.bobView, (arg, arg2) -> {
-        arg.bobView = arg2;
+    public static final BooleanOption VIEW_BOBBING = new BooleanOption("options.viewBobbing", arg -> arg.bobView, (arg, boolean_) -> {
+        arg.bobView = boolean_;
     });
     private final String key;
 

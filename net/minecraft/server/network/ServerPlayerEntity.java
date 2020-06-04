@@ -182,7 +182,7 @@ implements ScreenHandlerListener {
     @Nullable
     private Vec3d enteredNetherPos;
     private ChunkSectionPos cameraPosition = ChunkSectionPos.from(0, 0, 0);
-    private RegistryKey<World> spawnPointDimension = World.field_25179;
+    private RegistryKey<World> spawnPointDimension = World.OVERWORLD;
     private BlockPos spawnPointPosition;
     private boolean spawnPointSet;
     private int screenHandlerSyncId;
@@ -203,7 +203,7 @@ implements ScreenHandlerListener {
 
     private void moveToSpawn(ServerWorld arg) {
         BlockPos lv = arg.getSpawnPos();
-        if (arg.getDimension().hasSkyLight() && arg.getServer().method_27728().getGameMode() != GameMode.ADVENTURE) {
+        if (arg.getDimension().hasSkyLight() && arg.getServer().getSaveProperties().getGameMode() != GameMode.ADVENTURE) {
             long l;
             long m;
             int i = Math.max(0, this.server.getSpawnRadius(arg));
@@ -266,7 +266,7 @@ implements ScreenHandlerListener {
             this.spawnPointPosition = new BlockPos(arg.getInt("SpawnX"), arg.getInt("SpawnY"), arg.getInt("SpawnZ"));
             this.spawnPointSet = arg.getBoolean("SpawnForced");
             if (arg.contains("SpawnDimension")) {
-                this.spawnPointDimension = World.field_25178.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(World.field_25179);
+                this.spawnPointDimension = World.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("SpawnDimension")).resultOrPartial(((Logger)LOGGER)::error).orElse(World.OVERWORLD);
             }
         }
     }
@@ -294,7 +294,7 @@ implements ScreenHandlerListener {
             arg.put("RootVehicle", lv4);
         }
         arg.put("recipeBook", this.recipeBook.toTag());
-        arg.putString("Dimension", this.world.method_27983().getValue().toString());
+        arg.putString("Dimension", this.world.getRegistryKey().getValue().toString());
         if (this.spawnPointPosition != null) {
             arg.putInt("SpawnX", this.spawnPointPosition.getX());
             arg.putInt("SpawnY", this.spawnPointPosition.getY());
@@ -473,7 +473,7 @@ implements ScreenHandlerListener {
             }));
             AbstractTeam lv2 = this.getScoreboardTeam();
             if (lv2 == null || lv2.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.ALWAYS) {
-                this.server.getPlayerManager().broadcastChatMessage(lv, MessageType.SYSTEM, Util.field_25140);
+                this.server.getPlayerManager().broadcastChatMessage(lv, MessageType.SYSTEM, Util.NIL_UUID);
             } else if (lv2.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS) {
                 this.server.getPlayerManager().sendToTeam(this, lv);
             } else if (lv2.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM) {
@@ -572,8 +572,8 @@ implements ScreenHandlerListener {
     public Entity changeDimension(RegistryKey<World> arg) {
         float h;
         this.inTeleportationState = true;
-        RegistryKey<World> lv = this.world.method_27983();
-        if (lv == World.field_25181 && arg == World.field_25179) {
+        RegistryKey<World> lv = this.world.getRegistryKey();
+        if (lv == World.END && arg == World.OVERWORLD) {
             this.detach();
             this.getServerWorld().removePlayer(this);
             if (!this.notInAnyWorld) {
@@ -586,7 +586,7 @@ implements ScreenHandlerListener {
         ServerWorld lv2 = this.server.getWorld(lv);
         ServerWorld lv3 = this.server.getWorld(arg);
         WorldProperties lv4 = lv3.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv3.method_29287(), arg, BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.isDebugWorld(), lv3.method_28125(), true));
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv3.getDimensionRegistryKey(), arg, BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.isDebugWorld(), lv3.method_28125(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
         PlayerManager lv5 = this.server.getPlayerManager();
         lv5.sendCommandTree(this);
@@ -598,7 +598,7 @@ implements ScreenHandlerListener {
         float g = this.pitch;
         float i = h = this.yaw;
         lv2.getProfiler().push("moving");
-        if (lv == World.field_25179 && arg == World.field_25181) {
+        if (lv == World.OVERWORLD && arg == World.END) {
             BlockPos lv6 = ServerWorld.field_25144;
             d = lv6.getX();
             e = lv6.getY();
@@ -606,7 +606,7 @@ implements ScreenHandlerListener {
             h = 90.0f;
             g = 0.0f;
         } else {
-            if (lv == World.field_25179 && arg == World.field_25180) {
+            if (lv == World.OVERWORLD && arg == World.NETHER) {
                 this.enteredNetherPos = this.getPos();
             }
             DimensionType lv7 = lv2.getDimension();
@@ -630,7 +630,7 @@ implements ScreenHandlerListener {
         d = MathHelper.clamp(d, k, m);
         f = MathHelper.clamp(f, l, n);
         this.refreshPositionAndAngles(d, e, f, h, g);
-        if (arg == World.field_25181) {
+        if (arg == World.END) {
             int o = MathHelper.floor(this.getX());
             int p = MathHelper.floor(this.getY()) - 1;
             int q = MathHelper.floor(this.getZ());
@@ -663,13 +663,13 @@ implements ScreenHandlerListener {
     private void dimensionChanged(ServerWorld arg) {
         DimensionType lv = arg.getDimension();
         DimensionType lv2 = this.world.getDimension();
-        RegistryKey<World> lv3 = arg.method_27983();
-        RegistryKey<World> lv4 = this.world.method_27983();
+        RegistryKey<World> lv3 = arg.getRegistryKey();
+        RegistryKey<World> lv4 = this.world.getRegistryKey();
         Criteria.CHANGED_DIMENSION.trigger(this, lv3, lv4);
         if (lv.isNether() && lv2.isOverworld() && this.enteredNetherPos != null) {
             Criteria.NETHER_TRAVEL.trigger(this, this.enteredNetherPos);
         }
-        if (lv4 != World.field_25180) {
+        if (lv4 != World.NETHER) {
             this.enteredNetherPos = null;
         }
     }
@@ -713,7 +713,7 @@ implements ScreenHandlerListener {
         if (this.isBedObstructed(arg2, lv)) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.OBSTRUCTED));
         }
-        this.setSpawnPoint(this.world.method_27983(), arg2, false, true);
+        this.setSpawnPoint(this.world.getRegistryKey(), arg2, false, true);
         if (this.world.isDay()) {
             return Either.left((Object)((Object)PlayerEntity.SleepFailureReason.NOT_POSSIBLE_NOW));
         }
@@ -992,7 +992,7 @@ implements ScreenHandlerListener {
 
     @Override
     public void sendMessage(Text arg, boolean bl) {
-        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, bl ? MessageType.GAME_INFO : MessageType.CHAT, Util.field_25140));
+        this.networkHandler.sendPacket(new GameMessageS2CPacket(arg, bl ? MessageType.GAME_INFO : MessageType.CHAT, Util.NIL_UUID));
     }
 
     @Override
@@ -1276,7 +1276,7 @@ implements ScreenHandlerListener {
         } else {
             ServerWorld lv = this.getServerWorld();
             WorldProperties lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.method_29287(), arg.method_27983(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.isDebugWorld(), arg.method_28125(), true));
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.isDebugWorld(), arg.method_28125(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);
@@ -1310,14 +1310,14 @@ implements ScreenHandlerListener {
             boolean bl3;
             boolean bl4 = bl3 = arg2.equals(this.spawnPointPosition) && arg.equals(this.spawnPointDimension);
             if (bl2 && !bl3) {
-                this.sendSystemMessage(new TranslatableText("block.minecraft.set_spawn"), Util.field_25140);
+                this.sendSystemMessage(new TranslatableText("block.minecraft.set_spawn"), Util.NIL_UUID);
             }
             this.spawnPointPosition = arg2;
             this.spawnPointDimension = arg;
             this.spawnPointSet = bl;
         } else {
             this.spawnPointPosition = null;
-            this.spawnPointDimension = World.field_25179;
+            this.spawnPointDimension = World.OVERWORLD;
             this.spawnPointSet = false;
         }
     }

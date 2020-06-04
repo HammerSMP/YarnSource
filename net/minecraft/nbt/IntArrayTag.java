@@ -178,7 +178,8 @@ extends AbstractListTag<IntTag> {
         return false;
     }
 
-    public IntTag method_10536(int i) {
+    @Override
+    public IntTag remove(int i) {
         int j = this.value[i];
         this.value = ArrayUtils.remove((int[])this.value, (int)i);
         return IntTag.of(j);
@@ -196,7 +197,7 @@ extends AbstractListTag<IntTag> {
 
     @Override
     public /* synthetic */ Tag remove(int i) {
-        return this.method_10536(i);
+        return this.remove(i);
     }
 
     @Override
@@ -216,7 +217,7 @@ extends AbstractListTag<IntTag> {
 
     @Override
     public /* synthetic */ Object remove(int i) {
-        return this.method_10536(i);
+        return this.remove(i);
     }
 
     @Override

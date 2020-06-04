@@ -12,16 +12,16 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Random;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTableRange;
 import net.minecraft.loot.LootTableRanges;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.util.JsonHelper;
 
 public class EnchantWithLevelsLootFunction
@@ -29,15 +29,15 @@ extends ConditionalLootFunction {
     private final LootTableRange range;
     private final boolean treasureEnchantmentsAllowed;
 
-    private EnchantWithLevelsLootFunction(class_5341[] args, LootTableRange arg, boolean bl) {
+    private EnchantWithLevelsLootFunction(LootCondition[] args, LootTableRange arg, boolean bl) {
         super(args);
         this.range = arg;
         this.treasureEnchantmentsAllowed = bl;
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.ENCHANT_WITH_LEVELS;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.ENCHANT_WITH_LEVELS;
     }
 
     @Override
@@ -60,14 +60,14 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public EnchantWithLevelsLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public EnchantWithLevelsLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             LootTableRange lv = LootTableRanges.fromJson(jsonObject.get("levels"), jsonDeserializationContext);
             boolean bl = JsonHelper.getBoolean(jsonObject, "treasure", false);
             return new EnchantWithLevelsLootFunction(args, lv, bl);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

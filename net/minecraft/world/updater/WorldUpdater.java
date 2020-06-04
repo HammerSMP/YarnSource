@@ -77,12 +77,12 @@ public class WorldUpdater {
 
     public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, SaveProperties arg2, boolean bl) {
         this.levelName = arg2.getLevelName();
-        this.field_24654 = (ImmutableSet)arg2.method_28057().method_28609().keySet().stream().collect(ImmutableSet.toImmutableSet());
+        this.field_24654 = (ImmutableSet)arg2.getGeneratorOptions().getDimensionMap().keySet().stream().collect(ImmutableSet.toImmutableSet());
         this.eraseCache = bl;
         this.field_24084 = dataFixer;
         this.field_24083 = arg;
         arg.method_27425(arg2);
-        this.persistentStateManager = new PersistentStateManager(new File(this.field_24083.method_27424(World.field_25179), "data"), dataFixer);
+        this.persistentStateManager = new PersistentStateManager(new File(this.field_24083.method_27424(World.OVERWORLD), "data"), dataFixer);
         this.updateThread = UPDATE_THREAD_FACTORY.newThread(this::updateWorld);
         this.updateThread.setUncaughtExceptionHandler((thread, throwable) -> {
             LOGGER.error("Error upgrading world", throwable);

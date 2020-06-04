@@ -84,7 +84,7 @@ implements AutoCloseable {
 
     public CompletableFuture<Void> completeAll() {
         CompletionStage completableFuture = this.run(() -> Either.left(CompletableFuture.allOf((CompletableFuture[])this.results.values().stream().map(arg -> ((Result)arg).future).toArray(CompletableFuture[]::new)))).thenCompose(Function.identity());
-        return ((CompletableFuture)completableFuture).thenCompose(arg -> this.run(() -> {
+        return ((CompletableFuture)completableFuture).thenCompose(void_ -> this.run(() -> {
             try {
                 this.storage.method_26982();
                 return Either.left(null);

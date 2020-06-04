@@ -55,7 +55,7 @@ extends Task<LivingEntity> {
             lv.forget(MemoryModuleType.LOOK_TARGET);
             lv.forget(MemoryModuleType.BREED_TARGET);
             lv.forget(MemoryModuleType.INTERACTION_TARGET);
-            lv.remember(MemoryModuleType.HIDING_PLACE, GlobalPos.create(arg2.method_27983(), optional.get()));
+            lv.remember(MemoryModuleType.HIDING_PLACE, GlobalPos.create(arg2.getRegistryKey(), optional.get()));
             if (!optional.get().isWithinDistance(arg22.getPos(), (double)this.preferredDistance)) {
                 lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(optional.get(), this.walkSpeed, this.preferredDistance));
             }

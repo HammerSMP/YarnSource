@@ -55,9 +55,9 @@ implements DebugRenderer.Renderer {
             for (Map.Entry entry : this.field_4627.get(lv3).entrySet()) {
                 String string = (String)entry.getKey();
                 BlockBox lv7 = (BlockBox)entry.getValue();
-                Boolean lv8 = this.field_4625.get(lv3).get(string);
+                Boolean boolean_ = this.field_4625.get(lv3).get(string);
                 if (!lv4.isWithinDistance(lv7.getCenter(), 500.0)) continue;
-                if (lv8.booleanValue()) {
+                if (boolean_.booleanValue()) {
                     WorldRenderer.drawBox(arg, lv5, (double)lv7.minX - d, (double)lv7.minY - e, (double)lv7.minZ - f, (double)(lv7.maxX + 1) - d, (double)(lv7.maxY + 1) - e, (double)(lv7.maxZ + 1) - f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
                     continue;
                 }
@@ -77,9 +77,9 @@ implements DebugRenderer.Renderer {
         this.field_4626.get(arg2).put(arg.toString(), arg);
         for (int i = 0; i < list.size(); ++i) {
             BlockBox lv = list.get(i);
-            Boolean lv2 = list2.get(i);
+            Boolean boolean_ = list2.get(i);
             this.field_4627.get(arg2).put(lv.toString(), lv);
-            this.field_4625.get(arg2).put(lv.toString(), lv2);
+            this.field_4625.get(arg2).put(lv.toString(), boolean_);
         }
     }
 

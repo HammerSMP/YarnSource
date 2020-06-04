@@ -14,14 +14,14 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Nameable;
 
@@ -29,14 +29,14 @@ public class CopyNameLootFunction
 extends ConditionalLootFunction {
     private final Source source;
 
-    private CopyNameLootFunction(class_5341[] args, Source arg) {
+    private CopyNameLootFunction(LootCondition[] args, Source arg) {
         super(args);
         this.source = arg;
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.COPY_NAME;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.COPY_NAME;
     }
 
     @Override
@@ -55,7 +55,7 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> builder(Source arg) {
-        return CopyNameLootFunction.builder((class_5341[] args) -> new CopyNameLootFunction((class_5341[])args, arg));
+        return CopyNameLootFunction.builder((LootCondition[] args) -> new CopyNameLootFunction((LootCondition[])args, arg));
     }
 
     public static class Factory
@@ -67,13 +67,13 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public CopyNameLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public CopyNameLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             Source lv = Source.get(JsonHelper.getString(jsonObject, "source"));
             return new CopyNameLootFunction(args, lv);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

@@ -159,8 +159,8 @@ extends LivingEntity {
         } else {
             lv2 = this;
         }
-        Float lv3 = lv2.pathfindingPenalties.get((Object)arg);
-        return lv3 == null ? arg.getDefaultPenalty() : lv3.floatValue();
+        Float float_ = lv2.pathfindingPenalties.get((Object)arg);
+        return float_ == null ? arg.getDefaultPenalty() : float_.floatValue();
     }
 
     public void setPathfindingPenalty(PathNodeType arg, float f) {
@@ -753,7 +753,7 @@ extends LivingEntity {
         if (this.getTarget() == null) {
             return 3;
         }
-        int i = (int)(this.getHealth() - this.getMaximumHealth() * 0.33f);
+        int i = (int)(this.getHealth() - this.getMaxHealth() * 0.33f);
         if ((i -= (3 - this.world.getDifficulty().getId()) * 4) < 0) {
             i = 0;
         }

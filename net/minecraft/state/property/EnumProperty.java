@@ -27,15 +27,15 @@ extends Property<T> {
     private final ImmutableSet<T> values;
     private final Map<String, T> byName = Maps.newHashMap();
 
-    protected EnumProperty(String string, Class<T> arg, Collection<T> collection) {
-        super(string, arg);
+    protected EnumProperty(String string, Class<T> class_, Collection<T> collection) {
+        super(string, class_);
         this.values = ImmutableSet.copyOf(collection);
-        for (Enum lv : collection) {
-            String string2 = ((StringIdentifiable)((Object)lv)).asString();
+        for (Enum enum_ : collection) {
+            String string2 = ((StringIdentifiable)((Object)enum_)).asString();
             if (this.byName.containsKey(string2)) {
                 throw new IllegalArgumentException("Multiple values have the same name '" + string2 + "'");
             }
-            this.byName.put(string2, lv);
+            this.byName.put(string2, enum_);
         }
     }
 
@@ -50,8 +50,8 @@ extends Property<T> {
     }
 
     @Override
-    public String name(T arg) {
-        return ((StringIdentifiable)arg).asString();
+    public String name(T enum_) {
+        return ((StringIdentifiable)enum_).asString();
     }
 
     @Override
@@ -74,20 +74,20 @@ extends Property<T> {
         return i;
     }
 
-    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> arg) {
-        return EnumProperty.of(string, arg, Predicates.alwaysTrue());
+    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> class_) {
+        return EnumProperty.of(string, class_, Predicates.alwaysTrue());
     }
 
-    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> arg, Predicate<T> predicate) {
-        return EnumProperty.of(string, arg, Arrays.stream(arg.getEnumConstants()).filter(predicate).collect(Collectors.toList()));
+    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> class_, Predicate<T> predicate) {
+        return EnumProperty.of(string, class_, Arrays.stream(class_.getEnumConstants()).filter(predicate).collect(Collectors.toList()));
     }
 
-    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> arg, T ... args) {
-        return EnumProperty.of(string, arg, Lists.newArrayList((Object[])args));
+    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> class_, T ... enums) {
+        return EnumProperty.of(string, class_, Lists.newArrayList((Object[])enums));
     }
 
-    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> arg, Collection<T> collection) {
-        return new EnumProperty<T>(string, arg, collection);
+    public static <T extends Enum<T>> EnumProperty<T> of(String string, Class<T> class_, Collection<T> collection) {
+        return new EnumProperty<T>(string, class_, collection);
     }
 }
 

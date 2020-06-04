@@ -25,17 +25,17 @@ extends TrackTargetGoal {
     protected LivingEntity targetEntity;
     protected TargetPredicate targetPredicate;
 
-    public FollowTargetGoal(MobEntity arg, Class<T> arg2, boolean bl) {
-        this(arg, arg2, bl, false);
+    public FollowTargetGoal(MobEntity arg, Class<T> class_, boolean bl) {
+        this(arg, class_, bl, false);
     }
 
-    public FollowTargetGoal(MobEntity arg, Class<T> arg2, boolean bl, boolean bl2) {
-        this(arg, arg2, 10, bl, bl2, null);
+    public FollowTargetGoal(MobEntity arg, Class<T> class_, boolean bl, boolean bl2) {
+        this(arg, class_, 10, bl, bl2, null);
     }
 
-    public FollowTargetGoal(MobEntity arg, Class<T> arg2, int i, boolean bl, boolean bl2, @Nullable Predicate<LivingEntity> predicate) {
+    public FollowTargetGoal(MobEntity arg, Class<T> class_, int i, boolean bl, boolean bl2, @Nullable Predicate<LivingEntity> predicate) {
         super(arg, bl, bl2);
-        this.targetClass = arg2;
+        this.targetClass = class_;
         this.reciprocalChance = i;
         this.setControls(EnumSet.of(Goal.Control.TARGET));
         this.targetPredicate = new TargetPredicate().setBaseMaxDistance(this.getFollowRange()).setPredicate(predicate);

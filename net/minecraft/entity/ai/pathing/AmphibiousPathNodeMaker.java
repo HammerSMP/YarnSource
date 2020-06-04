@@ -114,7 +114,7 @@ extends LandPathNodeMaker {
         if (!this.entity.isTouchingWater()) {
             VoxelShape lv2;
             BlockPos lv;
-            return (double)lv.getY() + ((lv2 = this.cachedWorld.getBlockState(lv = arg.down()).getCollisionShape(this.cachedWorld, lv)).isEmpty() ? 0.0 : lv2.getMaximum(Direction.Axis.Y));
+            return (double)lv.getY() + ((lv2 = this.cachedWorld.getBlockState(lv = arg.down()).getCollisionShape(this.cachedWorld, lv)).isEmpty() ? 0.0 : lv2.getMax(Direction.Axis.Y));
         }
         return (double)arg.getY() + 0.5;
     }

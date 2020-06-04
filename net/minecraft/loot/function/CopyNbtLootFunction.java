@@ -33,17 +33,17 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.command.arguments.NbtPathArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -57,15 +57,15 @@ extends ConditionalLootFunction {
     private static final Function<Entity, Tag> ENTITY_TAG_GETTER = NbtPredicate::entityToTag;
     private static final Function<BlockEntity, Tag> BLOCK_ENTITY_TAG_GETTER = arg -> arg.toTag(new CompoundTag());
 
-    private CopyNbtLootFunction(class_5341[] args, Source arg, List<Operation> list) {
+    private CopyNbtLootFunction(LootCondition[] args, Source arg, List<Operation> list) {
         super(args);
         this.source = arg;
         this.operations = ImmutableList.copyOf(list);
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.COPY_NBT;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.COPY_NBT;
     }
 
     private static NbtPathArgumentType.NbtPath parseNbtPath(String string) {
@@ -115,7 +115,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public CopyNbtLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public CopyNbtLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             Source lv = Source.get(JsonHelper.getString(jsonObject, "source"));
             ArrayList list = Lists.newArrayList();
             JsonArray jsonArray = JsonHelper.getArray(jsonObject, "ops");
@@ -127,7 +127,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

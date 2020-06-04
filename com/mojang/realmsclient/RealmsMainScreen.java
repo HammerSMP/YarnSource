@@ -459,8 +459,8 @@ extends RealmsScreen {
             public void run() {
                 RealmsClient lv = RealmsClient.createRealmsClient();
                 try {
-                    Boolean lv2 = lv.mcoEnabled();
-                    if (lv2.booleanValue()) {
+                    Boolean boolean_ = lv.mcoEnabled();
+                    if (boolean_.booleanValue()) {
                         LOGGER.info("Realms is available for this user");
                         hasParentalConsent = true;
                     } else {
@@ -470,9 +470,9 @@ extends RealmsScreen {
                     }
                     checkedParentalConsent = true;
                 }
-                catch (RealmsServiceException lv3) {
-                    LOGGER.error("Couldn't connect to realms", (Throwable)lv3);
-                    RealmsMainScreen.this.client.execute(() -> RealmsMainScreen.this.client.openScreen(new RealmsGenericErrorScreen(lv3, RealmsMainScreen.this.lastScreen)));
+                catch (RealmsServiceException lv2) {
+                    LOGGER.error("Couldn't connect to realms", (Throwable)lv2);
+                    RealmsMainScreen.this.client.execute(() -> RealmsMainScreen.this.client.openScreen(new RealmsGenericErrorScreen(lv2, RealmsMainScreen.this.lastScreen)));
                 }
             }
         }.start();
@@ -486,15 +486,15 @@ extends RealmsScreen {
                 public void run() {
                     RealmsClient lv = RealmsClient.createRealmsClient();
                     try {
-                        Boolean lv2 = lv.stageAvailable();
-                        if (lv2.booleanValue()) {
+                        Boolean boolean_ = lv.stageAvailable();
+                        if (boolean_.booleanValue()) {
                             RealmsClient.switchToStage();
                             LOGGER.info("Switched to stage");
                             realmsDataFetcher.forceUpdate();
                         }
                     }
-                    catch (RealmsServiceException lv3) {
-                        LOGGER.error("Couldn't connect to Realms: " + lv3);
+                    catch (RealmsServiceException lv2) {
+                        LOGGER.error("Couldn't connect to Realms: " + lv2);
                     }
                 }
             }.start();
@@ -509,15 +509,15 @@ extends RealmsScreen {
                 public void run() {
                     RealmsClient lv = RealmsClient.createRealmsClient();
                     try {
-                        Boolean lv2 = lv.stageAvailable();
-                        if (lv2.booleanValue()) {
+                        Boolean boolean_ = lv.stageAvailable();
+                        if (boolean_.booleanValue()) {
                             RealmsClient.switchToLocal();
                             LOGGER.info("Switched to local");
                             realmsDataFetcher.forceUpdate();
                         }
                     }
-                    catch (RealmsServiceException lv3) {
-                        LOGGER.error("Couldn't connect to Realms: " + lv3);
+                    catch (RealmsServiceException lv2) {
+                        LOGGER.error("Couldn't connect to Realms: " + lv2);
                     }
                 }
             }.start();

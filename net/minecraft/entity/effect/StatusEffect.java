@@ -53,7 +53,7 @@ public class StatusEffect {
 
     public void applyUpdateEffect(LivingEntity arg, int i) {
         if (this == StatusEffects.REGENERATION) {
-            if (arg.getHealth() < arg.getMaximumHealth()) {
+            if (arg.getHealth() < arg.getMaxHealth()) {
                 arg.heal(1.0f);
             }
         } else if (this == StatusEffects.POISON) {

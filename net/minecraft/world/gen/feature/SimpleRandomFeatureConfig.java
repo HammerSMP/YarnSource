@@ -13,7 +13,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class SimpleRandomFeatureConfig
 implements FeatureConfig {
-    public static final Codec<SimpleRandomFeatureConfig> field_24910 = ConfiguredFeature.field_24833.listOf().fieldOf("features").xmap(SimpleRandomFeatureConfig::new, arg -> arg.features).codec();
+    public static final Codec<SimpleRandomFeatureConfig> CODEC = ConfiguredFeature.CODEC.listOf().fieldOf("features").xmap(SimpleRandomFeatureConfig::new, arg -> arg.features).codec();
     public final List<ConfiguredFeature<?, ?>> features;
 
     public SimpleRandomFeatureConfig(List<ConfiguredFeature<?, ?>> list) {

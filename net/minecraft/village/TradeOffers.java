@@ -161,7 +161,7 @@ public class TradeOffers {
         public TradeOffer create(Entity arg, Random random) {
             List list = Registry.ENCHANTMENT.stream().filter(Enchantment::isAvailableForEnchantedBookOffer).collect(Collectors.toList());
             Enchantment lv = (Enchantment)list.get(random.nextInt(list.size()));
-            int i = MathHelper.nextInt(random, lv.getMinimumLevel(), lv.getMaximumLevel());
+            int i = MathHelper.nextInt(random, lv.getMinLevel(), lv.getMaxLevel());
             ItemStack lv2 = EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(lv, i));
             int j = 2 + random.nextInt(5 + i * 10) + 3 * i;
             if (lv.isTreasure()) {

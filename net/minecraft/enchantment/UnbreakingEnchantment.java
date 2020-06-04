@@ -17,17 +17,17 @@ extends Enchantment {
     }
 
     @Override
-    public int getMinimumPower(int i) {
+    public int getMinPower(int i) {
         return 5 + (i - 1) * 8;
     }
 
     @Override
-    public int getMaximumPower(int i) {
-        return super.getMinimumPower(i) + 50;
+    public int getMaxPower(int i) {
+        return super.getMinPower(i) + 50;
     }
 
     @Override
-    public int getMaximumLevel() {
+    public int getMaxLevel() {
         return 3;
     }
 

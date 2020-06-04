@@ -392,25 +392,25 @@ public class BlockStateModelGenerator {
         Identifier lv4 = this.createSubModel(arg, "_on", Models.RAIL_FLAT, Texture::rail);
         Identifier lv5 = this.createSubModel(arg, "_on", Models.TEMPLATE_RAIL_RAISED_NE, Texture::rail);
         Identifier lv6 = this.createSubModel(arg, "_on", Models.TEMPLATE_RAIL_RAISED_SW, Texture::rail);
-        BlockStateVariantMap lv7 = BlockStateVariantMap.create(Properties.POWERED, Properties.STRAIGHT_RAIL_SHAPE).register((arg7, arg8) -> {
-            switch (arg8) {
+        BlockStateVariantMap lv7 = BlockStateVariantMap.create(Properties.POWERED, Properties.STRAIGHT_RAIL_SHAPE).register((boolean_, arg7) -> {
+            switch (arg7) {
                 case NORTH_SOUTH: {
-                    return BlockStateVariant.create().put(VariantSettings.MODEL, arg7 != false ? lv4 : lv);
+                    return BlockStateVariant.create().put(VariantSettings.MODEL, boolean_ != false ? lv4 : lv);
                 }
                 case EAST_WEST: {
-                    return BlockStateVariant.create().put(VariantSettings.MODEL, arg7 != false ? lv4 : lv).put(VariantSettings.Y, VariantSettings.Rotation.R90);
+                    return BlockStateVariant.create().put(VariantSettings.MODEL, boolean_ != false ? lv4 : lv).put(VariantSettings.Y, VariantSettings.Rotation.R90);
                 }
                 case ASCENDING_EAST: {
-                    return BlockStateVariant.create().put(VariantSettings.MODEL, arg7 != false ? lv5 : lv2).put(VariantSettings.Y, VariantSettings.Rotation.R90);
+                    return BlockStateVariant.create().put(VariantSettings.MODEL, boolean_ != false ? lv5 : lv2).put(VariantSettings.Y, VariantSettings.Rotation.R90);
                 }
                 case ASCENDING_WEST: {
-                    return BlockStateVariant.create().put(VariantSettings.MODEL, arg7 != false ? lv6 : lv3).put(VariantSettings.Y, VariantSettings.Rotation.R90);
+                    return BlockStateVariant.create().put(VariantSettings.MODEL, boolean_ != false ? lv6 : lv3).put(VariantSettings.Y, VariantSettings.Rotation.R90);
                 }
                 case ASCENDING_NORTH: {
-                    return BlockStateVariant.create().put(VariantSettings.MODEL, arg7 != false ? lv5 : lv2);
+                    return BlockStateVariant.create().put(VariantSettings.MODEL, boolean_ != false ? lv5 : lv2);
                 }
                 case ASCENDING_SOUTH: {
-                    return BlockStateVariant.create().put(VariantSettings.MODEL, arg7 != false ? lv6 : lv3);
+                    return BlockStateVariant.create().put(VariantSettings.MODEL, boolean_ != false ? lv6 : lv3);
                 }
             }
             throw new UnsupportedOperationException("Fix you generator!");
@@ -896,13 +896,13 @@ public class BlockStateModelGenerator {
 
     private void registerRepeater() {
         this.registerItemModel(Items.REPEATER);
-        this.blockStateCollector.accept(VariantsBlockStateSupplier.create(Blocks.REPEATER).coordinate(BlockStateVariantMap.create(Properties.DELAY, Properties.LOCKED, Properties.POWERED).register((integer, arg, arg2) -> {
+        this.blockStateCollector.accept(VariantsBlockStateSupplier.create(Blocks.REPEATER).coordinate(BlockStateVariantMap.create(Properties.DELAY, Properties.LOCKED, Properties.POWERED).register((integer, boolean_, boolean2) -> {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append('_').append(integer).append("tick");
-            if (arg2.booleanValue()) {
+            if (boolean2.booleanValue()) {
                 stringBuilder.append("_on");
             }
-            if (arg.booleanValue()) {
+            if (boolean_.booleanValue()) {
                 stringBuilder.append("_locked");
             }
             return BlockStateVariant.create().put(VariantSettings.MODEL, Texture.getSubId(Blocks.REPEATER, stringBuilder.toString()));
@@ -944,7 +944,7 @@ public class BlockStateModelGenerator {
 
     private void registerTripwireHook() {
         this.registerItemModel(Blocks.TRIPWIRE_HOOK);
-        this.blockStateCollector.accept(VariantsBlockStateSupplier.create(Blocks.TRIPWIRE_HOOK).coordinate(BlockStateVariantMap.create(Properties.ATTACHED, Properties.POWERED).register((arg, arg2) -> BlockStateVariant.create().put(VariantSettings.MODEL, Texture.getSubId(Blocks.TRIPWIRE_HOOK, (arg != false ? "_attached" : "") + (arg2 != false ? "_on" : ""))))).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates()));
+        this.blockStateCollector.accept(VariantsBlockStateSupplier.create(Blocks.TRIPWIRE_HOOK).coordinate(BlockStateVariantMap.create(Properties.ATTACHED, Properties.POWERED).register((boolean_, boolean2) -> BlockStateVariant.create().put(VariantSettings.MODEL, Texture.getSubId(Blocks.TRIPWIRE_HOOK, (boolean_ != false ? "_attached" : "") + (boolean2 != false ? "_on" : ""))))).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates()));
     }
 
     private Identifier getTurtleEggModel(int i, String string, Texture arg) {

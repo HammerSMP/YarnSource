@@ -36,12 +36,12 @@ public class DamagePredicate {
         this.type = DamageSourcePredicate.EMPTY;
     }
 
-    public DamagePredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, EntityPredicate arg3, @Nullable Boolean arg4, DamageSourcePredicate arg5) {
+    public DamagePredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, EntityPredicate arg3, @Nullable Boolean boolean_, DamageSourcePredicate arg4) {
         this.dealt = arg;
         this.taken = arg2;
         this.sourceEntity = arg3;
-        this.blocked = arg4;
-        this.type = arg5;
+        this.blocked = boolean_;
+        this.type = arg4;
     }
 
     public boolean test(ServerPlayerEntity arg, DamageSource arg2, float f, float g, boolean bl) {
@@ -70,10 +70,10 @@ public class DamagePredicate {
         JsonObject jsonObject = JsonHelper.asObject(jsonElement, "damage");
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject.get("dealt"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject.get("taken"));
-        Boolean lv3 = jsonObject.has("blocked") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "blocked")) : null;
-        EntityPredicate lv4 = EntityPredicate.fromJson(jsonObject.get("source_entity"));
-        DamageSourcePredicate lv5 = DamageSourcePredicate.fromJson(jsonObject.get("type"));
-        return new DamagePredicate(lv, lv2, lv4, lv3, lv5);
+        Boolean boolean_ = jsonObject.has("blocked") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "blocked")) : null;
+        EntityPredicate lv3 = EntityPredicate.fromJson(jsonObject.get("source_entity"));
+        DamageSourcePredicate lv4 = DamageSourcePredicate.fromJson(jsonObject.get("type"));
+        return new DamagePredicate(lv, lv2, lv3, boolean_, lv4);
     }
 
     public JsonElement toJson() {
@@ -102,8 +102,8 @@ public class DamagePredicate {
             return new Builder();
         }
 
-        public Builder blocked(Boolean arg) {
-            this.blocked = arg;
+        public Builder blocked(Boolean boolean_) {
+            this.blocked = boolean_;
             return this;
         }
 

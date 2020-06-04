@@ -334,7 +334,7 @@ extends TameableEntity {
             return true;
         }
         if (this.isTamed()) {
-            if (this.isBreedingItem(lv) && this.getHealth() < this.getMaximumHealth()) {
+            if (this.isBreedingItem(lv) && this.getHealth() < this.getMaxHealth()) {
                 if (!arg.abilities.creativeMode) {
                     lv.decrement(1);
                 }
@@ -397,7 +397,7 @@ extends TameableEntity {
             return 1.5393804f;
         }
         if (this.isTamed()) {
-            return (0.55f - (this.getMaximumHealth() - this.getHealth()) * 0.02f) * (float)Math.PI;
+            return (0.55f - (this.getMaxHealth() - this.getHealth()) * 0.02f) * (float)Math.PI;
         }
         return 0.62831855f;
     }
@@ -506,8 +506,8 @@ extends TameableEntity {
     extends FleeEntityGoal<T> {
         private final WolfEntity wolf;
 
-        public AvoidLlamaGoal(WolfEntity arg2, Class<T> arg3, float f, double d, double e) {
-            super(arg2, arg3, f, d, e);
+        public AvoidLlamaGoal(WolfEntity arg2, Class<T> class_, float f, double d, double e) {
+            super(arg2, class_, f, d, e);
             this.wolf = arg2;
         }
 

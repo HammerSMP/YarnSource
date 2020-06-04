@@ -31,12 +31,12 @@ public class LowercaseEnumTypeAdapterFactory
 implements TypeAdapterFactory {
     @Nullable
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        Class lv = typeToken.getRawType();
-        if (!lv.isEnum()) {
+        Class class_ = typeToken.getRawType();
+        if (!class_.isEnum()) {
             return null;
         }
         final HashMap map = Maps.newHashMap();
-        for (Object object : lv.getEnumConstants()) {
+        for (Object object : class_.getEnumConstants()) {
             map.put(this.getKey(object), object);
         }
         return new TypeAdapter<T>(){

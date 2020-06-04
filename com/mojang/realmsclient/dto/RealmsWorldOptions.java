@@ -35,16 +35,16 @@ extends ValueObject {
     public boolean empty;
     private static final String DEFAULT_WORLD_TEMPLATE_IMAGE = null;
 
-    public RealmsWorldOptions(Boolean arg, Boolean arg2, Boolean arg3, Boolean arg4, Integer integer, Boolean arg5, Integer integer2, Integer integer3, Boolean arg6, String string) {
-        this.pvp = arg;
-        this.spawnAnimals = arg2;
-        this.spawnMonsters = arg3;
-        this.spawnNPCs = arg4;
+    public RealmsWorldOptions(Boolean boolean_, Boolean boolean2, Boolean boolean3, Boolean boolean4, Integer integer, Boolean boolean5, Integer integer2, Integer integer3, Boolean boolean6, String string) {
+        this.pvp = boolean_;
+        this.spawnAnimals = boolean2;
+        this.spawnMonsters = boolean3;
+        this.spawnNPCs = boolean4;
         this.spawnProtection = integer;
-        this.commandBlocks = arg5;
+        this.commandBlocks = boolean5;
         this.difficulty = integer2;
         this.gameMode = integer3;
-        this.forceGameMode = arg6;
+        this.forceGameMode = boolean6;
         this.slotName = string;
     }
 

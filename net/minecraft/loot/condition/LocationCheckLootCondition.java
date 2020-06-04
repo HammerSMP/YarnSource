@@ -11,18 +11,18 @@ package net.minecraft.loot.condition;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 import net.minecraft.util.math.BlockPos;
 
 public class LocationCheckLootCondition
-implements class_5341 {
+implements LootCondition {
     private final LocationPredicate predicate;
     private final BlockPos offset;
 
@@ -32,8 +32,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.LOCATION_CHECK;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.LOCATION_CHECK;
     }
 
     @Override
@@ -42,7 +42,7 @@ implements class_5341 {
         return lv != null && this.predicate.test(arg.getWorld(), lv.getX() + this.offset.getX(), lv.getY() + this.offset.getY(), lv.getZ() + this.offset.getZ());
     }
 
-    public static class_5341.Builder builder(LocationPredicate.Builder arg) {
+    public static LootCondition.Builder builder(LocationPredicate.Builder arg) {
         return () -> new LocationCheckLootCondition(arg.build(), BlockPos.ORIGIN);
     }
 
@@ -52,7 +52,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<LocationCheckLootCondition> {
+    implements JsonSerializable<LocationCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, LocationCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());

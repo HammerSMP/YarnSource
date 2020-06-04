@@ -19,7 +19,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public final class GlobalPos {
-    public static final Codec<GlobalPos> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)World.field_25178.fieldOf("dimension").forGetter(GlobalPos::getDimension), (App)BlockPos.field_25064.fieldOf("pos").forGetter(GlobalPos::getPos)).apply((Applicative)instance, GlobalPos::create));
+    public static final Codec<GlobalPos> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)World.CODEC.fieldOf("dimension").forGetter(GlobalPos::getDimension), (App)BlockPos.field_25064.fieldOf("pos").forGetter(GlobalPos::getPos)).apply((Applicative)instance, GlobalPos::create));
     private final RegistryKey<World> dimension;
     private final BlockPos pos;
 

@@ -142,7 +142,7 @@ implements RangedAttackMob {
                     lv3 = Potions.WATER_BREATHING;
                 } else if (this.random.nextFloat() < 0.15f && (this.isOnFire() || this.getRecentDamageSource() != null && this.getRecentDamageSource().isFire()) && !this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
                     lv3 = Potions.FIRE_RESISTANCE;
-                } else if (this.random.nextFloat() < 0.05f && this.getHealth() < this.getMaximumHealth()) {
+                } else if (this.random.nextFloat() < 0.05f && this.getHealth() < this.getMaxHealth()) {
                     lv3 = Potions.HEALING;
                 } else if (this.random.nextFloat() < 0.5f && this.getTarget() != null && !this.hasStatusEffect(StatusEffects.SPEED) && this.getTarget().squaredDistanceTo(this) > 121.0) {
                     lv3 = Potions.SWIFTNESS;

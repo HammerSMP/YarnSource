@@ -88,7 +88,7 @@ public class Util {
     private static final ExecutorService SERVER_WORKER_EXECUTOR = Util.method_28122("Main");
     private static final ExecutorService field_24477 = Util.method_27959();
     public static LongSupplier nanoTimeSupplier = System::nanoTime;
-    public static final UUID field_25140 = new UUID(0L, 0L);
+    public static final UUID NIL_UUID = new UUID(0L, 0L);
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static <K, V> Collector<Map.Entry<? extends K, ? extends V>, ?, Map<K, V>> toMap() {
@@ -325,7 +325,7 @@ public class Util {
                 }
             });
         });
-        return CompletableFuture.allOf(completableFutures).applyToEither((CompletionStage)completableFuture, arg -> list2);
+        return CompletableFuture.allOf(completableFutures).applyToEither((CompletionStage)completableFuture, void_ -> list2);
     }
 
     public static <T> Stream<T> stream(Optional<? extends T> optional) {

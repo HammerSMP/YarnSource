@@ -36,7 +36,7 @@ public class DifficultyCommand {
 
     public static int execute(ServerCommandSource arg, Difficulty arg2) throws CommandSyntaxException {
         MinecraftServer minecraftServer = arg.getMinecraftServer();
-        if (minecraftServer.method_27728().getDifficulty() == arg2) {
+        if (minecraftServer.getSaveProperties().getDifficulty() == arg2) {
             throw FAILURE_EXCEPTION.create((Object)arg2.getName());
         }
         minecraftServer.setDifficulty(arg2, true);

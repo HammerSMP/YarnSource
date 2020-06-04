@@ -51,10 +51,10 @@ extends Block {
     @Override
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         ItemStack lv = arg4.getStackInHand(arg5);
-        if (arg5 == Hand.MAIN_HAND && !RespawnAnchorBlock.method_29289(lv) && RespawnAnchorBlock.method_29289(arg4.getStackInHand(Hand.OFF_HAND))) {
+        if (arg5 == Hand.MAIN_HAND && !RespawnAnchorBlock.isChargeItem(lv) && RespawnAnchorBlock.isChargeItem(arg4.getStackInHand(Hand.OFF_HAND))) {
             return ActionResult.PASS;
         }
-        if (RespawnAnchorBlock.method_29289(lv) && RespawnAnchorBlock.method_29290(arg)) {
+        if (RespawnAnchorBlock.isChargeItem(lv) && RespawnAnchorBlock.canCharge(arg)) {
             RespawnAnchorBlock.charge(arg2, arg3, arg);
             if (!arg4.abilities.creativeMode) {
                 lv.decrement(1);
@@ -64,14 +64,14 @@ extends Block {
         if (arg.get(CHARGES) == 0) {
             return ActionResult.PASS;
         }
-        if (RespawnAnchorBlock.method_27353(arg2)) {
+        if (RespawnAnchorBlock.isNether(arg2)) {
             ServerPlayerEntity lv2;
-            if (!(arg2.isClient || (lv2 = (ServerPlayerEntity)arg4).getSpawnPointDimension() == arg2.method_27983() && lv2.getSpawnPointPosition().equals(arg3))) {
-                lv2.setSpawnPoint(arg2.method_27983(), arg3, false, true);
+            if (!(arg2.isClient || (lv2 = (ServerPlayerEntity)arg4).getSpawnPointDimension() == arg2.getRegistryKey() && lv2.getSpawnPointPosition().equals(arg3))) {
+                lv2.setSpawnPoint(arg2.getRegistryKey(), arg3, false, true);
                 arg2.playSound(null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 return ActionResult.SUCCESS;
             }
-            return RespawnAnchorBlock.method_29290(arg) ? ActionResult.PASS : ActionResult.CONSUME;
+            return RespawnAnchorBlock.canCharge(arg) ? ActionResult.PASS : ActionResult.CONSUME;
         }
         if (!arg2.isClient) {
             arg2.removeBlock(arg3, false);
@@ -80,15 +80,15 @@ extends Block {
         return ActionResult.method_29236(arg2.isClient);
     }
 
-    private static boolean method_29289(ItemStack arg) {
+    private static boolean isChargeItem(ItemStack arg) {
         return arg.getItem() == Items.GLOWSTONE;
     }
 
-    private static boolean method_29290(BlockState arg) {
+    private static boolean canCharge(BlockState arg) {
         return arg.get(CHARGES) < 4;
     }
 
-    public static boolean method_27353(World arg) {
+    public static boolean isNether(World arg) {
         return arg.getDimension().isNether();
     }
 

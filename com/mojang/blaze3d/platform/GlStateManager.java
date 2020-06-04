@@ -425,7 +425,7 @@ public class GlStateManager {
         GL15.glDeleteBuffers((int)i);
     }
 
-    public static void method_29331(int i, int j, int k, int l, int m, int n, int o, int p) {
+    public static void copyTexSubImage2d(int i, int j, int k, int l, int m, int n, int o, int p) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         GL20.glCopyTexSubImage2D((int)i, (int)j, (int)k, (int)l, (int)m, (int)n, (int)o, (int)p);
     }
@@ -447,7 +447,7 @@ public class GlStateManager {
         }
     }
 
-    public static int method_29333() {
+    public static int getFramebufferDepthAttachment() {
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         switch (fboMode) {
             case BASE: {
@@ -466,7 +466,7 @@ public class GlStateManager {
         return 0;
     }
 
-    public static void method_29332(int i, int j, int k, int l, int m, int n, int o, int p, int q, int r) {
+    public static void blitFramebuffer(int i, int j, int k, int l, int m, int n, int o, int p, int q, int r) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
         switch (field_25251) {
             case BASE: {
@@ -547,7 +547,7 @@ public class GlStateManager {
     }
 
     @Deprecated
-    public static int method_29334() {
+    public static int getActiveBoundTexture() {
         return GlStateManager.TEXTURES[GlStateManager.activeTexture].boundTexture;
     }
 
@@ -1265,7 +1265,7 @@ public class GlStateManager {
         return GL11.glGetInteger((int)i);
     }
 
-    public static boolean method_29330() {
+    public static boolean supportsGl30() {
         return field_25251 != class_5343.NONE;
     }
 

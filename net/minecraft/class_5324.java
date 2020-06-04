@@ -27,11 +27,11 @@ public class class_5324 {
     }
 
     private static Function<Double, DataResult<Double>> method_29231(double d, double e) {
-        return arg -> {
-            if (arg >= d && arg <= e) {
-                return DataResult.success((Object)arg);
+        return double_ -> {
+            if (double_ >= d && double_ <= e) {
+                return DataResult.success((Object)double_);
             }
-            return DataResult.error((String)("Value " + arg + " outside of range [" + d + ":" + e + "]"), (Object)arg);
+            return DataResult.error((String)("Value " + double_ + " outside of range [" + d + ":" + e + "]"), (Object)double_);
         };
     }
 

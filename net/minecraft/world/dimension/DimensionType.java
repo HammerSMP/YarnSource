@@ -66,7 +66,7 @@ public class DimensionType {
     public static final RegistryKey<DimensionType> OVERWORLD_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld"));
     public static final RegistryKey<DimensionType> THE_NETHER_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("the_nether"));
     public static final RegistryKey<DimensionType> THE_END_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("the_end"));
-    private static final LinkedHashSet<RegistryKey<World>> DIMENSION_TYPES = Sets.newLinkedHashSet((Iterable)ImmutableList.of(World.field_25179, World.field_25180, World.field_25181));
+    private static final LinkedHashSet<RegistryKey<World>> DIMENSION_TYPES = Sets.newLinkedHashSet((Iterable)ImmutableList.of(World.OVERWORLD, World.NETHER, World.END));
     private static final Map<RegistryKey<DimensionType>, DimensionType> field_24759 = ImmutableMap.of(OVERWORLD_REGISTRY_KEY, (Object)DimensionType.method_29294(), THE_NETHER_REGISTRY_KEY, (Object)DimensionType.method_29295(), THE_END_REGISTRY_KEY, (Object)DimensionType.method_29296());
     private static final Codec<DimensionType> field_24760 = field_24751.flatXmap(arg -> Optional.ofNullable(field_24759.get(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown builtin dimension: " + arg))), arg -> arg.field_24765.map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown builtin dimension: " + arg)))).stable();
     public static final Codec<DimensionType> field_24756 = Codec.either(field_24760, CODEC).flatXmap(either -> (DataResult)either.map(arg -> DataResult.success((Object)arg, (Lifecycle)Lifecycle.stable()), DataResult::success), arg -> arg.field_24765.isPresent() ? DataResult.success((Object)Either.left((Object)arg), (Lifecycle)Lifecycle.stable()) : DataResult.success((Object)Either.right((Object)arg)));
@@ -128,15 +128,15 @@ public class DimensionType {
     public static DataResult<RegistryKey<World>> method_28521(Dynamic<?> dynamic) {
         DataResult dataResult = dynamic.asNumber();
         if (dataResult.result().equals(Optional.of(-1))) {
-            return DataResult.success(World.field_25180);
+            return DataResult.success(World.NETHER);
         }
         if (dataResult.result().equals(Optional.of(0))) {
-            return DataResult.success(World.field_25179);
+            return DataResult.success(World.OVERWORLD);
         }
         if (dataResult.result().equals(Optional.of(1))) {
-            return DataResult.success(World.field_25181);
+            return DataResult.success(World.END);
         }
-        return World.field_25178.parse(dynamic);
+        return World.CODEC.parse(dynamic);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -157,8 +157,8 @@ public class DimensionType {
 
     public static LinkedHashMap<RegistryKey<World>, Pair<DimensionType, ChunkGenerator>> method_28517(long l) {
         LinkedHashMap linkedHashMap = Maps.newLinkedHashMap();
-        linkedHashMap.put(World.field_25180, Pair.of((Object)DimensionType.method_29295(), (Object)DimensionType.method_28535(l)));
-        linkedHashMap.put(World.field_25181, Pair.of((Object)DimensionType.method_29296(), (Object)DimensionType.method_28533(l)));
+        linkedHashMap.put(World.NETHER, Pair.of((Object)DimensionType.method_29295(), (Object)DimensionType.method_28535(l)));
+        linkedHashMap.put(World.END, Pair.of((Object)DimensionType.method_29296(), (Object)DimensionType.method_28533(l)));
         return linkedHashMap;
     }
 
@@ -170,7 +170,7 @@ public class DimensionType {
         Map.Entry entry = (Map.Entry)list.get(0);
         Map.Entry entry2 = (Map.Entry)list.get(1);
         Map.Entry entry3 = (Map.Entry)list.get(2);
-        if (entry.getKey() != World.field_25179 || entry2.getKey() != World.field_25180 || entry3.getKey() != World.field_25181) {
+        if (entry.getKey() != World.OVERWORLD || entry2.getKey() != World.NETHER || entry3.getKey() != World.END) {
             return false;
         }
         if (!(((DimensionType)((Pair)entry.getValue()).getFirst()).isOverworld() && ((DimensionType)((Pair)entry2.getValue()).getFirst()).isNether() && ((DimensionType)((Pair)entry3.getValue()).getFirst()).isEnd())) {
@@ -206,13 +206,13 @@ public class DimensionType {
     }
 
     public static File getSaveDirectory(RegistryKey<World> arg, File file) {
-        if (arg == World.field_25179) {
+        if (arg == World.OVERWORLD) {
             return file;
         }
-        if (arg == World.field_25181) {
+        if (arg == World.END) {
             return new File(file, "DIM1");
         }
-        if (arg == World.field_25180) {
+        if (arg == World.NETHER) {
             return new File(file, "DIM-1");
         }
         return new File(file, "dimensions/" + arg.getValue().getNamespace() + "/" + arg.getValue().getPath());

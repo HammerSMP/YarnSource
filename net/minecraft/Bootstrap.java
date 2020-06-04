@@ -71,10 +71,10 @@ public class Bootstrap {
 
     private static void method_27732(final Set<String> set) {
         final Language lv = Language.getInstance();
-        GameRules.forEachType(new GameRules.RuleTypeConsumer(){
+        GameRules.forEachType(new GameRules.TypeConsumer(){
 
             @Override
-            public <T extends GameRules.Rule<T>> void accept(GameRules.RuleKey<T> arg, GameRules.RuleType<T> arg2) {
+            public <T extends GameRules.Rule<T>> void accept(GameRules.Key<T> arg, GameRules.Type<T> arg2) {
                 if (!lv.hasTranslation(arg.getTranslationKey())) {
                     set.add(arg.getName());
                 }

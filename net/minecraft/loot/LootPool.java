@@ -30,40 +30,40 @@ import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootChoice;
 import net.minecraft.loot.LootTableRange;
 import net.minecraft.loot.LootTableRanges;
 import net.minecraft.loot.LootTableReporter;
 import net.minecraft.loot.UniformLootTableRange;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditionConsumingBuilder;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.entry.LootEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.function.LootFunctionConsumingBuilder;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 public class LootPool {
-    private final LootEntry[] entries;
-    private final class_5341[] conditions;
+    private final LootPoolEntry[] entries;
+    private final LootCondition[] conditions;
     private final Predicate<LootContext> predicate;
     private final LootFunction[] functions;
     private final BiFunction<ItemStack, LootContext, ItemStack> javaFunctions;
     private final LootTableRange rolls;
     private final UniformLootTableRange bonusRolls;
 
-    private LootPool(LootEntry[] args, class_5341[] args2, LootFunction[] args3, LootTableRange arg, UniformLootTableRange arg2) {
+    private LootPool(LootPoolEntry[] args, LootCondition[] args2, LootFunction[] args3, LootTableRange arg, UniformLootTableRange arg2) {
         this.entries = args;
         this.conditions = args2;
-        this.predicate = LootConditions.joinAnd(args2);
+        this.predicate = LootConditionTypes.joinAnd(args2);
         this.functions = args3;
-        this.javaFunctions = LootFunctions.join(args3);
+        this.javaFunctions = LootFunctionTypes.join(args3);
         this.rolls = arg;
         this.bonusRolls = arg2;
     }
@@ -72,7 +72,7 @@ public class LootPool {
         Random random = arg.getRandom();
         ArrayList list = Lists.newArrayList();
         MutableInt mutableInt = new MutableInt();
-        for (LootEntry lv : this.entries) {
+        for (LootPoolEntry lv : this.entries) {
             lv.expand(arg, arg2 -> {
                 int i = arg2.getWeight(arg.getLuck());
                 if (i > 0) {
@@ -130,8 +130,8 @@ public class LootPool {
     JsonSerializer<LootPool> {
         public LootPool deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             JsonObject jsonObject = JsonHelper.asObject(jsonElement, "loot pool");
-            LootEntry[] lvs = JsonHelper.deserialize(jsonObject, "entries", jsonDeserializationContext, LootEntry[].class);
-            class_5341[] lvs2 = JsonHelper.deserialize(jsonObject, "conditions", new class_5341[0], jsonDeserializationContext, class_5341[].class);
+            LootPoolEntry[] lvs = JsonHelper.deserialize(jsonObject, "entries", jsonDeserializationContext, LootPoolEntry[].class);
+            LootCondition[] lvs2 = JsonHelper.deserialize(jsonObject, "conditions", new LootCondition[0], jsonDeserializationContext, LootCondition[].class);
             LootFunction[] lvs3 = JsonHelper.deserialize(jsonObject, "functions", new LootFunction[0], jsonDeserializationContext, LootFunction[].class);
             LootTableRange lv = LootTableRanges.fromJson(jsonObject.get("rolls"), jsonDeserializationContext);
             UniformLootTableRange lv2 = JsonHelper.deserialize(jsonObject, "bonus_rolls", new UniformLootTableRange(0.0f, 0.0f), jsonDeserializationContext, UniformLootTableRange.class);
@@ -166,8 +166,8 @@ public class LootPool {
     public static class Builder
     implements LootFunctionConsumingBuilder<Builder>,
     LootConditionConsumingBuilder<Builder> {
-        private final List<LootEntry> entries = Lists.newArrayList();
-        private final List<class_5341> conditions = Lists.newArrayList();
+        private final List<LootPoolEntry> entries = Lists.newArrayList();
+        private final List<LootCondition> conditions = Lists.newArrayList();
         private final List<LootFunction> functions = Lists.newArrayList();
         private LootTableRange rolls = new UniformLootTableRange(1.0f);
         private UniformLootTableRange bonusRollsRange = new UniformLootTableRange(0.0f, 0.0f);
@@ -182,13 +182,13 @@ public class LootPool {
             return this;
         }
 
-        public Builder with(LootEntry.Builder<?> arg) {
+        public Builder with(LootPoolEntry.Builder<?> arg) {
             this.entries.add(arg.build());
             return this;
         }
 
         @Override
-        public Builder conditionally(class_5341.Builder arg) {
+        public Builder conditionally(LootCondition.Builder arg) {
             this.conditions.add(arg.build());
             return this;
         }
@@ -203,7 +203,7 @@ public class LootPool {
             if (this.rolls == null) {
                 throw new IllegalArgumentException("Rolls not set");
             }
-            return new LootPool(this.entries.toArray(new LootEntry[0]), this.conditions.toArray(new class_5341[0]), this.functions.toArray(new LootFunction[0]), this.rolls, this.bonusRollsRange);
+            return new LootPool(this.entries.toArray(new LootPoolEntry[0]), this.conditions.toArray(new LootCondition[0]), this.functions.toArray(new LootFunction[0]), this.rolls, this.bonusRollsRange);
         }
 
         @Override
@@ -217,7 +217,7 @@ public class LootPool {
         }
 
         @Override
-        public /* synthetic */ Object conditionally(class_5341.Builder arg) {
+        public /* synthetic */ Object conditionally(LootCondition.Builder arg) {
             return this.conditionally(arg);
         }
     }

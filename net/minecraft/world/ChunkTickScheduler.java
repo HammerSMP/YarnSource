@@ -46,9 +46,9 @@ implements TickScheduler<T> {
     public void tick(TickScheduler<T> arg, Function<BlockPos, T> function) {
         for (int i = 0; i < this.scheduledPositions.length; ++i) {
             if (this.scheduledPositions[i] == null) continue;
-            for (Short lv : this.scheduledPositions[i]) {
-                BlockPos lv2 = ProtoChunk.joinBlockPos(lv, i, this.pos);
-                arg.schedule(lv2, function.apply(lv2), 0);
+            for (Short short_ : this.scheduledPositions[i]) {
+                BlockPos lv = ProtoChunk.joinBlockPos(short_, i, this.pos);
+                arg.schedule(lv, function.apply(lv), 0);
             }
             this.scheduledPositions[i].clear();
         }

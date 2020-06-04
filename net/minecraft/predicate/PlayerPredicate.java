@@ -186,7 +186,7 @@ public class PlayerPredicate {
         }
         if (!this.recipes.isEmpty()) {
             JsonObject jsonObject2 = new JsonObject();
-            this.recipes.forEach((arg, arg2) -> jsonObject2.addProperty(arg.toString(), arg2));
+            this.recipes.forEach((arg, boolean_) -> jsonObject2.addProperty(arg.toString(), boolean_));
             jsonObject.add("recipes", (JsonElement)jsonObject2);
         }
         if (!this.advancements.isEmpty()) {

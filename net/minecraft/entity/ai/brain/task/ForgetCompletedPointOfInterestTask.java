@@ -37,7 +37,7 @@ extends Task<LivingEntity> {
     @Override
     protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
         GlobalPos lv = arg2.getBrain().getOptionalMemory(this.memoryModule).get();
-        return arg.method_27983() == lv.getDimension() && lv.getPos().isWithinDistance(arg2.getPos(), 16.0);
+        return arg.getRegistryKey() == lv.getDimension() && lv.getPos().isWithinDistance(arg2.getPos(), 16.0);
     }
 
     @Override

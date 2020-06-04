@@ -16,8 +16,8 @@ public class DisableableFollowTargetGoal<T extends LivingEntity>
 extends FollowTargetGoal<T> {
     private boolean enabled = true;
 
-    public DisableableFollowTargetGoal(RaiderEntity arg, Class<T> arg2, int i, boolean bl, boolean bl2, @Nullable Predicate<LivingEntity> predicate) {
-        super(arg, arg2, i, bl, bl2, predicate);
+    public DisableableFollowTargetGoal(RaiderEntity arg, Class<T> class_, int i, boolean bl, boolean bl2, @Nullable Predicate<LivingEntity> predicate) {
+        super(arg, class_, i, bl, bl2, predicate);
     }
 
     public void setEnabled(boolean bl) {

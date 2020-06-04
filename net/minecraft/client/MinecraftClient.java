@@ -61,8 +61,6 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
-import net.minecraft.class_5346;
-import net.minecraft.class_5350;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClientGame;
@@ -80,6 +78,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.ConnectScreen;
 import net.minecraft.client.gui.screen.CreditsScreen;
+import net.minecraft.client.gui.screen.DatapackFailureScreen;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.LevelLoadingScreen;
@@ -191,6 +190,7 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.resource.metadata.PackResourceMetadata;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.QueueingWorldGenerationProgressListener;
@@ -724,7 +724,7 @@ WindowEventHandler {
     private void method_29041(String string) {
         if (!this.isInSingleplayer() && !this.isOnlineChatEnabled()) {
             if (this.player != null) {
-                this.player.sendSystemMessage(new TranslatableText("chat.cannotSend").formatted(Formatting.RED), Util.field_25140);
+                this.player.sendSystemMessage(new TranslatableText("chat.cannotSend").formatted(Formatting.RED), Util.NIL_UUID);
             }
         } else {
             this.openScreen(new ChatScreen(string));
@@ -1423,13 +1423,13 @@ WindowEventHandler {
     }
 
     public void startIntegratedServer(String string, @Nullable LevelInfo arg) {
-        this.method_29337(string, arg, false);
+        this.startIntegratedServer(string, arg, false);
     }
 
     /*
      * WARNING - void declaration
      */
-    public void method_29337(String string, @Nullable LevelInfo arg2, boolean bl) {
+    public void startIntegratedServer(String string, @Nullable LevelInfo arg2, boolean bl) {
         String string3;
         void lv2;
         this.disconnect();
@@ -1442,7 +1442,7 @@ WindowEventHandler {
             this.openScreen(null);
             return;
         }
-        MinecraftServer.method_27725((LevelStorage.Session)lv2);
+        MinecraftServer.convertLevel((LevelStorage.Session)lv2);
         SaveProperties lv3 = lv2.readLevelProperties();
         if (lv3 == null) {
             if (arg2 == null) {
@@ -1455,16 +1455,16 @@ WindowEventHandler {
             string3 = lv3.getLevelName();
         }
         this.worldGenProgressTracker.set(null);
-        ResourcePackManager<ResourcePackProfile> lv4 = MinecraftServer.method_29438(lv2.getDirectory(WorldSavePath.DATAPACKS), lv3, bl);
-        CompletableFuture<class_5350> completableFuture = class_5350.method_29466(lv4.method_29211(), true, 2, Util.getServerWorkerExecutor(), this);
+        ResourcePackManager<ResourcePackProfile> lv4 = MinecraftServer.createResourcePackManager(lv2.getDirectory(WorldSavePath.DATAPACKS), lv3, bl);
+        CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv4.method_29211(), true, 2, Util.getServerWorkerExecutor(), this);
         this.runTasks(completableFuture::isDone);
         try {
-            class_5350 lv5 = completableFuture.get();
+            ServerResourceManager lv5 = completableFuture.get();
             lv5.method_29475();
         }
         catch (Exception exception) {
             LOGGER.warn("Failed to load datapacks, can't proceed with server load", (Throwable)exception);
-            this.openScreen(new class_5346(string, arg2));
+            this.openScreen(new DatapackFailureScreen(string, arg2));
             try {
                 lv2.close();
                 lv4.close();
@@ -1483,7 +1483,7 @@ WindowEventHandler {
             SkullBlockEntity.setUserCache(lv7);
             SkullBlockEntity.setSessionService(minecraftSessionService);
             UserCache.setUseRemote(false);
-            this.server = new IntegratedServer(this, (LevelStorage.Session)lv2, lv4, (class_5350)lv6, lv3, minecraftSessionService, gameProfileRepository, lv7, i -> {
+            this.server = new IntegratedServer(this, (LevelStorage.Session)lv2, lv4, (ServerResourceManager)lv6, lv3, minecraftSessionService, gameProfileRepository, lv7, i -> {
                 WorldGenerationProgressTracker lv = new WorldGenerationProgressTracker(i + 0);
                 lv.start();
                 this.worldGenProgressTracker.set(lv);
@@ -1601,9 +1601,9 @@ WindowEventHandler {
         return this.multiplayerEnabled;
     }
 
-    public boolean method_29042(UUID uUID) {
+    public boolean shouldBlockMessages(UUID uUID) {
         if (!this.isOnlineChatEnabled()) {
-            return (this.player == null || !uUID.equals(this.player.getUuid())) && !uUID.equals(Util.field_25140);
+            return (this.player == null || !uUID.equals(this.player.getUuid())) && !uUID.equals(Util.NIL_UUID);
         }
         return false;
     }

@@ -392,7 +392,7 @@ implements ClientPlayPacketListener {
         boolean bl = arg.isDebugWorld();
         boolean bl2 = arg.isFlatWorld();
         this.worldProperties = lv4 = new ClientWorld.Properties(Difficulty.NORMAL, arg.isHardcore(), bl2);
-        this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSeed());
+        this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
         this.client.joinWorld(this.world);
         if (this.client.player == null) {
             this.client.player = this.client.interactionManager.method_29357(this.world, new StatHandler(), new ClientRecipeBook(this.world.getRecipeManager()));
@@ -1005,7 +1005,7 @@ implements ClientPlayPacketListener {
         ClientPlayerEntity lv4 = this.client.player;
         int i = lv4.getEntityId();
         this.positionLookSetup = false;
-        if (lv2 != lv4.world.method_27983()) {
+        if (lv2 != lv4.world.getRegistryKey()) {
             ClientWorld.Properties lv6;
             Scoreboard lv5 = this.world.getScoreboard();
             boolean bl = arg.isDebugWorld();
@@ -1548,7 +1548,7 @@ implements ClientPlayPacketListener {
         lv.abilities.invulnerable = arg.isInvulnerable();
         lv.abilities.allowFlying = arg.allowFlying();
         lv.abilities.setFlySpeed(arg.getFlySpeed());
-        lv.abilities.setWalkSpeed(arg.getFovModifier());
+        lv.abilities.setWalkSpeed(arg.getWalkSpeed());
     }
 
     @Override

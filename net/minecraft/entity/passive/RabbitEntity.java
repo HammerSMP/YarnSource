@@ -488,8 +488,8 @@ extends AnimalEntity {
     extends FleeEntityGoal<T> {
         private final RabbitEntity rabbit;
 
-        public FleeGoal(RabbitEntity arg, Class<T> arg2, float f, double d, double e) {
-            super(arg, arg2, f, d, e);
+        public FleeGoal(RabbitEntity arg, Class<T> class_, float f, double d, double e) {
+            super(arg, class_, f, d, e);
             this.rabbit = arg;
         }
 

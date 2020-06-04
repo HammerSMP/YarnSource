@@ -15,27 +15,27 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.List;
 import java.util.function.Predicate;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class AlternativeLootCondition
-implements class_5341 {
-    private final class_5341[] terms;
+implements LootCondition {
+    private final LootCondition[] terms;
     private final Predicate<LootContext> predicate;
 
-    private AlternativeLootCondition(class_5341[] args) {
+    private AlternativeLootCondition(LootCondition[] args) {
         this.terms = args;
-        this.predicate = LootConditions.joinOr(args);
+        this.predicate = LootConditionTypes.joinOr(args);
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.ALTERNATIVE;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.ALTERNATIVE;
     }
 
     @Override
@@ -45,13 +45,13 @@ implements class_5341 {
 
     @Override
     public void validate(LootTableReporter arg) {
-        class_5341.super.validate(arg);
+        LootCondition.super.validate(arg);
         for (int i = 0; i < this.terms.length; ++i) {
             this.terms[i].validate(arg.makeChild(".term[" + i + "]"));
         }
     }
 
-    public static Builder builder(class_5341.Builder ... args) {
+    public static Builder builder(LootCondition.Builder ... args) {
         return new Builder(args);
     }
 
@@ -61,7 +61,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<AlternativeLootCondition> {
+    implements JsonSerializable<AlternativeLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, AlternativeLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("terms", jsonSerializationContext.serialize((Object)arg.terms));
@@ -69,7 +69,7 @@ implements class_5341 {
 
         @Override
         public AlternativeLootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            class_5341[] lvs = JsonHelper.deserialize(jsonObject, "terms", jsonDeserializationContext, class_5341[].class);
+            LootCondition[] lvs = JsonHelper.deserialize(jsonObject, "terms", jsonDeserializationContext, LootCondition[].class);
             return new AlternativeLootCondition(lvs);
         }
 
@@ -80,24 +80,24 @@ implements class_5341 {
     }
 
     public static class Builder
-    implements class_5341.Builder {
-        private final List<class_5341> terms = Lists.newArrayList();
+    implements LootCondition.Builder {
+        private final List<LootCondition> terms = Lists.newArrayList();
 
-        public Builder(class_5341.Builder ... args) {
-            for (class_5341.Builder lv : args) {
+        public Builder(LootCondition.Builder ... args) {
+            for (LootCondition.Builder lv : args) {
                 this.terms.add(lv.build());
             }
         }
 
         @Override
-        public Builder or(class_5341.Builder arg) {
+        public Builder or(LootCondition.Builder arg) {
             this.terms.add(arg.build());
             return this;
         }
 
         @Override
-        public class_5341 build() {
-            return new AlternativeLootCondition(this.terms.toArray(new class_5341[0]));
+        public LootCondition build() {
+            return new AlternativeLootCondition(this.terms.toArray(new LootCondition[0]));
         }
     }
 }

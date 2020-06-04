@@ -790,8 +790,8 @@ VillagerDataContainer {
         if (!optional.isPresent()) {
             return false;
         }
-        Long lv = optional.get();
-        return l - lv <= 600L;
+        Long long_ = optional.get();
+        return l - long_ <= 600L;
     }
 
     public boolean canSummonGolem(long l) {

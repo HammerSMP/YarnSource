@@ -3,10 +3,10 @@
  */
 package net.minecraft.loot.condition;
 
-import net.minecraft.class_5341;
+import net.minecraft.loot.condition.LootCondition;
 
 public interface LootConditionConsumingBuilder<T> {
-    public T conditionally(class_5341.Builder var1);
+    public T conditionally(LootCondition.Builder var1);
 
     public T getThis();
 }

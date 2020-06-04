@@ -15,24 +15,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Random;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.util.JsonSerializable;
 
 public class SurvivesExplosionLootCondition
-implements class_5341 {
+implements LootCondition {
     private static final SurvivesExplosionLootCondition INSTANCE = new SurvivesExplosionLootCondition();
 
     private SurvivesExplosionLootCondition() {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.SURVIVES_EXPLOSION;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.SURVIVES_EXPLOSION;
     }
 
     @Override
@@ -42,16 +42,16 @@ implements class_5341 {
 
     @Override
     public boolean test(LootContext arg) {
-        Float lv = arg.get(LootContextParameters.EXPLOSION_RADIUS);
-        if (lv != null) {
+        Float float_ = arg.get(LootContextParameters.EXPLOSION_RADIUS);
+        if (float_ != null) {
             Random random = arg.getRandom();
-            float f = 1.0f / lv.floatValue();
+            float f = 1.0f / float_.floatValue();
             return random.nextFloat() <= f;
         }
         return true;
     }
 
-    public static class_5341.Builder builder() {
+    public static LootCondition.Builder builder() {
         return () -> INSTANCE;
     }
 
@@ -61,7 +61,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<SurvivesExplosionLootCondition> {
+    implements JsonSerializable<SurvivesExplosionLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, SurvivesExplosionLootCondition arg, JsonSerializationContext jsonSerializationContext) {
         }

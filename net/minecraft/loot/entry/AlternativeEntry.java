@@ -9,24 +9,24 @@ package net.minecraft.loot.entry;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import net.minecraft.class_5338;
-import net.minecraft.class_5341;
 import net.minecraft.loot.LootTableReporter;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.entry.CombinedEntry;
 import net.minecraft.loot.entry.EntryCombiner;
-import net.minecraft.loot.entry.LootEntries;
-import net.minecraft.loot.entry.LootEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
+import net.minecraft.loot.entry.LootPoolEntryType;
+import net.minecraft.loot.entry.LootPoolEntryTypes;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class AlternativeEntry
 extends CombinedEntry {
-    AlternativeEntry(LootEntry[] args, class_5341[] args2) {
+    AlternativeEntry(LootPoolEntry[] args, LootCondition[] args2) {
         super(args, args2);
     }
 
     @Override
-    public class_5338 method_29318() {
-        return LootEntries.ALTERNATIVES;
+    public LootPoolEntryType method_29318() {
+        return LootPoolEntryTypes.ALTERNATIVES;
     }
 
     @Override
@@ -60,16 +60,16 @@ extends CombinedEntry {
         }
     }
 
-    public static Builder builder(LootEntry.Builder<?> ... args) {
+    public static Builder builder(LootPoolEntry.Builder<?> ... args) {
         return new Builder(args);
     }
 
     public static class Builder
-    extends LootEntry.Builder<Builder> {
-        private final List<LootEntry> children = Lists.newArrayList();
+    extends LootPoolEntry.Builder<Builder> {
+        private final List<LootPoolEntry> children = Lists.newArrayList();
 
-        public Builder(LootEntry.Builder<?> ... args) {
-            for (LootEntry.Builder<?> lv : args) {
+        public Builder(LootPoolEntry.Builder<?> ... args) {
+            for (LootPoolEntry.Builder<?> lv : args) {
                 this.children.add(lv.build());
             }
         }
@@ -80,18 +80,18 @@ extends CombinedEntry {
         }
 
         @Override
-        public Builder alternatively(LootEntry.Builder<?> arg) {
+        public Builder alternatively(LootPoolEntry.Builder<?> arg) {
             this.children.add(arg.build());
             return this;
         }
 
         @Override
-        public LootEntry build() {
-            return new AlternativeEntry(this.children.toArray(new LootEntry[0]), this.getConditions());
+        public LootPoolEntry build() {
+            return new AlternativeEntry(this.children.toArray(new LootPoolEntry[0]), this.getConditions());
         }
 
         @Override
-        protected /* synthetic */ LootEntry.Builder getThisBuilder() {
+        protected /* synthetic */ LootPoolEntry.Builder getThisBuilder() {
             return this.getThisBuilder();
         }
     }

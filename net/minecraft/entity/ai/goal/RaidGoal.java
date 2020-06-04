@@ -16,8 +16,8 @@ public class RaidGoal<T extends LivingEntity>
 extends FollowTargetGoal<T> {
     private int cooldown = 0;
 
-    public RaidGoal(RaiderEntity arg, Class<T> arg2, boolean bl, @Nullable Predicate<LivingEntity> predicate) {
-        super(arg, arg2, 500, bl, false, predicate);
+    public RaidGoal(RaiderEntity arg, Class<T> class_, boolean bl, @Nullable Predicate<LivingEntity> predicate) {
+        super(arg, class_, 500, bl, false, predicate);
     }
 
     public int getCooldown() {

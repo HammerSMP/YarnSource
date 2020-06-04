@@ -98,18 +98,18 @@ public class ServerNetworkIo {
     public void bind(@Nullable InetAddress inetAddress, int i) throws IOException {
         List<ChannelFuture> list = this.channels;
         synchronized (list) {
-            Lazy<NioEventLoopGroup> lv4;
-            Class<NioServerSocketChannel> lv3;
+            Lazy<NioEventLoopGroup> lv2;
+            Class<NioServerSocketChannel> class2;
             if (Epoll.isAvailable() && this.server.isUsingNativeTransport()) {
-                Class<EpollServerSocketChannel> lv = EpollServerSocketChannel.class;
-                Lazy<EpollEventLoopGroup> lv2 = EPOLL_CHANNEL;
+                Class<EpollServerSocketChannel> class_ = EpollServerSocketChannel.class;
+                Lazy<EpollEventLoopGroup> lv = EPOLL_CHANNEL;
                 LOGGER.info("Using epoll channel type");
             } else {
-                lv3 = NioServerSocketChannel.class;
-                lv4 = DEFAULT_CHANNEL;
+                class2 = NioServerSocketChannel.class;
+                lv2 = DEFAULT_CHANNEL;
                 LOGGER.info("Using default channel type");
             }
-            this.channels.add(((ServerBootstrap)((ServerBootstrap)new ServerBootstrap().channel(lv3)).childHandler((ChannelHandler)new ChannelInitializer<Channel>(){
+            this.channels.add(((ServerBootstrap)((ServerBootstrap)new ServerBootstrap().channel(class2)).childHandler((ChannelHandler)new ChannelInitializer<Channel>(){
 
                 protected void initChannel(Channel channel) throws Exception {
                     try {
@@ -124,7 +124,7 @@ public class ServerNetworkIo {
                     channel.pipeline().addLast("packet_handler", (ChannelHandler)lv);
                     lv.setPacketListener(new ServerHandshakeNetworkHandler(ServerNetworkIo.this.server, lv));
                 }
-            }).group((EventLoopGroup)lv4.get()).localAddress(inetAddress, i)).bind().syncUninterruptibly());
+            }).group((EventLoopGroup)lv2.get()).localAddress(inetAddress, i)).bind().syncUninterruptibly());
         }
     }
 

@@ -170,22 +170,22 @@ public abstract class NumberRange<T extends Number> {
         private final Double squaredMin;
         private final Double squaredMax;
 
-        private static FloatRange create(StringReader stringReader, @Nullable Float arg, @Nullable Float arg2) throws CommandSyntaxException {
-            if (arg != null && arg2 != null && arg.floatValue() > arg2.floatValue()) {
+        private static FloatRange create(StringReader stringReader, @Nullable Float float_, @Nullable Float float2) throws CommandSyntaxException {
+            if (float_ != null && float2 != null && float_.floatValue() > float2.floatValue()) {
                 throw EXCEPTION_SWAPPED.createWithContext((ImmutableStringReader)stringReader);
             }
-            return new FloatRange(arg, arg2);
+            return new FloatRange(float_, float2);
         }
 
         @Nullable
-        private static Double square(@Nullable Float arg) {
-            return arg == null ? null : Double.valueOf(arg.doubleValue() * arg.doubleValue());
+        private static Double square(@Nullable Float float_) {
+            return float_ == null ? null : Double.valueOf(float_.doubleValue() * float_.doubleValue());
         }
 
-        private FloatRange(@Nullable Float arg, @Nullable Float arg2) {
-            super(arg, arg2);
-            this.squaredMin = FloatRange.square(arg);
-            this.squaredMax = FloatRange.square(arg2);
+        private FloatRange(@Nullable Float float_, @Nullable Float float2) {
+            super(float_, float2);
+            this.squaredMin = FloatRange.square(float_);
+            this.squaredMax = FloatRange.square(float2);
         }
 
         public static FloatRange atLeast(float f) {
@@ -211,7 +211,7 @@ public abstract class NumberRange<T extends Number> {
         }
 
         public static FloatRange parse(StringReader stringReader) throws CommandSyntaxException {
-            return FloatRange.parse(stringReader, arg -> arg);
+            return FloatRange.parse(stringReader, float_ -> float_);
         }
 
         public static FloatRange parse(StringReader stringReader, Function<Float, Float> function) throws CommandSyntaxException {

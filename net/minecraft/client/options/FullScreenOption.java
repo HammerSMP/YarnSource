@@ -34,14 +34,14 @@ extends DoubleOption {
             }
             Optional<VideoMode> optional = arg.getVideoMode();
             return optional.map(arg2 -> arg22.findClosestVideoModeIndex((VideoMode)arg2)).orElse(-1.0);
-        }, (arg3, arg4) -> {
+        }, (arg3, double_) -> {
             if (arg22 == null) {
                 return;
             }
-            if (arg4 == -1.0) {
+            if (double_ == -1.0) {
                 arg.setVideoMode(Optional.empty());
             } else {
-                arg.setVideoMode(Optional.of(arg22.getVideoMode(arg4.intValue())));
+                arg.setVideoMode(Optional.of(arg22.getVideoMode(double_.intValue())));
             }
         }, (arg2, arg3) -> {
             if (arg22 == null) {

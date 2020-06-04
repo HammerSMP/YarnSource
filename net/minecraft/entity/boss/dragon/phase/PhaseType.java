@@ -36,9 +36,9 @@ public class PhaseType<T extends Phase> {
     private final int id;
     private final String name;
 
-    private PhaseType(int i, Class<? extends Phase> arg, String string) {
+    private PhaseType(int i, Class<? extends Phase> class_, String string) {
         this.id = i;
-        this.phaseClass = arg;
+        this.phaseClass = class_;
         this.name = string;
     }
 
@@ -75,8 +75,8 @@ public class PhaseType<T extends Phase> {
         return types.length;
     }
 
-    private static <T extends Phase> PhaseType<T> register(Class<T> arg, String string) {
-        PhaseType<T> lv = new PhaseType<T>(types.length, arg, string);
+    private static <T extends Phase> PhaseType<T> register(Class<T> class_, String string) {
+        PhaseType<T> lv = new PhaseType<T>(types.length, class_, string);
         types = Arrays.copyOf(types, types.length + 1);
         PhaseType.types[lv.getTypeId()] = lv;
         return lv;

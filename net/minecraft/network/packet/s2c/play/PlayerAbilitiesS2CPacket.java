@@ -22,7 +22,7 @@ implements Packet<ClientPlayPacketListener> {
     private boolean allowFlying;
     private boolean creativeMode;
     private float flySpeed;
-    private float fovModifier;
+    private float walkSpeed;
 
     public PlayerAbilitiesS2CPacket() {
     }
@@ -33,7 +33,7 @@ implements Packet<ClientPlayPacketListener> {
         this.setAllowFlying(arg.allowFlying);
         this.setCreativeMode(arg.creativeMode);
         this.setFlySpeed(arg.getFlySpeed());
-        this.setFovModifier(arg.getWalkSpeed());
+        this.setWalkSpeed(arg.getWalkSpeed());
     }
 
     @Override
@@ -44,7 +44,7 @@ implements Packet<ClientPlayPacketListener> {
         this.setAllowFlying((b & 4) > 0);
         this.setCreativeMode((b & 8) > 0);
         this.setFlySpeed(arg.readFloat());
-        this.setFovModifier(arg.readFloat());
+        this.setWalkSpeed(arg.readFloat());
     }
 
     @Override
@@ -64,7 +64,7 @@ implements Packet<ClientPlayPacketListener> {
         }
         arg.writeByte(b);
         arg.writeFloat(this.flySpeed);
-        arg.writeFloat(this.fovModifier);
+        arg.writeFloat(this.walkSpeed);
     }
 
     @Override
@@ -114,12 +114,12 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getFovModifier() {
-        return this.fovModifier;
+    public float getWalkSpeed() {
+        return this.walkSpeed;
     }
 
-    public void setFovModifier(float f) {
-        this.fovModifier = f;
+    public void setWalkSpeed(float f) {
+        this.walkSpeed = f;
     }
 }
 

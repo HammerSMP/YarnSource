@@ -32,8 +32,8 @@ public class TrackedDataHandlerRegistry {
     public static final TrackedDataHandler<Byte> BYTE = new TrackedDataHandler<Byte>(){
 
         @Override
-        public void write(PacketByteBuf arg, Byte arg2) {
-            arg.writeByte(arg2.byteValue());
+        public void write(PacketByteBuf arg, Byte byte_) {
+            arg.writeByte(byte_.byteValue());
         }
 
         @Override
@@ -42,8 +42,8 @@ public class TrackedDataHandlerRegistry {
         }
 
         @Override
-        public Byte copy(Byte arg) {
-            return arg;
+        public Byte copy(Byte byte_) {
+            return byte_;
         }
 
         @Override
@@ -76,8 +76,8 @@ public class TrackedDataHandlerRegistry {
     public static final TrackedDataHandler<Float> FLOAT = new TrackedDataHandler<Float>(){
 
         @Override
-        public void write(PacketByteBuf arg, Float arg2) {
-            arg.writeFloat(arg2.floatValue());
+        public void write(PacketByteBuf arg, Float float_) {
+            arg.writeFloat(float_.floatValue());
         }
 
         @Override
@@ -86,8 +86,8 @@ public class TrackedDataHandlerRegistry {
         }
 
         @Override
-        public Float copy(Float arg) {
-            return arg;
+        public Float copy(Float float_) {
+            return float_;
         }
 
         @Override
@@ -221,8 +221,8 @@ public class TrackedDataHandlerRegistry {
     public static final TrackedDataHandler<Boolean> BOOLEAN = new TrackedDataHandler<Boolean>(){
 
         @Override
-        public void write(PacketByteBuf arg, Boolean arg2) {
-            arg.writeBoolean(arg2);
+        public void write(PacketByteBuf arg, Boolean boolean_) {
+            arg.writeBoolean(boolean_);
         }
 
         @Override
@@ -231,8 +231,8 @@ public class TrackedDataHandlerRegistry {
         }
 
         @Override
-        public Boolean copy(Boolean arg) {
-            return arg;
+        public Boolean copy(Boolean boolean_) {
+            return boolean_;
         }
 
         @Override

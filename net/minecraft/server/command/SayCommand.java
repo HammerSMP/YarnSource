@@ -29,7 +29,7 @@ public class SayCommand {
             if (lv3 != null) {
                 ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().broadcastChatMessage(lv2, MessageType.CHAT, lv3.getUuid());
             } else {
-                ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().broadcastChatMessage(lv2, MessageType.SYSTEM, Util.field_25140);
+                ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().broadcastChatMessage(lv2, MessageType.SYSTEM, Util.NIL_UUID);
             }
             return 1;
         })));

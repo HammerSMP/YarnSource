@@ -26,7 +26,7 @@ import net.minecraft.world.dimension.DimensionType;
 public class GameJoinS2CPacket
 implements Packet<ClientPlayPacketListener> {
     private int playerEntityId;
-    private long seed;
+    private long sha256Seed;
     private boolean hardcore;
     private GameMode gameMode;
     private Set<RegistryKey<World>> field_25320;
@@ -49,7 +49,7 @@ implements Packet<ClientPlayPacketListener> {
         this.dimensionTracker = arg2;
         this.field_25321 = arg3;
         this.dimensionId = arg4;
-        this.seed = l;
+        this.sha256Seed = l;
         this.gameMode = arg;
         this.maxPlayers = j;
         this.hardcore = bl;
@@ -74,7 +74,7 @@ implements Packet<ClientPlayPacketListener> {
         this.dimensionTracker = arg.decode(DimensionTracker.Modifiable.CODEC);
         this.field_25321 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
         this.dimensionId = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
-        this.seed = arg.readLong();
+        this.sha256Seed = arg.readLong();
         this.maxPlayers = arg.readUnsignedByte();
         this.chunkLoadDistance = arg.readVarInt();
         this.reducedDebugInfo = arg.readBoolean();
@@ -98,7 +98,7 @@ implements Packet<ClientPlayPacketListener> {
         arg.encode(DimensionTracker.Modifiable.CODEC, this.dimensionTracker);
         arg.writeIdentifier(this.field_25321.getValue());
         arg.writeIdentifier(this.dimensionId.getValue());
-        arg.writeLong(this.seed);
+        arg.writeLong(this.sha256Seed);
         arg.writeByte(this.maxPlayers);
         arg.writeVarInt(this.chunkLoadDistance);
         arg.writeBoolean(this.reducedDebugInfo);
@@ -118,8 +118,8 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public long getSeed() {
-        return this.seed;
+    public long getSha256Seed() {
+        return this.sha256Seed;
     }
 
     @Environment(value=EnvType.CLIENT)

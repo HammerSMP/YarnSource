@@ -472,14 +472,14 @@ implements Chunk {
         }
     }
 
-    public <T extends Entity> void getEntities(Class<? extends T> arg, Box arg2, List<T> list, @Nullable Predicate<? super T> predicate) {
-        int i = MathHelper.floor((arg2.minY - 2.0) / 16.0);
-        int j = MathHelper.floor((arg2.maxY + 2.0) / 16.0);
+    public <T extends Entity> void getEntities(Class<? extends T> class_, Box arg, List<T> list, @Nullable Predicate<? super T> predicate) {
+        int i = MathHelper.floor((arg.minY - 2.0) / 16.0);
+        int j = MathHelper.floor((arg.maxY + 2.0) / 16.0);
         i = MathHelper.clamp(i, 0, this.entitySections.length - 1);
         j = MathHelper.clamp(j, 0, this.entitySections.length - 1);
         for (int k = i; k <= j; ++k) {
-            for (Entity lv : this.entitySections[k].getAllOfType(arg)) {
-                if (!lv.getBoundingBox().intersects(arg2) || predicate != null && !predicate.test(lv)) continue;
+            for (Entity lv : this.entitySections[k].getAllOfType(class_)) {
+                if (!lv.getBoundingBox().intersects(arg) || predicate != null && !predicate.test(lv)) continue;
                 list.add(lv);
             }
         }
@@ -646,17 +646,17 @@ implements Chunk {
         ChunkPos lv = this.getPos();
         for (int i = 0; i < this.postProcessingLists.length; ++i) {
             if (this.postProcessingLists[i] == null) continue;
-            for (Short lv2 : this.postProcessingLists[i]) {
-                BlockPos lv3 = ProtoChunk.joinBlockPos(lv2, i, lv);
-                BlockState lv4 = this.getBlockState(lv3);
-                BlockState lv5 = Block.postProcessState(lv4, this.world, lv3);
-                this.world.setBlockState(lv3, lv5, 20);
+            for (Short short_ : this.postProcessingLists[i]) {
+                BlockPos lv2 = ProtoChunk.joinBlockPos(short_, i, lv);
+                BlockState lv3 = this.getBlockState(lv2);
+                BlockState lv4 = Block.postProcessState(lv3, this.world, lv2);
+                this.world.setBlockState(lv2, lv4, 20);
             }
             this.postProcessingLists[i].clear();
         }
         this.disableTickSchedulers();
-        for (BlockPos lv6 : Sets.newHashSet(this.pendingBlockEntityTags.keySet())) {
-            this.getBlockEntity(lv6);
+        for (BlockPos lv5 : Sets.newHashSet(this.pendingBlockEntityTags.keySet())) {
+            this.getBlockEntity(lv5);
         }
         this.pendingBlockEntityTags.clear();
         this.upgradeData.upgrade(this);

@@ -657,7 +657,7 @@ extends DrawableHelper {
         if (arg == null || !arg.isLiving()) {
             return 0;
         }
-        float f = arg.getMaximumHealth();
+        float f = arg.getMaxHealth();
         int i = (int)(f + 0.5f) / 2;
         if (i > 30) {
             i = 30;

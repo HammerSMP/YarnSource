@@ -229,15 +229,15 @@ implements ResourceReloadListener {
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg23, Profiler arg32, Profiler arg4, Executor executor, Executor executor2) {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg23, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
         ConcurrentMap map = Maps.newConcurrentMap();
         CompletableFuture[] completableFutures = (CompletableFuture[])Registry.PARTICLE_TYPE.getIds().stream().map(arg2 -> CompletableFuture.runAsync(() -> this.loadTextureList(arg23, (Identifier)arg2, map), executor)).toArray(CompletableFuture[]::new);
-        return ((CompletableFuture)((CompletableFuture)CompletableFuture.allOf(completableFutures).thenApplyAsync(arg3 -> {
-            arg32.startTick();
-            arg32.push("stitching");
-            SpriteAtlasTexture.Data lv = this.particleAtlasTexture.stitch(arg23, map.values().stream().flatMap(Collection::stream), arg32, 0);
-            arg32.pop();
-            arg32.endTick();
+        return ((CompletableFuture)((CompletableFuture)CompletableFuture.allOf(completableFutures).thenApplyAsync(void_ -> {
+            arg3.startTick();
+            arg3.push("stitching");
+            SpriteAtlasTexture.Data lv = this.particleAtlasTexture.stitch(arg23, map.values().stream().flatMap(Collection::stream), arg3, 0);
+            arg3.pop();
+            arg3.endTick();
             return lv;
         }, executor)).thenCompose(arg::whenPrepared)).thenAcceptAsync(arg22 -> {
             this.particles.clear();

@@ -13,13 +13,13 @@ package net.minecraft.loot.function;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.UniformLootTableRange;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
@@ -30,14 +30,14 @@ extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
     private final UniformLootTableRange durabilityRange;
 
-    private SetDamageLootFunction(class_5341[] args, UniformLootTableRange arg) {
+    private SetDamageLootFunction(LootCondition[] args, UniformLootTableRange arg) {
         super(args);
         this.durabilityRange = arg;
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.SET_DAMAGE;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.SET_DAMAGE;
     }
 
     @Override
@@ -52,7 +52,7 @@ extends ConditionalLootFunction {
     }
 
     public static ConditionalLootFunction.Builder<?> builder(UniformLootTableRange arg) {
-        return SetDamageLootFunction.builder((class_5341[] args) -> new SetDamageLootFunction((class_5341[])args, arg));
+        return SetDamageLootFunction.builder((LootCondition[] args) -> new SetDamageLootFunction((LootCondition[])args, arg));
     }
 
     public static class Factory
@@ -64,12 +64,12 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetDamageLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public SetDamageLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return new SetDamageLootFunction(args, JsonHelper.deserialize(jsonObject, "damage", jsonDeserializationContext, UniformLootTableRange.class));
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

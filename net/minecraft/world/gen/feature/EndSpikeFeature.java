@@ -114,9 +114,9 @@ extends Feature<EndSpikeFeatureConfig> {
         private SpikeCache() {
         }
 
-        public List<Spike> load(Long arg) {
+        public List<Spike> load(Long long_) {
             List list = IntStream.range(0, 10).boxed().collect(Collectors.toList());
-            Collections.shuffle(list, new Random(arg));
+            Collections.shuffle(list, new Random(long_));
             ArrayList list2 = Lists.newArrayList();
             for (int i = 0; i < 10; ++i) {
                 int j = MathHelper.floor(42.0 * Math.cos(2.0 * (-Math.PI + 0.3141592653589793 * (double)i)));

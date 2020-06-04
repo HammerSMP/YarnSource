@@ -49,13 +49,13 @@ extends DrawableHelper {
     }
 
     @Nullable
-    public <T extends Toast> T getToast(Class<? extends T> arg, Object object) {
+    public <T extends Toast> T getToast(Class<? extends T> class_, Object object) {
         for (Entry<?> lv : this.visibleEntries) {
-            if (lv == null || !arg.isAssignableFrom(lv.getInstance().getClass()) || !lv.getInstance().getType().equals(object)) continue;
+            if (lv == null || !class_.isAssignableFrom(lv.getInstance().getClass()) || !lv.getInstance().getType().equals(object)) continue;
             return (T)lv.getInstance();
         }
         for (Toast lv2 : this.toastQueue) {
-            if (!arg.isAssignableFrom(lv2.getClass()) || !lv2.getType().equals(object)) continue;
+            if (!class_.isAssignableFrom(lv2.getClass()) || !lv2.getType().equals(object)) continue;
             return (T)lv2;
         }
         return null;

@@ -18,20 +18,20 @@ import com.google.gson.JsonSyntaxException;
 import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.StatePredicate;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 import net.minecraft.util.registry.Registry;
 
 public class BlockStatePropertyLootCondition
-implements class_5341 {
+implements LootCondition {
     private final Block block;
     private final StatePredicate properties;
 
@@ -41,8 +41,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.BLOCK_STATE_PROPERTY;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.BLOCK_STATE_PROPERTY;
     }
 
     @Override
@@ -66,7 +66,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<BlockStatePropertyLootCondition> {
+    implements JsonSerializable<BlockStatePropertyLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, BlockStatePropertyLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("block", Registry.BLOCK.getId(arg.block).toString());
@@ -91,7 +91,7 @@ implements class_5341 {
     }
 
     public static class Builder
-    implements class_5341.Builder {
+    implements LootCondition.Builder {
         private final Block block;
         private StatePredicate propertyValues = StatePredicate.ANY;
 
@@ -105,7 +105,7 @@ implements class_5341 {
         }
 
         @Override
-        public class_5341 build() {
+        public LootCondition build() {
             return new BlockStatePropertyLootCondition(this.block, this.propertyValues);
         }
     }

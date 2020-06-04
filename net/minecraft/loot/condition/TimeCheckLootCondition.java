@@ -13,29 +13,29 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import javax.annotation.Nullable;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.loot.UniformLootTableRange;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class TimeCheckLootCondition
-implements class_5341 {
+implements LootCondition {
     @Nullable
     private final Long period;
     private final UniformLootTableRange value;
 
-    private TimeCheckLootCondition(@Nullable Long arg, UniformLootTableRange arg2) {
-        this.period = arg;
-        this.value = arg2;
+    private TimeCheckLootCondition(@Nullable Long long_, UniformLootTableRange arg) {
+        this.period = long_;
+        this.value = arg;
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.TIME_CHECK;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.TIME_CHECK;
     }
 
     @Override
@@ -54,7 +54,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<TimeCheckLootCondition> {
+    implements JsonSerializable<TimeCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, TimeCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("period", (Number)arg.period);
@@ -63,9 +63,9 @@ implements class_5341 {
 
         @Override
         public TimeCheckLootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            Long lv = jsonObject.has("period") ? Long.valueOf(JsonHelper.getLong(jsonObject, "period")) : null;
-            UniformLootTableRange lv2 = JsonHelper.deserialize(jsonObject, "value", jsonDeserializationContext, UniformLootTableRange.class);
-            return new TimeCheckLootCondition(lv, lv2);
+            Long long_ = jsonObject.has("period") ? Long.valueOf(JsonHelper.getLong(jsonObject, "period")) : null;
+            UniformLootTableRange lv = JsonHelper.deserialize(jsonObject, "value", jsonDeserializationContext, UniformLootTableRange.class);
+            return new TimeCheckLootCondition(long_, lv);
         }
 
         @Override

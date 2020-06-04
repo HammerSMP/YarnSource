@@ -67,7 +67,7 @@ extends RenderPhase {
     }
 
     private static MultiPhaseParameters createTranslucentPhaseData() {
-        return MultiPhaseParameters.builder().shadeModel(SMOOTH_SHADE_MODEL).lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).transparency(TRANSLUCENT_TRANSPARENCY).target(field_25280).build(true);
+        return MultiPhaseParameters.builder().shadeModel(SMOOTH_SHADE_MODEL).lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).transparency(TRANSLUCENT_TRANSPARENCY).target(TRANSLUCENT_TARGET).build(true);
     }
 
     public static RenderLayer getTranslucent() {
@@ -75,7 +75,7 @@ extends RenderPhase {
     }
 
     private static MultiPhaseParameters method_29381() {
-        return MultiPhaseParameters.builder().shadeModel(SMOOTH_SHADE_MODEL).lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).transparency(field_25284).build(true);
+        return MultiPhaseParameters.builder().shadeModel(SMOOTH_SHADE_MODEL).lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).transparency(ITEM_TRANSPARENCY).build(true);
     }
 
     public static RenderLayer method_29380() {
@@ -120,7 +120,7 @@ extends RenderPhase {
     }
 
     public static RenderLayer method_29379(Identifier arg) {
-        MultiPhaseParameters lv = MultiPhaseParameters.builder().texture(new RenderPhase.Texture(arg, false, false)).transparency(field_25284).diffuseLighting(ENABLE_DIFFUSE_LIGHTING).alpha(ONE_TENTH_ALPHA).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).writeMaskState(RenderPhase.ALL_MASK).build(true);
+        MultiPhaseParameters lv = MultiPhaseParameters.builder().texture(new RenderPhase.Texture(arg, false, false)).transparency(ITEM_TRANSPARENCY).diffuseLighting(ENABLE_DIFFUSE_LIGHTING).alpha(ONE_TENTH_ALPHA).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).writeMaskState(RenderPhase.ALL_MASK).build(true);
         return RenderLayer.of("item_entity_translucent_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, 7, 256, true, true, lv);
     }
 

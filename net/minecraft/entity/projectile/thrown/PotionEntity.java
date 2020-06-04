@@ -187,7 +187,7 @@ implements FlyingItemEntity {
             this.world.removeBlock(arg, false);
         } else if (CampfireBlock.isLitCampfire(lv)) {
             this.world.syncWorldEvent(null, 1009, arg, 0);
-            CampfireBlock.method_29288(this.world, arg, lv);
+            CampfireBlock.extinguish(this.world, arg, lv);
             this.world.setBlockState(arg, (BlockState)lv.with(CampfireBlock.LIT, false));
         }
     }

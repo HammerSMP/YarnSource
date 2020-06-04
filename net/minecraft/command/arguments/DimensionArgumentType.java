@@ -33,7 +33,7 @@ import net.minecraft.world.World;
 
 public class DimensionArgumentType
 implements ArgumentType<Identifier> {
-    private static final Collection<String> EXAMPLES = Stream.of(World.field_25179, World.field_25180).map(arg -> arg.getValue().toString()).collect(Collectors.toList());
+    private static final Collection<String> EXAMPLES = Stream.of(World.OVERWORLD, World.NETHER).map(arg -> arg.getValue().toString()).collect(Collectors.toList());
     private static final DynamicCommandExceptionType INVALID_DIMENSION_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("argument.dimension.invalid", object));
 
     public Identifier parse(StringReader stringReader) throws CommandSyntaxException {

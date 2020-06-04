@@ -187,12 +187,12 @@ extends ByteBuf {
         return this.writeString(Text.Serializer.toJson(arg), 262144);
     }
 
-    public <T extends Enum<T>> T readEnumConstant(Class<T> arg) {
-        return (T)((Enum[])arg.getEnumConstants())[this.readVarInt()];
+    public <T extends Enum<T>> T readEnumConstant(Class<T> class_) {
+        return (T)((Enum[])class_.getEnumConstants())[this.readVarInt()];
     }
 
-    public PacketByteBuf writeEnumConstant(Enum<?> arg) {
-        return this.writeVarInt(arg.ordinal());
+    public PacketByteBuf writeEnumConstant(Enum<?> enum_) {
+        return this.writeVarInt(enum_.ordinal());
     }
 
     public int readVarInt() {

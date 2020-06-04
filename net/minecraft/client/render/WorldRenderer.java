@@ -195,17 +195,17 @@ AutoCloseable {
     @Nullable
     private ShaderEffect entityOutlineShader;
     @Nullable
-    private Framebuffer field_25274;
+    private Framebuffer translucentFramebuffer;
     @Nullable
-    private Framebuffer field_25275;
+    private Framebuffer entityFramebuffer;
     @Nullable
-    private Framebuffer field_25276;
+    private Framebuffer particlesFramebuffer;
     @Nullable
-    private Framebuffer field_25277;
+    private Framebuffer weatherFramebuffer;
     @Nullable
-    private Framebuffer field_25278;
+    private Framebuffer cloudsFramebuffer;
     @Nullable
-    private ShaderEffect field_25279;
+    private ShaderEffect transparencyShader;
     private double lastCameraChunkUpdateX = Double.MIN_VALUE;
     private double lastCameraChunkUpdateY = Double.MIN_VALUE;
     private double lastCameraChunkUpdateZ = Double.MIN_VALUE;
@@ -415,8 +415,8 @@ AutoCloseable {
         if (this.entityOutlineShader != null) {
             this.entityOutlineShader.close();
         }
-        if (this.field_25279 != null) {
-            this.field_25279.close();
+        if (this.transparencyShader != null) {
+            this.transparencyShader.close();
         }
     }
 
@@ -427,7 +427,7 @@ AutoCloseable {
         RenderSystem.texParameter(3553, 10243, 10497);
         RenderSystem.bindTexture(0);
         this.loadEntityOutlineShader();
-        this.method_29365();
+        this.loadTransparencyShader();
     }
 
     public void loadEntityOutlineShader() {
@@ -452,19 +452,19 @@ AutoCloseable {
         }
     }
 
-    private void method_29365() {
-        if (this.field_25279 != null) {
-            this.field_25279.close();
+    private void loadTransparencyShader() {
+        if (this.transparencyShader != null) {
+            this.transparencyShader.close();
         }
         Identifier lv = new Identifier("shaders/post/transparency.json");
         try {
-            this.field_25279 = new ShaderEffect(this.client.getTextureManager(), this.client.getResourceManager(), this.client.getFramebuffer(), lv);
-            this.field_25279.setupDimensions(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
-            this.field_25274 = this.field_25279.getSecondaryTarget("translucent");
-            this.field_25275 = this.field_25279.getSecondaryTarget("itemEntity");
-            this.field_25276 = this.field_25279.getSecondaryTarget("particles");
-            this.field_25277 = this.field_25279.getSecondaryTarget("weather");
-            this.field_25278 = this.field_25279.getSecondaryTarget("clouds");
+            this.transparencyShader = new ShaderEffect(this.client.getTextureManager(), this.client.getResourceManager(), this.client.getFramebuffer(), lv);
+            this.transparencyShader.setupDimensions(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
+            this.translucentFramebuffer = this.transparencyShader.getSecondaryTarget("translucent");
+            this.entityFramebuffer = this.transparencyShader.getSecondaryTarget("itemEntity");
+            this.particlesFramebuffer = this.transparencyShader.getSecondaryTarget("particles");
+            this.weatherFramebuffer = this.transparencyShader.getSecondaryTarget("weather");
+            this.cloudsFramebuffer = this.transparencyShader.getSecondaryTarget("clouds");
         }
         catch (IOException iOException) {
             throw new class_5347("Failed to load shader: " + lv, iOException);
@@ -652,8 +652,8 @@ AutoCloseable {
         if (this.entityOutlineShader != null) {
             this.entityOutlineShader.setupDimensions(i, j);
         }
-        if (this.field_25279 != null) {
-            this.field_25279.setupDimensions(i, j);
+        if (this.transparencyShader != null) {
+            this.transparencyShader.setupDimensions(i, j);
         }
     }
 
@@ -888,9 +888,9 @@ AutoCloseable {
         this.regularEntityCount = 0;
         this.blockEntityCount = 0;
         lv.swap("entities");
-        if (this.field_25275 != null) {
-            this.field_25275.clear(MinecraftClient.IS_SYSTEM_MAC);
-            this.field_25275.method_29329(this.client.getFramebuffer());
+        if (this.entityFramebuffer != null) {
+            this.entityFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+            this.entityFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             this.client.getFramebuffer().beginWrite(false);
         }
         if (this.canDrawEntityOutlines()) {
@@ -1019,51 +1019,51 @@ AutoCloseable {
         lv6.draw(RenderLayer.getLines());
         lv6.draw();
         lv.swap("translucent");
-        if (this.field_25274 != null) {
-            this.field_25274.clear(MinecraftClient.IS_SYSTEM_MAC);
-            this.field_25274.method_29329(this.client.getFramebuffer());
+        if (this.translucentFramebuffer != null) {
+            this.translucentFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+            this.translucentFramebuffer.copyDepthFrom(this.client.getFramebuffer());
         }
         this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
         lv.swap("particles");
-        if (this.field_25276 != null) {
-            this.field_25276.clear(MinecraftClient.IS_SYSTEM_MAC);
-            this.field_25276.method_29329(this.client.getFramebuffer());
-            RenderPhase.field_25281.startDrawing();
+        if (this.particlesFramebuffer != null) {
+            this.particlesFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+            this.particlesFramebuffer.copyDepthFrom(this.client.getFramebuffer());
+            RenderPhase.PARTICLES_TARGET.startDrawing();
         }
         this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
-        if (this.field_25276 != null) {
-            RenderPhase.field_25281.endDrawing();
+        if (this.particlesFramebuffer != null) {
+            RenderPhase.PARTICLES_TARGET.endDrawing();
         }
         RenderSystem.pushMatrix();
         RenderSystem.multMatrix(arg.peek().getModel());
         lv.swap("cloudsLayers");
         if (this.client.options.getCloudRenderMode() != CloudRenderMode.OFF) {
             lv.swap("clouds");
-            if (this.field_25278 != null) {
-                this.field_25278.clear(MinecraftClient.IS_SYSTEM_MAC);
-                RenderPhase.field_25283.startDrawing();
+            if (this.cloudsFramebuffer != null) {
+                this.cloudsFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+                RenderPhase.CLOUDS_TARGET.startDrawing();
             }
             this.renderClouds(arg, f, d, e, g);
-            if (this.field_25278 != null) {
-                RenderPhase.field_25283.endDrawing();
+            if (this.cloudsFramebuffer != null) {
+                RenderPhase.CLOUDS_TARGET.endDrawing();
             }
         }
         lv.swap("weather");
-        if (this.field_25277 != null) {
-            this.field_25277.clear(MinecraftClient.IS_SYSTEM_MAC);
-            RenderPhase.field_25282.startDrawing();
+        if (this.weatherFramebuffer != null) {
+            this.weatherFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+            RenderPhase.WEATHER_TARGET.startDrawing();
         } else {
             RenderSystem.depthMask(false);
         }
         this.renderWeather(arg4, f, d, e, g);
         this.renderWorldBorder(arg2);
-        if (this.field_25277 != null) {
-            RenderPhase.field_25282.endDrawing();
+        if (this.weatherFramebuffer != null) {
+            RenderPhase.WEATHER_TARGET.endDrawing();
         } else {
             RenderSystem.depthMask(true);
         }
-        if (this.field_25279 != null) {
-            this.field_25279.render(f);
+        if (this.transparencyShader != null) {
+            this.transparencyShader.render(f);
             this.client.getFramebuffer().beginWrite(false);
         }
         this.renderChunkDebugInfo(arg2);
@@ -1890,7 +1890,7 @@ AutoCloseable {
         }
     }
 
-    public void checkBlockRerender(BlockPos arg, BlockState arg2, BlockState arg3) {
+    public void scheduleBlockRerenderIfNeeded(BlockPos arg, BlockState arg2, BlockState arg3) {
         if (this.client.getBakedModelManager().shouldRerender(arg2, arg3)) {
             this.scheduleBlockRenders(arg.getX(), arg.getY(), arg.getZ(), arg.getX(), arg.getY(), arg.getZ());
         }
@@ -2424,27 +2424,27 @@ AutoCloseable {
 
     @Nullable
     public Framebuffer method_29360() {
-        return this.field_25274;
+        return this.translucentFramebuffer;
     }
 
     @Nullable
     public Framebuffer method_29361() {
-        return this.field_25275;
+        return this.entityFramebuffer;
     }
 
     @Nullable
-    public Framebuffer method_29362() {
-        return this.field_25276;
+    public Framebuffer getParticlesFramebuffer() {
+        return this.particlesFramebuffer;
     }
 
     @Nullable
     public Framebuffer method_29363() {
-        return this.field_25277;
+        return this.weatherFramebuffer;
     }
 
     @Nullable
     public Framebuffer method_29364() {
-        return this.field_25278;
+        return this.cloudsFramebuffer;
     }
 
     @Environment(value=EnvType.CLIENT)

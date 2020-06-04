@@ -132,7 +132,7 @@ public class ChunkBuilder {
         BlockBufferBuilderStorage lv2 = this.threadBuffers.poll();
         this.queuedTaskCount = this.rebuildQueue.size();
         this.bufferCount = this.threadBuffers.size();
-        ((CompletableFuture)CompletableFuture.runAsync(() -> {}, this.executor).thenCompose(arg3 -> lv.run(lv2))).whenComplete((arg2, throwable) -> {
+        ((CompletableFuture)CompletableFuture.runAsync(() -> {}, this.executor).thenCompose(void_ -> lv.run(lv2))).whenComplete((arg2, throwable) -> {
             if (throwable != null) {
                 CrashReport lv = CrashReport.create(throwable, "Batching chunks");
                 MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(lv));
@@ -190,7 +190,7 @@ public class ChunkBuilder {
     }
 
     public CompletableFuture<Void> scheduleUpload(BufferBuilder arg, VertexBuffer arg2) {
-        return CompletableFuture.runAsync(() -> {}, this.uploadQueue::add).thenCompose(arg3 -> this.upload(arg, arg2));
+        return CompletableFuture.runAsync(() -> {}, this.uploadQueue::add).thenCompose(void_ -> this.upload(arg, arg2));
     }
 
     private CompletableFuture<Void> upload(BufferBuilder arg, VertexBuffer arg2) {
@@ -484,7 +484,7 @@ public class ChunkBuilder {
                 if (this.cancelled.get()) {
                     return CompletableFuture.completedFuture(Result.CANCELLED);
                 }
-                CompletionStage completableFuture = ChunkBuilder.this.scheduleUpload(arg2.get(RenderLayer.getTranslucent()), BuiltChunk.this.getBuffer(RenderLayer.getTranslucent())).thenApply(arg -> Result.CANCELLED);
+                CompletionStage completableFuture = ChunkBuilder.this.scheduleUpload(arg2.get(RenderLayer.getTranslucent()), BuiltChunk.this.getBuffer(RenderLayer.getTranslucent())).thenApply(void_ -> Result.CANCELLED);
                 return ((CompletableFuture)completableFuture).handle((arg, throwable) -> {
                     if (throwable != null && !(throwable instanceof CancellationException) && !(throwable instanceof InterruptedException)) {
                         MinecraftClient.getInstance().setCrashReport(CrashReport.create(throwable, "Rendering chunk"));

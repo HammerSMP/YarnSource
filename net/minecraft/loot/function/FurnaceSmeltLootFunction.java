@@ -12,13 +12,13 @@ package net.minecraft.loot.function;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import java.util.Optional;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import org.apache.logging.log4j.LogManager;
@@ -28,13 +28,13 @@ public class FurnaceSmeltLootFunction
 extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private FurnaceSmeltLootFunction(class_5341[] args) {
+    private FurnaceSmeltLootFunction(LootCondition[] args) {
         super(args);
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.FURNACE_SMELT;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.FURNACE_SMELT;
     }
 
     @Override
@@ -60,12 +60,12 @@ extends ConditionalLootFunction {
     public static class class_5340
     extends ConditionalLootFunction.Factory<FurnaceSmeltLootFunction> {
         @Override
-        public FurnaceSmeltLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public FurnaceSmeltLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return new FurnaceSmeltLootFunction(args);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

@@ -16,13 +16,13 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import net.minecraft.class_5341;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
@@ -179,16 +179,16 @@ public class EntityPredicate {
     }
 
     public static class Extended {
-        public static final Extended EMPTY = new Extended(new class_5341[0]);
-        private final class_5341[] conditions;
+        public static final Extended EMPTY = new Extended(new LootCondition[0]);
+        private final LootCondition[] conditions;
         private final Predicate<LootContext> combinedCondition;
 
-        private Extended(class_5341[] args) {
+        private Extended(LootCondition[] args) {
             this.conditions = args;
-            this.combinedCondition = LootConditions.joinAnd(args);
+            this.combinedCondition = LootConditionTypes.joinAnd(args);
         }
 
-        public static Extended create(class_5341 ... args) {
+        public static Extended create(LootCondition ... args) {
             return new Extended(args);
         }
 
@@ -212,7 +212,7 @@ public class EntityPredicate {
 
         private static Extended fromJson(String string, AdvancementEntityPredicateDeserializer arg, @Nullable JsonElement jsonElement) {
             if (jsonElement != null && jsonElement.isJsonArray()) {
-                class_5341[] lvs = arg.loadConditions(jsonElement.getAsJsonArray(), arg.getAdvancementId().toString() + "/" + string, LootContextTypes.ADVANCEMENT_ENTITY);
+                LootCondition[] lvs = arg.loadConditions(jsonElement.getAsJsonArray(), arg.getAdvancementId().toString() + "/" + string, LootContextTypes.ADVANCEMENT_ENTITY);
                 return new Extended(lvs);
             }
             EntityPredicate lv = EntityPredicate.fromJson(jsonElement);
@@ -223,8 +223,8 @@ public class EntityPredicate {
             if (arg == ANY) {
                 return EMPTY;
             }
-            class_5341 lv = EntityPropertiesLootCondition.builder(LootContext.EntityTarget.THIS, arg).build();
-            return new Extended(new class_5341[]{lv});
+            LootCondition lv = EntityPropertiesLootCondition.builder(LootContext.EntityTarget.THIS, arg).build();
+            return new Extended(new LootCondition[]{lv});
         }
 
         public boolean test(LootContext arg) {

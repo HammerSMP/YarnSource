@@ -88,7 +88,7 @@ implements Monster {
         this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.2f + 0.1f * (float)i);
         this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(i);
         if (bl) {
-            this.setHealth(this.getMaximumHealth());
+            this.setHealth(this.getMaxHealth());
         }
         this.experiencePoints = i;
     }

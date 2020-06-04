@@ -59,7 +59,7 @@ extends MiningToolItem {
                 if (!lv.isClient()) {
                     lv.syncWorldEvent(null, 1009, lv2, 0);
                 }
-                CampfireBlock.method_29288(lv, lv2, lv3);
+                CampfireBlock.extinguish(lv, lv2, lv3);
                 lv6 = (BlockState)lv3.with(CampfireBlock.LIT, false);
             }
             if (lv6 != null) {

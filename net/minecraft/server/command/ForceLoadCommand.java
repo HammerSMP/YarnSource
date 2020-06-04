@@ -48,7 +48,7 @@ public class ForceLoadCommand {
 
     private static int executeQuery(ServerCommandSource arg, ColumnPos arg2) throws CommandSyntaxException {
         ChunkPos lv = new ChunkPos(arg2.x >> 4, arg2.z >> 4);
-        RegistryKey<World> lv2 = arg.getWorld().method_27983();
+        RegistryKey<World> lv2 = arg.getWorld().getRegistryKey();
         boolean bl = arg.getMinecraftServer().getWorld(lv2).getForcedChunks().contains(lv.toLong());
         if (bl) {
             arg.sendFeedback(new TranslatableText("commands.forceload.query.success", lv, lv2.getValue()), false);
@@ -58,7 +58,7 @@ public class ForceLoadCommand {
     }
 
     private static int executeQuery(ServerCommandSource arg) {
-        RegistryKey<World> lv = arg.getWorld().method_27983();
+        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
         LongSet longSet = arg.getMinecraftServer().getWorld(lv).getForcedChunks();
         int i = longSet.size();
         if (i > 0) {
@@ -75,7 +75,7 @@ public class ForceLoadCommand {
     }
 
     private static int executeRemoveAll(ServerCommandSource arg) {
-        RegistryKey<World> lv = arg.getWorld().method_27983();
+        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
         ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
         LongSet longSet = lv2.getForcedChunks();
         longSet.forEach(l -> lv2.setChunkForced(ChunkPos.getPackedX(l), ChunkPos.getPackedZ(l), false));
@@ -99,7 +99,7 @@ public class ForceLoadCommand {
         if (q > 256L) {
             throw TOO_BIG_EXCEPTION.create((Object)256, (Object)q);
         }
-        RegistryKey<World> lv = arg.getWorld().method_27983();
+        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
         ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
         ChunkPos lv3 = null;
         int r = 0;

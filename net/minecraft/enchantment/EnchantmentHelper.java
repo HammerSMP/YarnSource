@@ -331,8 +331,8 @@ public class EnchantmentHelper {
         boolean bl2 = arg.getItem() == Items.BOOK;
         block0: for (Enchantment lv2 : Registry.ENCHANTMENT) {
             if (lv2.isTreasure() && !bl || !lv2.isAvailableForRandomSelection() || !lv2.type.isAcceptableItem(lv) && !bl2) continue;
-            for (int j = lv2.getMaximumLevel(); j > lv2.getMinimumLevel() - 1; --j) {
-                if (i < lv2.getMinimumPower(j) || i > lv2.getMaximumPower(j)) continue;
+            for (int j = lv2.getMaxLevel(); j > lv2.getMinLevel() - 1; --j) {
+                if (i < lv2.getMinPower(j) || i > lv2.getMaxPower(j)) continue;
                 list.add(new EnchantmentLevelEntry(lv2, j));
                 continue block0;
             }

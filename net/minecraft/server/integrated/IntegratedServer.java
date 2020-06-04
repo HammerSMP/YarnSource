@@ -26,12 +26,12 @@ import java.util.function.BooleanSupplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5350;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.NetworkEncryptionUtils;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.LanServerPinger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
@@ -57,12 +57,12 @@ extends MinecraftServer {
     private LanServerPinger lanPinger;
     private UUID localPlayerUuid;
 
-    public IntegratedServer(MinecraftClient arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, class_5350 arg4, SaveProperties arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+    public IntegratedServer(MinecraftClient arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
         super(arg2, arg5, arg3, arg.getNetworkProxy(), arg.getDataFixer(), arg4, minecraftSessionService, gameProfileRepository, arg6, arg7);
         this.setServerName(arg.getSession().getUsername());
         this.setDemo(arg.isDemo());
         this.setWorldHeight(256);
-        this.setPlayerManager(new IntegratedPlayerManager(this, this.field_25132, this.field_24371));
+        this.setPlayerManager(new IntegratedPlayerManager(this, this.dimensionTracker, this.field_24371));
         this.client = arg;
     }
 
@@ -75,7 +75,7 @@ extends MinecraftServer {
         LOGGER.info("Generating keypair");
         this.setKeyPair(NetworkEncryptionUtils.generateServerKeyPair());
         this.loadWorld();
-        this.setMotd(this.getUserName() + " - " + this.method_27728().getLevelName());
+        this.setMotd(this.getUserName() + " - " + this.getSaveProperties().getLevelName());
         return true;
     }
 

@@ -102,7 +102,7 @@ extends WorldChunk {
     }
 
     @Override
-    public <T extends Entity> void getEntities(Class<? extends T> arg, Box arg2, List<T> list, Predicate<? super T> predicate) {
+    public <T extends Entity> void getEntities(Class<? extends T> class_, Box arg, List<T> list, Predicate<? super T> predicate) {
     }
 
     @Override

@@ -82,8 +82,8 @@ public class RealmsDataFetcher {
     }
 
     public boolean isFetchedSinceLastTry(Task arg) {
-        Boolean lv = this.fetchStatus.get((Object)arg);
-        return lv == null ? false : lv;
+        Boolean boolean_ = this.fetchStatus.get((Object)arg);
+        return boolean_ == null ? false : boolean_;
     }
 
     public void markClean() {

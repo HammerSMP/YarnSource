@@ -43,7 +43,7 @@ extends Task<LivingEntity> {
         }
         Brain<?> lv = arg2.getBrain();
         GlobalPos lv2 = lv.getOptionalMemory(MemoryModuleType.HOME).get();
-        if (arg.method_27983() != lv2.getDimension()) {
+        if (arg.getRegistryKey() != lv2.getDimension()) {
             return false;
         }
         Optional<Timestamp> optional = lv.getOptionalMemory(MemoryModuleType.LAST_WOKEN);

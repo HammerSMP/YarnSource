@@ -16,16 +16,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.mojang.authlib.GameProfile;
 import java.util.Set;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.JsonHelper;
@@ -34,14 +34,14 @@ public class FillPlayerHeadLootFunction
 extends ConditionalLootFunction {
     private final LootContext.EntityTarget entity;
 
-    public FillPlayerHeadLootFunction(class_5341[] args, LootContext.EntityTarget arg) {
+    public FillPlayerHeadLootFunction(LootCondition[] args, LootContext.EntityTarget arg) {
         super(args);
         this.entity = arg;
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.FILL_PLAYER_HEAD;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.FILL_PLAYER_HEAD;
     }
 
     @Override
@@ -68,13 +68,13 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public FillPlayerHeadLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public FillPlayerHeadLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             LootContext.EntityTarget lv = JsonHelper.deserialize(jsonObject, "entity", jsonDeserializationContext, LootContext.EntityTarget.class);
             return new FillPlayerHeadLootFunction(args, lv);
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

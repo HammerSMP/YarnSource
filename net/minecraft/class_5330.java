@@ -27,13 +27,13 @@ import com.mojang.datafixers.util.Pair;
 import java.lang.reflect.Type;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import net.minecraft.class_5336;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializableType;
 import net.minecraft.util.registry.Registry;
 
 public class class_5330 {
-    public static <E, T extends class_5336<E>> class_5331<E, T> method_29306(Registry<T> arg, String string, String string2, Function<E, T> function) {
+    public static <E, T extends JsonSerializableType<E>> class_5331<E, T> method_29306(Registry<T> arg, String string, String string2, Function<E, T> function) {
         return new class_5331(arg, string, string2, function);
     }
 
@@ -43,7 +43,7 @@ public class class_5330 {
         public T method_29308(JsonElement var1, JsonDeserializationContext var2);
     }
 
-    static class class_5333<E, T extends class_5336<E>>
+    static class class_5333<E, T extends JsonSerializableType<E>>
     implements JsonDeserializer<E>,
     JsonSerializer<E> {
         private final Registry<T> field_25197;
@@ -65,11 +65,11 @@ public class class_5330 {
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = JsonHelper.asObject(jsonElement, this.field_25198);
                 Identifier lv = new Identifier(JsonHelper.getString(jsonObject, this.field_25199));
-                class_5336 lv2 = (class_5336)this.field_25197.get(lv);
+                JsonSerializableType lv2 = (JsonSerializableType)this.field_25197.get(lv);
                 if (lv2 == null) {
                     throw new JsonSyntaxException("Unknown type '" + lv + "'");
                 }
-                return (E)lv2.method_29312().fromJson(jsonObject, jsonDeserializationContext);
+                return (E)lv2.getJsonSerializer().fromJson(jsonObject, jsonDeserializationContext);
             }
             if (this.field_25201 == null) {
                 throw new UnsupportedOperationException("Object " + (Object)jsonElement + " can't be deserialized");
@@ -78,7 +78,7 @@ public class class_5330 {
         }
 
         public JsonElement serialize(E object, Type type, JsonSerializationContext jsonSerializationContext) {
-            class_5336 lv = (class_5336)this.field_25200.apply(object);
+            JsonSerializableType lv = (JsonSerializableType)this.field_25200.apply(object);
             if (this.field_25201 != null && this.field_25201.getFirst() == lv) {
                 return ((class_5332)this.field_25201.getSecond()).method_29309(object, jsonSerializationContext);
             }
@@ -87,12 +87,12 @@ public class class_5330 {
             }
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty(this.field_25199, this.field_25197.getId(lv).toString());
-            lv.method_29312().toJson(jsonObject, object, jsonSerializationContext);
+            lv.getJsonSerializer().toJson(jsonObject, object, jsonSerializationContext);
             return jsonObject;
         }
     }
 
-    public static class class_5331<E, T extends class_5336<E>> {
+    public static class class_5331<E, T extends JsonSerializableType<E>> {
         private final Registry<T> field_25192;
         private final String field_25193;
         private final String field_25194;

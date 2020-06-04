@@ -21,7 +21,7 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 
 public class AlterGroundTreeDecorator
 extends TreeDecorator {
-    public static final Codec<AlterGroundTreeDecorator> field_24957 = BlockStateProvider.field_24937.fieldOf("provider").xmap(AlterGroundTreeDecorator::new, arg -> arg.field_21316).codec();
+    public static final Codec<AlterGroundTreeDecorator> field_24957 = BlockStateProvider.CODEC.fieldOf("provider").xmap(AlterGroundTreeDecorator::new, arg -> arg.field_21316).codec();
     private final BlockStateProvider field_21316;
 
     public AlterGroundTreeDecorator(BlockStateProvider arg) {

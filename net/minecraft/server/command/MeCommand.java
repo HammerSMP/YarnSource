@@ -28,7 +28,7 @@ public class MeCommand {
             if (lv2 != null) {
                 ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().broadcastChatMessage(lv, MessageType.CHAT, lv2.getUuid());
             } else {
-                ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().broadcastChatMessage(lv, MessageType.SYSTEM, Util.field_25140);
+                ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getPlayerManager().broadcastChatMessage(lv, MessageType.SYSTEM, Util.NIL_UUID);
             }
             return 1;
         })));

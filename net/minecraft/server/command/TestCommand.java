@@ -312,7 +312,7 @@ public class TestCommand {
     }
 
     private static void sendMessage(ServerWorld arg3, String string, Formatting arg22) {
-        arg3.getPlayers(arg -> true).forEach(arg2 -> arg2.sendSystemMessage(new LiteralText((Object)((Object)arg22) + string), Util.field_25140));
+        arg3.getPlayers(arg -> true).forEach(arg2 -> arg2.sendSystemMessage(new LiteralText((Object)((Object)arg22) + string), Util.NIL_UUID));
     }
 
     static class Listener

@@ -17,8 +17,8 @@ extends StatusEffect {
     @Override
     public void onRemoved(LivingEntity arg, AttributeContainer arg2, int i) {
         super.onRemoved(arg, arg2, i);
-        if (arg.getHealth() > arg.getMaximumHealth()) {
-            arg.setHealth(arg.getMaximumHealth());
+        if (arg.getHealth() > arg.getMaxHealth()) {
+            arg.setHealth(arg.getMaxHealth());
         }
     }
 }

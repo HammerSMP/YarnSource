@@ -29,16 +29,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import net.minecraft.class_5339;
-import net.minecraft.class_5341;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.UniformLootTableRange;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.ConditionalLootFunction;
-import net.minecraft.loot.function.LootFunctions;
+import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Util;
@@ -48,14 +48,14 @@ public class SetAttributesLootFunction
 extends ConditionalLootFunction {
     private final List<Attribute> attributes;
 
-    private SetAttributesLootFunction(class_5341[] args, List<Attribute> list) {
+    private SetAttributesLootFunction(LootCondition[] args, List<Attribute> list) {
         super(args);
         this.attributes = ImmutableList.copyOf(list);
     }
 
     @Override
-    public class_5339 method_29321() {
-        return LootFunctions.SET_ATTRIBUTES;
+    public LootFunctionType method_29321() {
+        return LootFunctionTypes.SET_ATTRIBUTES;
     }
 
     @Override
@@ -196,7 +196,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public SetAttributesLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public SetAttributesLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             JsonArray jsonArray = JsonHelper.getArray(jsonObject, "modifiers");
             ArrayList list = Lists.newArrayListWithExpectedSize((int)jsonArray.size());
             for (JsonElement jsonElement : jsonArray) {
@@ -209,7 +209,7 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, class_5341[] args) {
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
             return this.fromJson(jsonObject, jsonDeserializationContext, args);
         }
     }

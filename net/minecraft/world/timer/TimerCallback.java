@@ -15,9 +15,9 @@ public interface TimerCallback<T> {
         private final Identifier id;
         private final Class<?> callbackClass;
 
-        public Serializer(Identifier arg, Class<?> arg2) {
+        public Serializer(Identifier arg, Class<?> class_) {
             this.id = arg;
-            this.callbackClass = arg2;
+            this.callbackClass = class_;
         }
 
         public Identifier getId() {

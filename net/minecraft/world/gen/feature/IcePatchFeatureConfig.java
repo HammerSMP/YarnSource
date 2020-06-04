@@ -11,7 +11,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class IcePatchFeatureConfig
 implements FeatureConfig {
-    public static final Codec<IcePatchFeatureConfig> field_24884 = Codec.INT.fieldOf("radius").xmap(IcePatchFeatureConfig::new, arg -> arg.radius).codec();
+    public static final Codec<IcePatchFeatureConfig> CODEC = Codec.INT.fieldOf("radius").xmap(IcePatchFeatureConfig::new, arg -> arg.radius).codec();
     public final int radius;
 
     public IcePatchFeatureConfig(int i) {

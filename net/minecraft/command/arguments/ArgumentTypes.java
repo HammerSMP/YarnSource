@@ -83,16 +83,16 @@ public class ArgumentTypes {
     private static final Map<Class<?>, Entry<?>> classMap = Maps.newHashMap();
     private static final Map<Identifier, Entry<?>> idMap = Maps.newHashMap();
 
-    public static <T extends ArgumentType<?>> void register(String string, Class<T> arg, ArgumentSerializer<T> arg2) {
+    public static <T extends ArgumentType<?>> void register(String string, Class<T> class_, ArgumentSerializer<T> arg) {
         Identifier lv = new Identifier(string);
-        if (classMap.containsKey(arg)) {
-            throw new IllegalArgumentException("Class " + arg.getName() + " already has a serializer!");
+        if (classMap.containsKey(class_)) {
+            throw new IllegalArgumentException("Class " + class_.getName() + " already has a serializer!");
         }
         if (idMap.containsKey(lv)) {
             throw new IllegalArgumentException("'" + lv + "' is already a registered serializer!");
         }
-        Entry lv2 = new Entry(arg, arg2, lv);
-        classMap.put(arg, lv2);
+        Entry lv2 = new Entry(class_, arg, lv);
+        classMap.put(class_, lv2);
         idMap.put(lv, lv2);
     }
 
@@ -227,10 +227,10 @@ public class ArgumentTypes {
         public final ArgumentSerializer<T> serializer;
         public final Identifier id;
 
-        private Entry(Class<T> arg, ArgumentSerializer<T> arg2, Identifier arg3) {
-            this.argClass = arg;
-            this.serializer = arg2;
-            this.id = arg3;
+        private Entry(Class<T> class_, ArgumentSerializer<T> arg, Identifier arg2) {
+            this.argClass = class_;
+            this.serializer = arg;
+            this.id = arg2;
         }
     }
 }

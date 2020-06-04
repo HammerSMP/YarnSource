@@ -14,20 +14,20 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class RandomChanceWithLootingLootCondition
-implements class_5341 {
+implements LootCondition {
     private final float chance;
     private final float lootingMultiplier;
 
@@ -37,8 +37,8 @@ implements class_5341 {
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.RANDOM_CHANCE_WITH_LOOTING;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.RANDOM_CHANCE_WITH_LOOTING;
     }
 
     @Override
@@ -56,7 +56,7 @@ implements class_5341 {
         return arg.getRandom().nextFloat() < this.chance + (float)i * this.lootingMultiplier;
     }
 
-    public static class_5341.Builder builder(float f, float g) {
+    public static LootCondition.Builder builder(float f, float g) {
         return () -> new RandomChanceWithLootingLootCondition(f, g);
     }
 
@@ -66,7 +66,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<RandomChanceWithLootingLootCondition> {
+    implements JsonSerializable<RandomChanceWithLootingLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, RandomChanceWithLootingLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("chance", (Number)Float.valueOf(arg.chance));

@@ -13,7 +13,6 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5323;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -26,6 +25,7 @@ import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.RegistryTagContainer;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.Registry;
@@ -70,17 +70,17 @@ implements ResourceReloadListener {
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg2, ResourceManager arg22, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.blocks.prepareReload(arg22, executor);
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture2 = this.items.prepareReload(arg22, executor);
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture3 = this.fluids.prepareReload(arg22, executor);
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture4 = this.entityTypes.prepareReload(arg22, executor);
-        return ((CompletableFuture)CompletableFuture.allOf(completableFuture, completableFuture2, completableFuture3, completableFuture4).thenCompose(arg2::whenPrepared)).thenAcceptAsync(arg -> {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.blocks.prepareReload(arg2, executor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture2 = this.items.prepareReload(arg2, executor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture3 = this.fluids.prepareReload(arg2, executor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture4 = this.entityTypes.prepareReload(arg2, executor);
+        return ((CompletableFuture)CompletableFuture.allOf(completableFuture, completableFuture2, completableFuture3, completableFuture4).thenCompose(arg::whenPrepared)).thenAcceptAsync(void_ -> {
             this.blocks.applyReload((Map)completableFuture.join());
             this.items.applyReload((Map)completableFuture2.join());
             this.fluids.applyReload((Map)completableFuture3.join());
             this.entityTypes.applyReload((Map)completableFuture4.join());
-            class_5323.method_29219(this.blocks, this.items, this.fluids, this.entityTypes);
+            TagContainers.method_29219(this.blocks, this.items, this.fluids, this.entityTypes);
             HashMultimap multimap = HashMultimap.create();
             multimap.putAll((Object)"blocks", BlockTags.method_29214(this.blocks));
             multimap.putAll((Object)"items", ItemTags.method_29217(this.items));

@@ -180,7 +180,7 @@ implements Tickable {
         if (!lv.getAxis().isHorizontal()) {
             return;
         }
-        double d = this.pushedBlock.getCollisionShape(this.world, this.pos).getMaximum(Direction.Axis.Y);
+        double d = this.pushedBlock.getCollisionShape(this.world, this.pos).getMax(Direction.Axis.Y);
         Box lv2 = this.offsetHeadBox(new Box(0.0, d, 0.0, 1.0, 1.5000000999999998, 1.0));
         double e = f - this.progress;
         List<Entity> list = this.world.getEntities((Entity)null, lv2, arg2 -> PistonBlockEntity.method_23671(lv2, arg2));

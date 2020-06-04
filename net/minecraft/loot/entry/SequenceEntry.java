@@ -3,22 +3,22 @@
  */
 package net.minecraft.loot.entry;
 
-import net.minecraft.class_5338;
-import net.minecraft.class_5341;
+import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.entry.CombinedEntry;
 import net.minecraft.loot.entry.EntryCombiner;
-import net.minecraft.loot.entry.LootEntries;
-import net.minecraft.loot.entry.LootEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
+import net.minecraft.loot.entry.LootPoolEntryType;
+import net.minecraft.loot.entry.LootPoolEntryTypes;
 
 public class SequenceEntry
 extends CombinedEntry {
-    SequenceEntry(LootEntry[] args, class_5341[] args2) {
+    SequenceEntry(LootPoolEntry[] args, LootCondition[] args2) {
         super(args, args2);
     }
 
     @Override
-    public class_5338 method_29318() {
-        return LootEntries.GROUP;
+    public LootPoolEntryType method_29318() {
+        return LootPoolEntryTypes.GROUP;
     }
 
     @Override

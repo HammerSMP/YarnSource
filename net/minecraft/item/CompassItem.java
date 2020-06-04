@@ -52,7 +52,7 @@ implements Vanishable {
     }
 
     public static Optional<RegistryKey<World>> getLodestoneDimension(CompoundTag arg) {
-        return World.field_25178.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("LodestoneDimension")).result();
+        return World.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("LodestoneDimension")).result();
     }
 
     @Override
@@ -66,7 +66,7 @@ implements Vanishable {
                 return;
             }
             Optional<RegistryKey<World>> optional = CompassItem.getLodestoneDimension(lv);
-            if (optional.isPresent() && optional.get() == arg2.method_27983() && lv.contains("LodestonePos") && !((ServerWorld)arg2).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos(lv.getCompound("LodestonePos")))) {
+            if (optional.isPresent() && optional.get() == arg2.getRegistryKey() && lv.contains("LodestonePos") && !((ServerWorld)arg2).getPointOfInterestStorage().method_26339(PointOfInterestType.LODESTONE, NbtHelper.toBlockPos(lv.getCompound("LodestonePos")))) {
                 lv.remove("LodestonePos");
             }
         }
@@ -80,7 +80,7 @@ implements Vanishable {
             arg.world.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             boolean bl2 = bl = !arg.player.abilities.creativeMode && arg.stack.getCount() == 1;
             if (bl) {
-                this.method_27315(arg.world.method_27983(), lv, arg.stack.getOrCreateTag());
+                this.method_27315(arg.world.getRegistryKey(), lv, arg.stack.getOrCreateTag());
             } else {
                 ItemStack lv2 = new ItemStack(Items.COMPASS, 1);
                 CompoundTag lv3 = arg.stack.hasTag() ? arg.stack.getTag().copy() : new CompoundTag();
@@ -88,7 +88,7 @@ implements Vanishable {
                 if (!arg.player.abilities.creativeMode) {
                     arg.stack.decrement(1);
                 }
-                this.method_27315(arg.world.method_27983(), lv, lv3);
+                this.method_27315(arg.world.getRegistryKey(), lv, lv3);
                 if (!arg.player.inventory.insertStack(lv2)) {
                     arg.player.dropItem(lv2, false);
                 }
@@ -100,7 +100,7 @@ implements Vanishable {
 
     private void method_27315(RegistryKey<World> arg, BlockPos arg22, CompoundTag arg3) {
         arg3.put("LodestonePos", NbtHelper.fromBlockPos(arg22));
-        World.field_25178.encodeStart((DynamicOps)NbtOps.INSTANCE, arg).resultOrPartial(((Logger)field_24670)::error).ifPresent(arg2 -> arg3.put("LodestoneDimension", (Tag)arg2));
+        World.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, arg).resultOrPartial(((Logger)field_24670)::error).ifPresent(arg2 -> arg3.put("LodestoneDimension", (Tag)arg2));
         arg3.putBoolean("LodestoneTracked", true);
     }
 

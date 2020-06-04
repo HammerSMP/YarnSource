@@ -35,13 +35,13 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.entity.SkullBlockEntity;
-import net.minecraft.class_5350;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.network.NetworkEncryptionUtils;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.ServerConfigHandler;
@@ -89,7 +89,7 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(LevelStorage.Session arg, ResourcePackManager<ResourcePackProfile> arg2, class_5350 arg3, SaveProperties arg4, ServerPropertiesLoader arg5, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+    public MinecraftDedicatedServer(LevelStorage.Session arg, ResourcePackManager<ResourcePackProfile> arg2, ServerResourceManager arg3, SaveProperties arg4, ServerPropertiesLoader arg5, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
         super(arg, arg4, arg2, Proxy.NO_PROXY, dataFixer, arg3, minecraftSessionService, gameProfileRepository, arg6, arg7);
         this.propertiesLoader = arg5;
         this.rconCommandOutput = new ServerCommandOutput(this);
@@ -136,7 +136,7 @@ implements DedicatedServer {
         this.setForceGameMode(lv.forceGameMode);
         super.setPlayerIdleTimeout(lv.playerIdleTimeout.get());
         this.setEnforceWhitelist(lv.enforceWhitelist);
-        this.field_24372.setGameMode(lv.gameMode);
+        this.saveProperties.setGameMode(lv.gameMode);
         LOGGER.info("Default game type: {}", (Object)lv.gameMode);
         InetAddress inetAddress = null;
         if (!this.getServerIp().isEmpty()) {
@@ -169,7 +169,7 @@ implements DedicatedServer {
         if (!ServerConfigHandler.checkSuccess(this)) {
             return false;
         }
-        this.setPlayerManager(new DedicatedPlayerManager(this, this.field_25132, this.field_24371));
+        this.setPlayerManager(new DedicatedPlayerManager(this, this.dimensionTracker, this.field_24371));
         long l = Util.getMeasuringTimeNano();
         this.setWorldHeight(lv.maxBuildHeight);
         SkullBlockEntity.setUserCache(this.getUserCache());
@@ -383,7 +383,7 @@ implements DedicatedServer {
     @Override
     public boolean isSpawnProtected(ServerWorld arg, BlockPos arg2, PlayerEntity arg3) {
         int j;
-        if (arg.method_27983() != World.field_25179) {
+        if (arg.getRegistryKey() != World.OVERWORLD) {
             return false;
         }
         if (this.getPlayerManager().getOpList().isEmpty()) {

@@ -1624,7 +1624,7 @@ CommandOutput {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
                 this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
-                RegistryKey<World> lv = this.world.getDimension().isNether() ? World.field_25179 : World.field_25180;
+                RegistryKey<World> lv = this.world.getDimension().isNether() ? World.OVERWORLD : World.NETHER;
                 this.changeDimension(lv);
                 this.world.getProfiler().pop();
             }
@@ -1967,16 +1967,16 @@ CommandOutput {
         }
         this.world.getProfiler().push("changeDimension");
         MinecraftServer minecraftServer = this.getServer();
-        RegistryKey<World> lv = this.world.method_27983();
+        RegistryKey<World> lv = this.world.getRegistryKey();
         ServerWorld lv2 = minecraftServer.getWorld(lv);
         ServerWorld lv3 = minecraftServer.getWorld(arg);
         this.detach();
         this.world.getProfiler().push("reposition");
         Vec3d lv4 = this.getVelocity();
         float f = 0.0f;
-        if (lv == World.field_25181 && arg == World.field_25179) {
+        if (lv == World.END && arg == World.OVERWORLD) {
             BlockPos lv5 = lv3.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv3.getSpawnPos());
-        } else if (arg == World.field_25181) {
+        } else if (arg == World.END) {
             BlockPos lv6 = ServerWorld.field_25144;
         } else {
             double d = this.getX();
@@ -2014,7 +2014,7 @@ CommandOutput {
             ((Entity)lv12).refreshPositionAndAngles(lv10, ((Entity)lv12).yaw + f, ((Entity)lv12).pitch);
             ((Entity)lv12).setVelocity(lv4);
             lv3.onDimensionChanged((Entity)lv12);
-            if (arg == World.field_25181) {
+            if (arg == World.END) {
                 ServerWorld.method_29200(lv3);
             }
         }
@@ -2338,9 +2338,9 @@ CommandOutput {
         return false;
     }
 
-    public boolean hasPassengerType(Class<? extends Entity> arg) {
+    public boolean hasPassengerType(Class<? extends Entity> class_) {
         for (Entity lv : this.getPassengerList()) {
-            if (!arg.isAssignableFrom(lv.getClass())) continue;
+            if (!class_.isAssignableFrom(lv.getClass())) continue;
             return true;
         }
         return false;

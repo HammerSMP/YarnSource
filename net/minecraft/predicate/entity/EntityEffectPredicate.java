@@ -109,11 +109,11 @@ public class EntityEffectPredicate {
         @Nullable
         private final Boolean visible;
 
-        public EffectData(NumberRange.IntRange arg, NumberRange.IntRange arg2, @Nullable Boolean arg3, @Nullable Boolean arg4) {
+        public EffectData(NumberRange.IntRange arg, NumberRange.IntRange arg2, @Nullable Boolean boolean_, @Nullable Boolean boolean2) {
             this.amplifier = arg;
             this.duration = arg2;
-            this.ambient = arg3;
-            this.visible = arg4;
+            this.ambient = boolean_;
+            this.visible = boolean2;
         }
 
         public EffectData() {
@@ -148,9 +148,9 @@ public class EntityEffectPredicate {
         public static EffectData fromJson(JsonObject jsonObject) {
             NumberRange.IntRange lv = NumberRange.IntRange.fromJson(jsonObject.get("amplifier"));
             NumberRange.IntRange lv2 = NumberRange.IntRange.fromJson(jsonObject.get("duration"));
-            Boolean lv3 = jsonObject.has("ambient") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "ambient")) : null;
-            Boolean lv4 = jsonObject.has("visible") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "visible")) : null;
-            return new EffectData(lv, lv2, lv3, lv4);
+            Boolean boolean_ = jsonObject.has("ambient") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "ambient")) : null;
+            Boolean boolean2 = jsonObject.has("visible") ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, "visible")) : null;
+            return new EffectData(lv, lv2, boolean_, boolean2);
         }
     }
 }

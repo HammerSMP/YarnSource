@@ -35,7 +35,7 @@ public class RepeatedNarrator {
             return arg;
         });
         if (lv.rateLimiter.tryAcquire(1)) {
-            NarratorManager.INSTANCE.onChatMessage(MessageType.SYSTEM, new LiteralText(string), Util.field_25140);
+            NarratorManager.INSTANCE.onChatMessage(MessageType.SYSTEM, new LiteralText(string), Util.NIL_UUID);
         }
     }
 

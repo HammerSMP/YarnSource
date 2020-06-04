@@ -456,7 +456,7 @@ extends LivingEntity {
     public void afterSpawn() {
         this.setPose(EntityPose.STANDING);
         super.afterSpawn();
-        this.setHealth(this.getMaximumHealth());
+        this.setHealth(this.getMaxHealth());
         this.deathTime = 0;
     }
 
@@ -474,7 +474,7 @@ extends LivingEntity {
             --this.abilityResyncCountdown;
         }
         if (this.world.getDifficulty() == Difficulty.PEACEFUL && this.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION)) {
-            if (this.getHealth() < this.getMaximumHealth() && this.age % 20 == 0) {
+            if (this.getHealth() < this.getMaxHealth() && this.age % 20 == 0) {
                 this.heal(1.0f);
             }
             if (this.hungerManager.isNotFull() && this.age % 10 == 0) {
@@ -686,7 +686,7 @@ extends LivingEntity {
     }
 
     public boolean isUsingEffectiveTool(BlockState arg) {
-        return !arg.method_29291() || this.inventory.getMainHandStack().isEffectiveOn(arg);
+        return !arg.isToolRequired() || this.inventory.getMainHandStack().isEffectiveOn(arg);
     }
 
     @Override
@@ -1187,7 +1187,7 @@ extends LivingEntity {
     public static Optional<Vec3d> findRespawnPosition(ServerWorld arg, BlockPos arg2, boolean bl, boolean bl2) {
         BlockState lv = arg.getBlockState(arg2);
         Block lv2 = lv.getBlock();
-        if (lv2 instanceof RespawnAnchorBlock && lv.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.method_27353(arg)) {
+        if (lv2 instanceof RespawnAnchorBlock && lv.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(arg)) {
             Optional<Vec3d> optional = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, arg, arg2);
             if (!bl2 && optional.isPresent()) {
                 arg.setBlockState(arg2, (BlockState)lv.with(RespawnAnchorBlock.CHARGES, lv.get(RespawnAnchorBlock.CHARGES) - 1), 3);
@@ -1509,7 +1509,7 @@ extends LivingEntity {
     }
 
     public boolean canFoodHeal() {
-        return this.getHealth() > 0.0f && this.getHealth() < this.getMaximumHealth();
+        return this.getHealth() > 0.0f && this.getHealth() < this.getMaxHealth();
     }
 
     public boolean canModifyBlocks() {

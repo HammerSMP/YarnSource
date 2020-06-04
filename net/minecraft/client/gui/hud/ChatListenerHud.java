@@ -26,7 +26,7 @@ implements ClientChatListener {
 
     @Override
     public void onChatMessage(MessageType arg, Text arg2, UUID uUID) {
-        if (this.client.method_29042(uUID)) {
+        if (this.client.shouldBlockMessages(uUID)) {
             return;
         }
         if (arg != MessageType.CHAT) {

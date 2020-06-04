@@ -74,7 +74,7 @@ import org.apache.logging.log4j.Logger;
 
 public class EnderDragonFight {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Predicate<Entity> VALID_ENTITY = EntityPredicates.VALID_ENTITY.and(EntityPredicates.maximumDistance(0.0, 128.0, 0.0, 192.0));
+    private static final Predicate<Entity> VALID_ENTITY = EntityPredicates.VALID_ENTITY.and(EntityPredicates.maxDistance(0.0, 128.0, 0.0, 192.0));
     private final ServerBossBar bossBar = (ServerBossBar)new ServerBossBar(new TranslatableText("entity.minecraft.ender_dragon"), BossBar.Color.PINK, BossBar.Style.PROGRESS).setDragonMusic(true).setThickenFog(true);
     private final ServerWorld world;
     private final List<Integer> gateways = Lists.newArrayList();
@@ -365,7 +365,7 @@ public class EnderDragonFight {
 
     public void updateFight(EnderDragonEntity arg) {
         if (arg.getUuid().equals(this.dragonUuid)) {
-            this.bossBar.setPercent(arg.getHealth() / arg.getMaximumHealth());
+            this.bossBar.setPercent(arg.getHealth() / arg.getMaxHealth());
             this.dragonSeenTimer = 0;
             if (arg.hasCustomName()) {
                 this.bossBar.setName(arg.getDisplayName());

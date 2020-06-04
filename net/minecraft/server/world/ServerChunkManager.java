@@ -92,7 +92,7 @@ extends ChunkManager {
         this.mainThreadExecutor = new MainThreadExecutor(arg);
         this.chunkGenerator = arg4;
         this.serverThread = Thread.currentThread();
-        File file = arg2.method_27424(arg.method_27983());
+        File file = arg2.method_27424(arg.getRegistryKey());
         File file2 = new File(file, "data");
         file2.mkdirs();
         this.persistentStateManager = new PersistentStateManager(file2, dataFixer);
@@ -504,7 +504,7 @@ extends ChunkManager {
     final class MainThreadExecutor
     extends ThreadExecutor<Runnable> {
         private MainThreadExecutor(World arg2) {
-            super("Chunk source main thread executor for " + arg2.method_27983().getValue());
+            super("Chunk source main thread executor for " + arg2.getRegistryKey().getValue());
         }
 
         @Override

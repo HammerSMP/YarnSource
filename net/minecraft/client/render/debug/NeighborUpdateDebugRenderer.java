@@ -64,26 +64,26 @@ implements DebugRenderer.Renderer {
         Iterator<Map.Entry<Long, Map<BlockPos, Integer>>> iterator = this.neighborUpdates.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Long, Map<BlockPos, Integer>> entry = iterator.next();
-            Long lv2 = entry.getKey();
+            Long long_ = entry.getKey();
             Map<BlockPos, Integer> map2 = entry.getValue();
-            long m = l - lv2;
+            long m = l - long_;
             if (m > 200L) {
                 iterator.remove();
                 continue;
             }
             for (Map.Entry<BlockPos, Integer> entry2 : map2.entrySet()) {
-                BlockPos lv3 = entry2.getKey();
+                BlockPos lv2 = entry2.getKey();
                 Integer integer = entry2.getValue();
-                if (!set.add(lv3)) continue;
-                Box lv4 = new Box(BlockPos.ORIGIN).expand(0.002).contract(0.0025 * (double)m).offset(lv3.getX(), lv3.getY(), lv3.getZ()).offset(-d, -e, -f);
-                WorldRenderer.drawBox(arg, lv, lv4.minX, lv4.minY, lv4.minZ, lv4.maxX, lv4.maxY, lv4.maxZ, 1.0f, 1.0f, 1.0f, 1.0f);
-                map.put(lv3, integer);
+                if (!set.add(lv2)) continue;
+                Box lv3 = new Box(BlockPos.ORIGIN).expand(0.002).contract(0.0025 * (double)m).offset(lv2.getX(), lv2.getY(), lv2.getZ()).offset(-d, -e, -f);
+                WorldRenderer.drawBox(arg, lv, lv3.minX, lv3.minY, lv3.minZ, lv3.maxX, lv3.maxY, lv3.maxZ, 1.0f, 1.0f, 1.0f, 1.0f);
+                map.put(lv2, integer);
             }
         }
         for (Map.Entry entry3 : map.entrySet()) {
-            BlockPos lv5 = (BlockPos)entry3.getKey();
+            BlockPos lv4 = (BlockPos)entry3.getKey();
             Integer integer2 = (Integer)entry3.getValue();
-            DebugRenderer.drawString(String.valueOf(integer2), lv5.getX(), lv5.getY(), lv5.getZ(), -1);
+            DebugRenderer.drawString(String.valueOf(integer2), lv4.getX(), lv4.getY(), lv4.getZ(), -1);
         }
     }
 }

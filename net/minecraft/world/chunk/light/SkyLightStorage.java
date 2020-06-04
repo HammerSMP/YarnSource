@@ -110,7 +110,7 @@ extends LightStorage<Data> {
         int i = ChunkSectionPos.getY(l);
         if (((Data)this.lightArrays).topArraySectionY.get(m) == i + 1) {
             long n = l;
-            while (!this.hasLight(n) && this.isAboveMinimumHeight(i)) {
+            while (!this.hasLight(n) && this.isAboveMinHeight(i)) {
                 --i;
                 n = ChunkSectionPos.offset(n, Direction.DOWN);
             }
@@ -255,7 +255,7 @@ extends LightStorage<Data> {
         this.hasSkyLightUpdates = false;
     }
 
-    protected boolean isAboveMinimumHeight(int i) {
+    protected boolean isAboveMinHeight(int i) {
         return i >= ((Data)this.lightArrays).defaultTopArraySectionY;
     }
 

@@ -59,7 +59,7 @@ implements ShapeContext {
 
     @Override
     public boolean isAbove(VoxelShape arg, BlockPos arg2, boolean bl) {
-        return this.minY > (double)arg2.getY() + arg.getMaximum(Direction.Axis.Y) - (double)1.0E-5f;
+        return this.minY > (double)arg2.getY() + arg.getMax(Direction.Axis.Y) - (double)1.0E-5f;
     }
 }
 

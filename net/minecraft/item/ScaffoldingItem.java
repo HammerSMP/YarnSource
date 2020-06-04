@@ -51,7 +51,7 @@ extends BlockItem {
                     PlayerEntity lv8 = arg.getPlayer();
                     int j = lv2.getHeight();
                     if (!(lv8 instanceof ServerPlayerEntity) || lv7.getY() < j) break;
-                    GameMessageS2CPacket lv9 = new GameMessageS2CPacket(new TranslatableText("build.tooHigh", j).formatted(Formatting.RED), MessageType.GAME_INFO, Util.field_25140);
+                    GameMessageS2CPacket lv9 = new GameMessageS2CPacket(new TranslatableText("build.tooHigh", j).formatted(Formatting.RED), MessageType.GAME_INFO, Util.NIL_UUID);
                     ((ServerPlayerEntity)lv8).networkHandler.sendPacket(lv9);
                     break;
                 }

@@ -38,13 +38,13 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.gen.decorator.ChanceDecoratorConfig;
 import net.minecraft.world.gen.decorator.Decorator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FillLayerFeatureConfig;
 import net.minecraft.world.gen.feature.SingleStateFeatureConfig;
@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
 
 public class FlatChunkGeneratorConfig {
     private static final Logger LOGGER = LogManager.getLogger();
-    public static final Codec<FlatChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)class_5311.field_24821.fieldOf("structures").forGetter(FlatChunkGeneratorConfig::getConfig), (App)FlatChunkGeneratorLayer.CODEC.listOf().fieldOf("layers").forGetter(FlatChunkGeneratorConfig::getLayers), (App)Registry.BIOME.fieldOf("biome").withDefault(() -> {
+    public static final Codec<FlatChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)class_5311.CODEC.fieldOf("structures").forGetter(FlatChunkGeneratorConfig::getConfig), (App)FlatChunkGeneratorLayer.CODEC.listOf().fieldOf("layers").forGetter(FlatChunkGeneratorConfig::getLayers), (App)Registry.BIOME.fieldOf("biome").withDefault(() -> {
         LOGGER.error("Unknown biome, defaulting to plains");
         return Biomes.PLAINS;
     }).forGetter(arg -> arg.biome)).apply((Applicative)instance, FlatChunkGeneratorConfig::new)).stable();
@@ -64,7 +64,7 @@ public class FlatChunkGeneratorConfig {
         hashMap.put(StructureFeature.MINESHAFT, DefaultBiomeFeatures.field_24688);
         hashMap.put(StructureFeature.VILLAGE, DefaultBiomeFeatures.field_24706);
         hashMap.put(StructureFeature.STRONGHOLD, DefaultBiomeFeatures.field_24697);
-        hashMap.put(StructureFeature.field_24851, DefaultBiomeFeatures.field_24696);
+        hashMap.put(StructureFeature.SWAMP_HUT, DefaultBiomeFeatures.field_24696);
         hashMap.put(StructureFeature.DESERT_PYRAMID, DefaultBiomeFeatures.field_24692);
         hashMap.put(StructureFeature.JUNGLE_PYRAMID, DefaultBiomeFeatures.field_24691);
         hashMap.put(StructureFeature.IGLOO, DefaultBiomeFeatures.field_24693);
@@ -75,7 +75,7 @@ public class FlatChunkGeneratorConfig {
         hashMap.put(StructureFeature.MANSION, DefaultBiomeFeatures.field_24690);
         hashMap.put(StructureFeature.FORTRESS, DefaultBiomeFeatures.field_24701);
         hashMap.put(StructureFeature.PILLAGER_OUTPOST, DefaultBiomeFeatures.field_24687);
-        hashMap.put(StructureFeature.RUINED_PORTAL, DefaultBiomeFeatures.field_24711);
+        hashMap.put(StructureFeature.RUINED_PORTAL, DefaultBiomeFeatures.STANDARD_CONFIGURED_RUINED_PORTAL);
         hashMap.put(StructureFeature.BASTION_REMNANT, DefaultBiomeFeatures.field_24705);
     });
     private final class_5311 config;

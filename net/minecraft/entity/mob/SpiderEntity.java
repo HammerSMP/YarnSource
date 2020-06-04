@@ -185,8 +185,8 @@ extends HostileEntity {
 
     static class FollowTargetGoal<T extends LivingEntity>
     extends net.minecraft.entity.ai.goal.FollowTargetGoal<T> {
-        public FollowTargetGoal(SpiderEntity arg, Class<T> arg2) {
-            super((MobEntity)arg, arg2, true);
+        public FollowTargetGoal(SpiderEntity arg, Class<T> class_) {
+            super((MobEntity)arg, class_, true);
         }
 
         @Override

@@ -12,26 +12,26 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import java.util.Set;
-import net.minecraft.class_5335;
-import net.minecraft.class_5341;
-import net.minecraft.class_5342;
 import net.minecraft.loot.LootTableReporter;
-import net.minecraft.loot.condition.LootConditions;
+import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.LootConditionType;
+import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.JsonSerializable;
 
 public class InvertedLootCondition
-implements class_5341 {
-    private final class_5341 term;
+implements LootCondition {
+    private final LootCondition term;
 
-    private InvertedLootCondition(class_5341 arg) {
+    private InvertedLootCondition(LootCondition arg) {
         this.term = arg;
     }
 
     @Override
-    public class_5342 method_29325() {
-        return LootConditions.INVERTED;
+    public LootConditionType method_29325() {
+        return LootConditionTypes.INVERTED;
     }
 
     @Override
@@ -46,11 +46,11 @@ implements class_5341 {
 
     @Override
     public void validate(LootTableReporter arg) {
-        class_5341.super.validate(arg);
+        LootCondition.super.validate(arg);
         this.term.validate(arg);
     }
 
-    public static class_5341.Builder builder(class_5341.Builder arg) {
+    public static LootCondition.Builder builder(LootCondition.Builder arg) {
         InvertedLootCondition lv = new InvertedLootCondition(arg.build());
         return () -> lv;
     }
@@ -61,7 +61,7 @@ implements class_5341 {
     }
 
     public static class Factory
-    implements class_5335<InvertedLootCondition> {
+    implements JsonSerializable<InvertedLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, InvertedLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("term", jsonSerializationContext.serialize((Object)arg.term));
@@ -69,7 +69,7 @@ implements class_5341 {
 
         @Override
         public InvertedLootCondition fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            class_5341 lv = JsonHelper.deserialize(jsonObject, "term", jsonDeserializationContext, class_5341.class);
+            LootCondition lv = JsonHelper.deserialize(jsonObject, "term", jsonDeserializationContext, LootCondition.class);
             return new InvertedLootCondition(lv);
         }
 

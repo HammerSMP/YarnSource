@@ -72,8 +72,8 @@ extends AbstractListTag<LongTag> {
     private static long[] toArray(List<Long> list) {
         long[] ls = new long[list.size()];
         for (int i = 0; i < list.size(); ++i) {
-            Long lv = list.get(i);
-            ls[i] = lv == null ? 0L : lv;
+            Long long_ = list.get(i);
+            ls[i] = long_ == null ? 0L : long_;
         }
         return ls;
     }
@@ -155,8 +155,7 @@ extends AbstractListTag<LongTag> {
         return LongTag.of(this.value[i]);
     }
 
-    @Override
-    public LongTag set(int i, LongTag arg) {
+    public LongTag method_10606(int i, LongTag arg) {
         long l = this.value[i];
         this.value[i] = arg.getLong();
         return LongTag.of(l);
@@ -185,7 +184,8 @@ extends AbstractListTag<LongTag> {
         return false;
     }
 
-    public LongTag method_10536(int i) {
+    @Override
+    public LongTag remove(int i) {
         long l = this.value[i];
         this.value = ArrayUtils.remove((long[])this.value, (int)i);
         return LongTag.of(l);
@@ -203,7 +203,7 @@ extends AbstractListTag<LongTag> {
 
     @Override
     public /* synthetic */ Tag remove(int i) {
-        return this.method_10536(i);
+        return this.remove(i);
     }
 
     @Override
@@ -213,7 +213,7 @@ extends AbstractListTag<LongTag> {
 
     @Override
     public /* synthetic */ Tag set(int i, Tag arg) {
-        return this.set(i, (LongTag)arg);
+        return this.method_10606(i, (LongTag)arg);
     }
 
     @Override
@@ -223,7 +223,7 @@ extends AbstractListTag<LongTag> {
 
     @Override
     public /* synthetic */ Object remove(int i) {
-        return this.method_10536(i);
+        return this.remove(i);
     }
 
     @Override
@@ -233,7 +233,7 @@ extends AbstractListTag<LongTag> {
 
     @Override
     public /* synthetic */ Object set(int i, Object object) {
-        return this.set(i, (LongTag)object);
+        return this.method_10606(i, (LongTag)object);
     }
 
     @Override

@@ -71,8 +71,8 @@ implements ServerWorldAccess {
     private final TickScheduler<Block> blockTickScheduler = new MultiTickScheduler<Block>(arg -> this.getChunk((BlockPos)arg).getBlockTickScheduler());
     private final TickScheduler<Fluid> fluidTickScheduler = new MultiTickScheduler<Fluid>(arg -> this.getChunk((BlockPos)arg).getFluidTickScheduler());
     private final BiomeAccess biomeAccess;
-    private final ChunkPos field_23788;
-    private final ChunkPos field_23789;
+    private final ChunkPos lowerCorner;
+    private final ChunkPos upperCorner;
 
     public ChunkRegion(ServerWorld arg2, List<Chunk> list) {
         int i = MathHelper.floor(Math.sqrt(list.size()));
@@ -90,8 +90,8 @@ implements ServerWorldAccess {
         this.random = arg2.getRandom();
         this.dimension = arg2.getDimension();
         this.biomeAccess = new BiomeAccess(this, BiomeAccess.hashSeed(this.seed), arg2.getDimension().getBiomeAccessType());
-        this.field_23788 = list.get(0).getPos();
-        this.field_23789 = list.get(list.size() - 1).getPos();
+        this.lowerCorner = list.get(0).getPos();
+        this.upperCorner = list.get(list.size() - 1).getPos();
     }
 
     public int getCenterChunkX() {
@@ -112,8 +112,8 @@ implements ServerWorldAccess {
     public Chunk getChunk(int i, int j, ChunkStatus arg, boolean bl) {
         Chunk lv2;
         if (this.isChunkLoaded(i, j)) {
-            int k = i - this.field_23788.x;
-            int l = j - this.field_23788.z;
+            int k = i - this.lowerCorner.x;
+            int l = j - this.lowerCorner.z;
             Chunk lv = this.chunks.get(k + l * this.width);
             if (lv.getStatus().isAtLeast(arg)) {
                 return lv;
@@ -125,7 +125,7 @@ implements ServerWorldAccess {
             return null;
         }
         LOGGER.error("Requested chunk : {} {}", (Object)i, (Object)j);
-        LOGGER.error("Region bounds : {} {} | {} {}", (Object)this.field_23788.x, (Object)this.field_23788.z, (Object)this.field_23789.x, (Object)this.field_23789.z);
+        LOGGER.error("Region bounds : {} {} | {} {}", (Object)this.lowerCorner.x, (Object)this.lowerCorner.z, (Object)this.upperCorner.x, (Object)this.upperCorner.z);
         if (lv2 != null) {
             throw Util.throwOrPause(new RuntimeException(String.format("Chunk is not of correct status. Expecting %s, got %s | %s %s", arg, lv2.getStatus(), i, j)));
         }
@@ -134,7 +134,7 @@ implements ServerWorldAccess {
 
     @Override
     public boolean isChunkLoaded(int i, int j) {
-        return i >= this.field_23788.x && i <= this.field_23789.x && j >= this.field_23788.z && j <= this.field_23789.z;
+        return i >= this.lowerCorner.x && i <= this.upperCorner.x && j >= this.lowerCorner.z && j <= this.upperCorner.z;
     }
 
     @Override
@@ -355,7 +355,7 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public <T extends Entity> List<T> getEntities(Class<? extends T> arg, Box arg2, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntities(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
         return Collections.emptyList();
     }
 

@@ -30,7 +30,7 @@ public class StructureAccessor {
     }
 
     public Stream<? extends StructureStart<?>> getStructuresWithChildren(ChunkSectionPos arg3, StructureFeature<?> arg22) {
-        return this.field_24404.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22).stream().map(arg -> ChunkSectionPos.from(new ChunkPos((long)arg), 0)).map(arg2 -> this.getStructureStart((ChunkSectionPos)arg2, arg22, this.field_24404.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
+        return this.field_24404.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22).stream().map(long_ -> ChunkSectionPos.from(new ChunkPos((long)long_), 0)).map(arg2 -> this.getStructureStart((ChunkSectionPos)arg2, arg22, this.field_24404.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
     }
 
     @Nullable

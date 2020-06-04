@@ -52,8 +52,8 @@ implements DebugRenderer.Renderer {
         lv2.begin(5, VertexFormats.POSITION_COLOR);
         for (int i = 0; i < this.field_4640.size(); ++i) {
             BlockPos lv3 = this.field_4640.get(i);
-            Float lv4 = this.field_4635.get(i);
-            float g = lv4.floatValue() / 2.0f;
+            Float float_ = this.field_4635.get(i);
+            float g = float_.floatValue() / 2.0f;
             WorldRenderer.drawBox(lv2, (double)((float)lv3.getX() + 0.5f - g) - d, (double)((float)lv3.getY() + 0.5f - g) - e, (double)((float)lv3.getZ() + 0.5f - g) - f, (double)((float)lv3.getX() + 0.5f + g) - d, (double)((float)lv3.getY() + 0.5f + g) - e, (double)((float)lv3.getZ() + 0.5f + g) - f, this.field_4639.get(i).floatValue(), this.field_4636.get(i).floatValue(), this.field_4638.get(i).floatValue(), this.field_4637.get(i).floatValue());
         }
         lv.draw();

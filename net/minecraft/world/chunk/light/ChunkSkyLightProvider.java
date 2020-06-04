@@ -111,7 +111,7 @@ extends ChunkLightProvider<SkyLightStorage.Data, SkyLightStorage> {
             boolean o = false;
         } else {
             int p = 0;
-            while (!((SkyLightStorage)this.lightStorage).hasLight(ChunkSectionPos.offset(m, 0, -p - 1, 0)) && ((SkyLightStorage)this.lightStorage).isAboveMinimumHeight(n - p - 1)) {
+            while (!((SkyLightStorage)this.lightStorage).hasLight(ChunkSectionPos.offset(m, 0, -p - 1, 0)) && ((SkyLightStorage)this.lightStorage).isAboveMinHeight(n - p - 1)) {
                 ++p;
             }
             q = p;

@@ -224,7 +224,7 @@ implements CommandSource {
 
     public void sendFeedback(Text arg, boolean bl) {
         if (this.output.shouldReceiveFeedback() && !this.silent) {
-            this.output.sendSystemMessage(arg, Util.field_25140);
+            this.output.sendSystemMessage(arg, Util.NIL_UUID);
         }
         if (bl && this.output.shouldBroadcastConsoleToOps() && !this.silent) {
             this.sendToOps(arg);
@@ -236,17 +236,17 @@ implements CommandSource {
         if (this.server.getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK)) {
             for (ServerPlayerEntity lv2 : this.server.getPlayerManager().getPlayerList()) {
                 if (lv2 == this.output || !this.server.getPlayerManager().isOperator(lv2.getGameProfile())) continue;
-                lv2.sendSystemMessage(lv, Util.field_25140);
+                lv2.sendSystemMessage(lv, Util.NIL_UUID);
             }
         }
         if (this.output != this.server && this.server.getGameRules().getBoolean(GameRules.LOG_ADMIN_COMMANDS)) {
-            this.server.sendSystemMessage(lv, Util.field_25140);
+            this.server.sendSystemMessage(lv, Util.NIL_UUID);
         }
     }
 
     public void sendError(Text arg) {
         if (this.output.shouldTrackOutput() && !this.silent) {
-            this.output.sendSystemMessage(new LiteralText("").append(arg).formatted(Formatting.RED), Util.field_25140);
+            this.output.sendSystemMessage(new LiteralText("").append(arg).formatted(Formatting.RED), Util.NIL_UUID);
         }
     }
 
@@ -283,7 +283,7 @@ implements CommandSource {
 
     @Override
     public Set<RegistryKey<World>> method_29310() {
-        return this.server.method_29435();
+        return this.server.getWorldRegistryKeys();
     }
 }
 
