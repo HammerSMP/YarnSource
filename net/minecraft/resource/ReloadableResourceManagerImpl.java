@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
@@ -9,9 +10,11 @@
  *  net.fabricmc.api.Environment
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
+ *  org.apache.logging.log4j.util.Supplier
  */
 package net.minecraft.resource;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -45,6 +48,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Supplier;
 
 public class ReloadableResourceManagerImpl
 implements ReloadableResourceManager {
@@ -108,6 +112,15 @@ implements ReloadableResourceManager {
     }
 
     @Override
+    public Collection<Identifier> method_29489(Identifier arg, Predicate<String> predicate) {
+        ResourceManager lv = this.namespaceManagers.get(arg.getNamespace());
+        if (lv != null) {
+            return lv.findResources(arg.getPath(), predicate);
+        }
+        return ImmutableSet.of();
+    }
+
+    @Override
     public Collection<Identifier> findResources(String string, Predicate<String> predicate) {
         HashSet set = Sets.newHashSet();
         for (NamespaceResourceManager lv : this.namespaceManagers.values()) {
@@ -121,7 +134,13 @@ implements ReloadableResourceManager {
     private void clear() {
         this.namespaceManagers.clear();
         this.namespaces.clear();
+        this.field_25145.forEach(ResourcePack::close);
         this.field_25145.clear();
+    }
+
+    @Override
+    public void close() {
+        this.clear();
     }
 
     @Override
@@ -144,7 +163,7 @@ implements ReloadableResourceManager {
     @Override
     public ResourceReloadMonitor beginMonitoredReload(Executor executor, Executor executor2, CompletableFuture<Unit> completableFuture, List<ResourcePack> list) {
         this.clear();
-        LOGGER.info("Reloading ResourceManager: {}", (Object)list.stream().map(ResourcePack::getName).collect(Collectors.joining(", ")));
+        LOGGER.info("Reloading ResourceManager: {}", new Supplier[]{() -> list.stream().map(ResourcePack::getName).collect(Collectors.joining(", "))});
         for (ResourcePack lv : list) {
             try {
                 this.addPack(lv);

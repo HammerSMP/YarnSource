@@ -6,16 +6,11 @@
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.common.io.Files
- *  com.google.gson.Gson
- *  com.google.gson.GsonBuilder
- *  com.google.gson.JsonIOException
- *  com.google.gson.stream.JsonWriter
  *  com.mojang.datafixers.DataFixer
  *  com.mojang.datafixers.util.Pair
  *  com.mojang.serialization.DataResult
  *  com.mojang.serialization.Dynamic
  *  com.mojang.serialization.DynamicOps
- *  com.mojang.serialization.JsonOps
  *  com.mojang.serialization.Lifecycle
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
@@ -28,16 +23,11 @@ package net.minecraft.world.level.storage;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.stream.JsonWriter;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -45,8 +35,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -74,6 +62,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.class_5315;
+import net.minecraft.class_5359;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.Schemas;
@@ -90,6 +79,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
@@ -105,7 +95,6 @@ public class LevelStorage {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateTimeFormatter TIME_FORMATTER = new DateTimeFormatterBuilder().appendValue(ChronoField.YEAR, 4, 10, SignStyle.EXCEEDS_PAD).appendLiteral('-').appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-').appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('_').appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral('-').appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral('-').appendValue(ChronoField.SECOND_OF_MINUTE, 2).toFormatter();
     private static final ImmutableList<String> field_25020 = ImmutableList.of((Object)"RandomSeed", (Object)"generatorName", (Object)"generatorOptions", (Object)"generatorVersion", (Object)"legacy_custom_options", (Object)"MapFeatures", (Object)"BonusChest");
-    private static final Gson field_25021 = new GsonBuilder().setPrettyPrinting().serializeNulls().disableHtmlEscaping().create();
     private final Path savesDirectory;
     private final Path backupsDirectory;
     private final DataFixer dataFixer;
@@ -136,6 +125,10 @@ public class LevelStorage {
         Dynamic dynamic3 = dataFixer.update(TypeReferences.CHUNK_GENERATOR_SETTINGS, dynamic2, i, SharedConstants.getGameVersion().getWorldVersion());
         DataResult dataResult = GeneratorOptions.CODEC.parse(dynamic3);
         return Pair.of((Object)dataResult.resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)LOGGER)::error)).orElseGet(GeneratorOptions::getDefaultOptions), (Object)dataResult.lifecycle());
+    }
+
+    private static class_5359 method_29580(Dynamic<?> dynamic) {
+        return class_5359.field_25394.parse(dynamic).resultOrPartial(((Logger)LOGGER)::error).orElse(class_5359.field_25393);
     }
 
     /*
@@ -187,18 +180,14 @@ public class LevelStorage {
     }
 
     @Nullable
-    private static SaveProperties readLevelProperties(File file, DataFixer dataFixer) {
+    private static class_5359 method_29583(File file, DataFixer dataFixer) {
         try {
             CompoundTag lv = NbtIo.readCompressed(new FileInputStream(file));
             CompoundTag lv2 = lv.getCompound("Data");
-            CompoundTag lv3 = lv2.contains("Player", 10) ? lv2.getCompound("Player") : null;
             lv2.remove("Player");
             int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
             Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
-            Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
-            class_5315 lv4 = class_5315.method_29023(dynamic);
-            LevelInfo lv5 = LevelInfo.method_28383(dynamic, (GeneratorOptions)pair.getFirst());
-            return LevelProperties.method_29029((Dynamic<Tag>)dynamic, dataFixer, i, lv3, lv5, lv4);
+            return dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(class_5359.field_25393);
         }
         catch (Exception exception) {
             LOGGER.error("Exception reading {}", (Object)file, (Object)exception);
@@ -206,7 +195,27 @@ public class LevelStorage {
         }
     }
 
-    @Environment(value=EnvType.CLIENT)
+    private static BiFunction<File, DataFixer, LevelProperties> readLevelProperties(DynamicOps<Tag> dynamicOps, class_5359 arg) {
+        return (file, dataFixer) -> {
+            try {
+                CompoundTag lv = NbtIo.readCompressed(new FileInputStream((File)file));
+                CompoundTag lv2 = lv.getCompound("Data");
+                CompoundTag lv3 = lv2.contains("Player", 10) ? lv2.getCompound("Player") : null;
+                lv2.remove("Player");
+                int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
+                Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic(dynamicOps, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
+                Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
+                class_5315 lv4 = class_5315.method_29023(dynamic);
+                LevelInfo lv5 = LevelInfo.method_28383(dynamic, arg);
+                return LevelProperties.method_29029((Dynamic<Tag>)dynamic, dataFixer, i, lv3, lv5, lv4, (GeneratorOptions)pair.getFirst(), (Lifecycle)pair.getSecond());
+            }
+            catch (Exception exception) {
+                LOGGER.error("Exception reading {}", file, (Object)exception);
+                return null;
+            }
+        };
+    }
+
     private BiFunction<File, DataFixer, LevelSummary> method_29014(File file, boolean bl) {
         return (file2, dataFixer) -> {
             try {
@@ -220,9 +229,9 @@ public class LevelStorage {
                 if (j == 19132 || j == 19133) {
                     boolean bl2 = j != this.getCurrentVersion();
                     File file3 = new File(file, "icon.png");
-                    Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
-                    LevelInfo lv4 = LevelInfo.method_28383(dynamic, (GeneratorOptions)pair.getFirst());
-                    return new LevelSummary(lv4, lv3, file.getName(), bl2, bl, file3, (Lifecycle)pair.getSecond());
+                    class_5359 lv4 = dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(class_5359.field_25393);
+                    LevelInfo lv5 = LevelInfo.method_28383(dynamic, lv4);
+                    return new LevelSummary(lv5, lv3, file.getName(), bl2, bl, file3);
                 }
                 return null;
             }
@@ -302,8 +311,8 @@ public class LevelStorage {
         }
 
         public boolean needsConversion() {
-            SaveProperties lv = this.readLevelProperties();
-            return lv != null && lv.getVersion() != LevelStorage.this.getCurrentVersion();
+            LevelSummary lv = this.method_29584();
+            return lv != null && lv.method_29586().method_29022() != LevelStorage.this.getCurrentVersion();
         }
 
         public boolean convert(ProgressListener arg) {
@@ -312,18 +321,30 @@ public class LevelStorage {
         }
 
         @Nullable
-        public SaveProperties readLevelProperties() {
+        public LevelSummary method_29584() {
             this.checkValid();
-            return (SaveProperties)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.readLevelProperties(file, dataFixer));
+            return (LevelSummary)LevelStorage.this.readLevelProperties(this.directory.toFile(), LevelStorage.this.method_29014(this.directory.toFile(), false));
         }
 
-        public void method_27425(SaveProperties arg) {
-            this.method_27426(arg, null);
+        @Nullable
+        public SaveProperties readLevelProperties(DynamicOps<Tag> dynamicOps, class_5359 arg) {
+            this.checkValid();
+            return (SaveProperties)LevelStorage.this.readLevelProperties(this.directory.toFile(), LevelStorage.readLevelProperties((DynamicOps<Tag>)dynamicOps, arg));
         }
 
-        public void method_27426(SaveProperties arg, @Nullable CompoundTag arg2) {
+        @Nullable
+        public class_5359 method_29585() {
+            this.checkValid();
+            return (class_5359)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.method_29583(file, dataFixer));
+        }
+
+        public void method_27425(DimensionTracker arg, SaveProperties arg2) {
+            this.method_27426(arg, arg2, null);
+        }
+
+        public void method_27426(DimensionTracker arg, SaveProperties arg2, @Nullable CompoundTag arg3) {
             File file = this.directory.toFile();
-            CompoundTag lv = arg.cloneWorldTag(arg2);
+            CompoundTag lv = arg2.cloneWorldTag(arg, arg3);
             CompoundTag lv2 = new CompoundTag();
             lv2.put("Data", lv);
             try {
@@ -452,27 +473,6 @@ public class LevelStorage {
                 });
             }
             return Files.size(path2);
-        }
-
-        @Environment(value=EnvType.CLIENT)
-        public DataResult<String> method_29019() {
-            this.checkValid();
-            File file = this.directory.toFile();
-            LevelSummary lv = (LevelSummary)LevelStorage.this.readLevelProperties(file, LevelStorage.this.method_29014(file, false));
-            if (lv == null) {
-                return DataResult.error((String)"Could not parse level data!");
-            }
-            DataResult dataResult = GeneratorOptions.CODEC.encodeStart((DynamicOps)JsonOps.INSTANCE, (Object)lv.method_29021());
-            return dataResult.flatMap(jsonElement -> {
-                Path path = this.directory.resolve("worldgen_settings_export.json");
-                try (JsonWriter jsonWriter = field_25021.newJsonWriter((Writer)Files.newBufferedWriter(path, StandardCharsets.UTF_8, new OpenOption[0]));){
-                    field_25021.toJson(jsonElement, jsonWriter);
-                }
-                catch (JsonIOException | IOException exception) {
-                    return DataResult.error((String)("Error writing file: " + exception.getMessage()));
-                }
-                return DataResult.success((Object)path.toString());
-            });
         }
 
         @Override

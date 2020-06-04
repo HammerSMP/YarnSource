@@ -35,6 +35,7 @@ public class CommandFunctionManager {
     public CommandFunctionManager(MinecraftServer minecraftServer, FunctionLoader arg) {
         this.server = minecraftServer;
         this.field_25333 = arg;
+        this.method_29773(arg);
     }
 
     public int getMaxCommandChainLength() {
@@ -109,6 +110,10 @@ public class CommandFunctionManager {
 
     public void method_29461(FunctionLoader arg) {
         this.field_25333 = arg;
+        this.method_29773(arg);
+    }
+
+    private void method_29773(FunctionLoader arg) {
         this.tickFunctions.clear();
         this.tickFunctions.addAll(arg.getTags().getOrCreate(TICK_FUNCTION).values());
         this.needToRunLoadFunctions = true;

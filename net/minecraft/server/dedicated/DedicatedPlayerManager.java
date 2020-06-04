@@ -28,10 +28,6 @@ extends PlayerManager {
         ServerPropertiesHandler lv = arg.getProperties();
         this.setViewDistance(lv.viewDistance);
         super.setWhitelistEnabled(lv.whiteList.get());
-        if (!arg.isSinglePlayer()) {
-            this.getUserBanList().setEnabled(true);
-            this.getIpBanList().setEnabled(true);
-        }
         this.loadUserBanList();
         this.saveUserBanList();
         this.loadIpBanList();

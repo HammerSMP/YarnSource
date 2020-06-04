@@ -67,12 +67,12 @@ extends AbstractClientPlayerEntity {
         }
         this.prevStrideDistance = this.strideDistance;
         this.tickHandSwing();
-        if (!this.onGround || this.getHealth() <= 0.0f) {
+        if (!this.onGround || this.method_29504()) {
             float g = 0.0f;
         } else {
             h = Math.min(0.1f, MathHelper.sqrt(OtherClientPlayerEntity.squaredHorizontalLength(this.getVelocity())));
         }
-        if (this.onGround || this.getHealth() <= 0.0f) {
+        if (this.onGround || this.method_29504()) {
             float i = 0.0f;
         } else {
             float j = (float)Math.atan(-this.getVelocity().y * (double)0.2f) * 15.0f;

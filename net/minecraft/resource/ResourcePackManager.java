@@ -34,9 +34,9 @@ implements AutoCloseable {
     private final Set<ResourcePackProvider> providers;
     private Map<String, T> profiles = ImmutableMap.of();
     private List<T> enabled = ImmutableList.of();
-    private final ResourcePackProfile.Factory<T> profileFactory;
+    private final ResourcePackProfile.class_5351<T> profileFactory;
 
-    public ResourcePackManager(ResourcePackProfile.Factory<T> arg, ResourcePackProvider ... args) {
+    public ResourcePackManager(ResourcePackProfile.class_5351<T> arg, ResourcePackProvider ... args) {
         this.profileFactory = arg;
         this.providers = ImmutableSet.copyOf((Object[])args);
     }
@@ -51,7 +51,7 @@ implements AutoCloseable {
     private Map<String, T> method_29212() {
         TreeMap map = Maps.newTreeMap();
         for (ResourcePackProvider lv : this.providers) {
-            lv.register(map, this.profileFactory);
+            lv.register(arg -> map.put(arg.getName(), arg), this.profileFactory);
         }
         return ImmutableMap.copyOf((Map)map);
     }

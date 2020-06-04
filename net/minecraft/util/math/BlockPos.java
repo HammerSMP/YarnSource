@@ -23,6 +23,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisCycleDirection;
 import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Position;
@@ -312,6 +313,10 @@ extends Vec3i {
 
     public static Stream<BlockPos> stream(BlockBox arg) {
         return BlockPos.stream(Math.min(arg.minX, arg.maxX), Math.min(arg.minY, arg.maxY), Math.min(arg.minZ, arg.maxZ), Math.max(arg.minX, arg.maxX), Math.max(arg.minY, arg.maxY), Math.max(arg.minZ, arg.maxZ));
+    }
+
+    public static Stream<BlockPos> method_29715(Box arg) {
+        return BlockPos.stream(MathHelper.floor(arg.minX), MathHelper.floor(arg.minY), MathHelper.floor(arg.minZ), MathHelper.floor(arg.maxX), MathHelper.floor(arg.maxY), MathHelper.floor(arg.maxZ));
     }
 
     public static Stream<BlockPos> stream(int i, int j, int k, int l, int m, int n) {

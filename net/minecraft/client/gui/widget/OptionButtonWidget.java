@@ -22,5 +22,9 @@ extends ButtonWidget {
         super(i, j, k, l, arg2, arg3);
         this.option = arg;
     }
+
+    public Option method_29623() {
+        return this.option;
+    }
 }
 

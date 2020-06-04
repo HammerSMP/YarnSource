@@ -314,7 +314,7 @@ public final class ItemStack {
         return this.getItem().isEffectiveOn(arg);
     }
 
-    public boolean useOnEntity(PlayerEntity arg, LivingEntity arg2, Hand arg3) {
+    public ActionResult useOnEntity(PlayerEntity arg, LivingEntity arg2, Hand arg3) {
         return this.getItem().useOnEntity(this, arg, arg2, arg3);
     }
 

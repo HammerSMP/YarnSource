@@ -36,13 +36,12 @@ extends Item {
         Entity lv2 = arg22.getVehicle();
         if (arg22.hasVehicle() && lv2 instanceof ItemSteerable && lv2.getType() == this.target && (lv3 = (ItemSteerable)((Object)lv2)).consumeOnAStickItem()) {
             lv.damage(this.damagePerUse, arg22, arg2 -> arg2.sendToolBreakStatus(arg3));
-            arg22.swingHand(arg3, true);
             if (lv.isEmpty()) {
                 ItemStack lv4 = new ItemStack(Items.FISHING_ROD);
                 lv4.setTag(lv.getTag());
-                return TypedActionResult.consume(lv4);
+                return TypedActionResult.success(lv4);
             }
-            return TypedActionResult.consume(lv);
+            return TypedActionResult.success(lv);
         }
         arg22.incrementStat(Stats.USED.getOrCreateStat(this));
         return TypedActionResult.pass(lv);

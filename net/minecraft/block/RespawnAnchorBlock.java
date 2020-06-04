@@ -15,10 +15,14 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.class_5360;
+import net.minecraft.class_5362;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
@@ -28,10 +32,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
@@ -74,8 +80,7 @@ extends Block {
             return RespawnAnchorBlock.canCharge(arg) ? ActionResult.PASS : ActionResult.CONSUME;
         }
         if (!arg2.isClient) {
-            arg2.removeBlock(arg3, false);
-            arg2.createExplosion(null, DamageSource.netherBed(), (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
+            this.method_29561(arg, arg2, arg3);
         }
         return ActionResult.method_29236(arg2.isClient);
     }
@@ -86,6 +91,44 @@ extends Block {
 
     private static boolean canCharge(BlockState arg) {
         return arg.get(CHARGES) < 4;
+    }
+
+    private static boolean method_29560(BlockPos arg, World arg2) {
+        FluidState lv = arg2.getFluidState(arg);
+        if (!lv.matches(FluidTags.WATER)) {
+            return false;
+        }
+        if (lv.isStill()) {
+            return true;
+        }
+        float f = lv.getLevel();
+        if (f < 2.0f) {
+            return false;
+        }
+        FluidState lv2 = arg2.getFluidState(arg.down());
+        return !lv2.matches(FluidTags.WATER);
+    }
+
+    private void method_29561(BlockState arg, World arg22, final BlockPos arg3) {
+        arg22.removeBlock(arg3, false);
+        boolean bl = Direction.Type.HORIZONTAL.method_29716().map(arg3::offset).anyMatch(arg2 -> RespawnAnchorBlock.method_29560(arg2, arg22));
+        final boolean bl2 = bl || arg22.getFluidState(arg3.up()).matches(FluidTags.WATER);
+        class_5362 lv = new class_5362(){
+
+            @Override
+            public Optional<Float> method_29555(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, FluidState arg5) {
+                if (arg32.equals(arg3) && bl2) {
+                    return Optional.of(Float.valueOf(Blocks.WATER.getBlastResistance()));
+                }
+                return class_5360.INSTANCE.method_29555(arg, arg2, arg32, arg4, arg5);
+            }
+
+            @Override
+            public boolean method_29554(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, float f) {
+                return class_5360.INSTANCE.method_29554(arg, arg2, arg32, arg4, f);
+            }
+        };
+        arg22.createExplosion(null, DamageSource.netherBed(), lv, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
     }
 
     public static boolean isNether(World arg) {
@@ -106,9 +149,9 @@ extends Block {
         if (random.nextInt(100) == 0) {
             arg2.playSound(null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
-        double d = (double)arg3.getX() + 0.5 + (double)(0.5f - random.nextFloat());
+        double d = (double)arg3.getX() + 0.5 + (0.5 - random.nextDouble());
         double e = (double)arg3.getY() + 1.0;
-        double f = (double)arg3.getZ() + 0.5 + (double)(0.5f - random.nextFloat());
+        double f = (double)arg3.getZ() + 0.5 + (0.5 - random.nextDouble());
         double g = (double)random.nextFloat() * 0.04;
         arg2.addParticle(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
     }

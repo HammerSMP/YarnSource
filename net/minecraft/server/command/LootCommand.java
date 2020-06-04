@@ -253,7 +253,7 @@ public class LootCommand {
 
     private static int executeFish(CommandContext<ServerCommandSource> commandContext, Identifier arg, BlockPos arg2, ItemStack arg3, Target arg4) throws CommandSyntaxException {
         ServerCommandSource lv = (ServerCommandSource)commandContext.getSource();
-        LootContext lv2 = new LootContext.Builder(lv.getWorld()).parameter(LootContextParameters.POSITION, arg2).parameter(LootContextParameters.TOOL, arg3).build(LootContextTypes.FISHING);
+        LootContext lv2 = new LootContext.Builder(lv.getWorld()).parameter(LootContextParameters.POSITION, arg2).parameter(LootContextParameters.TOOL, arg3).optionalParameter(LootContextParameters.THIS_ENTITY, lv.getEntity()).build(LootContextTypes.FISHING);
         return LootCommand.getFeedbackMessageSingle(commandContext, arg, lv2, arg4);
     }
 

@@ -300,6 +300,7 @@ extends Entity {
                 lv.setCount(i);
             }
             arg.increaseStat(Stats.PICKED_UP.getOrCreateStat(lv2), i);
+            arg.method_29499(this);
         }
     }
 

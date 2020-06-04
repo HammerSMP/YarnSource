@@ -38,6 +38,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.ItemTags;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -86,12 +87,14 @@ implements Shearable {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg22) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg22) {
         ItemStack lv = arg.getStackInHand(arg22);
-        if (lv.getItem() == Items.BOWL && !this.isBaby() && !arg.abilities.creativeMode) {
+        if (lv.getItem() == Items.BOWL && !this.isBaby()) {
             SoundEvent lv5;
             ItemStack lv3;
-            lv.decrement(1);
+            if (!arg.abilities.creativeMode) {
+                lv.decrement(1);
+            }
             boolean bl = false;
             if (this.stewEffect != null) {
                 bl = true;
@@ -113,19 +116,19 @@ implements Shearable {
                 lv5 = SoundEvents.ENTITY_MOOSHROOM_MILK;
             }
             this.playSound(lv5, 1.0f, 1.0f);
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         if (lv.getItem() == Items.SHEARS && this.isShearable()) {
             this.sheared(SoundCategory.PLAYERS);
             if (!this.world.isClient) {
                 lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         if (this.getMooshroomType() == Type.BROWN && lv.getItem().isIn(ItemTags.SMALL_FLOWERS)) {
             if (this.stewEffect != null) {
                 for (int i = 0; i < 2; ++i) {
-                    this.world.addParticle(ParticleTypes.SMOKE, this.getX() + (double)(this.random.nextFloat() / 2.0f), this.getBodyY(0.5), this.getZ() + (double)(this.random.nextFloat() / 2.0f), 0.0, this.random.nextFloat() / 5.0f, 0.0);
+                    this.world.addParticle(ParticleTypes.SMOKE, this.getX() + this.random.nextDouble() / 2.0, this.getBodyY(0.5), this.getZ() + this.random.nextDouble() / 2.0, 0.0, this.random.nextDouble() / 5.0, 0.0);
                 }
             } else {
                 Pair<StatusEffect, Integer> pair = this.getStewEffectFrom(lv);
@@ -133,12 +136,13 @@ implements Shearable {
                     lv.decrement(1);
                 }
                 for (int j = 0; j < 4; ++j) {
-                    this.world.addParticle(ParticleTypes.EFFECT, this.getX() + (double)(this.random.nextFloat() / 2.0f), this.getBodyY(0.5), this.getZ() + (double)(this.random.nextFloat() / 2.0f), 0.0, this.random.nextFloat() / 5.0f, 0.0);
+                    this.world.addParticle(ParticleTypes.EFFECT, this.getX() + this.random.nextDouble() / 2.0, this.getBodyY(0.5), this.getZ() + this.random.nextDouble() / 2.0, 0.0, this.random.nextDouble() / 5.0, 0.0);
                 }
                 this.stewEffect = (StatusEffect)pair.getLeft();
                 this.stewEffectDuration = (Integer)pair.getRight();
                 this.playSound(SoundEvents.ENTITY_MOOSHROOM_EAT, 2.0f, 1.0f);
             }
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg22);
     }

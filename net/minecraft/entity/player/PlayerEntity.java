@@ -493,7 +493,7 @@ extends LivingEntity {
             this.flyingSpeed = (float)((double)this.flyingSpeed + 0.005999999865889549);
         }
         this.setMovementSpeed((float)lv.getValue());
-        if (!this.onGround || this.getHealth() <= 0.0f || this.isSwimming()) {
+        if (!this.onGround || this.method_29504() || this.isSwimming()) {
             float f = 0.0f;
         } else {
             g = Math.min(0.1f, MathHelper.sqrt(PlayerEntity.squaredHorizontalLength(this.getVelocity())));
@@ -767,7 +767,7 @@ extends LivingEntity {
             return false;
         }
         this.despawnCounter = 0;
-        if (this.getHealth() <= 0.0f) {
+        if (this.method_29504()) {
             return false;
         }
         this.dropShoulderEntities();
@@ -904,21 +904,23 @@ extends LivingEntity {
         }
         ItemStack lv = this.getStackInHand(arg2);
         ItemStack lv2 = lv.copy();
-        if (arg.interact(this, arg2)) {
+        ActionResult lv3 = arg.interact(this, arg2);
+        if (lv3.isAccepted()) {
             if (this.abilities.creativeMode && lv == this.getStackInHand(arg2) && lv.getCount() < lv2.getCount()) {
                 lv.setCount(lv2.getCount());
             }
-            return ActionResult.SUCCESS;
+            return lv3;
         }
         if (!lv.isEmpty() && arg instanceof LivingEntity) {
+            ActionResult lv4;
             if (this.abilities.creativeMode) {
                 lv = lv2;
             }
-            if (lv.useOnEntity(this, (LivingEntity)arg, arg2)) {
+            if ((lv4 = lv.useOnEntity(this, (LivingEntity)arg, arg2)).isAccepted()) {
                 if (lv.isEmpty() && !this.abilities.creativeMode) {
                     this.setStackInHand(arg2, ItemStack.EMPTY);
                 }
-                return ActionResult.SUCCESS;
+                return lv4;
             }
         }
         return ActionResult.PASS;
@@ -1882,6 +1884,11 @@ extends LivingEntity {
             Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity)this, arg2);
         }
         return super.eatFood(arg, arg2);
+    }
+
+    @Override
+    protected boolean method_29500(BlockState arg) {
+        return this.abilities.flying || super.method_29500(arg);
     }
 
     public static enum SleepFailureReason {

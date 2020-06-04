@@ -58,12 +58,9 @@ extends BlockWithEntity {
     @Override
     @Environment(value=EnvType.CLIENT)
     public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        double d = (double)arg3.getX() + (double)random.nextFloat();
+        double d = (double)arg3.getX() + random.nextDouble();
         double e = (double)arg3.getY() + 0.8;
-        double f = (double)arg3.getZ() + (double)random.nextFloat();
-        double g = 0.0;
-        double h = 0.0;
-        double i = 0.0;
+        double f = (double)arg3.getZ() + random.nextDouble();
         arg2.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
     }
 

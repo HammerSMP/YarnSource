@@ -7,8 +7,11 @@
  */
 package net.minecraft.client.options;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5365;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.screen.ScreenTexts;
@@ -26,8 +29,10 @@ import net.minecraft.client.options.NarratorOption;
 import net.minecraft.client.options.ParticlesOption;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 
 @Environment(value=EnvType.CLIENT)
@@ -193,13 +198,30 @@ public abstract class Option {
         arg.chatVisibility = ChatVisibility.byId((arg.chatVisibility.getId() + integer) % 3);
     }, (arg, arg2) -> arg2.getDisplayPrefix().append(new TranslatableText(arg.chatVisibility.getTranslationKey())));
     public static final CyclingOption GRAPHICS = new CyclingOption("options.graphics", (arg, integer) -> {
-        arg.fancyGraphics = !arg.fancyGraphics;
+        arg.field_25444 = arg.field_25444.method_29595();
+        if (arg.field_25444 == class_5365.FABULOUS && !GlStateManager.supportsGl30()) {
+            arg.field_25444 = class_5365.FAST;
+        }
         MinecraftClient.getInstance().worldRenderer.reload();
     }, (arg, arg2) -> {
-        if (arg.fancyGraphics) {
-            return arg2.getDisplayPrefix().append(new TranslatableText("options.graphics.fancy"));
+        switch (arg.field_25444) {
+            case FAST: {
+                arg2.method_29618("options.graphics.fast.tooltip");
+                break;
+            }
+            case FANCY: {
+                arg2.method_29618("options.graphics.fancy.tooltip");
+                break;
+            }
+            case FABULOUS: {
+                arg2.method_29618("options.graphics.fabulous.tooltip");
+            }
         }
-        return arg2.getDisplayPrefix().append(new TranslatableText("options.graphics.fast"));
+        TranslatableText lv = new TranslatableText(arg.field_25444.method_29593());
+        if (arg.field_25444 == class_5365.FABULOUS) {
+            return arg2.getDisplayPrefix().append(new LiteralText("").append(lv).formatted(Formatting.ITALIC));
+        }
+        return arg2.getDisplayPrefix().append(lv);
     });
     public static final CyclingOption GUI_SCALE = new CyclingOption("options.guiScale", (arg, integer) -> {
         arg.guiScale = Integer.remainderUnsigned(arg.guiScale + integer, MinecraftClient.getInstance().getWindow().calculateScaleFactor(0, MinecraftClient.getInstance().forcesUnicodeFont()) + 1);
@@ -227,6 +249,9 @@ public abstract class Option {
     }, (arg, arg2) -> arg2.getDisplayPrefix().append(new TranslatableText(arg.particles.getTranslationKey())));
     public static final CyclingOption CLOUDS = new CyclingOption("options.renderClouds", (arg, integer) -> {
         arg.cloudRenderMode = CloudRenderMode.getOption(arg.cloudRenderMode.getValue() + integer);
+        if (MinecraftClient.method_29611()) {
+            MinecraftClient.getInstance().worldRenderer.method_29364().clear(MinecraftClient.IS_SYSTEM_MAC);
+        }
     }, (arg, arg2) -> arg2.getDisplayPrefix().append(new TranslatableText(arg.cloudRenderMode.getTranslationKey())));
     public static final CyclingOption TEXT_BACKGROUND = new CyclingOption("options.accessibility.text_background", (arg, integer) -> {
         arg.backgroundForChatOnly = !arg.backgroundForChatOnly;
@@ -306,15 +331,25 @@ public abstract class Option {
         arg.bobView = boolean_;
     });
     private final String key;
+    private Optional<TranslatableText> field_25442;
 
     public Option(String string) {
         this.key = string;
+        this.field_25442 = Optional.empty();
     }
 
     public abstract AbstractButtonWidget createButton(GameOptions var1, int var2, int var3, int var4);
 
     public MutableText getDisplayPrefix() {
         return new TranslatableText(this.key).append(": ");
+    }
+
+    public void method_29618(String string) {
+        this.field_25442 = Optional.of(new TranslatableText(string));
+    }
+
+    public Optional<TranslatableText> method_29619() {
+        return this.field_25442;
     }
 }
 

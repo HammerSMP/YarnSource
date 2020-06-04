@@ -18,6 +18,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -115,7 +116,7 @@ extends AbstractMinecartEntity {
     }
 
     @Override
-    public boolean interact(PlayerEntity arg, Hand arg2) {
+    public ActionResult interact(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         if (ACCEPTABLE_FUEL.test(lv) && this.fuel + 3600 <= 32000) {
             if (!arg.abilities.creativeMode) {
@@ -127,7 +128,7 @@ extends AbstractMinecartEntity {
             this.pushX = this.getX() - arg.getX();
             this.pushZ = this.getZ() - arg.getZ();
         }
-        return true;
+        return ActionResult.method_29236(this.world.isClient);
     }
 
     @Override

@@ -152,9 +152,10 @@ extends PersistentProjectileEntity {
         this.setVelocity(this.getVelocity().multiply(-0.01, -0.1, -0.01));
         float g = 1.0f;
         if (this.world instanceof ServerWorld && this.world.isThundering() && EnchantmentHelper.hasChanneling(this.tridentStack) && this.world.isSkyVisible(lv7 = lv.getBlockPos())) {
-            LightningEntity lv8 = new LightningEntity(this.world, (double)lv7.getX() + 0.5, lv7.getY(), (double)lv7.getZ() + 0.5, false);
+            LightningEntity lv8 = EntityType.LIGHTNING_BOLT.create(this.world);
+            lv8.method_29495(Vec3d.ofBottomCenter(lv7));
             lv8.setChanneller(lv3 instanceof ServerPlayerEntity ? (ServerPlayerEntity)lv3 : null);
-            ((ServerWorld)this.world).addLightning(lv8);
+            this.world.spawnEntity(lv8);
             lv5 = SoundEvents.ITEM_TRIDENT_THUNDER;
             g = 5.0f;
         }

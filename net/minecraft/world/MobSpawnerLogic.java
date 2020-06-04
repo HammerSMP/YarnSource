@@ -84,9 +84,9 @@ public abstract class MobSpawnerLogic {
         World lv = this.getWorld();
         BlockPos lv2 = this.getPos();
         if (lv.isClient) {
-            double d = (double)lv2.getX() + (double)lv.random.nextFloat();
-            double e = (double)lv2.getY() + (double)lv.random.nextFloat();
-            double f = (double)lv2.getZ() + (double)lv.random.nextFloat();
+            double d = (double)lv2.getX() + lv.random.nextDouble();
+            double e = (double)lv2.getY() + lv.random.nextDouble();
+            double f = (double)lv2.getZ() + lv.random.nextDouble();
             lv.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
             lv.addParticle(ParticleTypes.FLAME, d, e, f, 0.0, 0.0, 0.0);
             if (this.spawnDelay > 0) {

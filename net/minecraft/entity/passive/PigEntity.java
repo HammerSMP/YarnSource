@@ -45,6 +45,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -151,18 +152,23 @@ Saddleable {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
-        if (!super.interactMob(arg, arg2)) {
-            if (this.isSaddled() && !this.hasPassengers()) {
-                if (!this.world.isClient) {
-                    arg.startRiding(this);
-                }
-                return true;
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
+        boolean bl = this.isBreedingItem(arg.getStackInHand(arg2));
+        if (!bl && this.isSaddled() && !this.hasPassengers()) {
+            if (!this.world.isClient) {
+                arg.startRiding(this);
             }
-            ItemStack lv = arg.getStackInHand(arg2);
-            return lv.getItem() == Items.SADDLE && lv.useOnEntity(arg, this, arg2);
+            return ActionResult.method_29236(this.world.isClient);
         }
-        return true;
+        ActionResult lv = super.interactMob(arg, arg2);
+        if (!lv.isAccepted()) {
+            ItemStack lv2 = arg.getStackInHand(arg2);
+            if (lv2.getItem() == Items.SADDLE) {
+                return lv2.useOnEntity(arg, this, arg2);
+            }
+            return ActionResult.PASS;
+        }
+        return lv;
     }
 
     @Override
@@ -226,6 +232,7 @@ Saddleable {
                 lv.setCustomName(this.getCustomName());
                 lv.setCustomNameVisible(this.isCustomNameVisible());
             }
+            lv.setPersistent();
             this.world.spawnEntity(lv);
             this.remove();
         } else {

@@ -94,24 +94,29 @@ implements SynchronousResourceReloadListener {
     }
 
     public void renderItem(ItemStack arg, ModelTransformation.Mode arg2, boolean bl, MatrixStack arg3, VertexConsumerProvider arg4, int i, int j, BakedModel arg5) {
-        boolean bl3;
+        boolean bl2;
         if (arg.isEmpty()) {
             return;
         }
         arg3.push();
-        boolean bl2 = arg2 == ModelTransformation.Mode.GUI;
-        boolean bl4 = bl3 = bl2 || arg2 == ModelTransformation.Mode.GROUND || arg2 == ModelTransformation.Mode.FIXED;
-        if (arg.getItem() == Items.TRIDENT && bl3) {
+        boolean bl3 = bl2 = arg2 == ModelTransformation.Mode.GUI || arg2 == ModelTransformation.Mode.GROUND || arg2 == ModelTransformation.Mode.FIXED;
+        if (arg.getItem() == Items.TRIDENT && bl2) {
             arg5 = this.models.getModelManager().getModel(new ModelIdentifier("minecraft:trident#inventory"));
         }
         arg5.getTransformation().getTransformation(arg2).apply(bl, arg3);
         arg3.translate(-0.5, -0.5, -0.5);
-        if (arg5.isBuiltin() || arg.getItem() == Items.TRIDENT && !bl3) {
-            BuiltinModelItemRenderer.INSTANCE.render(arg, arg3, arg4, i, j);
+        if (arg5.isBuiltin() || arg.getItem() == Items.TRIDENT && !bl2) {
+            BuiltinModelItemRenderer.INSTANCE.render(arg, arg2, arg3, arg4, i, j);
         } else {
-            RenderLayer lv = RenderLayers.getItemLayer(arg, arg2 != ModelTransformation.Mode.GROUND);
-            VertexConsumer lv2 = ItemRenderer.getArmorVertexConsumer(arg4, lv, true, arg.hasEnchantmentGlint());
-            this.renderBakedItemModel(arg5, arg, i, j, arg3, lv2);
+            VertexConsumer lv3;
+            boolean bl32 = arg2 == ModelTransformation.Mode.GUI || arg2 == ModelTransformation.Mode.FIRST_PERSON_LEFT_HAND || arg2 == ModelTransformation.Mode.FIRST_PERSON_RIGHT_HAND || arg2 == ModelTransformation.Mode.FIXED;
+            RenderLayer lv = RenderLayers.getItemLayer(arg, bl32);
+            if (bl32) {
+                VertexConsumer lv2 = ItemRenderer.method_29711(arg4, lv, true, arg.hasEnchantmentGlint());
+            } else {
+                lv3 = ItemRenderer.getArmorVertexConsumer(arg4, lv, true, arg.hasEnchantmentGlint());
+            }
+            this.renderBakedItemModel(arg5, arg, i, j, arg3, lv3);
         }
         arg3.pop();
     }
@@ -126,6 +131,13 @@ implements SynchronousResourceReloadListener {
     public static VertexConsumer getArmorVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
             return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getGlint() : RenderLayer.getEntityGlint()), arg.getBuffer(arg2));
+        }
+        return arg.getBuffer(arg2);
+    }
+
+    public static VertexConsumer method_29711(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
+        if (bl2) {
+            return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.method_29706() : RenderLayer.method_29707()), arg.getBuffer(arg2));
         }
         return arg.getBuffer(arg2);
     }

@@ -101,7 +101,7 @@ implements BlockEntityProvider {
             if (arg22.getBlockState(lv).isOf(this)) {
                 arg22.removeBlock(lv, false);
             }
-            arg22.createExplosion(null, DamageSource.netherBed(), (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
+            arg22.createExplosion(null, DamageSource.netherBed(), null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
             return ActionResult.SUCCESS;
         }
         if (arg.get(OCCUPIED).booleanValue()) {
@@ -277,10 +277,12 @@ implements BlockEntityProvider {
         if ((double)arg3.getY() - d > 2.0) {
             return Optional.empty();
         }
-        float f = arg.getWidth() / 2.0f;
         Vec3d lv4 = new Vec3d((double)lv2.getX() + 0.5, d, (double)lv2.getZ() + 0.5);
-        if (arg2.doesNotCollide(new Box(lv4.x - (double)f, lv4.y, lv4.z - (double)f, lv4.x + (double)f, lv4.y + (double)arg.getHeight(), lv4.z + (double)f))) {
-            return Optional.of(lv4);
+        Box lv5 = arg.createSimpleBoundingBox(lv4.x, lv4.y, lv4.z);
+        if (arg2.doesNotCollide(lv5)) {
+            if (arg2.method_29546(lv5.stretch(0.0, -0.2f, 0.0)).noneMatch(arg::method_29496)) {
+                return Optional.of(lv4);
+            }
         }
         return Optional.empty();
     }

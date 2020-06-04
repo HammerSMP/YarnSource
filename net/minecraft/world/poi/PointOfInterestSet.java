@@ -53,7 +53,7 @@ public class PointOfInterestSet {
     private boolean valid;
 
     public static Codec<PointOfInterestSet> method_28364(Runnable runnable) {
-        return RecordCodecBuilder.create(instance -> instance.group((App)RecordCodecBuilder.point((Object)runnable), (App)Codec.BOOL.fieldOf("Valid").forGetter(arg -> arg.valid), (App)PointOfInterest.method_28359(runnable).listOf().fieldOf("Records").forGetter(arg -> ImmutableList.copyOf((Collection)arg.pointsOfInterestByPos.values()))).apply((Applicative)instance, PointOfInterestSet::new)).withDefault(Util.method_29188("Failed to read POI section: ", ((Logger)LOGGER)::error), () -> new PointOfInterestSet(runnable, false, (List<PointOfInterest>)ImmutableList.of()));
+        return RecordCodecBuilder.create(instance -> instance.group((App)RecordCodecBuilder.point((Object)runnable), (App)Codec.BOOL.optionalFieldOf("Valid", (Object)false).forGetter(arg -> arg.valid), (App)PointOfInterest.method_28359(runnable).listOf().fieldOf("Records").forGetter(arg -> ImmutableList.copyOf((Collection)arg.pointsOfInterestByPos.values()))).apply((Applicative)instance, PointOfInterestSet::new)).withDefault(Util.method_29188("Failed to read POI section: ", ((Logger)LOGGER)::error), () -> new PointOfInterestSet(runnable, false, (List<PointOfInterest>)ImmutableList.of()));
     }
 
     public PointOfInterestSet(Runnable runnable) {

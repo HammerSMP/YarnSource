@@ -67,6 +67,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -379,7 +380,7 @@ extends TameableEntity {
      * Exception decompiling
      */
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * org.benf.cfr.reader.util.ConfusedCFRException: Started 2 blocks at once
@@ -514,7 +515,7 @@ extends TameableEntity {
             LootContext.Builder lv3 = new LootContext.Builder((ServerWorld)this.cat.world).parameter(LootContextParameters.POSITION, lv).parameter(LootContextParameters.THIS_ENTITY, this.cat).random(random);
             List<ItemStack> list = lv2.generateLoot(lv3.build(LootContextTypes.GIFT));
             for (ItemStack lv4 : list) {
-                this.cat.world.spawnEntity(new ItemEntity(this.cat.world, (float)lv.getX() - MathHelper.sin(this.cat.bodyYaw * ((float)Math.PI / 180)), lv.getY(), (float)lv.getZ() + MathHelper.cos(this.cat.bodyYaw * ((float)Math.PI / 180)), lv4));
+                this.cat.world.spawnEntity(new ItemEntity(this.cat.world, (double)lv.getX() - (double)MathHelper.sin(this.cat.bodyYaw * ((float)Math.PI / 180)), lv.getY(), (double)lv.getZ() + (double)MathHelper.cos(this.cat.bodyYaw * ((float)Math.PI / 180)), lv4));
             }
         }
 

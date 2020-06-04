@@ -24,7 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
@@ -136,9 +135,9 @@ public class LookTargetUtil {
         return arg.squaredDistanceTo(lv) < arg.squaredDistanceTo(lv2) ? arg2 : arg3;
     }
 
-    public static Optional<LivingEntity> getEntity(LivingEntity arg, MemoryModuleType<DynamicSerializableUuid> arg2) {
-        Optional<DynamicSerializableUuid> optional = arg.getBrain().getOptionalMemory(arg2);
-        return optional.map(DynamicSerializableUuid::getUuid).map(uUID -> (LivingEntity)((ServerWorld)arg.world).getEntity((UUID)uUID));
+    public static Optional<LivingEntity> getEntity(LivingEntity arg, MemoryModuleType<UUID> arg2) {
+        Optional<UUID> optional = arg.getBrain().getOptionalMemory(arg2);
+        return optional.map(uUID -> (LivingEntity)((ServerWorld)arg.world).getEntity((UUID)uUID));
     }
 
     public static Stream<VillagerEntity> method_29248(VillagerEntity arg, Predicate<VillagerEntity> predicate) {

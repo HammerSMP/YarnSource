@@ -20,7 +20,8 @@ import net.minecraft.server.function.FunctionLoader;
 import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.util.Unit;
 
-public class ServerResourceManager {
+public class ServerResourceManager
+implements AutoCloseable {
     private static final CompletableFuture<Unit> field_25334 = CompletableFuture.completedFuture(Unit.INSTANCE);
     private final ReloadableResourceManager resourceManager = new ReloadableResourceManagerImpl(ResourceType.SERVER_DATA);
     private final CommandManager commandManager;
@@ -31,8 +32,8 @@ public class ServerResourceManager {
     private final ServerAdvancementLoader serverAdvancementLoader = new ServerAdvancementLoader(this.lootConditionManager);
     private final FunctionLoader functionLoader;
 
-    public ServerResourceManager(boolean bl, int i) {
-        this.commandManager = new CommandManager(bl);
+    public ServerResourceManager(CommandManager.class_5364 arg, int i) {
+        this.commandManager = new CommandManager(arg);
         this.functionLoader = new FunctionLoader(i, this.commandManager.getDispatcher());
         this.resourceManager.registerListener(this.registryTagManager);
         this.resourceManager.registerListener(this.lootConditionManager);
@@ -74,14 +75,23 @@ public class ServerResourceManager {
         return this.resourceManager;
     }
 
-    public static CompletableFuture<ServerResourceManager> reload(List<ResourcePack> list, boolean bl, int i, Executor executor, Executor executor2) {
-        ServerResourceManager lv = new ServerResourceManager(bl, i);
+    public static CompletableFuture<ServerResourceManager> reload(List<ResourcePack> list, CommandManager.class_5364 arg, int i, Executor executor, Executor executor2) {
+        ServerResourceManager lv = new ServerResourceManager(arg, i);
         CompletableFuture<Unit> completableFuture = lv.resourceManager.beginReload(executor, executor2, list, field_25334);
-        return completableFuture.thenApply(arg2 -> lv);
+        return ((CompletableFuture)completableFuture.whenComplete((arg2, throwable) -> {
+            if (throwable != null) {
+                lv.close();
+            }
+        })).thenApply(arg2 -> lv);
     }
 
     public void method_29475() {
         this.registryTagManager.method_29226();
+    }
+
+    @Override
+    public void close() {
+        this.resourceManager.close();
     }
 }
 

@@ -19,7 +19,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.NarratorManager;
@@ -28,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 @Environment(value=EnvType.CLIENT)
@@ -35,6 +35,7 @@ public class GameModeSelectionScreen
 extends Screen {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/gamemode_switcher.png");
     private static final int UI_WIDTH = GameMode.values().length * 30 - 5;
+    private static final Text field_25454 = new TranslatableText("debug.gamemodes.select_next", new TranslatableText("debug.gamemodes.press_f4").formatted(Formatting.AQUA));
     private final Optional<GameMode> currentGameMode;
     private Optional<GameMode> gameMode = Optional.empty();
     private int lastMouseX;
@@ -71,8 +72,7 @@ extends Screen {
         arg.pop();
         super.render(arg, i, j, f);
         this.gameMode.ifPresent(arg2 -> this.drawCenteredText(arg, this.textRenderer, ((GameMode)arg2).getText(), this.width / 2, this.height / 2 - 30 - 20, -1));
-        int m = this.textRenderer.getWidth(I18n.translate("debug.gamemodes.press_f4", new Object[0]));
-        this.drawHotkeys(arg, I18n.translate("debug.gamemodes.press_f4", new Object[0]), I18n.translate("debug.gamemodes.select_next", new Object[0]), 5, m);
+        this.drawCenteredText(arg, this.textRenderer, field_25454, this.width / 2, this.height / 2 + 5, 0xFFFFFF);
         if (!this.mouseUsedForSelection) {
             this.lastMouseX = i;
             this.lastMouseY = j;
@@ -85,15 +85,6 @@ extends Screen {
             if (bl || !lv.isHovered()) continue;
             this.gameMode = Optional.of(lv.gameMode);
         }
-    }
-
-    private void drawHotkeys(MatrixStack arg, String string, String string2, int i, int j) {
-        int k = 0x55FFFF;
-        int l = 0xFFFFFF;
-        this.drawStringWithShadow(arg, this.textRenderer, "[", this.width / 2 - j - 18, this.height / 2 + i, 0x55FFFF);
-        this.drawCenteredString(arg, this.textRenderer, string, this.width / 2 - j / 2 - 10, this.height / 2 + i, 0x55FFFF);
-        this.drawCenteredString(arg, this.textRenderer, "]", this.width / 2 - 5, this.height / 2 + i, 0x55FFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, string2, this.width / 2 + 5, this.height / 2 + i, 0xFFFFFF);
     }
 
     private void apply() {

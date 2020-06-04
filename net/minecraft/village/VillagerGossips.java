@@ -90,7 +90,7 @@ public class VillagerGossips {
         collection.forEach(arg -> {
             int i = arg.value - arg.type.shareDecrement;
             if (i >= 2) {
-                this.getReputationFor(arg.target.getUuid()).associatedGossip.mergeInt((Object)arg.type, i, VillagerGossips::max);
+                this.getReputationFor(arg.target).associatedGossip.mergeInt((Object)arg.type, i, VillagerGossips::max);
             }
         });
     }
@@ -114,7 +114,7 @@ public class VillagerGossips {
     }
 
     public void deserialize(Dynamic<?> dynamic) {
-        dynamic.asStream().map(GossipEntry::deserialize).flatMap(dataResult -> Util.stream(dataResult.result())).forEach(arg -> this.getReputationFor(arg.target.getUuid()).associatedGossip.put((Object)arg.type, arg.value));
+        dynamic.asStream().map(GossipEntry::deserialize).flatMap(dataResult -> Util.stream(dataResult.result())).forEach(arg -> this.getReputationFor(arg.target).associatedGossip.put((Object)arg.type, arg.value));
     }
 
     private static int max(int i, int j) {
@@ -173,17 +173,13 @@ public class VillagerGossips {
     }
 
     static class GossipEntry {
-        public final DynamicSerializableUuid target;
+        public final UUID target;
         public final VillageGossipType type;
         public final int value;
 
         public GossipEntry(UUID uUID, VillageGossipType arg, int i) {
-            this(new DynamicSerializableUuid(uUID), arg, i);
-        }
-
-        public GossipEntry(DynamicSerializableUuid arg, VillageGossipType arg2, int i) {
-            this.target = arg;
-            this.type = arg2;
+            this.target = uUID;
+            this.type = arg;
             this.value = i;
         }
 

@@ -17,8 +17,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import net.minecraft.class_5359;
+import net.minecraft.class_5382;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
@@ -28,6 +33,7 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.biome.source.VanillaLayeredBiomeSource;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.level.storage.AlphaChunkIo;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.storage.RegionFile;
@@ -38,7 +44,7 @@ public class AnvilLevelStorage {
     private static final Logger LOGGER = LogManager.getLogger();
 
     static boolean convertLevel(LevelStorage.Session arg, ProgressListener arg2) {
-        VanillaLayeredBiomeSource lv3;
+        VanillaLayeredBiomeSource lv5;
         long l;
         arg2.progressStagePercentage(0);
         ArrayList list = Lists.newArrayList();
@@ -57,18 +63,20 @@ public class AnvilLevelStorage {
         }
         int i = list.size() + list2.size() + list3.size();
         LOGGER.info("Total conversion count is {}", (Object)i);
-        SaveProperties lv = arg.readLevelProperties();
-        long l2 = l = lv != null ? lv.getGeneratorOptions().getSeed() : 0L;
-        if (lv != null && lv.getGeneratorOptions().isFlatWorld()) {
-            FixedBiomeSource lv2 = new FixedBiomeSource(Biomes.PLAINS);
+        DimensionTracker.Modifiable lv = DimensionTracker.create();
+        class_5382<Tag> lv2 = class_5382.method_29753(NbtOps.INSTANCE, ResourceManager.class_5353.INSTANCE, lv);
+        SaveProperties lv3 = arg.readLevelProperties(lv2, class_5359.field_25393);
+        long l2 = l = lv3 != null ? lv3.getGeneratorOptions().getSeed() : 0L;
+        if (lv3 != null && lv3.getGeneratorOptions().isFlatWorld()) {
+            FixedBiomeSource lv4 = new FixedBiomeSource(Biomes.PLAINS);
         } else {
-            lv3 = new VanillaLayeredBiomeSource(l, false, false);
+            lv5 = new VanillaLayeredBiomeSource(l, false, false);
         }
-        AnvilLevelStorage.convertRegions(new File(file, "region"), list, lv3, 0, i, arg2);
+        AnvilLevelStorage.convertRegions(new File(file, "region"), list, lv5, 0, i, arg2);
         AnvilLevelStorage.convertRegions(new File(file2, "region"), list2, new FixedBiomeSource(Biomes.NETHER_WASTES), list.size(), i, arg2);
         AnvilLevelStorage.convertRegions(new File(file3, "region"), list3, new FixedBiomeSource(Biomes.THE_END), list.size() + list2.size(), i, arg2);
         AnvilLevelStorage.makeMcrLevelDatBackup(arg);
-        arg.method_27425(lv);
+        arg.method_27425(lv, lv3);
         return true;
     }
 

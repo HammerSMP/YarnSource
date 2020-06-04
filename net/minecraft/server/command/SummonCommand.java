@@ -25,7 +25,6 @@ import net.minecraft.command.arguments.Vec3ArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -53,27 +52,21 @@ public class SummonCommand {
         }
         CompoundTag lv2 = arg4.copy();
         lv2.putString("id", arg2.toString());
-        if (EntityType.getId(EntityType.LIGHTNING_BOLT).equals(arg2)) {
-            LightningEntity lv3 = new LightningEntity(arg.getWorld(), arg32.x, arg32.y, arg32.z, false);
-            arg.getWorld().addLightning(lv3);
-            arg.sendFeedback(new TranslatableText("commands.summon.success", lv3.getDisplayName()), true);
-            return 1;
-        }
-        ServerWorld lv4 = arg.getWorld();
-        Entity lv5 = EntityType.loadEntityWithPassengers(lv2, lv4, arg3 -> {
+        ServerWorld lv3 = arg.getWorld();
+        Entity lv4 = EntityType.loadEntityWithPassengers(lv2, lv3, arg3 -> {
             arg3.refreshPositionAndAngles(arg.x, arg.y, arg.z, arg3.yaw, arg3.pitch);
-            if (!lv4.tryLoadEntity((Entity)arg3)) {
+            if (!lv3.tryLoadEntity((Entity)arg3)) {
                 return null;
             }
             return arg3;
         });
-        if (lv5 == null) {
+        if (lv4 == null) {
             throw FAILED_EXCEPTION.create();
         }
-        if (bl && lv5 instanceof MobEntity) {
-            ((MobEntity)lv5).initialize(arg.getWorld(), arg.getWorld().getLocalDifficulty(lv5.getBlockPos()), SpawnReason.COMMAND, null, null);
+        if (bl && lv4 instanceof MobEntity) {
+            ((MobEntity)lv4).initialize(arg.getWorld(), arg.getWorld().getLocalDifficulty(lv4.getBlockPos()), SpawnReason.COMMAND, null, null);
         }
-        arg.sendFeedback(new TranslatableText("commands.summon.success", lv5.getDisplayName()), true);
+        arg.sendFeedback(new TranslatableText("commands.summon.success", lv4.getDisplayName()), true);
         return 1;
     }
 }

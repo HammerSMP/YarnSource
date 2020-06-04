@@ -54,7 +54,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.SpawnEggItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -62,6 +61,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -472,7 +472,7 @@ extends AnimalEntity {
     @Override
     protected void loot(ItemEntity arg) {
         if (this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty() && IS_FOOD.test(arg)) {
-            this.method_27964(arg);
+            this.method_29499(arg);
             ItemStack lv = arg.getStack();
             this.equipStack(EquipmentSlot.MAINHAND, lv);
             this.handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2.0f;
@@ -549,17 +549,14 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
-        if (lv.getItem() instanceof SpawnEggItem) {
-            return super.interactMob(arg, arg2);
-        }
         if (this.isScaredByThunderstorm()) {
-            return false;
+            return ActionResult.PASS;
         }
         if (this.isLyingOnBack()) {
             this.setLyingOnBack(false);
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         if (this.isBreedingItem(lv)) {
             if (this.getTarget() != null) {
@@ -581,12 +578,11 @@ extends AnimalEntity {
                 this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(lv.getItem(), 1));
                 this.eat(arg, lv);
             } else {
-                return false;
+                return ActionResult.PASS;
             }
-            arg.swingHand(arg2, true);
-            return true;
+            return ActionResult.SUCCESS;
         }
-        return false;
+        return ActionResult.PASS;
     }
 
     @Override

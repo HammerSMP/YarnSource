@@ -61,7 +61,7 @@ extends FlowableFluid {
                 arg.playSound((double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5, SoundEvents.BLOCK_WATER_AMBIENT, SoundCategory.BLOCKS, random.nextFloat() * 0.25f + 0.75f, random.nextFloat() + 0.5f, false);
             }
         } else if (random.nextInt(10) == 0) {
-            arg.addParticle(ParticleTypes.UNDERWATER, (double)arg2.getX() + (double)random.nextFloat(), (double)arg2.getY() + (double)random.nextFloat(), (double)arg2.getZ() + (double)random.nextFloat(), 0.0, 0.0, 0.0);
+            arg.addParticle(ParticleTypes.UNDERWATER, (double)arg2.getX() + random.nextDouble(), (double)arg2.getY() + random.nextDouble(), (double)arg2.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
         }
     }
 

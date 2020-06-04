@@ -29,11 +29,11 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.HorseArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.SpawnEggItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.world.LocalDifficulty;
@@ -181,48 +181,45 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
-        boolean bl;
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
-        boolean bl2 = bl = !lv.isEmpty();
-        if (bl && lv.getItem() instanceof SpawnEggItem) {
-            return super.interactMob(arg, arg2);
-        }
         if (!this.isBaby()) {
             if (this.isTame() && arg.shouldCancelInteraction()) {
                 this.openInventory(arg);
-                return true;
+                return ActionResult.method_29236(this.world.isClient);
             }
             if (this.hasPassengers()) {
                 return super.interactMob(arg, arg2);
             }
         }
-        if (bl) {
-            boolean bl22;
-            if (this.receiveFood(arg, lv)) {
+        if (!lv.isEmpty()) {
+            boolean bl2;
+            if (this.isBreedingItem(lv)) {
+                boolean bl = this.receiveFood(arg, lv);
                 if (!arg.abilities.creativeMode) {
                     lv.decrement(1);
                 }
-                return true;
+                return bl ? ActionResult.method_29236(this.world.isClient) : ActionResult.CONSUME;
             }
-            if (lv.useOnEntity(arg, this, arg2)) {
-                return true;
+            ActionResult lv2 = lv.useOnEntity(arg, this, arg2);
+            if (lv2.isAccepted()) {
+                return lv2;
             }
             if (!this.isTame()) {
                 this.playAngrySound();
-                return true;
+                return ActionResult.method_29236(this.world.isClient);
             }
-            boolean bl3 = bl22 = !this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE;
-            if (this.canEquip(lv) || bl22) {
+            boolean bl = bl2 = !this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE;
+            if (this.canEquip(lv) || bl2) {
                 this.openInventory(arg);
-                return true;
+                return ActionResult.method_29236(this.world.isClient);
             }
         }
         if (this.isBaby()) {
             return super.interactMob(arg, arg2);
         }
         this.putPlayerOnBack(arg);
-        return true;
+        return ActionResult.method_29236(this.world.isClient);
     }
 
     @Override

@@ -26,6 +26,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
@@ -163,9 +164,9 @@ NamedScreenHandlerFactory {
     }
 
     @Override
-    public boolean interact(PlayerEntity arg, Hand arg2) {
+    public ActionResult interact(PlayerEntity arg, Hand arg2) {
         arg.openHandledScreen(this);
-        return true;
+        return ActionResult.method_29236(this.world.isClient);
     }
 
     @Override

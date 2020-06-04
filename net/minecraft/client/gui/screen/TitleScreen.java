@@ -49,8 +49,10 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.SaveProperties;
+import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -152,13 +154,13 @@ extends Screen {
     }
 
     private void initWidgetsDemo(int i, int j) {
-        this.addButton(new ButtonWidget(this.width / 2 - 100, i, 200, 20, new TranslatableText("menu.playdemo"), arg -> this.client.startIntegratedServer("Demo_World", MinecraftServer.DEMO_LEVEL_INFO)));
+        this.addButton(new ButtonWidget(this.width / 2 - 100, i, 200, 20, new TranslatableText("menu.playdemo"), arg -> this.client.method_29607("Demo_World", MinecraftServer.DEMO_LEVEL_INFO, DimensionTracker.create(), GeneratorOptions.DEMO_CONFIG)));
         this.buttonResetDemo = this.addButton(new ButtonWidget(this.width / 2 - 100, i + j * 1, 200, 20, new TranslatableText("menu.resetdemo"), arg -> {
             LevelStorage lv = this.client.getLevelStorage();
             try (LevelStorage.Session lv2 = lv.createSession("Demo_World");){
-                SaveProperties lv3 = lv2.readLevelProperties();
+                LevelSummary lv3 = lv2.method_29584();
                 if (lv3 != null) {
-                    this.client.openScreen(new ConfirmScreen(this::onDemoDeletionConfirmed, new TranslatableText("selectWorld.deleteQuestion"), new TranslatableText("selectWorld.deleteWarning", lv3.getLevelName()), new TranslatableText("selectWorld.deleteButton"), ScreenTexts.CANCEL));
+                    this.client.openScreen(new ConfirmScreen(this::onDemoDeletionConfirmed, new TranslatableText("selectWorld.deleteQuestion"), new TranslatableText("selectWorld.deleteWarning", lv3.getDisplayName()), new TranslatableText("selectWorld.deleteButton"), ScreenTexts.CANCEL));
                 }
             }
             catch (IOException iOException) {
@@ -167,7 +169,7 @@ extends Screen {
             }
         }));
         try (LevelStorage.Session lv = this.client.getLevelStorage().createSession("Demo_World");){
-            SaveProperties lv2 = lv.readLevelProperties();
+            LevelSummary lv2 = lv.method_29584();
             if (lv2 == null) {
                 this.buttonResetDemo.active = false;
             }

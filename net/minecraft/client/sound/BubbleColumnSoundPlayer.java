@@ -31,7 +31,7 @@ implements ClientPlayerTickable {
     @Override
     public void tick() {
         World lv = this.player.world;
-        BlockState lv2 = lv.getBlockState(this.player.getBoundingBox().expand(0.0, -0.4f, 0.0).contract(0.001), Blocks.BUBBLE_COLUMN);
+        BlockState lv2 = lv.method_29556(this.player.getBoundingBox().expand(0.0, -0.4f, 0.0).contract(0.001)).filter(arg -> arg.isOf(Blocks.BUBBLE_COLUMN)).findFirst().orElse(null);
         if (lv2 != null) {
             if (!this.hasPlayedForCurrentColumn && !this.firstTick && lv2.isOf(Blocks.BUBBLE_COLUMN) && !this.player.isSpectator()) {
                 boolean bl = lv2.get(BubbleColumnBlock.DRAG);

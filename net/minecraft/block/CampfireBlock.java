@@ -157,11 +157,11 @@ implements Waterloggable {
             return;
         }
         if (random.nextInt(10) == 0) {
-            arg2.playSound((float)arg3.getX() + 0.5f, (double)((float)arg3.getY() + 0.5f), (double)((float)arg3.getZ() + 0.5f), SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.5f + random.nextFloat(), random.nextFloat() * 0.7f + 0.6f, false);
+            arg2.playSound((double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_CAMPFIRE_CRACKLE, SoundCategory.BLOCKS, 0.5f + random.nextFloat(), random.nextFloat() * 0.7f + 0.6f, false);
         }
         if (this.emitsParticles && random.nextInt(5) == 0) {
             for (int i = 0; i < random.nextInt(1) + 1; ++i) {
-                arg2.addParticle(ParticleTypes.LAVA, (float)arg3.getX() + 0.5f, (float)arg3.getY() + 0.5f, (float)arg3.getZ() + 0.5f, random.nextFloat() / 2.0f, 5.0E-5, random.nextFloat() / 2.0f);
+                arg2.addParticle(ParticleTypes.LAVA, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, random.nextFloat() / 2.0f, 5.0E-5, random.nextFloat() / 2.0f);
             }
         }
     }

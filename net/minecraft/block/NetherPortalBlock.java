@@ -125,9 +125,9 @@ extends Block {
             arg2.playSound((double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_PORTAL_AMBIENT, SoundCategory.BLOCKS, 0.5f, random.nextFloat() * 0.4f + 0.8f, false);
         }
         for (int i = 0; i < 4; ++i) {
-            double d = (double)arg3.getX() + (double)random.nextFloat();
-            double e = (double)arg3.getY() + (double)random.nextFloat();
-            double f = (double)arg3.getZ() + (double)random.nextFloat();
+            double d = (double)arg3.getX() + random.nextDouble();
+            double e = (double)arg3.getY() + random.nextDouble();
+            double f = (double)arg3.getZ() + random.nextDouble();
             double g = ((double)random.nextFloat() - 0.5) * 0.5;
             double h = ((double)random.nextFloat() - 0.5) * 0.5;
             double j = ((double)random.nextFloat() - 0.5) * 0.5;

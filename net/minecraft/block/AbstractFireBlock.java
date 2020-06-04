@@ -73,7 +73,7 @@ extends Block {
                 BlockPos lv;
                 BlockState lv2;
                 if (random.nextInt(24) == 0) {
-                    arg2.playSound((float)arg3.getX() + 0.5f, (double)((float)arg3.getY() + 0.5f), (double)((float)arg3.getZ() + 0.5f), SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 1.0f + random.nextFloat(), random.nextFloat() * 0.7f + 0.3f, false);
+                    arg2.playSound((double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 1.0f + random.nextFloat(), random.nextFloat() * 0.7f + 0.3f, false);
                 }
                 if (!this.isFlammable(lv2 = arg2.getBlockState(lv = arg3.down())) && !lv2.isSideSolidFullSquare(arg2, lv, Direction.UP)) break block11;
                 for (int i = 0; i < 3; ++i) {

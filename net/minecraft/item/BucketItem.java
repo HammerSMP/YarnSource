@@ -103,6 +103,10 @@ extends Item {
 
     private ItemStack getFilledStack(ItemStack arg, PlayerEntity arg2, Item arg3) {
         if (arg2.abilities.creativeMode) {
+            ItemStack lv = new ItemStack(arg3);
+            if (!arg2.inventory.contains(lv)) {
+                arg2.inventory.insertStack(lv);
+            }
             return arg;
         }
         arg.decrement(1);

@@ -53,7 +53,7 @@ extends MobEntityRenderer<WolfEntity, WolfEntityModel<WolfEntity>> {
         if (arg.isTamed()) {
             return TAMED_TEXTURE;
         }
-        if (arg.isAngry()) {
+        if (arg.method_29511()) {
             return ANGRY_TEXTURE;
         }
         return WILD_TEXTURE;

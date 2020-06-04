@@ -42,6 +42,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -94,20 +95,20 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         if (lv.getItem() != Items.VILLAGER_SPAWN_EGG && this.isAlive() && !this.hasCustomer() && !this.isBaby()) {
             if (arg2 == Hand.MAIN_HAND) {
                 arg.incrementStat(Stats.TALKED_TO_VILLAGER);
             }
             if (this.getOffers().isEmpty()) {
-                return super.interactMob(arg, arg2);
+                return ActionResult.method_29236(this.world.isClient);
             }
             if (!this.world.isClient) {
                 this.setCurrentCustomer(arg);
                 this.sendOffers(arg, this.getDisplayName(), 1);
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

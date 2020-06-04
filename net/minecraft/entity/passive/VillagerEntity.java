@@ -86,9 +86,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.dynamic.GlobalPos;
-import net.minecraft.util.dynamic.Timestamp;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -250,12 +250,12 @@ VillagerDataContainer {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         if (lv.getItem() != Items.VILLAGER_SPAWN_EGG && this.isAlive() && !this.hasCustomer() && !this.isSleeping()) {
             if (this.isBaby()) {
                 this.sayNo();
-                return super.interactMob(arg, arg2);
+                return ActionResult.method_29236(this.world.isClient);
             }
             boolean bl = this.getOffers().isEmpty();
             if (arg2 == Hand.MAIN_HAND) {
@@ -265,12 +265,12 @@ VillagerDataContainer {
                 arg.incrementStat(Stats.TALKED_TO_VILLAGER);
             }
             if (bl) {
-                return super.interactMob(arg, arg2);
+                return ActionResult.method_29236(this.world.isClient);
             }
             if (!this.world.isClient && !this.offers.isEmpty()) {
                 this.beginTradeWith(arg);
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }
@@ -673,9 +673,7 @@ VillagerDataContainer {
                 lv.setCustomName(this.getCustomName());
                 lv.setCustomNameVisible(this.isCustomNameVisible());
             }
-            if (this.getExperience() > 0) {
-                lv.setPersistent();
-            }
+            lv.setPersistent();
             this.world.spawnEntity(lv);
             this.remove();
         } else {
@@ -692,7 +690,7 @@ VillagerDataContainer {
             if (!bl) {
                 return;
             }
-            this.method_27964(arg);
+            this.method_29499(arg);
             this.sendPickup(arg, lv.getCount());
             ItemStack lv3 = lv2.addStack(lv);
             if (lv3.isEmpty()) {
@@ -871,7 +869,7 @@ VillagerDataContainer {
     @Override
     public void sleep(BlockPos arg) {
         super.sleep(arg);
-        this.brain.remember(MemoryModuleType.LAST_SLEPT, Timestamp.of(this.world.getTime()));
+        this.brain.remember(MemoryModuleType.LAST_SLEPT, this.world.getTime());
         this.brain.forget(MemoryModuleType.WALK_TARGET);
         this.brain.forget(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
     }
@@ -879,13 +877,13 @@ VillagerDataContainer {
     @Override
     public void wakeUp() {
         super.wakeUp();
-        this.brain.remember(MemoryModuleType.LAST_WOKEN, Timestamp.of(this.world.getTime()));
+        this.brain.remember(MemoryModuleType.LAST_WOKEN, this.world.getTime());
     }
 
     private boolean hasRecentlyWorkedAndSlept(long l) {
-        Optional<Timestamp> optional = this.brain.getOptionalMemory(MemoryModuleType.LAST_SLEPT);
+        Optional<Long> optional = this.brain.getOptionalMemory(MemoryModuleType.LAST_SLEPT);
         if (optional.isPresent()) {
-            return l - optional.get().getTime() < 24000L;
+            return l - optional.get() < 24000L;
         }
         return false;
     }

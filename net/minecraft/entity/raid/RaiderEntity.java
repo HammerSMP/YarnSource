@@ -243,7 +243,7 @@ extends PatrolEntity {
             if (!lv3.isEmpty() && (double)Math.max(this.random.nextFloat() - 0.1f, 0.0f) < d) {
                 this.dropStack(lv3);
             }
-            this.method_27964(arg);
+            this.method_29499(arg);
             this.equipStack(lv2, lv);
             this.sendPickup(arg, lv.getCount());
             arg.remove();

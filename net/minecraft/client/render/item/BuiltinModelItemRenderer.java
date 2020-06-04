@@ -41,6 +41,7 @@ import net.minecraft.client.render.entity.model.ShieldEntityModel;
 import net.minecraft.client.render.entity.model.TridentEntityModel;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
@@ -70,7 +71,7 @@ public class BuiltinModelItemRenderer {
     /*
      * WARNING - void declaration
      */
-    public void render(ItemStack arg, MatrixStack arg2, VertexConsumerProvider arg3, int i, int j) {
+    public void render(ItemStack arg, ModelTransformation.Mode arg2, MatrixStack arg3, VertexConsumerProvider arg4, int i, int j) {
         Item lv = arg.getItem();
         if (lv instanceof BlockItem) {
             void lv13;
@@ -88,7 +89,7 @@ public class BuiltinModelItemRenderer {
                         lv3.put("SkullOwner", NbtHelper.fromGameProfile(new CompoundTag(), gameProfile));
                     }
                 }
-                SkullBlockEntityRenderer.render(null, 180.0f, ((AbstractSkullBlock)lv2).getSkullType(), gameProfile, 0.0f, arg2, arg3, i);
+                SkullBlockEntityRenderer.render(null, 180.0f, ((AbstractSkullBlock)lv2).getSkullType(), gameProfile, 0.0f, arg3, arg4, i);
                 return;
             }
             if (lv2 instanceof AbstractBannerBlock) {
@@ -115,29 +116,34 @@ public class BuiltinModelItemRenderer {
             } else {
                 return;
             }
-            BlockEntityRenderDispatcher.INSTANCE.renderEntity(lv13, arg2, arg3, i, j);
+            BlockEntityRenderDispatcher.INSTANCE.renderEntity(lv13, arg3, arg4, i, j);
             return;
         }
         if (lv == Items.SHIELD) {
             boolean bl = arg.getSubTag("BlockEntityTag") != null;
-            arg2.push();
-            arg2.scale(1.0f, -1.0f, -1.0f);
+            arg3.push();
+            arg3.scale(1.0f, -1.0f, -1.0f);
             SpriteIdentifier lv14 = bl ? ModelLoader.SHIELD_BASE : ModelLoader.SHIELD_BASE_NO_PATTERN;
-            VertexConsumer lv15 = lv14.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.getArmorVertexConsumer(arg3, this.modelShield.getLayer(lv14.getAtlasId()), false, arg.hasEnchantmentGlint()));
-            this.modelShield.method_23775().render(arg2, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
+            VertexConsumer lv15 = lv14.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.method_29711(arg4, this.modelShield.getLayer(lv14.getAtlasId()), false, arg.hasEnchantmentGlint()));
+            this.modelShield.method_23775().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             if (bl) {
                 List<Pair<BannerPattern, DyeColor>> list = BannerBlockEntity.method_24280(ShieldItem.getColor(arg), BannerBlockEntity.getPatternListTag(arg));
-                BannerBlockEntityRenderer.renderCanvas(arg2, arg3, i, j, this.modelShield.method_23774(), lv14, false, list);
+                BannerBlockEntityRenderer.renderCanvas(arg3, arg4, i, j, this.modelShield.method_23774(), lv14, false, list);
             } else {
-                this.modelShield.method_23774().render(arg2, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
+                this.modelShield.method_23774().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             }
-            arg2.pop();
+            arg3.pop();
         } else if (lv == Items.TRIDENT) {
-            arg2.push();
-            arg2.scale(1.0f, -1.0f, -1.0f);
-            VertexConsumer lv16 = ItemRenderer.getArmorVertexConsumer(arg3, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasEnchantmentGlint());
-            this.modelTrident.render(arg2, lv16, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
-            arg2.pop();
+            VertexConsumer lv17;
+            arg3.push();
+            arg3.scale(1.0f, -1.0f, -1.0f);
+            if (arg2 == ModelTransformation.Mode.GUI || arg2 == ModelTransformation.Mode.FIRST_PERSON_LEFT_HAND || arg2 == ModelTransformation.Mode.FIRST_PERSON_RIGHT_HAND || arg2 == ModelTransformation.Mode.FIXED) {
+                VertexConsumer lv16 = ItemRenderer.method_29711(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasEnchantmentGlint());
+            } else {
+                lv17 = ItemRenderer.getArmorVertexConsumer(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasEnchantmentGlint());
+            }
+            this.modelTrident.render(arg3, lv17, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
+            arg3.pop();
         }
     }
 }

@@ -72,7 +72,7 @@ extends Block {
         if (arg.isClient) {
             return;
         }
-        TntEntity lv = new TntEntity(arg, (float)arg2.getX() + 0.5f, arg2.getY(), (float)arg2.getZ() + 0.5f, arg3.getCausingEntity());
+        TntEntity lv = new TntEntity(arg, (double)arg2.getX() + 0.5, arg2.getY(), (double)arg2.getZ() + 0.5, arg3.getCausingEntity());
         lv.setFuse((short)(arg.random.nextInt(lv.getFuseTimer() / 4) + lv.getFuseTimer() / 8));
         arg.spawnEntity(lv);
     }

@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 
 public class SaddleItem
@@ -18,14 +19,14 @@ extends Item {
     }
 
     @Override
-    public boolean useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
+    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
         Saddleable lv;
         if (arg3 instanceof Saddleable && arg3.isAlive() && !(lv = (Saddleable)((Object)arg3)).isSaddled() && lv.canBeSaddled()) {
             lv.saddle(SoundCategory.NEUTRAL);
             arg.decrement(1);
-            return true;
+            return ActionResult.method_29236(arg2.world.isClient);
         }
-        return false;
+        return ActionResult.PASS;
     }
 }
 

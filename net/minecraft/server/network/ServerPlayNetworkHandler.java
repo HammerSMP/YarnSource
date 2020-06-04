@@ -28,11 +28,14 @@ import io.netty.util.concurrent.GenericFutureListener;
 import it.unimi.dsi.fastutil.ints.Int2ShortMap;
 import it.unimi.dsi.fastutil.ints.Int2ShortOpenHashMap;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CommandBlock;
@@ -144,10 +147,14 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.CommandBlockExecutor;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -363,11 +370,15 @@ implements ServerPlayPacketListener {
             }
             this.player.getServerWorld().getChunkManager().updateCameraPosition(this.player);
             this.player.increaseTravelMotionStats(this.player.getX() - d, this.player.getY() - e, this.player.getZ() - f);
-            this.ridingEntity = q >= -0.03125 && !this.server.isFlightEnabled() && !lv2.isAreaNotEmpty(lv.getBoundingBox().expand(0.0625).stretch(0.0, -0.55, 0.0));
+            this.ridingEntity = q >= -0.03125 && !this.server.isFlightEnabled() && this.method_29780(lv);
             this.updatedRiddenX = lv.getX();
             this.updatedRiddenY = lv.getY();
             this.updatedRiddenZ = lv.getZ();
         }
+    }
+
+    private boolean method_29780(Entity arg) {
+        return arg.world.method_29546(arg.getBoundingBox().expand(0.0625).stretch(0.0, -0.55, 0.0)).allMatch(AbstractBlock.AbstractBlockState::isAir);
     }
 
     @Override
@@ -757,7 +768,7 @@ implements ServerPlayPacketListener {
                 return;
             }
         }
-        boolean bl = this.isPlayerNotCollidingWithBlocks(lv);
+        Box lv2 = this.player.getBoundingBox();
         m = h - this.updatedX;
         n = i - this.updatedY;
         o = j - this.updatedZ;
@@ -776,20 +787,17 @@ implements ServerPlayPacketListener {
         }
         o = j - this.player.getZ();
         q = m * m + n * n + o * o;
-        boolean bl2 = false;
+        boolean bl = false;
         if (!this.player.isInTeleportationState() && q > 0.0625 && !this.player.isSleeping() && !this.player.interactionManager.isCreative() && this.player.interactionManager.getGameMode() != GameMode.SPECTATOR) {
-            bl2 = true;
+            bl = true;
             LOGGER.warn("{} moved wrongly!", (Object)this.player.getName().getString());
         }
         this.player.updatePositionAndAngles(h, i, j, k, l);
-        if (!this.player.noClip && !this.player.isSleeping()) {
-            boolean bl3 = this.isPlayerNotCollidingWithBlocks(lv);
-            if (bl && (bl2 || !bl3)) {
-                this.requestTeleport(d, e, f, k, l);
-                return;
-            }
+        if (!this.player.noClip && !this.player.isSleeping() && (bl && lv.doesNotCollide(this.player, lv2) || this.isPlayerNotCollidingWithBlocks(lv, lv2))) {
+            this.requestTeleport(d, e, f, k, l);
+            return;
         }
-        this.floating = t >= -0.03125 && this.player.interactionManager.getGameMode() != GameMode.SPECTATOR && !this.server.isFlightEnabled() && !this.player.abilities.allowFlying && !this.player.hasStatusEffect(StatusEffects.LEVITATION) && !this.player.isFallFlying() && !lv.isAreaNotEmpty(this.player.getBoundingBox().expand(0.0625).stretch(0.0, -0.55, 0.0));
+        this.floating = t >= -0.03125 && this.player.interactionManager.getGameMode() != GameMode.SPECTATOR && !this.server.isFlightEnabled() && !this.player.abilities.allowFlying && !this.player.hasStatusEffect(StatusEffects.LEVITATION) && !this.player.isFallFlying() && this.method_29780(this.player);
         this.player.getServerWorld().getChunkManager().updateCameraPosition(this.player);
         this.player.handleFall(this.player.getY() - g, arg.isOnGround());
         this.player.setOnGround(arg.isOnGround());
@@ -799,8 +807,10 @@ implements ServerPlayPacketListener {
         this.updatedZ = this.player.getZ();
     }
 
-    private boolean isPlayerNotCollidingWithBlocks(WorldView arg) {
-        return arg.doesNotCollide(this.player, this.player.getBoundingBox().contract(1.0E-5f));
+    private boolean isPlayerNotCollidingWithBlocks(WorldView arg3, Box arg22) {
+        Stream<VoxelShape> stream = arg3.getCollisions(this.player, this.player.getBoundingBox().contract(1.0E-5f), arg -> true);
+        VoxelShape lv = VoxelShapes.cuboid(arg22.contract(1.0E-5f));
+        return stream.anyMatch(arg2 -> !VoxelShapes.matchesAnywhere(arg2, lv, BooleanBiFunction.AND));
     }
 
     public void requestTeleport(double d, double e, double f, float g, float h) {
@@ -910,7 +920,10 @@ implements ServerPlayPacketListener {
         if (lv3.isEmpty()) {
             return;
         }
-        this.player.interactionManager.interactItem(this.player, lv, lv3, lv2);
+        ActionResult lv4 = this.player.interactionManager.interactItem(this.player, lv, lv3, lv2);
+        if (lv4.shouldSwingHand()) {
+            this.player.swingHand(lv2, true);
+        }
     }
 
     @Override
@@ -1095,15 +1108,12 @@ implements ServerPlayPacketListener {
         if (lv2 != null) {
             double d = 36.0;
             if (this.player.squaredDistanceTo(lv2) < 36.0) {
+                Hand lv3 = arg.getHand();
+                Optional<Object> optional = Optional.empty();
                 if (arg.getType() == PlayerInteractEntityC2SPacket.InteractionType.INTERACT) {
-                    Hand lv3 = arg.getHand();
-                    this.player.interact(lv2, lv3);
+                    optional = Optional.of(this.player.interact(lv2, lv3));
                 } else if (arg.getType() == PlayerInteractEntityC2SPacket.InteractionType.INTERACT_AT) {
-                    Hand lv4 = arg.getHand();
-                    ActionResult lv5 = lv2.interactAt(this.player, arg.getHitPosition(), lv4);
-                    if (lv5.shouldSwingHand()) {
-                        this.player.swingHand(lv4, true);
-                    }
+                    optional = Optional.of(lv2.interactAt(this.player, arg.getHitPosition(), lv3));
                 } else if (arg.getType() == PlayerInteractEntityC2SPacket.InteractionType.ATTACK) {
                     if (lv2 instanceof ItemEntity || lv2 instanceof ExperienceOrbEntity || lv2 instanceof PersistentProjectileEntity || lv2 == this.player) {
                         this.disconnect(new TranslatableText("multiplayer.disconnect.invalid_entity_attacked"));
@@ -1111,6 +1121,9 @@ implements ServerPlayPacketListener {
                         return;
                     }
                     this.player.attack(lv2);
+                }
+                if (optional.isPresent() && ((ActionResult)((Object)optional.get())).shouldSwingHand()) {
+                    this.player.swingHand(lv3, true);
                 }
             }
         }

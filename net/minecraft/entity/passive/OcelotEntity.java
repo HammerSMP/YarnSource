@@ -52,6 +52,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LocalDifficulty;
@@ -185,7 +186,7 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         if ((this.temptGoal == null || this.temptGoal.isActive()) && !this.isTrusting() && this.isBreedingItem(lv) && arg.squaredDistanceTo(this) < 9.0) {
             this.eat(arg, lv);
@@ -199,7 +200,7 @@ extends AnimalEntity {
                     this.world.sendEntityStatus(this, (byte)40);
                 }
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

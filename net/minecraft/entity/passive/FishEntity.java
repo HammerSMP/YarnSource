@@ -34,6 +34,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -143,7 +144,7 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected boolean interactMob(PlayerEntity arg, Hand arg2) {
+    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         if (lv.getItem() == Items.WATER_BUCKET && this.isAlive()) {
             this.playSound(SoundEvents.ITEM_BUCKET_FILL_FISH, 1.0f, 1.0f);
@@ -159,7 +160,7 @@ extends WaterCreatureEntity {
                 arg.dropItem(lv2, false);
             }
             this.remove();
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

@@ -64,6 +64,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_5362;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityInteraction;
 import net.minecraft.entity.EntityType;
@@ -91,7 +92,6 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockEventS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitySpawnGlobalS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
@@ -175,7 +175,6 @@ extends World
 implements ServerWorldAccess {
     public static final BlockPos field_25144 = new BlockPos(100, 50, 0);
     private static final Logger LOGGER = LogManager.getLogger();
-    private final List<Entity> globalEntities = Lists.newArrayList();
     private final Int2ObjectMap<Entity> entitiesById = new Int2ObjectLinkedOpenHashMap();
     private final Map<UUID, Entity> entitiesByUuid = Maps.newHashMap();
     private final Queue<Entity> entitiesToLoad = Queues.newArrayDeque();
@@ -332,60 +331,48 @@ implements ServerWorldAccess {
             this.resetIdleTimeout();
         }
         if (bl4 || this.idleTimeout++ < 300) {
-            Entity lv5;
+            Entity lv4;
             if (this.enderDragonFight != null) {
                 this.enderDragonFight.tick();
             }
-            lv.push("global");
-            for (int m = 0; m < this.globalEntities.size(); ++m) {
-                Entity lv2 = this.globalEntities.get(m);
-                this.tickEntity(arg -> {
-                    ++arg.age;
-                    arg.tick();
-                }, lv2);
-                if (!lv2.removed) continue;
-                this.globalEntities.remove(m--);
-            }
-            lv.swap("regular");
             this.inEntityTick = true;
             ObjectIterator objectIterator = this.entitiesById.int2ObjectEntrySet().iterator();
             while (objectIterator.hasNext()) {
                 Int2ObjectMap.Entry entry = (Int2ObjectMap.Entry)objectIterator.next();
-                Entity lv3 = (Entity)entry.getValue();
-                Entity lv4 = lv3.getVehicle();
-                if (!this.server.shouldSpawnAnimals() && (lv3 instanceof AnimalEntity || lv3 instanceof WaterCreatureEntity)) {
-                    lv3.remove();
+                Entity lv2 = (Entity)entry.getValue();
+                Entity lv3 = lv2.getVehicle();
+                if (!this.server.shouldSpawnAnimals() && (lv2 instanceof AnimalEntity || lv2 instanceof WaterCreatureEntity)) {
+                    lv2.remove();
                 }
-                if (!this.server.shouldSpawnNpcs() && lv3 instanceof Npc) {
-                    lv3.remove();
+                if (!this.server.shouldSpawnNpcs() && lv2 instanceof Npc) {
+                    lv2.remove();
                 }
                 lv.push("checkDespawn");
-                if (!lv3.removed) {
-                    lv3.checkDespawn();
+                if (!lv2.removed) {
+                    lv2.checkDespawn();
                 }
                 lv.pop();
-                if (lv4 != null) {
-                    if (!lv4.removed && lv4.hasPassenger(lv3)) continue;
-                    lv3.stopRiding();
+                if (lv3 != null) {
+                    if (!lv3.removed && lv3.hasPassenger(lv2)) continue;
+                    lv2.stopRiding();
                 }
                 lv.push("tick");
-                if (!lv3.removed && !(lv3 instanceof EnderDragonPart)) {
-                    this.tickEntity(this::tickEntity, lv3);
+                if (!lv2.removed && !(lv2 instanceof EnderDragonPart)) {
+                    this.tickEntity(this::tickEntity, lv2);
                 }
                 lv.pop();
                 lv.push("remove");
-                if (lv3.removed) {
-                    this.removeEntityFromChunk(lv3);
+                if (lv2.removed) {
+                    this.removeEntityFromChunk(lv2);
                     objectIterator.remove();
-                    this.unloadEntity(lv3);
+                    this.unloadEntity(lv2);
                 }
                 lv.pop();
             }
             this.inEntityTick = false;
-            while ((lv5 = this.entitiesToLoad.poll()) != null) {
-                this.loadEntityUnchecked(lv5);
+            while ((lv4 = this.entitiesToLoad.poll()) != null) {
+                this.loadEntityUnchecked(lv4);
             }
-            lv.pop();
             this.tickBlockEntities();
         }
         lv.pop();
@@ -436,38 +423,41 @@ implements ServerWorldAccess {
                 lv5.updatePosition(lv3.getX(), lv3.getY(), lv3.getZ());
                 this.spawnEntity(lv5);
             }
-            this.addLightning(new LightningEntity(this, (double)lv3.getX() + 0.5, lv3.getY(), (double)lv3.getZ() + 0.5, bl2));
+            LightningEntity lv6 = EntityType.LIGHTNING_BOLT.create(this);
+            lv6.method_29495(Vec3d.ofBottomCenter(lv3));
+            lv6.method_29498(bl2);
+            this.spawnEntity(lv6);
         }
         lv2.swap("iceandsnow");
         if (this.random.nextInt(16) == 0) {
-            BlockPos lv6 = this.getTopPosition(Heightmap.Type.MOTION_BLOCKING, this.getRandomPosInChunk(j, 0, k, 15));
-            BlockPos lv7 = lv6.down();
-            Biome lv8 = this.getBiome(lv6);
-            if (lv8.canSetIce(this, lv7)) {
-                this.setBlockState(lv7, Blocks.ICE.getDefaultState());
+            BlockPos lv7 = this.getTopPosition(Heightmap.Type.MOTION_BLOCKING, this.getRandomPosInChunk(j, 0, k, 15));
+            BlockPos lv8 = lv7.down();
+            Biome lv9 = this.getBiome(lv7);
+            if (lv9.canSetIce(this, lv8)) {
+                this.setBlockState(lv8, Blocks.ICE.getDefaultState());
             }
-            if (bl && lv8.canSetSnow(this, lv6)) {
-                this.setBlockState(lv6, Blocks.SNOW.getDefaultState());
+            if (bl && lv9.canSetSnow(this, lv7)) {
+                this.setBlockState(lv7, Blocks.SNOW.getDefaultState());
             }
-            if (bl && this.getBiome(lv7).getPrecipitation() == Biome.Precipitation.RAIN) {
-                this.getBlockState(lv7).getBlock().rainTick(this, lv7);
+            if (bl && this.getBiome(lv8).getPrecipitation() == Biome.Precipitation.RAIN) {
+                this.getBlockState(lv8).getBlock().rainTick(this, lv8);
             }
         }
         lv2.swap("tickBlocks");
         if (i > 0) {
-            for (ChunkSection lv9 : arg.getSectionArray()) {
-                if (lv9 == WorldChunk.EMPTY_SECTION || !lv9.hasRandomTicks()) continue;
-                int l = lv9.getYOffset();
+            for (ChunkSection lv10 : arg.getSectionArray()) {
+                if (lv10 == WorldChunk.EMPTY_SECTION || !lv10.hasRandomTicks()) continue;
+                int l = lv10.getYOffset();
                 for (int m = 0; m < i; ++m) {
-                    FluidState lv12;
-                    BlockPos lv10 = this.getRandomPosInChunk(j, l, k, 15);
+                    FluidState lv13;
+                    BlockPos lv11 = this.getRandomPosInChunk(j, l, k, 15);
                     lv2.push("randomTick");
-                    BlockState lv11 = lv9.getBlockState(lv10.getX() - j, lv10.getY() - l, lv10.getZ() - k);
-                    if (lv11.hasRandomTicks()) {
-                        lv11.randomTick(this, lv10, this.random);
+                    BlockState lv12 = lv10.getBlockState(lv11.getX() - j, lv11.getY() - l, lv11.getZ() - k);
+                    if (lv12.hasRandomTicks()) {
+                        lv12.randomTick(this, lv11, this.random);
                     }
-                    if ((lv12 = lv11.getFluidState()).hasRandomTicks()) {
-                        lv12.onRandomTick(this, lv10, this.random);
+                    if ((lv13 = lv12.getFluidState()).hasRandomTicks()) {
+                        lv13.onRandomTick(this, lv11, this.random);
                     }
                     lv2.pop();
                 }
@@ -836,11 +826,6 @@ implements ServerWorldAccess {
         this.updateSleepingPlayers();
     }
 
-    public void addLightning(LightningEntity arg) {
-        this.globalEntities.add(arg);
-        this.server.getPlayerManager().sendToAround(null, arg.getX(), arg.getY(), arg.getZ(), 512.0, this.getRegistryKey(), new EntitySpawnGlobalS2CPacket(arg));
-    }
-
     @Override
     public void setBlockBreakingInfo(int i, BlockPos arg, int j) {
         for (ServerPlayerEntity lv : this.server.getPlayerManager().getPlayerList()) {
@@ -897,14 +882,11 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg3) {
-        Explosion lv = new Explosion(this, arg, d, e, f, g, bl, arg3);
-        if (arg2 != null) {
-            lv.setDamageSource(arg2);
-        }
+    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, @Nullable class_5362 arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
+        Explosion lv = new Explosion(this, arg, arg2, arg3, d, e, f, g, bl, arg4);
         lv.collectBlocksAndDamageEntities();
         lv.affectWorld(false);
-        if (arg3 == Explosion.DestructionType.NONE) {
+        if (arg4 == Explosion.DestructionType.NONE) {
             lv.clearAffectedBlocks();
         }
         for (ServerPlayerEntity lv2 : this.players) {
@@ -1239,13 +1221,9 @@ implements ServerWorldAccess {
                 }
             }
         }
-        Path path4 = path.resolve("global_entities.csv");
+        Path path4 = path.resolve("block_entities.csv");
         try (BufferedWriter writer5 = Files.newBufferedWriter(path4, new OpenOption[0]);){
-            ServerWorld.dumpEntities(writer5, this.globalEntities);
-        }
-        Path path5 = path.resolve("block_entities.csv");
-        try (BufferedWriter writer6 = Files.newBufferedWriter(path5, new OpenOption[0]);){
-            this.dumpBlockEntities(writer6);
+            this.dumpBlockEntities(writer5);
         }
     }
 

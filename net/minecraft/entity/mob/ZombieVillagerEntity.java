@@ -47,6 +47,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -134,17 +135,19 @@ implements VillagerDataContainer {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
-        if (lv.getItem() == Items.GOLDEN_APPLE && this.hasStatusEffect(StatusEffects.WEAKNESS)) {
-            if (!arg.abilities.creativeMode) {
-                lv.decrement(1);
+        if (lv.getItem() == Items.GOLDEN_APPLE) {
+            if (this.hasStatusEffect(StatusEffects.WEAKNESS)) {
+                if (!arg.abilities.creativeMode) {
+                    lv.decrement(1);
+                }
+                if (!this.world.isClient) {
+                    this.setConverting(arg.getUuid(), this.random.nextInt(2401) + 3600);
+                }
+                return ActionResult.SUCCESS;
             }
-            if (!this.world.isClient) {
-                this.setConverting(arg.getUuid(), this.random.nextInt(2401) + 3600);
-                arg.swingHand(arg2, true);
-            }
-            return true;
+            return ActionResult.CONSUME;
         }
         return super.interactMob(arg, arg2);
     }

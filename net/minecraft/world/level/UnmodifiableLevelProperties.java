@@ -12,20 +12,17 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.timer.Timer;
 
 public class UnmodifiableLevelProperties
 implements ServerWorldProperties {
-    private final DimensionType dimensionType;
     private final SaveProperties field_24179;
     private final ServerWorldProperties properties;
 
-    public UnmodifiableLevelProperties(DimensionType arg, SaveProperties arg2, ServerWorldProperties arg3) {
-        this.dimensionType = arg;
-        this.field_24179 = arg2;
-        this.properties = arg3;
+    public UnmodifiableLevelProperties(SaveProperties arg, ServerWorldProperties arg2) {
+        this.field_24179 = arg;
+        this.properties = arg2;
     }
 
     @Override

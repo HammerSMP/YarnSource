@@ -233,7 +233,7 @@ public class Structure {
                 lv2.tag.putInt("y", lv3.getY());
                 lv2.tag.putInt("z", lv3.getZ());
                 if (lv7 instanceof LootableContainerBlockEntity) {
-                    lv2.tag.putLong("LootTable", random.nextLong());
+                    lv2.tag.putLong("LootTableSeed", random.nextLong());
                 }
                 lv7.fromTag(lv2.state, lv2.tag);
                 lv7.applyMirror(arg4.getMirror());

@@ -104,7 +104,7 @@ extends Feature<EndSpikeFeatureConfig> {
         EndCrystalEntity lv4 = EntityType.END_CRYSTAL.create(arg.getWorld());
         lv4.setBeamTarget(arg2.getPos());
         lv4.setInvulnerable(arg2.isCrystalInvulerable());
-        lv4.refreshPositionAndAngles((float)arg3.getCenterX() + 0.5f, arg3.getHeight() + 1, (float)arg3.getCenterZ() + 0.5f, random.nextFloat() * 360.0f, 0.0f);
+        lv4.refreshPositionAndAngles((double)arg3.getCenterX() + 0.5, arg3.getHeight() + 1, (double)arg3.getCenterZ() + 0.5, random.nextFloat() * 360.0f, 0.0f);
         arg.spawnEntity(lv4);
         this.setBlockState(arg, new BlockPos(arg3.getCenterX(), arg3.getHeight(), arg3.getCenterZ()), Blocks.BEDROCK.getDefaultState());
     }

@@ -14,7 +14,6 @@ import net.minecraft.entity.mob.SkeletonHorseEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.LocalDifficulty;
 
 public class SkeletonHorseTrapTriggerGoal
@@ -36,14 +35,17 @@ extends Goal {
         this.skeletonHorse.setTrapped(false);
         this.skeletonHorse.setTame(true);
         this.skeletonHorse.setBreedingAge(0);
-        ((ServerWorld)this.skeletonHorse.world).addLightning(new LightningEntity(this.skeletonHorse.world, this.skeletonHorse.getX(), this.skeletonHorse.getY(), this.skeletonHorse.getZ(), true));
-        SkeletonEntity lv2 = this.getSkeleton(lv, this.skeletonHorse);
-        lv2.startRiding(this.skeletonHorse);
+        LightningEntity lv2 = EntityType.LIGHTNING_BOLT.create(this.skeletonHorse.world);
+        lv2.positAfterTeleport(this.skeletonHorse.getX(), this.skeletonHorse.getY(), this.skeletonHorse.getZ());
+        lv2.method_29498(true);
+        this.skeletonHorse.world.spawnEntity(lv2);
+        SkeletonEntity lv3 = this.getSkeleton(lv, this.skeletonHorse);
+        lv3.startRiding(this.skeletonHorse);
         for (int i = 0; i < 3; ++i) {
-            HorseBaseEntity lv3 = this.getHorse(lv);
-            SkeletonEntity lv4 = this.getSkeleton(lv, lv3);
-            lv4.startRiding(lv3);
-            lv3.addVelocity(this.skeletonHorse.getRandom().nextGaussian() * 0.5, 0.0, this.skeletonHorse.getRandom().nextGaussian() * 0.5);
+            HorseBaseEntity lv4 = this.getHorse(lv);
+            SkeletonEntity lv5 = this.getSkeleton(lv, lv4);
+            lv5.startRiding(lv4);
+            lv4.addVelocity(this.skeletonHorse.getRandom().nextGaussian() * 0.5, 0.0, this.skeletonHorse.getRandom().nextGaussian() * 0.5);
         }
     }
 

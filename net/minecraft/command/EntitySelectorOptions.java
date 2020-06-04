@@ -55,7 +55,6 @@ import net.minecraft.server.command.CommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.EntityTypeTags;
-import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -271,24 +270,19 @@ public class EntitySelectorOptions {
             }
             if (arg.readTagCharacter()) {
                 Identifier lv = Identifier.fromCommandInput(arg.getReader());
-                Tag<EntityType<?>> lv2 = EntityTypeTags.getContainer().get(lv);
-                if (lv2 == null) {
-                    arg.getReader().setCursor(i);
-                    throw INVALID_TYPE_EXCEPTION.createWithContext((ImmutableStringReader)arg.getReader(), (Object)lv.toString());
-                }
-                arg.setPredicate(arg2 -> lv2.contains(arg2.getType()) != bl);
+                arg.setPredicate(arg2 -> arg2.getServer().getTagManager().entityTypes().getOrCreate(lv).contains(arg2.getType()) != bl);
             } else {
-                Identifier lv3 = Identifier.fromCommandInput(arg.getReader());
-                EntityType lv4 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv3).orElseThrow(() -> {
+                Identifier lv2 = Identifier.fromCommandInput(arg.getReader());
+                EntityType lv3 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> {
                     arg.getReader().setCursor(i);
-                    return INVALID_TYPE_EXCEPTION.createWithContext((ImmutableStringReader)arg.getReader(), (Object)lv3.toString());
+                    return INVALID_TYPE_EXCEPTION.createWithContext((ImmutableStringReader)arg.getReader(), (Object)lv2.toString());
                 });
-                if (Objects.equals(EntityType.PLAYER, lv4) && !bl) {
+                if (Objects.equals(EntityType.PLAYER, lv3) && !bl) {
                     arg.setIncludesNonPlayers(false);
                 }
-                arg.setPredicate(arg2 -> Objects.equals(lv4, arg2.getType()) != bl);
+                arg.setPredicate(arg2 -> Objects.equals(lv3, arg2.getType()) != bl);
                 if (!bl) {
-                    arg.setEntityType(lv4);
+                    arg.setEntityType(lv3);
                 }
             }
         }, arg -> !arg.selectsEntityType(), new TranslatableText("argument.entity.options.type.description"));

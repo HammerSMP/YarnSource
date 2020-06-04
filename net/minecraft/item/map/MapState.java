@@ -282,14 +282,14 @@ extends PersistentState {
     }
 
     public void addBanner(WorldAccess arg, BlockPos arg2) {
-        float f = (float)arg2.getX() + 0.5f;
-        float g = (float)arg2.getZ() + 0.5f;
+        double d = (double)arg2.getX() + 0.5;
+        double e = (double)arg2.getZ() + 0.5;
         int i = 1 << this.scale;
-        float h = (f - (float)this.xCenter) / (float)i;
-        float j = (g - (float)this.zCenter) / (float)i;
-        int k = 63;
+        double f = (d - (double)this.xCenter) / (double)i;
+        double g = (e - (double)this.zCenter) / (double)i;
+        int j = 63;
         boolean bl = false;
-        if (h >= -63.0f && j >= -63.0f && h <= 63.0f && j <= 63.0f) {
+        if (f >= -63.0 && g >= -63.0 && f <= 63.0 && g <= 63.0) {
             MapBannerMarker lv = MapBannerMarker.fromWorldBlock(arg, arg2);
             if (lv == null) {
                 return;
@@ -303,7 +303,7 @@ extends PersistentState {
             }
             if (bl2) {
                 this.banners.put(lv.getKey(), lv);
-                this.addIcon(lv.getIconType(), arg, lv.getKey(), f, g, 180.0, lv.getName());
+                this.addIcon(lv.getIconType(), arg, lv.getKey(), d, e, 180.0, lv.getName());
                 bl = true;
             }
             if (bl) {

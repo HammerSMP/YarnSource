@@ -2,60 +2,60 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  org.apache.commons.lang3.text.WordUtils
  */
 package net.minecraft.client.toast;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.Arrays;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import org.apache.commons.lang3.text.WordUtils;
 
 @Environment(value=EnvType.CLIENT)
 public class SystemToast
 implements Toast {
     private final Type type;
-    private String title;
-    private String[] field_25037;
+    private class_5348 title;
+    private List<class_5348> field_25037;
     private long startTime;
     private boolean justUpdated;
     private final int field_25038;
 
     public SystemToast(Type arg, Text arg2, @Nullable Text arg3) {
-        String[] arrstring;
-        if (arg3 == null) {
-            arrstring = new String[]{};
-        } else {
-            String[] arrstring2 = new String[1];
-            arrstring = arrstring2;
-            arrstring2[0] = arg3.getString();
-        }
-        this(arg, arg2, arrstring, 160);
+        this(arg, arg2, (List<class_5348>)SystemToast.method_29626(arg3), 160);
     }
 
-    public static SystemToast method_29047(Type arg, Text arg2, Text arg3) {
-        String[] strings = WordUtils.wrap((String)arg3.getString(), (int)80).split("\n");
-        int i = Math.max(130, Arrays.stream(strings).mapToInt(string -> MinecraftClient.getInstance().textRenderer.getWidth((String)string)).max().orElse(130));
-        return new SystemToast(arg, arg2, strings, i + 30);
+    public static SystemToast method_29047(MinecraftClient arg, Type arg2, Text arg3, Text arg4) {
+        TextRenderer lv = arg.textRenderer;
+        List<class_5348> list = lv.getTextHandler().wrapLines(arg4, 200, Style.EMPTY);
+        int i = Math.max(200, list.stream().mapToInt(lv::getWidth).max().orElse(200));
+        return new SystemToast(arg2, arg3, list, i + 30);
     }
 
-    private SystemToast(Type arg, Text arg2, String[] strings, int i) {
+    private SystemToast(Type arg, Text arg2, List<class_5348> list, int i) {
         this.type = arg;
-        this.title = arg2.getString();
-        this.field_25037 = strings;
+        this.title = arg2;
+        this.field_25037 = list;
         this.field_25038 = i;
+    }
+
+    private static ImmutableList<class_5348> method_29626(@Nullable Text arg) {
+        return arg == null ? ImmutableList.of() : ImmutableList.of((Object)arg);
     }
 
     @Override
@@ -73,10 +73,10 @@ implements Toast {
         RenderSystem.color3f(1.0f, 1.0f, 1.0f);
         int i = this.method_29049();
         int j = 12;
-        if (i == 160 && this.field_25037.length <= 1) {
+        if (i == 160 && this.field_25037.size() <= 1) {
             arg2.drawTexture(arg, 0, 0, 0, 64, i, this.method_29050());
         } else {
-            int k = this.method_29050() + Math.max(0, this.field_25037.length - 1) * 12;
+            int k = this.method_29050() + Math.max(0, this.field_25037.size() - 1) * 12;
             int m = 28;
             int n = Math.min(4, k - 28);
             this.method_29046(arg, arg2, i, 0, 0, 28);
@@ -89,9 +89,8 @@ implements Toast {
             arg2.getGame().textRenderer.draw(arg, this.title, 18.0f, 12.0f, -256);
         } else {
             arg2.getGame().textRenderer.draw(arg, this.title, 18.0f, 7.0f, -256);
-            for (int p = 0; p < this.field_25037.length; ++p) {
-                String string = this.field_25037[p];
-                arg2.getGame().textRenderer.draw(arg, string, 18.0f, (float)(18 + p * 12), -1);
+            for (int p = 0; p < this.field_25037.size(); ++p) {
+                arg2.getGame().textRenderer.draw(arg, this.field_25037.get(p), 18.0f, (float)(18 + p * 12), -1);
             }
         }
         return l - this.startTime < 5000L ? Toast.Visibility.SHOW : Toast.Visibility.HIDE;
@@ -108,16 +107,8 @@ implements Toast {
     }
 
     public void setContent(Text arg, @Nullable Text arg2) {
-        String[] arrstring;
-        this.title = arg.getString();
-        if (arg2 == null) {
-            arrstring = new String[]{};
-        } else {
-            String[] arrstring2 = new String[1];
-            arrstring = arrstring2;
-            arrstring2[0] = arg2.getString();
-        }
-        this.field_25037 = arrstring;
+        this.title = arg;
+        this.field_25037 = SystemToast.method_29626(arg2);
         this.justUpdated = true;
     }
 
@@ -146,6 +137,10 @@ implements Toast {
         SystemToast.add(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.delete_failure"), new LiteralText(string));
     }
 
+    public static void method_29627(MinecraftClient arg, String string) {
+        SystemToast.add(arg.getToastManager(), Type.PACK_COPY_FAILURE, new TranslatableText("pack.copyFailure"), new LiteralText(string));
+    }
+
     @Override
     public /* synthetic */ Object getType() {
         return this.getType();
@@ -158,7 +153,8 @@ implements Toast {
         WORLD_BACKUP,
         WORLD_GEN_SETTINGS_TRANSFER,
         PACK_LOAD_FAILURE,
-        WORLD_ACCESS_FAILURE;
+        WORLD_ACCESS_FAILURE,
+        PACK_COPY_FAILURE;
 
     }
 }

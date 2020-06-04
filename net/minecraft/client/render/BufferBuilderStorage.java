@@ -38,7 +38,9 @@ public class BufferBuilderStorage {
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.method_27948());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.method_27949());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getGlint());
+        BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.method_29706());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getEntityGlint());
+        BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.method_29707());
         BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, RenderLayer.getWaterMask());
         ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.forEach(arg -> BufferBuilderStorage.assignBufferBuilder((Object2ObjectLinkedOpenHashMap<RenderLayer, BufferBuilder>)object2ObjectLinkedOpenHashMap, arg));
     });

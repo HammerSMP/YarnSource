@@ -8,12 +8,14 @@ package net.minecraft.world;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -38,6 +40,10 @@ public interface BlockView {
 
     default public int getHeight() {
         return 256;
+    }
+
+    default public Stream<BlockState> method_29546(Box arg) {
+        return BlockPos.method_29715(arg).map(this::getBlockState);
     }
 
     default public BlockHitResult rayTrace(RayTraceContext arg3) {

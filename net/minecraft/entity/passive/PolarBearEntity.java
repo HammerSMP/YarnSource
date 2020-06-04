@@ -10,11 +10,13 @@ package net.minecraft.entity.passive;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5354;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -22,6 +24,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.Durations;
 import net.minecraft.entity.ai.goal.EscapeDangerGoal;
 import net.minecraft.entity.ai.goal.FollowParentGoal;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
@@ -47,6 +50,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.IntRange;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -55,11 +59,15 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 
 public class PolarBearEntity
-extends AnimalEntity {
+extends AnimalEntity
+implements class_5354 {
     private static final TrackedData<Boolean> WARNING = DataTracker.registerData(PolarBearEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private float lastWarningAnimationProgress;
     private float warningAnimationProgress;
     private int warningSoundCooldown;
+    private static final IntRange field_25369 = Durations.betweenSeconds(20, 39);
+    private int field_25370;
+    private UUID field_25368;
 
     public PolarBearEntity(EntityType<? extends PolarBearEntity> arg, World arg2) {
         super((EntityType<? extends AnimalEntity>)arg, arg2);
@@ -87,7 +95,8 @@ extends AnimalEntity {
         this.goalSelector.add(7, new LookAroundGoal(this));
         this.targetSelector.add(1, new PolarBearRevengeGoal());
         this.targetSelector.add(2, new FollowPlayersGoal());
-        this.targetSelector.add(3, new FollowTargetGoal<FoxEntity>(this, FoxEntity.class, 10, true, true, null));
+        this.targetSelector.add(3, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::method_29515));
+        this.targetSelector.add(4, new FollowTargetGoal<FoxEntity>(this, FoxEntity.class, 10, true, true, null));
     }
 
     public static DefaultAttributeContainer.Builder createPolarBearAttributes() {
@@ -100,6 +109,43 @@ extends AnimalEntity {
             return arg2.getBaseLightLevel(arg4, 0) > 8 && arg2.getBlockState(arg4.down()).isOf(Blocks.ICE);
         }
         return PolarBearEntity.isValidNaturalSpawn(arg, arg2, arg3, arg4, random);
+    }
+
+    @Override
+    public void readCustomDataFromTag(CompoundTag arg) {
+        super.readCustomDataFromTag(arg);
+        this.method_29512(this.world, arg);
+    }
+
+    @Override
+    public void writeCustomDataToTag(CompoundTag arg) {
+        super.writeCustomDataToTag(arg);
+        this.method_29517(arg);
+    }
+
+    @Override
+    public void method_29509() {
+        this.method_29514(field_25369.choose(this.random));
+    }
+
+    @Override
+    public void method_29514(int i) {
+        this.field_25370 = i;
+    }
+
+    @Override
+    public int method_29507() {
+        return this.field_25370;
+    }
+
+    @Override
+    public void method_29513(@Nullable UUID uUID) {
+        this.field_25368 = uUID;
+    }
+
+    @Override
+    public UUID method_29508() {
+        return this.field_25368;
     }
 
     @Override
@@ -150,6 +196,9 @@ extends AnimalEntity {
         }
         if (this.warningSoundCooldown > 0) {
             --this.warningSoundCooldown;
+        }
+        if (!this.world.isClient) {
+            this.method_29510();
         }
     }
 

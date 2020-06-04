@@ -159,8 +159,8 @@ extends AbstractRailBlock {
     }
 
     private Box getCartDetectionBox(BlockPos arg) {
-        float f = 0.2f;
-        return new Box((float)arg.getX() + 0.2f, arg.getY(), (float)arg.getZ() + 0.2f, (float)(arg.getX() + 1) - 0.2f, (float)(arg.getY() + 1) - 0.2f, (float)(arg.getZ() + 1) - 0.2f);
+        double d = 0.2;
+        return new Box((double)arg.getX() + 0.2, arg.getY(), (double)arg.getZ() + 0.2, (double)(arg.getX() + 1) - 0.2, (double)(arg.getY() + 1) - 0.2, (double)(arg.getZ() + 1) - 0.2);
     }
 
     @Override

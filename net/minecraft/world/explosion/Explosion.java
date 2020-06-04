@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -31,6 +32,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_5360;
+import net.minecraft.class_5361;
+import net.minecraft.class_5362;
 import net.minecraft.enchantment.ProtectionEnchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -66,7 +70,8 @@ public class Explosion {
     @Nullable
     private final Entity entity;
     private final float power;
-    private DamageSource damageSource;
+    private final DamageSource damageSource;
+    private final class_5362 field_25400;
     private final List<BlockPos> affectedBlocks = Lists.newArrayList();
     private final Map<PlayerEntity, Vec3d> affectedPlayers = Maps.newHashMap();
 
@@ -81,7 +86,12 @@ public class Explosion {
         this.affectedBlocks.addAll(list);
     }
 
+    @Environment(value=EnvType.CLIENT)
     public Explosion(World arg, @Nullable Entity arg2, double d, double e, double f, float g, boolean bl, DestructionType arg3) {
+        this(arg, arg2, null, null, d, e, f, g, bl, arg3);
+    }
+
+    public Explosion(World arg, @Nullable Entity arg2, @Nullable DamageSource arg3, @Nullable class_5362 arg4, double d, double e, double f, float g, boolean bl, DestructionType arg5) {
         this.world = arg;
         this.entity = arg2;
         this.power = g;
@@ -89,8 +99,13 @@ public class Explosion {
         this.y = e;
         this.z = f;
         this.createFire = bl;
-        this.destructionType = arg3;
-        this.damageSource = DamageSource.explosion(this);
+        this.destructionType = arg5;
+        this.damageSource = arg3 == null ? DamageSource.explosion(this) : arg3;
+        this.field_25400 = arg4 == null ? this.method_29553(arg2) : arg4;
+    }
+
+    private class_5362 method_29553(@Nullable Entity arg) {
+        return arg == null ? class_5360.INSTANCE : new class_5361(arg);
     }
 
     public static float getExposure(Vec3d arg, Entity arg2) {
@@ -147,17 +162,14 @@ public class Explosion {
                     double o = this.z;
                     float p = 0.3f;
                     for (float h = this.power * (0.7f + this.world.random.nextFloat() * 0.6f); h > 0.0f; h -= 0.22500001f) {
+                        FluidState lv3;
                         BlockPos lv = new BlockPos(m, n, o);
                         BlockState lv2 = this.world.getBlockState(lv);
-                        FluidState lv3 = this.world.getFluidState(lv);
-                        if (!lv2.isAir() || !lv3.isEmpty()) {
-                            float q = Math.max(lv2.getBlock().getBlastResistance(), lv3.getBlastResistance());
-                            if (this.entity != null) {
-                                q = this.entity.getEffectiveExplosionResistance(this, this.world, lv, lv2, lv3, q);
-                            }
-                            h -= (q + 0.3f) * 0.3f;
+                        Optional<Float> optional = this.field_25400.method_29555(this, this.world, lv, lv2, lv3 = this.world.getFluidState(lv));
+                        if (optional.isPresent()) {
+                            h -= (optional.get().floatValue() + 0.3f) * 0.3f;
                         }
-                        if (h > 0.0f && (this.entity == null || this.entity.canExplosionDestroyBlock(this, this.world, lv, lv2, h))) {
+                        if (h > 0.0f && this.field_25400.method_29554(this, this.world, lv, lv2, h)) {
                             set.add(lv);
                         }
                         m += d * (double)0.3f;
@@ -168,37 +180,37 @@ public class Explosion {
             }
         }
         this.affectedBlocks.addAll(set);
-        float r = this.power * 2.0f;
-        int s = MathHelper.floor(this.x - (double)r - 1.0);
-        int t = MathHelper.floor(this.x + (double)r + 1.0);
-        int u = MathHelper.floor(this.y - (double)r - 1.0);
-        int v = MathHelper.floor(this.y + (double)r + 1.0);
-        int w = MathHelper.floor(this.z - (double)r - 1.0);
-        int x = MathHelper.floor(this.z + (double)r + 1.0);
-        List<Entity> list = this.world.getEntities(this.entity, new Box(s, u, w, t, v, x));
+        float q = this.power * 2.0f;
+        int r = MathHelper.floor(this.x - (double)q - 1.0);
+        int s = MathHelper.floor(this.x + (double)q + 1.0);
+        int t = MathHelper.floor(this.y - (double)q - 1.0);
+        int u = MathHelper.floor(this.y + (double)q + 1.0);
+        int v = MathHelper.floor(this.z - (double)q - 1.0);
+        int w = MathHelper.floor(this.z + (double)q + 1.0);
+        List<Entity> list = this.world.getEntities(this.entity, new Box(r, t, v, s, u, w));
         Vec3d lv4 = new Vec3d(this.x, this.y, this.z);
-        for (int y = 0; y < list.size(); ++y) {
+        for (int x = 0; x < list.size(); ++x) {
             PlayerEntity lv6;
-            double ac;
             double ab;
             double aa;
-            double ad;
             double z;
-            Entity lv5 = list.get(y);
-            if (lv5.isImmuneToExplosion() || !((z = (double)(MathHelper.sqrt(lv5.squaredDistanceTo(lv4)) / r)) <= 1.0) || (ad = (double)MathHelper.sqrt((aa = lv5.getX() - this.x) * aa + (ab = (lv5 instanceof TntEntity ? lv5.getY() : lv5.getEyeY()) - this.y) * ab + (ac = lv5.getZ() - this.z) * ac)) == 0.0) continue;
-            aa /= ad;
-            ab /= ad;
-            ac /= ad;
-            double ae = Explosion.getExposure(lv4, lv5);
-            double af = (1.0 - z) * ae;
-            lv5.damage(this.getDamageSource(), (int)((af * af + af) / 2.0 * 7.0 * (double)r + 1.0));
-            double ag = af;
+            double ac;
+            double y;
+            Entity lv5 = list.get(x);
+            if (lv5.isImmuneToExplosion() || !((y = (double)(MathHelper.sqrt(lv5.squaredDistanceTo(lv4)) / q)) <= 1.0) || (ac = (double)MathHelper.sqrt((z = lv5.getX() - this.x) * z + (aa = (lv5 instanceof TntEntity ? lv5.getY() : lv5.getEyeY()) - this.y) * aa + (ab = lv5.getZ() - this.z) * ab)) == 0.0) continue;
+            z /= ac;
+            aa /= ac;
+            ab /= ac;
+            double ad = Explosion.getExposure(lv4, lv5);
+            double ae = (1.0 - y) * ad;
+            lv5.damage(this.getDamageSource(), (int)((ae * ae + ae) / 2.0 * 7.0 * (double)q + 1.0));
+            double af = ae;
             if (lv5 instanceof LivingEntity) {
-                ag = ProtectionEnchantment.transformExplosionKnockback((LivingEntity)lv5, af);
+                af = ProtectionEnchantment.transformExplosionKnockback((LivingEntity)lv5, ae);
             }
-            lv5.setVelocity(lv5.getVelocity().add(aa * ag, ab * ag, ac * ag));
+            lv5.setVelocity(lv5.getVelocity().add(z * af, aa * af, ab * af));
             if (!(lv5 instanceof PlayerEntity) || (lv6 = (PlayerEntity)lv5).isSpectator() || lv6.isCreative() && lv6.abilities.flying) continue;
-            this.affectedPlayers.put(lv6, new Vec3d(aa * af, ab * af, ac * af));
+            this.affectedPlayers.put(lv6, new Vec3d(z * ae, aa * ae, ab * ae));
         }
     }
 
@@ -264,10 +276,6 @@ public class Explosion {
 
     public DamageSource getDamageSource() {
         return this.damageSource;
-    }
-
-    public void setDamageSource(DamageSource arg) {
-        this.damageSource = arg;
     }
 
     public Map<PlayerEntity, Vec3d> getAffectedPlayers() {

@@ -28,6 +28,7 @@ import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -80,17 +81,19 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
-        if (lv.getItem() == Items.BUCKET && !arg.abilities.creativeMode && !this.isBaby()) {
+        if (lv.getItem() == Items.BUCKET && !this.isBaby()) {
             arg.playSound(SoundEvents.ENTITY_COW_MILK, 1.0f, 1.0f);
-            lv.decrement(1);
+            if (!arg.abilities.creativeMode) {
+                lv.decrement(1);
+            }
             if (lv.isEmpty()) {
                 arg.setStackInHand(arg2, new ItemStack(Items.MILK_BUCKET));
             } else if (!arg.inventory.insertStack(new ItemStack(Items.MILK_BUCKET))) {
                 arg.dropItem(new ItemStack(Items.MILK_BUCKET), false);
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

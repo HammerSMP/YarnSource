@@ -152,7 +152,7 @@ public class SpreadPlayersCommand {
             } else {
                 lv4 = args[j++];
             }
-            entity.teleport((float)MathHelper.floor(lv4.x) + 0.5f, lv4.getY(arg, i), (double)MathHelper.floor(lv4.z) + 0.5);
+            entity.teleport((double)MathHelper.floor(lv4.x) + 0.5, lv4.getY(arg, i), (double)MathHelper.floor(lv4.z) + 0.5);
             double e = Double.MAX_VALUE;
             for (Pile lv5 : args) {
                 if (lv4 == lv5) continue;

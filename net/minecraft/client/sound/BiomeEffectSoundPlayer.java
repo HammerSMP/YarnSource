@@ -94,7 +94,7 @@ implements ClientPlayerTickable {
                 double k = f - this.player.getZ();
                 double l = MathHelper.sqrt(g * g + h * h + k * k);
                 double m = l + arg.getExtraDistance();
-                PositionedSoundInstance lv3 = PositionedSoundInstance.ambient(arg.getEvent(), (float)(this.player.getX() + g / l * m), (float)(this.player.getEyeY() + h / l * m), (float)(this.player.getZ() + k / l * m));
+                PositionedSoundInstance lv3 = PositionedSoundInstance.ambient(arg.getEvent(), this.player.getX() + g / l * m, this.player.getEyeY() + h / l * m, this.player.getZ() + k / l * m);
                 this.soundManager.play(lv3);
                 this.moodPercentage = 0.0f;
             } else {

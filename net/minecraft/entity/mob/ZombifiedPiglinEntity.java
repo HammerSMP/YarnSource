@@ -10,11 +10,12 @@ import java.util.Random;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
+import net.minecraft.class_5354;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.Durations;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
@@ -25,7 +26,6 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -34,6 +34,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.IntRange;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
@@ -41,12 +42,15 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public class ZombifiedPiglinEntity
-extends ZombieEntity {
+extends ZombieEntity
+implements class_5354 {
     private static final UUID ATTACKING_SPEED_BOOST_ID = UUID.fromString("49455A49-7EC5-45BA-B886-3B90B23A1718");
     private static final EntityAttributeModifier ATTACKING_SPEED_BOOST = new EntityAttributeModifier(ATTACKING_SPEED_BOOST_ID, "Attacking speed boost", 0.05, EntityAttributeModifier.Operation.ADDITION);
-    private int anger;
+    private static final IntRange field_25382 = Durations.betweenSeconds(0, 2);
     private int angrySoundDelay;
-    private UUID angerTarget;
+    private static final IntRange field_25379 = Durations.betweenSeconds(20, 39);
+    private int field_25380;
+    private UUID field_25381;
 
     public ZombifiedPiglinEntity(EntityType<? extends ZombifiedPiglinEntity> arg, World arg2) {
         super((EntityType<? extends ZombieEntity>)arg, arg2);
@@ -54,19 +58,16 @@ extends ZombieEntity {
     }
 
     @Override
-    public void setAttacker(@Nullable LivingEntity arg) {
-        super.setAttacker(arg);
-        if (arg != null) {
-            this.angerTarget = arg.getUuid();
-        }
+    public void method_29513(@Nullable UUID uUID) {
+        this.field_25381 = uUID;
     }
 
     @Override
     protected void initCustomGoals() {
         this.goalSelector.add(2, new ZombieAttackGoal(this, 1.0, false));
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0));
-        this.targetSelector.add(1, new AvoidZombiesGoal(this));
-        this.targetSelector.add(2, new FollowPlayerIfAngryGoal(this));
+        this.targetSelector.add(1, new RevengeGoal(this, new Class[0]).setGroupRevenge(new Class[0]));
+        this.targetSelector.add(2, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::method_29515));
     }
 
     public static DefaultAttributeContainer.Builder createZombifiedPiglinAttributes() {
@@ -82,34 +83,39 @@ extends ZombieEntity {
     protected void mobTick() {
         EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
         LivingEntity lv2 = this.getAttacker();
-        if (this.isAngry()) {
-            LivingEntity lv3;
+        if (this.method_29511()) {
             if (!this.isBaby() && !lv.hasModifier(ATTACKING_SPEED_BOOST)) {
                 lv.addTemporaryModifier(ATTACKING_SPEED_BOOST);
             }
-            --this.anger;
-            LivingEntity livingEntity = lv3 = lv2 != null ? lv2 : this.getTarget();
-            if (!this.isAngry() && lv3 != null) {
-                if (!this.canSee(lv3)) {
-                    this.setAttacker(null);
-                    this.setTarget(null);
-                } else {
-                    this.anger = this.getNewAngerDuration();
-                }
+            if (this.angrySoundDelay == 0) {
+                this.method_29533();
+                this.angrySoundDelay = field_25382.choose(this.random);
+            } else {
+                --this.angrySoundDelay;
             }
         } else if (lv.hasModifier(ATTACKING_SPEED_BOOST)) {
             lv.removeModifier(ATTACKING_SPEED_BOOST);
         }
-        if (this.angrySoundDelay > 0 && --this.angrySoundDelay == 0) {
-            this.playSound(SoundEvents.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, this.getSoundVolume() * 2.0f, ((this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f) * 1.8f);
-        }
-        if (this.isAngry() && this.angerTarget != null && lv2 == null) {
-            PlayerEntity lv4 = this.world.getPlayerByUuid(this.angerTarget);
-            this.setAttacker(lv4);
-            this.attackingPlayer = lv4;
-            this.playerHitTimer = this.getLastAttackedTime();
-        }
+        this.method_29510();
         super.mobTick();
+    }
+
+    private void method_29533() {
+        this.playSound(SoundEvents.ENTITY_ZOMBIFIED_PIGLIN_ANGRY, this.getSoundVolume() * 2.0f, this.getSoundPitch() * 1.8f);
+    }
+
+    @Override
+    public void setTarget(@Nullable LivingEntity arg) {
+        if (this.getTarget() == null && arg != null) {
+            this.method_29533();
+            this.angrySoundDelay = field_25382.choose(this.random);
+        }
+        super.setTarget(arg);
+    }
+
+    @Override
+    public void method_29509() {
+        this.method_29514(field_25379.choose(this.random));
     }
 
     public static boolean canSpawn(EntityType<ZombifiedPiglinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
@@ -124,25 +130,23 @@ extends ZombieEntity {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        arg.putShort("Anger", (short)this.anger);
-        if (this.angerTarget != null) {
-            arg.putUuid("HurtBy", this.angerTarget);
-        }
+        this.method_29517(arg);
     }
 
     @Override
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
-        this.anger = arg.getShort("Anger");
-        if (arg.containsUuid("HurtBy")) {
-            this.angerTarget = arg.getUuid("HurtBy");
-            PlayerEntity lv = this.world.getPlayerByUuid(this.angerTarget);
-            this.setAttacker(lv);
-            if (lv != null) {
-                this.attackingPlayer = lv;
-                this.playerHitTimer = this.getLastAttackedTime();
-            }
-        }
+        this.method_29512(this.world, arg);
+    }
+
+    @Override
+    public void method_29514(int i) {
+        this.field_25380 = i;
+    }
+
+    @Override
+    public int method_29507() {
+        return this.field_25380;
     }
 
     @Override
@@ -150,26 +154,7 @@ extends ZombieEntity {
         if (this.isInvulnerableTo(arg)) {
             return false;
         }
-        Entity lv = arg.getAttacker();
-        if (lv instanceof PlayerEntity && !((PlayerEntity)lv).isCreative() && this.canSee(lv)) {
-            this.getAngryAt((LivingEntity)lv);
-        }
         return super.damage(arg, f);
-    }
-
-    private boolean getAngryAt(LivingEntity arg) {
-        this.anger = this.getNewAngerDuration();
-        this.angrySoundDelay = this.random.nextInt(40);
-        this.setAttacker(arg);
-        return true;
-    }
-
-    private int getNewAngerDuration() {
-        return 400 + this.random.nextInt(400);
-    }
-
-    private boolean isAngry() {
-        return this.anger > 0;
     }
 
     @Override
@@ -203,35 +188,13 @@ extends ZombieEntity {
     }
 
     @Override
+    public UUID method_29508() {
+        return this.field_25381;
+    }
+
+    @Override
     public boolean isAngryAt(PlayerEntity arg) {
-        return this.isAngry();
-    }
-
-    static class FollowPlayerIfAngryGoal
-    extends FollowTargetGoal<PlayerEntity> {
-        public FollowPlayerIfAngryGoal(ZombifiedPiglinEntity arg) {
-            super((MobEntity)arg, PlayerEntity.class, true);
-        }
-
-        @Override
-        public boolean canStart() {
-            return ((ZombifiedPiglinEntity)this.mob).isAngry() && super.canStart();
-        }
-    }
-
-    static class AvoidZombiesGoal
-    extends RevengeGoal {
-        public AvoidZombiesGoal(ZombifiedPiglinEntity arg) {
-            super(arg, new Class[0]);
-            this.setGroupRevenge(ZombieEntity.class);
-        }
-
-        @Override
-        protected void setMobEntityTarget(MobEntity arg, LivingEntity arg2) {
-            if (arg instanceof ZombifiedPiglinEntity && this.mob.canSee(arg2) && ((ZombifiedPiglinEntity)arg).getAngryAt(arg2)) {
-                arg.setTarget(arg2);
-            }
-        }
+        return this.method_29515(arg);
     }
 }
 

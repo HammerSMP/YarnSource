@@ -45,6 +45,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
@@ -212,7 +213,7 @@ implements SkinOverlayOwner {
     }
 
     @Override
-    protected boolean interactMob(PlayerEntity arg, Hand arg22) {
+    protected ActionResult interactMob(PlayerEntity arg, Hand arg22) {
         ItemStack lv = arg.getStackInHand(arg22);
         if (lv.getItem() == Items.FLINT_AND_STEEL) {
             this.world.playSound(arg, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_FLINTANDSTEEL_USE, this.getSoundCategory(), 1.0f, this.random.nextFloat() * 0.4f + 0.8f);
@@ -220,7 +221,7 @@ implements SkinOverlayOwner {
                 this.setIgnited();
                 lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg22);
     }

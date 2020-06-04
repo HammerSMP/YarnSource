@@ -30,12 +30,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5352;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.client.resource.ClientResourcePackProfile;
@@ -83,15 +85,18 @@ implements ResourcePackProvider {
     }
 
     @Override
-    public <T extends ResourcePackProfile> void register(Map<String, T> map, ResourcePackProfile.Factory<T> arg) {
-        T lv = ResourcePackProfile.of("vanilla", true, () -> this.pack, arg, ResourcePackProfile.InsertionPosition.BOTTOM);
+    public <T extends ResourcePackProfile> void register(Consumer<T> consumer, ResourcePackProfile.class_5351<T> arg) {
+        T lv2;
+        T lv = ResourcePackProfile.of("vanilla", true, () -> this.pack, arg, ResourcePackProfile.InsertionPosition.BOTTOM, class_5352.PACK_SOURCE_BUILTIN);
         if (lv != null) {
-            map.put("vanilla", lv);
+            consumer.accept((ClientResourcePackProfile)lv);
         }
         if (this.serverContainer != null) {
-            map.put("server", this.serverContainer);
+            consumer.accept(this.serverContainer);
         }
-        this.method_25454(map, arg);
+        if ((lv2 = this.method_25454(arg)) != null) {
+            consumer.accept((ClientResourcePackProfile)lv2);
+        }
     }
 
     public DefaultResourcePack getPack() {
@@ -134,7 +139,7 @@ implements ResourcePackProvider {
                 if (!this.verifyFile(string4, file)) {
                     return Util.completeExceptionally(new RuntimeException("Hash check failure for file " + file + ", see log"));
                 }
-                return this.loadServerPack(file);
+                return this.loadServerPack(file, class_5352.PACK_SOURCE_SERVER);
             })).whenComplete((void_, throwable) -> {
                 if (throwable != null) {
                     LOGGER.warn("Pack application failed: {}, deleting file {}", (Object)throwable.getMessage(), (Object)file);
@@ -215,48 +220,41 @@ implements ResourcePackProvider {
         }
     }
 
-    public CompletableFuture<Void> loadServerPack(File file) {
-        PackResourceMetadata lv = null;
-        NativeImage lv2 = null;
-        String string = null;
-        try (ZipResourcePack lv3 = new ZipResourcePack(file);){
-            lv = lv3.parseMetadata(PackResourceMetadata.READER);
-            try (InputStream inputStream = lv3.openRoot("pack.png");){
-                lv2 = NativeImage.read(inputStream);
-            }
-            catch (IOException | IllegalArgumentException exception) {
-                LOGGER.info("Could not read pack.png: {}", (Object)exception.getMessage());
-            }
+    /*
+     * WARNING - void declaration
+     */
+    public CompletableFuture<Void> loadServerPack(File file, class_5352 arg) {
+        void lv7;
+        void lv6;
+        try (ZipResourcePack lv = new ZipResourcePack(file);){
+            PackResourceMetadata lv2 = lv.parseMetadata(PackResourceMetadata.READER);
+            NativeImage lv3 = ClientResourcePackProfile.method_29713(lv);
         }
         catch (IOException iOException) {
-            string = iOException.getMessage();
-        }
-        if (string != null) {
-            return Util.completeExceptionally(new RuntimeException(String.format("Invalid resourcepack at %s: %s", file, string)));
+            return Util.completeExceptionally(new IOException(String.format("Invalid resourcepack at %s", file), iOException));
         }
         LOGGER.info("Applying server pack {}", (Object)file);
-        this.serverContainer = new ClientResourcePackProfile("server", true, () -> new ZipResourcePack(file), new TranslatableText("resourcePack.server.name"), lv.getDescription(), ResourcePackCompatibility.from(lv.getPackFormat()), ResourcePackProfile.InsertionPosition.TOP, true, lv2);
+        this.serverContainer = new ClientResourcePackProfile("server", true, () -> new ZipResourcePack(file), new TranslatableText("resourcePack.server.name"), lv6.getDescription(), ResourcePackCompatibility.from(lv6.getPackFormat()), ResourcePackProfile.InsertionPosition.TOP, true, arg, (NativeImage)lv7);
         return MinecraftClient.getInstance().reloadResourcesConcurrently();
     }
 
-    private <T extends ResourcePackProfile> void method_25454(Map<String, T> map, ResourcePackProfile.Factory<T> arg) {
+    @Nullable
+    private <T extends ResourcePackProfile> T method_25454(ResourcePackProfile.class_5351<T> arg) {
         File file2;
+        T lv = null;
         File file = this.index.getResource(new Identifier("resourcepacks/programmer_art.zip"));
-        if (file != null && file.isFile() && ClientBuiltinResourcePackProvider.method_25453(map, arg, () -> ClientBuiltinResourcePackProvider.method_16048(file))) {
-            return;
+        if (file != null && file.isFile()) {
+            lv = ClientBuiltinResourcePackProvider.method_25453(arg, () -> ClientBuiltinResourcePackProvider.method_16048(file));
         }
-        if (SharedConstants.isDevelopment && (file2 = this.index.findFile("../resourcepacks/programmer_art")) != null && file2.isDirectory()) {
-            ClientBuiltinResourcePackProvider.method_25453(map, arg, () -> ClientBuiltinResourcePackProvider.method_25455(file2));
+        if (lv == null && SharedConstants.isDevelopment && (file2 = this.index.findFile("../resourcepacks/programmer_art")) != null && file2.isDirectory()) {
+            lv = ClientBuiltinResourcePackProvider.method_25453(arg, () -> ClientBuiltinResourcePackProvider.method_25455(file2));
         }
+        return lv;
     }
 
-    private static <T extends ResourcePackProfile> boolean method_25453(Map<String, T> map, ResourcePackProfile.Factory<T> arg, Supplier<ResourcePack> supplier) {
-        T lv = ResourcePackProfile.of("programer_art", false, supplier, arg, ResourcePackProfile.InsertionPosition.TOP);
-        if (lv != null) {
-            map.put("programer_art", lv);
-            return true;
-        }
-        return false;
+    @Nullable
+    private static <T extends ResourcePackProfile> T method_25453(ResourcePackProfile.class_5351<T> arg, Supplier<ResourcePack> supplier) {
+        return ResourcePackProfile.of("programer_art", false, supplier, arg, ResourcePackProfile.InsertionPosition.TOP, class_5352.PACK_SOURCE_BUILTIN);
     }
 
     private static DirectoryResourcePack method_25455(File file) {

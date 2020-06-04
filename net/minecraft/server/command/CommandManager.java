@@ -130,7 +130,7 @@ public class CommandManager {
     private static final Logger LOGGER = LogManager.getLogger();
     private final CommandDispatcher<ServerCommandSource> dispatcher = new CommandDispatcher();
 
-    public CommandManager(boolean bl2) {
+    public CommandManager(class_5364 arg) {
         AdvancementCommand.register(this.dispatcher);
         AttributeCommand.register(this.dispatcher);
         ExecuteCommand.register(this.dispatcher);
@@ -162,14 +162,13 @@ public class CommandManager {
         MessageCommand.register(this.dispatcher);
         ParticleCommand.register(this.dispatcher);
         PlaySoundCommand.register(this.dispatcher);
-        PublishCommand.register(this.dispatcher);
         ReloadCommand.register(this.dispatcher);
         RecipeCommand.register(this.dispatcher);
         ReplaceItemCommand.register(this.dispatcher);
         SayCommand.register(this.dispatcher);
         ScheduleCommand.register(this.dispatcher);
         ScoreboardCommand.register(this.dispatcher);
-        SeedCommand.register(this.dispatcher);
+        SeedCommand.register(this.dispatcher, arg == class_5364.INTEGRATED);
         SetBlockCommand.register(this.dispatcher);
         SpawnPointCommand.register(this.dispatcher);
         SetWorldSpawnCommand.register(this.dispatcher);
@@ -190,7 +189,7 @@ public class CommandManager {
         if (SharedConstants.isDevelopment) {
             TestCommand.register(this.dispatcher);
         }
-        if (bl2) {
+        if (arg.field_25423) {
             BanIpCommand.register(this.dispatcher);
             BanListCommand.register(this.dispatcher);
             BanCommand.register(this.dispatcher);
@@ -204,6 +203,9 @@ public class CommandManager {
             SetIdleTimeoutCommand.register(this.dispatcher);
             StopCommand.register(this.dispatcher);
             WhitelistCommand.register(this.dispatcher);
+        }
+        if (arg.field_25422) {
+            PublishCommand.register(this.dispatcher);
         }
         this.dispatcher.findAmbiguities((commandNode, commandNode2, commandNode3, collection) -> LOGGER.warn("Ambiguity between arguments {} and {} with inputs: {}", (Object)this.dispatcher.getPath(commandNode2), (Object)this.dispatcher.getPath(commandNode3), (Object)collection));
         this.dispatcher.setConsumer((commandContext, bl, i) -> ((ServerCommandSource)commandContext.getSource()).onCommandComplete((CommandContext<ServerCommandSource>)commandContext, bl, i));
@@ -336,6 +338,20 @@ public class CommandManager {
             return CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().createWithContext(parseResults.getReader());
         }
         return CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(parseResults.getReader());
+    }
+
+    public static enum class_5364 {
+        ALL(true, true),
+        DEDICATED(false, true),
+        INTEGRATED(true, false);
+
+        private final boolean field_25422;
+        private final boolean field_25423;
+
+        private class_5364(boolean bl, boolean bl2) {
+            this.field_25422 = bl;
+            this.field_25423 = bl2;
+        }
     }
 
     @FunctionalInterface

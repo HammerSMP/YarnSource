@@ -236,7 +236,7 @@ implements CrossbowUser {
         } else {
             Item lv2 = lv.getItem();
             if (this.method_7111(lv2)) {
-                this.method_27964(arg);
+                this.method_29499(arg);
                 ItemStack lv3 = this.inventory.addStack(lv);
                 if (lv3.isEmpty()) {
                     arg.remove();

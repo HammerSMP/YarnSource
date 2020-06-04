@@ -18,6 +18,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -433,6 +434,9 @@ Drawable {
     @Override
     public boolean isMouseOver(double d, double e) {
         return true;
+    }
+
+    public void method_29638(List<Path> list) {
     }
 }
 

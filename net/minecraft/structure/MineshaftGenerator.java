@@ -455,7 +455,7 @@ public class MineshaftGenerator {
             if (arg2.contains(lv) && arg.getBlockState(lv).isAir() && !arg.getBlockState(lv.down()).isAir()) {
                 BlockState lv2 = (BlockState)Blocks.RAIL.getDefaultState().with(RailBlock.SHAPE, random.nextBoolean() ? RailShape.NORTH_SOUTH : RailShape.EAST_WEST);
                 this.addBlock(arg, lv2, i, j, k, arg2);
-                ChestMinecartEntity lv3 = new ChestMinecartEntity(arg.getWorld(), (float)lv.getX() + 0.5f, (float)lv.getY() + 0.5f, (float)lv.getZ() + 0.5f);
+                ChestMinecartEntity lv3 = new ChestMinecartEntity(arg.getWorld(), (double)lv.getX() + 0.5, (double)lv.getY() + 0.5, (double)lv.getZ() + 0.5);
                 lv3.setLootTable(arg3, random.nextLong());
                 arg.spawnEntity(lv3);
                 return true;

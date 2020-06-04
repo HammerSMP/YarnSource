@@ -75,9 +75,9 @@ extends Block {
     public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
         BlockPos lv;
         if (random.nextInt(16) == 0 && FallingBlock.canFallThrough(arg2.getBlockState(lv = arg3.down()))) {
-            double d = (double)arg3.getX() + (double)random.nextFloat();
+            double d = (double)arg3.getX() + random.nextDouble();
             double e = (double)arg3.getY() - 0.05;
-            double f = (double)arg3.getZ() + (double)random.nextFloat();
+            double f = (double)arg3.getZ() + random.nextDouble();
             arg2.addParticle(new BlockStateParticleEffect(ParticleTypes.FALLING_DUST, arg), d, e, f, 0.0, 0.0, 0.0);
         }
     }

@@ -8,6 +8,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 
 public class NameTagItem
@@ -17,7 +18,7 @@ extends Item {
     }
 
     @Override
-    public boolean useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
+    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
         if (arg.hasCustomName() && !(arg3 instanceof PlayerEntity)) {
             if (arg3.isAlive()) {
                 arg3.setCustomName(arg.getName());
@@ -26,9 +27,9 @@ extends Item {
                 }
                 arg.decrement(1);
             }
-            return true;
+            return ActionResult.method_29236(arg2.world.isClient);
         }
-        return false;
+        return ActionResult.PASS;
     }
 }
 

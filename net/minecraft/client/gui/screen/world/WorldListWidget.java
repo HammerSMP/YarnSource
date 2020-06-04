@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.hash.Hashing
+ *  com.mojang.datafixers.util.Function4
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -15,9 +16,11 @@ package net.minecraft.client.gui.screen.world;
 
 import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Function4;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -31,6 +34,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5359;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
@@ -38,7 +42,6 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.FatalErrorScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.ProgressScreen;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
@@ -51,6 +54,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -59,7 +63,11 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.SaveProperties;
+import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.world.gen.GeneratorOptions;
+import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -211,19 +219,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                     }
                 } else if (this.level.isDifferentVersion()) {
                     DrawableHelper.drawTexture(arg, k, j, 32.0f, q, 32, 32, 256, 256);
-                    if (this.level.method_29020()) {
-                        DrawableHelper.drawTexture(arg, k, j, 96.0f, q, 32, 32, 256, 256);
-                        if (bl2) {
-                            MutableText lv3 = new TranslatableText("selectWorld.tooltip.unsupported", this.level.getVersion()).formatted(Formatting.RED);
-                            this.screen.setTooltip(this.client.textRenderer.wrapLines(lv3, 175));
-                        }
-                    } else if (this.level.isLegacyCustomizedWorld()) {
-                        DrawableHelper.drawTexture(arg, k, j, 96.0f, q, 32, 32, 256, 256);
-                        if (bl2) {
-                            MutableText lv4 = new TranslatableText("selectWorld.tooltip.experimental").formatted(Formatting.RED);
-                            this.screen.setTooltip(this.client.textRenderer.wrapLines(lv4, 175));
-                        }
-                    } else if (this.level.isFutureLevel()) {
+                    if (this.level.isFutureLevel()) {
                         DrawableHelper.drawTexture(arg, k, j, 96.0f, q, 32, 32, 256, 256);
                         if (bl2) {
                             this.screen.setTooltip(Arrays.asList(new TranslatableText("selectWorld.tooltip.fromNewerVersion1").formatted(Formatting.RED), new TranslatableText("selectWorld.tooltip.fromNewerVersion2").formatted(Formatting.RED)));
@@ -263,19 +259,9 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             if (this.level.isLocked()) {
                 return;
             }
-            if (this.level.isOutdatedLevel() || this.level.method_29020() || this.level.isLegacyCustomizedWorld()) {
-                TranslatableText lv6;
-                TranslatableText lv5;
-                if (this.level.method_29020()) {
-                    TranslatableText lv = new TranslatableText("selectWorld.backupQuestion.customized");
-                    TranslatableText lv2 = new TranslatableText("selectWorld.backupWarning.customized");
-                } else if (this.level.isLegacyCustomizedWorld()) {
-                    TranslatableText lv3 = new TranslatableText("selectWorld.backupQuestion.experimental");
-                    TranslatableText lv4 = new TranslatableText("selectWorld.backupWarning.experimental");
-                } else {
-                    lv5 = new TranslatableText("selectWorld.backupQuestion");
-                    lv6 = new TranslatableText("selectWorld.backupWarning", this.level.getVersion(), SharedConstants.getGameVersion().getName());
-                }
+            if (this.level.isOutdatedLevel()) {
+                TranslatableText lv = new TranslatableText("selectWorld.backupQuestion");
+                TranslatableText lv2 = new TranslatableText("selectWorld.backupWarning", this.level.getVersion(), SharedConstants.getGameVersion().getName());
                 this.client.openScreen(new BackupPromptScreen(this.screen, (bl, bl2) -> {
                     if (bl) {
                         String string = this.level.getName();
@@ -288,7 +274,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                         }
                     }
                     this.start();
-                }, lv5, lv6, false));
+                }, lv, lv2, false));
             } else if (this.level.isFutureLevel()) {
                 this.client.openScreen(new ConfirmScreen(bl -> {
                     if (bl) {
@@ -352,18 +338,16 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         }
 
         public void recreate() {
-            try {
-                this.client.openScreen(new ProgressScreen());
-                try (LevelStorage.Session lv = this.client.getLevelStorage().createSession(this.level.getName());){
-                    SaveProperties lv2 = lv.readLevelProperties();
-                    if (lv2 != null) {
-                        CreateWorldScreen lv3 = new CreateWorldScreen((Screen)this.screen, lv2);
-                        if (this.level.method_29020()) {
-                            this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? lv3 : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
-                        } else {
-                            this.client.openScreen(lv3);
-                        }
-                    }
+            DimensionTracker.Modifiable lv = DimensionTracker.create();
+            try (LevelStorage.Session lv2 = this.client.getLevelStorage().createSession(this.level.getName());
+                 MinecraftClient.class_5367 lv3 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, DimensionTracker.Modifiable, ResourceManager, class_5359, SaveProperties>)((Function4)MinecraftClient::method_29599), false, lv2);){
+                LevelInfo lv4 = lv3.method_29614().getLevelInfo();
+                GeneratorOptions lv5 = lv3.method_29614().getGeneratorOptions();
+                Path path = CreateWorldScreen.method_29685(lv2.getDirectory(WorldSavePath.DATAPACKS), this.client);
+                if (lv5.isLegacyCustomizedType()) {
+                    this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? new CreateWorldScreen(this.screen, lv4, lv5, path, lv) : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
+                } else {
+                    this.client.openScreen(new CreateWorldScreen(this.screen, lv4, lv5, path, lv));
                 }
             }
             catch (Exception exception) {
@@ -375,7 +359,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         private void start() {
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             if (this.client.getLevelStorage().levelExists(this.level.getName())) {
-                this.client.startIntegratedServer(this.level.getName(), null);
+                this.client.method_29606(this.level.getName());
             }
         }
 

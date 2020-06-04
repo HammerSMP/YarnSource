@@ -49,7 +49,7 @@ extends FlowerBlock {
         double e = (double)arg3.getZ() + lv2.z;
         for (int i = 0; i < 3; ++i) {
             if (!random.nextBoolean()) continue;
-            arg2.addParticle(ParticleTypes.SMOKE, d + (double)(random.nextFloat() / 5.0f), (double)arg3.getY() + (0.5 - (double)random.nextFloat()), e + (double)(random.nextFloat() / 5.0f), 0.0, 0.0, 0.0);
+            arg2.addParticle(ParticleTypes.SMOKE, d + random.nextDouble() / 5.0, (double)arg3.getY() + (0.5 - random.nextDouble()), e + random.nextDouble() / 5.0, 0.0, 0.0, 0.0);
         }
     }
 

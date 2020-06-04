@@ -2,38 +2,54 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableSet
  *  com.mojang.datafixers.DataFixer
+ *  com.mojang.datafixers.util.Function4
  *  it.unimi.dsi.fastutil.booleans.BooleanConsumer
  *  it.unimi.dsi.fastutil.objects.Object2IntMap
  *  it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.client.gui.screen.world;
 
+import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.DataFixer;
+import com.mojang.datafixers.util.Function4;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5359;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.updater.WorldUpdater;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Environment(value=EnvType.CLIENT)
 public class OptimizeWorldScreen
 extends Screen {
+    private static final Logger field_25482 = LogManager.getLogger();
     private static final Object2IntMap<RegistryKey<World>> DIMENSION_COLORS = (Object2IntMap)Util.make(new Object2IntOpenCustomHashMap(Util.identityHashStrategy()), object2IntOpenCustomHashMap -> {
         object2IntOpenCustomHashMap.put(World.OVERWORLD, -13408734);
         object2IntOpenCustomHashMap.put(World.NETHER, -10075085);
@@ -43,15 +59,31 @@ extends Screen {
     private final BooleanConsumer callback;
     private final WorldUpdater updater;
 
-    public static OptimizeWorldScreen method_27031(BooleanConsumer booleanConsumer, DataFixer dataFixer, LevelStorage.Session arg, boolean bl) {
-        SaveProperties lv = arg.readLevelProperties();
-        return new OptimizeWorldScreen(booleanConsumer, dataFixer, arg, lv, bl);
+    /*
+     * Enabled aggressive block sorting
+     * Enabled unnecessary exception pruning
+     * Enabled aggressive exception aggregation
+     */
+    @Nullable
+    public static OptimizeWorldScreen method_27031(MinecraftClient arg, BooleanConsumer booleanConsumer, DataFixer dataFixer, LevelStorage.Session arg2, boolean bl) {
+        DimensionTracker.Modifiable lv = DimensionTracker.create();
+        try (MinecraftClient.class_5367 lv2 = arg.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, DimensionTracker.Modifiable, ResourceManager, class_5359, SaveProperties>)((Function4)MinecraftClient::method_29599), false, arg2);){
+            SaveProperties lv3 = lv2.method_29614();
+            arg2.method_27425(lv, lv3);
+            ImmutableSet<RegistryKey<World>> immutableSet = lv3.getGeneratorOptions().method_29575();
+            OptimizeWorldScreen optimizeWorldScreen = new OptimizeWorldScreen(booleanConsumer, dataFixer, arg2, lv3.getLevelInfo(), bl, immutableSet);
+            return optimizeWorldScreen;
+        }
+        catch (Exception exception) {
+            field_25482.warn("Failed to load datapacks, can't optimize world", (Throwable)exception);
+            return null;
+        }
     }
 
-    private OptimizeWorldScreen(BooleanConsumer booleanConsumer, DataFixer dataFixer, LevelStorage.Session arg, SaveProperties arg2, boolean bl) {
+    private OptimizeWorldScreen(BooleanConsumer booleanConsumer, DataFixer dataFixer, LevelStorage.Session arg, LevelInfo arg2, boolean bl, ImmutableSet<RegistryKey<World>> immutableSet) {
         super(new TranslatableText("optimizeWorld.title", arg2.getLevelName()));
         this.callback = booleanConsumer;
-        this.updater = new WorldUpdater(arg, dataFixer, arg2, bl);
+        this.updater = new WorldUpdater(arg, dataFixer, immutableSet, bl);
     }
 
     @Override

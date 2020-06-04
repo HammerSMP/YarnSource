@@ -8,7 +8,6 @@
  */
 package net.minecraft.resource;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -22,7 +21,7 @@ import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
 
 public interface ResourcePack
-extends Closeable {
+extends AutoCloseable {
     @Environment(value=EnvType.CLIENT)
     public InputStream openRoot(String var1) throws IOException;
 
@@ -38,5 +37,8 @@ extends Closeable {
     public <T> T parseMetadata(ResourceMetadataReader<T> var1) throws IOException;
 
     public String getName();
+
+    @Override
+    public void close();
 }
 

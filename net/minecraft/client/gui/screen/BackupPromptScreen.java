@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
@@ -10,6 +11,7 @@ package net.minecraft.client.gui.screen;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.class_5348;
@@ -24,6 +26,7 @@ import net.minecraft.text.TranslatableText;
 @Environment(value=EnvType.CLIENT)
 public class BackupPromptScreen
 extends Screen {
+    @Nullable
     private final Screen parent;
     protected final Callback callback;
     private final Text subtitle;
@@ -31,7 +34,7 @@ extends Screen {
     private final List<class_5348> wrappedText = Lists.newArrayList();
     private CheckboxWidget eraseCacheCheckbox;
 
-    public BackupPromptScreen(Screen arg, Callback arg2, Text arg3, Text arg4, boolean bl) {
+    public BackupPromptScreen(@Nullable Screen arg, Callback arg2, Text arg3, Text arg4, boolean bl) {
         super(arg3);
         this.parent = arg;
         this.callback = arg2;

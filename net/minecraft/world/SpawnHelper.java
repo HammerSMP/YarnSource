@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -126,24 +125,24 @@ public final class SpawnHelper {
             int o = MathHelper.ceil(arg2.random.nextFloat() * 4.0f);
             int p = 0;
             for (int q = 0; q < o; ++q) {
-                double d;
+                double f;
                 lv4.set(l += arg2.random.nextInt(6) - arg2.random.nextInt(6), i, m += arg2.random.nextInt(6) - arg2.random.nextInt(6));
-                float f = (float)l + 0.5f;
-                float g = (float)m + 0.5f;
-                PlayerEntity lv7 = arg2.getClosestPlayer((double)f, (double)i, (double)g, -1.0, false);
-                if (lv7 == null || !SpawnHelper.isAcceptableSpawnPosition(arg2, arg3, lv4, d = lv7.squaredDistanceTo(f, i, g))) continue;
+                double d = (double)l + 0.5;
+                double e = (double)m + 0.5;
+                PlayerEntity lv7 = arg2.getClosestPlayer(d, (double)i, e, -1.0, false);
+                if (lv7 == null || !SpawnHelper.isAcceptableSpawnPosition(arg2, arg3, lv4, f = lv7.squaredDistanceTo(d, i, e))) continue;
                 if (lv5 == null) {
                     lv5 = SpawnHelper.pickRandomSpawnEntry(arg2, lv, lv2, arg, arg2.random, lv4);
                     if (lv5 == null) continue block0;
                     o = lv5.minGroupSize + arg2.random.nextInt(1 + lv5.maxGroupSize - lv5.minGroupSize);
                 }
-                if (!SpawnHelper.canSpawn(arg2, arg, lv, lv2, lv5, lv4, d) || !arg5.test(lv5.type, lv4, arg3)) continue;
+                if (!SpawnHelper.canSpawn(arg2, arg, lv, lv2, lv5, lv4, f) || !arg5.test(lv5.type, lv4, arg3)) continue;
                 MobEntity lv8 = SpawnHelper.createMob(arg2, lv5.type);
                 if (lv8 == null) {
                     return;
                 }
-                lv8.refreshPositionAndAngles(f, i, g, arg2.random.nextFloat() * 360.0f, 0.0f);
-                if (!SpawnHelper.isValidSpawn(arg2, lv8, d)) continue;
+                lv8.refreshPositionAndAngles(d, i, e, arg2.random.nextFloat() * 360.0f, 0.0f);
+                if (!SpawnHelper.isValidSpawn(arg2, lv8, f)) continue;
                 lv6 = lv8.initialize(arg2, arg2.getLocalDifficulty(lv8.getBlockPos()), SpawnReason.NATURAL, lv6, null);
                 ++p;
                 arg2.spawnEntity(lv8);
@@ -160,7 +159,7 @@ public final class SpawnHelper {
         if (d <= 576.0) {
             return false;
         }
-        if (arg.getSpawnPos().isWithinDistance(new Vec3d((float)arg3.getX() + 0.5f, arg3.getY(), (float)arg3.getZ() + 0.5f), 24.0)) {
+        if (arg.getSpawnPos().isWithinDistance(new Vec3d((double)arg3.getX() + 0.5, arg3.getY(), (double)arg3.getZ() + 0.5), 24.0)) {
             return false;
         }
         ChunkPos lv = new ChunkPos(arg3);
@@ -185,7 +184,7 @@ public final class SpawnHelper {
         if (!SpawnRestriction.canSpawn(lv, arg, SpawnReason.NATURAL, arg6, arg.random)) {
             return false;
         }
-        return arg.doesNotCollide(lv.createSimpleBoundingBox((float)arg6.getX() + 0.5f, arg6.getY(), (float)arg6.getZ() + 0.5f));
+        return arg.doesNotCollide(lv.createSimpleBoundingBox((double)arg6.getX() + 0.5, arg6.getY(), (double)arg6.getZ() + 0.5));
     }
 
     /*
@@ -250,7 +249,7 @@ public final class SpawnHelper {
         if (arg3.isIn(BlockTags.PREVENT_MOB_SPAWNING_INSIDE)) {
             return false;
         }
-        return !arg3.isOf(Blocks.WITHER_ROSE) || arg5 == EntityType.WITHER_SKELETON;
+        return !arg5.method_29496(arg3);
     }
 
     public static boolean canSpawn(SpawnRestriction.Location arg, WorldView arg2, BlockPos arg3, @Nullable EntityType<?> arg4) {

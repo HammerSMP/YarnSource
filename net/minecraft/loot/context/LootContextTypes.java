@@ -22,7 +22,7 @@ public class LootContextTypes {
     public static final LootContextType CHEST = LootContextTypes.register("chest", arg -> arg.require(LootContextParameters.POSITION).allow(LootContextParameters.THIS_ENTITY));
     public static final LootContextType COMMAND = LootContextTypes.register("command", arg -> arg.require(LootContextParameters.POSITION).allow(LootContextParameters.THIS_ENTITY));
     public static final LootContextType SELECTOR = LootContextTypes.register("selector", arg -> arg.require(LootContextParameters.POSITION).require(LootContextParameters.THIS_ENTITY));
-    public static final LootContextType FISHING = LootContextTypes.register("fishing", arg -> arg.require(LootContextParameters.POSITION).require(LootContextParameters.TOOL).require(LootContextParameters.THIS_ENTITY));
+    public static final LootContextType FISHING = LootContextTypes.register("fishing", arg -> arg.require(LootContextParameters.POSITION).require(LootContextParameters.TOOL).allow(LootContextParameters.THIS_ENTITY));
     public static final LootContextType ENTITY = LootContextTypes.register("entity", arg -> arg.require(LootContextParameters.THIS_ENTITY).require(LootContextParameters.POSITION).require(LootContextParameters.DAMAGE_SOURCE).allow(LootContextParameters.KILLER_ENTITY).allow(LootContextParameters.DIRECT_KILLER_ENTITY).allow(LootContextParameters.LAST_DAMAGE_PLAYER));
     public static final LootContextType GIFT = LootContextTypes.register("gift", arg -> arg.require(LootContextParameters.POSITION).require(LootContextParameters.THIS_ENTITY));
     public static final LootContextType BARTER = LootContextTypes.register("barter", arg -> arg.require(LootContextParameters.THIS_ENTITY));

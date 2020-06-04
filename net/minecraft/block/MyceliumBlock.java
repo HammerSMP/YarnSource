@@ -28,7 +28,7 @@ extends SpreadableBlock {
     public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
         super.randomDisplayTick(arg, arg2, arg3, random);
         if (random.nextInt(10) == 0) {
-            arg2.addParticle(ParticleTypes.MYCELIUM, (double)arg3.getX() + (double)random.nextFloat(), (double)arg3.getY() + 1.1, (double)arg3.getZ() + (double)random.nextFloat(), 0.0, 0.0, 0.0);
+            arg2.addParticle(ParticleTypes.MYCELIUM, (double)arg3.getX() + random.nextDouble(), (double)arg3.getY() + 1.1, (double)arg3.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
         }
     }
 }

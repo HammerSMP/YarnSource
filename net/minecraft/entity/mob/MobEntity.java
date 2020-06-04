@@ -19,7 +19,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -72,10 +71,10 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.packet.s2c.play.EntityAttachS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.DebugInfoSender;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.Tag;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -490,17 +489,9 @@ extends LivingEntity {
     protected void loot(ItemEntity arg) {
         ItemStack lv = arg.getStack();
         if (this.tryEquip(lv)) {
-            this.method_27964(arg);
+            this.method_29499(arg);
             this.sendPickup(arg, lv.getCount());
             arg.remove();
-        }
-    }
-
-    protected void method_27964(ItemEntity arg) {
-        PlayerEntity lv;
-        PlayerEntity playerEntity = lv = arg.getThrower() != null ? this.world.getPlayerByUuid(arg.getThrower()) : null;
-        if (lv instanceof ServerPlayerEntity) {
-            Criteria.THROWN_ITEM_PICKED_UP_BY_ENTITY.trigger((ServerPlayerEntity)lv, arg.getStack(), this);
         }
     }
 
@@ -1010,42 +1001,53 @@ extends LivingEntity {
     }
 
     @Override
-    public final boolean interact(PlayerEntity arg, Hand arg2) {
+    public final ActionResult interact(PlayerEntity arg, Hand arg2) {
         if (!this.isAlive()) {
-            return false;
+            return ActionResult.PASS;
         }
         if (this.getHoldingEntity() == arg) {
             this.detachLeash(true, !arg.abilities.creativeMode);
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
-        ItemStack lv = arg.getStackInHand(arg2);
+        ActionResult lv = this.method_29506(arg, arg2);
+        if (lv.isAccepted()) {
+            return lv;
+        }
+        lv = this.interactMob(arg, arg2);
+        if (lv.isAccepted()) {
+            return lv;
+        }
+        return super.interact(arg, arg2);
+    }
+
+    private ActionResult method_29506(PlayerEntity arg, Hand arg22) {
+        ActionResult lv2;
+        ItemStack lv = arg.getStackInHand(arg22);
         if (lv.getItem() == Items.LEAD && this.canBeLeashedBy(arg)) {
             this.attachLeash(arg, true);
             lv.decrement(1);
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
-        if (lv.getItem() == Items.NAME_TAG) {
-            lv.useOnEntity(arg, this, arg2);
-            return true;
+        if (lv.getItem() == Items.NAME_TAG && (lv2 = lv.useOnEntity(arg, this, arg22)).isAccepted()) {
+            return lv2;
         }
-        if (this.interactMob(arg, arg2)) {
-            return true;
+        if (lv.getItem() instanceof SpawnEggItem) {
+            if (!this.world.isClient) {
+                SpawnEggItem lv3 = (SpawnEggItem)lv.getItem();
+                Optional<MobEntity> optional = lv3.spawnBaby(arg, this, this.getType(), this.world, this.getPos(), lv);
+                optional.ifPresent(arg2 -> this.onPlayerSpawnedChild(arg, (MobEntity)arg2));
+                return optional.isPresent() ? ActionResult.SUCCESS : ActionResult.PASS;
+            }
+            return ActionResult.CONSUME;
         }
-        return super.interact(arg, arg2);
+        return ActionResult.PASS;
     }
 
     protected void onPlayerSpawnedChild(PlayerEntity arg, MobEntity arg2) {
     }
 
-    protected boolean interactMob(PlayerEntity arg, Hand arg22) {
-        ItemStack lv = arg.getStackInHand(arg22);
-        Item lv2 = lv.getItem();
-        if (!this.world.isClient && lv2 instanceof SpawnEggItem) {
-            SpawnEggItem lv3 = (SpawnEggItem)lv2;
-            Optional<MobEntity> optional = lv3.spawnBaby(arg, this, this.getType(), this.world, this.getPos(), lv);
-            optional.ifPresent(arg2 -> this.onPlayerSpawnedChild(arg, (MobEntity)arg2));
-        }
-        return false;
+    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
+        return ActionResult.PASS;
     }
 
     public boolean isInWalkTargetRange() {

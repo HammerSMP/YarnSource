@@ -19,7 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnGlobalS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -34,22 +34,20 @@ extends Entity {
     private int ambientTick;
     public long seed;
     private int remainingActions;
-    private final boolean cosmetic;
+    private boolean cosmetic;
     @Nullable
     private ServerPlayerEntity channeller;
 
-    public LightningEntity(World arg, double d, double e, double f, boolean bl) {
-        super(EntityType.LIGHTNING_BOLT, arg);
+    public LightningEntity(EntityType<? extends LightningEntity> arg, World arg2) {
+        super(arg, arg2);
         this.ignoreCameraFrustum = true;
-        this.refreshPositionAndAngles(d, e, f, 0.0f, 0.0f);
         this.ambientTick = 2;
         this.seed = this.random.nextLong();
         this.remainingActions = this.random.nextInt(3) + 1;
+    }
+
+    public void method_29498(boolean bl) {
         this.cosmetic = bl;
-        Difficulty lv = arg.getDifficulty();
-        if (lv == Difficulty.NORMAL || lv == Difficulty.HARD) {
-            this.spawnFire(4);
-        }
     }
 
     @Override
@@ -65,6 +63,10 @@ extends Entity {
     public void tick() {
         super.tick();
         if (this.ambientTick == 2) {
+            Difficulty lv = this.world.getDifficulty();
+            if (lv == Difficulty.NORMAL || lv == Difficulty.HARD) {
+                this.spawnFire(4);
+            }
             this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.WEATHER, 10000.0f, 0.8f + this.random.nextFloat() * 0.2f);
             this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_IMPACT, SoundCategory.WEATHER, 2.0f, 0.5f + this.random.nextFloat() * 0.2f);
         }
@@ -85,8 +87,8 @@ extends Entity {
             } else if (!this.cosmetic) {
                 double d = 3.0;
                 List<Entity> list = this.world.getEntities(this, new Box(this.getX() - 3.0, this.getY() - 3.0, this.getZ() - 3.0, this.getX() + 3.0, this.getY() + 6.0 + 3.0, this.getZ() + 3.0), Entity::isAlive);
-                for (Entity lv : list) {
-                    lv.onStruckByLightning(this);
+                for (Entity lv2 : list) {
+                    lv2.onStruckByLightning(this);
                 }
                 if (this.channeller != null) {
                     Criteria.CHANNELED_LIGHTNING.trigger(this.channeller, list);
@@ -133,7 +135,7 @@ extends Entity {
 
     @Override
     public Packet<?> createSpawnPacket() {
-        return new EntitySpawnGlobalS2CPacket(this);
+        return new EntitySpawnS2CPacket(this);
     }
 }
 

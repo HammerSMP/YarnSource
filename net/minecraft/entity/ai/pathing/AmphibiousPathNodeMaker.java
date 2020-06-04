@@ -141,7 +141,7 @@ extends LandPathNodeMaker {
             }
             return lv;
         }
-        if (lv == null && l > 0 && lv3 != PathNodeType.FENCE && lv3 != PathNodeType.TRAPDOOR) {
+        if (lv == null && l > 0 && lv3 != PathNodeType.FENCE && lv3 != PathNodeType.UNPASSABLE_RAIL && lv3 != PathNodeType.TRAPDOOR) {
             lv = this.getPathNode(i, j + 1, k, l - 1, d);
         }
         if (lv3 == PathNodeType.OPEN) {
@@ -186,7 +186,7 @@ extends LandPathNodeMaker {
     @Override
     protected PathNodeType adjustNodeType(BlockView arg, boolean bl, boolean bl2, BlockPos arg2, PathNodeType arg3) {
         if (arg3 == PathNodeType.RAIL && !(arg.getBlockState(arg2).getBlock() instanceof AbstractRailBlock) && !(arg.getBlockState(arg2.down()).getBlock() instanceof AbstractRailBlock)) {
-            arg3 = PathNodeType.FENCE;
+            arg3 = PathNodeType.UNPASSABLE_RAIL;
         }
         if (arg3 == PathNodeType.DOOR_OPEN || arg3 == PathNodeType.DOOR_WOOD_CLOSED || arg3 == PathNodeType.DOOR_IRON_CLOSED) {
             arg3 = PathNodeType.BLOCKED;

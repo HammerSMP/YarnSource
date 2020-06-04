@@ -407,6 +407,7 @@ public class Biome {
         return this.downfall;
     }
 
+    @Environment(value=EnvType.CLIENT)
     public Text getName() {
         return new TranslatableText(this.getTranslationKey());
     }
@@ -487,7 +488,7 @@ public class Biome {
     }
 
     public static class MixedNoisePoint {
-        public static final Codec<MixedNoisePoint> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("temparature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("humidity").forGetter(arg -> Float.valueOf(arg.humidity)), (App)Codec.FLOAT.fieldOf("altitude").forGetter(arg -> Float.valueOf(arg.altitude)), (App)Codec.FLOAT.fieldOf("weirdness").forGetter(arg -> Float.valueOf(arg.weirdness)), (App)Codec.FLOAT.fieldOf("offset").forGetter(arg -> Float.valueOf(arg.weight))).apply((Applicative)instance, MixedNoisePoint::new));
+        public static final Codec<MixedNoisePoint> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.FLOAT.fieldOf("temperature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("humidity").forGetter(arg -> Float.valueOf(arg.humidity)), (App)Codec.FLOAT.fieldOf("altitude").forGetter(arg -> Float.valueOf(arg.altitude)), (App)Codec.FLOAT.fieldOf("weirdness").forGetter(arg -> Float.valueOf(arg.weirdness)), (App)Codec.FLOAT.fieldOf("offset").forGetter(arg -> Float.valueOf(arg.weight))).apply((Applicative)instance, MixedNoisePoint::new));
         private final float temperature;
         private final float humidity;
         private final float altitude;

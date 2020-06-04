@@ -129,8 +129,8 @@ extends Overlay {
         int m = MathHelper.ceil((float)(k - i - 2) * this.progress);
         int n = Math.round(f * 255.0f);
         int o = BackgroundHelper.ColorMixer.getArgb(n, 255, 255, 255);
-        SplashScreen.fill(arg, i, j, k, j + 1, o);
-        SplashScreen.fill(arg, i, l, k, l - 1, o);
+        SplashScreen.fill(arg, i + 1, j, k - 1, j + 1, o);
+        SplashScreen.fill(arg, i + 1, l, k - 1, l - 1, o);
         SplashScreen.fill(arg, i, j, i + 1, l, o);
         SplashScreen.fill(arg, k, j, k - 1, l, o);
         SplashScreen.fill(arg, i + 2, j + 2, i + m, l - 2, o);

@@ -63,10 +63,6 @@ implements Packet<ServerPlayPacketListener> {
         arg.onClientSettings(this);
     }
 
-    public String getLanguage() {
-        return this.language;
-    }
-
     public ChatVisibility getChatVisibility() {
         return this.chatVisibility;
     }

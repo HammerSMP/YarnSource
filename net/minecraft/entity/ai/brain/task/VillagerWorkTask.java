@@ -18,7 +18,6 @@ import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.dynamic.GlobalPos;
-import net.minecraft.util.dynamic.Timestamp;
 
 public class VillagerWorkTask
 extends Task<VillagerEntity> {
@@ -44,7 +43,7 @@ extends Task<VillagerEntity> {
     @Override
     protected void run(ServerWorld arg, VillagerEntity arg22, long l) {
         Brain<VillagerEntity> lv = arg22.getBrain();
-        lv.remember(MemoryModuleType.LAST_WORKED_AT_POI, Timestamp.of(l));
+        lv.remember(MemoryModuleType.LAST_WORKED_AT_POI, l);
         lv.getOptionalMemory(MemoryModuleType.JOB_SITE).ifPresent(arg2 -> lv.remember(MemoryModuleType.LOOK_TARGET, new BlockPosLookTarget(arg2.getPos())));
         arg22.playWorkSound();
         this.performAdditionalWork(arg, arg22);

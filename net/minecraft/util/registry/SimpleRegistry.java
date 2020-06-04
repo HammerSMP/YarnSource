@@ -6,13 +6,14 @@
  *  com.google.common.collect.HashBiMap
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableList$Builder
+ *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.ImmutableMap$Builder
+ *  com.google.common.collect.Sets
  *  com.mojang.datafixers.util.Pair
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.Lifecycle
  *  com.mojang.serialization.MapCodec
  *  javax.annotation.Nullable
- *  net.fabricmc.api.EnvType
- *  net.fabricmc.api.Environment
  *  org.apache.commons.lang3.Validate
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -22,6 +23,8 @@ package net.minecraft.util.registry;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
@@ -33,8 +36,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import javax.annotation.Nullable;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.class_5380;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.Int2ObjectBiMap;
@@ -50,7 +52,8 @@ extends MutableRegistry<T> {
     protected static final Logger LOGGER = LogManager.getLogger();
     protected final Int2ObjectBiMap<T> indexedEntries = new Int2ObjectBiMap(256);
     protected final BiMap<Identifier, T> entriesById = HashBiMap.create();
-    protected final BiMap<RegistryKey<T>, T> entriesByKey = HashBiMap.create();
+    private final BiMap<RegistryKey<T>, T> entriesByKey = HashBiMap.create();
+    private final Set<RegistryKey<T>> field_25489 = Sets.newIdentityHashSet();
     protected Object[] randomEntries;
     private int nextId;
 
@@ -87,7 +90,6 @@ extends MutableRegistry<T> {
     }
 
     @Override
-    @Environment(value=EnvType.CLIENT)
     public Optional<RegistryKey<T>> getKey(T object) {
         return Optional.ofNullable(this.entriesByKey.inverse().get(object));
     }
@@ -99,7 +101,6 @@ extends MutableRegistry<T> {
 
     @Override
     @Nullable
-    @Environment(value=EnvType.CLIENT)
     public T get(@Nullable RegistryKey<T> arg) {
         return (T)this.entriesByKey.get(arg);
     }
@@ -131,6 +132,10 @@ extends MutableRegistry<T> {
         return Collections.unmodifiableSet(this.entriesById.keySet());
     }
 
+    public Set<Map.Entry<RegistryKey<T>, T>> method_29722() {
+        return Collections.unmodifiableMap(this.entriesByKey).entrySet();
+    }
+
     @Nullable
     public T getRandom(Random random) {
         if (this.randomEntries == null) {
@@ -153,6 +158,14 @@ extends MutableRegistry<T> {
         return this.indexedEntries.containsId(i);
     }
 
+    public boolean method_29723(RegistryKey<T> arg) {
+        return this.field_25489.contains(arg);
+    }
+
+    public void method_29725(RegistryKey<T> arg) {
+        this.field_25489.add(arg);
+    }
+
     public static <T> Codec<SimpleRegistry<T>> method_29098(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, Codec<T> codec) {
         return Codec.mapPair((MapCodec)Identifier.field_25139.xmap(RegistryKey.createKeyFactory(arg2), RegistryKey::getValue).fieldOf("key"), (MapCodec)codec.fieldOf("element")).codec().listOf().xmap(list -> {
             SimpleRegistry lv = new SimpleRegistry(arg2, lifecycle);
@@ -162,9 +175,28 @@ extends MutableRegistry<T> {
             return lv;
         }, arg -> {
             ImmutableList.Builder builder = ImmutableList.builder();
-            for (Map.Entry entry : arg.entriesByKey.entrySet()) {
-                builder.add((Object)Pair.of(entry.getKey(), entry.getValue()));
+            for (Object object : arg.indexedEntries) {
+                builder.add((Object)Pair.of(arg.getKey(object).get(), object));
             }
+            return builder.build();
+        });
+    }
+
+    public static <T> Codec<SimpleRegistry<T>> method_29721(RegistryKey<Registry<T>> arg, Lifecycle lifecycle, Codec<T> codec) {
+        return class_5380.method_29745(arg, lifecycle, codec);
+    }
+
+    public static <T> Codec<SimpleRegistry<T>> method_29724(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, Codec<T> codec) {
+        return Codec.unboundedMap((Codec)Identifier.field_25139.xmap(RegistryKey.createKeyFactory(arg2), RegistryKey::getValue), codec).xmap(map -> {
+            SimpleRegistry lv = new SimpleRegistry(arg2, lifecycle);
+            map.forEach((? super K arg2, ? super V object) -> {
+                lv.set(arg.nextId, (RegistryKey)arg2, (Object)object);
+                lv.method_29725((RegistryKey)arg2);
+            });
+            return lv;
+        }, arg -> {
+            ImmutableMap.Builder builder = ImmutableMap.builder();
+            arg.entriesByKey.entrySet().stream().filter(entry -> arg.method_29723((RegistryKey)entry.getKey())).forEach(((ImmutableMap.Builder)builder)::put);
             return builder.build();
         });
     }

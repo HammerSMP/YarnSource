@@ -11,6 +11,7 @@
  *  org.lwjgl.glfw.GLFW
  *  org.lwjgl.glfw.GLFWCharModsCallbackI
  *  org.lwjgl.glfw.GLFWCursorPosCallbackI
+ *  org.lwjgl.glfw.GLFWDropCallbackI
  *  org.lwjgl.glfw.GLFWKeyCallbackI
  *  org.lwjgl.glfw.GLFWMouseButtonCallbackI
  *  org.lwjgl.glfw.GLFWScrollCallbackI
@@ -36,6 +37,7 @@ import net.minecraft.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCharModsCallbackI;
 import org.lwjgl.glfw.GLFWCursorPosCallbackI;
+import org.lwjgl.glfw.GLFWDropCallbackI;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
 import org.lwjgl.glfw.GLFWScrollCallbackI;
@@ -75,10 +77,11 @@ public class InputUtil {
         GLFW.glfwSetCharModsCallback((long)l, (GLFWCharModsCallbackI)gLFWCharModsCallbackI);
     }
 
-    public static void setMouseCallbacks(long l, GLFWCursorPosCallbackI gLFWCursorPosCallbackI, GLFWMouseButtonCallbackI gLFWMouseButtonCallbackI, GLFWScrollCallbackI gLFWScrollCallbackI) {
+    public static void setMouseCallbacks(long l, GLFWCursorPosCallbackI gLFWCursorPosCallbackI, GLFWMouseButtonCallbackI gLFWMouseButtonCallbackI, GLFWScrollCallbackI gLFWScrollCallbackI, GLFWDropCallbackI gLFWDropCallbackI) {
         GLFW.glfwSetCursorPosCallback((long)l, (GLFWCursorPosCallbackI)gLFWCursorPosCallbackI);
         GLFW.glfwSetMouseButtonCallback((long)l, (GLFWMouseButtonCallbackI)gLFWMouseButtonCallbackI);
         GLFW.glfwSetScrollCallback((long)l, (GLFWScrollCallbackI)gLFWScrollCallbackI);
+        GLFW.glfwSetDropCallback((long)l, (GLFWDropCallbackI)gLFWDropCallbackI);
     }
 
     public static void setCursorParameters(long l, int i, double d, double e) {

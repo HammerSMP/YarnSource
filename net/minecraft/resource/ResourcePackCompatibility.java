@@ -22,8 +22,8 @@ public enum ResourcePackCompatibility {
     private final Text confirmMessage;
 
     private ResourcePackCompatibility(String string2) {
-        this.notification = new TranslatableText("resourcePack.incompatible." + string2);
-        this.confirmMessage = new TranslatableText("resourcePack.incompatible.confirm." + string2);
+        this.notification = new TranslatableText("pack.incompatible." + string2);
+        this.confirmMessage = new TranslatableText("pack.incompatible.confirm." + string2);
     }
 
     public boolean isCompatible() {

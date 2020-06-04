@@ -56,6 +56,7 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
+import net.minecraft.class_5352;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -211,7 +212,6 @@ import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySetHeadYawS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitySpawnGlobalS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusEffectS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
@@ -420,7 +420,7 @@ implements ClientPlayPacketListener {
 
     @Override
     public void onEntitySpawn(EntitySpawnS2CPacket arg) {
-        Object lv41;
+        Object lv42;
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         double d = arg.getX();
         double e = arg.getY();
@@ -511,19 +511,22 @@ implements ClientPlayPacketListener {
             FallingBlockEntity lv39 = new FallingBlockEntity(this.world, d, e, f, Block.getStateFromRawId(arg.getEntityData()));
         } else if (lv == EntityType.AREA_EFFECT_CLOUD) {
             AreaEffectCloudEntity lv40 = new AreaEffectCloudEntity(this.world, d, e, f);
+        } else if (lv == EntityType.LIGHTNING_BOLT) {
+            LightningEntity lv41 = new LightningEntity((EntityType<? extends LightningEntity>)EntityType.LIGHTNING_BOLT, (World)this.world);
+            lv41.positAfterTeleport(d, e, f);
         } else {
-            lv41 = null;
+            lv42 = null;
         }
-        if (lv41 != null) {
+        if (lv42 != null) {
             int i = arg.getId();
-            lv41.updateTrackedPosition(d, e, f);
-            lv41.pitch = (float)(arg.getPitch() * 360) / 256.0f;
-            lv41.yaw = (float)(arg.getYaw() * 360) / 256.0f;
-            lv41.setEntityId(i);
-            lv41.setUuid(arg.getUuid());
-            this.world.addEntity(i, lv41);
-            if (lv41 instanceof AbstractMinecartEntity) {
-                this.client.getSoundManager().play(new MovingMinecartSoundInstance(lv41));
+            lv42.updateTrackedPosition(d, e, f);
+            lv42.pitch = (float)(arg.getPitch() * 360) / 256.0f;
+            lv42.yaw = (float)(arg.getYaw() * 360) / 256.0f;
+            lv42.setEntityId(i);
+            lv42.setUuid(arg.getUuid());
+            this.world.addEntity(i, lv42);
+            if (lv42 instanceof AbstractMinecartEntity) {
+                this.client.getSoundManager().play(new MovingMinecartSoundInstance(lv42));
             }
         }
     }
@@ -540,22 +543,6 @@ implements ClientPlayPacketListener {
         lv.pitch = 0.0f;
         lv.setEntityId(arg.getId());
         this.world.addEntity(arg.getId(), lv);
-    }
-
-    @Override
-    public void onEntitySpawnGlobal(EntitySpawnGlobalS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        double d = arg.getX();
-        double e = arg.getY();
-        double f = arg.getZ();
-        if (arg.getEntityTypeId() == 1) {
-            LightningEntity lv = new LightningEntity(this.world, d, e, f, false);
-            lv.updateTrackedPosition(d, e, f);
-            lv.yaw = 0.0f;
-            lv.pitch = 0.0f;
-            lv.setEntityId(arg.getId());
-            this.world.addLightning(lv);
-        }
     }
 
     @Override
@@ -899,7 +886,7 @@ implements ClientPlayPacketListener {
             this.world.addEntity(arg.getId(), lv);
             if (lv instanceof BeeEntity) {
                 PassiveBeeSoundInstance lv3;
-                boolean bl = ((BeeEntity)lv).isAngry();
+                boolean bl = ((BeeEntity)lv).method_29511();
                 if (bl) {
                     AggressiveBeeSoundInstance lv2 = new AggressiveBeeSoundInstance((BeeEntity)lv);
                 } else {
@@ -1570,7 +1557,7 @@ implements ClientPlayPacketListener {
     @Override
     public void onPlaySoundId(PlaySoundIdS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.getSoundManager().play(new PositionedSoundInstance(arg.getSoundId(), arg.getCategory(), arg.getVolume(), arg.getPitch(), false, 0, SoundInstance.AttenuationType.LINEAR, (float)arg.getX(), (float)arg.getY(), (float)arg.getZ(), false));
+        this.client.getSoundManager().play(new PositionedSoundInstance(arg.getSoundId(), arg.getCategory(), arg.getVolume(), arg.getPitch(), false, 0, SoundInstance.AttenuationType.LINEAR, arg.getX(), arg.getY(), arg.getZ(), false));
     }
 
     @Override
@@ -1587,7 +1574,7 @@ implements ClientPlayPacketListener {
                 File file2 = new File(file, string3);
                 if (file2.isFile()) {
                     this.sendResourcePackStatus(ResourcePackStatusC2SPacket.Status.ACCEPTED);
-                    CompletableFuture<Void> completableFuture = this.client.getResourcePackDownloader().loadServerPack(file2);
+                    CompletableFuture<Void> completableFuture = this.client.getResourcePackDownloader().loadServerPack(file2, class_5352.PACK_SOURCE_WORLD);
                     this.feedbackAfterDownload(completableFuture);
                     return;
                 }

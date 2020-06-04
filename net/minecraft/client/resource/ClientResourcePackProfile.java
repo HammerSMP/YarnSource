@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5352;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -32,21 +33,30 @@ extends ResourcePackProfile {
     @Nullable
     private Identifier iconId;
 
-    public ClientResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, ResourcePackProfile.InsertionPosition arg3) {
-        super(string, bl, supplier, arg, arg2, arg3);
-        NativeImage lv = null;
-        try (InputStream inputStream = arg.openRoot("pack.png");){
-            lv = NativeImage.read(inputStream);
-        }
-        catch (IOException | IllegalArgumentException exception) {
-            // empty catch block
-        }
-        this.icon = lv;
+    public ClientResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, ResourcePackProfile.InsertionPosition arg3, class_5352 arg4) {
+        super(string, bl, supplier, arg, arg2, arg3, arg4);
+        this.icon = ClientResourcePackProfile.method_29713(arg);
     }
 
-    public ClientResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, ResourcePackProfile.InsertionPosition arg4, boolean bl2, @Nullable NativeImage arg5) {
-        super(string, bl, supplier, arg, arg2, arg3, arg4, bl2);
-        this.icon = arg5;
+    public ClientResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, ResourcePackProfile.InsertionPosition arg4, boolean bl2, class_5352 arg5, @Nullable NativeImage arg6) {
+        super(string, bl, supplier, arg, arg2, arg3, arg4, bl2, arg5);
+        this.icon = arg6;
+    }
+
+    /*
+     * Enabled aggressive block sorting
+     * Enabled unnecessary exception pruning
+     * Enabled aggressive exception aggregation
+     */
+    @Nullable
+    public static NativeImage method_29713(ResourcePack arg) {
+        try (InputStream inputStream = arg.openRoot("pack.png");){
+            NativeImage nativeImage = NativeImage.read(inputStream);
+            return nativeImage;
+        }
+        catch (IOException | IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     public void drawIcon(TextureManager arg) {

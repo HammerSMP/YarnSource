@@ -15,6 +15,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.server.MinecraftServer;
@@ -39,8 +40,9 @@ public class ReloadCommand {
     private static Collection<String> method_29478(ResourcePackManager<?> arg, SaveProperties arg2, Collection<String> collection) {
         arg.scanPacks();
         ArrayList collection2 = Lists.newArrayList(collection);
+        List<String> collection3 = arg2.method_29589().method_29550();
         for (String string : arg.method_29206()) {
-            if (arg2.getDisabledDataPacks().contains(string) || collection2.contains(string)) continue;
+            if (collection3.contains(string) || collection2.contains(string)) continue;
             collection2.add(string);
         }
         return collection2;

@@ -489,43 +489,43 @@ CommandOutput {
         return this.onGround;
     }
 
-    public void move(MovementType arg, Vec3d arg2) {
+    public void move(MovementType arg2, Vec3d arg22) {
         Vec3d lv;
         if (this.noClip) {
-            this.setBoundingBox(this.getBoundingBox().offset(arg2));
+            this.setBoundingBox(this.getBoundingBox().offset(arg22));
             this.moveToBoundingBoxCenter();
             return;
         }
-        if (arg == MovementType.PISTON && (arg2 = this.adjustMovementForPiston(arg2)).equals(Vec3d.ZERO)) {
+        if (arg2 == MovementType.PISTON && (arg22 = this.adjustMovementForPiston(arg22)).equals(Vec3d.ZERO)) {
             return;
         }
         this.world.getProfiler().push("move");
         if (this.movementMultiplier.lengthSquared() > 1.0E-7) {
-            arg2 = arg2.multiply(this.movementMultiplier);
+            arg22 = arg22.multiply(this.movementMultiplier);
             this.movementMultiplier = Vec3d.ZERO;
             this.setVelocity(Vec3d.ZERO);
         }
-        if ((lv = this.adjustMovementForCollisions(arg2 = this.adjustMovementForSneaking(arg2, arg))).lengthSquared() > 1.0E-7) {
+        if ((lv = this.adjustMovementForCollisions(arg22 = this.adjustMovementForSneaking(arg22, arg2))).lengthSquared() > 1.0E-7) {
             this.setBoundingBox(this.getBoundingBox().offset(lv));
             this.moveToBoundingBoxCenter();
         }
         this.world.getProfiler().pop();
         this.world.getProfiler().push("rest");
-        this.horizontalCollision = !MathHelper.approximatelyEquals(arg2.x, lv.x) || !MathHelper.approximatelyEquals(arg2.z, lv.z);
-        this.verticalCollision = arg2.y != lv.y;
-        this.onGround = this.verticalCollision && arg2.y < 0.0;
+        this.horizontalCollision = !MathHelper.approximatelyEquals(arg22.x, lv.x) || !MathHelper.approximatelyEquals(arg22.z, lv.z);
+        this.verticalCollision = arg22.y != lv.y;
+        this.onGround = this.verticalCollision && arg22.y < 0.0;
         BlockPos lv2 = this.getLandingPos();
         BlockState lv3 = this.world.getBlockState(lv2);
         this.fall(lv.y, this.onGround, lv3, lv2);
         Vec3d lv4 = this.getVelocity();
-        if (arg2.x != lv.x) {
+        if (arg22.x != lv.x) {
             this.setVelocity(0.0, lv4.y, lv4.z);
         }
-        if (arg2.z != lv.z) {
+        if (arg22.z != lv.z) {
             this.setVelocity(lv4.x, lv4.y, 0.0);
         }
         Block lv5 = lv3.getBlock();
-        if (arg2.y != lv.y) {
+        if (arg22.y != lv.y) {
             lv5.onEntityLand(this.world, this);
         }
         if (this.onGround && !this.bypassesSteppingEffects()) {
@@ -570,7 +570,7 @@ CommandOutput {
         }
         float i = this.getVelocityMultiplier();
         this.setVelocity(this.getVelocity().multiply(i, 1.0, i));
-        if (!this.world.doesAreaContainFireSource(this.getBoundingBox().contract(0.001)) && this.fireTicks <= 0) {
+        if (this.world.method_29556(this.getBoundingBox().contract(0.001)).noneMatch(arg -> arg.isIn(BlockTags.FIRE) || arg.isOf(Blocks.LAVA)) && this.fireTicks <= 0) {
             this.fireTicks = -this.getBurningDuration();
         }
         if (this.isWet() && this.isOnFire()) {
@@ -950,17 +950,17 @@ CommandOutput {
         float h = MathHelper.floor(this.getY());
         int i = 0;
         while ((float)i < 1.0f + this.dimensions.width * 20.0f) {
-            float j = (this.random.nextFloat() * 2.0f - 1.0f) * this.dimensions.width;
-            float k = (this.random.nextFloat() * 2.0f - 1.0f) * this.dimensions.width;
-            this.world.addParticle(ParticleTypes.BUBBLE, this.getX() + (double)j, h + 1.0f, this.getZ() + (double)k, lv2.x, lv2.y - (double)(this.random.nextFloat() * 0.2f), lv2.z);
+            double d = (this.random.nextDouble() * 2.0 - 1.0) * (double)this.dimensions.width;
+            double e = (this.random.nextDouble() * 2.0 - 1.0) * (double)this.dimensions.width;
+            this.world.addParticle(ParticleTypes.BUBBLE, this.getX() + d, h + 1.0f, this.getZ() + e, lv2.x, lv2.y - this.random.nextDouble() * (double)0.2f, lv2.z);
             ++i;
         }
-        int l = 0;
-        while ((float)l < 1.0f + this.dimensions.width * 20.0f) {
-            float m = (this.random.nextFloat() * 2.0f - 1.0f) * this.dimensions.width;
-            float n = (this.random.nextFloat() * 2.0f - 1.0f) * this.dimensions.width;
-            this.world.addParticle(ParticleTypes.SPLASH, this.getX() + (double)m, h + 1.0f, this.getZ() + (double)n, lv2.x, lv2.y, lv2.z);
-            ++l;
+        int j = 0;
+        while ((float)j < 1.0f + this.dimensions.width * 20.0f) {
+            double k = (this.random.nextDouble() * 2.0 - 1.0) * (double)this.dimensions.width;
+            double l = (this.random.nextDouble() * 2.0 - 1.0) * (double)this.dimensions.width;
+            this.world.addParticle(ParticleTypes.SPLASH, this.getX() + k, h + 1.0f, this.getZ() + l, lv2.x, lv2.y, lv2.z);
+            ++j;
         }
     }
 
@@ -980,7 +980,7 @@ CommandOutput {
         BlockState lv2 = this.world.getBlockState(lv);
         if (lv2.getRenderType() != BlockRenderType.INVISIBLE) {
             Vec3d lv3 = this.getVelocity();
-            this.world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, lv2), this.getX() + ((double)this.random.nextFloat() - 0.5) * (double)this.dimensions.width, this.getY() + 0.1, this.getZ() + ((double)this.random.nextFloat() - 0.5) * (double)this.dimensions.width, lv3.x * -4.0, 1.5, lv3.z * -4.0);
+            this.world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, lv2), this.getX() + (this.random.nextDouble() - 0.5) * (double)this.dimensions.width, this.getY() + 0.1, this.getZ() + (this.random.nextDouble() - 0.5) * (double)this.dimensions.width, lv3.x * -4.0, 1.5, lv3.z * -4.0);
         }
     }
 
@@ -1036,6 +1036,10 @@ CommandOutput {
         this.pitch = MathHelper.clamp(h, -90.0f, 90.0f) % 360.0f;
         this.prevYaw = this.yaw;
         this.prevPitch = this.pitch;
+    }
+
+    public void method_29495(Vec3d arg) {
+        this.positAfterTeleport(arg.x, arg.y, arg.z);
     }
 
     public void positAfterTeleport(double d, double e, double f) {
@@ -1448,8 +1452,8 @@ CommandOutput {
         return false;
     }
 
-    public boolean interact(PlayerEntity arg, Hand arg2) {
-        return false;
+    public ActionResult interact(PlayerEntity arg, Hand arg2) {
+        return ActionResult.PASS;
     }
 
     @Nullable

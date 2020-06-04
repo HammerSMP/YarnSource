@@ -8,11 +8,9 @@ package net.minecraft.entity.ai.brain.task;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.TargetFinder;
-import net.minecraft.entity.ai.brain.LookTarget;
 import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
@@ -58,12 +56,16 @@ extends Task<MobEntityWithAi> {
     }
 
     private boolean isWalkTargetPresentAndFar(MobEntityWithAi arg) {
+        Vec3d lv3;
         if (!arg.getBrain().hasMemoryModule(MemoryModuleType.WALK_TARGET)) {
             return false;
         }
-        Optional<WalkTarget> optional = arg.getBrain().getOptionalMemory(MemoryModuleType.WALK_TARGET);
-        LookTarget lv = optional.get().getLookTarget();
-        return optional.isPresent() && !lv.getBlockPos().isWithinDistance(this.getPos(arg), (double)this.range);
+        WalkTarget lv = arg.getBrain().getOptionalMemory(MemoryModuleType.WALK_TARGET).get();
+        if (lv.getSpeed() != this.speed) {
+            return false;
+        }
+        Vec3d lv2 = lv.getLookTarget().getPos().subtract(arg.getPos());
+        return lv2.dotProduct(lv3 = this.getPos(arg).subtract(arg.getPos())) < 0.0;
     }
 
     @Override

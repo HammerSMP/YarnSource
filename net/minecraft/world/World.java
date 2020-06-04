@@ -31,9 +31,9 @@ import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.class_5362;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -51,14 +51,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
-import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -546,96 +544,16 @@ AutoCloseable {
         }
     }
 
-    public boolean isAreaNotEmpty(Box arg) {
-        int i = MathHelper.floor(arg.minX);
-        int j = MathHelper.ceil(arg.maxX);
-        int k = MathHelper.floor(arg.minY);
-        int l = MathHelper.ceil(arg.maxY);
-        int m = MathHelper.floor(arg.minZ);
-        int n = MathHelper.ceil(arg.maxZ);
-        BlockPos.Mutable lv = new BlockPos.Mutable();
-        for (int o = i; o < j; ++o) {
-            for (int p = k; p < l; ++p) {
-                for (int q = m; q < n; ++q) {
-                    BlockState lv2 = this.getBlockState(lv.set(o, p, q));
-                    if (lv2.isAir()) continue;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean doesAreaContainFireSource(Box arg) {
-        int n;
-        int i = MathHelper.floor(arg.minX);
-        int j = MathHelper.ceil(arg.maxX);
-        int k = MathHelper.floor(arg.minY);
-        int l = MathHelper.ceil(arg.maxY);
-        int m = MathHelper.floor(arg.minZ);
-        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(arg.maxZ))) {
-            BlockPos.Mutable lv = new BlockPos.Mutable();
-            for (int o = i; o < j; ++o) {
-                for (int p = k; p < l; ++p) {
-                    for (int q = m; q < n; ++q) {
-                        BlockState lv2 = this.getBlockState(lv.set(o, p, q));
-                        if (!lv2.isIn(BlockTags.FIRE) && !lv2.isOf(Blocks.LAVA)) continue;
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    @Nullable
-    @Environment(value=EnvType.CLIENT)
-    public BlockState getBlockState(Box arg, Block arg2) {
-        int n;
-        int i = MathHelper.floor(arg.minX);
-        int j = MathHelper.ceil(arg.maxX);
-        int k = MathHelper.floor(arg.minY);
-        int l = MathHelper.ceil(arg.maxY);
-        int m = MathHelper.floor(arg.minZ);
-        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.ceil(arg.maxZ))) {
-            BlockPos.Mutable lv = new BlockPos.Mutable();
-            for (int o = i; o < j; ++o) {
-                for (int p = k; p < l; ++p) {
-                    for (int q = m; q < n; ++q) {
-                        BlockState lv2 = this.getBlockState(lv.set(o, p, q));
-                        if (!lv2.isOf(arg2)) continue;
-                        return lv2;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public boolean containsBlockWithMaterial(Box arg, Material arg22) {
-        int i = MathHelper.floor(arg.minX);
-        int j = MathHelper.ceil(arg.maxX);
-        int k = MathHelper.floor(arg.minY);
-        int l = MathHelper.ceil(arg.maxY);
-        int m = MathHelper.floor(arg.minZ);
-        int n = MathHelper.ceil(arg.maxZ);
-        MaterialPredicate lv = MaterialPredicate.create(arg22);
-        return BlockPos.stream(i, k, m, j - 1, l - 1, n - 1).anyMatch(arg2 -> lv.test(this.getBlockState((BlockPos)arg2)));
-    }
-
     public Explosion createExplosion(@Nullable Entity arg, double d, double e, double f, float g, Explosion.DestructionType arg2) {
-        return this.createExplosion(arg, null, d, e, f, g, false, arg2);
+        return this.createExplosion(arg, null, null, d, e, f, g, false, arg2);
     }
 
     public Explosion createExplosion(@Nullable Entity arg, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg2) {
-        return this.createExplosion(arg, null, d, e, f, g, bl, arg2);
+        return this.createExplosion(arg, null, null, d, e, f, g, bl, arg2);
     }
 
-    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg3) {
-        Explosion lv = new Explosion(this, arg, d, e, f, g, bl, arg3);
-        if (arg2 != null) {
-            lv.setDamageSource(arg2);
-        }
+    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, @Nullable class_5362 arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
+        Explosion lv = new Explosion(this, arg, arg2, arg3, d, e, f, g, bl, arg4);
         lv.collectBlocksAndDamageEntities();
         lv.affectWorld(true);
         return lv;

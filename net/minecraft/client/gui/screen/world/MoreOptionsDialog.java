@@ -8,7 +8,6 @@
  *  com.google.gson.JsonSyntaxException
  *  com.mojang.serialization.DataResult
  *  com.mojang.serialization.DataResult$PartialResult
- *  com.mojang.serialization.DynamicOps
  *  com.mojang.serialization.JsonOps
  *  com.mojang.serialization.Lifecycle
  *  it.unimi.dsi.fastutil.booleans.BooleanConsumer
@@ -26,7 +25,6 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
@@ -38,9 +36,13 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.class_5317;
+import net.minecraft.class_5352;
+import net.minecraft.class_5382;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
@@ -54,10 +56,19 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.FileResourcePackProvider;
+import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ServerResourceManager;
+import net.minecraft.resource.VanillaDataPackProvider;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -79,24 +90,27 @@ Drawable {
     private ButtonWidget mapTypeButton;
     private ButtonWidget customizeTypeButton;
     private ButtonWidget field_25048;
+    private DimensionTracker.Modifiable field_25483;
     private GeneratorOptions generatorOptions;
     private Optional<class_5317> field_25049;
     private String seedText;
 
     public MoreOptionsDialog() {
+        this.field_25483 = DimensionTracker.create();
         this.generatorOptions = GeneratorOptions.getDefaultOptions();
         this.field_25049 = Optional.of(class_5317.field_25050);
         this.seedText = "";
     }
 
-    public MoreOptionsDialog(GeneratorOptions arg) {
-        this.generatorOptions = arg;
-        this.field_25049 = class_5317.method_29078(arg);
-        this.seedText = Long.toString(arg.getSeed());
+    public MoreOptionsDialog(DimensionTracker.Modifiable arg, GeneratorOptions arg2) {
+        this.field_25483 = arg;
+        this.generatorOptions = arg2;
+        this.field_25049 = class_5317.method_29078(arg2);
+        this.seedText = Long.toString(arg2.getSeed());
     }
 
-    public void method_28092(final CreateWorldScreen arg4, MinecraftClient arg22, TextRenderer arg33) {
-        this.textRenderer = arg33;
+    public void method_28092(final CreateWorldScreen arg4, MinecraftClient arg22, TextRenderer arg32) {
+        this.textRenderer = arg32;
         this.parentWidth = arg4.width;
         this.seedTextField = new TextFieldWidget(this.textRenderer, this.parentWidth / 2 - 100, 60, 200, 20, new TranslatableText("selectWorld.enterSeed"));
         this.seedTextField.setText(this.seedText);
@@ -104,7 +118,9 @@ Drawable {
             this.seedText = this.seedTextField.getText();
         });
         arg4.addChild(this.seedTextField);
-        this.mapFeaturesButton = arg4.addButton(new ButtonWidget(this.parentWidth / 2 - 155, 100, 150, 20, new TranslatableText("selectWorld.mapFeatures"), arg -> {
+        int i = this.parentWidth / 2 - 155;
+        int j = this.parentWidth / 2 + 5;
+        this.mapFeaturesButton = arg4.addButton(new ButtonWidget(i, 100, 150, 20, new TranslatableText("selectWorld.mapFeatures"), arg -> {
             this.generatorOptions = this.generatorOptions.toggleGenerateStructures();
             arg.queueNarration(250);
         }){
@@ -120,7 +136,7 @@ Drawable {
             }
         });
         this.mapFeaturesButton.visible = false;
-        this.mapTypeButton = arg4.addButton(new ButtonWidget(this.parentWidth / 2 + 5, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
+        this.mapTypeButton = arg4.addButton(new ButtonWidget(j, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
             while (this.field_25049.isPresent()) {
                 int i = class_5317.field_25052.indexOf(this.field_25049.get()) + 1;
                 if (i >= class_5317.field_25052.size()) {
@@ -150,14 +166,14 @@ Drawable {
         });
         this.mapTypeButton.visible = false;
         this.mapTypeButton.active = this.field_25049.isPresent();
-        this.customizeTypeButton = arg4.addButton(new ButtonWidget(arg4.width / 2 + 5, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
+        this.customizeTypeButton = arg4.addButton(new ButtonWidget(j, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
             class_5317.class_5293 lv = class_5317.field_25053.get(this.field_25049);
             if (lv != null) {
                 arg22.openScreen(lv.createEditScreen(arg4, this.generatorOptions));
             }
         }));
         this.customizeTypeButton.visible = false;
-        this.bonusItemsButton = arg4.addButton(new ButtonWidget(arg4.width / 2 - 155, 151, 150, 20, new TranslatableText("selectWorld.bonusItems"), arg -> {
+        this.bonusItemsButton = arg4.addButton(new ButtonWidget(i, 151, 150, 20, new TranslatableText("selectWorld.bonusItems"), arg -> {
             this.generatorOptions = this.generatorOptions.toggleBonusChest();
             arg.queueNarration(250);
         }){
@@ -168,38 +184,56 @@ Drawable {
             }
         });
         this.bonusItemsButton.visible = false;
-        this.field_25048 = arg4.addButton(new ButtonWidget(this.parentWidth / 2 - 155, 185, 150, 20, new TranslatableText("selectWorld.import_worldgen_settings"), arg32 -> {
+        this.field_25048 = arg4.addButton(new ButtonWidget(i, 185, 150, 20, new TranslatableText("selectWorld.import_worldgen_settings"), arg3 -> {
             DataResult dataResult3;
+            void lv7;
             TranslatableText lv = new TranslatableText("selectWorld.import_worldgen_settings.select_file");
             String string = TinyFileDialogs.tinyfd_openFileDialog((CharSequence)lv.getString(), null, null, null, (boolean)false);
             if (string == null) {
                 return;
             }
+            DimensionTracker.Modifiable lv2 = DimensionTracker.create();
+            ResourcePackManager<ResourcePackProfile> lv3 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), class_5352.PACK_SOURCE_WORLD));
+            try {
+                MinecraftServer.method_29736(lv3, arg.field_25479, false);
+                CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv3.method_29211(), CommandManager.class_5364.INTEGRATED, 2, Util.getServerWorkerExecutor(), arg22);
+                arg22.runTasks(completableFuture::isDone);
+                ServerResourceManager lv4 = completableFuture.get();
+            }
+            catch (InterruptedException | ExecutionException exception) {
+                field_25046.error("Error loading data packs when importing world settings", (Throwable)exception);
+                TranslatableText lv5 = new TranslatableText("selectWorld.import_worldgen_settings.failure");
+                LiteralText lv6 = new LiteralText(exception.getMessage());
+                arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv5, lv6));
+                lv3.close();
+                return;
+            }
+            class_5382 lv8 = class_5382.method_29753(JsonOps.INSTANCE, lv7.getResourceManager(), lv2);
             JsonParser jsonParser = new JsonParser();
             try (BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(string, new String[0]));){
                 JsonElement jsonElement = jsonParser.parse((Reader)bufferedReader);
-                DataResult dataResult = GeneratorOptions.CODEC.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonElement);
+                DataResult dataResult = GeneratorOptions.CODEC.parse(lv8, (Object)jsonElement);
             }
-            catch (JsonIOException | JsonSyntaxException | IOException exception) {
-                dataResult3 = DataResult.error((String)("Failed to parse file: " + exception.getMessage()));
+            catch (JsonIOException | JsonSyntaxException | IOException exception2) {
+                dataResult3 = DataResult.error((String)("Failed to parse file: " + exception2.getMessage()));
             }
             if (dataResult3.error().isPresent()) {
-                TranslatableText lv2 = new TranslatableText("selectWorld.import_worldgen_settings.failure");
+                TranslatableText lv9 = new TranslatableText("selectWorld.import_worldgen_settings.failure");
                 String string2 = ((DataResult.PartialResult)dataResult3.error().get()).message();
                 field_25046.error("Error parsing world settings: {}", (Object)string2);
-                LiteralText lv3 = new LiteralText(string2);
-                arg22.getToastManager().add(SystemToast.method_29047(SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv2, lv3));
+                LiteralText lv10 = new LiteralText(string2);
+                arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv9, lv10));
             }
             Lifecycle lifecycle = dataResult3.lifecycle();
-            dataResult3.resultOrPartial(((Logger)field_25046)::error).ifPresent(arg3 -> {
+            dataResult3.resultOrPartial(((Logger)field_25046)::error).ifPresent(arg4 -> {
                 BooleanConsumer booleanConsumer = bl -> {
                     arg22.openScreen(arg4);
                     if (bl) {
-                        this.method_29073((GeneratorOptions)arg3);
+                        this.method_29073(lv2, (GeneratorOptions)arg4);
                     }
                 };
                 if (lifecycle == Lifecycle.stable()) {
-                    this.method_29073((GeneratorOptions)arg3);
+                    this.method_29073(lv2, (GeneratorOptions)arg4);
                 } else if (lifecycle == Lifecycle.experimental()) {
                     arg22.openScreen(new ConfirmScreen(booleanConsumer, new TranslatableText("selectWorld.import_worldgen_settings.experimental.title"), new TranslatableText("selectWorld.import_worldgen_settings.experimental.question")));
                 } else {
@@ -210,10 +244,11 @@ Drawable {
         this.field_25048.visible = false;
     }
 
-    private void method_29073(GeneratorOptions arg) {
-        this.generatorOptions = arg;
-        this.field_25049 = class_5317.method_29078(arg);
-        this.seedText = Long.toString(arg.getSeed());
+    private void method_29073(DimensionTracker.Modifiable arg, GeneratorOptions arg2) {
+        this.field_25483 = arg;
+        this.generatorOptions = arg2;
+        this.field_25049 = class_5317.method_29078(arg2);
+        this.seedText = Long.toString(arg2.getSeed());
         this.seedTextField.setText(this.seedText);
         this.mapTypeButton.active = this.field_25049.isPresent();
     }
@@ -281,6 +316,10 @@ Drawable {
             this.field_25048.visible = bl;
         }
         this.seedTextField.setVisible(bl);
+    }
+
+    public DimensionTracker.Modifiable method_29700() {
+        return this.field_25483;
     }
 }
 

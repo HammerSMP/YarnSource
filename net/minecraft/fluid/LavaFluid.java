@@ -59,9 +59,9 @@ extends FlowableFluid {
         BlockPos lv = arg2.up();
         if (arg.getBlockState(lv).isAir() && !arg.getBlockState(lv).isOpaqueFullCube(arg, lv)) {
             if (random.nextInt(100) == 0) {
-                double d = (float)arg2.getX() + random.nextFloat();
-                double e = arg2.getY() + 1;
-                double f = (float)arg2.getZ() + random.nextFloat();
+                double d = (double)arg2.getX() + random.nextDouble();
+                double e = (double)arg2.getY() + 1.0;
+                double f = (double)arg2.getZ() + random.nextDouble();
                 arg.addParticle(ParticleTypes.LAVA, d, e, f, 0.0, 0.0, 0.0);
                 arg.playSound(d, e, f, SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.2f + random.nextFloat() * 0.2f, 0.9f + random.nextFloat() * 0.15f, false);
             }

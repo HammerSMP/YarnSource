@@ -14,6 +14,7 @@ import com.mojang.datafixers.util.Pair;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import net.minecraft.class_5355;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.Durations;
@@ -49,6 +50,7 @@ import net.minecraft.util.math.IntRange;
 
 public class HoglinBrain {
     private static final IntRange AVOID_MEMORY_DURATION = Durations.betweenSeconds(5, 20);
+    private static final IntRange field_25383 = IntRange.between(5, 16);
 
     protected static Brain<?> create(Brain<HoglinEntity> arg) {
         HoglinBrain.addCoreTasks(arg);
@@ -66,7 +68,7 @@ public class HoglinBrain {
     }
 
     private static void addIdleTasks(Brain<HoglinEntity> arg) {
-        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<HoglinEntity>>)ImmutableList.of((Object)new PacifyTask(MemoryModuleType.NEAREST_REPELLENT, 200), (Object)new BreedTask(EntityType.HOGLIN, 0.6f), GoToRememberedPositionTask.toBlock(MemoryModuleType.NEAREST_REPELLENT, 1.0f, 8, true), new UpdateAttackTargetTask<HoglinEntity>(HoglinBrain::getNearestVisibleTargetablePlayer), new ConditionalTask<MobEntityWithAi>(HoglinEntity::isAdult, GoToRememberedPositionTask.toEntity(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, 0.4f, 8, false)), new TimeLimitedTask<LivingEntity>(new FollowMobTask(8.0f), IntRange.between(30, 60)), HoglinBrain.makeRandomWalkTask()));
+        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<HoglinEntity>>)ImmutableList.of((Object)new PacifyTask(MemoryModuleType.NEAREST_REPELLENT, 200), (Object)new BreedTask(EntityType.HOGLIN, 0.6f), GoToRememberedPositionTask.toBlock(MemoryModuleType.NEAREST_REPELLENT, 1.0f, 8, true), new UpdateAttackTargetTask<HoglinEntity>(HoglinBrain::getNearestVisibleTargetablePlayer), new ConditionalTask<MobEntityWithAi>(HoglinEntity::isAdult, GoToRememberedPositionTask.toEntity(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, 0.4f, 8, false)), new TimeLimitedTask<LivingEntity>(new FollowMobTask(8.0f), IntRange.between(30, 60)), new class_5355(field_25383, 0.6f), HoglinBrain.makeRandomWalkTask()));
     }
 
     private static void addFightTasks(Brain<HoglinEntity> arg) {
@@ -74,7 +76,7 @@ public class HoglinBrain {
     }
 
     private static void addAvoidTasks(Brain<HoglinEntity> arg) {
-        arg.setTaskList(Activity.AVOID, 10, (ImmutableList<Task<HoglinEntity>>)ImmutableList.of(GoToRememberedPositionTask.toEntity(MemoryModuleType.AVOID_TARGET, 1.0f, 15, false), HoglinBrain.makeRandomWalkTask(), new TimeLimitedTask<LivingEntity>(new FollowMobTask(8.0f), IntRange.between(30, 60)), new ForgetTask<HoglinEntity>(HoglinBrain::method_25947, MemoryModuleType.AVOID_TARGET)), MemoryModuleType.AVOID_TARGET);
+        arg.setTaskList(Activity.AVOID, 10, (ImmutableList<Task<HoglinEntity>>)ImmutableList.of(GoToRememberedPositionTask.toEntity(MemoryModuleType.AVOID_TARGET, 1.3f, 15, false), HoglinBrain.makeRandomWalkTask(), new TimeLimitedTask<LivingEntity>(new FollowMobTask(8.0f), IntRange.between(30, 60)), new ForgetTask<HoglinEntity>(HoglinBrain::method_25947, MemoryModuleType.AVOID_TARGET)), MemoryModuleType.AVOID_TARGET);
     }
 
     private static RandomTask<HoglinEntity> makeRandomWalkTask() {
@@ -118,6 +120,7 @@ public class HoglinBrain {
 
     private static void avoid(HoglinEntity arg, LivingEntity arg2) {
         arg.getBrain().forget(MemoryModuleType.ATTACK_TARGET);
+        arg.getBrain().forget(MemoryModuleType.WALK_TARGET);
         arg.getBrain().remember(MemoryModuleType.AVOID_TARGET, arg2, AVOID_MEMORY_DURATION.choose(arg.world.random));
     }
 
@@ -186,6 +189,9 @@ public class HoglinBrain {
     }
 
     private static void setAttackTargetIfCloser(HoglinEntity arg, LivingEntity arg2) {
+        if (HoglinBrain.isNearPlayer(arg)) {
+            return;
+        }
         Optional<LivingEntity> optional = arg.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET);
         LivingEntity lv = LookTargetUtil.getCloserEntity((LivingEntity)arg, optional, arg2);
         HoglinBrain.setAttackTarget(arg, lv);

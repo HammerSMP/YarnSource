@@ -3,6 +3,7 @@
  * 
  * Could not load the following classes:
  *  it.unimi.dsi.fastutil.objects.Object2IntMap
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
@@ -10,6 +11,7 @@ package net.minecraft.client.render.model;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -32,6 +34,7 @@ public class BakedModelManager
 extends SinglePreparationResourceReloadListener<ModelLoader>
 implements AutoCloseable {
     private Map<Identifier, BakedModel> models;
+    @Nullable
     private SpriteAtlasManager atlasManager;
     private final BlockModels blockModelCache;
     private final TextureManager textureManager;
@@ -104,7 +107,9 @@ implements AutoCloseable {
 
     @Override
     public void close() {
-        this.atlasManager.close();
+        if (this.atlasManager != null) {
+            this.atlasManager.close();
+        }
     }
 
     public void resetMipmapLevels(int i) {

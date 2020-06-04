@@ -2,7 +2,6 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  it.unimi.dsi.fastutil.ints.Int2ObjectMap
@@ -16,7 +15,6 @@
  */
 package net.minecraft.client.world;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -47,7 +45,6 @@ import net.minecraft.client.world.BiomeColorCache;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
@@ -97,7 +94,6 @@ import net.minecraft.world.level.ColorResolver;
 @Environment(value=EnvType.CLIENT)
 public class ClientWorld
 extends World {
-    private final List<Entity> globalEntities = Lists.newArrayList();
     private final Int2ObjectMap<Entity> regularEntities = new Int2ObjectOpenHashMap();
     private final ClientPlayNetworkHandler netHandler;
     private final WorldRenderer worldRenderer;
@@ -161,41 +157,29 @@ extends World {
     }
 
     public Iterable<Entity> getEntities() {
-        return Iterables.concat((Iterable)this.regularEntities.values(), this.globalEntities);
+        return this.regularEntities.values();
     }
 
     public void tickEntities() {
         Profiler lv = this.getProfiler();
         lv.push("entities");
-        lv.push("global");
-        for (int i = 0; i < this.globalEntities.size(); ++i) {
-            Entity lv2 = this.globalEntities.get(i);
-            this.tickEntity(arg -> {
-                ++arg.age;
-                arg.tick();
-            }, lv2);
-            if (!lv2.removed) continue;
-            this.globalEntities.remove(i--);
-        }
-        lv.swap("regular");
         ObjectIterator objectIterator = this.regularEntities.int2ObjectEntrySet().iterator();
         while (objectIterator.hasNext()) {
             Int2ObjectMap.Entry entry = (Int2ObjectMap.Entry)objectIterator.next();
-            Entity lv3 = (Entity)entry.getValue();
-            if (lv3.hasVehicle()) continue;
+            Entity lv2 = (Entity)entry.getValue();
+            if (lv2.hasVehicle()) continue;
             lv.push("tick");
-            if (!lv3.removed) {
-                this.tickEntity(this::tickEntity, lv3);
+            if (!lv2.removed) {
+                this.tickEntity(this::tickEntity, lv2);
             }
             lv.pop();
             lv.push("remove");
-            if (lv3.removed) {
+            if (lv2.removed) {
                 objectIterator.remove();
-                this.finishRemovingEntity(lv3);
+                this.finishRemovingEntity(lv2);
             }
             lv.pop();
         }
-        lv.pop();
         this.tickBlockEntities();
         lv.pop();
     }
@@ -289,10 +273,6 @@ extends World {
 
     public int getRegularEntityCount() {
         return this.regularEntities.size();
-    }
-
-    public void addLightning(LightningEntity arg) {
-        this.globalEntities.add(arg);
     }
 
     public void addPlayer(int i, AbstractClientPlayerEntity arg) {
@@ -392,7 +372,7 @@ extends World {
         if (!lv.isFullCube(this, arg)) {
             this.getBiome(arg).getParticleConfig().ifPresent(arg2 -> {
                 if (arg2.shouldAddParticle(this.random)) {
-                    this.addParticle(arg2.getParticleType(), (float)arg.getX() + this.random.nextFloat(), (float)arg.getY() + this.random.nextFloat(), (float)arg.getZ() + this.random.nextFloat(), 0.0, 0.0, 0.0);
+                    this.addParticle(arg2.getParticleType(), (double)arg.getX() + this.random.nextDouble(), (double)arg.getY() + this.random.nextDouble(), (double)arg.getZ() + this.random.nextDouble(), 0.0, 0.0, 0.0);
                 }
             });
         }
@@ -472,7 +452,7 @@ extends World {
     @Override
     public void playSound(double d, double e, double f, SoundEvent arg, SoundCategory arg2, float g, float h, boolean bl) {
         double i = this.client.gameRenderer.getCamera().getPos().squaredDistanceTo(d, e, f);
-        PositionedSoundInstance lv = new PositionedSoundInstance(arg, arg2, g, h, (float)d, (float)e, (float)f);
+        PositionedSoundInstance lv = new PositionedSoundInstance(arg, arg2, g, h, d, e, f);
         if (bl && i > 100.0) {
             double j = Math.sqrt(i) / 40.0;
             this.client.getSoundManager().play(lv, (int)(j * 20.0));

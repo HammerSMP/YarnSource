@@ -165,8 +165,8 @@ implements ItemConvertible {
         return false;
     }
 
-    public boolean useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
-        return false;
+    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
+        return ActionResult.PASS;
     }
 
     @Environment(value=EnvType.CLIENT)

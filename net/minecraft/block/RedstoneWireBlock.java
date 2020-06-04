@@ -384,10 +384,10 @@ extends Block {
         }
         float i = 0.4375f;
         float j = f + h * random.nextFloat();
-        float k = 0.5f + 0.4375f * (float)arg4.getOffsetX() + j * (float)arg5.getOffsetX();
-        float l = 0.5f + 0.4375f * (float)arg4.getOffsetY() + j * (float)arg5.getOffsetY();
-        float m = 0.5f + 0.4375f * (float)arg4.getOffsetZ() + j * (float)arg5.getOffsetZ();
-        arg.addParticle(new DustParticleEffect(arg3.getX(), arg3.getY(), arg3.getZ(), 1.0f), (float)arg2.getX() + k, (float)arg2.getY() + l, (float)arg2.getZ() + m, 0.0, 0.0, 0.0);
+        double d = 0.5 + (double)(0.4375f * (float)arg4.getOffsetX()) + (double)(j * (float)arg5.getOffsetX());
+        double e = 0.5 + (double)(0.4375f * (float)arg4.getOffsetY()) + (double)(j * (float)arg5.getOffsetY());
+        double k = 0.5 + (double)(0.4375f * (float)arg4.getOffsetZ()) + (double)(j * (float)arg5.getOffsetZ());
+        arg.addParticle(new DustParticleEffect(arg3.getX(), arg3.getY(), arg3.getZ(), 1.0f), (double)arg2.getX() + d, (double)arg2.getY() + e, (double)arg2.getZ() + k, 0.0, 0.0, 0.0);
     }
 
     @Override

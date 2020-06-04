@@ -11,25 +11,29 @@ package net.minecraft.world.dimension;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
+import java.util.Objects;
+import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.dimension.DimensionType;
 
 public interface DimensionTracker {
+    public <E> Optional<MutableRegistry<E>> method_29726(RegistryKey<Registry<E>> var1);
+
     @Environment(value=EnvType.CLIENT)
     public Registry<DimensionType> getRegistry();
 
-    @Environment(value=EnvType.CLIENT)
     public static Modifiable create() {
         return DimensionType.addDefaults(new Modifiable());
     }
 
     public static final class Modifiable
     implements DimensionTracker {
-        public static final Codec<Modifiable> CODEC = SimpleRegistry.method_29098(Registry.DIMENSION_TYPE_KEY, Lifecycle.experimental(), DimensionType.field_24756).xmap(Modifiable::new, arg -> arg.registry).fieldOf("dimension").codec();
+        public static final Codec<Modifiable> CODEC = SimpleRegistry.method_29098(Registry.DIMENSION_TYPE_KEY, Lifecycle.experimental(), DimensionType.CODEC).xmap(Modifiable::new, arg -> arg.registry).fieldOf("dimension").codec();
         private final SimpleRegistry<DimensionType> registry;
 
         public Modifiable() {
@@ -45,7 +49,14 @@ public interface DimensionTracker {
         }
 
         @Override
-        @Environment(value=EnvType.CLIENT)
+        public <E> Optional<MutableRegistry<E>> method_29726(RegistryKey<Registry<E>> arg) {
+            if (Objects.equals(arg, Registry.DIMENSION_TYPE_KEY)) {
+                return Optional.of(this.registry);
+            }
+            return Optional.empty();
+        }
+
+        @Override
         public Registry<DimensionType> getRegistry() {
             return this.registry;
         }

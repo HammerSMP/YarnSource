@@ -8,6 +8,7 @@
  */
 package net.minecraft.world;
 
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -46,6 +47,19 @@ BiomeAccess.Storage {
 
     default public Biome getBiome(BlockPos arg) {
         return this.getBiomeAccess().getBiome(arg);
+    }
+
+    default public Stream<BlockState> method_29556(Box arg) {
+        int n;
+        int i = MathHelper.floor(arg.minX);
+        int j = MathHelper.floor(arg.maxX);
+        int k = MathHelper.floor(arg.minY);
+        int l = MathHelper.floor(arg.maxY);
+        int m = MathHelper.floor(arg.minZ);
+        if (this.isRegionLoaded(i, k, m, j, l, n = MathHelper.floor(arg.maxZ))) {
+            return this.method_29546(arg);
+        }
+        return Stream.empty();
     }
 
     @Override

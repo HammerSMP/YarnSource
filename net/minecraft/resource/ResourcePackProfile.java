@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5352;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackCompatibility;
 import net.minecraft.resource.metadata.PackResourceMetadata;
@@ -44,6 +45,7 @@ implements AutoCloseable {
     private final InsertionPosition position;
     private final boolean alwaysEnabled;
     private final boolean pinned;
+    private final class_5352 field_25346;
 
     /*
      * Enabled aggressive block sorting
@@ -51,7 +53,7 @@ implements AutoCloseable {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    public static <T extends ResourcePackProfile> T of(String string, boolean bl, Supplier<ResourcePack> supplier, Factory<T> arg, InsertionPosition arg2) {
+    public static <T extends ResourcePackProfile> T of(String string, boolean bl, Supplier<ResourcePack> supplier, class_5351<T> arg, InsertionPosition arg2, class_5352 arg3) {
         try (ResourcePack lv = supplier.get();){
             PackResourceMetadata lv2 = lv.parseMetadata(PackResourceMetadata.READER);
             if (bl && lv2 == null) {
@@ -59,7 +61,7 @@ implements AutoCloseable {
                 lv2 = BROKEN_PACK_META;
             }
             if (lv2 != null) {
-                T t = arg.create(string, bl, supplier, lv, lv2, arg2);
+                T t = arg.create(string, bl, supplier, lv, lv2, arg2, arg3);
                 return t;
             }
             LOGGER.warn("Couldn't find pack meta for pack {}", (Object)string);
@@ -71,7 +73,7 @@ implements AutoCloseable {
         return null;
     }
 
-    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, InsertionPosition arg4, boolean bl2) {
+    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, InsertionPosition arg4, boolean bl2, class_5352 arg5) {
         this.name = string;
         this.packGetter = supplier;
         this.displayName = arg;
@@ -80,10 +82,11 @@ implements AutoCloseable {
         this.alwaysEnabled = bl;
         this.position = arg4;
         this.pinned = bl2;
+        this.field_25346 = arg5;
     }
 
-    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, InsertionPosition arg3) {
-        this(string, bl, supplier, new LiteralText(arg.getName()), arg2.getDescription(), ResourcePackCompatibility.from(arg2.getPackFormat()), arg3, false);
+    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, InsertionPosition arg3, class_5352 arg4) {
+        this(string, bl, supplier, new LiteralText(arg.getName()), arg2.getDescription(), ResourcePackCompatibility.from(arg2.getPackFormat()), arg3, false, arg4);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -97,7 +100,7 @@ implements AutoCloseable {
     }
 
     public Text getInformationText(boolean bl) {
-        return Texts.bracketed(new LiteralText(this.name)).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
+        return Texts.bracketed(this.field_25346.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
     }
 
     public ResourcePackCompatibility getCompatibility() {
@@ -122,6 +125,11 @@ implements AutoCloseable {
 
     public InsertionPosition getInitialPosition() {
         return this.position;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public class_5352 method_29483() {
+        return this.field_25346;
     }
 
     public boolean equals(Object object) {
@@ -173,9 +181,9 @@ implements AutoCloseable {
     }
 
     @FunctionalInterface
-    public static interface Factory<T extends ResourcePackProfile> {
+    public static interface class_5351<T extends ResourcePackProfile> {
         @Nullable
-        public T create(String var1, boolean var2, Supplier<ResourcePack> var3, ResourcePack var4, PackResourceMetadata var5, InsertionPosition var6);
+        public T create(String var1, boolean var2, Supplier<ResourcePack> var3, ResourcePack var4, PackResourceMetadata var5, InsertionPosition var6, class_5352 var7);
     }
 }
 

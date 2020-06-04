@@ -72,6 +72,7 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,9 +90,9 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(LevelStorage.Session arg, ResourcePackManager<ResourcePackProfile> arg2, ServerResourceManager arg3, SaveProperties arg4, ServerPropertiesLoader arg5, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
-        super(arg, arg4, arg2, Proxy.NO_PROXY, dataFixer, arg3, minecraftSessionService, gameProfileRepository, arg6, arg7);
-        this.propertiesLoader = arg5;
+    public MinecraftDedicatedServer(Thread thread, DimensionTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+        super(thread, arg, arg2, arg5, arg3, Proxy.NO_PROXY, dataFixer, arg4, minecraftSessionService, gameProfileRepository, arg7, arg8);
+        this.propertiesLoader = arg6;
         this.rconCommandOutput = new ServerCommandOutput(this);
     }
 

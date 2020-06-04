@@ -111,9 +111,9 @@ extends Block {
         if (lv2.isOpaque() && lv2.isSideSolidFullSquare(arg2, lv, Direction.UP)) {
             return;
         }
-        double d = (float)arg3.getX() + random.nextFloat();
+        double d = (double)arg3.getX() + random.nextDouble();
         double e = (double)arg3.getY() - 0.05;
-        double f = (float)arg3.getZ() + random.nextFloat();
+        double f = (double)arg3.getZ() + random.nextDouble();
         arg2.addParticle(ParticleTypes.DRIPPING_WATER, d, e, f, 0.0, 0.0, 0.0);
     }
 

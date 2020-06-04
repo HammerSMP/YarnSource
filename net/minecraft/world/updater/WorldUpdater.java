@@ -47,7 +47,6 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentStateManager;
-import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.storage.RegionFile;
@@ -58,8 +57,7 @@ import org.apache.logging.log4j.Logger;
 public class WorldUpdater {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final ThreadFactory UPDATE_THREAD_FACTORY = new ThreadFactoryBuilder().setDaemon(true).build();
-    private final String levelName;
-    private final ImmutableSet<RegistryKey<World>> field_24654;
+    private final ImmutableSet<RegistryKey<World>> field_25354;
     private final boolean eraseCache;
     private final LevelStorage.Session field_24083;
     private final Thread updateThread;
@@ -75,13 +73,11 @@ public class WorldUpdater {
     private static final Pattern REGION_FILE_PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
     private final PersistentStateManager persistentStateManager;
 
-    public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, SaveProperties arg2, boolean bl) {
-        this.levelName = arg2.getLevelName();
-        this.field_24654 = (ImmutableSet)arg2.getGeneratorOptions().getDimensionMap().keySet().stream().collect(ImmutableSet.toImmutableSet());
+    public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, ImmutableSet<RegistryKey<World>> immutableSet, boolean bl) {
+        this.field_25354 = immutableSet;
         this.eraseCache = bl;
         this.field_24084 = dataFixer;
         this.field_24083 = arg;
-        arg.method_27425(arg2);
         this.persistentStateManager = new PersistentStateManager(new File(this.field_24083.method_27424(World.OVERWORLD), "data"), dataFixer);
         this.updateThread = UPDATE_THREAD_FACTORY.newThread(this::updateWorld);
         this.updateThread.setUncaughtExceptionHandler((thread, throwable) -> {
@@ -105,7 +101,7 @@ public class WorldUpdater {
     private void updateWorld() {
         this.totalChunkCount = 0;
         ImmutableMap.Builder builder = ImmutableMap.builder();
-        for (RegistryKey lv : this.field_24654) {
+        for (RegistryKey lv : this.field_25354) {
             List<ChunkPos> list = this.getChunkPositions(lv);
             builder.put((Object)lv, list.listIterator());
             this.totalChunkCount += list.size();
@@ -117,7 +113,7 @@ public class WorldUpdater {
         float f = this.totalChunkCount;
         ImmutableMap immutableMap = builder.build();
         ImmutableMap.Builder builder2 = ImmutableMap.builder();
-        for (RegistryKey lv2 : this.field_24654) {
+        for (RegistryKey lv2 : this.field_25354) {
             File file = this.field_24083.method_27424(lv2);
             builder2.put((Object)lv2, (Object)new VersionedChunkStorage(new File(file, "region"), this.field_24084, true));
         }
@@ -127,7 +123,7 @@ public class WorldUpdater {
         while (this.keepUpgradingChunks) {
             boolean bl = false;
             float g = 0.0f;
-            for (RegistryKey lv3 : this.field_24654) {
+            for (RegistryKey lv3 : this.field_25354) {
                 ListIterator listIterator = (ListIterator)immutableMap.get((Object)lv3);
                 VersionedChunkStorage lv4 = (VersionedChunkStorage)immutableMap2.get((Object)lv3);
                 if (listIterator.hasNext()) {
@@ -232,7 +228,7 @@ public class WorldUpdater {
 
     @Environment(value=EnvType.CLIENT)
     public ImmutableSet<RegistryKey<World>> method_28304() {
-        return this.field_24654;
+        return this.field_25354;
     }
 
     @Environment(value=EnvType.CLIENT)

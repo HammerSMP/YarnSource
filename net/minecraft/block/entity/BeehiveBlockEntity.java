@@ -80,7 +80,7 @@ implements Tickable {
                 BeeEntity lv2 = (BeeEntity)lv;
                 if (!(arg.getPos().squaredDistanceTo(lv.getPos()) <= 16.0)) continue;
                 if (!this.isSmoked()) {
-                    lv2.setBeeAttacker(arg);
+                    lv2.setTarget(arg);
                     continue;
                 }
                 lv2.setCannotEnterHiveTicks(400);
@@ -172,10 +172,7 @@ implements Tickable {
                         this.world.setBlockState(this.getPos(), (BlockState)arg2.with(BeehiveBlock.HONEY_LEVEL, i + j));
                     }
                 }
-                int k = arg22.ticksInHive;
-                lv6.growUp(k);
-                lv6.setLoveTicks(Math.max(0, lv6.method_29270() - k));
-                lv6.resetPollinationTicks();
+                this.method_29562(arg22.ticksInHive, lv6);
                 if (list != null) {
                     list.add(lv6);
                 }
@@ -192,6 +189,17 @@ implements Tickable {
         return false;
     }
 
+    private void method_29562(int i, BeeEntity arg) {
+        int j = arg.getBreedingAge();
+        if (j < 0) {
+            arg.setBreedingAge(Math.min(0, j + i));
+        } else if (j > 0) {
+            arg.setBreedingAge(Math.max(0, j - i));
+        }
+        arg.setLoveTicks(Math.max(0, arg.method_29270() - i));
+        arg.resetPollinationTicks();
+    }
+
     private boolean hasFlowerPos() {
         return this.flowerPos != null;
     }
@@ -202,10 +210,11 @@ implements Tickable {
         while (iterator.hasNext()) {
             Bee lv2 = iterator.next();
             if (lv2.ticksInHive > lv2.minOccupationTIcks) {
-                BeeState lv3 = lv2.entityData.getBoolean("HasNectar") ? BeeState.HONEY_DELIVERED : BeeState.BEE_RELEASED;
-                if (!this.releaseBee(lv, lv2, null, lv3)) continue;
-                iterator.remove();
-                continue;
+                BeeState lv3;
+                BeeState beeState = lv3 = lv2.entityData.getBoolean("HasNectar") ? BeeState.HONEY_DELIVERED : BeeState.BEE_RELEASED;
+                if (this.releaseBee(lv, lv2, null, lv3)) {
+                    iterator.remove();
+                }
             }
             lv2.ticksInHive++;
         }

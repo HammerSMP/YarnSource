@@ -12,7 +12,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.StainedGlassBlock;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.TransparentBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.VertexConsumer;
@@ -51,36 +52,48 @@ public class FluidRenderer {
         return lv2.getFluid().matchesType(arg4.getFluid());
     }
 
-    private static boolean isSideCovered(BlockView arg, BlockPos arg2, Direction arg3, float f) {
-        BlockPos lv = arg2.offset(arg3);
-        BlockState lv2 = arg.getBlockState(lv);
-        if (lv2.isOpaque()) {
-            VoxelShape lv3 = VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, f, 1.0);
-            VoxelShape lv4 = lv2.getCullingShape(arg, lv);
-            return VoxelShapes.isSideCovered(lv3, lv4, arg3);
+    private static boolean method_29710(BlockView arg, Direction arg2, float f, BlockPos arg3, BlockState arg4) {
+        if (arg4.isOpaque()) {
+            VoxelShape lv = VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, f, 1.0);
+            VoxelShape lv2 = arg4.getCullingShape(arg, arg3);
+            return VoxelShapes.isSideCovered(lv, lv2, arg2);
         }
         return false;
     }
 
+    private static boolean isSideCovered(BlockView arg, BlockPos arg2, Direction arg3, float f) {
+        BlockPos lv = arg2.offset(arg3);
+        BlockState lv2 = arg.getBlockState(lv);
+        return FluidRenderer.method_29710(arg, arg3, f, lv, lv2);
+    }
+
+    private static boolean method_29709(BlockView arg, BlockPos arg2, BlockState arg3, Direction arg4) {
+        return FluidRenderer.method_29710(arg, arg4.getOpposite(), 1.0f, arg2, arg3);
+    }
+
+    public static boolean method_29708(BlockRenderView arg, BlockPos arg2, FluidState arg3, BlockState arg4, Direction arg5) {
+        return !FluidRenderer.method_29709(arg, arg2, arg4, arg5) && !FluidRenderer.isSameFluid(arg, arg2, arg5, arg3);
+    }
+
     public boolean render(BlockRenderView arg, BlockPos arg2, VertexConsumer arg3, FluidState arg4) {
         float t;
-        boolean bl7;
         boolean bl = arg4.matches(FluidTags.LAVA);
         Sprite[] lvs = bl ? this.lavaSprites : this.waterSprites;
+        BlockState lv = arg.getBlockState(arg2);
         int i = bl ? 0xFFFFFF : BiomeColors.getWaterColor(arg, arg2);
         float f = (float)(i >> 16 & 0xFF) / 255.0f;
         float g = (float)(i >> 8 & 0xFF) / 255.0f;
         float h = (float)(i & 0xFF) / 255.0f;
         boolean bl2 = !FluidRenderer.isSameFluid(arg, arg2, Direction.UP, arg4);
-        boolean bl3 = !FluidRenderer.isSameFluid(arg, arg2, Direction.DOWN, arg4) && !FluidRenderer.isSideCovered(arg, arg2, Direction.DOWN, 0.8888889f);
-        boolean bl4 = !FluidRenderer.isSameFluid(arg, arg2, Direction.NORTH, arg4);
-        boolean bl5 = !FluidRenderer.isSameFluid(arg, arg2, Direction.SOUTH, arg4);
-        boolean bl6 = !FluidRenderer.isSameFluid(arg, arg2, Direction.WEST, arg4);
-        boolean bl8 = bl7 = !FluidRenderer.isSameFluid(arg, arg2, Direction.EAST, arg4);
+        boolean bl3 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.DOWN) && !FluidRenderer.isSideCovered(arg, arg2, Direction.DOWN, 0.8888889f);
+        boolean bl4 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.NORTH);
+        boolean bl5 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.SOUTH);
+        boolean bl6 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.WEST);
+        boolean bl7 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.EAST);
         if (!(bl2 || bl3 || bl7 || bl6 || bl4 || bl5)) {
             return false;
         }
-        boolean bl82 = false;
+        boolean bl8 = false;
         float j = arg.getBrightness(Direction.DOWN, true);
         float k = arg.getBrightness(Direction.UP, true);
         float l = arg.getBrightness(Direction.NORTH, true);
@@ -103,36 +116,36 @@ public class FluidRenderer {
             float ai;
             float ah;
             float ag;
-            bl82 = true;
+            bl8 = true;
             n -= 0.001f;
             o -= 0.001f;
             p -= 0.001f;
             q -= 0.001f;
-            Vec3d lv = arg4.getVelocity(arg, arg2);
-            if (lv.x == 0.0 && lv.z == 0.0) {
-                Sprite lv2 = lvs[0];
-                float u = lv2.getFrameU(0.0);
-                float v = lv2.getFrameV(0.0);
+            Vec3d lv2 = arg4.getVelocity(arg, arg2);
+            if (lv2.x == 0.0 && lv2.z == 0.0) {
+                Sprite lv3 = lvs[0];
+                float u = lv3.getFrameU(0.0);
+                float v = lv3.getFrameV(0.0);
                 float w = u;
-                float x = lv2.getFrameV(16.0);
-                float y = lv2.getFrameU(16.0);
+                float x = lv3.getFrameV(16.0);
+                float y = lv3.getFrameU(16.0);
                 float z = x;
                 float aa = y;
                 float ab = v;
             } else {
-                Sprite lv3 = lvs[1];
-                float ac = (float)MathHelper.atan2(lv.z, lv.x) - 1.5707964f;
+                Sprite lv4 = lvs[1];
+                float ac = (float)MathHelper.atan2(lv2.z, lv2.x) - 1.5707964f;
                 float ad = MathHelper.sin(ac) * 0.25f;
                 float ae = MathHelper.cos(ac) * 0.25f;
                 float af = 8.0f;
-                ag = lv3.getFrameU(8.0f + (-ae - ad) * 16.0f);
-                ah = lv3.getFrameV(8.0f + (-ae + ad) * 16.0f);
-                ai = lv3.getFrameU(8.0f + (-ae + ad) * 16.0f);
-                aj = lv3.getFrameV(8.0f + (ae + ad) * 16.0f);
-                ak = lv3.getFrameU(8.0f + (ae + ad) * 16.0f);
-                al = lv3.getFrameV(8.0f + (ae - ad) * 16.0f);
-                am = lv3.getFrameU(8.0f + (ae - ad) * 16.0f);
-                an = lv3.getFrameV(8.0f + (-ae - ad) * 16.0f);
+                ag = lv4.getFrameU(8.0f + (-ae - ad) * 16.0f);
+                ah = lv4.getFrameV(8.0f + (-ae + ad) * 16.0f);
+                ai = lv4.getFrameU(8.0f + (-ae + ad) * 16.0f);
+                aj = lv4.getFrameV(8.0f + (ae + ad) * 16.0f);
+                ak = lv4.getFrameU(8.0f + (ae + ad) * 16.0f);
+                al = lv4.getFrameV(8.0f + (ae - ad) * 16.0f);
+                am = lv4.getFrameU(8.0f + (ae - ad) * 16.0f);
+                an = lv4.getFrameV(8.0f + (-ae - ad) * 16.0f);
             }
             void ao = (ag + ai + ak + am) / 4.0f;
             void ap = (ah + aj + al + an) / 4.0f;
@@ -175,12 +188,12 @@ public class FluidRenderer {
             this.vertex(arg3, d, e + (double)t, r, bc, bd, be, ax, az, bb);
             this.vertex(arg3, d + 1.0, e + (double)t, r, bc, bd, be, ay, az, bb);
             this.vertex(arg3, d + 1.0, e + (double)t, r + 1.0, bc, bd, be, ay, ba, bb);
-            bl82 = true;
+            bl8 = true;
         }
         for (int bf = 0; bf < 4; ++bf) {
-            Block lv10;
+            Block lv11;
             boolean bl12;
-            Direction lv7;
+            Direction lv8;
             double ce;
             double cd;
             double cc;
@@ -194,7 +207,7 @@ public class FluidRenderer {
                 double bj = d + 1.0;
                 double bk = r + (double)0.001f;
                 double bm = r + (double)0.001f;
-                Direction lv4 = Direction.NORTH;
+                Direction lv5 = Direction.NORTH;
                 boolean bl9 = bl4;
             } else if (bf == 1) {
                 float bn = p;
@@ -203,7 +216,7 @@ public class FluidRenderer {
                 double bq = d;
                 double br = r + 1.0 - (double)0.001f;
                 double bs = r + 1.0 - (double)0.001f;
-                Direction lv5 = Direction.SOUTH;
+                Direction lv6 = Direction.SOUTH;
                 boolean bl10 = bl5;
             } else if (bf == 2) {
                 float bt = o;
@@ -212,7 +225,7 @@ public class FluidRenderer {
                 double bw = d + (double)0.001f;
                 double bx = r + 1.0;
                 double by = r;
-                Direction lv6 = Direction.WEST;
+                Direction lv7 = Direction.WEST;
                 boolean bl11 = bl6;
             } else {
                 bz = q;
@@ -221,22 +234,22 @@ public class FluidRenderer {
                 cc = d + 1.0 - (double)0.001f;
                 cd = r;
                 ce = r + 1.0;
-                lv7 = Direction.EAST;
+                lv8 = Direction.EAST;
                 bl12 = bl7;
             }
-            if (!bl12 || FluidRenderer.isSideCovered(arg, arg2, lv7, Math.max(bz, ca))) continue;
-            bl82 = true;
-            BlockPos lv8 = arg2.offset(lv7);
-            Sprite lv9 = lvs[1];
-            if (!bl && ((lv10 = arg.getBlockState(lv8).getBlock()) == Blocks.GLASS || lv10 instanceof StainedGlassBlock)) {
-                lv9 = this.waterOverlaySprite;
+            if (!bl12 || FluidRenderer.isSideCovered(arg, arg2, lv8, Math.max(bz, ca))) continue;
+            bl8 = true;
+            BlockPos lv9 = arg2.offset(lv8);
+            Sprite lv10 = lvs[1];
+            if (!bl && ((lv11 = arg.getBlockState(lv9).getBlock()) instanceof TransparentBlock || lv11 instanceof LeavesBlock)) {
+                lv10 = this.waterOverlaySprite;
             }
-            float cf = lv9.getFrameU(0.0);
-            float cg = lv9.getFrameU(8.0);
-            float ch = lv9.getFrameV((1.0f - bz) * 16.0f * 0.5f);
-            float ci = lv9.getFrameV((1.0f - ca) * 16.0f * 0.5f);
-            float cj = lv9.getFrameV(8.0);
-            int ck = this.getLight(arg, lv8);
+            float cf = lv10.getFrameU(0.0);
+            float cg = lv10.getFrameU(8.0);
+            float ch = lv10.getFrameV((1.0f - bz) * 16.0f * 0.5f);
+            float ci = lv10.getFrameV((1.0f - ca) * 16.0f * 0.5f);
+            float cj = lv10.getFrameV(8.0);
+            int ck = this.getLight(arg, lv9);
             float cl = bf < 2 ? l : m;
             float cm = k * cl * f;
             float cn = k * cl * g;
@@ -245,13 +258,13 @@ public class FluidRenderer {
             this.vertex(arg3, cc, e + (double)ca, ce, cm, cn, co, cg, ci, ck);
             this.vertex(arg3, cc, e + (double)t, ce, cm, cn, co, cg, cj, ck);
             this.vertex(arg3, cb, e + (double)t, cd, cm, cn, co, cf, cj, ck);
-            if (lv9 == this.waterOverlaySprite) continue;
+            if (lv10 == this.waterOverlaySprite) continue;
             this.vertex(arg3, cb, e + (double)t, cd, cm, cn, co, cf, cj, ck);
             this.vertex(arg3, cc, e + (double)t, ce, cm, cn, co, cg, cj, ck);
             this.vertex(arg3, cc, e + (double)ca, ce, cm, cn, co, cg, ci, ck);
             this.vertex(arg3, cb, e + (double)bz, cd, cm, cn, co, cf, ch, ck);
         }
-        return bl82;
+        return bl8;
     }
 
     private void vertex(VertexConsumer arg, double d, double e, double f, float g, float h, float i, float j, float k, int l) {

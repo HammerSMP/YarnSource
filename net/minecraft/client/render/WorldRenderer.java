@@ -65,6 +65,7 @@ import net.minecraft.client.gl.ShaderEffect;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.CloudRenderMode;
+import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.Option;
 import net.minecraft.client.options.ParticlesOption;
 import net.minecraft.client.particle.Particle;
@@ -279,7 +280,7 @@ AutoCloseable {
         RenderSystem.defaultBlendFunc();
         RenderSystem.defaultAlphaFunc();
         int l = 5;
-        if (this.client.options.fancyGraphics) {
+        if (MinecraftClient.isFancyGraphicsEnabled()) {
             l = 10;
         }
         int m = -1;
@@ -372,7 +373,7 @@ AutoCloseable {
     }
 
     public void method_22713(Camera arg) {
-        float f = this.client.world.getRainGradient(1.0f) / (this.client.options.fancyGraphics ? 1.0f : 2.0f);
+        float f = this.client.world.getRainGradient(1.0f) / (MinecraftClient.isFancyGraphicsEnabled() ? 1.0f : 2.0f);
         if (f <= 0.0f) {
             return;
         }
@@ -389,16 +390,16 @@ AutoCloseable {
             if (lv4.getY() <= 0 || lv4.getY() > lv2.getY() + 10 || lv4.getY() < lv2.getY() - 10 || lv5.getPrecipitation() != Biome.Precipitation.RAIN || !(lv5.getTemperature(lv4) >= 0.15f)) continue;
             lv3 = lv4;
             if (this.client.options.particles == ParticlesOption.MINIMAL) break;
-            float g = random.nextFloat();
-            float h = random.nextFloat();
+            double d = random.nextDouble();
+            double e = random.nextDouble();
             BlockState lv6 = lv.getBlockState((BlockPos)lv3);
             FluidState lv7 = lv.getFluidState((BlockPos)lv3);
             VoxelShape lv8 = lv6.getCollisionShape(lv, (BlockPos)lv3);
-            float m = (float)lv8.getEndingCoord(Direction.Axis.Y, g, h);
-            float n = lv7.getHeight(lv, (BlockPos)lv3);
-            float o = Math.max(m, n);
+            double g = lv8.getEndingCoord(Direction.Axis.Y, d, e);
+            double h = lv7.getHeight(lv, (BlockPos)lv3);
+            double m = Math.max(g, h);
             DefaultParticleType lv9 = lv7.matches(FluidTags.LAVA) || lv6.isOf(Blocks.MAGMA_BLOCK) || CampfireBlock.isLitCampfire(lv6) ? ParticleTypes.SMOKE : ParticleTypes.RAIN;
-            this.client.world.addParticle(lv9, (float)lv3.getX() + g, (float)lv3.getY() + o, (float)lv3.getZ() + h, 0.0, 0.0, 0.0);
+            this.client.world.addParticle(lv9, (double)lv3.getX() + d, (double)lv3.getY() + m, (double)lv3.getZ() + e, 0.0, 0.0, 0.0);
         }
         if (lv3 != null && random.nextInt(3) < this.field_20793++) {
             this.field_20793 = 0;
@@ -427,7 +428,9 @@ AutoCloseable {
         RenderSystem.texParameter(3553, 10243, 10497);
         RenderSystem.bindTexture(0);
         this.loadEntityOutlineShader();
-        this.loadTransparencyShader();
+        if (MinecraftClient.method_29611()) {
+            this.loadTransparencyShader();
+        }
     }
 
     public void loadEntityOutlineShader() {
@@ -453,24 +456,49 @@ AutoCloseable {
     }
 
     private void loadTransparencyShader() {
-        if (this.transparencyShader != null) {
-            this.transparencyShader.close();
-        }
+        this.method_29701();
         Identifier lv = new Identifier("shaders/post/transparency.json");
         try {
-            this.transparencyShader = new ShaderEffect(this.client.getTextureManager(), this.client.getResourceManager(), this.client.getFramebuffer(), lv);
-            this.transparencyShader.setupDimensions(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
-            this.translucentFramebuffer = this.transparencyShader.getSecondaryTarget("translucent");
-            this.entityFramebuffer = this.transparencyShader.getSecondaryTarget("itemEntity");
-            this.particlesFramebuffer = this.transparencyShader.getSecondaryTarget("particles");
-            this.weatherFramebuffer = this.transparencyShader.getSecondaryTarget("weather");
-            this.cloudsFramebuffer = this.transparencyShader.getSecondaryTarget("clouds");
+            ShaderEffect lv2 = new ShaderEffect(this.client.getTextureManager(), this.client.getResourceManager(), this.client.getFramebuffer(), lv);
+            lv2.setupDimensions(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight());
+            Framebuffer lv3 = lv2.getSecondaryTarget("translucent");
+            Framebuffer lv4 = lv2.getSecondaryTarget("itemEntity");
+            Framebuffer lv5 = lv2.getSecondaryTarget("particles");
+            Framebuffer lv6 = lv2.getSecondaryTarget("weather");
+            Framebuffer lv7 = lv2.getSecondaryTarget("clouds");
+            this.transparencyShader = lv2;
+            this.translucentFramebuffer = lv3;
+            this.entityFramebuffer = lv4;
+            this.particlesFramebuffer = lv5;
+            this.weatherFramebuffer = lv6;
+            this.cloudsFramebuffer = lv7;
         }
         catch (IOException iOException) {
+            GameOptions lv8 = MinecraftClient.getInstance().options;
+            lv8.field_25444 = lv8.field_25444.method_29596();
             throw new class_5347("Failed to load shader: " + lv, iOException);
         }
         catch (JsonSyntaxException jsonSyntaxException) {
+            GameOptions lv9 = MinecraftClient.getInstance().options;
+            lv9.field_25444 = lv9.field_25444.method_29596();
             throw new class_5347("Failed to parse shader: " + lv, jsonSyntaxException);
+        }
+    }
+
+    private void method_29701() {
+        if (this.transparencyShader != null) {
+            this.transparencyShader.close();
+            this.translucentFramebuffer.delete();
+            this.entityFramebuffer.delete();
+            this.particlesFramebuffer.delete();
+            this.weatherFramebuffer.delete();
+            this.cloudsFramebuffer.delete();
+            this.transparencyShader = null;
+            this.translucentFramebuffer = null;
+            this.entityFramebuffer = null;
+            this.particlesFramebuffer = null;
+            this.weatherFramebuffer = null;
+            this.cloudsFramebuffer = null;
         }
     }
 
@@ -618,6 +646,11 @@ AutoCloseable {
         if (this.world == null) {
             return;
         }
+        if (MinecraftClient.method_29611()) {
+            this.loadTransparencyShader();
+        } else {
+            this.method_29701();
+        }
         this.world.reloadColor();
         if (this.chunkBuilder == null) {
             this.chunkBuilder = new ChunkBuilder(this.world, this, Util.getServerWorkerExecutor(), this.client.is64Bit(), this.bufferBuilders.getBlockBufferBuilders());
@@ -626,7 +659,7 @@ AutoCloseable {
         }
         this.needsTerrainUpdate = true;
         this.cloudsDirty = true;
-        RenderLayers.setFancyGraphics(this.client.options.fancyGraphics);
+        RenderLayers.setFancyGraphics(MinecraftClient.isFancyGraphicsEnabled());
         this.renderDistance = this.client.options.viewDistance;
         if (this.chunks != null) {
             this.chunks.clear();
@@ -893,6 +926,9 @@ AutoCloseable {
             this.entityFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             this.client.getFramebuffer().beginWrite(false);
         }
+        if (this.weatherFramebuffer != null) {
+            this.weatherFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
+        }
         if (this.canDrawEntityOutlines()) {
             this.entityOutlinesFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.client.getFramebuffer().beginWrite(false);
@@ -1018,53 +1054,51 @@ AutoCloseable {
         this.bufferBuilders.getEffectVertexConsumers().draw();
         lv6.draw(RenderLayer.getLines());
         lv6.draw();
-        lv.swap("translucent");
-        if (this.translucentFramebuffer != null) {
+        if (this.transparencyShader != null) {
             this.translucentFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.translucentFramebuffer.copyDepthFrom(this.client.getFramebuffer());
-        }
-        this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
-        lv.swap("particles");
-        if (this.particlesFramebuffer != null) {
+            lv.swap("translucent");
+            this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
             this.particlesFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.particlesFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             RenderPhase.PARTICLES_TARGET.startDrawing();
-        }
-        this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
-        if (this.particlesFramebuffer != null) {
+            lv.swap("particles");
+            this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
             RenderPhase.PARTICLES_TARGET.endDrawing();
+        } else {
+            lv.swap("translucent");
+            this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
+            lv.swap("particles");
+            this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
         }
         RenderSystem.pushMatrix();
         RenderSystem.multMatrix(arg.peek().getModel());
-        lv.swap("cloudsLayers");
         if (this.client.options.getCloudRenderMode() != CloudRenderMode.OFF) {
-            lv.swap("clouds");
-            if (this.cloudsFramebuffer != null) {
+            if (this.transparencyShader != null) {
                 this.cloudsFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
                 RenderPhase.CLOUDS_TARGET.startDrawing();
-            }
-            this.renderClouds(arg, f, d, e, g);
-            if (this.cloudsFramebuffer != null) {
+                lv.swap("clouds");
+                this.renderClouds(arg, f, d, e, g);
                 RenderPhase.CLOUDS_TARGET.endDrawing();
+            } else {
+                lv.swap("clouds");
+                this.renderClouds(arg, f, d, e, g);
             }
-        }
-        lv.swap("weather");
-        if (this.weatherFramebuffer != null) {
-            this.weatherFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
-            RenderPhase.WEATHER_TARGET.startDrawing();
-        } else {
-            RenderSystem.depthMask(false);
-        }
-        this.renderWeather(arg4, f, d, e, g);
-        this.renderWorldBorder(arg2);
-        if (this.weatherFramebuffer != null) {
-            RenderPhase.WEATHER_TARGET.endDrawing();
-        } else {
-            RenderSystem.depthMask(true);
         }
         if (this.transparencyShader != null) {
+            RenderPhase.WEATHER_TARGET.startDrawing();
+            lv.swap("weather");
+            this.renderWeather(arg4, f, d, e, g);
+            this.renderWorldBorder(arg2);
+            RenderPhase.WEATHER_TARGET.endDrawing();
             this.transparencyShader.render(f);
             this.client.getFramebuffer().beginWrite(false);
+        } else {
+            RenderSystem.depthMask(false);
+            lv.swap("weather");
+            this.renderWeather(arg4, f, d, e, g);
+            this.renderWorldBorder(arg2);
+            RenderSystem.depthMask(true);
         }
         this.renderChunkDebugInfo(arg2);
         RenderSystem.shadeModel(7424);
@@ -2127,7 +2161,7 @@ AutoCloseable {
                     lv3.setColor(ac * al, ad * al, ae * al);
                     lv3.move((float)ag);
                 }
-                this.world.playSound(arg2, SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.NEUTRAL, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.NEUTRAL, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 2001: {
@@ -2141,9 +2175,9 @@ AutoCloseable {
             }
             case 2004: {
                 for (int am = 0; am < 20; ++am) {
-                    double an = (double)arg2.getX() + 0.5 + ((double)this.world.random.nextFloat() - 0.5) * 2.0;
-                    double ao = (double)arg2.getY() + 0.5 + ((double)this.world.random.nextFloat() - 0.5) * 2.0;
-                    double ap = (double)arg2.getZ() + 0.5 + ((double)this.world.random.nextFloat() - 0.5) * 2.0;
+                    double an = (double)arg2.getX() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
+                    double ao = (double)arg2.getY() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
+                    double ap = (double)arg2.getZ() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
                     this.world.addParticle(ParticleTypes.SMOKE, an, ao, ap, 0.0, 0.0, 0.0);
                     this.world.addParticle(ParticleTypes.FLAME, an, ao, ap, 0.0, 0.0, 0.0);
                 }
@@ -2162,14 +2196,14 @@ AutoCloseable {
                 break;
             }
             case 1501: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (this.world.getRandom().nextFloat() - this.world.getRandom().nextFloat()) * 0.8f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (random.nextFloat() - random.nextFloat()) * 0.8f, false);
                 for (int aq = 0; aq < 8; ++aq) {
-                    this.world.addParticle(ParticleTypes.LARGE_SMOKE, (double)arg2.getX() + Math.random(), (double)arg2.getY() + 1.2, (double)arg2.getZ() + Math.random(), 0.0, 0.0, 0.0);
+                    this.world.addParticle(ParticleTypes.LARGE_SMOKE, (double)arg2.getX() + random.nextDouble(), (double)arg2.getY() + 1.2, (double)arg2.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
                 }
                 break;
             }
             case 1502: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.5f, 2.6f + (this.world.random.nextFloat() - this.world.random.nextFloat()) * 0.8f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.5f, 2.6f + (random.nextFloat() - random.nextFloat()) * 0.8f, false);
                 for (int ar = 0; ar < 5; ++ar) {
                     double as = (double)arg2.getX() + random.nextDouble() * 0.6 + 0.2;
                     double at = (double)arg2.getY() + random.nextDouble() * 0.6 + 0.2;
@@ -2181,75 +2215,72 @@ AutoCloseable {
             case 1503: {
                 this.world.playSound(arg2, SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
                 for (int av = 0; av < 16; ++av) {
-                    double aw = (float)arg2.getX() + (5.0f + random.nextFloat() * 6.0f) / 16.0f;
-                    double ax = (float)arg2.getY() + 0.8125f;
-                    double ay = (float)arg2.getZ() + (5.0f + random.nextFloat() * 6.0f) / 16.0f;
-                    double az = 0.0;
-                    double ba = 0.0;
-                    double bb = 0.0;
+                    double aw = (double)arg2.getX() + (5.0 + random.nextDouble() * 6.0) / 16.0;
+                    double ax = (double)arg2.getY() + 0.8125;
+                    double ay = (double)arg2.getZ() + (5.0 + random.nextDouble() * 6.0) / 16.0;
                     this.world.addParticle(ParticleTypes.SMOKE, aw, ax, ay, 0.0, 0.0, 0.0);
                 }
                 break;
             }
             case 2006: {
-                for (int bc = 0; bc < 200; ++bc) {
-                    float bd = random.nextFloat() * 4.0f;
-                    float be = random.nextFloat() * ((float)Math.PI * 2);
-                    double bf = MathHelper.cos(be) * bd;
-                    double bg = 0.01 + random.nextDouble() * 0.5;
-                    double bh = MathHelper.sin(be) * bd;
-                    Particle lv6 = this.spawnParticle(ParticleTypes.DRAGON_BREATH, false, (double)arg2.getX() + bf * 0.1, (double)arg2.getY() + 0.3, (double)arg2.getZ() + bh * 0.1, bf, bg, bh);
+                for (int az = 0; az < 200; ++az) {
+                    float ba = random.nextFloat() * 4.0f;
+                    float bb = random.nextFloat() * ((float)Math.PI * 2);
+                    double bc = MathHelper.cos(bb) * ba;
+                    double bd = 0.01 + random.nextDouble() * 0.5;
+                    double be = MathHelper.sin(bb) * ba;
+                    Particle lv6 = this.spawnParticle(ParticleTypes.DRAGON_BREATH, false, (double)arg2.getX() + bc * 0.1, (double)arg2.getY() + 0.3, (double)arg2.getZ() + be * 0.1, bc, bd, be);
                     if (lv6 == null) continue;
-                    lv6.move(bd);
+                    lv6.move(ba);
                 }
                 if (j != 1) break;
-                this.world.playSound(arg2, SoundEvents.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 2009: {
-                for (int bi = 0; bi < 8; ++bi) {
-                    this.world.addParticle(ParticleTypes.CLOUD, (double)arg2.getX() + Math.random(), (double)arg2.getY() + 1.2, (double)arg2.getZ() + Math.random(), 0.0, 0.0, 0.0);
+                for (int bf = 0; bf < 8; ++bf) {
+                    this.world.addParticle(ParticleTypes.CLOUD, (double)arg2.getX() + random.nextDouble(), (double)arg2.getY() + 1.2, (double)arg2.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
                 }
                 break;
             }
             case 1012: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_DOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_DOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1036: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1013: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1014: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_FENCE_GATE_CLOSE, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_FENCE_GATE_CLOSE, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1011: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_DOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_DOOR_CLOSE, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1006: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_DOOR_OPEN, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_DOOR_OPEN, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1007: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1037: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1008: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_FENCE_GATE_OPEN, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_FENCE_GATE_OPEN, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1005: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_DOOR_OPEN, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_IRON_DOOR_OPEN, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1009: {
@@ -2257,11 +2288,11 @@ AutoCloseable {
                 break;
             }
             case 1029: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1030: {
-                this.world.playSound(arg2, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1.0f, this.world.random.nextFloat() * 0.1f + 0.9f, false);
+                this.world.playSound(arg2, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 1044: {

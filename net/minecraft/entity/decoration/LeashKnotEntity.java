@@ -24,6 +24,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -96,9 +97,9 @@ extends AbstractDecorationEntity {
     }
 
     @Override
-    public boolean interact(PlayerEntity arg, Hand arg2) {
+    public ActionResult interact(PlayerEntity arg, Hand arg2) {
         if (this.world.isClient) {
-            return true;
+            return ActionResult.SUCCESS;
         }
         boolean bl = false;
         double d = 7.0;
@@ -117,7 +118,7 @@ extends AbstractDecorationEntity {
                 }
             }
         }
-        return true;
+        return ActionResult.CONSUME;
     }
 
     @Override

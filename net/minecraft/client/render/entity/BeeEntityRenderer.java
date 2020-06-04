@@ -29,7 +29,7 @@ extends MobEntityRenderer<BeeEntity, BeeEntityModel<BeeEntity>> {
 
     @Override
     public Identifier getTexture(BeeEntity arg) {
-        if (arg.isAngry()) {
+        if (arg.method_29511()) {
             if (arg.hasNectar()) {
                 return ANGRY_NECTAR_TEXTURE;
             }

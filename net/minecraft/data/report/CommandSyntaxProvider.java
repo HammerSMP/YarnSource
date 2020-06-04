@@ -34,7 +34,7 @@ implements DataProvider {
     @Override
     public void run(DataCache arg) throws IOException {
         Path path = this.root.getOutput().resolve("reports/commands.json");
-        CommandDispatcher<ServerCommandSource> commandDispatcher = new CommandManager(true).getDispatcher();
+        CommandDispatcher<ServerCommandSource> commandDispatcher = new CommandManager(CommandManager.class_5364.ALL).getDispatcher();
         DataProvider.writeToPath(GSON, arg, (JsonElement)ArgumentTypes.toJson(commandDispatcher, commandDispatcher.getRoot()), path);
     }
 

@@ -63,6 +63,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.ItemTags;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -238,7 +239,7 @@ extends WaterCreatureEntity {
     protected void loot(ItemEntity arg) {
         ItemStack lv;
         if (this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty() && this.canPickupItem(lv = arg.getStack())) {
-            this.method_27964(arg);
+            this.method_29499(arg);
             this.equipStack(EquipmentSlot.MAINHAND, lv);
             this.handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2.0f;
             this.sendPickup(arg, lv.getCount());
@@ -299,7 +300,7 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected boolean interactMob(PlayerEntity arg, Hand arg2) {
+    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         if (!lv.isEmpty() && lv.getItem().isIn(ItemTags.FISHES)) {
             if (!this.world.isClient) {
@@ -309,7 +310,7 @@ extends WaterCreatureEntity {
             if (!arg.abilities.creativeMode) {
                 lv.decrement(1);
             }
-            return true;
+            return ActionResult.method_29236(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

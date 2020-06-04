@@ -68,6 +68,7 @@ extends ExplosiveProjectileEntity {
 
     @Override
     protected void onEntityHit(EntityHitResult arg) {
+        boolean bl2;
         super.onEntityHit(arg);
         if (this.world.isClient) {
             return;
@@ -76,7 +77,8 @@ extends ExplosiveProjectileEntity {
         Entity lv2 = this.getOwner();
         if (lv2 instanceof LivingEntity) {
             LivingEntity lv3 = (LivingEntity)lv2;
-            if (lv.damage(DamageSource.method_29238(this, lv3), 8.0f)) {
+            boolean bl = lv.damage(DamageSource.method_29238(this, lv3), 8.0f);
+            if (bl) {
                 if (lv.isAlive()) {
                     this.dealDamage(lv3, lv);
                 } else {
@@ -84,9 +86,9 @@ extends ExplosiveProjectileEntity {
                 }
             }
         } else {
-            lv.damage(DamageSource.MAGIC, 5.0f);
+            bl2 = lv.damage(DamageSource.MAGIC, 5.0f);
         }
-        if (lv instanceof LivingEntity) {
+        if (bl2 && lv instanceof LivingEntity) {
             int i = 0;
             if (this.world.getDifficulty() == Difficulty.NORMAL) {
                 i = 10;

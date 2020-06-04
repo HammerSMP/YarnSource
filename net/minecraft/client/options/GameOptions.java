@@ -46,6 +46,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5365;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.AoOption;
 import net.minecraft.client.options.AttackIndicator;
@@ -84,7 +85,7 @@ public class GameOptions {
     public float entityDistanceScaling = 1.0f;
     public int maxFps = 120;
     public CloudRenderMode cloudRenderMode = CloudRenderMode.FANCY;
-    public boolean fancyGraphics = true;
+    public class_5365 field_25444 = class_5365.FANCY;
     public AoOption ao = AoOption.MAX;
     public List<String> resourcePacks = Lists.newArrayList();
     public List<String> incompatibleResourcePacks = Lists.newArrayList();
@@ -248,6 +249,9 @@ public class GameOptions {
                 }
             }
             CompoundTag lv2 = this.update(lv);
+            if (!lv2.contains("graphicsMode") && lv2.contains("fancyGraphics")) {
+                this.field_25444 = "true".equals(lv2.getString("fancyGraphics")) ? class_5365.FANCY : class_5365.FAST;
+            }
             for (String string2 : lv2.getKeys()) {
                 String string22 = lv2.getString(string2);
                 try {
@@ -338,8 +342,8 @@ public class GameOptions {
                     if ("difficulty".equals(string2)) {
                         this.difficulty = Difficulty.byOrdinal(Integer.parseInt(string22));
                     }
-                    if ("fancyGraphics".equals(string2)) {
-                        this.fancyGraphics = "true".equals(string22);
+                    if ("graphicsMode".equals(string2)) {
+                        this.field_25444 = class_5365.method_29592(Integer.parseInt(string22));
                     }
                     if ("tutorialStep".equals(string2)) {
                         this.tutorialStep = TutorialStep.byName(string22);
@@ -531,7 +535,7 @@ public class GameOptions {
             printWriter.println("particles:" + this.particles.getId());
             printWriter.println("maxFps:" + this.maxFps);
             printWriter.println("difficulty:" + this.difficulty.getId());
-            printWriter.println("fancyGraphics:" + this.fancyGraphics);
+            printWriter.println("graphicsMode:" + this.field_25444.method_29591());
             printWriter.println("ao:" + this.ao.getValue());
             printWriter.println("biomeBlendRadius:" + this.biomeBlendRadius);
             switch (this.cloudRenderMode) {

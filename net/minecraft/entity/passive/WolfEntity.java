@@ -14,11 +14,13 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5354;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.Durations;
 import net.minecraft.entity.ai.goal.AnimalMateGoal;
 import net.minecraft.entity.ai.goal.AttackWithOwnerGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
@@ -57,22 +59,25 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.SpawnEggItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.IntRange;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class WolfEntity
-extends TameableEntity {
+extends TameableEntity
+implements class_5354 {
     private static final TrackedData<Boolean> BEGGING = DataTracker.registerData(WolfEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> COLLAR_COLOR = DataTracker.registerData(WolfEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Integer> field_25373 = DataTracker.registerData(WolfEntity.class, TrackedDataHandlerRegistry.INTEGER);
     public static final Predicate<LivingEntity> FOLLOW_TAMED_PREDICATE = arg -> {
         EntityType<?> lv = arg.getType();
         return lv == EntityType.SHEEP || lv == EntityType.RABBIT || lv == EntityType.FOX;
@@ -83,6 +88,8 @@ extends TameableEntity {
     private boolean canShakeWaterOff;
     private float shakeProgress;
     private float lastShakeProgress;
+    private static final IntRange field_25371 = Durations.betweenSeconds(20, 39);
+    private UUID field_25372;
 
     public WolfEntity(EntityType<? extends WolfEntity> arg, World arg2) {
         super((EntityType<? extends TameableEntity>)arg, arg2);
@@ -105,9 +112,10 @@ extends TameableEntity {
         this.targetSelector.add(1, new TrackOwnerAttackerGoal(this));
         this.targetSelector.add(2, new AttackWithOwnerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, new Class[0]).setGroupRevenge(new Class[0]));
-        this.targetSelector.add(4, new FollowTargetIfTamedGoal<AnimalEntity>(this, AnimalEntity.class, false, FOLLOW_TAMED_PREDICATE));
-        this.targetSelector.add(4, new FollowTargetIfTamedGoal<TurtleEntity>(this, TurtleEntity.class, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
-        this.targetSelector.add(5, new FollowTargetGoal<AbstractSkeletonEntity>((MobEntity)this, AbstractSkeletonEntity.class, false));
+        this.targetSelector.add(4, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::method_29515));
+        this.targetSelector.add(5, new FollowTargetIfTamedGoal<AnimalEntity>(this, AnimalEntity.class, false, FOLLOW_TAMED_PREDICATE));
+        this.targetSelector.add(6, new FollowTargetIfTamedGoal<TurtleEntity>(this, TurtleEntity.class, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
+        this.targetSelector.add(7, new FollowTargetGoal<AbstractSkeletonEntity>((MobEntity)this, AbstractSkeletonEntity.class, false));
     }
 
     public static DefaultAttributeContainer.Builder createWolfAttributes() {
@@ -115,20 +123,11 @@ extends TameableEntity {
     }
 
     @Override
-    public void setTarget(@Nullable LivingEntity arg) {
-        super.setTarget(arg);
-        if (arg == null) {
-            this.setAngry(false);
-        } else if (!this.isTamed()) {
-            this.setAngry(true);
-        }
-    }
-
-    @Override
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(BEGGING, false);
         this.dataTracker.startTracking(COLLAR_COLOR, DyeColor.RED.getId());
+        this.dataTracker.startTracking(field_25373, 0);
     }
 
     @Override
@@ -139,22 +138,22 @@ extends TameableEntity {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        arg.putBoolean("Angry", this.isAngry());
         arg.putByte("CollarColor", (byte)this.getCollarColor().getId());
+        this.method_29517(arg);
     }
 
     @Override
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
-        this.setAngry(arg.getBoolean("Angry"));
         if (arg.contains("CollarColor", 99)) {
             this.setCollarColor(DyeColor.byId(arg.getInt("CollarColor")));
         }
+        this.method_29512(this.world, arg);
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        if (this.isAngry()) {
+        if (this.method_29511()) {
             return SoundEvents.ENTITY_WOLF_GROWL;
         }
         if (this.random.nextInt(3) == 0) {
@@ -190,8 +189,8 @@ extends TameableEntity {
             this.lastShakeProgress = 0.0f;
             this.world.sendEntityStatus(this, (byte)8);
         }
-        if (!this.world.isClient && this.getTarget() == null && this.isAngry()) {
-            this.setAngry(false);
+        if (!this.world.isClient) {
+            this.method_29510();
         }
     }
 
@@ -320,18 +319,12 @@ extends TameableEntity {
      * Lifted jumps to return sites
      */
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         ItemStack lv = arg.getStackInHand(arg2);
         Item lv2 = lv.getItem();
-        if (lv.getItem() instanceof SpawnEggItem) {
-            return super.interactMob(arg, arg2);
-        }
         if (this.world.isClient) {
-            if (this.isOwner(arg)) return true;
-            if (lv2 != Items.BONE) return false;
-            if (this.isTamed()) return false;
-            if (this.isAngry()) return false;
-            return true;
+            boolean bl = this.isOwner(arg) || this.isTamed() || lv2 == Items.BONE && !this.isTamed() && !this.method_29511();
+            return bl ? ActionResult.CONSUME : ActionResult.PASS;
         }
         if (this.isTamed()) {
             if (this.isBreedingItem(lv) && this.getHealth() < this.getMaxHealth()) {
@@ -339,30 +332,25 @@ extends TameableEntity {
                     lv.decrement(1);
                 }
                 this.heal(lv2.getFoodComponent().getHunger());
-                return true;
+                return ActionResult.SUCCESS;
             }
             if (lv2 instanceof DyeItem) {
                 DyeColor lv3 = ((DyeItem)lv2).getColor();
                 if (lv3 == this.getCollarColor()) return super.interactMob(arg, arg2);
                 this.setCollarColor(lv3);
-                if (arg.abilities.creativeMode) return true;
+                if (arg.abilities.creativeMode) return ActionResult.SUCCESS;
                 lv.decrement(1);
-                return true;
+                return ActionResult.SUCCESS;
             }
-            boolean bl = super.interactMob(arg, arg2);
-            if (bl) {
-                if (!this.isBaby()) return bl;
-            }
-            if (!this.isOwner(arg)) return bl;
-            if (this.isBreedingItem(lv)) return bl;
+            ActionResult lv4 = super.interactMob(arg, arg2);
+            if (lv4.isAccepted() && !this.isBaby() || !this.isOwner(arg)) return lv4;
             this.setSitting(!this.isSitting());
             this.jumping = false;
             this.navigation.stop();
             this.setTarget(null);
-            return bl;
+            return ActionResult.SUCCESS;
         }
-        if (lv2 != Items.BONE) return super.interactMob(arg, arg2);
-        if (this.isAngry()) return super.interactMob(arg, arg2);
+        if (lv2 != Items.BONE || this.method_29511()) return super.interactMob(arg, arg2);
         if (!arg.abilities.creativeMode) {
             lv.decrement(1);
         }
@@ -372,11 +360,11 @@ extends TameableEntity {
             this.setTarget(null);
             this.setSitting(true);
             this.world.sendEntityStatus(this, (byte)7);
-            return true;
+            return ActionResult.SUCCESS;
         } else {
             this.world.sendEntityStatus(this, (byte)6);
         }
-        return true;
+        return ActionResult.SUCCESS;
     }
 
     @Override
@@ -393,7 +381,7 @@ extends TameableEntity {
 
     @Environment(value=EnvType.CLIENT)
     public float getTailAngle() {
-        if (this.isAngry()) {
+        if (this.method_29511()) {
             return 1.5393804f;
         }
         if (this.isTamed()) {
@@ -413,17 +401,30 @@ extends TameableEntity {
         return 8;
     }
 
-    public boolean isAngry() {
-        return ((Byte)this.dataTracker.get(TAMEABLE_FLAGS) & 2) != 0;
+    @Override
+    public int method_29507() {
+        return this.dataTracker.get(field_25373);
     }
 
-    public void setAngry(boolean bl) {
-        byte b = (Byte)this.dataTracker.get(TAMEABLE_FLAGS);
-        if (bl) {
-            this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 2));
-        } else {
-            this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & 0xFFFFFFFD));
-        }
+    @Override
+    public void method_29514(int i) {
+        this.dataTracker.set(field_25373, i);
+    }
+
+    @Override
+    public void method_29509() {
+        this.method_29514(field_25371.choose(this.random));
+    }
+
+    @Override
+    @Nullable
+    public UUID method_29508() {
+        return this.field_25372;
+    }
+
+    @Override
+    public void method_29513(@Nullable UUID uUID) {
+        this.field_25372 = uUID;
     }
 
     public DyeColor getCollarColor() {
@@ -494,7 +495,7 @@ extends TameableEntity {
 
     @Override
     public boolean canBeLeashedBy(PlayerEntity arg) {
-        return !this.isAngry() && super.canBeLeashedBy(arg);
+        return !this.method_29511() && super.canBeLeashedBy(arg);
     }
 
     @Override

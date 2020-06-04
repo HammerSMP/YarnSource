@@ -5,8 +5,9 @@ package net.minecraft.resource;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
+import net.minecraft.class_5352;
 import net.minecraft.resource.DirectoryResourcePack;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
@@ -21,13 +22,15 @@ implements ResourcePackProvider {
         return bl || bl2;
     };
     private final File packsFolder;
+    private final class_5352 field_25345;
 
-    public FileResourcePackProvider(File file) {
+    public FileResourcePackProvider(File file, class_5352 arg) {
         this.packsFolder = file;
+        this.field_25345 = arg;
     }
 
     @Override
-    public <T extends ResourcePackProfile> void register(Map<String, T> map, ResourcePackProfile.Factory<T> arg) {
+    public <T extends ResourcePackProfile> void register(Consumer<T> consumer, ResourcePackProfile.class_5351<T> arg) {
         File[] files;
         if (!this.packsFolder.isDirectory()) {
             this.packsFolder.mkdirs();
@@ -37,9 +40,9 @@ implements ResourcePackProvider {
         }
         for (File file : files) {
             String string = "file/" + file.getName();
-            T lv = ResourcePackProfile.of(string, false, this.createResourcePack(file), arg, ResourcePackProfile.InsertionPosition.TOP);
+            T lv = ResourcePackProfile.of(string, false, this.createResourcePack(file), arg, ResourcePackProfile.InsertionPosition.TOP, this.field_25345);
             if (lv == null) continue;
-            map.put(string, lv);
+            consumer.accept(lv);
         }
     }
 

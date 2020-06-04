@@ -43,6 +43,7 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.SaveProperties;
+import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,8 +58,8 @@ extends MinecraftServer {
     private LanServerPinger lanPinger;
     private UUID localPlayerUuid;
 
-    public IntegratedServer(MinecraftClient arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
-        super(arg2, arg5, arg3, arg.getNetworkProxy(), arg.getDataFixer(), arg4, minecraftSessionService, gameProfileRepository, arg6, arg7);
+    public IntegratedServer(Thread thread, MinecraftClient arg, DimensionTracker.Modifiable arg2, LevelStorage.Session arg3, ResourcePackManager<ResourcePackProfile> arg4, ServerResourceManager arg5, SaveProperties arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+        super(thread, arg2, arg3, arg6, arg4, arg.getNetworkProxy(), arg.getDataFixer(), arg5, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.setServerName(arg.getSession().getUsername());
         this.setDemo(arg.isDemo());
         this.setWorldHeight(256);

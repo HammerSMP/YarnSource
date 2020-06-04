@@ -59,6 +59,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -244,12 +245,15 @@ implements Shearable {
     }
 
     @Override
-    public boolean interactMob(PlayerEntity arg, Hand arg22) {
-        ItemStack lv;
-        if (!this.world.isClient && (lv = arg.getStackInHand(arg22)).getItem() == Items.SHEARS && this.isShearable()) {
-            this.sheared(SoundCategory.PLAYERS);
-            lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
-            return true;
+    public ActionResult interactMob(PlayerEntity arg, Hand arg22) {
+        ItemStack lv = arg.getStackInHand(arg22);
+        if (lv.getItem() == Items.SHEARS) {
+            if (!this.world.isClient && this.isShearable()) {
+                this.sheared(SoundCategory.PLAYERS);
+                lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
+                return ActionResult.SUCCESS;
+            }
+            return ActionResult.CONSUME;
         }
         return super.interactMob(arg, arg22);
     }
