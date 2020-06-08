@@ -164,7 +164,7 @@ extends HorseBaseEntity {
 
     @Override
     @Nullable
-    protected SoundEvent method_28368() {
+    protected SoundEvent getEatSound() {
         return SoundEvents.ENTITY_HORSE_EAT;
     }
 
@@ -186,7 +186,7 @@ extends HorseBaseEntity {
         if (!this.isBaby()) {
             if (this.isTame() && arg.shouldCancelInteraction()) {
                 this.openInventory(arg);
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
             if (this.hasPassengers()) {
                 return super.interactMob(arg, arg2);
@@ -199,7 +199,7 @@ extends HorseBaseEntity {
                 if (!arg.abilities.creativeMode) {
                     lv.decrement(1);
                 }
-                return bl ? ActionResult.method_29236(this.world.isClient) : ActionResult.CONSUME;
+                return bl ? ActionResult.success(this.world.isClient) : ActionResult.CONSUME;
             }
             ActionResult lv2 = lv.useOnEntity(arg, this, arg2);
             if (lv2.isAccepted()) {
@@ -207,19 +207,19 @@ extends HorseBaseEntity {
             }
             if (!this.isTame()) {
                 this.playAngrySound();
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
             boolean bl = bl2 = !this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE;
             if (this.canEquip(lv) || bl2) {
                 this.openInventory(arg);
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
         }
         if (this.isBaby()) {
             return super.interactMob(arg, arg2);
         }
         this.putPlayerOnBack(arg);
-        return ActionResult.method_29236(this.world.isClient);
+        return ActionResult.success(this.world.isClient);
     }
 
     @Override

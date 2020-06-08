@@ -89,11 +89,11 @@ implements BiomeAccess.Storage {
 
     @Nullable
     public BlockPos locateBiome(int i, int j, int k, int l, List<Biome> list, Random random) {
-        return this.method_24385(i, j, k, l, 1, list, random, false);
+        return this.locateBiome(i, j, k, l, 1, list, random, false);
     }
 
     @Nullable
-    public BlockPos method_24385(int i, int j, int k, int l, int m, List<Biome> list, Random random, boolean bl) {
+    public BlockPos locateBiome(int i, int j, int k, int l, int m, List<Biome> list, Random random, boolean bl) {
         int s;
         int n = i >> 2;
         int o = k >> 2;

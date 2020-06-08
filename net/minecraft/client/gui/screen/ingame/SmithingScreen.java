@@ -24,8 +24,8 @@ extends ForgingScreen<SmithingScreenHandler> {
 
     public SmithingScreen(SmithingScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3, TEXTURE);
-        this.field_25267 = 60;
-        this.field_25268 = 18;
+        this.titleX = 60;
+        this.titleY = 18;
     }
 
     @Override

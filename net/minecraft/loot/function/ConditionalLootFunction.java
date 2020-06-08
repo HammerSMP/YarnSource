@@ -25,7 +25,7 @@ import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.function.LootFunction;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class ConditionalLootFunction
@@ -62,8 +62,8 @@ implements LootFunction {
         return this.apply((ItemStack)object, (LootContext)object2);
     }
 
-    public static abstract class Factory<T extends ConditionalLootFunction>
-    implements JsonSerializable<T> {
+    public static abstract class Serializer<T extends ConditionalLootFunction>
+    implements JsonSerializer<T> {
         @Override
         public void toJson(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
             if (!ArrayUtils.isEmpty((Object[])((ConditionalLootFunction)arg).conditions)) {

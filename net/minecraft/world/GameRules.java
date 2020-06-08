@@ -139,7 +139,7 @@ public class GameRules {
         Key<?> lv = arg2;
         Type<?> lv2 = arg3;
         arg.accept(lv, lv2);
-        lv2.method_27336(arg, lv);
+        lv2.accept(arg, lv);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -381,13 +381,13 @@ public class GameRules {
         private final Supplier<ArgumentType<?>> argumentType;
         private final Function<Type<T>, T> ruleFactory;
         private final BiConsumer<MinecraftServer, T> changeCallback;
-        private final Acceptor<T> field_24104;
+        private final Acceptor<T> ruleAcceptor;
 
         private Type(Supplier<ArgumentType<?>> supplier, Function<Type<T>, T> function, BiConsumer<MinecraftServer, T> biConsumer, Acceptor<T> arg) {
             this.argumentType = supplier;
             this.ruleFactory = function;
             this.changeCallback = biConsumer;
-            this.field_24104 = arg;
+            this.ruleAcceptor = arg;
         }
 
         public RequiredArgumentBuilder<ServerCommandSource, ?> argument(String string) {
@@ -398,8 +398,8 @@ public class GameRules {
             return (T)((Rule)this.ruleFactory.apply(this));
         }
 
-        public void method_27336(TypeConsumer arg, Key<T> arg2) {
-            this.field_24104.call(arg, arg2, this);
+        public void accept(TypeConsumer arg, Key<T> arg2) {
+            this.ruleAcceptor.call(arg, arg2, this);
         }
     }
 

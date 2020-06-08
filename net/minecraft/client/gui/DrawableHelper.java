@@ -12,7 +12,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.function.BiConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
@@ -20,6 +19,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Matrix4f;
 
@@ -118,7 +118,7 @@ public abstract class DrawableHelper {
         arg2.drawWithShadow(arg, string, (float)(i - arg2.getWidth(string) / 2), (float)j, k);
     }
 
-    public void drawCenteredText(MatrixStack arg, TextRenderer arg2, class_5348 arg3, int i, int j, int k) {
+    public void drawCenteredText(MatrixStack arg, TextRenderer arg2, StringRenderable arg3, int i, int j, int k) {
         arg2.drawWithShadow(arg, arg3, (float)(i - arg2.getWidth(arg3) / 2), (float)j, k);
     }
 
@@ -126,7 +126,7 @@ public abstract class DrawableHelper {
         arg2.drawWithShadow(arg, string, (float)i, (float)j, k);
     }
 
-    public void drawTextWithShadow(MatrixStack arg, TextRenderer arg2, class_5348 arg3, int i, int j, int k) {
+    public void drawTextWithShadow(MatrixStack arg, TextRenderer arg2, StringRenderable arg3, int i, int j, int k) {
         arg2.drawWithShadow(arg, arg3, (float)i, (float)j, k);
     }
 

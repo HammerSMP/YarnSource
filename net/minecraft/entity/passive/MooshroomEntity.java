@@ -116,14 +116,14 @@ implements Shearable {
                 lv5 = SoundEvents.ENTITY_MOOSHROOM_MILK;
             }
             this.playSound(lv5, 1.0f, 1.0f);
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         if (lv.getItem() == Items.SHEARS && this.isShearable()) {
             this.sheared(SoundCategory.PLAYERS);
             if (!this.world.isClient) {
                 lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         if (this.getMooshroomType() == Type.BROWN && lv.getItem().isIn(ItemTags.SMALL_FLOWERS)) {
             if (this.stewEffect != null) {
@@ -142,7 +142,7 @@ implements Shearable {
                 this.stewEffectDuration = (Integer)pair.getRight();
                 this.playSound(SoundEvents.ENTITY_MOOSHROOM_EAT, 2.0f, 1.0f);
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         return super.interactMob(arg, arg22);
     }

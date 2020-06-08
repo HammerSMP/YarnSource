@@ -40,10 +40,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.UserCache;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.SaveProperties;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +58,7 @@ extends MinecraftServer {
     private LanServerPinger lanPinger;
     private UUID localPlayerUuid;
 
-    public IntegratedServer(Thread thread, MinecraftClient arg, DimensionTracker.Modifiable arg2, LevelStorage.Session arg3, ResourcePackManager<ResourcePackProfile> arg4, ServerResourceManager arg5, SaveProperties arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+    public IntegratedServer(Thread thread, MinecraftClient arg, RegistryTracker.Modifiable arg2, LevelStorage.Session arg3, ResourcePackManager<ResourcePackProfile> arg4, ServerResourceManager arg5, SaveProperties arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg2, arg3, arg6, arg4, arg.getNetworkProxy(), arg.getDataFixer(), arg5, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.setServerName(arg.getSession().getUsername());
         this.setDemo(arg.isDemo());

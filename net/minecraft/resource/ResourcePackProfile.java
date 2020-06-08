@@ -20,9 +20,9 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5352;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackCompatibility;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.metadata.PackResourceMetadata;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
@@ -45,7 +45,7 @@ implements AutoCloseable {
     private final InsertionPosition position;
     private final boolean alwaysEnabled;
     private final boolean pinned;
-    private final class_5352 field_25346;
+    private final ResourcePackSource source;
 
     /*
      * Enabled aggressive block sorting
@@ -53,7 +53,7 @@ implements AutoCloseable {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    public static <T extends ResourcePackProfile> T of(String string, boolean bl, Supplier<ResourcePack> supplier, class_5351<T> arg, InsertionPosition arg2, class_5352 arg3) {
+    public static <T extends ResourcePackProfile> T of(String string, boolean bl, Supplier<ResourcePack> supplier, Factory<T> arg, InsertionPosition arg2, ResourcePackSource arg3) {
         try (ResourcePack lv = supplier.get();){
             PackResourceMetadata lv2 = lv.parseMetadata(PackResourceMetadata.READER);
             if (bl && lv2 == null) {
@@ -73,7 +73,7 @@ implements AutoCloseable {
         return null;
     }
 
-    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, InsertionPosition arg4, boolean bl2, class_5352 arg5) {
+    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, InsertionPosition arg4, boolean bl2, ResourcePackSource arg5) {
         this.name = string;
         this.packGetter = supplier;
         this.displayName = arg;
@@ -82,10 +82,10 @@ implements AutoCloseable {
         this.alwaysEnabled = bl;
         this.position = arg4;
         this.pinned = bl2;
-        this.field_25346 = arg5;
+        this.source = arg5;
     }
 
-    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, InsertionPosition arg3, class_5352 arg4) {
+    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, InsertionPosition arg3, ResourcePackSource arg4) {
         this(string, bl, supplier, new LiteralText(arg.getName()), arg2.getDescription(), ResourcePackCompatibility.from(arg2.getPackFormat()), arg3, false, arg4);
     }
 
@@ -100,7 +100,7 @@ implements AutoCloseable {
     }
 
     public Text getInformationText(boolean bl) {
-        return Texts.bracketed(this.field_25346.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
+        return Texts.bracketed(this.source.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
     }
 
     public ResourcePackCompatibility getCompatibility() {
@@ -128,8 +128,8 @@ implements AutoCloseable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public class_5352 method_29483() {
-        return this.field_25346;
+    public ResourcePackSource getSource() {
+        return this.source;
     }
 
     public boolean equals(Object object) {
@@ -181,9 +181,9 @@ implements AutoCloseable {
     }
 
     @FunctionalInterface
-    public static interface class_5351<T extends ResourcePackProfile> {
+    public static interface Factory<T extends ResourcePackProfile> {
         @Nullable
-        public T create(String var1, boolean var2, Supplier<ResourcePack> var3, ResourcePack var4, PackResourceMetadata var5, InsertionPosition var6, class_5352 var7);
+        public T create(String var1, boolean var2, Supplier<ResourcePack> var3, ResourcePack var4, PackResourceMetadata var5, InsertionPosition var6, ResourcePackSource var7);
     }
 }
 

@@ -123,7 +123,7 @@ implements SynchronousResourceReloadListener {
 
     public static VertexConsumer method_27952(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
-            return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.method_27948() : RenderLayer.method_27949()), arg.getBuffer(arg2));
+            return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getArmorGlint() : RenderLayer.getArmorEntityGlint()), arg.getBuffer(arg2));
         }
         return arg.getBuffer(arg2);
     }
@@ -137,7 +137,7 @@ implements SynchronousResourceReloadListener {
 
     public static VertexConsumer method_29711(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
-            return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.method_29706() : RenderLayer.method_29707()), arg.getBuffer(arg2));
+            return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getGlintDirect() : RenderLayer.getEntityGlintDirect()), arg.getBuffer(arg2));
         }
         return arg.getBuffer(arg2);
     }
@@ -218,19 +218,19 @@ implements SynchronousResourceReloadListener {
         RenderSystem.popMatrix();
     }
 
-    public void renderGuiItem(ItemStack arg, int i, int j) {
-        this.renderGuiItem(MinecraftClient.getInstance().player, arg, i, j);
+    public void renderInGuiWithOverrides(ItemStack arg, int i, int j) {
+        this.innerRenderInGui(MinecraftClient.getInstance().player, arg, i, j);
     }
 
-    public void method_27953(ItemStack arg, int i, int j) {
-        this.renderGuiItem(null, arg, i, j);
+    public void renderInGui(ItemStack arg, int i, int j) {
+        this.innerRenderInGui(null, arg, i, j);
     }
 
-    public void method_27951(LivingEntity arg, ItemStack arg2, int i, int j) {
-        this.renderGuiItem(arg, arg2, i, j);
+    public void renderInGuiWithOverrides(LivingEntity arg, ItemStack arg2, int i, int j) {
+        this.innerRenderInGui(arg, arg2, i, j);
     }
 
-    private void renderGuiItem(@Nullable LivingEntity arg, ItemStack arg2, int i, int j) {
+    private void innerRenderInGui(@Nullable LivingEntity arg, ItemStack arg2, int i, int j) {
         if (arg2.isEmpty()) {
             return;
         }

@@ -119,7 +119,7 @@ implements ResourcePack {
                     int i = lv.getWidth() / 256;
                     for (int j = 88 * i; j < 200 * i; ++j) {
                         for (int k = 56 * i; k < 112 * i; ++k) {
-                            lv.setPixelRgba(k, j, 0);
+                            lv.setPixelColor(k, j, 0);
                         }
                     }
                     ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(lv.getBytes());
@@ -164,9 +164,9 @@ implements ResourcePack {
                             int p = n / i;
                             for (int q = k * p; q < m * p; ++q) {
                                 for (int r = j * p; r < l * p; ++r) {
-                                    int s = NativeImage.method_24033(lv2.getPixelRgba(r, q));
-                                    int t = lv.getPixelRgba(r, q);
-                                    lv3.setPixelRgba(r, q, NativeImage.method_24031(s, NativeImage.method_24035(t), NativeImage.method_24034(t), NativeImage.method_24033(t)));
+                                    int s = NativeImage.getRed(lv2.getPixelColor(r, q));
+                                    int t = lv.getPixelColor(r, q);
+                                    lv3.setPixelColor(r, q, NativeImage.getAbgrColor(s, NativeImage.getBlue(t), NativeImage.getGreen(t), NativeImage.getRed(t)));
                                 }
                             }
                             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(lv3.getBytes());
@@ -321,7 +321,7 @@ implements ResourcePack {
         j *= o;
         for (int p = 0; p < (n *= o); ++p) {
             for (int q = 0; q < m; ++q) {
-                arg2.setPixelRgba(k + q, l + p, arg.getPixelRgba(i + (bl ? m - 1 - q : q), j + (bl2 ? n - 1 - p : p)));
+                arg2.setPixelColor(k + q, l + p, arg.getPixelColor(i + (bl ? m - 1 - q : q), j + (bl2 ? n - 1 - p : p)));
             }
         }
     }

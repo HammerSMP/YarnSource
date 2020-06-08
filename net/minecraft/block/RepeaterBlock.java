@@ -46,7 +46,7 @@ extends AbstractRedstoneGateBlock {
             return ActionResult.PASS;
         }
         arg2.setBlockState(arg3, (BlockState)arg.cycle(DELAY), 3);
-        return ActionResult.method_29236(arg2.isClient);
+        return ActionResult.success(arg2.isClient);
     }
 
     @Override

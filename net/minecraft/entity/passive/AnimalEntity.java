@@ -146,7 +146,7 @@ extends PassiveEntity {
             if (this.isBaby()) {
                 this.eat(arg, lv);
                 this.growUp((int)((float)(-i / 20) * 0.1f), true);
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
             if (this.world.isClient) {
                 return ActionResult.CONSUME;
@@ -177,7 +177,7 @@ extends PassiveEntity {
         this.loveTicks = i;
     }
 
-    public int method_29270() {
+    public int getLoveTicks() {
         return this.loveTicks;
     }
 

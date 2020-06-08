@@ -9,8 +9,8 @@ package net.minecraft.entity.damage;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.BadRespawnPointDamageSource;
 import net.minecraft.entity.damage.EntityDamageSource;
-import net.minecraft.entity.damage.NetherBedDamageSource;
 import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractFireballEntity;
@@ -83,14 +83,14 @@ public class DamageSource {
         return new ProjectileDamageSource("fireworks", arg, arg2).setExplosive();
     }
 
-    public static DamageSource explosiveProjectile(AbstractFireballEntity arg, @Nullable Entity arg2) {
+    public static DamageSource fireball(AbstractFireballEntity arg, @Nullable Entity arg2) {
         if (arg2 == null) {
             return new ProjectileDamageSource("onFire", arg, arg).setFire().setProjectile();
         }
         return new ProjectileDamageSource("fireball", arg, arg2).setFire().setProjectile();
     }
 
-    public static DamageSource method_29238(WitherSkullEntity arg, Entity arg2) {
+    public static DamageSource witherSkull(WitherSkullEntity arg, Entity arg2) {
         return new ProjectileDamageSource("witherSkull", arg, arg2).setProjectile();
     }
 
@@ -117,8 +117,8 @@ public class DamageSource {
         return new DamageSource("explosion").setScaledWithDifficulty().setExplosive();
     }
 
-    public static DamageSource netherBed() {
-        return new NetherBedDamageSource();
+    public static DamageSource badRespawnPoint() {
+        return new BadRespawnPointDamageSource();
     }
 
     public String toString() {

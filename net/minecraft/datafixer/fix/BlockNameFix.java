@@ -33,7 +33,7 @@ extends DataFix {
     public TypeRewriteRule makeRule() {
         Type type2;
         Type type = this.getInputSchema().getType(TypeReferences.BLOCK_NAME);
-        if (!Objects.equals((Object)type, (Object)(type2 = DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), IdentifierNormalizingSchema.method_28295())))) {
+        if (!Objects.equals((Object)type, (Object)(type2 = DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType())))) {
             throw new IllegalStateException("block type is not what was expected.");
         }
         TypeRewriteRule typeRewriteRule = this.fixTypeEverywhere(this.name + " for block", type2, dynamicOps -> pair -> pair.mapSecond(this::rename));

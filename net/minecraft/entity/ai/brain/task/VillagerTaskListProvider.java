@@ -15,9 +15,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.class_5325;
-import net.minecraft.class_5326;
-import net.minecraft.class_5327;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
@@ -66,6 +63,7 @@ import net.minecraft.entity.ai.brain.task.SleepTask;
 import net.minecraft.entity.ai.brain.task.StartRaidTask;
 import net.minecraft.entity.ai.brain.task.StayAboveWaterTask;
 import net.minecraft.entity.ai.brain.task.StopPanickingTask;
+import net.minecraft.entity.ai.brain.task.TakeJobSiteTask;
 import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.ai.brain.task.VillagerBreedTask;
 import net.minecraft.entity.ai.brain.task.VillagerWalkTowardsTask;
@@ -74,8 +72,10 @@ import net.minecraft.entity.ai.brain.task.WaitTask;
 import net.minecraft.entity.ai.brain.task.WakeUpTask;
 import net.minecraft.entity.ai.brain.task.WalkHomeTask;
 import net.minecraft.entity.ai.brain.task.WalkToNearestVisibleWantedItemTask;
+import net.minecraft.entity.ai.brain.task.WalkTowardJobSiteTask;
 import net.minecraft.entity.ai.brain.task.WanderAroundTask;
 import net.minecraft.entity.ai.brain.task.WanderIndoorsTask;
+import net.minecraft.entity.ai.brain.task.WorkStationCompetitionTask;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.village.VillagerProfession;
@@ -83,7 +83,7 @@ import net.minecraft.world.poi.PointOfInterestType;
 
 public class VillagerTaskListProvider {
     public static ImmutableList<Pair<Integer, ? extends Task<? super VillagerEntity>>> createCoreTasks(VillagerProfession arg, float f) {
-        return ImmutableList.of((Object)Pair.of((Object)0, (Object)new StayAboveWaterTask(0.8f)), (Object)Pair.of((Object)0, (Object)new OpenDoorsTask()), (Object)Pair.of((Object)0, (Object)new LookAroundTask(45, 90)), (Object)Pair.of((Object)0, (Object)new PanicTask()), (Object)Pair.of((Object)0, (Object)new WakeUpTask()), (Object)Pair.of((Object)0, (Object)new HideWhenBellRingsTask()), (Object)Pair.of((Object)0, (Object)new StartRaidTask()), (Object)Pair.of((Object)0, (Object)new ForgetCompletedPointOfInterestTask(arg.getWorkStation(), MemoryModuleType.JOB_SITE)), (Object)Pair.of((Object)0, (Object)new ForgetCompletedPointOfInterestTask(arg.getWorkStation(), MemoryModuleType.POTENTIAL_JOB_SITE)), (Object)Pair.of((Object)1, (Object)new WanderAroundTask(200)), (Object)Pair.of((Object)2, (Object)new class_5326(arg)), (Object)Pair.of((Object)3, (Object)new FollowCustomerTask(f)), (Object[])new Pair[]{Pair.of((Object)5, new WalkToNearestVisibleWantedItemTask(f, false, 4)), Pair.of((Object)6, (Object)new FindPointOfInterestTask(arg.getWorkStation(), MemoryModuleType.JOB_SITE, MemoryModuleType.POTENTIAL_JOB_SITE, true)), Pair.of((Object)7, (Object)new class_5325(f)), Pair.of((Object)8, (Object)new class_5327(f)), Pair.of((Object)10, (Object)new FindPointOfInterestTask(PointOfInterestType.HOME, MemoryModuleType.HOME, false)), Pair.of((Object)10, (Object)new FindPointOfInterestTask(PointOfInterestType.MEETING, MemoryModuleType.MEETING_POINT, true)), Pair.of((Object)10, (Object)new GoToWorkTask()), Pair.of((Object)10, (Object)new LoseJobOnSiteLossTask())});
+        return ImmutableList.of((Object)Pair.of((Object)0, (Object)new StayAboveWaterTask(0.8f)), (Object)Pair.of((Object)0, (Object)new OpenDoorsTask()), (Object)Pair.of((Object)0, (Object)new LookAroundTask(45, 90)), (Object)Pair.of((Object)0, (Object)new PanicTask()), (Object)Pair.of((Object)0, (Object)new WakeUpTask()), (Object)Pair.of((Object)0, (Object)new HideWhenBellRingsTask()), (Object)Pair.of((Object)0, (Object)new StartRaidTask()), (Object)Pair.of((Object)0, (Object)new ForgetCompletedPointOfInterestTask(arg.getWorkStation(), MemoryModuleType.JOB_SITE)), (Object)Pair.of((Object)0, (Object)new ForgetCompletedPointOfInterestTask(arg.getWorkStation(), MemoryModuleType.POTENTIAL_JOB_SITE)), (Object)Pair.of((Object)1, (Object)new WanderAroundTask(200)), (Object)Pair.of((Object)2, (Object)new WorkStationCompetitionTask(arg)), (Object)Pair.of((Object)3, (Object)new FollowCustomerTask(f)), (Object[])new Pair[]{Pair.of((Object)5, new WalkToNearestVisibleWantedItemTask(f, false, 4)), Pair.of((Object)6, (Object)new FindPointOfInterestTask(arg.getWorkStation(), MemoryModuleType.JOB_SITE, MemoryModuleType.POTENTIAL_JOB_SITE, true)), Pair.of((Object)7, (Object)new WalkTowardJobSiteTask(f)), Pair.of((Object)8, (Object)new TakeJobSiteTask(f)), Pair.of((Object)10, (Object)new FindPointOfInterestTask(PointOfInterestType.HOME, MemoryModuleType.HOME, false)), Pair.of((Object)10, (Object)new FindPointOfInterestTask(PointOfInterestType.MEETING, MemoryModuleType.MEETING_POINT, true)), Pair.of((Object)10, (Object)new GoToWorkTask()), Pair.of((Object)10, (Object)new LoseJobOnSiteLossTask())});
     }
 
     public static ImmutableList<Pair<Integer, ? extends Task<? super VillagerEntity>>> createWorkTasks(VillagerProfession arg, float f) {

@@ -72,7 +72,7 @@ implements CrossbowUser {
     private static final TrackedData<Boolean> BABY = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> IMMUNE_TO_ZOMBIFICATION = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> CHARGING = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> field_25164 = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> dancing = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final UUID BABY_SPEED_BOOST_ID = UUID.fromString("766bfa64-11f3-11ea-8d71-362b9e155667");
     private static final EntityAttributeModifier BABY_SPEED_BOOST = new EntityAttributeModifier(BABY_SPEED_BOOST_ID, "Baby speed boost", (double)0.2f, EntityAttributeModifier.Operation.MULTIPLY_BASE);
     private int conversionTicks = 0;
@@ -136,7 +136,7 @@ implements CrossbowUser {
         this.dataTracker.startTracking(BABY, false);
         this.dataTracker.startTracking(CHARGING, false);
         this.dataTracker.startTracking(IMMUNE_TO_ZOMBIFICATION, false);
-        this.dataTracker.startTracking(field_25164, false);
+        this.dataTracker.startTracking(dancing, false);
     }
 
     @Override
@@ -332,7 +332,7 @@ implements CrossbowUser {
     }
 
     public Activity getActivity() {
-        if (this.method_29272()) {
+        if (this.isDancing()) {
             return Activity.DANCING;
         }
         if (this.handSwinging) {
@@ -347,21 +347,21 @@ implements CrossbowUser {
         if (this.isAttacking() && this.isHolding(Items.CROSSBOW)) {
             return Activity.CROSSBOW_HOLD;
         }
-        if (this.isAttacking() && this.method_29273()) {
+        if (this.isAttacking() && this.isHoldingTool()) {
             return Activity.ATTACKING_WITH_MELEE_WEAPON;
         }
         return Activity.DEFAULT;
     }
 
-    public boolean method_29272() {
-        return this.dataTracker.get(field_25164);
+    public boolean isDancing() {
+        return this.dataTracker.get(dancing);
     }
 
-    public void method_29274(boolean bl) {
-        this.dataTracker.set(field_25164, bl);
+    public void setDancing(boolean bl) {
+        this.dataTracker.set(dancing, bl);
     }
 
-    private boolean method_29273() {
+    private boolean isHoldingTool() {
         return this.getMainHandStack().getItem() instanceof ToolItem;
     }
 

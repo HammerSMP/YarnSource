@@ -39,7 +39,7 @@ implements AutoCloseable {
         this.image = this.texture.getImage();
         for (int i = 0; i < 16; ++i) {
             for (int j = 0; j < 16; ++j) {
-                this.image.setPixelRgba(j, i, -1);
+                this.image.setPixelColor(j, i, -1);
             }
         }
         this.texture.upload();
@@ -151,7 +151,7 @@ implements AutoCloseable {
                 int aa = (int)lv3.getX();
                 int ab = (int)lv3.getY();
                 int ac = (int)lv3.getZ();
-                this.image.setPixelRgba(p, o, 0xFF000000 | ac << 16 | ab << 8 | aa);
+                this.image.setPixelColor(p, o, 0xFF000000 | ac << 16 | ab << 8 | aa);
             }
         }
         this.texture.upload();

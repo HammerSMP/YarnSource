@@ -135,7 +135,7 @@ extends HorseBaseEntity {
         if (!this.isBaby()) {
             if (this.isTame() && arg.shouldCancelInteraction()) {
                 this.openInventory(arg);
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
             if (this.hasPassengers()) {
                 return super.interactMob(arg, arg2);
@@ -147,11 +147,11 @@ extends HorseBaseEntity {
                 if (!arg.abilities.creativeMode) {
                     lv.decrement(1);
                 }
-                return bl ? ActionResult.method_29236(this.world.isClient) : ActionResult.CONSUME;
+                return bl ? ActionResult.success(this.world.isClient) : ActionResult.CONSUME;
             }
             if (!this.isTame()) {
                 this.playAngrySound();
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
             if (!this.hasChest() && lv.getItem() == Blocks.CHEST.asItem()) {
                 this.setHasChest(true);
@@ -160,18 +160,18 @@ extends HorseBaseEntity {
                     lv.decrement(1);
                 }
                 this.onChestedStatusChanged();
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
             if (!this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE) {
                 this.openInventory(arg);
-                return ActionResult.method_29236(this.world.isClient);
+                return ActionResult.success(this.world.isClient);
             }
         }
         if (this.isBaby()) {
             return super.interactMob(arg, arg2);
         }
         this.putPlayerOnBack(arg);
-        return ActionResult.method_29236(this.world.isClient);
+        return ActionResult.success(this.world.isClient);
     }
 
     protected void playAddChestSound() {

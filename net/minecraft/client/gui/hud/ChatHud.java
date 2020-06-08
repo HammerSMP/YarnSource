@@ -21,7 +21,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.ChatHudLine;
@@ -29,6 +28,7 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.client.util.ChatMessages;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -159,14 +159,14 @@ extends DrawableHelper {
         LOGGER.info("[CHAT] {}", (Object)arg.getString().replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n"));
     }
 
-    private void addMessage(class_5348 arg, int i, int j, boolean bl) {
+    private void addMessage(StringRenderable arg, int i, int j, boolean bl) {
         if (i != 0) {
             this.removeMessage(i);
         }
         int k = MathHelper.floor((double)this.getWidth() / this.getChatScale());
-        List<class_5348> list = ChatMessages.breakRenderedChatMessageLines(arg, k, this.client.textRenderer);
+        List<StringRenderable> list = ChatMessages.breakRenderedChatMessageLines(arg, k, this.client.textRenderer);
         boolean bl2 = this.isChatFocused();
-        for (class_5348 lv : list) {
+        for (StringRenderable lv : list) {
             if (bl2 && this.scrolledLines > 0) {
                 this.hasUnreadNewMessages = true;
                 this.scroll(1.0);

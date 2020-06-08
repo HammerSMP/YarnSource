@@ -379,7 +379,7 @@ extends NetworkSyncedItem {
                 MapState lv2 = FilledMapItem.getOrCreateMapState(arg.getStack(), arg.getWorld());
                 lv2.addBanner(arg.getWorld(), arg.getBlockPos());
             }
-            return ActionResult.method_29236(arg.world.isClient);
+            return ActionResult.success(arg.world.isClient);
         }
         return super.useOnBlock(arg);
     }

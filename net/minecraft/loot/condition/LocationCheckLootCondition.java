@@ -18,7 +18,7 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 import net.minecraft.util.math.BlockPos;
 
 public class LocationCheckLootCondition
@@ -32,7 +32,7 @@ implements LootCondition {
     }
 
     @Override
-    public LootConditionType method_29325() {
+    public LootConditionType getType() {
         return LootConditionTypes.LOCATION_CHECK;
     }
 
@@ -51,8 +51,8 @@ implements LootCondition {
         return this.test((LootContext)object);
     }
 
-    public static class Factory
-    implements JsonSerializable<LocationCheckLootCondition> {
+    public static class Serializer
+    implements JsonSerializer<LocationCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, LocationCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());

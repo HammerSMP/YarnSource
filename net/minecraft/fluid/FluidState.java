@@ -34,7 +34,7 @@ import net.minecraft.world.World;
 
 public final class FluidState
 extends State<Fluid, FluidState> {
-    public static final Codec<FluidState> field_25018 = FluidState.method_28494(Registry.FLUID, Fluid::getDefaultState).stable();
+    public static final Codec<FluidState> CODEC = FluidState.createCodec(Registry.FLUID, Fluid::getDefaultState).stable();
 
     public FluidState(Fluid arg, ImmutableMap<Property<?>, Comparable<?>> immutableMap, MapCodec<FluidState> mapCodec) {
         super(arg, immutableMap, mapCodec);

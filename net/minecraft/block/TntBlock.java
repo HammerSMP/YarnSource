@@ -104,7 +104,7 @@ extends Block {
                     lv.decrement(1);
                 }
             }
-            return ActionResult.method_29236(arg22.isClient);
+            return ActionResult.success(arg22.isClient);
         }
         return super.onUse(arg, arg22, arg3, arg4, arg5, arg6);
     }

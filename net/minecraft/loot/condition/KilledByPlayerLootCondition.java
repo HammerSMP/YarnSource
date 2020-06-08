@@ -20,7 +20,7 @@ import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 
 public class KilledByPlayerLootCondition
 implements LootCondition {
@@ -30,7 +30,7 @@ implements LootCondition {
     }
 
     @Override
-    public LootConditionType method_29325() {
+    public LootConditionType getType() {
         return LootConditionTypes.KILLED_BY_PLAYER;
     }
 
@@ -53,8 +53,8 @@ implements LootCondition {
         return this.test((LootContext)object);
     }
 
-    public static class Factory
-    implements JsonSerializable<KilledByPlayerLootCondition> {
+    public static class Serializer
+    implements JsonSerializer<KilledByPlayerLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, KilledByPlayerLootCondition arg, JsonSerializationContext jsonSerializationContext) {
         }

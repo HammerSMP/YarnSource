@@ -78,7 +78,7 @@ implements SynchronousResourceReloadListener {
         }
         TranslationStorage lv2 = TranslationStorage.load(arg, list);
         I18n.method_29391(lv2);
-        Language.method_29427(lv2);
+        Language.setInstance(lv2);
     }
 
     public void setLanguage(LanguageDefinition arg) {

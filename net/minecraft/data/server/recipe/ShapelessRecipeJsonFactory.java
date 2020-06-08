@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementRewards;
-import net.minecraft.advancement.CriteriaMerger;
+import net.minecraft.advancement.CriterionMerger;
 import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
@@ -106,7 +106,7 @@ public class ShapelessRecipeJsonFactory {
 
     public void offerTo(Consumer<RecipeJsonProvider> consumer, Identifier arg) {
         this.validate(arg);
-        this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(arg)).rewards(AdvancementRewards.Builder.recipe(arg)).criteriaMerger(CriteriaMerger.OR);
+        this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(arg)).rewards(AdvancementRewards.Builder.recipe(arg)).criteriaMerger(CriterionMerger.OR);
         consumer.accept(new ShapelessRecipeJsonProvider(arg, this.output, this.outputCount, this.group == null ? "" : this.group, this.inputs, this.builder, new Identifier(arg.getNamespace(), "recipes/" + this.output.getGroup().getName() + "/" + arg.getPath())));
     }
 

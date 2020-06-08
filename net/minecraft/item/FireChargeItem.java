@@ -40,7 +40,7 @@ extends Item {
         }
         if (bl) {
             arg2.getStack().decrement(1);
-            return ActionResult.method_29236(lv.isClient);
+            return ActionResult.success(lv.isClient);
         }
         return ActionResult.FAIL;
     }

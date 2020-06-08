@@ -99,6 +99,7 @@ import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -107,7 +108,6 @@ import net.minecraft.world.WorldSaveHandler;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderListener;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -130,14 +130,14 @@ public abstract class PlayerManager {
     private final Map<UUID, PlayerAdvancementTracker> advancementTrackers = Maps.newHashMap();
     private final WorldSaveHandler saveHandler;
     private boolean whitelistEnabled;
-    private final DimensionTracker.Modifiable field_24626;
+    private final RegistryTracker.Modifiable field_24626;
     protected final int maxPlayers;
     private int viewDistance;
     private GameMode gameMode;
     private boolean cheatsAllowed;
     private int latencyUpdateTimer;
 
-    public PlayerManager(MinecraftServer minecraftServer, DimensionTracker.Modifiable arg, WorldSaveHandler arg2, int i) {
+    public PlayerManager(MinecraftServer minecraftServer, RegistryTracker.Modifiable arg, WorldSaveHandler arg2, int i) {
         this.server = minecraftServer;
         this.field_24626 = arg;
         this.maxPlayers = i;
@@ -145,9 +145,10 @@ public abstract class PlayerManager {
     }
 
     public void onPlayerConnect(ClientConnection arg, ServerPlayerEntity arg22) {
-        CompoundTag lv11;
-        Entity lv12;
-        TranslatableText lv9;
+        CompoundTag lv13;
+        Entity lv14;
+        TranslatableText lv11;
+        ServerWorld lv6;
         GameProfile gameProfile = arg22.getGameProfile();
         UserCache lv = this.server.getUserCache();
         GameProfile gameProfile2 = lv.getByUuid(gameProfile.getId());
@@ -156,79 +157,85 @@ public abstract class PlayerManager {
         CompoundTag lv2 = this.loadPlayerData(arg22);
         RegistryKey<World> lv3 = lv2 != null ? DimensionType.method_28521(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2.get("Dimension"))).resultOrPartial(((Logger)LOGGER)::error).orElse(World.OVERWORLD) : World.OVERWORLD;
         ServerWorld lv4 = this.server.getWorld(lv3);
-        arg22.setWorld(lv4);
+        if (lv4 == null) {
+            LOGGER.warn("Unknown respawn dimension {}, defaulting to overworld", lv3);
+            ServerWorld lv5 = this.server.getWorld(World.OVERWORLD);
+        } else {
+            lv6 = lv4;
+        }
+        arg22.setWorld(lv6);
         arg22.interactionManager.setWorld((ServerWorld)arg22.world);
         String string2 = "local";
         if (arg.getAddress() != null) {
             string2 = arg.getAddress().toString();
         }
         LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {})", (Object)arg22.getName().getString(), (Object)string2, (Object)arg22.getEntityId(), (Object)arg22.getX(), (Object)arg22.getY(), (Object)arg22.getZ());
-        WorldProperties lv5 = lv4.getLevelProperties();
-        this.setGameMode(arg22, null, lv4);
-        ServerPlayNetworkHandler lv6 = new ServerPlayNetworkHandler(this.server, arg, arg22);
-        GameRules lv7 = lv4.getGameRules();
-        boolean bl = lv7.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
-        boolean bl2 = lv7.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv6.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv4.getSeed()), lv5.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv4.getDimensionRegistryKey(), lv4.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv4.isDebugWorld(), lv4.method_28125()));
-        lv6.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
-        lv6.sendPacket(new DifficultyS2CPacket(lv5.getDifficulty(), lv5.isDifficultyLocked()));
-        lv6.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
-        lv6.sendPacket(new HeldItemChangeS2CPacket(arg22.inventory.selectedSlot));
-        lv6.sendPacket(new SynchronizeRecipesS2CPacket(this.server.getRecipeManager().values()));
-        lv6.sendPacket(new SynchronizeTagsS2CPacket(this.server.getTagManager()));
+        WorldProperties lv7 = lv6.getLevelProperties();
+        this.setGameMode(arg22, null, lv6);
+        ServerPlayNetworkHandler lv8 = new ServerPlayNetworkHandler(this.server, arg, arg22);
+        GameRules lv9 = lv6.getGameRules();
+        boolean bl = lv9.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
+        boolean bl2 = lv9.getBoolean(GameRules.REDUCED_DEBUG_INFO);
+        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.method_28125()));
+        lv8.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
+        lv8.sendPacket(new DifficultyS2CPacket(lv7.getDifficulty(), lv7.isDifficultyLocked()));
+        lv8.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
+        lv8.sendPacket(new HeldItemChangeS2CPacket(arg22.inventory.selectedSlot));
+        lv8.sendPacket(new SynchronizeRecipesS2CPacket(this.server.getRecipeManager().values()));
+        lv8.sendPacket(new SynchronizeTagsS2CPacket(this.server.getTagManager()));
         this.sendCommandTree(arg22);
         arg22.getStatHandler().updateStatSet();
         arg22.getRecipeBook().sendInitRecipesPacket(arg22);
-        this.sendScoreboard(lv4.getScoreboard(), arg22);
+        this.sendScoreboard(lv6.getScoreboard(), arg22);
         this.server.forcePlayerSampleUpdate();
         if (arg22.getGameProfile().getName().equalsIgnoreCase(string)) {
-            TranslatableText lv8 = new TranslatableText("multiplayer.player.joined", arg22.getDisplayName());
+            TranslatableText lv10 = new TranslatableText("multiplayer.player.joined", arg22.getDisplayName());
         } else {
-            lv9 = new TranslatableText("multiplayer.player.joined.renamed", arg22.getDisplayName(), string);
+            lv11 = new TranslatableText("multiplayer.player.joined.renamed", arg22.getDisplayName(), string);
         }
-        this.broadcastChatMessage(lv9.formatted(Formatting.YELLOW), MessageType.SYSTEM, Util.NIL_UUID);
-        lv6.requestTeleport(arg22.getX(), arg22.getY(), arg22.getZ(), arg22.yaw, arg22.pitch);
+        this.broadcastChatMessage(lv11.formatted(Formatting.YELLOW), MessageType.SYSTEM, Util.NIL_UUID);
+        lv8.requestTeleport(arg22.getX(), arg22.getY(), arg22.getZ(), arg22.yaw, arg22.pitch);
         this.players.add(arg22);
         this.playerMap.put(arg22.getUuid(), arg22);
         this.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, arg22));
         for (int i = 0; i < this.players.size(); ++i) {
             arg22.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, this.players.get(i)));
         }
-        lv4.onPlayerConnected(arg22);
+        lv6.onPlayerConnected(arg22);
         this.server.getBossBarManager().onPlayerConnect(arg22);
-        this.sendWorldInfo(arg22, lv4);
+        this.sendWorldInfo(arg22, lv6);
         if (!this.server.getResourcePackUrl().isEmpty()) {
             arg22.sendResourcePackUrl(this.server.getResourcePackUrl(), this.server.getResourcePackHash());
         }
-        for (StatusEffectInstance lv10 : arg22.getStatusEffects()) {
-            lv6.sendPacket(new EntityStatusEffectS2CPacket(arg22.getEntityId(), lv10));
+        for (StatusEffectInstance lv12 : arg22.getStatusEffects()) {
+            lv8.sendPacket(new EntityStatusEffectS2CPacket(arg22.getEntityId(), lv12));
         }
-        if (lv2 != null && lv2.contains("RootVehicle", 10) && (lv12 = EntityType.loadEntityWithPassengers((lv11 = lv2.getCompound("RootVehicle")).getCompound("Entity"), lv4, arg2 -> {
-            if (!lv4.tryLoadEntity((Entity)arg2)) {
+        if (lv2 != null && lv2.contains("RootVehicle", 10) && (lv14 = EntityType.loadEntityWithPassengers((lv13 = lv2.getCompound("RootVehicle")).getCompound("Entity"), lv6, arg2 -> {
+            if (!lv6.tryLoadEntity((Entity)arg2)) {
                 return null;
             }
             return arg2;
         })) != null) {
             Object uUID2;
-            if (lv11.containsUuid("Attach")) {
-                UUID uUID = lv11.getUuid("Attach");
+            if (lv13.containsUuid("Attach")) {
+                UUID uUID = lv13.getUuid("Attach");
             } else {
                 uUID2 = null;
             }
-            if (lv12.getUuid().equals(uUID2)) {
-                arg22.startRiding(lv12, true);
+            if (lv14.getUuid().equals(uUID2)) {
+                arg22.startRiding(lv14, true);
             } else {
-                for (Entity lv13 : lv12.getPassengersDeep()) {
-                    if (!lv13.getUuid().equals(uUID2)) continue;
-                    arg22.startRiding(lv13, true);
+                for (Entity lv15 : lv14.getPassengersDeep()) {
+                    if (!lv15.getUuid().equals(uUID2)) continue;
+                    arg22.startRiding(lv15, true);
                     break;
                 }
             }
             if (!arg22.hasVehicle()) {
                 LOGGER.warn("Couldn't reattach entity to player");
-                lv4.removeEntity(lv12);
-                for (Entity lv14 : lv12.getPassengersDeep()) {
-                    lv4.removeEntity(lv14);
+                lv6.removeEntity(lv14);
+                for (Entity lv16 : lv14.getPassengersDeep()) {
+                    lv6.removeEntity(lv16);
                 }
             }
         }

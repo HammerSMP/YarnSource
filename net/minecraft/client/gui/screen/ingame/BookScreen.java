@@ -17,7 +17,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -33,6 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -51,14 +51,14 @@ extends Screen {
         }
 
         @Override
-        public class_5348 getPageUnchecked(int i) {
-            return class_5348.field_25310;
+        public StringRenderable getPageUnchecked(int i) {
+            return StringRenderable.EMPTY;
         }
     };
     public static final Identifier BOOK_TEXTURE = new Identifier("textures/gui/book.png");
     private Contents contents;
     private int pageIndex;
-    private List<class_5348> cachedPage = Collections.emptyList();
+    private List<StringRenderable> cachedPage = Collections.emptyList();
     private int cachedPageIndex = -1;
     private PageTurnWidget nextPageButton;
     private PageTurnWidget previousPageButton;
@@ -169,7 +169,7 @@ extends Screen {
         this.drawTexture(arg, k, 2, 0, 0, 192, 192);
         String string = I18n.translate("book.pageIndicator", this.pageIndex + 1, Math.max(this.getPageCount(), 1));
         if (this.cachedPageIndex != this.pageIndex) {
-            class_5348 lv = this.contents.getPage(this.pageIndex);
+            StringRenderable lv = this.contents.getPage(this.pageIndex);
             this.cachedPage = this.textRenderer.getTextHandler().wrapLines(lv, 114, Style.EMPTY);
         }
         this.cachedPageIndex = this.pageIndex;
@@ -178,7 +178,7 @@ extends Screen {
         this.textRenderer.getClass();
         int n = Math.min(128 / 9, this.cachedPage.size());
         for (int o = 0; o < n; ++o) {
-            class_5348 lv2 = this.cachedPage.get(o);
+            StringRenderable lv2 = this.cachedPage.get(o);
             this.textRenderer.getClass();
             this.textRenderer.draw(arg, lv2, (float)(k + 36), (float)(32 + o * 9), 0);
         }
@@ -243,7 +243,7 @@ extends Screen {
                 this.client.textRenderer.getClass();
                 int l = j / 9;
                 if (l >= 0 && l < this.cachedPage.size()) {
-                    class_5348 lv = this.cachedPage.get(l);
+                    StringRenderable lv = this.cachedPage.get(l);
                     return this.client.textRenderer.getTextHandler().trimToWidth(lv, i);
                 }
                 return null;
@@ -281,8 +281,8 @@ extends Screen {
         }
 
         @Override
-        public class_5348 getPageUnchecked(int i) {
-            return class_5348.method_29430(this.pages.get(i));
+        public StringRenderable getPageUnchecked(int i) {
+            return StringRenderable.plain(this.pages.get(i));
         }
     }
 
@@ -309,7 +309,7 @@ extends Screen {
         }
 
         @Override
-        public class_5348 getPageUnchecked(int i) {
+        public StringRenderable getPageUnchecked(int i) {
             String string = this.pages.get(i);
             try {
                 MutableText lv = Text.Serializer.fromJson(string);
@@ -320,7 +320,7 @@ extends Screen {
             catch (Exception exception) {
                 // empty catch block
             }
-            return class_5348.method_29430(string);
+            return StringRenderable.plain(string);
         }
     }
 
@@ -328,13 +328,13 @@ extends Screen {
     public static interface Contents {
         public int getPageCount();
 
-        public class_5348 getPageUnchecked(int var1);
+        public StringRenderable getPageUnchecked(int var1);
 
-        default public class_5348 getPage(int i) {
+        default public StringRenderable getPage(int i) {
             if (i >= 0 && i < this.getPageCount()) {
                 return this.getPageUnchecked(i);
             }
-            return class_5348.field_25310;
+            return StringRenderable.EMPTY;
         }
 
         public static Contents create(ItemStack arg) {

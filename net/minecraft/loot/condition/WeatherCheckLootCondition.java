@@ -19,7 +19,7 @@ import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 
 public class WeatherCheckLootCondition
 implements LootCondition {
@@ -34,7 +34,7 @@ implements LootCondition {
     }
 
     @Override
-    public LootConditionType method_29325() {
+    public LootConditionType getType() {
         return LootConditionTypes.WEATHER_CHECK;
     }
 
@@ -52,8 +52,8 @@ implements LootCondition {
         return this.test((LootContext)object);
     }
 
-    public static class Factory
-    implements JsonSerializable<WeatherCheckLootCondition> {
+    public static class Serializer
+    implements JsonSerializer<WeatherCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, WeatherCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("raining", arg.raining);

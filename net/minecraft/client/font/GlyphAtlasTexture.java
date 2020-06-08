@@ -35,7 +35,7 @@ implements Closeable {
         this.id = arg;
         this.hasColor = bl;
         this.rootSlot = new Slot(0, 0, 256, 256);
-        TextureUtil.method_24960(bl ? NativeImage.GLFormat.RGBA : NativeImage.GLFormat.INTENSITY, this.getGlId(), 256, 256);
+        TextureUtil.allocate(bl ? NativeImage.GLFormat.ABGR : NativeImage.GLFormat.INTENSITY, this.getGlId(), 256, 256);
         this.field_21690 = RenderLayer.getText(arg);
         this.field_21691 = RenderLayer.getTextSeeThrough(arg);
     }

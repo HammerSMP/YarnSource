@@ -26,7 +26,7 @@ extends Task<E> {
     @Override
     protected void run(ServerWorld arg, E arg2, long l) {
         LookTargetUtil.getEntity(arg2, MemoryModuleType.ANGRY_AT).ifPresent(arg3 -> {
-            if (arg3.method_29504() && (arg3.getType() != EntityType.PLAYER || arg.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS))) {
+            if (arg3.isDead() && (arg3.getType() != EntityType.PLAYER || arg.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS))) {
                 arg2.getBrain().forget(MemoryModuleType.ANGRY_AT);
             }
         });

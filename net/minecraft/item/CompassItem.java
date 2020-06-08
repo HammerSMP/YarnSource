@@ -93,7 +93,7 @@ implements Vanishable {
                     arg.player.dropItem(lv2, false);
                 }
             }
-            return ActionResult.method_29236(arg.world.isClient);
+            return ActionResult.success(arg.world.isClient);
         }
         return super.useOnBlock(arg);
     }

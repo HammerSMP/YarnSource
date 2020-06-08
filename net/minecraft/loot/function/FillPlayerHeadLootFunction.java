@@ -40,7 +40,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.FILL_PLAYER_HEAD;
     }
 
@@ -59,8 +59,8 @@ extends ConditionalLootFunction {
         return arg;
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<FillPlayerHeadLootFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<FillPlayerHeadLootFunction> {
         @Override
         public void toJson(JsonObject jsonObject, FillPlayerHeadLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);

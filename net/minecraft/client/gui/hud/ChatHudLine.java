@@ -9,21 +9,21 @@ package net.minecraft.client.gui.hud;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
+import net.minecraft.text.StringRenderable;
 
 @Environment(value=EnvType.CLIENT)
 public class ChatHudLine {
     private final int creationTick;
-    private final class_5348 text;
+    private final StringRenderable text;
     private final int id;
 
-    public ChatHudLine(int i, class_5348 arg, int j) {
+    public ChatHudLine(int i, StringRenderable arg, int j) {
         this.text = arg;
         this.creationTick = i;
         this.id = j;
     }
 
-    public class_5348 getText() {
+    public StringRenderable getText() {
         return this.text;
     }
 

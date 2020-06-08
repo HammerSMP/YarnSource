@@ -14,30 +14,30 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
+import net.minecraft.text.StringRenderable;
 
 @Environment(value=EnvType.CLIENT)
 public class TextCollector {
-    private final List<class_5348> field_25260 = Lists.newArrayList();
+    private final List<StringRenderable> field_25260 = Lists.newArrayList();
 
-    public void add(class_5348 arg) {
+    public void add(StringRenderable arg) {
         this.field_25260.add(arg);
     }
 
     @Nullable
-    public class_5348 getRawCombined() {
+    public StringRenderable getRawCombined() {
         if (this.field_25260.isEmpty()) {
             return null;
         }
         if (this.field_25260.size() == 1) {
             return this.field_25260.get(0);
         }
-        return class_5348.method_29432(this.field_25260);
+        return StringRenderable.concat(this.field_25260);
     }
 
-    public class_5348 getCombined() {
-        class_5348 lv = this.getRawCombined();
-        return lv != null ? lv : class_5348.field_25310;
+    public StringRenderable getCombined() {
+        StringRenderable lv = this.getRawCombined();
+        return lv != null ? lv : StringRenderable.EMPTY;
     }
 }
 

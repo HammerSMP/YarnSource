@@ -30,7 +30,7 @@ extends DataFix {
     }
 
     public TypeRewriteRule makeRule() {
-        Type type = DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295());
+        Type type = DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType());
         if (!Objects.equals((Object)this.getInputSchema().getType(TypeReferences.ITEM_NAME), (Object)type)) {
             throw new IllegalStateException("item name type is not what was expected.");
         }

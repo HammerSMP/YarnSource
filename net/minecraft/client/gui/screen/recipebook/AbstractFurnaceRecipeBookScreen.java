@@ -124,7 +124,7 @@ extends RecipeBookWidget {
         int k = this.outputSlot.x + i;
         int l = this.outputSlot.y + j;
         DrawableHelper.fill(arg, k, l, k + 16, l + 16, 0x30FF0000);
-        this.client.getItemRenderer().method_27951(this.client.player, this.getItem().getStackForRender(), k, l);
+        this.client.getItemRenderer().renderInGuiWithOverrides(this.client.player, this.getItem().getStackForRender(), k, l);
         RenderSystem.depthFunc(516);
         DrawableHelper.fill(arg, k, l, k + 16, l + 16, 0x30FFFFFF);
         RenderSystem.depthFunc(515);

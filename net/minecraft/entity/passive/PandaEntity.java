@@ -556,7 +556,7 @@ extends AnimalEntity {
         }
         if (this.isLyingOnBack()) {
             this.setLyingOnBack(false);
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         if (this.isBreedingItem(lv)) {
             if (this.getTarget() != null) {

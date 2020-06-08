@@ -49,9 +49,9 @@ implements Toast {
         ItemStack lv2 = lv.getRecipeKindIcon();
         RenderSystem.pushMatrix();
         RenderSystem.scalef(0.6f, 0.6f, 1.0f);
-        arg2.getGame().getItemRenderer().method_27953(lv2, 3, 3);
+        arg2.getGame().getItemRenderer().renderInGui(lv2, 3, 3);
         RenderSystem.popMatrix();
-        arg2.getGame().getItemRenderer().method_27953(lv.getOutput(), 8, 8);
+        arg2.getGame().getItemRenderer().renderInGui(lv.getOutput(), 8, 8);
         return l - this.startTime >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
     }
 

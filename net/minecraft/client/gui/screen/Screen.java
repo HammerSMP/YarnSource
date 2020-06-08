@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.AbstractParentElement;
@@ -47,6 +46,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -138,21 +138,21 @@ Drawable {
         return arg.getTooltip(this.client.player, this.client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
     }
 
-    public void renderTooltip(MatrixStack arg, class_5348 arg2, int i, int j) {
+    public void renderTooltip(MatrixStack arg, StringRenderable arg2, int i, int j) {
         this.renderTooltip(arg, Arrays.asList(arg2), i, j);
     }
 
     /*
      * WARNING - void declaration
      */
-    public void renderTooltip(MatrixStack arg, List<? extends class_5348> list, int i, int j) {
+    public void renderTooltip(MatrixStack arg, List<? extends StringRenderable> list, int i, int j) {
         int n;
         if (list.isEmpty()) {
             return;
         }
         int k = 0;
-        for (class_5348 class_53482 : list) {
-            int l = this.textRenderer.getWidth(class_53482);
+        for (StringRenderable stringRenderable : list) {
+            int l = this.textRenderer.getWidth(stringRenderable);
             if (l <= k) continue;
             k = l;
         }
@@ -200,7 +200,7 @@ Drawable {
         VertexConsumerProvider.Immediate lv5 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         arg.translate(0.0, 0.0, 400.0);
         for (int u = 0; u < list.size(); ++u) {
-            class_5348 lv6 = list.get(u);
+            StringRenderable lv6 = list.get(u);
             if (lv6 != null) {
                 void var7_11;
                 this.textRenderer.draw(lv6, (float)m, (float)var7_11, -1, true, lv4, (VertexConsumerProvider)lv5, false, 0, 0xF000F0);

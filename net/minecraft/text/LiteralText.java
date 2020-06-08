@@ -36,7 +36,7 @@ extends BaseText {
         }
         Language lv = Language.getInstance();
         if (this.field_25315 != lv) {
-            this.field_25316 = lv.method_29426(this.string, false);
+            this.field_25316 = lv.reorder(this.string, false);
             this.field_25315 = lv;
         }
         return this.field_25316;

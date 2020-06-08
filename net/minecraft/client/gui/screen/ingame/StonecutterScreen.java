@@ -35,7 +35,7 @@ extends HandledScreen<StonecutterScreenHandler> {
     public StonecutterScreen(StonecutterScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
         arg.setContentsChangedListener(this::onInventoryChange);
-        --this.field_25268;
+        --this.titleY;
     }
 
     @Override
@@ -102,7 +102,7 @@ extends HandledScreen<StonecutterScreenHandler> {
             int n = i + m % 4 * 16;
             int o = m / 4;
             int p = j + o * 18 + 2;
-            this.client.getItemRenderer().renderGuiItem(list.get(l).getOutput(), n, p);
+            this.client.getItemRenderer().renderInGuiWithOverrides(list.get(l).getOutput(), n, p);
         }
     }
 

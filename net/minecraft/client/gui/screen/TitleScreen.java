@@ -49,7 +49,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -154,7 +154,7 @@ extends Screen {
     }
 
     private void initWidgetsDemo(int i, int j) {
-        this.addButton(new ButtonWidget(this.width / 2 - 100, i, 200, 20, new TranslatableText("menu.playdemo"), arg -> this.client.method_29607("Demo_World", MinecraftServer.DEMO_LEVEL_INFO, DimensionTracker.create(), GeneratorOptions.DEMO_CONFIG)));
+        this.addButton(new ButtonWidget(this.width / 2 - 100, i, 200, 20, new TranslatableText("menu.playdemo"), arg -> this.client.method_29607("Demo_World", MinecraftServer.DEMO_LEVEL_INFO, RegistryTracker.create(), GeneratorOptions.DEMO_CONFIG)));
         this.buttonResetDemo = this.addButton(new ButtonWidget(this.width / 2 - 100, i + j * 1, 200, 20, new TranslatableText("menu.resetdemo"), arg -> {
             LevelStorage lv = this.client.getLevelStorage();
             try (LevelStorage.Session lv2 = lv.createSession("Demo_World");){

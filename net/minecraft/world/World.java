@@ -33,7 +33,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.class_5362;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -83,6 +82,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionBehavior;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -90,7 +90,7 @@ public abstract class World
 implements WorldAccess,
 AutoCloseable {
     protected static final Logger LOGGER = LogManager.getLogger();
-    public static final Codec<RegistryKey<World>> CODEC = Identifier.field_25139.xmap(RegistryKey.createKeyFactory(Registry.DIMENSION), RegistryKey::getValue);
+    public static final Codec<RegistryKey<World>> CODEC = Identifier.CODEC.xmap(RegistryKey.createKeyFactory(Registry.DIMENSION), RegistryKey::getValue);
     public static final RegistryKey<World> OVERWORLD = RegistryKey.of(Registry.DIMENSION, new Identifier("overworld"));
     public static final RegistryKey<World> NETHER = RegistryKey.of(Registry.DIMENSION, new Identifier("the_nether"));
     public static final RegistryKey<World> END = RegistryKey.of(Registry.DIMENSION, new Identifier("the_end"));
@@ -552,7 +552,7 @@ AutoCloseable {
         return this.createExplosion(arg, null, null, d, e, f, g, bl, arg2);
     }
 
-    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, @Nullable class_5362 arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
+    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, @Nullable ExplosionBehavior arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
         Explosion lv = new Explosion(this, arg, arg2, arg3, d, e, f, g, bl, arg4);
         lv.collectBlocksAndDamageEntities();
         lv.affectWorld(true);

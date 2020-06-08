@@ -25,21 +25,21 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5359;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.updater.WorldUpdater;
@@ -66,9 +66,9 @@ extends Screen {
      */
     @Nullable
     public static OptimizeWorldScreen method_27031(MinecraftClient arg, BooleanConsumer booleanConsumer, DataFixer dataFixer, LevelStorage.Session arg2, boolean bl) {
-        DimensionTracker.Modifiable lv = DimensionTracker.create();
-        try (MinecraftClient.class_5367 lv2 = arg.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, DimensionTracker.Modifiable, ResourceManager, class_5359, SaveProperties>)((Function4)MinecraftClient::method_29599), false, arg2);){
-            SaveProperties lv3 = lv2.method_29614();
+        RegistryTracker.Modifiable lv = RegistryTracker.create();
+        try (MinecraftClient.IntegratedResourceManager lv2 = arg.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, arg2);){
+            SaveProperties lv3 = lv2.getSaveProperties();
             arg2.method_27425(lv, lv3);
             ImmutableSet<RegistryKey<World>> immutableSet = lv3.getGeneratorOptions().method_29575();
             OptimizeWorldScreen optimizeWorldScreen = new OptimizeWorldScreen(booleanConsumer, dataFixer, arg2, lv3.getLevelInfo(), bl, immutableSet);

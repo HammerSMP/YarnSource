@@ -64,7 +64,7 @@ extends Item {
                 lv5.incrementStat(Stats.PLAY_RECORD);
             }
         }
-        return ActionResult.method_29236(lv.isClient);
+        return ActionResult.success(lv.isClient);
     }
 
     public int getComparatorOutput() {

@@ -75,7 +75,7 @@ extends LivingEntityRenderer<ArmorStandEntity, ArmorStandArmorEntityModel> {
             return RenderLayer.getEntityTranslucent(lv, false);
         }
         if (bl) {
-            return RenderLayer.getCutoutNoCull(lv, false);
+            return RenderLayer.getEntityCutoutNoCull(lv, false);
         }
         return null;
     }

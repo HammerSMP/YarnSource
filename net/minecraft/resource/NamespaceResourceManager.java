@@ -126,7 +126,7 @@ implements ResourceManager {
     }
 
     @Override
-    public Collection<Identifier> method_29489(Identifier arg, Predicate<String> predicate) {
+    public Collection<Identifier> findResources(Identifier arg, Predicate<String> predicate) {
         if (Objects.equals(arg.getNamespace(), this.namespace)) {
             return this.findResources(arg.getPath(), predicate);
         }

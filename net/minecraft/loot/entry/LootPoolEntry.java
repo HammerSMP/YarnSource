@@ -25,7 +25,7 @@ import net.minecraft.loot.entry.AlternativeEntry;
 import net.minecraft.loot.entry.EntryCombiner;
 import net.minecraft.loot.entry.LootPoolEntryType;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class LootPoolEntry
@@ -48,16 +48,16 @@ implements EntryCombiner {
         return this.conditionPredicate.test(arg);
     }
 
-    public abstract LootPoolEntryType method_29318();
+    public abstract LootPoolEntryType getType();
 
-    public static abstract class class_5337<T extends LootPoolEntry>
-    implements JsonSerializable<T> {
+    public static abstract class Serializer<T extends LootPoolEntry>
+    implements JsonSerializer<T> {
         @Override
         public final void toJson(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
             if (!ArrayUtils.isEmpty((Object[])((LootPoolEntry)arg).conditions)) {
                 jsonObject.add("conditions", jsonSerializationContext.serialize((Object)((LootPoolEntry)arg).conditions));
             }
-            this.method_422(jsonObject, arg, jsonSerializationContext);
+            this.addEntryFields(jsonObject, arg, jsonSerializationContext);
         }
 
         @Override
@@ -66,7 +66,7 @@ implements EntryCombiner {
             return this.fromJson(jsonObject, jsonDeserializationContext, lvs);
         }
 
-        public abstract void method_422(JsonObject var1, T var2, JsonSerializationContext var3);
+        public abstract void addEntryFields(JsonObject var1, T var2, JsonSerializationContext var3);
 
         public abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, LootCondition[] var3);
 

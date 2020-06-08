@@ -40,9 +40,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5317;
-import net.minecraft.class_5352;
-import net.minecraft.class_5382;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
@@ -56,9 +53,11 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.GeneratorType;
 import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.resource.VanillaDataPackProvider;
 import net.minecraft.server.MinecraftServer;
@@ -68,7 +67,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.util.dynamic.RegistryOps;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -90,22 +90,22 @@ Drawable {
     private ButtonWidget mapTypeButton;
     private ButtonWidget customizeTypeButton;
     private ButtonWidget field_25048;
-    private DimensionTracker.Modifiable field_25483;
+    private RegistryTracker.Modifiable field_25483;
     private GeneratorOptions generatorOptions;
-    private Optional<class_5317> field_25049;
+    private Optional<GeneratorType> field_25049;
     private String seedText;
 
     public MoreOptionsDialog() {
-        this.field_25483 = DimensionTracker.create();
+        this.field_25483 = RegistryTracker.create();
         this.generatorOptions = GeneratorOptions.getDefaultOptions();
-        this.field_25049 = Optional.of(class_5317.field_25050);
+        this.field_25049 = Optional.of(GeneratorType.DEFAULT);
         this.seedText = "";
     }
 
-    public MoreOptionsDialog(DimensionTracker.Modifiable arg, GeneratorOptions arg2) {
+    public MoreOptionsDialog(RegistryTracker.Modifiable arg, GeneratorOptions arg2) {
         this.field_25483 = arg;
         this.generatorOptions = arg2;
-        this.field_25049 = class_5317.method_29078(arg2);
+        this.field_25049 = GeneratorType.method_29078(arg2);
         this.seedText = Long.toString(arg2.getSeed());
     }
 
@@ -138,11 +138,11 @@ Drawable {
         this.mapFeaturesButton.visible = false;
         this.mapTypeButton = arg4.addButton(new ButtonWidget(j, 100, 150, 20, new TranslatableText("selectWorld.mapType"), arg2 -> {
             while (this.field_25049.isPresent()) {
-                int i = class_5317.field_25052.indexOf(this.field_25049.get()) + 1;
-                if (i >= class_5317.field_25052.size()) {
+                int i = GeneratorType.VALUES.indexOf(this.field_25049.get()) + 1;
+                if (i >= GeneratorType.VALUES.size()) {
                     i = 0;
                 }
-                class_5317 lv = class_5317.field_25052.get(i);
+                GeneratorType lv = GeneratorType.VALUES.get(i);
                 this.field_25049 = Optional.of(lv);
                 this.generatorOptions = lv.method_29077(this.generatorOptions.getSeed(), this.generatorOptions.shouldGenerateStructures(), this.generatorOptions.hasBonusChest());
                 if (this.generatorOptions.isDebugWorld() && !Screen.hasShiftDown()) continue;
@@ -153,12 +153,12 @@ Drawable {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(MoreOptionsDialog.this.field_25049.map(class_5317::method_29075).orElse(field_25047));
+                return super.getMessage().shallowCopy().append(" ").append(MoreOptionsDialog.this.field_25049.map(GeneratorType::getTranslationKey).orElse(field_25047));
             }
 
             @Override
             protected MutableText getNarrationMessage() {
-                if (Objects.equals(MoreOptionsDialog.this.field_25049, Optional.of(class_5317.field_25051))) {
+                if (Objects.equals(MoreOptionsDialog.this.field_25049, Optional.of(GeneratorType.AMPLIFIED))) {
                     return super.getNarrationMessage().append(". ").append(AMPLIFIED_INFO_TEXT);
                 }
                 return super.getNarrationMessage();
@@ -167,7 +167,7 @@ Drawable {
         this.mapTypeButton.visible = false;
         this.mapTypeButton.active = this.field_25049.isPresent();
         this.customizeTypeButton = arg4.addButton(new ButtonWidget(j, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
-            class_5317.class_5293 lv = class_5317.field_25053.get(this.field_25049);
+            GeneratorType.class_5293 lv = GeneratorType.field_25053.get(this.field_25049);
             if (lv != null) {
                 arg22.openScreen(lv.createEditScreen(arg4, this.generatorOptions));
             }
@@ -192,11 +192,11 @@ Drawable {
             if (string == null) {
                 return;
             }
-            DimensionTracker.Modifiable lv2 = DimensionTracker.create();
-            ResourcePackManager<ResourcePackProfile> lv3 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), class_5352.PACK_SOURCE_WORLD));
+            RegistryTracker.Modifiable lv2 = RegistryTracker.create();
+            ResourcePackManager<ResourcePackProfile> lv3 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
             try {
-                MinecraftServer.method_29736(lv3, arg.field_25479, false);
-                CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv3.method_29211(), CommandManager.class_5364.INTEGRATED, 2, Util.getServerWorkerExecutor(), arg22);
+                MinecraftServer.loadDataPacks(lv3, arg.field_25479, false);
+                CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv3.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), arg22);
                 arg22.runTasks(completableFuture::isDone);
                 ServerResourceManager lv4 = completableFuture.get();
             }
@@ -208,7 +208,7 @@ Drawable {
                 lv3.close();
                 return;
             }
-            class_5382 lv8 = class_5382.method_29753(JsonOps.INSTANCE, lv7.getResourceManager(), lv2);
+            RegistryOps lv8 = RegistryOps.of(JsonOps.INSTANCE, lv7.getResourceManager(), lv2);
             JsonParser jsonParser = new JsonParser();
             try (BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(string, new String[0]));){
                 JsonElement jsonElement = jsonParser.parse((Reader)bufferedReader);
@@ -244,10 +244,10 @@ Drawable {
         this.field_25048.visible = false;
     }
 
-    private void method_29073(DimensionTracker.Modifiable arg, GeneratorOptions arg2) {
+    private void method_29073(RegistryTracker.Modifiable arg, GeneratorOptions arg2) {
         this.field_25483 = arg;
         this.generatorOptions = arg2;
-        this.field_25049 = class_5317.method_29078(arg2);
+        this.field_25049 = GeneratorType.method_29078(arg2);
         this.seedText = Long.toString(arg2.getSeed());
         this.seedTextField.setText(this.seedText);
         this.mapTypeButton.active = this.field_25049.isPresent();
@@ -264,7 +264,7 @@ Drawable {
             this.textRenderer.drawWithShadow(arg, I18n.translate("selectWorld.mapFeatures.info", new Object[0]), (float)(this.parentWidth / 2 - 150), 122.0f, -6250336);
         }
         this.seedTextField.render(arg, i, j, f);
-        if (this.field_25049.equals(Optional.of(class_5317.field_25051))) {
+        if (this.field_25049.equals(Optional.of(GeneratorType.AMPLIFIED))) {
             this.textRenderer.drawTrimmed(AMPLIFIED_INFO_TEXT, this.mapTypeButton.x + 2, this.mapTypeButton.y + 22, this.mapTypeButton.getWidth(), 0xA0A0A0);
         }
     }
@@ -312,13 +312,13 @@ Drawable {
         } else {
             this.mapFeaturesButton.visible = bl;
             this.bonusItemsButton.visible = bl;
-            this.customizeTypeButton.visible = bl && class_5317.field_25053.containsKey(this.field_25049);
+            this.customizeTypeButton.visible = bl && GeneratorType.field_25053.containsKey(this.field_25049);
             this.field_25048.visible = bl;
         }
         this.seedTextField.setVisible(bl);
     }
 
-    public DimensionTracker.Modifiable method_29700() {
+    public RegistryTracker.Modifiable method_29700() {
         return this.field_25483;
     }
 }

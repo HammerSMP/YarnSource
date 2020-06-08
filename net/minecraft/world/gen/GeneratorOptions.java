@@ -45,13 +45,13 @@ import java.util.Random;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5363;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.VanillaLayeredBiomeSource;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorType;
@@ -63,14 +63,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class GeneratorOptions {
-    public static final Codec<GeneratorOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.LONG.fieldOf("seed").stable().forGetter(GeneratorOptions::getSeed), (App)Codec.BOOL.fieldOf("generate_features").withDefault((Object)true).stable().forGetter(GeneratorOptions::shouldGenerateStructures), (App)Codec.BOOL.fieldOf("bonus_chest").withDefault((Object)false).stable().forGetter(GeneratorOptions::hasBonusChest), (App)SimpleRegistry.method_29721(Registry.field_25490, Lifecycle.stable(), class_5363.field_25411).xmap(class_5363::method_29569, Function.identity()).fieldOf("dimensions").forGetter(GeneratorOptions::getDimensionMap), (App)Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter(arg -> arg.legacyCustomOptions)).apply((Applicative)instance, instance.stable((Object)((Function5)GeneratorOptions::new)))).comapFlatMap(GeneratorOptions::method_28610, Function.identity());
+    public static final Codec<GeneratorOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.LONG.fieldOf("seed").stable().forGetter(GeneratorOptions::getSeed), (App)Codec.BOOL.fieldOf("generate_features").withDefault((Object)true).stable().forGetter(GeneratorOptions::shouldGenerateStructures), (App)Codec.BOOL.fieldOf("bonus_chest").withDefault((Object)false).stable().forGetter(GeneratorOptions::hasBonusChest), (App)SimpleRegistry.createCodec(Registry.DIMENSION_OPTIONS, Lifecycle.stable(), DimensionOptions.CODEC).xmap(DimensionOptions::method_29569, Function.identity()).fieldOf("dimensions").forGetter(GeneratorOptions::getDimensionMap), (App)Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter(arg -> arg.legacyCustomOptions)).apply((Applicative)instance, instance.stable((Object)((Function5)GeneratorOptions::new)))).comapFlatMap(GeneratorOptions::method_28610, Function.identity());
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int DEMO_SEED = "North Carolina".hashCode();
-    public static final GeneratorOptions DEMO_CONFIG = new GeneratorOptions(DEMO_SEED, true, true, GeneratorOptions.method_28608(DimensionType.method_28517(DEMO_SEED), GeneratorOptions.method_28604(DEMO_SEED)));
+    public static final GeneratorOptions DEMO_CONFIG = new GeneratorOptions(DEMO_SEED, true, true, GeneratorOptions.method_28608(DimensionType.method_28517(DEMO_SEED), GeneratorOptions.createOverworldGenerator(DEMO_SEED)));
     private final long seed;
     private final boolean generateStructures;
     private final boolean bonusChest;
-    private final SimpleRegistry<class_5363> field_24827;
+    private final SimpleRegistry<DimensionOptions> field_24827;
     private final Optional<String> legacyCustomOptions;
 
     private DataResult<GeneratorOptions> method_28610() {
@@ -81,14 +81,14 @@ public class GeneratorOptions {
     }
 
     private boolean method_28611() {
-        return class_5363.method_29567(this.seed, this.field_24827);
+        return DimensionOptions.method_29567(this.seed, this.field_24827);
     }
 
-    public GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<class_5363> arg) {
+    public GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<DimensionOptions> arg) {
         this(l, bl, bl2, arg, Optional.empty());
     }
 
-    private GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<class_5363> arg, Optional<String> optional) {
+    private GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<DimensionOptions> arg, Optional<String> optional) {
         this.seed = l;
         this.generateStructures = bl;
         this.bonusChest = bl2;
@@ -98,10 +98,10 @@ public class GeneratorOptions {
 
     public static GeneratorOptions getDefaultOptions() {
         long l = new Random().nextLong();
-        return new GeneratorOptions(l, true, false, GeneratorOptions.method_28608(DimensionType.method_28517(l), GeneratorOptions.method_28604(l)));
+        return new GeneratorOptions(l, true, false, GeneratorOptions.method_28608(DimensionType.method_28517(l), GeneratorOptions.createOverworldGenerator(l)));
     }
 
-    public static SurfaceChunkGenerator method_28604(long l) {
+    public static SurfaceChunkGenerator createOverworldGenerator(long l) {
         return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
     }
 
@@ -117,35 +117,36 @@ public class GeneratorOptions {
         return this.bonusChest;
     }
 
-    public static SimpleRegistry<class_5363> method_28608(SimpleRegistry<class_5363> arg, ChunkGenerator arg2) {
-        SimpleRegistry<class_5363> lv = new SimpleRegistry<class_5363>(Registry.field_25490, Lifecycle.experimental());
-        class_5363 lv2 = arg.get(class_5363.field_25412);
-        DimensionType lv3 = lv2 == null ? DimensionType.method_29563() : lv2.method_29570();
-        lv.add(class_5363.field_25412, new class_5363(() -> lv3, arg2));
-        for (Map.Entry<RegistryKey<class_5363>, class_5363> entry : arg.method_29722()) {
-            RegistryKey<class_5363> lv4 = entry.getKey();
-            if (lv4 == class_5363.field_25412) continue;
+    public static SimpleRegistry<DimensionOptions> method_28608(SimpleRegistry<DimensionOptions> arg, ChunkGenerator arg2) {
+        SimpleRegistry<DimensionOptions> lv = new SimpleRegistry<DimensionOptions>(Registry.DIMENSION_OPTIONS, Lifecycle.experimental());
+        DimensionOptions lv2 = arg.get(DimensionOptions.OVERWORLD);
+        DimensionType lv3 = lv2 == null ? DimensionType.getOverworldDimensionType() : lv2.getDimensionType();
+        lv.add(DimensionOptions.OVERWORLD, new DimensionOptions(() -> lv3, arg2));
+        lv.markLoaded(DimensionOptions.OVERWORLD);
+        for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : arg.getEntries()) {
+            RegistryKey<DimensionOptions> lv4 = entry.getKey();
+            if (lv4 == DimensionOptions.OVERWORLD) continue;
             lv.add(lv4, entry.getValue());
-            if (!arg.method_29723(lv4)) continue;
-            lv.method_29725(lv4);
+            if (!arg.isLoaded(lv4)) continue;
+            lv.markLoaded(lv4);
         }
         return lv;
     }
 
-    public SimpleRegistry<class_5363> getDimensionMap() {
+    public SimpleRegistry<DimensionOptions> getDimensionMap() {
         return this.field_24827;
     }
 
     public ChunkGenerator getChunkGenerator() {
-        class_5363 lv = this.field_24827.get(class_5363.field_25412);
+        DimensionOptions lv = this.field_24827.get(DimensionOptions.OVERWORLD);
         if (lv == null) {
-            return GeneratorOptions.method_28604(new Random().nextLong());
+            return GeneratorOptions.createOverworldGenerator(new Random().nextLong());
         }
-        return lv.method_29571();
+        return lv.getChunkGenerator();
     }
 
     public ImmutableSet<RegistryKey<World>> method_29575() {
-        return (ImmutableSet)this.getDimensionMap().method_29722().stream().map(entry -> RegistryKey.of(Registry.DIMENSION, ((RegistryKey)entry.getKey()).getValue())).collect(ImmutableSet.toImmutableSet());
+        return (ImmutableSet)this.getDimensionMap().getEntries().stream().map(entry -> RegistryKey.of(Registry.DIMENSION, ((RegistryKey)entry.getKey()).getValue())).collect(ImmutableSet.toImmutableSet());
     }
 
     public boolean isDebugWorld() {
@@ -176,7 +177,7 @@ public class GeneratorOptions {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public GeneratorOptions method_29573(SimpleRegistry<class_5363> arg) {
+    public GeneratorOptions method_29573(SimpleRegistry<DimensionOptions> arg) {
         return new GeneratorOptions(this.seed, this.generateStructures, this.bonusChest, arg);
     }
 
@@ -203,7 +204,7 @@ public class GeneratorOptions {
                 l = string22.hashCode();
             }
         }
-        SimpleRegistry<class_5363> lv = DimensionType.method_28517(l);
+        SimpleRegistry<DimensionOptions> lv = DimensionType.method_28517(l);
         switch (string5) {
             case "flat": {
                 JsonObject jsonObject = !string2.isEmpty() ? JsonHelper.deserialize(string2) : new JsonObject();
@@ -214,22 +215,22 @@ public class GeneratorOptions {
                 return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, DebugChunkGenerator.INSTANCE));
             }
         }
-        return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, GeneratorOptions.method_28604(l)));
+        return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, GeneratorOptions.createOverworldGenerator(l)));
     }
 
     @Environment(value=EnvType.CLIENT)
     public GeneratorOptions withHardcore(boolean bl, OptionalLong optionalLong) {
         GeneratorOptions lv5;
-        SimpleRegistry<class_5363> lv3;
+        SimpleRegistry<DimensionOptions> lv3;
         long l = optionalLong.orElse(this.seed);
         if (optionalLong.isPresent()) {
-            SimpleRegistry<class_5363> lv = new SimpleRegistry<class_5363>(Registry.field_25490, Lifecycle.experimental());
+            SimpleRegistry<DimensionOptions> lv = new SimpleRegistry<DimensionOptions>(Registry.DIMENSION_OPTIONS, Lifecycle.experimental());
             long m = optionalLong.getAsLong();
-            for (Map.Entry<RegistryKey<class_5363>, class_5363> entry : this.field_24827.method_29722()) {
-                RegistryKey<class_5363> lv2 = entry.getKey();
-                lv.add(lv2, new class_5363(entry.getValue().method_29566(), entry.getValue().method_29571().withSeed(m)));
-                if (!this.field_24827.method_29723(lv2)) continue;
-                lv.method_29725(lv2);
+            for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : this.field_24827.getEntries()) {
+                RegistryKey<DimensionOptions> lv2 = entry.getKey();
+                lv.add(lv2, new DimensionOptions(entry.getValue().getDimensionTypeSupplier(), entry.getValue().getChunkGenerator().withSeed(m)));
+                if (!this.field_24827.isLoaded(lv2)) continue;
+                lv.markLoaded(lv2);
             }
         } else {
             lv3 = this.field_24827;

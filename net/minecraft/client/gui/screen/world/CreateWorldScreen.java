@@ -21,14 +21,13 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5359;
-import net.minecraft.class_5368;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.SaveLevelScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
+import net.minecraft.client.gui.screen.pack.DataPackScreen;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.screen.world.MoreOptionsDialog;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
@@ -37,6 +36,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ServerResourceManager;
@@ -48,10 +48,10 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -75,7 +75,7 @@ extends Screen {
     private boolean tweakedCheats;
     public boolean hardcore;
     private boolean creatingLevel;
-    protected class_5359 field_25479 = class_5359.field_25393;
+    protected DataPackSettings field_25479 = DataPackSettings.SAFE_MODE;
     @Nullable
     private Path field_25477;
     private boolean moreOptionsOpen;
@@ -92,7 +92,7 @@ extends Screen {
     private GameRules gameRules = new GameRules();
     public final MoreOptionsDialog moreOptionsDialog;
 
-    public CreateWorldScreen(@Nullable Screen arg, LevelInfo arg2, GeneratorOptions arg3, @Nullable Path path, DimensionTracker.Modifiable arg4) {
+    public CreateWorldScreen(@Nullable Screen arg, LevelInfo arg2, GeneratorOptions arg3, @Nullable Path path, RegistryTracker.Modifiable arg4) {
         this(arg, new MoreOptionsDialog(arg4, arg3));
         this.levelName = arg2.getLevelName();
         this.cheatsEnabled = arg2.isHardcore();
@@ -263,7 +263,7 @@ extends Screen {
         if (lv.isDebugWorld()) {
             GameRules lv2 = new GameRules();
             lv2.get(GameRules.DO_DAYLIGHT_CYCLE).set(false, null);
-            LevelInfo lv3 = new LevelInfo(this.levelNameField.getText().trim(), GameMode.SPECTATOR, false, Difficulty.PEACEFUL, true, lv2, class_5359.field_25393);
+            LevelInfo lv3 = new LevelInfo(this.levelNameField.getText().trim(), GameMode.SPECTATOR, false, Difficulty.PEACEFUL, true, lv2, DataPackSettings.SAFE_MODE);
         } else {
             lv4 = new LevelInfo(this.levelNameField.getText().trim(), this.currentMode.defaultGameMode, this.hardcore, this.field_24290, this.cheatsEnabled && !this.hardcore, this.gameRules, this.field_25479);
         }
@@ -400,20 +400,20 @@ extends Screen {
     private void method_29694() {
         Path path = this.method_29693();
         if (path != null) {
-            this.client.openScreen(new class_5368((Screen)this, this.field_25479, (arg_0, arg_1) -> this.method_29682(arg_0, arg_1), path.toFile()));
+            this.client.openScreen(new DataPackScreen((Screen)this, this.field_25479, (arg_0, arg_1) -> this.method_29682(arg_0, arg_1), path.toFile()));
         }
     }
 
-    private void method_29682(class_5359 arg, ResourcePackManager<ResourcePackProfile> arg22) {
+    private void method_29682(DataPackSettings arg, ResourcePackManager<ResourcePackProfile> arg22) {
         this.client.send(() -> this.client.openScreen(new SaveLevelScreen(new TranslatableText("dataPack.validation.working"))));
-        ServerResourceManager.reload(arg22.method_29211(), CommandManager.class_5364.INTEGRATED, 2, Util.getServerWorkerExecutor(), this.client).handle((arg2, throwable) -> {
+        ServerResourceManager.reload(arg22.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), this.client).handle((arg2, throwable) -> {
             if (throwable != null) {
                 field_25480.warn("Failed to validate datapack", throwable);
                 this.client.send(() -> this.client.openScreen(new ConfirmScreen(bl -> {
                     if (bl) {
                         this.method_29694();
                     } else {
-                        this.field_25479 = class_5359.field_25393;
+                        this.field_25479 = DataPackSettings.SAFE_MODE;
                         this.client.openScreen(this);
                     }
                 }, new TranslatableText("dataPack.validation.failed"), LiteralText.EMPTY, new TranslatableText("dataPack.validation.back"), new TranslatableText("dataPack.validation.reset"))));

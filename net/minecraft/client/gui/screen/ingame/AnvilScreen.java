@@ -33,7 +33,7 @@ extends ForgingScreen<AnvilScreenHandler> {
 
     public AnvilScreen(AnvilScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3, TEXTURE);
-        this.field_25267 = 60;
+        this.titleX = 60;
     }
 
     @Override

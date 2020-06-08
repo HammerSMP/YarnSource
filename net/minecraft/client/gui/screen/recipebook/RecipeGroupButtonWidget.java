@@ -89,10 +89,10 @@ extends ToggleButtonWidget {
         List<ItemStack> list = this.category.getIcons();
         int n = i = this.toggled ? -2 : 0;
         if (list.size() == 1) {
-            arg.method_27953(list.get(0), this.x + 9 + i, this.y + 5);
+            arg.renderInGui(list.get(0), this.x + 9 + i, this.y + 5);
         } else if (list.size() == 2) {
-            arg.method_27953(list.get(0), this.x + 3 + i, this.y + 5);
-            arg.method_27953(list.get(1), this.x + 14 + i, this.y + 5);
+            arg.renderInGui(list.get(0), this.x + 3 + i, this.y + 5);
+            arg.renderInGui(list.get(1), this.x + 14 + i, this.y + 5);
         }
     }
 

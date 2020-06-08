@@ -157,7 +157,7 @@ public class LocationPredicate {
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject2.get("x"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject2.get("y"));
         NumberRange.FloatRange lv3 = NumberRange.FloatRange.fromJson(jsonObject2.get("z"));
-        RegistryKey lv4 = jsonObject.has("dimension") ? (RegistryKey)Identifier.field_25139.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonObject.get("dimension")).resultOrPartial(((Logger)field_24732)::error).map(arg -> RegistryKey.of(Registry.DIMENSION, arg)).orElse(null) : null;
+        RegistryKey lv4 = jsonObject.has("dimension") ? (RegistryKey)Identifier.CODEC.parse((DynamicOps)JsonOps.INSTANCE, (Object)jsonObject.get("dimension")).resultOrPartial(((Logger)field_24732)::error).map(arg -> RegistryKey.of(Registry.DIMENSION, arg)).orElse(null) : null;
         StructureFeature lv5 = jsonObject.has("feature") ? (StructureFeature)StructureFeature.STRUCTURES.get((Object)JsonHelper.getString(jsonObject, "feature")) : null;
         Biome lv6 = null;
         if (jsonObject.has("biome")) {

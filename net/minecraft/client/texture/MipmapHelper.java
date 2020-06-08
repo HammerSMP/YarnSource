@@ -27,7 +27,7 @@ public class MipmapHelper {
             boolean bl = false;
             block0: for (int j = 0; j < arg.getWidth(); ++j) {
                 for (int k = 0; k < arg.getHeight(); ++k) {
-                    if (arg.getPixelRgba(j, k) >> 24 != 0) continue;
+                    if (arg.getPixelColor(j, k) >> 24 != 0) continue;
                     bl = true;
                     break block0;
                 }
@@ -39,7 +39,7 @@ public class MipmapHelper {
                 int n = lv2.getHeight();
                 for (int o = 0; o < m; ++o) {
                     for (int p = 0; p < n; ++p) {
-                        lv2.setPixelRgba(o, p, MipmapHelper.blend(lv.getPixelRgba(o * 2 + 0, p * 2 + 0), lv.getPixelRgba(o * 2 + 1, p * 2 + 0), lv.getPixelRgba(o * 2 + 0, p * 2 + 1), lv.getPixelRgba(o * 2 + 1, p * 2 + 1), bl));
+                        lv2.setPixelColor(o, p, MipmapHelper.blend(lv.getPixelColor(o * 2 + 0, p * 2 + 0), lv.getPixelColor(o * 2 + 1, p * 2 + 0), lv.getPixelColor(o * 2 + 0, p * 2 + 1), lv.getPixelColor(o * 2 + 1, p * 2 + 1), bl));
                     }
                 }
                 lvs[l] = lv2;

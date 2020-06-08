@@ -117,7 +117,7 @@ implements BlockEntityProvider {
         arg2.playSound(arg4, arg3, SoundEvents.BLOCK_COMPARATOR_CLICK, SoundCategory.BLOCKS, 0.3f, f);
         arg2.setBlockState(arg3, arg, 2);
         this.update(arg2, arg3, arg);
-        return ActionResult.method_29236(arg2.isClient);
+        return ActionResult.success(arg2.isClient);
     }
 
     @Override

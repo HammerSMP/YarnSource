@@ -51,11 +51,11 @@ public enum WhiteRectangleGlyph implements RenderableGlyph
     }
 
     static {
-        IMAGE = Util.make(new NativeImage(NativeImage.Format.RGBA, 5, 8, false), arg -> {
+        IMAGE = Util.make(new NativeImage(NativeImage.Format.ABGR, 5, 8, false), arg -> {
             for (int i = 0; i < 8; ++i) {
                 for (int j = 0; j < 5; ++j) {
                     boolean bl = j == 0 || j + 1 == 5 || i == 0 || i + 1 == 8;
-                    arg.setPixelRgba(j, i, -1);
+                    arg.setPixelColor(j, i, -1);
                 }
             }
             arg.untrack();

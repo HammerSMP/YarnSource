@@ -10,11 +10,11 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5357;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
@@ -25,7 +25,7 @@ public class SmithingScreenHandler
 extends ForgingScreenHandler {
     private final World field_25385;
     @Nullable
-    private class_5357 field_25386;
+    private SmithingRecipe field_25386;
 
     public SmithingScreenHandler(int i, PlayerInventory arg) {
         this(i, arg, ScreenHandlerContext.EMPTY);
@@ -62,7 +62,7 @@ extends ForgingScreenHandler {
 
     @Override
     public void updateResult() {
-        List<class_5357> list = this.field_25385.getRecipeManager().getAllMatches(RecipeType.SMITHING, this.input, this.field_25385);
+        List<SmithingRecipe> list = this.field_25385.getRecipeManager().getAllMatches(RecipeType.SMITHING, this.input, this.field_25385);
         if (list.isEmpty()) {
             this.output.setStack(0, ItemStack.EMPTY);
         } else {

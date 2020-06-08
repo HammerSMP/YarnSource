@@ -15,13 +15,13 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -30,31 +30,31 @@ import net.minecraft.text.TranslatableText;
 public class SystemToast
 implements Toast {
     private final Type type;
-    private class_5348 title;
-    private List<class_5348> field_25037;
+    private StringRenderable title;
+    private List<StringRenderable> field_25037;
     private long startTime;
     private boolean justUpdated;
     private final int field_25038;
 
     public SystemToast(Type arg, Text arg2, @Nullable Text arg3) {
-        this(arg, arg2, (List<class_5348>)SystemToast.method_29626(arg3), 160);
+        this(arg, arg2, (List<StringRenderable>)SystemToast.method_29626(arg3), 160);
     }
 
     public static SystemToast method_29047(MinecraftClient arg, Type arg2, Text arg3, Text arg4) {
         TextRenderer lv = arg.textRenderer;
-        List<class_5348> list = lv.getTextHandler().wrapLines(arg4, 200, Style.EMPTY);
+        List<StringRenderable> list = lv.getTextHandler().wrapLines(arg4, 200, Style.EMPTY);
         int i = Math.max(200, list.stream().mapToInt(lv::getWidth).max().orElse(200));
         return new SystemToast(arg2, arg3, list, i + 30);
     }
 
-    private SystemToast(Type arg, Text arg2, List<class_5348> list, int i) {
+    private SystemToast(Type arg, Text arg2, List<StringRenderable> list, int i) {
         this.type = arg;
         this.title = arg2;
         this.field_25037 = list;
         this.field_25038 = i;
     }
 
-    private static ImmutableList<class_5348> method_29626(@Nullable Text arg) {
+    private static ImmutableList<StringRenderable> method_29626(@Nullable Text arg) {
         return arg == null ? ImmutableList.of() : ImmutableList.of((Object)arg);
     }
 

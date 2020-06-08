@@ -25,7 +25,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class SpringFeatureConfig
 implements FeatureConfig {
-    public static final Codec<SpringFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)FluidState.field_25018.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.BOOL.fieldOf("requires_block_below").withDefault((Object)true).forGetter(arg -> arg.requiresBlockBelow), (App)Codec.INT.fieldOf("rock_count").withDefault((Object)4).forGetter(arg -> arg.rockCount), (App)Codec.INT.fieldOf("hole_count").withDefault((Object)1).forGetter(arg -> arg.holeCount), (App)Registry.BLOCK.listOf().fieldOf("valid_blocks").xmap(ImmutableSet::copyOf, ImmutableList::copyOf).forGetter(arg -> arg.validBlocks)).apply((Applicative)instance, SpringFeatureConfig::new));
+    public static final Codec<SpringFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)FluidState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.BOOL.fieldOf("requires_block_below").withDefault((Object)true).forGetter(arg -> arg.requiresBlockBelow), (App)Codec.INT.fieldOf("rock_count").withDefault((Object)4).forGetter(arg -> arg.rockCount), (App)Codec.INT.fieldOf("hole_count").withDefault((Object)1).forGetter(arg -> arg.holeCount), (App)Registry.BLOCK.listOf().fieldOf("valid_blocks").xmap(ImmutableSet::copyOf, ImmutableList::copyOf).forGetter(arg -> arg.validBlocks)).apply((Applicative)instance, SpringFeatureConfig::new));
     public final FluidState state;
     public final boolean requiresBlockBelow;
     public final int rockCount;

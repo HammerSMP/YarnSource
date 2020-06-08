@@ -52,7 +52,7 @@ implements ParticleEffect {
     private final BlockState blockState;
 
     public static Codec<BlockStateParticleEffect> method_29128(ParticleType<BlockStateParticleEffect> arg3) {
-        return BlockState.field_24734.xmap(arg2 -> new BlockStateParticleEffect(arg3, (BlockState)arg2), arg -> arg.blockState);
+        return BlockState.CODEC.xmap(arg2 -> new BlockStateParticleEffect(arg3, (BlockState)arg2), arg -> arg.blockState);
     }
 
     public BlockStateParticleEffect(ParticleType<BlockStateParticleEffect> arg, BlockState arg2) {

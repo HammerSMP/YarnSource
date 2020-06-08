@@ -54,7 +54,7 @@ extends Item {
             lv.spawnEntity(lv5);
             lv2.decrement(1);
         }
-        return ActionResult.method_29236(lv.isClient);
+        return ActionResult.success(lv.isClient);
     }
 
     @Override

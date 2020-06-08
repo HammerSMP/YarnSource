@@ -21,7 +21,7 @@ public class TakeoffPhase
 extends AbstractPhase {
     private boolean field_7056;
     private Path field_7054;
-    private Vec3d field_7055;
+    private Vec3d target;
 
     public TakeoffPhase(EnderDragonEntity arg) {
         super(arg);
@@ -44,7 +44,7 @@ extends AbstractPhase {
     public void beginPhase() {
         this.field_7056 = true;
         this.field_7054 = null;
-        this.field_7055 = null;
+        this.target = null;
     }
 
     private void method_6858() {
@@ -71,7 +71,7 @@ extends AbstractPhase {
                 this.field_7054.next();
                 while ((d = (double)((float)lv.getY() + this.dragon.getRandom().nextFloat() * 20.0f)) < (double)lv.getY()) {
                 }
-                this.field_7055 = new Vec3d(lv.getX(), d, lv.getZ());
+                this.target = new Vec3d(lv.getX(), d, lv.getZ());
             }
         }
     }
@@ -79,7 +79,7 @@ extends AbstractPhase {
     @Override
     @Nullable
     public Vec3d getTarget() {
-        return this.field_7055;
+        return this.target;
     }
 
     public PhaseType<TakeoffPhase> getType() {

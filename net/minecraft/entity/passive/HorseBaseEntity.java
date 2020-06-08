@@ -234,7 +234,7 @@ Saddleable {
     private void playEatingAnimation() {
         SoundEvent lv;
         this.setEating();
-        if (!this.isSilent() && (lv = this.method_28368()) != null) {
+        if (!this.isSilent() && (lv = this.getEatSound()) != null) {
             this.world.playSound(null, this.getX(), this.getY(), this.getZ(), lv, this.getSoundCategory(), 1.0f, 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f);
         }
     }
@@ -304,7 +304,7 @@ Saddleable {
     }
 
     @Nullable
-    protected SoundEvent method_28368() {
+    protected SoundEvent getEatSound() {
         return null;
     }
 

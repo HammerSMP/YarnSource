@@ -56,7 +56,7 @@ extends AbstractFireballEntity {
         }
         Entity lv = arg.getEntity();
         Entity lv2 = this.getOwner();
-        lv.damage(DamageSource.explosiveProjectile(this, lv2), 6.0f);
+        lv.damage(DamageSource.fireball(this, lv2), 6.0f);
         if (lv2 instanceof LivingEntity) {
             this.dealDamage((LivingEntity)lv2, lv);
         }

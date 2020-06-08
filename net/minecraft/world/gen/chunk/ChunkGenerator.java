@@ -21,8 +21,6 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5311;
-import net.minecraft.class_5313;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
@@ -50,6 +48,8 @@ import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
+import net.minecraft.world.gen.chunk.StrongholdConfig;
+import net.minecraft.world.gen.chunk.StructuresConfig;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
@@ -59,15 +59,15 @@ public abstract class ChunkGenerator {
     public static final Codec<ChunkGenerator> field_24746;
     protected final BiomeSource biomeSource;
     protected final BiomeSource field_24747;
-    private final class_5311 config;
+    private final StructuresConfig config;
     private final long field_24748;
     private final List<ChunkPos> field_24749 = Lists.newArrayList();
 
-    public ChunkGenerator(BiomeSource arg, class_5311 arg2) {
+    public ChunkGenerator(BiomeSource arg, StructuresConfig arg2) {
         this(arg, arg, arg2, 0L);
     }
 
-    public ChunkGenerator(BiomeSource arg, BiomeSource arg2, class_5311 arg3, long l) {
+    public ChunkGenerator(BiomeSource arg, BiomeSource arg2, StructuresConfig arg3, long l) {
         this.biomeSource = arg;
         this.field_24747 = arg2;
         this.config = arg3;
@@ -78,8 +78,8 @@ public abstract class ChunkGenerator {
         if (!this.field_24749.isEmpty()) {
             return;
         }
-        class_5313 lv = this.config.method_28602();
-        if (lv == null || lv.method_28802() == 0) {
+        StrongholdConfig lv = this.config.getStronghold();
+        if (lv == null || lv.getCount() == 0) {
             return;
         }
         ArrayList list = Lists.newArrayList();
@@ -87,9 +87,9 @@ public abstract class ChunkGenerator {
             if (!lv2.hasStructureFeature(StructureFeature.STRONGHOLD)) continue;
             list.add(lv2);
         }
-        int i = lv.method_28799();
-        int j = lv.method_28802();
-        int k = lv.method_28801();
+        int i = lv.getDistance();
+        int j = lv.getCount();
+        int k = lv.getSpread();
         Random random = new Random();
         random.setSeed(this.field_24748);
         double d = random.nextDouble() * Math.PI * 2.0;
@@ -201,7 +201,7 @@ public abstract class ChunkGenerator {
     public void populateEntities(ChunkRegion arg) {
     }
 
-    public class_5311 getConfig() {
+    public StructuresConfig getConfig() {
         return this.config;
     }
 
@@ -224,7 +224,7 @@ public abstract class ChunkGenerator {
     public void setStructureStarts(StructureAccessor arg, Chunk arg2, StructureManager arg3, long l) {
         ChunkPos lv = arg2.getPos();
         Biome lv2 = this.biomeSource.getBiomeForNoiseGen((lv.x << 2) + 2, 0, (lv.z << 2) + 2);
-        this.method_28508(DefaultBiomeFeatures.field_24697, arg, arg2, arg3, l, lv, lv2);
+        this.method_28508(DefaultBiomeFeatures.STRONGHOLD, arg, arg2, arg3, l, lv, lv2);
         for (ConfiguredStructureFeature<?, ?> lv3 : lv2.method_28413()) {
             this.method_28508(lv3, arg, arg2, arg3, l, lv, lv2);
         }

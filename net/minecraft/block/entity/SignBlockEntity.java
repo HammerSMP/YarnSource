@@ -17,7 +17,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.class_5348;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -28,6 +27,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
@@ -40,7 +40,7 @@ extends BlockEntity {
     private final Text[] text = new Text[]{LiteralText.EMPTY, LiteralText.EMPTY, LiteralText.EMPTY, LiteralText.EMPTY};
     private boolean editable = true;
     private PlayerEntity editor;
-    private final class_5348[] textBeingEdited = new class_5348[4];
+    private final StringRenderable[] textBeingEdited = new StringRenderable[4];
     private DyeColor textColor = DyeColor.BLACK;
 
     public SignBlockEntity() {
@@ -87,9 +87,9 @@ extends BlockEntity {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public class_5348 getTextBeingEditedOnRow(int i, UnaryOperator<class_5348> unaryOperator) {
+    public StringRenderable getTextBeingEditedOnRow(int i, UnaryOperator<StringRenderable> unaryOperator) {
         if (this.textBeingEdited[i] == null && this.text[i] != null) {
-            this.textBeingEdited[i] = (class_5348)unaryOperator.apply(this.text[i]);
+            this.textBeingEdited[i] = (StringRenderable)unaryOperator.apply(this.text[i]);
         }
         return this.textBeingEdited[i];
     }

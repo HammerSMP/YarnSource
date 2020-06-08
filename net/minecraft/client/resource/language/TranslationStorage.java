@@ -43,11 +43,11 @@ extends Language {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Pattern field_25288 = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z])");
     private final Map<String, String> translations;
-    private final boolean field_25289;
+    private final boolean rightToLeft;
 
     private TranslationStorage(Map<String, String> map, boolean bl) {
         this.translations = map;
-        this.field_25289 = bl;
+        this.rightToLeft = bl;
     }
 
     public static TranslationStorage load(ResourceManager arg, List<LanguageDefinition> list) {
@@ -77,7 +77,7 @@ extends Language {
                 InputStream inputStream = lv.getInputStream();
                 Throwable throwable = null;
                 try {
-                    Language.method_29425(inputStream, (arg_0, arg_1) -> map.put(arg_0, arg_1));
+                    Language.load(inputStream, (arg_0, arg_1) -> map.put(arg_0, arg_1));
                 }
                 catch (Throwable throwable2) {
                     throwable = throwable2;
@@ -114,19 +114,19 @@ extends Language {
     }
 
     @Override
-    public boolean method_29428() {
-        return this.field_25289;
+    public boolean isRightToLeft() {
+        return this.rightToLeft;
     }
 
     @Override
-    public String method_29426(String string, boolean bl) {
-        if (!this.field_25289) {
+    public String reorder(String string, boolean bl) {
+        if (!this.rightToLeft) {
             return string;
         }
         if (bl && string.indexOf(37) != -1) {
             string = TranslationStorage.method_29389(string);
         }
-        return this.method_29390(string);
+        return this.reorder(string);
     }
 
     public static String method_29389(String string) {
@@ -144,7 +144,7 @@ extends Language {
         return stringBuffer.toString();
     }
 
-    private String method_29390(String string) {
+    private String reorder(String string) {
         try {
             Bidi bidi = new Bidi(new ArabicShaping(8).shape(string), 127);
             bidi.setReorderingMode(0);

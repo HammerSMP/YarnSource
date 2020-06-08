@@ -69,8 +69,8 @@ extends PathNodeMaker {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         int i = MathHelper.floor(this.entity.getY());
         BlockState lv2 = this.cachedWorld.getBlockState(lv.set(this.entity.getX(), (double)i, this.entity.getZ()));
-        if (this.entity.canWalkOnLava(lv2.getFluidState().getFluid())) {
-            while (this.entity.canWalkOnLava(lv2.getFluidState().getFluid())) {
+        if (this.entity.canWalkOnFluid(lv2.getFluidState().getFluid())) {
+            while (this.entity.canWalkOnFluid(lv2.getFluidState().getFluid())) {
                 lv2 = this.cachedWorld.getBlockState(lv.set(this.entity.getX(), (double)(++i), this.entity.getZ()));
             }
             --i;

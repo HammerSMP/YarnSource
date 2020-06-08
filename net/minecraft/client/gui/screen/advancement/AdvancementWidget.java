@@ -18,13 +18,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextHandler;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.advancement.AdvancementObtainedStatus;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -38,9 +38,9 @@ extends DrawableHelper {
     private final AdvancementTab tab;
     private final Advancement advancement;
     private final AdvancementDisplay display;
-    private final class_5348 title;
+    private final StringRenderable title;
     private final int width;
-    private final List<class_5348> description;
+    private final List<StringRenderable> description;
     private final MinecraftClient client;
     private AdvancementWidget parent;
     private final List<AdvancementWidget> children = Lists.newArrayList();
@@ -61,22 +61,22 @@ extends DrawableHelper {
         int k = i > 1 ? arg2.textRenderer.getWidth("  ") + arg2.textRenderer.getWidth("0") * j * 2 + arg2.textRenderer.getWidth("/") : 0;
         int l = 29 + arg2.textRenderer.getWidth(this.title) + k;
         this.description = this.wrapDescription(arg4.getDescription().shallowCopy().formatted(arg4.getFrame().getTitleFormat()), l);
-        for (class_5348 lv : this.description) {
+        for (StringRenderable lv : this.description) {
             l = Math.max(l, arg2.textRenderer.getWidth(lv));
         }
         this.width = l + 3 + 5;
     }
 
-    private static float method_27572(TextHandler arg, List<class_5348> list) {
+    private static float method_27572(TextHandler arg, List<StringRenderable> list) {
         return (float)list.stream().mapToDouble(arg::getWidth).max().orElse(0.0);
     }
 
-    private List<class_5348> wrapDescription(Text arg, int i) {
+    private List<StringRenderable> wrapDescription(Text arg, int i) {
         TextHandler lv = this.client.textRenderer.getTextHandler();
-        List<class_5348> list = null;
+        List<StringRenderable> list = null;
         float f = Float.MAX_VALUE;
         for (int j : field_24262) {
-            List<class_5348> list2 = lv.wrapLines(arg, i - j, Style.EMPTY);
+            List<StringRenderable> list2 = lv.wrapLines(arg, i - j, Style.EMPTY);
             float g = Math.abs(AdvancementWidget.method_27572(lv, list2) - (float)i);
             if (g <= 10.0f) {
                 return list2;
@@ -139,7 +139,7 @@ extends DrawableHelper {
             }
             this.client.getTextureManager().bindTexture(WIDGETS_TEX);
             this.drawTexture(arg, i + this.xPos + 3, j + this.yPos, this.display.getFrame().texV(), 128 + lv2.getSpriteIndex() * 26, 26, 26);
-            this.client.getItemRenderer().method_27953(this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
+            this.client.getItemRenderer().renderInGui(this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
         }
         for (AdvancementWidget lv3 : this.children) {
             lv3.renderWidgets(arg, i, j);
@@ -230,7 +230,7 @@ extends DrawableHelper {
                 this.client.textRenderer.draw(arg, this.description.get(u), (float)(r + 5), (float)(j + this.yPos + 9 + 17 + u * 9), -5592406);
             }
         }
-        this.client.getItemRenderer().method_27953(this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
+        this.client.getItemRenderer().renderInGui(this.display.getIcon(), i + this.xPos + 8, j + this.yPos + 5);
     }
 
     protected void method_2324(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, int p, int q) {

@@ -109,7 +109,7 @@ extends DataFix {
     public TypeRewriteRule makeRule() {
         Schema schema = this.getInputSchema();
         Type type = schema.getType(TypeReferences.ITEM_STACK);
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType()));
         OpticFinder opticFinder2 = DSL.fieldFinder((String)"id", (Type)DSL.string());
         OpticFinder opticFinder3 = type.findField("tag");
         OpticFinder opticFinder4 = opticFinder3.type().findField("EntityTag");

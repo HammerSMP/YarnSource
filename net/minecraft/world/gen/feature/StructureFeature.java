@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
-import net.minecraft.class_5314;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.structure.StructureManager;
@@ -45,6 +44,7 @@ import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.StructureConfig;
 import net.minecraft.world.gen.feature.BastionRemnantFeature;
 import net.minecraft.world.gen.feature.BastionRemnantFeatureConfig;
 import net.minecraft.world.gen.feature.BuriedTreasureFeature;
@@ -170,8 +170,8 @@ public abstract class StructureFeature<C extends FeatureConfig> {
     }
 
     @Nullable
-    public BlockPos locateStructure(WorldView arg, StructureAccessor arg2, BlockPos arg3, int i, boolean bl, long l, class_5314 arg4) {
-        int j = arg4.method_28803();
+    public BlockPos locateStructure(WorldView arg, StructureAccessor arg2, BlockPos arg3, int i, boolean bl, long l, StructureConfig arg4) {
+        int j = arg4.getSpacing();
         int k = arg3.getX() >> 4;
         int m = arg3.getZ() >> 4;
         ChunkRandom lv = new ChunkRandom();
@@ -208,14 +208,14 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         return true;
     }
 
-    public final ChunkPos method_27218(class_5314 arg, long l, ChunkRandom arg2, int i, int j) {
+    public final ChunkPos method_27218(StructureConfig arg, long l, ChunkRandom arg2, int i, int j) {
         int s;
         int r;
-        int k = arg.method_28803();
-        int m = arg.method_28806();
+        int k = arg.getSpacing();
+        int m = arg.getSeparation();
         int n = Math.floorDiv(i, k);
         int o = Math.floorDiv(j, k);
-        arg2.setRegionSeed(l, n, o, arg.method_28808());
+        arg2.setRegionSeed(l, n, o, arg.getSalt());
         if (this.method_27219()) {
             int p = arg2.nextInt(k - m);
             int q = arg2.nextInt(k - m);
@@ -234,7 +234,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         return this.getStructureStartFactory().create(this, i, j, arg, k, l);
     }
 
-    public StructureStart<?> method_28657(ChunkGenerator arg, BiomeSource arg2, StructureManager arg3, long l, ChunkPos arg4, Biome arg5, int i, ChunkRandom arg6, class_5314 arg7, C arg8) {
+    public StructureStart<?> method_28657(ChunkGenerator arg, BiomeSource arg2, StructureManager arg3, long l, ChunkPos arg4, Biome arg5, int i, ChunkRandom arg6, StructureConfig arg7, C arg8) {
         ChunkPos lv = this.method_27218(arg7, l, arg6, arg4.x, arg4.z);
         if (arg4.x == lv.x && arg4.z == lv.z && this.shouldStartAt(arg, arg2, l, arg6, arg4.x, arg4.z, arg5, lv, arg8)) {
             StructureStart<C> lv2 = this.method_28656(arg4.x, arg4.z, BlockBox.empty(), i, l);

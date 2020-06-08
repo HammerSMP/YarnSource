@@ -35,7 +35,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.COPY_NAME;
     }
 
@@ -58,8 +58,8 @@ extends ConditionalLootFunction {
         return CopyNameLootFunction.builder((LootCondition[] args) -> new CopyNameLootFunction((LootCondition[])args, arg));
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<CopyNameLootFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<CopyNameLootFunction> {
         @Override
         public void toJson(JsonObject jsonObject, CopyNameLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);

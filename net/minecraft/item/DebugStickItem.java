@@ -56,7 +56,7 @@ extends Item {
             BlockPos lv3 = arg.getBlockPos();
             this.use(lv, lv2.getBlockState(lv3), lv2, lv3, true, arg.getStack());
         }
-        return ActionResult.method_29236(lv2.isClient);
+        return ActionResult.success(lv2.isClient);
     }
 
     private void use(PlayerEntity arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, boolean bl, ItemStack arg5) {

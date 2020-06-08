@@ -39,7 +39,7 @@ implements ShapeContext {
 
     @Deprecated
     protected EntityShapeContext(Entity arg2) {
-        this(arg2.isDescending(), arg2.getY(), arg2 instanceof LivingEntity ? ((LivingEntity)arg2).getMainHandStack().getItem() : Items.AIR, arg2 instanceof LivingEntity ? ((LivingEntity)arg2)::canWalkOnLava : arg -> false);
+        this(arg2.isDescending(), arg2.getY(), arg2 instanceof LivingEntity ? ((LivingEntity)arg2).getMainHandStack().getItem() : Items.AIR, arg2 instanceof LivingEntity ? ((LivingEntity)arg2)::canWalkOnFluid : arg -> false);
     }
 
     @Override

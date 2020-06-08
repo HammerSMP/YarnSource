@@ -102,7 +102,7 @@ extends Item {
             lv.spawnEntity(lv6);
         }
         lv4.decrement(1);
-        return ActionResult.method_29236(lv.isClient);
+        return ActionResult.success(lv.isClient);
     }
 }
 

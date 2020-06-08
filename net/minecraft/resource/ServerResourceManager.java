@@ -32,7 +32,7 @@ implements AutoCloseable {
     private final ServerAdvancementLoader serverAdvancementLoader = new ServerAdvancementLoader(this.lootConditionManager);
     private final FunctionLoader functionLoader;
 
-    public ServerResourceManager(CommandManager.class_5364 arg, int i) {
+    public ServerResourceManager(CommandManager.RegistrationEnvironment arg, int i) {
         this.commandManager = new CommandManager(arg);
         this.functionLoader = new FunctionLoader(i, this.commandManager.getDispatcher());
         this.resourceManager.registerListener(this.registryTagManager);
@@ -75,7 +75,7 @@ implements AutoCloseable {
         return this.resourceManager;
     }
 
-    public static CompletableFuture<ServerResourceManager> reload(List<ResourcePack> list, CommandManager.class_5364 arg, int i, Executor executor, Executor executor2) {
+    public static CompletableFuture<ServerResourceManager> reload(List<ResourcePack> list, CommandManager.RegistrationEnvironment arg, int i, Executor executor, Executor executor2) {
         ServerResourceManager lv = new ServerResourceManager(arg, i);
         CompletableFuture<Unit> completableFuture = lv.resourceManager.beginReload(executor, executor2, list, field_25334);
         return ((CompletableFuture)completableFuture.whenComplete((arg2, throwable) -> {
@@ -85,8 +85,8 @@ implements AutoCloseable {
         })).thenApply(arg2 -> lv);
     }
 
-    public void method_29475() {
-        this.registryTagManager.method_29226();
+    public void loadRegistryTags() {
+        this.registryTagManager.apply();
     }
 
     @Override

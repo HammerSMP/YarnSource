@@ -20,7 +20,7 @@ import net.minecraft.loot.condition.LootConditionTypes;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 
 public class TimeCheckLootCondition
 implements LootCondition {
@@ -34,7 +34,7 @@ implements LootCondition {
     }
 
     @Override
-    public LootConditionType method_29325() {
+    public LootConditionType getType() {
         return LootConditionTypes.TIME_CHECK;
     }
 
@@ -53,8 +53,8 @@ implements LootCondition {
         return this.test((LootContext)object);
     }
 
-    public static class Factory
-    implements JsonSerializable<TimeCheckLootCondition> {
+    public static class Serializer
+    implements JsonSerializer<TimeCheckLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, TimeCheckLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.addProperty("period", (Number)arg.period);

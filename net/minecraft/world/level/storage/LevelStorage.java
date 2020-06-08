@@ -61,8 +61,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5315;
-import net.minecraft.class_5359;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.Schemas;
@@ -70,16 +68,17 @@ import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
@@ -87,6 +86,7 @@ import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.storage.AnvilLevelStorage;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
+import net.minecraft.world.level.storage.SaveVersionInfo;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -127,8 +127,8 @@ public class LevelStorage {
         return Pair.of((Object)dataResult.resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)LOGGER)::error)).orElseGet(GeneratorOptions::getDefaultOptions), (Object)dataResult.lifecycle());
     }
 
-    private static class_5359 method_29580(Dynamic<?> dynamic) {
-        return class_5359.field_25394.parse(dynamic).resultOrPartial(((Logger)LOGGER)::error).orElse(class_5359.field_25393);
+    private static DataPackSettings method_29580(Dynamic<?> dynamic) {
+        return DataPackSettings.CODEC.parse(dynamic).resultOrPartial(((Logger)LOGGER)::error).orElse(DataPackSettings.SAFE_MODE);
     }
 
     /*
@@ -180,14 +180,14 @@ public class LevelStorage {
     }
 
     @Nullable
-    private static class_5359 method_29583(File file, DataFixer dataFixer) {
+    private static DataPackSettings method_29583(File file, DataFixer dataFixer) {
         try {
             CompoundTag lv = NbtIo.readCompressed(new FileInputStream(file));
             CompoundTag lv2 = lv.getCompound("Data");
             lv2.remove("Player");
             int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
             Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
-            return dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(class_5359.field_25393);
+            return dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(DataPackSettings.SAFE_MODE);
         }
         catch (Exception exception) {
             LOGGER.error("Exception reading {}", (Object)file, (Object)exception);
@@ -195,7 +195,7 @@ public class LevelStorage {
         }
     }
 
-    private static BiFunction<File, DataFixer, LevelProperties> readLevelProperties(DynamicOps<Tag> dynamicOps, class_5359 arg) {
+    private static BiFunction<File, DataFixer, LevelProperties> readLevelProperties(DynamicOps<Tag> dynamicOps, DataPackSettings arg) {
         return (file, dataFixer) -> {
             try {
                 CompoundTag lv = NbtIo.readCompressed(new FileInputStream((File)file));
@@ -205,7 +205,7 @@ public class LevelStorage {
                 int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
                 Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic(dynamicOps, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
                 Pair<GeneratorOptions, Lifecycle> pair = LevelStorage.method_29010(dynamic, dataFixer, i);
-                class_5315 lv4 = class_5315.method_29023(dynamic);
+                SaveVersionInfo lv4 = SaveVersionInfo.fromDynamic(dynamic);
                 LevelInfo lv5 = LevelInfo.method_28383(dynamic, arg);
                 return LevelProperties.method_29029((Dynamic<Tag>)dynamic, dataFixer, i, lv3, lv5, lv4, (GeneratorOptions)pair.getFirst(), (Lifecycle)pair.getSecond());
             }
@@ -224,12 +224,12 @@ public class LevelStorage {
                 lv2.remove("Player");
                 int i = lv2.contains("DataVersion", 99) ? lv2.getInt("DataVersion") : -1;
                 Dynamic dynamic = dataFixer.update(DataFixTypes.LEVEL.getTypeReference(), new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)lv2), i, SharedConstants.getGameVersion().getWorldVersion());
-                class_5315 lv3 = class_5315.method_29023(dynamic);
-                int j = lv3.method_29022();
+                SaveVersionInfo lv3 = SaveVersionInfo.fromDynamic(dynamic);
+                int j = lv3.getLevelFormatVersion();
                 if (j == 19132 || j == 19133) {
                     boolean bl2 = j != this.getCurrentVersion();
                     File file3 = new File(file, "icon.png");
-                    class_5359 lv4 = dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(class_5359.field_25393);
+                    DataPackSettings lv4 = dynamic.get("DataPacks").result().map(LevelStorage::method_29580).orElse(DataPackSettings.SAFE_MODE);
                     LevelInfo lv5 = LevelInfo.method_28383(dynamic, lv4);
                     return new LevelSummary(lv5, lv3, file.getName(), bl2, bl, file3);
                 }
@@ -312,7 +312,7 @@ public class LevelStorage {
 
         public boolean needsConversion() {
             LevelSummary lv = this.method_29584();
-            return lv != null && lv.method_29586().method_29022() != LevelStorage.this.getCurrentVersion();
+            return lv != null && lv.method_29586().getLevelFormatVersion() != LevelStorage.this.getCurrentVersion();
         }
 
         public boolean convert(ProgressListener arg) {
@@ -327,22 +327,22 @@ public class LevelStorage {
         }
 
         @Nullable
-        public SaveProperties readLevelProperties(DynamicOps<Tag> dynamicOps, class_5359 arg) {
+        public SaveProperties readLevelProperties(DynamicOps<Tag> dynamicOps, DataPackSettings arg) {
             this.checkValid();
             return (SaveProperties)LevelStorage.this.readLevelProperties(this.directory.toFile(), LevelStorage.readLevelProperties((DynamicOps<Tag>)dynamicOps, arg));
         }
 
         @Nullable
-        public class_5359 method_29585() {
+        public DataPackSettings method_29585() {
             this.checkValid();
-            return (class_5359)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.method_29583(file, dataFixer));
+            return (DataPackSettings)LevelStorage.this.readLevelProperties(this.directory.toFile(), (file, dataFixer) -> LevelStorage.method_29583(file, dataFixer));
         }
 
-        public void method_27425(DimensionTracker arg, SaveProperties arg2) {
+        public void method_27425(RegistryTracker arg, SaveProperties arg2) {
             this.method_27426(arg, arg2, null);
         }
 
-        public void method_27426(DimensionTracker arg, SaveProperties arg2, @Nullable CompoundTag arg3) {
+        public void method_27426(RegistryTracker arg, SaveProperties arg2, @Nullable CompoundTag arg3) {
             File file = this.directory.toFile();
             CompoundTag lv = arg2.cloneWorldTag(arg, arg3);
             CompoundTag lv2 = new CompoundTag();

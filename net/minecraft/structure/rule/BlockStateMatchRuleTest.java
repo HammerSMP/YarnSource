@@ -14,7 +14,7 @@ import net.minecraft.structure.rule.RuleTestType;
 
 public class BlockStateMatchRuleTest
 extends RuleTest {
-    public static final Codec<BlockStateMatchRuleTest> field_25001 = BlockState.field_24734.fieldOf("block_state").xmap(BlockStateMatchRuleTest::new, arg -> arg.blockState).codec();
+    public static final Codec<BlockStateMatchRuleTest> field_25001 = BlockState.CODEC.fieldOf("block_state").xmap(BlockStateMatchRuleTest::new, arg -> arg.blockState).codec();
     private final BlockState blockState;
 
     public BlockStateMatchRuleTest(BlockState arg) {

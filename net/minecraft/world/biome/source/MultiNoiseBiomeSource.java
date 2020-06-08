@@ -108,7 +108,7 @@ extends BiomeSource {
 
     public static class class_5305 {
         private static final Map<Identifier, class_5305> field_24724 = Maps.newHashMap();
-        public static final MapCodec<Pair<class_5305, Long>> field_24722 = Codec.mapPair((MapCodec)Identifier.field_25139.flatXmap(arg -> Optional.ofNullable(field_24724.get(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown preset: " + arg))), arg -> DataResult.success((Object)arg.field_24725)).fieldOf("preset"), (MapCodec)Codec.LONG.fieldOf("seed")).stable();
+        public static final MapCodec<Pair<class_5305, Long>> field_24722 = Codec.mapPair((MapCodec)Identifier.CODEC.flatXmap(arg -> Optional.ofNullable(field_24724.get(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown preset: " + arg))), arg -> DataResult.success((Object)arg.field_24725)).fieldOf("preset"), (MapCodec)Codec.LONG.fieldOf("seed")).stable();
         public static final class_5305 field_24723 = new class_5305(new Identifier("nether"), l -> MultiNoiseBiomeSource.method_28465(l));
         private final Identifier field_24725;
         private final LongFunction<MultiNoiseBiomeSource> field_24726;

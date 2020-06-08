@@ -91,11 +91,11 @@ implements Waterloggable {
         EnderChestInventory lv = arg4.getEnderChestInventory();
         BlockEntity lv2 = arg22.getBlockEntity(arg32);
         if (lv == null || !(lv2 instanceof EnderChestBlockEntity)) {
-            return ActionResult.method_29236(arg22.isClient);
+            return ActionResult.success(arg22.isClient);
         }
         BlockPos lv3 = arg32.up();
         if (arg22.getBlockState(lv3).isSolidBlock(arg22, lv3)) {
-            return ActionResult.method_29236(arg22.isClient);
+            return ActionResult.success(arg22.isClient);
         }
         if (arg22.isClient) {
             return ActionResult.SUCCESS;

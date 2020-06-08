@@ -160,7 +160,7 @@ extends WaterCreatureEntity {
                 arg.dropItem(lv2, false);
             }
             this.remove();
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

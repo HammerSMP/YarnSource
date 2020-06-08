@@ -45,7 +45,7 @@ extends Item {
             if (!lv.isClient) {
                 lv.syncWorldEvent(2005, lv2, 0);
             }
-            return ActionResult.method_29236(lv.isClient);
+            return ActionResult.success(lv.isClient);
         }
         BlockState lv4 = lv.getBlockState(lv2);
         boolean bl = lv4.isSideSolidFullSquare(lv, lv2, arg.getSide());
@@ -53,7 +53,7 @@ extends Item {
             if (!lv.isClient) {
                 lv.syncWorldEvent(2005, lv3, 0);
             }
-            return ActionResult.method_29236(lv.isClient);
+            return ActionResult.success(lv.isClient);
         }
         return ActionResult.PASS;
     }

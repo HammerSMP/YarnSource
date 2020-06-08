@@ -88,7 +88,7 @@ extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        return this.ring(arg2, arg, arg6, arg4, true) ? ActionResult.method_29236(arg2.isClient) : ActionResult.PASS;
+        return this.ring(arg2, arg, arg6, arg4, true) ? ActionResult.success(arg2.isClient) : ActionResult.PASS;
     }
 
     public boolean ring(World arg, BlockState arg2, BlockHitResult arg3, @Nullable PlayerEntity arg4, boolean bl) {

@@ -18,7 +18,7 @@ public enum ActionResult {
         return this == SUCCESS;
     }
 
-    public static ActionResult method_29236(boolean bl) {
+    public static ActionResult success(boolean bl) {
         return bl ? SUCCESS : CONSUME;
     }
 }

@@ -32,7 +32,7 @@ extends Item {
             if (!lv.isClient && lv4 != null) {
                 LeadItem.attachHeldMobsToBlock(lv4, lv, lv2);
             }
-            return ActionResult.method_29236(lv.isClient);
+            return ActionResult.success(lv.isClient);
         }
         return ActionResult.PASS;
     }

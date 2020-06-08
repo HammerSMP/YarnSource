@@ -34,7 +34,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5359;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
@@ -54,6 +53,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
@@ -64,8 +64,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -338,11 +338,11 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         }
 
         public void recreate() {
-            DimensionTracker.Modifiable lv = DimensionTracker.create();
+            RegistryTracker.Modifiable lv = RegistryTracker.create();
             try (LevelStorage.Session lv2 = this.client.getLevelStorage().createSession(this.level.getName());
-                 MinecraftClient.class_5367 lv3 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, DimensionTracker.Modifiable, ResourceManager, class_5359, SaveProperties>)((Function4)MinecraftClient::method_29599), false, lv2);){
-                LevelInfo lv4 = lv3.method_29614().getLevelInfo();
-                GeneratorOptions lv5 = lv3.method_29614().getGeneratorOptions();
+                 MinecraftClient.IntegratedResourceManager lv3 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, lv2);){
+                LevelInfo lv4 = lv3.getSaveProperties().getLevelInfo();
+                GeneratorOptions lv5 = lv3.getSaveProperties().getGeneratorOptions();
                 Path path = CreateWorldScreen.method_29685(lv2.getDirectory(WorldSavePath.DATAPACKS), this.client);
                 if (lv5.isLegacyCustomizedType()) {
                     this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? new CreateWorldScreen(this.screen, lv4, lv5, path, lv) : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
@@ -359,7 +359,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         private void start() {
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             if (this.client.getLevelStorage().levelExists(this.level.getName())) {
-                this.client.method_29606(this.level.getName());
+                this.client.startIntegratedServer(this.level.getName());
             }
         }
 

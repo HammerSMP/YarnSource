@@ -22,7 +22,7 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.entity.DamageSourcePredicate;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -35,7 +35,7 @@ implements LootCondition {
     }
 
     @Override
-    public LootConditionType method_29325() {
+    public LootConditionType getType() {
         return LootConditionTypes.DAMAGE_SOURCE_PROPERTIES;
     }
 
@@ -60,8 +60,8 @@ implements LootCondition {
         return this.test((LootContext)object);
     }
 
-    public static class Factory
-    implements JsonSerializable<DamageSourcePropertiesLootCondition> {
+    public static class Serializer
+    implements JsonSerializer<DamageSourcePropertiesLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, DamageSourcePropertiesLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());

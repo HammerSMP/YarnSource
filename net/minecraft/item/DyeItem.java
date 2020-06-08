@@ -34,7 +34,7 @@ extends Item {
         if (arg3 instanceof SheepEntity && (lv = (SheepEntity)arg3).isAlive() && !lv.isSheared() && lv.getColor() != this.color) {
             lv.setColor(this.color);
             arg.decrement(1);
-            return ActionResult.method_29236(arg2.world.isClient);
+            return ActionResult.success(arg2.world.isClient);
         }
         return ActionResult.PASS;
     }

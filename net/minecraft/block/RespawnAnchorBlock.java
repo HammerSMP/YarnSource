@@ -16,8 +16,6 @@ import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5360;
-import net.minecraft.class_5362;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.damage.DamageSource;
@@ -43,7 +41,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.explosion.DefaultExplosionBehavior;
 import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionBehavior;
 
 public class RespawnAnchorBlock
 extends Block {
@@ -65,7 +65,7 @@ extends Block {
             if (!arg4.abilities.creativeMode) {
                 lv.decrement(1);
             }
-            return ActionResult.method_29236(arg2.isClient);
+            return ActionResult.success(arg2.isClient);
         }
         if (arg.get(CHARGES) == 0) {
             return ActionResult.PASS;
@@ -80,9 +80,9 @@ extends Block {
             return RespawnAnchorBlock.canCharge(arg) ? ActionResult.PASS : ActionResult.CONSUME;
         }
         if (!arg2.isClient) {
-            this.method_29561(arg, arg2, arg3);
+            this.explode(arg, arg2, arg3);
         }
-        return ActionResult.method_29236(arg2.isClient);
+        return ActionResult.success(arg2.isClient);
     }
 
     private static boolean isChargeItem(ItemStack arg) {
@@ -93,7 +93,7 @@ extends Block {
         return arg.get(CHARGES) < 4;
     }
 
-    private static boolean method_29560(BlockPos arg, World arg2) {
+    private static boolean hasStillWater(BlockPos arg, World arg2) {
         FluidState lv = arg2.getFluidState(arg);
         if (!lv.matches(FluidTags.WATER)) {
             return false;
@@ -109,26 +109,26 @@ extends Block {
         return !lv2.matches(FluidTags.WATER);
     }
 
-    private void method_29561(BlockState arg, World arg22, final BlockPos arg3) {
+    private void explode(BlockState arg, World arg22, final BlockPos arg3) {
         arg22.removeBlock(arg3, false);
-        boolean bl = Direction.Type.HORIZONTAL.method_29716().map(arg3::offset).anyMatch(arg2 -> RespawnAnchorBlock.method_29560(arg2, arg22));
+        boolean bl = Direction.Type.HORIZONTAL.stream().map(arg3::offset).anyMatch(arg2 -> RespawnAnchorBlock.hasStillWater(arg2, arg22));
         final boolean bl2 = bl || arg22.getFluidState(arg3.up()).matches(FluidTags.WATER);
-        class_5362 lv = new class_5362(){
+        ExplosionBehavior lv = new ExplosionBehavior(){
 
             @Override
-            public Optional<Float> method_29555(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, FluidState arg5) {
+            public Optional<Float> getBlastResistance(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, FluidState arg5) {
                 if (arg32.equals(arg3) && bl2) {
                     return Optional.of(Float.valueOf(Blocks.WATER.getBlastResistance()));
                 }
-                return class_5360.INSTANCE.method_29555(arg, arg2, arg32, arg4, arg5);
+                return DefaultExplosionBehavior.INSTANCE.getBlastResistance(arg, arg2, arg32, arg4, arg5);
             }
 
             @Override
-            public boolean method_29554(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, float f) {
-                return class_5360.INSTANCE.method_29554(arg, arg2, arg32, arg4, f);
+            public boolean canDestroyBlock(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, float f) {
+                return DefaultExplosionBehavior.INSTANCE.canDestroyBlock(arg, arg2, arg32, arg4, f);
             }
         };
-        arg22.createExplosion(null, DamageSource.netherBed(), lv, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
+        arg22.createExplosion(null, DamageSource.badRespawnPoint(), lv, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
     }
 
     public static boolean isNether(World arg) {

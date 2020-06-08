@@ -64,7 +64,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.COPY_NBT;
     }
 
@@ -103,8 +103,8 @@ extends ConditionalLootFunction {
         return BLOCK_ENTITY_TAG_GETTER;
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<CopyNbtLootFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<CopyNbtLootFunction> {
         @Override
         public void toJson(JsonObject jsonObject, CopyNbtLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);

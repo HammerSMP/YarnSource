@@ -493,7 +493,7 @@ extends LivingEntity {
             this.flyingSpeed = (float)((double)this.flyingSpeed + 0.005999999865889549);
         }
         this.setMovementSpeed((float)lv.getValue());
-        if (!this.onGround || this.method_29504() || this.isSwimming()) {
+        if (!this.onGround || this.isDead() || this.isSwimming()) {
             float f = 0.0f;
         } else {
             g = Math.min(0.1f, MathHelper.sqrt(PlayerEntity.squaredHorizontalLength(this.getVelocity())));
@@ -767,7 +767,7 @@ extends LivingEntity {
             return false;
         }
         this.despawnCounter = 0;
-        if (this.method_29504()) {
+        if (this.isDead()) {
             return false;
         }
         this.dropShoulderEntities();

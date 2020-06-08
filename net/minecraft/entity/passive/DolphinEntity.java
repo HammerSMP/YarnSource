@@ -310,7 +310,7 @@ extends WaterCreatureEntity {
             if (!arg.abilities.creativeMode) {
                 lv.decrement(1);
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         return super.interactMob(arg, arg2);
     }

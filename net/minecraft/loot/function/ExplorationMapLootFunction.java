@@ -59,7 +59,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.EXPLORATION_MAP;
     }
 
@@ -90,8 +90,8 @@ extends ConditionalLootFunction {
         return new Builder();
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<ExplorationMapLootFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<ExplorationMapLootFunction> {
         @Override
         public void toJson(JsonObject jsonObject, ExplorationMapLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);
@@ -114,7 +114,7 @@ extends ConditionalLootFunction {
 
         @Override
         public ExplorationMapLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            StructureFeature<?> lv = Factory.method_29039(jsonObject);
+            StructureFeature<?> lv = Serializer.method_29039(jsonObject);
             String string = jsonObject.has("decoration") ? JsonHelper.getString(jsonObject, "decoration") : "mansion";
             MapIcon.Type lv2 = DEFAULT_DECORATION;
             try {

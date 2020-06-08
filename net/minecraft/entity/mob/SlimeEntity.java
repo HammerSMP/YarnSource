@@ -188,7 +188,7 @@ implements Monster {
     @Override
     public void remove() {
         int i = this.getSize();
-        if (!this.world.isClient && i > 1 && this.method_29504()) {
+        if (!this.world.isClient && i > 1 && this.isDead()) {
             Text lv = this.getCustomName();
             boolean bl = this.isAiDisabled();
             float f = (float)i / 4.0f;

@@ -39,7 +39,7 @@ extends HandledScreen<MerchantScreenHandler> {
     public MerchantScreen(MerchantScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
         this.backgroundWidth = 276;
-        this.field_25269 = 107;
+        this.playerInventoryTitleX = 107;
     }
 
     private void syncRecipeIndex() {
@@ -79,7 +79,7 @@ extends HandledScreen<MerchantScreenHandler> {
         } else {
             this.textRenderer.draw(arg, this.title, (float)(49 + this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2), 6.0f, 0x404040);
         }
-        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), (float)this.field_25269, (float)this.field_25270, 0x404040);
+        this.textRenderer.draw(arg, this.playerInventory.getDisplayName(), (float)this.playerInventoryTitleX, (float)this.playerInventoryTitleY, 0x404040);
         String string2 = I18n.translate("merchant.trades", new Object[0]);
         int p = this.textRenderer.getWidth(string2);
         this.textRenderer.draw(arg, string2, (float)(5 - p / 2 + 48), 6.0f, 0x404040);
@@ -174,11 +174,11 @@ extends HandledScreen<MerchantScreenHandler> {
                 int p = m + 2;
                 this.method_20222(arg, lv4, lv3, n, p);
                 if (!lv5.isEmpty()) {
-                    this.itemRenderer.method_27953(lv5, k + 5 + 35, p);
+                    this.itemRenderer.renderInGui(lv5, k + 5 + 35, p);
                     this.itemRenderer.renderGuiItemOverlay(this.textRenderer, lv5, k + 5 + 35, p);
                 }
                 this.method_20223(arg, lv2, k, p);
-                this.itemRenderer.method_27953(lv6, k + 5 + 68, p);
+                this.itemRenderer.renderInGui(lv6, k + 5 + 68, p);
                 this.itemRenderer.renderGuiItemOverlay(this.textRenderer, lv6, k + 5 + 68, p);
                 this.itemRenderer.zOffset = 0.0f;
                 m += 20;
@@ -215,7 +215,7 @@ extends HandledScreen<MerchantScreenHandler> {
     }
 
     private void method_20222(MatrixStack arg, ItemStack arg2, ItemStack arg3, int i, int j) {
-        this.itemRenderer.method_27953(arg2, i, j);
+        this.itemRenderer.renderInGui(arg2, i, j);
         if (arg3.getCount() == arg2.getCount()) {
             this.itemRenderer.renderGuiItemOverlay(this.textRenderer, arg2, i, j);
         } else {

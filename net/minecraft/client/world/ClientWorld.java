@@ -117,7 +117,7 @@ extends World {
         this.clientWorldProperties = arg2;
         this.netHandler = arg;
         this.worldRenderer = arg6;
-        this.skyProperties = SkyProperties.byDimensionType(arg.method_29091().getRegistry().getKey(arg5));
+        this.skyProperties = SkyProperties.byDimensionType(arg.method_29091().getDimensionTypeRegistry().getKey(arg5));
         this.setSpawnPos(new BlockPos(8, 64, 8));
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
@@ -129,13 +129,13 @@ extends World {
 
     public void tick(BooleanSupplier booleanSupplier) {
         this.getWorldBorder().tick();
-        this.method_29090();
+        this.tickTime();
         this.getProfiler().push("blocks");
         this.chunkManager.tick(booleanSupplier);
         this.getProfiler().pop();
     }
 
-    private void method_29090() {
+    private void tickTime() {
         this.method_29089(this.properties.getTime() + 1L);
         if (this.properties.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
             this.setTimeOfDay(this.properties.getTimeOfDay() + 1L);

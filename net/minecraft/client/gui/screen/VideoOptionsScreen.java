@@ -16,7 +16,6 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.options.GameOptionsScreen;
@@ -28,13 +27,14 @@ import net.minecraft.client.options.FullScreenOption;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.Option;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.TranslatableText;
 
 @Environment(value=EnvType.CLIENT)
 public class VideoOptionsScreen
 extends GameOptionsScreen {
     @Nullable
-    private List<class_5348> field_25453;
+    private List<StringRenderable> field_25453;
     private ButtonListWidget list;
     private static final Option[] OPTIONS = new Option[]{Option.GRAPHICS, Option.RENDER_DISTANCE, Option.AO, Option.FRAMERATE_LIMIT, Option.VSYNC, Option.VIEW_BOBBING, Option.GUI_SCALE, Option.ATTACK_INDICATOR, Option.GAMMA, Option.CLOUDS, Option.FULLSCREEN, Option.PARTICLES, Option.MIPMAP_LEVELS, Option.ENTITY_SHADOWS, Option.ENTITY_DISTANCE_SCALING};
     private int mipmapLevels;

@@ -60,8 +60,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import net.minecraft.class_5298;
 import net.minecraft.datafixer.TypeReferences;
+import net.minecraft.util.math.WordPackedArray;
 
 public class LeavesFix
 extends DataFix {
@@ -254,14 +254,14 @@ extends DataFix {
                 this.properties.add(this.createLeafProperties(dynamic, string, bl, k));
             }
             int n = this.leafStates.get(l);
-            if (1 << this.blockStateMap.method_28154() <= n) {
-                class_5298 lv = new class_5298(this.blockStateMap.method_28154() + 1, 4096);
+            if (1 << this.blockStateMap.getUnitSize() <= n) {
+                WordPackedArray lv = new WordPackedArray(this.blockStateMap.getUnitSize() + 1, 4096);
                 for (int o = 0; o < 4096; ++o) {
-                    lv.method_28153(o, this.blockStateMap.method_28152(o));
+                    lv.set(o, this.blockStateMap.get(o));
                 }
                 this.blockStateMap = lv;
             }
-            this.blockStateMap.method_28153(i, n);
+            this.blockStateMap.set(i, n);
         }
     }
 
@@ -271,7 +271,7 @@ extends DataFix {
         protected final List<Dynamic<?>> properties;
         protected final int field_5694;
         @Nullable
-        protected class_5298 blockStateMap;
+        protected WordPackedArray blockStateMap;
 
         public ListFixer(Typed<?> typed, Schema schema) {
             if (!Objects.equals((Object)schema.getType(TypeReferences.BLOCK_STATE), this.field_5695)) {
@@ -290,7 +290,7 @@ extends DataFix {
             } else {
                 long[] ls = dynamic.get("BlockStates").asLongStream().toArray();
                 int i = Math.max(4, DataFixUtils.ceillog2((int)this.properties.size()));
-                this.blockStateMap = new class_5298(i, 4096, ls);
+                this.blockStateMap = new WordPackedArray(i, 4096, ls);
             }
         }
 
@@ -298,7 +298,7 @@ extends DataFix {
             if (this.isFixed()) {
                 return typed;
             }
-            return typed.update(DSL.remainderFinder(), dynamic -> dynamic.set("BlockStates", dynamic.createLongList(Arrays.stream(this.blockStateMap.method_28151())))).set(this.field_5693, this.properties.stream().map(dynamic -> Pair.of((Object)TypeReferences.BLOCK_STATE.typeName(), (Object)dynamic)).collect(Collectors.toList()));
+            return typed.update(DSL.remainderFinder(), dynamic -> dynamic.set("BlockStates", dynamic.createLongList(Arrays.stream(this.blockStateMap.getAlignedArray())))).set(this.field_5693, this.properties.stream().map(dynamic -> Pair.of((Object)TypeReferences.BLOCK_STATE.typeName(), (Object)dynamic)).collect(Collectors.toList()));
         }
 
         public boolean isFixed() {
@@ -306,7 +306,7 @@ extends DataFix {
         }
 
         public int needsFix(int i) {
-            return this.blockStateMap.method_28152(i);
+            return this.blockStateMap.get(i);
         }
 
         protected int computeFlags(String string, boolean bl, int i) {

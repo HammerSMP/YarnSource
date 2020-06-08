@@ -85,8 +85,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
-import net.minecraft.class_5359;
-import net.minecraft.class_5363;
 import net.minecraft.command.DataCommandStorage;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -95,6 +93,7 @@ import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.network.packet.s2c.play.DifficultyS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.recipe.RecipeManager;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
@@ -148,6 +147,7 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.TickTimeTracker;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
@@ -168,7 +168,7 @@ import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.border.WorldBorderListener;
-import net.minecraft.world.dimension.DimensionTracker;
+import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.CatSpawner;
 import net.minecraft.world.gen.GeneratorOptions;
@@ -196,7 +196,7 @@ CommandOutput,
 AutoCloseable {
     private static final Logger LOGGER = LogManager.getLogger();
     public static final File USER_CACHE_FILE = new File("usercache.json");
-    public static final LevelInfo DEMO_LEVEL_INFO = new LevelInfo("Demo World", GameMode.SURVIVAL, false, Difficulty.NORMAL, false, new GameRules(), class_5359.field_25393);
+    public static final LevelInfo DEMO_LEVEL_INFO = new LevelInfo("Demo World", GameMode.SURVIVAL, false, Difficulty.NORMAL, false, new GameRules(), DataPackSettings.SAFE_MODE);
     protected final LevelStorage.Session session;
     protected final WorldSaveHandler field_24371;
     private final Snooper snooper = new Snooper("server", this, Util.getMeasuringTimeMs());
@@ -210,7 +210,7 @@ AutoCloseable {
     private final DataFixer dataFixer;
     private String serverIp;
     private int serverPort = -1;
-    protected final DimensionTracker.Modifiable dimensionTracker;
+    protected final RegistryTracker.Modifiable dimensionTracker;
     private final Map<RegistryKey<World>, ServerWorld> worlds = Maps.newLinkedHashMap();
     private PlayerManager playerManager;
     private volatile boolean running = true;
@@ -263,7 +263,7 @@ AutoCloseable {
     private final StructureManager structureManager;
     protected final SaveProperties saveProperties;
 
-    public static <S extends MinecraftServer> S method_29740(Function<Thread, S> function) {
+    public static <S extends MinecraftServer> S startServer(Function<Thread, S> function) {
         AtomicReference<MinecraftServer> atomicReference = new AtomicReference<MinecraftServer>();
         Thread thread2 = new Thread(() -> ((MinecraftServer)atomicReference.get()).method_29741(), "Server thread");
         thread2.setUncaughtExceptionHandler((thread, throwable) -> LOGGER.error((Object)throwable));
@@ -273,7 +273,7 @@ AutoCloseable {
         return (S)minecraftServer;
     }
 
-    public MinecraftServer(Thread thread, DimensionTracker.Modifiable arg, LevelStorage.Session arg2, SaveProperties arg3, ResourcePackManager<ResourcePackProfile> arg4, Proxy proxy, DataFixer dataFixer, ServerResourceManager arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+    public MinecraftServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, SaveProperties arg3, ResourcePackManager<ResourcePackProfile> arg4, Proxy proxy, DataFixer dataFixer, ServerResourceManager arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
         super("Server");
         this.dimensionTracker = arg;
         this.saveProperties = arg3;
@@ -358,14 +358,14 @@ AutoCloseable {
         long l = lv2.getSeed();
         long m = BiomeAccess.hashSeed(l);
         ImmutableList list = ImmutableList.of((Object)new PhantomSpawner(), (Object)new PillagerSpawner(), (Object)new CatSpawner(), (Object)new ZombieSiegeManager(), (Object)new WanderingTraderManager(lv));
-        SimpleRegistry<class_5363> lv3 = lv2.getDimensionMap();
-        class_5363 lv4 = lv3.get(class_5363.field_25412);
+        SimpleRegistry<DimensionOptions> lv3 = lv2.getDimensionMap();
+        DimensionOptions lv4 = lv3.get(DimensionOptions.OVERWORLD);
         if (lv4 == null) {
-            DimensionType lv5 = DimensionType.method_29563();
-            SurfaceChunkGenerator lv6 = GeneratorOptions.method_28604(new Random().nextLong());
+            DimensionType lv5 = DimensionType.getOverworldDimensionType();
+            SurfaceChunkGenerator lv6 = GeneratorOptions.createOverworldGenerator(new Random().nextLong());
         } else {
-            lv7 = lv4.method_29570();
-            lv8 = lv4.method_29571();
+            lv7 = lv4.getDimensionType();
+            lv8 = lv4.getChunkGenerator();
         }
         ServerWorld lv9 = new ServerWorld(this, this.workerExecutor, this.session, lv, World.OVERWORLD, DimensionType.OVERWORLD_REGISTRY_KEY, lv7, arg, lv8, bl, m, (List<Spawner>)list, true);
         this.worlds.put(World.OVERWORLD, lv9);
@@ -398,13 +398,13 @@ AutoCloseable {
         if (this.saveProperties.getCustomBossEvents() != null) {
             this.getBossBarManager().fromTag(this.saveProperties.getCustomBossEvents());
         }
-        for (Map.Entry<RegistryKey<class_5363>, class_5363> entry : lv3.method_29722()) {
-            RegistryKey<class_5363> lv13 = entry.getKey();
-            if (lv13 == class_5363.field_25412) continue;
+        for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : lv3.getEntries()) {
+            RegistryKey<DimensionOptions> lv13 = entry.getKey();
+            if (lv13 == DimensionOptions.OVERWORLD) continue;
             RegistryKey<World> lv14 = RegistryKey.of(Registry.DIMENSION, lv13.getValue());
-            DimensionType lv15 = entry.getValue().method_29570();
-            RegistryKey<DimensionType> lv16 = this.dimensionTracker.getRegistry().getKey(lv15).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv15));
-            ChunkGenerator lv17 = entry.getValue().method_29571();
+            DimensionType lv15 = entry.getValue().getDimensionType();
+            RegistryKey<DimensionType> lv16 = this.dimensionTracker.getDimensionTypeRegistry().getKey(lv15).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv15));
+            ChunkGenerator lv17 = entry.getValue().getChunkGenerator();
             UnmodifiableLevelProperties lv18 = new UnmodifiableLevelProperties(this.saveProperties, lv);
             ServerWorld lv19 = new ServerWorld(this, this.workerExecutor, this.session, lv18, lv14, lv16, lv15, arg, lv17, bl, m, (List<Spawner>)ImmutableList.of(), false);
             lv11.addListener(new WorldBorderListener.WorldBorderSyncer(lv19.getWorldBorder()));
@@ -1241,12 +1241,12 @@ AutoCloseable {
     }
 
     public CompletableFuture<Void> reloadResources(Collection<String> collection) {
-        CompletionStage completableFuture = ((CompletableFuture)CompletableFuture.supplyAsync(() -> (ImmutableList)collection.stream().map(this.dataPackManager::getProfile).filter(Objects::nonNull).map(ResourcePackProfile::createResourcePack).collect(ImmutableList.toImmutableList()), this).thenCompose(immutableList -> ServerResourceManager.reload((List<ResourcePack>)immutableList, this.isDedicated() ? CommandManager.class_5364.DEDICATED : CommandManager.class_5364.INTEGRATED, this.getFunctionPermissionLevel(), this.workerExecutor, this))).thenAcceptAsync(arg -> {
+        CompletionStage completableFuture = ((CompletableFuture)CompletableFuture.supplyAsync(() -> (ImmutableList)collection.stream().map(this.dataPackManager::getProfile).filter(Objects::nonNull).map(ResourcePackProfile::createResourcePack).collect(ImmutableList.toImmutableList()), this).thenCompose(immutableList -> ServerResourceManager.reload((List<ResourcePack>)immutableList, this.isDedicated() ? CommandManager.RegistrationEnvironment.DEDICATED : CommandManager.RegistrationEnvironment.INTEGRATED, this.getFunctionPermissionLevel(), this.workerExecutor, this))).thenAcceptAsync(arg -> {
             this.serverResourceManager.close();
             this.serverResourceManager = arg;
             this.dataPackManager.setEnabledProfiles(collection);
             this.saveProperties.method_29590(MinecraftServer.method_29735(this.dataPackManager));
-            arg.method_29475();
+            arg.loadRegistryTags();
             this.getPlayerManager().saveAllPlayerData();
             this.getPlayerManager().onDataPacksReloaded();
             this.commandFunctionManager.method_29461(this.serverResourceManager.getFunctionLoader());
@@ -1258,15 +1258,15 @@ AutoCloseable {
         return completableFuture;
     }
 
-    public static class_5359 method_29736(ResourcePackManager<ResourcePackProfile> arg, class_5359 arg2, boolean bl) {
+    public static DataPackSettings loadDataPacks(ResourcePackManager<ResourcePackProfile> arg, DataPackSettings arg2, boolean bl) {
         arg.scanPacks();
         if (bl) {
             arg.setEnabledProfiles(Collections.singleton("vanilla"));
-            return new class_5359((List<String>)ImmutableList.of((Object)"vanilla"), (List<String>)ImmutableList.of());
+            return new DataPackSettings((List<String>)ImmutableList.of((Object)"vanilla"), (List<String>)ImmutableList.of());
         }
         LinkedHashSet set = Sets.newLinkedHashSet();
-        for (String string : arg2.method_29547()) {
-            if (arg.method_29207(string)) {
+        for (String string : arg2.getEnabled()) {
+            if (arg.hasProfile(string)) {
                 set.add(string);
                 continue;
             }
@@ -1274,7 +1274,7 @@ AutoCloseable {
         }
         for (ResourcePackProfile lv : arg.getProfiles()) {
             String string2 = lv.getName();
-            if (arg2.method_29550().contains(string2) || set.contains(string2)) continue;
+            if (arg2.getDisabled().contains(string2) || set.contains(string2)) continue;
             LOGGER.info("Found new data pack {}, loading it automatically", (Object)string2);
             set.add(string2);
         }
@@ -1286,11 +1286,11 @@ AutoCloseable {
         return MinecraftServer.method_29735(arg);
     }
 
-    private static class_5359 method_29735(ResourcePackManager<?> arg) {
-        Collection<String> collection = arg.method_29210();
+    private static DataPackSettings method_29735(ResourcePackManager<?> arg) {
+        Collection<String> collection = arg.getEnabledNames();
         ImmutableList list = ImmutableList.copyOf(collection);
-        List list2 = (List)arg.method_29206().stream().filter(string -> !collection.contains(string)).collect(ImmutableList.toImmutableList());
-        return new class_5359((List<String>)list, list2);
+        List list2 = (List)arg.getNames().stream().filter(string -> !collection.contains(string)).collect(ImmutableList.toImmutableList());
+        return new DataPackSettings((List<String>)list, list2);
     }
 
     public void kickNonWhitelistedPlayers(ServerCommandSource arg) {

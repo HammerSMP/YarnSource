@@ -35,7 +35,6 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.class_5354;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.datafixer.NbtOps;
@@ -46,6 +45,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
@@ -301,7 +301,7 @@ implements ScreenHandlerListener {
             arg.putInt("SpawnY", this.spawnPointPosition.getY());
             arg.putInt("SpawnZ", this.spawnPointPosition.getZ());
             arg.putBoolean("SpawnForced", this.spawnPointSet);
-            Identifier.field_25139.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.getValue()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("SpawnDimension", (Tag)arg2));
+            Identifier.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.spawnPointDimension.getValue()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("SpawnDimension", (Tag)arg2));
         }
     }
 
@@ -485,7 +485,7 @@ implements ScreenHandlerListener {
         }
         this.dropShoulderEntities();
         if (this.world.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)) {
-            this.method_29779();
+            this.forgiveMobAnger();
         }
         if (!this.isSpectator()) {
             this.drop(arg);
@@ -506,9 +506,9 @@ implements ScreenHandlerListener {
         this.getDamageTracker().update();
     }
 
-    private void method_29779() {
+    private void forgiveMobAnger() {
         Box lv = new Box(this.getBlockPos()).expand(32.0, 10.0, 32.0);
-        this.world.getEntitiesIncludingUngeneratedChunks(MobEntity.class, lv).stream().filter(arg -> arg instanceof class_5354).forEach(arg -> ((class_5354)((Object)arg)).method_29516(this));
+        this.world.getEntitiesIncludingUngeneratedChunks(MobEntity.class, lv).stream().filter(arg -> arg instanceof Angerable).forEach(arg -> ((Angerable)((Object)arg)).forgive(this));
     }
 
     @Override

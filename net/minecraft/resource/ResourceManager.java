@@ -35,7 +35,7 @@ public interface ResourceManager {
 
     public List<Resource> getAllResources(Identifier var1) throws IOException;
 
-    public Collection<Identifier> method_29489(Identifier var1, Predicate<String> var2);
+    public Collection<Identifier> findResources(Identifier var1, Predicate<String> var2);
 
     public Collection<Identifier> findResources(String var1, Predicate<String> var2);
 
@@ -70,7 +70,7 @@ public interface ResourceManager {
         }
 
         @Override
-        public Collection<Identifier> method_29489(Identifier arg, Predicate<String> predicate) {
+        public Collection<Identifier> findResources(Identifier arg, Predicate<String> predicate) {
             return ImmutableSet.of();
         }
 

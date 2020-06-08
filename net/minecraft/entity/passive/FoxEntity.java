@@ -211,7 +211,7 @@ extends AnimalEntity {
 
     @Override
     protected boolean isImmobile() {
-        return this.method_29504();
+        return this.isDead();
     }
 
     private boolean canEat(ItemStack arg) {

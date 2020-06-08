@@ -208,11 +208,11 @@ implements InventoryProvider {
                     lv.decrement(1);
                 }
             }
-            return ActionResult.method_29236(arg2.isClient);
+            return ActionResult.success(arg2.isClient);
         }
         if (i == 8) {
             ComposterBlock.emptyFullComposter(arg, arg2, arg3);
-            return ActionResult.method_29236(arg2.isClient);
+            return ActionResult.success(arg2.isClient);
         }
         return ActionResult.PASS;
     }

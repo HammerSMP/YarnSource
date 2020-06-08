@@ -177,7 +177,7 @@ implements Font {
         @Nullable
         public Font load(ResourceManager arg) {
             try (Resource lv = arg.getResource(this.filename);){
-                NativeImage lv2 = NativeImage.read(NativeImage.Format.RGBA, lv.getInputStream());
+                NativeImage lv2 = NativeImage.read(NativeImage.Format.ABGR, lv.getInputStream());
                 int i = lv2.getWidth();
                 int j = lv2.getHeight();
                 int k = i / this.chars.get(0).length;

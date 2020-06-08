@@ -39,10 +39,10 @@ public class LookTargetUtil {
     }
 
     public static boolean canSee(Brain<?> arg, MemoryModuleType<? extends LivingEntity> arg22, EntityType<?> arg3) {
-        return LookTargetUtil.method_24564(arg, arg22, arg2 -> arg2.getType() == arg3);
+        return LookTargetUtil.canSee(arg, arg22, (LivingEntity arg2) -> arg2.getType() == arg3);
     }
 
-    private static boolean method_24564(Brain<?> arg, MemoryModuleType<? extends LivingEntity> arg22, Predicate<LivingEntity> predicate) {
+    private static boolean canSee(Brain<?> arg, MemoryModuleType<? extends LivingEntity> arg22, Predicate<LivingEntity> predicate) {
         return arg.getOptionalMemory(arg22).filter(predicate).filter(LivingEntity::isAlive).filter(arg2 -> LookTargetUtil.canSee(arg, arg2)).isPresent();
     }
 
@@ -140,7 +140,7 @@ public class LookTargetUtil {
         return optional.map(uUID -> (LivingEntity)((ServerWorld)arg.world).getEntity((UUID)uUID));
     }
 
-    public static Stream<VillagerEntity> method_29248(VillagerEntity arg, Predicate<VillagerEntity> predicate) {
+    public static Stream<VillagerEntity> streamSeenVillagers(VillagerEntity arg, Predicate<VillagerEntity> predicate) {
         return arg.getBrain().getOptionalMemory(MemoryModuleType.MOBS).map(list -> list.stream().filter(arg2 -> arg2 instanceof VillagerEntity && arg2 != arg).map(arg -> (VillagerEntity)arg).filter(LivingEntity::isAlive).filter(predicate)).orElseGet(Stream::empty);
     }
 }

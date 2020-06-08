@@ -38,7 +38,7 @@ extends DataFix {
 
     public TypeRewriteRule makeRule() {
         Type type = this.getInputSchema().getType(TypeReferences.ITEM_STACK);
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType()));
         OpticFinder opticFinder2 = type.findField("tag");
         OpticFinder opticFinder3 = opticFinder2.type().findField("BlockEntityTag");
         return this.fixTypeEverywhereTyped("ItemShulkerBoxColorFix", type, typed -> {

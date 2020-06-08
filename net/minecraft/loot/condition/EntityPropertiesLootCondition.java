@@ -23,7 +23,7 @@ import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.JsonSerializable;
+import net.minecraft.util.JsonSerializer;
 import net.minecraft.util.math.Vec3d;
 
 public class EntityPropertiesLootCondition
@@ -37,7 +37,7 @@ implements LootCondition {
     }
 
     @Override
-    public LootConditionType method_29325() {
+    public LootConditionType getType() {
         return LootConditionTypes.ENTITY_PROPERTIES;
     }
 
@@ -70,8 +70,8 @@ implements LootCondition {
         return this.test((LootContext)object);
     }
 
-    public static class Factory
-    implements JsonSerializable<EntityPropertiesLootCondition> {
+    public static class Serializer
+    implements JsonSerializer<EntityPropertiesLootCondition> {
         @Override
         public void toJson(JsonObject jsonObject, EntityPropertiesLootCondition arg, JsonSerializationContext jsonSerializationContext) {
             jsonObject.add("predicate", arg.predicate.toJson());

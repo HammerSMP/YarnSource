@@ -31,7 +31,7 @@ extends DataFix {
     }
 
     public TypeRewriteRule makeRule() {
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", IdentifierNormalizingSchema.method_28295());
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", IdentifierNormalizingSchema.getIdentifierType());
         return this.fixTypeEverywhereTyped("EntityCustomNameToComponentFix", this.getInputSchema().getType(TypeReferences.ENTITY), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
             Optional optional = typed.getOptional(opticFinder);
             if (optional.isPresent() && Objects.equals(optional.get(), "minecraft:commandblock_minecart")) {

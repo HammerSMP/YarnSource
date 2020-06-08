@@ -19,7 +19,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class SimpleBlockFeatureConfig
 implements FeatureConfig {
-    public static final Codec<SimpleBlockFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("to_place").forGetter(arg -> arg.toPlace), (App)BlockState.field_24734.listOf().fieldOf("place_on").forGetter(arg -> arg.placeOn), (App)BlockState.field_24734.listOf().fieldOf("place_in").forGetter(arg -> arg.placeIn), (App)BlockState.field_24734.listOf().fieldOf("place_under").forGetter(arg -> arg.placeUnder)).apply((Applicative)instance, SimpleBlockFeatureConfig::new));
+    public static final Codec<SimpleBlockFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("to_place").forGetter(arg -> arg.toPlace), (App)BlockState.CODEC.listOf().fieldOf("place_on").forGetter(arg -> arg.placeOn), (App)BlockState.CODEC.listOf().fieldOf("place_in").forGetter(arg -> arg.placeIn), (App)BlockState.CODEC.listOf().fieldOf("place_under").forGetter(arg -> arg.placeUnder)).apply((Applicative)instance, SimpleBlockFeatureConfig::new));
     public final BlockState toPlace;
     public final List<BlockState> placeOn;
     public final List<BlockState> placeIn;

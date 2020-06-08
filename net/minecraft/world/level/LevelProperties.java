@@ -30,9 +30,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5315;
-import net.minecraft.class_5359;
-import net.minecraft.class_5384;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
@@ -40,20 +37,23 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.dynamic.DynamicSerializableUuid;
+import net.minecraft.util.dynamic.RegistryReadingOps;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.storage.SaveVersionInfo;
 import net.minecraft.world.timer.Timer;
 import net.minecraft.world.timer.TimerCallbackSerializer;
 import org.apache.logging.log4j.LogManager;
@@ -132,14 +132,14 @@ SaveProperties {
         this(null, SharedConstants.getGameVersion().getWorldVersion(), null, false, 0, 0, 0, 0L, 0L, 19133, 0, 0, false, 0, false, false, false, WorldBorder.DEFAULT_BORDER, 0, 0, null, Sets.newLinkedHashSet(), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE), null, new CompoundTag(), arg.method_28385(), arg2, lifecycle);
     }
 
-    public static LevelProperties method_29029(Dynamic<Tag> dynamic2, DataFixer dataFixer, int i, @Nullable CompoundTag arg, LevelInfo arg2, class_5315 arg3, GeneratorOptions arg4, Lifecycle lifecycle) {
+    public static LevelProperties method_29029(Dynamic<Tag> dynamic2, DataFixer dataFixer, int i, @Nullable CompoundTag arg, LevelInfo arg2, SaveVersionInfo arg3, GeneratorOptions arg4, Lifecycle lifecycle) {
         long l = dynamic2.get("Time").asLong(0L);
         CompoundTag lv = (CompoundTag)dynamic2.get("DragonFight").result().map(Dynamic::getValue).orElseGet(() -> (Tag)dynamic2.get("DimensionData").get("1").get("DragonFight").orElseEmptyMap().getValue());
-        return new LevelProperties(dataFixer, i, arg, dynamic2.get("WasModded").asBoolean(false), dynamic2.get("SpawnX").asInt(0), dynamic2.get("SpawnY").asInt(0), dynamic2.get("SpawnZ").asInt(0), l, dynamic2.get("DayTime").asLong(l), arg3.method_29022(), dynamic2.get("clearWeatherTime").asInt(0), dynamic2.get("rainTime").asInt(0), dynamic2.get("raining").asBoolean(false), dynamic2.get("thunderTime").asInt(0), dynamic2.get("thundering").asBoolean(false), dynamic2.get("initialized").asBoolean(true), dynamic2.get("DifficultyLocked").asBoolean(false), WorldBorder.Properties.fromDynamic(dynamic2, WorldBorder.DEFAULT_BORDER), dynamic2.get("WanderingTraderSpawnDelay").asInt(0), dynamic2.get("WanderingTraderSpawnChance").asInt(0), dynamic2.get("WanderingTraderId").read(DynamicSerializableUuid.field_25122).result().orElse(null), dynamic2.get("ServerBrands").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE, dynamic2.get("ScheduledEvents").asStream()), (CompoundTag)dynamic2.get("CustomBossEvents").orElseEmptyMap().getValue(), lv, arg2, arg4, lifecycle);
+        return new LevelProperties(dataFixer, i, arg, dynamic2.get("WasModded").asBoolean(false), dynamic2.get("SpawnX").asInt(0), dynamic2.get("SpawnY").asInt(0), dynamic2.get("SpawnZ").asInt(0), l, dynamic2.get("DayTime").asLong(l), arg3.getLevelFormatVersion(), dynamic2.get("clearWeatherTime").asInt(0), dynamic2.get("rainTime").asInt(0), dynamic2.get("raining").asBoolean(false), dynamic2.get("thunderTime").asInt(0), dynamic2.get("thundering").asBoolean(false), dynamic2.get("initialized").asBoolean(true), dynamic2.get("DifficultyLocked").asBoolean(false), WorldBorder.Properties.fromDynamic(dynamic2, WorldBorder.DEFAULT_BORDER), dynamic2.get("WanderingTraderSpawnDelay").asInt(0), dynamic2.get("WanderingTraderSpawnChance").asInt(0), dynamic2.get("WanderingTraderId").read(DynamicSerializableUuid.field_25122).result().orElse(null), dynamic2.get("ServerBrands").asStream().flatMap(dynamic -> Util.stream(dynamic.asString().result())).collect(Collectors.toCollection(Sets::newLinkedHashSet)), new Timer<MinecraftServer>(TimerCallbackSerializer.INSTANCE, dynamic2.get("ScheduledEvents").asStream()), (CompoundTag)dynamic2.get("CustomBossEvents").orElseEmptyMap().getValue(), lv, arg2, arg4, lifecycle);
     }
 
     @Override
-    public CompoundTag cloneWorldTag(DimensionTracker arg, @Nullable CompoundTag arg2) {
+    public CompoundTag cloneWorldTag(RegistryTracker arg, @Nullable CompoundTag arg2) {
         this.loadPlayerData();
         if (arg2 == null) {
             arg2 = this.playerData;
@@ -149,7 +149,7 @@ SaveProperties {
         return lv;
     }
 
-    private void updateProperties(DimensionTracker arg, CompoundTag arg22, @Nullable CompoundTag arg3) {
+    private void updateProperties(RegistryTracker arg, CompoundTag arg22, @Nullable CompoundTag arg3) {
         ListTag lv = new ListTag();
         this.serverBrands.stream().map(StringTag::of).forEach(lv::add);
         arg22.put("ServerBrands", lv);
@@ -160,7 +160,7 @@ SaveProperties {
         lv2.putBoolean("Snapshot", !SharedConstants.getGameVersion().isStable());
         arg22.put("Version", lv2);
         arg22.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-        class_5384<Tag> lv3 = class_5384.method_29771(NbtOps.INSTANCE, arg);
+        RegistryReadingOps<Tag> lv3 = RegistryReadingOps.of(NbtOps.INSTANCE, arg);
         GeneratorOptions.CODEC.encodeStart(lv3, (Object)this.field_25425).resultOrPartial(Util.method_29188("WorldGenSettings: ", ((Logger)LOGGER)::error)).ifPresent(arg2 -> arg22.put("WorldGenSettings", (Tag)arg2));
         arg22.putInt("GameType", this.field_25030.getGameMode().getId());
         arg22.putInt("SpawnX", this.spawnX);
@@ -187,7 +187,7 @@ SaveProperties {
         if (arg3 != null) {
             arg22.put("Player", arg3);
         }
-        class_5359.field_25394.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.field_25030.method_29558()).result().ifPresent(arg2 -> arg22.put("DataPacks", (Tag)arg2));
+        DataPackSettings.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.field_25030.method_29558()).result().ifPresent(arg2 -> arg22.put("DataPacks", (Tag)arg2));
         if (this.customBossEvents != null) {
             arg22.put("CustomBossEvents", this.customBossEvents);
         }
@@ -433,12 +433,12 @@ SaveProperties {
     }
 
     @Override
-    public class_5359 method_29589() {
+    public DataPackSettings method_29589() {
         return this.field_25030.method_29558();
     }
 
     @Override
-    public void method_29590(class_5359 arg) {
+    public void method_29590(DataPackSettings arg) {
         this.field_25030 = this.field_25030.method_29557(arg);
     }
 

@@ -44,15 +44,14 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import net.minecraft.Bootstrap;
-import net.minecraft.class_5352;
-import net.minecraft.class_5359;
-import net.minecraft.class_5382;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.Schemas;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.resource.VanillaDataPackProvider;
 import net.minecraft.server.MinecraftServer;
@@ -67,13 +66,14 @@ import net.minecraft.util.UserCache;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
@@ -137,14 +137,14 @@ public class Main {
             LevelStorage lv4 = LevelStorage.create(file.toPath());
             LevelStorage.Session lv5 = lv4.createSession(string);
             MinecraftServer.convertLevel(lv5);
-            class_5359 lv6 = lv5.method_29585();
+            DataPackSettings lv6 = lv5.method_29585();
             boolean bl = optionSet.has((OptionSpec)optionSpec7);
             if (bl) {
                 LOGGER.warn("Safe mode active, only vanilla datapack will be loaded");
             }
-            ResourcePackManager<ResourcePackProfile> lv7 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(lv5.getDirectory(WorldSavePath.DATAPACKS).toFile(), class_5352.PACK_SOURCE_WORLD));
-            class_5359 lv8 = MinecraftServer.method_29736(lv7, lv6 == null ? class_5359.field_25393 : lv6, bl);
-            CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv7.method_29211(), CommandManager.class_5364.DEDICATED, lv.getPropertiesHandler().functionPermissionLevel, Util.getServerWorkerExecutor(), Runnable::run);
+            ResourcePackManager<ResourcePackProfile> lv7 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(lv5.getDirectory(WorldSavePath.DATAPACKS).toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
+            DataPackSettings lv8 = MinecraftServer.loadDataPacks(lv7, lv6 == null ? DataPackSettings.SAFE_MODE : lv6, bl);
+            CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv7.createResourcePacks(), CommandManager.RegistrationEnvironment.DEDICATED, lv.getPropertiesHandler().functionPermissionLevel, Util.getServerWorkerExecutor(), Runnable::run);
             try {
                 ServerResourceManager lv9 = completableFuture.get();
             }
@@ -153,9 +153,9 @@ public class Main {
                 lv7.close();
                 return;
             }
-            lv10.method_29475();
-            DimensionTracker.Modifiable lv11 = DimensionTracker.create();
-            class_5382<Tag> lv12 = class_5382.method_29753(NbtOps.INSTANCE, lv10.getResourceManager(), lv11);
+            lv10.loadRegistryTags();
+            RegistryTracker.Modifiable lv11 = RegistryTracker.create();
+            RegistryOps<Tag> lv12 = RegistryOps.of(NbtOps.INSTANCE, lv10.getResourceManager(), lv11);
             SaveProperties lv13 = lv5.readLevelProperties(lv12, lv8);
             if (lv13 == null) {
                 GeneratorOptions lv18;
@@ -175,7 +175,7 @@ public class Main {
             }
             lv5.method_27425(lv11, lv13);
             SaveProperties lv19 = lv13;
-            final MinecraftDedicatedServer lv20 = MinecraftServer.method_29740(arg_0 -> Main.method_29734(lv11, lv5, lv7, (ServerResourceManager)lv10, lv19, lv, minecraftSessionService, gameProfileRepository, lv3, optionSet, (OptionSpec)optionSpec9, (OptionSpec)optionSpec12, (OptionSpec)optionSpec3, (OptionSpec)optionSpec13, (OptionSpec)optionSpec, (OptionSpec)optionSpec14, arg_0));
+            final MinecraftDedicatedServer lv20 = MinecraftServer.startServer(arg_0 -> Main.method_29734(lv11, lv5, lv7, (ServerResourceManager)lv10, lv19, lv, minecraftSessionService, gameProfileRepository, lv3, optionSet, (OptionSpec)optionSpec9, (OptionSpec)optionSpec12, (OptionSpec)optionSpec3, (OptionSpec)optionSpec13, (OptionSpec)optionSpec, (OptionSpec)optionSpec14, arg_0));
             Thread thread = new Thread("Server Shutdown Thread"){
 
                 @Override
@@ -217,7 +217,7 @@ public class Main {
         }
     }
 
-    private static /* synthetic */ MinecraftDedicatedServer method_29734(DimensionTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, OptionSet optionSet, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, Thread thread) {
+    private static /* synthetic */ MinecraftDedicatedServer method_29734(RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, OptionSet optionSet, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, Thread thread) {
         boolean bl;
         MinecraftDedicatedServer lv = new MinecraftDedicatedServer(thread, arg, arg2, arg3, arg4, arg5, arg6, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, arg7, WorldGenerationProgressLogger::new);
         lv.setServerName((String)optionSet.valueOf(optionSpec));

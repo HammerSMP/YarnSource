@@ -53,7 +53,7 @@ extends BiomeSource {
 
     @Override
     @Nullable
-    public BlockPos method_24385(int i, int j, int k, int l, int m, List<Biome> list, Random random, boolean bl) {
+    public BlockPos locateBiome(int i, int j, int k, int l, int m, List<Biome> list, Random random, boolean bl) {
         if (list.contains(this.biome)) {
             if (bl) {
                 return new BlockPos(i, j, k);

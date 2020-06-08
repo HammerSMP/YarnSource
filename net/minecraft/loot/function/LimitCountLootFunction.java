@@ -30,7 +30,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.LIMIT_COUNT;
     }
 
@@ -45,8 +45,8 @@ extends ConditionalLootFunction {
         return LimitCountLootFunction.builder((LootCondition[] args) -> new LimitCountLootFunction((LootCondition[])args, arg));
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<LimitCountLootFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<LimitCountLootFunction> {
         @Override
         public void toJson(JsonObject jsonObject, LimitCountLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);

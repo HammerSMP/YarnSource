@@ -290,7 +290,7 @@ public class MathHelper {
         return MathHelper.log2DeBruijn(i) - (MathHelper.isPowerOfTwo(i) ? 0 : 1);
     }
 
-    public static int method_28139(int i, int j) {
+    public static int roundUpToMultiple(int i, int j) {
         int k;
         if (j == 0) {
             return 0;

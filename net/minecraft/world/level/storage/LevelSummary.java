@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5315;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -23,12 +22,13 @@ import net.minecraft.util.ChatUtil;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.level.LevelInfo;
+import net.minecraft.world.level.storage.SaveVersionInfo;
 import org.apache.commons.lang3.StringUtils;
 
 public class LevelSummary
 implements Comparable<LevelSummary> {
     private final LevelInfo field_25022;
-    private final class_5315 field_25023;
+    private final SaveVersionInfo field_25023;
     private final String name;
     private final boolean requiresConversion;
     private final boolean locked;
@@ -37,7 +37,7 @@ implements Comparable<LevelSummary> {
     @Environment(value=EnvType.CLIENT)
     private Text field_24191;
 
-    public LevelSummary(LevelInfo arg, class_5315 arg2, String string, boolean bl, boolean bl2, File file) {
+    public LevelSummary(LevelInfo arg, SaveVersionInfo arg2, String string, boolean bl, boolean bl2, File file) {
         this.field_25022 = arg;
         this.field_25023 = arg2;
         this.name = string;
@@ -68,15 +68,15 @@ implements Comparable<LevelSummary> {
 
     @Environment(value=EnvType.CLIENT)
     public long getLastPlayed() {
-        return this.field_25023.method_29024();
+        return this.field_25023.getLastPlayed();
     }
 
     @Override
     public int compareTo(LevelSummary arg) {
-        if (this.field_25023.method_29024() < arg.field_25023.method_29024()) {
+        if (this.field_25023.getLastPlayed() < arg.field_25023.getLastPlayed()) {
             return 1;
         }
-        if (this.field_25023.method_29024() > arg.field_25023.method_29024()) {
+        if (this.field_25023.getLastPlayed() > arg.field_25023.getLastPlayed()) {
             return -1;
         }
         return this.name.compareTo(arg.name);
@@ -99,29 +99,29 @@ implements Comparable<LevelSummary> {
 
     @Environment(value=EnvType.CLIENT)
     public MutableText getVersion() {
-        if (ChatUtil.isEmpty(this.field_25023.method_29025())) {
+        if (ChatUtil.isEmpty(this.field_25023.getVersionName())) {
             return new TranslatableText("selectWorld.versionUnknown");
         }
-        return new LiteralText(this.field_25023.method_29025());
+        return new LiteralText(this.field_25023.getVersionName());
     }
 
-    public class_5315 method_29586() {
+    public SaveVersionInfo method_29586() {
         return this.field_25023;
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean isDifferentVersion() {
-        return this.isFutureLevel() || !SharedConstants.getGameVersion().isStable() && !this.field_25023.method_29027() || this.isOutdatedLevel();
+        return this.isFutureLevel() || !SharedConstants.getGameVersion().isStable() && !this.field_25023.isStable() || this.isOutdatedLevel();
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean isFutureLevel() {
-        return this.field_25023.method_29026() > SharedConstants.getGameVersion().getWorldVersion();
+        return this.field_25023.getVersionId() > SharedConstants.getGameVersion().getWorldVersion();
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean isOutdatedLevel() {
-        return this.field_25023.method_29026() < SharedConstants.getGameVersion().getWorldVersion();
+        return this.field_25023.getVersionId() < SharedConstants.getGameVersion().getWorldVersion();
     }
 
     @Environment(value=EnvType.CLIENT)

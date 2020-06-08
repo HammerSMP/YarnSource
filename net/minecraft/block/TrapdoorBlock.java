@@ -100,7 +100,7 @@ implements Waterloggable {
             arg2.getFluidTickScheduler().schedule(arg3, Fluids.WATER, Fluids.WATER.getTickRate(arg2));
         }
         this.playToggleSound(arg4, arg2, arg3, arg.get(OPEN));
-        return ActionResult.method_29236(arg2.isClient);
+        return ActionResult.success(arg2.isClient);
     }
 
     protected void playToggleSound(@Nullable PlayerEntity arg, World arg2, BlockPos arg3, boolean bl) {

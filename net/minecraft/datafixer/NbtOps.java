@@ -403,7 +403,7 @@ implements DynamicOps<Tag> {
     }
 
     public RecordBuilder<Tag> mapBuilder() {
-        return new class_5320();
+        return new MapBuilder();
     }
 
     public /* synthetic */ Object remove(Object object, String string) {
@@ -530,9 +530,9 @@ implements DynamicOps<Tag> {
         return this.empty();
     }
 
-    class class_5320
+    class MapBuilder
     extends RecordBuilder.AbstractStringBuilder<Tag, CompoundTag> {
-        protected class_5320() {
+        protected MapBuilder() {
             super((DynamicOps)NbtOps.this);
         }
 

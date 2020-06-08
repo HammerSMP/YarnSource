@@ -19,7 +19,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DeltaFeatureConfig
 implements FeatureConfig {
-    public static final Codec<DeltaFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.field_24734.fieldOf("contents").forGetter(arg -> arg.contents), (App)BlockState.field_24734.fieldOf("rim").forGetter(arg -> arg.rim), (App)Codec.INT.fieldOf("minimum_radius").forGetter(arg -> arg.minRadius), (App)Codec.INT.fieldOf("maximum_radius").forGetter(arg -> arg.maxRadius), (App)Codec.INT.fieldOf("maximum_rim").forGetter(arg -> arg.maxRim)).apply((Applicative)instance, DeltaFeatureConfig::new));
+    public static final Codec<DeltaFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("contents").forGetter(arg -> arg.contents), (App)BlockState.CODEC.fieldOf("rim").forGetter(arg -> arg.rim), (App)Codec.INT.fieldOf("minimum_radius").forGetter(arg -> arg.minRadius), (App)Codec.INT.fieldOf("maximum_radius").forGetter(arg -> arg.maxRadius), (App)Codec.INT.fieldOf("maximum_rim").forGetter(arg -> arg.maxRim)).apply((Applicative)instance, DeltaFeatureConfig::new));
     public final BlockState contents;
     public final BlockState rim;
     public final int minRadius;

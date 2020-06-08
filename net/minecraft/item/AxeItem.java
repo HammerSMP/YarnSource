@@ -62,7 +62,7 @@ extends MiningToolItem {
                     arg.getStack().damage(1, lv5, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
                 }
             }
-            return ActionResult.method_29236(lv.isClient);
+            return ActionResult.success(lv.isClient);
         }
         return ActionResult.PASS;
     }

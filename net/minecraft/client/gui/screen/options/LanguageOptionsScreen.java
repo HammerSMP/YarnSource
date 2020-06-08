@@ -129,7 +129,7 @@ extends GameOptionsScreen {
             @Override
             public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
                 String string = this.languageDefinition.toString();
-                LanguageOptionsScreen.this.textRenderer.method_29342(arg, string, LanguageSelectionListWidget.this.width / 2 - LanguageOptionsScreen.this.textRenderer.getWidth(string) / 2, j + 1, 0xFFFFFF, true);
+                LanguageOptionsScreen.this.textRenderer.drawWithShadow(arg, string, LanguageSelectionListWidget.this.width / 2 - LanguageOptionsScreen.this.textRenderer.getWidth(string) / 2, j + 1, 0xFFFFFF, true);
             }
 
             @Override

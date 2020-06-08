@@ -47,7 +47,7 @@ extends Item {
         } else if (this.entityType == EntityType.ITEM_FRAME) {
             ItemFrameEntity lv8 = new ItemFrameEntity(lv6, lv3, lv2);
         } else {
-            return ActionResult.method_29236(lv6.isClient);
+            return ActionResult.success(lv6.isClient);
         }
         CompoundTag lv10 = lv5.getTag();
         if (lv10 != null) {
@@ -59,7 +59,7 @@ extends Item {
                 lv6.spawnEntity((Entity)lv9);
             }
             lv5.decrement(1);
-            return ActionResult.method_29236(lv6.isClient);
+            return ActionResult.success(lv6.isClient);
         }
         return ActionResult.CONSUME;
     }

@@ -48,7 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Identifier
 implements Comparable<Identifier> {
-    public static final Codec<Identifier> field_25139 = Codec.STRING.comapFlatMap(Identifier::method_29186, Identifier::toString).stable();
+    public static final Codec<Identifier> CODEC = Codec.STRING.comapFlatMap(Identifier::method_29186, Identifier::toString).stable();
     private static final SimpleCommandExceptionType COMMAND_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("argument.id.invalid"));
     protected final String namespace;
     protected final String path;

@@ -221,7 +221,7 @@ implements SkinOverlayOwner {
                 this.setIgnited();
                 lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         return super.interactMob(arg, arg22);
     }

@@ -9,7 +9,7 @@ package net.minecraft.world.level;
 
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicLike;
-import net.minecraft.class_5359;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -21,9 +21,9 @@ public final class LevelInfo {
     private final Difficulty difficulty;
     private final boolean hardcore;
     private final GameRules gameRules;
-    private final class_5359 field_25403;
+    private final DataPackSettings field_25403;
 
-    public LevelInfo(String string, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, class_5359 arg4) {
+    public LevelInfo(String string, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, DataPackSettings arg4) {
         this.name = string;
         this.gameMode = arg;
         this.structures = bl;
@@ -33,7 +33,7 @@ public final class LevelInfo {
         this.field_25403 = arg4;
     }
 
-    public static LevelInfo method_28383(Dynamic<?> dynamic, class_5359 arg) {
+    public static LevelInfo method_28383(Dynamic<?> dynamic, DataPackSettings arg) {
         GameMode lv;
         return new LevelInfo(dynamic.get("LevelName").asString(""), lv, dynamic.get("hardcore").asBoolean(false), dynamic.get("Difficulty").asNumber().map(number -> Difficulty.byOrdinal(number.byteValue())).result().orElse(Difficulty.NORMAL), dynamic.get("allowCommands").asBoolean((lv = GameMode.byId(dynamic.get("GameType").asInt(0))) == GameMode.CREATIVE), new GameRules((DynamicLike<?>)dynamic.get("GameRules")), arg);
     }
@@ -62,7 +62,7 @@ public final class LevelInfo {
         return this.gameRules;
     }
 
-    public class_5359 method_29558() {
+    public DataPackSettings method_29558() {
         return this.field_25403;
     }
 
@@ -74,7 +74,7 @@ public final class LevelInfo {
         return new LevelInfo(this.name, this.gameMode, this.structures, arg, this.hardcore, this.gameRules, this.field_25403);
     }
 
-    public LevelInfo method_29557(class_5359 arg) {
+    public LevelInfo method_29557(DataPackSettings arg) {
         return new LevelInfo(this.name, this.gameMode, this.structures, this.difficulty, this.hardcore, this.gameRules, arg);
     }
 

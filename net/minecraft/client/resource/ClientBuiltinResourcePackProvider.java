@@ -37,7 +37,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.class_5352;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.client.resource.ClientResourcePackProfile;
@@ -51,6 +50,7 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackCompatibility;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProvider;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ZipResourcePack;
 import net.minecraft.resource.metadata.PackResourceMetadata;
 import net.minecraft.text.TranslatableText;
@@ -85,9 +85,9 @@ implements ResourcePackProvider {
     }
 
     @Override
-    public <T extends ResourcePackProfile> void register(Consumer<T> consumer, ResourcePackProfile.class_5351<T> arg) {
+    public <T extends ResourcePackProfile> void register(Consumer<T> consumer, ResourcePackProfile.Factory<T> arg) {
         T lv2;
-        T lv = ResourcePackProfile.of("vanilla", true, () -> this.pack, arg, ResourcePackProfile.InsertionPosition.BOTTOM, class_5352.PACK_SOURCE_BUILTIN);
+        T lv = ResourcePackProfile.of("vanilla", true, () -> this.pack, arg, ResourcePackProfile.InsertionPosition.BOTTOM, ResourcePackSource.PACK_SOURCE_BUILTIN);
         if (lv != null) {
             consumer.accept((ClientResourcePackProfile)lv);
         }
@@ -139,7 +139,7 @@ implements ResourcePackProvider {
                 if (!this.verifyFile(string4, file)) {
                     return Util.completeExceptionally(new RuntimeException("Hash check failure for file " + file + ", see log"));
                 }
-                return this.loadServerPack(file, class_5352.PACK_SOURCE_SERVER);
+                return this.loadServerPack(file, ResourcePackSource.PACK_SOURCE_SERVER);
             })).whenComplete((void_, throwable) -> {
                 if (throwable != null) {
                     LOGGER.warn("Pack application failed: {}, deleting file {}", (Object)throwable.getMessage(), (Object)file);
@@ -223,7 +223,7 @@ implements ResourcePackProvider {
     /*
      * WARNING - void declaration
      */
-    public CompletableFuture<Void> loadServerPack(File file, class_5352 arg) {
+    public CompletableFuture<Void> loadServerPack(File file, ResourcePackSource arg) {
         void lv7;
         void lv6;
         try (ZipResourcePack lv = new ZipResourcePack(file);){
@@ -239,7 +239,7 @@ implements ResourcePackProvider {
     }
 
     @Nullable
-    private <T extends ResourcePackProfile> T method_25454(ResourcePackProfile.class_5351<T> arg) {
+    private <T extends ResourcePackProfile> T method_25454(ResourcePackProfile.Factory<T> arg) {
         File file2;
         T lv = null;
         File file = this.index.getResource(new Identifier("resourcepacks/programmer_art.zip"));
@@ -253,8 +253,8 @@ implements ResourcePackProvider {
     }
 
     @Nullable
-    private static <T extends ResourcePackProfile> T method_25453(ResourcePackProfile.class_5351<T> arg, Supplier<ResourcePack> supplier) {
-        return ResourcePackProfile.of("programer_art", false, supplier, arg, ResourcePackProfile.InsertionPosition.TOP, class_5352.PACK_SOURCE_BUILTIN);
+    private static <T extends ResourcePackProfile> T method_25453(ResourcePackProfile.Factory<T> arg, Supplier<ResourcePack> supplier) {
+        return ResourcePackProfile.of("programer_art", false, supplier, arg, ResourcePackProfile.InsertionPosition.TOP, ResourcePackSource.PACK_SOURCE_BUILTIN);
     }
 
     private static DirectoryResourcePack method_25455(File file) {

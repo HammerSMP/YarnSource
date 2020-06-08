@@ -193,7 +193,7 @@ extends Screen {
         }
 
         private void renderIcon(ItemRenderer arg, int i, int j) {
-            arg.renderGuiItem(this.icon, i, j);
+            arg.renderInGuiWithOverrides(this.icon, i, j);
         }
 
         private Text getText() {

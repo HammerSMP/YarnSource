@@ -53,7 +53,7 @@ implements Font {
             int j = i * 256;
             Identifier lv = this.getImageId(j);
             try (Resource lv2 = this.resourceManager.getResource(lv);
-                 NativeImage lv3 = NativeImage.read(NativeImage.Format.RGBA, lv2.getInputStream());){
+                 NativeImage lv3 = NativeImage.read(NativeImage.Format.ABGR, lv2.getInputStream());){
                 if (lv3.getWidth() == 256 && lv3.getHeight() == 256) {
                     for (int k = 0; k < 256; ++k) {
                         byte b = bs[j + k];
@@ -113,7 +113,7 @@ implements Font {
     @Nullable
     private NativeImage getGlyphImage(Identifier arg) {
         try (Resource lv = this.resourceManager.getResource(arg);){
-            NativeImage nativeImage = NativeImage.read(NativeImage.Format.RGBA, lv.getInputStream());
+            NativeImage nativeImage = NativeImage.read(NativeImage.Format.ABGR, lv.getInputStream());
             return nativeImage;
         }
         catch (IOException iOException) {

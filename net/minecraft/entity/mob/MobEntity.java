@@ -1007,7 +1007,7 @@ extends LivingEntity {
         }
         if (this.getHoldingEntity() == arg) {
             this.detachLeash(true, !arg.abilities.creativeMode);
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         ActionResult lv = this.method_29506(arg, arg2);
         if (lv.isAccepted()) {
@@ -1026,7 +1026,7 @@ extends LivingEntity {
         if (lv.getItem() == Items.LEAD && this.canBeLeashedBy(arg)) {
             this.attachLeash(arg, true);
             lv.decrement(1);
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         if (lv.getItem() == Items.NAME_TAG && (lv2 = lv.useOnEntity(arg, this, arg22)).isAccepted()) {
             return lv2;

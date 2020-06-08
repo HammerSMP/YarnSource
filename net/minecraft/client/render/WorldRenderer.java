@@ -280,7 +280,7 @@ AutoCloseable {
         RenderSystem.defaultBlendFunc();
         RenderSystem.defaultAlphaFunc();
         int l = 5;
-        if (MinecraftClient.isFancyGraphicsEnabled()) {
+        if (MinecraftClient.isFancyGraphicsOrBetter()) {
             l = 10;
         }
         int m = -1;
@@ -373,7 +373,7 @@ AutoCloseable {
     }
 
     public void method_22713(Camera arg) {
-        float f = this.client.world.getRainGradient(1.0f) / (MinecraftClient.isFancyGraphicsEnabled() ? 1.0f : 2.0f);
+        float f = this.client.world.getRainGradient(1.0f) / (MinecraftClient.isFancyGraphicsOrBetter() ? 1.0f : 2.0f);
         if (f <= 0.0f) {
             return;
         }
@@ -428,7 +428,7 @@ AutoCloseable {
         RenderSystem.texParameter(3553, 10243, 10497);
         RenderSystem.bindTexture(0);
         this.loadEntityOutlineShader();
-        if (MinecraftClient.method_29611()) {
+        if (MinecraftClient.isFabulousGraphicsOrBetter()) {
             this.loadTransparencyShader();
         }
     }
@@ -456,7 +456,7 @@ AutoCloseable {
     }
 
     private void loadTransparencyShader() {
-        this.method_29701();
+        this.resetTransparencyShader();
         Identifier lv = new Identifier("shaders/post/transparency.json");
         try {
             ShaderEffect lv2 = new ShaderEffect(this.client.getTextureManager(), this.client.getResourceManager(), this.client.getFramebuffer(), lv);
@@ -475,17 +475,17 @@ AutoCloseable {
         }
         catch (IOException iOException) {
             GameOptions lv8 = MinecraftClient.getInstance().options;
-            lv8.field_25444 = lv8.field_25444.method_29596();
-            throw new class_5347("Failed to load shader: " + lv, iOException);
+            lv8.graphicsMode = lv8.graphicsMode.previous();
+            throw new ShaderException("Failed to load shader: " + lv, iOException);
         }
         catch (JsonSyntaxException jsonSyntaxException) {
             GameOptions lv9 = MinecraftClient.getInstance().options;
-            lv9.field_25444 = lv9.field_25444.method_29596();
-            throw new class_5347("Failed to parse shader: " + lv, jsonSyntaxException);
+            lv9.graphicsMode = lv9.graphicsMode.previous();
+            throw new ShaderException("Failed to parse shader: " + lv, jsonSyntaxException);
         }
     }
 
-    private void method_29701() {
+    private void resetTransparencyShader() {
         if (this.transparencyShader != null) {
             this.transparencyShader.close();
             this.translucentFramebuffer.delete();
@@ -646,10 +646,10 @@ AutoCloseable {
         if (this.world == null) {
             return;
         }
-        if (MinecraftClient.method_29611()) {
+        if (MinecraftClient.isFabulousGraphicsOrBetter()) {
             this.loadTransparencyShader();
         } else {
-            this.method_29701();
+            this.resetTransparencyShader();
         }
         this.world.reloadColor();
         if (this.chunkBuilder == null) {
@@ -659,7 +659,7 @@ AutoCloseable {
         }
         this.needsTerrainUpdate = true;
         this.cloudsDirty = true;
-        RenderLayers.setFancyGraphics(MinecraftClient.isFancyGraphicsEnabled());
+        RenderLayers.setFancyGraphicsOrBetter(MinecraftClient.isFancyGraphicsOrBetter());
         this.renderDistance = this.client.options.viewDistance;
         if (this.chunks != null) {
             this.chunks.clear();
@@ -1046,8 +1046,8 @@ AutoCloseable {
         lv6.draw(TexturedRenderLayers.getEntityTranslucentCull());
         lv6.draw(TexturedRenderLayers.getBannerPatterns());
         lv6.draw(TexturedRenderLayers.getShieldPatterns());
-        lv6.draw(RenderLayer.method_27948());
-        lv6.draw(RenderLayer.method_27949());
+        lv6.draw(RenderLayer.getArmorGlint());
+        lv6.draw(RenderLayer.getArmorEntityGlint());
         lv6.draw(RenderLayer.getGlint());
         lv6.draw(RenderLayer.getEntityGlint());
         lv6.draw(RenderLayer.getWaterMask());
@@ -2454,12 +2454,12 @@ AutoCloseable {
     }
 
     @Nullable
-    public Framebuffer method_29360() {
+    public Framebuffer getTranslucentFramebuffer() {
         return this.translucentFramebuffer;
     }
 
     @Nullable
-    public Framebuffer method_29361() {
+    public Framebuffer getEntityFramebuffer() {
         return this.entityFramebuffer;
     }
 
@@ -2469,19 +2469,19 @@ AutoCloseable {
     }
 
     @Nullable
-    public Framebuffer method_29363() {
+    public Framebuffer getWeatherFramebuffer() {
         return this.weatherFramebuffer;
     }
 
     @Nullable
-    public Framebuffer method_29364() {
+    public Framebuffer getCloudsFramebuffer() {
         return this.cloudsFramebuffer;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static class class_5347
+    public static class ShaderException
     extends RuntimeException {
-        public class_5347(String string, Throwable throwable) {
+        public ShaderException(String string, Throwable throwable) {
             super(string, throwable);
         }
     }

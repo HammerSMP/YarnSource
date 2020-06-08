@@ -205,7 +205,7 @@ public class RealmsTextureManager {
         }
         RenderSystem.activeTexture(33984);
         RenderSystem.bindTexture(j);
-        TextureUtil.method_24963(intBuffer, k, l);
+        TextureUtil.uploadImage(intBuffer, k, l);
         textures.put(string, new RealmsTexture(string2, j));
         return j;
     }

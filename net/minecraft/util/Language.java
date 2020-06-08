@@ -36,15 +36,15 @@ import org.apache.logging.log4j.Logger;
 
 public abstract class Language {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Gson field_25307 = new Gson();
+    private static final Gson GSON = new Gson();
     private static final Pattern TOKEN_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
-    private static volatile Language INSTANCE = Language.method_29429();
+    private static volatile Language instance = Language.create();
 
-    private static Language method_29429() {
+    private static Language create() {
         ImmutableMap.Builder builder = ImmutableMap.builder();
         BiConsumer<String, String> biConsumer = (arg_0, arg_1) -> ((ImmutableMap.Builder)builder).put(arg_0, arg_1);
         try (InputStream inputStream = Language.class.getResourceAsStream("/assets/minecraft/lang/en_us.json");){
-            Language.method_29425(inputStream, biConsumer);
+            Language.load(inputStream, biConsumer);
         }
         catch (JsonParseException | IOException exception) {
             LOGGER.error("Couldn't read strings from /assets/minecraft/lang/en_us.json", exception);
@@ -68,19 +68,19 @@ public abstract class Language {
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            public boolean method_29428() {
+            public boolean isRightToLeft() {
                 return false;
             }
 
             @Override
-            public String method_29426(String string, boolean bl) {
+            public String reorder(String string, boolean bl) {
                 return string;
             }
         };
     }
 
-    public static void method_29425(InputStream inputStream, BiConsumer<String, String> biConsumer) {
-        JsonObject jsonObject = (JsonObject)field_25307.fromJson((Reader)new InputStreamReader(inputStream, StandardCharsets.UTF_8), JsonObject.class);
+    public static void load(InputStream inputStream, BiConsumer<String, String> biConsumer) {
+        JsonObject jsonObject = (JsonObject)GSON.fromJson((Reader)new InputStreamReader(inputStream, StandardCharsets.UTF_8), JsonObject.class);
         for (Map.Entry entry : jsonObject.entrySet()) {
             String string = TOKEN_PATTERN.matcher(JsonHelper.asString((JsonElement)entry.getValue(), (String)entry.getKey())).replaceAll("%$1s");
             biConsumer.accept((String)entry.getKey(), string);
@@ -88,12 +88,12 @@ public abstract class Language {
     }
 
     public static Language getInstance() {
-        return INSTANCE;
+        return instance;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void method_29427(Language arg) {
-        INSTANCE = arg;
+    public static void setInstance(Language arg) {
+        instance = arg;
     }
 
     public abstract String get(String var1);
@@ -101,8 +101,8 @@ public abstract class Language {
     public abstract boolean hasTranslation(String var1);
 
     @Environment(value=EnvType.CLIENT)
-    public abstract boolean method_29428();
+    public abstract boolean isRightToLeft();
 
-    public abstract String method_29426(String var1, boolean var2);
+    public abstract String reorder(String var1, boolean var2);
 }
 

@@ -154,7 +154,7 @@ AutoCloseable {
     public void destroyTexture(Identifier arg) {
         AbstractTexture lv = this.getTexture(arg);
         if (lv != null) {
-            TextureUtil.method_24957(lv.getGlId());
+            TextureUtil.deleteId(lv.getGlId());
         }
     }
 

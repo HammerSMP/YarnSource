@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.font.TextVisitFactory;
 import net.minecraft.client.util.TextCollector;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -47,7 +47,7 @@ public class TextHandler {
         return mutableFloat.floatValue();
     }
 
-    public float getWidth(class_5348 arg2) {
+    public float getWidth(StringRenderable arg2) {
         MutableFloat mutableFloat = new MutableFloat();
         TextVisitFactory.visitFormatted(arg2, Style.EMPTY, (i, arg, j) -> {
             mutableFloat.add(this.widthRetriever.getWidth(j, arg));
@@ -81,28 +81,28 @@ public class TextHandler {
     }
 
     @Nullable
-    public Style trimToWidth(class_5348 arg, int i) {
+    public Style trimToWidth(StringRenderable arg, int i) {
         WidthLimitingVisitor lv = new WidthLimitingVisitor(i);
         return arg.visit((arg2, string) -> TextVisitFactory.visitFormatted(string, arg2, (TextVisitFactory.CharacterVisitor)lv) ? Optional.empty() : Optional.of(arg2), Style.EMPTY).orElse(null);
     }
 
-    public class_5348 trimToWidth(class_5348 arg, int i, Style arg2) {
+    public StringRenderable trimToWidth(StringRenderable arg, int i, Style arg2) {
         final WidthLimitingVisitor lv = new WidthLimitingVisitor(i);
-        return arg.visit(new class_5348.StyledVisitor<class_5348>(){
+        return arg.visit(new StringRenderable.StyledVisitor<StringRenderable>(){
             private final TextCollector collector = new TextCollector();
 
             @Override
-            public Optional<class_5348> accept(Style arg, String string) {
+            public Optional<StringRenderable> accept(Style arg, String string) {
                 lv.resetLength();
                 if (!TextVisitFactory.visitFormatted(string, arg, (TextVisitFactory.CharacterVisitor)lv)) {
                     String string2 = string.substring(0, lv.getLength());
                     if (!string2.isEmpty()) {
-                        this.collector.add(class_5348.method_29431(string2, arg));
+                        this.collector.add(StringRenderable.styled(string2, arg));
                     }
                     return Optional.of(this.collector.getCombined());
                 }
                 if (!string.isEmpty()) {
-                    this.collector.add(class_5348.method_29431(string, arg));
+                    this.collector.add(StringRenderable.styled(string, arg));
                 }
                 return Optional.empty();
             }
@@ -158,18 +158,18 @@ public class TextHandler {
         }
     }
 
-    public List<class_5348> wrapLines(String string, int i2, Style arg2) {
+    public List<StringRenderable> wrapLines(String string, int i2, Style arg2) {
         ArrayList list = Lists.newArrayList();
-        this.wrapLines(string, i2, arg2, false, (arg, i, j) -> list.add(class_5348.method_29431(string.substring(i, j), arg)));
+        this.wrapLines(string, i2, arg2, false, (arg, i, j) -> list.add(StringRenderable.styled(string.substring(i, j), arg)));
         return list;
     }
 
-    public List<class_5348> wrapLines(class_5348 arg2, int i, Style arg22) {
+    public List<StringRenderable> wrapLines(StringRenderable arg2, int i, Style arg22) {
         ArrayList list = Lists.newArrayList();
         ArrayList list2 = Lists.newArrayList();
         arg2.visit((arg, string) -> {
             if (!string.isEmpty()) {
-                list2.add(new class_5345(string, arg));
+                list2.add(new StyledString(string, arg));
             }
             return Optional.empty();
         }, arg22);
@@ -179,8 +179,8 @@ public class TextHandler {
         block0 : while (bl) {
             bl = false;
             LineBreakingVisitor lv2 = new LineBreakingVisitor(i);
-            for (class_5345 lv3 : lv.parts) {
-                boolean bl3 = TextVisitFactory.visitFormatted(lv3.field_25261, 0, lv3.field_25262, arg22, lv2);
+            for (StyledString lv3 : lv.parts) {
+                boolean bl3 = TextVisitFactory.visitFormatted(lv3.literal, 0, lv3.style, arg22, lv2);
                 if (!bl3) {
                     int j = lv2.getEndingIndex();
                     Style lv4 = lv2.getEndingStyle();
@@ -192,40 +192,40 @@ public class TextHandler {
                     bl = true;
                     continue block0;
                 }
-                lv2.offset(lv3.field_25261.length());
+                lv2.offset(lv3.literal.length());
             }
         }
-        class_5348 lv5 = lv.collectRemainers();
+        StringRenderable lv5 = lv.collectRemainers();
         if (lv5 != null) {
             list.add(lv5);
         } else if (bl2) {
-            list.add(class_5348.field_25310);
+            list.add(StringRenderable.EMPTY);
         }
         return list;
     }
 
     @Environment(value=EnvType.CLIENT)
     static class LineWrappingCollector {
-        private final List<class_5345> parts;
+        private final List<StyledString> parts;
         private String joined;
 
-        public LineWrappingCollector(List<class_5345> list) {
+        public LineWrappingCollector(List<StyledString> list) {
             this.parts = list;
-            this.joined = list.stream().map(arg -> ((class_5345)arg).field_25261).collect(Collectors.joining());
+            this.joined = list.stream().map(arg -> ((StyledString)arg).literal).collect(Collectors.joining());
         }
 
         public char charAt(int i) {
             return this.joined.charAt(i);
         }
 
-        public class_5348 collectLine(int i, int j, Style arg) {
+        public StringRenderable collectLine(int i, int j, Style arg) {
             TextCollector lv = new TextCollector();
-            ListIterator<class_5345> listIterator = this.parts.listIterator();
+            ListIterator<StyledString> listIterator = this.parts.listIterator();
             int k = i;
             boolean bl = false;
             while (listIterator.hasNext()) {
-                class_5345 lv2 = listIterator.next();
-                String string = lv2.field_25261;
+                StyledString lv2 = listIterator.next();
+                String string = lv2.literal;
                 int l = string.length();
                 if (!bl) {
                     if (k > l) {
@@ -235,7 +235,7 @@ public class TextHandler {
                     } else {
                         String string2 = string.substring(0, k);
                         if (!string2.isEmpty()) {
-                            lv.add(class_5348.method_29431(string2, lv2.field_25262));
+                            lv.add(StringRenderable.styled(string2, lv2.style));
                         }
                         k += j;
                         bl = true;
@@ -252,7 +252,7 @@ public class TextHandler {
                     listIterator.remove();
                     break;
                 }
-                listIterator.set(new class_5345(string3, arg));
+                listIterator.set(new StyledString(string3, arg));
                 break;
             }
             this.joined = this.joined.substring(i + j);
@@ -260,7 +260,7 @@ public class TextHandler {
         }
 
         @Nullable
-        public class_5348 collectRemainers() {
+        public StringRenderable collectRemainers() {
             TextCollector lv = new TextCollector();
             this.parts.forEach(lv::add);
             this.parts.clear();
@@ -269,24 +269,24 @@ public class TextHandler {
     }
 
     @Environment(value=EnvType.CLIENT)
-    static class class_5345
-    implements class_5348 {
-        private final String field_25261;
-        private final Style field_25262;
+    static class StyledString
+    implements StringRenderable {
+        private final String literal;
+        private final Style style;
 
-        public class_5345(String string, Style arg) {
-            this.field_25261 = string;
-            this.field_25262 = arg;
+        public StyledString(String string, Style arg) {
+            this.literal = string;
+            this.style = arg;
         }
 
         @Override
-        public <T> Optional<T> visit(class_5348.Visitor<T> arg) {
-            return arg.accept(this.field_25261);
+        public <T> Optional<T> visit(StringRenderable.Visitor<T> arg) {
+            return arg.accept(this.literal);
         }
 
         @Override
-        public <T> Optional<T> visit(class_5348.StyledVisitor<T> arg, Style arg2) {
-            return arg.accept(this.field_25262.withParent(arg2), this.field_25261);
+        public <T> Optional<T> visit(StringRenderable.StyledVisitor<T> arg, Style arg2) {
+            return arg.accept(this.style.withParent(arg2), this.literal);
         }
     }
 

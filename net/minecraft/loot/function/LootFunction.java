@@ -13,7 +13,7 @@ import net.minecraft.loot.function.LootFunctionType;
 public interface LootFunction
 extends LootContextAware,
 BiFunction<ItemStack, LootContext, ItemStack> {
-    public LootFunctionType method_29321();
+    public LootFunctionType getType();
 
     public static Consumer<ItemStack> apply(BiFunction<ItemStack, LootContext, ItemStack> biFunction, Consumer<ItemStack> consumer, LootContext arg) {
         return arg2 -> consumer.accept((ItemStack)biFunction.apply((ItemStack)arg2, arg));

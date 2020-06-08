@@ -53,7 +53,7 @@ extends Item {
             }
         }
         arg.getStack().decrement(1);
-        return ActionResult.method_29236(lv.isClient);
+        return ActionResult.success(lv.isClient);
     }
 
     @Override

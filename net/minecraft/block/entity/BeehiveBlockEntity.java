@@ -172,7 +172,7 @@ implements Tickable {
                         this.world.setBlockState(this.getPos(), (BlockState)arg2.with(BeehiveBlock.HONEY_LEVEL, i + j));
                     }
                 }
-                this.method_29562(arg22.ticksInHive, lv6);
+                this.ageBee(arg22.ticksInHive, lv6);
                 if (list != null) {
                     list.add(lv6);
                 }
@@ -189,14 +189,14 @@ implements Tickable {
         return false;
     }
 
-    private void method_29562(int i, BeeEntity arg) {
+    private void ageBee(int i, BeeEntity arg) {
         int j = arg.getBreedingAge();
         if (j < 0) {
             arg.setBreedingAge(Math.min(0, j + i));
         } else if (j > 0) {
             arg.setBreedingAge(Math.max(0, j - i));
         }
-        arg.setLoveTicks(Math.max(0, arg.method_29270() - i));
+        arg.setLoveTicks(Math.max(0, arg.getLoveTicks() - i));
         arg.resetPollinationTicks();
     }
 

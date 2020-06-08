@@ -33,7 +33,7 @@ extends HandledScreen<CartographyTableScreenHandler> {
 
     public CartographyTableScreen(CartographyTableScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
-        this.field_25268 -= 2;
+        this.titleY -= 2;
     }
 
     @Override

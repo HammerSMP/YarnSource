@@ -50,7 +50,7 @@ implements RecipeBookProvider {
             this.x = this.recipeBook.findLeftEdge(this.isNarrow, this.width, this.backgroundWidth);
             ((TexturedButtonWidget)arg).setPos(this.x + 5, this.height / 2 - 49);
         }));
-        this.field_25267 = 29;
+        this.titleX = 29;
     }
 
     @Override

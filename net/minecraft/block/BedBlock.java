@@ -101,7 +101,7 @@ implements BlockEntityProvider {
             if (arg22.getBlockState(lv).isOf(this)) {
                 arg22.removeBlock(lv, false);
             }
-            arg22.createExplosion(null, DamageSource.netherBed(), null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
+            arg22.createExplosion(null, DamageSource.badRespawnPoint(), null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
             return ActionResult.SUCCESS;
         }
         if (arg.get(OCCUPIED).booleanValue()) {

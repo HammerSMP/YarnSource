@@ -57,12 +57,12 @@ extends HorizontalConnectingBlock {
 
     public boolean canConnect(BlockState arg, boolean bl, Direction arg2) {
         Block lv = arg.getBlock();
-        boolean bl2 = this.method_26375(lv);
+        boolean bl2 = this.isFence(lv);
         boolean bl3 = lv instanceof FenceGateBlock && FenceGateBlock.canWallConnect(arg, arg2);
         return !FenceBlock.cannotConnect(lv) && bl || bl2 || bl3;
     }
 
-    private boolean method_26375(Block arg) {
+    private boolean isFence(Block arg) {
         return arg.isIn(BlockTags.FENCES) && arg.isIn(BlockTags.WOODEN_FENCES) == this.getDefaultState().isIn(BlockTags.WOODEN_FENCES);
     }
 

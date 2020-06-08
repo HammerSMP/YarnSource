@@ -33,7 +33,7 @@ extends DataFix {
     public TypeRewriteRule makeRule() {
         TaggedChoice.TaggedChoiceType taggedChoiceType = this.getInputSchema().findChoiceType(TypeReferences.ENTITY);
         TaggedChoice.TaggedChoiceType taggedChoiceType2 = this.getOutputSchema().findChoiceType(TypeReferences.ENTITY);
-        Type type = DSL.named((String)TypeReferences.ENTITY_NAME.typeName(), IdentifierNormalizingSchema.method_28295());
+        Type type = DSL.named((String)TypeReferences.ENTITY_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType());
         if (!Objects.equals((Object)this.getOutputSchema().getType(TypeReferences.ENTITY_NAME), (Object)type)) {
             throw new IllegalStateException("Entity name type is not what was expected.");
         }

@@ -42,7 +42,7 @@ extends AbstractFireballEntity {
             Entity lv2 = this.getOwner();
             int i = lv.getFireTicks();
             lv.setOnFireFor(5);
-            boolean bl = lv.damage(DamageSource.explosiveProjectile(this, lv2), 5.0f);
+            boolean bl = lv.damage(DamageSource.fireball(this, lv2), 5.0f);
             if (!bl) {
                 lv.setFireTicks(i);
             } else if (lv2 instanceof LivingEntity) {

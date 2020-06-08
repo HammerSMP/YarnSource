@@ -94,7 +94,7 @@ extends SpriteBillboardParticle {
                 return null;
             }
             BlockPos lv2 = new BlockPos(d, e, f);
-            int j = MinecraftClient.getInstance().getBlockColorMap().getColor(lv, arg2, lv2);
+            int j = MinecraftClient.getInstance().getBlockColors().getColor(lv, arg2, lv2);
             if (lv.getBlock() instanceof FallingBlock) {
                 j = ((FallingBlock)lv.getBlock()).getColor(lv, arg2, lv2);
             }

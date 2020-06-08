@@ -32,7 +32,7 @@ extends DataFix {
     }
 
     protected TypeRewriteRule makeRule() {
-        Type type = DSL.named((String)TypeReferences.BIOME.typeName(), IdentifierNormalizingSchema.method_28295());
+        Type type = DSL.named((String)TypeReferences.BIOME.typeName(), IdentifierNormalizingSchema.getIdentifierType());
         if (!Objects.equals((Object)type, (Object)this.getInputSchema().getType(TypeReferences.BIOME))) {
             throw new IllegalStateException("Biome type is not what was expected.");
         }

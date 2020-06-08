@@ -67,12 +67,12 @@ import net.minecraft.util.logging.UncaughtExceptionHandler;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -90,7 +90,7 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(Thread thread, DimensionTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+    public MinecraftDedicatedServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg, arg2, arg5, arg3, Proxy.NO_PROXY, dataFixer, arg4, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.propertiesLoader = arg6;
         this.rconCommandOutput = new ServerCommandOutput(this);

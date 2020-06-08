@@ -24,7 +24,7 @@ extends Item {
         if (arg3 instanceof Saddleable && arg3.isAlive() && !(lv = (Saddleable)((Object)arg3)).isSaddled() && lv.canBeSaddled()) {
             lv.saddle(SoundCategory.NEUTRAL);
             arg.decrement(1);
-            return ActionResult.method_29236(arg2.world.isClient);
+            return ActionResult.success(arg2.world.isClient);
         }
         return ActionResult.PASS;
     }

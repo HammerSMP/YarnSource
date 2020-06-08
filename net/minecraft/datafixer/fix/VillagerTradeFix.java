@@ -45,7 +45,7 @@ extends ChoiceFix {
         OpticFinder opticFinder4 = type2.findField("buy");
         OpticFinder opticFinder5 = type2.findField("buyB");
         OpticFinder opticFinder6 = type2.findField("sell");
-        OpticFinder opticFinder7 = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
+        OpticFinder opticFinder7 = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType()));
         Function<Typed, Typed> function = typed -> this.fixPumpkinTrade((OpticFinder<Pair<String, String>>)opticFinder7, (Typed<?>)typed);
         return typed2.updateTyped(opticFinder, typed -> typed.updateTyped(opticFinder2, typed2 -> typed2.updateTyped(opticFinder3, typed -> typed.updateTyped(opticFinder4, function).updateTyped(opticFinder5, function).updateTyped(opticFinder6, function))));
     }

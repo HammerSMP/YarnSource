@@ -89,7 +89,7 @@ RangedAttackMob {
     }
 
     @Override
-    public boolean method_29503() {
+    public boolean hurtByWater() {
         return true;
     }
 
@@ -144,7 +144,7 @@ RangedAttackMob {
             if (!this.world.isClient) {
                 lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         return ActionResult.PASS;
     }

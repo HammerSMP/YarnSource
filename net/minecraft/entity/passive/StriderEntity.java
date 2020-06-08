@@ -170,7 +170,7 @@ Saddleable {
     }
 
     @Override
-    public boolean canWalkOnLava(Fluid arg) {
+    public boolean canWalkOnFluid(Fluid arg) {
         return arg.isIn(FluidTags.LAVA);
     }
 
@@ -317,7 +317,7 @@ Saddleable {
     private void updateFloating() {
         if (this.isInLava()) {
             ShapeContext lv = ShapeContext.of(this);
-            if (!lv.isAbove(FluidBlock.field_24412, this.getBlockPos(), true) || this.world.getFluidState(this.getBlockPos().up()).matches(FluidTags.LAVA)) {
+            if (!lv.isAbove(FluidBlock.COLLISION_SHAPE, this.getBlockPos(), true) || this.world.getFluidState(this.getBlockPos().up()).matches(FluidTags.LAVA)) {
                 this.setVelocity(this.getVelocity().multiply(0.5).add(0.0, 0.05, 0.0));
             } else {
                 this.onGround = true;
@@ -350,7 +350,7 @@ Saddleable {
     }
 
     @Override
-    public boolean method_29503() {
+    public boolean hurtByWater() {
         return true;
     }
 
@@ -397,7 +397,7 @@ Saddleable {
             if (!this.world.isClient) {
                 arg.startRiding(this);
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         ActionResult lv = super.interactMob(arg, arg2);
         if (!lv.isAccepted()) {

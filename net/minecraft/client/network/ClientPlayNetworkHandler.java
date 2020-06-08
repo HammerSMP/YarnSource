@@ -56,7 +56,6 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
-import net.minecraft.class_5352;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -277,6 +276,7 @@ import net.minecraft.realms.DisconnectedRealmsScreen;
 import net.minecraft.realms.RealmsScreen;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardCriterion;
@@ -311,6 +311,7 @@ import net.minecraft.util.math.PositionImpl;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
@@ -319,7 +320,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.logging.log4j.LogManager;
@@ -347,7 +347,7 @@ implements ClientPlayPacketListener {
     private final RecipeManager recipeManager = new RecipeManager();
     private final UUID sessionId = UUID.randomUUID();
     private Set<RegistryKey<World>> field_25273;
-    private DimensionTracker dimensionTracker = DimensionTracker.create();
+    private RegistryTracker dimensionTracker = RegistryTracker.create();
 
     public ClientPlayNetworkHandler(MinecraftClient arg, Screen arg2, ClientConnection arg3, GameProfile gameProfile) {
         this.client = arg;
@@ -387,7 +387,7 @@ implements ClientPlayPacketListener {
         this.dimensionTracker = arg.getDimension();
         RegistryKey<DimensionType> lv = arg.method_29444();
         RegistryKey<World> lv2 = arg.getDimensionId();
-        DimensionType lv3 = this.dimensionTracker.getRegistry().get(lv);
+        DimensionType lv3 = this.dimensionTracker.getDimensionTypeRegistry().get(lv);
         this.chunkLoadDistance = arg.getChunkLoadDistance();
         boolean bl = arg.isDebugWorld();
         boolean bl2 = arg.isFlatWorld();
@@ -886,7 +886,7 @@ implements ClientPlayPacketListener {
             this.world.addEntity(arg.getId(), lv);
             if (lv instanceof BeeEntity) {
                 PassiveBeeSoundInstance lv3;
-                boolean bl = ((BeeEntity)lv).method_29511();
+                boolean bl = ((BeeEntity)lv).hasAngerTime();
                 if (bl) {
                     AggressiveBeeSoundInstance lv2 = new AggressiveBeeSoundInstance((BeeEntity)lv);
                 } else {
@@ -988,7 +988,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         RegistryKey<DimensionType> lv = arg.method_29445();
         RegistryKey<World> lv2 = arg.getDimension();
-        DimensionType lv3 = this.dimensionTracker.getRegistry().get(lv);
+        DimensionType lv3 = this.dimensionTracker.getDimensionTypeRegistry().get(lv);
         ClientPlayerEntity lv4 = this.client.player;
         int i = lv4.getEntityId();
         this.positionLookSetup = false;
@@ -1393,7 +1393,7 @@ implements ClientPlayPacketListener {
         }
         StatusEffectInstance lv3 = new StatusEffectInstance(lv2, arg.getDuration(), arg.getAmplifier(), arg.isAmbient(), arg.shouldShowParticles(), arg.shouldShowIcon());
         lv3.setPermanent(arg.isPermanent());
-        ((LivingEntity)lv).method_26082(lv3);
+        ((LivingEntity)lv).applyStatusEffect(lv3);
     }
 
     @Override
@@ -1401,7 +1401,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         this.tagManager = arg.getTagManager();
         if (!this.connection.isLocal()) {
-            this.tagManager.method_29226();
+            this.tagManager.apply();
         }
         this.client.getSearchableContainer(SearchManager.ITEM_TAG).reload();
     }
@@ -1574,7 +1574,7 @@ implements ClientPlayPacketListener {
                 File file2 = new File(file, string3);
                 if (file2.isFile()) {
                     this.sendResourcePackStatus(ResourcePackStatusC2SPacket.Status.ACCEPTED);
-                    CompletableFuture<Void> completableFuture = this.client.getResourcePackDownloader().loadServerPack(file2, class_5352.PACK_SOURCE_WORLD);
+                    CompletableFuture<Void> completableFuture = this.client.getResourcePackDownloader().loadServerPack(file2, ResourcePackSource.PACK_SOURCE_WORLD);
                     this.feedbackAfterDownload(completableFuture);
                     return;
                 }
@@ -1710,7 +1710,7 @@ implements ClientPlayPacketListener {
                 }
                 this.client.debugRenderer.caveDebugRenderer.method_3704(lv5, list, list2);
             } else if (CustomPayloadS2CPacket.DEBUG_STRUCTURES.equals(lv)) {
-                DimensionType lv6 = this.dimensionTracker.getRegistry().get(lv2.readIdentifier());
+                DimensionType lv6 = this.dimensionTracker.getDimensionTypeRegistry().get(lv2.readIdentifier());
                 BlockBox lv7 = new BlockBox(lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt());
                 int m = lv2.readInt();
                 ArrayList list3 = Lists.newArrayList();
@@ -2151,7 +2151,7 @@ implements ClientPlayPacketListener {
         return this.field_25273;
     }
 
-    public DimensionTracker method_29091() {
+    public RegistryTracker method_29091() {
         return this.dimensionTracker;
     }
 }

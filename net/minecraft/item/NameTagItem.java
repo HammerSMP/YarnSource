@@ -27,7 +27,7 @@ extends Item {
                 }
                 arg.decrement(1);
             }
-            return ActionResult.method_29236(arg2.world.isClient);
+            return ActionResult.success(arg2.world.isClient);
         }
         return ActionResult.PASS;
     }

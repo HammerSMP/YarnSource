@@ -7,7 +7,6 @@
 package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.class_5314;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.ChunkPos;
@@ -16,6 +15,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.chunk.StructureConfig;
 import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
@@ -29,7 +29,7 @@ public class ConfiguredStructureFeature<FC extends FeatureConfig, F extends Stru
         this.field_24836 = arg2;
     }
 
-    public StructureStart<?> method_28622(ChunkGenerator arg, BiomeSource arg2, StructureManager arg3, long l, ChunkPos arg4, Biome arg5, int i, class_5314 arg6) {
+    public StructureStart<?> method_28622(ChunkGenerator arg, BiomeSource arg2, StructureManager arg3, long l, ChunkPos arg4, Biome arg5, int i, StructureConfig arg6) {
         return ((StructureFeature)this.field_24835).method_28657(arg, arg2, arg3, l, arg4, arg5, i, new ChunkRandom(), arg6, this.field_24836);
     }
 }

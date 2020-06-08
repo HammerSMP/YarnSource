@@ -32,7 +32,7 @@ extends ChoiceFix {
 
     @Override
     protected Typed<?> transform(Typed<?> typed) {
-        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.method_28295()));
+        OpticFinder opticFinder = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType()));
         Type type = this.getInputSchema().getTypeRaw(TypeReferences.ITEM_STACK);
         OpticFinder opticFinder2 = DSL.fieldFinder((String)"SaddleItem", (Type)type);
         Optional optional = typed.getOptionalTyped(opticFinder2);

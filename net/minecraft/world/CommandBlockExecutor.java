@@ -179,7 +179,7 @@ implements CommandOutput {
         if (arg.getEntityWorld().isClient) {
             arg.openCommandBlockMinecartScreen(this);
         }
-        return ActionResult.method_29236(arg.world.isClient);
+        return ActionResult.success(arg.world.isClient);
     }
 
     @Environment(value=EnvType.CLIENT)

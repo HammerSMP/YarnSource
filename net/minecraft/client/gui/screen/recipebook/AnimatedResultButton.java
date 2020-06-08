@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookResults;
@@ -26,6 +25,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeBook;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -98,10 +98,10 @@ extends AbstractButtonWidget {
         ItemStack lv2 = list.get(this.currentResultIndex).getOutput();
         int m = 4;
         if (this.results.hasSingleOutput() && this.getResults().size() > 1) {
-            lv.getItemRenderer().renderGuiItem(lv2, this.x + m + 1, this.y + m + 1);
+            lv.getItemRenderer().renderInGuiWithOverrides(lv2, this.x + m + 1, this.y + m + 1);
             --m;
         }
-        lv.getItemRenderer().method_27953(lv2, this.x + m, this.y + m);
+        lv.getItemRenderer().renderInGui(lv2, this.x + m, this.y + m);
         if (bl) {
             RenderSystem.popMatrix();
         }
@@ -124,7 +124,7 @@ extends AbstractButtonWidget {
         return list.get(this.currentResultIndex);
     }
 
-    public List<class_5348> getTooltip(Screen arg) {
+    public List<StringRenderable> getTooltip(Screen arg) {
         ItemStack lv = this.getResults().get(this.currentResultIndex).getOutput();
         ArrayList list = Lists.newArrayList(arg.getTooltipFromItem(lv));
         if (this.results.getResults(this.recipeBook.isFilteringCraftable(this.craftingScreenHandler)).size() > 1) {

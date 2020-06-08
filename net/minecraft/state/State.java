@@ -154,7 +154,7 @@ public abstract class State<O, S> {
         return this.entries;
     }
 
-    protected static <O, S extends State<O, S>> Codec<S> method_28494(Codec<O> codec, Function<O, S> function) {
+    protected static <O, S extends State<O, S>> Codec<S> createCodec(Codec<O> codec, Function<O, S> function) {
         return codec.dispatch("Name", arg -> arg.owner, object -> {
             State lv = (State)function.apply(object);
             if (lv.getEntries().isEmpty()) {

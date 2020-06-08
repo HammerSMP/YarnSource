@@ -62,7 +62,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.ENCHANT_RANDOMLY;
     }
 
@@ -99,8 +99,8 @@ extends ConditionalLootFunction {
         return EnchantRandomlyLootFunction.builder(args -> new EnchantRandomlyLootFunction((LootCondition[])args, (Collection<Enchantment>)ImmutableList.of()));
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<EnchantRandomlyLootFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<EnchantRandomlyLootFunction> {
         @Override
         public void toJson(JsonObject jsonObject, EnchantRandomlyLootFunction arg, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg, jsonSerializationContext);

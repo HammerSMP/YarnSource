@@ -76,9 +76,9 @@ extends LootPoolEntry {
     }
 
     public static abstract class Serializer<T extends LeafEntry>
-    extends LootPoolEntry.class_5337<T> {
+    extends LootPoolEntry.Serializer<T> {
         @Override
-        public void method_422(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
+        public void addEntryFields(JsonObject jsonObject, T arg, JsonSerializationContext jsonSerializationContext) {
             if (((LeafEntry)arg).weight != 1) {
                 jsonObject.addProperty("weight", (Number)((LeafEntry)arg).weight);
             }

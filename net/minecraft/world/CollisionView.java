@@ -14,12 +14,12 @@ import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.class_5329;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockCollisionSpliterator;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.border.WorldBorder;
 
@@ -68,7 +68,7 @@ extends BlockView {
     }
 
     default public Stream<VoxelShape> getBlockCollisions(@Nullable Entity arg, Box arg2) {
-        return StreamSupport.stream(new class_5329(this, arg, arg2), false);
+        return StreamSupport.stream(new BlockCollisionSpliterator(this, arg, arg2), false);
     }
 }
 

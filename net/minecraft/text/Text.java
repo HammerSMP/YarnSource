@@ -48,13 +48,13 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.text.KeybindText;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.NbtText;
 import net.minecraft.text.ScoreText;
 import net.minecraft.text.SelectorText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -64,7 +64,7 @@ import net.minecraft.util.Util;
 
 public interface Text
 extends Message,
-class_5348 {
+StringRenderable {
     public Style getStyle();
 
     public String asString();
@@ -83,7 +83,7 @@ class_5348 {
         this.visit(string -> {
             int j = i - stringBuilder.length();
             if (j <= 0) {
-                return field_25309;
+                return TERMINATE_VISIT;
             }
             stringBuilder.append(string.length() <= j ? string : string.substring(0, j));
             return Optional.empty();
@@ -99,7 +99,7 @@ class_5348 {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    default public <T> Optional<T> visit(class_5348.StyledVisitor<T> arg, Style arg2) {
+    default public <T> Optional<T> visit(StringRenderable.StyledVisitor<T> arg, Style arg2) {
         Style lv = this.getStyle().withParent(arg2);
         Optional<T> optional = this.visitSelf(arg, lv);
         if (optional.isPresent()) {
@@ -114,7 +114,7 @@ class_5348 {
     }
 
     @Override
-    default public <T> Optional<T> visit(class_5348.Visitor<T> arg) {
+    default public <T> Optional<T> visit(StringRenderable.Visitor<T> arg) {
         Optional<T> optional = this.visitSelf(arg);
         if (optional.isPresent()) {
             return optional;
@@ -128,11 +128,11 @@ class_5348 {
     }
 
     @Environment(value=EnvType.CLIENT)
-    default public <T> Optional<T> visitSelf(class_5348.StyledVisitor<T> arg, Style arg2) {
+    default public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> arg, Style arg2) {
         return arg.accept(arg2, this.asString());
     }
 
-    default public <T> Optional<T> visitSelf(class_5348.Visitor<T> arg) {
+    default public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> arg) {
         return arg.accept(this.asString());
     }
 

@@ -35,7 +35,7 @@ extends Item {
         World lv = arg.getWorld();
         BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
         if (lv3.isOf(Blocks.LECTERN)) {
-            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, arg.getStack()) ? ActionResult.method_29236(lv.isClient) : ActionResult.PASS;
+            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, arg.getStack()) ? ActionResult.success(lv.isClient) : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }

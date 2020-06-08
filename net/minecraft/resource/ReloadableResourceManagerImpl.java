@@ -112,7 +112,7 @@ implements ReloadableResourceManager {
     }
 
     @Override
-    public Collection<Identifier> method_29489(Identifier arg, Predicate<String> predicate) {
+    public Collection<Identifier> findResources(Identifier arg, Predicate<String> predicate) {
         ResourceManager lv = this.namespaceManagers.get(arg.getNamespace());
         if (lv != null) {
             return lv.findResources(arg.getPath(), predicate);

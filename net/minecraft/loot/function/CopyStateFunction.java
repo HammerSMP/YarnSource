@@ -51,7 +51,7 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType method_29321() {
+    public LootFunctionType getType() {
         return LootFunctionTypes.COPY_STATE;
     }
 
@@ -86,8 +86,8 @@ extends ConditionalLootFunction {
         return arg2.name(comparable);
     }
 
-    public static class Factory
-    extends ConditionalLootFunction.Factory<CopyStateFunction> {
+    public static class Serializer
+    extends ConditionalLootFunction.Serializer<CopyStateFunction> {
         @Override
         public void toJson(JsonObject jsonObject, CopyStateFunction arg2, JsonSerializationContext jsonSerializationContext) {
             super.toJson(jsonObject, arg2, jsonSerializationContext);

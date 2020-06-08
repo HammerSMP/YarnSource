@@ -24,7 +24,7 @@ extends IdentifierNormalizingSchema {
 
     public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> map, Map<String, Supplier<TypeTemplate>> map2) {
         super.registerTypes(schema, map, map2);
-        schema.registerType(false, TypeReferences.BLOCK_NAME, () -> DSL.constType(Schema1451v4.method_28295()));
+        schema.registerType(false, TypeReferences.BLOCK_NAME, () -> DSL.constType(Schema1451v4.getIdentifierType()));
     }
 }
 

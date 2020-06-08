@@ -29,7 +29,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5311;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.CustomizeFlatLevelScreen;
@@ -52,6 +51,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
 import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
+import net.minecraft.world.gen.chunk.StructuresConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,7 +67,7 @@ extends Screen {
     private SuperflatPresetsListWidget listWidget;
     private ButtonWidget selectPresetButton;
     private TextFieldWidget customPresetField;
-    private class_5311 field_25044;
+    private StructuresConfig field_25044;
 
     public PresetsScreen(CustomizeFlatLevelScreen arg) {
         super(new TranslatableText("createWorld.customize.presets.title"));
@@ -127,7 +127,7 @@ extends Screen {
         return list;
     }
 
-    public static FlatChunkGeneratorConfig method_29060(String string, class_5311 arg) {
+    public static FlatChunkGeneratorConfig method_29060(String string, StructuresConfig arg) {
         Iterator iterator = Splitter.on((char)';').split((CharSequence)string).iterator();
         if (!iterator.hasNext()) {
             return FlatChunkGeneratorConfig.getDefaultConfig();
@@ -236,9 +236,9 @@ extends Screen {
     private static void addPreset(Text arg, ItemConvertible arg2, Biome arg3, List<StructureFeature<?>> list, boolean bl, boolean bl2, boolean bl3, FlatChunkGeneratorLayer ... args) {
         HashMap map = Maps.newHashMap();
         for (StructureFeature<?> lv : list) {
-            map.put(lv, class_5311.field_24822.get(lv));
+            map.put(lv, StructuresConfig.DEFAULT_STRUCTURES.get(lv));
         }
-        class_5311 lv2 = new class_5311(bl ? Optional.of(class_5311.field_24823) : Optional.empty(), map);
+        StructuresConfig lv2 = new StructuresConfig(bl ? Optional.of(StructuresConfig.DEFAULT_STRONGHOLD) : Optional.empty(), map);
         FlatChunkGeneratorConfig lv3 = new FlatChunkGeneratorConfig(lv2);
         if (bl2) {
             lv3.method_28911();

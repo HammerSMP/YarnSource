@@ -16,7 +16,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.SignBlock;
 import net.minecraft.block.WallSignBlock;
 import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.class_5348;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.ModelPart;
@@ -30,6 +29,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.util.SignType;
 
@@ -72,15 +72,15 @@ extends BlockEntityRenderer<SignBlockEntity> {
         arg22.scale(0.010416667f, -0.010416667f, 0.010416667f);
         int m = arg.getTextColor().getSignColor();
         double d = 0.4;
-        int n = (int)((double)NativeImage.method_24033(m) * 0.4);
-        int o = (int)((double)NativeImage.method_24034(m) * 0.4);
-        int p = (int)((double)NativeImage.method_24035(m) * 0.4);
-        int q = NativeImage.method_24031(0, p, o, n);
+        int n = (int)((double)NativeImage.getRed(m) * 0.4);
+        int o = (int)((double)NativeImage.getGreen(m) * 0.4);
+        int p = (int)((double)NativeImage.getBlue(m) * 0.4);
+        int q = NativeImage.getAbgrColor(0, p, o, n);
         int r = 20;
         for (int s = 0; s < 4; ++s) {
-            class_5348 lv5 = arg.getTextBeingEditedOnRow(s, arg2 -> {
-                List<class_5348> list = lv4.getTextHandler().wrapLines((class_5348)arg2, 90, Style.EMPTY);
-                return list.isEmpty() ? class_5348.field_25310 : list.get(0);
+            StringRenderable lv5 = arg.getTextBeingEditedOnRow(s, arg2 -> {
+                List<StringRenderable> list = lv4.getTextHandler().wrapLines((StringRenderable)arg2, 90, Style.EMPTY);
+                return list.isEmpty() ? StringRenderable.EMPTY : list.get(0);
             });
             if (lv5 == null) continue;
             float t = -lv4.getWidth(lv5) / 2;

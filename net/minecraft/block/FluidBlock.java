@@ -49,7 +49,7 @@ implements FluidDrainable {
     public static final IntProperty LEVEL = Properties.LEVEL_15;
     protected final FlowableFluid fluid;
     private final List<FluidState> statesByLevel;
-    public static final VoxelShape field_24412 = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
+    public static final VoxelShape COLLISION_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
 
     protected FluidBlock(FlowableFluid arg, AbstractBlock.Settings arg2) {
         super(arg2);
@@ -65,8 +65,8 @@ implements FluidDrainable {
 
     @Override
     public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        if (arg4.isAbove(field_24412, arg3, true) && arg.get(LEVEL) == 0 && arg4.method_27866(arg2.getFluidState(arg3.up()), this.fluid)) {
-            return field_24412;
+        if (arg4.isAbove(COLLISION_SHAPE, arg3, true) && arg.get(LEVEL) == 0 && arg4.method_27866(arg2.getFluidState(arg3.up()), this.fluid)) {
+            return COLLISION_SHAPE;
         }
         return VoxelShapes.empty();
     }

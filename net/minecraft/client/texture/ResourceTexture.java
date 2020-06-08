@@ -59,7 +59,7 @@ extends AbstractTexture {
     }
 
     private void method_22810(NativeImage arg, boolean bl, boolean bl2) {
-        TextureUtil.method_24959(this.getGlId(), 0, arg.getWidth(), arg.getHeight());
+        TextureUtil.allocate(this.getGlId(), 0, arg.getWidth(), arg.getHeight());
         arg.upload(0, 0, 0, 0, 0, arg.getWidth(), arg.getHeight(), bl, bl2, false, true);
     }
 

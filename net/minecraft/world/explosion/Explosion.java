@@ -32,9 +32,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.class_5360;
-import net.minecraft.class_5361;
-import net.minecraft.class_5362;
 import net.minecraft.enchantment.ProtectionEnchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -58,6 +55,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.DefaultExplosionBehavior;
+import net.minecraft.world.explosion.EntityExplosionBehavior;
+import net.minecraft.world.explosion.ExplosionBehavior;
 
 public class Explosion {
     private final boolean createFire;
@@ -71,7 +71,7 @@ public class Explosion {
     private final Entity entity;
     private final float power;
     private final DamageSource damageSource;
-    private final class_5362 field_25400;
+    private final ExplosionBehavior behavior;
     private final List<BlockPos> affectedBlocks = Lists.newArrayList();
     private final Map<PlayerEntity, Vec3d> affectedPlayers = Maps.newHashMap();
 
@@ -91,7 +91,7 @@ public class Explosion {
         this(arg, arg2, null, null, d, e, f, g, bl, arg3);
     }
 
-    public Explosion(World arg, @Nullable Entity arg2, @Nullable DamageSource arg3, @Nullable class_5362 arg4, double d, double e, double f, float g, boolean bl, DestructionType arg5) {
+    public Explosion(World arg, @Nullable Entity arg2, @Nullable DamageSource arg3, @Nullable ExplosionBehavior arg4, double d, double e, double f, float g, boolean bl, DestructionType arg5) {
         this.world = arg;
         this.entity = arg2;
         this.power = g;
@@ -101,11 +101,11 @@ public class Explosion {
         this.createFire = bl;
         this.destructionType = arg5;
         this.damageSource = arg3 == null ? DamageSource.explosion(this) : arg3;
-        this.field_25400 = arg4 == null ? this.method_29553(arg2) : arg4;
+        this.behavior = arg4 == null ? this.chooseBehavior(arg2) : arg4;
     }
 
-    private class_5362 method_29553(@Nullable Entity arg) {
-        return arg == null ? class_5360.INSTANCE : new class_5361(arg);
+    private ExplosionBehavior chooseBehavior(@Nullable Entity arg) {
+        return arg == null ? DefaultExplosionBehavior.INSTANCE : new EntityExplosionBehavior(arg);
     }
 
     public static float getExposure(Vec3d arg, Entity arg2) {
@@ -165,11 +165,11 @@ public class Explosion {
                         FluidState lv3;
                         BlockPos lv = new BlockPos(m, n, o);
                         BlockState lv2 = this.world.getBlockState(lv);
-                        Optional<Float> optional = this.field_25400.method_29555(this, this.world, lv, lv2, lv3 = this.world.getFluidState(lv));
+                        Optional<Float> optional = this.behavior.getBlastResistance(this, this.world, lv, lv2, lv3 = this.world.getFluidState(lv));
                         if (optional.isPresent()) {
                             h -= (optional.get().floatValue() + 0.3f) * 0.3f;
                         }
-                        if (h > 0.0f && this.field_25400.method_29554(this, this.world, lv, lv2, h)) {
+                        if (h > 0.0f && this.behavior.canDestroyBlock(this, this.world, lv, lv2, h)) {
                             set.add(lv);
                         }
                         m += d * (double)0.3f;

@@ -52,11 +52,11 @@ extends LootPoolEntry {
         return this.predicate.expand(arg, consumer);
     }
 
-    public static <T extends CombinedEntry> LootPoolEntry.class_5337<T> createSerializer(final Factory<T> arg) {
-        return new LootPoolEntry.class_5337<T>(){
+    public static <T extends CombinedEntry> LootPoolEntry.Serializer<T> createSerializer(final Factory<T> arg) {
+        return new LootPoolEntry.Serializer<T>(){
 
             @Override
-            public void method_422(JsonObject jsonObject, T arg2, JsonSerializationContext jsonSerializationContext) {
+            public void addEntryFields(JsonObject jsonObject, T arg2, JsonSerializationContext jsonSerializationContext) {
                 jsonObject.add("children", jsonSerializationContext.serialize((Object)((CombinedEntry)arg2).children));
             }
 

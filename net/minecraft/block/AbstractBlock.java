@@ -954,7 +954,7 @@ public abstract class AbstractBlock {
             return this;
         }
 
-        public Settings method_29292() {
+        public Settings requiresTool() {
             this.toolRequired = true;
             return this;
         }

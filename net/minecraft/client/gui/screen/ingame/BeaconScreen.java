@@ -143,11 +143,11 @@ extends HandledScreen<BeaconScreenHandler> {
         int l = (this.height - this.backgroundHeight) / 2;
         this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
         this.itemRenderer.zOffset = 100.0f;
-        this.itemRenderer.renderGuiItem(new ItemStack(Items.NETHERITE_INGOT), k + 20, l + 109);
-        this.itemRenderer.renderGuiItem(new ItemStack(Items.EMERALD), k + 41, l + 109);
-        this.itemRenderer.renderGuiItem(new ItemStack(Items.DIAMOND), k + 41 + 22, l + 109);
-        this.itemRenderer.renderGuiItem(new ItemStack(Items.GOLD_INGOT), k + 42 + 44, l + 109);
-        this.itemRenderer.renderGuiItem(new ItemStack(Items.IRON_INGOT), k + 42 + 66, l + 109);
+        this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.NETHERITE_INGOT), k + 20, l + 109);
+        this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.EMERALD), k + 41, l + 109);
+        this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.DIAMOND), k + 41 + 22, l + 109);
+        this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.GOLD_INGOT), k + 42 + 44, l + 109);
+        this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.IRON_INGOT), k + 42 + 66, l + 109);
         this.itemRenderer.zOffset = 0.0f;
     }
 

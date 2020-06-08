@@ -24,11 +24,11 @@ public enum NarratorOption {
 
     private static final NarratorOption[] VALUES;
     private final int id;
-    private final Text field_24212;
+    private final Text translationKey;
 
     private NarratorOption(int j, String string2) {
         this.id = j;
-        this.field_24212 = new TranslatableText(string2);
+        this.translationKey = new TranslatableText(string2);
     }
 
     public int getId() {
@@ -36,7 +36,7 @@ public enum NarratorOption {
     }
 
     public Text getTranslationKey() {
-        return this.field_24212;
+        return this.translationKey;
     }
 
     public static NarratorOption byId(int i) {

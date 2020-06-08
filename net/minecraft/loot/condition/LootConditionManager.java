@@ -56,7 +56,7 @@ extends JsonDataLoader {
             try {
                 if (jsonElement.isJsonArray()) {
                     LootCondition[] lvs = (LootCondition[])GSON.fromJson(jsonElement, LootCondition[].class);
-                    builder.put(arg, (Object)new class_5334(lvs));
+                    builder.put(arg, (Object)new AndCondition(lvs));
                 } else {
                     LootCondition lv = (LootCondition)GSON.fromJson(jsonElement, LootCondition.class);
                     builder.put(arg, (Object)lv);
@@ -77,31 +77,31 @@ extends JsonDataLoader {
         return Collections.unmodifiableSet(this.conditions.keySet());
     }
 
-    static class class_5334
+    static class AndCondition
     implements LootCondition {
-        private final LootCondition[] field_25202;
-        private final Predicate<LootContext> field_25203;
+        private final LootCondition[] terms;
+        private final Predicate<LootContext> predicate;
 
-        private class_5334(LootCondition[] args) {
-            this.field_25202 = args;
-            this.field_25203 = LootConditionTypes.joinAnd(args);
+        private AndCondition(LootCondition[] args) {
+            this.terms = args;
+            this.predicate = LootConditionTypes.joinAnd(args);
         }
 
         @Override
         public final boolean test(LootContext arg) {
-            return this.field_25203.test(arg);
+            return this.predicate.test(arg);
         }
 
         @Override
         public void validate(LootTableReporter arg) {
             LootCondition.super.validate(arg);
-            for (int i = 0; i < this.field_25202.length; ++i) {
-                this.field_25202[i].validate(arg.makeChild(".term[" + i + "]"));
+            for (int i = 0; i < this.terms.length; ++i) {
+                this.terms[i].validate(arg.makeChild(".term[" + i + "]"));
             }
         }
 
         @Override
-        public LootConditionType method_29325() {
+        public LootConditionType getType() {
             throw new UnsupportedOperationException();
         }
 

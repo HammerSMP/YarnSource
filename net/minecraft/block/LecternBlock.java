@@ -238,7 +238,7 @@ extends BlockWithEntity {
             if (!arg2.isClient) {
                 this.openScreen(arg2, arg3, arg4);
             }
-            return ActionResult.method_29236(arg2.isClient);
+            return ActionResult.success(arg2.isClient);
         }
         ItemStack lv = arg4.getStackInHand(arg5);
         if (lv.isEmpty() || lv.getItem().isIn(ItemTags.LECTERN_BOOKS)) {

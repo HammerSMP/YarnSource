@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.ingame.EnchantingPhrases;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.DiffuseLighting;
@@ -30,6 +29,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -151,7 +151,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
             }
             String string = "" + u;
             int v = 86 - this.textRenderer.getWidth(string);
-            class_5348 lv4 = EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, v);
+            StringRenderable lv4 = EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, v);
             int w = 6839882;
             if (!(q >= r + 1 && this.client.player.experienceLevel >= u || this.client.player.abilities.creativeMode)) {
                 this.drawTexture(arg, s, l + 14 + 19 * r, 0, 185, 108, 19);

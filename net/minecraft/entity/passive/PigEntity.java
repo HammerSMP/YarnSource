@@ -158,7 +158,7 @@ Saddleable {
             if (!this.world.isClient) {
                 arg.startRiding(this);
             }
-            return ActionResult.method_29236(this.world.isClient);
+            return ActionResult.success(this.world.isClient);
         }
         ActionResult lv = super.interactMob(arg, arg2);
         if (!lv.isAccepted()) {

@@ -203,7 +203,7 @@ extends Block {
         arg = (BlockState)arg.cycle(OPEN);
         arg2.setBlockState(arg3, arg, 10);
         arg2.syncWorldEvent(arg4, arg.get(OPEN) != false ? this.getCloseSoundEventId() : this.getOpenSoundEventId(), arg3, 0);
-        return ActionResult.method_29236(arg2.isClient);
+        return ActionResult.success(arg2.isClient);
     }
 
     public void setOpen(World arg, BlockPos arg2, boolean bl) {

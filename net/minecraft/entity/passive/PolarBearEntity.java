@@ -16,7 +16,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5354;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -40,6 +39,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.FoxEntity;
@@ -60,7 +60,7 @@ import net.minecraft.world.biome.Biomes;
 
 public class PolarBearEntity
 extends AnimalEntity
-implements class_5354 {
+implements Angerable {
     private static final TrackedData<Boolean> WARNING = DataTracker.registerData(PolarBearEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private float lastWarningAnimationProgress;
     private float warningAnimationProgress;
@@ -95,7 +95,7 @@ implements class_5354 {
         this.goalSelector.add(7, new LookAroundGoal(this));
         this.targetSelector.add(1, new PolarBearRevengeGoal());
         this.targetSelector.add(2, new FollowPlayersGoal());
-        this.targetSelector.add(3, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::method_29515));
+        this.targetSelector.add(3, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::shouldAngerAt));
         this.targetSelector.add(4, new FollowTargetGoal<FoxEntity>(this, FoxEntity.class, 10, true, true, null));
     }
 
@@ -114,37 +114,37 @@ implements class_5354 {
     @Override
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
-        this.method_29512(this.world, arg);
+        this.angerFromTag(this.world, arg);
     }
 
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        this.method_29517(arg);
+        this.angerToTag(arg);
     }
 
     @Override
-    public void method_29509() {
-        this.method_29514(field_25369.choose(this.random));
+    public void chooseRandomAngerTime() {
+        this.setAngerTime(field_25369.choose(this.random));
     }
 
     @Override
-    public void method_29514(int i) {
+    public void setAngerTime(int i) {
         this.field_25370 = i;
     }
 
     @Override
-    public int method_29507() {
+    public int getAngerTime() {
         return this.field_25370;
     }
 
     @Override
-    public void method_29513(@Nullable UUID uUID) {
+    public void setAngryAt(@Nullable UUID uUID) {
         this.field_25368 = uUID;
     }
 
     @Override
-    public UUID method_29508() {
+    public UUID getAngryAt() {
         return this.field_25368;
     }
 
@@ -198,7 +198,7 @@ implements class_5354 {
             --this.warningSoundCooldown;
         }
         if (!this.world.isClient) {
-            this.method_29510();
+            this.tickAngerLogic();
         }
     }
 

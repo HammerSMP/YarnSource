@@ -12,16 +12,16 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5348;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.TranslatableText;
 
 @Environment(value=EnvType.CLIENT)
 public class DatapackFailureScreen
 extends Screen {
-    private final List<class_5348> wrappedText = Lists.newArrayList();
+    private final List<StringRenderable> wrappedText = Lists.newArrayList();
     private final Runnable field_25452;
 
     public DatapackFailureScreen(Runnable runnable) {
@@ -42,7 +42,7 @@ extends Screen {
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
         int k = 70;
-        for (class_5348 lv : this.wrappedText) {
+        for (StringRenderable lv : this.wrappedText) {
             this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;

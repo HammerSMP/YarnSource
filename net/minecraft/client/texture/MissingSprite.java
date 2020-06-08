@@ -71,10 +71,10 @@ extends Sprite {
             for (int k = 0; k < 16; ++k) {
                 for (int l = 0; l < 16; ++l) {
                     if (k < 8 ^ l < 8) {
-                        lv.setPixelRgba(l, k, -524040);
+                        lv.setPixelColor(l, k, -524040);
                         continue;
                     }
-                    lv.setPixelRgba(l, k, -16777216);
+                    lv.setPixelColor(l, k, -16777216);
                 }
             }
             lv.untrack();

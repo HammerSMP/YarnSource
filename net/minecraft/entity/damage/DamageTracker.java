@@ -40,7 +40,7 @@ public class DamageTracker {
 
     public void setFallDeathSuffix() {
         this.clearFallDeathSuffix();
-        Optional<BlockPos> optional = this.entity.method_24832();
+        Optional<BlockPos> optional = this.entity.getClimbingPos();
         if (optional.isPresent()) {
             BlockState lv = this.entity.world.getBlockState(optional.get());
             this.fallDeathSuffix = lv.isOf(Blocks.LADDER) || lv.isIn(BlockTags.TRAPDOORS) ? "ladder" : (lv.isOf(Blocks.VINE) ? "vines" : (lv.isOf(Blocks.WEEPING_VINES) || lv.isOf(Blocks.WEEPING_VINES_PLANT) ? "weeping_vines" : (lv.isOf(Blocks.TWISTING_VINES) || lv.isOf(Blocks.TWISTING_VINES_PLANT) ? "twisting_vines" : (lv.isOf(Blocks.SCAFFOLDING) ? "scaffolding" : "other_climbable"))));

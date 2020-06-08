@@ -41,7 +41,7 @@ extends Item {
             if (lv != null) {
                 arg.getStack().damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
             }
-            return ActionResult.method_29236(lv2.isClient());
+            return ActionResult.success(lv2.isClient());
         }
         BlockPos lv5 = lv3.offset(arg.getSide());
         if (FlintAndSteelItem.canIgnite(lv2.getBlockState(lv5), lv2, lv5)) {
@@ -53,7 +53,7 @@ extends Item {
                 Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)lv, lv5, lv7);
                 lv7.damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg.getHand()));
             }
-            return ActionResult.method_29236(lv2.isClient());
+            return ActionResult.success(lv2.isClient());
         }
         return ActionResult.FAIL;
     }

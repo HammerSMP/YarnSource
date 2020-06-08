@@ -236,7 +236,7 @@ Element {
                 int m = (int)((float)(this.x + lv.y) / 0.42f - 3.0f);
                 int n2 = (int)((float)(this.y + lv.x) / 0.42f - 3.0f);
                 RenderSystem.scalef(0.42f, 0.42f, 1.0f);
-                RecipeAlternativesWidget.this.client.getItemRenderer().renderGuiItem(lv.stacks[MathHelper.floor(RecipeAlternativesWidget.this.time / 30.0f) % lv.stacks.length], m, n2);
+                RecipeAlternativesWidget.this.client.getItemRenderer().renderInGuiWithOverrides(lv.stacks[MathHelper.floor(RecipeAlternativesWidget.this.time / 30.0f) % lv.stacks.length], m, n2);
                 RenderSystem.popMatrix();
             }
             RenderSystem.disableAlphaTest();

@@ -130,7 +130,7 @@ public class CommandManager {
     private static final Logger LOGGER = LogManager.getLogger();
     private final CommandDispatcher<ServerCommandSource> dispatcher = new CommandDispatcher();
 
-    public CommandManager(class_5364 arg) {
+    public CommandManager(RegistrationEnvironment arg) {
         AdvancementCommand.register(this.dispatcher);
         AttributeCommand.register(this.dispatcher);
         ExecuteCommand.register(this.dispatcher);
@@ -168,7 +168,7 @@ public class CommandManager {
         SayCommand.register(this.dispatcher);
         ScheduleCommand.register(this.dispatcher);
         ScoreboardCommand.register(this.dispatcher);
-        SeedCommand.register(this.dispatcher, arg == class_5364.INTEGRATED);
+        SeedCommand.register(this.dispatcher, arg == RegistrationEnvironment.INTEGRATED);
         SetBlockCommand.register(this.dispatcher);
         SpawnPointCommand.register(this.dispatcher);
         SetWorldSpawnCommand.register(this.dispatcher);
@@ -189,7 +189,7 @@ public class CommandManager {
         if (SharedConstants.isDevelopment) {
             TestCommand.register(this.dispatcher);
         }
-        if (arg.field_25423) {
+        if (arg.dedicated) {
             BanIpCommand.register(this.dispatcher);
             BanListCommand.register(this.dispatcher);
             BanCommand.register(this.dispatcher);
@@ -204,7 +204,7 @@ public class CommandManager {
             StopCommand.register(this.dispatcher);
             WhitelistCommand.register(this.dispatcher);
         }
-        if (arg.field_25422) {
+        if (arg.integrated) {
             PublishCommand.register(this.dispatcher);
         }
         this.dispatcher.findAmbiguities((commandNode, commandNode2, commandNode3, collection) -> LOGGER.warn("Ambiguity between arguments {} and {} with inputs: {}", (Object)this.dispatcher.getPath(commandNode2), (Object)this.dispatcher.getPath(commandNode3), (Object)collection));
@@ -340,17 +340,17 @@ public class CommandManager {
         return CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().createWithContext(parseResults.getReader());
     }
 
-    public static enum class_5364 {
+    public static enum RegistrationEnvironment {
         ALL(true, true),
         DEDICATED(false, true),
         INTEGRATED(true, false);
 
-        private final boolean field_25422;
-        private final boolean field_25423;
+        private final boolean integrated;
+        private final boolean dedicated;
 
-        private class_5364(boolean bl, boolean bl2) {
-            this.field_25422 = bl;
-            this.field_25423 = bl2;
+        private RegistrationEnvironment(boolean bl, boolean bl2) {
+            this.integrated = bl;
+            this.dedicated = bl2;
         }
     }
 

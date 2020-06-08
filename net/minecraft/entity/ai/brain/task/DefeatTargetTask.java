@@ -30,7 +30,7 @@ extends Task<LivingEntity> {
 
     @Override
     protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return this.getAttackTarget(arg2).method_29504();
+        return this.getAttackTarget(arg2).isDead();
     }
 
     @Override

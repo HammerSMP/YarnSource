@@ -70,7 +70,7 @@ extends ResourceTexture {
     }
 
     private void uploadTexture(NativeImage arg) {
-        TextureUtil.method_24958(this.getGlId(), arg.getWidth(), arg.getHeight());
+        TextureUtil.allocate(this.getGlId(), arg.getWidth(), arg.getHeight());
         arg.upload(0, 0, 0, true);
     }
 
@@ -187,14 +187,14 @@ extends ResourceTexture {
     private static void stripColor(NativeImage arg, int i, int j, int k, int l) {
         for (int m = i; m < k; ++m) {
             for (int n = j; n < l; ++n) {
-                int o = arg.getPixelRgba(m, n);
+                int o = arg.getPixelColor(m, n);
                 if ((o >> 24 & 0xFF) >= 128) continue;
                 return;
             }
         }
         for (int p = i; p < k; ++p) {
             for (int q = j; q < l; ++q) {
-                arg.setPixelRgba(p, q, arg.getPixelRgba(p, q) & 0xFFFFFF);
+                arg.setPixelColor(p, q, arg.getPixelColor(p, q) & 0xFFFFFF);
             }
         }
     }
@@ -202,7 +202,7 @@ extends ResourceTexture {
     private static void stripAlpha(NativeImage arg, int i, int j, int k, int l) {
         for (int m = i; m < k; ++m) {
             for (int n = j; n < l; ++n) {
-                arg.setPixelRgba(m, n, arg.getPixelRgba(m, n) | 0xFF000000);
+                arg.setPixelColor(m, n, arg.getPixelColor(m, n) | 0xFF000000);
             }
         }
     }

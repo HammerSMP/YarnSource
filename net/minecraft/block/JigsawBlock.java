@@ -78,7 +78,7 @@ implements BlockEntityProvider {
         BlockEntity lv = arg2.getBlockEntity(arg3);
         if (lv instanceof JigsawBlockEntity && arg4.isCreativeLevelTwoOp()) {
             arg4.openJigsawScreen((JigsawBlockEntity)lv);
-            return ActionResult.method_29236(arg2.isClient);
+            return ActionResult.success(arg2.isClient);
         }
         return ActionResult.PASS;
     }

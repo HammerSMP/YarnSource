@@ -40,8 +40,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5359;
-import net.minecraft.class_5384;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -52,14 +50,16 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.dynamic.RegistryReadingOps;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
-import net.minecraft.world.dimension.DimensionTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -119,10 +119,10 @@ extends Screen {
         }, new TranslatableText("optimizeWorld.confirm.title"), new TranslatableText("optimizeWorld.confirm.description"), true))));
         this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 120 + 5, 200, 20, new TranslatableText("selectWorld.edit.export_worldgen_settings"), arg -> {
             DataResult dataResult4;
-            DimensionTracker.Modifiable lv = DimensionTracker.create();
-            try (MinecraftClient.class_5367 lv2 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, DimensionTracker.Modifiable, ResourceManager, class_5359, SaveProperties>)((Function4)MinecraftClient::method_29599), false, this.field_23777);){
-                class_5384 dynamicOps = class_5384.method_29771(JsonOps.INSTANCE, lv);
-                DataResult dataResult = GeneratorOptions.CODEC.encodeStart(dynamicOps, (Object)lv2.method_29614().getGeneratorOptions());
+            RegistryTracker.Modifiable lv = RegistryTracker.create();
+            try (MinecraftClient.IntegratedResourceManager lv2 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, this.field_23777);){
+                RegistryReadingOps dynamicOps = RegistryReadingOps.of(JsonOps.INSTANCE, lv);
+                DataResult dataResult = GeneratorOptions.CODEC.encodeStart(dynamicOps, (Object)lv2.getSaveProperties().getGeneratorOptions());
                 DataResult dataResult2 = dataResult.flatMap(jsonElement -> {
                     Path path = this.field_23777.getDirectory(WorldSavePath.ROOT).resolve("worldgen_settings_export.json");
                     try (JsonWriter jsonWriter = field_25481.newJsonWriter((Writer)Files.newBufferedWriter(path, StandardCharsets.UTF_8, new OpenOption[0]));){
@@ -182,6 +182,34 @@ extends Screen {
             field_23776.error("Failed to access world '{}'", (Object)this.field_23777.getDirectoryName(), (Object)iOException);
             SystemToast.addWorldAccessFailureToast(this.client, this.field_23777.getDirectoryName());
             this.callback.accept(true);
+        }
+    }
+
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     * WARNING - void declaration
+     */
+    public static boolean method_29784(LevelStorage arg, String string) {
+        void lv2;
+        try {
+            LevelStorage.Session lv = arg.createSession(string);
+        }
+        catch (IOException iOException) {
+            field_23776.warn("Failed to read level {} data", (Object)string, (Object)iOException);
+            SystemToast.addWorldAccessFailureToast(MinecraftClient.getInstance(), string);
+            return false;
+        }
+        try {
+            boolean bl = EditWorldScreen.backupLevel((LevelStorage.Session)lv2);
+            return bl;
+        }
+        finally {
+            try {
+                lv2.close();
+            }
+            catch (IOException iOException2) {
+                field_23776.warn("Failed to unlock access to level {}", (Object)string, (Object)iOException2);
+            }
         }
     }
 

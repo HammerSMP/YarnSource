@@ -41,7 +41,7 @@ extends LeafEntry {
     }
 
     @Override
-    public LootPoolEntryType method_29318() {
+    public LootPoolEntryType getType() {
         return LootPoolEntryTypes.TAG;
     }
 
@@ -81,8 +81,8 @@ extends LeafEntry {
     public static class Serializer
     extends LeafEntry.Serializer<TagEntry> {
         @Override
-        public void method_422(JsonObject jsonObject, TagEntry arg, JsonSerializationContext jsonSerializationContext) {
-            super.method_422(jsonObject, arg, jsonSerializationContext);
+        public void addEntryFields(JsonObject jsonObject, TagEntry arg, JsonSerializationContext jsonSerializationContext) {
+            super.addEntryFields(jsonObject, arg, jsonSerializationContext);
             jsonObject.addProperty("name", TagContainers.instance().items().checkId(arg.name).toString());
             jsonObject.addProperty("expand", Boolean.valueOf(arg.expand));
         }
