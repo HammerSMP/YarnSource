@@ -12,7 +12,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class ServerCommandOutput
 implements CommandOutput {
@@ -33,7 +32,7 @@ implements CommandOutput {
     }
 
     public ServerCommandSource createReconCommandSource() {
-        ServerWorld lv = this.server.getWorld(World.OVERWORLD);
+        ServerWorld lv = this.server.method_30002();
         return new ServerCommandSource(this, Vec3d.of(lv.getSpawnPos()), Vec2f.ZERO, lv, 4, "Rcon", field_25146, this.server, null);
     }
 

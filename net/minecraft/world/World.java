@@ -153,14 +153,6 @@ AutoCloseable {
         return null;
     }
 
-    public BlockState getTopNonAirState(BlockPos arg) {
-        BlockPos lv = new BlockPos(arg.getX(), this.getSeaLevel(), arg.getZ());
-        while (!this.isAir(lv.up())) {
-            lv = lv.up();
-        }
-        return this.getBlockState(lv);
-    }
-
     public static boolean method_24794(BlockPos arg) {
         return !World.isHeightInvalid(arg) && World.isValid(arg);
     }
@@ -407,11 +399,11 @@ AutoCloseable {
     }
 
     public boolean isDay() {
-        return this.getDimension().isOverworld() && this.ambientDarkness < 4;
+        return !this.getDimension().method_29960() && this.ambientDarkness < 4;
     }
 
     public boolean isNight() {
-        return this.getDimension().isOverworld() && !this.isDay();
+        return !this.getDimension().method_29960() && !this.isDay();
     }
 
     @Override
@@ -694,11 +686,12 @@ AutoCloseable {
         int j = MathHelper.floor((arg2.maxX + 2.0) / 16.0);
         int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
         int l = MathHelper.floor((arg2.maxZ + 2.0) / 16.0);
+        ChunkManager lv = this.getChunkManager();
         for (int m = i; m <= j; ++m) {
             for (int n = k; n <= l; ++n) {
-                WorldChunk lv = this.getChunkManager().getWorldChunk(m, n, false);
-                if (lv == null) continue;
-                lv.getEntities(arg, arg2, list, predicate);
+                WorldChunk lv2 = lv.getWorldChunk(m, n, false);
+                if (lv2 == null) continue;
+                lv2.getEntities(arg, arg2, list, predicate);
             }
         }
         return list;

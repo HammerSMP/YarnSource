@@ -139,7 +139,7 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
                 ItemStack lv4 = lv3.getCursorStack();
                 ItemStack lv5 = arg.getStack();
                 if (arg2 == SlotActionType.SWAP) {
-                    if (!lv5.isEmpty() && j >= 0 && j < 9) {
+                    if (!lv5.isEmpty()) {
                         ItemStack lv6 = lv5.copy();
                         lv6.setCount(lv6.getMaxCount());
                         this.client.player.inventory.setStack(j, lv6);

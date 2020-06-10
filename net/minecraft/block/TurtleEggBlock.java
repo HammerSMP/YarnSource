@@ -11,13 +11,13 @@ import javax.annotation.Nullable;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.passive.BatEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -28,6 +28,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -62,7 +63,6 @@ extends Block {
 
     private void tryBreakEgg(World arg, BlockPos arg2, Entity arg3, int i) {
         if (!this.breaksEgg(arg, arg3)) {
-            super.onSteppedOn(arg, arg2, arg3);
             return;
         }
         if (!arg.isClient && arg.random.nextInt(i) == 0) {
@@ -83,7 +83,7 @@ extends Block {
 
     @Override
     public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (this.shouldHatchProgress(arg2) && this.isSand(arg2, arg3)) {
+        if (this.shouldHatchProgress(arg2) && TurtleEggBlock.isSand(arg2, arg3)) {
             int i = arg.get(HATCH);
             if (i < 2) {
                 arg2.playSound(null, arg3, SoundEvents.ENTITY_TURTLE_EGG_CRACK, SoundCategory.BLOCKS, 0.7f, 0.9f + random.nextFloat() * 0.2f);
@@ -103,13 +103,17 @@ extends Block {
         }
     }
 
-    private boolean isSand(BlockView arg, BlockPos arg2) {
-        return arg.getBlockState(arg2.down()).isOf(Blocks.SAND);
+    public static boolean isSand(BlockView arg, BlockPos arg2) {
+        return TurtleEggBlock.method_29952(arg, arg2.down());
+    }
+
+    public static boolean method_29952(BlockView arg, BlockPos arg2) {
+        return arg.getBlockState(arg2.down()).isIn(BlockTags.SAND);
     }
 
     @Override
     public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (this.isSand(arg2, arg3) && !arg2.isClient) {
+        if (TurtleEggBlock.isSand(arg2, arg3) && !arg2.isClient) {
             arg2.syncWorldEvent(2005, arg3, 0);
         }
     }
@@ -160,7 +164,7 @@ extends Block {
     }
 
     private boolean breaksEgg(World arg, Entity arg2) {
-        if (arg2 instanceof TurtleEntity) {
+        if (arg2 instanceof TurtleEntity || arg2 instanceof BatEntity) {
             return false;
         }
         if (arg2 instanceof LivingEntity) {

@@ -79,7 +79,7 @@ public class GameRules {
     public static final Key<BooleanRule> DO_INSOMNIA = GameRules.register("doInsomnia", Category.SPAWNING, BooleanRule.method_20755(true));
     public static final Key<BooleanRule> DO_IMMEDIATE_RESPAWN = GameRules.register("doImmediateRespawn", Category.PLAYER, BooleanRule.method_20757(false, (minecraftServer, arg) -> {
         for (ServerPlayerEntity lv : minecraftServer.getPlayerManager().getPlayerList()) {
-            lv.networkHandler.sendPacket(new GameStateChangeS2CPacket(11, arg.get() ? 1.0f : 0.0f));
+            lv.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25656, arg.get() ? 1.0f : 0.0f));
         }
     }));
     public static final Key<BooleanRule> DROWNING_DAMAGE = GameRules.register("drowningDamage", Category.PLAYER, BooleanRule.method_20755(true));

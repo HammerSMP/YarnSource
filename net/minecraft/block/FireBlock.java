@@ -122,7 +122,7 @@ extends AbstractFireBlock {
             arg2.removeBlock(arg3, false);
         }
         BlockState lv = arg2.getBlockState(arg3.down());
-        boolean bl = arg2.getDimension().isEnd() && lv.isOf(Blocks.BEDROCK) || lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.MAGMA_BLOCK);
+        boolean bl = lv.isIn(arg2.getDimension().method_29961());
         int i = arg.get(AGE);
         if (!bl && arg2.isRaining() && this.isRainingAround(arg2, arg3) && random.nextFloat() < 0.2f + (float)i * 0.03f) {
             arg2.removeBlock(arg3, false);

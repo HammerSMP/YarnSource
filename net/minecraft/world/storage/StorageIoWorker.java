@@ -44,7 +44,7 @@ implements AutoCloseable {
 
     protected StorageIoWorker(File file, boolean bl, String string) {
         this.storage = new RegionBasedStorage(file, bl);
-        this.field_24468 = new TaskExecutor<TaskQueue.PrioritizedTask>(new TaskQueue.Prioritized(class_5276.values().length), Util.method_27958(), "IOWorker-" + string);
+        this.field_24468 = new TaskExecutor<TaskQueue.PrioritizedTask>(new TaskQueue.Prioritized(Priority.values().length), Util.method_27958(), "IOWorker-" + string);
     }
 
     public CompletableFuture<Void> setResult(ChunkPos arg, CompoundTag arg2) {
@@ -97,7 +97,7 @@ implements AutoCloseable {
     }
 
     private <T> CompletableFuture<T> run(Supplier<Either<T, Exception>> supplier) {
-        return this.field_24468.method_27918(arg -> new TaskQueue.PrioritizedTask(class_5276.HIGH.ordinal(), () -> this.method_27939(arg, (Supplier)supplier)));
+        return this.field_24468.method_27918(arg -> new TaskQueue.PrioritizedTask(Priority.HIGH.ordinal(), () -> this.method_27939(arg, (Supplier)supplier)));
     }
 
     private void writeResult() {
@@ -112,7 +112,7 @@ implements AutoCloseable {
     }
 
     private void method_27945() {
-        this.field_24468.send(new TaskQueue.PrioritizedTask(class_5276.LOW.ordinal(), this::writeResult));
+        this.field_24468.send(new TaskQueue.PrioritizedTask(Priority.LOW.ordinal(), this::writeResult));
     }
 
     private void write(ChunkPos arg, Result arg2) {
@@ -131,7 +131,7 @@ implements AutoCloseable {
         if (!this.closed.compareAndSet(false, true)) {
             return;
         }
-        CompletableFuture completableFuture = this.field_24468.ask(arg -> new TaskQueue.PrioritizedTask(class_5276.HIGH.ordinal(), () -> arg.send(Unit.INSTANCE)));
+        CompletableFuture completableFuture = this.field_24468.ask(arg -> new TaskQueue.PrioritizedTask(Priority.HIGH.ordinal(), () -> arg.send(Unit.INSTANCE)));
         try {
             completableFuture.join();
         }
@@ -168,7 +168,7 @@ implements AutoCloseable {
         }
     }
 
-    static enum class_5276 {
+    static enum Priority {
         HIGH,
         LOW;
 

@@ -144,7 +144,7 @@ Drawable {
                 }
                 GeneratorType lv = GeneratorType.VALUES.get(i);
                 this.field_25049 = Optional.of(lv);
-                this.generatorOptions = lv.method_29077(this.generatorOptions.getSeed(), this.generatorOptions.shouldGenerateStructures(), this.generatorOptions.hasBonusChest());
+                this.generatorOptions = lv.method_29077(this.field_25483, this.generatorOptions.getSeed(), this.generatorOptions.shouldGenerateStructures(), this.generatorOptions.hasBonusChest());
                 if (this.generatorOptions.isDebugWorld() && !Screen.hasShiftDown()) continue;
             }
             arg4.setMoreOptionsOpen();
@@ -167,7 +167,7 @@ Drawable {
         this.mapTypeButton.visible = false;
         this.mapTypeButton.active = this.field_25049.isPresent();
         this.customizeTypeButton = arg4.addButton(new ButtonWidget(j, 120, 150, 20, new TranslatableText("selectWorld.customizeType"), arg3 -> {
-            GeneratorType.class_5293 lv = GeneratorType.field_25053.get(this.field_25049);
+            GeneratorType.ScreenProvider lv = GeneratorType.field_25053.get(this.field_25049);
             if (lv != null) {
                 arg22.openScreen(lv.createEditScreen(arg4, this.generatorOptions));
             }

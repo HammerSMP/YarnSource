@@ -158,28 +158,28 @@ extends LandPathNodeMaker {
         if (this.unvisited(lv18 = this.getNode(arg.x - 1, arg.y, arg.z + 1)) && this.isPassable(lv) && this.isPassable(lv2)) {
             args[i++] = lv18;
         }
-        if (this.unvisited(lv19 = this.getNode(arg.x + 1, arg.y + 1, arg.z - 1)) && this.isPassable(lv15) && this.isPassable(lv10) && this.isPassable(lv9)) {
+        if (this.unvisited(lv19 = this.getNode(arg.x + 1, arg.y + 1, arg.z - 1)) && this.isPassable(lv15) && this.isPassable(lv4) && this.isPassable(lv3) && this.isPassable(lv5) && this.isPassable(lv10) && this.isPassable(lv9)) {
             args[i++] = lv19;
         }
-        if (this.unvisited(lv20 = this.getNode(arg.x + 1, arg.y + 1, arg.z + 1)) && this.isPassable(lv16) && this.isPassable(lv7) && this.isPassable(lv9)) {
+        if (this.unvisited(lv20 = this.getNode(arg.x + 1, arg.y + 1, arg.z + 1)) && this.isPassable(lv16) && this.isPassable(lv) && this.isPassable(lv3) && this.isPassable(lv5) && this.isPassable(lv7) && this.isPassable(lv9)) {
             args[i++] = lv20;
         }
-        if (this.unvisited(lv21 = this.getNode(arg.x - 1, arg.y + 1, arg.z - 1)) && this.isPassable(lv17) && this.isPassable(lv10) && this.isPassable(lv8)) {
+        if (this.unvisited(lv21 = this.getNode(arg.x - 1, arg.y + 1, arg.z - 1)) && this.isPassable(lv17) && this.isPassable(lv4) && this.isPassable(lv2) & this.isPassable(lv5) && this.isPassable(lv10) && this.isPassable(lv8)) {
             args[i++] = lv21;
         }
-        if (this.unvisited(lv22 = this.getNode(arg.x - 1, arg.y + 1, arg.z + 1)) && this.isPassable(lv18) && this.isPassable(lv7) && this.isPassable(lv8)) {
+        if (this.unvisited(lv22 = this.getNode(arg.x - 1, arg.y + 1, arg.z + 1)) && this.isPassable(lv18) && this.isPassable(lv) && this.isPassable(lv2) & this.isPassable(lv5) && this.isPassable(lv7) && this.isPassable(lv8)) {
             args[i++] = lv22;
         }
-        if (this.unvisited(lv23 = this.getNode(arg.x + 1, arg.y - 1, arg.z - 1)) && this.isPassable(lv15) && this.isPassable(lv14) && this.isPassable(lv13)) {
+        if (this.unvisited(lv23 = this.getNode(arg.x + 1, arg.y - 1, arg.z - 1)) && this.isPassable(lv15) && this.isPassable(lv4) && this.isPassable(lv3) && this.isPassable(lv6) && this.isPassable(lv14) && this.isPassable(lv13)) {
             args[i++] = lv23;
         }
-        if (this.unvisited(lv24 = this.getNode(arg.x + 1, arg.y - 1, arg.z + 1)) && this.isPassable(lv16) && this.isPassable(lv11) && this.isPassable(lv13)) {
+        if (this.unvisited(lv24 = this.getNode(arg.x + 1, arg.y - 1, arg.z + 1)) && this.isPassable(lv16) && this.isPassable(lv) && this.isPassable(lv3) && this.isPassable(lv6) && this.isPassable(lv11) && this.isPassable(lv13)) {
             args[i++] = lv24;
         }
-        if (this.unvisited(lv25 = this.getNode(arg.x - 1, arg.y - 1, arg.z - 1)) && this.isPassable(lv17) && this.isPassable(lv14) && this.isPassable(lv12)) {
+        if (this.unvisited(lv25 = this.getNode(arg.x - 1, arg.y - 1, arg.z - 1)) && this.isPassable(lv17) && this.isPassable(lv4) && this.isPassable(lv2) && this.isPassable(lv6) && this.isPassable(lv14) && this.isPassable(lv12)) {
             args[i++] = lv25;
         }
-        if (this.unvisited(lv26 = this.getNode(arg.x - 1, arg.y - 1, arg.z + 1)) && this.isPassable(lv18) && this.isPassable(lv11) && this.isPassable(lv12)) {
+        if (this.unvisited(lv26 = this.getNode(arg.x - 1, arg.y - 1, arg.z + 1)) && this.isPassable(lv18) && this.isPassable(lv) && this.isPassable(lv2) && this.isPassable(lv6) && this.isPassable(lv11) && this.isPassable(lv12)) {
             args[i++] = lv26;
         }
         return i;

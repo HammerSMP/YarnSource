@@ -86,7 +86,7 @@ ModifiableTestableWorld {
     public void syncWorldEvent(@Nullable PlayerEntity var1, int var2, BlockPos var3, int var4);
 
     default public int getDimensionHeight() {
-        return this.getDimension().hasCeiling() ? 128 : 256;
+        return this.getDimension().method_29959();
     }
 
     default public void syncWorldEvent(int i, BlockPos arg, int j) {

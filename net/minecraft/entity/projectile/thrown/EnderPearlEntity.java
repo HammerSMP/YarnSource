@@ -25,25 +25,22 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
 public class EnderPearlEntity
 extends ThrownItemEntity {
-    private LivingEntity owner;
-
     public EnderPearlEntity(EntityType<? extends EnderPearlEntity> arg, World arg2) {
         super((EntityType<? extends ThrownItemEntity>)arg, arg2);
     }
 
     public EnderPearlEntity(World arg, LivingEntity arg2) {
         super((EntityType<? extends ThrownItemEntity>)EntityType.ENDER_PEARL, arg2, arg);
-        this.owner = arg2;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -59,11 +56,7 @@ extends ThrownItemEntity {
     @Override
     protected void onEntityHit(EntityHitResult arg) {
         super.onEntityHit(arg);
-        Entity lv = arg.getEntity();
-        if (lv == this.owner) {
-            return;
-        }
-        lv.damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
+        arg.getEntity().damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
     }
 
     @Override
@@ -121,7 +114,7 @@ extends ThrownItemEntity {
     @Override
     public void tick() {
         Entity lv = this.getOwner();
-        if (lv != null && lv instanceof PlayerEntity && !lv.isAlive()) {
+        if (lv instanceof PlayerEntity && !lv.isAlive()) {
             this.remove();
         } else {
             super.tick();
@@ -130,9 +123,9 @@ extends ThrownItemEntity {
 
     @Override
     @Nullable
-    public Entity changeDimension(RegistryKey<World> arg) {
+    public Entity changeDimension(ServerWorld arg) {
         Entity lv = this.getOwner();
-        if (lv != null && lv.world.getRegistryKey() != arg) {
+        if (lv != null && lv.world.getRegistryKey() != arg.getRegistryKey()) {
             this.setOwner(null);
         }
         return super.changeDimension(arg);

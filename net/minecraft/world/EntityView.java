@@ -64,7 +64,13 @@ public interface EntityView {
             return Stream.empty();
         }
         Box lv = arg22.expand(1.0E-7);
-        return this.getEntities(arg, lv).stream().filter(predicate).filter(arg2 -> arg == null || !arg.isConnectedThroughVehicle((Entity)arg2)).flatMap(arg2 -> Stream.of(arg2.getCollisionBox(), arg == null ? null : arg.getHardCollisionBox((Entity)arg2))).filter(Objects::nonNull).filter(lv::intersects).map(VoxelShapes::cuboid);
+        return this.getEntities(arg, lv, predicate.and(arg2 -> arg == null || !arg.isConnectedThroughVehicle((Entity)arg2))).stream().flatMap(arg3 -> {
+            Box lv;
+            if (arg != null && (lv = arg.getHardCollisionBox((Entity)arg3)) != null && lv.intersects(lv)) {
+                return Stream.of(arg3.getCollisionBox(), lv);
+            }
+            return Stream.of(arg3.getCollisionBox());
+        }).filter(Objects::nonNull).map(VoxelShapes::cuboid);
     }
 
     @Nullable

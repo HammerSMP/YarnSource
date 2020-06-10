@@ -48,21 +48,24 @@ implements BlockRenderView {
                 lvs[n - j][o - k] = arg.getChunk(n, o);
             }
         }
-        boolean bl = true;
-        for (int p = arg2.getX() >> 4; p <= arg3.getX() >> 4; ++p) {
-            for (int q = arg2.getZ() >> 4; q <= arg3.getZ() >> 4; ++q) {
-                WorldChunk lv = lvs[p - j][q - k];
-                if (lv.method_12228(arg2.getY(), arg3.getY())) continue;
-                bl = false;
-            }
-        }
-        if (bl) {
+        if (ChunkRendererRegion.method_30000(arg2, arg3, j, k, lvs)) {
             return null;
         }
-        boolean r = true;
-        BlockPos lv2 = arg2.add(-1, -1, -1);
-        BlockPos lv3 = arg3.add(1, 1, 1);
-        return new ChunkRendererRegion(arg, j, k, lvs, lv2, lv3);
+        boolean p = true;
+        BlockPos lv = arg2.add(-1, -1, -1);
+        BlockPos lv2 = arg3.add(1, 1, 1);
+        return new ChunkRendererRegion(arg, j, k, lvs, lv, lv2);
+    }
+
+    public static boolean method_30000(BlockPos arg, BlockPos arg2, int i, int j, WorldChunk[][] args) {
+        for (int k = arg.getX() >> 4; k <= arg2.getX() >> 4; ++k) {
+            for (int l = arg.getZ() >> 4; l <= arg2.getZ() >> 4; ++l) {
+                WorldChunk lv = args[k - i][l - j];
+                if (lv.method_12228(arg.getY(), arg2.getY())) continue;
+                return false;
+            }
+        }
+        return true;
     }
 
     public ChunkRendererRegion(World arg, int i, int j, WorldChunk[][] args, BlockPos arg2, BlockPos arg3) {

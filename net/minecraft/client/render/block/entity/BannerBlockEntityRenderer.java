@@ -91,13 +91,17 @@ extends BlockEntityRenderer<BannerBlockEntity> {
         float n = ((float)Math.floorMod((long)(lv3.getX() * 7 + lv3.getY() * 9 + lv3.getZ() * 13) + m, 100L) + f) / 100.0f;
         this.banner.pitch = (-0.0125f + 0.01f * MathHelper.cos((float)Math.PI * 2 * n)) * (float)Math.PI;
         this.banner.pivotY = -32.0f;
-        BannerBlockEntityRenderer.renderCanvas(arg2, arg3, i, j, this.banner, ModelLoader.BANNER_BASE, true, list);
+        BannerBlockEntityRenderer.method_29999(arg2, arg3, i, j, this.banner, ModelLoader.BANNER_BASE, true, list);
         arg2.pop();
         arg2.pop();
     }
 
-    public static void renderCanvas(MatrixStack arg, VertexConsumerProvider arg2, int i, int j, ModelPart arg3, SpriteIdentifier arg4, boolean bl, List<Pair<BannerPattern, DyeColor>> list) {
-        arg3.render(arg, arg4.getVertexConsumer(arg2, RenderLayer::getEntitySolid), i, j);
+    public static void method_29999(MatrixStack arg, VertexConsumerProvider arg2, int i, int j, ModelPart arg3, SpriteIdentifier arg4, boolean bl, List<Pair<BannerPattern, DyeColor>> list) {
+        BannerBlockEntityRenderer.renderCanvas(arg, arg2, i, j, arg3, arg4, bl, list, false);
+    }
+
+    public static void renderCanvas(MatrixStack arg, VertexConsumerProvider arg2, int i, int j, ModelPart arg3, SpriteIdentifier arg4, boolean bl, List<Pair<BannerPattern, DyeColor>> list, boolean bl2) {
+        arg3.render(arg, arg4.method_30001(arg2, RenderLayer::getEntitySolid, bl2), i, j);
         for (int k = 0; k < 17 && k < list.size(); ++k) {
             Pair<BannerPattern, DyeColor> pair = list.get(k);
             float[] fs = ((DyeColor)pair.getSecond()).getColorComponents();

@@ -132,7 +132,7 @@ extends Block {
     }
 
     public static boolean isNether(World arg) {
-        return arg.getDimension().isNether();
+        return arg.getDimension().method_29957();
     }
 
     public static void charge(World arg, BlockPos arg2, BlockState arg3) {
@@ -182,11 +182,6 @@ extends Block {
             return optional;
         }
         return Optional.empty();
-    }
-
-    @Override
-    public boolean hasSidedTransparency(BlockState arg) {
-        return true;
     }
 
     @Override

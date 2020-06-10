@@ -34,7 +34,7 @@ extends StructureFeature<DefaultFeatureConfig> {
 
     @Override
     protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
-        return arg3.nextInt(6) < 2;
+        return arg3.nextInt(5) < 2;
     }
 
     @Override

@@ -34,9 +34,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
 import net.minecraft.village.Trader;
@@ -190,7 +190,7 @@ Trader {
 
     @Override
     @Nullable
-    public Entity changeDimension(RegistryKey<World> arg) {
+    public Entity changeDimension(ServerWorld arg) {
         this.resetCustomer();
         return super.changeDimension(arg);
     }

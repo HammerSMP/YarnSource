@@ -85,8 +85,8 @@ implements Waterloggable {
         ItemStack lv3;
         CampfireBlockEntity lv2;
         Optional<CampfireCookingRecipe> optional;
-        BlockEntity lv;
-        if (arg.get(LIT).booleanValue() && (lv = arg2.getBlockEntity(arg3)) instanceof CampfireBlockEntity && (optional = (lv2 = (CampfireBlockEntity)lv).getRecipeFor(lv3 = arg4.getStackInHand(arg5))).isPresent()) {
+        BlockEntity lv = arg2.getBlockEntity(arg3);
+        if (lv instanceof CampfireBlockEntity && (optional = (lv2 = (CampfireBlockEntity)lv).getRecipeFor(lv3 = arg4.getStackInHand(arg5))).isPresent()) {
             if (!arg2.isClient && lv2.addItem(arg4.abilities.creativeMode ? lv3.copy() : lv3, optional.get().getCookTime())) {
                 arg4.incrementStat(Stats.INTERACT_WITH_CAMPFIRE);
                 return ActionResult.SUCCESS;

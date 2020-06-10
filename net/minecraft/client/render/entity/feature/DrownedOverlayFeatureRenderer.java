@@ -14,11 +14,11 @@ import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.DrownedEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.util.Identifier;
 
 @Environment(value=EnvType.CLIENT)
-public class DrownedOverlayFeatureRenderer<T extends ZombieEntity>
+public class DrownedOverlayFeatureRenderer<T extends DrownedEntity>
 extends FeatureRenderer<T, DrownedEntityModel<T>> {
     private static final Identifier SKIN = new Identifier("textures/entity/zombie/drowned_outer_layer.png");
     private final DrownedEntityModel<T> model = new DrownedEntityModel(0.25f, 0.0f, 64, 64);

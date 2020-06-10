@@ -5,6 +5,7 @@
  *  com.google.common.collect.Lists
  *  com.google.common.hash.Hashing
  *  com.google.common.util.concurrent.ThreadFactoryBuilder
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  *  org.apache.commons.lang3.Validate
@@ -20,8 +21,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
@@ -165,7 +168,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 this.server.playerCountLabel = LiteralText.EMPTY;
                 SERVER_PINGER_THREAD_POOL.submit(() -> {
                     try {
-                        this.screen.getServerListPinger().add(this.server);
+                        this.screen.getServerListPinger().add(this.server, () -> this.client.execute(this::method_29978));
                     }
                     catch (UnknownHostException unknownHostException) {
                         this.server.ping = -1L;
@@ -227,10 +230,14 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             this.client.getTextureManager().bindTexture(DrawableHelper.GUI_ICONS_TEXTURE);
             DrawableHelper.drawTexture(arg, k + l - 15, j, r * 10, 176 + z * 8, 10, 8, 256, 256);
-            if (this.server.getIcon() != null && !this.server.getIcon().equals(this.iconUri)) {
-                this.iconUri = this.server.getIcon();
-                this.updateIcon();
-                this.screen.getServerList().saveFile();
+            String string = this.server.getIcon();
+            if (!Objects.equals(string, this.iconUri)) {
+                if (this.method_29979(string)) {
+                    this.iconUri = string;
+                } else {
+                    this.server.setIcon(null);
+                    this.method_29978();
+                }
             }
             if (this.icon != null) {
                 this.draw(arg, k, j, this.iconTextureId);
@@ -274,6 +281,10 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             }
         }
 
+        public void method_29978() {
+            this.screen.getServerList().saveFile();
+        }
+
         protected void draw(MatrixStack arg, int i, int j, Identifier arg2) {
             this.client.getTextureManager().bindTexture(arg2);
             RenderSystem.enableBlend();
@@ -285,8 +296,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             return true;
         }
 
-        private void updateIcon() {
-            String string = this.server.getIcon();
+        private boolean method_29979(@Nullable String string) {
             if (string == null) {
                 this.client.getTextureManager().destroyTexture(this.iconTextureId);
                 if (this.icon != null && this.icon.getImage() != null) {
@@ -308,9 +318,10 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 }
                 catch (Throwable throwable) {
                     LOGGER.error("Invalid icon for server {} ({})", (Object)this.server.name, (Object)this.server.address, (Object)throwable);
-                    this.server.setIcon(null);
+                    return false;
                 }
             }
+            return true;
         }
 
         @Override

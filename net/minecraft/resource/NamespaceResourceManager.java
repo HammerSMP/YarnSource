@@ -145,7 +145,7 @@ implements ResourceManager {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public Stream<ResourcePack> method_29213() {
+    public Stream<ResourcePack> streamResourcePacks() {
         return this.packList.stream();
     }
 

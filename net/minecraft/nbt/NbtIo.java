@@ -49,22 +49,6 @@ public class NbtIo {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void safeWrite(CompoundTag arg, File file) throws IOException {
-        File file2 = new File(file.getAbsolutePath() + "_tmp");
-        if (file2.exists()) {
-            file2.delete();
-        }
-        NbtIo.write(arg, file2);
-        if (file.exists()) {
-            file.delete();
-        }
-        if (file.exists()) {
-            throw new IOException("Failed to delete " + file);
-        }
-        file2.renameTo(file);
-    }
-
-    @Environment(value=EnvType.CLIENT)
     public static void write(CompoundTag arg, File file) throws IOException {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file));){
             NbtIo.write(arg, (DataOutput)dataOutputStream);

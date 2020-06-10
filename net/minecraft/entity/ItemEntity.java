@@ -28,6 +28,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.tag.FluidTags;
@@ -36,7 +37,6 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public class ItemEntity
@@ -320,7 +320,7 @@ extends Entity {
 
     @Override
     @Nullable
-    public Entity changeDimension(RegistryKey<World> arg) {
+    public Entity changeDimension(ServerWorld arg) {
         Entity lv = super.changeDimension(arg);
         if (!this.world.isClient && lv instanceof ItemEntity) {
             ((ItemEntity)lv).tryMerge();

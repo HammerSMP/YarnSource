@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.Int2ObjectBiMap;
+import net.minecraft.util.dynamic.NumberCodecs;
 import net.minecraft.util.dynamic.RegistryCodec;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
@@ -158,16 +159,18 @@ extends MutableRegistry<T> {
         return this.indexedEntries.containsId(i);
     }
 
+    @Override
     public boolean isLoaded(RegistryKey<T> arg) {
         return this.loadedKeys.contains(arg);
     }
 
+    @Override
     public void markLoaded(RegistryKey<T> arg) {
         this.loadedKeys.add(arg);
     }
 
-    public static <T> Codec<SimpleRegistry<T>> method_29098(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, Codec<T> codec) {
-        return Codec.mapPair((MapCodec)Identifier.CODEC.xmap(RegistryKey.createKeyFactory(arg2), RegistryKey::getValue).fieldOf("key"), (MapCodec)codec.fieldOf("element")).codec().listOf().xmap(list -> {
+    public static <T> Codec<SimpleRegistry<T>> method_29098(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, MapCodec<T> mapCodec) {
+        return NumberCodecs.method_29906(arg2, mapCodec).codec().listOf().xmap(list -> {
             SimpleRegistry lv = new SimpleRegistry(arg2, lifecycle);
             for (Pair pair : list) {
                 lv.add((RegistryKey)pair.getFirst(), pair.getSecond());
@@ -182,12 +185,12 @@ extends MutableRegistry<T> {
         });
     }
 
-    public static <T> Codec<SimpleRegistry<T>> createCodec(RegistryKey<Registry<T>> arg, Lifecycle lifecycle, Codec<T> codec) {
-        return RegistryCodec.of(arg, lifecycle, codec);
+    public static <T> Codec<SimpleRegistry<T>> createCodec(RegistryKey<Registry<T>> arg, Lifecycle lifecycle, MapCodec<T> mapCodec) {
+        return RegistryCodec.of(arg, lifecycle, mapCodec);
     }
 
-    public static <T> Codec<SimpleRegistry<T>> createEmptyCodec(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, Codec<T> codec) {
-        return Codec.unboundedMap((Codec)Identifier.CODEC.xmap(RegistryKey.createKeyFactory(arg2), RegistryKey::getValue), codec).xmap(map -> {
+    public static <T> Codec<SimpleRegistry<T>> createEmptyCodec(RegistryKey<Registry<T>> arg2, Lifecycle lifecycle, MapCodec<T> mapCodec) {
+        return Codec.unboundedMap((Codec)Identifier.CODEC.xmap(RegistryKey.createKeyFactory(arg2), RegistryKey::getValue), (Codec)mapCodec.codec()).xmap(map -> {
             SimpleRegistry lv = new SimpleRegistry(arg2, lifecycle);
             map.forEach((? super K arg2, ? super V object) -> {
                 lv.set(arg.nextId, (RegistryKey)arg2, (Object)object);

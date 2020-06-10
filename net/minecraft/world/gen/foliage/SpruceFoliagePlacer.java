@@ -59,7 +59,7 @@ extends FoliagePlacer {
 
     @Override
     public int getHeight(Random random, int i, TreeFeatureConfig arg) {
-        return i - this.trunkHeight - random.nextInt(this.randomTrunkHeight + 1);
+        return Math.max(4, i - this.trunkHeight - random.nextInt(this.randomTrunkHeight + 1));
     }
 
     @Override

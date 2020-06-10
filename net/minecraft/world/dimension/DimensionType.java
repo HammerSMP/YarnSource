@@ -2,33 +2,38 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
- *  com.mojang.datafixers.util.Either
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.DataResult
  *  com.mojang.serialization.Dynamic
  *  com.mojang.serialization.Lifecycle
+ *  com.mojang.serialization.MapCodec
  *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.world.dimension;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.kinds.Applicative;
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.io.File;
-import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Supplier;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.NumberCodecs;
 import net.minecraft.util.dynamic.RegistryElementCodec;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
@@ -47,20 +52,17 @@ import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 
 public class DimensionType {
-    private static final Codec<RegistryKey<DimensionType>> REGISTRY_KEY_CODEC = Identifier.CODEC.xmap(RegistryKey.createKeyFactory(Registry.DIMENSION_TYPE_KEY), RegistryKey::getValue);
-    public static final Codec<DimensionType> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.fixedTime), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::hasCeiling), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::isUltrawarm), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::isNatural), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::isShrunk), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.ambientLight))).apply((Applicative)instance, DimensionType::new));
+    public static final MapCodec<DimensionType> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.fixedTime), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::hasCeiling), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::isUltrawarm), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::isNatural), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::isShrunk), (App)Codec.BOOL.fieldOf("piglin_safe").forGetter(DimensionType::method_29955), (App)Codec.BOOL.fieldOf("bed_works").forGetter(DimensionType::method_29956), (App)Codec.BOOL.fieldOf("respawn_anchor_works").forGetter(DimensionType::method_29957), (App)Codec.BOOL.fieldOf("has_raids").forGetter(DimensionType::method_29958), (App)NumberCodecs.rangedInt(0, 256).fieldOf("logical_height").forGetter(DimensionType::method_29959), (App)Identifier.CODEC.fieldOf("infiniburn").forGetter(arg -> arg.field_25617), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.ambientLight))).apply((Applicative)instance, DimensionType::new));
     public static final float[] field_24752 = new float[]{1.0f, 0.75f, 0.5f, 0.25f, 0.0f, 0.25f, 0.5f, 0.75f};
     public static final RegistryKey<DimensionType> OVERWORLD_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld"));
     public static final RegistryKey<DimensionType> THE_NETHER_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("the_nether"));
     public static final RegistryKey<DimensionType> THE_END_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("the_end"));
-    private static final DimensionType OVERWORLD = new DimensionType("", OptionalLong.empty(), true, false, false, true, false, false, HorizontalVoronoiBiomeAccessType.INSTANCE, Optional.of(OVERWORLD_REGISTRY_KEY), 0.0f);
-    private static final DimensionType THE_NETHER = new DimensionType("_nether", OptionalLong.of(18000L), false, true, true, false, true, false, VoronoiBiomeAccessType.INSTANCE, Optional.of(THE_NETHER_REGISTRY_KEY), 0.1f);
-    private static final DimensionType THE_END = new DimensionType("_end", OptionalLong.of(6000L), false, false, false, false, false, true, VoronoiBiomeAccessType.INSTANCE, Optional.of(THE_END_REGISTRY_KEY), 0.0f);
-    private static final Map<RegistryKey<DimensionType>, DimensionType> field_24759 = ImmutableMap.of(OVERWORLD_REGISTRY_KEY, (Object)DimensionType.getOverworldDimensionType(), THE_NETHER_REGISTRY_KEY, (Object)THE_NETHER, THE_END_REGISTRY_KEY, (Object)THE_END);
-    private static final Codec<DimensionType> field_24760 = REGISTRY_KEY_CODEC.flatXmap(arg -> Optional.ofNullable(field_24759.get(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown builtin dimension: " + arg))), arg -> arg.field_24765.map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown builtin dimension: " + arg)))).stable();
-    private static final Codec<DimensionType> field_25410 = Codec.either(field_24760, CODEC).flatXmap(either -> (DataResult)either.map(arg -> DataResult.success((Object)arg, (Lifecycle)Lifecycle.stable()), DataResult::success), arg -> arg.field_24765.isPresent() ? DataResult.success((Object)Either.left((Object)arg), (Lifecycle)Lifecycle.stable()) : DataResult.success((Object)Either.right((Object)arg)));
-    public static final Codec<Supplier<DimensionType>> field_24756 = RegistryElementCodec.of(Registry.DIMENSION_TYPE_KEY, field_25410);
-    private final String suffix;
+    protected static final DimensionType OVERWORLD = new DimensionType(OptionalLong.empty(), true, false, false, true, false, false, false, true, false, true, 256, HorizontalVoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_OVERWORLD.getId(), 0.0f);
+    protected static final DimensionType THE_NETHER = new DimensionType(OptionalLong.of(18000L), false, true, true, false, true, false, true, false, true, false, 128, VoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_NETHER.getId(), 0.1f);
+    protected static final DimensionType THE_END = new DimensionType(OptionalLong.of(6000L), false, false, false, false, false, true, false, false, false, true, 256, VoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_END.getId(), 0.0f);
+    public static final RegistryKey<DimensionType> field_25610 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld_caves"));
+    protected static final DimensionType field_25611 = new DimensionType(OptionalLong.empty(), true, true, false, true, false, false, false, true, false, true, 256, HorizontalVoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_OVERWORLD.getId(), 0.0f);
+    public static final Codec<Supplier<DimensionType>> field_24756 = RegistryElementCodec.of(Registry.DIMENSION_TYPE_KEY, CODEC);
     private final OptionalLong fixedTime;
     private final boolean hasSkyLight;
     private final boolean hasCeiling;
@@ -68,8 +70,13 @@ public class DimensionType {
     private final boolean natural;
     private final boolean shrunk;
     private final boolean hasEnderDragonFight;
+    private final boolean field_25612;
+    private final boolean field_25613;
+    private final boolean field_25614;
+    private final boolean field_25615;
+    private final int field_25616;
     private final BiomeAccessType biomeAccessType;
-    private final Optional<RegistryKey<DimensionType>> field_24765;
+    private final Identifier field_25617;
     private final float ambientLight;
     private final transient float[] field_24767;
 
@@ -77,12 +84,16 @@ public class DimensionType {
         return OVERWORLD;
     }
 
-    protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, float f) {
-        this("", optionalLong, bl, bl2, bl3, bl4, bl5, false, VoronoiBiomeAccessType.INSTANCE, Optional.empty(), f);
+    @Environment(value=EnvType.CLIENT)
+    public static DimensionType method_29953() {
+        return field_25611;
     }
 
-    protected DimensionType(String string, OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, BiomeAccessType arg, Optional<RegistryKey<DimensionType>> optional, float f) {
-        this.suffix = string;
+    protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, boolean bl7, boolean bl8, boolean bl9, int i, Identifier arg, float f) {
+        this(optionalLong, bl, bl2, bl3, bl4, bl5, false, bl6, bl7, bl8, bl9, i, VoronoiBiomeAccessType.INSTANCE, arg, f);
+    }
+
+    protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, boolean bl7, boolean bl8, boolean bl9, boolean bl10, int i, BiomeAccessType arg, Identifier arg2, float f) {
         this.fixedTime = optionalLong;
         this.hasSkyLight = bl;
         this.hasCeiling = bl2;
@@ -90,8 +101,13 @@ public class DimensionType {
         this.natural = bl4;
         this.shrunk = bl5;
         this.hasEnderDragonFight = bl6;
+        this.field_25612 = bl7;
+        this.field_25613 = bl8;
+        this.field_25614 = bl9;
+        this.field_25615 = bl10;
+        this.field_25616 = i;
         this.biomeAccessType = arg;
-        this.field_24765 = optional;
+        this.field_25617 = arg2;
         this.ambientLight = f;
         this.field_24767 = DimensionType.method_28515(f);
     }
@@ -108,21 +124,25 @@ public class DimensionType {
 
     @Deprecated
     public static DataResult<RegistryKey<World>> method_28521(Dynamic<?> dynamic) {
-        DataResult dataResult = dynamic.asNumber();
-        if (dataResult.result().equals(Optional.of(-1))) {
-            return DataResult.success(World.NETHER);
-        }
-        if (dataResult.result().equals(Optional.of(0))) {
-            return DataResult.success(World.OVERWORLD);
-        }
-        if (dataResult.result().equals(Optional.of(1))) {
-            return DataResult.success(World.END);
+        Optional optional = dynamic.asNumber().result();
+        if (optional.isPresent()) {
+            int i = ((Number)optional.get()).intValue();
+            if (i == -1) {
+                return DataResult.success(World.NETHER);
+            }
+            if (i == 0) {
+                return DataResult.success(World.OVERWORLD);
+            }
+            if (i == 1) {
+                return DataResult.success(World.END);
+            }
         }
         return World.CODEC.parse(dynamic);
     }
 
     public static RegistryTracker.Modifiable addRegistryDefaults(RegistryTracker.Modifiable arg) {
-        arg.addDimensionType(OVERWORLD_REGISTRY_KEY, DimensionType.getOverworldDimensionType());
+        arg.addDimensionType(OVERWORLD_REGISTRY_KEY, OVERWORLD);
+        arg.addDimensionType(field_25610, field_25611);
         arg.addDimensionType(THE_NETHER_REGISTRY_KEY, THE_NETHER);
         arg.addDimensionType(THE_END_REGISTRY_KEY, THE_END);
         return arg;
@@ -133,7 +153,7 @@ public class DimensionType {
     }
 
     private static ChunkGenerator createNetherGenerator(long l) {
-        return new SurfaceChunkGenerator(MultiNoiseBiomeSource.class_5305.field_24723.method_28469(l), l, ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType());
+        return new SurfaceChunkGenerator(MultiNoiseBiomeSource.Preset.NETHER.getBiomeSource(l), l, ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType());
     }
 
     public static SimpleRegistry<DimensionOptions> method_28517(long l) {
@@ -145,8 +165,12 @@ public class DimensionType {
         return lv;
     }
 
+    @Deprecated
     public String getSuffix() {
-        return this.suffix;
+        if (this == THE_END) {
+            return "_end";
+        }
+        return "";
     }
 
     public static File getSaveDirectory(RegistryKey<World> arg, File file) {
@@ -182,12 +206,36 @@ public class DimensionType {
         return this.shrunk;
     }
 
+    public boolean method_29955() {
+        return this.field_25612;
+    }
+
+    public boolean method_29956() {
+        return this.field_25613;
+    }
+
+    public boolean method_29957() {
+        return this.field_25614;
+    }
+
+    public boolean method_29958() {
+        return this.field_25615;
+    }
+
+    public int method_29959() {
+        return this.field_25616;
+    }
+
     public boolean hasEnderDragonFight() {
         return this.hasEnderDragonFight;
     }
 
     public BiomeAccessType getBiomeAccessType() {
         return this.biomeAccessType;
+    }
+
+    public boolean method_29960() {
+        return this.fixedTime.isPresent();
     }
 
     public float method_28528(long l) {
@@ -204,16 +252,8 @@ public class DimensionType {
         return this.field_24767[i];
     }
 
-    public boolean isOverworld() {
-        return this.field_24765.equals(Optional.of(OVERWORLD_REGISTRY_KEY));
-    }
-
-    public boolean isNether() {
-        return this.field_24765.equals(Optional.of(THE_NETHER_REGISTRY_KEY));
-    }
-
-    public boolean isEnd() {
-        return this.field_24765.equals(Optional.of(THE_END_REGISTRY_KEY));
+    public Tag<Block> method_29961() {
+        return BlockTags.getContainer().get(this.field_25617);
     }
 }
 

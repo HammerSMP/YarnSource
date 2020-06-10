@@ -21,13 +21,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.resource.ResourceImpl;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,7 +58,7 @@ public class ScreenshotUtils {
         } else {
             file4 = new File(file2, string);
         }
-        ResourceImpl.RESOURCE_IO_EXECUTOR.execute(() -> {
+        Util.method_27958().execute(() -> {
             try {
                 lv.writeFile(file4);
                 MutableText lv = new LiteralText(file4.getName()).formatted(Formatting.UNDERLINE).styled(arg -> arg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file4.getAbsolutePath())));

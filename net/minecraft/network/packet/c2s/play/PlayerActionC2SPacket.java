@@ -70,7 +70,7 @@ implements Packet<ServerPlayPacketListener> {
         DROP_ALL_ITEMS,
         DROP_ITEM,
         RELEASE_USE_ITEM,
-        SWAP_HELD_ITEMS;
+        SWAP_ITEM_WITH_OFFHAND;
 
     }
 }

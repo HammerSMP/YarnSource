@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5398;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -31,9 +32,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.IntRange;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LocalDifficulty;
@@ -51,6 +54,8 @@ implements Angerable {
     private static final IntRange field_25379 = Durations.betweenSeconds(20, 39);
     private int field_25380;
     private UUID field_25381;
+    private static final IntRange field_25609 = Durations.betweenSeconds(4, 6);
+    private int field_25608;
 
     public ZombifiedPiglinEntity(EntityType<? extends ZombifiedPiglinEntity> arg, World arg2) {
         super((EntityType<? extends ZombieEntity>)arg, arg2);
@@ -68,6 +73,7 @@ implements Angerable {
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0));
         this.targetSelector.add(1, new RevengeGoal(this, new Class[0]).setGroupRevenge(new Class[0]));
         this.targetSelector.add(2, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::shouldAngerAt));
+        this.targetSelector.add(3, new class_5398<ZombifiedPiglinEntity>(this, true));
     }
 
     public static DefaultAttributeContainer.Builder createZombifiedPiglinAttributes() {
@@ -82,7 +88,6 @@ implements Angerable {
     @Override
     protected void mobTick() {
         EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        LivingEntity lv2 = this.getAttacker();
         if (this.hasAngerTime()) {
             if (!this.isBaby() && !lv.hasModifier(ATTACKING_SPEED_BOOST)) {
                 lv.addTemporaryModifier(ATTACKING_SPEED_BOOST);
@@ -96,8 +101,28 @@ implements Angerable {
         } else if (lv.hasModifier(ATTACKING_SPEED_BOOST)) {
             lv.removeModifier(ATTACKING_SPEED_BOOST);
         }
-        this.tickAngerLogic();
+        this.tickAngerLogic((ServerWorld)this.world, true);
+        if (this.getTarget() != null) {
+            this.method_29941();
+        }
         super.mobTick();
+    }
+
+    private void method_29941() {
+        if (this.field_25608 > 0) {
+            --this.field_25608;
+            return;
+        }
+        if (this.getVisibilityCache().canSee(this.getTarget())) {
+            this.method_29942();
+        }
+        this.field_25608 = field_25609.choose(this.random);
+    }
+
+    private void method_29942() {
+        double d = this.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
+        Box lv = Box.method_29968(this.getPos()).expand(d, 10.0, d);
+        this.world.getEntitiesIncludingUngeneratedChunks(ZombifiedPiglinEntity.class, lv).stream().filter(arg -> arg != this).filter(arg -> arg.getTarget() == null).filter(arg -> !arg.isTeammate(this.getTarget())).forEach(arg -> arg.setTarget(this.getTarget()));
     }
 
     private void method_29533() {
@@ -109,8 +134,14 @@ implements Angerable {
         if (this.getTarget() == null && arg != null) {
             this.method_29533();
             this.angrySoundDelay = field_25382.choose(this.random);
+            this.field_25608 = field_25609.choose(this.random);
         }
         super.setTarget(arg);
+    }
+
+    @Override
+    protected boolean shouldAlwaysDropXp() {
+        return this.getTarget() != null;
     }
 
     @Override
@@ -136,7 +167,7 @@ implements Angerable {
     @Override
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
-        this.angerFromTag(this.world, arg);
+        this.angerFromTag((ServerWorld)this.world, arg);
     }
 
     @Override

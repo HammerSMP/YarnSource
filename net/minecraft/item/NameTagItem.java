@@ -20,7 +20,7 @@ extends Item {
     @Override
     public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
         if (arg.hasCustomName() && !(arg3 instanceof PlayerEntity)) {
-            if (arg3.isAlive()) {
+            if (!arg2.world.isClient && arg3.isAlive()) {
                 arg3.setCustomName(arg.getName());
                 if (arg3 instanceof MobEntity) {
                     ((MobEntity)arg3).setPersistent();

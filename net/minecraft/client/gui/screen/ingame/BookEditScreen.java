@@ -85,7 +85,7 @@ extends Screen {
     private ButtonWidget cancelButton;
     private final Hand hand;
     @Nullable
-    private class_5233 field_24268 = class_5233.method_27599();
+    private PageContent pageContent = PageContent.method_27599();
 
     public BookEditScreen(PlayerEntity arg, ItemStack arg2, Hand arg3) {
         super(NarratorManager.EMPTY);
@@ -126,7 +126,7 @@ extends Screen {
 
     @Override
     protected void init() {
-        this.method_27577();
+        this.invalidatePageContent();
         this.client.keyboard.enableRepeatEvents(true);
         this.signButton = this.addButton(new ButtonWidget(this.width / 2 - 100, 196, 98, 20, new TranslatableText("book.signButton"), arg -> {
             this.signing = true;
@@ -233,7 +233,7 @@ extends Screen {
         }
         boolean bl = this.method_27592(i, j, k);
         if (bl) {
-            this.method_27577();
+            this.invalidatePageContent();
             return true;
         }
         return false;
@@ -255,7 +255,7 @@ extends Screen {
         }
         if (SharedConstants.isValidChar(c)) {
             this.field_24269.insert(Character.toString(c));
-            this.method_27577();
+            this.invalidatePageContent();
             return true;
         }
         return false;
@@ -338,18 +338,18 @@ extends Screen {
 
     private void method_27580(int i) {
         int j = this.field_24269.getSelectionStart();
-        int k = this.method_27576().method_27601(j, i);
+        int k = this.getPageContent().method_27601(j, i);
         this.field_24269.method_27560(k, Screen.hasShiftDown());
     }
 
     private void moveCursorToTop() {
         int i = this.field_24269.getSelectionStart();
-        int j = this.method_27576().method_27600(i);
+        int j = this.getPageContent().method_27600(i);
         this.field_24269.method_27560(j, Screen.hasShiftDown());
     }
 
     private void moveCursorToBottom() {
-        class_5233 lv = this.method_27576();
+        PageContent lv = this.getPageContent();
         int i = this.field_24269.getSelectionStart();
         int j = lv.method_27604(i);
         this.field_24269.method_27560(j, Screen.hasShiftDown());
@@ -386,7 +386,7 @@ extends Screen {
         if (this.currentPage >= 0 && this.currentPage < this.pages.size()) {
             this.pages.set(this.currentPage, string);
             this.dirty = true;
-            this.method_27577();
+            this.invalidatePageContent();
         }
     }
 
@@ -415,24 +415,24 @@ extends Screen {
             String string4 = I18n.translate("book.pageIndicator", this.currentPage + 1, this.countPages());
             int p = this.getStringWidth(string4);
             this.textRenderer.draw(arg, string4, (float)(k - p + 192 - 44), 18.0f, 0);
-            class_5233 lv = this.method_27576();
-            for (Position lv2 : lv.field_24276) {
-                this.textRenderer.draw(arg, lv2.field_24280, (float)lv2.x, (float)lv2.y, -16777216);
+            PageContent lv = this.getPageContent();
+            for (Line lv2 : lv.lines) {
+                this.textRenderer.draw(arg, lv2.text, (float)lv2.x, (float)lv2.y, -16777216);
             }
             this.method_27588(lv.field_24277);
-            this.method_27581(arg, lv.field_24273, lv.field_24274);
+            this.method_27581(arg, lv.position, lv.field_24274);
         }
         super.render(arg, i, j, f);
     }
 
-    private void method_27581(MatrixStack arg, class_5234 arg2, boolean bl) {
+    private void method_27581(MatrixStack arg, Position arg2, boolean bl) {
         if (this.tickCounter / 6 % 2 == 0) {
             arg2 = this.method_27590(arg2);
             if (!bl) {
                 this.textRenderer.getClass();
-                DrawableHelper.fill(arg, arg2.field_24281, arg2.field_24282 - 1, arg2.field_24281 + 1, arg2.field_24282 + 9, -16777216);
+                DrawableHelper.fill(arg, arg2.x, arg2.y - 1, arg2.x + 1, arg2.y + 9, -16777216);
             } else {
-                this.textRenderer.draw(arg, "_", (float)arg2.field_24281, (float)arg2.field_24282, 0);
+                this.textRenderer.draw(arg, "_", (float)arg2.x, (float)arg2.y, 0);
             }
         }
     }
@@ -464,12 +464,12 @@ extends Screen {
         RenderSystem.enableTexture();
     }
 
-    private class_5234 method_27582(class_5234 arg) {
-        return new class_5234(arg.field_24281 - (this.width - 192) / 2 - 36, arg.field_24282 - 32);
+    private Position method_27582(Position arg) {
+        return new Position(arg.x - (this.width - 192) / 2 - 36, arg.y - 32);
     }
 
-    private class_5234 method_27590(class_5234 arg) {
-        return new class_5234(arg.field_24281 + (this.width - 192) / 2 + 36, arg.field_24282 + 32);
+    private Position method_27590(Position arg) {
+        return new Position(arg.x + (this.width - 192) / 2 + 36, arg.y + 32);
     }
 
     @Override
@@ -479,8 +479,8 @@ extends Screen {
         }
         if (i == 0) {
             long l = Util.getMeasuringTimeMs();
-            class_5233 lv = this.method_27576();
-            int j = lv.method_27602(this.textRenderer, this.method_27582(new class_5234((int)d, (int)e)));
+            PageContent lv = this.getPageContent();
+            int j = lv.method_27602(this.textRenderer, this.method_27582(new Position((int)d, (int)e)));
             if (j >= 0) {
                 if (j == this.lastClickIndex && l - this.lastClickTime < 250L) {
                     if (!this.field_24269.method_27568()) {
@@ -491,7 +491,7 @@ extends Screen {
                 } else {
                     this.field_24269.method_27560(j, Screen.hasShiftDown());
                 }
-                this.method_27577();
+                this.invalidatePageContent();
             }
             this.lastClickIndex = j;
             this.lastClickTime = l;
@@ -510,36 +510,36 @@ extends Screen {
             return true;
         }
         if (i == 0) {
-            class_5233 lv = this.method_27576();
-            int j = lv.method_27602(this.textRenderer, this.method_27582(new class_5234((int)d, (int)e)));
+            PageContent lv = this.getPageContent();
+            int j = lv.method_27602(this.textRenderer, this.method_27582(new Position((int)d, (int)e)));
             this.field_24269.method_27560(j, true);
-            this.method_27577();
+            this.invalidatePageContent();
         }
         return true;
     }
 
-    private class_5233 method_27576() {
-        if (this.field_24268 == null) {
-            this.field_24268 = this.method_27578();
+    private PageContent getPageContent() {
+        if (this.pageContent == null) {
+            this.pageContent = this.createPageContent();
         }
-        return this.field_24268;
+        return this.pageContent;
     }
 
-    private void method_27577() {
-        this.field_24268 = null;
+    private void invalidatePageContent() {
+        this.pageContent = null;
     }
 
     private void method_27872() {
         this.field_24269.moveCaretToEnd();
-        this.method_27577();
+        this.invalidatePageContent();
     }
 
-    private class_5233 method_27578() {
-        class_5234 lv3;
+    private PageContent createPageContent() {
+        Position lv3;
         boolean bl;
         String string = this.getCurrentPageContent();
         if (string.isEmpty()) {
-            return class_5233.field_24271;
+            return PageContent.EMPTY;
         }
         int i = this.field_24269.getSelectionStart();
         int j = this.field_24269.getSelectionEnd();
@@ -553,12 +553,12 @@ extends Screen {
         boolean bl2 = bl = i == string.length();
         if (bl && mutableBoolean.isTrue()) {
             this.textRenderer.getClass();
-            class_5234 lv2 = new class_5234(0, list.size() * 9);
+            Position lv2 = new Position(0, list.size() * 9);
         } else {
             int k = BookEditScreen.method_27591(is, i);
             int l = this.textRenderer.getWidth(string.substring(is[k], i));
             this.textRenderer.getClass();
-            lv3 = new class_5234(l, k * 9);
+            lv3 = new Position(l, k * 9);
         }
         ArrayList list2 = Lists.newArrayList();
         if (i != j) {
@@ -581,13 +581,13 @@ extends Screen {
                     String string2 = string.substring(is[t], is[t + 1]);
                     int v = (int)lv.getWidth(string2);
                     this.textRenderer.getClass();
-                    list2.add(this.method_27583(new class_5234(0, u), new class_5234(v, u + 9)));
+                    list2.add(this.method_27583(new Position(0, u), new Position(v, u + 9)));
                 }
                 this.textRenderer.getClass();
                 list2.add(this.method_27585(string, lv, is[p], n, p * 9, is[p]));
             }
         }
-        return new class_5233(string, lv3, bl, is, list.toArray(new Position[0]), list2.toArray(new Rect2i[0]));
+        return new PageContent(string, lv3, bl, is, list.toArray(new Line[0]), list2.toArray(new Rect2i[0]));
     }
 
     private static int method_27591(int[] is, int i) {
@@ -601,19 +601,19 @@ extends Screen {
     private Rect2i method_27585(String string, TextHandler arg, int i, int j, int k, int l) {
         String string2 = string.substring(l, i);
         String string3 = string.substring(l, j);
-        class_5234 lv = new class_5234((int)arg.getWidth(string2), k);
+        Position lv = new Position((int)arg.getWidth(string2), k);
         this.textRenderer.getClass();
-        class_5234 lv2 = new class_5234((int)arg.getWidth(string3), k + 9);
+        Position lv2 = new Position((int)arg.getWidth(string3), k + 9);
         return this.method_27583(lv, lv2);
     }
 
-    private Rect2i method_27583(class_5234 arg, class_5234 arg2) {
-        class_5234 lv = this.method_27590(arg);
-        class_5234 lv2 = this.method_27590(arg2);
-        int i = Math.min(lv.field_24281, lv2.field_24281);
-        int j = Math.max(lv.field_24281, lv2.field_24281);
-        int k = Math.min(lv.field_24282, lv2.field_24282);
-        int l = Math.max(lv.field_24282, lv2.field_24282);
+    private Rect2i method_27583(Position arg, Position arg2) {
+        Position lv = this.method_27590(arg);
+        Position lv2 = this.method_27590(arg2);
+        int i = Math.min(lv.x, lv2.x);
+        int j = Math.max(lv.x, lv2.x);
+        int k = Math.min(lv.y, lv2.y);
+        int l = Math.max(lv.y, lv2.y);
         return new Rect2i(i, k, j - i, l - k);
     }
 
@@ -624,41 +624,41 @@ extends Screen {
         String string3 = StringUtils.stripEnd((String)string2, (String)" \n");
         this.textRenderer.getClass();
         int l = k * 9;
-        class_5234 lv = this.method_27590(new class_5234(0, l));
+        Position lv = this.method_27590(new Position(0, l));
         intList.add(i);
-        list.add(new Position(arg, string3, lv.field_24281, lv.field_24282));
+        list.add(new Line(arg, string3, lv.x, lv.y));
     }
 
     @Environment(value=EnvType.CLIENT)
-    static class class_5233 {
-        private static final class_5233 field_24271 = new class_5233("", new class_5234(0, 0), true, new int[]{0}, new Position[]{new Position(Style.EMPTY, "", 0, 0)}, new Rect2i[0]);
-        private final String field_24272;
-        private final class_5234 field_24273;
+    static class PageContent {
+        private static final PageContent EMPTY = new PageContent("", new Position(0, 0), true, new int[]{0}, new Line[]{new Line(Style.EMPTY, "", 0, 0)}, new Rect2i[0]);
+        private final String pageContent;
+        private final Position position;
         private final boolean field_24274;
         private final int[] field_24275;
-        private final Position[] field_24276;
+        private final Line[] lines;
         private final Rect2i[] field_24277;
 
-        public class_5233(String string, class_5234 arg, boolean bl, int[] is, Position[] args, Rect2i[] args2) {
-            this.field_24272 = string;
-            this.field_24273 = arg;
+        public PageContent(String string, Position arg, boolean bl, int[] is, Line[] args, Rect2i[] args2) {
+            this.pageContent = string;
+            this.position = arg;
             this.field_24274 = bl;
             this.field_24275 = is;
-            this.field_24276 = args;
+            this.lines = args;
             this.field_24277 = args2;
         }
 
-        public int method_27602(TextRenderer arg, class_5234 arg2) {
+        public int method_27602(TextRenderer arg, Position arg2) {
             arg.getClass();
-            int i = arg2.field_24282 / 9;
+            int i = arg2.y / 9;
             if (i < 0) {
                 return 0;
             }
-            if (i >= this.field_24276.length) {
-                return this.field_24272.length();
+            if (i >= this.lines.length) {
+                return this.pageContent.length();
             }
-            Position lv = this.field_24276[i];
-            return this.field_24275[i] + arg.getTextHandler().getTrimmedLength(lv.field_24279, arg2.field_24281, lv.field_24278);
+            Line lv = this.lines[i];
+            return this.field_24275[i] + arg.getTextHandler().getTrimmedLength(lv.content, arg2.x, lv.style);
         }
 
         public int method_27601(int i, int j) {
@@ -667,7 +667,7 @@ extends Screen {
             int l = k + j;
             if (0 <= l && l < this.field_24275.length) {
                 int m = i - this.field_24275[k];
-                int n = this.field_24276[l].field_24279.length();
+                int n = this.lines[l].content.length();
                 int o = this.field_24275[l] + Math.min(m, n);
             } else {
                 p = i;
@@ -682,35 +682,35 @@ extends Screen {
 
         public int method_27604(int i) {
             int j = BookEditScreen.method_27591(this.field_24275, i);
-            return this.field_24275[j] + this.field_24276[j].field_24279.length();
+            return this.field_24275[j] + this.lines[j].content.length();
+        }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    static class Line {
+        private final Style style;
+        private final String content;
+        private final Text text;
+        private final int x;
+        private final int y;
+
+        public Line(Style arg, String string, int i, int j) {
+            this.style = arg;
+            this.content = string;
+            this.x = i;
+            this.y = j;
+            this.text = new LiteralText(string).setStyle(arg);
         }
     }
 
     @Environment(value=EnvType.CLIENT)
     static class Position {
-        private final Style field_24278;
-        private final String field_24279;
-        private final Text field_24280;
-        private final int x;
-        private final int y;
+        public final int x;
+        public final int y;
 
-        public Position(Style arg, String string, int i, int j) {
-            this.field_24278 = arg;
-            this.field_24279 = string;
+        Position(int i, int j) {
             this.x = i;
             this.y = j;
-            this.field_24280 = new LiteralText(string).setStyle(arg);
-        }
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    static class class_5234 {
-        public final int field_24281;
-        public final int field_24282;
-
-        class_5234(int i, int j) {
-            this.field_24281 = i;
-            this.field_24282 = j;
         }
     }
 }

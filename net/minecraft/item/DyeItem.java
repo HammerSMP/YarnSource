@@ -32,8 +32,10 @@ extends Item {
     public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
         SheepEntity lv;
         if (arg3 instanceof SheepEntity && (lv = (SheepEntity)arg3).isAlive() && !lv.isSheared() && lv.getColor() != this.color) {
-            lv.setColor(this.color);
-            arg.decrement(1);
+            if (!arg2.world.isClient) {
+                lv.setColor(this.color);
+                arg.decrement(1);
+            }
             return ActionResult.success(arg2.world.isClient);
         }
         return ActionResult.PASS;

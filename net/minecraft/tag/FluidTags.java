@@ -7,6 +7,7 @@
  */
 package net.minecraft.tag;
 
+import java.util.List;
 import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -36,6 +37,10 @@ public class FluidTags {
 
     public static TagContainer<Fluid> getContainer() {
         return ACCESSOR.getContainer();
+    }
+
+    public static List<GlobalTagAccessor.CachedTag<Fluid>> method_29897() {
+        return ACCESSOR.method_29902();
     }
 
     public static Set<Identifier> method_29216(TagContainer<Fluid> arg) {

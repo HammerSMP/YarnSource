@@ -182,7 +182,7 @@ extends AnimalEntity {
     }
 
     public static boolean canSpawn(EntityType<TurtleEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg4.getY() < arg2.getSeaLevel() + 4 && arg2.getBlockState(arg4.down()).isOf(Blocks.SAND) && arg2.getBaseLightLevel(arg4, 0) > 8;
+        return arg4.getY() < arg2.getSeaLevel() + 4 && TurtleEggBlock.isSand(arg2, arg4) && arg2.getBaseLightLevel(arg4, 0) > 8;
     }
 
     @Override
@@ -301,7 +301,7 @@ extends AnimalEntity {
         if (!this.isLandBound() && arg2.getFluidState(arg).matches(FluidTags.WATER)) {
             return 10.0f;
         }
-        if (arg2.getBlockState(arg.down()).isOf(Blocks.SAND)) {
+        if (TurtleEggBlock.isSand(arg2, arg)) {
             return 10.0f;
         }
         return arg2.getBrightness(arg) - 0.5f;
@@ -311,7 +311,7 @@ extends AnimalEntity {
     public void tickMovement() {
         BlockPos lv;
         super.tickMovement();
-        if (this.isAlive() && this.isDiggingSand() && this.sandDiggingCounter >= 1 && this.sandDiggingCounter % 5 == 0 && this.world.getBlockState((lv = this.getBlockPos()).down()).isOf(Blocks.SAND)) {
+        if (this.isAlive() && this.isDiggingSand() && this.sandDiggingCounter >= 1 && this.sandDiggingCounter % 5 == 0 && TurtleEggBlock.isSand(this.world, lv = this.getBlockPos())) {
             this.world.syncWorldEvent(2001, lv, Block.getRawIdFromState(Blocks.SAND.getDefaultState()));
         }
     }
@@ -520,7 +520,7 @@ extends AnimalEntity {
             if (!arg.isAir(arg2.up())) {
                 return false;
             }
-            return arg.getBlockState(arg2).isOf(Blocks.SAND);
+            return TurtleEggBlock.method_29952(arg, arg2);
         }
     }
 

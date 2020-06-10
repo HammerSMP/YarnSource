@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.RegistryKey;
@@ -49,9 +50,13 @@ extends BlockWithEntity {
 
     @Override
     public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (!arg2.isClient && !arg4.hasVehicle() && !arg4.hasPassengers() && arg4.canUsePortals() && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(arg4.getBoundingBox().offset(-arg3.getX(), -arg3.getY(), -arg3.getZ())), arg.getOutlineShape(arg2, arg3), BooleanBiFunction.AND)) {
-            RegistryKey<World> lv = arg2.getDimension().isEnd() ? World.OVERWORLD : World.END;
-            arg4.changeDimension(lv);
+        if (arg2 instanceof ServerWorld && !arg4.hasVehicle() && !arg4.hasPassengers() && arg4.canUsePortals() && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(arg4.getBoundingBox().offset(-arg3.getX(), -arg3.getY(), -arg3.getZ())), arg.getOutlineShape(arg2, arg3), BooleanBiFunction.AND)) {
+            RegistryKey<World> lv = arg2.getRegistryKey() == World.END ? World.OVERWORLD : World.END;
+            ServerWorld lv2 = ((ServerWorld)arg2).getServer().getWorld(lv);
+            if (lv2 == null) {
+                return;
+            }
+            arg4.changeDimension(lv2);
         }
     }
 

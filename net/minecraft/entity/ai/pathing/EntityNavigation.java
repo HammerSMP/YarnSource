@@ -106,6 +106,11 @@ public abstract class EntityNavigation {
     }
 
     @Nullable
+    public Path method_29934(Set<BlockPos> set, int i) {
+        return this.findPathToAny(set, 8, false, i);
+    }
+
+    @Nullable
     public Path findPathTo(BlockPos arg, int i) {
         return this.findPathToAny((Set<BlockPos>)ImmutableSet.of((Object)arg), 8, false, i);
     }

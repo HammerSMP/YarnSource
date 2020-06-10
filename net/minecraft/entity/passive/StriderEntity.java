@@ -4,6 +4,8 @@
  * Could not load the following classes:
  *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.entity.passive;
 
@@ -11,6 +13,8 @@ import com.google.common.collect.Sets;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
@@ -45,6 +49,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
@@ -95,7 +100,11 @@ Saddleable {
     }
 
     public static boolean canSpawn(EntityType<StriderEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getBlockState(arg4.up()).isAir();
+        BlockPos.Mutable lv = arg4.mutableCopy();
+        do {
+            lv.move(Direction.UP);
+        } while (arg2.getFluidState(lv).matches(FluidTags.LAVA));
+        return arg2.getBlockState(lv).isAir();
     }
 
     @Override
@@ -302,7 +311,7 @@ Saddleable {
         }
         BlockState lv = this.world.getBlockState(this.getBlockPos());
         BlockState lv2 = this.getLandingBlockState();
-        boolean bl = lv.isIn(BlockTags.STRIDER_WARM_BLOCKS) || lv2.isIn(BlockTags.STRIDER_WARM_BLOCKS);
+        boolean bl = lv.isIn(BlockTags.STRIDER_WARM_BLOCKS) || lv2.isIn(BlockTags.STRIDER_WARM_BLOCKS) || this.getFluidHeight(FluidTags.LAVA) > 0.0;
         this.setCold(!bl);
         super.tick();
         this.updateFloating();
@@ -414,42 +423,50 @@ Saddleable {
     }
 
     @Override
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_29919() {
+        return new Vec3d(0.0, 0.6f * this.getStandingEyeHeight(), this.getWidth() * 0.4f);
+    }
+
+    @Override
     @Nullable
     public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        ZombifiedPiglinEntity lv8;
-        StriderData.RiderType lv5;
+        ZombifiedPiglinEntity lv9;
+        StriderData.RiderType lv6;
+        ZombieEntity.ZombieData lv = null;
         if (arg4 instanceof StriderData) {
-            StriderData.RiderType lv = ((StriderData)arg4).type;
+            StriderData.RiderType lv2 = ((StriderData)arg4).type;
         } else if (!this.isBaby()) {
-            StriderData.RiderType lv4;
+            StriderData.RiderType lv5;
             if (this.random.nextInt(30) == 0) {
-                StriderData.RiderType lv2 = StriderData.RiderType.PIGLIN_RIDER;
+                StriderData.RiderType lv3 = StriderData.RiderType.PIGLIN_RIDER;
+                lv = new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false);
             } else if (this.random.nextInt(10) == 0) {
-                StriderData.RiderType lv3 = StriderData.RiderType.BABY_RIDER;
+                StriderData.RiderType lv4 = StriderData.RiderType.BABY_RIDER;
             } else {
-                lv4 = StriderData.RiderType.NO_RIDER;
+                lv5 = StriderData.RiderType.NO_RIDER;
             }
-            arg4 = new StriderData(lv4);
-            ((PassiveEntity.PassiveData)arg4).setBabyChance(lv4 == StriderData.RiderType.NO_RIDER ? 0.5f : 0.0f);
+            arg4 = new StriderData(lv5);
+            ((PassiveEntity.PassiveData)arg4).setBabyChance(lv5 == StriderData.RiderType.NO_RIDER ? 0.5f : 0.0f);
         } else {
-            lv5 = StriderData.RiderType.NO_RIDER;
+            lv6 = StriderData.RiderType.NO_RIDER;
         }
-        MobEntityWithAi lv6 = null;
-        if (lv5 == StriderData.RiderType.BABY_RIDER) {
-            StriderEntity lv7 = EntityType.STRIDER.create(arg.getWorld());
-            if (lv7 != null) {
-                lv6 = lv7;
-                lv7.setBreedingAge(-24000);
+        MobEntityWithAi lv7 = null;
+        if (lv6 == StriderData.RiderType.BABY_RIDER) {
+            StriderEntity lv8 = EntityType.STRIDER.create(arg.getWorld());
+            if (lv8 != null) {
+                lv7 = lv8;
+                lv8.setBreedingAge(-24000);
             }
-        } else if (lv5 == StriderData.RiderType.PIGLIN_RIDER && (lv8 = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld())) != null) {
-            lv6 = lv8;
+        } else if (lv6 == StriderData.RiderType.PIGLIN_RIDER && (lv9 = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld())) != null) {
+            lv7 = lv9;
             this.saddle(null);
         }
-        if (lv6 != null) {
-            lv6.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-            lv6.initialize(arg, arg2, SpawnReason.JOCKEY, null, null);
-            lv6.startRiding(this, true);
-            arg.spawnEntity(lv6);
+        if (lv7 != null) {
+            lv7.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
+            lv7.initialize(arg, arg2, SpawnReason.JOCKEY, lv, null);
+            lv7.startRiding(this, true);
+            arg.spawnEntity(lv7);
         }
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }

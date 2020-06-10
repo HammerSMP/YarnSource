@@ -2,7 +2,6 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.common.collect.Sets
@@ -10,7 +9,6 @@
  */
 package net.minecraft.advancement.criterion;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -64,7 +62,7 @@ implements Criterion<T> {
     protected void test(ServerPlayerEntity arg, Predicate<T> predicate) {
         PlayerAdvancementTracker lv = arg.getAdvancementTracker();
         Set<Criterion.ConditionsContainer<T>> set = this.progressions.get(lv);
-        if (set == null) {
+        if (set == null || set.isEmpty()) {
             return;
         }
         LootContext lv2 = EntityPredicate.createAdvancementEntityLootContext(arg, arg);
@@ -80,15 +78,6 @@ implements Criterion<T> {
         if (list != null) {
             for (Criterion.ConditionsContainer<Object> lv5 : list) {
                 lv5.grant(lv);
-            }
-        }
-    }
-
-    protected void grant(PlayerAdvancementTracker arg) {
-        Set<Criterion.ConditionsContainer<T>> set = this.progressions.get(arg);
-        if (set != null && !set.isEmpty()) {
-            for (Criterion.ConditionsContainer lv : ImmutableSet.copyOf(set)) {
-                lv.grant(arg);
             }
         }
     }

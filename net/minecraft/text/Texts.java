@@ -7,6 +7,8 @@
  *  com.mojang.brigadier.Message
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.text;
 
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.HoverEvent;
@@ -29,6 +33,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class Texts {
+    @Environment(value=EnvType.CLIENT)
     public static MutableText setStyleIfAbsent(MutableText arg, Style arg2) {
         if (arg2.isEmpty()) {
             return arg;
@@ -51,7 +56,7 @@ public class Texts {
         for (Text lv2 : arg2.getSiblings()) {
             lv.append(Texts.parse(arg, lv2, arg3, i + 1));
         }
-        return Texts.setStyleIfAbsent(lv, Texts.method_27663(arg, arg2.getStyle(), arg3, i));
+        return lv.fillStyle(Texts.method_27663(arg, arg2.getStyle(), arg3, i));
     }
 
     private static Style method_27663(@Nullable ServerCommandSource arg, Style arg2, @Nullable Entity arg3, int i) throws CommandSyntaxException {

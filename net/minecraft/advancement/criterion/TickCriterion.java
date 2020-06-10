@@ -28,8 +28,8 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg);
     }
 
-    public void trigger(ServerPlayerEntity arg) {
-        this.grant(arg.getAdvancementTracker());
+    public void trigger(ServerPlayerEntity arg2) {
+        this.test(arg2, arg -> true);
     }
 
     @Override

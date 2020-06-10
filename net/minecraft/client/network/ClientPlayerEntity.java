@@ -168,8 +168,8 @@ extends AbstractClientPlayerEntity {
     }
 
     @Override
-    public void stopRiding() {
-        super.stopRiding();
+    public void method_29239() {
+        super.method_29239();
         this.riding = false;
     }
 
@@ -720,7 +720,7 @@ extends AbstractClientPlayerEntity {
             this.networkHandler.sendPacket(new ClientCommandC2SPacket(this, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
         }
         this.field_3939 = this.isFallFlying();
-        if (this.isTouchingWater() && this.input.sneaking) {
+        if (this.isTouchingWater() && this.input.sneaking && this.method_29920()) {
             this.knockDownwards();
         }
         if (this.isSubmergedIn(FluidTags.WATER)) {

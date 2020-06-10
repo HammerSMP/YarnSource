@@ -50,7 +50,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.resource.ResourceImpl;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloadListener;
 import net.minecraft.util.Identifier;
@@ -486,7 +485,7 @@ AutoCloseable {
     private void updateWorldIcon() {
         if (this.client.worldRenderer.getCompletedChunkCount() > 10 && this.client.worldRenderer.isTerrainRenderComplete() && !this.client.getServer().hasIconFile()) {
             NativeImage lv = ScreenshotUtils.takeScreenshot(this.client.getWindow().getFramebufferWidth(), this.client.getWindow().getFramebufferHeight(), this.client.getFramebuffer());
-            ResourceImpl.RESOURCE_IO_EXECUTOR.execute(() -> {
+            Util.method_27958().execute(() -> {
                 int i = lv.getWidth();
                 int j = lv.getHeight();
                 int k = 0;

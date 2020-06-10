@@ -367,48 +367,49 @@ AutoCloseable {
             lv7 = lv4.getDimensionType();
             lv8 = lv4.getChunkGenerator();
         }
-        ServerWorld lv9 = new ServerWorld(this, this.workerExecutor, this.session, lv, World.OVERWORLD, DimensionType.OVERWORLD_REGISTRY_KEY, lv7, arg, lv8, bl, m, (List<Spawner>)list, true);
-        this.worlds.put(World.OVERWORLD, lv9);
-        PersistentStateManager lv10 = lv9.getPersistentStateManager();
-        this.initScoreboard(lv10);
-        this.dataCommandStorage = new DataCommandStorage(lv10);
-        WorldBorder lv11 = lv9.getWorldBorder();
-        lv11.load(lv.getWorldBorder());
+        RegistryKey<DimensionType> lv9 = this.dimensionTracker.getDimensionTypeRegistry().getKey(lv7).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv7));
+        ServerWorld lv10 = new ServerWorld(this, this.workerExecutor, this.session, lv, World.OVERWORLD, lv9, lv7, arg, lv8, bl, m, (List<Spawner>)list, true);
+        this.worlds.put(World.OVERWORLD, lv10);
+        PersistentStateManager lv11 = lv10.getPersistentStateManager();
+        this.initScoreboard(lv11);
+        this.dataCommandStorage = new DataCommandStorage(lv11);
+        WorldBorder lv12 = lv10.getWorldBorder();
+        lv12.load(lv.getWorldBorder());
         if (!lv.isInitialized()) {
             try {
-                MinecraftServer.setupSpawn(lv9, lv, lv2.hasBonusChest(), bl, true);
+                MinecraftServer.setupSpawn(lv10, lv, lv2.hasBonusChest(), bl, true);
                 lv.setInitialized(true);
                 if (bl) {
                     this.setToDebugWorldProperties(this.saveProperties);
                 }
             }
             catch (Throwable throwable) {
-                CrashReport lv12 = CrashReport.create(throwable, "Exception initializing level");
+                CrashReport lv13 = CrashReport.create(throwable, "Exception initializing level");
                 try {
-                    lv9.addDetailsToCrashReport(lv12);
+                    lv10.addDetailsToCrashReport(lv13);
                 }
                 catch (Throwable throwable2) {
                     // empty catch block
                 }
-                throw new CrashException(lv12);
+                throw new CrashException(lv13);
             }
             lv.setInitialized(true);
         }
-        this.getPlayerManager().setMainWorld(lv9);
+        this.getPlayerManager().setMainWorld(lv10);
         if (this.saveProperties.getCustomBossEvents() != null) {
             this.getBossBarManager().fromTag(this.saveProperties.getCustomBossEvents());
         }
         for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : lv3.getEntries()) {
-            RegistryKey<DimensionOptions> lv13 = entry.getKey();
-            if (lv13 == DimensionOptions.OVERWORLD) continue;
-            RegistryKey<World> lv14 = RegistryKey.of(Registry.DIMENSION, lv13.getValue());
-            DimensionType lv15 = entry.getValue().getDimensionType();
-            RegistryKey<DimensionType> lv16 = this.dimensionTracker.getDimensionTypeRegistry().getKey(lv15).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv15));
-            ChunkGenerator lv17 = entry.getValue().getChunkGenerator();
-            UnmodifiableLevelProperties lv18 = new UnmodifiableLevelProperties(this.saveProperties, lv);
-            ServerWorld lv19 = new ServerWorld(this, this.workerExecutor, this.session, lv18, lv14, lv16, lv15, arg, lv17, bl, m, (List<Spawner>)ImmutableList.of(), false);
-            lv11.addListener(new WorldBorderListener.WorldBorderSyncer(lv19.getWorldBorder()));
-            this.worlds.put(lv14, lv19);
+            RegistryKey<DimensionOptions> lv14 = entry.getKey();
+            if (lv14 == DimensionOptions.OVERWORLD) continue;
+            RegistryKey<World> lv15 = RegistryKey.of(Registry.DIMENSION, lv14.getValue());
+            DimensionType lv16 = entry.getValue().getDimensionType();
+            RegistryKey<DimensionType> lv17 = this.dimensionTracker.getDimensionTypeRegistry().getKey(lv16).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv16));
+            ChunkGenerator lv18 = entry.getValue().getChunkGenerator();
+            UnmodifiableLevelProperties lv19 = new UnmodifiableLevelProperties(this.saveProperties, lv);
+            ServerWorld lv20 = new ServerWorld(this, this.workerExecutor, this.session, lv19, lv15, lv17, lv16, arg, lv18, bl, m, (List<Spawner>)ImmutableList.of(), false);
+            lv12.addListener(new WorldBorderListener.WorldBorderSyncer(lv20.getWorldBorder()));
+            this.worlds.put(lv15, lv20);
         }
     }
 
@@ -475,7 +476,7 @@ AutoCloseable {
     }
 
     private void prepareStartRegion(WorldGenerationProgressListener arg) {
-        ServerWorld lv = this.getWorld(World.OVERWORLD);
+        ServerWorld lv = this.method_30002();
         LOGGER.info("Preparing start region for dimension {}", (Object)lv.getRegistryKey().getValue());
         BlockPos lv2 = lv.getSpawnPos();
         arg.start(new ChunkPos(lv2));
@@ -542,7 +543,7 @@ AutoCloseable {
             lv.save(null, bl2, lv.savingDisabled && !bl3);
             bl4 = true;
         }
-        ServerWorld lv2 = this.getWorld(World.OVERWORLD);
+        ServerWorld lv2 = this.method_30002();
         ServerWorldProperties lv3 = this.saveProperties.getMainWorldProperties();
         lv3.setWorldBorder(lv2.getWorldBorder().write());
         this.saveProperties.setCustomBossEvents(this.getBossBarManager().toTag());
@@ -822,7 +823,6 @@ AutoCloseable {
         this.getCommandFunctionManager().tick();
         this.profiler.swap("levels");
         for (ServerWorld lv : this.getWorlds()) {
-            if (!lv.getDimension().isOverworld() && !this.isNetherAllowed()) continue;
             this.profiler.push(() -> lv + " " + lv.getRegistryKey().getValue());
             if (this.ticks % 20 == 0) {
                 this.profiler.push("timeSync");
@@ -876,6 +876,11 @@ AutoCloseable {
         return new File(this.getRunDirectory(), string);
     }
 
+    public final ServerWorld method_30002() {
+        return this.worlds.get(World.OVERWORLD);
+    }
+
+    @Nullable
     public ServerWorld getWorld(RegistryKey<World> arg) {
         return this.worlds.get(arg);
     }
@@ -1315,7 +1320,7 @@ AutoCloseable {
     }
 
     public ServerCommandSource getCommandSource() {
-        ServerWorld lv = this.getWorld(World.OVERWORLD);
+        ServerWorld lv = this.method_30002();
         return new ServerCommandSource(this, lv == null ? Vec3d.ZERO : Vec3d.of(lv.getSpawnPos()), Vec2f.ZERO, lv, 4, "Server", new LiteralText("Server"), this, null);
     }
 
@@ -1357,7 +1362,7 @@ AutoCloseable {
     }
 
     public GameRules getGameRules() {
-        return this.getWorld(World.OVERWORLD).getGameRules();
+        return this.method_30002().getGameRules();
     }
 
     public BossBarManager getBossBarManager() {

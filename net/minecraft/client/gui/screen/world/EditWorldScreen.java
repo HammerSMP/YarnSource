@@ -185,31 +185,17 @@ extends Screen {
         }
     }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     * WARNING - void declaration
-     */
-    public static boolean method_29784(LevelStorage arg, String string) {
-        void lv2;
-        try {
-            LevelStorage.Session lv = arg.createSession(string);
+    public static void method_29784(LevelStorage arg, String string) {
+        boolean bl = false;
+        try (LevelStorage.Session lv = arg.createSession(string);){
+            bl = true;
+            EditWorldScreen.backupLevel(lv);
         }
         catch (IOException iOException) {
-            field_23776.warn("Failed to read level {} data", (Object)string, (Object)iOException);
-            SystemToast.addWorldAccessFailureToast(MinecraftClient.getInstance(), string);
-            return false;
-        }
-        try {
-            boolean bl = EditWorldScreen.backupLevel((LevelStorage.Session)lv2);
-            return bl;
-        }
-        finally {
-            try {
-                lv2.close();
+            if (!bl) {
+                SystemToast.addWorldAccessFailureToast(MinecraftClient.getInstance(), string);
             }
-            catch (IOException iOException2) {
-                field_23776.warn("Failed to unlock access to level {}", (Object)string, (Object)iOException2);
-            }
+            field_23776.warn("Failed to create backup of level {}", (Object)string, (Object)iOException);
         }
     }
 

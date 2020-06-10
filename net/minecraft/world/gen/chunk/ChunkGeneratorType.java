@@ -134,7 +134,7 @@ public final class ChunkGeneratorType {
         private static ChunkGeneratorType createCavesType(StructuresConfig arg, BlockState arg2, BlockState arg3, Preset arg4) {
             HashMap map = Maps.newHashMap(StructuresConfig.DEFAULT_STRUCTURES);
             map.put(StructureFeature.RUINED_PORTAL, new StructureConfig(25, 10, 34222645));
-            return new ChunkGeneratorType(new StructuresConfig(Optional.ofNullable(arg.getStronghold()), map), new NoiseConfig(128, new NoiseSamplingConfig(1.0, 3.0, 80.0, 60.0), new SlideConfig(120, 3, 0), new SlideConfig(320, 4, -1), 1, 2, 0.0, 0.019921875, false, false, false, false), arg2, arg3, 0, 0, 32, true, Optional.of(arg4));
+            return new ChunkGeneratorType(new StructuresConfig(Optional.ofNullable(arg.getStronghold()), map), new NoiseConfig(128, new NoiseSamplingConfig(1.0, 3.0, 80.0, 60.0), new SlideConfig(120, 3, 0), new SlideConfig(320, 4, -1), 1, 2, 0.0, 0.019921875, false, false, false, false), arg2, arg3, 0, 0, 32, false, Optional.of(arg4));
         }
 
         private static ChunkGeneratorType createOverworldType(StructuresConfig arg, boolean bl, Preset arg2) {

@@ -18,6 +18,9 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
+import net.minecraft.block.StainedGlassPaneBlock;
+import net.minecraft.block.TransparentBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.font.TextRenderer;
@@ -44,6 +47,7 @@ import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -108,15 +112,21 @@ implements SynchronousResourceReloadListener {
         if (arg5.isBuiltin() || arg.getItem() == Items.TRIDENT && !bl2) {
             BuiltinModelItemRenderer.INSTANCE.render(arg, arg2, arg3, arg4, i, j);
         } else {
-            VertexConsumer lv3;
-            boolean bl32 = arg2 == ModelTransformation.Mode.GUI || arg2 == ModelTransformation.Mode.FIRST_PERSON_LEFT_HAND || arg2 == ModelTransformation.Mode.FIRST_PERSON_RIGHT_HAND || arg2 == ModelTransformation.Mode.FIXED;
-            RenderLayer lv = RenderLayers.getItemLayer(arg, bl32);
-            if (bl32) {
-                VertexConsumer lv2 = ItemRenderer.method_29711(arg4, lv, true, arg.hasEnchantmentGlint());
+            VertexConsumer lv4;
+            boolean bl4;
+            if (arg2 != ModelTransformation.Mode.GUI && !arg2.method_29998() && arg.getItem() instanceof BlockItem) {
+                Block lv = ((BlockItem)arg.getItem()).getBlock();
+                boolean bl32 = !(lv instanceof TransparentBlock) && !(lv instanceof StainedGlassPaneBlock);
             } else {
-                lv3 = ItemRenderer.getArmorVertexConsumer(arg4, lv, true, arg.hasEnchantmentGlint());
+                bl4 = true;
             }
-            this.renderBakedItemModel(arg5, arg, i, j, arg3, lv3);
+            RenderLayer lv2 = RenderLayers.getItemLayer(arg, bl4);
+            if (bl4) {
+                VertexConsumer lv3 = ItemRenderer.method_29711(arg4, lv2, true, arg.hasEnchantmentGlint());
+            } else {
+                lv4 = ItemRenderer.getArmorVertexConsumer(arg4, lv2, true, arg.hasEnchantmentGlint());
+            }
+            this.renderBakedItemModel(arg5, arg, i, j, arg3, lv4);
         }
         arg3.pop();
     }

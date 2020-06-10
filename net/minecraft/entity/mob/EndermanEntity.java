@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5398;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -50,6 +51,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
@@ -100,6 +102,7 @@ implements Angerable {
         this.targetSelector.add(2, new TeleportTowardsPlayerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, new Class[0]));
         this.targetSelector.add(4, new FollowTargetGoal<EndermiteEntity>(this, EndermiteEntity.class, 10, true, false, PLAYER_ENDERMITE_PREDICATE));
+        this.targetSelector.add(5, new class_5398<EndermanEntity>(this, false));
     }
 
     public static DefaultAttributeContainer.Builder createEndermanAttributes() {
@@ -192,7 +195,7 @@ implements Angerable {
             lv = null;
         }
         this.setCarriedBlock(lv);
-        this.angerFromTag(this.world, arg);
+        this.angerFromTag((ServerWorld)this.world, arg);
     }
 
     private boolean isPlayerStaring(PlayerEntity arg) {
@@ -224,7 +227,7 @@ implements Angerable {
         }
         this.jumping = false;
         if (!this.world.isClient) {
-            this.tickAngerLogic();
+            this.tickAngerLogic((ServerWorld)this.world, true);
         }
         super.tickMovement();
     }

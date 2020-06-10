@@ -158,7 +158,7 @@ extends FlowableFluid {
 
     @Override
     public int getTickRate(WorldView arg) {
-        return arg.getDimension().hasCeiling() ? 10 : 30;
+        return arg.getDimension().isUltrawarm() ? 10 : 30;
     }
 
     @Override

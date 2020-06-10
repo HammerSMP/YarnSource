@@ -56,7 +56,7 @@ public class StateManager<O, S extends State<O, S>> {
     protected StateManager(Function<O, S> function, O object, Factory<O, S> arg, Map<String, Property<?>> map) {
         this.owner = object;
         this.properties = ImmutableSortedMap.copyOf(map);
-        class_5306<State> mapCodec = new class_5306<State>((Map<String, Property<?>>)this.properties, () -> (State)function.apply(object));
+        PropertiesCodec<State> mapCodec = new PropertiesCodec<State>((Map<String, Property<?>>)this.properties, () -> (State)function.apply(object));
         LinkedHashMap map2 = Maps.newLinkedHashMap();
         ArrayList list3 = Lists.newArrayList();
         Stream<List<List<Object>>> stream = Stream.of(Collections.emptyList());
@@ -104,18 +104,18 @@ public class StateManager<O, S extends State<O, S>> {
         return (Property)this.properties.get((Object)string);
     }
 
-    static class class_5306<S extends State<?, S>>
+    static class PropertiesCodec<S extends State<?, S>>
     extends MapCodec<S> {
         private final Map<String, Property<?>> field_24735;
         private final Supplier<S> field_24736;
 
-        public class_5306(Map<String, Property<?>> map, Supplier<S> supplier) {
+        public PropertiesCodec(Map<String, Property<?>> map, Supplier<S> supplier) {
             this.field_24735 = map;
             this.field_24736 = supplier;
         }
 
         public <T> RecordBuilder<T> encode(S arg2, DynamicOps<T> dynamicOps, RecordBuilder<T> recordBuilder) {
-            ((State)arg2).getEntries().forEach((arg, comparable) -> recordBuilder.add(arg.getName(), dynamicOps.createString(class_5306.method_28487(arg, comparable))));
+            ((State)arg2).getEntries().forEach((arg, comparable) -> recordBuilder.add(arg.getName(), dynamicOps.createString(PropertiesCodec.method_28487(arg, comparable))));
             return recordBuilder;
         }
 

@@ -32,7 +32,7 @@ extends Feature<SingleStateFeatureConfig> {
     public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SingleStateFeatureConfig arg5) {
         boolean bl3;
         int l;
-        arg4 = new BlockPos(arg4.getX(), arg.getSeaLevel(), arg4.getZ());
+        arg4 = new BlockPos(arg4.getX(), arg3.getSeaLevel(), arg4.getZ());
         boolean bl = random.nextDouble() > 0.7;
         BlockState lv = arg5.state;
         double d = random.nextDouble() * 2.0 * Math.PI;

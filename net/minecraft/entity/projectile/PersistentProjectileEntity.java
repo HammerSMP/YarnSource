@@ -323,7 +323,7 @@ extends ProjectileEntity {
                 }
                 this.onHit(lv5);
                 if (lv2 != null && lv5 != lv2 && lv5 instanceof PlayerEntity && lv2 instanceof ServerPlayerEntity && !this.isSilent()) {
-                    ((ServerPlayerEntity)lv2).networkHandler.sendPacket(new GameStateChangeS2CPacket(6, 0.0f));
+                    ((ServerPlayerEntity)lv2).networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25651, 0.0f));
                 }
                 if (!lv.isAlive() && this.piercingKilledEntities != null) {
                     this.piercingKilledEntities.add(lv5);

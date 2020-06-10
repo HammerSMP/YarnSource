@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.FixedBiomeSource;
@@ -75,15 +76,20 @@ public abstract class GeneratorType {
     private static final GeneratorType SINGLE_BIOME_CAVES = new GeneratorType("single_biome_caves"){
 
         @Override
+        public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
+            return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_29962(DimensionType.method_28517(l), DimensionType::method_29953, this.method_29076(l)));
+        }
+
+        @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType());
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.CAVES.getChunkGeneratorType());
         }
     };
     private static final GeneratorType SINGLE_BIOME_FLOATING_ISLANDS = new GeneratorType("single_biome_floating_islands"){
 
         @Override
         protected ChunkGenerator method_29076(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.END.getChunkGeneratorType());
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.OCEAN), l, ChunkGeneratorType.Preset.FLOATING_ISLANDS.getChunkGeneratorType());
         }
     };
     private static final GeneratorType DEBUG_ALL_BLOCK_STATES = new GeneratorType("debug_all_block_states"){
@@ -94,7 +100,7 @@ public abstract class GeneratorType {
         }
     };
     protected static final List<GeneratorType> VALUES = Lists.newArrayList((Object[])new GeneratorType[]{DEFAULT, FLAT, LARGE_BIOMES, AMPLIFIED, SINGLE_BIOME_SURFACE, SINGLE_BIOME_CAVES, SINGLE_BIOME_FLOATING_ISLANDS, DEBUG_ALL_BLOCK_STATES});
-    protected static final Map<Optional<GeneratorType>, class_5293> field_25053 = ImmutableMap.of(Optional.of(FLAT), (arg, arg2) -> {
+    protected static final Map<Optional<GeneratorType>, ScreenProvider> field_25053 = ImmutableMap.of(Optional.of(FLAT), (arg, arg2) -> {
         ChunkGenerator lv = arg2.getChunkGenerator();
         return new CustomizeFlatLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(new GeneratorOptions(arg2.getSeed(), arg2.shouldGenerateStructures(), arg2.hasBonusChest(), GeneratorOptions.method_28608(arg2.getDimensionMap(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
     }, Optional.of(SINGLE_BIOME_SURFACE), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_SURFACE, arg3)), GeneratorType.method_29083(arg2)), Optional.of(SINGLE_BIOME_CAVES), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_CAVES, arg3)), GeneratorType.method_29083(arg2)), Optional.of(SINGLE_BIOME_FLOATING_ISLANDS), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_FLOATING_ISLANDS, arg3)), GeneratorType.method_29083(arg2)));
@@ -136,14 +142,14 @@ public abstract class GeneratorType {
         return this.translationKey;
     }
 
-    public GeneratorOptions method_29077(long l, boolean bl, boolean bl2) {
+    public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
         return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_28608(DimensionType.method_28517(l), this.method_29076(l)));
     }
 
     protected abstract ChunkGenerator method_29076(long var1);
 
     @Environment(value=EnvType.CLIENT)
-    public static interface class_5293 {
+    public static interface ScreenProvider {
         public Screen createEditScreen(CreateWorldScreen var1, GeneratorOptions var2);
     }
 }

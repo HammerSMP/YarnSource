@@ -164,7 +164,11 @@ public class TextHandler {
         return list;
     }
 
-    public List<StringRenderable> wrapLines(StringRenderable arg2, int i, Style arg22) {
+    public List<StringRenderable> wrapLines(StringRenderable arg, int i, Style arg2) {
+        return this.method_29971(arg, i, arg2, null);
+    }
+
+    public List<StringRenderable> method_29971(StringRenderable arg2, int i, Style arg22, @Nullable StringRenderable arg3) {
         ArrayList list = Lists.newArrayList();
         ArrayList list2 = Lists.newArrayList();
         arg2.visit((arg, string) -> {
@@ -176,32 +180,42 @@ public class TextHandler {
         LineWrappingCollector lv = new LineWrappingCollector(list2);
         boolean bl = true;
         boolean bl2 = false;
+        boolean bl3 = false;
         block0 : while (bl) {
             bl = false;
             LineBreakingVisitor lv2 = new LineBreakingVisitor(i);
             for (StyledString lv3 : lv.parts) {
-                boolean bl3 = TextVisitFactory.visitFormatted(lv3.literal, 0, lv3.style, arg22, lv2);
-                if (!bl3) {
+                boolean bl4 = TextVisitFactory.visitFormatted(lv3.literal, 0, lv3.style, arg22, lv2);
+                if (!bl4) {
                     int j = lv2.getEndingIndex();
                     Style lv4 = lv2.getEndingStyle();
                     char c = lv.charAt(j);
-                    boolean bl4 = c == '\n';
-                    boolean bl5 = bl4 || c == ' ';
-                    bl2 = bl4;
-                    list.add(lv.collectLine(j, bl5 ? 1 : 0, lv4));
+                    boolean bl5 = c == '\n';
+                    boolean bl6 = bl5 || c == ' ';
+                    bl2 = bl5;
+                    StringRenderable lv5 = lv.collectLine(j, bl6 ? 1 : 0, lv4);
+                    list.add(this.method_29972(lv5, bl3, arg3));
+                    bl3 = !bl5;
                     bl = true;
                     continue block0;
                 }
                 lv2.offset(lv3.literal.length());
             }
         }
-        StringRenderable lv5 = lv.collectRemainers();
-        if (lv5 != null) {
-            list.add(lv5);
+        StringRenderable lv6 = lv.collectRemainers();
+        if (lv6 != null) {
+            list.add(this.method_29972(lv6, bl3, arg3));
         } else if (bl2) {
             list.add(StringRenderable.EMPTY);
         }
         return list;
+    }
+
+    private StringRenderable method_29972(StringRenderable arg, boolean bl, StringRenderable arg2) {
+        if (bl && arg2 != null) {
+            return StringRenderable.concat(arg2, arg);
+        }
+        return arg;
     }
 
     @Environment(value=EnvType.CLIENT)

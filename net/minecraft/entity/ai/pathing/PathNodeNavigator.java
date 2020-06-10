@@ -2,12 +2,14 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
  */
 package net.minecraft.entity.ai.pathing;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
@@ -18,7 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.ai.pathing.PathMinHeap;
@@ -52,51 +53,51 @@ public class PathNodeNavigator {
     }
 
     @Nullable
-    private Path findPathToAny(PathNode arg3, Map<TargetPathNode, BlockPos> map, float f, int i, float g) {
-        Stream<Path> stream2;
+    private Path findPathToAny(PathNode arg2, Map<TargetPathNode, BlockPos> map, float f, int i, float g) {
+        Optional<Path> optional;
         Set<TargetPathNode> set = map.keySet();
-        arg3.penalizedPathLength = 0.0f;
-        arg3.heapWeight = arg3.distanceToNearestTarget = this.calculateDistances(arg3, set);
+        arg2.penalizedPathLength = 0.0f;
+        arg2.heapWeight = arg2.distanceToNearestTarget = this.calculateDistances(arg2, set);
         this.minHeap.clear();
-        this.minHeap.push(arg3);
-        HashSet set2 = Sets.newHashSet();
+        this.minHeap.push(arg2);
+        ImmutableSet set2 = ImmutableSet.of();
         int j = 0;
+        HashSet set3 = Sets.newHashSetWithExpectedSize((int)set.size());
         int k = (int)((float)this.range * g);
         while (!this.minHeap.isEmpty() && ++j < k) {
             PathNode lv = this.minHeap.pop();
             lv.visited = true;
-            set.stream().filter(arg2 -> lv.getManhattanDistance((PathNode)arg2) <= (float)i).forEach(TargetPathNode::markReached);
-            if (set.stream().anyMatch(TargetPathNode::isReached)) break;
-            if (lv.getDistance(arg3) >= f) continue;
+            for (TargetPathNode lv2 : set) {
+                if (!(lv.getManhattanDistance(lv2) <= (float)i)) continue;
+                lv2.markReached();
+                set3.add(lv2);
+            }
+            if (!set3.isEmpty()) break;
+            if (lv.getDistance(arg2) >= f) continue;
             int l = this.pathNodeMaker.getSuccessors(this.successors, lv);
             for (int m = 0; m < l; ++m) {
-                PathNode lv2 = this.successors[m];
-                float h = lv.getDistance(lv2);
-                lv2.pathLength = lv.pathLength + h;
-                float n = lv.penalizedPathLength + h + lv2.penalty;
-                if (!(lv2.pathLength < f) || lv2.isInHeap() && !(n < lv2.penalizedPathLength)) continue;
-                lv2.previous = lv;
-                lv2.penalizedPathLength = n;
-                lv2.distanceToNearestTarget = this.calculateDistances(lv2, set) * 1.5f;
-                if (lv2.isInHeap()) {
-                    this.minHeap.setNodeWeight(lv2, lv2.penalizedPathLength + lv2.distanceToNearestTarget);
+                PathNode lv3 = this.successors[m];
+                float h = lv.getDistance(lv3);
+                lv3.pathLength = lv.pathLength + h;
+                float n = lv.penalizedPathLength + h + lv3.penalty;
+                if (!(lv3.pathLength < f) || lv3.isInHeap() && !(n < lv3.penalizedPathLength)) continue;
+                lv3.previous = lv;
+                lv3.penalizedPathLength = n;
+                lv3.distanceToNearestTarget = this.calculateDistances(lv3, set) * 1.5f;
+                if (lv3.isInHeap()) {
+                    this.minHeap.setNodeWeight(lv3, lv3.penalizedPathLength + lv3.distanceToNearestTarget);
                     continue;
                 }
-                lv2.heapWeight = lv2.penalizedPathLength + lv2.distanceToNearestTarget;
-                this.minHeap.push(lv2);
+                lv3.heapWeight = lv3.penalizedPathLength + lv3.distanceToNearestTarget;
+                this.minHeap.push(lv3);
             }
         }
-        if (set.stream().anyMatch(TargetPathNode::isReached)) {
-            Stream<Path> stream = set.stream().filter(TargetPathNode::isReached).map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)map.get(arg), true)).sorted(Comparator.comparingInt(Path::getLength));
-        } else {
-            stream2 = set.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)map.get(arg), false)).sorted(Comparator.comparingDouble(Path::getManhattanDistanceFromTarget).thenComparingInt(Path::getLength));
-        }
-        Optional<Path> optional = stream2.findFirst();
+        Optional<Path> optional2 = optional = !set3.isEmpty() ? set3.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)map.get(arg), true)).min(Comparator.comparingInt(Path::getLength)) : set.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)map.get(arg), false)).min(Comparator.comparingDouble(Path::getManhattanDistanceFromTarget).thenComparingInt(Path::getLength));
         if (!optional.isPresent()) {
             return null;
         }
-        Path lv3 = optional.get();
-        return lv3;
+        Path lv4 = optional.get();
+        return lv4;
     }
 
     private float calculateDistances(PathNode arg, Set<TargetPathNode> set) {

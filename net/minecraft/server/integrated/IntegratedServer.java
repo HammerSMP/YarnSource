@@ -254,5 +254,10 @@ extends MinecraftServer {
     public int adjustTrackingDistance(int i) {
         return (int)(this.client.options.entityDistanceScaling * (float)i);
     }
+
+    @Override
+    public boolean syncChunkWrites() {
+        return this.client.options.field_25623;
+    }
 }
 

@@ -46,6 +46,7 @@ extends SectionDistanceLevelPropagator {
     protected final LongSet field_15802 = new LongOpenHashSet();
     protected final LongSet dirtySections = new LongOpenHashSet();
     protected final Long2ObjectMap<ChunkNibbleArray> lightArraysToAdd = Long2ObjectMaps.synchronize((Long2ObjectMap)new Long2ObjectOpenHashMap());
+    private final LongSet field_25621 = new LongOpenHashSet();
     private final LongSet field_19342 = new LongOpenHashSet();
     private final LongSet lightArraysToRemove = new LongOpenHashSet();
     protected volatile boolean hasLightUpdates;
@@ -234,61 +235,74 @@ extends SectionDistanceLevelPropagator {
             longIterator = this.lightArraysToAdd.keySet().iterator();
             while (longIterator.hasNext()) {
                 long o = (Long)longIterator.next();
-                if (!this.hasLight(o)) continue;
-                int i = ChunkSectionPos.getWorldCoord(ChunkSectionPos.getX(o));
-                int j = ChunkSectionPos.getWorldCoord(ChunkSectionPos.getY(o));
-                int k = ChunkSectionPos.getWorldCoord(ChunkSectionPos.getZ(o));
-                for (Direction lv4 : DIRECTIONS) {
-                    long p = ChunkSectionPos.offset(o, lv4);
-                    if (this.lightArraysToAdd.containsKey(p) || !this.hasLight(p)) continue;
-                    for (int q = 0; q < 16; ++q) {
-                        for (int r = 0; r < 16; ++r) {
-                            long ad;
-                            long ac;
-                            switch (lv4) {
-                                case DOWN: {
-                                    long s = BlockPos.asLong(i + r, j, k + q);
-                                    long t = BlockPos.asLong(i + r, j - 1, k + q);
-                                    break;
-                                }
-                                case UP: {
-                                    long u = BlockPos.asLong(i + r, j + 16 - 1, k + q);
-                                    long v = BlockPos.asLong(i + r, j + 16, k + q);
-                                    break;
-                                }
-                                case NORTH: {
-                                    long w = BlockPos.asLong(i + q, j + r, k);
-                                    long x = BlockPos.asLong(i + q, j + r, k - 1);
-                                    break;
-                                }
-                                case SOUTH: {
-                                    long y = BlockPos.asLong(i + q, j + r, k + 16 - 1);
-                                    long z = BlockPos.asLong(i + q, j + r, k + 16);
-                                    break;
-                                }
-                                case WEST: {
-                                    long aa = BlockPos.asLong(i, j + q, k + r);
-                                    long ab = BlockPos.asLong(i - 1, j + q, k + r);
-                                    break;
-                                }
-                                default: {
-                                    ac = BlockPos.asLong(i + 16 - 1, j + q, k + r);
-                                    ad = BlockPos.asLong(i + 16, j + q, k + r);
-                                }
-                            }
-                            arg.updateLevel(ac, ad, arg.getPropagatedLevel(ac, ad, arg.getLevel(ac)), false);
-                            arg.updateLevel(ad, ac, arg.getPropagatedLevel(ad, ac, arg.getLevel(ad)), false);
-                        }
-                    }
-                }
+                this.method_29967(arg, o);
+            }
+        } else {
+            longIterator = this.field_25621.iterator();
+            while (longIterator.hasNext()) {
+                long p = (Long)longIterator.next();
+                this.method_29967(arg, p);
             }
         }
+        this.field_25621.clear();
         ObjectIterator objectIterator = this.lightArraysToAdd.long2ObjectEntrySet().iterator();
         while (objectIterator.hasNext()) {
             Long2ObjectMap.Entry entry2 = (Long2ObjectMap.Entry)objectIterator.next();
-            long ae = entry2.getLongKey();
-            if (!this.hasLight(ae)) continue;
+            long q = entry2.getLongKey();
+            if (!this.hasLight(q)) continue;
             objectIterator.remove();
+        }
+    }
+
+    private void method_29967(ChunkLightProvider<M, ?> arg, long l) {
+        if (!this.hasLight(l)) {
+            return;
+        }
+        int i = ChunkSectionPos.getWorldCoord(ChunkSectionPos.getX(l));
+        int j = ChunkSectionPos.getWorldCoord(ChunkSectionPos.getY(l));
+        int k = ChunkSectionPos.getWorldCoord(ChunkSectionPos.getZ(l));
+        for (Direction lv : DIRECTIONS) {
+            long m = ChunkSectionPos.offset(l, lv);
+            if (this.lightArraysToAdd.containsKey(m) || !this.hasLight(m)) continue;
+            for (int n = 0; n < 16; ++n) {
+                for (int o = 0; o < 16; ++o) {
+                    long aa;
+                    long z;
+                    switch (lv) {
+                        case DOWN: {
+                            long p = BlockPos.asLong(i + o, j, k + n);
+                            long q = BlockPos.asLong(i + o, j - 1, k + n);
+                            break;
+                        }
+                        case UP: {
+                            long r = BlockPos.asLong(i + o, j + 16 - 1, k + n);
+                            long s = BlockPos.asLong(i + o, j + 16, k + n);
+                            break;
+                        }
+                        case NORTH: {
+                            long t = BlockPos.asLong(i + n, j + o, k);
+                            long u = BlockPos.asLong(i + n, j + o, k - 1);
+                            break;
+                        }
+                        case SOUTH: {
+                            long v = BlockPos.asLong(i + n, j + o, k + 16 - 1);
+                            long w = BlockPos.asLong(i + n, j + o, k + 16);
+                            break;
+                        }
+                        case WEST: {
+                            long x = BlockPos.asLong(i, j + n, k + o);
+                            long y = BlockPos.asLong(i - 1, j + n, k + o);
+                            break;
+                        }
+                        default: {
+                            z = BlockPos.asLong(i + 16 - 1, j + n, k + o);
+                            aa = BlockPos.asLong(i + 16, j + n, k + o);
+                        }
+                    }
+                    arg.updateLevel(z, aa, arg.getPropagatedLevel(z, aa, arg.getLevel(z)), false);
+                    arg.updateLevel(aa, z, arg.getPropagatedLevel(aa, z, arg.getLevel(aa)), false);
+                }
+            }
         }
     }
 
@@ -309,9 +323,12 @@ extends SectionDistanceLevelPropagator {
         }
     }
 
-    protected void setLightArray(long l, @Nullable ChunkNibbleArray arg) {
+    protected void setLightArray(long l, @Nullable ChunkNibbleArray arg, boolean bl) {
         if (arg != null) {
             this.lightArraysToAdd.put(l, (Object)arg);
+            if (!bl) {
+                this.field_25621.add(l);
+            }
         } else {
             this.lightArraysToAdd.remove(l);
         }

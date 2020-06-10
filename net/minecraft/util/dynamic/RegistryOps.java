@@ -6,10 +6,10 @@
  *  com.google.common.base.Suppliers
  *  com.google.common.collect.Maps
  *  com.mojang.datafixers.util.Pair
- *  com.mojang.serialization.Codec
  *  com.mojang.serialization.DataResult
  *  com.mojang.serialization.DynamicOps
  *  com.mojang.serialization.Lifecycle
+ *  com.mojang.serialization.MapCodec
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
@@ -19,16 +19,17 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Lifecycle;
+import com.mojang.serialization.MapCodec;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.ForwardingDynamicOps;
+import net.minecraft.util.dynamic.NumberCodecs;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -54,21 +55,26 @@ extends ForwardingDynamicOps<T> {
         this.registryTracker = arg2;
     }
 
-    protected <E> DataResult<Pair<java.util.function.Supplier<E>, T>> decodeOrId(T object, RegistryKey<Registry<E>> arg, Codec<E> codec) {
-        DataResult dataResult = Identifier.CODEC.decode(this.delegate, object);
-        if (!dataResult.result().isPresent()) {
-            return codec.decode(this.delegate, object).map(pair -> pair.mapFirst(object -> () -> object));
-        }
+    protected <E> DataResult<Pair<java.util.function.Supplier<E>, T>> decodeOrId(T object, RegistryKey<Registry<E>> arg, MapCodec<E> mapCodec) {
         Optional<MutableRegistry<E>> optional = this.registryTracker.get(arg);
         if (!optional.isPresent()) {
             return DataResult.error((String)("Unknown registry: " + arg));
         }
-        Pair pair2 = (Pair)dataResult.result().get();
-        Identifier lv = (Identifier)pair2.getFirst();
-        return this.readSupplier(arg, optional.get(), codec, lv).map(supplier -> Pair.of((Object)supplier, (Object)pair2.getSecond()));
+        MutableRegistry lv = optional.get();
+        DataResult dataResult = Identifier.CODEC.decode(this.delegate, object);
+        if (!dataResult.result().isPresent()) {
+            return NumberCodecs.method_29906(arg, mapCodec).codec().decode(this.delegate, object).map(pair2 -> pair2.mapFirst(pair -> {
+                lv.add((RegistryKey)pair.getFirst(), pair.getSecond());
+                lv.markLoaded((RegistryKey)pair.getFirst());
+                return ((Pair)pair)::getSecond;
+            }));
+        }
+        Pair pair = (Pair)dataResult.result().get();
+        Identifier lv2 = (Identifier)pair.getFirst();
+        return this.readSupplier(arg, lv, mapCodec, lv2).map(supplier -> Pair.of((Object)supplier, (Object)pair.getSecond()));
     }
 
-    public <E> DataResult<SimpleRegistry<E>> loadToRegistry(SimpleRegistry<E> arg, RegistryKey<Registry<E>> arg2, Codec<E> codec) {
+    public <E> DataResult<SimpleRegistry<E>> loadToRegistry(SimpleRegistry<E> arg, RegistryKey<Registry<E>> arg2, MapCodec<E> mapCodec) {
         Identifier lv = arg2.getValue();
         Collection<Identifier> collection = this.resourceManager.findResources(lv, string -> string.endsWith(".json"));
         DataResult dataResult = DataResult.success(arg, (Lifecycle)Lifecycle.stable());
@@ -91,12 +97,12 @@ extends ForwardingDynamicOps<T> {
             String string3 = string22.substring(0, i);
             String string4 = string22.substring(i + 1);
             Identifier lv3 = new Identifier(string3, string4);
-            dataResult = dataResult.flatMap(arg3 -> this.readSupplier(arg2, (MutableRegistry)arg3, codec, lv3).map(supplier -> arg3));
+            dataResult = dataResult.flatMap(arg3 -> this.readSupplier(arg2, (MutableRegistry)arg3, mapCodec, lv3).map(supplier -> arg3));
         }
         return dataResult.setPartial(arg);
     }
 
-    private <E> DataResult<java.util.function.Supplier<E>> readSupplier(RegistryKey<Registry<E>> arg, MutableRegistry<E> arg2, Codec<E> codec, Identifier arg3) {
+    private <E> DataResult<java.util.function.Supplier<E>> readSupplier(RegistryKey<Registry<E>> arg, MutableRegistry<E> arg2, MapCodec<E> mapCodec, Identifier arg3) {
         RegistryKey lv = RegistryKey.of(arg, arg3);
         Object object2 = arg2.get(lv);
         if (object2 != null) {
@@ -115,7 +121,7 @@ extends ForwardingDynamicOps<T> {
             return object;
         });
         ((ValueHolder)lv2).values.put(lv, DataResult.success((Object)supplier));
-        DataResult<E> dataResult2 = this.readElement(arg, lv, codec);
+        DataResult<E> dataResult2 = this.readElement(arg, lv, mapCodec);
         dataResult2.result().ifPresent(object -> arg2.add(lv, object));
         DataResult dataResult3 = dataResult2.map(object -> () -> object);
         ((ValueHolder)lv2).values.put(lv, dataResult3);
@@ -125,7 +131,7 @@ extends ForwardingDynamicOps<T> {
     /*
      * Exception decompiling
      */
-    private <E> DataResult<E> readElement(RegistryKey<Registry<E>> arg, RegistryKey<E> arg2, Codec<E> codec) {
+    private <E> DataResult<E> readElement(RegistryKey<Registry<E>> arg, RegistryKey<E> arg2, MapCodec<E> mapCodec) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [1[TRYBLOCK]], but top level block is 5[TRYBLOCK]

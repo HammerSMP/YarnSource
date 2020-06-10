@@ -386,6 +386,12 @@ extends AnimalEntity {
     }
 
     @Override
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_29919() {
+        return new Vec3d(0.0, 0.6f * this.getStandingEyeHeight(), this.getWidth() * 0.4f);
+    }
+
+    @Override
     public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
         return this.createChild(arg);
     }

@@ -43,6 +43,7 @@ import java.util.OptionalLong;
 import java.util.Properties;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.JsonHelper;
@@ -118,17 +119,21 @@ public class GeneratorOptions {
     }
 
     public static SimpleRegistry<DimensionOptions> method_28608(SimpleRegistry<DimensionOptions> arg, ChunkGenerator arg2) {
+        DimensionOptions lv = arg.get(DimensionOptions.OVERWORLD);
+        Supplier<DimensionType> supplier = () -> lv == null ? DimensionType.getOverworldDimensionType() : lv.getDimensionType();
+        return GeneratorOptions.method_29962(arg, supplier, arg2);
+    }
+
+    public static SimpleRegistry<DimensionOptions> method_29962(SimpleRegistry<DimensionOptions> arg, Supplier<DimensionType> supplier, ChunkGenerator arg2) {
         SimpleRegistry<DimensionOptions> lv = new SimpleRegistry<DimensionOptions>(Registry.DIMENSION_OPTIONS, Lifecycle.experimental());
-        DimensionOptions lv2 = arg.get(DimensionOptions.OVERWORLD);
-        DimensionType lv3 = lv2 == null ? DimensionType.getOverworldDimensionType() : lv2.getDimensionType();
-        lv.add(DimensionOptions.OVERWORLD, new DimensionOptions(() -> lv3, arg2));
+        lv.add(DimensionOptions.OVERWORLD, new DimensionOptions(supplier, arg2));
         lv.markLoaded(DimensionOptions.OVERWORLD);
         for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : arg.getEntries()) {
-            RegistryKey<DimensionOptions> lv4 = entry.getKey();
-            if (lv4 == DimensionOptions.OVERWORLD) continue;
-            lv.add(lv4, entry.getValue());
-            if (!arg.isLoaded(lv4)) continue;
-            lv.markLoaded(lv4);
+            RegistryKey<DimensionOptions> lv2 = entry.getKey();
+            if (lv2 == DimensionOptions.OVERWORLD) continue;
+            lv.add(lv2, entry.getValue());
+            if (!arg.isLoaded(lv2)) continue;
+            lv.markLoaded(lv2);
         }
         return lv;
     }

@@ -40,9 +40,9 @@ public interface ResourceManager {
     public Collection<Identifier> findResources(String var1, Predicate<String> var2);
 
     @Environment(value=EnvType.CLIENT)
-    public Stream<ResourcePack> method_29213();
+    public Stream<ResourcePack> streamResourcePacks();
 
-    public static enum class_5353 implements ResourceManager
+    public static enum Empty implements ResourceManager
     {
         INSTANCE;
 
@@ -81,7 +81,7 @@ public interface ResourceManager {
 
         @Override
         @Environment(value=EnvType.CLIENT)
-        public Stream<ResourcePack> method_29213() {
+        public Stream<ResourcePack> streamResourcePacks() {
             return Stream.of(new ResourcePack[0]);
         }
     }

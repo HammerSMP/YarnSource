@@ -309,7 +309,7 @@ extends DrawableHelper {
     }
 
     private World getWorld() {
-        return (World)DataFixUtils.orElse(Optional.ofNullable(this.client.getServer()).map(arg -> arg.getWorld(this.client.world.getRegistryKey())), (Object)this.client.world);
+        return (World)DataFixUtils.orElse(Optional.ofNullable(this.client.getServer()).flatMap(arg -> Optional.ofNullable(arg.getWorld(this.client.world.getRegistryKey()))), (Object)this.client.world);
     }
 
     @Nullable

@@ -504,6 +504,10 @@ implements ScreenHandlerProvider<T> {
 
     protected boolean handleHotbarKeyPressed(int i, int j) {
         if (this.client.player.inventory.getCursorStack().isEmpty() && this.focusedSlot != null) {
+            if (this.client.options.keySwapHands.matchesKey(i, j)) {
+                this.onMouseClick(this.focusedSlot, this.focusedSlot.id, 40, SlotActionType.SWAP);
+                return true;
+            }
             for (int k = 0; k < 9; ++k) {
                 if (!this.client.options.keysHotbar[k].matchesKey(i, j)) continue;
                 this.onMouseClick(this.focusedSlot, this.focusedSlot.id, k, SlotActionType.SWAP);

@@ -298,7 +298,7 @@ public abstract class ScreenHandler {
                     lv11.markDirty();
                 }
             }
-        } else if (arg == SlotActionType.SWAP && j >= 0 && j < 9) {
+        } else if (arg == SlotActionType.SWAP) {
             Slot lv14 = this.slots.get(i);
             ItemStack lv15 = lv2.getStack(j);
             ItemStack lv16 = lv14.getStack();

@@ -184,6 +184,7 @@ implements ScreenHandlerListener {
     private Vec3d enteredNetherPos;
     private ChunkSectionPos cameraPosition = ChunkSectionPos.from(0, 0, 0);
     private RegistryKey<World> spawnPointDimension = World.OVERWORLD;
+    @Nullable
     private BlockPos spawnPointPosition;
     private boolean spawnPointSet;
     private int screenHandlerSyncId;
@@ -222,7 +223,7 @@ implements ScreenHandlerListener {
                 int q = (o + n * p) % k;
                 int r = q % (i * 2 + 1);
                 int s = q / (i * 2 + 1);
-                BlockPos lv2 = SpawnLocating.findPlayerSpawn(arg, lv, i, r, s);
+                BlockPos lv2 = SpawnLocating.findOverworldSpawn(arg, lv.getX() + r - i, lv.getZ() + s - i, false);
                 if (lv2 == null) continue;
                 this.refreshPositionAndAngles(lv2, 0.0f, 0.0f);
                 if (!arg.doesNotCollide(this)) {
@@ -578,89 +579,88 @@ implements ScreenHandlerListener {
 
     @Override
     @Nullable
-    public Entity changeDimension(RegistryKey<World> arg) {
+    public Entity changeDimension(ServerWorld arg) {
         float h;
         this.inTeleportationState = true;
-        RegistryKey<World> lv = this.world.getRegistryKey();
-        if (lv == World.END && arg == World.OVERWORLD) {
+        ServerWorld lv = this.getServerWorld();
+        RegistryKey<World> lv2 = lv.getRegistryKey();
+        if (lv2 == World.END && arg.getRegistryKey() == World.OVERWORLD) {
             this.detach();
             this.getServerWorld().removePlayer(this);
             if (!this.notInAnyWorld) {
                 this.notInAnyWorld = true;
-                this.networkHandler.sendPacket(new GameStateChangeS2CPacket(4, this.seenCredits ? 0.0f : 1.0f));
+                this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25649, this.seenCredits ? 0.0f : 1.0f));
                 this.seenCredits = true;
             }
             return this;
         }
-        ServerWorld lv2 = this.server.getWorld(lv);
-        ServerWorld lv3 = this.server.getWorld(arg);
-        WorldProperties lv4 = lv3.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv3.getDimensionRegistryKey(), arg, BiomeAccess.hashSeed(lv3.getSeed()), this.interactionManager.getGameMode(), lv3.isDebugWorld(), lv3.method_28125(), true));
-        this.networkHandler.sendPacket(new DifficultyS2CPacket(lv4.getDifficulty(), lv4.isDifficultyLocked()));
-        PlayerManager lv5 = this.server.getPlayerManager();
-        lv5.sendCommandTree(this);
-        lv2.removePlayer(this);
+        WorldProperties lv3 = arg.getLevelProperties();
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.isDebugWorld(), arg.method_28125(), true));
+        this.networkHandler.sendPacket(new DifficultyS2CPacket(lv3.getDifficulty(), lv3.isDifficultyLocked()));
+        PlayerManager lv4 = this.server.getPlayerManager();
+        lv4.sendCommandTree(this);
+        lv.removePlayer(this);
         this.removed = false;
         double d = this.getX();
         double e = this.getY();
         double f = this.getZ();
         float g = this.pitch;
         float i = h = this.yaw;
-        lv2.getProfiler().push("moving");
-        if (lv == World.OVERWORLD && arg == World.END) {
-            BlockPos lv6 = ServerWorld.field_25144;
-            d = lv6.getX();
-            e = lv6.getY();
-            f = lv6.getZ();
+        lv.getProfiler().push("moving");
+        if (arg.getRegistryKey() == World.END) {
+            BlockPos lv5 = ServerWorld.field_25144;
+            d = lv5.getX();
+            e = lv5.getY();
+            f = lv5.getZ();
             h = 90.0f;
             g = 0.0f;
         } else {
-            if (lv == World.OVERWORLD && arg == World.NETHER) {
+            if (lv2 == World.OVERWORLD && arg.getRegistryKey() == World.NETHER) {
                 this.enteredNetherPos = this.getPos();
             }
-            DimensionType lv7 = lv2.getDimension();
-            DimensionType lv8 = lv3.getDimension();
+            DimensionType lv6 = lv.getDimension();
+            DimensionType lv7 = arg.getDimension();
             double j = 8.0;
-            if (!lv7.isShrunk() && lv8.isShrunk()) {
+            if (!lv6.isShrunk() && lv7.isShrunk()) {
                 d /= 8.0;
                 f /= 8.0;
-            } else if (lv7.isShrunk() && !lv8.isShrunk()) {
+            } else if (lv6.isShrunk() && !lv7.isShrunk()) {
                 d *= 8.0;
                 f *= 8.0;
             }
         }
         this.refreshPositionAndAngles(d, e, f, h, g);
-        lv2.getProfiler().pop();
-        lv2.getProfiler().push("placing");
-        double k = Math.min(-2.9999872E7, lv3.getWorldBorder().getBoundWest() + 16.0);
-        double l = Math.min(-2.9999872E7, lv3.getWorldBorder().getBoundNorth() + 16.0);
-        double m = Math.min(2.9999872E7, lv3.getWorldBorder().getBoundEast() - 16.0);
-        double n = Math.min(2.9999872E7, lv3.getWorldBorder().getBoundSouth() - 16.0);
+        lv.getProfiler().pop();
+        lv.getProfiler().push("placing");
+        double k = Math.min(-2.9999872E7, arg.getWorldBorder().getBoundWest() + 16.0);
+        double l = Math.min(-2.9999872E7, arg.getWorldBorder().getBoundNorth() + 16.0);
+        double m = Math.min(2.9999872E7, arg.getWorldBorder().getBoundEast() - 16.0);
+        double n = Math.min(2.9999872E7, arg.getWorldBorder().getBoundSouth() - 16.0);
         d = MathHelper.clamp(d, k, m);
         f = MathHelper.clamp(f, l, n);
         this.refreshPositionAndAngles(d, e, f, h, g);
-        if (arg == World.END) {
+        if (arg.getRegistryKey() == World.END) {
             int o = MathHelper.floor(this.getX());
             int p = MathHelper.floor(this.getY()) - 1;
             int q = MathHelper.floor(this.getZ());
-            ServerWorld.method_29200(lv3);
+            ServerWorld.method_29200(arg);
             this.refreshPositionAndAngles(o, p, q, h, 0.0f);
             this.setVelocity(Vec3d.ZERO);
-        } else if (!lv3.getPortalForcer().usePortal(this, i)) {
-            lv3.getPortalForcer().createPortal(this);
-            lv3.getPortalForcer().usePortal(this, i);
+        } else if (!arg.getPortalForcer().usePortal(this, i)) {
+            arg.getPortalForcer().createPortal(this);
+            arg.getPortalForcer().usePortal(this, i);
         }
-        lv2.getProfiler().pop();
-        this.setWorld(lv3);
-        lv3.onPlayerChangeDimension(this);
-        this.dimensionChanged(lv2);
+        lv.getProfiler().pop();
+        this.setWorld(arg);
+        arg.onPlayerChangeDimension(this);
+        this.dimensionChanged(lv);
         this.networkHandler.requestTeleport(this.getX(), this.getY(), this.getZ(), h, g);
-        this.interactionManager.setWorld(lv3);
+        this.interactionManager.setWorld(arg);
         this.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(this.abilities));
-        lv5.sendWorldInfo(this, lv3);
-        lv5.sendPlayerStatus(this);
-        for (StatusEffectInstance lv9 : this.getStatusEffects()) {
-            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv9));
+        lv4.sendWorldInfo(this, arg);
+        lv4.sendPlayerStatus(this);
+        for (StatusEffectInstance lv8 : this.getStatusEffects()) {
+            this.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(this.getEntityId(), lv8));
         }
         this.networkHandler.sendPacket(new WorldEventS2CPacket(1032, BlockPos.ORIGIN, 0, false));
         this.syncedExperience = -1;
@@ -670,15 +670,13 @@ implements ScreenHandlerListener {
     }
 
     private void dimensionChanged(ServerWorld arg) {
-        DimensionType lv = arg.getDimension();
-        DimensionType lv2 = this.world.getDimension();
-        RegistryKey<World> lv3 = arg.getRegistryKey();
-        RegistryKey<World> lv4 = this.world.getRegistryKey();
-        Criteria.CHANGED_DIMENSION.trigger(this, lv3, lv4);
-        if (lv.isNether() && lv2.isOverworld() && this.enteredNetherPos != null) {
+        RegistryKey<World> lv = arg.getRegistryKey();
+        RegistryKey<World> lv2 = this.world.getRegistryKey();
+        Criteria.CHANGED_DIMENSION.trigger(this, lv, lv2);
+        if (lv == World.NETHER && lv2 == World.OVERWORLD && this.enteredNetherPos != null) {
             Criteria.NETHER_TRAVEL.trigger(this, this.enteredNetherPos);
         }
-        if (lv4 != World.NETHER) {
+        if (lv2 != World.NETHER) {
             this.enteredNetherPos = null;
         }
     }
@@ -1122,7 +1120,7 @@ implements ScreenHandlerListener {
     @Override
     public void setGameMode(GameMode arg) {
         this.interactionManager.setGameMode(arg);
-        this.networkHandler.sendPacket(new GameStateChangeS2CPacket(3, arg.getId()));
+        this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25648, arg.getId()));
         if (arg == GameMode.SPECTATOR) {
             this.dropShoulderEntities();
             this.stopRiding();
@@ -1313,7 +1311,7 @@ implements ScreenHandlerListener {
         return this.spawnPointSet;
     }
 
-    public void setSpawnPoint(RegistryKey<World> arg, BlockPos arg2, boolean bl, boolean bl2) {
+    public void setSpawnPoint(RegistryKey<World> arg, @Nullable BlockPos arg2, boolean bl, boolean bl2) {
         if (arg2 != null) {
             boolean bl3;
             boolean bl4 = bl3 = arg2.equals(this.spawnPointPosition) && arg.equals(this.spawnPointDimension);

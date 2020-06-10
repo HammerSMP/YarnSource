@@ -64,7 +64,7 @@ public class AnvilLevelStorage {
         int i = list.size() + list2.size() + list3.size();
         LOGGER.info("Total conversion count is {}", (Object)i);
         RegistryTracker.Modifiable lv = RegistryTracker.create();
-        RegistryOps<Tag> lv2 = RegistryOps.of(NbtOps.INSTANCE, ResourceManager.class_5353.INSTANCE, lv);
+        RegistryOps<Tag> lv2 = RegistryOps.of(NbtOps.INSTANCE, ResourceManager.Empty.INSTANCE, lv);
         SaveProperties lv3 = arg.readLevelProperties(lv2, DataPackSettings.SAFE_MODE);
         long l2 = l = lv3 != null ? lv3.getGeneratorOptions().getSeed() : 0L;
         if (lv3 != null && lv3.getGeneratorOptions().isFlatWorld()) {

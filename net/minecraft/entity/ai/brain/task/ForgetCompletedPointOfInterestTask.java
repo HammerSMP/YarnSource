@@ -46,7 +46,7 @@ extends Task<LivingEntity> {
         GlobalPos lv2 = lv.getOptionalMemory(this.memoryModule).get();
         BlockPos lv3 = lv2.getPos();
         ServerWorld lv4 = arg.getServer().getWorld(lv2.getDimension());
-        if (this.hasCompletedPointOfInterest(lv4, lv3)) {
+        if (lv4 == null || this.hasCompletedPointOfInterest(lv4, lv3)) {
             lv.forget(this.memoryModule);
         } else if (this.isBedOccupiedByOthers(lv4, lv3, arg2)) {
             lv.forget(this.memoryModule);

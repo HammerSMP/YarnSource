@@ -121,13 +121,13 @@ implements LightingView {
         return "n/a";
     }
 
-    public void queueData(LightType arg, ChunkSectionPos arg2, @Nullable ChunkNibbleArray arg3) {
+    public void queueData(LightType arg, ChunkSectionPos arg2, @Nullable ChunkNibbleArray arg3, boolean bl) {
         if (arg == LightType.BLOCK) {
             if (this.blockLightProvider != null) {
-                this.blockLightProvider.setLightArray(arg2.asLong(), arg3);
+                this.blockLightProvider.setLightArray(arg2.asLong(), arg3, bl);
             }
         } else if (this.skyLightProvider != null) {
-            this.skyLightProvider.setLightArray(arg2.asLong(), arg3);
+            this.skyLightProvider.setLightArray(arg2.asLong(), arg3, bl);
         }
     }
 

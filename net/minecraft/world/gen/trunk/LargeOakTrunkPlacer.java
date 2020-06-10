@@ -50,7 +50,9 @@ extends TrunkPlacer {
         int j = 5;
         int k = i + 2;
         int l = MathHelper.floor((double)k * 0.618);
-        LargeOakTrunkPlacer.method_27400(arg, arg2.down());
+        if (!arg4.skipFluidCheck) {
+            LargeOakTrunkPlacer.method_27400(arg, arg2.down());
+        }
         double d = 1.0;
         int m = Math.min(1, MathHelper.floor(1.382 + Math.pow(1.0 * (double)k / 13.0, 2.0)));
         int n = arg2.getY() + l;

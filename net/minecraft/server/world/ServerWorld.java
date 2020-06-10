@@ -205,7 +205,7 @@ implements ServerWorldAccess {
         this.server = minecraftServer;
         this.field_25141 = list;
         this.field_24456 = arg22;
-        this.serverChunkManager = new ServerChunkManager(this, arg2, minecraftServer.getDataFixer(), minecraftServer.getStructureManager(), executor, arg7, minecraftServer.getPlayerManager().getViewDistance(), minecraftServer.syncChunkWrites(), arg6, () -> minecraftServer.getWorld(World.OVERWORLD).getPersistentStateManager());
+        this.serverChunkManager = new ServerChunkManager(this, arg2, minecraftServer.getDataFixer(), minecraftServer.getStructureManager(), executor, arg7, minecraftServer.getPlayerManager().getViewDistance(), minecraftServer.syncChunkWrites(), arg6, () -> minecraftServer.method_30002().getPersistentStateManager());
         this.portalForcer = new PortalForcer(this);
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
@@ -286,19 +286,19 @@ implements ServerWorldAccess {
             this.rainGradient = MathHelper.clamp(this.rainGradient, 0.0f, 1.0f);
         }
         if (this.rainGradientPrev != this.rainGradient) {
-            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(7, this.rainGradient), this.getRegistryKey());
+            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25652, this.rainGradient), this.getRegistryKey());
         }
         if (this.thunderGradientPrev != this.thunderGradient) {
-            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(8, this.thunderGradient), this.getRegistryKey());
+            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25653, this.thunderGradient), this.getRegistryKey());
         }
         if (bl != this.isRaining()) {
             if (bl) {
-                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(2, 0.0f));
+                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25647, 0.0f));
             } else {
-                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(1, 0.0f));
+                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25646, 0.0f));
             }
-            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(7, this.rainGradient));
-            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(8, this.thunderGradient));
+            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25652, this.rainGradient));
+            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25653, this.thunderGradient));
         }
         if (this.allPlayersSleeping && this.players.stream().noneMatch(arg -> !arg.isSpectator() && !arg.isSleepingLongEnough())) {
             this.allPlayersSleeping = false;
@@ -1013,17 +1013,17 @@ implements ServerWorldAccess {
     @Override
     @Nullable
     public MapState getMapState(String string) {
-        return this.getServer().getWorld(World.OVERWORLD).getPersistentStateManager().get(() -> new MapState(string), string);
+        return this.getServer().method_30002().getPersistentStateManager().get(() -> new MapState(string), string);
     }
 
     @Override
     public void putMapState(MapState arg) {
-        this.getServer().getWorld(World.OVERWORLD).getPersistentStateManager().set(arg);
+        this.getServer().method_30002().getPersistentStateManager().set(arg);
     }
 
     @Override
     public int getNextMapId() {
-        return this.getServer().getWorld(World.OVERWORLD).getPersistentStateManager().getOrCreate(IdCountsState::new, "idcounts").getNextMapId();
+        return this.getServer().method_30002().getPersistentStateManager().getOrCreate(IdCountsState::new, "idcounts").getNextMapId();
     }
 
     public void setSpawnPos(BlockPos arg) {

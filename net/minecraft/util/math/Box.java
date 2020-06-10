@@ -52,6 +52,10 @@ public class Box {
         return new Box(arg.minX, arg.minY, arg.minZ, arg.maxX + 1, arg.maxY + 1, arg.maxZ + 1);
     }
 
+    public static Box method_29968(Vec3d arg) {
+        return new Box(arg.x, arg.y, arg.z, arg.x + 1.0, arg.y + 1.0, arg.z + 1.0);
+    }
+
     public double getMin(Direction.Axis arg) {
         return arg.choose(this.minX, this.minY, this.minZ);
     }

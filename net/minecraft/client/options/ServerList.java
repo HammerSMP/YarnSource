@@ -20,6 +20,7 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,7 +60,11 @@ public class ServerList {
             }
             CompoundTag lv3 = new CompoundTag();
             lv3.put("servers", lv);
-            NbtIo.safeWrite(lv3, new File(this.client.runDirectory, "servers.dat"));
+            File file = File.createTempFile("servers", ".dat", this.client.runDirectory);
+            NbtIo.write(lv3, file);
+            File file2 = new File(this.client.runDirectory, "servers.dat_old");
+            File file3 = new File(this.client.runDirectory, "servers.dat");
+            Util.method_27760(file3, file, file2);
         }
         catch (Exception exception) {
             LOGGER.error("Couldn't save server list", (Throwable)exception);

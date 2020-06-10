@@ -2,12 +2,14 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Iterators
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  */
 package net.minecraft.util.collection;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -70,6 +72,10 @@ extends AbstractCollection<T> {
             return Collections.emptyIterator();
         }
         return Iterators.unmodifiableIterator(this.allElements.iterator());
+    }
+
+    public List<T> method_29903() {
+        return ImmutableList.copyOf(this.allElements);
     }
 
     @Override

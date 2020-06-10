@@ -34,12 +34,16 @@ public abstract class SkyProperties {
     private final float[] rgba = new float[4];
     private final float cloudsHeight;
     private final boolean alternateSkyColor;
+    private final class_5401 field_25637;
     private final boolean shouldRenderSky;
+    private final boolean field_25638;
 
-    public SkyProperties(float f, boolean bl, boolean bl2) {
+    public SkyProperties(float f, boolean bl, class_5401 arg, boolean bl2, boolean bl3) {
         this.cloudsHeight = f;
         this.alternateSkyColor = bl;
+        this.field_25637 = arg;
         this.shouldRenderSky = bl2;
+        this.field_25638 = bl3;
     }
 
     public static SkyProperties byDimensionType(Optional<RegistryKey<DimensionType>> optional) {
@@ -76,15 +80,23 @@ public abstract class SkyProperties {
 
     public abstract boolean useThickFog(int var1, int var2);
 
+    public class_5401 method_29992() {
+        return this.field_25637;
+    }
+
     public boolean shouldRenderSky() {
         return this.shouldRenderSky;
+    }
+
+    public boolean method_29993() {
+        return this.field_25638;
     }
 
     @Environment(value=EnvType.CLIENT)
     public static class End
     extends SkyProperties {
         public End() {
-            super(Float.NaN, false, false);
+            super(Float.NaN, false, class_5401.END, true, false);
         }
 
         @Override
@@ -108,7 +120,7 @@ public abstract class SkyProperties {
     public static class Overworld
     extends SkyProperties {
         public Overworld() {
-            super(128.0f, true, true);
+            super(128.0f, true, class_5401.NORMAL, false, false);
         }
 
         @Override
@@ -126,7 +138,7 @@ public abstract class SkyProperties {
     public static class Nether
     extends SkyProperties {
         public Nether() {
-            super(Float.NaN, true, false);
+            super(Float.NaN, true, class_5401.NONE, false, true);
         }
 
         @Override
@@ -138,6 +150,14 @@ public abstract class SkyProperties {
         public boolean useThickFog(int i, int j) {
             return true;
         }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public static enum class_5401 {
+        NONE,
+        NORMAL,
+        END;
+
     }
 }
 

@@ -66,6 +66,7 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.CloudRenderMode;
 import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.options.GraphicsMode;
 import net.minecraft.client.options.Option;
 import net.minecraft.client.options.ParticlesOption;
 import net.minecraft.client.particle.Particle;
@@ -85,6 +86,7 @@ import net.minecraft.client.render.OutlineVertexConsumerProvider;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.render.SkyProperties;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.TransformingVertexConsumer;
@@ -473,15 +475,12 @@ AutoCloseable {
             this.weatherFramebuffer = lv6;
             this.cloudsFramebuffer = lv7;
         }
-        catch (IOException iOException) {
+        catch (Exception exception) {
+            String string = exception instanceof JsonSyntaxException ? "parse" : "load";
             GameOptions lv8 = MinecraftClient.getInstance().options;
-            lv8.graphicsMode = lv8.graphicsMode.previous();
-            throw new ShaderException("Failed to load shader: " + lv, iOException);
-        }
-        catch (JsonSyntaxException jsonSyntaxException) {
-            GameOptions lv9 = MinecraftClient.getInstance().options;
-            lv9.graphicsMode = lv9.graphicsMode.previous();
-            throw new ShaderException("Failed to parse shader: " + lv, jsonSyntaxException);
+            lv8.graphicsMode = GraphicsMode.FANCY;
+            lv8.write();
+            throw new ShaderException("Failed to " + string + " shader: " + lv, exception);
         }
     }
 
@@ -911,7 +910,7 @@ AutoCloseable {
         this.renderLayer(RenderLayer.getSolid(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutoutMipped(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutout(), arg, d, e, g);
-        if (this.world.getDimension().isNether()) {
+        if (this.world.getSkyProperties().method_29993()) {
             DiffuseLighting.enableForLevel(arg.peek().getModel());
         } else {
             DiffuseLighting.method_27869(arg.peek().getModel());
@@ -1059,6 +1058,8 @@ AutoCloseable {
             this.translucentFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             lv.swap("translucent");
             this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
+            lv.swap("string");
+            this.renderLayer(RenderLayer.method_29997(), arg, d, e, g);
             this.particlesFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.particlesFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             RenderPhase.PARTICLES_TARGET.startDrawing();
@@ -1068,6 +1069,8 @@ AutoCloseable {
         } else {
             lv.swap("translucent");
             this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
+            lv.swap("string");
+            this.renderLayer(RenderLayer.method_29997(), arg, d, e, g);
             lv.swap("particles");
             this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
         }
@@ -1381,11 +1384,11 @@ AutoCloseable {
     }
 
     public void renderSky(MatrixStack arg, float f) {
-        if (this.client.world.getDimension().isEnd()) {
+        if (this.client.world.getSkyProperties().method_29992() == SkyProperties.class_5401.END) {
             this.renderEndSky(arg);
             return;
         }
-        if (!this.client.world.getSkyProperties().shouldRenderSky()) {
+        if (this.client.world.getSkyProperties().method_29992() != SkyProperties.class_5401.NORMAL) {
             return;
         }
         RenderSystem.disableTexture();

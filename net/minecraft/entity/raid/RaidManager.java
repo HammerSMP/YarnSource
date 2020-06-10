@@ -89,7 +89,7 @@ extends PersistentState {
             return null;
         }
         DimensionType lv = arg.world.getDimension();
-        if (lv.isNether()) {
+        if (!lv.method_29958()) {
             return null;
         }
         BlockPos lv2 = arg.getBlockPos();

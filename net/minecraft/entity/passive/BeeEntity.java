@@ -32,6 +32,7 @@ import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.DoubleBlockHalf;
+import net.minecraft.class_5398;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityGroup;
@@ -126,6 +127,7 @@ Flutterer {
         this.lookControl = new BeeLookControl(this);
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0f);
         this.setPathfindingPenalty(PathNodeType.WATER, -1.0f);
+        this.setPathfindingPenalty(PathNodeType.WATER_BORDER, 16.0f);
         this.setPathfindingPenalty(PathNodeType.COCOA, -1.0f);
         this.setPathfindingPenalty(PathNodeType.FENCE, -1.0f);
     }
@@ -164,6 +166,7 @@ Flutterer {
         this.goalSelector.add(9, new SwimGoal(this));
         this.targetSelector.add(1, new BeeRevengeGoal(this).setGroupRevenge(new Class[0]));
         this.targetSelector.add(2, new BeeFollowTargetGoal(this));
+        this.targetSelector.add(3, new class_5398<BeeEntity>(this, true));
     }
 
     @Override
@@ -199,7 +202,7 @@ Flutterer {
         this.ticksSincePollination = arg.getInt("TicksSincePollination");
         this.cannotEnterHiveTicks = arg.getInt("CannotEnterHiveTicks");
         this.cropsGrownSincePollination = arg.getInt("CropsGrownSincePollination");
-        this.angerFromTag(this.world, arg);
+        this.angerFromTag((ServerWorld)this.world, arg);
     }
 
     @Override
@@ -220,7 +223,7 @@ Flutterer {
                 }
             }
             this.setHasStung(true);
-            this.setTarget(null);
+            this.method_29922();
             this.playSound(SoundEvents.ENTITY_BEE_STING, 1.0f, 1.0f);
         }
         return bl;
@@ -284,7 +287,7 @@ Flutterer {
     }
 
     private boolean canEnterHive() {
-        if (this.cannotEnterHiveTicks > 0 || this.pollinateGoal.isRunning() || this.hasStung()) {
+        if (this.cannotEnterHiveTicks > 0 || this.pollinateGoal.isRunning() || this.hasStung() || this.getTarget() != null) {
             return false;
         }
         boolean bl = this.failedPollinatingTooLong() || this.world.isRaining() || this.world.isNight() || this.hasNectar();
@@ -318,9 +321,11 @@ Flutterer {
                 this.damage(DamageSource.GENERIC, this.getHealth());
             }
         }
-        this.tickAngerLogic();
         if (!this.hasNectar()) {
             ++this.ticksSincePollination;
+        }
+        if (!this.world.isClient) {
+            this.tickAngerLogic((ServerWorld)this.world, false);
         }
     }
 
@@ -580,6 +585,12 @@ Flutterer {
     @Override
     protected void swimUpward(Tag<Fluid> arg) {
         this.setVelocity(this.getVelocity().add(0.0, 0.01, 0.0));
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_29919() {
+        return new Vec3d(0.0, 0.5f * this.getStandingEyeHeight(), this.getWidth() * 0.2f);
     }
 
     private boolean isWithinDistance(BlockPos arg, int i) {
@@ -1209,6 +1220,11 @@ Flutterer {
     extends RevengeGoal {
         BeeRevengeGoal(BeeEntity arg2) {
             super(arg2, new Class[0]);
+        }
+
+        @Override
+        public boolean shouldContinue() {
+            return BeeEntity.this.hasAngerTime() && super.shouldContinue();
         }
 
         @Override

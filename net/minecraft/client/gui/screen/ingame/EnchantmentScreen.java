@@ -190,7 +190,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
             int o = l + 1;
             if (!this.isPointWithinBounds(60, 14 + 19 * l, 108, 17, i, j) || m <= 0 || n < 0 || lv == null) continue;
             ArrayList list = Lists.newArrayList();
-            list.add(new TranslatableText("container.enchant.clue", lv.getName(n)).formatted(Formatting.WHITE, Formatting.ITALIC));
+            list.add(new TranslatableText("container.enchant.clue", lv.getName(n)).formatted(Formatting.WHITE));
             if (!bl) {
                 list.add(LiteralText.EMPTY);
                 if (this.client.player.experienceLevel < m) {

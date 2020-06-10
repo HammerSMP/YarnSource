@@ -629,7 +629,7 @@ implements ClientPlayPacketListener {
             return;
         }
         if (!lv.isLogicalSideForUpdatingMovement()) {
-            if (arg.method_22826()) {
+            if (arg.isPositionChanged()) {
                 lv.trackedX += (long)arg.getDeltaXShort();
                 lv.trackedY += (long)arg.getDeltaYShort();
                 lv.trackedZ += (long)arg.getDeltaZShort();
@@ -705,7 +705,7 @@ implements ClientPlayPacketListener {
             lv.lastRenderZ = o = arg.getZ();
         }
         if (lv.age > 0 && lv.getVehicle() != null) {
-            lv.method_29239();
+            ((PlayerEntity)lv).method_29239();
         }
         lv.setPos(g, k, o);
         lv.prevX = g;
@@ -1009,6 +1009,9 @@ implements ClientPlayPacketListener {
         ClientPlayerEntity lv7 = this.client.interactionManager.createPlayer(this.world, lv4.getStatHandler(), lv4.getRecipeBook(), lv4.isSneaking(), lv4.isSprinting());
         lv7.setEntityId(i);
         this.client.player = lv7;
+        if (lv2 != lv4.world.getRegistryKey()) {
+            this.client.getMusicTracker().stop();
+        }
         this.client.cameraEntity = lv7;
         lv7.getDataTracker().writeUpdatedEntries(lv4.getDataTracker().getAllEntries());
         if (arg.shouldKeepPlayerAttributes()) {
@@ -1180,54 +1183,53 @@ implements ClientPlayPacketListener {
     public void onGameStateChange(GameStateChangeS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        int i = arg.getReason();
+        GameStateChangeS2CPacket.class_5402 lv2 = arg.getReason();
         float f = arg.getValue();
-        int j = MathHelper.floor(f + 0.5f);
-        if (i >= 0 && i < GameStateChangeS2CPacket.REASON_MESSAGES.length && GameStateChangeS2CPacket.REASON_MESSAGES[i] != null) {
-            ((PlayerEntity)lv).sendMessage(new TranslatableText(GameStateChangeS2CPacket.REASON_MESSAGES[i]), false);
-        }
-        if (i == 1) {
+        int i = MathHelper.floor(f + 0.5f);
+        if (lv2 == GameStateChangeS2CPacket.field_25645) {
+            ((PlayerEntity)lv).sendMessage(new TranslatableText("block.minecraft.spawn.not_valid"), false);
+        } else if (lv2 == GameStateChangeS2CPacket.field_25646) {
             this.world.getLevelProperties().setRaining(true);
             this.world.setRainGradient(0.0f);
-        } else if (i == 2) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25647) {
             this.world.getLevelProperties().setRaining(false);
             this.world.setRainGradient(1.0f);
-        } else if (i == 3) {
-            this.client.interactionManager.setGameMode(GameMode.byId(j));
-        } else if (i == 4) {
-            if (j == 0) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25648) {
+            this.client.interactionManager.setGameMode(GameMode.byId(i));
+        } else if (lv2 == GameStateChangeS2CPacket.field_25649) {
+            if (i == 0) {
                 this.client.player.networkHandler.sendPacket(new ClientStatusC2SPacket(ClientStatusC2SPacket.Mode.PERFORM_RESPAWN));
                 this.client.openScreen(new DownloadingTerrainScreen());
-            } else if (j == 1) {
+            } else if (i == 1) {
                 this.client.openScreen(new CreditsScreen(true, () -> this.client.player.networkHandler.sendPacket(new ClientStatusC2SPacket(ClientStatusC2SPacket.Mode.PERFORM_RESPAWN))));
             }
-        } else if (i == 5) {
-            GameOptions lv2 = this.client.options;
+        } else if (lv2 == GameStateChangeS2CPacket.field_25650) {
+            GameOptions lv3 = this.client.options;
             if (f == 0.0f) {
                 this.client.openScreen(new DemoScreen());
             } else if (f == 101.0f) {
-                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.help.movement", lv2.keyForward.getBoundKeyLocalizedText(), lv2.keyLeft.getBoundKeyLocalizedText(), lv2.keyBack.getBoundKeyLocalizedText(), lv2.keyRight.getBoundKeyLocalizedText()));
+                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.help.movement", lv3.keyForward.getBoundKeyLocalizedText(), lv3.keyLeft.getBoundKeyLocalizedText(), lv3.keyBack.getBoundKeyLocalizedText(), lv3.keyRight.getBoundKeyLocalizedText()));
             } else if (f == 102.0f) {
-                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.help.jump", lv2.keyJump.getBoundKeyLocalizedText()));
+                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.help.jump", lv3.keyJump.getBoundKeyLocalizedText()));
             } else if (f == 103.0f) {
-                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.help.inventory", lv2.keyInventory.getBoundKeyLocalizedText()));
+                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.help.inventory", lv3.keyInventory.getBoundKeyLocalizedText()));
             } else if (f == 104.0f) {
-                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.day.6", lv2.keyScreenshot.getBoundKeyLocalizedText()));
+                this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.day.6", lv3.keyScreenshot.getBoundKeyLocalizedText()));
             }
-        } else if (i == 6) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25651) {
             this.world.playSound(lv, lv.getX(), lv.getEyeY(), lv.getZ(), SoundEvents.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.18f, 0.45f);
-        } else if (i == 7) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25652) {
             this.world.setRainGradient(f);
-        } else if (i == 8) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25653) {
             this.world.setThunderGradient(f);
-        } else if (i == 9) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25654) {
             this.world.playSound(lv, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_PUFFER_FISH_STING, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-        } else if (i == 10) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25655) {
             this.world.addParticle(ParticleTypes.ELDER_GUARDIAN, lv.getX(), lv.getY(), lv.getZ(), 0.0, 0.0, 0.0);
-            if (j == 1) {
+            if (i == 1) {
                 this.world.playSound(lv, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 1.0f);
             }
-        } else if (i == 11) {
+        } else if (lv2 == GameStateChangeS2CPacket.field_25656) {
             this.client.player.setShowsDeathScreen(f == 0.0f);
         }
     }
@@ -2045,11 +2047,11 @@ implements ClientPlayPacketListener {
         int k = arg.getSkyLightMask();
         int l = arg.getFilledSkyLightMask();
         Iterator<byte[]> iterator = arg.getSkyLightUpdates().iterator();
-        this.updateLighting(i, j, lv, LightType.SKY, k, l, iterator);
+        this.updateLighting(i, j, lv, LightType.SKY, k, l, iterator, arg.method_30006());
         int m = arg.getBlockLightMask();
         int n = arg.getFilledBlockLightMask();
         Iterator<byte[]> iterator2 = arg.getBlockLightUpdates().iterator();
-        this.updateLighting(i, j, lv, LightType.BLOCK, m, n, iterator2);
+        this.updateLighting(i, j, lv, LightType.BLOCK, m, n, iterator2, arg.method_30006());
     }
 
     @Override
@@ -2084,14 +2086,14 @@ implements ClientPlayPacketListener {
         this.client.interactionManager.processPlayerActionResponse(this.world, arg.getBlockPos(), arg.getBlockState(), arg.getAction(), arg.isApproved());
     }
 
-    private void updateLighting(int i, int j, LightingProvider arg, LightType arg2, int k, int l, Iterator<byte[]> iterator) {
+    private void updateLighting(int i, int j, LightingProvider arg, LightType arg2, int k, int l, Iterator<byte[]> iterator, boolean bl) {
         for (int m = 0; m < 18; ++m) {
-            boolean bl2;
+            boolean bl3;
             int n = -1 + m;
-            boolean bl = (k & 1 << m) != 0;
-            boolean bl3 = bl2 = (l & 1 << m) != 0;
-            if (!bl && !bl2) continue;
-            arg.queueData(arg2, ChunkSectionPos.from(i, n, j), bl ? new ChunkNibbleArray((byte[])iterator.next().clone()) : new ChunkNibbleArray());
+            boolean bl2 = (k & 1 << m) != 0;
+            boolean bl4 = bl3 = (l & 1 << m) != 0;
+            if (!bl2 && !bl3) continue;
+            arg.queueData(arg2, ChunkSectionPos.from(i, n, j), bl2 ? new ChunkNibbleArray((byte[])iterator.next().clone()) : new ChunkNibbleArray(), bl);
             this.world.scheduleBlockRenders(i, n, j);
         }
     }

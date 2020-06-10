@@ -9,6 +9,7 @@ package net.minecraft.entity.mob;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
@@ -387,7 +388,7 @@ extends HostileEntity {
             ZombieVillagerEntity lv2 = EntityType.ZOMBIE_VILLAGER.create(this.world);
             lv2.copyPositionAndRotation(lv);
             lv.remove();
-            lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.CONVERSION, new ZombieData(false), null);
+            lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.CONVERSION, new ZombieData(false, true), null);
             lv2.setVillagerData(lv.getVillagerData());
             lv2.setGossipData((Tag)lv.getGossip().serialize(NbtOps.INSTANCE).getValue());
             lv2.setOfferData(lv.getOffers().toTag());
@@ -429,26 +430,28 @@ extends HostileEntity {
         float f = arg2.getClampedLocalDifficulty();
         this.setCanPickUpLoot(this.random.nextFloat() < 0.55f * f);
         if (arg4 == null) {
-            arg4 = new ZombieData(arg.getRandom().nextFloat() < 0.05f);
+            arg4 = new ZombieData(ZombieEntity.method_29936(arg.getRandom()), true);
         }
         if (arg4 instanceof ZombieData) {
             ZombieData lv = (ZombieData)arg4;
             if (lv.baby) {
                 this.setBaby(true);
-                if ((double)arg.getRandom().nextFloat() < 0.05) {
-                    List<Entity> list = arg.getEntities(ChickenEntity.class, this.getBoundingBox().expand(5.0, 3.0, 5.0), EntityPredicates.NOT_MOUNTED);
-                    if (!list.isEmpty()) {
-                        ChickenEntity lv2 = (ChickenEntity)list.get(0);
-                        lv2.setHasJockey(true);
-                        this.startRiding(lv2);
+                if (lv.field_25607) {
+                    if ((double)arg.getRandom().nextFloat() < 0.05) {
+                        List<Entity> list = arg.getEntities(ChickenEntity.class, this.getBoundingBox().expand(5.0, 3.0, 5.0), EntityPredicates.NOT_MOUNTED);
+                        if (!list.isEmpty()) {
+                            ChickenEntity lv2 = (ChickenEntity)list.get(0);
+                            lv2.setHasJockey(true);
+                            this.startRiding(lv2);
+                        }
+                    } else if ((double)arg.getRandom().nextFloat() < 0.05) {
+                        ChickenEntity lv3 = EntityType.CHICKEN.create(this.world);
+                        lv3.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
+                        lv3.initialize(arg, arg2, SpawnReason.JOCKEY, null, null);
+                        lv3.setHasJockey(true);
+                        this.startRiding(lv3);
+                        arg.spawnEntity(lv3);
                     }
-                } else if ((double)arg.getRandom().nextFloat() < 0.05) {
-                    ChickenEntity lv3 = EntityType.CHICKEN.create(this.world);
-                    lv3.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-                    lv3.initialize(arg, arg2, SpawnReason.JOCKEY, null, null);
-                    lv3.setHasJockey(true);
-                    this.startRiding(lv3);
-                    arg.spawnEntity(lv3);
                 }
             }
             this.setCanBreakDoors(this.shouldBreakDoors() && this.random.nextFloat() < f * 0.1f);
@@ -466,6 +469,10 @@ extends HostileEntity {
         }
         this.applyAttributeModifiers(f);
         return arg4;
+    }
+
+    public static boolean method_29936(Random random) {
+        return random.nextFloat() < 0.05f;
     }
 
     protected void applyAttributeModifiers(float f) {
@@ -534,9 +541,11 @@ extends HostileEntity {
     public static class ZombieData
     implements EntityData {
         public final boolean baby;
+        public final boolean field_25607;
 
-        public ZombieData(boolean bl) {
+        public ZombieData(boolean bl, boolean bl2) {
             this.baby = bl;
+            this.field_25607 = bl2;
         }
     }
 }

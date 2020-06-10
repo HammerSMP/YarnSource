@@ -144,13 +144,13 @@ extends Screen {
     private void initWidgetsNormal(int i2, int j2) {
         this.addButton(new ButtonWidget(this.width / 2 - 100, i2, 200, 20, new TranslatableText("menu.singleplayer"), arg -> this.client.openScreen(new SelectWorldScreen(this))));
         boolean bl = this.client.isMultiplayerEnabled();
-        ButtonWidget.class_5316 lv = bl ? ButtonWidget.field_25035 : (arg, arg2, i, j) -> {
+        ButtonWidget.TooltipSupplier lv = bl ? ButtonWidget.EMPTY : (arg, arg2, i, j) -> {
             if (!arg.active) {
                 this.renderTooltip(arg2, this.client.textRenderer.wrapLines(new TranslatableText("title.multiplayer.disabled"), Math.max(this.width / 2 - 43, 170)), i, j);
             }
         };
-        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(i2 + j2 * 1), (int)200, (int)20, (Text)new TranslatableText((String)"menu.multiplayer"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19860(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.class_5316)lv)).active = bl;
-        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(i2 + j2 * 2), (int)200, (int)20, (Text)new TranslatableText((String)"menu.online"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19859(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.class_5316)lv)).active = bl;
+        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(i2 + j2 * 1), (int)200, (int)20, (Text)new TranslatableText((String)"menu.multiplayer"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19860(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.TooltipSupplier)lv)).active = bl;
+        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(i2 + j2 * 2), (int)200, (int)20, (Text)new TranslatableText((String)"menu.online"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19859(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.TooltipSupplier)lv)).active = bl;
     }
 
     private void initWidgetsDemo(int i, int j) {

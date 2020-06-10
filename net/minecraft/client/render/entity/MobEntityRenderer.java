@@ -25,6 +25,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 
 @Environment(value=EnvType.CLIENT)
@@ -78,29 +79,30 @@ extends LivingEntityRenderer<T, M> {
         double l = MathHelper.lerp((double)f, arg4.prevY + (double)arg4.getStandingEyeHeight() * 0.7, arg4.getY() + (double)arg4.getStandingEyeHeight() * 0.7) - i * 0.5 - 0.25;
         double m = MathHelper.lerp((double)f, arg4.prevZ, arg4.getZ()) - h * 0.7 + g * 0.5 * j;
         double n = (double)(MathHelper.lerp(f, ((MobEntity)arg).bodyYaw, ((MobEntity)arg).prevBodyYaw) * ((float)Math.PI / 180)) + 1.5707963267948966;
-        g = Math.cos(n) * (double)((Entity)arg).getWidth() * 0.4;
-        h = Math.sin(n) * (double)((Entity)arg).getWidth() * 0.4;
+        Vec3d lv = ((Entity)arg).method_29919();
+        g = Math.cos(n) * lv.z + Math.sin(n) * lv.x;
+        h = Math.sin(n) * lv.z - Math.cos(n) * lv.x;
         double o = MathHelper.lerp((double)f, ((MobEntity)arg).prevX, ((Entity)arg).getX()) + g;
-        double p = MathHelper.lerp((double)f, ((MobEntity)arg).prevY, ((Entity)arg).getY());
+        double p = MathHelper.lerp((double)f, ((MobEntity)arg).prevY, ((Entity)arg).getY()) + lv.y;
         double q = MathHelper.lerp((double)f, ((MobEntity)arg).prevZ, ((Entity)arg).getZ()) + h;
-        arg2.translate(g, -(1.6 - (double)((Entity)arg).getHeight()) * 0.5, h);
+        arg2.translate(g, lv.y, h);
         float r = (float)(k - o);
         float s = (float)(l - p);
         float t = (float)(m - q);
         float u = 0.025f;
-        VertexConsumer lv = arg3.getBuffer(RenderLayer.getLeash());
-        Matrix4f lv2 = arg2.peek().getModel();
+        VertexConsumer lv2 = arg3.getBuffer(RenderLayer.getLeash());
+        Matrix4f lv3 = arg2.peek().getModel();
         float v = MathHelper.fastInverseSqrt(r * r + t * t) * 0.025f / 2.0f;
         float w = t * v;
         float x = r * v;
-        BlockPos lv3 = new BlockPos(((Entity)arg).getCameraPosVec(f));
-        BlockPos lv4 = new BlockPos(arg4.getCameraPosVec(f));
-        int y = this.getBlockLight(arg, lv3);
-        int z = this.dispatcher.getRenderer(arg4).getBlockLight(arg4, lv4);
-        int aa = ((MobEntity)arg).world.getLightLevel(LightType.SKY, lv3);
-        int ab = ((MobEntity)arg).world.getLightLevel(LightType.SKY, lv4);
-        MobEntityRenderer.method_23186(lv, lv2, r, s, t, y, z, aa, ab, 0.025f, 0.025f, w, x);
-        MobEntityRenderer.method_23186(lv, lv2, r, s, t, y, z, aa, ab, 0.025f, 0.0f, w, x);
+        BlockPos lv4 = new BlockPos(((Entity)arg).getCameraPosVec(f));
+        BlockPos lv5 = new BlockPos(arg4.getCameraPosVec(f));
+        int y = this.getBlockLight(arg, lv4);
+        int z = this.dispatcher.getRenderer(arg4).getBlockLight(arg4, lv5);
+        int aa = ((MobEntity)arg).world.getLightLevel(LightType.SKY, lv4);
+        int ab = ((MobEntity)arg).world.getLightLevel(LightType.SKY, lv5);
+        MobEntityRenderer.method_23186(lv2, lv3, r, s, t, y, z, aa, ab, 0.025f, 0.025f, w, x);
+        MobEntityRenderer.method_23186(lv2, lv3, r, s, t, y, z, aa, ab, 0.025f, 0.0f, w, x);
         arg2.pop();
     }
 
@@ -127,7 +129,7 @@ extends LivingEntityRenderer<T, M> {
         }
         float s = (float)m / (float)l;
         float t = f * s;
-        float u = g * (s * s + s) * 0.5f + ((float)l - (float)m) / ((float)l * 0.75f) + 0.125f;
+        float u = g > 0.0f ? g * s * s : g - g * (1.0f - s) * (1.0f - s);
         float v = h * s;
         if (!bl) {
             arg.vertex(arg2, t + n, u + j - k, v - o).color(p, q, r, 1.0f).light(i).next();

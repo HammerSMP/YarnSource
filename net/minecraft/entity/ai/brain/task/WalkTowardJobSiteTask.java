@@ -51,9 +51,13 @@ extends Task<VillagerEntity> {
         Optional<GlobalPos> optional = arg2.getBrain().getOptionalMemory(MemoryModuleType.POTENTIAL_JOB_SITE);
         optional.ifPresent(arg22 -> {
             BlockPos lv = arg22.getPos();
-            PointOfInterestStorage lv2 = arg.getServer().getWorld(arg22.getDimension()).getPointOfInterestStorage();
-            if (lv2.test(lv, arg -> true)) {
-                lv2.releaseTicket(lv);
+            ServerWorld lv2 = arg.getServer().getWorld(arg22.getDimension());
+            if (lv2 == null) {
+                return;
+            }
+            PointOfInterestStorage lv3 = lv2.getPointOfInterestStorage();
+            if (lv3.test(lv, arg -> true)) {
+                lv3.releaseTicket(lv);
             }
             DebugInfoSender.sendPointOfInterest(arg, lv);
         });

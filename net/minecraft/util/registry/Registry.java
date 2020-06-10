@@ -148,7 +148,7 @@ IndexedIterable<T> {
     public static final RegistryKey<Registry<ScreenHandlerType<?>>> MENU_KEY = Registry.createRegistryKey("menu");
     public static final RegistryKey<Registry<RecipeType<?>>> RECIPE_TYPE_KEY = Registry.createRegistryKey("recipe_type");
     public static final RegistryKey<Registry<RecipeSerializer<?>>> RECIPE_SERIALIZER_KEY = Registry.createRegistryKey("recipe_serializer");
-    public static final RegistryKey<Registry<EntityAttribute>> ATTRIBUTES_KEY = Registry.createRegistryKey("attributes");
+    public static final RegistryKey<Registry<EntityAttribute>> ATTRIBUTES_KEY = Registry.createRegistryKey("attribute");
     public static final RegistryKey<Registry<StatType<?>>> STAT_TYPE_KEY = Registry.createRegistryKey("stat_type");
     public static final RegistryKey<Registry<VillagerType>> VILLAGER_TYPE_KEY = Registry.createRegistryKey("villager_type");
     public static final RegistryKey<Registry<VillagerProfession>> VILLAGER_PROFESSION_KEY = Registry.createRegistryKey("villager_profession");
@@ -320,6 +320,8 @@ IndexedIterable<T> {
     }
 
     public abstract boolean containsId(Identifier var1);
+
+    public abstract boolean isLoaded(RegistryKey<T> var1);
 
     public abstract boolean containsId(int var1);
 

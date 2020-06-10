@@ -50,10 +50,7 @@ extends Feature<TreeFeatureConfig> {
     }
 
     public static boolean canTreeReplace(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> {
-            Block lv = arg.getBlock();
-            return arg.isAir() || arg.isIn(BlockTags.LEAVES) || TreeFeature.isDirt(lv) || arg.isIn(BlockTags.LOGS) || arg.isIn(BlockTags.SAPLINGS) || arg.isOf(Blocks.VINE) || arg.isOf(Blocks.WATER);
-        });
+        return TreeFeature.canReplace(arg2, arg22) || arg2.testBlockState(arg22, arg -> arg.isIn(BlockTags.LOGS));
     }
 
     private static boolean isVine(TestableWorld arg2, BlockPos arg22) {
@@ -86,7 +83,7 @@ extends Feature<TreeFeatureConfig> {
         arg.setBlockState(arg2, arg3, 19);
     }
 
-    public static boolean canReplace(ModifiableTestableWorld arg, BlockPos arg2) {
+    public static boolean canReplace(TestableWorld arg, BlockPos arg2) {
         return TreeFeature.isAirOrLeaves(arg, arg2) || TreeFeature.isReplaceablePlant(arg, arg2) || TreeFeature.isWater(arg, arg2);
     }
 
@@ -120,27 +117,29 @@ extends Feature<TreeFeatureConfig> {
         if (!TreeFeature.isDirtOrGrass(arg, lv2.down())) {
             return false;
         }
-        BlockPos.Mutable lv3 = new BlockPos.Mutable();
         OptionalInt optionalInt = arg42.minimumSize.getMinClippedHeight();
-        int r = i;
-        for (int s = 0; s <= i + 1; ++s) {
-            int t = arg42.minimumSize.method_27378(i, s);
-            block1: for (int u = -t; u <= t; ++u) {
-                for (int v = -t; v <= t; ++v) {
-                    lv3.set(lv2, u, s, v);
-                    if (TreeFeature.canTreeReplace(arg, lv3) && (arg42.ignoreVines || !TreeFeature.isVine(arg, lv3))) continue;
-                    if (optionalInt.isPresent() && s - 1 >= optionalInt.getAsInt() + 1) {
-                        r = s - 2;
-                        continue block1;
-                    }
-                    return false;
+        int r = this.method_29963(arg, i, lv2, arg42);
+        if (!(r >= i || optionalInt.isPresent() && r >= optionalInt.getAsInt())) {
+            return false;
+        }
+        List<FoliagePlacer.TreeNode> list = arg42.trunkPlacer.generate(arg, random, r, lv2, set, arg3, arg42);
+        list.forEach(arg4 -> arg.foliagePlacer.generate(arg, random, arg42, r, (FoliagePlacer.TreeNode)arg4, j, l, set2, arg3));
+        return true;
+    }
+
+    private int method_29963(TestableWorld arg, int i, BlockPos arg2, TreeFeatureConfig arg3) {
+        BlockPos.Mutable lv = new BlockPos.Mutable();
+        for (int j = 0; j <= i + 1; ++j) {
+            int k = arg3.minimumSize.method_27378(i, j);
+            for (int l = -k; l <= k; ++l) {
+                for (int m = -k; m <= k; ++m) {
+                    lv.set(arg2, l, j, m);
+                    if (TreeFeature.canTreeReplace(arg, lv) && (arg3.ignoreVines || !TreeFeature.isVine(arg, lv))) continue;
+                    return j - 2;
                 }
             }
         }
-        int w = r;
-        List<FoliagePlacer.TreeNode> list = arg42.trunkPlacer.generate(arg, random, w, lv2, set, arg3, arg42);
-        list.forEach(arg4 -> arg.foliagePlacer.generate(arg, random, arg42, w, (FoliagePlacer.TreeNode)arg4, j, l, set2, arg3));
-        return true;
+        return i;
     }
 
     @Override

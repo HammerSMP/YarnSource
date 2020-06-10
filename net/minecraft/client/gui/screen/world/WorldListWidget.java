@@ -41,6 +41,7 @@ import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.FatalErrorScreen;
 import net.minecraft.client.gui.screen.NoticeScreen;
 import net.minecraft.client.gui.screen.ProgressScreen;
+import net.minecraft.client.gui.screen.SaveLevelScreen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.EditWorldScreen;
@@ -338,6 +339,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         }
 
         public void recreate() {
+            this.method_29990();
             RegistryTracker.Modifiable lv = RegistryTracker.create();
             try (LevelStorage.Session lv2 = this.client.getLevelStorage().createSession(this.level.getName());
                  MinecraftClient.IntegratedResourceManager lv3 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, lv2);){
@@ -359,8 +361,13 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         private void start() {
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             if (this.client.getLevelStorage().levelExists(this.level.getName())) {
+                this.method_29990();
                 this.client.startIntegratedServer(this.level.getName());
             }
+        }
+
+        private void method_29990() {
+            this.client.method_29970(new SaveLevelScreen(new TranslatableText("selectWorld.data_read")));
         }
 
         /*

@@ -932,14 +932,19 @@ extends LivingEntity {
     }
 
     @Override
-    public void stopRiding() {
-        super.stopRiding();
+    public void method_29239() {
+        super.method_29239();
         this.ridingCooldown = 0;
     }
 
     @Override
     protected boolean isImmobile() {
         return super.isImmobile() || this.isSleeping();
+    }
+
+    @Override
+    public boolean method_29920() {
+        return !this.abilities.flying;
     }
 
     @Override
@@ -1196,7 +1201,7 @@ extends LivingEntity {
             }
             return optional;
         }
-        if (lv2 instanceof BedBlock && BedBlock.isOverworld(arg, arg2)) {
+        if (lv2 instanceof BedBlock && BedBlock.isOverworld(arg)) {
             return BedBlock.findWakeUpPosition(EntityType.PLAYER, arg, arg2, 0);
         }
         if (!bl) {

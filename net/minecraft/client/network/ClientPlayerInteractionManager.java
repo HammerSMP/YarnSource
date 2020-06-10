@@ -324,7 +324,7 @@ public class ClientPlayerInteractionManager {
 
     public ActionResult interactEntity(PlayerEntity arg, Entity arg2, Hand arg3) {
         this.syncSelectedSlot();
-        this.networkHandler.sendPacket(new PlayerInteractEntityC2SPacket(arg2, arg3));
+        this.networkHandler.sendPacket(new PlayerInteractEntityC2SPacket(arg2, arg3, arg.isSneaking()));
         if (this.gameMode == GameMode.SPECTATOR) {
             return ActionResult.PASS;
         }
@@ -334,7 +334,7 @@ public class ClientPlayerInteractionManager {
     public ActionResult interactEntityAtLocation(PlayerEntity arg, Entity arg2, EntityHitResult arg3, Hand arg4) {
         this.syncSelectedSlot();
         Vec3d lv = arg3.getPos().subtract(arg2.getX(), arg2.getY(), arg2.getZ());
-        this.networkHandler.sendPacket(new PlayerInteractEntityC2SPacket(arg2, arg4, lv));
+        this.networkHandler.sendPacket(new PlayerInteractEntityC2SPacket(arg2, arg4, lv, arg.isSneaking()));
         if (this.gameMode == GameMode.SPECTATOR) {
             return ActionResult.PASS;
         }

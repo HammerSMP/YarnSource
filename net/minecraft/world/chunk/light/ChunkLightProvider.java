@@ -183,8 +183,8 @@ implements ChunkLightingView {
         return i;
     }
 
-    protected void setLightArray(long l, @Nullable ChunkNibbleArray arg) {
-        ((LightStorage)this.lightStorage).setLightArray(l, arg);
+    protected void setLightArray(long l, @Nullable ChunkNibbleArray arg, boolean bl) {
+        ((LightStorage)this.lightStorage).setLightArray(l, arg, bl);
     }
 
     @Override

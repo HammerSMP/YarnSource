@@ -18,6 +18,8 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.server.world.ServerWorld;
@@ -55,10 +57,14 @@ extends Block {
     public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
         if (arg2.isClient) {
             RedstoneOreBlock.spawnParticles(arg2, arg3);
-            return ActionResult.SUCCESS;
+        } else {
+            RedstoneOreBlock.light(arg, arg2, arg3);
         }
-        RedstoneOreBlock.light(arg, arg2, arg3);
-        return ActionResult.PASS;
+        ItemStack lv = arg4.getStackInHand(arg5);
+        if (lv.getItem() instanceof BlockItem && new ItemPlacementContext(arg4, arg5, lv, arg6).canPlace()) {
+            return ActionResult.PASS;
+        }
+        return ActionResult.SUCCESS;
     }
 
     private static void light(BlockState arg, World arg2, BlockPos arg3) {

@@ -406,17 +406,7 @@ extends ChunkManager {
         int i = arg.getX() >> 4;
         ChunkHolder lv = this.getChunkHolder(ChunkPos.toLong(i, j = arg.getZ() >> 4));
         if (lv != null) {
-            lv.markForBlockUpdate(this, arg.getX() & 0xF, arg.getY(), arg.getZ() & 0xF);
-        }
-    }
-
-    protected void method_29482(int i, int j) {
-        for (int k = -1; k <= 1; ++k) {
-            for (int l = -1; l <= 1; ++l) {
-                ChunkHolder lv;
-                if (k == 0 && l == 0 || (lv = this.getChunkHolder(ChunkPos.toLong(i + k, j + l))) == null) continue;
-                lv.method_29481();
-            }
+            lv.markForBlockUpdate(arg.getX() & 0xF, arg.getY(), arg.getZ() & 0xF);
         }
     }
 

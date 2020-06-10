@@ -178,7 +178,7 @@ implements ReloadableResourceManager {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public Stream<ResourcePack> method_29213() {
+    public Stream<ResourcePack> streamResourcePacks() {
         return this.field_25145.stream();
     }
 

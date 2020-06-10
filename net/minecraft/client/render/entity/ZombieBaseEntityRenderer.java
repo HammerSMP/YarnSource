@@ -11,7 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.entity.feature.ArmorBipedFeatureRenderer;
+import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.model.ZombieEntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -24,7 +24,7 @@ extends BipedEntityRenderer<T, M> {
 
     protected ZombieBaseEntityRenderer(EntityRenderDispatcher arg, M arg2, M arg3, M arg4) {
         super(arg, arg2, 0.5f);
-        this.addFeature(new ArmorBipedFeatureRenderer(this, arg3, arg4));
+        this.addFeature(new ArmorFeatureRenderer(this, arg3, arg4));
     }
 
     @Override

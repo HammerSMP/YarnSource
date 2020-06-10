@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5396;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.AddTrappedChestFix;
 import net.minecraft.datafixer.fix.AdvancementRenameFix;
@@ -529,6 +530,8 @@ public class Schemas {
         dataFixerBuilder.addFixer((DataFix)new BiomeRenameFix(schema121, false, "Nether biome rename", (Map<String, String>)ImmutableMap.of((Object)"minecraft:nether", (Object)"minecraft:nether_wastes")));
         Schema schema122 = dataFixerBuilder.addSchema(2553, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer((DataFix)new BiomesFix(schema122, false));
+        Schema schema123 = dataFixerBuilder.addSchema(2558, EMPTY_IDENTIFIER_NORMALIZE);
+        dataFixerBuilder.addFixer((DataFix)new class_5396(schema123, false));
     }
 }
 

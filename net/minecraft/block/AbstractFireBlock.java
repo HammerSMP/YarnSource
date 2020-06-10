@@ -145,7 +145,7 @@ extends Block {
         if (arg4.isOf(arg.getBlock())) {
             return;
         }
-        if ((arg2.getDimension().isOverworld() || arg2.getDimension().isNether()) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
+        if ((arg2.getRegistryKey() == World.OVERWORLD || arg2.getRegistryKey() == World.NETHER) && NetherPortalBlock.createPortalAt(arg2, arg3)) {
             return;
         }
         if (!arg.canPlaceAt(arg2, arg3)) {

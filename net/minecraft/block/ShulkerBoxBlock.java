@@ -105,7 +105,7 @@ extends BlockWithEntity {
             if (bl2) {
                 arg4.openHandledScreen(lv2);
                 arg4.incrementStat(Stats.OPEN_SHULKER_BOX);
-                PiglinBrain.onGoldBlockBroken(arg4);
+                PiglinBrain.onGoldBlockBroken(arg4, true);
             }
             return ActionResult.CONSUME;
         }

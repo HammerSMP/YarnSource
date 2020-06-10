@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
@@ -11,12 +12,15 @@
  */
 package net.minecraft.client.gui.screen.world;
 
+import com.google.common.collect.ImmutableList;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -37,9 +41,12 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.DataPackSettings;
+import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ServerResourceManager;
+import net.minecraft.resource.VanillaDataPackProvider;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -74,7 +81,6 @@ extends Screen {
     private boolean cheatsEnabled;
     private boolean tweakedCheats;
     public boolean hardcore;
-    private boolean creatingLevel;
     protected DataPackSettings field_25479 = DataPackSettings.SAFE_MODE;
     @Nullable
     private Path field_25477;
@@ -251,11 +257,7 @@ extends Screen {
 
     private void createLevel() {
         LevelInfo lv4;
-        this.client.openScreen(null);
-        if (this.creatingLevel) {
-            return;
-        }
-        this.creatingLevel = true;
+        this.client.method_29970(new SaveLevelScreen(new TranslatableText("createWorld.preparing")));
         if (!this.method_29696()) {
             return;
         }
@@ -400,13 +402,24 @@ extends Screen {
     private void method_29694() {
         Path path = this.method_29693();
         if (path != null) {
-            this.client.openScreen(new DataPackScreen((Screen)this, this.field_25479, (arg_0, arg_1) -> this.method_29682(arg_0, arg_1), path.toFile()));
+            File file = path.toFile();
+            ResourcePackManager<ResourcePackProfile> lv = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(file, ResourcePackSource.field_25347));
+            lv.scanPacks();
+            lv.setEnabledProfiles(this.field_25479.getEnabled());
+            this.client.openScreen(new DataPackScreen((Screen)this, lv, this::method_29682, file));
         }
     }
 
-    private void method_29682(DataPackSettings arg, ResourcePackManager<ResourcePackProfile> arg22) {
+    private void method_29682(ResourcePackManager<ResourcePackProfile> arg) {
+        ImmutableList list = ImmutableList.copyOf(arg.getEnabledNames());
+        List list2 = (List)arg.getNames().stream().filter(arg_0 -> CreateWorldScreen.method_29983((List)list, arg_0)).collect(ImmutableList.toImmutableList());
+        DataPackSettings lv = new DataPackSettings((List<String>)list, list2);
+        if (list.equals(this.field_25479.getEnabled())) {
+            this.field_25479 = lv;
+            return;
+        }
         this.client.send(() -> this.client.openScreen(new SaveLevelScreen(new TranslatableText("dataPack.validation.working"))));
-        ServerResourceManager.reload(arg22.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), this.client).handle((arg2, throwable) -> {
+        ServerResourceManager.reload(arg.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), this.client).handle((arg2, throwable) -> {
             if (throwable != null) {
                 field_25480.warn("Failed to validate datapack", throwable);
                 this.client.send(() -> this.client.openScreen(new ConfirmScreen(bl -> {
@@ -419,7 +432,7 @@ extends Screen {
                 }, new TranslatableText("dataPack.validation.failed"), LiteralText.EMPTY, new TranslatableText("dataPack.validation.back"), new TranslatableText("dataPack.validation.reset"))));
             } else {
                 this.client.send(() -> {
-                    this.field_25479 = arg;
+                    this.field_25479 = lv;
                     this.client.openScreen(this);
                 });
             }
@@ -452,7 +465,7 @@ extends Screen {
         }
         catch (IOException iOException) {
             field_25480.warn("Failed to copy datapack file from {} to {}", (Object)path3, (Object)path2);
-            throw new class_5376(iOException);
+            throw new WorldCreationException(iOException);
         }
     }
 
@@ -464,7 +477,7 @@ extends Screen {
                 Files.createDirectories(path3, new FileAttribute[0]);
                 stream.filter(path -> !path.equals(this.field_25477)).forEach(path2 -> CreateWorldScreen.method_29687(this.field_25477, path3, path2));
             }
-            catch (IOException | class_5376 exception) {
+            catch (IOException | WorldCreationException exception) {
                 field_25480.warn("Failed to copy datapacks to world {}", (Object)this.saveDirectoryName, (Object)exception);
                 SystemToast.method_29627(this.client, this.saveDirectoryName);
                 this.client.openScreen(this.parent);
@@ -488,14 +501,14 @@ extends Screen {
                     }
                     catch (IOException iOException) {
                         field_25480.warn("Failed to create temporary dir");
-                        throw new class_5376(iOException);
+                        throw new WorldCreationException(iOException);
                     }
                     mutableObject.setValue((Object)path3);
                 }
                 CreateWorldScreen.method_29687(path, path3, path2);
             });
         }
-        catch (IOException | class_5376 exception) {
+        catch (IOException | WorldCreationException exception) {
             field_25480.warn("Failed to copy datapacks from world {}", (Object)path, (Object)exception);
             SystemToast.method_29627(arg, path.toString());
             return null;
@@ -503,10 +516,14 @@ extends Screen {
         return (Path)mutableObject.getValue();
     }
 
+    private static /* synthetic */ boolean method_29983(List list, String string) {
+        return !list.contains(string);
+    }
+
     @Environment(value=EnvType.CLIENT)
-    static class class_5376
+    static class WorldCreationException
     extends RuntimeException {
-        public class_5376(Throwable throwable) {
+        public WorldCreationException(Throwable throwable) {
             super(throwable);
         }
     }

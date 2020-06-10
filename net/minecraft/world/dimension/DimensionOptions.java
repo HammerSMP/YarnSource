@@ -7,8 +7,8 @@
  *  com.google.common.collect.Sets
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
- *  com.mojang.serialization.Codec
  *  com.mojang.serialization.Lifecycle
+ *  com.mojang.serialization.MapCodec
  *  com.mojang.serialization.codecs.RecordCodecBuilder
  */
 package net.minecraft.world.dimension;
@@ -18,8 +18,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.kinds.Applicative;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -37,7 +37,7 @@ import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 
 public final class DimensionOptions {
-    public static final Codec<DimensionOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)DimensionType.field_24756.fieldOf("type").forGetter(DimensionOptions::getDimensionTypeSupplier), (App)ChunkGenerator.field_24746.fieldOf("generator").forGetter(DimensionOptions::getChunkGenerator)).apply((Applicative)instance, instance.stable(DimensionOptions::new)));
+    public static final MapCodec<DimensionOptions> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)DimensionType.field_24756.fieldOf("type").forGetter(DimensionOptions::getDimensionTypeSupplier), (App)ChunkGenerator.field_24746.fieldOf("generator").forGetter(DimensionOptions::getChunkGenerator)).apply((Applicative)instance, instance.stable(DimensionOptions::new)));
     public static final RegistryKey<DimensionOptions> OVERWORLD = RegistryKey.of(Registry.DIMENSION_OPTIONS, new Identifier("overworld"));
     public static final RegistryKey<DimensionOptions> NETHER = RegistryKey.of(Registry.DIMENSION_OPTIONS, new Identifier("the_nether"));
     public static final RegistryKey<DimensionOptions> END = RegistryKey.of(Registry.DIMENSION_OPTIONS, new Identifier("the_end"));
@@ -92,7 +92,13 @@ public final class DimensionOptions {
         if (entry.getKey() != OVERWORLD || entry2.getKey() != NETHER || entry3.getKey() != END) {
             return false;
         }
-        if (!(((DimensionOptions)entry.getValue()).getDimensionType().isOverworld() && ((DimensionOptions)entry2.getValue()).getDimensionType().isNether() && ((DimensionOptions)entry3.getValue()).getDimensionType().isEnd())) {
+        if (((DimensionOptions)entry.getValue()).getDimensionType() != DimensionType.OVERWORLD && ((DimensionOptions)entry.getValue()).getDimensionType() != DimensionType.field_25611) {
+            return false;
+        }
+        if (((DimensionOptions)entry2.getValue()).getDimensionType() != DimensionType.THE_NETHER) {
+            return false;
+        }
+        if (((DimensionOptions)entry3.getValue()).getDimensionType() != DimensionType.THE_END) {
             return false;
         }
         if (!(((DimensionOptions)entry2.getValue()).getChunkGenerator() instanceof SurfaceChunkGenerator) || !(((DimensionOptions)entry3.getValue()).getChunkGenerator() instanceof SurfaceChunkGenerator)) {

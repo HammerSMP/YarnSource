@@ -58,9 +58,15 @@ public class ChunkStatus {
         }
         return CompletableFuture.completedFuture(Either.left((Object)arg6));
     });
-    public static final ChunkStatus STRUCTURE_REFERENCES = ChunkStatus.register("structure_references", STRUCTURE_STARTS, 8, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.addStructureReferences(new ChunkRegion(arg, list), arg.getStructureAccessor(), arg3));
+    public static final ChunkStatus STRUCTURE_REFERENCES = ChunkStatus.register("structure_references", STRUCTURE_STARTS, 8, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> {
+        ChunkRegion lv = new ChunkRegion(arg, list);
+        arg2.addStructureReferences(lv, arg.getStructureAccessor().method_29951(lv), arg3);
+    });
     public static final ChunkStatus BIOMES = ChunkStatus.register("biomes", STRUCTURE_REFERENCES, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.populateBiomes(arg3));
-    public static final ChunkStatus NOISE = ChunkStatus.register("noise", BIOMES, 8, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.populateNoise(new ChunkRegion(arg, list), arg.getStructureAccessor(), arg3));
+    public static final ChunkStatus NOISE = ChunkStatus.register("noise", BIOMES, 8, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> {
+        ChunkRegion lv = new ChunkRegion(arg, list);
+        arg2.populateNoise(lv, arg.getStructureAccessor().method_29951(lv), arg3);
+    });
     public static final ChunkStatus SURFACE = ChunkStatus.register("surface", NOISE, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.buildSurface(new ChunkRegion(arg, list), arg3));
     public static final ChunkStatus CARVERS = ChunkStatus.register("carvers", SURFACE, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.carve(arg.getSeed(), arg.getBiomeAccess(), arg3, GenerationStep.Carver.AIR));
     public static final ChunkStatus LIQUID_CARVERS = ChunkStatus.register("liquid_carvers", CARVERS, 0, POST_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.carve(arg.getSeed(), arg.getBiomeAccess(), arg3, GenerationStep.Carver.LIQUID));
@@ -69,7 +75,8 @@ public class ChunkStatus {
         lv.setLightingProvider(arg5);
         if (!arg6.getStatus().isAtLeast(arg)) {
             Heightmap.populateHeightmaps(arg6, EnumSet.of(Heightmap.Type.MOTION_BLOCKING, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, Heightmap.Type.OCEAN_FLOOR, Heightmap.Type.WORLD_SURFACE));
-            arg3.generateFeatures(new ChunkRegion(arg2, list), arg2.getStructureAccessor());
+            ChunkRegion lv2 = new ChunkRegion(arg2, list);
+            arg3.generateFeatures(lv2, arg2.getStructureAccessor().method_29951(lv2));
             lv.setStatus(arg);
         }
         return CompletableFuture.completedFuture(Either.left((Object)arg6));

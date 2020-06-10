@@ -70,8 +70,12 @@ extends AbstractCriterion<Conditions> {
             return new Conditions(EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(arg.build()));
         }
 
+        public static Conditions method_29918(EntityPredicate arg, EntityPredicate arg2, EntityPredicate arg3) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(arg), EntityPredicate.Extended.ofLegacy(arg2), EntityPredicate.Extended.ofLegacy(arg3));
+        }
+
         public boolean matches(LootContext arg, LootContext arg2, @Nullable LootContext arg3) {
-            if (arg3 != null && !this.child.test(arg3)) {
+            if (!(this.child == EntityPredicate.Extended.EMPTY || arg3 != null && this.child.test(arg3))) {
                 return false;
             }
             return this.parent.test(arg) && this.partner.test(arg2) || this.parent.test(arg2) && this.partner.test(arg);

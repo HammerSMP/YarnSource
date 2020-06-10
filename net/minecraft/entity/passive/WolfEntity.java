@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5398;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -61,6 +62,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -116,6 +118,7 @@ implements Angerable {
         this.targetSelector.add(5, new FollowTargetIfTamedGoal<AnimalEntity>(this, AnimalEntity.class, false, FOLLOW_TAMED_PREDICATE));
         this.targetSelector.add(6, new FollowTargetIfTamedGoal<TurtleEntity>(this, TurtleEntity.class, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
         this.targetSelector.add(7, new FollowTargetGoal<AbstractSkeletonEntity>((MobEntity)this, AbstractSkeletonEntity.class, false));
+        this.targetSelector.add(8, new class_5398<WolfEntity>(this, true));
     }
 
     public static DefaultAttributeContainer.Builder createWolfAttributes() {
@@ -148,7 +151,7 @@ implements Angerable {
         if (arg.contains("CollarColor", 99)) {
             this.setCollarColor(DyeColor.byId(arg.getInt("CollarColor")));
         }
-        this.angerFromTag(this.world, arg);
+        this.angerFromTag((ServerWorld)this.world, arg);
     }
 
     @Override
@@ -190,7 +193,7 @@ implements Angerable {
             this.world.sendEntityStatus(this, (byte)8);
         }
         if (!this.world.isClient) {
-            this.tickAngerLogic();
+            this.tickAngerLogic((ServerWorld)this.world, true);
         }
     }
 
@@ -496,6 +499,12 @@ implements Angerable {
     @Override
     public boolean canBeLeashedBy(PlayerEntity arg) {
         return !this.hasAngerTime() && super.canBeLeashedBy(arg);
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_29919() {
+        return new Vec3d(0.0, 0.6f * this.getStandingEyeHeight(), this.getWidth() * 0.4f);
     }
 
     @Override

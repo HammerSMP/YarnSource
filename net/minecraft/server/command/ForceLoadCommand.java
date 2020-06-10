@@ -48,38 +48,40 @@ public class ForceLoadCommand {
 
     private static int executeQuery(ServerCommandSource arg, ColumnPos arg2) throws CommandSyntaxException {
         ChunkPos lv = new ChunkPos(arg2.x >> 4, arg2.z >> 4);
-        RegistryKey<World> lv2 = arg.getWorld().getRegistryKey();
-        boolean bl = arg.getMinecraftServer().getWorld(lv2).getForcedChunks().contains(lv.toLong());
+        ServerWorld lv2 = arg.getWorld();
+        RegistryKey<World> lv3 = lv2.getRegistryKey();
+        boolean bl = lv2.getForcedChunks().contains(lv.toLong());
         if (bl) {
-            arg.sendFeedback(new TranslatableText("commands.forceload.query.success", lv, lv2.getValue()), false);
+            arg.sendFeedback(new TranslatableText("commands.forceload.query.success", lv, lv3.getValue()), false);
             return 1;
         }
-        throw QUERY_FAILURE_EXCEPTION.create((Object)lv, (Object)lv2.getValue());
+        throw QUERY_FAILURE_EXCEPTION.create((Object)lv, (Object)lv3.getValue());
     }
 
     private static int executeQuery(ServerCommandSource arg) {
-        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
-        LongSet longSet = arg.getMinecraftServer().getWorld(lv).getForcedChunks();
+        ServerWorld lv = arg.getWorld();
+        RegistryKey<World> lv2 = lv.getRegistryKey();
+        LongSet longSet = lv.getForcedChunks();
         int i = longSet.size();
         if (i > 0) {
             String string = Joiner.on((String)", ").join(longSet.stream().sorted().map(ChunkPos::new).map(ChunkPos::toString).iterator());
             if (i == 1) {
-                arg.sendFeedback(new TranslatableText("commands.forceload.list.single", lv.getValue(), string), false);
+                arg.sendFeedback(new TranslatableText("commands.forceload.list.single", lv2.getValue(), string), false);
             } else {
-                arg.sendFeedback(new TranslatableText("commands.forceload.list.multiple", i, lv.getValue(), string), false);
+                arg.sendFeedback(new TranslatableText("commands.forceload.list.multiple", i, lv2.getValue(), string), false);
             }
         } else {
-            arg.sendError(new TranslatableText("commands.forceload.added.none", lv.getValue()));
+            arg.sendError(new TranslatableText("commands.forceload.added.none", lv2.getValue()));
         }
         return i;
     }
 
     private static int executeRemoveAll(ServerCommandSource arg) {
-        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
-        ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
-        LongSet longSet = lv2.getForcedChunks();
-        longSet.forEach(l -> lv2.setChunkForced(ChunkPos.getPackedX(l), ChunkPos.getPackedZ(l), false));
-        arg.sendFeedback(new TranslatableText("commands.forceload.removed.all", lv.getValue()), true);
+        ServerWorld lv = arg.getWorld();
+        RegistryKey<World> lv2 = lv.getRegistryKey();
+        LongSet longSet = lv.getForcedChunks();
+        longSet.forEach(l -> lv.setChunkForced(ChunkPos.getPackedX(l), ChunkPos.getPackedZ(l), false));
+        arg.sendFeedback(new TranslatableText("commands.forceload.removed.all", lv2.getValue()), true);
         return 0;
     }
 
@@ -99,13 +101,13 @@ public class ForceLoadCommand {
         if (q > 256L) {
             throw TOO_BIG_EXCEPTION.create((Object)256, (Object)q);
         }
-        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
-        ServerWorld lv2 = arg.getMinecraftServer().getWorld(lv);
+        ServerWorld lv = arg.getWorld();
+        RegistryKey<World> lv2 = lv.getRegistryKey();
         ChunkPos lv3 = null;
         int r = 0;
         for (int s = m; s <= o; ++s) {
             for (int t = n; t <= p; ++t) {
-                boolean bl2 = lv2.setChunkForced(s, t, bl);
+                boolean bl2 = lv.setChunkForced(s, t, bl);
                 if (!bl2) continue;
                 ++r;
                 if (lv3 != null) continue;
@@ -116,11 +118,11 @@ public class ForceLoadCommand {
             throw (bl ? ADDED_FAILURE_EXCEPTION : REMOVED_FAILURE_EXCEPTION).create();
         }
         if (r == 1) {
-            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".single", lv3, lv.getValue()), true);
+            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".single", lv3, lv2.getValue()), true);
         } else {
             ChunkPos lv4 = new ChunkPos(m, n);
             ChunkPos lv5 = new ChunkPos(o, p);
-            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".multiple", r, lv.getValue(), lv4, lv5), true);
+            arg.sendFeedback(new TranslatableText("commands.forceload." + (bl ? "added" : "removed") + ".multiple", r, lv2.getValue(), lv4, lv5), true);
         }
         return r;
     }

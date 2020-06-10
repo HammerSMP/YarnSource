@@ -119,7 +119,7 @@ implements AutoCloseable {
                 float t = r * ((r * 0.6f + 0.4f) * 0.6f + 0.4f);
                 float u = r * (r * r * 0.6f + 0.4f);
                 lv3.set(s, t, u);
-                if (lv.getDimension().isEnd()) {
+                if (lv.getSkyProperties().shouldRenderSky()) {
                     lv3.lerp(new Vector3f(0.99f, 1.12f, 1.0f), 0.25f);
                 } else {
                     Vector3f lv4 = lv2.copy();

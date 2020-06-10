@@ -2,7 +2,6 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Maps
  *  com.google.gson.Gson
  *  com.google.gson.GsonBuilder
@@ -13,7 +12,6 @@
  */
 package net.minecraft.data.server;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,6 +30,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.minecraft.class_5394;
 import net.minecraft.data.DataCache;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -60,7 +59,7 @@ implements DataProvider {
     public void run(DataCache arg4) {
         this.tagBuilders.clear();
         this.configure();
-        Tag lv = Tag.of(ImmutableSet.of());
+        class_5394 lv = class_5394.method_29898();
         Function<Identifier, Tag> function = arg2 -> this.tagBuilders.containsKey(arg2) ? lv : null;
         Function<Identifier, Object> function2 = arg -> this.registry.getOrEmpty((Identifier)arg).orElse(null);
         this.tagBuilders.forEach((arg2, arg3) -> {

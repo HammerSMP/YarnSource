@@ -110,10 +110,10 @@ public class ChunkSerializer {
             }
             if (!bl) continue;
             if (lv12.contains("BlockLight", 7)) {
-                lv11.queueData(LightType.BLOCK, ChunkSectionPos.from(arg4, k), new ChunkNibbleArray(lv12.getByteArray("BlockLight")));
+                lv11.queueData(LightType.BLOCK, ChunkSectionPos.from(arg4, k), new ChunkNibbleArray(lv12.getByteArray("BlockLight")), true);
             }
             if (!bl2 || !lv12.contains("SkyLight", 7)) continue;
-            lv11.queueData(LightType.SKY, ChunkSectionPos.from(arg4, k), new ChunkNibbleArray(lv12.getByteArray("SkyLight")));
+            lv11.queueData(LightType.SKY, ChunkSectionPos.from(arg4, k), new ChunkNibbleArray(lv12.getByteArray("SkyLight")), true);
         }
         long l = lv3.getLong("InhabitedTime");
         ChunkStatus.ChunkType lv14 = ChunkSerializer.getChunkType(arg5);

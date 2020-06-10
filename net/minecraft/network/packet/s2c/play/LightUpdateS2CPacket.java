@@ -32,13 +32,15 @@ implements Packet<ClientPlayPacketListener> {
     private int filledBlockLightMask;
     private List<byte[]> skyLightUpdates;
     private List<byte[]> blockLightUpdates;
+    private boolean field_25659;
 
     public LightUpdateS2CPacket() {
     }
 
-    public LightUpdateS2CPacket(ChunkPos arg, LightingProvider arg2) {
+    public LightUpdateS2CPacket(ChunkPos arg, LightingProvider arg2, boolean bl) {
         this.chunkX = arg.x;
         this.chunkZ = arg.z;
+        this.field_25659 = bl;
         this.skyLightUpdates = Lists.newArrayList();
         this.blockLightUpdates = Lists.newArrayList();
         for (int i = 0; i < 18; ++i) {
@@ -62,9 +64,10 @@ implements Packet<ClientPlayPacketListener> {
         }
     }
 
-    public LightUpdateS2CPacket(ChunkPos arg, LightingProvider arg2, int i, int j) {
+    public LightUpdateS2CPacket(ChunkPos arg, LightingProvider arg2, int i, int j, boolean bl) {
         this.chunkX = arg.x;
         this.chunkZ = arg.z;
+        this.field_25659 = bl;
         this.skyLightMask = i;
         this.blockLightMask = j;
         this.skyLightUpdates = Lists.newArrayList();
@@ -97,6 +100,7 @@ implements Packet<ClientPlayPacketListener> {
     public void read(PacketByteBuf arg) throws IOException {
         this.chunkX = arg.readVarInt();
         this.chunkZ = arg.readVarInt();
+        this.field_25659 = arg.readBoolean();
         this.skyLightMask = arg.readVarInt();
         this.blockLightMask = arg.readVarInt();
         this.filledSkyLightMask = arg.readVarInt();
@@ -117,6 +121,7 @@ implements Packet<ClientPlayPacketListener> {
     public void write(PacketByteBuf arg) throws IOException {
         arg.writeVarInt(this.chunkX);
         arg.writeVarInt(this.chunkZ);
+        arg.writeBoolean(this.field_25659);
         arg.writeVarInt(this.skyLightMask);
         arg.writeVarInt(this.blockLightMask);
         arg.writeVarInt(this.filledSkyLightMask);
@@ -172,6 +177,11 @@ implements Packet<ClientPlayPacketListener> {
     @Environment(value=EnvType.CLIENT)
     public List<byte[]> getBlockLightUpdates() {
         return this.blockLightUpdates;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public boolean method_30006() {
+        return this.field_25659;
     }
 }
 

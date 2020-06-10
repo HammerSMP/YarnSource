@@ -631,7 +631,7 @@ implements ServerPlayPacketListener {
         BlockEntity lv2 = this.player.world.getBlockEntity(lv);
         if (lv2 instanceof JigsawBlockEntity) {
             JigsawBlockEntity lv3 = (JigsawBlockEntity)lv2;
-            lv3.generate(this.server.getWorld(this.player.world.getRegistryKey()), arg.getMaxDepth(), arg.method_29446());
+            lv3.generate(this.player.getServerWorld(), arg.getMaxDepth(), arg.method_29446());
         }
     }
 
@@ -708,6 +708,7 @@ implements ServerPlayPacketListener {
 
     @Override
     public void onPlayerMove(PlayerMoveC2SPacket arg) {
+        boolean bl;
         NetworkThreadUtils.forceMainThread(arg, this, this.player.getServerWorld());
         if (ServerPlayNetworkHandler.validatePlayerMove(arg)) {
             this.disconnect(new TranslatableText("multiplayer.disconnect.invalid_player_movement"));
@@ -772,10 +773,8 @@ implements ServerPlayPacketListener {
         m = h - this.updatedX;
         n = i - this.updatedY;
         o = j - this.updatedZ;
-        if (n > 0.0) {
-            this.player.fallDistance = 0.0f;
-        }
-        if (this.player.isOnGround() && !arg.isOnGround() && n > 0.0) {
+        boolean bl2 = bl = n > 0.0;
+        if (this.player.isOnGround() && !arg.isOnGround() && bl) {
             this.player.jump();
         }
         this.player.move(MovementType.PLAYER, new Vec3d(m, n, o));
@@ -787,13 +786,13 @@ implements ServerPlayPacketListener {
         }
         o = j - this.player.getZ();
         q = m * m + n * n + o * o;
-        boolean bl = false;
+        boolean bl22 = false;
         if (!this.player.isInTeleportationState() && q > 0.0625 && !this.player.isSleeping() && !this.player.interactionManager.isCreative() && this.player.interactionManager.getGameMode() != GameMode.SPECTATOR) {
-            bl = true;
+            bl22 = true;
             LOGGER.warn("{} moved wrongly!", (Object)this.player.getName().getString());
         }
         this.player.updatePositionAndAngles(h, i, j, k, l);
-        if (!this.player.noClip && !this.player.isSleeping() && (bl && lv.doesNotCollide(this.player, lv2) || this.isPlayerNotCollidingWithBlocks(lv, lv2))) {
+        if (!this.player.noClip && !this.player.isSleeping() && (bl22 && lv.doesNotCollide(this.player, lv2) || this.isPlayerNotCollidingWithBlocks(lv, lv2))) {
             this.requestTeleport(d, e, f, k, l);
             return;
         }
@@ -801,6 +800,9 @@ implements ServerPlayPacketListener {
         this.player.getServerWorld().getChunkManager().updateCameraPosition(this.player);
         this.player.handleFall(this.player.getY() - g, arg.isOnGround());
         this.player.setOnGround(arg.isOnGround());
+        if (bl) {
+            this.player.fallDistance = 0.0f;
+        }
         this.player.increaseTravelMotionStats(this.player.getX() - d, this.player.getY() - e, this.player.getZ() - f);
         this.updatedX = this.player.getX();
         this.updatedY = this.player.getY();
@@ -839,7 +841,7 @@ implements ServerPlayPacketListener {
         this.player.updateLastActionTime();
         PlayerActionC2SPacket.Action lv2 = arg.getAction();
         switch (lv2) {
-            case SWAP_HELD_ITEMS: {
+            case SWAP_ITEM_WITH_OFFHAND: {
                 if (!this.player.isSpectator()) {
                     ItemStack lv3 = this.player.getStackInHand(Hand.OFF_HAND);
                     this.player.setStackInHand(Hand.OFF_HAND, this.player.getStackInHand(Hand.MAIN_HAND));
@@ -1105,6 +1107,7 @@ implements ServerPlayPacketListener {
         ServerWorld lv = this.player.getServerWorld();
         Entity lv2 = arg.getEntity(lv);
         this.player.updateLastActionTime();
+        this.player.setSneaking(arg.method_30007());
         if (lv2 != null) {
             double d = 36.0;
             if (this.player.squaredDistanceTo(lv2) < 36.0) {

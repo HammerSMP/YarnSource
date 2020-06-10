@@ -51,7 +51,7 @@ extends Feature<HugeFungusFeatureConfig> {
             i *= 2;
         }
         if (!arg5.planted) {
-            int j = arg.getDimensionHeight();
+            int j = arg3.getMaxY();
             if (lv2.getY() + i + 1 >= j) {
                 return false;
             }

@@ -168,7 +168,7 @@ public class CommandManager {
         SayCommand.register(this.dispatcher);
         ScheduleCommand.register(this.dispatcher);
         ScoreboardCommand.register(this.dispatcher);
-        SeedCommand.register(this.dispatcher, arg == RegistrationEnvironment.INTEGRATED);
+        SeedCommand.register(this.dispatcher, arg != RegistrationEnvironment.INTEGRATED);
         SetBlockCommand.register(this.dispatcher);
         SpawnPointCommand.register(this.dispatcher);
         SetWorldSpawnCommand.register(this.dispatcher);

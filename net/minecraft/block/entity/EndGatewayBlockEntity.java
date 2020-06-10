@@ -157,12 +157,12 @@ implements Tickable {
             return;
         }
         this.teleportCooldown = 100;
-        if (this.exitPortalPos == null && this.world.getDimension().isEnd()) {
+        if (this.exitPortalPos == null && this.world.getRegistryKey() == World.END) {
             this.createPortal((ServerWorld)this.world);
         }
         if (this.exitPortalPos != null) {
             BlockPos lv = this.exactTeleport ? this.exitPortalPos : this.findBestPortalExitPos();
-            arg.teleport((double)lv.getX() + 0.5, (double)lv.getY() + 0.5, (double)lv.getZ() + 0.5);
+            arg.teleport((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
         this.startTeleportCooldown();
     }

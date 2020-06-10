@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.server.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -55,13 +56,14 @@ implements ArgumentType<Identifier> {
         return new DimensionArgumentType();
     }
 
-    public static RegistryKey<World> getDimensionArgument(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
+    public static ServerWorld getDimensionArgument(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
         Identifier lv = (Identifier)commandContext.getArgument(string, Identifier.class);
         RegistryKey<World> lv2 = RegistryKey.of(Registry.DIMENSION, lv);
-        if (((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getWorld(lv2) == null) {
+        ServerWorld lv3 = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getWorld(lv2);
+        if (lv3 == null) {
             throw INVALID_DIMENSION_EXCEPTION.create((Object)lv);
         }
-        return lv2;
+        return lv3;
     }
 
     public /* synthetic */ Object parse(StringReader stringReader) throws CommandSyntaxException {

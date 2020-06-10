@@ -104,7 +104,7 @@ extends HandledScreen<LoomScreenHandler> {
             arg.scale(0.6666667f, -0.6666667f, -0.6666667f);
             this.bannerField.pitch = 0.0f;
             this.bannerField.pivotY = -32.0f;
-            BannerBlockEntityRenderer.renderCanvas(arg, lv5, 0xF000F0, OverlayTexture.DEFAULT_UV, this.bannerField, ModelLoader.BANNER_BASE, true, this.field_21841);
+            BannerBlockEntityRenderer.method_29999(arg, lv5, 0xF000F0, OverlayTexture.DEFAULT_UV, this.bannerField, ModelLoader.BANNER_BASE, true, this.field_21841);
             arg.pop();
             lv5.draw();
         } else if (this.hasTooManyPatterns) {
@@ -156,7 +156,7 @@ extends HandledScreen<LoomScreenHandler> {
         this.bannerField.pitch = 0.0f;
         this.bannerField.pivotY = -32.0f;
         List<Pair<BannerPattern, DyeColor>> list = BannerBlockEntity.method_24280(DyeColor.GRAY, BannerBlockEntity.getPatternListTag(lv));
-        BannerBlockEntityRenderer.renderCanvas(lv4, lv5, 0xF000F0, OverlayTexture.DEFAULT_UV, this.bannerField, ModelLoader.BANNER_BASE, true, list);
+        BannerBlockEntityRenderer.method_29999(lv4, lv5, 0xF000F0, OverlayTexture.DEFAULT_UV, this.bannerField, ModelLoader.BANNER_BASE, true, list);
         lv4.pop();
         lv5.draw();
     }

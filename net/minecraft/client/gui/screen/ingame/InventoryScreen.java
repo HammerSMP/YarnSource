@@ -140,7 +140,7 @@ implements RecipeBookProvider {
         lv4.setRotation(lv3);
         lv4.setRenderShadows(false);
         VertexConsumerProvider.Immediate lv5 = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-        lv4.render(arg, 0.0, 0.0, 0.0, 0.0f, 1.0f, lv, lv5, 0xF000F0);
+        RenderSystem.runAsFancy(() -> lv4.render(arg, 0.0, 0.0, 0.0, 0.0f, 1.0f, lv, lv5, 0xF000F0));
         lv5.draw();
         lv4.setRenderShadows(true);
         arg.bodyYaw = m;
@@ -159,6 +159,7 @@ implements RecipeBookProvider {
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         if (this.recipeBook.mouseClicked(d, e, i)) {
+            this.setFocused(this.recipeBook);
             return true;
         }
         if (this.isNarrow && this.recipeBook.isOpen()) {

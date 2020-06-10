@@ -16,18 +16,18 @@ import net.minecraft.text.Text;
 @Environment(value=EnvType.CLIENT)
 public class ButtonWidget
 extends AbstractPressableButtonWidget {
-    public static final class_5316 field_25035 = (arg, arg2, i, j) -> {};
+    public static final TooltipSupplier EMPTY = (arg, arg2, i, j) -> {};
     protected final PressAction onPress;
-    protected final class_5316 field_25036;
+    protected final TooltipSupplier tooltipSupplier;
 
     public ButtonWidget(int i, int j, int k, int l, Text arg, PressAction arg2) {
-        this(i, j, k, l, arg, arg2, field_25035);
+        this(i, j, k, l, arg, arg2, EMPTY);
     }
 
-    public ButtonWidget(int i, int j, int k, int l, Text arg, PressAction arg2, class_5316 arg3) {
+    public ButtonWidget(int i, int j, int k, int l, Text arg, PressAction arg2, TooltipSupplier arg3) {
         super(i, j, k, l, arg);
         this.onPress = arg2;
-        this.field_25036 = arg3;
+        this.tooltipSupplier = arg3;
     }
 
     @Override
@@ -45,11 +45,11 @@ extends AbstractPressableButtonWidget {
 
     @Override
     public void renderToolTip(MatrixStack arg, int i, int j) {
-        this.field_25036.onTooltip(this, arg, i, j);
+        this.tooltipSupplier.onTooltip(this, arg, i, j);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static interface class_5316 {
+    public static interface TooltipSupplier {
         public void onTooltip(ButtonWidget var1, MatrixStack var2, int var3, int var4);
     }
 

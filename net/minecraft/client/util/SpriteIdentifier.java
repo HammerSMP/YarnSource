@@ -17,6 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
 
@@ -53,6 +54,10 @@ public class SpriteIdentifier {
 
     public VertexConsumer getVertexConsumer(VertexConsumerProvider arg, Function<Identifier, RenderLayer> function) {
         return this.getSprite().getTextureSpecificVertexConsumer(arg.getBuffer(this.getRenderLayer(function)));
+    }
+
+    public VertexConsumer method_30001(VertexConsumerProvider arg, Function<Identifier, RenderLayer> function, boolean bl) {
+        return this.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.method_29711(arg, this.getRenderLayer(function), false, bl));
     }
 
     public boolean equals(Object object) {

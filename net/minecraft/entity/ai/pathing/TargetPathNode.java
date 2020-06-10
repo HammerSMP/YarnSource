@@ -43,10 +43,6 @@ extends PathNode {
         this.reached = true;
     }
 
-    public boolean isReached() {
-        return this.reached;
-    }
-
     @Environment(value=EnvType.CLIENT)
     public static TargetPathNode fromBuffer(PacketByteBuf arg) {
         TargetPathNode lv = new TargetPathNode(arg.readInt(), arg.readInt(), arg.readInt());

@@ -81,7 +81,7 @@ extends Entity {
     private boolean method_26961() {
         Entity lv = this.getOwner();
         if (lv != null) {
-            for (Entity lv2 : this.world.getEntities(this, this.getBoundingBox().expand(1.0), arg -> !arg.isSpectator() && arg.collides())) {
+            for (Entity lv2 : this.world.getEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0), arg -> !arg.isSpectator() && arg.collides())) {
                 if (lv2.getRootVehicle() != lv.getRootVehicle()) continue;
                 return false;
             }

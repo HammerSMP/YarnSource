@@ -69,7 +69,7 @@ implements SynchronousResourceReloadListener {
 
     @Override
     public void apply(ResourceManager arg) {
-        this.languageDefs = LanguageManager.method_29393(arg.method_29213());
+        this.languageDefs = LanguageManager.method_29393(arg.streamResourcePacks());
         LanguageDefinition lv = this.languageDefs.getOrDefault("en_us", field_25291);
         this.field_25292 = this.languageDefs.getOrDefault(this.currentLanguageCode, lv);
         ArrayList list = Lists.newArrayList((Object[])new LanguageDefinition[]{lv});

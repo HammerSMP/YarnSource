@@ -83,10 +83,11 @@ extends DataFix {
             }
             return Optional.empty();
         });
+        boolean bl = false;
         if (optional.equals(Optional.of("customized"))) {
-            Dynamic<T> dynamic22 = StructureSeparationDataFix.method_28268(l, dynamic2, dynamic2.createString("minecraft:overworld"), StructureSeparationDataFix.method_28272(dynamic2, l, false, false));
+            Dynamic<T> dynamic22 = StructureSeparationDataFix.method_29916(dynamic2, l);
         } else if (!optional.isPresent()) {
-            Dynamic<T> dynamic3 = StructureSeparationDataFix.method_28268(l, dynamic2, dynamic2.createString("minecraft:overworld"), StructureSeparationDataFix.method_28272(dynamic2, l, false, false));
+            Dynamic<T> dynamic3 = StructureSeparationDataFix.method_29916(dynamic2, l);
         } else {
             OptionalDynamic optionalDynamic = dynamic2.get("generatorOptions");
             switch ((String)optional.get()) {
@@ -106,6 +107,7 @@ extends DataFix {
                     Optional optional3 = optionalDynamic2.get("type").asString().result();
                     if (Objects.equals(optional3, Optional.of("minecraft:caves"))) {
                         Dynamic dynamic6 = dynamic2.createString("minecraft:caves");
+                        bl = true;
                     } else if (Objects.equals(optional3, Optional.of("minecraft:floating_islands"))) {
                         Dynamic dynamic7 = dynamic2.createString("minecraft:floating_islands");
                     } else {
@@ -122,23 +124,32 @@ extends DataFix {
                     break;
                 }
                 default: {
-                    boolean bl = ((String)optional.get()).equals("default");
-                    boolean bl2 = ((String)optional.get()).equals("default_1_1") || bl && dynamic2.get("generatorVersion").asInt(0) == 0;
-                    boolean bl3 = ((String)optional.get()).equals("amplified");
-                    boolean bl4 = ((String)optional.get()).equals("largebiomes");
-                    dynamic13 = StructureSeparationDataFix.method_28268(l, dynamic2, dynamic2.createString(bl3 ? "minecraft:amplified" : "minecraft:overworld"), StructureSeparationDataFix.method_28272(dynamic2, l, bl2, bl4));
+                    boolean bl2 = ((String)optional.get()).equals("default");
+                    boolean bl3 = ((String)optional.get()).equals("default_1_1") || bl2 && dynamic2.get("generatorVersion").asInt(0) == 0;
+                    boolean bl4 = ((String)optional.get()).equals("amplified");
+                    boolean bl5 = ((String)optional.get()).equals("largebiomes");
+                    dynamic13 = StructureSeparationDataFix.method_28268(l, dynamic2, dynamic2.createString(bl4 ? "minecraft:amplified" : "minecraft:overworld"), StructureSeparationDataFix.method_28272(dynamic2, l, bl3, bl5));
                 }
             }
         }
-        boolean bl5 = dynamic2.get("MapFeatures").asBoolean(true);
-        boolean bl6 = dynamic2.get("BonusChest").asBoolean(false);
+        boolean bl6 = dynamic2.get("MapFeatures").asBoolean(true);
+        boolean bl7 = dynamic2.get("BonusChest").asBoolean(false);
         ImmutableMap.Builder builder = ImmutableMap.builder();
         builder.put(dynamicOps.createString("seed"), dynamicOps.createLong(l));
-        builder.put(dynamicOps.createString("generate_features"), dynamicOps.createBoolean(bl5));
-        builder.put(dynamicOps.createString("bonus_chest"), dynamicOps.createBoolean(bl6));
-        builder.put(dynamicOps.createString("dimensions"), dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("minecraft:overworld"), (Object)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString("minecraft:overworld"), (Object)dynamicOps.createString("generator"), (Object)dynamic13.getValue())), (Object)dynamicOps.createString("minecraft:the_nether"), (Object)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString("minecraft:the_nether"), (Object)dynamicOps.createString("generator"), (Object)StructureSeparationDataFix.method_28268(l, dynamic2, dynamic2.createString("minecraft:nether"), dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("type"), (Object)dynamic2.createString("minecraft:multi_noise"), (Object)dynamic2.createString("seed"), (Object)dynamic2.createLong(l), (Object)dynamic2.createString("preset"), (Object)dynamic2.createString("minecraft:nether")))).getValue())), (Object)dynamicOps.createString("minecraft:the_end"), (Object)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString("minecraft:the_end"), (Object)dynamicOps.createString("generator"), (Object)StructureSeparationDataFix.method_28268(l, dynamic2, dynamic2.createString("minecraft:end"), dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("type"), (Object)dynamic2.createString("minecraft:the_end"), (Object)dynamic2.createString("seed"), (Object)dynamic2.createLong(l)))).getValue())))));
+        builder.put(dynamicOps.createString("generate_features"), dynamicOps.createBoolean(bl6));
+        builder.put(dynamicOps.createString("bonus_chest"), dynamicOps.createBoolean(bl7));
+        builder.put(dynamicOps.createString("dimensions"), StructureSeparationDataFix.method_29917(dynamic2, l, dynamic13, bl));
         optional2.ifPresent(string -> builder.put(dynamicOps.createString("legacy_custom_options"), dynamicOps.createString(string)));
         return new Dynamic(dynamicOps, dynamicOps.createMap((Map)builder.build()));
+    }
+
+    protected static <T> Dynamic<T> method_29916(Dynamic<T> dynamic, long l) {
+        return StructureSeparationDataFix.method_28268(l, dynamic, dynamic.createString("minecraft:overworld"), StructureSeparationDataFix.method_28272(dynamic, l, false, false));
+    }
+
+    protected static <T> T method_29917(Dynamic<T> dynamic, long l, Dynamic<T> dynamic2, boolean bl) {
+        DynamicOps dynamicOps = dynamic.getOps();
+        return (T)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("minecraft:overworld"), (Object)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString("minecraft:overworld" + (bl ? "_caves" : "")), (Object)dynamicOps.createString("generator"), (Object)dynamic2.getValue())), (Object)dynamicOps.createString("minecraft:the_nether"), (Object)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString("minecraft:the_nether"), (Object)dynamicOps.createString("generator"), (Object)StructureSeparationDataFix.method_28268(l, dynamic, dynamic.createString("minecraft:nether"), dynamic.createMap((Map)ImmutableMap.of((Object)dynamic.createString("type"), (Object)dynamic.createString("minecraft:multi_noise"), (Object)dynamic.createString("seed"), (Object)dynamic.createLong(l), (Object)dynamic.createString("preset"), (Object)dynamic.createString("minecraft:nether")))).getValue())), (Object)dynamicOps.createString("minecraft:the_end"), (Object)dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("type"), (Object)dynamicOps.createString("minecraft:the_end"), (Object)dynamicOps.createString("generator"), (Object)StructureSeparationDataFix.method_28268(l, dynamic, dynamic.createString("minecraft:end"), dynamic.createMap((Map)ImmutableMap.of((Object)dynamic.createString("type"), (Object)dynamic.createString("minecraft:the_end"), (Object)dynamic.createString("seed"), (Object)dynamic.createLong(l)))).getValue()))));
     }
 
     private static <T> Map<Dynamic<T>, Dynamic<T>> method_28275(DynamicOps<T> dynamicOps, OptionalDynamic<T> optionalDynamic) {

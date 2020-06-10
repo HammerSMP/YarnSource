@@ -84,23 +84,8 @@ extends BlockEntityRenderer<SkullBlockEntity> {
         if (arg == null) {
             arg3.translate(0.5, 0.0, 0.5);
         } else {
-            switch (arg) {
-                case NORTH: {
-                    arg3.translate(0.5, 0.25, 0.74f);
-                    break;
-                }
-                case SOUTH: {
-                    arg3.translate(0.5, 0.25, 0.26f);
-                    break;
-                }
-                case WEST: {
-                    arg3.translate(0.74f, 0.25, 0.5);
-                    break;
-                }
-                default: {
-                    arg3.translate(0.26f, 0.25, 0.5);
-                }
-            }
+            float h = 0.25f;
+            arg3.translate(0.5f - (float)arg.getOffsetX() * 0.25f, 0.25, 0.5f - (float)arg.getOffsetZ() * 0.25f);
         }
         arg3.scale(-1.0f, -1.0f, 1.0f);
         VertexConsumer lv2 = arg4.getBuffer(SkullBlockEntityRenderer.method_3578(arg2, gameProfile));

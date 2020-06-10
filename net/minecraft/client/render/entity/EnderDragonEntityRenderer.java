@@ -74,10 +74,7 @@ extends EntityRenderer<EnderDragonEntity> {
         this.model.render(arg2, lv4, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
         if (arg.ticksSinceDeath > 0) {
             float l = ((float)arg.ticksSinceDeath + g) / 200.0f;
-            float m = 0.0f;
-            if (l > 0.8f) {
-                m = (l - 0.8f) / 0.2f;
-            }
+            float m = Math.min(l > 0.8f ? (l - 0.8f) / 0.2f : 0.0f, 1.0f);
             Random random = new Random(432L);
             VertexConsumer lv5 = arg3.getBuffer(RenderLayer.getLightning());
             arg2.push();

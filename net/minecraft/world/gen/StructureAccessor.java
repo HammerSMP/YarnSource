@@ -10,23 +10,31 @@ package net.minecraft.world.gen;
 import com.mojang.datafixers.DataFixUtils;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.StructureHolder;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class StructureAccessor {
-    private final ServerWorld field_24404;
+    private final WorldAccess field_24404;
     private final GeneratorOptions field_24497;
 
-    public StructureAccessor(ServerWorld arg, GeneratorOptions arg2) {
+    public StructureAccessor(WorldAccess arg, GeneratorOptions arg2) {
         this.field_24404 = arg;
         this.field_24497 = arg2;
+    }
+
+    public StructureAccessor method_29951(ChunkRegion arg) {
+        if (arg.getWorld() != this.field_24404) {
+            throw new IllegalStateException("Using invalid feature manager (source level: " + arg.getWorld() + ", region: " + arg);
+        }
+        return new StructureAccessor(arg, this.field_24497);
     }
 
     public Stream<? extends StructureStart<?>> getStructuresWithChildren(ChunkSectionPos arg3, StructureFeature<?> arg22) {

@@ -126,7 +126,7 @@ public class BackgroundRenderer {
             int ag = ((LivingEntity)arg.getFocusedEntity()).getStatusEffect(StatusEffects.BLINDNESS).getDuration();
             d = ag < 20 ? (d *= (double)(1.0f - (float)ag / 20.0f)) : 0.0;
         }
-        if (d < 1.0) {
+        if (d < 1.0 && !lv.matches(FluidTags.LAVA)) {
             if (d < 0.0) {
                 d = 0.0;
             }
@@ -170,48 +170,52 @@ public class BackgroundRenderer {
         FluidState lv = arg.getSubmergedFluidState();
         Entity lv2 = arg.getFocusedEntity();
         boolean bl3 = bl2 = lv.getFluid() != Fluids.EMPTY;
-        if (bl2) {
+        if (lv.matches(FluidTags.WATER)) {
             float g = 1.0f;
-            if (lv.matches(FluidTags.WATER)) {
-                g = 0.05f;
-                if (lv2 instanceof ClientPlayerEntity) {
-                    ClientPlayerEntity lv3 = (ClientPlayerEntity)lv2;
-                    g -= lv3.getUnderwaterVisibility() * lv3.getUnderwaterVisibility() * 0.03f;
-                    Biome lv4 = lv3.world.getBiome(lv3.getBlockPos());
-                    if (lv4 == Biomes.SWAMP || lv4 == Biomes.SWAMP_HILLS) {
-                        g += 0.005f;
-                    }
+            g = 0.05f;
+            if (lv2 instanceof ClientPlayerEntity) {
+                ClientPlayerEntity lv3 = (ClientPlayerEntity)lv2;
+                g -= lv3.getUnderwaterVisibility() * lv3.getUnderwaterVisibility() * 0.03f;
+                Biome lv4 = lv3.world.getBiome(lv3.getBlockPos());
+                if (lv4 == Biomes.SWAMP || lv4 == Biomes.SWAMP_HILLS) {
+                    g += 0.005f;
                 }
-            } else if (lv.matches(FluidTags.LAVA)) {
-                g = 2.0f;
             }
             RenderSystem.fogDensity(g);
             RenderSystem.fogMode(GlStateManager.FogMode.EXP2);
         } else {
-            float s;
-            float r;
-            if (lv2 instanceof LivingEntity && ((LivingEntity)lv2).hasStatusEffect(StatusEffects.BLINDNESS)) {
-                int i = ((LivingEntity)lv2).getStatusEffect(StatusEffects.BLINDNESS).getDuration();
-                float h = MathHelper.lerp(Math.min(1.0f, (float)i / 20.0f), f, 5.0f);
-                if (arg2 == FogType.FOG_SKY) {
-                    float j = 0.0f;
-                    float k = h * 0.8f;
+            float w;
+            float v;
+            if (lv.matches(FluidTags.LAVA)) {
+                if (lv2 instanceof LivingEntity && ((LivingEntity)lv2).hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+                    float h = 0.0f;
+                    float i = 3.0f;
                 } else {
-                    float l = h * 0.25f;
-                    float m = h;
+                    float j = 0.25f;
+                    float k = 1.0f;
+                }
+            } else if (lv2 instanceof LivingEntity && ((LivingEntity)lv2).hasStatusEffect(StatusEffects.BLINDNESS)) {
+                int l = ((LivingEntity)lv2).getStatusEffect(StatusEffects.BLINDNESS).getDuration();
+                float m = MathHelper.lerp(Math.min(1.0f, (float)l / 20.0f), f, 5.0f);
+                if (arg2 == FogType.FOG_SKY) {
+                    float n = 0.0f;
+                    float o = m * 0.8f;
+                } else {
+                    float p = m * 0.25f;
+                    float q = m;
                 }
             } else if (bl) {
-                float n = f * 0.05f;
-                float o = Math.min(f, 192.0f) * 0.5f;
+                float r = f * 0.05f;
+                float s = Math.min(f, 192.0f) * 0.5f;
             } else if (arg2 == FogType.FOG_SKY) {
-                float p = 0.0f;
-                float q = f;
+                float t = 0.0f;
+                float u = f;
             } else {
-                r = f * 0.75f;
-                s = f;
+                v = f * 0.75f;
+                w = f;
             }
-            RenderSystem.fogStart(r);
-            RenderSystem.fogEnd(s);
+            RenderSystem.fogStart(v);
+            RenderSystem.fogEnd(w);
             RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
             RenderSystem.setupNvFogDistance();
         }

@@ -22,6 +22,10 @@ extends ItemUsageContext {
     private final BlockPos placementPos;
     protected boolean canReplaceExisting = true;
 
+    public ItemPlacementContext(PlayerEntity arg, Hand arg2, ItemStack arg3, BlockHitResult arg4) {
+        this(arg.world, arg, arg2, arg3, arg4);
+    }
+
     public ItemPlacementContext(ItemUsageContext arg) {
         this(arg.getWorld(), arg.getPlayer(), arg.getHand(), arg.getStack(), arg.hit);
     }

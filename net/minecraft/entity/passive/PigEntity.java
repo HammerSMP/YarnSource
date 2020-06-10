@@ -3,10 +3,14 @@
  * 
  * Could not load the following classes:
  *  javax.annotation.Nullable
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
  */
 package net.minecraft.entity.passive;
 
 import javax.annotation.Nullable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
@@ -242,7 +246,6 @@ Saddleable {
 
     @Override
     public void travel(Vec3d arg) {
-        this.setMovementSpeed(this.getSaddledSpeed());
         this.travel(this, this.saddledComponent, arg);
     }
 
@@ -269,6 +272,12 @@ Saddleable {
     @Override
     public boolean isBreedingItem(ItemStack arg) {
         return BREEDING_INGREDIENT.test(arg);
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_29919() {
+        return new Vec3d(0.0, 0.6f * this.getStandingEyeHeight(), this.getWidth() * 0.4f);
     }
 
     @Override

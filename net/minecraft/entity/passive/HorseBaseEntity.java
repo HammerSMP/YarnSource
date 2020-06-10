@@ -674,7 +674,6 @@ Saddleable {
                 float i = MathHelper.sin(this.yaw * ((float)Math.PI / 180));
                 float j = MathHelper.cos(this.yaw * ((float)Math.PI / 180));
                 this.setVelocity(this.getVelocity().add(-0.4f * i * this.jumpStrength, 0.0, 0.4f * j * this.jumpStrength));
-                this.playJumpSound();
             }
             this.jumpStrength = 0.0f;
         }
@@ -803,6 +802,7 @@ Saddleable {
     public void startJumping(int i) {
         this.jumping = true;
         this.updateAnger();
+        this.playJumpSound();
     }
 
     @Override

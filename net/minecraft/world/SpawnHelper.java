@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -41,9 +42,11 @@ import net.minecraft.tag.FluidTags;
 import net.minecraft.util.collection.WeightedPicker;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.GravityField;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Heightmap;
@@ -56,6 +59,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.gen.feature.StructureFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -216,7 +220,11 @@ public final class SpawnHelper {
 
     @Nullable
     private static Biome.SpawnEntry pickRandomSpawnEntry(ServerWorld arg, StructureAccessor arg2, ChunkGenerator arg3, SpawnGroup arg4, Random random, BlockPos arg5) {
-        List<Biome.SpawnEntry> list = arg3.getEntitySpawnList(arg.getBiome(arg5), arg2, arg4, arg5);
+        Biome lv = arg.getBiome(arg5);
+        if (arg4 == SpawnGroup.WATER_AMBIENT && lv.getCategory() == Biome.Category.RIVER && random.nextFloat() < 0.98f) {
+            return null;
+        }
+        List<Biome.SpawnEntry> list = SpawnHelper.method_29950(arg, arg2, arg3, arg4, arg5, lv);
         if (list.isEmpty()) {
             return null;
         }
@@ -224,7 +232,14 @@ public final class SpawnHelper {
     }
 
     private static boolean containsSpawnEntry(ServerWorld arg, StructureAccessor arg2, ChunkGenerator arg3, SpawnGroup arg4, Biome.SpawnEntry arg5, BlockPos arg6) {
-        return arg3.getEntitySpawnList(arg.getBiome(arg6), arg2, arg4, arg6).contains(arg5);
+        return SpawnHelper.method_29950(arg, arg2, arg3, arg4, arg6, null).contains(arg5);
+    }
+
+    private static List<Biome.SpawnEntry> method_29950(ServerWorld arg, StructureAccessor arg2, ChunkGenerator arg3, SpawnGroup arg4, BlockPos arg5, @Nullable Biome arg6) {
+        if (arg4 == SpawnGroup.MONSTER && arg.getBlockState(arg5.down()).getBlock() == Blocks.NETHER_BRICKS && arg2.method_28388(arg5, false, StructureFeature.FORTRESS).hasChildren()) {
+            return StructureFeature.FORTRESS.getMonsterSpawns();
+        }
+        return arg3.getEntitySpawnList(arg6 != null ? arg6 : arg.getBiome(arg5), arg2, arg4, arg5);
     }
 
     private static BlockPos getSpawnPos(World arg, WorldChunk arg2) {
@@ -268,7 +283,7 @@ public final class SpawnHelper {
                 return lv2.matches(FluidTags.WATER) && arg2.getFluidState(lv4).matches(FluidTags.WATER) && !arg2.getBlockState(lv3).isSolidBlock(arg2, lv3);
             }
             case IN_LAVA: {
-                return lv2.matches(FluidTags.LAVA) && arg2.getFluidState(lv4).matches(FluidTags.LAVA) && !arg2.getBlockState(lv3).isSolidBlock(arg2, lv3);
+                return lv2.matches(FluidTags.LAVA);
             }
         }
         BlockState lv5 = arg2.getBlockState(lv4);
@@ -300,7 +315,7 @@ public final class SpawnHelper {
                 boolean bl = false;
                 for (int s = 0; !bl && s < 4; ++s) {
                     BlockPos lv3 = SpawnHelper.getEntitySpawnPos(arg, lv.type, n, o);
-                    if (lv.type.isSummonable() && SpawnHelper.canSpawn(SpawnRestriction.Location.ON_GROUND, arg, lv3, lv.type)) {
+                    if (lv.type.isSummonable() && SpawnHelper.canSpawn(SpawnRestriction.getLocation(lv.type), arg, lv3, lv.type)) {
                         MobEntity lv6;
                         void lv5;
                         float f = lv.type.getWidth();
@@ -332,13 +347,22 @@ public final class SpawnHelper {
         }
     }
 
-    private static BlockPos getEntitySpawnPos(WorldView arg, @Nullable EntityType<?> arg2, int i, int j) {
-        BlockPos lv = new BlockPos(i, arg.getTopY(SpawnRestriction.getHeightmapType(arg2), i, j), j);
-        BlockPos lv2 = lv.down();
-        if (arg.getBlockState(lv2).canPathfindThrough(arg, lv2, NavigationType.LAND)) {
+    private static BlockPos getEntitySpawnPos(WorldView arg, EntityType<?> arg2, int i, int j) {
+        Vec3i lv2;
+        int k = arg.getTopY(SpawnRestriction.getHeightmapType(arg2), i, j);
+        BlockPos.Mutable lv = new BlockPos.Mutable(i, k, j);
+        if (arg.getDimension().hasCeiling()) {
+            do {
+                lv.move(Direction.DOWN);
+            } while (!arg.getBlockState(lv).isAir());
+            do {
+                lv.move(Direction.DOWN);
+            } while (arg.getBlockState(lv).isAir() && lv.getY() > 0);
+        }
+        if (SpawnRestriction.getLocation(arg2) == SpawnRestriction.Location.ON_GROUND && arg.getBlockState((BlockPos)(lv2 = lv.down())).canPathfindThrough(arg, (BlockPos)lv2, NavigationType.LAND)) {
             return lv2;
         }
-        return lv;
+        return lv.toImmutable();
     }
 
     @FunctionalInterface

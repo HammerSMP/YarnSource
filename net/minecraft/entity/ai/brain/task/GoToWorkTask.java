@@ -8,6 +8,7 @@ package net.minecraft.entity.ai.brain.task;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import java.util.Optional;
 import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.task.Task;
@@ -32,18 +33,18 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected void run(ServerWorld arg, VillagerEntity arg2, long l) {
-        GlobalPos lv = arg2.getBrain().getOptionalMemory(MemoryModuleType.POTENTIAL_JOB_SITE).get();
-        arg2.getBrain().forget(MemoryModuleType.POTENTIAL_JOB_SITE);
-        arg2.getBrain().remember(MemoryModuleType.JOB_SITE, lv);
-        if (arg2.getVillagerData().getProfession() != VillagerProfession.NONE) {
+    protected void run(ServerWorld arg4, VillagerEntity arg22, long l) {
+        GlobalPos lv = arg22.getBrain().getOptionalMemory(MemoryModuleType.POTENTIAL_JOB_SITE).get();
+        arg22.getBrain().forget(MemoryModuleType.POTENTIAL_JOB_SITE);
+        arg22.getBrain().remember(MemoryModuleType.JOB_SITE, lv);
+        if (arg22.getVillagerData().getProfession() != VillagerProfession.NONE) {
             return;
         }
-        MinecraftServer minecraftServer = arg.getServer();
-        minecraftServer.getWorld(lv.getDimension()).getPointOfInterestStorage().getType(lv.getPos()).ifPresent(arg32 -> Registry.VILLAGER_PROFESSION.stream().filter(arg2 -> arg2.getWorkStation() == arg32).findFirst().ifPresent(arg3 -> {
-            arg2.setVillagerData(arg2.getVillagerData().withProfession((VillagerProfession)arg3));
-            arg2.reinitializeBrain(arg);
-        }));
+        MinecraftServer minecraftServer = arg4.getServer();
+        Optional.ofNullable(minecraftServer.getWorld(lv.getDimension())).flatMap(arg2 -> arg2.getPointOfInterestStorage().getType(lv.getPos())).flatMap(arg -> Registry.VILLAGER_PROFESSION.stream().filter(arg2 -> arg2.getWorkStation() == arg).findFirst()).ifPresent(arg3 -> {
+            arg22.setVillagerData(arg22.getVillagerData().withProfession((VillagerProfession)arg3));
+            arg22.reinitializeBrain(arg4);
+        });
     }
 }
 

@@ -6,6 +6,7 @@
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.DataResult
  *  com.mojang.serialization.DynamicOps
+ *  com.mojang.serialization.MapCodec
  */
 package net.minecraft.util.dynamic;
 
@@ -13,6 +14,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
 import java.util.function.Supplier;
 import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.dynamic.RegistryReadingOps;
@@ -22,29 +24,29 @@ import net.minecraft.util.registry.RegistryKey;
 public final class RegistryElementCodec<E>
 implements Codec<Supplier<E>> {
     private final RegistryKey<Registry<E>> registryRef;
-    private final Codec<E> elementCodec;
+    private final MapCodec<E> elementCodec;
 
-    public static <E> RegistryElementCodec<E> of(RegistryKey<Registry<E>> arg, Codec<E> codec) {
-        return new RegistryElementCodec<E>(arg, codec);
+    public static <E> RegistryElementCodec<E> of(RegistryKey<Registry<E>> arg, MapCodec<E> mapCodec) {
+        return new RegistryElementCodec<E>(arg, mapCodec);
     }
 
-    private RegistryElementCodec(RegistryKey<Registry<E>> arg, Codec<E> codec) {
+    private RegistryElementCodec(RegistryKey<Registry<E>> arg, MapCodec<E> mapCodec) {
         this.registryRef = arg;
-        this.elementCodec = codec;
+        this.elementCodec = mapCodec;
     }
 
     public <T> DataResult<T> encode(Supplier<E> supplier, DynamicOps<T> dynamicOps, T object) {
         if (dynamicOps instanceof RegistryReadingOps) {
             return ((RegistryReadingOps)dynamicOps).encodeOrId(supplier.get(), object, this.registryRef, this.elementCodec);
         }
-        return this.elementCodec.encode(supplier.get(), dynamicOps, object);
+        return this.elementCodec.codec().encode(supplier.get(), dynamicOps, object);
     }
 
     public <T> DataResult<Pair<Supplier<E>, T>> decode(DynamicOps<T> dynamicOps, T object) {
         if (dynamicOps instanceof RegistryOps) {
             return ((RegistryOps)dynamicOps).decodeOrId(object, this.registryRef, this.elementCodec);
         }
-        return this.elementCodec.decode(dynamicOps, object).map(pair -> pair.mapFirst(object -> () -> object));
+        return this.elementCodec.codec().decode(dynamicOps, object).map(pair -> pair.mapFirst(object -> () -> object));
     }
 
     public String toString() {

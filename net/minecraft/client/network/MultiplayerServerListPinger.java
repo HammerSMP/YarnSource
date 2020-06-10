@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.network.ServerInfo;
@@ -82,7 +83,7 @@ public class MultiplayerServerListPinger {
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<ClientConnection> clientConnections = Collections.synchronizedList(Lists.newArrayList());
 
-    public void add(final ServerInfo arg) throws UnknownHostException {
+    public void add(final ServerInfo arg, final Runnable runnable) throws UnknownHostException {
         ServerAddress lv = ServerAddress.parse(arg.address);
         final ClientConnection lv2 = ClientConnection.connect(InetAddress.getByName(lv.getAddress()), lv.getPort(), false);
         this.clientConnections.add(lv2);
@@ -125,15 +126,18 @@ public class MultiplayerServerListPinger {
                 } else {
                     arg.playerCountLabel = new TranslatableText("multiplayer.status.unknown").formatted(Formatting.DARK_GRAY);
                 }
+                String string = null;
                 if (lv.getFavicon() != null) {
-                    String string = lv.getFavicon();
-                    if (string.startsWith("data:image/png;base64,")) {
-                        arg.setIcon(string.substring("data:image/png;base64,".length()));
+                    String string2 = lv.getFavicon();
+                    if (string2.startsWith("data:image/png;base64,")) {
+                        string = string2.substring("data:image/png;base64,".length());
                     } else {
                         LOGGER.error("Invalid server icon (unknown format)");
                     }
-                } else {
-                    arg.setIcon(null);
+                }
+                if (!Objects.equals(string, arg.getIcon())) {
+                    arg.setIcon(string);
+                    runnable.run();
                 }
                 this.startTime = Util.getMeasuringTimeMs();
                 lv2.send(new QueryPingC2SPacket(this.startTime));

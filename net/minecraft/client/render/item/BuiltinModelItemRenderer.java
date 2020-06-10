@@ -128,21 +128,16 @@ public class BuiltinModelItemRenderer {
             this.modelShield.method_23775().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             if (bl) {
                 List<Pair<BannerPattern, DyeColor>> list = BannerBlockEntity.method_24280(ShieldItem.getColor(arg), BannerBlockEntity.getPatternListTag(arg));
-                BannerBlockEntityRenderer.renderCanvas(arg3, arg4, i, j, this.modelShield.method_23774(), lv14, false, list);
+                BannerBlockEntityRenderer.renderCanvas(arg3, arg4, i, j, this.modelShield.method_23774(), lv14, false, list, arg.hasEnchantmentGlint());
             } else {
                 this.modelShield.method_23774().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             }
             arg3.pop();
         } else if (lv == Items.TRIDENT) {
-            VertexConsumer lv17;
             arg3.push();
             arg3.scale(1.0f, -1.0f, -1.0f);
-            if (arg2 == ModelTransformation.Mode.GUI || arg2 == ModelTransformation.Mode.FIRST_PERSON_LEFT_HAND || arg2 == ModelTransformation.Mode.FIRST_PERSON_RIGHT_HAND || arg2 == ModelTransformation.Mode.FIXED) {
-                VertexConsumer lv16 = ItemRenderer.method_29711(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasEnchantmentGlint());
-            } else {
-                lv17 = ItemRenderer.getArmorVertexConsumer(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasEnchantmentGlint());
-            }
-            this.modelTrident.render(arg3, lv17, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
+            VertexConsumer lv16 = ItemRenderer.method_29711(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasEnchantmentGlint());
+            this.modelTrident.render(arg3, lv16, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             arg3.pop();
         }
     }
