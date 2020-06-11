@@ -16,6 +16,7 @@ import java.util.AbstractList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -353,23 +354,43 @@ implements Drawable {
             return true;
         }
         if (i == 264) {
-            this.moveSelection(1);
+            this.moveSelection(class_5403.DOWN);
             return true;
         }
         if (i == 265) {
-            this.moveSelection(-1);
+            this.moveSelection(class_5403.UP);
             return true;
         }
         return false;
     }
 
-    protected void moveSelection(int i) {
-        if (!this.children().isEmpty()) {
-            int j = this.children().indexOf(this.getSelected());
-            int k = MathHelper.clamp(j + i, 0, this.getItemCount() - 1);
-            Entry lv = (Entry)this.children().get(k);
+    protected void moveSelection(class_5403 arg2) {
+        this.method_30013(arg2, arg -> true);
+    }
+
+    protected void method_30015() {
+        E lv = this.getSelected();
+        if (lv != null) {
             this.setSelected(lv);
             this.ensureVisible(lv);
+        }
+    }
+
+    protected void method_30013(class_5403 arg, Predicate<E> predicate) {
+        int i;
+        int n = i = arg == class_5403.UP ? -1 : 1;
+        if (!this.children().isEmpty()) {
+            int k;
+            int j = this.children().indexOf(this.getSelected());
+            while (j != (k = MathHelper.clamp(j + i, 0, this.getItemCount() - 1))) {
+                Entry lv = (Entry)this.children().get(k);
+                if (predicate.test(lv)) {
+                    this.setSelected(lv);
+                    this.ensureVisible(lv);
+                    break;
+                }
+                j = k;
+            }
         }
     }
 
@@ -527,6 +548,13 @@ implements Drawable {
         public boolean isMouseOver(double d, double e) {
             return Objects.equals(this.list.getEntryAtPosition(d, e), this);
         }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public static enum class_5403 {
+        UP,
+        DOWN;
+
     }
 }
 

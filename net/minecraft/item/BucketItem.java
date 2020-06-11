@@ -19,6 +19,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -68,7 +69,7 @@ extends Item {
                 if (lv7.getBlock() instanceof FluidDrainable && (lv8 = ((FluidDrainable)((Object)lv7.getBlock())).tryDrainFluid(arg, lv4, lv7)) != Fluids.EMPTY) {
                     arg2.incrementStat(Stats.USED.getOrCreateStat(this));
                     arg2.playSound(lv8.isIn(FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_FILL_LAVA : SoundEvents.ITEM_BUCKET_FILL, 1.0f, 1.0f);
-                    ItemStack lv9 = this.getFilledStack(lv, arg2, lv8.getBucketItem());
+                    ItemStack lv9 = ItemUsage.method_30012(lv, arg2, new ItemStack(lv8.getBucketItem()));
                     if (!arg.isClient) {
                         Criteria.FILLED_BUCKET.trigger((ServerPlayerEntity)arg2, new ItemStack(lv8.getBucketItem()));
                     }
@@ -99,24 +100,6 @@ extends Item {
     }
 
     public void onEmptied(World arg, ItemStack arg2, BlockPos arg3) {
-    }
-
-    private ItemStack getFilledStack(ItemStack arg, PlayerEntity arg2, Item arg3) {
-        if (arg2.abilities.creativeMode) {
-            ItemStack lv = new ItemStack(arg3);
-            if (!arg2.inventory.contains(lv)) {
-                arg2.inventory.insertStack(lv);
-            }
-            return arg;
-        }
-        arg.decrement(1);
-        if (arg.isEmpty()) {
-            return new ItemStack(arg3);
-        }
-        if (!arg2.inventory.insertStack(new ItemStack(arg3))) {
-            arg2.dropItem(new ItemStack(arg3), false);
-        }
-        return arg;
     }
 
     public boolean placeFluid(@Nullable PlayerEntity arg, World arg2, BlockPos arg3, @Nullable BlockHitResult arg4) {

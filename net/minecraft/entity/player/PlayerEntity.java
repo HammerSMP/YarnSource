@@ -52,7 +52,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.damage.DamageSource;
@@ -484,15 +483,11 @@ extends LivingEntity {
         this.inventory.updateItems();
         this.prevStrideDistance = this.strideDistance;
         super.tickMovement();
-        EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (!this.world.isClient) {
-            lv.setBaseValue(this.abilities.getWalkSpeed());
-        }
         this.flyingSpeed = 0.02f;
         if (this.isSprinting()) {
             this.flyingSpeed = (float)((double)this.flyingSpeed + 0.005999999865889549);
         }
-        this.setMovementSpeed((float)lv.getValue());
+        this.setMovementSpeed((float)this.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
         if (!this.onGround || this.isDead() || this.isSwimming()) {
             float f = 0.0f;
         } else {
@@ -500,17 +495,17 @@ extends LivingEntity {
         }
         this.strideDistance += (g - this.strideDistance) * 0.4f;
         if (this.getHealth() > 0.0f && !this.isSpectator()) {
-            Box lv3;
+            Box lv2;
             if (this.hasVehicle() && !this.getVehicle().removed) {
-                Box lv2 = this.getBoundingBox().union(this.getVehicle().getBoundingBox()).expand(1.0, 0.0, 1.0);
+                Box lv = this.getBoundingBox().union(this.getVehicle().getBoundingBox()).expand(1.0, 0.0, 1.0);
             } else {
-                lv3 = this.getBoundingBox().expand(1.0, 0.5, 1.0);
+                lv2 = this.getBoundingBox().expand(1.0, 0.5, 1.0);
             }
-            List<Entity> list = this.world.getEntities(this, lv3);
+            List<Entity> list = this.world.getEntities(this, lv2);
             for (int i = 0; i < list.size(); ++i) {
-                Entity lv4 = list.get(i);
-                if (lv4.removed) continue;
-                this.collideWithEntity(lv4);
+                Entity lv3 = list.get(i);
+                if (lv3.removed) continue;
+                this.collideWithEntity(lv3);
             }
         }
         this.updateShoulderEntity(this.getShoulderEntityLeft());
@@ -707,6 +702,7 @@ extends LivingEntity {
         this.setScore(arg.getInt("Score"));
         this.hungerManager.fromTag(arg);
         this.abilities.deserialize(arg);
+        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(this.abilities.getWalkSpeed());
         if (arg.contains("EnderItems", 9)) {
             this.enderChestInventory.readTags(arg.getList("EnderItems", 10));
         }

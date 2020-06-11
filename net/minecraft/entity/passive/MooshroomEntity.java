@@ -29,6 +29,7 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.item.SuspiciousStewItem;
 import net.minecraft.nbt.CompoundTag;
@@ -92,9 +93,6 @@ implements Shearable {
         if (lv.getItem() == Items.BOWL && !this.isBaby()) {
             SoundEvent lv5;
             ItemStack lv3;
-            if (!arg.abilities.creativeMode) {
-                lv.decrement(1);
-            }
             boolean bl = false;
             if (this.stewEffect != null) {
                 bl = true;
@@ -105,11 +103,7 @@ implements Shearable {
             } else {
                 lv3 = new ItemStack(Items.MUSHROOM_STEW);
             }
-            if (lv.isEmpty()) {
-                arg.setStackInHand(arg22, lv3);
-            } else if (!arg.inventory.insertStack(lv3)) {
-                arg.dropItem(lv3, false);
-            }
+            ItemUsage.method_30012(lv, arg, lv3);
             if (bl) {
                 SoundEvent lv4 = SoundEvents.ENTITY_MOOSHROOM_SUSPICIOUS_MILK;
             } else {

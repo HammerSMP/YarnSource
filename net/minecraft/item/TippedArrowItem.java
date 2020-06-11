@@ -32,7 +32,6 @@ extends ArrowItem {
     }
 
     @Override
-    @Environment(value=EnvType.CLIENT)
     public ItemStack getStackForRender() {
         return PotionUtil.setPotion(super.getStackForRender(), Potions.POISON);
     }

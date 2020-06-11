@@ -74,7 +74,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -179,14 +178,11 @@ public class ServerNetworkIo {
                     }
                     catch (Exception exception) {
                         if (lv.isLocal()) {
-                            CrashReport lv2 = CrashReport.create(exception, "Ticking memory connection");
-                            CrashReportSection lv3 = lv2.addElement("Ticking connection");
-                            lv3.add("Connection", lv::toString);
-                            throw new CrashException(lv2);
+                            throw new CrashException(CrashReport.create(exception, "Ticking memory connection"));
                         }
                         LOGGER.warn("Failed to handle packet for {}", (Object)lv.getAddress(), (Object)exception);
-                        LiteralText lv4 = new LiteralText("Internal server error");
-                        lv.send(new DisconnectS2CPacket(lv4), (GenericFutureListener<? extends Future<? super Void>>)((GenericFutureListener)future -> lv.disconnect(lv4)));
+                        LiteralText lv2 = new LiteralText("Internal server error");
+                        lv.send(new DisconnectS2CPacket(lv2), (GenericFutureListener<? extends Future<? super Void>>)((GenericFutureListener)future -> lv.disconnect(lv2)));
                         lv.disableAutoRead();
                     }
                     continue;

@@ -193,13 +193,9 @@ extends HorseBaseEntity {
             }
         }
         if (!lv.isEmpty()) {
-            boolean bl2;
+            boolean bl;
             if (this.isBreedingItem(lv)) {
-                boolean bl = this.receiveFood(arg, lv);
-                if (!arg.abilities.creativeMode) {
-                    lv.decrement(1);
-                }
-                return bl ? ActionResult.success(this.world.isClient) : ActionResult.CONSUME;
+                return this.method_30009(arg, lv);
             }
             ActionResult lv2 = lv.useOnEntity(arg, this, arg2);
             if (lv2.isAccepted()) {
@@ -209,8 +205,8 @@ extends HorseBaseEntity {
                 this.playAngrySound();
                 return ActionResult.success(this.world.isClient);
             }
-            boolean bl = bl2 = !this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE;
-            if (this.canEquip(lv) || bl2) {
+            boolean bl2 = bl = !this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE;
+            if (this.canEquip(lv) || bl) {
                 this.openInventory(arg);
                 return ActionResult.success(this.world.isClient);
             }

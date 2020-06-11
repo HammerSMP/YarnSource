@@ -55,7 +55,7 @@ public class DatapackCommand {
         ResourcePackManager<ResourcePackProfile> lv = arg.getMinecraftServer().getDataPackManager();
         ArrayList list = Lists.newArrayList(lv.getEnabledProfiles());
         arg3.apply(list, arg2);
-        arg.sendFeedback(new TranslatableText("commands.datapack.enable.success", arg2.getInformationText(true)), true);
+        arg.sendFeedback(new TranslatableText("commands.datapack.modify.enable", arg2.getInformationText(true)), true);
         ReloadCommand.method_29480(list.stream().map(ResourcePackProfile::getName).collect(Collectors.toList()), arg);
         return list.size();
     }
@@ -64,8 +64,8 @@ public class DatapackCommand {
         ResourcePackManager<ResourcePackProfile> lv = arg.getMinecraftServer().getDataPackManager();
         ArrayList list = Lists.newArrayList(lv.getEnabledProfiles());
         list.remove(arg2);
+        arg.sendFeedback(new TranslatableText("commands.datapack.modify.disable", arg2.getInformationText(true)), true);
         ReloadCommand.method_29480(list.stream().map(ResourcePackProfile::getName).collect(Collectors.toList()), arg);
-        arg.sendFeedback(new TranslatableText("commands.datapack.disable.success", arg2.getInformationText(true)), true);
         return list.size();
     }
 

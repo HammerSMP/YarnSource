@@ -92,7 +92,7 @@ public final class DimensionOptions {
         if (entry.getKey() != OVERWORLD || entry2.getKey() != NETHER || entry3.getKey() != END) {
             return false;
         }
-        if (((DimensionOptions)entry.getValue()).getDimensionType() != DimensionType.OVERWORLD && ((DimensionOptions)entry.getValue()).getDimensionType() != DimensionType.field_25611) {
+        if (((DimensionOptions)entry.getValue()).getDimensionType() != DimensionType.OVERWORLD && ((DimensionOptions)entry.getValue()).getDimensionType() != DimensionType.OVERWORLD_CAVES) {
             return false;
         }
         if (((DimensionOptions)entry2.getValue()).getDimensionType() != DimensionType.THE_NETHER) {

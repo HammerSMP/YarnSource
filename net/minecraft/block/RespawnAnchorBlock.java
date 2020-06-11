@@ -132,7 +132,7 @@ extends Block {
     }
 
     public static boolean isNether(World arg) {
-        return arg.getDimension().method_29957();
+        return arg.getDimension().isRespawnAnchorWorking();
     }
 
     public static void charge(World arg, BlockPos arg2, BlockState arg3) {

@@ -46,7 +46,7 @@ implements Packet<ClientPlayPacketListener> {
         int i = arg.readInt();
         for (int j = 0; j < i; ++j) {
             Identifier lv = arg.readIdentifier();
-            EntityAttribute lv2 = Registry.ATTRIBUTES.get(lv);
+            EntityAttribute lv2 = Registry.ATTRIBUTE.get(lv);
             double d = arg.readDouble();
             ArrayList list = Lists.newArrayList();
             int k = arg.readVarInt();
@@ -63,7 +63,7 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeVarInt(this.entityId);
         arg.writeInt(this.entries.size());
         for (Entry lv : this.entries) {
-            arg.writeIdentifier(Registry.ATTRIBUTES.getId(lv.getId()));
+            arg.writeIdentifier(Registry.ATTRIBUTE.getId(lv.getId()));
             arg.writeDouble(lv.getBaseValue());
             arg.writeVarInt(lv.getModifiers().size());
             for (EntityAttributeModifier lv2 : lv.getModifiers()) {

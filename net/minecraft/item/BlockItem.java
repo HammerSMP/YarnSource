@@ -89,7 +89,7 @@ extends Item {
         }
         BlockSoundGroup lv9 = lv7.getSoundGroup();
         lv4.playSound(lv5, lv3, this.getPlaceSound(lv7), SoundCategory.BLOCKS, (lv9.getVolume() + 1.0f) / 2.0f, lv9.getPitch() * 0.8f);
-        if (!lv5.abilities.creativeMode) {
+        if (lv5 == null || !lv5.abilities.creativeMode) {
             lv6.decrement(1);
         }
         return ActionResult.success(lv4.isClient);

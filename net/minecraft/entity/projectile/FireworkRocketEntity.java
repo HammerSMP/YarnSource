@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  *  net.fabricmc.api.EnvironmentInterface
@@ -11,6 +12,7 @@ package net.minecraft.entity.projectile;
 
 import java.util.List;
 import java.util.OptionalInt;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvironmentInterface;
@@ -71,7 +73,7 @@ implements FlyingItemEntity {
         this.lifeTime = 10 * i + this.random.nextInt(6) + this.random.nextInt(7);
     }
 
-    public FireworkRocketEntity(World arg, Entity arg2, double d, double e, double f, ItemStack arg3) {
+    public FireworkRocketEntity(World arg, @Nullable Entity arg2, double d, double e, double f, ItemStack arg3) {
         this(arg, d, e, f, arg3);
         this.setOwner(arg2);
     }

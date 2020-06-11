@@ -6,14 +6,19 @@
  */
 package net.minecraft.world.chunk;
 
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
@@ -93,6 +98,16 @@ CollisionView {
         }
         Chunk lv = this.method_22354(arg);
         return lv.getBlockState(arg);
+    }
+
+    @Override
+    public Stream<VoxelShape> getEntityCollisions(@Nullable Entity arg, Box arg2, Predicate<Entity> predicate) {
+        return Stream.empty();
+    }
+
+    @Override
+    public Stream<VoxelShape> getCollisions(@Nullable Entity arg, Box arg2, Predicate<Entity> predicate) {
+        return this.getBlockCollisions(arg, arg2);
     }
 
     @Override

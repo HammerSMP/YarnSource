@@ -77,7 +77,7 @@ public abstract class GeneratorType {
 
         @Override
         public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
-            return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_29962(DimensionType.method_28517(l), DimensionType::method_29953, this.method_29076(l)));
+            return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_29962(DimensionType.method_28517(l), DimensionType::getOverworldCavesDimensionType, this.method_29076(l)));
         }
 
         @Override
@@ -114,9 +114,9 @@ public abstract class GeneratorType {
         ChunkGeneratorType lv4;
         FixedBiomeSource lv = new FixedBiomeSource(arg3);
         if (arg2 == SINGLE_BIOME_CAVES) {
-            ChunkGeneratorType lv2 = ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType();
+            ChunkGeneratorType lv2 = ChunkGeneratorType.Preset.CAVES.getChunkGeneratorType();
         } else if (arg2 == SINGLE_BIOME_FLOATING_ISLANDS) {
-            ChunkGeneratorType lv3 = ChunkGeneratorType.Preset.END.getChunkGeneratorType();
+            ChunkGeneratorType lv3 = ChunkGeneratorType.Preset.FLOATING_ISLANDS.getChunkGeneratorType();
         } else {
             lv4 = ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType();
         }

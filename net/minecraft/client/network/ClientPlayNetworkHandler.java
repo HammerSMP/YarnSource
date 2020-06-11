@@ -2012,7 +2012,7 @@ implements ClientPlayPacketListener {
         for (EntityAttributesS2CPacket.Entry lv3 : arg.getEntries()) {
             EntityAttributeInstance lv4 = lv2.getCustomInstance(lv3.getId());
             if (lv4 == null) {
-                LOGGER.warn("Entity {} does not have attribute {}", (Object)lv, (Object)Registry.ATTRIBUTES.getId(lv3.getId()));
+                LOGGER.warn("Entity {} does not have attribute {}", (Object)lv, (Object)Registry.ATTRIBUTE.getId(lv3.getId()));
                 continue;
             }
             lv4.setBaseValue(lv3.getBaseValue());

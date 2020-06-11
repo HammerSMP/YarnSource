@@ -33,10 +33,14 @@ extends Item {
                 lv.setBlockState(lv2, (BlockState)lv3.with(CampfireBlock.LIT, true));
                 bl = true;
             }
-        } else if (lv.getBlockState(lv2 = lv2.offset(arg2.getSide())).isAir()) {
-            this.playUseSound(lv, lv2);
-            lv.setBlockState(lv2, AbstractFireBlock.getState(lv, lv2));
-            bl = true;
+        } else {
+            lv2 = lv2.offset(arg2.getSide());
+            BlockState lv4 = AbstractFireBlock.getState(lv, lv2);
+            if (lv.getBlockState(lv2).isAir() && lv4.canPlaceAt(lv, lv2)) {
+                this.playUseSound(lv, lv2);
+                lv.setBlockState(lv2, lv4);
+                bl = true;
+            }
         }
         if (bl) {
             arg2.getStack().decrement(1);

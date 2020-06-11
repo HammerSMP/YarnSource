@@ -44,7 +44,9 @@ import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -75,7 +77,7 @@ public class Advancement {
         } else {
             Text lv = arg3.getTitle();
             Formatting lv2 = arg3.getFrame().getTitleFormat();
-            MutableText lv3 = lv.shallowCopy().formatted(lv2).append("\n").append(arg3.getDescription());
+            MutableText lv3 = Texts.setStyleIfAbsent(lv.shallowCopy(), Style.EMPTY.withColor(lv2)).append("\n").append(arg3.getDescription());
             MutableText lv4 = lv.shallowCopy().styled(arg2 -> arg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv3)));
             this.text = new LiteralText("[").append(lv4).append("]").formatted(lv2);
         }

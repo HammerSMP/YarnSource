@@ -764,7 +764,7 @@ public final class ItemStack {
                 EntityAttributeModifier lv3;
                 Optional<EntityAttribute> optional;
                 CompoundTag lv2 = lv.getCompound(i);
-                if (lv2.contains("Slot", 8) && !lv2.getString("Slot").equals(arg.getName()) || !(optional = Registry.ATTRIBUTES.getOrEmpty(Identifier.tryParse(lv2.getString("AttributeName")))).isPresent() || (lv3 = EntityAttributeModifier.fromTag(lv2)) == null || lv3.getId().getLeastSignificantBits() == 0L || lv3.getId().getMostSignificantBits() == 0L) continue;
+                if (lv2.contains("Slot", 8) && !lv2.getString("Slot").equals(arg.getName()) || !(optional = Registry.ATTRIBUTE.getOrEmpty(Identifier.tryParse(lv2.getString("AttributeName")))).isPresent() || (lv3 = EntityAttributeModifier.fromTag(lv2)) == null || lv3.getId().getLeastSignificantBits() == 0L || lv3.getId().getMostSignificantBits() == 0L) continue;
                 multimap.put((Object)optional.get(), (Object)lv3);
             }
         } else {
@@ -780,7 +780,7 @@ public final class ItemStack {
         }
         ListTag lv = this.tag.getList("AttributeModifiers", 10);
         CompoundTag lv2 = arg2.toTag();
-        lv2.putString("AttributeName", Registry.ATTRIBUTES.getId(arg).toString());
+        lv2.putString("AttributeName", Registry.ATTRIBUTE.getId(arg).toString());
         if (arg3 != null) {
             lv2.putString("Slot", arg3.getName());
         }

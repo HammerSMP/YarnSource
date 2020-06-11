@@ -24,6 +24,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
@@ -85,14 +86,7 @@ extends AnimalEntity {
         ItemStack lv = arg.getStackInHand(arg2);
         if (lv.getItem() == Items.BUCKET && !this.isBaby()) {
             arg.playSound(SoundEvents.ENTITY_COW_MILK, 1.0f, 1.0f);
-            if (!arg.abilities.creativeMode) {
-                lv.decrement(1);
-            }
-            if (lv.isEmpty()) {
-                arg.setStackInHand(arg2, new ItemStack(Items.MILK_BUCKET));
-            } else if (!arg.inventory.insertStack(new ItemStack(Items.MILK_BUCKET))) {
-                arg.dropItem(new ItemStack(Items.MILK_BUCKET), false);
-            }
+            ItemUsage.method_30012(lv, arg, Items.MILK_BUCKET.getStackForRender());
             return ActionResult.success(this.world.isClient);
         }
         return super.interactMob(arg, arg2);

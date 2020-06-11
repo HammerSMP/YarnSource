@@ -52,7 +52,7 @@ import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 
 public class DimensionType {
-    public static final MapCodec<DimensionType> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.fixedTime), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::hasCeiling), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::isUltrawarm), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::isNatural), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::isShrunk), (App)Codec.BOOL.fieldOf("piglin_safe").forGetter(DimensionType::method_29955), (App)Codec.BOOL.fieldOf("bed_works").forGetter(DimensionType::method_29956), (App)Codec.BOOL.fieldOf("respawn_anchor_works").forGetter(DimensionType::method_29957), (App)Codec.BOOL.fieldOf("has_raids").forGetter(DimensionType::method_29958), (App)NumberCodecs.rangedInt(0, 256).fieldOf("logical_height").forGetter(DimensionType::method_29959), (App)Identifier.CODEC.fieldOf("infiniburn").forGetter(arg -> arg.field_25617), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.ambientLight))).apply((Applicative)instance, DimensionType::new));
+    public static final MapCodec<DimensionType> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.fixedTime), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::hasCeiling), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::isUltrawarm), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::isNatural), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::isShrunk), (App)Codec.BOOL.fieldOf("piglin_safe").forGetter(DimensionType::isPiglinSafe), (App)Codec.BOOL.fieldOf("bed_works").forGetter(DimensionType::isBedWorking), (App)Codec.BOOL.fieldOf("respawn_anchor_works").forGetter(DimensionType::isRespawnAnchorWorking), (App)Codec.BOOL.fieldOf("has_raids").forGetter(DimensionType::hasRaids), (App)NumberCodecs.rangedInt(0, 256).fieldOf("logical_height").forGetter(DimensionType::getLogicalHeight), (App)Identifier.CODEC.fieldOf("infiniburn").forGetter(arg -> arg.infiniburn), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.ambientLight))).apply((Applicative)instance, DimensionType::new));
     public static final float[] field_24752 = new float[]{1.0f, 0.75f, 0.5f, 0.25f, 0.0f, 0.25f, 0.5f, 0.75f};
     public static final RegistryKey<DimensionType> OVERWORLD_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld"));
     public static final RegistryKey<DimensionType> THE_NETHER_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("the_nether"));
@@ -60,8 +60,8 @@ public class DimensionType {
     protected static final DimensionType OVERWORLD = new DimensionType(OptionalLong.empty(), true, false, false, true, false, false, false, true, false, true, 256, HorizontalVoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_OVERWORLD.getId(), 0.0f);
     protected static final DimensionType THE_NETHER = new DimensionType(OptionalLong.of(18000L), false, true, true, false, true, false, true, false, true, false, 128, VoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_NETHER.getId(), 0.1f);
     protected static final DimensionType THE_END = new DimensionType(OptionalLong.of(6000L), false, false, false, false, false, true, false, false, false, true, 256, VoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_END.getId(), 0.0f);
-    public static final RegistryKey<DimensionType> field_25610 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld_caves"));
-    protected static final DimensionType field_25611 = new DimensionType(OptionalLong.empty(), true, true, false, true, false, false, false, true, false, true, 256, HorizontalVoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_OVERWORLD.getId(), 0.0f);
+    public static final RegistryKey<DimensionType> OVERWORLD_CAVES_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld_caves"));
+    protected static final DimensionType OVERWORLD_CAVES = new DimensionType(OptionalLong.empty(), true, true, false, true, false, false, false, true, false, true, 256, HorizontalVoronoiBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_OVERWORLD.getId(), 0.0f);
     public static final Codec<Supplier<DimensionType>> field_24756 = RegistryElementCodec.of(Registry.DIMENSION_TYPE_KEY, CODEC);
     private final OptionalLong fixedTime;
     private final boolean hasSkyLight;
@@ -70,13 +70,13 @@ public class DimensionType {
     private final boolean natural;
     private final boolean shrunk;
     private final boolean hasEnderDragonFight;
-    private final boolean field_25612;
-    private final boolean field_25613;
-    private final boolean field_25614;
-    private final boolean field_25615;
-    private final int field_25616;
+    private final boolean piglinSafe;
+    private final boolean bedWorks;
+    private final boolean respawnAnchorWorks;
+    private final boolean hasRaids;
+    private final int logicalHeight;
     private final BiomeAccessType biomeAccessType;
-    private final Identifier field_25617;
+    private final Identifier infiniburn;
     private final float ambientLight;
     private final transient float[] field_24767;
 
@@ -85,8 +85,8 @@ public class DimensionType {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static DimensionType method_29953() {
-        return field_25611;
+    public static DimensionType getOverworldCavesDimensionType() {
+        return OVERWORLD_CAVES;
     }
 
     protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, boolean bl7, boolean bl8, boolean bl9, int i, Identifier arg, float f) {
@@ -101,13 +101,13 @@ public class DimensionType {
         this.natural = bl4;
         this.shrunk = bl5;
         this.hasEnderDragonFight = bl6;
-        this.field_25612 = bl7;
-        this.field_25613 = bl8;
-        this.field_25614 = bl9;
-        this.field_25615 = bl10;
-        this.field_25616 = i;
+        this.piglinSafe = bl7;
+        this.bedWorks = bl8;
+        this.respawnAnchorWorks = bl9;
+        this.hasRaids = bl10;
+        this.logicalHeight = i;
         this.biomeAccessType = arg;
-        this.field_25617 = arg2;
+        this.infiniburn = arg2;
         this.ambientLight = f;
         this.field_24767 = DimensionType.method_28515(f);
     }
@@ -142,7 +142,7 @@ public class DimensionType {
 
     public static RegistryTracker.Modifiable addRegistryDefaults(RegistryTracker.Modifiable arg) {
         arg.addDimensionType(OVERWORLD_REGISTRY_KEY, OVERWORLD);
-        arg.addDimensionType(field_25610, field_25611);
+        arg.addDimensionType(OVERWORLD_CAVES_REGISTRY_KEY, OVERWORLD_CAVES);
         arg.addDimensionType(THE_NETHER_REGISTRY_KEY, THE_NETHER);
         arg.addDimensionType(THE_END_REGISTRY_KEY, THE_END);
         return arg;
@@ -206,24 +206,24 @@ public class DimensionType {
         return this.shrunk;
     }
 
-    public boolean method_29955() {
-        return this.field_25612;
+    public boolean isPiglinSafe() {
+        return this.piglinSafe;
     }
 
-    public boolean method_29956() {
-        return this.field_25613;
+    public boolean isBedWorking() {
+        return this.bedWorks;
     }
 
-    public boolean method_29957() {
-        return this.field_25614;
+    public boolean isRespawnAnchorWorking() {
+        return this.respawnAnchorWorks;
     }
 
-    public boolean method_29958() {
-        return this.field_25615;
+    public boolean hasRaids() {
+        return this.hasRaids;
     }
 
-    public int method_29959() {
-        return this.field_25616;
+    public int getLogicalHeight() {
+        return this.logicalHeight;
     }
 
     public boolean hasEnderDragonFight() {
@@ -234,7 +234,7 @@ public class DimensionType {
         return this.biomeAccessType;
     }
 
-    public boolean method_29960() {
+    public boolean hasFixedTime() {
         return this.fixedTime.isPresent();
     }
 
@@ -252,8 +252,8 @@ public class DimensionType {
         return this.field_24767[i];
     }
 
-    public Tag<Block> method_29961() {
-        return BlockTags.getContainer().get(this.field_25617);
+    public Tag<Block> getInfiniburnBlocks() {
+        return BlockTags.getContainer().get(this.infiniburn);
     }
 }
 

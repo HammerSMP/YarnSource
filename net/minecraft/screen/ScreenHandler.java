@@ -32,8 +32,12 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public abstract class ScreenHandler {
@@ -163,6 +167,21 @@ public abstract class ScreenHandler {
     }
 
     public ItemStack onSlotClick(int i, int j, SlotActionType arg, PlayerEntity arg2) {
+        try {
+            return this.method_30010(i, j, arg, arg2);
+        }
+        catch (Exception exception) {
+            CrashReport lv = CrashReport.create(exception, "Container click");
+            CrashReportSection lv2 = lv.addElement("Click info");
+            lv2.add("Menu", () -> this.type != null ? Registry.SCREEN_HANDLER.getId(this.type).toString() : "<no type>");
+            lv2.add("Slot", i);
+            lv2.add("Button", j);
+            lv2.add("Type", (Object)arg);
+            throw new CrashException(lv);
+        }
+    }
+
+    private ItemStack method_30010(int i, int j, SlotActionType arg, PlayerEntity arg2) {
         ItemStack lv = ItemStack.EMPTY;
         PlayerInventory lv2 = arg2.inventory;
         if (arg == SlotActionType.QUICK_CRAFT) {

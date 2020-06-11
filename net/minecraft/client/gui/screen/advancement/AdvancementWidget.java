@@ -27,6 +27,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -60,7 +61,7 @@ extends DrawableHelper {
         int j = String.valueOf(i).length();
         int k = i > 1 ? arg2.textRenderer.getWidth("  ") + arg2.textRenderer.getWidth("0") * j * 2 + arg2.textRenderer.getWidth("/") : 0;
         int l = 29 + arg2.textRenderer.getWidth(this.title) + k;
-        this.description = this.wrapDescription(arg4.getDescription().shallowCopy().formatted(arg4.getFrame().getTitleFormat()), l);
+        this.description = this.wrapDescription(Texts.setStyleIfAbsent(arg4.getDescription().shallowCopy(), Style.EMPTY.withColor(arg4.getFrame().getTitleFormat())), l);
         for (StringRenderable lv : this.description) {
             l = Math.max(l, arg2.textRenderer.getWidth(lv));
         }

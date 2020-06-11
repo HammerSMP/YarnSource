@@ -33,6 +33,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.network.LanServerInfo;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.options.ServerList;
@@ -49,7 +50,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,11 +79,12 @@ extends AlwaysSelectedEntryListWidget<Entry> {
     }
 
     @Override
-    public void setSelected(Entry arg) {
+    public void setSelected(@Nullable Entry arg) {
         super.setSelected(arg);
         if (this.getSelected() instanceof ServerEntry) {
             NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", ((ServerEntry)((ServerEntry)this.getSelected())).server.name).getString());
         }
+        this.screen.updateButtonActivationStates();
     }
 
     @Override
@@ -93,17 +94,8 @@ extends AlwaysSelectedEntryListWidget<Entry> {
     }
 
     @Override
-    protected void moveSelection(int i) {
-        int j = this.children().indexOf(this.getSelected());
-        int k = MathHelper.clamp(j + i, 0, this.getItemCount() - 1);
-        Entry lv = (Entry)this.children().get(k);
-        if (lv instanceof ScanningEntry) {
-            k = MathHelper.clamp(k + (i > 0 ? 1 : -1), 0, this.getItemCount() - 1);
-            lv = (Entry)this.children().get(k);
-        }
-        super.setSelected(lv);
-        this.ensureVisible(lv);
-        this.screen.updateButtonActivationStates();
+    protected void moveSelection(EntryListWidget.class_5403 arg2) {
+        this.method_30013(arg2, arg -> !(arg instanceof ScanningEntry));
     }
 
     public void setServers(ServerList arg) {

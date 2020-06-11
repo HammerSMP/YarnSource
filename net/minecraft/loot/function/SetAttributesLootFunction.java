@@ -93,7 +93,7 @@ extends ConditionalLootFunction {
         public JsonObject serialize(JsonSerializationContext jsonSerializationContext) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("name", this.name);
-            jsonObject.addProperty("attribute", Registry.ATTRIBUTES.getId(this.attribute).toString());
+            jsonObject.addProperty("attribute", Registry.ATTRIBUTE.getId(this.attribute).toString());
             jsonObject.addProperty("operation", Attribute.getName(this.operation));
             jsonObject.add("amount", jsonSerializationContext.serialize((Object)this.amountRange));
             if (this.id != null) {
@@ -118,7 +118,7 @@ extends ConditionalLootFunction {
             void lvs3;
             String string = JsonHelper.getString(jsonObject, "name");
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "attribute"));
-            EntityAttribute lv2 = Registry.ATTRIBUTES.get(lv);
+            EntityAttribute lv2 = Registry.ATTRIBUTE.get(lv);
             if (lv2 == null) {
                 throw new JsonSyntaxException("Unknown attribute: " + lv);
             }

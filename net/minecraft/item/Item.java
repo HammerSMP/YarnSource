@@ -310,7 +310,6 @@ implements ItemConvertible {
         return arg.getItem() == Items.CROSSBOW;
     }
 
-    @Environment(value=EnvType.CLIENT)
     public ItemStack getStackForRender() {
         return new ItemStack(this);
     }

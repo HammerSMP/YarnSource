@@ -261,7 +261,7 @@ AutoCloseable {
                     }
                 }
                 if ((i & 0x10) == 0) {
-                    int j = i & 0xFFFFFFFE;
+                    int j = i & 0xFFFFFFDE;
                     lv3.prepare(this, arg, j);
                     arg2.updateNeighbors(this, arg, j);
                     arg2.prepare(this, arg, j);
@@ -399,11 +399,11 @@ AutoCloseable {
     }
 
     public boolean isDay() {
-        return !this.getDimension().method_29960() && this.ambientDarkness < 4;
+        return !this.getDimension().hasFixedTime() && this.ambientDarkness < 4;
     }
 
     public boolean isNight() {
-        return !this.getDimension().method_29960() && !this.isDay();
+        return !this.getDimension().hasFixedTime() && !this.isDay();
     }
 
     @Override

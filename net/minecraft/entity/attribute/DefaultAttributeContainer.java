@@ -29,7 +29,7 @@ public class DefaultAttributeContainer {
     private EntityAttributeInstance require(EntityAttribute arg) {
         EntityAttributeInstance lv = this.instances.get(arg);
         if (lv == null) {
-            throw new IllegalArgumentException("Can't find attribute " + Registry.ATTRIBUTES.getId(arg));
+            throw new IllegalArgumentException("Can't find attribute " + Registry.ATTRIBUTE.getId(arg));
         }
         return lv;
     }
@@ -45,7 +45,7 @@ public class DefaultAttributeContainer {
     public double getModifierValue(EntityAttribute arg, UUID uUID) {
         EntityAttributeModifier lv = this.require(arg).getModifier(uUID);
         if (lv == null) {
-            throw new IllegalArgumentException("Can't find modifier " + uUID + " on attribute " + Registry.ATTRIBUTES.getId(arg));
+            throw new IllegalArgumentException("Can't find modifier " + uUID + " on attribute " + Registry.ATTRIBUTE.getId(arg));
         }
         return lv.getValue();
     }
@@ -81,7 +81,7 @@ public class DefaultAttributeContainer {
         private EntityAttributeInstance checkedAdd(EntityAttribute arg) {
             EntityAttributeInstance lv = new EntityAttributeInstance(arg, arg2 -> {
                 if (this.unmodifiable) {
-                    throw new UnsupportedOperationException("Tried to change value for default attribute instance: " + Registry.ATTRIBUTES.getId(arg));
+                    throw new UnsupportedOperationException("Tried to change value for default attribute instance: " + Registry.ATTRIBUTE.getId(arg));
                 }
             });
             this.instances.put(arg, lv);

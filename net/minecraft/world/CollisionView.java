@@ -2,12 +2,10 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.Streams
  *  javax.annotation.Nullable
  */
 package net.minecraft.world;
 
-import com.google.common.collect.Streams;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -59,12 +57,10 @@ extends BlockView {
         return this.getCollisions(arg, arg2, predicate).allMatch(VoxelShape::isEmpty);
     }
 
-    default public Stream<VoxelShape> getEntityCollisions(@Nullable Entity arg, Box arg2, Predicate<Entity> predicate) {
-        return Stream.empty();
-    }
+    public Stream<VoxelShape> getEntityCollisions(@Nullable Entity var1, Box var2, Predicate<Entity> var3);
 
     default public Stream<VoxelShape> getCollisions(@Nullable Entity arg, Box arg2, Predicate<Entity> predicate) {
-        return Streams.concat((Stream[])new Stream[]{this.getBlockCollisions(arg, arg2), this.getEntityCollisions(arg, arg2, predicate)});
+        return Stream.concat(this.getBlockCollisions(arg, arg2), this.getEntityCollisions(arg, arg2, predicate));
     }
 
     default public Stream<VoxelShape> getBlockCollisions(@Nullable Entity arg, Box arg2) {

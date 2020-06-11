@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5394;
 import net.minecraft.tag.Tag;
 import net.minecraft.tag.TagContainer;
 import net.minecraft.util.Identifier;
@@ -40,7 +41,7 @@ public class GlobalTagAccessor<T> {
     @Environment(value=EnvType.CLIENT)
     public void markReady() {
         this.currentContainer = this.emptyContainer;
-        Tag lv = this.emptyContainer.getEmpty();
+        class_5394 lv = class_5394.method_29898();
         this.tags.forEach(arg22 -> arg22.updateContainer(arg2 -> lv));
     }
 
