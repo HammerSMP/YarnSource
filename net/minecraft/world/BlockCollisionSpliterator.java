@@ -8,6 +8,7 @@ package net.minecraft.world;
 
 import java.util.Objects;
 import java.util.Spliterators;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
@@ -36,8 +37,13 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
     private final VoxelShape boxShape;
     private final CollisionView world;
     private boolean checkEntity;
+    private final BiPredicate<BlockState, BlockPos> field_25669;
 
-    public BlockCollisionSpliterator(CollisionView arg, @Nullable Entity arg2, Box arg3) {
+    public BlockCollisionSpliterator(CollisionView arg3, @Nullable Entity arg22, Box arg32) {
+        this(arg3, arg22, arg32, (arg, arg2) -> true);
+    }
+
+    public BlockCollisionSpliterator(CollisionView arg, @Nullable Entity arg2, Box arg3, BiPredicate<BlockState, BlockPos> biPredicate) {
         super(Long.MAX_VALUE, 1280);
         this.context = arg2 == null ? ShapeContext.absent() : ShapeContext.of(arg2);
         this.pos = new BlockPos.Mutable();
@@ -46,6 +52,7 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
         this.checkEntity = arg2 != null;
         this.entity = arg2;
         this.box = arg3;
+        this.field_25669 = biPredicate;
         int i = MathHelper.floor(arg3.minX - 1.0E-7) - 1;
         int j = MathHelper.floor(arg3.maxX + 1.0E-7) + 1;
         int k = MathHelper.floor(arg3.minY - 1.0E-7) - 1;
@@ -70,7 +77,7 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
             if (l == 3 || (lv = this.getChunk(i, k)) == null) continue;
             this.pos.set(i, j, k);
             BlockState lv2 = lv.getBlockState(this.pos);
-            if (l == 1 && !lv2.exceedsCube() || l == 2 && !lv2.isOf(Blocks.MOVING_PISTON)) continue;
+            if (!this.field_25669.test(lv2, this.pos) || l == 1 && !lv2.exceedsCube() || l == 2 && !lv2.isOf(Blocks.MOVING_PISTON)) continue;
             VoxelShape lv3 = lv2.getCollisionShape(this.world, this.pos, this.context);
             if (lv3 == VoxelShapes.fullCube()) {
                 if (!this.box.intersects(i, j, k, (double)i + 1.0, (double)j + 1.0, (double)k + 1.0)) continue;

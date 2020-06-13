@@ -56,7 +56,7 @@ import org.apache.logging.log4j.Logger;
 
 public class FlatChunkGeneratorConfig {
     private static final Logger LOGGER = LogManager.getLogger();
-    public static final Codec<FlatChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)StructuresConfig.CODEC.fieldOf("structures").forGetter(FlatChunkGeneratorConfig::getConfig), (App)FlatChunkGeneratorLayer.CODEC.listOf().fieldOf("layers").forGetter(FlatChunkGeneratorConfig::getLayers), (App)NumberCodecs.method_29905(Registry.BIOME.fieldOf("biome"), Util.method_29188("Unknown biome, defaulting to plains", ((Logger)LOGGER)::error), () -> Biomes.PLAINS).forGetter(arg -> arg.biome)).apply((Applicative)instance, FlatChunkGeneratorConfig::new)).stable();
+    public static final Codec<FlatChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)StructuresConfig.CODEC.fieldOf("structures").forGetter(FlatChunkGeneratorConfig::getConfig), (App)FlatChunkGeneratorLayer.CODEC.listOf().fieldOf("layers").forGetter(FlatChunkGeneratorConfig::getLayers), (App)Codec.BOOL.fieldOf("lakes").withDefault((Object)false).forGetter(arg -> arg.field_24977), (App)Codec.BOOL.fieldOf("features").withDefault((Object)false).forGetter(arg -> arg.field_24976), (App)NumberCodecs.method_29905(Registry.BIOME.fieldOf("biome"), Util.method_29188("Unknown biome, defaulting to plains", ((Logger)LOGGER)::error), () -> Biomes.PLAINS).forGetter(arg -> arg.biome)).apply((Applicative)instance, FlatChunkGeneratorConfig::new)).stable();
     private static final ConfiguredFeature<?, ?> WATER_LAKE = Feature.LAKE.configure(new SingleStateFeatureConfig(Blocks.WATER.getDefaultState())).createDecoratedFeature(Decorator.WATER_LAKE.configure(new ChanceDecoratorConfig(4)));
     private static final ConfiguredFeature<?, ?> LAVA_LAKE = Feature.LAKE.configure(new SingleStateFeatureConfig(Blocks.LAVA.getDefaultState())).createDecoratedFeature(Decorator.LAVA_LAKE.configure(new ChanceDecoratorConfig(80)));
     private static final Map<StructureFeature<?>, ConfiguredStructureFeature<?, ?>> STRUCTURE_TO_FEATURES = Util.make(Maps.newHashMap(), hashMap -> {
@@ -85,8 +85,14 @@ public class FlatChunkGeneratorConfig {
     private boolean field_24976 = false;
     private boolean field_24977 = false;
 
-    public FlatChunkGeneratorConfig(StructuresConfig arg, List<FlatChunkGeneratorLayer> list, Biome arg2) {
+    public FlatChunkGeneratorConfig(StructuresConfig arg, List<FlatChunkGeneratorLayer> list, boolean bl, boolean bl2, Biome arg2) {
         this(arg);
+        if (bl) {
+            this.method_28916();
+        }
+        if (bl2) {
+            this.method_28911();
+        }
         this.layers.addAll(list);
         this.updateLayerBlocks();
         this.biome = arg2;
@@ -118,12 +124,10 @@ public class FlatChunkGeneratorConfig {
         return lv;
     }
 
-    @Environment(value=EnvType.CLIENT)
     public void method_28911() {
         this.field_24976 = true;
     }
 
-    @Environment(value=EnvType.CLIENT)
     public void method_28916() {
         this.field_24977 = true;
     }

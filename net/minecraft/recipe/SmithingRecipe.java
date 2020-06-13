@@ -67,6 +67,10 @@ implements Recipe<Inventory> {
         return this.result;
     }
 
+    public boolean method_30029(ItemStack arg) {
+        return this.addition.test(arg);
+    }
+
     @Override
     @Environment(value=EnvType.CLIENT)
     public ItemStack getRecipeKindIcon() {

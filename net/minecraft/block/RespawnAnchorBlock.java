@@ -77,7 +77,7 @@ extends Block {
                 arg2.playSound(null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 return ActionResult.SUCCESS;
             }
-            return RespawnAnchorBlock.canCharge(arg) ? ActionResult.PASS : ActionResult.CONSUME;
+            return ActionResult.CONSUME;
         }
         if (!arg2.isClient) {
             this.explode(arg, arg2, arg3);

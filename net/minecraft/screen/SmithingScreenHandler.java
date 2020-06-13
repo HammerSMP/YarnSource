@@ -26,6 +26,7 @@ extends ForgingScreenHandler {
     private final World field_25385;
     @Nullable
     private SmithingRecipe field_25386;
+    private final List<SmithingRecipe> field_25668;
 
     public SmithingScreenHandler(int i, PlayerInventory arg) {
         this(i, arg, ScreenHandlerContext.EMPTY);
@@ -34,6 +35,7 @@ extends ForgingScreenHandler {
     public SmithingScreenHandler(int i, PlayerInventory arg, ScreenHandlerContext arg2) {
         super(ScreenHandlerType.SMITHING, i, arg, arg2);
         this.field_25385 = arg.player.world;
+        this.field_25668 = this.field_25385.getRecipeManager().method_30027(RecipeType.SMITHING);
     }
 
     @Override
@@ -70,6 +72,11 @@ extends ForgingScreenHandler {
             ItemStack lv = this.field_25386.craft(this.input);
             this.output.setStack(0, lv);
         }
+    }
+
+    @Override
+    protected boolean method_30025(ItemStack arg) {
+        return this.field_25668.stream().anyMatch(arg2 -> arg2.method_30029(arg));
     }
 }
 

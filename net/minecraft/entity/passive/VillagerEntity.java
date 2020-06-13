@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -806,23 +807,32 @@ VillagerDataContainer {
     private IronGolemEntity spawnIronGolem() {
         BlockPos lv = this.getBlockPos();
         for (int i = 0; i < 10; ++i) {
-            BlockPos lv3;
-            IronGolemEntity lv4;
+            IronGolemEntity lv3;
+            double e;
             double d = this.world.random.nextInt(16) - 8;
-            double e = this.world.random.nextInt(16) - 8;
-            double f = 6.0;
-            for (int j = 0; j >= -12; --j) {
-                BlockPos lv2 = lv.add(d, f + (double)j, e);
-                if (!this.world.getBlockState(lv2).isAir() && !this.world.getBlockState(lv2).getMaterial().isLiquid() || !this.world.getBlockState(lv2.down()).getMaterial().blocksLight()) continue;
-                f += (double)j;
-                break;
+            BlockPos lv2 = this.method_30023(lv, d, e = (double)(this.world.random.nextInt(16) - 8));
+            if (lv2 == null || (lv3 = EntityType.IRON_GOLEM.create(this.world, null, null, null, lv2, SpawnReason.MOB_SUMMONED, false, false)) == null) continue;
+            if (lv3.canSpawn(this.world, SpawnReason.MOB_SUMMONED) && lv3.canSpawn(this.world)) {
+                this.world.spawnEntity(lv3);
+                return lv3;
             }
-            if ((lv4 = EntityType.IRON_GOLEM.create(this.world, null, null, null, lv3 = lv.add(d, f, e), SpawnReason.MOB_SUMMONED, false, false)) == null) continue;
-            if (lv4.canSpawn(this.world, SpawnReason.MOB_SUMMONED) && lv4.canSpawn(this.world)) {
-                this.world.spawnEntity(lv4);
-                return lv4;
-            }
-            lv4.remove();
+            lv3.remove();
+        }
+        return null;
+    }
+
+    @Nullable
+    private BlockPos method_30023(BlockPos arg, double d, double e) {
+        int i = 6;
+        BlockPos lv = arg.add(d, 6.0, e);
+        BlockState lv2 = this.world.getBlockState(lv);
+        for (int j = 6; j >= -6; --j) {
+            BlockPos lv3 = lv;
+            BlockState lv4 = lv2;
+            lv = lv3.down();
+            lv2 = this.world.getBlockState(lv);
+            if (!lv4.isAir() && !lv4.getMaterial().isLiquid() || !lv2.getMaterial().blocksLight()) continue;
+            return lv3;
         }
         return null;
     }

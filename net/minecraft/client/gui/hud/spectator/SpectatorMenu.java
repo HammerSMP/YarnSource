@@ -55,7 +55,6 @@ public class SpectatorMenu {
         }
     };
     private final SpectatorMenuCloseCallback closeCallback;
-    private final List<SpectatorMenuState> stateStack = Lists.newArrayList();
     private SpectatorMenuCommandGroup currentGroup = new RootSpectatorCommandGroup();
     private int selectedSlot = -1;
     private int page;
@@ -120,7 +119,6 @@ public class SpectatorMenu {
     }
 
     public void selectElement(SpectatorMenuCommandGroup arg) {
-        this.stateStack.add(this.getCurrentState());
         this.currentGroup = arg;
         this.selectedSlot = -1;
         this.page = 0;

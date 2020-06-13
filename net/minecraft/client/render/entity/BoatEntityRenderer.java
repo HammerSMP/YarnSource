@@ -56,8 +56,10 @@ extends EntityRenderer<BoatEntity> {
         this.model.setAngles(arg, g, 0.0f, -0.1f, 0.0f, 0.0f);
         VertexConsumer lv = arg3.getBuffer(this.model.getLayer(this.getTexture(arg)));
         this.model.render(arg2, lv, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
-        VertexConsumer lv2 = arg3.getBuffer(RenderLayer.getWaterMask());
-        this.model.getBottom().render(arg2, lv2, i, OverlayTexture.DEFAULT_UV);
+        if (!arg.isSubmergedInWater()) {
+            VertexConsumer lv2 = arg3.getBuffer(RenderLayer.getWaterMask());
+            this.model.getBottom().render(arg2, lv2, i, OverlayTexture.DEFAULT_UV);
+        }
         arg2.pop();
         super.render(arg, f, g, arg2, arg3, i);
     }

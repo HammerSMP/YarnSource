@@ -35,7 +35,6 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
@@ -169,24 +168,13 @@ implements BlockEntityProvider {
     }
 
     @Override
-    public void afterBreak(World arg, PlayerEntity arg2, BlockPos arg3, BlockState arg4, @Nullable BlockEntity arg5, ItemStack arg6) {
-        super.afterBreak(arg, arg2, arg3, Blocks.AIR.getDefaultState(), arg5, arg6);
-    }
-
-    @Override
     public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        BedPart lv = arg3.get(PART);
-        BlockPos lv2 = arg2.offset(BedBlock.getDirectionTowardsOtherPart(lv, arg3.get(FACING)));
-        BlockState lv3 = arg.getBlockState(lv2);
-        if (lv3.isOf(this) && lv3.get(PART) != lv) {
+        BlockPos lv2;
+        BlockState lv3;
+        BedPart lv;
+        if (!arg.isClient && arg4.isCreative() && (lv = arg3.get(PART)) == BedPart.FOOT && (lv3 = arg.getBlockState(lv2 = arg2.offset(BedBlock.getDirectionTowardsOtherPart(lv, arg3.get(FACING))))).getBlock() == this && lv3.get(PART) == BedPart.HEAD) {
             arg.setBlockState(lv2, Blocks.AIR.getDefaultState(), 35);
             arg.syncWorldEvent(arg4, 2001, lv2, Block.getRawIdFromState(lv3));
-            if (!arg.isClient && !arg4.isCreative()) {
-                ItemStack lv4 = arg4.getMainHandStack();
-                BedBlock.dropStacks(arg3, arg, arg2, null, arg4, lv4);
-                BedBlock.dropStacks(lv3, arg, lv2, null, arg4, lv4);
-            }
-            arg4.incrementStat(Stats.MINED.getOrCreateStat(this));
         }
         super.onBreak(arg, arg2, arg3, arg4);
     }

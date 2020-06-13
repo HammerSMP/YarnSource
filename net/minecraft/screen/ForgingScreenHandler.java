@@ -100,6 +100,10 @@ extends ScreenHandler {
         }, true);
     }
 
+    protected boolean method_30025(ItemStack arg) {
+        return false;
+    }
+
     @Override
     public ItemStack transferSlot(PlayerEntity arg, int i) {
         ItemStack lv = ItemStack.EMPTY;
@@ -112,8 +116,16 @@ extends ScreenHandler {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i == 0 || i == 1 ? !this.insertItem(lv3, 3, 39, false) : i >= 3 && i < 39 && !this.insertItem(lv3, 0, 2, false)) {
-                return ItemStack.EMPTY;
+            } else if (i == 0 || i == 1) {
+                if (!this.insertItem(lv3, 3, 39, false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (i >= 3 && i < 39) {
+                int j;
+                int n = j = this.method_30025(lv) ? 1 : 0;
+                if (!this.insertItem(lv3, j, 2, false)) {
+                    return ItemStack.EMPTY;
+                }
             }
             if (lv3.isEmpty()) {
                 lv2.setStack(ItemStack.EMPTY);

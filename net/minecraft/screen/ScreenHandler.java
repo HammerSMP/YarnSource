@@ -173,7 +173,9 @@ public abstract class ScreenHandler {
         catch (Exception exception) {
             CrashReport lv = CrashReport.create(exception, "Container click");
             CrashReportSection lv2 = lv.addElement("Click info");
-            lv2.add("Menu", () -> this.type != null ? Registry.SCREEN_HANDLER.getId(this.type).toString() : "<no type>");
+            lv2.add("Menu Type", () -> this.type != null ? Registry.SCREEN_HANDLER.getId(this.type).toString() : "<no type>");
+            lv2.add("Menu Class", () -> this.getClass().getCanonicalName());
+            lv2.add("Slot Count", this.slots.size());
             lv2.add("Slot", i);
             lv2.add("Button", j);
             lv2.add("Type", (Object)arg);

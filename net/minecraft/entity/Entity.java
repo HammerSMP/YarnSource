@@ -5,7 +5,6 @@
  *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Sets
- *  com.google.gson.JsonSyntaxException
  *  it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap
  *  it.unimi.dsi.fastutil.objects.Object2DoubleMap
  *  javax.annotation.Nullable
@@ -19,7 +18,6 @@ package net.minecraft.entity;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonSyntaxException;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import java.util.Arrays;
@@ -935,14 +933,20 @@ CommandOutput {
     }
 
     private void updateSubmergedInWaterState() {
+        BoatEntity lv3;
         this.submergedInWater = this.isSubmergedIn(FluidTags.WATER);
         this.field_25599 = null;
         double d = this.getEyeY() - 0.1111111119389534;
-        BlockPos lv = new BlockPos(this.getX(), d, this.getZ());
-        FluidState lv2 = this.world.getFluidState(lv);
+        Vec3d lv = new Vec3d(this.getX(), d, this.getZ());
+        Entity lv2 = this.getVehicle();
+        if (lv2 instanceof BoatEntity && !(lv3 = (BoatEntity)lv2).isSubmergedInWater() && lv3.getBoundingBox().contains(lv)) {
+            return;
+        }
+        BlockPos lv4 = new BlockPos(lv);
+        FluidState lv5 = this.world.getFluidState(lv4);
         for (Tag tag : FluidTags.method_29897()) {
-            if (!lv2.matches(tag)) continue;
-            double e = (float)lv.getY() + lv2.getHeight(this.world, lv);
+            if (!lv5.matches(tag)) continue;
+            double e = (float)lv4.getY() + lv5.getHeight(this.world, lv4);
             if (e > d) {
                 this.field_25599 = tag;
             }
@@ -1364,8 +1368,8 @@ CommandOutput {
                 try {
                     this.setCustomName(Text.Serializer.fromJson(string));
                 }
-                catch (JsonSyntaxException jsonSyntaxException) {
-                    LOGGER.warn("Failed to parse entity custom name {}", (Object)string, (Object)jsonSyntaxException);
+                catch (Exception exception) {
+                    LOGGER.warn("Failed to parse entity custom name {}", (Object)string, (Object)exception);
                 }
             }
             this.setCustomNameVisible(arg.getBoolean("CustomNameVisible"));
@@ -1461,17 +1465,10 @@ CommandOutput {
         if (this.noClip) {
             return false;
         }
-        BlockPos.Mutable lv = new BlockPos.Mutable();
-        for (int i = 0; i < 8; ++i) {
-            int j = MathHelper.floor(this.getY() + (double)(((float)((i >> 0) % 2) - 0.5f) * 0.1f) + (double)this.standingEyeHeight);
-            int k = MathHelper.floor(this.getX() + (double)(((float)((i >> 1) % 2) - 0.5f) * this.dimensions.width * 0.8f));
-            int l = MathHelper.floor(this.getZ() + (double)(((float)((i >> 2) % 2) - 0.5f) * this.dimensions.width * 0.8f));
-            if (lv.getX() == k && lv.getY() == j && lv.getZ() == l) continue;
-            lv.set(k, j, l);
-            if (!this.world.getBlockState(lv).shouldSuffocate(this.world, lv)) continue;
-            return true;
-        }
-        return false;
+        float f = 0.1f;
+        float g = this.dimensions.width * 0.8f;
+        Box lv = Box.method_30048(g, 0.1f, g).offset(this.getX(), this.getEyeY(), this.getZ());
+        return this.world.method_30030(this, lv, (arg, arg2) -> arg.shouldSuffocate(this.world, (BlockPos)arg2)).findAny().isPresent();
     }
 
     public ActionResult interact(PlayerEntity arg, Hand arg2) {

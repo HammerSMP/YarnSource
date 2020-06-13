@@ -70,6 +70,7 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
+import net.minecraft.class_5407;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClientGame;
@@ -322,6 +323,7 @@ WindowEventHandler {
     private final MusicTracker musicTracker;
     private final FontManager fontManager;
     private final SplashTextResourceSupplier splashTextLoader;
+    private final class_5407 field_25671;
     private final MinecraftSessionService sessionService;
     private final PlayerSkinProvider skinProvider;
     private final BakedModelManager bakedModelManager;
@@ -494,6 +496,8 @@ WindowEventHandler {
         this.resourceManager.registerListener(this.paintingManager);
         this.statusEffectSpriteManager = new StatusEffectSpriteManager(this.textureManager);
         this.resourceManager.registerListener(this.statusEffectSpriteManager);
+        this.field_25671 = new class_5407();
+        this.resourceManager.registerListener(this.field_25671);
         this.inGameHud = new InGameHud(this);
         this.debugRenderer = new DebugRenderer(this);
         RenderSystem.setErrorCallback((arg_0, arg_1) -> this.handleGlErrorByDisableVsync(arg_0, arg_1));
@@ -2032,6 +2036,10 @@ WindowEventHandler {
 
     public boolean isPaused() {
         return this.paused;
+    }
+
+    public class_5407 method_30049() {
+        return this.field_25671;
     }
 
     public SoundManager getSoundManager() {

@@ -513,13 +513,13 @@ implements ClientPlayPacketListener {
             AreaEffectCloudEntity lv40 = new AreaEffectCloudEntity(this.world, d, e, f);
         } else if (lv == EntityType.LIGHTNING_BOLT) {
             LightningEntity lv41 = new LightningEntity((EntityType<? extends LightningEntity>)EntityType.LIGHTNING_BOLT, (World)this.world);
-            lv41.positAfterTeleport(d, e, f);
         } else {
             lv42 = null;
         }
         if (lv42 != null) {
             int i = arg.getId();
             lv42.updateTrackedPosition(d, e, f);
+            lv42.positAfterTeleport(d, e, f);
             lv42.pitch = (float)(arg.getPitch() * 360) / 256.0f;
             lv42.yaw = (float)(arg.getYaw() * 360) / 256.0f;
             lv42.setEntityId(i);

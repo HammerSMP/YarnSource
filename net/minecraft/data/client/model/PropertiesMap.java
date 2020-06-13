@@ -10,22 +10,22 @@ import com.google.common.collect.ImmutableList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.minecraft.data.client.model.PropertiesEntry;
+import net.minecraft.state.property.Property;
 
 public final class PropertiesMap {
-    private static final PropertiesMap EMPTY = new PropertiesMap((List<PropertiesEntry<?>>)ImmutableList.of());
-    private static final Comparator<PropertiesEntry<?>> COMPARATOR = Comparator.comparing(arg -> arg.getProperty().getName());
-    private final List<PropertiesEntry<?>> propertyValues;
+    private static final PropertiesMap EMPTY = new PropertiesMap((List<Property.class_4933<?>>)ImmutableList.of());
+    private static final Comparator<Property.class_4933<?>> COMPARATOR = Comparator.comparing(arg -> arg.method_25815().getName());
+    private final List<Property.class_4933<?>> propertyValues;
 
-    public PropertiesMap with(PropertiesEntry<?> arg) {
-        return new PropertiesMap((List<PropertiesEntry<?>>)ImmutableList.builder().addAll(this.propertyValues).add(arg).build());
+    public PropertiesMap method_25819(Property.class_4933<?> arg) {
+        return new PropertiesMap((List<Property.class_4933<?>>)ImmutableList.builder().addAll(this.propertyValues).add(arg).build());
     }
 
     public PropertiesMap with(PropertiesMap arg) {
-        return new PropertiesMap((List<PropertiesEntry<?>>)ImmutableList.builder().addAll(this.propertyValues).addAll(arg.propertyValues).build());
+        return new PropertiesMap((List<Property.class_4933<?>>)ImmutableList.builder().addAll(this.propertyValues).addAll(arg.propertyValues).build());
     }
 
-    private PropertiesMap(List<PropertiesEntry<?>> list) {
+    private PropertiesMap(List<Property.class_4933<?>> list) {
         this.propertyValues = list;
     }
 
@@ -33,8 +33,8 @@ public final class PropertiesMap {
         return EMPTY;
     }
 
-    public static PropertiesMap create(PropertiesEntry<?> ... args) {
-        return new PropertiesMap((List<PropertiesEntry<?>>)ImmutableList.copyOf((Object[])args));
+    public static PropertiesMap method_25821(Property.class_4933<?> ... args) {
+        return new PropertiesMap((List<Property.class_4933<?>>)ImmutableList.copyOf((Object[])args));
     }
 
     public boolean equals(Object object) {
@@ -46,7 +46,7 @@ public final class PropertiesMap {
     }
 
     public String asString() {
-        return this.propertyValues.stream().sorted(COMPARATOR).map(PropertiesEntry::toString).collect(Collectors.joining(","));
+        return this.propertyValues.stream().sorted(COMPARATOR).map(Property.class_4933::toString).collect(Collectors.joining(","));
     }
 
     public String toString() {

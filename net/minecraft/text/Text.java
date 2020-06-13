@@ -69,13 +69,9 @@ StringRenderable {
 
     public String asString();
 
+    @Override
     default public String getString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        this.visit(string -> {
-            stringBuilder.append(string);
-            return Optional.empty();
-        });
-        return stringBuilder.toString();
+        return StringRenderable.super.getString();
     }
 
     default public String asTruncatedString(int i) {

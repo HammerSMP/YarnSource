@@ -365,8 +365,8 @@ extends Screen {
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
             this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirectoryName, this.width / 2 - 100, 85, -6250336);
             this.levelNameField.render(arg, i, j, f);
-            this.drawCenteredText(arg, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 155 + 75, 122, -6250336);
-            this.drawCenteredText(arg, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 155 + 75, 134, -6250336);
+            this.drawTextWithShadow(arg, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 150, 122, -6250336);
+            this.drawTextWithShadow(arg, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 150, 134, -6250336);
             if (this.enableCheatsButton.visible) {
                 this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
             }

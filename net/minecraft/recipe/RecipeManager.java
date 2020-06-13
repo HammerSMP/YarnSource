@@ -87,6 +87,10 @@ extends JsonDataLoader {
         return this.getAllOfType(arg).values().stream().flatMap(arg4 -> Util.stream(arg.get(arg4, arg3, arg2))).findFirst();
     }
 
+    public <C extends Inventory, T extends Recipe<C>> List<T> method_30027(RecipeType<T> arg2) {
+        return this.getAllOfType(arg2).values().stream().map(arg -> arg).collect(Collectors.toList());
+    }
+
     public <C extends Inventory, T extends Recipe<C>> List<T> getAllMatches(RecipeType<T> arg2, C arg22, World arg3) {
         return this.getAllOfType(arg2).values().stream().flatMap(arg4 -> Util.stream(arg2.get(arg4, arg3, arg22))).sorted(Comparator.comparing(arg -> arg.getOutput().getTranslationKey())).collect(Collectors.toList());
     }

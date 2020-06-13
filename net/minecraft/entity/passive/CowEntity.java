@@ -86,7 +86,8 @@ extends AnimalEntity {
         ItemStack lv = arg.getStackInHand(arg2);
         if (lv.getItem() == Items.BUCKET && !this.isBaby()) {
             arg.playSound(SoundEvents.ENTITY_COW_MILK, 1.0f, 1.0f);
-            ItemUsage.method_30012(lv, arg, Items.MILK_BUCKET.getStackForRender());
+            ItemStack lv2 = ItemUsage.method_30012(lv, arg, Items.MILK_BUCKET.getStackForRender());
+            arg.setStackInHand(arg2, lv2);
             return ActionResult.success(this.world.isClient);
         }
         return super.interactMob(arg, arg2);

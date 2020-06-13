@@ -1,8 +1,12 @@
 /*
  * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  javax.annotation.Nullable
  */
 package net.minecraft.block;
 
+import javax.annotation.Nullable;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -11,10 +15,12 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.JukeboxBlockEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.MusicDiscItem;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -33,6 +39,16 @@ extends BlockWithEntity {
     protected JukeboxBlock(AbstractBlock.Settings arg) {
         super(arg);
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(HAS_RECORD, false));
+    }
+
+    @Override
+    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
+        CompoundTag lv2;
+        super.onPlaced(arg, arg2, arg3, arg4, arg5);
+        CompoundTag lv = arg5.getOrCreateTag();
+        if (lv.contains("BlockEntityTag") && (lv2 = lv.getCompound("BlockEntityTag")).contains("RecordItem")) {
+            arg.setBlockState(arg2, (BlockState)arg3.with(HAS_RECORD, true), 2);
+        }
     }
 
     @Override

@@ -48,6 +48,9 @@ extends EntityRenderer<T> {
 
     @Override
     public void render(T arg, float f, float g, MatrixStack arg2, VertexConsumerProvider arg3, int i) {
+        if (((Entity)arg).age < 2 && this.dispatcher.camera.getFocusedEntity().squaredDistanceTo((Entity)arg) < 12.25) {
+            return;
+        }
         arg2.push();
         arg2.scale(this.scale, this.scale, this.scale);
         arg2.multiply(this.dispatcher.getRotation());

@@ -16,7 +16,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PlantBlock;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -83,24 +82,21 @@ extends PlantBlock {
     }
 
     @Override
-    public void afterBreak(World arg, PlayerEntity arg2, BlockPos arg3, BlockState arg4, @Nullable BlockEntity arg5, ItemStack arg6) {
-        super.afterBreak(arg, arg2, arg3, Blocks.AIR.getDefaultState(), arg5, arg6);
-    }
-
-    @Override
     public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        DoubleBlockHalf lv = arg3.get(HALF);
-        BlockPos lv2 = lv == DoubleBlockHalf.LOWER ? arg2.up() : arg2.down();
-        BlockState lv3 = arg.getBlockState(lv2);
-        if (lv3.isOf(this) && lv3.get(HALF) != lv) {
-            arg.setBlockState(lv2, Blocks.AIR.getDefaultState(), 35);
-            arg.syncWorldEvent(arg4, 2001, lv2, Block.getRawIdFromState(lv3));
-            if (!arg.isClient && !arg4.isCreative()) {
-                TallPlantBlock.dropStacks(arg3, arg, arg2, null, arg4, arg4.getMainHandStack());
-                TallPlantBlock.dropStacks(lv3, arg, lv2, null, arg4, arg4.getMainHandStack());
-            }
+        if (!arg.isClient && arg4.isCreative()) {
+            TallPlantBlock.method_30036(arg, arg2, arg3, arg4);
         }
         super.onBreak(arg, arg2, arg3, arg4);
+    }
+
+    protected static void method_30036(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
+        BlockPos lv2;
+        BlockState lv3;
+        DoubleBlockHalf lv = arg3.get(HALF);
+        if (lv == DoubleBlockHalf.UPPER && (lv3 = arg.getBlockState(lv2 = arg2.down())).getBlock() == arg3.getBlock() && lv3.get(HALF) == DoubleBlockHalf.LOWER) {
+            arg.setBlockState(lv2, Blocks.AIR.getDefaultState(), 35);
+            arg.syncWorldEvent(arg4, 2001, lv2, Block.getRawIdFromState(lv3));
+        }
     }
 
     @Override

@@ -10,7 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -22,28 +21,22 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg2) {
-        World lv = arg2.getWorld();
-        BlockPos lv2 = arg2.getBlockPos();
+    public ActionResult useOnBlock(ItemUsageContext arg) {
+        World lv = arg.getWorld();
+        BlockPos lv2 = arg.getBlockPos();
         BlockState lv3 = lv.getBlockState(lv2);
         boolean bl = false;
-        if (lv3.method_27851(BlockTags.CAMPFIRES, arg -> arg.contains(CampfireBlock.LIT) && arg.contains(CampfireBlock.WATERLOGGED))) {
-            if (!lv3.get(CampfireBlock.LIT).booleanValue() && !lv3.get(CampfireBlock.WATERLOGGED).booleanValue()) {
-                this.playUseSound(lv, lv2);
-                lv.setBlockState(lv2, (BlockState)lv3.with(CampfireBlock.LIT, true));
-                bl = true;
-            }
-        } else {
-            lv2 = lv2.offset(arg2.getSide());
-            BlockState lv4 = AbstractFireBlock.getState(lv, lv2);
-            if (lv.getBlockState(lv2).isAir() && lv4.canPlaceAt(lv, lv2)) {
-                this.playUseSound(lv, lv2);
-                lv.setBlockState(lv2, lv4);
-                bl = true;
-            }
+        if (CampfireBlock.method_30035(lv3)) {
+            this.playUseSound(lv, lv2);
+            lv.setBlockState(lv2, (BlockState)lv3.with(CampfireBlock.LIT, true));
+            bl = true;
+        } else if (AbstractFireBlock.method_30032(lv, lv2 = lv2.offset(arg.getSide()))) {
+            this.playUseSound(lv, lv2);
+            lv.setBlockState(lv2, AbstractFireBlock.getState(lv, lv2));
+            bl = true;
         }
         if (bl) {
-            arg2.getStack().decrement(1);
+            arg.getStack().decrement(1);
             return ActionResult.success(lv.isClient);
         }
         return ActionResult.FAIL;

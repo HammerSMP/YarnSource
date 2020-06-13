@@ -10,6 +10,7 @@ import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.CarvedPumpkinBlock;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.FluidDrainable;
@@ -53,7 +54,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BoneMealItem;
 import net.minecraft.item.BucketItem;
-import net.minecraft.item.FlintAndSteelItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -396,9 +396,9 @@ public interface DispenserBehavior {
                 this.setSuccess(true);
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
                 BlockState lv3 = lv.getBlockState(lv2);
-                if (FlintAndSteelItem.canIgnite(lv3, lv, lv2)) {
+                if (AbstractFireBlock.method_30032(lv, lv2)) {
                     lv.setBlockState(lv2, AbstractFireBlock.getState(lv, lv2));
-                } else if (FlintAndSteelItem.isIgnitable(lv3)) {
+                } else if (CampfireBlock.method_30035(lv3)) {
                     lv.setBlockState(lv2, (BlockState)lv3.with(Properties.LIT, true));
                 } else if (lv3.getBlock() instanceof TntBlock) {
                     TntBlock.primeTnt(lv, lv2);

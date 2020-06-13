@@ -6,6 +6,7 @@
  */
 package net.minecraft.world;
 
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -65,6 +66,10 @@ extends BlockView {
 
     default public Stream<VoxelShape> getBlockCollisions(@Nullable Entity arg, Box arg2) {
         return StreamSupport.stream(new BlockCollisionSpliterator(this, arg, arg2), false);
+    }
+
+    default public Stream<VoxelShape> method_30030(@Nullable Entity arg, Box arg2, BiPredicate<BlockState, BlockPos> biPredicate) {
+        return StreamSupport.stream(new BlockCollisionSpliterator(this, arg, arg2, biPredicate), false);
     }
 }
 

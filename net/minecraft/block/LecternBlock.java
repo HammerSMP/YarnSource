@@ -22,6 +22,7 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -81,7 +82,16 @@ extends BlockWithEntity {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite());
+        CompoundTag lv5;
+        World lv = arg.getWorld();
+        ItemStack lv2 = arg.getStack();
+        CompoundTag lv3 = lv2.getOrCreateTag();
+        PlayerEntity lv4 = arg.getPlayer();
+        boolean bl = false;
+        if (!lv.isClient && lv4 != null && lv4.isCreativeLevelTwoOp() && lv3.contains("BlockEntityTag") && (lv5 = lv3.getCompound("BlockEntityTag")).contains("Book")) {
+            bl = true;
+        }
+        return (BlockState)((BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite())).with(HAS_BOOK, bl);
     }
 
     @Override

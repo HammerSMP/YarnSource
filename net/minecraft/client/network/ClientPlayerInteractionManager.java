@@ -315,7 +315,7 @@ public class ClientPlayerInteractionManager {
 
     public void attackEntity(PlayerEntity arg, Entity arg2) {
         this.syncSelectedSlot();
-        this.networkHandler.sendPacket(new PlayerInteractEntityC2SPacket(arg2));
+        this.networkHandler.sendPacket(new PlayerInteractEntityC2SPacket(arg2, arg.isSneaking()));
         if (this.gameMode != GameMode.SPECTATOR) {
             arg.attack(arg2);
             arg.resetLastAttackedTicks();

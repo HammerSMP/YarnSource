@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import net.minecraft.SharedConstants;
 import net.minecraft.class_5396;
+import net.minecraft.class_5404;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.AddTrappedChestFix;
 import net.minecraft.datafixer.fix.AdvancementRenameFix;
@@ -532,6 +533,7 @@ public class Schemas {
         dataFixerBuilder.addFixer((DataFix)new BiomesFix(schema122, false));
         Schema schema123 = dataFixerBuilder.addSchema(2558, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer((DataFix)new class_5396(schema123, false));
+        dataFixerBuilder.addFixer((DataFix)new class_5404(schema123, false, "Rename swapHands setting", "key_key.swapHands", "key_key.swapOffhand"));
     }
 }
 

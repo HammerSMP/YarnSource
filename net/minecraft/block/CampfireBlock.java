@@ -268,5 +268,9 @@ implements Waterloggable {
     public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
         return false;
     }
+
+    public static boolean method_30035(BlockState arg2) {
+        return arg2.method_27851(BlockTags.CAMPFIRES, arg -> arg.contains(Properties.WATERLOGGED) && arg.contains(Properties.LIT)) && arg2.get(Properties.WATERLOGGED) == false && arg2.get(Properties.LIT) == false;
+    }
 }
 

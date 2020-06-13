@@ -19,7 +19,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.data.client.model.BlockStateVariant;
-import net.minecraft.data.client.model.PropertiesEntry;
 import net.minecraft.data.client.model.PropertiesMap;
 import net.minecraft.state.property.Property;
 
@@ -42,7 +41,7 @@ public abstract class BlockStateVariantMap {
         List<Property<?>> list = this.getProperties();
         Stream<PropertiesMap> stream = Stream.of(PropertiesMap.empty());
         for (Property<?> lv : list) {
-            stream = stream.flatMap(arg2 -> PropertiesEntry.streamAllFor(lv).map(arg2::with));
+            stream = stream.flatMap(arg2 -> lv.method_30043().map(arg2::method_25819));
         }
         List list2 = stream.filter(arg -> !this.variants.containsKey(arg)).collect(Collectors.toList());
         if (!list2.isEmpty()) {
@@ -99,7 +98,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public QuintupleProperty<T1, T2, T3, T4, T5> register(T1 comparable, T2 comparable2, T3 comparable3, T4 comparable4, T5 comparable5, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.create(new PropertiesEntry<T1>(this.first, comparable), new PropertiesEntry<T2>(this.second, comparable2), new PropertiesEntry<T3>(this.third, comparable3), new PropertiesEntry<T4>(this.fourth, comparable4), new PropertiesEntry<T5>(this.fifth, comparable5));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2), this.third.method_30042(comparable3), this.fourth.method_30042(comparable4), this.fifth.method_30042(comparable5));
             this.register(lv, list);
             return this;
         }
@@ -129,7 +128,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public QuadrupleProperty<T1, T2, T3, T4> register(T1 comparable, T2 comparable2, T3 comparable3, T4 comparable4, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.create(new PropertiesEntry<T1>(this.first, comparable), new PropertiesEntry<T2>(this.second, comparable2), new PropertiesEntry<T3>(this.third, comparable3), new PropertiesEntry<T4>(this.fourth, comparable4));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2), this.third.method_30042(comparable3), this.fourth.method_30042(comparable4));
             this.register(lv, list);
             return this;
         }
@@ -157,7 +156,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public TripleProperty<T1, T2, T3> register(T1 comparable, T2 comparable2, T3 comparable3, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.create(new PropertiesEntry<T1>(this.first, comparable), new PropertiesEntry<T2>(this.second, comparable2), new PropertiesEntry<T3>(this.third, comparable3));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2), this.third.method_30042(comparable3));
             this.register(lv, list);
             return this;
         }
@@ -188,7 +187,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public DoubleProperty<T1, T2> register(T1 comparable, T2 comparable2, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.create(new PropertiesEntry<T1>(this.first, comparable), new PropertiesEntry<T2>(this.second, comparable2));
+            PropertiesMap lv = PropertiesMap.method_25821(this.first.method_30042(comparable), this.second.method_30042(comparable2));
             this.register(lv, list);
             return this;
         }
@@ -222,7 +221,7 @@ public abstract class BlockStateVariantMap {
         }
 
         public SingleProperty<T1> register(T1 comparable, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.create(new PropertiesEntry<T1>(this.property, comparable));
+            PropertiesMap lv = PropertiesMap.method_25821(this.property.method_30042(comparable));
             this.register(lv, list);
             return this;
         }

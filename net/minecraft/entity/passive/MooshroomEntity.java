@@ -91,7 +91,7 @@ implements Shearable {
     public ActionResult interactMob(PlayerEntity arg, Hand arg22) {
         ItemStack lv = arg.getStackInHand(arg22);
         if (lv.getItem() == Items.BOWL && !this.isBaby()) {
-            SoundEvent lv5;
+            SoundEvent lv6;
             ItemStack lv3;
             boolean bl = false;
             if (this.stewEffect != null) {
@@ -103,13 +103,14 @@ implements Shearable {
             } else {
                 lv3 = new ItemStack(Items.MUSHROOM_STEW);
             }
-            ItemUsage.method_30012(lv, arg, lv3);
+            ItemStack lv4 = ItemUsage.method_30012(lv, arg, lv3);
+            arg.setStackInHand(arg22, lv4);
             if (bl) {
-                SoundEvent lv4 = SoundEvents.ENTITY_MOOSHROOM_SUSPICIOUS_MILK;
+                SoundEvent lv5 = SoundEvents.ENTITY_MOOSHROOM_SUSPICIOUS_MILK;
             } else {
-                lv5 = SoundEvents.ENTITY_MOOSHROOM_MILK;
+                lv6 = SoundEvents.ENTITY_MOOSHROOM_MILK;
             }
-            this.playSound(lv5, 1.0f, 1.0f);
+            this.playSound(lv6, 1.0f, 1.0f);
             return ActionResult.success(this.world.isClient);
         }
         if (lv.getItem() == Items.SHEARS && this.isShearable()) {

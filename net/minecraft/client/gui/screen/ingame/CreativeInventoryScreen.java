@@ -301,20 +301,20 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        boolean bl;
         this.ignoreTypedCharacter = false;
         if (selectedTab != ItemGroup.SEARCH.getIndex()) {
+            boolean bl;
+            boolean bl2 = bl = !this.isCreativeInventorySlot(this.focusedSlot) || this.focusedSlot != null && this.focusedSlot.hasStack();
+            if (bl && this.handleHotbarKeyPressed(i, j)) {
+                this.ignoreTypedCharacter = true;
+                return true;
+            }
             if (this.client.options.keyChat.matchesKey(i, j)) {
                 this.ignoreTypedCharacter = true;
                 this.setSelectedTab(ItemGroup.SEARCH);
                 return true;
             }
             return super.keyPressed(i, j, k);
-        }
-        boolean bl2 = bl = !this.isCreativeInventorySlot(this.focusedSlot) || this.focusedSlot != null && this.focusedSlot.hasStack();
-        if (bl && this.handleHotbarKeyPressed(i, j)) {
-            this.ignoreTypedCharacter = true;
-            return true;
         }
         String string = this.searchBox.getText();
         if (this.searchBox.keyPressed(i, j, k)) {
