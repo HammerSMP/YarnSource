@@ -325,11 +325,26 @@ implements ScreenHandlerProvider<T> {
                     }
                 }
             }
+        } else {
+            this.method_30107(i);
         }
         this.lastClickedSlot = lv;
         this.lastButtonClickTime = l;
         this.lastClickedButton = i;
         return true;
+    }
+
+    private void method_30107(int i) {
+        if (this.client.player.inventory.getCursorStack().isEmpty()) {
+            if (this.client.options.keySwapHands.matchesMouse(i)) {
+                this.onMouseClick(this.focusedSlot, this.focusedSlot.id, 40, SlotActionType.SWAP);
+                return;
+            }
+            for (int j = 0; j < 9; ++j) {
+                if (!this.client.options.keysHotbar[j].matchesMouse(i)) continue;
+                this.onMouseClick(this.focusedSlot, this.focusedSlot.id, j, SlotActionType.SWAP);
+            }
+        }
     }
 
     protected boolean isClickOutsideBounds(double d, double e, int i, int j, int k) {

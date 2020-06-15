@@ -1125,8 +1125,11 @@ implements ServerPlayPacketListener {
                     }
                     this.player.attack(lv2);
                 }
-                if (optional.isPresent() && ((ActionResult)((Object)optional.get())).shouldSwingHand()) {
-                    this.player.swingHand(lv3, true);
+                if (optional.isPresent() && ((ActionResult)((Object)optional.get())).isAccepted()) {
+                    Criteria.field_25694.method_30097(this.player, this.player.getStackInHand(lv3), lv2);
+                    if (((ActionResult)((Object)optional.get())).shouldSwingHand()) {
+                        this.player.swingHand(lv3, true);
+                    }
                 }
             }
         }

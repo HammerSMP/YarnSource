@@ -11,9 +11,6 @@ package net.minecraft.entity.projectile.thrown;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -26,10 +23,8 @@ import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
@@ -57,26 +52,6 @@ extends ThrownItemEntity {
     protected void onEntityHit(EntityHitResult arg) {
         super.onEntityHit(arg);
         arg.getEntity().damage(DamageSource.thrownProjectile(this, this.getOwner()), 0.0f);
-    }
-
-    @Override
-    protected void onBlockHit(BlockHitResult arg) {
-        super.onBlockHit(arg);
-        Entity lv = this.getOwner();
-        BlockPos lv2 = arg.getBlockPos();
-        BlockEntity lv3 = this.world.getBlockEntity(lv2);
-        if (lv3 instanceof EndGatewayBlockEntity) {
-            EndGatewayBlockEntity lv4 = (EndGatewayBlockEntity)lv3;
-            if (lv != null) {
-                if (lv instanceof ServerPlayerEntity) {
-                    Criteria.ENTER_BLOCK.trigger((ServerPlayerEntity)lv, this.world.getBlockState(lv2));
-                }
-                lv4.tryTeleportingEntity(lv);
-                this.remove();
-            } else {
-                lv4.tryTeleportingEntity(this);
-            }
-        }
     }
 
     @Override

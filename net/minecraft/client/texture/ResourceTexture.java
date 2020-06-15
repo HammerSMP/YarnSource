@@ -52,13 +52,13 @@ extends AbstractTexture {
         }
         NativeImage lv3 = lv.getImage();
         if (!RenderSystem.isOnRenderThreadOrInit()) {
-            RenderSystem.recordRenderCall(() -> this.method_22810(lv3, bl3, bl4));
+            RenderSystem.recordRenderCall(() -> this.upload(lv3, bl3, bl4));
         } else {
-            this.method_22810(lv3, bl3, bl4);
+            this.upload(lv3, bl3, bl4);
         }
     }
 
-    private void method_22810(NativeImage arg, boolean bl, boolean bl2) {
+    private void upload(NativeImage arg, boolean bl, boolean bl2) {
         TextureUtil.allocate(this.getGlId(), 0, arg.getWidth(), arg.getHeight());
         arg.upload(0, 0, 0, 0, 0, arg.getWidth(), arg.getHeight(), bl, bl2, false, true);
     }

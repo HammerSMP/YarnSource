@@ -85,6 +85,10 @@ implements SoundContainer<Sound> {
         return this.attenuation;
     }
 
+    public String toString() {
+        return "Sound[" + this.id + "]";
+    }
+
     @Override
     public /* synthetic */ Object getSound() {
         return this.getSound();

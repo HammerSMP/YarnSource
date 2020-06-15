@@ -413,6 +413,7 @@ implements ClientPlayPacketListener {
         this.client.player.setReducedDebugInfo(arg.hasReducedDebugInfo());
         this.client.player.setShowsDeathScreen(arg.showsDeathScreen());
         this.client.interactionManager.setGameMode(arg.getGameMode());
+        this.client.interactionManager.method_30108(arg.method_30116());
         this.client.options.onPlayerModelPartChange();
         this.connection.send(new CustomPayloadC2SPacket(CustomPayloadC2SPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(ClientBrandRetriever.getClientModName())));
         this.client.getGame().onStartGameSession();
@@ -832,7 +833,7 @@ implements ClientPlayPacketListener {
     @Override
     public void onGameMessage(GameMessageS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.inGameHud.addChatMessage(arg.getLocation(), arg.getMessage(), arg.method_29175());
+        this.client.inGameHud.addChatMessage(arg.getLocation(), arg.getMessage(), arg.getSenderUuid());
     }
 
     @Override
@@ -1029,6 +1030,7 @@ implements ClientPlayPacketListener {
             this.client.openScreen(null);
         }
         this.client.interactionManager.setGameMode(arg.getGameMode());
+        this.client.interactionManager.method_30108(arg.method_30117());
     }
 
     @Override

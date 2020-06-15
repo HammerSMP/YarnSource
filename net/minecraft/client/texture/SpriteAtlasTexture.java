@@ -82,8 +82,8 @@ implements TextureTickListener {
     public void upload(Data arg) {
         this.spritesToLoad.clear();
         this.spritesToLoad.addAll(arg.spriteIds);
-        LOGGER.info("Created: {}x{}x{} {}-atlas", (Object)arg.width, (Object)arg.height, (Object)arg.field_21795, (Object)this.id);
-        TextureUtil.allocate(this.getGlId(), arg.field_21795, arg.width, arg.height);
+        LOGGER.info("Created: {}x{}x{} {}-atlas", (Object)arg.width, (Object)arg.height, (Object)arg.maxLevel, (Object)this.id);
+        TextureUtil.allocate(this.getGlId(), arg.maxLevel, arg.width, arg.height);
         this.clear();
         for (Sprite lv : arg.sprites) {
             this.sprites.put(lv.getId(), lv);
@@ -146,7 +146,7 @@ implements TextureTickListener {
             throw new CrashException(lv4);
         }
         arg22.swap("loading");
-        List<Sprite> list = this.method_18161(arg2, lv, q);
+        List<Sprite> list = this.loadSprites(arg2, lv, q);
         arg22.pop();
         return new Data(set, lv.getWidth(), lv.getHeight(), q, list);
     }
@@ -183,7 +183,7 @@ implements TextureTickListener {
         return concurrentLinkedQueue;
     }
 
-    private List<Sprite> method_18161(ResourceManager arg, TextureStitcher arg22, int i) {
+    private List<Sprite> loadSprites(ResourceManager arg, TextureStitcher arg22, int i) {
         ConcurrentLinkedQueue concurrentLinkedQueue = new ConcurrentLinkedQueue();
         ArrayList list = Lists.newArrayList();
         arg22.getStitchedSprites((arg2, j, k, l, m) -> {
@@ -266,8 +266,8 @@ implements TextureTickListener {
         return this.id;
     }
 
-    public void method_24198(Data arg) {
-        this.setFilter(false, arg.field_21795 > 0);
+    public void applyTextureFilter(Data arg) {
+        this.setFilter(false, arg.maxLevel > 0);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -275,14 +275,14 @@ implements TextureTickListener {
         final Set<Identifier> spriteIds;
         final int width;
         final int height;
-        final int field_21795;
+        final int maxLevel;
         final List<Sprite> sprites;
 
         public Data(Set<Identifier> set, int i, int j, int k, List<Sprite> list) {
             this.spriteIds = set;
             this.width = i;
             this.height = j;
-            this.field_21795 = k;
+            this.maxLevel = k;
             this.sprites = list;
         }
     }

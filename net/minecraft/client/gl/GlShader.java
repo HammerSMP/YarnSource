@@ -55,7 +55,7 @@ public class GlShader {
 
     public static GlShader createFromResource(Type arg, String string, InputStream inputStream) throws IOException {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        String string2 = TextureUtil.method_24965(inputStream);
+        String string2 = TextureUtil.readAllToString(inputStream);
         if (string2 == null) {
             throw new IOException("Could not load program " + arg.getName());
         }

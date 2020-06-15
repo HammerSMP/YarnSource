@@ -57,7 +57,7 @@ extends AnimalModel<T> {
         this.head.addChild(this.leftEar);
         ModelPart lv = new ModelPart(this);
         lv.setPivot(-7.0f, 2.0f, -12.0f);
-        lv.setTextureOffset(1, 13).addCuboid(-1.0f, -11.0f, -1.0f, 2.0f, 11.0f, 2.0f);
+        lv.setTextureOffset(10, 13).addCuboid(-1.0f, -11.0f, -1.0f, 2.0f, 11.0f, 2.0f);
         this.head.addChild(lv);
         ModelPart lv2 = new ModelPart(this);
         lv2.setPivot(7.0f, 2.0f, -12.0f);

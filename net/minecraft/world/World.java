@@ -231,6 +231,11 @@ AutoCloseable {
 
     @Override
     public boolean setBlockState(BlockPos arg, BlockState arg2, int i) {
+        return this.method_30092(arg, arg2, i, 512);
+    }
+
+    @Override
+    public boolean method_30092(BlockPos arg, BlockState arg2, int i, int j) {
         if (World.isHeightInvalid(arg)) {
             return false;
         }
@@ -260,11 +265,11 @@ AutoCloseable {
                         this.updateComparators(arg, lv2);
                     }
                 }
-                if ((i & 0x10) == 0) {
-                    int j = i & 0xFFFFFFDE;
-                    lv3.prepare(this, arg, j);
-                    arg2.updateNeighbors(this, arg, j);
-                    arg2.prepare(this, arg, j);
+                if ((i & 0x10) == 0 && j > 0) {
+                    int k = i & 0xFFFFFFDE;
+                    lv3.prepare(this, arg, k, j - 1);
+                    arg2.updateNeighbors(this, arg, k, j - 1);
+                    arg2.prepare(this, arg, k, j - 1);
                 }
                 this.onBlockChanged(arg, lv3, lv4);
             }
@@ -283,7 +288,7 @@ AutoCloseable {
     }
 
     @Override
-    public boolean breakBlock(BlockPos arg, boolean bl, @Nullable Entity arg2) {
+    public boolean method_30093(BlockPos arg, boolean bl, @Nullable Entity arg2, int i) {
         BlockState lv = this.getBlockState(arg);
         if (lv.isAir()) {
             return false;
@@ -296,7 +301,7 @@ AutoCloseable {
             BlockEntity lv3 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(arg) : null;
             Block.dropStacks(lv, this, arg, lv3, arg2, ItemStack.EMPTY);
         }
-        return this.setBlockState(arg, lv2.getBlockState(), 3);
+        return this.method_30092(arg, lv2.getBlockState(), 3, i);
     }
 
     public boolean setBlockState(BlockPos arg, BlockState arg2) {

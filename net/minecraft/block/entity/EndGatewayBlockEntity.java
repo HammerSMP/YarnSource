@@ -15,15 +15,18 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
@@ -95,7 +98,7 @@ implements Tickable {
         } else if (!this.world.isClient) {
             List<Entity> list = this.world.getNonSpectatingEntities(Entity.class, new Box(this.getPos()));
             if (!list.isEmpty()) {
-                this.tryTeleportingEntity(list.get(0).getRootVehicle());
+                this.tryTeleportingEntity(list.get(this.world.random.nextInt(list.size())));
             }
             if (this.age % 2400L == 0L) {
                 this.startTeleportCooldown();
@@ -161,8 +164,24 @@ implements Tickable {
             this.createPortal((ServerWorld)this.world);
         }
         if (this.exitPortalPos != null) {
-            BlockPos lv = this.exactTeleport ? this.exitPortalPos : this.findBestPortalExitPos();
-            arg.teleport((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
+            Entity lv5;
+            BlockPos lv;
+            BlockPos blockPos = lv = this.exactTeleport ? this.exitPortalPos : this.findBestPortalExitPos();
+            if (arg instanceof EnderPearlEntity) {
+                Entity lv2 = ((EnderPearlEntity)arg).getOwner();
+                if (lv2 instanceof ServerPlayerEntity) {
+                    Criteria.ENTER_BLOCK.trigger((ServerPlayerEntity)lv2, this.world.getBlockState(this.getPos()));
+                }
+                if (lv2 != null) {
+                    Entity lv3 = lv2;
+                    arg.remove();
+                } else {
+                    Entity lv4 = arg;
+                }
+            } else {
+                lv5 = arg.getRootVehicle();
+            }
+            lv5.teleport((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
         this.startTeleportCooldown();
     }

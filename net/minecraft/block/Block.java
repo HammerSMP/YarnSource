@@ -156,14 +156,18 @@ implements ItemConvertible {
         return lv;
     }
 
-    public static void replaceBlock(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
+    public static void method_30094(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
+        Block.replaceBlock(arg, arg2, arg3, arg4, i, 512);
+    }
+
+    public static void replaceBlock(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i, int j) {
         if (arg2 != arg) {
             if (arg2.isAir()) {
                 if (!arg3.isClient()) {
-                    arg3.breakBlock(arg4, (i & 0x20) == 0);
+                    arg3.method_30093(arg4, (i & 0x20) == 0, null, j);
                 }
             } else {
-                arg3.setBlockState(arg4, arg2, i & 0xFFFFFFDF);
+                arg3.method_30092(arg4, arg2, i & 0xFFFFFFDF, j);
             }
         }
     }

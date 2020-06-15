@@ -154,10 +154,10 @@ extends ForgingScreenHandler {
                 boolean bl22 = false;
                 boolean bl3 = false;
                 for (Enchantment lv4 : map2.keySet()) {
+                    int u;
                     if (lv4 == null) continue;
-                    int t = map.containsKey(lv4) ? map.get(lv4) : 0;
-                    int u = map2.get(lv4);
-                    u = t == u ? u + 1 : Math.max(u, t);
+                    int t = map.getOrDefault(lv4, 0);
+                    u = t == (u = map2.get(lv4).intValue()) ? u + 1 : Math.max(u, t);
                     boolean bl4 = lv4.isAcceptableItem(lv);
                     if (this.player.abilities.creativeMode || lv.getItem() == Items.ENCHANTED_BOOK) {
                         bl4 = true;

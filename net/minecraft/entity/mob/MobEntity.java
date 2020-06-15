@@ -1347,5 +1347,11 @@ extends LivingEntity {
             this.setVelocity(this.getVelocity().add(0.0, 0.3, 0.0));
         }
     }
+
+    @Override
+    protected void method_30076() {
+        super.method_30076();
+        this.detachLeash(true, false);
+    }
 }
 

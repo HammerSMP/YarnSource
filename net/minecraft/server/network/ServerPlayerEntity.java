@@ -248,9 +248,9 @@ implements ScreenHandlerListener {
         super.readCustomDataFromTag(arg);
         if (arg.contains("playerGameType", 99)) {
             if (this.getServer().shouldForceGameMode()) {
-                this.interactionManager.setGameMode(this.getServer().getDefaultGameMode());
+                this.interactionManager.setGameMode(this.getServer().getDefaultGameMode(), GameMode.NOT_SET);
             } else {
-                this.interactionManager.setGameMode(GameMode.byId(arg.getInt("playerGameType")));
+                this.interactionManager.setGameMode(GameMode.byId(arg.getInt("playerGameType")), arg.contains("previousPlayerGameType", 3) ? GameMode.byId(arg.getInt("previousPlayerGameType")) : GameMode.NOT_SET);
             }
         }
         if (arg.contains("enteredNetherPosition", 10)) {
@@ -277,6 +277,7 @@ implements ScreenHandlerListener {
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
         arg.putInt("playerGameType", this.interactionManager.getGameMode().getId());
+        arg.putInt("previousPlayerGameType", this.interactionManager.method_30119().getId());
         arg.putBoolean("seenCredits", this.seenCredits);
         if (this.enteredNetherPos != null) {
             CompoundTag lv = new CompoundTag();
@@ -595,7 +596,7 @@ implements ScreenHandlerListener {
             return this;
         }
         WorldProperties lv3 = arg.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.isDebugWorld(), arg.method_28125(), true));
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.method_28125(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv3.getDifficulty(), lv3.isDifficultyLocked()));
         PlayerManager lv4 = this.server.getPlayerManager();
         lv4.sendCommandTree(this);
@@ -1119,7 +1120,7 @@ implements ScreenHandlerListener {
 
     @Override
     public void setGameMode(GameMode arg) {
-        this.interactionManager.setGameMode(arg);
+        this.interactionManager.method_30118(arg);
         this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25648, arg.getId()));
         if (arg == GameMode.SPECTATOR) {
             this.dropShoulderEntities();
@@ -1282,7 +1283,7 @@ implements ScreenHandlerListener {
         } else {
             ServerWorld lv = this.getServerWorld();
             WorldProperties lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), arg.isDebugWorld(), arg.method_28125(), true));
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.method_28125(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);

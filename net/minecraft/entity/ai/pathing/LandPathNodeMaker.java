@@ -412,10 +412,11 @@ extends PathNodeMaker {
                     if (LandPathNodeMaker.method_27138(lv)) {
                         return PathNodeType.DANGER_FIRE;
                     }
-                    if (arg.getFluidState(arg2).matches(FluidTags.WATER)) {
+                    FluidState lv2 = arg.getFluidState(arg2);
+                    if (lv2.matches(FluidTags.WATER)) {
                         return PathNodeType.WATER_BORDER;
                     }
-                    if (!arg.getFluidState(arg2).matches(FluidTags.LAVA)) continue;
+                    if (!lv2.matches(FluidTags.LAVA)) continue;
                     return PathNodeType.LAVA;
                 }
             }

@@ -41,16 +41,9 @@ implements DebugRenderer.Renderer {
     }
 
     public void addNeighborUpdate(long l, BlockPos arg) {
-        Integer integer;
-        HashMap map = this.neighborUpdates.get(l);
-        if (map == null) {
-            map = Maps.newHashMap();
-            this.neighborUpdates.put(l, map);
-        }
-        if ((integer = (Integer)map.get(arg)) == null) {
-            integer = 0;
-        }
-        map.put(arg, integer + 1);
+        Map map = this.neighborUpdates.computeIfAbsent(l, long_ -> Maps.newHashMap());
+        int i = map.getOrDefault(arg, 0);
+        map.put(arg, i + 1);
     }
 
     @Override

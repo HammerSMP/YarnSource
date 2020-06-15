@@ -16,6 +16,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CrossbowUser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -167,6 +168,7 @@ implements CrossbowUser {
         }
         PiglinBrain.setHuntedRecently(this);
         this.initEquipment(arg2);
+        this.updateEnchantments(arg2);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
 
@@ -284,10 +286,9 @@ implements CrossbowUser {
         this.getBrain().tick((ServerWorld)this.world, this);
         this.world.getProfiler().pop();
         PiglinBrain.tickActivities(this);
-        PiglinBrain.playSoundAtChance(this);
         this.conversionTicks = this.canConvert() ? ++this.conversionTicks : 0;
         if (this.conversionTicks > 300) {
-            this.playZombifySound();
+            this.method_30086(SoundEvents.ENTITY_PIGLIN_CONVERTED_TO_ZOMBIFIED);
             this.zombify((ServerWorld)this.world);
         }
     }
@@ -335,20 +336,17 @@ implements CrossbowUser {
         if (this.isDancing()) {
             return Activity.DANCING;
         }
-        if (this.handSwinging) {
-            return Activity.DEFAULT;
-        }
         if (PiglinBrain.isGoldenItem(this.getOffHandStack().getItem())) {
             return Activity.ADMIRING_ITEM;
+        }
+        if (this.isAttacking() && this.isHoldingTool()) {
+            return Activity.ATTACKING_WITH_MELEE_WEAPON;
         }
         if (this.isCharging()) {
             return Activity.CROSSBOW_CHARGE;
         }
         if (this.isAttacking() && this.isHolding(Items.CROSSBOW)) {
             return Activity.CROSSBOW_HOLD;
-        }
-        if (this.isAttacking() && this.isHoldingTool()) {
-            return Activity.ATTACKING_WITH_MELEE_WEAPON;
         }
         return Activity.DEFAULT;
     }
@@ -419,6 +417,9 @@ implements CrossbowUser {
     @Override
     protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
         boolean bl2;
+        if (EnchantmentHelper.hasBindingCurse(arg2)) {
+            return false;
+        }
         boolean bl = PiglinBrain.isGoldenItem(arg.getItem()) || arg.getItem() == Items.CROSSBOW;
         boolean bl3 = bl2 = PiglinBrain.isGoldenItem(arg2.getItem()) || arg2.getItem() == Items.CROSSBOW;
         if (bl && !bl2) {
@@ -457,7 +458,10 @@ implements CrossbowUser {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.ENTITY_PIGLIN_AMBIENT;
+        if (this.world.isClient) {
+            return null;
+        }
+        return PiglinBrain.method_30091(this).orElse(null);
     }
 
     @Override
@@ -475,35 +479,8 @@ implements CrossbowUser {
         this.playSound(SoundEvents.ENTITY_PIGLIN_STEP, 0.15f, 1.0f);
     }
 
-    protected void playAdmireItemSound() {
-        this.playSound(SoundEvents.ENTITY_PIGLIN_ADMIRING_ITEM, 1.0f, this.getSoundPitch());
-    }
-
-    @Override
-    public void playAmbientSound() {
-        if (PiglinBrain.hasIdleActivity(this)) {
-            super.playAmbientSound();
-        }
-    }
-
-    protected void playAngrySound() {
-        this.playSound(SoundEvents.ENTITY_PIGLIN_ANGRY, 1.0f, this.getSoundPitch());
-    }
-
-    protected void playCelebrateSound() {
-        this.playSound(SoundEvents.ENTITY_PIGLIN_CELEBRATE, 1.0f, this.getSoundPitch());
-    }
-
-    protected void playRetreatSound() {
-        this.playSound(SoundEvents.ENTITY_PIGLIN_RETREAT, 1.0f, this.getSoundPitch());
-    }
-
-    protected void playJealousSound() {
-        this.playSound(SoundEvents.ENTITY_PIGLIN_JEALOUS, 1.0f, this.getSoundPitch());
-    }
-
-    private void playZombifySound() {
-        this.playSound(SoundEvents.ENTITY_PIGLIN_CONVERTED_TO_ZOMBIFIED, 1.0f, this.getSoundPitch());
+    protected void method_30086(SoundEvent arg) {
+        this.playSound(arg, this.getSoundVolume(), this.getSoundPitch());
     }
 
     @Override

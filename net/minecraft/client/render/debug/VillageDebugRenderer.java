@@ -286,12 +286,7 @@ implements DebugRenderer.Renderer {
         for (Brain lv : this.brains.values()) {
             for (BlockPos lv2 : Iterables.concat(lv.pointsOfInterest, lv.field_25287)) {
                 if (this.pointsOfInterest.containsKey(lv2)) continue;
-                List list = (List)map.get(lv2);
-                if (list == null) {
-                    list = Lists.newArrayList();
-                    map.put(lv2, list);
-                }
-                list.add(lv.field_19328);
+                map.computeIfAbsent(lv2, arg -> Lists.newArrayList()).add(lv.field_19328);
             }
         }
         return map;

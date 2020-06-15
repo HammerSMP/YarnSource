@@ -417,7 +417,7 @@ public class Util {
         return string2 -> consumer.accept(string + string2);
     }
 
-    public static DataResult<int[]> method_29190(IntStream intStream, int i) {
+    public static DataResult<int[]> toIntArray(IntStream intStream, int i) {
         int[] is = intStream.limit(i + 1).toArray();
         if (is.length != i) {
             String string = "Input is not a list of " + i + " ints";

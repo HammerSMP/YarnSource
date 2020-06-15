@@ -11,7 +11,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.FixedColorVertexConsumer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.client.util.math.Vector4f;
 import net.minecraft.util.math.Direction;
@@ -34,11 +33,11 @@ extends FixedColorVertexConsumer {
     private float normalY;
     private float normalZ;
 
-    public TransformingVertexConsumer(VertexConsumer arg, MatrixStack.Entry arg2) {
+    public TransformingVertexConsumer(VertexConsumer arg, Matrix4f arg2, Matrix3f arg3) {
         this.vertexConsumer = arg;
-        this.textureMatrix = arg2.getModel().copy();
+        this.textureMatrix = arg2.copy();
         this.textureMatrix.invert();
-        this.normalMatrix = arg2.getNormal().copy();
+        this.normalMatrix = arg3.copy();
         this.normalMatrix.invert();
         this.init();
     }

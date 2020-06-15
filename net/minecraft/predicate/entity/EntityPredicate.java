@@ -46,7 +46,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Vec3d;
 
 public class EntityPredicate {
-    public static final EntityPredicate ANY = new EntityPredicate(EntityTypePredicate.ANY, DistancePredicate.ANY, LocationPredicate.ANY, EntityEffectPredicate.EMPTY, NbtPredicate.ANY, EntityFlagsPredicate.ANY, EntityEquipmentPredicate.ANY, PlayerPredicate.ANY, FishingHookPredicate.ANY, ANY, ANY, null, null);
+    public static final EntityPredicate ANY = new EntityPredicate(EntityTypePredicate.ANY, DistancePredicate.ANY, LocationPredicate.ANY, EntityEffectPredicate.EMPTY, NbtPredicate.ANY, EntityFlagsPredicate.ANY, EntityEquipmentPredicate.ANY, PlayerPredicate.ANY, FishingHookPredicate.ANY, null, null);
     private final EntityTypePredicate type;
     private final DistancePredicate distance;
     private final LocationPredicate location;
@@ -62,6 +62,22 @@ public class EntityPredicate {
     private final String team;
     @Nullable
     private final Identifier catType;
+
+    private EntityPredicate(EntityTypePredicate arg, DistancePredicate arg2, LocationPredicate arg3, EntityEffectPredicate arg4, NbtPredicate arg5, EntityFlagsPredicate arg6, EntityEquipmentPredicate arg7, PlayerPredicate arg8, FishingHookPredicate arg9, @Nullable String string, @Nullable Identifier arg10) {
+        this.type = arg;
+        this.distance = arg2;
+        this.location = arg3;
+        this.effects = arg4;
+        this.nbt = arg5;
+        this.flags = arg6;
+        this.equipment = arg7;
+        this.player = arg8;
+        this.fishingHook = arg9;
+        this.vehicle = this;
+        this.targetedEntity = this;
+        this.team = string;
+        this.catType = arg10;
+    }
 
     private EntityPredicate(EntityTypePredicate arg, DistancePredicate arg2, LocationPredicate arg3, EntityEffectPredicate arg4, NbtPredicate arg5, EntityFlagsPredicate arg6, EntityEquipmentPredicate arg7, PlayerPredicate arg8, FishingHookPredicate arg9, EntityPredicate arg10, EntityPredicate arg11, @Nullable String string, @Nullable Identifier arg12) {
         this.type = arg;

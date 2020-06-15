@@ -185,7 +185,7 @@ extends FacingBlock {
             arg2.setBlockState(arg3, lv3, 20);
             arg2.setBlockEntity(arg3, PistonExtensionBlock.createBlockEntityPiston((BlockState)this.getDefaultState().with(FACING, Direction.byId(j & 7)), lv, false, true));
             arg2.updateNeighbors(arg3, lv3.getBlock());
-            lv3.updateNeighbors(arg2, arg3, 2);
+            lv3.method_30101(arg2, arg3, 2);
             if (this.sticky) {
                 PistonBlockEntity lv7;
                 BlockEntity lv6;
@@ -301,15 +301,15 @@ extends FacingBlock {
         for (Map.Entry entry : map.entrySet()) {
             BlockPos lv16 = (BlockPos)entry.getKey();
             BlockState lv17 = (BlockState)entry.getValue();
-            lv17.prepare(arg, lv16, 2);
-            lv14.updateNeighbors(arg, lv16, 2);
-            lv14.prepare(arg, lv16, 2);
+            lv17.method_30102(arg, lv16, 2);
+            lv14.method_30101(arg, lv16, 2);
+            lv14.method_30102(arg, lv16, 2);
         }
         j = 0;
         for (int m = list3.size() - 1; m >= 0; --m) {
             BlockState blockState = lvs[j++];
             BlockPos lv19 = list3.get(m);
-            blockState.prepare(arg, lv19, 2);
+            blockState.method_30102(arg, lv19, 2);
             arg.updateNeighborsAlways(lv19, blockState.getBlock());
         }
         for (int n = list.size() - 1; n >= 0; --n) {

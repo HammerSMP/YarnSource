@@ -69,8 +69,8 @@ extends Block {
 
     public RedstoneWireBlock(AbstractBlock.Settings arg) {
         super(arg);
-        this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)).with(WIRE_CONNECTION_EAST, WireConnection.SIDE)).with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)).with(WIRE_CONNECTION_WEST, WireConnection.SIDE)).with(POWER, 0));
-        this.dotShape = (BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(WIRE_CONNECTION_NORTH, WireConnection.NONE)).with(WIRE_CONNECTION_EAST, WireConnection.NONE)).with(WIRE_CONNECTION_SOUTH, WireConnection.NONE)).with(WIRE_CONNECTION_WEST, WireConnection.NONE);
+        this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(WIRE_CONNECTION_NORTH, WireConnection.NONE)).with(WIRE_CONNECTION_EAST, WireConnection.NONE)).with(WIRE_CONNECTION_SOUTH, WireConnection.NONE)).with(WIRE_CONNECTION_WEST, WireConnection.NONE)).with(POWER, 0));
+        this.dotShape = (BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(WIRE_CONNECTION_NORTH, WireConnection.SIDE)).with(WIRE_CONNECTION_EAST, WireConnection.SIDE)).with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE)).with(WIRE_CONNECTION_WEST, WireConnection.SIDE);
         for (BlockState lv : this.getStateManager().getStates()) {
             if (lv.get(POWER) != 0) continue;
             this.field_24416.put(lv, this.method_27845(lv));
@@ -98,22 +98,22 @@ extends Block {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext arg) {
-        return this.method_27840(arg.getWorld(), this.getDefaultState(), arg.getBlockPos());
+        return this.method_27840(arg.getWorld(), this.dotShape, arg.getBlockPos());
     }
 
     private BlockState method_27840(BlockView arg, BlockState arg2, BlockPos arg3) {
         boolean bl7;
         boolean bl = RedstoneWireBlock.isNotConnected(arg2);
-        arg2 = this.method_27843(arg, (BlockState)this.dotShape.with(POWER, arg2.get(POWER)), arg3);
+        arg2 = this.method_27843(arg, (BlockState)this.getDefaultState().with(POWER, arg2.get(POWER)), arg3);
+        if (bl && RedstoneWireBlock.isNotConnected(arg2)) {
+            return arg2;
+        }
         boolean bl2 = arg2.get(WIRE_CONNECTION_NORTH).isConnected();
         boolean bl3 = arg2.get(WIRE_CONNECTION_SOUTH).isConnected();
         boolean bl4 = arg2.get(WIRE_CONNECTION_EAST).isConnected();
         boolean bl5 = arg2.get(WIRE_CONNECTION_WEST).isConnected();
         boolean bl6 = !bl2 && !bl3;
         boolean bl8 = bl7 = !bl4 && !bl5;
-        if (bl && RedstoneWireBlock.isNotConnected(arg2)) {
-            return arg2;
-        }
         if (!bl5 && bl6) {
             arg2 = (BlockState)arg2.with(WIRE_CONNECTION_WEST, WireConnection.SIDE);
         }
@@ -151,7 +151,7 @@ extends Block {
         if (lv.isConnected() == ((WireConnection)arg.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(arg2))).isConnected() && !RedstoneWireBlock.isFullyConnected(arg)) {
             return (BlockState)arg.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(arg2), lv);
         }
-        return this.method_27840(arg4, (BlockState)((BlockState)this.getDefaultState().with(POWER, arg.get(POWER))).with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(arg2), lv), arg5);
+        return this.method_27840(arg4, (BlockState)((BlockState)this.dotShape.with(POWER, arg.get(POWER))).with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(arg2), lv), arg5);
     }
 
     private static boolean isFullyConnected(BlockState arg) {
@@ -163,7 +163,7 @@ extends Block {
     }
 
     @Override
-    public void prepare(BlockState arg, WorldAccess arg2, BlockPos arg3, int i) {
+    public void prepare(BlockState arg, WorldAccess arg2, BlockPos arg3, int i, int j) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Direction lv2 : Direction.Type.HORIZONTAL) {
             WireConnection lv3 = (WireConnection)arg.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(lv2));
@@ -173,14 +173,14 @@ extends Block {
             if (!lv4.isOf(Blocks.OBSERVER)) {
                 BlockPos lv5 = lv.offset(lv2.getOpposite());
                 BlockState lv6 = lv4.getStateForNeighborUpdate(lv2.getOpposite(), arg2.getBlockState(lv5), arg2, lv, lv5);
-                RedstoneWireBlock.replaceBlock(lv4, lv6, arg2, lv, i);
+                RedstoneWireBlock.replaceBlock(lv4, lv6, arg2, lv, i, j);
             }
             lv.set(arg3, lv2).move(Direction.UP);
             BlockState lv7 = arg2.getBlockState(lv);
             if (lv7.isOf(Blocks.OBSERVER)) continue;
             BlockPos lv8 = lv.offset(lv2.getOpposite());
             BlockState lv9 = lv7.getStateForNeighborUpdate(lv2.getOpposite(), arg2.getBlockState(lv8), arg2, lv, lv8);
-            RedstoneWireBlock.replaceBlock(lv7, lv9, arg2, lv, i);
+            RedstoneWireBlock.replaceBlock(lv7, lv9, arg2, lv, i, j);
         }
     }
 
@@ -273,7 +273,6 @@ extends Block {
         if (arg4.isOf(arg.getBlock()) || arg2.isClient) {
             return;
         }
-        arg2.setBlockState(arg3, this.method_27840(arg2, this.getDefaultState(), arg3), 2);
         this.update(arg2, arg3, arg);
         for (Direction lv : Direction.Type.VERTICAL) {
             arg2.updateNeighborsAlways(arg3.offset(lv), this);
@@ -452,7 +451,7 @@ extends Block {
             return ActionResult.PASS;
         }
         if (RedstoneWireBlock.isFullyConnected(arg) || RedstoneWireBlock.isNotConnected(arg)) {
-            BlockState lv = RedstoneWireBlock.isFullyConnected(arg) ? this.dotShape : this.getDefaultState();
+            BlockState lv = RedstoneWireBlock.isFullyConnected(arg) ? this.getDefaultState() : this.dotShape;
             lv = (BlockState)lv.with(POWER, arg.get(POWER));
             if ((lv = this.method_27840(arg2, lv, arg3)) != arg) {
                 arg2.setBlockState(arg3, lv, 3);

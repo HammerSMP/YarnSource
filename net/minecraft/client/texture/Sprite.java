@@ -229,9 +229,9 @@ implements AutoCloseable {
             }
         } else if (this.interpolation != null) {
             if (!RenderSystem.isOnRenderThread()) {
-                RenderSystem.recordRenderCall(() -> this.interpolation.method_24128());
+                RenderSystem.recordRenderCall(() -> this.interpolation.apply());
             } else {
-                this.interpolation.method_24128();
+                this.interpolation.apply();
             }
         }
     }
@@ -259,7 +259,7 @@ implements AutoCloseable {
             }
         }
 
-        private void method_24128() {
+        private void apply() {
             double d = 1.0 - (double)Sprite.this.frameTicks / (double)Sprite.this.animationMetadata.getFrameTime(Sprite.this.frameIndex);
             int i = Sprite.this.animationMetadata.getFrameIndex(Sprite.this.frameIndex);
             int j = Sprite.this.animationMetadata.getFrameCount() == 0 ? Sprite.this.getFrameCount() : Sprite.this.animationMetadata.getFrameCount();
@@ -270,11 +270,11 @@ implements AutoCloseable {
                     int n = Sprite.this.info.height >> l;
                     for (int o = 0; o < n; ++o) {
                         for (int p = 0; p < m; ++p) {
-                            int q = this.method_24130(i, l, p, o);
-                            int r = this.method_24130(k, l, p, o);
-                            int s = this.method_24129(d, q >> 16 & 0xFF, r >> 16 & 0xFF);
-                            int t = this.method_24129(d, q >> 8 & 0xFF, r >> 8 & 0xFF);
-                            int u = this.method_24129(d, q & 0xFF, r & 0xFF);
+                            int q = this.getPixelColor(i, l, p, o);
+                            int r = this.getPixelColor(k, l, p, o);
+                            int s = this.lerp(d, q >> 16 & 0xFF, r >> 16 & 0xFF);
+                            int t = this.lerp(d, q >> 8 & 0xFF, r >> 8 & 0xFF);
+                            int u = this.lerp(d, q & 0xFF, r & 0xFF);
                             this.images[l].setPixelColor(p, o, q & 0xFF000000 | s << 16 | t << 8 | u);
                         }
                     }
@@ -283,11 +283,11 @@ implements AutoCloseable {
             }
         }
 
-        private int method_24130(int i, int j, int k, int l) {
+        private int getPixelColor(int i, int j, int k, int l) {
             return Sprite.this.images[j].getPixelColor(k + (Sprite.this.frameXs[i] * Sprite.this.info.width >> j), l + (Sprite.this.frameYs[i] * Sprite.this.info.height >> j));
         }
 
-        private int method_24129(double d, int i, int j) {
+        private int lerp(double d, int i, int j) {
             return (int)(d * (double)i + (1.0 - d) * (double)j);
         }
 

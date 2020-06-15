@@ -50,6 +50,7 @@ import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 @Environment(value=EnvType.CLIENT)
@@ -60,6 +61,7 @@ Element,
 RecipeDisplayListener,
 RecipeGridAligner<Ingredient> {
     protected static final Identifier TEXTURE = new Identifier("textures/gui/recipe_book.png");
+    private static final Text field_25711 = new TranslatableText("gui.recipebook.search_hint").formatted(Formatting.ITALIC).formatted(Formatting.GRAY);
     private int leftOffset;
     private int parentWidth;
     private int parentHeight;
@@ -239,7 +241,11 @@ RecipeGridAligner<Ingredient> {
         int k = (this.parentWidth - 147) / 2 - this.leftOffset;
         int l = (this.parentHeight - 166) / 2;
         this.drawTexture(arg, k, l, 1, 1, 147, 166);
-        this.searchField.render(arg, i, j, f);
+        if (!this.searchField.isFocused() && this.searchField.getText().isEmpty()) {
+            this.drawTextWithShadow(arg, this.client.textRenderer, field_25711, k + 25, l + 14, -1);
+        } else {
+            this.searchField.render(arg, i, j, f);
+        }
         for (RecipeGroupButtonWidget lv : this.tabButtons) {
             lv.render(arg, i, j, f);
         }

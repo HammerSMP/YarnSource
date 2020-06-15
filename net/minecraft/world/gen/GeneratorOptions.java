@@ -219,6 +219,12 @@ public class GeneratorOptions {
             case "debug_all_block_states": {
                 return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, DebugChunkGenerator.INSTANCE));
             }
+            case "amplified": {
+                return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.AMPLIFIED.getChunkGeneratorType())));
+            }
+            case "largebiomes": {
+                return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType())));
+            }
         }
         return new GeneratorOptions(l, bl, false, GeneratorOptions.method_28608(lv, GeneratorOptions.createOverworldGenerator(l)));
     }

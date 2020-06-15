@@ -217,7 +217,7 @@ public class ModelLoader {
             lv.upload(lv2);
             arg2.registerTexture(lv.getId(), lv);
             arg2.bindTexture(lv.getId());
-            lv.method_24198(lv2);
+            lv.applyTextureFilter(lv2);
         }
         this.spriteAtlasManager = new SpriteAtlasManager(this.spriteAtlasData.values().stream().map(Pair::getFirst).collect(Collectors.toList()));
         arg22.swap("baking");

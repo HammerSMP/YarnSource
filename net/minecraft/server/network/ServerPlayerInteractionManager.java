@@ -39,6 +39,7 @@ public class ServerPlayerInteractionManager {
     public ServerWorld world;
     public ServerPlayerEntity player;
     private GameMode gameMode = GameMode.NOT_SET;
+    private GameMode field_25715 = GameMode.NOT_SET;
     private boolean mining;
     private int startMiningTime;
     private BlockPos miningPos = BlockPos.ORIGIN;
@@ -52,7 +53,12 @@ public class ServerPlayerInteractionManager {
         this.world = arg;
     }
 
-    public void setGameMode(GameMode arg) {
+    public void method_30118(GameMode arg) {
+        this.setGameMode(arg, arg != this.gameMode ? this.gameMode : this.field_25715);
+    }
+
+    public void setGameMode(GameMode arg, GameMode arg2) {
+        this.field_25715 = arg2;
         this.gameMode = arg;
         arg.setAbilitites(this.player.abilities);
         this.player.sendAbilitiesUpdate();
@@ -62,6 +68,10 @@ public class ServerPlayerInteractionManager {
 
     public GameMode getGameMode() {
         return this.gameMode;
+    }
+
+    public GameMode method_30119() {
+        return this.field_25715;
     }
 
     public boolean isSurvivalLike() {
@@ -76,7 +86,7 @@ public class ServerPlayerInteractionManager {
         if (this.gameMode == GameMode.NOT_SET) {
             this.gameMode = arg;
         }
-        this.setGameMode(this.gameMode);
+        this.method_30118(this.gameMode);
     }
 
     public void update() {

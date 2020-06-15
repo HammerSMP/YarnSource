@@ -31,6 +31,7 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.TransformingVertexConsumer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexConsumers;
@@ -112,7 +113,7 @@ implements SynchronousResourceReloadListener {
         if (arg5.isBuiltin() || arg.getItem() == Items.TRIDENT && !bl2) {
             BuiltinModelItemRenderer.INSTANCE.render(arg, arg2, arg3, arg4, i, j);
         } else {
-            VertexConsumer lv4;
+            VertexConsumer lv7;
             boolean bl4;
             if (arg2 != ModelTransformation.Mode.GUI && !arg2.method_29998() && arg.getItem() instanceof BlockItem) {
                 Block lv = ((BlockItem)arg.getItem()).getBlock();
@@ -121,12 +122,26 @@ implements SynchronousResourceReloadListener {
                 bl4 = true;
             }
             RenderLayer lv2 = RenderLayers.getItemLayer(arg, bl4);
-            if (bl4) {
-                VertexConsumer lv3 = ItemRenderer.method_29711(arg4, lv2, true, arg.hasEnchantmentGlint());
+            if (arg.getItem() == Items.COMPASS && arg.hasEnchantmentGlint()) {
+                arg3.push();
+                MatrixStack.Entry lv3 = arg3.peek();
+                if (arg2 == ModelTransformation.Mode.GUI) {
+                    lv3.getModel().multiply(0.5f);
+                } else if (arg2.method_29998()) {
+                    lv3.getModel().multiply(0.75f);
+                }
+                if (bl4) {
+                    VertexConsumer lv4 = ItemRenderer.method_30115(arg4, lv2, lv3);
+                } else {
+                    VertexConsumer lv5 = ItemRenderer.method_30114(arg4, lv2, lv3);
+                }
+                arg3.pop();
+            } else if (bl4) {
+                VertexConsumer lv6 = ItemRenderer.method_29711(arg4, lv2, true, arg.hasEnchantmentGlint());
             } else {
-                lv4 = ItemRenderer.getArmorVertexConsumer(arg4, lv2, true, arg.hasEnchantmentGlint());
+                lv7 = ItemRenderer.getArmorVertexConsumer(arg4, lv2, true, arg.hasEnchantmentGlint());
             }
-            this.renderBakedItemModel(arg5, arg, i, j, arg3, lv4);
+            this.renderBakedItemModel(arg5, arg, i, j, arg3, lv7);
         }
         arg3.pop();
     }
@@ -136,6 +151,14 @@ implements SynchronousResourceReloadListener {
             return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getArmorGlint() : RenderLayer.getArmorEntityGlint()), arg.getBuffer(arg2));
         }
         return arg.getBuffer(arg2);
+    }
+
+    public static VertexConsumer method_30114(VertexConsumerProvider arg, RenderLayer arg2, MatrixStack.Entry arg3) {
+        return VertexConsumers.dual(new TransformingVertexConsumer(arg.getBuffer(RenderLayer.getGlint()), arg3.getModel(), arg3.getNormal()), arg.getBuffer(arg2));
+    }
+
+    public static VertexConsumer method_30115(VertexConsumerProvider arg, RenderLayer arg2, MatrixStack.Entry arg3) {
+        return VertexConsumers.dual(new TransformingVertexConsumer(arg.getBuffer(RenderLayer.getGlintDirect()), arg3.getModel(), arg3.getNormal()), arg.getBuffer(arg2));
     }
 
     public static VertexConsumer getArmorVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {

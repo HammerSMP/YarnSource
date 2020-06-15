@@ -156,7 +156,7 @@ public final class NbtHelper {
     }
 
     public static IntArrayTag fromUuidNew(UUID uUID) {
-        return new IntArrayTag(DynamicSerializableUuid.method_26275(uUID));
+        return new IntArrayTag(DynamicSerializableUuid.toIntArray(uUID));
     }
 
     public static UUID toUuidNew(Tag arg) {
@@ -167,7 +167,7 @@ public final class NbtHelper {
         if (is.length != 4) {
             throw new IllegalArgumentException("Expected UUID-Array to be of length 4, but found " + is.length + ".");
         }
-        return DynamicSerializableUuid.method_26276(is);
+        return DynamicSerializableUuid.toUuid(is);
     }
 
     public static BlockPos toBlockPos(CompoundTag arg) {

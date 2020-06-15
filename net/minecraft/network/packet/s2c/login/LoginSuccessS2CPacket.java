@@ -35,14 +35,14 @@ implements Packet<ClientLoginPacketListener> {
         for (int i = 0; i < is.length; ++i) {
             is[i] = arg.readInt();
         }
-        UUID uUID = DynamicSerializableUuid.method_26276(is);
+        UUID uUID = DynamicSerializableUuid.toUuid(is);
         String string = arg.readString(16);
         this.profile = new GameProfile(uUID, string);
     }
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
-        for (int i : DynamicSerializableUuid.method_26275(this.profile.getId())) {
+        for (int i : DynamicSerializableUuid.toIntArray(this.profile.getId())) {
             arg.writeInt(i);
         }
         arg.writeString(this.profile.getName());

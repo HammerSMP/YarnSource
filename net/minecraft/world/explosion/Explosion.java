@@ -130,7 +130,7 @@ public class Explosion {
                     double o;
                     double n = MathHelper.lerp((double)k, lv.minX, lv.maxX);
                     Vec3d lv2 = new Vec3d(n + g, o = MathHelper.lerp((double)l, lv.minY, lv.maxY), (p = MathHelper.lerp((double)m, lv.minZ, lv.maxZ)) + h);
-                    if (arg2.world.rayTrace(new RayTraceContext(lv2, arg, RayTraceContext.ShapeType.OUTLINE, RayTraceContext.FluidHandling.NONE, arg2)).getType() == HitResult.Type.MISS) {
+                    if (arg2.world.rayTrace(new RayTraceContext(lv2, arg, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, arg2)).getType() == HitResult.Type.MISS) {
                         ++i;
                     }
                     ++j;

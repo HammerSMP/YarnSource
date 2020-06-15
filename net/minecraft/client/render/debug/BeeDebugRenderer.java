@@ -17,7 +17,6 @@ import com.google.common.collect.Sets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -122,20 +121,13 @@ implements DebugRenderer.Renderer {
 
     private Map<BlockPos, Set<UUID>> getBlacklistingBees() {
         HashMap map = Maps.newHashMap();
-        this.bees.values().forEach(arg -> arg.blacklist.forEach(arg2 -> BeeDebugRenderer.addToMap(map, arg, arg2)));
+        this.bees.values().forEach(arg -> arg.blacklist.forEach(arg22 -> map.computeIfAbsent(arg22, arg -> Sets.newHashSet()).add(arg.getUuid())));
         return map;
     }
 
     private void drawFlowers() {
         HashMap map = Maps.newHashMap();
-        this.bees.values().stream().filter(Bee::hasFlower).forEach(arg -> {
-            Set set = (Set)map.get(arg.flower);
-            if (set == null) {
-                set = Sets.newHashSet();
-                map.put(arg.flower, set);
-            }
-            set.add(arg.getUuid());
-        });
+        this.bees.values().stream().filter(Bee::hasFlower).forEach(arg2 -> map.computeIfAbsent(arg2.flower, arg -> Sets.newHashSet()).add(arg2.getUuid()));
         map.entrySet().forEach(entry -> {
             BlockPos lv = (BlockPos)entry.getKey();
             Set set = (Set)entry.getValue();
@@ -156,15 +148,6 @@ implements DebugRenderer.Renderer {
             return "" + collection.size() + " bees";
         }
         return collection.stream().map(NameGenerator::name).collect(Collectors.toSet()).toString();
-    }
-
-    private static void addToMap(Map<BlockPos, Set<UUID>> map, Bee arg, BlockPos arg2) {
-        HashSet set = map.get(arg2);
-        if (set == null) {
-            set = Sets.newHashSet();
-            map.put(arg2, set);
-        }
-        set.add(arg.getUuid());
     }
 
     private static void drawHive(BlockPos arg) {
@@ -288,12 +271,7 @@ implements DebugRenderer.Renderer {
         HashMap map = Maps.newHashMap();
         for (Bee lv : this.bees.values()) {
             if (lv.hive == null || this.hives.containsKey(lv.hive)) continue;
-            List list = (List)map.get(lv.hive);
-            if (list == null) {
-                list = Lists.newArrayList();
-                map.put(lv.hive, list);
-            }
-            list.add(lv.getName());
+            map.computeIfAbsent(lv.hive, arg -> Lists.newArrayList()).add(lv.getName());
         }
         return map;
     }

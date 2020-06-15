@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableMap
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
  *  com.mojang.datafixers.OpticFinder
@@ -14,6 +15,7 @@
  */
 package net.minecraft.datafixer.fix;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.OpticFinder;
@@ -23,6 +25,7 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Dynamic;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -52,10 +55,11 @@ extends DataFix {
                     Dynamic dynamic2 = (Dynamic)typed2.get(DSL.remainderFinder());
                     Dynamic dynamic3 = (Dynamic)typed3.getOrCreate(DSL.remainderFinder());
                     if (dynamic3.get("Base").asNumber().result().isPresent()) {
+                        Dynamic dynamic5;
                         Dynamic dynamic4;
                         dynamic = dynamic.set("Damage", dynamic.createShort((short)(dynamic3.get("Base").asInt(0) & 0xF)));
                         Optional optional4 = dynamic2.get("display").result();
-                        if (optional4.isPresent() && Objects.equals((Object)(dynamic4 = (Dynamic)optional4.get()), (Object)dynamic4.emptyMap().merge(dynamic4.createString("Lore"), dynamic4.createList(Stream.of(dynamic4.createString("(+NBT")))))) {
+                        if (optional4.isPresent() && Objects.equals((Object)(dynamic4 = (Dynamic)optional4.get()), (Object)(dynamic5 = dynamic4.createMap((Map)ImmutableMap.of((Object)dynamic4.createString("Lore"), (Object)dynamic4.createList(Stream.of(dynamic4.createString("(+NBT")))))))) {
                             return typed.set(DSL.remainderFinder(), (Object)dynamic);
                         }
                         dynamic3.remove("Base");

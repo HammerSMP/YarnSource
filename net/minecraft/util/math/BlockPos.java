@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
 @Immutable
 public class BlockPos
 extends Vec3i {
-    public static final Codec<BlockPos> field_25064 = Codec.INT_STREAM.comapFlatMap(intStream -> Util.method_29190(intStream, 3).map(is -> new BlockPos(is[0], is[1], is[2])), arg -> IntStream.of(arg.getX(), arg.getY(), arg.getZ())).stable();
+    public static final Codec<BlockPos> field_25064 = Codec.INT_STREAM.comapFlatMap(intStream -> Util.toIntArray(intStream, 3).map(is -> new BlockPos(is[0], is[1], is[2])), arg -> IntStream.of(arg.getX(), arg.getY(), arg.getZ())).stable();
     private static final Logger LOGGER = LogManager.getLogger();
     public static final BlockPos ORIGIN = new BlockPos(0, 0, 0);
     private static final int SIZE_BITS_X;

@@ -19,7 +19,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -46,7 +45,7 @@ implements Waterloggable {
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext arg) {
         FluidState lv = arg.getWorld().getFluidState(arg.getBlockPos());
-        boolean bl = lv.matches(FluidTags.WATER) && lv.getLevel() == 8;
+        boolean bl = lv.getFluid() == Fluids.WATER;
         return (BlockState)super.getPlacementState(arg).with(WATERLOGGED, bl);
     }
 

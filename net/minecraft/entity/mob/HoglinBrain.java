@@ -45,6 +45,8 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.MobEntityWithAi;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.IntRange;
 
@@ -89,7 +91,7 @@ public class HoglinBrain {
         lv.resetPossibleActivities((List<Activity>)ImmutableList.of((Object)Activity.FIGHT, (Object)Activity.AVOID, (Object)Activity.IDLE));
         Activity lv3 = lv.getFirstPossibleNonCoreActivity().orElse(null);
         if (lv2 != lv3) {
-            HoglinBrain.playSound(arg);
+            HoglinBrain.method_30083(arg).ifPresent(arg::method_30081);
         }
         arg.setAttacking(lv.hasMemoryModule(MemoryModuleType.ATTACK_TARGET));
     }
@@ -197,24 +199,29 @@ public class HoglinBrain {
         HoglinBrain.setAttackTarget(arg, lv);
     }
 
-    private static void playSound(HoglinEntity arg) {
-        arg.getBrain().getFirstPossibleNonCoreActivity().ifPresent(arg2 -> {
-            if (arg2 == Activity.AVOID || arg.canConvert()) {
-                arg.playRetreatSound();
-            } else if (arg2 == Activity.FIGHT) {
-                arg.playFightSound();
-            }
-        });
+    public static Optional<SoundEvent> method_30083(HoglinEntity arg) {
+        return arg.getBrain().getFirstPossibleNonCoreActivity().map(arg2 -> HoglinBrain.method_30082(arg, arg2));
     }
 
-    protected static void playSoundAtChance(HoglinEntity arg) {
-        if ((double)arg.world.random.nextFloat() < 0.0125) {
-            HoglinBrain.playSound(arg);
+    private static SoundEvent method_30082(HoglinEntity arg, Activity arg2) {
+        if (arg2 == Activity.AVOID || arg.canConvert()) {
+            return SoundEvents.ENTITY_HOGLIN_RETREAT;
         }
+        if (arg2 == Activity.FIGHT) {
+            return SoundEvents.ENTITY_HOGLIN_ANGRY;
+        }
+        if (HoglinBrain.method_30085(arg)) {
+            return SoundEvents.ENTITY_HOGLIN_RETREAT;
+        }
+        return SoundEvents.ENTITY_HOGLIN_AMBIENT;
     }
 
     private static List<HoglinEntity> getAdultHoglinsAround(HoglinEntity arg) {
         return arg.getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_ADULT_HOGLINS).orElse((List<HoglinEntity>)ImmutableList.of());
+    }
+
+    private static boolean method_30085(HoglinEntity arg) {
+        return arg.getBrain().hasMemoryModule(MemoryModuleType.NEAREST_REPELLENT);
     }
 
     private static boolean hasBreedTarget(HoglinEntity arg) {
@@ -223,10 +230,6 @@ public class HoglinBrain {
 
     protected static boolean isNearPlayer(HoglinEntity arg) {
         return arg.getBrain().hasMemoryModule(MemoryModuleType.PACIFIED);
-    }
-
-    protected static boolean hasIdleActivity(HoglinEntity arg) {
-        return arg.getBrain().hasActivity(Activity.IDLE);
     }
 }
 

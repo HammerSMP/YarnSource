@@ -176,7 +176,7 @@ public abstract class PlayerManager {
         GameRules lv9 = lv6.getGameRules();
         boolean bl = lv9.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
         boolean bl2 = lv9.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.method_28125()));
+        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), arg22.interactionManager.method_30119(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.method_28125()));
         lv8.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
         lv8.sendPacket(new DifficultyS2CPacket(lv7.getDifficulty(), lv7.isDifficultyLocked()));
         lv8.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
@@ -447,7 +447,7 @@ public abstract class PlayerManager {
             lv6.updatePosition(lv6.getX(), lv6.getY() + 1.0, lv6.getZ());
         }
         WorldProperties lv8 = lv6.world.getLevelProperties();
-        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.getDimensionRegistryKey(), lv6.world.getRegistryKey(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.getServerWorld().isDebugWorld(), lv6.getServerWorld().method_28125(), bl));
+        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.getDimensionRegistryKey(), lv6.world.getRegistryKey(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.interactionManager.method_30119(), lv6.getServerWorld().isDebugWorld(), lv6.getServerWorld().method_28125(), bl));
         lv6.networkHandler.requestTeleport(lv6.getX(), lv6.getY(), lv6.getZ(), lv6.yaw, lv6.pitch);
         lv6.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv3.getSpawnPos()));
         lv6.networkHandler.sendPacket(new DifficultyS2CPacket(lv8.getDifficulty(), lv8.isDifficultyLocked()));
@@ -680,9 +680,9 @@ public abstract class PlayerManager {
 
     private void setGameMode(ServerPlayerEntity arg, @Nullable ServerPlayerEntity arg2, ServerWorld arg3) {
         if (arg2 != null) {
-            arg.interactionManager.setGameMode(arg2.interactionManager.getGameMode());
+            arg.interactionManager.setGameMode(arg2.interactionManager.getGameMode(), arg2.interactionManager.method_30119());
         } else if (this.gameMode != null) {
-            arg.interactionManager.setGameMode(this.gameMode);
+            arg.interactionManager.setGameMode(this.gameMode, GameMode.NOT_SET);
         }
         arg.interactionManager.setGameModeIfNotPresent(arg3.getServer().getSaveProperties().getGameMode());
     }

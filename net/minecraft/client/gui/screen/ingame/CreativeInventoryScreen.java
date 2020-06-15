@@ -39,6 +39,7 @@ import net.minecraft.client.options.HotbarStorageEntry;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.search.SearchManager;
 import net.minecraft.client.search.SearchableContainer;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -303,18 +304,18 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
     public boolean keyPressed(int i, int j, int k) {
         this.ignoreTypedCharacter = false;
         if (selectedTab != ItemGroup.SEARCH.getIndex()) {
-            boolean bl;
-            boolean bl2 = bl = !this.isCreativeInventorySlot(this.focusedSlot) || this.focusedSlot != null && this.focusedSlot.hasStack();
-            if (bl && this.handleHotbarKeyPressed(i, j)) {
-                this.ignoreTypedCharacter = true;
-                return true;
-            }
             if (this.client.options.keyChat.matchesKey(i, j)) {
                 this.ignoreTypedCharacter = true;
                 this.setSelectedTab(ItemGroup.SEARCH);
                 return true;
             }
             return super.keyPressed(i, j, k);
+        }
+        boolean bl = !this.isCreativeInventorySlot(this.focusedSlot) || this.focusedSlot.hasStack();
+        boolean bl2 = InputUtil.fromKeyCode(i, j).method_30103().isPresent();
+        if (bl && bl2 && this.handleHotbarKeyPressed(i, j)) {
+            this.ignoreTypedCharacter = true;
+            return true;
         }
         String string = this.searchBox.getText();
         if (this.searchBox.keyPressed(i, j, k)) {

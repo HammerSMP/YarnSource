@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.minecraft.datafixer.TypeReferences;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -89,11 +90,11 @@ extends DataFix {
         } else if (!optional.isPresent()) {
             Dynamic<T> dynamic3 = StructureSeparationDataFix.method_29916(dynamic2, l);
         } else {
-            OptionalDynamic optionalDynamic = dynamic2.get("generatorOptions");
             switch ((String)optional.get()) {
                 case "flat": {
+                    OptionalDynamic optionalDynamic = dynamic2.get("generatorOptions");
                     Map<Dynamic<T>, Dynamic<T>> map = StructureSeparationDataFix.method_28275(dynamicOps, optionalDynamic);
-                    Dynamic dynamic4 = dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("type"), (Object)dynamic2.createString("minecraft:flat"), (Object)dynamic2.createString("settings"), (Object)dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("structures"), (Object)dynamic2.createMap(map), (Object)dynamic2.createString("layers"), (Object)optionalDynamic.get("layers").orElseEmptyList(), (Object)dynamic2.createString("biome"), (Object)dynamic2.createString(optionalDynamic.get("biome").asString("plains"))))));
+                    Dynamic dynamic4 = dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("type"), (Object)dynamic2.createString("minecraft:flat"), (Object)dynamic2.createString("settings"), (Object)dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("structures"), (Object)dynamic2.createMap(map), (Object)dynamic2.createString("layers"), (Object)optionalDynamic.get("layers").result().orElseGet(() -> dynamic2.createList(Stream.of(new Dynamic[]{dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("height"), (Object)dynamic2.createInt(1), (Object)dynamic2.createString("block"), (Object)dynamic2.createString("minecraft:bedrock"))), dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("height"), (Object)dynamic2.createInt(2), (Object)dynamic2.createString("block"), (Object)dynamic2.createString("minecraft:dirt"))), dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("height"), (Object)dynamic2.createInt(1), (Object)dynamic2.createString("block"), (Object)dynamic2.createString("minecraft:grass_block")))}))), (Object)dynamic2.createString("biome"), (Object)dynamic2.createString(optionalDynamic.get("biome").asString("minecraft:plains"))))));
                     break;
                 }
                 case "debug_all_block_states": {
@@ -103,8 +104,9 @@ extends DataFix {
                 case "buffet": {
                     Dynamic dynamic11;
                     Dynamic dynamic8;
-                    OptionalDynamic optionalDynamic2 = optionalDynamic.get("chunk_generator");
-                    Optional optional3 = optionalDynamic2.get("type").asString().result();
+                    OptionalDynamic optionalDynamic2 = dynamic2.get("generatorOptions");
+                    OptionalDynamic optionalDynamic3 = optionalDynamic2.get("chunk_generator");
+                    Optional optional3 = optionalDynamic3.get("type").asString().result();
                     if (Objects.equals(optional3, Optional.of("minecraft:caves"))) {
                         Dynamic dynamic6 = dynamic2.createString("minecraft:caves");
                         bl = true;
@@ -113,7 +115,7 @@ extends DataFix {
                     } else {
                         dynamic8 = dynamic2.createString("minecraft:overworld");
                     }
-                    Dynamic dynamic9 = optionalDynamic.get("biome_source").result().orElseGet(() -> dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("type"), (Object)dynamic2.createString("minecraft:fixed"))));
+                    Dynamic dynamic9 = optionalDynamic2.get("biome_source").result().orElseGet(() -> dynamic2.createMap((Map)ImmutableMap.of((Object)dynamic2.createString("type"), (Object)dynamic2.createString("minecraft:fixed"))));
                     if (dynamic9.get("type").asString().result().equals(Optional.of("minecraft:fixed"))) {
                         String string2 = dynamic9.get("options").get("biomes").asStream().findFirst().flatMap(dynamic -> dynamic.asString().result()).orElse("minecraft:ocean");
                         Dynamic dynamic10 = dynamic9.remove("options").set("biome", dynamic2.createString(string2));
@@ -158,6 +160,10 @@ extends DataFix {
         MutableInt mutableInt3 = new MutableInt(128);
         MutableBoolean mutableBoolean = new MutableBoolean(false);
         HashMap map = Maps.newHashMap();
+        if (!optionalDynamic.result().isPresent()) {
+            mutableBoolean.setTrue();
+            map.put("minecraft:village", STRUCTURE_SPACING.get((Object)"minecraft:village"));
+        }
         optionalDynamic.get("structures").flatMap(Dynamic::getMapValues).result().ifPresent(map2 -> map2.forEach((dynamic, dynamic2) -> dynamic2.getMapValues().result().ifPresent(map2 -> map2.forEach((dynamic2, dynamic3) -> {
             String string = dynamic.asString("");
             String string2 = dynamic2.asString("");

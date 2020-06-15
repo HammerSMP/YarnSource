@@ -21,7 +21,7 @@ public class GameMessageS2CPacket
 implements Packet<ClientPlayPacketListener> {
     private Text message;
     private MessageType location;
-    private UUID field_25133;
+    private UUID senderUuid;
 
     public GameMessageS2CPacket() {
     }
@@ -29,21 +29,21 @@ implements Packet<ClientPlayPacketListener> {
     public GameMessageS2CPacket(Text arg, MessageType arg2, UUID uUID) {
         this.message = arg;
         this.location = arg2;
-        this.field_25133 = uUID;
+        this.senderUuid = uUID;
     }
 
     @Override
     public void read(PacketByteBuf arg) throws IOException {
         this.message = arg.readText();
         this.location = MessageType.byId(arg.readByte());
-        this.field_25133 = arg.readUuid();
+        this.senderUuid = arg.readUuid();
     }
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
         arg.writeText(this.message);
         arg.writeByte(this.location.getId());
-        arg.writeUuid(this.field_25133);
+        arg.writeUuid(this.senderUuid);
     }
 
     @Override
@@ -65,8 +65,8 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UUID method_29175() {
-        return this.field_25133;
+    public UUID getSenderUuid() {
+        return this.senderUuid;
     }
 
     @Override

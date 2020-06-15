@@ -29,6 +29,7 @@ implements Packet<ClientPlayPacketListener> {
     private long sha256Seed;
     private boolean hardcore;
     private GameMode gameMode;
+    private GameMode field_25713;
     private Set<RegistryKey<World>> field_25320;
     private RegistryTracker.Modifiable dimensionTracker;
     private RegistryKey<DimensionType> field_25321;
@@ -43,14 +44,15 @@ implements Packet<ClientPlayPacketListener> {
     public GameJoinS2CPacket() {
     }
 
-    public GameJoinS2CPacket(int i, GameMode arg, long l, boolean bl, Set<RegistryKey<World>> set, RegistryTracker.Modifiable arg2, RegistryKey<DimensionType> arg3, RegistryKey<World> arg4, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
+    public GameJoinS2CPacket(int i, GameMode arg, GameMode arg2, long l, boolean bl, Set<RegistryKey<World>> set, RegistryTracker.Modifiable arg3, RegistryKey<DimensionType> arg4, RegistryKey<World> arg5, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
         this.playerEntityId = i;
         this.field_25320 = set;
-        this.dimensionTracker = arg2;
-        this.field_25321 = arg3;
-        this.dimensionId = arg4;
+        this.dimensionTracker = arg3;
+        this.field_25321 = arg4;
+        this.dimensionId = arg5;
         this.sha256Seed = l;
         this.gameMode = arg;
+        this.field_25713 = arg2;
         this.maxPlayers = j;
         this.hardcore = bl;
         this.chunkLoadDistance = k;
@@ -66,6 +68,7 @@ implements Packet<ClientPlayPacketListener> {
         int i = arg.readUnsignedByte();
         this.hardcore = (i & 8) == 8;
         this.gameMode = GameMode.byId(i &= 0xFFFFFFF7);
+        this.field_25713 = GameMode.byId(arg.readUnsignedByte());
         int j = arg.readVarInt();
         this.field_25320 = Sets.newHashSet();
         for (int k = 0; k < j; ++k) {
@@ -91,6 +94,7 @@ implements Packet<ClientPlayPacketListener> {
             i |= 8;
         }
         arg.writeByte(i);
+        arg.writeByte(this.field_25713.getId());
         arg.writeVarInt(this.field_25320.size());
         for (RegistryKey<World> lv : this.field_25320) {
             arg.writeIdentifier(lv.getValue());
@@ -130,6 +134,11 @@ implements Packet<ClientPlayPacketListener> {
     @Environment(value=EnvType.CLIENT)
     public GameMode getGameMode() {
         return this.gameMode;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public GameMode method_30116() {
+        return this.field_25713;
     }
 
     @Environment(value=EnvType.CLIENT)

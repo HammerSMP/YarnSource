@@ -103,7 +103,7 @@ implements AutoCloseable {
     public static NativeImage read(@Nullable Format arg, InputStream inputStream) throws IOException {
         ByteBuffer byteBuffer = null;
         try {
-            byteBuffer = TextureUtil.method_24962(inputStream);
+            byteBuffer = TextureUtil.readAllToByteBuffer(inputStream);
             byteBuffer.rewind();
             NativeImage nativeImage = NativeImage.read(arg, byteBuffer);
             return nativeImage;
@@ -315,7 +315,7 @@ implements AutoCloseable {
         }
         this.checkAllocated();
         try (SeekableByteChannel writableByteChannel = Files.newByteChannel(path, WRITE_TO_FILE_OPEN_OPTIONS, new FileAttribute[0]);){
-            if (!this.method_24032(writableByteChannel)) {
+            if (!this.write(writableByteChannel)) {
                 throw new IOException("Could not write image to the PNG file \"" + path.toAbsolutePath() + "\": " + STBImage.stbi_failure_reason());
             }
         }
@@ -349,7 +349,7 @@ implements AutoCloseable {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    private boolean method_24032(WritableByteChannel writableByteChannel) throws IOException {
+    private boolean write(WritableByteChannel writableByteChannel) throws IOException {
         WriteCallback lv = new WriteCallback(writableByteChannel);
         try {
             int i = Math.min(this.getHeight(), Integer.MAX_VALUE / this.getWidth() / this.format.getChannelCount());

@@ -302,7 +302,7 @@ implements BlockEntityProvider {
             BlockPos lv = arg2.offset(arg3.get(FACING));
             arg.setBlockState(lv, (BlockState)arg3.with(PART, BedPart.HEAD), 3);
             arg.updateNeighbors(arg2, Blocks.AIR);
-            arg3.updateNeighbors(arg, arg2, 3);
+            arg3.method_30101(arg, arg2, 3);
         }
     }
 

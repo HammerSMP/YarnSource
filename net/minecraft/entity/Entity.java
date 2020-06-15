@@ -2040,12 +2040,16 @@ CommandOutput {
                 ServerWorld.method_29200(arg);
             }
         }
-        this.removed = true;
+        this.method_30076();
         this.world.getProfiler().pop();
         ((ServerWorld)this.world).resetIdleTimeout();
         arg.resetIdleTimeout();
         this.world.getProfiler().pop();
         return lv9;
+    }
+
+    protected void method_30076() {
+        this.removed = true;
     }
 
     public boolean canUsePortals() {
@@ -2545,7 +2549,13 @@ CommandOutput {
             if (!(this instanceof PlayerEntity)) {
                 lv2 = lv2.normalize();
             }
-            this.setVelocity(this.getVelocity().add(lv2.multiply(d)));
+            Vec3d lv6 = this.getVelocity();
+            lv2 = lv2.multiply(d * 1.0);
+            double g = 0.003;
+            if (Math.abs(lv6.x) < 0.003 && Math.abs(lv6.z) < 0.003 && lv2.length() < 0.0045000000000000005) {
+                lv2 = lv2.normalize().multiply(0.0045000000000000005);
+            }
+            this.setVelocity(this.getVelocity().add(lv2));
         }
         this.fluidHeight.put(arg, e);
         return bl2;

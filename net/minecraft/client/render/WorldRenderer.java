@@ -975,11 +975,12 @@ AutoCloseable {
                 arg.translate((double)lv13.getX() - d, (double)lv13.getY() - e, (double)lv13.getZ() - g);
                 SortedSet sortedSet = (SortedSet)this.blockBreakingProgressions.get(lv13.asLong());
                 if (sortedSet != null && !sortedSet.isEmpty() && (x = ((BlockBreakingInfo)sortedSet.last()).getStage()) >= 0) {
-                    TransformingVertexConsumer lv15 = new TransformingVertexConsumer(this.bufferBuilders.getEffectVertexConsumers().getBuffer(ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.get(x)), arg.peek());
+                    MatrixStack.Entry lv15 = arg.peek();
+                    TransformingVertexConsumer lv16 = new TransformingVertexConsumer(this.bufferBuilders.getEffectVertexConsumers().getBuffer(ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.get(x)), lv15.getModel(), lv15.getNormal());
                     lv14 = arg3 -> {
                         VertexConsumer lv = lv6.getBuffer(arg3);
                         if (arg3.hasCrumbling()) {
-                            return VertexConsumers.dual(lv15, lv);
+                            return VertexConsumers.dual(lv16, lv);
                         }
                         return lv;
                     };
@@ -990,11 +991,11 @@ AutoCloseable {
         }
         Set<BlockEntity> set = this.noCullingBlockEntities;
         synchronized (set) {
-            for (BlockEntity lv16 : this.noCullingBlockEntities) {
-                BlockPos lv17 = lv16.getPos();
+            for (BlockEntity lv17 : this.noCullingBlockEntities) {
+                BlockPos lv18 = lv17.getPos();
                 arg.push();
-                arg.translate((double)lv17.getX() - d, (double)lv17.getY() - e, (double)lv17.getZ() - g);
-                BlockEntityRenderDispatcher.INSTANCE.render(lv16, f, arg, lv6);
+                arg.translate((double)lv18.getX() - d, (double)lv18.getY() - e, (double)lv18.getZ() - g);
+                BlockEntityRenderDispatcher.INSTANCE.render(lv17, f, arg, lv6);
                 arg.pop();
             }
         }
@@ -1016,26 +1017,27 @@ AutoCloseable {
             SortedSet sortedSet2;
             double aa;
             double z;
-            BlockPos lv18 = BlockPos.fromLong(entry.getLongKey());
-            double y = (double)lv18.getX() - d;
-            if (y * y + (z = (double)lv18.getY() - e) * z + (aa = (double)lv18.getZ() - g) * aa > 1024.0 || (sortedSet2 = (SortedSet)entry.getValue()) == null || sortedSet2.isEmpty()) continue;
+            BlockPos lv19 = BlockPos.fromLong(entry.getLongKey());
+            double y = (double)lv19.getX() - d;
+            if (y * y + (z = (double)lv19.getY() - e) * z + (aa = (double)lv19.getZ() - g) * aa > 1024.0 || (sortedSet2 = (SortedSet)entry.getValue()) == null || sortedSet2.isEmpty()) continue;
             int ab = ((BlockBreakingInfo)sortedSet2.last()).getStage();
             arg.push();
-            arg.translate((double)lv18.getX() - d, (double)lv18.getY() - e, (double)lv18.getZ() - g);
-            TransformingVertexConsumer lv19 = new TransformingVertexConsumer(this.bufferBuilders.getEffectVertexConsumers().getBuffer(ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.get(ab)), arg.peek());
-            this.client.getBlockRenderManager().renderDamage(this.world.getBlockState(lv18), lv18, this.world, arg, lv19);
+            arg.translate((double)lv19.getX() - d, (double)lv19.getY() - e, (double)lv19.getZ() - g);
+            MatrixStack.Entry lv20 = arg.peek();
+            TransformingVertexConsumer lv21 = new TransformingVertexConsumer(this.bufferBuilders.getEffectVertexConsumers().getBuffer(ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.get(ab)), lv20.getModel(), lv20.getNormal());
+            this.client.getBlockRenderManager().renderDamage(this.world.getBlockState(lv19), lv19, this.world, arg, lv21);
             arg.pop();
         }
         this.checkEmpty(arg);
         lv.pop();
-        HitResult lv20 = this.client.crosshairTarget;
-        if (bl && lv20 != null && lv20.getType() == HitResult.Type.BLOCK) {
+        HitResult lv22 = this.client.crosshairTarget;
+        if (bl && lv22 != null && lv22.getType() == HitResult.Type.BLOCK) {
             lv.swap("outline");
-            BlockPos lv21 = ((BlockHitResult)lv20).getBlockPos();
-            BlockState lv22 = this.world.getBlockState(lv21);
-            if (!lv22.isAir() && this.world.getWorldBorder().contains(lv21)) {
-                VertexConsumer lv23 = lv6.getBuffer(RenderLayer.getLines());
-                this.drawBlockOutline(arg, lv23, arg2.getFocusedEntity(), d, e, g, lv21, lv22);
+            BlockPos lv23 = ((BlockHitResult)lv22).getBlockPos();
+            BlockState lv24 = this.world.getBlockState(lv23);
+            if (!lv24.isAir() && this.world.getWorldBorder().contains(lv23)) {
+                VertexConsumer lv25 = lv6.getBuffer(RenderLayer.getLines());
+                this.drawBlockOutline(arg, lv25, arg2.getFocusedEntity(), d, e, g, lv23, lv24);
             }
         }
         RenderSystem.pushMatrix();
@@ -1059,7 +1061,7 @@ AutoCloseable {
             lv.swap("translucent");
             this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
             lv.swap("string");
-            this.renderLayer(RenderLayer.method_29997(), arg, d, e, g);
+            this.renderLayer(RenderLayer.getTripwire(), arg, d, e, g);
             this.particlesFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.particlesFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             RenderPhase.PARTICLES_TARGET.startDrawing();
@@ -1070,7 +1072,7 @@ AutoCloseable {
             lv.swap("translucent");
             this.renderLayer(RenderLayer.getTranslucent(), arg, d, e, g);
             lv.swap("string");
-            this.renderLayer(RenderLayer.method_29997(), arg, d, e, g);
+            this.renderLayer(RenderLayer.getTripwire(), arg, d, e, g);
             lv.swap("particles");
             this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
         }
@@ -2142,47 +2144,45 @@ AutoCloseable {
             }
             case 2002: 
             case 2007: {
-                double y = arg2.getX();
-                double z = arg2.getY();
-                double aa = arg2.getZ();
-                for (int ab = 0; ab < 8; ++ab) {
-                    this.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(Items.SPLASH_POTION)), y, z, aa, random.nextGaussian() * 0.15, random.nextDouble() * 0.2, random.nextGaussian() * 0.15);
+                Vec3d lv2 = Vec3d.ofBottomCenter(arg2);
+                for (int y = 0; y < 8; ++y) {
+                    this.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, new ItemStack(Items.SPLASH_POTION)), lv2.x, lv2.y, lv2.z, random.nextGaussian() * 0.15, random.nextDouble() * 0.2, random.nextGaussian() * 0.15);
                 }
-                float ac = (float)(j >> 16 & 0xFF) / 255.0f;
-                float ad = (float)(j >> 8 & 0xFF) / 255.0f;
-                float ae = (float)(j >> 0 & 0xFF) / 255.0f;
-                DefaultParticleType lv2 = i == 2007 ? ParticleTypes.INSTANT_EFFECT : ParticleTypes.EFFECT;
-                for (int af = 0; af < 100; ++af) {
-                    double ag = random.nextDouble() * 4.0;
-                    double ah = random.nextDouble() * Math.PI * 2.0;
-                    double ai = Math.cos(ah) * ag;
-                    double aj = 0.01 + random.nextDouble() * 0.5;
-                    double ak = Math.sin(ah) * ag;
-                    Particle lv3 = this.spawnParticle(lv2, lv2.getType().shouldAlwaysSpawn(), y + ai * 0.1, z + 0.3, aa + ak * 0.1, ai, aj, ak);
-                    if (lv3 == null) continue;
-                    float al = 0.75f + random.nextFloat() * 0.25f;
-                    lv3.setColor(ac * al, ad * al, ae * al);
-                    lv3.move((float)ag);
+                float z = (float)(j >> 16 & 0xFF) / 255.0f;
+                float aa = (float)(j >> 8 & 0xFF) / 255.0f;
+                float ab = (float)(j >> 0 & 0xFF) / 255.0f;
+                DefaultParticleType lv3 = i == 2007 ? ParticleTypes.INSTANT_EFFECT : ParticleTypes.EFFECT;
+                for (int ac = 0; ac < 100; ++ac) {
+                    double ad = random.nextDouble() * 4.0;
+                    double ae = random.nextDouble() * Math.PI * 2.0;
+                    double af = Math.cos(ae) * ad;
+                    double ag = 0.01 + random.nextDouble() * 0.5;
+                    double ah = Math.sin(ae) * ad;
+                    Particle lv4 = this.spawnParticle(lv3, lv3.getType().shouldAlwaysSpawn(), lv2.x + af * 0.1, lv2.y + 0.3, lv2.z + ah * 0.1, af, ag, ah);
+                    if (lv4 == null) continue;
+                    float ai = 0.75f + random.nextFloat() * 0.25f;
+                    lv4.setColor(z * ai, aa * ai, ab * ai);
+                    lv4.move((float)ad);
                 }
                 this.world.playSound(arg2, SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.NEUTRAL, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 2001: {
-                BlockState lv4 = Block.getStateFromRawId(j);
-                if (!lv4.isAir()) {
-                    BlockSoundGroup lv5 = lv4.getSoundGroup();
-                    this.world.playSound(arg2, lv5.getBreakSound(), SoundCategory.BLOCKS, (lv5.getVolume() + 1.0f) / 2.0f, lv5.getPitch() * 0.8f, false);
+                BlockState lv5 = Block.getStateFromRawId(j);
+                if (!lv5.isAir()) {
+                    BlockSoundGroup lv6 = lv5.getSoundGroup();
+                    this.world.playSound(arg2, lv6.getBreakSound(), SoundCategory.BLOCKS, (lv6.getVolume() + 1.0f) / 2.0f, lv6.getPitch() * 0.8f, false);
                 }
-                this.client.particleManager.addBlockBreakParticles(arg2, lv4);
+                this.client.particleManager.addBlockBreakParticles(arg2, lv5);
                 break;
             }
             case 2004: {
-                for (int am = 0; am < 20; ++am) {
-                    double an = (double)arg2.getX() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
-                    double ao = (double)arg2.getY() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
-                    double ap = (double)arg2.getZ() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
-                    this.world.addParticle(ParticleTypes.SMOKE, an, ao, ap, 0.0, 0.0, 0.0);
-                    this.world.addParticle(ParticleTypes.FLAME, an, ao, ap, 0.0, 0.0, 0.0);
+                for (int aj = 0; aj < 20; ++aj) {
+                    double ak = (double)arg2.getX() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
+                    double al = (double)arg2.getY() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
+                    double am = (double)arg2.getZ() + 0.5 + (random.nextDouble() - 0.5) * 2.0;
+                    this.world.addParticle(ParticleTypes.SMOKE, ak, al, am, 0.0, 0.0, 0.0);
+                    this.world.addParticle(ParticleTypes.FLAME, ak, al, am, 0.0, 0.0, 0.0);
                 }
                 break;
             }
@@ -2200,48 +2200,48 @@ AutoCloseable {
             }
             case 1501: {
                 this.world.playSound(arg2, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (random.nextFloat() - random.nextFloat()) * 0.8f, false);
-                for (int aq = 0; aq < 8; ++aq) {
+                for (int an = 0; an < 8; ++an) {
                     this.world.addParticle(ParticleTypes.LARGE_SMOKE, (double)arg2.getX() + random.nextDouble(), (double)arg2.getY() + 1.2, (double)arg2.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
                 }
                 break;
             }
             case 1502: {
                 this.world.playSound(arg2, SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.5f, 2.6f + (random.nextFloat() - random.nextFloat()) * 0.8f, false);
-                for (int ar = 0; ar < 5; ++ar) {
-                    double as = (double)arg2.getX() + random.nextDouble() * 0.6 + 0.2;
-                    double at = (double)arg2.getY() + random.nextDouble() * 0.6 + 0.2;
-                    double au = (double)arg2.getZ() + random.nextDouble() * 0.6 + 0.2;
-                    this.world.addParticle(ParticleTypes.SMOKE, as, at, au, 0.0, 0.0, 0.0);
+                for (int ao = 0; ao < 5; ++ao) {
+                    double ap = (double)arg2.getX() + random.nextDouble() * 0.6 + 0.2;
+                    double aq = (double)arg2.getY() + random.nextDouble() * 0.6 + 0.2;
+                    double ar = (double)arg2.getZ() + random.nextDouble() * 0.6 + 0.2;
+                    this.world.addParticle(ParticleTypes.SMOKE, ap, aq, ar, 0.0, 0.0, 0.0);
                 }
                 break;
             }
             case 1503: {
                 this.world.playSound(arg2, SoundEvents.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
-                for (int av = 0; av < 16; ++av) {
-                    double aw = (double)arg2.getX() + (5.0 + random.nextDouble() * 6.0) / 16.0;
-                    double ax = (double)arg2.getY() + 0.8125;
-                    double ay = (double)arg2.getZ() + (5.0 + random.nextDouble() * 6.0) / 16.0;
-                    this.world.addParticle(ParticleTypes.SMOKE, aw, ax, ay, 0.0, 0.0, 0.0);
+                for (int as = 0; as < 16; ++as) {
+                    double at = (double)arg2.getX() + (5.0 + random.nextDouble() * 6.0) / 16.0;
+                    double au = (double)arg2.getY() + 0.8125;
+                    double av = (double)arg2.getZ() + (5.0 + random.nextDouble() * 6.0) / 16.0;
+                    this.world.addParticle(ParticleTypes.SMOKE, at, au, av, 0.0, 0.0, 0.0);
                 }
                 break;
             }
             case 2006: {
-                for (int az = 0; az < 200; ++az) {
-                    float ba = random.nextFloat() * 4.0f;
-                    float bb = random.nextFloat() * ((float)Math.PI * 2);
-                    double bc = MathHelper.cos(bb) * ba;
-                    double bd = 0.01 + random.nextDouble() * 0.5;
-                    double be = MathHelper.sin(bb) * ba;
-                    Particle lv6 = this.spawnParticle(ParticleTypes.DRAGON_BREATH, false, (double)arg2.getX() + bc * 0.1, (double)arg2.getY() + 0.3, (double)arg2.getZ() + be * 0.1, bc, bd, be);
-                    if (lv6 == null) continue;
-                    lv6.move(ba);
+                for (int aw = 0; aw < 200; ++aw) {
+                    float ax = random.nextFloat() * 4.0f;
+                    float ay = random.nextFloat() * ((float)Math.PI * 2);
+                    double az = MathHelper.cos(ay) * ax;
+                    double ba = 0.01 + random.nextDouble() * 0.5;
+                    double bb = MathHelper.sin(ay) * ax;
+                    Particle lv7 = this.spawnParticle(ParticleTypes.DRAGON_BREATH, false, (double)arg2.getX() + az * 0.1, (double)arg2.getY() + 0.3, (double)arg2.getZ() + bb * 0.1, az, ba, bb);
+                    if (lv7 == null) continue;
+                    lv7.move(ax);
                 }
                 if (j != 1) break;
                 this.world.playSound(arg2, SoundEvents.ENTITY_DRAGON_FIREBALL_EXPLODE, SoundCategory.HOSTILE, 1.0f, random.nextFloat() * 0.1f + 0.9f, false);
                 break;
             }
             case 2009: {
-                for (int bf = 0; bf < 8; ++bf) {
+                for (int bc = 0; bc < 8; ++bc) {
                     this.world.addParticle(ParticleTypes.CLOUD, (double)arg2.getX() + random.nextDouble(), (double)arg2.getY() + 1.2, (double)arg2.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
                 }
                 break;

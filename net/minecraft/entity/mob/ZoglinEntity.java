@@ -131,7 +131,7 @@ Hoglin {
     }
 
     public static DefaultAttributeContainer.Builder createZoglinAttributes() {
-        return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 40.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3f).add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.5).add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 1.0).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0);
+        return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 40.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3f).add(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, 0.6f).add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 1.0).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0);
     }
 
     public boolean isAdult() {
@@ -185,8 +185,8 @@ Hoglin {
         Activity lv = this.brain.getFirstPossibleNonCoreActivity().orElse(null);
         this.brain.resetPossibleActivities((List<Activity>)ImmutableList.of((Object)Activity.FIGHT, (Object)Activity.IDLE));
         Activity lv2 = this.brain.getFirstPossibleNonCoreActivity().orElse(null);
-        if (lv != lv2) {
-            this.method_26935();
+        if (lv2 == Activity.FIGHT && lv != Activity.FIGHT) {
+            this.playAngrySound();
         }
         this.setAttacking(this.brain.hasMemoryModule(MemoryModuleType.ATTACK_TARGET));
     }
@@ -197,19 +197,6 @@ Hoglin {
         this.getBrain().tick((ServerWorld)this.world, this);
         this.world.getProfiler().pop();
         this.method_26931();
-        this.method_26932();
-    }
-
-    private void method_26935() {
-        if (this.brain.hasMemoryModule(MemoryModuleType.ATTACK_TARGET)) {
-            this.playAngrySound();
-        }
-    }
-
-    protected void method_26932() {
-        if ((double)this.random.nextFloat() < 0.0125) {
-            this.method_26935();
-        }
     }
 
     @Override
@@ -252,6 +239,12 @@ Hoglin {
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (this.world.isClient) {
+            return null;
+        }
+        if (this.brain.hasMemoryModule(MemoryModuleType.ATTACK_TARGET)) {
+            return SoundEvents.ENTITY_ZOGLIN_ANGRY;
+        }
         return SoundEvents.ENTITY_ZOGLIN_AMBIENT;
     }
 

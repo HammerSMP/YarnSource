@@ -25,6 +25,7 @@ implements Packet<ClientPlayPacketListener> {
     private RegistryKey<World> dimension;
     private long sha256Seed;
     private GameMode gameMode;
+    private GameMode field_25714;
     private boolean debugWorld;
     private boolean flatWorld;
     private boolean keepPlayerAttributes;
@@ -32,11 +33,12 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerRespawnS2CPacket() {
     }
 
-    public PlayerRespawnS2CPacket(RegistryKey<DimensionType> arg, RegistryKey<World> arg2, long l, GameMode arg3, boolean bl, boolean bl2, boolean bl3) {
+    public PlayerRespawnS2CPacket(RegistryKey<DimensionType> arg, RegistryKey<World> arg2, long l, GameMode arg3, GameMode arg4, boolean bl, boolean bl2, boolean bl3) {
         this.field_25322 = arg;
         this.dimension = arg2;
         this.sha256Seed = l;
         this.gameMode = arg3;
+        this.field_25714 = arg4;
         this.debugWorld = bl;
         this.flatWorld = bl2;
         this.keepPlayerAttributes = bl3;
@@ -53,6 +55,7 @@ implements Packet<ClientPlayPacketListener> {
         this.dimension = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
         this.sha256Seed = arg.readLong();
         this.gameMode = GameMode.byId(arg.readUnsignedByte());
+        this.field_25714 = GameMode.byId(arg.readUnsignedByte());
         this.debugWorld = arg.readBoolean();
         this.flatWorld = arg.readBoolean();
         this.keepPlayerAttributes = arg.readBoolean();
@@ -64,6 +67,7 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeIdentifier(this.dimension.getValue());
         arg.writeLong(this.sha256Seed);
         arg.writeByte(this.gameMode.getId());
+        arg.writeByte(this.field_25714.getId());
         arg.writeBoolean(this.debugWorld);
         arg.writeBoolean(this.flatWorld);
         arg.writeBoolean(this.keepPlayerAttributes);
@@ -87,6 +91,11 @@ implements Packet<ClientPlayPacketListener> {
     @Environment(value=EnvType.CLIENT)
     public GameMode getGameMode() {
         return this.gameMode;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public GameMode method_30117() {
+        return this.field_25714;
     }
 
     @Environment(value=EnvType.CLIENT)

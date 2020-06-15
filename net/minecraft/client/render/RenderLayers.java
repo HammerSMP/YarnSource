@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.fluid.Fluid;
@@ -29,7 +30,7 @@ import net.minecraft.util.Util;
 @Environment(value=EnvType.CLIENT)
 public class RenderLayers {
     private static final Map<Block, RenderLayer> BLOCKS = Util.make(Maps.newHashMap(), hashMap -> {
-        RenderLayer lv = RenderLayer.method_29997();
+        RenderLayer lv = RenderLayer.getTripwire();
         hashMap.put(Blocks.TRIPWIRE, lv);
         RenderLayer lv2 = RenderLayer.getCutoutMipped();
         hashMap.put(Blocks.GRASS_BLOCK, lv2);
@@ -309,6 +310,9 @@ public class RenderLayers {
     public static RenderLayer getEntityBlockLayer(BlockState arg, boolean bl) {
         RenderLayer lv = RenderLayers.getBlockLayer(arg);
         if (lv == RenderLayer.getTranslucent()) {
+            if (!MinecraftClient.isFabulousGraphicsOrBetter()) {
+                return TexturedRenderLayers.getEntityTranslucentCull();
+            }
             return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.method_29382();
         }
         return TexturedRenderLayers.getEntityCutout();

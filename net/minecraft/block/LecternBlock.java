@@ -85,10 +85,10 @@ extends BlockWithEntity {
         CompoundTag lv5;
         World lv = arg.getWorld();
         ItemStack lv2 = arg.getStack();
-        CompoundTag lv3 = lv2.getOrCreateTag();
+        CompoundTag lv3 = lv2.getTag();
         PlayerEntity lv4 = arg.getPlayer();
         boolean bl = false;
-        if (!lv.isClient && lv4 != null && lv4.isCreativeLevelTwoOp() && lv3.contains("BlockEntityTag") && (lv5 = lv3.getCompound("BlockEntityTag")).contains("Book")) {
+        if (!lv.isClient && lv4 != null && lv3 != null && lv4.isCreativeLevelTwoOp() && lv3.contains("BlockEntityTag") && (lv5 = lv3.getCompound("BlockEntityTag")).contains("Book")) {
             bl = true;
         }
         return (BlockState)((BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite())).with(HAS_BOOK, bl);

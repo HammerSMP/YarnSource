@@ -29,11 +29,6 @@ extends Block {
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        super.onBlockAdded(arg, arg2, arg3, arg4, bl);
-    }
-
-    @Override
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext arg) {
         return (BlockState)this.getDefaultState().with(LIT, arg.getWorld().isReceivingRedstonePower(arg.getBlockPos()));

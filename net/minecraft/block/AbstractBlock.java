@@ -104,7 +104,7 @@ public abstract class AbstractBlock {
     }
 
     @Deprecated
-    public void prepare(BlockState arg, WorldAccess arg2, BlockPos arg3, int i) {
+    public void prepare(BlockState arg, WorldAccess arg2, BlockPos arg3, int i, int j) {
     }
 
     @Deprecated
@@ -598,19 +598,27 @@ public abstract class AbstractBlock {
             this.getBlock().neighborUpdate(this.asBlockState(), arg, arg2, arg3, arg4, bl);
         }
 
-        public final void updateNeighbors(WorldAccess arg, BlockPos arg2, int i) {
+        public final void method_30101(WorldAccess arg, BlockPos arg2, int i) {
+            this.updateNeighbors(arg, arg2, i, 512);
+        }
+
+        public final void updateNeighbors(WorldAccess arg, BlockPos arg2, int i, int j) {
             this.getBlock();
             BlockPos.Mutable lv = new BlockPos.Mutable();
             for (Direction lv2 : FACINGS) {
                 lv.set(arg2, lv2);
                 BlockState lv3 = arg.getBlockState(lv);
                 BlockState lv4 = lv3.getStateForNeighborUpdate(lv2.getOpposite(), this.asBlockState(), arg, lv, arg2);
-                Block.replaceBlock(lv3, lv4, arg, lv, i);
+                Block.replaceBlock(lv3, lv4, arg, lv, i, j);
             }
         }
 
-        public void prepare(WorldAccess arg, BlockPos arg2, int i) {
-            this.getBlock().prepare(this.asBlockState(), arg, arg2, i);
+        public final void method_30102(WorldAccess arg, BlockPos arg2, int i) {
+            this.prepare(arg, arg2, i, 512);
+        }
+
+        public void prepare(WorldAccess arg, BlockPos arg2, int i, int j) {
+            this.getBlock().prepare(this.asBlockState(), arg, arg2, i, j);
         }
 
         public void onBlockAdded(World arg, BlockPos arg2, BlockState arg3, boolean bl) {
