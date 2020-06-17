@@ -531,7 +531,7 @@ implements ServerPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.player.getServerWorld());
         if (this.player.currentScreenHandler instanceof AnvilScreenHandler) {
             AnvilScreenHandler lv = (AnvilScreenHandler)this.player.currentScreenHandler;
-            String string = SharedConstants.stripInvalidChars(arg.getItemName());
+            String string = SharedConstants.stripInvalidChars(arg.getName());
             if (string.length() <= 35) {
                 lv.setNewItemName(string);
             }
@@ -631,14 +631,14 @@ implements ServerPlayPacketListener {
         BlockEntity lv2 = this.player.world.getBlockEntity(lv);
         if (lv2 instanceof JigsawBlockEntity) {
             JigsawBlockEntity lv3 = (JigsawBlockEntity)lv2;
-            lv3.generate(this.player.getServerWorld(), arg.getMaxDepth(), arg.method_29446());
+            lv3.generate(this.player.getServerWorld(), arg.getMaxDepth(), arg.shouldKeepJigsaws());
         }
     }
 
     @Override
     public void onVillagerTradeSelect(SelectVillagerTradeC2SPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.player.getServerWorld());
-        int i = arg.method_12431();
+        int i = arg.getTradeId();
         ScreenHandler lv = this.player.currentScreenHandler;
         if (lv instanceof MerchantScreenHandler) {
             MerchantScreenHandler lv2 = (MerchantScreenHandler)lv;
@@ -890,7 +890,7 @@ implements ServerPlayPacketListener {
         ServerWorld lv = this.player.getServerWorld();
         Hand lv2 = arg.getHand();
         ItemStack lv3 = this.player.getStackInHand(lv2);
-        BlockHitResult lv4 = arg.getHitY();
+        BlockHitResult lv4 = arg.getBlockHitResult();
         BlockPos lv5 = lv4.getBlockPos();
         Direction lv6 = lv4.getSide();
         this.player.updateLastActionTime();
@@ -1107,7 +1107,7 @@ implements ServerPlayPacketListener {
         ServerWorld lv = this.player.getServerWorld();
         Entity lv2 = arg.getEntity(lv);
         this.player.updateLastActionTime();
-        this.player.setSneaking(arg.method_30007());
+        this.player.setSneaking(arg.isPlayerSneaking());
         if (lv2 != null) {
             double d = 36.0;
             if (this.player.squaredDistanceTo(lv2) < 36.0) {
@@ -1184,10 +1184,10 @@ implements ServerPlayPacketListener {
                 ItemStack lv2 = this.player.currentScreenHandler.onSlotClick(arg.getSlot(), arg.getClickData(), arg.getActionType(), this.player);
                 if (ItemStack.areEqual(arg.getStack(), lv2)) {
                     this.player.networkHandler.sendPacket(new ConfirmGuiActionS2CPacket(arg.getSyncId(), arg.getActionId(), true));
-                    this.player.field_13991 = true;
+                    this.player.skipPacketSlotUpdates = true;
                     this.player.currentScreenHandler.sendContentUpdates();
                     this.player.updateCursorStack();
-                    this.player.field_13991 = false;
+                    this.player.skipPacketSlotUpdates = false;
                 } else {
                     this.transactions.put(this.player.currentScreenHandler.syncId, arg.getActionId());
                     this.player.networkHandler.sendPacket(new ConfirmGuiActionS2CPacket(arg.getSyncId(), arg.getActionId(), false));

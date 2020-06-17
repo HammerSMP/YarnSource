@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PlantBlock;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -83,10 +84,19 @@ extends PlantBlock {
 
     @Override
     public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        if (!arg.isClient && arg4.isCreative()) {
-            TallPlantBlock.method_30036(arg, arg2, arg3, arg4);
+        if (!arg.isClient) {
+            if (arg4.isCreative()) {
+                TallPlantBlock.method_30036(arg, arg2, arg3, arg4);
+            } else {
+                TallPlantBlock.dropStacks(arg3, arg, arg2, null, arg4, arg4.getMainHandStack());
+            }
         }
         super.onBreak(arg, arg2, arg3, arg4);
+    }
+
+    @Override
+    public void afterBreak(World arg, PlayerEntity arg2, BlockPos arg3, BlockState arg4, @Nullable BlockEntity arg5, ItemStack arg6) {
+        super.afterBreak(arg, arg2, arg3, Blocks.AIR.getDefaultState(), arg5, arg6);
     }
 
     protected static void method_30036(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {

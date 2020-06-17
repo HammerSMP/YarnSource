@@ -98,7 +98,7 @@ public class Structure {
                 lv8.remove("x");
                 lv8.remove("y");
                 lv8.remove("z");
-                StructureBlockInfo lv9 = new StructureBlockInfo(lv5, lv6, lv8);
+                StructureBlockInfo lv9 = new StructureBlockInfo(lv5, lv6, lv8.copy());
             } else {
                 lv10 = new StructureBlockInfo(lv5, lv6, null);
             }
@@ -149,7 +149,7 @@ public class Structure {
             } else {
                 lv5 = new BlockPos(lv2);
             }
-            this.entities.add(new StructureEntityInfo(lv2, lv5, lv3));
+            this.entities.add(new StructureEntityInfo(lv2, lv5, lv3.copy()));
         }
     }
 
@@ -322,7 +322,7 @@ public class Structure {
         ArrayList list2 = Lists.newArrayList();
         for (StructureBlockInfo lv : list) {
             BlockPos lv2 = Structure.transform(arg4, lv.pos).add(arg2);
-            StructureBlockInfo lv3 = new StructureBlockInfo(lv2, lv.state, lv.tag);
+            StructureBlockInfo lv3 = new StructureBlockInfo(lv2, lv.state, lv.tag != null ? lv.tag.copy() : null);
             Iterator<StructureProcessor> iterator = arg4.getProcessors().iterator();
             while (lv3 != null && iterator.hasNext()) {
                 lv3 = iterator.next().process(arg, arg2, arg3, lv, lv3, arg4);
@@ -337,7 +337,7 @@ public class Structure {
         for (StructureEntityInfo lv : this.entities) {
             BlockPos lv2 = Structure.transformAround(lv.blockPos, arg3, arg4, arg5).add(arg2);
             if (arg62 != null && !arg62.contains(lv2)) continue;
-            CompoundTag lv3 = lv.tag;
+            CompoundTag lv3 = lv.tag.copy();
             Vec3d lv4 = Structure.transformAround(lv.pos, arg3, arg4, arg5);
             Vec3d lv5 = lv4.add(arg2.getX(), arg2.getY(), arg2.getZ());
             ListTag lv6 = new ListTag();

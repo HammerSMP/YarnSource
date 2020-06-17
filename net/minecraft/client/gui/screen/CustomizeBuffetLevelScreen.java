@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
@@ -52,13 +51,12 @@ extends Screen {
         this.client.keyboard.enableRepeatEvents(true);
         this.biomeSelectionList = new BuffetBiomesListWidget();
         this.children.add(this.biomeSelectionList);
-        this.biomeSelectionList.setSelected((BuffetBiomesListWidget.BuffetBiomeItem)this.biomeSelectionList.children().stream().filter(arg -> Objects.equals(((BuffetBiomesListWidget.BuffetBiomeItem)arg).field_24564, this.field_25040)).findFirst().orElse(null));
         this.confirmButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, ScreenTexts.DONE, arg -> {
             this.field_24563.accept(this.field_25040);
             this.client.openScreen(this.field_24562);
         }));
         this.addButton(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.field_24562)));
-        this.refreshConfirmButton();
+        this.biomeSelectionList.setSelected((BuffetBiomesListWidget.BuffetBiomeItem)this.biomeSelectionList.children().stream().filter(arg -> Objects.equals(((BuffetBiomesListWidget.BuffetBiomeItem)arg).field_24564, this.field_25040)).findFirst().orElse(null));
     }
 
     private void refreshConfirmButton() {
@@ -94,11 +92,6 @@ extends Screen {
                 CustomizeBuffetLevelScreen.this.field_25040 = arg.field_24564;
                 NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", arg.field_24564.getName().getString()).getString());
             }
-        }
-
-        @Override
-        protected void moveSelection(EntryListWidget.class_5403 arg) {
-            super.moveSelection(arg);
             CustomizeBuffetLevelScreen.this.refreshConfirmButton();
         }
 
@@ -120,7 +113,6 @@ extends Screen {
             public boolean mouseClicked(double d, double e, int i) {
                 if (i == 0) {
                     BuffetBiomesListWidget.this.setSelected(this);
-                    CustomizeBuffetLevelScreen.this.refreshConfirmButton();
                     return true;
                 }
                 return false;

@@ -54,11 +54,14 @@ extends GameOptionsScreen {
     private ButtonListWidget list;
     private final class_5407 field_25688;
     private final int mipmapLevels;
-    private boolean field_25710;
 
     public VideoOptionsScreen(Screen arg, GameOptions arg2) {
         super(arg, arg2, new TranslatableText("options.videoTitle"));
         this.field_25688 = arg.client.method_30049();
+        this.field_25688.method_30143();
+        if (arg2.graphicsMode == GraphicsMode.FABULOUS) {
+            this.field_25688.method_30139();
+        }
         this.mipmapLevels = arg2.mipmapLevels;
     }
 
@@ -93,37 +96,32 @@ extends GameOptionsScreen {
             if (this.gameOptions.guiScale != j) {
                 this.client.onResolutionChanged();
             }
-            if (this.gameOptions.graphicsMode != lv && this.gameOptions.graphicsMode == GraphicsMode.FABULOUS) {
-                if (this.field_25710) {
-                    this.gameOptions.graphicsMode = GraphicsMode.FAST;
-                    this.method_30105();
-                } else if (this.field_25688.method_30055()) {
-                    String string3;
-                    String string2;
-                    this.gameOptions.graphicsMode = GraphicsMode.FANCY;
-                    ArrayList list = Lists.newArrayList((Object[])new StringRenderable[]{field_25683, field_25687});
-                    String string = this.field_25688.method_30060();
-                    if (string != null) {
-                        list.add(field_25687);
-                        list.add(new TranslatableText("options.graphics.warning.renderer", string).formatted(Formatting.GRAY));
-                    }
-                    if ((string2 = this.field_25688.method_30063()) != null) {
-                        list.add(field_25687);
-                        list.add(new TranslatableText("options.graphics.warning.vendor", string2).formatted(Formatting.GRAY));
-                    }
-                    if ((string3 = this.field_25688.method_30062()) != null) {
-                        list.add(field_25687);
-                        list.add(new TranslatableText("options.graphics.warning.version", string3).formatted(Formatting.GRAY));
-                    }
-                    this.client.openScreen(new class_5405(field_25684, list, (ImmutableList<class_5405.class_5406>)ImmutableList.of((Object)new class_5405.class_5406(field_25685, arg -> {
-                        this.gameOptions.graphicsMode = GraphicsMode.FABULOUS;
-                        MinecraftClient.getInstance().worldRenderer.reload();
-                        this.client.openScreen(this);
-                    }), (Object)new class_5405.class_5406(field_25686, arg -> {
-                        this.field_25710 = true;
-                        this.client.openScreen(this);
-                    }))));
+            if (this.field_25688.method_30141()) {
+                String string3;
+                String string2;
+                ArrayList list = Lists.newArrayList((Object[])new StringRenderable[]{field_25683, field_25687});
+                String string = this.field_25688.method_30060();
+                if (string != null) {
+                    list.add(field_25687);
+                    list.add(new TranslatableText("options.graphics.warning.renderer", string).formatted(Formatting.GRAY));
                 }
+                if ((string2 = this.field_25688.method_30063()) != null) {
+                    list.add(field_25687);
+                    list.add(new TranslatableText("options.graphics.warning.vendor", string2).formatted(Formatting.GRAY));
+                }
+                if ((string3 = this.field_25688.method_30062()) != null) {
+                    list.add(field_25687);
+                    list.add(new TranslatableText("options.graphics.warning.version", string3).formatted(Formatting.GRAY));
+                }
+                this.client.openScreen(new class_5405(field_25684, list, (ImmutableList<class_5405.class_5406>)ImmutableList.of((Object)new class_5405.class_5406(field_25685, arg -> {
+                    this.gameOptions.graphicsMode = GraphicsMode.FABULOUS;
+                    MinecraftClient.getInstance().worldRenderer.reload();
+                    this.field_25688.method_30139();
+                    this.client.openScreen(this);
+                }), (Object)new class_5405.class_5406(field_25686, arg -> {
+                    this.field_25688.method_30140();
+                    this.client.openScreen(this);
+                }))));
             }
             return true;
         }
@@ -162,12 +160,6 @@ extends GameOptionsScreen {
         if (this.field_25453 != null) {
             this.renderTooltip(arg, this.field_25453, i, j);
         }
-    }
-
-    private void method_30105() {
-        this.buttons.clear();
-        this.children.clear();
-        this.init();
     }
 }
 

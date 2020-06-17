@@ -89,8 +89,6 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
             lv.head.visible = true;
             lv.helmet.visible = true;
         } else {
-            ItemStack lv2 = arg.getMainHandStack();
-            ItemStack lv3 = arg.getOffHandStack();
             lv.setVisible(true);
             lv.helmet.visible = arg.isPartVisible(PlayerModelPart.HAT);
             lv.jacket.visible = arg.isPartVisible(PlayerModelPart.JACKET);
@@ -99,49 +97,44 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
             lv.leftSleeve.visible = arg.isPartVisible(PlayerModelPart.LEFT_SLEEVE);
             lv.rightSleeve.visible = arg.isPartVisible(PlayerModelPart.RIGHT_SLEEVE);
             lv.isSneaking = arg.isInSneakingPose();
-            BipedEntityModel.ArmPose lv4 = this.getArmPose(arg, lv2, lv3, Hand.MAIN_HAND);
-            BipedEntityModel.ArmPose lv5 = this.getArmPose(arg, lv2, lv3, Hand.OFF_HAND);
+            BipedEntityModel.ArmPose lv2 = PlayerEntityRenderer.getArmPose(arg, Hand.MAIN_HAND);
+            BipedEntityModel.ArmPose lv3 = PlayerEntityRenderer.getArmPose(arg, Hand.OFF_HAND);
+            if (lv2.method_30156()) {
+                BipedEntityModel.ArmPose armPose = lv3 = arg.getOffHandStack().isEmpty() ? BipedEntityModel.ArmPose.EMPTY : BipedEntityModel.ArmPose.ITEM;
+            }
             if (arg.getMainArm() == Arm.RIGHT) {
-                lv.rightArmPose = lv4;
-                lv.leftArmPose = lv5;
+                lv.rightArmPose = lv2;
+                lv.leftArmPose = lv3;
             } else {
-                lv.rightArmPose = lv5;
-                lv.leftArmPose = lv4;
+                lv.rightArmPose = lv3;
+                lv.leftArmPose = lv2;
             }
         }
     }
 
-    private BipedEntityModel.ArmPose getArmPose(AbstractClientPlayerEntity arg, ItemStack arg2, ItemStack arg3, Hand arg4) {
-        ItemStack lv2;
-        BipedEntityModel.ArmPose lv = BipedEntityModel.ArmPose.EMPTY;
-        ItemStack itemStack = lv2 = arg4 == Hand.MAIN_HAND ? arg2 : arg3;
-        if (!lv2.isEmpty()) {
-            lv = BipedEntityModel.ArmPose.ITEM;
-            if (arg.getItemUseTimeLeft() > 0) {
-                UseAction lv3 = lv2.getUseAction();
-                if (lv3 == UseAction.BLOCK) {
-                    lv = BipedEntityModel.ArmPose.BLOCK;
-                } else if (lv3 == UseAction.BOW) {
-                    lv = BipedEntityModel.ArmPose.BOW_AND_ARROW;
-                } else if (lv3 == UseAction.SPEAR) {
-                    lv = BipedEntityModel.ArmPose.THROW_SPEAR;
-                } else if (lv3 == UseAction.CROSSBOW && arg4 == arg.getActiveHand()) {
-                    lv = BipedEntityModel.ArmPose.CROSSBOW_CHARGE;
-                }
-            } else {
-                boolean bl = arg2.getItem() == Items.CROSSBOW;
-                boolean bl2 = CrossbowItem.isCharged(arg2);
-                boolean bl3 = arg3.getItem() == Items.CROSSBOW;
-                boolean bl4 = CrossbowItem.isCharged(arg3);
-                if (bl && bl2) {
-                    lv = BipedEntityModel.ArmPose.CROSSBOW_HOLD;
-                }
-                if (bl3 && bl4 && arg2.getItem().getUseAction(arg2) == UseAction.NONE) {
-                    lv = BipedEntityModel.ArmPose.CROSSBOW_HOLD;
-                }
-            }
+    private static BipedEntityModel.ArmPose getArmPose(AbstractClientPlayerEntity arg, Hand arg2) {
+        ItemStack lv = arg.getStackInHand(arg2);
+        if (lv.isEmpty()) {
+            return BipedEntityModel.ArmPose.EMPTY;
         }
-        return lv;
+        if (arg.getActiveHand() == arg2 && arg.getItemUseTimeLeft() > 0) {
+            UseAction lv2 = lv.getUseAction();
+            if (lv2 == UseAction.BLOCK) {
+                return BipedEntityModel.ArmPose.BLOCK;
+            }
+            if (lv2 == UseAction.BOW) {
+                return BipedEntityModel.ArmPose.BOW_AND_ARROW;
+            }
+            if (lv2 == UseAction.SPEAR) {
+                return BipedEntityModel.ArmPose.THROW_SPEAR;
+            }
+            if (lv2 == UseAction.CROSSBOW && arg2 == arg.getActiveHand()) {
+                return BipedEntityModel.ArmPose.CROSSBOW_CHARGE;
+            }
+        } else if (!arg.handSwinging && lv.getItem() == Items.CROSSBOW && CrossbowItem.isCharged(lv)) {
+            return BipedEntityModel.ArmPose.CROSSBOW_HOLD;
+        }
+        return BipedEntityModel.ArmPose.ITEM;
     }
 
     @Override

@@ -56,6 +56,9 @@ implements Predicate<CachedBlockPosition> {
     public boolean setBlockState(ServerWorld arg, BlockPos arg2, int i) {
         BlockEntity lv2;
         BlockState lv = Block.postProcessState(this.state, arg, arg2);
+        if (lv.isAir()) {
+            lv = this.state;
+        }
         if (!arg.setBlockState(arg2, lv, i)) {
             return false;
         }

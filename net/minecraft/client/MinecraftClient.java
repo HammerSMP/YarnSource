@@ -987,6 +987,11 @@ WindowEventHandler {
         this.mouse.onResolutionChanged();
     }
 
+    @Override
+    public void method_30133() {
+        this.mouse.method_30134();
+    }
+
     private int getFramerateLimit() {
         if (this.world == null && (this.currentScreen != null || this.overlay != null)) {
             return 60;
@@ -2061,7 +2066,7 @@ WindowEventHandler {
             if (this.musicTracker.isPlayingType(MusicType.UNDERWATER) || this.player.isSubmergedInWater() && (lv == Biome.Category.OCEAN || lv == Biome.Category.RIVER)) {
                 return MusicType.UNDERWATER;
             }
-            if (this.player.abilities.creativeMode && this.player.abilities.allowFlying) {
+            if (this.player.world.getRegistryKey() != World.NETHER && this.player.abilities.creativeMode && this.player.abilities.allowFlying) {
                 return MusicType.CREATIVE;
             }
             return this.world.getBiomeAccess().method_27344(this.player.getBlockPos()).method_27343().orElse(MusicType.GAME);

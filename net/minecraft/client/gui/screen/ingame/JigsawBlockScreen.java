@@ -37,7 +37,7 @@ extends Screen {
     private TextFieldWidget poolField;
     private TextFieldWidget finalStateField;
     private int generationDepth;
-    private boolean field_25271 = true;
+    private boolean keepJigsaws = true;
     private ButtonWidget jointRotationButton;
     private ButtonWidget doneButton;
     private JigsawBlockEntity.Joint joint;
@@ -69,7 +69,7 @@ extends Screen {
     }
 
     private void generate() {
-        this.client.getNetworkHandler().sendPacket(new JigsawGeneratingC2SPacket(this.jigsaw.getPos(), this.generationDepth, this.field_25271));
+        this.client.getNetworkHandler().sendPacket(new JigsawGeneratingC2SPacket(this.jigsaw.getPos(), this.generationDepth, this.keepJigsaws));
     }
 
     @Override
@@ -126,13 +126,13 @@ extends Screen {
             }
         });
         this.addButton(new ButtonWidget(this.width / 2 - 50, 180, 100, 20, new TranslatableText("jigsaw_block.keep_jigsaws"), arg -> {
-            this.field_25271 = !this.field_25271;
+            this.keepJigsaws = !this.keepJigsaws;
             arg.queueNarration(250);
         }){
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(JigsawBlockScreen.this.field_25271));
+                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(JigsawBlockScreen.this.keepJigsaws));
             }
         });
         this.addButton(new ButtonWidget(this.width / 2 + 54, 180, 100, 20, new TranslatableText("jigsaw_block.generate"), arg -> this.generate()));

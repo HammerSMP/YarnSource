@@ -20,23 +20,23 @@ import net.minecraft.world.World;
 
 public class SetCameraEntityS2CPacket
 implements Packet<ClientPlayPacketListener> {
-    public int id;
+    public int entityId;
 
     public SetCameraEntityS2CPacket() {
     }
 
     public SetCameraEntityS2CPacket(Entity arg) {
-        this.id = arg.getEntityId();
+        this.entityId = arg.getEntityId();
     }
 
     @Override
     public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
+        this.entityId = arg.readVarInt();
     }
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
+        arg.writeVarInt(this.entityId);
     }
 
     @Override
@@ -47,7 +47,7 @@ implements Packet<ClientPlayPacketListener> {
     @Nullable
     @Environment(value=EnvType.CLIENT)
     public Entity getEntity(World arg) {
-        return arg.getEntityById(this.id);
+        return arg.getEntityById(this.entityId);
     }
 }
 

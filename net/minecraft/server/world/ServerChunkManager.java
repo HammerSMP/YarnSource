@@ -348,14 +348,18 @@ extends ChunkManager {
             ArrayList list = Lists.newArrayList(this.threadedAnvilChunkStorage.entryIterator());
             Collections.shuffle(list);
             list.forEach(arg2 -> {
-                Optional optional = arg2.getEntityTickingFuture().getNow(ChunkHolder.UNLOADED_WORLD_CHUNK).left();
+                Optional optional = arg2.getTickingFuture().getNow(ChunkHolder.UNLOADED_WORLD_CHUNK).left();
                 if (!optional.isPresent()) {
                     return;
                 }
-                WorldChunk lv = (WorldChunk)optional.get();
                 this.world.getProfiler().push("broadcast");
-                arg2.flushUpdates(lv);
+                arg2.flushUpdates((WorldChunk)optional.get());
                 this.world.getProfiler().pop();
+                Optional optional2 = arg2.getEntityTickingFuture().getNow(ChunkHolder.UNLOADED_WORLD_CHUNK).left();
+                if (!optional2.isPresent()) {
+                    return;
+                }
+                WorldChunk lv = (WorldChunk)optional2.get();
                 ChunkPos lv2 = arg2.getPos();
                 if (this.threadedAnvilChunkStorage.isTooFarFromPlayersToSpawnMobs(lv2)) {
                     return;

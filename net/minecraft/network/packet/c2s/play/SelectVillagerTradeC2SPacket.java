@@ -41,7 +41,7 @@ implements Packet<ServerPlayPacketListener> {
         arg.onVillagerTradeSelect(this);
     }
 
-    public int method_12431() {
+    public int getTradeId() {
         return this.tradeId;
     }
 }

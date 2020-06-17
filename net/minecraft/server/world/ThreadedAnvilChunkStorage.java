@@ -955,7 +955,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
 
     private void sendChunkDataPackets(ServerPlayerEntity arg, Packet<?>[] args, WorldChunk arg2) {
         if (args[0] == null) {
-            args[0] = new ChunkDataS2CPacket(arg2, 65535);
+            args[0] = new ChunkDataS2CPacket(arg2, 65535, true);
             args[1] = new LightUpdateS2CPacket(arg2.getPos(), this.serverLightingProvider, true);
         }
         arg.sendInitialChunkPackets(arg2.getPos(), args[0], args[1]);

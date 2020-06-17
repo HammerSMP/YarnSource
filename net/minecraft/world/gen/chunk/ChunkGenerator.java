@@ -28,6 +28,7 @@ import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
@@ -248,9 +249,19 @@ public abstract class ChunkGenerator {
             for (int o = k - 8; o <= k + 8; ++o) {
                 long p = ChunkPos.toLong(n, o);
                 for (StructureStart<?> lv2 : arg.getChunk(n, o).getStructureStarts().values()) {
-                    if (lv2 == StructureStart.DEFAULT || !lv2.getBoundingBox().intersectsXZ(l, m, l + 15, m + 15)) continue;
-                    arg2.addStructureReference(lv, lv2.getFeature(), p, arg3);
-                    DebugInfoSender.sendStructureStart(arg, lv2);
+                    try {
+                        if (lv2 == StructureStart.DEFAULT || !lv2.getBoundingBox().intersectsXZ(l, m, l + 15, m + 15)) continue;
+                        arg2.addStructureReference(lv, lv2.getFeature(), p, arg3);
+                        DebugInfoSender.sendStructureStart(arg, lv2);
+                    }
+                    catch (Exception exception) {
+                        CrashReport lv3 = CrashReport.create(exception, "Generating structure reference");
+                        CrashReportSection lv4 = lv3.addElement("Structure");
+                        lv4.add("Id", () -> Registry.STRUCTURE_FEATURE.getId(lv2.getFeature()).toString());
+                        lv4.add("Name", () -> lv2.getFeature().getName());
+                        lv4.add("Class", () -> lv2.getFeature().getClass().getCanonicalName());
+                        throw new CrashException(lv3);
+                    }
                 }
             }
         }

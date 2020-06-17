@@ -100,17 +100,24 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
     }
 
     boolean offerEntityShape(Consumer<? super VoxelShape> consumer) {
-        boolean bl2;
+        VoxelShape lv3;
         Objects.requireNonNull(this.entity);
         this.checkEntity = false;
         WorldBorder lv = this.world.getWorldBorder();
-        boolean bl = BlockCollisionSpliterator.isInWorldBorder(lv, this.entity.getBoundingBox().contract(1.0E-7));
-        boolean bl3 = bl2 = bl && !BlockCollisionSpliterator.isInWorldBorder(lv, this.entity.getBoundingBox().expand(1.0E-7));
-        if (bl2) {
-            consumer.accept(lv.asVoxelShape());
+        Box lv2 = this.entity.getBoundingBox();
+        if (!BlockCollisionSpliterator.isInWorldBorder(lv, lv2) && !BlockCollisionSpliterator.method_30131(lv3 = lv.asVoxelShape(), lv2) && BlockCollisionSpliterator.method_30130(lv3, lv2)) {
+            consumer.accept(lv3);
             return true;
         }
         return false;
+    }
+
+    private static boolean method_30130(VoxelShape arg, Box arg2) {
+        return VoxelShapes.matchesAnywhere(arg, VoxelShapes.cuboid(arg2.expand(1.0E-7)), BooleanBiFunction.AND);
+    }
+
+    private static boolean method_30131(VoxelShape arg, Box arg2) {
+        return VoxelShapes.matchesAnywhere(arg, VoxelShapes.cuboid(arg2.contract(1.0E-7)), BooleanBiFunction.AND);
     }
 
     public static boolean isInWorldBorder(WorldBorder arg, Box arg2) {

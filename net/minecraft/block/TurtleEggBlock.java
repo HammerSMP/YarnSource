@@ -108,7 +108,7 @@ extends Block {
     }
 
     public static boolean method_29952(BlockView arg, BlockPos arg2) {
-        return arg.getBlockState(arg2.down()).isIn(BlockTags.SAND);
+        return arg.getBlockState(arg2).isIn(BlockTags.SAND);
     }
 
     @Override

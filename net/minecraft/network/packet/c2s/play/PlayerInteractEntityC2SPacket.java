@@ -26,7 +26,7 @@ implements Packet<ServerPlayPacketListener> {
     private InteractionType type;
     private Vec3d hitPos;
     private Hand hand;
-    private boolean field_25660;
+    private boolean playerSneaking;
 
     public PlayerInteractEntityC2SPacket() {
     }
@@ -35,7 +35,7 @@ implements Packet<ServerPlayPacketListener> {
     public PlayerInteractEntityC2SPacket(Entity arg, boolean bl) {
         this.entityId = arg.getEntityId();
         this.type = InteractionType.ATTACK;
-        this.field_25660 = bl;
+        this.playerSneaking = bl;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -43,7 +43,7 @@ implements Packet<ServerPlayPacketListener> {
         this.entityId = arg.getEntityId();
         this.type = InteractionType.INTERACT;
         this.hand = arg2;
-        this.field_25660 = bl;
+        this.playerSneaking = bl;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -52,7 +52,7 @@ implements Packet<ServerPlayPacketListener> {
         this.type = InteractionType.INTERACT_AT;
         this.hand = arg2;
         this.hitPos = arg3;
-        this.field_25660 = bl;
+        this.playerSneaking = bl;
     }
 
     @Override
@@ -65,7 +65,7 @@ implements Packet<ServerPlayPacketListener> {
         if (this.type == InteractionType.INTERACT || this.type == InteractionType.INTERACT_AT) {
             this.hand = arg.readEnumConstant(Hand.class);
         }
-        this.field_25660 = arg.readBoolean();
+        this.playerSneaking = arg.readBoolean();
     }
 
     @Override
@@ -80,7 +80,7 @@ implements Packet<ServerPlayPacketListener> {
         if (this.type == InteractionType.INTERACT || this.type == InteractionType.INTERACT_AT) {
             arg.writeEnumConstant(this.hand);
         }
-        arg.writeBoolean(this.field_25660);
+        arg.writeBoolean(this.playerSneaking);
     }
 
     @Override
@@ -105,8 +105,8 @@ implements Packet<ServerPlayPacketListener> {
         return this.hitPos;
     }
 
-    public boolean method_30007() {
-        return this.field_25660;
+    public boolean isPlayerSneaking() {
+        return this.playerSneaking;
     }
 
     public static enum InteractionType {

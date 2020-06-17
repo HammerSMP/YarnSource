@@ -406,7 +406,7 @@ CommandOutput {
             this.extinguish();
         } else if (this.fireTicks > 0) {
             if (this.isFireImmune()) {
-                this.fireTicks -= 4;
+                this.setFireTicks(this.fireTicks - 4);
                 if (this.fireTicks < 0) {
                     this.extinguish();
                 }
@@ -414,7 +414,7 @@ CommandOutput {
                 if (this.fireTicks % 20 == 0) {
                     this.damage(DamageSource.ON_FIRE, 1.0f);
                 }
-                --this.fireTicks;
+                this.setFireTicks(this.fireTicks - 1);
             }
         }
         if (this.isInLava()) {
@@ -455,7 +455,7 @@ CommandOutput {
             j = ProtectionEnchantment.transformFireDuration((LivingEntity)this, j);
         }
         if (this.fireTicks < j) {
-            this.fireTicks = j;
+            this.setFireTicks(j);
         }
     }
 
@@ -468,7 +468,7 @@ CommandOutput {
     }
 
     public void extinguish() {
-        this.fireTicks = 0;
+        this.setFireTicks(0);
     }
 
     protected void destroy() {
@@ -573,11 +573,11 @@ CommandOutput {
         float i = this.getVelocityMultiplier();
         this.setVelocity(this.getVelocity().multiply(i, 1.0, i));
         if (this.world.method_29556(this.getBoundingBox().contract(0.001)).noneMatch(arg -> arg.isIn(BlockTags.FIRE) || arg.isOf(Blocks.LAVA)) && this.fireTicks <= 0) {
-            this.fireTicks = -this.getBurningDuration();
+            this.setFireTicks(-this.getBurningDuration());
         }
         if (this.isWet() && this.isOnFire()) {
             this.playSound(SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.7f, 1.6f + (this.random.nextFloat() - this.random.nextFloat()) * 0.4f);
-            this.fireTicks = -this.getBurningDuration();
+            this.setFireTicks(-this.getBurningDuration());
         }
         this.world.getProfiler().pop();
     }
@@ -1846,7 +1846,7 @@ CommandOutput {
     }
 
     public void onStruckByLightning(LightningEntity arg) {
-        ++this.fireTicks;
+        this.setFireTicks(this.fireTicks + 1);
         if (this.fireTicks == 0) {
             this.setOnFireFor(8);
         }

@@ -55,6 +55,7 @@ import net.minecraft.loot.LootTables;
 import net.minecraft.loot.UniformLootTableRange;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.loot.condition.EntityPropertiesLootCondition;
+import net.minecraft.loot.condition.LocationCheckLootCondition;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.LootConditionConsumingBuilder;
 import net.minecraft.loot.condition.MatchToolLootCondition;
@@ -78,13 +79,16 @@ import net.minecraft.loot.function.LootFunctionConsumingBuilder;
 import net.minecraft.loot.function.SetContentsLootFunction;
 import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.operator.BoundedIntUnaryOperator;
+import net.minecraft.predicate.BlockPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.StatePredicate;
+import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.predicate.item.EnchantmentPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 
 public class BlockLootTableGenerator
@@ -215,6 +219,15 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
 
     private static LootTable.Builder cropDrops(Block arg, Item arg2, Item arg3, LootCondition.Builder arg4) {
         return BlockLootTableGenerator.applyExplosionDecay(arg, LootTable.builder().pool(LootPool.builder().with(((LeafEntry.Builder)ItemEntry.builder(arg2).conditionally(arg4)).alternatively(ItemEntry.builder(arg3)))).pool(LootPool.builder().conditionally(arg4).with((LootPoolEntry.Builder<?>)ItemEntry.builder(arg3).apply(ApplyBonusLootFunction.binomialWithBonusCount(Enchantments.FORTUNE, 0.5714286f, 3)))));
+    }
+
+    private static LootTable.Builder method_30159(Block arg) {
+        return LootTable.builder().pool(LootPool.builder().conditionally(WITH_SHEARS).with((LootPoolEntry.Builder<?>)ItemEntry.builder(arg).apply(SetCountLootFunction.builder(ConstantLootTableRange.create(2)))));
+    }
+
+    private static LootTable.Builder method_30158(Block arg, Block arg2) {
+        AlternativeEntry.Builder lv = ((LeafEntry.Builder)((LootPoolEntry.Builder)ItemEntry.builder(arg2).apply(SetCountLootFunction.builder(ConstantLootTableRange.create(2)))).conditionally(WITH_SHEARS)).alternatively((LootPoolEntry.Builder<?>)((LeafEntry.Builder)BlockLootTableGenerator.addSurvivesExplosionCondition(arg, ItemEntry.builder(Items.WHEAT_SEEDS))).conditionally(RandomChanceLootCondition.builder(0.125f)));
+        return LootTable.builder().pool(LootPool.builder().with(lv).conditionally(BlockStatePropertyLootCondition.builder(arg).properties(StatePredicate.Builder.create().exactMatch(TallPlantBlock.HALF, DoubleBlockHalf.LOWER))).conditionally(LocationCheckLootCondition.method_30151(LocationPredicate.Builder.create().block(BlockPredicate.Builder.create().block(arg).state(StatePredicate.Builder.create().exactMatch(TallPlantBlock.HALF, DoubleBlockHalf.UPPER).build()).build()), new BlockPos(0, 1, 0)))).pool(LootPool.builder().with(lv).conditionally(BlockStatePropertyLootCondition.builder(arg).properties(StatePredicate.Builder.create().exactMatch(TallPlantBlock.HALF, DoubleBlockHalf.UPPER))).conditionally(LocationCheckLootCondition.method_30151(LocationPredicate.Builder.create().block(BlockPredicate.Builder.create().block(arg).state(StatePredicate.Builder.create().exactMatch(TallPlantBlock.HALF, DoubleBlockHalf.LOWER).build()).build()), new BlockPos(0, -1, 0))));
     }
 
     public static LootTable.Builder dropsNothing() {
@@ -833,9 +846,9 @@ implements Consumer<BiConsumer<Identifier, LootTable.Builder>> {
         this.addDrop(Blocks.NETHER_SPROUTS, BlockLootTableGenerator::dropsWithShears);
         this.addDrop(Blocks.SEAGRASS, BlockLootTableGenerator::dropsWithShears);
         this.addDrop(Blocks.VINE, BlockLootTableGenerator::dropsWithShears);
-        this.addDrop(Blocks.TALL_SEAGRASS, BlockLootTableGenerator.dropsWithShears(Blocks.SEAGRASS));
-        this.addDrop(Blocks.LARGE_FERN, (Block arg) -> BlockLootTableGenerator.dropsWithShears(Blocks.FERN, ((LeafEntry.Builder)((LeafEntry.Builder)BlockLootTableGenerator.addSurvivesExplosionCondition(arg, ItemEntry.builder(Items.WHEAT_SEEDS))).conditionally(BlockStatePropertyLootCondition.builder(arg).properties(StatePredicate.Builder.create().exactMatch(TallPlantBlock.HALF, DoubleBlockHalf.LOWER)))).conditionally(RandomChanceLootCondition.builder(0.125f))));
-        this.addDrop(Blocks.TALL_GRASS, BlockLootTableGenerator.dropsWithShears(Blocks.GRASS, ((LeafEntry.Builder)((LeafEntry.Builder)BlockLootTableGenerator.addSurvivesExplosionCondition(Blocks.TALL_GRASS, ItemEntry.builder(Items.WHEAT_SEEDS))).conditionally(BlockStatePropertyLootCondition.builder(Blocks.TALL_GRASS).properties(StatePredicate.Builder.create().exactMatch(TallPlantBlock.HALF, DoubleBlockHalf.LOWER)))).conditionally(RandomChanceLootCondition.builder(0.125f))));
+        this.addDrop(Blocks.TALL_SEAGRASS, BlockLootTableGenerator.method_30159(Blocks.SEAGRASS));
+        this.addDrop(Blocks.LARGE_FERN, (Block arg) -> BlockLootTableGenerator.method_30158(arg, Blocks.FERN));
+        this.addDrop(Blocks.TALL_GRASS, (Block arg) -> BlockLootTableGenerator.method_30158(arg, Blocks.GRASS));
         this.addDrop(Blocks.MELON_STEM, (Block arg) -> BlockLootTableGenerator.cropStemDrops(arg, Items.MELON_SEEDS));
         this.addDrop(Blocks.ATTACHED_MELON_STEM, (Block arg) -> BlockLootTableGenerator.attachedCropStemDrops(arg, Items.MELON_SEEDS));
         this.addDrop(Blocks.PUMPKIN_STEM, (Block arg) -> BlockLootTableGenerator.cropStemDrops(arg, Items.PUMPKIN_SEEDS));

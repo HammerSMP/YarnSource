@@ -9,7 +9,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.block.SnowyBlock;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +28,7 @@ extends SnowyBlock {
         if (lv2.isOf(Blocks.SNOW) && lv2.get(SnowBlock.LAYERS) == 1) {
             return true;
         }
-        if (lv2.getFluidState().getFluid() != Fluids.EMPTY) {
+        if (lv2.getFluidState().getLevel() == 8) {
             return false;
         }
         int i = ChunkLightProvider.getRealisticOpacity(arg2, arg, arg3, lv2, lv, Direction.UP, lv2.getOpacity(arg2, lv));

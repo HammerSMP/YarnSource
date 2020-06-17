@@ -8,10 +8,12 @@
  */
 package net.minecraft.entity.passive;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowerBlock;
@@ -28,6 +30,7 @@ import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
@@ -126,7 +129,11 @@ implements Shearable {
                     this.world.addParticle(ParticleTypes.SMOKE, this.getX() + this.random.nextDouble() / 2.0, this.getBodyY(0.5), this.getZ() + this.random.nextDouble() / 2.0, 0.0, this.random.nextDouble() / 5.0, 0.0);
                 }
             } else {
-                Pair<StatusEffect, Integer> pair = this.getStewEffectFrom(lv);
+                Optional<Pair<StatusEffect, Integer>> optional = this.getStewEffectFrom(lv);
+                if (!optional.isPresent()) {
+                    return ActionResult.PASS;
+                }
+                Pair<StatusEffect, Integer> pair = optional.get();
                 if (!arg.abilities.creativeMode) {
                     lv.decrement(1);
                 }
@@ -194,9 +201,14 @@ implements Shearable {
         }
     }
 
-    private Pair<StatusEffect, Integer> getStewEffectFrom(ItemStack arg) {
-        FlowerBlock lv = (FlowerBlock)((BlockItem)arg.getItem()).getBlock();
-        return Pair.of((Object)lv.getEffectInStew(), (Object)lv.getEffectInStewDuration());
+    private Optional<Pair<StatusEffect, Integer>> getStewEffectFrom(ItemStack arg) {
+        Block lv2;
+        Item lv = arg.getItem();
+        if (lv instanceof BlockItem && (lv2 = ((BlockItem)lv).getBlock()) instanceof FlowerBlock) {
+            FlowerBlock lv3 = (FlowerBlock)lv2;
+            return Optional.of(Pair.of((Object)lv3.getEffectInStew(), (Object)lv3.getEffectInStewDuration()));
+        }
+        return Optional.empty();
     }
 
     private void setType(Type arg) {

@@ -169,7 +169,7 @@ AutoCloseable {
             this.shadersEnabled = false;
         }
         catch (JsonSyntaxException jsonSyntaxException) {
-            LOGGER.warn("Failed to load shader: {}", (Object)arg, (Object)jsonSyntaxException);
+            LOGGER.warn("Failed to parse shader: {}", (Object)arg, (Object)jsonSyntaxException);
             this.forcedShaderIndex = SHADER_COUNT;
             this.shadersEnabled = false;
         }
@@ -197,7 +197,7 @@ AutoCloseable {
         this.camera.updateEyeHeight();
         ++this.ticks;
         this.firstPersonRenderer.updateHeldItems();
-        this.client.worldRenderer.method_22713(this.camera);
+        this.client.worldRenderer.tickRainSplashing(this.camera);
         this.lastSkyDarkness = this.skyDarkness;
         if (this.client.inGameHud.getBossBarHud().shouldDarkenSky()) {
             this.skyDarkness += 0.05f;

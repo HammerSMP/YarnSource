@@ -98,10 +98,11 @@ ModelWithHead {
 
     @Override
     public void setAngles(T arg, float f, float g, float h, float i, float j) {
+        boolean bl4;
         boolean bl = ((LivingEntity)arg).getRoll() > 4;
         boolean bl2 = ((LivingEntity)arg).isInSwimmingPose();
         this.head.yaw = i * ((float)Math.PI / 180);
-        this.head.pitch = bl ? -0.7853982f : (this.leaningPitch > 0.0f ? (bl2 ? this.lerpAngle(this.head.pitch, -0.7853982f, this.leaningPitch) : this.lerpAngle(this.head.pitch, j * ((float)Math.PI / 180), this.leaningPitch)) : j * ((float)Math.PI / 180));
+        this.head.pitch = bl ? -0.7853982f : (this.leaningPitch > 0.0f ? (bl2 ? this.lerpAngle(this.leaningPitch, this.head.pitch, -0.7853982f) : this.lerpAngle(this.leaningPitch, this.head.pitch, j * ((float)Math.PI / 180))) : j * ((float)Math.PI / 180));
         this.torso.yaw = 0.0f;
         this.rightArm.pivotZ = 0.0f;
         this.rightArm.pivotX = -5.0f;
@@ -137,54 +138,15 @@ ModelWithHead {
             this.leftLeg.roll = -0.07853982f;
         }
         this.rightArm.yaw = 0.0f;
-        this.rightArm.roll = 0.0f;
-        switch (this.leftArmPose) {
-            case EMPTY: {
-                this.leftArm.yaw = 0.0f;
-                break;
-            }
-            case BLOCK: {
-                this.leftArm.pitch = this.leftArm.pitch * 0.5f - 0.9424779f;
-                this.leftArm.yaw = 0.5235988f;
-                break;
-            }
-            case ITEM: {
-                this.leftArm.pitch = this.leftArm.pitch * 0.5f - 0.31415927f;
-                this.leftArm.yaw = 0.0f;
-                break;
-            }
-            case THROW_SPEAR: {
-                this.leftArm.pitch = this.leftArm.pitch * 0.5f - (float)Math.PI;
-                this.leftArm.yaw = 0.0f;
-            }
-        }
-        switch (this.rightArmPose) {
-            case EMPTY: {
-                this.rightArm.yaw = 0.0f;
-                break;
-            }
-            case BLOCK: {
-                this.rightArm.pitch = this.rightArm.pitch * 0.5f - 0.9424779f;
-                this.rightArm.yaw = -0.5235988f;
-                break;
-            }
-            case ITEM: {
-                this.rightArm.pitch = this.rightArm.pitch * 0.5f - 0.31415927f;
-                this.rightArm.yaw = 0.0f;
-                break;
-            }
-            case THROW_SPEAR: {
-                this.rightArm.pitch = this.rightArm.pitch * 0.5f - (float)Math.PI;
-                this.rightArm.yaw = 0.0f;
-            }
-        }
-        if (this.leftArmPose == ArmPose.THROW_SPEAR && this.rightArmPose != ArmPose.BLOCK && this.rightArmPose != ArmPose.THROW_SPEAR && this.rightArmPose != ArmPose.BOW_AND_ARROW) {
-            this.leftArm.pitch = this.leftArm.pitch * 0.5f - (float)Math.PI;
-            this.leftArm.yaw = 0.0f;
-        }
-        if (this.rightArmPose == ArmPose.THROW_SPEAR && this.leftArmPose != ArmPose.BLOCK && this.leftArmPose != ArmPose.THROW_SPEAR && this.leftArmPose != ArmPose.BOW_AND_ARROW) {
-            this.rightArm.pitch = this.rightArm.pitch * 0.5f - (float)Math.PI;
-            this.rightArm.yaw = 0.0f;
+        this.leftArm.yaw = 0.0f;
+        boolean bl3 = ((LivingEntity)arg).getMainArm() == Arm.RIGHT;
+        boolean bl5 = bl4 = bl3 ? this.leftArmPose.method_30156() : this.rightArmPose.method_30156();
+        if (bl3 != bl4) {
+            this.method_30155(arg);
+            this.method_30154(arg);
+        } else {
+            this.method_30154(arg);
+            this.method_30155(arg);
         }
         this.method_29353(arg, h);
         if (this.isSneaking) {
@@ -211,27 +173,6 @@ ModelWithHead {
             this.rightArm.pivotY = 2.0f;
         }
         CrossbowPosing.method_29350(this.rightArm, this.leftArm, h);
-        if (this.rightArmPose == ArmPose.BOW_AND_ARROW) {
-            this.rightArm.yaw = -0.1f + this.head.yaw;
-            this.leftArm.yaw = 0.1f + this.head.yaw + 0.4f;
-            this.rightArm.pitch = -1.5707964f + this.head.pitch;
-            this.leftArm.pitch = -1.5707964f + this.head.pitch;
-        } else if (this.leftArmPose == ArmPose.BOW_AND_ARROW && this.rightArmPose != ArmPose.THROW_SPEAR && this.rightArmPose != ArmPose.BLOCK) {
-            this.rightArm.yaw = -0.1f + this.head.yaw - 0.4f;
-            this.leftArm.yaw = 0.1f + this.head.yaw;
-            this.rightArm.pitch = -1.5707964f + this.head.pitch;
-            this.leftArm.pitch = -1.5707964f + this.head.pitch;
-        }
-        if (this.rightArmPose == ArmPose.CROSSBOW_CHARGE) {
-            CrossbowPosing.charge(this.rightArm, this.leftArm, arg, true);
-        } else if (this.leftArmPose == ArmPose.CROSSBOW_CHARGE) {
-            CrossbowPosing.charge(this.rightArm, this.leftArm, arg, false);
-        }
-        if (this.rightArmPose == ArmPose.CROSSBOW_HOLD && this.handSwingProgress <= 0.0f) {
-            CrossbowPosing.hold(this.rightArm, this.leftArm, this.head, true);
-        } else if (this.leftArmPose == ArmPose.CROSSBOW_HOLD) {
-            CrossbowPosing.hold(this.rightArm, this.leftArm, this.head, false);
-        }
         if (this.leaningPitch > 0.0f) {
             float n;
             float l = f % 26.0f;
@@ -239,27 +180,27 @@ ModelWithHead {
             float m = lv == Arm.RIGHT && this.handSwingProgress > 0.0f ? 0.0f : this.leaningPitch;
             float f2 = n = lv == Arm.LEFT && this.handSwingProgress > 0.0f ? 0.0f : this.leaningPitch;
             if (l < 14.0f) {
-                this.leftArm.pitch = MathHelper.lerp(n, this.leftArm.pitch, 0.0f);
+                this.leftArm.pitch = this.lerpAngle(n, this.leftArm.pitch, 0.0f);
                 this.rightArm.pitch = MathHelper.lerp(m, this.rightArm.pitch, 0.0f);
-                this.leftArm.yaw = MathHelper.lerp(n, this.leftArm.yaw, (float)Math.PI);
+                this.leftArm.yaw = this.lerpAngle(n, this.leftArm.yaw, (float)Math.PI);
                 this.rightArm.yaw = MathHelper.lerp(m, this.rightArm.yaw, (float)Math.PI);
-                this.leftArm.roll = MathHelper.lerp(n, this.leftArm.roll, (float)Math.PI + 1.8707964f * this.method_2807(l) / this.method_2807(14.0f));
+                this.leftArm.roll = this.lerpAngle(n, this.leftArm.roll, (float)Math.PI + 1.8707964f * this.method_2807(l) / this.method_2807(14.0f));
                 this.rightArm.roll = MathHelper.lerp(m, this.rightArm.roll, (float)Math.PI - 1.8707964f * this.method_2807(l) / this.method_2807(14.0f));
             } else if (l >= 14.0f && l < 22.0f) {
                 float o = (l - 14.0f) / 8.0f;
-                this.leftArm.pitch = MathHelper.lerp(n, this.leftArm.pitch, 1.5707964f * o);
+                this.leftArm.pitch = this.lerpAngle(n, this.leftArm.pitch, 1.5707964f * o);
                 this.rightArm.pitch = MathHelper.lerp(m, this.rightArm.pitch, 1.5707964f * o);
-                this.leftArm.yaw = MathHelper.lerp(n, this.leftArm.yaw, (float)Math.PI);
+                this.leftArm.yaw = this.lerpAngle(n, this.leftArm.yaw, (float)Math.PI);
                 this.rightArm.yaw = MathHelper.lerp(m, this.rightArm.yaw, (float)Math.PI);
-                this.leftArm.roll = MathHelper.lerp(n, this.leftArm.roll, 5.012389f - 1.8707964f * o);
+                this.leftArm.roll = this.lerpAngle(n, this.leftArm.roll, 5.012389f - 1.8707964f * o);
                 this.rightArm.roll = MathHelper.lerp(m, this.rightArm.roll, 1.2707963f + 1.8707964f * o);
             } else if (l >= 22.0f && l < 26.0f) {
                 float p = (l - 22.0f) / 4.0f;
-                this.leftArm.pitch = MathHelper.lerp(n, this.leftArm.pitch, 1.5707964f - 1.5707964f * p);
+                this.leftArm.pitch = this.lerpAngle(n, this.leftArm.pitch, 1.5707964f - 1.5707964f * p);
                 this.rightArm.pitch = MathHelper.lerp(m, this.rightArm.pitch, 1.5707964f - 1.5707964f * p);
-                this.leftArm.yaw = MathHelper.lerp(n, this.leftArm.yaw, (float)Math.PI);
+                this.leftArm.yaw = this.lerpAngle(n, this.leftArm.yaw, (float)Math.PI);
                 this.rightArm.yaw = MathHelper.lerp(m, this.rightArm.yaw, (float)Math.PI);
-                this.leftArm.roll = MathHelper.lerp(n, this.leftArm.roll, (float)Math.PI);
+                this.leftArm.roll = this.lerpAngle(n, this.leftArm.roll, (float)Math.PI);
                 this.rightArm.roll = MathHelper.lerp(m, this.rightArm.roll, (float)Math.PI);
             }
             float q = 0.3f;
@@ -268,6 +209,82 @@ ModelWithHead {
             this.rightLeg.pitch = MathHelper.lerp(this.leaningPitch, this.rightLeg.pitch, 0.3f * MathHelper.cos(f * 0.33333334f));
         }
         this.helmet.copyPositionAndRotation(this.head);
+    }
+
+    private void method_30154(T arg) {
+        switch (this.rightArmPose) {
+            case EMPTY: {
+                this.rightArm.yaw = 0.0f;
+                break;
+            }
+            case BLOCK: {
+                this.rightArm.pitch = this.rightArm.pitch * 0.5f - 0.9424779f;
+                this.rightArm.yaw = -0.5235988f;
+                break;
+            }
+            case ITEM: {
+                this.rightArm.pitch = this.rightArm.pitch * 0.5f - 0.31415927f;
+                this.rightArm.yaw = 0.0f;
+                break;
+            }
+            case THROW_SPEAR: {
+                this.rightArm.pitch = this.rightArm.pitch * 0.5f - (float)Math.PI;
+                this.rightArm.yaw = 0.0f;
+                break;
+            }
+            case BOW_AND_ARROW: {
+                this.rightArm.yaw = -0.1f + this.head.yaw;
+                this.leftArm.yaw = 0.1f + this.head.yaw + 0.4f;
+                this.rightArm.pitch = -1.5707964f + this.head.pitch;
+                this.leftArm.pitch = -1.5707964f + this.head.pitch;
+                break;
+            }
+            case CROSSBOW_CHARGE: {
+                CrossbowPosing.charge(this.rightArm, this.leftArm, arg, true);
+                break;
+            }
+            case CROSSBOW_HOLD: {
+                CrossbowPosing.hold(this.rightArm, this.leftArm, this.head, true);
+            }
+        }
+    }
+
+    private void method_30155(T arg) {
+        switch (this.leftArmPose) {
+            case EMPTY: {
+                this.leftArm.yaw = 0.0f;
+                break;
+            }
+            case BLOCK: {
+                this.leftArm.pitch = this.leftArm.pitch * 0.5f - 0.9424779f;
+                this.leftArm.yaw = 0.5235988f;
+                break;
+            }
+            case ITEM: {
+                this.leftArm.pitch = this.leftArm.pitch * 0.5f - 0.31415927f;
+                this.leftArm.yaw = 0.0f;
+                break;
+            }
+            case THROW_SPEAR: {
+                this.leftArm.pitch = this.leftArm.pitch * 0.5f - (float)Math.PI;
+                this.leftArm.yaw = 0.0f;
+                break;
+            }
+            case BOW_AND_ARROW: {
+                this.rightArm.yaw = -0.1f + this.head.yaw - 0.4f;
+                this.leftArm.yaw = 0.1f + this.head.yaw;
+                this.rightArm.pitch = -1.5707964f + this.head.pitch;
+                this.leftArm.pitch = -1.5707964f + this.head.pitch;
+                break;
+            }
+            case CROSSBOW_CHARGE: {
+                CrossbowPosing.charge(this.rightArm, this.leftArm, arg, false);
+                break;
+            }
+            case CROSSBOW_HOLD: {
+                CrossbowPosing.hold(this.rightArm, this.leftArm, this.head, false);
+            }
+        }
     }
 
     protected void method_29353(T arg, float f) {
@@ -300,14 +317,14 @@ ModelWithHead {
     }
 
     protected float lerpAngle(float f, float g, float h) {
-        float i = (g - f) % ((float)Math.PI * 2);
+        float i = (h - g) % ((float)Math.PI * 2);
         if (i < (float)(-Math.PI)) {
             i += (float)Math.PI * 2;
         }
         if (i >= (float)Math.PI) {
             i -= (float)Math.PI * 2;
         }
-        return f + h * i;
+        return g + f * i;
     }
 
     private float method_2807(float f) {
@@ -362,14 +379,23 @@ ModelWithHead {
 
     @Environment(value=EnvType.CLIENT)
     public static enum ArmPose {
-        EMPTY,
-        ITEM,
-        BLOCK,
-        BOW_AND_ARROW,
-        THROW_SPEAR,
-        CROSSBOW_CHARGE,
-        CROSSBOW_HOLD;
+        EMPTY(false),
+        ITEM(false),
+        BLOCK(false),
+        BOW_AND_ARROW(true),
+        THROW_SPEAR(false),
+        CROSSBOW_CHARGE(true),
+        CROSSBOW_HOLD(true);
 
+        private final boolean field_25722;
+
+        private ArmPose(boolean bl) {
+            this.field_25722 = bl;
+        }
+
+        public boolean method_30156() {
+            return this.field_25722;
+        }
     }
 }
 

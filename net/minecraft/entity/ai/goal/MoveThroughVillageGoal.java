@@ -43,13 +43,16 @@ extends Goal {
         this.distance = i;
         this.doorPassingThroughGetter = booleanSupplier;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
-        if (!(arg.getNavigation() instanceof MobNavigation)) {
+        if (!this.method_30147()) {
             throw new IllegalArgumentException("Unsupported mob for MoveThroughVillageGoal");
         }
     }
 
     @Override
     public boolean canStart() {
+        if (!this.method_30147()) {
+            return false;
+        }
         this.forgetOldTarget();
         if (this.requiresNighttime && this.mob.world.isDay()) {
             return false;
@@ -136,6 +139,10 @@ extends Goal {
         if (this.visitedTargets.size() > 15) {
             this.visitedTargets.remove(0);
         }
+    }
+
+    private boolean method_30147() {
+        return this.mob.getNavigation() instanceof MobNavigation;
     }
 }
 

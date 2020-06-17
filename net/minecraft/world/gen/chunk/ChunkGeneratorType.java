@@ -109,9 +109,9 @@ public final class ChunkGeneratorType {
         public static final Preset OVERWORLD = new Preset("overworld", arg -> Preset.createOverworldType(new StructuresConfig(true), false, arg));
         public static final Preset AMPLIFIED = new Preset("amplified", arg -> Preset.createOverworldType(new StructuresConfig(true), true, arg));
         public static final Preset NETHER = new Preset("nether", arg -> Preset.createCavesType(new StructuresConfig(false), Blocks.NETHERRACK.getDefaultState(), Blocks.LAVA.getDefaultState(), arg));
-        public static final Preset END = new Preset("end", arg -> Preset.createIslandsType(new StructuresConfig(false), Blocks.END_STONE.getDefaultState(), Blocks.AIR.getDefaultState(), arg, true));
+        public static final Preset END = new Preset("end", arg -> Preset.createIslandsType(new StructuresConfig(false), Blocks.END_STONE.getDefaultState(), Blocks.AIR.getDefaultState(), arg, true, true));
         public static final Preset CAVES = new Preset("caves", arg -> Preset.createCavesType(new StructuresConfig(false), Blocks.STONE.getDefaultState(), Blocks.WATER.getDefaultState(), arg));
-        public static final Preset FLOATING_ISLANDS = new Preset("floating_islands", arg -> Preset.createIslandsType(new StructuresConfig(false), Blocks.STONE.getDefaultState(), Blocks.WATER.getDefaultState(), arg, false));
+        public static final Preset FLOATING_ISLANDS = new Preset("floating_islands", arg -> Preset.createIslandsType(new StructuresConfig(false), Blocks.STONE.getDefaultState(), Blocks.WATER.getDefaultState(), arg, false, false));
         private final Text text;
         private final Identifier id;
         private final ChunkGeneratorType chunkGeneratorType;
@@ -127,8 +127,8 @@ public final class ChunkGeneratorType {
             return this.chunkGeneratorType;
         }
 
-        private static ChunkGeneratorType createIslandsType(StructuresConfig arg, BlockState arg2, BlockState arg3, Preset arg4, boolean bl) {
-            return new ChunkGeneratorType(arg, new NoiseConfig(128, new NoiseSamplingConfig(2.0, 1.0, 80.0, 160.0), new SlideConfig(-3000, 64, -46), new SlideConfig(-30, 7, 1), 2, 1, 0.0, 0.0, true, false, bl, false), arg2, arg3, -10, -10, 0, true, Optional.of(arg4));
+        private static ChunkGeneratorType createIslandsType(StructuresConfig arg, BlockState arg2, BlockState arg3, Preset arg4, boolean bl, boolean bl2) {
+            return new ChunkGeneratorType(arg, new NoiseConfig(128, new NoiseSamplingConfig(2.0, 1.0, 80.0, 160.0), new SlideConfig(-3000, 64, -46), new SlideConfig(-30, 7, 1), 2, 1, 0.0, 0.0, true, false, bl2, false), arg2, arg3, -10, -10, 0, bl, Optional.of(arg4));
         }
 
         private static ChunkGeneratorType createCavesType(StructuresConfig arg, BlockState arg2, BlockState arg3, Preset arg4) {

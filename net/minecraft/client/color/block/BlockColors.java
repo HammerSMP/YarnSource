@@ -22,8 +22,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MaterialColor;
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.block.ReplaceableTallPlantBlock;
 import net.minecraft.block.StemBlock;
+import net.minecraft.block.TallPlantBlock;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.color.block.BlockColorProvider;
 import net.minecraft.client.color.world.BiomeColors;
@@ -47,9 +47,9 @@ public class BlockColors {
             if (arg2 == null || arg3 == null) {
                 return -1;
             }
-            return BiomeColors.getGrassColor(arg2, arg.get(ReplaceableTallPlantBlock.HALF) == DoubleBlockHalf.UPPER ? arg3.down() : arg3);
+            return BiomeColors.getGrassColor(arg2, arg.get(TallPlantBlock.HALF) == DoubleBlockHalf.UPPER ? arg3.down() : arg3);
         }, Blocks.LARGE_FERN, Blocks.TALL_GRASS);
-        lv.registerColorProperty(ReplaceableTallPlantBlock.HALF, Blocks.LARGE_FERN, Blocks.TALL_GRASS);
+        lv.registerColorProperty(TallPlantBlock.HALF, Blocks.LARGE_FERN, Blocks.TALL_GRASS);
         lv.registerColorProvider((arg, arg2, arg3, i) -> {
             if (arg2 == null || arg3 == null) {
                 return GrassColors.getColor(0.5, 1.0);

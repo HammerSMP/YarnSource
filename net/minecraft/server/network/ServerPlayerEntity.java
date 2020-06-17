@@ -169,7 +169,7 @@ implements ScreenHandlerListener {
     private int syncedFoodLevel = -99999999;
     private boolean syncedSaturationIsZero = true;
     private int syncedExperience = -99999999;
-    private int field_13998 = 60;
+    private int joinInvulnerabilityTicks = 60;
     private ChatVisibility clientChatVisibility;
     private boolean clientChatColorsEnabled = true;
     private long lastActionTime = Util.getMeasuringTimeMs();
@@ -188,7 +188,7 @@ implements ScreenHandlerListener {
     private BlockPos spawnPointPosition;
     private boolean spawnPointSet;
     private int screenHandlerSyncId;
-    public boolean field_13991;
+    public boolean skipPacketSlotUpdates;
     public int pingMilliseconds;
     public boolean notInAnyWorld;
 
@@ -360,7 +360,7 @@ implements ScreenHandlerListener {
     @Override
     public void tick() {
         this.interactionManager.update();
-        --this.field_13998;
+        --this.joinInvulnerabilityTicks;
         if (this.timeUntilRegen > 0) {
             --this.timeUntilRegen;
         }
@@ -549,7 +549,7 @@ implements ScreenHandlerListener {
             return false;
         }
         boolean bl2 = bl = this.server.isDedicated() && this.isPvpEnabled() && "fall".equals(arg.name);
-        if (!bl && this.field_13998 > 0 && arg != DamageSource.OUT_OF_WORLD) {
+        if (!bl && this.joinInvulnerabilityTicks > 0 && arg != DamageSource.OUT_OF_WORLD) {
             return false;
         }
         if (arg instanceof EntityDamageSource) {
@@ -893,7 +893,7 @@ implements ScreenHandlerListener {
         if (arg == this.playerScreenHandler) {
             Criteria.INVENTORY_CHANGED.trigger(this, this.inventory, arg2);
         }
-        if (this.field_13991) {
+        if (this.skipPacketSlotUpdates) {
             return;
         }
         this.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(arg.syncId, i, arg2));
@@ -921,7 +921,7 @@ implements ScreenHandlerListener {
     }
 
     public void updateCursorStack() {
-        if (this.field_13991) {
+        if (this.skipPacketSlotUpdates) {
             return;
         }
         this.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-1, -1, this.inventory.getCursorStack()));

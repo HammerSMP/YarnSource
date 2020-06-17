@@ -1190,14 +1190,15 @@ extends LivingEntity {
                 Entity lv = ((ServerWorld)this.world).getEntity(uUID);
                 if (lv != null) {
                     this.attachLeash(lv, true);
+                    return;
                 }
             } else if (this.leashTag.contains("X", 99) && this.leashTag.contains("Y", 99) && this.leashTag.contains("Z", 99)) {
                 BlockPos lv2 = new BlockPos(this.leashTag.getInt("X"), this.leashTag.getInt("Y"), this.leashTag.getInt("Z"));
                 this.attachLeash(LeashKnotEntity.getOrCreate(this.world, lv2), true);
-            } else {
-                this.detachLeash(false, true);
+                return;
             }
             if (this.age > 100) {
+                this.dropItem(Items.LEAD);
                 this.leashTag = null;
             }
         }

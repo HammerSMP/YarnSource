@@ -44,15 +44,17 @@ implements Packet<ClientPlayPacketListener> {
     private byte[] data;
     private List<CompoundTag> blockEntities;
     private boolean isFullChunk;
+    private boolean field_25720;
 
     public ChunkDataS2CPacket() {
     }
 
-    public ChunkDataS2CPacket(WorldChunk arg, int i) {
+    public ChunkDataS2CPacket(WorldChunk arg, int i, boolean bl) {
         ChunkPos lv = arg.getPos();
         this.chunkX = lv.x;
         this.chunkZ = lv.z;
         this.isFullChunk = i == 65535;
+        this.field_25720 = bl;
         this.heightmaps = new CompoundTag();
         for (Map.Entry<Heightmap.Type, Heightmap> entry : arg.getHeightmaps()) {
             if (!entry.getKey().shouldSendToClient()) continue;
@@ -80,6 +82,7 @@ implements Packet<ClientPlayPacketListener> {
         this.chunkX = arg.readInt();
         this.chunkZ = arg.readInt();
         this.isFullChunk = arg.readBoolean();
+        this.field_25720 = arg.readBoolean();
         this.verticalStripBitmask = arg.readVarInt();
         this.heightmaps = arg.readCompoundTag();
         if (this.isFullChunk) {
@@ -102,6 +105,7 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeInt(this.chunkX);
         arg.writeInt(this.chunkZ);
         arg.writeBoolean(this.isFullChunk);
+        arg.writeBoolean(this.field_25720);
         arg.writeVarInt(this.verticalStripBitmask);
         arg.writeCompoundTag(this.heightmaps);
         if (this.biomeArray != null) {
@@ -173,6 +177,11 @@ implements Packet<ClientPlayPacketListener> {
 
     public boolean isFullChunk() {
         return this.isFullChunk;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public boolean method_30144() {
+        return this.field_25720;
     }
 
     @Environment(value=EnvType.CLIENT)

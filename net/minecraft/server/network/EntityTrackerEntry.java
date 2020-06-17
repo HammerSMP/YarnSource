@@ -2,11 +2,16 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.Lists
+ *  com.mojang.datafixers.util.Pair
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.server.network;
 
+import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -196,9 +201,9 @@ public class EntityTrackerEntry {
         }
         boolean bl = this.alwaysUpdateVelocity;
         if (this.entity instanceof LivingEntity) {
-            EquipmentSlot[] collection = ((LivingEntity)this.entity).getAttributes().getAttributesToSend();
+            Collection<EntityAttributeInstance> collection = ((LivingEntity)this.entity).getAttributes().getAttributesToSend();
             if (!collection.isEmpty()) {
-                consumer.accept(new EntityAttributesS2CPacket(this.entity.getEntityId(), (Collection<EntityAttributeInstance>)collection));
+                consumer.accept(new EntityAttributesS2CPacket(this.entity.getEntityId(), collection));
             }
             if (((LivingEntity)this.entity).isFallFlying()) {
                 bl = true;
@@ -209,10 +214,14 @@ public class EntityTrackerEntry {
             consumer.accept(new EntityVelocityUpdateS2CPacket(this.entity.getEntityId(), this.velocity));
         }
         if (this.entity instanceof LivingEntity) {
+            ArrayList list = Lists.newArrayList();
             for (EquipmentSlot lv2 : EquipmentSlot.values()) {
                 ItemStack lv3 = ((LivingEntity)this.entity).getEquippedStack(lv2);
                 if (lv3.isEmpty()) continue;
-                consumer.accept(new EntityEquipmentUpdateS2CPacket(this.entity.getEntityId(), lv2, lv3));
+                list.add(Pair.of((Object)((Object)lv2), (Object)lv3.copy()));
+            }
+            if (!list.isEmpty()) {
+                consumer.accept(new EntityEquipmentUpdateS2CPacket(this.entity.getEntityId(), list));
             }
         }
         if (this.entity instanceof LivingEntity) {

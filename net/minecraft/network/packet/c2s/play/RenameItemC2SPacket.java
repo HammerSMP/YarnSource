@@ -10,23 +10,23 @@ import net.minecraft.network.listener.ServerPlayPacketListener;
 
 public class RenameItemC2SPacket
 implements Packet<ServerPlayPacketListener> {
-    private String itemName;
+    private String name;
 
     public RenameItemC2SPacket() {
     }
 
     public RenameItemC2SPacket(String string) {
-        this.itemName = string;
+        this.name = string;
     }
 
     @Override
     public void read(PacketByteBuf arg) throws IOException {
-        this.itemName = arg.readString(32767);
+        this.name = arg.readString(32767);
     }
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.itemName);
+        arg.writeString(this.name);
     }
 
     @Override
@@ -34,8 +34,8 @@ implements Packet<ServerPlayPacketListener> {
         arg.onRenameItem(this);
     }
 
-    public String getItemName() {
-        return this.itemName;
+    public String getName() {
+        return this.name;
     }
 }
 

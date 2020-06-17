@@ -109,6 +109,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.EyeOfEnderEntity;
 import net.minecraft.entity.FallingBlockEntity;
@@ -756,6 +757,18 @@ implements ClientPlayPacketListener {
             if (lv4 == null) continue;
             lv4.fromTag(this.world.getBlockState(lv3), lv2);
         }
+        if (!arg.method_30144()) {
+            this.world.getLightingProvider().setLightEnabled(lv.getPos(), false);
+            int l = arg.getVerticalStripBitmask();
+            for (int m = 0; m < 16; ++m) {
+                if ((l & 1 << m) == 0) continue;
+                this.world.getLightingProvider().queueData(LightType.BLOCK, ChunkSectionPos.from(lv.getPos(), m), new ChunkNibbleArray(), false);
+                this.world.getLightingProvider().queueData(LightType.SKY, ChunkSectionPos.from(lv.getPos(), m), new ChunkNibbleArray(), false);
+            }
+            this.world.getLightingProvider().doLightUpdates(Integer.MAX_VALUE, true, true);
+            this.world.getLightingProvider().setLightEnabled(lv.getPos(), true);
+            lv.getLightSourcesStream().forEach(arg2 -> this.world.getLightingProvider().addLightSource((BlockPos)arg2, lv.getLuminance((BlockPos)arg2)));
+        }
     }
 
     @Override
@@ -1159,7 +1172,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         Entity lv = this.world.getEntityById(arg.getId());
         if (lv != null) {
-            lv.equipStack(arg.getSlot(), arg.getStack());
+            arg.method_30145().forEach(pair -> lv.equipStack((EquipmentSlot)((Object)((Object)pair.getFirst())), (ItemStack)pair.getSecond()));
         }
     }
 

@@ -97,7 +97,7 @@ extends BlockEntityRenderer<SkullBlockEntity> {
     private static RenderLayer method_3578(SkullBlock.SkullType arg, @Nullable GameProfile gameProfile) {
         Identifier lv = TEXTURES.get(arg);
         if (arg != SkullBlock.Type.PLAYER || gameProfile == null) {
-            return RenderLayer.getEntityCutoutNoCull(lv);
+            return RenderLayer.getEntityCutoutNoCullZOffset(lv);
         }
         MinecraftClient lv2 = MinecraftClient.getInstance();
         Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = lv2.getSkinProvider().getTextures(gameProfile);

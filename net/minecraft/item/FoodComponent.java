@@ -3,14 +3,14 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.Lists
- *  org.apache.commons.lang3.tuple.Pair
+ *  com.mojang.datafixers.util.Pair
  */
 package net.minecraft.item;
 
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 import java.util.List;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class FoodComponent {
     private final int hunger;

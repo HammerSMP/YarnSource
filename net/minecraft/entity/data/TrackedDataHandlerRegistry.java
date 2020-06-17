@@ -313,7 +313,7 @@ public class TrackedDataHandlerRegistry {
             return this.read(arg);
         }
     };
-    public static final TrackedDataHandler<Optional<BlockPos>> OPTIONA_BLOCK_POS = new TrackedDataHandler<Optional<BlockPos>>(){
+    public static final TrackedDataHandler<Optional<BlockPos>> OPTIONAL_BLOCK_POS = new TrackedDataHandler<Optional<BlockPos>>(){
 
         @Override
         public void write(PacketByteBuf arg, Optional<BlockPos> optional) {
@@ -507,7 +507,7 @@ public class TrackedDataHandlerRegistry {
         TrackedDataHandlerRegistry.register(BOOLEAN);
         TrackedDataHandlerRegistry.register(ROTATION);
         TrackedDataHandlerRegistry.register(BLOCK_POS);
-        TrackedDataHandlerRegistry.register(OPTIONA_BLOCK_POS);
+        TrackedDataHandlerRegistry.register(OPTIONAL_BLOCK_POS);
         TrackedDataHandlerRegistry.register(FACING);
         TrackedDataHandlerRegistry.register(OPTIONAL_UUID);
         TrackedDataHandlerRegistry.register(OPTIONAL_BLOCK_STATE);

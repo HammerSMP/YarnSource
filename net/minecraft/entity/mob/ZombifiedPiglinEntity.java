@@ -105,6 +105,9 @@ implements Angerable {
         if (this.getTarget() != null) {
             this.method_29941();
         }
+        if (this.hasAngerTime()) {
+            this.playerHitTimer = this.age;
+        }
         super.mobTick();
     }
 
@@ -144,12 +147,10 @@ implements Angerable {
             this.angrySoundDelay = field_25382.choose(this.random);
             this.field_25608 = field_25609.choose(this.random);
         }
+        if (arg instanceof PlayerEntity) {
+            this.setAttacking((PlayerEntity)arg);
+        }
         super.setTarget(arg);
-    }
-
-    @Override
-    protected boolean shouldAlwaysDropXp() {
-        return this.getTarget() != null;
     }
 
     @Override

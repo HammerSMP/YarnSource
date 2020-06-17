@@ -5,14 +5,15 @@
  *  com.google.common.base.Objects
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
+ *  com.mojang.datafixers.util.Pair
  *  com.mojang.serialization.DataResult
  *  com.mojang.serialization.Dynamic
  *  com.mojang.serialization.DynamicOps
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
- *  org.apache.commons.lang3.tuple.Pair
  *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.entity;
@@ -20,12 +21,16 @@ package net.minecraft.entity;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +107,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
 import net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket;
 import net.minecraft.particle.BlockStateParticleEffect;
@@ -134,7 +140,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 
 public abstract class LivingEntity
@@ -148,7 +153,7 @@ extends Entity {
     private static final TrackedData<Boolean> POTION_SWIRLS_AMBIENT = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Integer> STUCK_ARROW_COUNT = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> STINGER_COUNT = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final TrackedData<Optional<BlockPos>> SLEEPING_POSITION = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.OPTIONA_BLOCK_POS);
+    private static final TrackedData<Optional<BlockPos>> SLEEPING_POSITION = DataTracker.registerData(LivingEntity.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS);
     protected static final EntityDimensions SLEEPING_DIMENSIONS = EntityDimensions.fixed(0.2f, 0.2f);
     private final AttributeContainer attributes;
     private final DamageTracker damageTracker = new DamageTracker(this);
@@ -1528,10 +1533,21 @@ extends Entity {
                 HoneyBlock.addRichParticles(this);
                 break;
             }
+            case 55: {
+                this.method_30127();
+                break;
+            }
             default: {
                 super.handleStatus(b);
             }
         }
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    private void method_30127() {
+        ItemStack lv = this.getEquippedStack(EquipmentSlot.OFFHAND);
+        this.equipStack(EquipmentSlot.OFFHAND, this.getEquippedStack(EquipmentSlot.MAINHAND));
+        this.equipStack(EquipmentSlot.MAINHAND, lv);
     }
 
     @Override
@@ -1764,42 +1780,48 @@ extends Entity {
                 double i = this.getY();
                 this.updateVelocity(0.02f, arg);
                 this.move(MovementType.SELF, this.getVelocity());
-                this.setVelocity(this.getVelocity().multiply(0.5));
+                if (this.getFluidHeight(FluidTags.LAVA) <= this.method_29241()) {
+                    this.setVelocity(this.getVelocity().multiply(0.5, 0.8f, 0.5));
+                    Vec3d lv4 = this.method_26317(d, bl, this.getVelocity());
+                    this.setVelocity(lv4);
+                } else {
+                    this.setVelocity(this.getVelocity().multiply(0.5));
+                }
                 if (!this.hasNoGravity()) {
                     this.setVelocity(this.getVelocity().add(0.0, -d / 4.0, 0.0));
                 }
-                Vec3d lv4 = this.getVelocity();
-                if (this.horizontalCollision && this.doesNotCollide(lv4.x, lv4.y + (double)0.6f - this.getY() + i, lv4.z)) {
-                    this.setVelocity(lv4.x, 0.3f, lv4.z);
+                Vec3d lv5 = this.getVelocity();
+                if (this.horizontalCollision && this.doesNotCollide(lv5.x, lv5.y + (double)0.6f - this.getY() + i, lv5.z)) {
+                    this.setVelocity(lv5.x, 0.3f, lv5.z);
                 }
             } else if (this.isFallFlying()) {
                 double q;
                 double r;
                 float s;
-                Vec3d lv5 = this.getVelocity();
-                if (lv5.y > -0.5) {
+                Vec3d lv6 = this.getVelocity();
+                if (lv6.y > -0.5) {
                     this.fallDistance = 1.0f;
                 }
-                Vec3d lv6 = this.getRotationVector();
+                Vec3d lv7 = this.getRotationVector();
                 float j = this.pitch * ((float)Math.PI / 180);
-                double k = Math.sqrt(lv6.x * lv6.x + lv6.z * lv6.z);
-                double l = Math.sqrt(LivingEntity.squaredHorizontalLength(lv5));
-                double m = lv6.length();
+                double k = Math.sqrt(lv7.x * lv7.x + lv7.z * lv7.z);
+                double l = Math.sqrt(LivingEntity.squaredHorizontalLength(lv6));
+                double m = lv7.length();
                 float n = MathHelper.cos(j);
                 n = (float)((double)n * ((double)n * Math.min(1.0, m / 0.4)));
-                lv5 = this.getVelocity().add(0.0, d * (-1.0 + (double)n * 0.75), 0.0);
-                if (lv5.y < 0.0 && k > 0.0) {
-                    double o = lv5.y * -0.1 * (double)n;
-                    lv5 = lv5.add(lv6.x * o / k, o, lv6.z * o / k);
+                lv6 = this.getVelocity().add(0.0, d * (-1.0 + (double)n * 0.75), 0.0);
+                if (lv6.y < 0.0 && k > 0.0) {
+                    double o = lv6.y * -0.1 * (double)n;
+                    lv6 = lv6.add(lv7.x * o / k, o, lv7.z * o / k);
                 }
                 if (j < 0.0f && k > 0.0) {
                     double p = l * (double)(-MathHelper.sin(j)) * 0.04;
-                    lv5 = lv5.add(-lv6.x * p / k, p * 3.2, -lv6.z * p / k);
+                    lv6 = lv6.add(-lv7.x * p / k, p * 3.2, -lv7.z * p / k);
                 }
                 if (k > 0.0) {
-                    lv5 = lv5.add((lv6.x / k * l - lv5.x) * 0.1, 0.0, (lv6.z / k * l - lv5.z) * 0.1);
+                    lv6 = lv6.add((lv7.x / k * l - lv6.x) * 0.1, 0.0, (lv7.z / k * l - lv6.z) * 0.1);
                 }
-                this.setVelocity(lv5.multiply(0.99f, 0.98f, 0.99f));
+                this.setVelocity(lv6.multiply(0.99f, 0.98f, 0.99f));
                 this.move(MovementType.SELF, this.getVelocity());
                 if (this.horizontalCollision && !this.world.isClient && (s = (float)((r = l - (q = Math.sqrt(LivingEntity.squaredHorizontalLength(this.getVelocity())))) * 10.0 - 3.0)) > 0.0f) {
                     this.playSound(this.getFallSound((int)s), 1.0f, 1.0f);
@@ -1809,22 +1831,22 @@ extends Entity {
                     this.setFlag(7, false);
                 }
             } else {
-                BlockPos lv7 = this.getVelocityAffectingPos();
-                float t = this.world.getBlockState(lv7).getBlock().getSlipperiness();
+                BlockPos lv8 = this.getVelocityAffectingPos();
+                float t = this.world.getBlockState(lv8).getBlock().getSlipperiness();
                 float u = this.onGround ? t * 0.91f : 0.91f;
-                Vec3d lv8 = this.method_26318(arg, t);
-                double v = lv8.y;
+                Vec3d lv9 = this.method_26318(arg, t);
+                double v = lv9.y;
                 if (this.hasStatusEffect(StatusEffects.LEVITATION)) {
-                    v += (0.05 * (double)(this.getStatusEffect(StatusEffects.LEVITATION).getAmplifier() + 1) - lv8.y) * 0.2;
+                    v += (0.05 * (double)(this.getStatusEffect(StatusEffects.LEVITATION).getAmplifier() + 1) - lv9.y) * 0.2;
                     this.fallDistance = 0.0f;
-                } else if (!this.world.isClient || this.world.isChunkLoaded(lv7)) {
+                } else if (!this.world.isClient || this.world.isChunkLoaded(lv8)) {
                     if (!this.hasNoGravity()) {
                         v -= d;
                     }
                 } else {
                     v = this.getY() > 0.0 ? -0.1 : 0.0;
                 }
-                this.setVelocity(lv8.x * (double)u, v * (double)0.98f, lv8.z * (double)u);
+                this.setVelocity(lv9.x * (double)u, v * (double)0.98f, lv9.z * (double)u);
             }
         }
         this.method_29242(this, this instanceof Flutterer);
@@ -1902,9 +1924,6 @@ extends Entity {
         return false;
     }
 
-    /*
-     * WARNING - void declaration
-     */
     @Override
     public void tick() {
         super.tick();
@@ -1931,40 +1950,7 @@ extends Entity {
                     this.setStingerCount(j - 1);
                 }
             }
-            block8: for (EquipmentSlot lv : EquipmentSlot.values()) {
-                void lv4;
-                switch (lv.getType()) {
-                    case HAND: {
-                        ItemStack lv2 = this.equippedHand.get(lv.getEntitySlotId());
-                        break;
-                    }
-                    case ARMOR: {
-                        ItemStack lv3 = this.equippedArmor.get(lv.getEntitySlotId());
-                        break;
-                    }
-                    default: {
-                        continue block8;
-                    }
-                }
-                ItemStack lv5 = this.getEquippedStack(lv);
-                if (ItemStack.areEqual(lv5, (ItemStack)lv4)) continue;
-                ((ServerWorld)this.world).getChunkManager().sendToOtherNearbyPlayers(this, new EntityEquipmentUpdateS2CPacket(this.getEntityId(), lv, lv5));
-                if (!lv4.isEmpty()) {
-                    this.getAttributes().removeModifiers(lv4.getAttributeModifiers(lv));
-                }
-                if (!lv5.isEmpty()) {
-                    this.getAttributes().addTemporaryModifiers(lv5.getAttributeModifiers(lv));
-                }
-                switch (lv.getType()) {
-                    case HAND: {
-                        this.equippedHand.set(lv.getEntitySlotId(), lv5.copy());
-                        continue block8;
-                    }
-                    case ARMOR: {
-                        this.equippedArmor.set(lv.getEntitySlotId(), lv5.copy());
-                    }
-                }
-            }
+            this.method_30128();
             if (this.age % 20 == 0) {
                 this.getDamageTracker().update();
             }
@@ -2034,6 +2020,98 @@ extends Entity {
         if (this.isSleeping()) {
             this.pitch = 0.0f;
         }
+    }
+
+    private void method_30128() {
+        Map<EquipmentSlot, ItemStack> map = this.method_30129();
+        if (map != null) {
+            this.method_30121(map);
+            if (!map.isEmpty()) {
+                this.method_30123(map);
+            }
+        }
+    }
+
+    /*
+     * WARNING - void declaration
+     */
+    @Nullable
+    private Map<EquipmentSlot, ItemStack> method_30129() {
+        EnumMap map = null;
+        block4: for (EquipmentSlot lv : EquipmentSlot.values()) {
+            void lv4;
+            switch (lv.getType()) {
+                case HAND: {
+                    ItemStack lv2 = this.method_30126(lv);
+                    break;
+                }
+                case ARMOR: {
+                    ItemStack lv3 = this.method_30125(lv);
+                    break;
+                }
+                default: {
+                    continue block4;
+                }
+            }
+            ItemStack lv5 = this.getEquippedStack(lv);
+            if (ItemStack.areEqual(lv5, (ItemStack)lv4)) continue;
+            if (map == null) {
+                map = Maps.newEnumMap(EquipmentSlot.class);
+            }
+            map.put(lv, lv5);
+            if (!lv4.isEmpty()) {
+                this.getAttributes().removeModifiers(lv4.getAttributeModifiers(lv));
+            }
+            if (lv5.isEmpty()) continue;
+            this.getAttributes().addTemporaryModifiers(lv5.getAttributeModifiers(lv));
+        }
+        return map;
+    }
+
+    private void method_30121(Map<EquipmentSlot, ItemStack> map) {
+        ItemStack lv = map.get((Object)EquipmentSlot.MAINHAND);
+        ItemStack lv2 = map.get((Object)EquipmentSlot.OFFHAND);
+        if (lv != null && lv2 != null && ItemStack.areEqual(lv, this.method_30126(EquipmentSlot.OFFHAND)) && ItemStack.areEqual(lv2, this.method_30126(EquipmentSlot.MAINHAND))) {
+            ((ServerWorld)this.world).getChunkManager().sendToOtherNearbyPlayers(this, new EntityStatusS2CPacket(this, 55));
+            map.remove((Object)EquipmentSlot.MAINHAND);
+            map.remove((Object)EquipmentSlot.OFFHAND);
+            this.method_30124(EquipmentSlot.MAINHAND, lv.copy());
+            this.method_30124(EquipmentSlot.OFFHAND, lv2.copy());
+        }
+    }
+
+    private void method_30123(Map<EquipmentSlot, ItemStack> map) {
+        ArrayList list = Lists.newArrayListWithCapacity((int)map.size());
+        map.forEach((arg, arg2) -> {
+            ItemStack lv = arg2.copy();
+            list.add(Pair.of((Object)arg, (Object)lv));
+            switch (arg.getType()) {
+                case HAND: {
+                    this.method_30124((EquipmentSlot)((Object)arg), lv);
+                    break;
+                }
+                case ARMOR: {
+                    this.method_30122((EquipmentSlot)((Object)arg), lv);
+                }
+            }
+        });
+        ((ServerWorld)this.world).getChunkManager().sendToOtherNearbyPlayers(this, new EntityEquipmentUpdateS2CPacket(this.getEntityId(), list));
+    }
+
+    private ItemStack method_30125(EquipmentSlot arg) {
+        return this.equippedArmor.get(arg.getEntitySlotId());
+    }
+
+    private void method_30122(EquipmentSlot arg, ItemStack arg2) {
+        this.equippedArmor.set(arg.getEntitySlotId(), arg2);
+    }
+
+    private ItemStack method_30126(EquipmentSlot arg) {
+        return this.equippedHand.get(arg.getEntitySlotId());
+    }
+
+    private void method_30124(EquipmentSlot arg, ItemStack arg2) {
+        this.equippedHand.set(arg.getEntitySlotId(), arg2);
     }
 
     protected float turnHead(float f, float g) {
@@ -2110,14 +2188,19 @@ extends Entity {
         this.world.getProfiler().pop();
         this.world.getProfiler().push("jump");
         if (this.jumping && this.method_29920()) {
-            double k = this.getFluidHeight(FluidTags.WATER);
-            boolean bl = this.isTouchingWater() && k > 0.0;
-            double l = this.method_29241();
-            if (bl && (!this.onGround || k > l)) {
+            double l;
+            if (this.isInLava()) {
+                double k = this.getFluidHeight(FluidTags.LAVA);
+            } else {
+                l = this.getFluidHeight(FluidTags.WATER);
+            }
+            boolean bl = this.isTouchingWater() && l > 0.0;
+            double m = this.method_29241();
+            if (bl && (!this.onGround || l > m)) {
                 this.swimUpward(FluidTags.WATER);
-            } else if (this.isInLava()) {
+            } else if (this.isInLava() && (!this.onGround || l > m)) {
                 this.swimUpward(FluidTags.LAVA);
-            } else if ((this.onGround || bl && k <= l) && this.jumpingCooldown == 0) {
+            } else if ((this.onGround || bl && l <= m) && this.jumpingCooldown == 0) {
                 this.jump();
                 this.jumpingCooldown = 10;
             }
@@ -2720,8 +2803,8 @@ extends Entity {
         if (lv.isFood()) {
             List<Pair<StatusEffectInstance, Float>> list = lv.getFoodComponent().getStatusEffects();
             for (Pair<StatusEffectInstance, Float> pair : list) {
-                if (arg2.isClient || pair.getLeft() == null || !(arg2.random.nextFloat() < ((Float)pair.getRight()).floatValue())) continue;
-                arg3.addStatusEffect(new StatusEffectInstance((StatusEffectInstance)pair.getLeft()));
+                if (arg2.isClient || pair.getFirst() == null || !(arg2.random.nextFloat() < ((Float)pair.getSecond()).floatValue())) continue;
+                arg3.addStatusEffect(new StatusEffectInstance((StatusEffectInstance)pair.getFirst()));
             }
         }
     }
