@@ -1999,7 +1999,7 @@ CommandOutput {
         if (this.world.getRegistryKey() == World.END && arg.getRegistryKey() == World.OVERWORLD) {
             BlockPos lv2 = arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, arg.getSpawnPos());
         } else if (arg.getRegistryKey() == World.END) {
-            BlockPos lv3 = ServerWorld.field_25144;
+            BlockPos lv3 = ServerWorld.END_SPAWN_POS;
         } else {
             double d = this.getX();
             double e = this.getZ();
@@ -2037,7 +2037,7 @@ CommandOutput {
             ((Entity)lv9).setVelocity(lv);
             arg.onDimensionChanged((Entity)lv9);
             if (arg.getRegistryKey() == World.END) {
-                ServerWorld.method_29200(arg);
+                ServerWorld.createEndSpawnPlatform(arg);
             }
         }
         this.method_30076();

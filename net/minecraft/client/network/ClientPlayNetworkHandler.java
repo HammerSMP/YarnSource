@@ -1198,27 +1198,27 @@ implements ClientPlayPacketListener {
     public void onGameStateChange(GameStateChangeS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        GameStateChangeS2CPacket.class_5402 lv2 = arg.getReason();
+        GameStateChangeS2CPacket.Reason lv2 = arg.getReason();
         float f = arg.getValue();
         int i = MathHelper.floor(f + 0.5f);
-        if (lv2 == GameStateChangeS2CPacket.field_25645) {
+        if (lv2 == GameStateChangeS2CPacket.NO_RESPAWN_BLOCK) {
             ((PlayerEntity)lv).sendMessage(new TranslatableText("block.minecraft.spawn.not_valid"), false);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25646) {
+        } else if (lv2 == GameStateChangeS2CPacket.RAIN_STARTED) {
             this.world.getLevelProperties().setRaining(true);
             this.world.setRainGradient(0.0f);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25647) {
+        } else if (lv2 == GameStateChangeS2CPacket.RAIN_STOPPED) {
             this.world.getLevelProperties().setRaining(false);
             this.world.setRainGradient(1.0f);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25648) {
+        } else if (lv2 == GameStateChangeS2CPacket.GAME_MODE_CHANGED) {
             this.client.interactionManager.setGameMode(GameMode.byId(i));
-        } else if (lv2 == GameStateChangeS2CPacket.field_25649) {
+        } else if (lv2 == GameStateChangeS2CPacket.GAME_WON) {
             if (i == 0) {
                 this.client.player.networkHandler.sendPacket(new ClientStatusC2SPacket(ClientStatusC2SPacket.Mode.PERFORM_RESPAWN));
                 this.client.openScreen(new DownloadingTerrainScreen());
             } else if (i == 1) {
                 this.client.openScreen(new CreditsScreen(true, () -> this.client.player.networkHandler.sendPacket(new ClientStatusC2SPacket(ClientStatusC2SPacket.Mode.PERFORM_RESPAWN))));
             }
-        } else if (lv2 == GameStateChangeS2CPacket.field_25650) {
+        } else if (lv2 == GameStateChangeS2CPacket.DEMO_MESSAGE_SHOWN) {
             GameOptions lv3 = this.client.options;
             if (f == 0.0f) {
                 this.client.openScreen(new DemoScreen());
@@ -1231,20 +1231,20 @@ implements ClientPlayPacketListener {
             } else if (f == 104.0f) {
                 this.client.inGameHud.getChatHud().addMessage(new TranslatableText("demo.day.6", lv3.keyScreenshot.getBoundKeyLocalizedText()));
             }
-        } else if (lv2 == GameStateChangeS2CPacket.field_25651) {
+        } else if (lv2 == GameStateChangeS2CPacket.PROJECTILE_HIT_PLAYER) {
             this.world.playSound(lv, lv.getX(), lv.getEyeY(), lv.getZ(), SoundEvents.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS, 0.18f, 0.45f);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25652) {
+        } else if (lv2 == GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED) {
             this.world.setRainGradient(f);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25653) {
+        } else if (lv2 == GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED) {
             this.world.setThunderGradient(f);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25654) {
+        } else if (lv2 == GameStateChangeS2CPacket.PUFFERFISH_STING) {
             this.world.playSound(lv, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_PUFFER_FISH_STING, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-        } else if (lv2 == GameStateChangeS2CPacket.field_25655) {
+        } else if (lv2 == GameStateChangeS2CPacket.ELDER_GUARDIAN_EFFECT) {
             this.world.addParticle(ParticleTypes.ELDER_GUARDIAN, lv.getX(), lv.getY(), lv.getZ(), 0.0, 0.0, 0.0);
             if (i == 1) {
                 this.world.playSound(lv, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE, SoundCategory.HOSTILE, 1.0f, 1.0f);
             }
-        } else if (lv2 == GameStateChangeS2CPacket.field_25656) {
+        } else if (lv2 == GameStateChangeS2CPacket.IMMEDIATE_RESPAWN) {
             this.client.player.setShowsDeathScreen(f == 0.0f);
         }
     }

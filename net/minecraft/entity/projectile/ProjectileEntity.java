@@ -151,11 +151,11 @@ extends Entity {
     protected void method_26962() {
         Vec3d lv = this.getVelocity();
         float f = MathHelper.sqrt(ProjectileEntity.squaredHorizontalLength(lv));
-        this.pitch = ProjectileEntity.method_26960(this.prevPitch, (float)(MathHelper.atan2(lv.y, f) * 57.2957763671875));
-        this.yaw = ProjectileEntity.method_26960(this.prevYaw, (float)(MathHelper.atan2(lv.x, lv.z) * 57.2957763671875));
+        this.pitch = ProjectileEntity.updateRotation(this.prevPitch, (float)(MathHelper.atan2(lv.y, f) * 57.2957763671875));
+        this.yaw = ProjectileEntity.updateRotation(this.prevYaw, (float)(MathHelper.atan2(lv.x, lv.z) * 57.2957763671875));
     }
 
-    protected static float method_26960(float f, float g) {
+    protected static float updateRotation(float f, float g) {
         while (g - f < -180.0f) {
             f -= 360.0f;
         }

@@ -18,7 +18,7 @@ import net.minecraft.world.WorldView;
 
 public class NopStructureProcessor
 extends StructureProcessor {
-    public static final Codec<NopStructureProcessor> field_25005 = Codec.unit(() -> INSTANCE);
+    public static final Codec<NopStructureProcessor> CODEC = Codec.unit(() -> INSTANCE);
     public static final NopStructureProcessor INSTANCE = new NopStructureProcessor();
 
     private NopStructureProcessor() {

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+read -p "Name branch " branch
+
+git checkout -b ${branch}
+git add *
+git commit -m "${branch}"
+
+git push -u origin ${branch}

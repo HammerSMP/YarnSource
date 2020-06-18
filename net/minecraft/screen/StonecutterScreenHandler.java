@@ -125,11 +125,15 @@ extends ScreenHandler {
 
     @Override
     public boolean onButtonClick(PlayerEntity arg, int i) {
-        if (i >= 0 && i < this.availableRecipes.size()) {
+        if (this.method_30160(i)) {
             this.selectedRecipe.set(i);
             this.populateResult();
         }
         return true;
+    }
+
+    private boolean method_30160(int i) {
+        return i >= 0 && i < this.availableRecipes.size();
     }
 
     @Override
@@ -151,7 +155,7 @@ extends ScreenHandler {
     }
 
     private void populateResult() {
-        if (!this.availableRecipes.isEmpty()) {
+        if (!this.availableRecipes.isEmpty() && this.method_30160(this.selectedRecipe.get())) {
             StonecuttingRecipe lv = this.availableRecipes.get(this.selectedRecipe.get());
             this.outputSlot.setStack(lv.craft(this.input));
         } else {

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -62,11 +63,12 @@ extends Block {
     }
 
     private void tryBreakEgg(World arg, BlockPos arg2, Entity arg3, int i) {
+        BlockState lv;
         if (!this.breaksEgg(arg, arg3)) {
             return;
         }
-        if (!arg.isClient && arg.random.nextInt(i) == 0) {
-            this.breakEgg(arg, arg2, arg.getBlockState(arg2));
+        if (!arg.isClient && arg.random.nextInt(i) == 0 && (lv = arg.getBlockState(arg2)).isOf(Blocks.TURTLE_EGG)) {
+            this.breakEgg(arg, arg2, lv);
         }
     }
 

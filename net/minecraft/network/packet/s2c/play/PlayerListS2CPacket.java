@@ -39,14 +39,14 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerListS2CPacket(Action arg, ServerPlayerEntity ... args) {
         this.action = arg;
         for (ServerPlayerEntity lv : args) {
-            this.entries.add(new Entry(lv.getGameProfile(), lv.pingMilliseconds, lv.interactionManager.getGameMode(), lv.method_14206()));
+            this.entries.add(new Entry(lv.getGameProfile(), lv.pingMilliseconds, lv.interactionManager.getGameMode(), lv.getPlayerListName()));
         }
     }
 
     public PlayerListS2CPacket(Action arg, Iterable<ServerPlayerEntity> iterable) {
         this.action = arg;
         for (ServerPlayerEntity lv : iterable) {
-            this.entries.add(new Entry(lv.getGameProfile(), lv.pingMilliseconds, lv.interactionManager.getGameMode(), lv.method_14206()));
+            this.entries.add(new Entry(lv.getGameProfile(), lv.pingMilliseconds, lv.interactionManager.getGameMode(), lv.getPlayerListName()));
         }
     }
 

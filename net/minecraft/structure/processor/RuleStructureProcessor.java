@@ -25,7 +25,7 @@ import net.minecraft.world.WorldView;
 
 public class RuleStructureProcessor
 extends StructureProcessor {
-    public static final Codec<RuleStructureProcessor> field_25011 = StructureProcessorRule.CODEC.listOf().fieldOf("rules").xmap(RuleStructureProcessor::new, arg -> arg.rules).codec();
+    public static final Codec<RuleStructureProcessor> CODEC = StructureProcessorRule.CODEC.listOf().fieldOf("rules").xmap(RuleStructureProcessor::new, arg -> arg.rules).codec();
     private final ImmutableList<StructureProcessorRule> rules;
 
     public RuleStructureProcessor(List<? extends StructureProcessorRule> list) {

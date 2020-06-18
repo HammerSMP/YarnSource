@@ -31,7 +31,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.VineBlock;
-import net.minecraft.class_5399;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -44,6 +43,7 @@ import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.processor.BlackstoneReplacementStructureProcessor;
 import net.minecraft.structure.processor.BlockAgeStructureProcessor;
 import net.minecraft.structure.processor.BlockIgnoreStructureProcessor;
+import net.minecraft.structure.processor.LavaSubmergedBlockStructureProcessor;
 import net.minecraft.structure.processor.RuleStructureProcessor;
 import net.minecraft.structure.processor.StructureProcessorRule;
 import net.minecraft.structure.rule.AlwaysTrueRuleTest;
@@ -114,7 +114,7 @@ extends SimpleStructurePiece {
         if (!this.properties.cold) {
             list.add(RuinedPortalFeaturePiece.createReplacementRule(Blocks.NETHERRACK, 0.07f, Blocks.MAGMA_BLOCK));
         }
-        StructurePlacementData lv2 = new StructurePlacementData().setRotation(this.rotation).setMirror(this.mirror).setPosition(arg2).addProcessor(lv).addProcessor(new RuleStructureProcessor(list)).addProcessor(new BlockAgeStructureProcessor(this.properties.mossiness)).addProcessor(new class_5399());
+        StructurePlacementData lv2 = new StructurePlacementData().setRotation(this.rotation).setMirror(this.mirror).setPosition(arg2).addProcessor(lv).addProcessor(new RuleStructureProcessor(list)).addProcessor(new BlockAgeStructureProcessor(this.properties.mossiness)).addProcessor(new LavaSubmergedBlockStructureProcessor());
         if (this.properties.replaceWithBlackstone) {
             lv2.addProcessor(BlackstoneReplacementStructureProcessor.INSTANCE);
         }

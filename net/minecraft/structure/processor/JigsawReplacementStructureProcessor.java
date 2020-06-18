@@ -25,7 +25,7 @@ import net.minecraft.world.WorldView;
 
 public class JigsawReplacementStructureProcessor
 extends StructureProcessor {
-    public static final Codec<JigsawReplacementStructureProcessor> field_25003 = Codec.unit(() -> INSTANCE);
+    public static final Codec<JigsawReplacementStructureProcessor> CODEC = Codec.unit(() -> INSTANCE);
     public static final JigsawReplacementStructureProcessor INSTANCE = new JigsawReplacementStructureProcessor();
 
     private JigsawReplacementStructureProcessor() {

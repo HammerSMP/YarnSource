@@ -153,13 +153,21 @@ public class HoverEvent {
             return (T)object;
         }
 
+        @Nullable
         public HoverEvent buildHoverEvent(JsonElement jsonElement) {
             T object = this.deserializer.apply(jsonElement);
+            if (object == null) {
+                return null;
+            }
             return new HoverEvent(this, object);
         }
 
+        @Nullable
         public HoverEvent buildHoverEvent(Text arg) {
             T object = this.legacyDeserializer.apply(arg);
+            if (object == null) {
+                return null;
+            }
             return new HoverEvent(this, object);
         }
 

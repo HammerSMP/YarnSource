@@ -19,7 +19,7 @@
  *  com.mojang.datafixers.util.Unit
  *  com.mojang.serialization.Dynamic
  */
-package net.minecraft;
+package net.minecraft.datafixer.fix;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.DSL;
@@ -43,9 +43,9 @@ import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.StructureSeparationDataFix;
 import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
-public class class_5396
+public class MissingDimensionFix
 extends DataFix {
-    public class_5396(Schema schema, boolean bl) {
+    public MissingDimensionFix(Schema schema, boolean bl) {
         super(schema, bl);
     }
 
@@ -63,8 +63,8 @@ extends DataFix {
 
     protected TypeRewriteRule makeRule() {
         Schema schema = this.getInputSchema();
-        TaggedChoice.TaggedChoiceType taggedChoiceType = new TaggedChoice.TaggedChoiceType("type", DSL.string(), (Map)ImmutableMap.of((Object)"minecraft:debug", (Object)DSL.remainderType(), (Object)"minecraft:flat", class_5396.method_29915("settings", class_5396.method_29914("biome", schema.getType(TypeReferences.BIOME), "layers", DSL.list(class_5396.method_29915("block", schema.getType(TypeReferences.BLOCK_NAME))))), (Object)"minecraft:noise", class_5396.method_29914("biome_source", DSL.taggedChoiceType((String)"type", (Type)DSL.string(), (Map)ImmutableMap.of((Object)"minecraft:fixed", class_5396.method_29913("biome", schema.getType(TypeReferences.BIOME)), (Object)"minecraft:multi_noise", (Object)DSL.list(class_5396.method_29913("biome", schema.getType(TypeReferences.BIOME))), (Object)"minecraft:checkerboard", class_5396.method_29913("biomes", DSL.list((Type)schema.getType(TypeReferences.BIOME))), (Object)"minecraft:vanilla_layered", (Object)DSL.remainderType(), (Object)"minecraft:the_end", (Object)DSL.remainderType())), "settings", DSL.or((Type)DSL.string(), class_5396.method_29914("default_block", schema.getType(TypeReferences.BLOCK_NAME), "default_fluid", schema.getType(TypeReferences.BLOCK_NAME))))));
-        CompoundList.CompoundListType compoundListType = DSL.compoundList(IdentifierNormalizingSchema.getIdentifierType(), class_5396.method_29913("generator", taggedChoiceType));
+        TaggedChoice.TaggedChoiceType taggedChoiceType = new TaggedChoice.TaggedChoiceType("type", DSL.string(), (Map)ImmutableMap.of((Object)"minecraft:debug", (Object)DSL.remainderType(), (Object)"minecraft:flat", MissingDimensionFix.method_29915("settings", MissingDimensionFix.method_29914("biome", schema.getType(TypeReferences.BIOME), "layers", DSL.list(MissingDimensionFix.method_29915("block", schema.getType(TypeReferences.BLOCK_NAME))))), (Object)"minecraft:noise", MissingDimensionFix.method_29914("biome_source", DSL.taggedChoiceType((String)"type", (Type)DSL.string(), (Map)ImmutableMap.of((Object)"minecraft:fixed", MissingDimensionFix.method_29913("biome", schema.getType(TypeReferences.BIOME)), (Object)"minecraft:multi_noise", (Object)DSL.list(MissingDimensionFix.method_29913("biome", schema.getType(TypeReferences.BIOME))), (Object)"minecraft:checkerboard", MissingDimensionFix.method_29913("biomes", DSL.list((Type)schema.getType(TypeReferences.BIOME))), (Object)"minecraft:vanilla_layered", (Object)DSL.remainderType(), (Object)"minecraft:the_end", (Object)DSL.remainderType())), "settings", DSL.or((Type)DSL.string(), MissingDimensionFix.method_29914("default_block", schema.getType(TypeReferences.BLOCK_NAME), "default_fluid", schema.getType(TypeReferences.BLOCK_NAME))))));
+        CompoundList.CompoundListType compoundListType = DSL.compoundList(IdentifierNormalizingSchema.getIdentifierType(), MissingDimensionFix.method_29913("generator", taggedChoiceType));
         Type type = DSL.and((Type)compoundListType, (Type)DSL.remainderType());
         Type type2 = schema.getType(TypeReferences.CHUNK_GENERATOR_SETTINGS);
         FieldFinder fieldFinder = new FieldFinder("dimensions", type);

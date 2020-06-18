@@ -590,13 +590,13 @@ implements ScreenHandlerListener {
             this.getServerWorld().removePlayer(this);
             if (!this.notInAnyWorld) {
                 this.notInAnyWorld = true;
-                this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25649, this.seenCredits ? 0.0f : 1.0f));
+                this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.GAME_WON, this.seenCredits ? 0.0f : 1.0f));
                 this.seenCredits = true;
             }
             return this;
         }
         WorldProperties lv3 = arg.getLevelProperties();
-        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.method_28125(), true));
+        this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.isFlat(), true));
         this.networkHandler.sendPacket(new DifficultyS2CPacket(lv3.getDifficulty(), lv3.isDifficultyLocked()));
         PlayerManager lv4 = this.server.getPlayerManager();
         lv4.sendCommandTree(this);
@@ -609,7 +609,7 @@ implements ScreenHandlerListener {
         float i = h = this.yaw;
         lv.getProfiler().push("moving");
         if (arg.getRegistryKey() == World.END) {
-            BlockPos lv5 = ServerWorld.field_25144;
+            BlockPos lv5 = ServerWorld.END_SPAWN_POS;
             d = lv5.getX();
             e = lv5.getY();
             f = lv5.getZ();
@@ -644,7 +644,7 @@ implements ScreenHandlerListener {
             int o = MathHelper.floor(this.getX());
             int p = MathHelper.floor(this.getY()) - 1;
             int q = MathHelper.floor(this.getZ());
-            ServerWorld.method_29200(arg);
+            ServerWorld.createEndSpawnPlatform(arg);
             this.refreshPositionAndAngles(o, p, q, h, 0.0f);
             this.setVelocity(Vec3d.ZERO);
         } else if (!arg.getPortalForcer().usePortal(this, i)) {
@@ -1121,7 +1121,7 @@ implements ScreenHandlerListener {
     @Override
     public void setGameMode(GameMode arg) {
         this.interactionManager.method_30118(arg);
-        this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25648, arg.getId()));
+        this.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.GAME_MODE_CHANGED, arg.getId()));
         if (arg == GameMode.SPECTATOR) {
             this.dropShoulderEntities();
             this.stopRiding();
@@ -1253,7 +1253,7 @@ implements ScreenHandlerListener {
     }
 
     @Nullable
-    public Text method_14206() {
+    public Text getPlayerListName() {
         return null;
     }
 
@@ -1283,7 +1283,7 @@ implements ScreenHandlerListener {
         } else {
             ServerWorld lv = this.getServerWorld();
             WorldProperties lv2 = arg.getLevelProperties();
-            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.method_28125(), true));
+            this.networkHandler.sendPacket(new PlayerRespawnS2CPacket(arg.getDimensionRegistryKey(), arg.getRegistryKey(), BiomeAccess.hashSeed(arg.getSeed()), this.interactionManager.getGameMode(), this.interactionManager.method_30119(), arg.isDebugWorld(), arg.isFlat(), true));
             this.networkHandler.sendPacket(new DifficultyS2CPacket(lv2.getDifficulty(), lv2.isDifficultyLocked()));
             this.server.getPlayerManager().sendCommandTree(this);
             lv.removePlayer(this);

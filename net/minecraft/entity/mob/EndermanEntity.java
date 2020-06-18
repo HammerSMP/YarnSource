@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5398;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -30,6 +29,7 @@ import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.UniversalAngerGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -102,7 +102,7 @@ implements Angerable {
         this.targetSelector.add(2, new TeleportTowardsPlayerGoal(this));
         this.targetSelector.add(3, new RevengeGoal(this, new Class[0]));
         this.targetSelector.add(4, new FollowTargetGoal<EndermiteEntity>(this, EndermiteEntity.class, 10, true, false, PLAYER_ENDERMITE_PREDICATE));
-        this.targetSelector.add(5, new class_5398<EndermanEntity>(this, false));
+        this.targetSelector.add(5, new UniversalAngerGoal<EndermanEntity>(this, false));
     }
 
     public static DefaultAttributeContainer.Builder createEndermanAttributes() {

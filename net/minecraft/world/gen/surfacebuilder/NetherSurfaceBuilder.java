@@ -33,7 +33,7 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
 
     @Override
     public void generate(Random random, Chunk arg, Biome arg2, int i, int j, int k, double d, BlockState arg3, BlockState arg4, int l, long m, TernarySurfaceConfig arg5) {
-        int n = l + 1;
+        int n = l;
         int o = i & 0xF;
         int p = j & 0xF;
         double e = 0.03125;
@@ -53,8 +53,9 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
             }
             if (!lv4.isOf(arg3.getBlock())) continue;
             if (r == -1) {
+                boolean bl3 = false;
                 if (q <= 0) {
-                    lv2 = CAVE_AIR;
+                    bl3 = true;
                     lv3 = arg5.getUnderMaterial();
                 } else if (s >= n - 4 && s <= n + 1) {
                     lv2 = arg5.getTopMaterial();
@@ -68,7 +69,7 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
                         lv3 = GLOWSTONE;
                     }
                 }
-                if (s < n && lv2.isAir()) {
+                if (s < n && bl3) {
                     lv2 = arg4;
                 }
                 r = q;

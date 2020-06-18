@@ -47,7 +47,7 @@ extends Item {
             EndCrystalEntity lv5 = new EndCrystalEntity(lv, d + 0.5, e, f + 0.5);
             lv5.setShowBottom(false);
             lv.spawnEntity(lv5);
-            EnderDragonFight lv6 = ((ServerWorld)lv).method_29198();
+            EnderDragonFight lv6 = ((ServerWorld)lv).getEnderDragonFight();
             if (lv6 != null) {
                 lv6.respawnDragon();
             }

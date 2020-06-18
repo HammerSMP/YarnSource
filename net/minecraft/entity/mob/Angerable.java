@@ -63,7 +63,7 @@ public interface Angerable {
         LivingEntity lv = this.getTarget();
         UUID uUID = this.getAngryAt();
         if ((lv == null || lv.isDead()) && uUID != null && arg.getEntity(uUID) instanceof MobEntity) {
-            this.method_29922();
+            this.stopAnger();
             return;
         }
         if (lv != null && !Objects.equals(uUID, lv.getUuid())) {
@@ -73,7 +73,7 @@ public interface Angerable {
         if (!(this.getAngerTime() <= 0 || lv != null && lv.getType() == EntityType.PLAYER && bl)) {
             this.setAngerTime(this.getAngerTime() - 1);
             if (this.getAngerTime() == 0) {
-                this.method_29922();
+                this.stopAnger();
             }
         }
     }
@@ -82,13 +82,13 @@ public interface Angerable {
         if (!EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL.test(arg)) {
             return false;
         }
-        if (arg.getType() == EntityType.PLAYER && this.method_29923(arg.world)) {
+        if (arg.getType() == EntityType.PLAYER && this.isUniversallyAngry(arg.world)) {
             return true;
         }
         return arg.getUuid().equals(this.getAngryAt());
     }
 
-    default public boolean method_29923(World arg) {
+    default public boolean isUniversallyAngry(World arg) {
         return arg.getGameRules().getBoolean(GameRules.UNIVERSAL_ANGER) && this.hasAngerTime() && this.getAngryAt() == null;
     }
 
@@ -103,15 +103,15 @@ public interface Angerable {
         if (!arg.getUuid().equals(this.getAngryAt())) {
             return;
         }
-        this.method_29922();
+        this.stopAnger();
     }
 
-    default public void method_29921() {
-        this.method_29922();
+    default public void universallyAnger() {
+        this.stopAnger();
         this.chooseRandomAngerTime();
     }
 
-    default public void method_29922() {
+    default public void stopAnger() {
         this.setAttacker(null);
         this.setAngryAt(null);
         this.setTarget(null);

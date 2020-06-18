@@ -127,8 +127,8 @@ implements FlyingItemEntity {
         double e = this.getY() + lv.y;
         double f = this.getZ() + lv.z;
         float g = MathHelper.sqrt(EyeOfEnderEntity.squaredHorizontalLength(lv));
-        this.pitch = ProjectileEntity.method_26960(this.prevPitch, (float)(MathHelper.atan2(lv.y, g) * 57.2957763671875));
-        this.yaw = ProjectileEntity.method_26960(this.prevYaw, (float)(MathHelper.atan2(lv.x, lv.z) * 57.2957763671875));
+        this.pitch = ProjectileEntity.updateRotation(this.prevPitch, (float)(MathHelper.atan2(lv.y, g) * 57.2957763671875));
+        this.yaw = ProjectileEntity.updateRotation(this.prevYaw, (float)(MathHelper.atan2(lv.x, lv.z) * 57.2957763671875));
         if (!this.world.isClient) {
             double h = this.velocityX - d;
             double i = this.velocityZ - f;

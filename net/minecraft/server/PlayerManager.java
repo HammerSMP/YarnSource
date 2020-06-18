@@ -159,7 +159,7 @@ public abstract class PlayerManager {
         ServerWorld lv4 = this.server.getWorld(lv3);
         if (lv4 == null) {
             LOGGER.warn("Unknown respawn dimension {}, defaulting to overworld", lv3);
-            ServerWorld lv5 = this.server.method_30002();
+            ServerWorld lv5 = this.server.getOverworld();
         } else {
             lv6 = lv4;
         }
@@ -176,7 +176,7 @@ public abstract class PlayerManager {
         GameRules lv9 = lv6.getGameRules();
         boolean bl = lv9.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
         boolean bl2 = lv9.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), arg22.interactionManager.method_30119(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.method_28125()));
+        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), arg22.interactionManager.method_30119(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.isFlat()));
         lv8.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
         lv8.sendPacket(new DifficultyS2CPacket(lv7.getDifficulty(), lv7.isDifficultyLocked()));
         lv8.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));
@@ -396,7 +396,7 @@ public abstract class PlayerManager {
         for (ServerPlayerEntity lv3 : list) {
             lv3.networkHandler.disconnect(new TranslatableText("multiplayer.disconnect.duplicate_login"));
         }
-        ServerWorld lv4 = this.server.method_30002();
+        ServerWorld lv4 = this.server.getOverworld();
         if (this.server.isDemo()) {
             DemoServerPlayerInteractionManager lv5 = new DemoServerPlayerInteractionManager(lv4);
         } else {
@@ -419,7 +419,7 @@ public abstract class PlayerManager {
         } else {
             optional2 = Optional.empty();
         }
-        ServerWorld serverWorld = lv3 = lv2 != null && optional2.isPresent() ? lv2 : this.server.method_30002();
+        ServerWorld serverWorld = lv3 = lv2 != null && optional2.isPresent() ? lv2 : this.server.getOverworld();
         if (this.server.isDemo()) {
             DemoServerPlayerInteractionManager lv4 = new DemoServerPlayerInteractionManager(lv3);
         } else {
@@ -441,13 +441,13 @@ public abstract class PlayerManager {
             lv6.setSpawnPoint(lv3.getRegistryKey(), lv, bl2, false);
             bl3 = !bl && lv3.getBlockState(lv).getBlock() instanceof RespawnAnchorBlock;
         } else if (lv != null) {
-            lv6.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25645, 0.0f));
+            lv6.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.NO_RESPAWN_BLOCK, 0.0f));
         }
         while (!lv3.doesNotCollide(lv6) && lv6.getY() < 256.0) {
             lv6.updatePosition(lv6.getX(), lv6.getY() + 1.0, lv6.getZ());
         }
         WorldProperties lv8 = lv6.world.getLevelProperties();
-        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.getDimensionRegistryKey(), lv6.world.getRegistryKey(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.interactionManager.method_30119(), lv6.getServerWorld().isDebugWorld(), lv6.getServerWorld().method_28125(), bl));
+        lv6.networkHandler.sendPacket(new PlayerRespawnS2CPacket(lv6.world.getDimensionRegistryKey(), lv6.world.getRegistryKey(), BiomeAccess.hashSeed(lv6.getServerWorld().getSeed()), lv6.interactionManager.getGameMode(), lv6.interactionManager.method_30119(), lv6.getServerWorld().isDebugWorld(), lv6.getServerWorld().isFlat(), bl));
         lv6.networkHandler.requestTeleport(lv6.getX(), lv6.getY(), lv6.getZ(), lv6.yaw, lv6.pitch);
         lv6.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(lv3.getSpawnPos()));
         lv6.networkHandler.sendPacket(new DifficultyS2CPacket(lv8.getDifficulty(), lv8.isDifficultyLocked()));
@@ -619,14 +619,14 @@ public abstract class PlayerManager {
     }
 
     public void sendWorldInfo(ServerPlayerEntity arg, ServerWorld arg2) {
-        WorldBorder lv = this.server.method_30002().getWorldBorder();
+        WorldBorder lv = this.server.getOverworld().getWorldBorder();
         arg.networkHandler.sendPacket(new WorldBorderS2CPacket(lv, WorldBorderS2CPacket.Type.INITIALIZE));
         arg.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(arg2.getTime(), arg2.getTimeOfDay(), arg2.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)));
         arg.networkHandler.sendPacket(new PlayerSpawnPositionS2CPacket(arg2.getSpawnPos()));
         if (arg2.isRaining()) {
-            arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25646, 0.0f));
-            arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25652, arg2.getRainGradient(1.0f)));
-            arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25653, arg2.getThunderGradient(1.0f)));
+            arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_STARTED, 0.0f));
+            arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED, arg2.getRainGradient(1.0f)));
+            arg.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED, arg2.getThunderGradient(1.0f)));
         }
     }
 

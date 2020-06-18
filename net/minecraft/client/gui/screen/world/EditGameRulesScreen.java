@@ -168,7 +168,7 @@ extends Screen {
 
     @Environment(value=EnvType.CLIENT)
     public class IntRuleWidget
-    extends class_5400 {
+    extends NamedRuleWidget {
         private final TextFieldWidget valueWidget;
 
         public IntRuleWidget(Text arg2, List<StringRenderable> list, String string2, GameRules.IntRule arg3) {
@@ -184,12 +184,12 @@ extends Screen {
                     EditGameRulesScreen.this.markInvalid(this);
                 }
             });
-            this.field_25630.add(this.valueWidget);
+            this.children.add(this.valueWidget);
         }
 
         @Override
         public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.method_29989(arg, j, k);
+            this.drawName(arg, j, k);
             this.valueWidget.x = k + l - 44;
             this.valueWidget.y = j;
             this.valueWidget.render(arg, n, o, f);
@@ -198,7 +198,7 @@ extends Screen {
 
     @Environment(value=EnvType.CLIENT)
     public class BooleanRuleWidget
-    extends class_5400 {
+    extends NamedRuleWidget {
         private final ButtonWidget toggleButton;
 
         public BooleanRuleWidget(final Text arg22, List<StringRenderable> list, final String string, final GameRules.BooleanRule arg3) {
@@ -214,7 +214,7 @@ extends Screen {
                     return BooleanRuleWidget.this.createBooleanRuleText(arg22, arg3.get()).shallowCopy().append("\n").append(string);
                 }
             };
-            this.field_25630.add(this.toggleButton);
+            this.children.add(this.toggleButton);
         }
 
         private MutableText createBooleanRuleText(Text arg, boolean bl) {
@@ -223,7 +223,7 @@ extends Screen {
 
         @Override
         public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.method_29989(arg, j, k);
+            this.drawName(arg, j, k);
             this.toggleButton.x = k + l - 45;
             this.toggleButton.y = j;
             this.toggleButton.render(arg, n, o, f);
@@ -231,28 +231,28 @@ extends Screen {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public abstract class class_5400
+    public abstract class NamedRuleWidget
     extends AbstractRuleWidget {
-        private final List<StringRenderable> field_25629;
-        protected final List<Element> field_25630;
+        private final List<StringRenderable> name;
+        protected final List<Element> children;
 
-        public class_5400(@Nullable List<StringRenderable> list, Text arg2) {
+        public NamedRuleWidget(@Nullable List<StringRenderable> list, Text arg2) {
             super(list);
-            this.field_25630 = Lists.newArrayList();
-            this.field_25629 = ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.wrapLines(arg2, 175);
+            this.children = Lists.newArrayList();
+            this.name = ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.wrapLines(arg2, 175);
         }
 
         @Override
         public List<? extends Element> children() {
-            return this.field_25630;
+            return this.children;
         }
 
-        protected void method_29989(MatrixStack arg, int i, int j) {
-            if (this.field_25629.size() == 1) {
-                ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.draw(arg, this.field_25629.get(0), (float)j, (float)(i + 5), 0xFFFFFF);
-            } else if (this.field_25629.size() >= 2) {
-                ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.draw(arg, this.field_25629.get(0), (float)j, (float)i, 0xFFFFFF);
-                ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.draw(arg, this.field_25629.get(1), (float)j, (float)(i + 10), 0xFFFFFF);
+        protected void drawName(MatrixStack arg, int i, int j) {
+            if (this.name.size() == 1) {
+                ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.draw(arg, this.name.get(0), (float)j, (float)(i + 5), 0xFFFFFF);
+            } else if (this.name.size() >= 2) {
+                ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.draw(arg, this.name.get(0), (float)j, (float)i, 0xFFFFFF);
+                ((EditGameRulesScreen)EditGameRulesScreen.this).client.textRenderer.draw(arg, this.name.get(1), (float)j, (float)(i + 10), 0xFFFFFF);
             }
         }
     }

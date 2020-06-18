@@ -476,7 +476,7 @@ AutoCloseable {
     }
 
     private void prepareStartRegion(WorldGenerationProgressListener arg) {
-        ServerWorld lv = this.method_30002();
+        ServerWorld lv = this.getOverworld();
         LOGGER.info("Preparing start region for dimension {}", (Object)lv.getRegistryKey().getValue());
         BlockPos lv2 = lv.getSpawnPos();
         arg.start(new ChunkPos(lv2));
@@ -543,7 +543,7 @@ AutoCloseable {
             lv.save(null, bl2, lv.savingDisabled && !bl3);
             bl4 = true;
         }
-        ServerWorld lv2 = this.method_30002();
+        ServerWorld lv2 = this.getOverworld();
         ServerWorldProperties lv3 = this.saveProperties.getMainWorldProperties();
         lv3.setWorldBorder(lv2.getWorldBorder().write());
         this.saveProperties.setCustomBossEvents(this.getBossBarManager().toTag());
@@ -876,7 +876,7 @@ AutoCloseable {
         return new File(this.getRunDirectory(), string);
     }
 
-    public final ServerWorld method_30002() {
+    public final ServerWorld getOverworld() {
         return this.worlds.get(World.OVERWORLD);
     }
 
@@ -1320,7 +1320,7 @@ AutoCloseable {
     }
 
     public ServerCommandSource getCommandSource() {
-        ServerWorld lv = this.method_30002();
+        ServerWorld lv = this.getOverworld();
         return new ServerCommandSource(this, lv == null ? Vec3d.ZERO : Vec3d.of(lv.getSpawnPos()), Vec2f.ZERO, lv, 4, "Server", new LiteralText("Server"), this, null);
     }
 
@@ -1362,7 +1362,7 @@ AutoCloseable {
     }
 
     public GameRules getGameRules() {
-        return this.method_30002().getGameRules();
+        return this.getOverworld().getGameRules();
     }
 
     public BossBarManager getBossBarManager() {

@@ -876,7 +876,7 @@ implements ServerPlayPacketListener {
         throw new IllegalArgumentException("Invalid player action");
     }
 
-    private static boolean method_27913(ServerPlayerEntity arg, ItemStack arg2) {
+    private static boolean canPlace(ServerPlayerEntity arg, ItemStack arg2) {
         if (arg2.isEmpty()) {
             return false;
         }
@@ -897,7 +897,7 @@ implements ServerPlayPacketListener {
         if (lv5.getY() < this.server.getWorldHeight()) {
             if (this.requestedTeleportPos == null && this.player.squaredDistanceTo((double)lv5.getX() + 0.5, (double)lv5.getY() + 0.5, (double)lv5.getZ() + 0.5) < 64.0 && lv.canPlayerModifyAt(this.player, lv5)) {
                 ActionResult lv7 = this.player.interactionManager.interactBlock(this.player, lv, lv3, lv2, lv4);
-                if (lv6 == Direction.UP && !lv7.isAccepted() && lv5.getY() >= this.server.getWorldHeight() - 1 && ServerPlayNetworkHandler.method_27913(this.player, lv3)) {
+                if (lv6 == Direction.UP && !lv7.isAccepted() && lv5.getY() >= this.server.getWorldHeight() - 1 && ServerPlayNetworkHandler.canPlace(this.player, lv3)) {
                     MutableText lv8 = new TranslatableText("build.tooHigh", this.server.getWorldHeight()).formatted(Formatting.RED);
                     this.player.networkHandler.sendPacket(new GameMessageS2CPacket(lv8, MessageType.GAME_INFO, Util.NIL_UUID));
                 } else if (lv7.shouldSwingHand()) {
@@ -1126,7 +1126,7 @@ implements ServerPlayPacketListener {
                     this.player.attack(lv2);
                 }
                 if (optional.isPresent() && ((ActionResult)((Object)optional.get())).isAccepted()) {
-                    Criteria.field_25694.method_30097(this.player, this.player.getStackInHand(lv3), lv2);
+                    Criteria.PLAYER_INTERACTED_WITH_ENTITY.test(this.player, this.player.getStackInHand(lv3), lv2);
                     if (((ActionResult)((Object)optional.get())).shouldSwingHand()) {
                         this.player.swingHand(lv3, true);
                     }

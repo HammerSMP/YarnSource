@@ -73,7 +73,7 @@ extends GuardianEntity {
             int l = 1200;
             for (ServerPlayerEntity lv2 : list) {
                 if (lv2.hasStatusEffect(lv) && lv2.getStatusEffect(lv).getAmplifier() >= 2 && lv2.getStatusEffect(lv).getDuration() >= 1200) continue;
-                lv2.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25655, this.isSilent() ? 0.0f : 1.0f));
+                lv2.networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.ELDER_GUARDIAN_EFFECT, this.isSilent() ? 0.0f : 1.0f));
                 lv2.addStatusEffect(new StatusEffectInstance(lv, 6000, 2));
             }
         }

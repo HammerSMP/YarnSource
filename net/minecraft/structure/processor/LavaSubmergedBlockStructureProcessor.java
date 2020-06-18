@@ -5,7 +5,7 @@
  *  com.mojang.serialization.Codec
  *  javax.annotation.Nullable
  */
-package net.minecraft;
+package net.minecraft.structure.processor;
 
 import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
@@ -18,10 +18,10 @@ import net.minecraft.structure.processor.StructureProcessorType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
-public class class_5399
+public class LavaSubmergedBlockStructureProcessor
 extends StructureProcessor {
-    public static final Codec<class_5399> field_25618 = Codec.unit(() -> field_25619);
-    public static final class_5399 field_25619 = new class_5399();
+    public static final Codec<LavaSubmergedBlockStructureProcessor> CODEC = Codec.unit(() -> INSTANCE);
+    public static final LavaSubmergedBlockStructureProcessor INSTANCE = new LavaSubmergedBlockStructureProcessor();
 
     @Override
     @Nullable

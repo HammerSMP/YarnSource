@@ -173,7 +173,7 @@ import org.apache.logging.log4j.Logger;
 public class ServerWorld
 extends World
 implements ServerWorldAccess {
-    public static final BlockPos field_25144 = new BlockPos(100, 50, 0);
+    public static final BlockPos END_SPAWN_POS = new BlockPos(100, 50, 0);
     private static final Logger LOGGER = LogManager.getLogger();
     private final Int2ObjectMap<Entity> entitiesById = new Int2ObjectLinkedOpenHashMap();
     private final Map<UUID, Entity> entitiesByUuid = Maps.newHashMap();
@@ -205,7 +205,7 @@ implements ServerWorldAccess {
         this.server = minecraftServer;
         this.field_25141 = list;
         this.field_24456 = arg22;
-        this.serverChunkManager = new ServerChunkManager(this, arg2, minecraftServer.getDataFixer(), minecraftServer.getStructureManager(), executor, arg7, minecraftServer.getPlayerManager().getViewDistance(), minecraftServer.syncChunkWrites(), arg6, () -> minecraftServer.method_30002().getPersistentStateManager());
+        this.serverChunkManager = new ServerChunkManager(this, arg2, minecraftServer.getDataFixer(), minecraftServer.getStructureManager(), executor, arg7, minecraftServer.getPlayerManager().getViewDistance(), minecraftServer.syncChunkWrites(), arg6, () -> minecraftServer.getOverworld().getPersistentStateManager());
         this.portalForcer = new PortalForcer(this);
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
@@ -286,19 +286,19 @@ implements ServerWorldAccess {
             this.rainGradient = MathHelper.clamp(this.rainGradient, 0.0f, 1.0f);
         }
         if (this.rainGradientPrev != this.rainGradient) {
-            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25652, this.rainGradient), this.getRegistryKey());
+            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED, this.rainGradient), this.getRegistryKey());
         }
         if (this.thunderGradientPrev != this.thunderGradient) {
-            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25653, this.thunderGradient), this.getRegistryKey());
+            this.server.getPlayerManager().sendToDimension(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED, this.thunderGradient), this.getRegistryKey());
         }
         if (bl != this.isRaining()) {
             if (bl) {
-                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25647, 0.0f));
+                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_STOPPED, 0.0f));
             } else {
-                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25646, 0.0f));
+                this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_STARTED, 0.0f));
             }
-            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25652, this.rainGradient));
-            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.field_25653, this.thunderGradient));
+            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED, this.rainGradient));
+            this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED, this.thunderGradient));
         }
         if (this.allPlayersSleeping && this.players.stream().noneMatch(arg -> !arg.isSpectator() && !arg.isSleepingLongEnough())) {
             this.allPlayersSleeping = false;
@@ -1013,17 +1013,17 @@ implements ServerWorldAccess {
     @Override
     @Nullable
     public MapState getMapState(String string) {
-        return this.getServer().method_30002().getPersistentStateManager().get(() -> new MapState(string), string);
+        return this.getServer().getOverworld().getPersistentStateManager().get(() -> new MapState(string), string);
     }
 
     @Override
     public void putMapState(MapState arg) {
-        this.getServer().method_30002().getPersistentStateManager().set(arg);
+        this.getServer().getOverworld().getPersistentStateManager().set(arg);
     }
 
     @Override
     public int getNextMapId() {
-        return this.getServer().method_30002().getPersistentStateManager().getOrCreate(IdCountsState::new, "idcounts").getNextMapId();
+        return this.getServer().getOverworld().getPersistentStateManager().getOrCreate(IdCountsState::new, "idcounts").getNextMapId();
     }
 
     public void setSpawnPos(BlockPos arg) {
@@ -1270,7 +1270,7 @@ implements ServerWorldAccess {
         return "ServerLevel[" + this.field_24456.getLevelName() + "]";
     }
 
-    public boolean method_28125() {
+    public boolean isFlat() {
         return this.server.getSaveProperties().getGeneratorOptions().isFlatWorld();
     }
 
@@ -1280,12 +1280,12 @@ implements ServerWorldAccess {
     }
 
     @Nullable
-    public EnderDragonFight method_29198() {
+    public EnderDragonFight getEnderDragonFight() {
         return this.enderDragonFight;
     }
 
-    public static void method_29200(ServerWorld arg) {
-        BlockPos lv = field_25144;
+    public static void createEndSpawnPlatform(ServerWorld arg) {
+        BlockPos lv = END_SPAWN_POS;
         int i = lv.getX();
         int j = lv.getY() - 2;
         int k = lv.getZ();

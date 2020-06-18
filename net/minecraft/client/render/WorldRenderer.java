@@ -912,7 +912,7 @@ AutoCloseable {
         this.renderLayer(RenderLayer.getSolid(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutoutMipped(), arg, d, e, g);
         this.renderLayer(RenderLayer.getCutout(), arg, d, e, g);
-        if (this.world.getSkyProperties().method_29993()) {
+        if (this.world.getSkyProperties().isDarkened()) {
             DiffuseLighting.enableForLevel(arg.peek().getModel());
         } else {
             DiffuseLighting.method_27869(arg.peek().getModel());
@@ -1388,11 +1388,11 @@ AutoCloseable {
     }
 
     public void renderSky(MatrixStack arg, float f) {
-        if (this.client.world.getSkyProperties().method_29992() == SkyProperties.class_5401.END) {
+        if (this.client.world.getSkyProperties().getSkyType() == SkyProperties.SkyType.END) {
             this.renderEndSky(arg);
             return;
         }
-        if (this.client.world.getSkyProperties().method_29992() != SkyProperties.class_5401.NORMAL) {
+        if (this.client.world.getSkyProperties().getSkyType() != SkyProperties.SkyType.NORMAL) {
             return;
         }
         RenderSystem.disableTexture();

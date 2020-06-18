@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5398;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -18,6 +17,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.Durations;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.RevengeGoal;
+import net.minecraft.entity.ai.goal.UniversalAngerGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.entity.ai.pathing.PathNodeType;
@@ -78,7 +78,7 @@ implements Angerable {
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0));
         this.targetSelector.add(1, new RevengeGoal(this, new Class[0]).setGroupRevenge(new Class[0]));
         this.targetSelector.add(2, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::shouldAngerAt));
-        this.targetSelector.add(3, new class_5398<ZombifiedPiglinEntity>(this, true));
+        this.targetSelector.add(3, new UniversalAngerGoal<ZombifiedPiglinEntity>(this, true));
     }
 
     public static DefaultAttributeContainer.Builder createZombifiedPiglinAttributes() {

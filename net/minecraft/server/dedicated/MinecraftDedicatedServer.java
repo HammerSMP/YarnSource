@@ -51,12 +51,12 @@ import net.minecraft.server.dedicated.DedicatedPlayerManager;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerWatchdog;
 import net.minecraft.server.dedicated.PendingServerCommand;
-import net.minecraft.server.dedicated.ServerCommandOutput;
 import net.minecraft.server.dedicated.ServerMBean;
 import net.minecraft.server.dedicated.ServerPropertiesHandler;
 import net.minecraft.server.dedicated.ServerPropertiesLoader;
 import net.minecraft.server.dedicated.gui.DedicatedServerGui;
 import net.minecraft.server.rcon.QueryResponseHandler;
+import net.minecraft.server.rcon.RconCommandOutput;
 import net.minecraft.server.rcon.RconListener;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.UserCache;
@@ -84,7 +84,7 @@ implements DedicatedServer {
     private static final Pattern SHA1_PATTERN = Pattern.compile("^[a-fA-F0-9]{40}$");
     private final List<PendingServerCommand> commandQueue = Collections.synchronizedList(Lists.newArrayList());
     private QueryResponseHandler queryResponseHandler;
-    private final ServerCommandOutput rconCommandOutput;
+    private final RconCommandOutput rconCommandOutput;
     private RconListener rconServer;
     private final ServerPropertiesLoader propertiesLoader;
     @Nullable
@@ -93,7 +93,7 @@ implements DedicatedServer {
     public MinecraftDedicatedServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg, arg2, arg5, arg3, Proxy.NO_PROXY, dataFixer, arg4, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.propertiesLoader = arg6;
-        this.rconCommandOutput = new ServerCommandOutput(this);
+        this.rconCommandOutput = new RconCommandOutput(this);
     }
 
     @Override
