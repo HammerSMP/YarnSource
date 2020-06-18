@@ -877,9 +877,9 @@ extends Entity {
     }
 
     @Override
-    public boolean damage(DamageSource arg2, float f) {
-        boolean bl3;
-        if (this.isInvulnerableTo(arg2)) {
+    public boolean damage(DamageSource damageSource, float damageAmount) {
+        boolean wasDamaged;
+        if (this.isInvulnerableTo(damageSource)) {
             return false;
         }
         if (this.world.isClient) {
@@ -888,26 +888,26 @@ extends Entity {
         if (this.isDead()) {
             return false;
         }
-        if (arg2.isFire() && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
+        if (damageSource.isFire() && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
             return false;
         }
         if (this.isSleeping() && !this.world.isClient) {
             this.wakeUp();
         }
         this.despawnCounter = 0;
-        float g = f;
-        if (!(arg2 != DamageSource.ANVIL && arg2 != DamageSource.FALLING_BLOCK || this.getEquippedStack(EquipmentSlot.HEAD).isEmpty())) {
-            this.getEquippedStack(EquipmentSlot.HEAD).damage((int)(f * 4.0f + this.random.nextFloat() * f * 2.0f), this, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.HEAD));
-            f *= 0.75f;
+        float g = damageAmount;
+        if (!(damageSource != DamageSource.ANVIL && damageSource != DamageSource.FALLING_BLOCK || this.getEquippedStack(EquipmentSlot.HEAD).isEmpty())) {
+            this.getEquippedStack(EquipmentSlot.HEAD).damage((int)(damageAmount * 4.0f + this.random.nextFloat() * damageAmount * 2.0f), this, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.HEAD));
+            damageAmount *= 0.75f;
         }
         boolean bl = false;
         float h = 0.0f;
-        if (f > 0.0f && this.blockedByShield(arg2)) {
+        if (damageAmount > 0.0f && this.blockedByShield(damageSource)) {
             Entity lv;
-            this.damageShield(f);
-            h = f;
-            f = 0.0f;
-            if (!arg2.isProjectile() && (lv = arg2.getSource()) instanceof LivingEntity) {
+            this.damageShield(damageAmount);
+            h = damageAmount;
+            damageAmount = 0.0f;
+            if (!damageSource.isProjectile() && (lv = damageSource.getSource()) instanceof LivingEntity) {
                 this.takeShieldHit((LivingEntity)lv);
             }
             bl = true;
@@ -915,20 +915,20 @@ extends Entity {
         this.limbDistance = 1.5f;
         boolean bl2 = true;
         if ((float)this.timeUntilRegen > 10.0f) {
-            if (f <= this.lastDamageTaken) {
+            if (damageAmount <= this.lastDamageTaken) {
                 return false;
             }
-            this.applyDamage(arg2, f - this.lastDamageTaken);
-            this.lastDamageTaken = f;
+            this.applyDamage(damageSource, damageAmount - this.lastDamageTaken);
+            this.lastDamageTaken = damageAmount;
             bl2 = false;
         } else {
-            this.lastDamageTaken = f;
+            this.lastDamageTaken = damageAmount;
             this.timeUntilRegen = 20;
-            this.applyDamage(arg2, f);
+            this.applyDamage(damageSource, damageAmount);
             this.hurtTime = this.maxHurtTime = 10;
         }
         this.knockbackVelocity = 0.0f;
-        Entity lv2 = arg2.getAttacker();
+        Entity lv2 = damageSource.getAttacker();
         if (lv2 != null) {
             WolfEntity lv3;
             if (lv2 instanceof LivingEntity) {
@@ -946,22 +946,22 @@ extends Entity {
         if (bl2) {
             if (bl) {
                 this.world.sendEntityStatus(this, (byte)29);
-            } else if (arg2 instanceof EntityDamageSource && ((EntityDamageSource)arg2).isThorns()) {
+            } else if (damageSource instanceof EntityDamageSource && ((EntityDamageSource)damageSource).isThorns()) {
                 this.world.sendEntityStatus(this, (byte)33);
             } else {
                 int e;
-                if (arg2 == DamageSource.DROWN) {
+                if (damageSource == DamageSource.DROWN) {
                     int b = 36;
-                } else if (arg2.isFire()) {
+                } else if (damageSource.isFire()) {
                     int c = 37;
-                } else if (arg2 == DamageSource.SWEET_BERRY_BUSH) {
+                } else if (damageSource == DamageSource.SWEET_BERRY_BUSH) {
                     int d = 44;
                 } else {
                     e = 2;
                 }
                 this.world.sendEntityStatus(this, (byte)e);
             }
-            if (arg2 != DamageSource.DROWN && (!bl || f > 0.0f)) {
+            if (damageSource != DamageSource.DROWN && (!bl || damageAmount > 0.0f)) {
                 this.scheduleVelocityUpdate();
             }
             if (lv2 != null) {
@@ -978,31 +978,31 @@ extends Entity {
             }
         }
         if (this.isDead()) {
-            if (!this.tryUseTotem(arg2)) {
+            if (!this.tryUseTotem(damageSource)) {
                 SoundEvent lv5 = this.getDeathSound();
                 if (bl2 && lv5 != null) {
                     this.playSound(lv5, this.getSoundVolume(), this.getSoundPitch());
                 }
-                this.onDeath(arg2);
+                this.onDeath(damageSource);
             }
         } else if (bl2) {
-            this.playHurtSound(arg2);
+            this.playHurtSound(damageSource);
         }
-        boolean bl4 = bl3 = !bl || f > 0.0f;
-        if (bl3) {
-            this.lastDamageSource = arg2;
+        boolean bl4 = wasDamaged = !bl || damageAmount > 0.0f;
+        if (wasDamaged) {
+            this.lastDamageSource = damageSource;
             this.lastDamageTime = this.world.getTime();
         }
         if (this instanceof ServerPlayerEntity) {
-            Criteria.ENTITY_HURT_PLAYER.trigger((ServerPlayerEntity)this, arg2, g, f, bl);
+            Criteria.ENTITY_HURT_PLAYER.trigger((ServerPlayerEntity)this, damageSource, g, damageAmount, bl);
             if (h > 0.0f && h < 3.4028235E37f) {
                 ((ServerPlayerEntity)this).increaseStat(Stats.DAMAGE_BLOCKED_BY_SHIELD, Math.round(h * 10.0f));
             }
         }
         if (lv2 instanceof ServerPlayerEntity) {
-            Criteria.PLAYER_HURT_ENTITY.trigger((ServerPlayerEntity)lv2, this, arg2, g, f, bl);
+            Criteria.PLAYER_HURT_ENTITY.trigger((ServerPlayerEntity)lv2, this, damageSource, g, damageAmount, bl);
         }
-        return bl3;
+        return wasDamaged;
     }
 
     protected void takeShieldHit(LivingEntity arg) {
