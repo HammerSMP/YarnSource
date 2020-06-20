@@ -64,8 +64,13 @@ extends Random {
         return m;
     }
 
-    public static Random getSlimeRandom(int i, int j, long l, long m) {
-        return new Random(l + (long)(i * i * 4987142) + (long)(i * 5947611) + (long)(j * j) * 4392871L + (long)(j * 389711) ^ m);
+    public static Random getSlimeRandom(int xChunkPos, int zChunkPos, long worldSeed, long LONG_987234911L) {
+        return new Random(worldSeed +
+                            (long)((xChunkPos ^ 2) * 4987142) +
+                            (long)(xChunkPos * 5947611) +
+                            (long)(zChunkPos ^ 2) * 4392871L +
+                            (long)(zChunkPos * 389711) ^ LONG_987234911L
+                        );
     }
 }
 

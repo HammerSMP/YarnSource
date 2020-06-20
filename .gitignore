@@ -1,2 +1,8 @@
 *.jar
 summary.txt
+.idea/misc.xml
+.idea/modules.xml
+.idea/source.iml
+.idea/vcs.xml
+.idea/libraries/source.xml
+.idea

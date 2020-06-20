@@ -278,20 +278,19 @@ implements Monster {
         return this.getSize() == 1 ? this.getType().getLootTableId() : LootTables.EMPTY;
     }
 
-    public static boolean canSpawn(EntityType<SlimeEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        if (arg2.getDifficulty() != Difficulty.PEACEFUL) {
-            boolean bl;
-            Biome lv = arg2.getBiome(arg4);
-            if (lv == Biomes.SWAMP && arg4.getY() > 50 && arg4.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < arg2.getMoonSize() && arg2.getLightLevel(arg4) <= random.nextInt(8)) {
-                return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+    public static boolean canSpawn(EntityType<SlimeEntity> entityType, WorldAccess worldAccess, SpawnReason spawnReason, BlockPos blockPosition, Random random) {
+        if (worldAccess.getDifficulty() != Difficulty.PEACEFUL) {
+            Biome biomeAtPos = worldAccess.getBiome(blockPosition);
+            if (biomeAtPos == Biomes.SWAMP && blockPosition.getY() > 50 && blockPosition.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < worldAccess.getMoonSize() && worldAccess.getLightLevel(blockPosition) <= random.nextInt(8)) {
+                return SlimeEntity.canMobSpawn(entityType, worldAccess, spawnReason, blockPosition, random);
             }
-            if (!(arg2 instanceof ServerWorldAccess)) {
+            if (!(worldAccess instanceof ServerWorldAccess)) {
                 return false;
             }
-            ChunkPos lv2 = new ChunkPos(arg4);
-            boolean bl2 = bl = ChunkRandom.getSlimeRandom(lv2.x, lv2.z, ((ServerWorldAccess)arg2).getSeed(), 987234911L).nextInt(10) == 0;
-            if (random.nextInt(10) == 0 && bl && arg4.getY() < 40) {
-                return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+            ChunkPos chunkPositionFromBlockPosition = new ChunkPos(blockPosition);
+            boolean isSlimeChunk = ChunkRandom.getSlimeRandom(chunkPositionFromBlockPosition.x, chunkPositionFromBlockPosition.z, ((ServerWorldAccess)worldAccess).getSeed(), 987234911L).nextInt(10) == 0;
+            if (random.nextInt(10) == 0 && isSlimeChunk && blockPosition.getY() < 40) {
+                return SlimeEntity.canMobSpawn(entityType, worldAccess, spawnReason, blockPosition, random);
             }
         }
         return false;
@@ -313,21 +312,21 @@ implements Monster {
 
     @Override
     protected void jump() {
-        Vec3d lv = this.getVelocity();
-        this.setVelocity(lv.x, this.getJumpVelocity(), lv.z);
+        Vec3d currentVelocity = this.getVelocity();
+        this.setVelocity(currentVelocity.x, this.getJumpVelocity(), currentVelocity.z);
         this.velocityDirty = true;
     }
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(WorldAccess worldAccess, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag compoundTag) {
         int i = this.random.nextInt(3);
-        if (i < 2 && this.random.nextFloat() < 0.5f * arg2.getClampedLocalDifficulty()) {
+        if (i < 2 && this.random.nextFloat() < 0.5f * difficulty.getClampedLocalDifficulty()) {
             ++i;
         }
         int j = 1 << i;
         this.setSize(j, true);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(worldAccess, difficulty, spawnReason, entityData, compoundTag);
     }
 
     private float getJumpSoundPitch() {
@@ -348,8 +347,8 @@ implements Monster {
     extends Goal {
         private final SlimeEntity slime;
 
-        public MoveGoal(SlimeEntity arg) {
-            this.slime = arg;
+        public MoveGoal(SlimeEntity slimeEntity) {
+            this.slime = slimeEntity;
             this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
         }
 
@@ -368,10 +367,10 @@ implements Monster {
     extends Goal {
         private final SlimeEntity slime;
 
-        public SwimmingGoal(SlimeEntity arg) {
-            this.slime = arg;
+        public SwimmingGoal(SlimeEntity slimeEntity) {
+            this.slime = slimeEntity;
             this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
-            arg.getNavigation().setCanSwim(true);
+            slimeEntity.getNavigation().setCanSwim(true);
         }
 
         @Override
