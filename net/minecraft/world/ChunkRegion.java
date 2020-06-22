@@ -189,7 +189,7 @@ implements ServerWorldAccess {
             BlockEntity lv2 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(arg) : null;
             Block.dropStacks(lv, this.world, arg, lv2, arg2, ItemStack.EMPTY);
         }
-        return this.method_30092(arg, Blocks.AIR.getDefaultState(), 3, i);
+        return this.setBlockState(arg, Blocks.AIR.getDefaultState(), 3, i);
     }
 
     @Override
@@ -224,7 +224,7 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public boolean method_30092(BlockPos arg, BlockState arg2, int i, int j) {
+    public boolean setBlockState(BlockPos arg, BlockState arg2, int i, int j) {
         Block lv3;
         Chunk lv = this.getChunk(arg);
         BlockState lv2 = lv.setBlockState(arg, arg2, false);

@@ -167,7 +167,7 @@ implements ItemConvertible {
                     arg3.method_30093(arg4, (i & 0x20) == 0, null, j);
                 }
             } else {
-                arg3.method_30092(arg4, arg2, i & 0xFFFFFFDF, j);
+                arg3.setBlockState(arg4, arg2, i & 0xFFFFFFDF, j);
             }
         }
     }

@@ -44,7 +44,7 @@ extends DiveJumpingGoal {
 
     private boolean isWater(BlockPos arg, int i, int j, int k) {
         BlockPos lv = arg.add(i * k, 0, j * k);
-        return this.dolphin.world.getFluidState(lv).matches(FluidTags.WATER) && !this.dolphin.world.getBlockState(lv).getMaterial().blocksMovement();
+        return this.dolphin.world.getFluidState(lv).isIn(FluidTags.WATER) && !this.dolphin.world.getBlockState(lv).getMaterial().blocksMovement();
     }
 
     private boolean isAirAbove(BlockPos arg, int i, int j, int k) {
@@ -79,7 +79,7 @@ extends DiveJumpingGoal {
         boolean bl = this.inWater;
         if (!bl) {
             FluidState lv = this.dolphin.world.getFluidState(this.dolphin.getBlockPos());
-            this.inWater = lv.matches(FluidTags.WATER);
+            this.inWater = lv.isIn(FluidTags.WATER);
         }
         if (this.inWater && !bl) {
             this.dolphin.playSound(SoundEvents.ENTITY_DOLPHIN_JUMP, 1.0f, 1.0f);

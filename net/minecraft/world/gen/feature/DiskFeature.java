@@ -25,7 +25,7 @@ extends Feature<DiskFeatureConfig> {
 
     @Override
     public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DiskFeatureConfig arg5) {
-        if (!arg.getFluidState(arg4).matches(FluidTags.WATER)) {
+        if (!arg.getFluidState(arg4).isIn(FluidTags.WATER)) {
             return false;
         }
         int i = 0;

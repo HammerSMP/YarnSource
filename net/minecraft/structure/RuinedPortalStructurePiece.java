@@ -12,7 +12,7 @@
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
-package net.minecraft.world.gen.feature;
+package net.minecraft.structure;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.kinds.App;
@@ -65,7 +65,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RuinedPortalFeaturePiece
+public class RuinedPortalStructurePiece
 extends SimpleStructurePiece {
     private static final Logger field_24992 = LogManager.getLogger();
     private final Identifier template;
@@ -74,7 +74,7 @@ extends SimpleStructurePiece {
     private final VerticalPlacement verticalPlacement;
     private final Properties properties;
 
-    public RuinedPortalFeaturePiece(BlockPos arg, VerticalPlacement arg2, Properties arg3, Identifier arg4, Structure arg5, BlockRotation arg6, BlockMirror arg7, BlockPos arg8) {
+    public RuinedPortalStructurePiece(BlockPos arg, VerticalPlacement arg2, Properties arg3, Identifier arg4, Structure arg5, BlockRotation arg6, BlockMirror arg7, BlockPos arg8) {
         super(StructurePieceType.RUINED_PORTAL, 0);
         this.pos = arg;
         this.template = arg4;
@@ -85,7 +85,7 @@ extends SimpleStructurePiece {
         this.processProperties(arg5, arg8);
     }
 
-    public RuinedPortalFeaturePiece(StructureManager arg, CompoundTag arg2) {
+    public RuinedPortalStructurePiece(StructureManager arg, CompoundTag arg2) {
         super(StructurePieceType.RUINED_PORTAL, arg2);
         this.template = new Identifier(arg2.getString("Template"));
         this.rotation = BlockRotation.valueOf(arg2.getString("Rotation"));
@@ -109,10 +109,10 @@ extends SimpleStructurePiece {
     private void processProperties(Structure arg, BlockPos arg2) {
         BlockIgnoreStructureProcessor lv = this.properties.airPocket ? BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS : BlockIgnoreStructureProcessor.IGNORE_AIR_AND_STRUCTURE_BLOCKS;
         ArrayList list = Lists.newArrayList();
-        list.add(RuinedPortalFeaturePiece.createReplacementRule(Blocks.GOLD_BLOCK, 0.3f, Blocks.AIR));
+        list.add(RuinedPortalStructurePiece.createReplacementRule(Blocks.GOLD_BLOCK, 0.3f, Blocks.AIR));
         list.add(this.createLavaReplacementRule());
         if (!this.properties.cold) {
-            list.add(RuinedPortalFeaturePiece.createReplacementRule(Blocks.NETHERRACK, 0.07f, Blocks.MAGMA_BLOCK));
+            list.add(RuinedPortalStructurePiece.createReplacementRule(Blocks.NETHERRACK, 0.07f, Blocks.MAGMA_BLOCK));
         }
         StructurePlacementData lv2 = new StructurePlacementData().setRotation(this.rotation).setMirror(this.mirror).setPosition(arg2).addProcessor(lv).addProcessor(new RuleStructureProcessor(list)).addProcessor(new BlockAgeStructureProcessor(this.properties.mossiness)).addProcessor(new LavaSubmergedBlockStructureProcessor());
         if (this.properties.replaceWithBlackstone) {
@@ -123,12 +123,12 @@ extends SimpleStructurePiece {
 
     private StructureProcessorRule createLavaReplacementRule() {
         if (this.verticalPlacement == VerticalPlacement.ON_OCEAN_FLOOR) {
-            return RuinedPortalFeaturePiece.createReplacementRule(Blocks.LAVA, Blocks.MAGMA_BLOCK);
+            return RuinedPortalStructurePiece.createReplacementRule(Blocks.LAVA, Blocks.MAGMA_BLOCK);
         }
         if (this.properties.cold) {
-            return RuinedPortalFeaturePiece.createReplacementRule(Blocks.LAVA, Blocks.NETHERRACK);
+            return RuinedPortalStructurePiece.createReplacementRule(Blocks.LAVA, Blocks.NETHERRACK);
         }
-        return RuinedPortalFeaturePiece.createReplacementRule(Blocks.LAVA, 0.2f, Blocks.MAGMA_BLOCK);
+        return RuinedPortalStructurePiece.createReplacementRule(Blocks.LAVA, 0.2f, Blocks.MAGMA_BLOCK);
     }
 
     @Override
@@ -218,7 +218,7 @@ extends SimpleStructurePiece {
                 if (r >= k) continue;
                 float f = fs[r];
                 if (!(random.nextDouble() < (double)f)) continue;
-                int s = RuinedPortalFeaturePiece.getBaseHeight(arg, o, p, this.verticalPlacement);
+                int s = RuinedPortalStructurePiece.getBaseHeight(arg, o, p, this.verticalPlacement);
                 int t = bl ? s : Math.min(this.boundingBox.minY, s);
                 lv2.set(o, t, p);
                 if (Math.abs(t - this.boundingBox.minY) > 3 || !this.canFillNetherrack(arg, lv2)) continue;
@@ -245,7 +245,7 @@ extends SimpleStructurePiece {
     }
 
     private static int getBaseHeight(WorldAccess arg, int i, int j, VerticalPlacement arg2) {
-        return arg.getTopY(RuinedPortalFeaturePiece.getHeightmapType(arg2), i, j) - 1;
+        return arg.getTopY(RuinedPortalStructurePiece.getHeightmapType(arg2), i, j) - 1;
     }
 
     public static Heightmap.Type getHeightmapType(VerticalPlacement arg) {

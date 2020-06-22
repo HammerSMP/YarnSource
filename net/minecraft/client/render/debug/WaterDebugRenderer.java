@@ -40,13 +40,13 @@ implements DebugRenderer.Renderer {
         RenderSystem.lineWidth(6.0f);
         for (BlockPos lv3 : BlockPos.iterate(lv.add(-10, -10, -10), lv.add(10, 10, 10))) {
             FluidState lv4 = lv2.getFluidState(lv3);
-            if (!lv4.matches(FluidTags.WATER)) continue;
+            if (!lv4.isIn(FluidTags.WATER)) continue;
             double g = (float)lv3.getY() + lv4.getHeight(lv2, lv3);
             DebugRenderer.drawBox(new Box((float)lv3.getX() + 0.01f, (float)lv3.getY() + 0.01f, (float)lv3.getZ() + 0.01f, (float)lv3.getX() + 0.99f, g, (float)lv3.getZ() + 0.99f).offset(-d, -e, -f), 1.0f, 1.0f, 1.0f, 0.2f);
         }
         for (BlockPos lv5 : BlockPos.iterate(lv.add(-10, -10, -10), lv.add(10, 10, 10))) {
             FluidState lv6 = lv2.getFluidState(lv5);
-            if (!lv6.matches(FluidTags.WATER)) continue;
+            if (!lv6.isIn(FluidTags.WATER)) continue;
             DebugRenderer.drawString(String.valueOf(lv6.getLevel()), (double)lv5.getX() + 0.5, (float)lv5.getY() + lv6.getHeight(lv2, lv5), (double)lv5.getZ() + 0.5, -16777216);
         }
         RenderSystem.enableTexture();

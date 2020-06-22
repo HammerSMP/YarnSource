@@ -298,7 +298,7 @@ extends AnimalEntity {
 
     @Override
     public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (!this.isLandBound() && arg2.getFluidState(arg).matches(FluidTags.WATER)) {
+        if (!this.isLandBound() && arg2.getFluidState(arg).isIn(FluidTags.WATER)) {
             return 10.0f;
         }
         if (TurtleEggBlock.isSand(arg2, arg)) {

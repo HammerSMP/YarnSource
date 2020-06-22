@@ -53,7 +53,7 @@ extends Block {
     @Override
     public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
         BlockPos lv = arg3.up();
-        if (arg2.getFluidState(arg3).matches(FluidTags.WATER)) {
+        if (arg2.getFluidState(arg3).isIn(FluidTags.WATER)) {
             arg2.playSound(null, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (arg2.random.nextFloat() - arg2.random.nextFloat()) * 0.8f);
             arg2.spawnParticles(ParticleTypes.LARGE_SMOKE, (double)lv.getX() + 0.5, (double)lv.getY() + 0.25, (double)lv.getZ() + 0.5, 8, 0.5, 0.25, 0.5, 0.0);
         }

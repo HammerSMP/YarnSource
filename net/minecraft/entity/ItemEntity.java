@@ -130,7 +130,7 @@ extends Entity {
         boolean bl = MathHelper.floor(this.prevX) != MathHelper.floor(this.getX()) || MathHelper.floor(this.prevY) != MathHelper.floor(this.getY()) || MathHelper.floor(this.prevZ) != MathHelper.floor(this.getZ());
         int n = i = bl ? 2 : 40;
         if (this.age % i == 0) {
-            if (this.world.getFluidState(this.getBlockPos()).matches(FluidTags.LAVA) && !this.isFireImmune()) {
+            if (this.world.getFluidState(this.getBlockPos()).isIn(FluidTags.LAVA) && !this.isFireImmune()) {
                 this.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4f, 2.0f + this.random.nextFloat() * 0.4f);
             }
             if (!this.world.isClient && this.canMerge()) {

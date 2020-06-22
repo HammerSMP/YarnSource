@@ -183,7 +183,7 @@ extends FlowableFluid {
     protected void flow(WorldAccess arg, BlockPos arg2, BlockState arg3, Direction arg4, FluidState arg5) {
         if (arg4 == Direction.DOWN) {
             FluidState lv = arg.getFluidState(arg2);
-            if (this.isIn(FluidTags.LAVA) && lv.matches(FluidTags.WATER)) {
+            if (this.isIn(FluidTags.LAVA) && lv.isIn(FluidTags.WATER)) {
                 if (arg3.getBlock() instanceof FluidBlock) {
                     arg.setBlockState(arg2, Blocks.STONE.getDefaultState(), 3);
                 }

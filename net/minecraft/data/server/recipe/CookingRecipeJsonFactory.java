@@ -26,19 +26,19 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class CookingRecipeJsonFactory {
-    private final Item output;
-    private final Ingredient input;
-    private final float exp;
-    private final int time;
+    private final Item result;
+    private final Ingredient ingredient;
+    private final float experience;
+    private final int cookingTime;
     private final Advancement.Task builder = Advancement.Task.create();
     private String group;
     private final CookingRecipeSerializer<?> serializer;
 
     private CookingRecipeJsonFactory(ItemConvertible arg, Ingredient arg2, float f, int i, CookingRecipeSerializer<?> arg3) {
-        this.output = arg.asItem();
-        this.input = arg2;
-        this.exp = f;
-        this.time = i;
+        this.result = arg.asItem();
+        this.ingredient = arg2;
+        this.experience = f;
+        this.cookingTime = i;
         this.serializer = arg3;
     }
 
@@ -60,12 +60,12 @@ public class CookingRecipeJsonFactory {
     }
 
     public void offerTo(Consumer<RecipeJsonProvider> consumer) {
-        this.offerTo(consumer, Registry.ITEM.getId(this.output));
+        this.offerTo(consumer, Registry.ITEM.getId(this.result));
     }
 
     public void offerTo(Consumer<RecipeJsonProvider> consumer, String string) {
         Identifier lv2 = new Identifier(string);
-        Identifier lv = Registry.ITEM.getId(this.output);
+        Identifier lv = Registry.ITEM.getId(this.result);
         if (lv2.equals(lv)) {
             throw new IllegalStateException("Recipe " + lv2 + " should remove its 'save' argument");
         }
@@ -75,7 +75,7 @@ public class CookingRecipeJsonFactory {
     public void offerTo(Consumer<RecipeJsonProvider> consumer, Identifier arg) {
         this.validate(arg);
         this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(arg)).rewards(AdvancementRewards.Builder.recipe(arg)).criteriaMerger(CriterionMerger.OR);
-        consumer.accept(new CookingRecipeJsonProvider(arg, this.group == null ? "" : this.group, this.input, this.output, this.exp, this.time, this.builder, new Identifier(arg.getNamespace(), "recipes/" + this.output.getGroup().getName() + "/" + arg.getPath()), this.serializer));
+        consumer.accept(new CookingRecipeJsonProvider(arg, this.group == null ? "" : this.group, this.ingredient, this.result, this.experience, this.cookingTime, this.builder, new Identifier(arg.getNamespace(), "recipes/" + this.result.getGroup().getName() + "/" + arg.getPath()), this.serializer));
     }
 
     private void validate(Identifier arg) {
@@ -94,7 +94,7 @@ public class CookingRecipeJsonFactory {
         private final int cookingTime;
         private final Advancement.Task builder;
         private final Identifier advancementId;
-        private final RecipeSerializer<? extends AbstractCookingRecipe> cookingRecipeSerializer;
+        private final RecipeSerializer<? extends AbstractCookingRecipe> serializer;
 
         public CookingRecipeJsonProvider(Identifier arg, String string, Ingredient arg2, Item arg3, float f, int i, Advancement.Task arg4, Identifier arg5, RecipeSerializer<? extends AbstractCookingRecipe> arg6) {
             this.recipeId = arg;
@@ -105,7 +105,7 @@ public class CookingRecipeJsonFactory {
             this.cookingTime = i;
             this.builder = arg4;
             this.advancementId = arg5;
-            this.cookingRecipeSerializer = arg6;
+            this.serializer = arg6;
         }
 
         @Override
@@ -121,7 +121,7 @@ public class CookingRecipeJsonFactory {
 
         @Override
         public RecipeSerializer<?> getSerializer() {
-            return this.cookingRecipeSerializer;
+            return this.serializer;
         }
 
         @Override

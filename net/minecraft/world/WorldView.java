@@ -141,7 +141,7 @@ BiomeAccess.Storage {
     }
 
     default public boolean isWater(BlockPos arg) {
-        return this.getFluidState(arg).matches(FluidTags.WATER);
+        return this.getFluidState(arg).isIn(FluidTags.WATER);
     }
 
     default public boolean containsFluid(Box arg) {

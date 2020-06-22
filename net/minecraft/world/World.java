@@ -231,11 +231,11 @@ AutoCloseable {
 
     @Override
     public boolean setBlockState(BlockPos arg, BlockState arg2, int i) {
-        return this.method_30092(arg, arg2, i, 512);
+        return this.setBlockState(arg, arg2, i, 512);
     }
 
     @Override
-    public boolean method_30092(BlockPos arg, BlockState arg2, int i, int j) {
+    public boolean setBlockState(BlockPos arg, BlockState arg2, int i, int j) {
         if (World.isHeightInvalid(arg)) {
             return false;
         }
@@ -301,7 +301,7 @@ AutoCloseable {
             BlockEntity lv3 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(arg) : null;
             Block.dropStacks(lv, this, arg, lv3, arg2, ItemStack.EMPTY);
         }
-        return this.method_30092(arg, lv2.getBlockState(), 3, i);
+        return this.setBlockState(arg, lv2.getBlockState(), 3, i);
     }
 
     public boolean setBlockState(BlockPos arg, BlockState arg2) {

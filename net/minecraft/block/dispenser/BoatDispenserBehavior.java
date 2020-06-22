@@ -34,9 +34,9 @@ extends ItemDispenserBehavior {
         double e = arg.getY() + (double)((float)lv.getOffsetY() * 1.125f);
         double f = arg.getZ() + (double)((float)lv.getOffsetZ() * 1.125f);
         BlockPos lv3 = arg.getBlockPos().offset(lv);
-        if (lv2.getFluidState(lv3).matches(FluidTags.WATER)) {
+        if (lv2.getFluidState(lv3).isIn(FluidTags.WATER)) {
             double g = 1.0;
-        } else if (lv2.getBlockState(lv3).isAir() && lv2.getFluidState(lv3.down()).matches(FluidTags.WATER)) {
+        } else if (lv2.getBlockState(lv3).isAir() && lv2.getFluidState(lv3.down()).isIn(FluidTags.WATER)) {
             double h = 0.0;
         } else {
             return this.itemDispenser.dispense(arg, arg2);

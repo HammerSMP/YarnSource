@@ -91,7 +91,7 @@ extends Block {
         for (Direction lv : Direction.Type.HORIZONTAL) {
             BlockState lv2 = arg2.getBlockState(arg3.offset(lv));
             Material lv3 = lv2.getMaterial();
-            if (!lv3.isSolid() && !arg2.getFluidState(arg3.offset(lv)).matches(FluidTags.LAVA)) continue;
+            if (!lv3.isSolid() && !arg2.getFluidState(arg3.offset(lv)).isIn(FluidTags.LAVA)) continue;
             return false;
         }
         BlockState lv4 = arg2.getBlockState(arg3.down());

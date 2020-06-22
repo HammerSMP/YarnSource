@@ -242,7 +242,7 @@ extends WaterCreatureEntity {
             Vec3d lv2 = new Vec3d(SquidEntity.this.getX() - lv.getX(), SquidEntity.this.getY() - lv.getY(), SquidEntity.this.getZ() - lv.getZ());
             BlockState lv3 = SquidEntity.this.world.getBlockState(new BlockPos(SquidEntity.this.getX() + lv2.x, SquidEntity.this.getY() + lv2.y, SquidEntity.this.getZ() + lv2.z));
             FluidState lv4 = SquidEntity.this.world.getFluidState(new BlockPos(SquidEntity.this.getX() + lv2.x, SquidEntity.this.getY() + lv2.y, SquidEntity.this.getZ() + lv2.z));
-            if (lv4.matches(FluidTags.WATER) || lv3.isAir()) {
+            if (lv4.isIn(FluidTags.WATER) || lv3.isAir()) {
                 double d = lv2.length();
                 if (d > 0.0) {
                     lv2.normalize();

@@ -95,7 +95,7 @@ extends Block {
 
     private static boolean hasStillWater(BlockPos arg, World arg2) {
         FluidState lv = arg2.getFluidState(arg);
-        if (!lv.matches(FluidTags.WATER)) {
+        if (!lv.isIn(FluidTags.WATER)) {
             return false;
         }
         if (lv.isStill()) {
@@ -106,13 +106,13 @@ extends Block {
             return false;
         }
         FluidState lv2 = arg2.getFluidState(arg.down());
-        return !lv2.matches(FluidTags.WATER);
+        return !lv2.isIn(FluidTags.WATER);
     }
 
     private void explode(BlockState arg, World arg22, final BlockPos arg3) {
         arg22.removeBlock(arg3, false);
         boolean bl = Direction.Type.HORIZONTAL.stream().map(arg3::offset).anyMatch(arg2 -> RespawnAnchorBlock.hasStillWater(arg2, arg22));
-        final boolean bl2 = bl || arg22.getFluidState(arg3.up()).matches(FluidTags.WATER);
+        final boolean bl2 = bl || arg22.getFluidState(arg3.up()).isIn(FluidTags.WATER);
         ExplosionBehavior lv = new ExplosionBehavior(){
 
             @Override

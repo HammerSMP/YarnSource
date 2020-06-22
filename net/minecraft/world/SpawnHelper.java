@@ -280,10 +280,10 @@ public final class SpawnHelper {
         BlockPos lv4 = arg3.down();
         switch (arg) {
             case IN_WATER: {
-                return lv2.matches(FluidTags.WATER) && arg2.getFluidState(lv4).matches(FluidTags.WATER) && !arg2.getBlockState(lv3).isSolidBlock(arg2, lv3);
+                return lv2.isIn(FluidTags.WATER) && arg2.getFluidState(lv4).isIn(FluidTags.WATER) && !arg2.getBlockState(lv3).isSolidBlock(arg2, lv3);
             }
             case IN_LAVA: {
-                return lv2.matches(FluidTags.LAVA);
+                return lv2.isIn(FluidTags.LAVA);
             }
         }
         BlockState lv5 = arg2.getBlockState(lv4);

@@ -402,7 +402,7 @@ AutoCloseable {
             double g = lv8.getEndingCoord(Direction.Axis.Y, d, e);
             double h = lv7.getHeight(lv, (BlockPos)lv3);
             double m = Math.max(g, h);
-            DefaultParticleType lv9 = lv7.matches(FluidTags.LAVA) || lv6.isOf(Blocks.MAGMA_BLOCK) || CampfireBlock.isLitCampfire(lv6) ? ParticleTypes.SMOKE : ParticleTypes.RAIN;
+            DefaultParticleType lv9 = lv7.isIn(FluidTags.LAVA) || lv6.isOf(Blocks.MAGMA_BLOCK) || CampfireBlock.isLitCampfire(lv6) ? ParticleTypes.SMOKE : ParticleTypes.RAIN;
             this.client.world.addParticle(lv9, (double)lv3.getX() + d, (double)lv3.getY() + m, (double)lv3.getZ() + e, 0.0, 0.0, 0.0);
         }
         if (lv3 != null && random.nextInt(3) < this.field_20793++) {

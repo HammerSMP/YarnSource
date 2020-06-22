@@ -419,7 +419,7 @@ extends Entity {
                 for (int q = m; q < n; ++q) {
                     lv2.set(p, o, q);
                     FluidState lv3 = this.world.getFluidState(lv2);
-                    if (lv3.matches(FluidTags.WATER)) {
+                    if (lv3.isIn(FluidTags.WATER)) {
                         f = Math.max(f, lv3.getHeight(this.world, lv2));
                     }
                     if (f >= 1.0f) continue block0;
@@ -477,7 +477,7 @@ extends Entity {
                 for (int q = m; q < n; ++q) {
                     lv2.set(o, p, q);
                     FluidState lv3 = this.world.getFluidState(lv2);
-                    if (!lv3.matches(FluidTags.WATER)) continue;
+                    if (!lv3.isIn(FluidTags.WATER)) continue;
                     float f = (float)p + lv3.getHeight(this.world, lv2);
                     this.waterLevel = Math.max((double)f, this.waterLevel);
                     bl |= lv.minY < (double)f;
@@ -504,7 +504,7 @@ extends Entity {
                 for (int q = m; q < n; ++q) {
                     lv2.set(o, p, q);
                     FluidState lv3 = this.world.getFluidState(lv2);
-                    if (!lv3.matches(FluidTags.WATER) || !(d < (double)((float)lv2.getY() + lv3.getHeight(this.world, lv2)))) continue;
+                    if (!lv3.isIn(FluidTags.WATER) || !(d < (double)((float)lv2.getY() + lv3.getHeight(this.world, lv2)))) continue;
                     if (lv3.isStill()) {
                         bl = true;
                         continue;
@@ -699,7 +699,7 @@ extends Entity {
                 }
             }
             this.fallDistance = 0.0f;
-        } else if (!this.world.getFluidState(this.getBlockPos().down()).matches(FluidTags.WATER) && d < 0.0) {
+        } else if (!this.world.getFluidState(this.getBlockPos().down()).isIn(FluidTags.WATER) && d < 0.0) {
             this.fallDistance = (float)((double)this.fallDistance - d);
         }
     }

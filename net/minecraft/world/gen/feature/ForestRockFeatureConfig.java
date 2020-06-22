@@ -16,13 +16,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
-public class BoulderFeatureConfig
+public class ForestRockFeatureConfig
 implements FeatureConfig {
-    public static final Codec<BoulderFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("start_radius").withDefault((Object)0).forGetter(arg -> arg.startRadius)).apply((Applicative)instance, BoulderFeatureConfig::new));
+    public static final Codec<ForestRockFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("start_radius").withDefault((Object)0).forGetter(arg -> arg.startRadius)).apply((Applicative)instance, ForestRockFeatureConfig::new));
     public final BlockState state;
     public final int startRadius;
 
-    public BoulderFeatureConfig(BlockState arg, int i) {
+    public ForestRockFeatureConfig(BlockState arg, int i) {
         this.state = arg;
         this.startRadius = i;
     }

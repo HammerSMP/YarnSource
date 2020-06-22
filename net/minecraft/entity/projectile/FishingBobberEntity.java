@@ -171,7 +171,7 @@ extends ProjectileEntity {
         float f = 0.0f;
         BlockPos lv2 = this.getBlockPos();
         FluidState lv3 = this.world.getFluidState(lv2);
-        if (lv3.matches(FluidTags.WATER)) {
+        if (lv3.isIn(FluidTags.WATER)) {
             f = lv3.getHeight(this.world, lv2);
         }
         boolean bl2 = bl = f > 0.0f;
@@ -220,7 +220,7 @@ extends ProjectileEntity {
                 }
             }
         }
-        if (!lv3.matches(FluidTags.WATER)) {
+        if (!lv3.isIn(FluidTags.WATER)) {
             this.setVelocity(this.getVelocity().add(0.0, -0.03, 0.0));
         }
         this.move(MovementType.SELF, this.getVelocity());
@@ -383,7 +383,7 @@ extends ProjectileEntity {
             return PositionType.ABOVE_WATER;
         }
         FluidState lv2 = lv.getFluidState();
-        if (lv2.matches(FluidTags.WATER) && lv2.isStill() && lv.getCollisionShape(this.world, arg).isEmpty()) {
+        if (lv2.isIn(FluidTags.WATER) && lv2.isStill() && lv.getCollisionShape(this.world, arg).isEmpty()) {
             return PositionType.INSIDE_WATER;
         }
         return PositionType.INVALID;

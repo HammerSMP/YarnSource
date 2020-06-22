@@ -37,7 +37,7 @@ extends SnowyBlock {
 
     private static boolean canSpread(BlockState arg, WorldView arg2, BlockPos arg3) {
         BlockPos lv = arg3.up();
-        return SpreadableBlock.canSurvive(arg, arg2, arg3) && !arg2.getFluidState(lv).matches(FluidTags.WATER);
+        return SpreadableBlock.canSurvive(arg, arg2, arg3) && !arg2.getFluidState(lv).isIn(FluidTags.WATER);
     }
 
     @Override

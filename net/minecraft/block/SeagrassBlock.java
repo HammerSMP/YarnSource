@@ -55,7 +55,7 @@ FluidFillable {
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext arg) {
         FluidState lv = arg.getWorld().getFluidState(arg.getBlockPos());
-        if (lv.matches(FluidTags.WATER) && lv.getLevel() == 8) {
+        if (lv.isIn(FluidTags.WATER) && lv.getLevel() == 8) {
             return super.getPlacementState(arg);
         }
         return null;

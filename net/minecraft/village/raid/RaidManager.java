@@ -5,7 +5,7 @@
  *  com.google.common.collect.Maps
  *  javax.annotation.Nullable
  */
-package net.minecraft.entity.raid;
+package net.minecraft.village.raid;
 
 import com.google.common.collect.Maps;
 import java.util.Iterator;
@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.raid.Raid;
 import net.minecraft.entity.raid.RaiderEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,6 +25,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.village.raid.Raid;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.dimension.DimensionType;

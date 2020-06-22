@@ -152,7 +152,7 @@ extends NetworkSyncedItem {
                                 BlockState lv6;
                                 do {
                                     lv4.set(lv3.getStartX() + y + u, --aa, lv3.getStartZ() + z + v);
-                                } while ((lv6 = lv2.getBlockState(lv4)).getTopMaterialColor(arg, lv4) == MaterialColor.AIR && aa > 0);
+                                } while ((lv6 = lv2.getBlockState(lv4)).getTopMaterialColor(arg, lv4) == MaterialColor.CLEAR && aa > 0);
                                 if (aa > 0 && !lv6.getFluidState().isEmpty()) {
                                     BlockState lv7;
                                     int ab = aa - 1;
@@ -182,7 +182,7 @@ extends NetworkSyncedItem {
                 if (f < -0.6) {
                     ac = 0;
                 }
-                if ((lv9 = (MaterialColor)Iterables.getFirst((Iterable)Multisets.copyHighestCountFirst((Multiset)multiset), (Object)MaterialColor.AIR)) == MaterialColor.WATER) {
+                if ((lv9 = (MaterialColor)Iterables.getFirst((Iterable)Multisets.copyHighestCountFirst((Multiset)multiset), (Object)MaterialColor.CLEAR)) == MaterialColor.WATER) {
                     f = (double)w * 0.1 + (double)(o + p & 1) * 0.2;
                     ac = 1;
                     if (f < 0.5) {
@@ -260,7 +260,7 @@ extends NetworkSyncedItem {
                     --p;
                 }
                 int q = 3;
-                MaterialColor lv3 = MaterialColor.AIR;
+                MaterialColor lv3 = MaterialColor.CLEAR;
                 if (lv2.getDepth() < 0.0f) {
                     lv3 = MaterialColor.ORANGE;
                     if (p > 7 && o % 2 == 0) {
@@ -271,7 +271,7 @@ extends NetworkSyncedItem {
                             q = 0;
                         }
                     } else if (p > 7) {
-                        lv3 = MaterialColor.AIR;
+                        lv3 = MaterialColor.CLEAR;
                     } else if (p > 5) {
                         q = 1;
                     } else if (p > 3) {
@@ -283,7 +283,7 @@ extends NetworkSyncedItem {
                     lv3 = MaterialColor.BROWN;
                     q = p > 3 ? 1 : 3;
                 }
-                if (lv3 == MaterialColor.AIR) continue;
+                if (lv3 == MaterialColor.CLEAR) continue;
                 lv.colors[n + o * 128] = (byte)(lv3.id * 4 + q);
                 lv.markDirty(n, o);
             }

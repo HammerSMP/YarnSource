@@ -40,7 +40,7 @@ extends Feature<RandomPatchFeatureConfig> {
             lv4.set(lv3, random.nextInt(arg5.spreadX + 1) - random.nextInt(arg5.spreadX + 1), random.nextInt(arg5.spreadY + 1) - random.nextInt(arg5.spreadY + 1), random.nextInt(arg5.spreadZ + 1) - random.nextInt(arg5.spreadZ + 1));
             Vec3i lv5 = lv4.down();
             BlockState lv6 = arg.getBlockState((BlockPos)lv5);
-            if (!arg.isAir(lv4) && (!arg5.canReplace || !arg.getBlockState(lv4).getMaterial().isReplaceable()) || !lv.canPlaceAt(arg, lv4) || !arg5.whitelist.isEmpty() && !arg5.whitelist.contains(lv6.getBlock()) || arg5.blacklist.contains(lv6) || arg5.needsWater && !arg.getFluidState(((BlockPos)lv5).west()).matches(FluidTags.WATER) && !arg.getFluidState(((BlockPos)lv5).east()).matches(FluidTags.WATER) && !arg.getFluidState(((BlockPos)lv5).north()).matches(FluidTags.WATER) && !arg.getFluidState(((BlockPos)lv5).south()).matches(FluidTags.WATER)) continue;
+            if (!arg.isAir(lv4) && (!arg5.canReplace || !arg.getBlockState(lv4).getMaterial().isReplaceable()) || !lv.canPlaceAt(arg, lv4) || !arg5.whitelist.isEmpty() && !arg5.whitelist.contains(lv6.getBlock()) || arg5.blacklist.contains(lv6) || arg5.needsWater && !arg.getFluidState(((BlockPos)lv5).west()).isIn(FluidTags.WATER) && !arg.getFluidState(((BlockPos)lv5).east()).isIn(FluidTags.WATER) && !arg.getFluidState(((BlockPos)lv5).north()).isIn(FluidTags.WATER) && !arg.getFluidState(((BlockPos)lv5).south()).isIn(FluidTags.WATER)) continue;
             arg5.blockPlacer.method_23403(arg, lv4, lv, random);
             ++i;
         }

@@ -267,13 +267,13 @@ extends ProjectileEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        DamageSource damageSourceAsProjectile;
-        Entity projectileOwner;
-        super.onEntityHit(entityHitResult);
-        Entity hitEntity = entityHitResult.getEntity();
-        float projectileSpeed = (float)this.getVelocity().length();
-        int damageAmount = MathHelper.ceil(MathHelper.clamp((double)projectileSpeed * this.damage, 0.0, 2.147483647E9));
+    protected void onEntityHit(EntityHitResult arg) {
+        DamageSource lv4;
+        Entity lv2;
+        super.onEntityHit(arg);
+        Entity lv = arg.getEntity();
+        float f = (float)this.getVelocity().length();
+        int i = MathHelper.ceil(MathHelper.clamp((double)f * this.damage, 0.0, 2.147483647E9));
         if (this.getPierceLevel() > 0) {
             if (this.piercedEntities == null) {
                 this.piercedEntities = new IntOpenHashSet(5);
@@ -282,59 +282,59 @@ extends ProjectileEntity {
                 this.piercingKilledEntities = Lists.newArrayListWithCapacity((int)5);
             }
             if (this.piercedEntities.size() < this.getPierceLevel() + 1) {
-                this.piercedEntities.add(hitEntity.getEntityId());
+                this.piercedEntities.add(lv.getEntityId());
             } else {
                 this.remove();
                 return;
             }
         }
         if (this.isCritical()) {
-            long halfDamage = this.random.nextInt(damageAmount / 2 + 2);
-            damageAmount = (int)Math.min(halfDamage + (long)damageAmount, Integer.MAX_VALUE);
+            long l = this.random.nextInt(i / 2 + 2);
+            i = (int)Math.min(l + (long)i, Integer.MAX_VALUE);
         }
-        if ((projectileOwner = this.getOwner()) == null) {
+        if ((lv2 = this.getOwner()) == null) {
             DamageSource lv3 = DamageSource.arrow(this, this);
         } else {
-            damageSourceAsProjectile = DamageSource.arrow(this, projectileOwner);
-            if (projectileOwner instanceof LivingEntity) {
-                ((LivingEntity)projectileOwner).onAttacking(hitEntity);
+            lv4 = DamageSource.arrow(this, lv2);
+            if (lv2 instanceof LivingEntity) {
+                ((LivingEntity)lv2).onAttacking(lv);
             }
         }
-        boolean hitEnderman = hitEntity.getType() == EntityType.ENDERMAN;
-        int oldFireTicks = hitEntity.getFireTicks();
-        if (this.isOnFire() && !hitEnderman) {
-            hitEntity.setOnFireFor(5);
+        boolean bl = lv.getType() == EntityType.ENDERMAN;
+        int j = lv.getFireTicks();
+        if (this.isOnFire() && !bl) {
+            lv.setOnFireFor(5);
         }
-        if (hitEntity.damage(damageSourceAsProjectile, damageAmount)) {
-            if (hitEnderman) {
+        if (lv.damage(lv4, i)) {
+            if (bl) {
                 return;
             }
-            if (hitEntity instanceof LivingEntity) {
-                Vec3d knockback = this.getVelocity().multiply(1.0, 0.0, 1.0).normalize().multiply((double)this.punch * 0.6);
-                LivingEntity lv5 = (LivingEntity)hitEntity;
+            if (lv instanceof LivingEntity) {
+                Vec3d lv6;
+                LivingEntity lv5 = (LivingEntity)lv;
                 if (!this.world.isClient && this.getPierceLevel() <= 0) {
                     lv5.setStuckArrowCount(lv5.getStuckArrowCount() + 1);
                 }
-                if (this.punch > 0 && knockback.lengthSquared() > 0.0) {
-                    lv5.addVelocity(knockback.x, 0.1, knockback.z);
+                if (this.punch > 0 && (lv6 = this.getVelocity().multiply(1.0, 0.0, 1.0).normalize().multiply((double)this.punch * 0.6)).lengthSquared() > 0.0) {
+                    lv5.addVelocity(lv6.x, 0.1, lv6.z);
                 }
-                if (!this.world.isClient && projectileOwner instanceof LivingEntity) {
-                    EnchantmentHelper.onUserDamaged(lv5, projectileOwner);
-                    EnchantmentHelper.onTargetDamaged((LivingEntity)projectileOwner, lv5);
+                if (!this.world.isClient && lv2 instanceof LivingEntity) {
+                    EnchantmentHelper.onUserDamaged(lv5, lv2);
+                    EnchantmentHelper.onTargetDamaged((LivingEntity)lv2, lv5);
                 }
                 this.onHit(lv5);
-                if (projectileOwner != null && lv5 != projectileOwner && lv5 instanceof PlayerEntity && projectileOwner instanceof ServerPlayerEntity && !this.isSilent()) {
-                    ((ServerPlayerEntity)projectileOwner).networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.PROJECTILE_HIT_PLAYER, 0.0f));
+                if (lv2 != null && lv5 != lv2 && lv5 instanceof PlayerEntity && lv2 instanceof ServerPlayerEntity && !this.isSilent()) {
+                    ((ServerPlayerEntity)lv2).networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.PROJECTILE_HIT_PLAYER, 0.0f));
                 }
-                if (!hitEntity.isAlive() && this.piercingKilledEntities != null) {
+                if (!lv.isAlive() && this.piercingKilledEntities != null) {
                     this.piercingKilledEntities.add(lv5);
                 }
-                if (!this.world.isClient && projectileOwner instanceof ServerPlayerEntity) {
-                    ServerPlayerEntity lv7 = (ServerPlayerEntity)projectileOwner;
+                if (!this.world.isClient && lv2 instanceof ServerPlayerEntity) {
+                    ServerPlayerEntity lv7 = (ServerPlayerEntity)lv2;
                     if (this.piercingKilledEntities != null && this.isShotFromCrossbow()) {
                         Criteria.KILLED_BY_CROSSBOW.trigger(lv7, this.piercingKilledEntities);
-                    } else if (!hitEntity.isAlive() && this.isShotFromCrossbow()) {
-                        Criteria.KILLED_BY_CROSSBOW.trigger(lv7, Arrays.asList(hitEntity));
+                    } else if (!lv.isAlive() && this.isShotFromCrossbow()) {
+                        Criteria.KILLED_BY_CROSSBOW.trigger(lv7, Arrays.asList(lv));
                     }
                 }
             }
@@ -343,7 +343,7 @@ extends ProjectileEntity {
                 this.remove();
             }
         } else {
-            hitEntity.setFireTicks(oldFireTicks);
+            lv.setFireTicks(j);
             this.setVelocity(this.getVelocity().multiply(-0.1));
             this.yaw += 180.0f;
             this.prevYaw += 180.0f;

@@ -945,7 +945,7 @@ CommandOutput {
         BlockPos lv4 = new BlockPos(lv);
         FluidState lv5 = this.world.getFluidState(lv4);
         for (Tag tag : FluidTags.method_29897()) {
-            if (!lv5.matches(tag)) continue;
+            if (!lv5.isIn(tag)) continue;
             double e = (float)lv4.getY() + lv5.getHeight(this.world, lv4);
             if (e > d) {
                 this.field_25599 = tag;
@@ -2529,7 +2529,7 @@ CommandOutput {
                     double f;
                     lv3.set(p, q, r);
                     FluidState lv4 = this.world.getFluidState(lv3);
-                    if (!lv4.matches(arg) || !((f = (double)((float)q + lv4.getHeight(this.world, lv3))) >= lv.minY)) continue;
+                    if (!lv4.isIn(arg) || !((f = (double)((float)q + lv4.getHeight(this.world, lv3))) >= lv.minY)) continue;
                     bl2 = true;
                     e = Math.max(f - lv.minY, e);
                     if (!bl) continue;

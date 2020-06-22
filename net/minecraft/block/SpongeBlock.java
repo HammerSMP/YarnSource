@@ -64,7 +64,7 @@ extends Block {
                 BlockState lv5 = arg.getBlockState(lv4);
                 FluidState lv6 = arg.getFluidState(lv4);
                 Material lv7 = lv5.getMaterial();
-                if (!lv6.matches(FluidTags.WATER)) continue;
+                if (!lv6.isIn(FluidTags.WATER)) continue;
                 if (lv5.getBlock() instanceof FluidDrainable && ((FluidDrainable)((Object)lv5.getBlock())).tryDrainFluid(arg, lv4, lv5) != Fluids.EMPTY) {
                     ++i;
                     if (j >= 6) continue;

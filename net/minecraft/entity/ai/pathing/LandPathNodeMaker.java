@@ -413,10 +413,10 @@ extends PathNodeMaker {
                         return PathNodeType.DANGER_FIRE;
                     }
                     FluidState lv2 = arg.getFluidState(arg2);
-                    if (lv2.matches(FluidTags.WATER)) {
+                    if (lv2.isIn(FluidTags.WATER)) {
                         return PathNodeType.WATER_BORDER;
                     }
-                    if (!lv2.matches(FluidTags.LAVA)) continue;
+                    if (!lv2.isIn(FluidTags.LAVA)) continue;
                     return PathNodeType.LAVA;
                 }
             }
@@ -471,10 +471,10 @@ extends PathNodeMaker {
             return PathNodeType.BLOCKED;
         }
         FluidState lv4 = arg.getFluidState(arg2);
-        if (lv4.matches(FluidTags.WATER)) {
+        if (lv4.isIn(FluidTags.WATER)) {
             return PathNodeType.WATER;
         }
-        if (lv4.matches(FluidTags.LAVA)) {
+        if (lv4.isIn(FluidTags.LAVA)) {
             return PathNodeType.LAVA;
         }
         return PathNodeType.OPEN;

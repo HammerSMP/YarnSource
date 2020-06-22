@@ -77,7 +77,7 @@ public class FluidRenderer {
 
     public boolean render(BlockRenderView arg, BlockPos arg2, VertexConsumer arg3, FluidState arg4) {
         float t;
-        boolean bl = arg4.matches(FluidTags.LAVA);
+        boolean bl = arg4.isIn(FluidTags.LAVA);
         Sprite[] lvs = bl ? this.lavaSprites : this.waterSprites;
         BlockState lv = arg.getBlockState(arg2);
         int i = bl ? 0xFFFFFF : BiomeColors.getWaterColor(arg, arg2);

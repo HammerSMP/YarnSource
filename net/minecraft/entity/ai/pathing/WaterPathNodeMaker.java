@@ -63,7 +63,7 @@ extends PathNodeMaker {
         if (lv2.isEmpty() && lv3.canPathfindThrough(arg, lv.down(), NavigationType.WATER) && lv3.isAir()) {
             return PathNodeType.BREACH;
         }
-        if (!lv2.matches(FluidTags.WATER) || !lv3.canPathfindThrough(arg, lv, NavigationType.WATER)) {
+        if (!lv2.isIn(FluidTags.WATER) || !lv3.canPathfindThrough(arg, lv, NavigationType.WATER)) {
             return PathNodeType.BLOCKED;
         }
         return PathNodeType.WATER;
@@ -108,7 +108,7 @@ extends PathNodeMaker {
                     if (lv2.isEmpty() && lv3.canPathfindThrough(this.cachedWorld, (BlockPos)lv.down(), NavigationType.WATER) && lv3.isAir()) {
                         return PathNodeType.BREACH;
                     }
-                    if (lv2.matches(FluidTags.WATER)) continue;
+                    if (lv2.isIn(FluidTags.WATER)) continue;
                     return PathNodeType.BLOCKED;
                 }
             }

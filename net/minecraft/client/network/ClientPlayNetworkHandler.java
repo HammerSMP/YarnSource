@@ -470,7 +470,7 @@ implements ClientPlayPacketListener {
         } else if (lv == EntityType.SNOWBALL) {
             SnowballEntity lv18 = new SnowballEntity(this.world, d, e, f);
         } else if (lv == EntityType.LLAMA_SPIT) {
-            LlamaSpitEntity lv19 = new LlamaSpitEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityz());
+            LlamaSpitEntity lv19 = new LlamaSpitEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
         } else if (lv == EntityType.ITEM_FRAME) {
             ItemFrameEntity lv20 = new ItemFrameEntity(this.world, new BlockPos(d, e, f), Direction.byId(arg.getEntityData()));
         } else if (lv == EntityType.LEASH_KNOT) {
@@ -482,15 +482,15 @@ implements ClientPlayPacketListener {
         } else if (lv == EntityType.FIREWORK_ROCKET) {
             FireworkRocketEntity lv24 = new FireworkRocketEntity(this.world, d, e, f, ItemStack.EMPTY);
         } else if (lv == EntityType.FIREBALL) {
-            FireballEntity lv25 = new FireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityz());
+            FireballEntity lv25 = new FireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
         } else if (lv == EntityType.DRAGON_FIREBALL) {
-            DragonFireballEntity lv26 = new DragonFireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityz());
+            DragonFireballEntity lv26 = new DragonFireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
         } else if (lv == EntityType.SMALL_FIREBALL) {
-            SmallFireballEntity lv27 = new SmallFireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityz());
+            SmallFireballEntity lv27 = new SmallFireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
         } else if (lv == EntityType.WITHER_SKULL) {
-            WitherSkullEntity lv28 = new WitherSkullEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityz());
+            WitherSkullEntity lv28 = new WitherSkullEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
         } else if (lv == EntityType.SHULKER_BULLET) {
-            ShulkerBulletEntity lv29 = new ShulkerBulletEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityz());
+            ShulkerBulletEntity lv29 = new ShulkerBulletEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
         } else if (lv == EntityType.EGG) {
             EggEntity lv30 = new EggEntity(this.world, d, e, f);
         } else if (lv == EntityType.EVOKER_FANGS) {

@@ -13,17 +13,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.BoulderFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.ForestRockFeatureConfig;
 
 public class ForestRockFeature
-extends Feature<BoulderFeatureConfig> {
-    public ForestRockFeature(Codec<BoulderFeatureConfig> codec) {
+extends Feature<ForestRockFeatureConfig> {
+    public ForestRockFeature(Codec<ForestRockFeatureConfig> codec) {
         super(codec);
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, BoulderFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, ForestRockFeatureConfig arg5) {
         Block lv;
         while (arg4.getY() > 3 && (arg.isAir(arg4.down()) || !ForestRockFeature.isDirt(lv = arg.getBlockState(arg4.down()).getBlock()) && !ForestRockFeature.isStone(lv))) {
             arg4 = arg4.down();

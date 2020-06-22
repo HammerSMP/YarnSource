@@ -92,7 +92,7 @@ extends Goal {
                 for (int p = m - i; p <= m + i; ++p) {
                     float g;
                     lv3.set(n, o, p);
-                    if (!arg.getFluidState(lv3).matches(FluidTags.WATER) || !((g = (float)((n - k) * (n - k) + (o - l) * (o - l) + (p - m) * (p - m))) < f)) continue;
+                    if (!arg.getFluidState(lv3).isIn(FluidTags.WATER) || !((g = (float)((n - k) * (n - k) + (o - l) * (o - l) + (p - m) * (p - m))) < f)) continue;
                     f = g;
                     lv2 = new BlockPos(lv3);
                 }

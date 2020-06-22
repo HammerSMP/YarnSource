@@ -274,7 +274,7 @@ implements Angerable {
         }
         BlockState lv2 = this.world.getBlockState(lv);
         boolean bl = lv2.getMaterial().blocksMovement();
-        boolean bl2 = lv2.getFluidState().matches(FluidTags.WATER);
+        boolean bl2 = lv2.getFluidState().isIn(FluidTags.WATER);
         if (!bl || bl2) {
             return false;
         }

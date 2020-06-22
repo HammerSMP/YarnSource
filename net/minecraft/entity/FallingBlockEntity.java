@@ -130,9 +130,9 @@ extends Entity {
             BlockHitResult lv4;
             BlockPos lv3 = this.getBlockPos();
             boolean bl = this.block.getBlock() instanceof ConcretePowderBlock;
-            boolean bl2 = bl && this.world.getFluidState(lv3).matches(FluidTags.WATER);
+            boolean bl2 = bl && this.world.getFluidState(lv3).isIn(FluidTags.WATER);
             double d = this.getVelocity().lengthSquared();
-            if (bl && d > 1.0 && (lv4 = this.world.rayTrace(new RayTraceContext(new Vec3d(this.prevX, this.prevY, this.prevZ), this.getPos(), RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.SOURCE_ONLY, this))).getType() != HitResult.Type.MISS && this.world.getFluidState(lv4.getBlockPos()).matches(FluidTags.WATER)) {
+            if (bl && d > 1.0 && (lv4 = this.world.rayTrace(new RayTraceContext(new Vec3d(this.prevX, this.prevY, this.prevZ), this.getPos(), RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.SOURCE_ONLY, this))).getType() != HitResult.Type.MISS && this.world.getFluidState(lv4.getBlockPos()).isIn(FluidTags.WATER)) {
                 lv3 = lv4.getBlockPos();
                 bl2 = true;
             }

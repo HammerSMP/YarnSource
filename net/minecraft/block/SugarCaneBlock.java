@@ -82,7 +82,7 @@ extends Block {
             for (Direction lv3 : Direction.Type.HORIZONTAL) {
                 BlockState lv4 = arg2.getBlockState(lv2.offset(lv3));
                 FluidState lv5 = arg2.getFluidState(lv2.offset(lv3));
-                if (!lv5.matches(FluidTags.WATER) && !lv4.isOf(Blocks.FROSTED_ICE)) continue;
+                if (!lv5.isIn(FluidTags.WATER) && !lv4.isOf(Blocks.FROSTED_ICE)) continue;
                 return true;
             }
         }

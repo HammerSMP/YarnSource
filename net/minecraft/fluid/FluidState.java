@@ -108,7 +108,7 @@ extends State<Fluid, FluidState> {
         return this.getFluid().getParticle();
     }
 
-    public boolean matches(Tag<Fluid> arg) {
+    public boolean isIn(Tag<Fluid> arg) {
         return this.getFluid().isIn(arg);
     }
 

@@ -317,7 +317,7 @@ extends WaterCreatureEntity {
     }
 
     public static boolean canSpawn(EntityType<DolphinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg4.getY() > 45 && arg4.getY() < arg2.getSeaLevel() && (arg2.getBiome(arg4) != Biomes.OCEAN || arg2.getBiome(arg4) != Biomes.DEEP_OCEAN) && arg2.getFluidState(arg4).matches(FluidTags.WATER);
+        return arg4.getY() > 45 && arg4.getY() < arg2.getSeaLevel() && (arg2.getBiome(arg4) != Biomes.OCEAN || arg2.getBiome(arg4) != Biomes.DEEP_OCEAN) && arg2.getFluidState(arg4).isIn(FluidTags.WATER);
     }
 
     @Override
@@ -446,7 +446,7 @@ extends WaterCreatureEntity {
                 if (lv3 == null) {
                     lv3 = TargetFinder.findTargetTowards(this.dolphin, 8, 4, lv2);
                 }
-                if (!(lv3 == null || lv.getFluidState(lv4 = new BlockPos(lv3)).matches(FluidTags.WATER) && lv.getBlockState(lv4).canPathfindThrough(lv, lv4, NavigationType.WATER))) {
+                if (!(lv3 == null || lv.getFluidState(lv4 = new BlockPos(lv3)).isIn(FluidTags.WATER) && lv.getBlockState(lv4).canPathfindThrough(lv, lv4, NavigationType.WATER))) {
                     lv3 = TargetFinder.findTargetTowards(this.dolphin, 8, 5, lv2);
                 }
                 if (lv3 == null) {

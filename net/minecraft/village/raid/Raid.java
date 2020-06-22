@@ -6,7 +6,7 @@
  *  com.google.common.collect.Sets
  *  javax.annotation.Nullable
  */
-package net.minecraft.entity.raid;
+package net.minecraft.village.raid;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -222,7 +222,7 @@ public class Raid {
                 return;
             }
             if (!this.world.isNearOccupiedPointOfInterest(this.center)) {
-                this.method_20511();
+                this.moveRaidCenter();
             }
             if (!this.world.isNearOccupiedPointOfInterest(this.center)) {
                 if (this.wavesSpawned > 0) {
@@ -334,7 +334,7 @@ public class Raid {
         }
     }
 
-    private void method_20511() {
+    private void moveRaidCenter() {
         Stream<ChunkSectionPos> stream = ChunkSectionPos.stream(ChunkSectionPos.from(this.center), 2);
         stream.filter(this.world::isNearOccupiedPointOfInterest).map(ChunkSectionPos::getCenterPos).min(Comparator.comparingDouble(arg -> arg.getSquaredDistance(this.center))).ifPresent(this::setCenter);
     }

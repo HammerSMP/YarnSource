@@ -142,7 +142,7 @@ implements Waterloggable {
                 return false;
             }
             case WATER: {
-                return arg2.getFluidState(arg3).matches(FluidTags.WATER);
+                return arg2.getFluidState(arg3).isIn(FluidTags.WATER);
             }
             case AIR: {
                 return false;

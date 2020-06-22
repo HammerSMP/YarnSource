@@ -12,10 +12,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 
 public interface ModifiableWorld {
-    public boolean method_30092(BlockPos var1, BlockState var2, int var3, int var4);
+    public boolean setBlockState(BlockPos var1, BlockState var2, int var3, int var4);
 
     default public boolean setBlockState(BlockPos arg, BlockState arg2, int i) {
-        return this.method_30092(arg, arg2, i, 512);
+        return this.setBlockState(arg, arg2, i, 512);
     }
 
     public boolean removeBlock(BlockPos var1, boolean var2);

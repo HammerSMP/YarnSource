@@ -49,7 +49,7 @@ implements Waterloggable {
             return true;
         }
         for (Direction lv : Direction.values()) {
-            if (!arg2.getFluidState(arg3.offset(lv)).matches(FluidTags.WATER)) continue;
+            if (!arg2.getFluidState(arg3.offset(lv)).isIn(FluidTags.WATER)) continue;
             return true;
         }
         return false;
@@ -59,7 +59,7 @@ implements Waterloggable {
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext arg) {
         FluidState lv;
-        return (BlockState)this.getDefaultState().with(WATERLOGGED, (lv = arg.getWorld().getFluidState(arg.getBlockPos())).matches(FluidTags.WATER) && lv.getLevel() == 8);
+        return (BlockState)this.getDefaultState().with(WATERLOGGED, (lv = arg.getWorld().getFluidState(arg.getBlockPos())).isIn(FluidTags.WATER) && lv.getLevel() == 8);
     }
 
     @Override

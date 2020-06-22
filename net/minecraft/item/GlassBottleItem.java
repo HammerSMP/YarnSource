@@ -49,7 +49,7 @@ extends Item {
             if (!arg2.canPlayerModifyAt(arg22, lv4)) {
                 return TypedActionResult.pass(lv);
             }
-            if (arg2.getFluidState(lv4).matches(FluidTags.WATER)) {
+            if (arg2.getFluidState(lv4).isIn(FluidTags.WATER)) {
                 arg2.playSound(arg22, arg22.getX(), arg22.getY(), arg22.getZ(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
                 return TypedActionResult.method_29237(this.fill(lv, arg22, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)), arg2.isClient());
             }

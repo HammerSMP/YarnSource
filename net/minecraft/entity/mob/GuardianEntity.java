@@ -198,7 +198,7 @@ extends HostileEntity {
 
     @Override
     public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (arg2.getFluidState(arg).matches(FluidTags.WATER)) {
+        if (arg2.getFluidState(arg).isIn(FluidTags.WATER)) {
             return 10.0f + arg2.getBrightness(arg) - 0.5f;
         }
         return super.getPathfindingFavor(arg, arg2);
@@ -290,7 +290,7 @@ extends HostileEntity {
     }
 
     public static boolean canSpawn(EntityType<? extends GuardianEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return !(random.nextInt(20) != 0 && arg2.isSkyVisibleAllowingSea(arg4) || arg2.getDifficulty() == Difficulty.PEACEFUL || arg3 != SpawnReason.SPAWNER && !arg2.getFluidState(arg4).matches(FluidTags.WATER));
+        return !(random.nextInt(20) != 0 && arg2.isSkyVisibleAllowingSea(arg4) || arg2.getDifficulty() == Difficulty.PEACEFUL || arg3 != SpawnReason.SPAWNER && !arg2.getFluidState(arg4).isIn(FluidTags.WATER));
     }
 
     @Override

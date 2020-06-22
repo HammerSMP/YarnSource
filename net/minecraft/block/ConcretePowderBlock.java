@@ -69,7 +69,7 @@ extends FallingBlock {
     }
 
     private static boolean hardensIn(BlockState arg) {
-        return arg.getFluidState().matches(FluidTags.WATER);
+        return arg.getFluidState().isIn(FluidTags.WATER);
     }
 
     @Override

@@ -112,7 +112,7 @@ public class TargetFinder {
             if (bl2) {
                 lv5 = TargetFinder.findValidPositionAbove(lv5, random.nextInt(l + 1) + m, arg.world.getHeight(), arg2 -> arg.world.getBlockState((BlockPos)arg2).getMaterial().isSolid());
             }
-            if (!bl && arg.world.getFluidState(lv5).matches(FluidTags.WATER) || arg.getPathfindingPenalty(lv6 = LandPathNodeMaker.getLandNodeType(arg.world, lv5.mutableCopy())) != 0.0f || !((f = toDoubleFunction.applyAsDouble(lv5)) > e)) continue;
+            if (!bl && arg.world.getFluidState(lv5).isIn(FluidTags.WATER) || arg.getPathfindingPenalty(lv6 = LandPathNodeMaker.getLandNodeType(arg.world, lv5.mutableCopy())) != 0.0f || !((f = toDoubleFunction.applyAsDouble(lv5)) > e)) continue;
             e = f;
             lv2 = lv5;
             bl6 = true;

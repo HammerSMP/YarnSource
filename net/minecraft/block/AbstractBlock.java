@@ -114,7 +114,7 @@ public abstract class AbstractBlock {
                 return !arg.isFullCube(arg2, arg3);
             }
             case WATER: {
-                return arg2.getFluidState(arg3).matches(FluidTags.WATER);
+                return arg2.getFluidState(arg3).isIn(FluidTags.WATER);
             }
             case AIR: {
                 return !arg.isFullCube(arg2, arg3);

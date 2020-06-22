@@ -42,7 +42,7 @@ public class BackgroundRenderer {
 
     public static void render(Camera arg, float f, ClientWorld arg2, int i2, float g) {
         FluidState lv = arg.getSubmergedFluidState();
-        if (lv.matches(FluidTags.WATER)) {
+        if (lv.isIn(FluidTags.WATER)) {
             long l = Util.getMeasuringTimeMs();
             int j2 = arg2.getBiome(new BlockPos(arg.getPos())).getWaterFogColor();
             if (lastWaterFogColorUpdateTime < 0L) {
@@ -68,7 +68,7 @@ public class BackgroundRenderer {
                 nextWaterFogColor = MathHelper.floor(r) << 16 | MathHelper.floor(s) << 8 | MathHelper.floor(t);
                 lastWaterFogColorUpdateTime = l;
             }
-        } else if (lv.matches(FluidTags.LAVA)) {
+        } else if (lv.isIn(FluidTags.LAVA)) {
             red = 0.6f;
             green = 0.1f;
             blue = 0.0f;
@@ -126,7 +126,7 @@ public class BackgroundRenderer {
             int ag = ((LivingEntity)arg.getFocusedEntity()).getStatusEffect(StatusEffects.BLINDNESS).getDuration();
             d = ag < 20 ? (d *= (double)(1.0f - (float)ag / 20.0f)) : 0.0;
         }
-        if (d < 1.0 && !lv.matches(FluidTags.LAVA)) {
+        if (d < 1.0 && !lv.isIn(FluidTags.LAVA)) {
             if (d < 0.0) {
                 d = 0.0;
             }
@@ -140,7 +140,7 @@ public class BackgroundRenderer {
             green = green * (1.0f - g) + green * 0.6f * g;
             blue = blue * (1.0f - g) + blue * 0.6f * g;
         }
-        if (lv.matches(FluidTags.WATER)) {
+        if (lv.isIn(FluidTags.WATER)) {
             float ah = 0.0f;
             if (arg.getFocusedEntity() instanceof ClientPlayerEntity) {
                 ClientPlayerEntity lv7 = (ClientPlayerEntity)arg.getFocusedEntity();
@@ -170,7 +170,7 @@ public class BackgroundRenderer {
         FluidState lv = arg.getSubmergedFluidState();
         Entity lv2 = arg.getFocusedEntity();
         boolean bl3 = bl2 = lv.getFluid() != Fluids.EMPTY;
-        if (lv.matches(FluidTags.WATER)) {
+        if (lv.isIn(FluidTags.WATER)) {
             float g = 1.0f;
             g = 0.05f;
             if (lv2 instanceof ClientPlayerEntity) {
@@ -186,7 +186,7 @@ public class BackgroundRenderer {
         } else {
             float w;
             float v;
-            if (lv.matches(FluidTags.LAVA)) {
+            if (lv.isIn(FluidTags.LAVA)) {
                 if (lv2 instanceof LivingEntity && ((LivingEntity)lv2).hasStatusEffect(StatusEffects.FIRE_RESISTANCE)) {
                     float h = 0.0f;
                     float i = 3.0f;

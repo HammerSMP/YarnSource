@@ -524,7 +524,7 @@ public interface DispenserBehavior {
                     this.setSuccess(true);
                     return this.method_22141(arg2, arg22, new ItemStack(Items.HONEY_BOTTLE));
                 }
-                if (lv.getFluidState(lv2).matches(FluidTags.WATER)) {
+                if (lv.getFluidState(lv2).isIn(FluidTags.WATER)) {
                     this.setSuccess(true);
                     return this.method_22141(arg2, arg22, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER));
                 }

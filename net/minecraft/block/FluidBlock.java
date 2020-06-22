@@ -146,7 +146,7 @@ implements FluidDrainable {
             for (Direction lv : Direction.values()) {
                 if (lv == Direction.DOWN) continue;
                 BlockPos lv2 = arg2.offset(lv);
-                if (arg.getFluidState(lv2).matches(FluidTags.WATER)) {
+                if (arg.getFluidState(lv2).isIn(FluidTags.WATER)) {
                     Block lv3 = arg.getFluidState(arg2).isStill() ? Blocks.OBSIDIAN : Blocks.COBBLESTONE;
                     arg.setBlockState(arg2, lv3.getDefaultState());
                     this.playExtinguishSound(arg, arg2);

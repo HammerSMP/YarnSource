@@ -172,7 +172,7 @@ public class OceanRuinGenerator {
         @Override
         protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
             if ("chest".equals(string)) {
-                arg2.setBlockState(arg, (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.WATERLOGGED, arg2.getFluidState(arg).matches(FluidTags.WATER)), 2);
+                arg2.setBlockState(arg, (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.WATERLOGGED, arg2.getFluidState(arg).isIn(FluidTags.WATER)), 2);
                 BlockEntity lv = arg2.getBlockEntity(arg);
                 if (lv instanceof ChestBlockEntity) {
                     ((ChestBlockEntity)lv).setLootTable(this.large ? LootTables.UNDERWATER_RUIN_BIG_CHEST : LootTables.UNDERWATER_RUIN_SMALL_CHEST, random.nextLong());
@@ -213,7 +213,7 @@ public class OceanRuinGenerator {
                 BlockPos.Mutable lv2 = new BlockPos.Mutable(m, o, n);
                 BlockState lv3 = arg2.getBlockState(lv2);
                 FluidState lv4 = arg2.getFluidState(lv2);
-                while ((lv3.isAir() || lv4.matches(FluidTags.WATER) || lv3.getBlock().isIn(BlockTags.ICE)) && o > 1) {
+                while ((lv3.isAir() || lv4.isIn(FluidTags.WATER) || lv3.getBlock().isIn(BlockTags.ICE)) && o > 1) {
                     lv2.set(m, --o, n);
                     lv3 = arg2.getBlockState(lv2);
                     lv4 = arg2.getFluidState(lv2);
