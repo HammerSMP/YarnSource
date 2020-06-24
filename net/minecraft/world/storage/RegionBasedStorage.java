@@ -24,11 +24,11 @@ public final class RegionBasedStorage
 implements AutoCloseable {
     private final Long2ObjectLinkedOpenHashMap<RegionFile> cachedRegionFiles = new Long2ObjectLinkedOpenHashMap();
     private final File directory;
-    private final boolean dsync;
+    private final boolean desync;
 
     RegionBasedStorage(File file, boolean bl) {
         this.directory = file;
-        this.dsync = bl;
+        this.desync = bl;
     }
 
     private RegionFile getRegionFile(ChunkPos arg) throws IOException {
@@ -44,7 +44,7 @@ implements AutoCloseable {
             this.directory.mkdirs();
         }
         File file = new File(this.directory, "r." + arg.getRegionX() + "." + arg.getRegionZ() + ".mca");
-        RegionFile lv2 = new RegionFile(file, this.directory, this.dsync);
+        RegionFile lv2 = new RegionFile(file, this.directory, this.desync);
         this.cachedRegionFiles.putAndMoveToFirst(l, (Object)lv2);
         return lv2;
     }

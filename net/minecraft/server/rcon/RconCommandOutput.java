@@ -31,7 +31,7 @@ implements CommandOutput {
         return this.buffer.toString();
     }
 
-    public ServerCommandSource createReconCommandSource() {
+    public ServerCommandSource createRconCommandSource() {
         ServerWorld lv = this.server.getOverworld();
         return new ServerCommandSource(this, Vec3d.of(lv.getSpawnPos()), Vec2f.ZERO, lv, 4, "Rcon", RCON_NAME, this.server, null);
     }

@@ -149,7 +149,7 @@ extends AnimalEntity {
         this.followFishGoal = new FollowTargetGoal<FishEntity>(this, FishEntity.class, 20, false, false, arg -> arg instanceof SchoolingFishEntity);
         this.goalSelector.add(0, new FoxSwimGoal());
         this.goalSelector.add(1, new StopWanderingGoal());
-        this.goalSelector.add(2, new EscapeWhenNotAggresiveGoal(2.2));
+        this.goalSelector.add(2, new EscapeWhenNotAggressiveGoal(2.2));
         this.goalSelector.add(3, new MateGoal(1.0));
         this.goalSelector.add(4, new FleeEntityGoal<PlayerEntity>(this, PlayerEntity.class, 16.0f, 1.6, 1.4, arg -> NOTICEABLE_PLAYER_FILTER.test((Entity)arg) && !this.canTrust(arg.getUuid()) && !this.isAggressive()));
         this.goalSelector.add(4, new FleeEntityGoal<WolfEntity>(this, WolfEntity.class, 8.0f, 1.6, 1.4, arg -> !((WolfEntity)arg).isTamed() && !this.isAggressive()));
@@ -847,9 +847,9 @@ extends AnimalEntity {
         }
     }
 
-    class EscapeWhenNotAggresiveGoal
+    class EscapeWhenNotAggressiveGoal
     extends EscapeDangerGoal {
-        public EscapeWhenNotAggresiveGoal(double d) {
+        public EscapeWhenNotAggressiveGoal(double d) {
             super(FoxEntity.this, d);
         }
 
@@ -942,7 +942,7 @@ extends AnimalEntity {
         }
 
         protected void eatSweetBerry() {
-            if (!FoxEntity.this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+            if (!FoxEntity.this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                 return;
             }
             BlockState lv = FoxEntity.this.world.getBlockState(this.targetPos);

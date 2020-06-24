@@ -228,7 +228,7 @@ implements SkinOverlayOwner {
 
     private void explode() {
         if (!this.world.isClient) {
-            Explosion.DestructionType lv = this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE;
+            Explosion.DestructionType lv = this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE;
             float f = this.shouldRenderOverlay() ? 2.0f : 1.0f;
             this.dead = true;
             this.world.createExplosion(this, this.getX(), this.getY(), this.getZ(), (float)this.explosionRadius * f, lv);

@@ -48,7 +48,7 @@ extends Feature<HugeMushroomFeatureConfig> {
             return false;
         }
         Block lv = arg.getBlockState(arg2.down()).getBlock();
-        if (!HugeMushroomFeature.isDirt(lv)) {
+        if (!HugeMushroomFeature.isSoil(lv)) {
             return false;
         }
         for (int k = 0; k <= i; ++k) {

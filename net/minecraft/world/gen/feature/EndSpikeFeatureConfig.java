@@ -39,7 +39,7 @@ implements FeatureConfig {
         this.crystalBeamTarget = optional.orElse(null);
     }
 
-    public boolean isCrystalInvulerable() {
+    public boolean isCrystalInvulnerable() {
         return this.crystalInvulnerable;
     }
 

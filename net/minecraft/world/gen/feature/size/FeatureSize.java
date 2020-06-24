@@ -15,10 +15,10 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.feature.size.FeatureSizeType;
 
 public abstract class FeatureSize {
-    public static final Codec<FeatureSize> field_24922 = Registry.FEATURE_SIZE_TYPE.dispatch(FeatureSize::method_28824, FeatureSizeType::method_28825);
+    public static final Codec<FeatureSize> CODEC = Registry.FEATURE_SIZE_TYPE.dispatch(FeatureSize::getType, FeatureSizeType::getCodec);
     protected final OptionalInt minClippedHeight;
 
-    protected static <S extends FeatureSize> RecordCodecBuilder<S, OptionalInt> method_28820() {
+    protected static <S extends FeatureSize> RecordCodecBuilder<S, OptionalInt> createCodecBuilder() {
         return Codec.INT.optionalFieldOf("min_clipped_height").xmap(optional -> optional.map(OptionalInt::of).orElse(OptionalInt.empty()), optionalInt -> optionalInt.isPresent() ? Optional.of(optionalInt.getAsInt()) : Optional.empty()).forGetter(arg -> arg.minClippedHeight);
     }
 
@@ -26,7 +26,7 @@ public abstract class FeatureSize {
         this.minClippedHeight = optionalInt;
     }
 
-    protected abstract FeatureSizeType<?> method_28824();
+    protected abstract FeatureSizeType<?> getType();
 
     public abstract int method_27378(int var1, int var2);
 

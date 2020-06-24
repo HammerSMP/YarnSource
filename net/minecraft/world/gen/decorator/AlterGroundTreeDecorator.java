@@ -63,11 +63,11 @@ extends TreeDecorator {
     private void method_23463(ModifiableTestableWorld arg, Random random, BlockPos arg2) {
         for (int i = 2; i >= -3; --i) {
             BlockPos lv = arg2.up(i);
-            if (Feature.method_27368(arg, lv)) {
+            if (Feature.isSoil(arg, lv)) {
                 arg.setBlockState(lv, this.field_21316.getBlockState(random, arg2), 19);
                 break;
             }
-            if (!Feature.method_27370(arg, lv) && i < 0) break;
+            if (!Feature.isAir(arg, lv) && i < 0) break;
         }
     }
 }

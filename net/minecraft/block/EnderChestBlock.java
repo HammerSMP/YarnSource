@@ -104,7 +104,7 @@ implements Waterloggable {
         lv.setActiveBlockEntity(lv4);
         arg4.openHandledScreen(new SimpleNamedScreenHandlerFactory((i, arg2, arg3) -> GenericContainerScreenHandler.createGeneric9x3(i, arg2, lv), CONTAINER_NAME));
         arg4.incrementStat(Stats.OPEN_ENDERCHEST);
-        PiglinBrain.onGoldBlockBroken(arg4, true);
+        PiglinBrain.onGuardedBlockBroken(arg4, true);
         return ActionResult.CONSUME;
     }
 

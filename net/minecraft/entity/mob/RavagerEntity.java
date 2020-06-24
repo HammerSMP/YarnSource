@@ -160,7 +160,7 @@ extends RaiderEntity {
             double e = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).getBaseValue();
             this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(MathHelper.lerp(0.1, e, d));
         }
-        if (this.horizontalCollision && this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+        if (this.horizontalCollision && this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
             boolean bl = false;
             Box lv = this.getBoundingBox().expand(0.2);
             for (BlockPos lv2 : BlockPos.iterate(MathHelper.floor(lv.minX), MathHelper.floor(lv.minY), MathHelper.floor(lv.minZ), MathHelper.floor(lv.maxX), MathHelper.floor(lv.maxY), MathHelper.floor(lv.maxZ))) {

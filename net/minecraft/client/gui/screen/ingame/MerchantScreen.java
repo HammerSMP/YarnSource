@@ -68,7 +68,7 @@ extends HandledScreen<MerchantScreenHandler> {
     @Override
     protected void drawForeground(MatrixStack arg, int i, int j) {
         int k = ((MerchantScreenHandler)this.handler).getLevelProgress();
-        if (k > 0 && k <= 5 && ((MerchantScreenHandler)this.handler).isLevelled()) {
+        if (k > 0 && k <= 5 && ((MerchantScreenHandler)this.handler).isLeveled()) {
             String string = "- " + I18n.translate("merchant.level." + k, new Object[0]);
             int l = this.textRenderer.getWidth(this.title);
             int m = this.textRenderer.getWidth(string);
@@ -186,7 +186,7 @@ extends HandledScreen<MerchantScreenHandler> {
             }
             int q = this.selectedIndex;
             TradeOffer lv7 = (TradeOffer)lv.get(q);
-            if (((MerchantScreenHandler)this.handler).isLevelled()) {
+            if (((MerchantScreenHandler)this.handler).isLeveled()) {
                 this.drawLevelInfo(arg, k, l, lv7);
             }
             if (lv7.isDisabled() && this.isPointWithinBounds(186, 35, 22, 21, i, j) && ((MerchantScreenHandler)this.handler).canRefreshTrades()) {

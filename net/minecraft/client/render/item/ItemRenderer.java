@@ -122,7 +122,7 @@ implements SynchronousResourceReloadListener {
                 bl4 = true;
             }
             RenderLayer lv2 = RenderLayers.getItemLayer(arg, bl4);
-            if (arg.getItem() == Items.COMPASS && arg.hasEnchantmentGlint()) {
+            if (arg.getItem() == Items.COMPASS && arg.hasGlint()) {
                 arg3.push();
                 MatrixStack.Entry lv3 = arg3.peek();
                 if (arg2 == ModelTransformation.Mode.GUI) {
@@ -137,9 +137,9 @@ implements SynchronousResourceReloadListener {
                 }
                 arg3.pop();
             } else if (bl4) {
-                VertexConsumer lv6 = ItemRenderer.method_29711(arg4, lv2, true, arg.hasEnchantmentGlint());
+                VertexConsumer lv6 = ItemRenderer.method_29711(arg4, lv2, true, arg.hasGlint());
             } else {
-                lv7 = ItemRenderer.getArmorVertexConsumer(arg4, lv2, true, arg.hasEnchantmentGlint());
+                lv7 = ItemRenderer.getArmorVertexConsumer(arg4, lv2, true, arg.hasGlint());
             }
             this.renderBakedItemModel(arg5, arg, i, j, arg3, lv7);
         }
@@ -277,7 +277,7 @@ implements SynchronousResourceReloadListener {
             lv2.add("Item Type", () -> String.valueOf(arg2.getItem()));
             lv2.add("Item Damage", () -> String.valueOf(arg2.getDamage()));
             lv2.add("Item NBT", () -> String.valueOf(arg2.getTag()));
-            lv2.add("Item Foil", () -> String.valueOf(arg2.hasEnchantmentGlint()));
+            lv2.add("Item Foil", () -> String.valueOf(arg2.hasGlint()));
             throw new CrashException(lv);
         }
         this.zOffset -= 50.0f;

@@ -53,7 +53,7 @@ extends TreeDecorator {
         }
         BlockPos lv2 = (BlockPos)list3.get(random.nextInt(list3.size()));
         BlockPos lv3 = lv2.offset(lv);
-        if (!Feature.method_27370(arg2, lv3) || !Feature.method_27370(arg2, lv3.offset(Direction.SOUTH))) {
+        if (!Feature.isAir(arg2, lv3) || !Feature.isAir(arg2, lv3.offset(Direction.SOUTH))) {
             return;
         }
         BlockState lv4 = (BlockState)Blocks.BEE_NEST.getDefaultState().with(BeehiveBlock.FACING, Direction.SOUTH);

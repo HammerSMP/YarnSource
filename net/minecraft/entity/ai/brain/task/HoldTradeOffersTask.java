@@ -57,7 +57,7 @@ extends Task<VillagerEntity> {
     @Override
     public void run(ServerWorld arg, VillagerEntity arg2, long l) {
         super.run(arg, arg2, l);
-        this.findPotentialCuatomer(arg2);
+        this.findPotentialCustomer(arg2);
         this.offerShownTicks = 0;
         this.offerIndex = 0;
         this.ticksLeft = 40;
@@ -65,7 +65,7 @@ extends Task<VillagerEntity> {
 
     @Override
     public void keepRunning(ServerWorld arg, VillagerEntity arg2, long l) {
-        LivingEntity lv = this.findPotentialCuatomer(arg2);
+        LivingEntity lv = this.findPotentialCustomer(arg2);
         this.setupOffers(lv, arg2);
         if (!this.offers.isEmpty()) {
             this.refreshShownOffer(arg2);
@@ -116,7 +116,7 @@ extends Task<VillagerEntity> {
         return ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, arg.getAdjustedFirstBuyItem()) || ItemStack.areItemsEqualIgnoreDamage(this.customerHeldStack, arg.getSecondBuyItem());
     }
 
-    private LivingEntity findPotentialCuatomer(VillagerEntity arg) {
+    private LivingEntity findPotentialCustomer(VillagerEntity arg) {
         Brain<VillagerEntity> lv = arg.getBrain();
         LivingEntity lv2 = lv.getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).get();
         lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(lv2, true));

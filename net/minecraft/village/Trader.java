@@ -43,7 +43,7 @@ public interface Trader {
 
     public void setExperienceFromServer(int var1);
 
-    public boolean isLevelledTrader();
+    public boolean isLeveledTrader();
 
     public SoundEvent getYesSound();
 
@@ -55,7 +55,7 @@ public interface Trader {
         TraderOfferList lv;
         OptionalInt optionalInt = arg3.openHandledScreen(new SimpleNamedScreenHandlerFactory((i, arg, arg2) -> new MerchantScreenHandler(i, arg, this), arg22));
         if (optionalInt.isPresent() && !(lv = this.getOffers()).isEmpty()) {
-            arg3.sendTradeOffers(optionalInt.getAsInt(), lv, i2, this.getExperience(), this.isLevelledTrader(), this.canRefreshTrades());
+            arg3.sendTradeOffers(optionalInt.getAsInt(), lv, i2, this.getExperience(), this.isLeveledTrader(), this.canRefreshTrades());
         }
     }
 }

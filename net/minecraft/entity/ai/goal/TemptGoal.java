@@ -54,10 +54,10 @@ extends Goal {
         if (this.closestPlayer == null) {
             return false;
         }
-        return this.isTempedBy(this.closestPlayer.getMainHandStack()) || this.isTempedBy(this.closestPlayer.getOffHandStack());
+        return this.isTemptedBy(this.closestPlayer.getMainHandStack()) || this.isTemptedBy(this.closestPlayer.getOffHandStack());
     }
 
-    protected boolean isTempedBy(ItemStack arg) {
+    protected boolean isTemptedBy(ItemStack arg) {
         return this.food.test(arg);
     }
 

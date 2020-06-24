@@ -25,7 +25,7 @@ extends Feature<ForestRockFeatureConfig> {
     @Override
     public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, ForestRockFeatureConfig arg5) {
         Block lv;
-        while (arg4.getY() > 3 && (arg.isAir(arg4.down()) || !ForestRockFeature.isDirt(lv = arg.getBlockState(arg4.down()).getBlock()) && !ForestRockFeature.isStone(lv))) {
+        while (arg4.getY() > 3 && (arg.isAir(arg4.down()) || !ForestRockFeature.isSoil(lv = arg.getBlockState(arg4.down()).getBlock()) && !ForestRockFeature.isStone(lv))) {
             arg4 = arg4.down();
         }
         if (arg4.getY() <= 3) {

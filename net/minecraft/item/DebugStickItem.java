@@ -36,7 +36,7 @@ extends Item {
     }
 
     @Override
-    public boolean hasEnchantmentGlint(ItemStack arg) {
+    public boolean hasGlint(ItemStack arg) {
         return true;
     }
 

@@ -19,7 +19,7 @@ import net.minecraft.world.gen.stateprovider.BlockStateProviderType;
 
 public class PillarBlockStateProvider
 extends BlockStateProvider {
-    public static final Codec<PillarBlockStateProvider> field_24944 = BlockState.CODEC.fieldOf("state").xmap(AbstractBlock.AbstractBlockState::getBlock, Block::getDefaultState).xmap(PillarBlockStateProvider::new, arg -> arg.block).codec();
+    public static final Codec<PillarBlockStateProvider> CODEC = BlockState.CODEC.fieldOf("state").xmap(AbstractBlock.AbstractBlockState::getBlock, Block::getDefaultState).xmap(PillarBlockStateProvider::new, arg -> arg.block).codec();
     private final Block block;
 
     public PillarBlockStateProvider(Block arg) {
@@ -27,7 +27,7 @@ extends BlockStateProvider {
     }
 
     @Override
-    protected BlockStateProviderType<?> method_28862() {
+    protected BlockStateProviderType<?> getType() {
         return BlockStateProviderType.ROTATED_BLOCK_PROVIDER;
     }
 

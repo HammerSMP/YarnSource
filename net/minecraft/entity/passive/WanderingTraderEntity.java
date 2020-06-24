@@ -92,7 +92,7 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    public boolean isLevelledTrader() {
+    public boolean isLeveledTrader() {
         return false;
     }
 

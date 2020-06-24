@@ -1059,10 +1059,10 @@ CommandOutput {
     }
 
     public void method_29495(Vec3d arg) {
-        this.positAfterTeleport(arg.x, arg.y, arg.z);
+        this.refreshPositionAfterTeleport(arg.x, arg.y, arg.z);
     }
 
-    public void positAfterTeleport(double d, double e, double f) {
+    public void refreshPositionAfterTeleport(double d, double e, double f) {
         this.refreshPositionAndAngles(d, e, f, this.yaw, this.pitch);
     }
 
@@ -2176,7 +2176,7 @@ CommandOutput {
             lv.checkChunk((Entity)arg2);
             arg2.teleportRequested = true;
             for (Entity lv : arg2.passengerList) {
-                arg2.updatePassengerPosition(lv, Entity::positAfterTeleport);
+                arg2.updatePassengerPosition(lv, Entity::refreshPositionAfterTeleport);
             }
         });
     }

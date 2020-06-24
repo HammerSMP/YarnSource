@@ -165,17 +165,17 @@ public class VertexFormatElement {
         }, GlStateManager::method_22607);
 
         private final String name;
-        private final Starter stater;
+        private final Starter starter;
         private final IntConsumer finisher;
 
         private Type(String string2, Starter arg, IntConsumer intConsumer) {
             this.name = string2;
-            this.stater = arg;
+            this.starter = arg;
             this.finisher = intConsumer;
         }
 
         private void startDrawing(int i, int j, int k, long l, int m) {
-            this.stater.setupBufferState(i, j, k, l, m);
+            this.starter.setupBufferState(i, j, k, l, m);
         }
 
         public void endDrawing(int i) {

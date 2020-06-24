@@ -200,7 +200,7 @@ implements Waterloggable {
         if (!arg.isClient && arg4.isOnFire()) {
             boolean bl;
             Entity lv = arg4.getOwner();
-            boolean bl2 = bl = lv == null || lv instanceof PlayerEntity || arg.getGameRules().getBoolean(GameRules.MOB_GRIEFING);
+            boolean bl2 = bl = lv == null || lv instanceof PlayerEntity || arg.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING);
             if (bl && !arg2.get(LIT).booleanValue() && !arg2.get(WATERLOGGED).booleanValue()) {
                 BlockPos lv2 = arg3.getBlockPos();
                 arg.setBlockState(lv2, (BlockState)arg2.with(Properties.LIT, true), 11);

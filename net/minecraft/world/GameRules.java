@@ -48,7 +48,7 @@ public class GameRules {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Map<Key<?>, Type<?>> RULE_TYPES = Maps.newTreeMap(Comparator.comparing(arg -> Key.method_20772(arg)));
     public static final Key<BooleanRule> DO_FIRE_TICK = GameRules.register("doFireTick", Category.UPDATES, BooleanRule.method_20755(true));
-    public static final Key<BooleanRule> MOB_GRIEFING = GameRules.register("mobGriefing", Category.MOBS, BooleanRule.method_20755(true));
+    public static final Key<BooleanRule> DO_MOB_GRIEFING = GameRules.register("mobGriefing", Category.MOBS, BooleanRule.method_20755(true));
     public static final Key<BooleanRule> KEEP_INVENTORY = GameRules.register("keepInventory", Category.PLAYER, BooleanRule.method_20755(false));
     public static final Key<BooleanRule> DO_MOB_SPAWNING = GameRules.register("doMobSpawning", Category.SPAWNING, BooleanRule.method_20755(true));
     public static final Key<BooleanRule> DO_MOB_LOOT = GameRules.register("doMobLoot", Category.DROPS, BooleanRule.method_20755(true));

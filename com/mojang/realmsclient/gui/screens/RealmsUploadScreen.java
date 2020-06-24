@@ -74,7 +74,7 @@ extends RealmsScreen {
     private final UploadStatus uploadStatus;
     private final RateLimiter narrationRateLimiter;
     private volatile Text[] field_20503;
-    private volatile Text status;
+    private volatile Text status = new TranslatableText("mco.upload.preparing");
     private volatile String progress;
     private volatile boolean cancelled;
     private volatile boolean uploadFinished;
@@ -249,9 +249,9 @@ extends RealmsScreen {
             long l = this.worldId;
             try {
                 if (!uploadLock.tryLock(1L, TimeUnit.SECONDS)) {
+                    this.status = new TranslatableText("mco.upload.close.failure");
                     return;
                 }
-                this.status = new TranslatableText("mco.upload.preparing");
                 UploadInfo lv2 = null;
                 for (int i = 0; i < 20; ++i) {
                     block35: {

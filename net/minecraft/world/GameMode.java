@@ -34,7 +34,7 @@ public enum GameMode {
         return new TranslatableText("gameMode." + this.name);
     }
 
-    public void setAbilitites(PlayerAbilities arg) {
+    public void setAbilities(PlayerAbilities arg) {
         if (this == CREATIVE) {
             arg.allowFlying = true;
             arg.creativeMode = true;

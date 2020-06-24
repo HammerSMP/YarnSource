@@ -35,7 +35,7 @@ public class AffineTransformations {
         enumMap.put(Direction.UP, new AffineTransformation(null, new Quaternion(new Vector3f(1.0f, 0.0f, 0.0f), -90.0f, true), null, null));
         enumMap.put(Direction.DOWN, new AffineTransformation(null, new Quaternion(new Vector3f(1.0f, 0.0f, 0.0f), 90.0f, true), null, null));
     });
-    public static final EnumMap<Direction, AffineTransformation> INVERSED_DIRECTION_ROTATIONS = Util.make(Maps.newEnumMap(Direction.class), enumMap -> {
+    public static final EnumMap<Direction, AffineTransformation> INVERTED_DIRECTION_ROTATIONS = Util.make(Maps.newEnumMap(Direction.class), enumMap -> {
         for (Direction lv : Direction.values()) {
             enumMap.put(lv, DIRECTION_ROTATIONS.get(lv).invert());
         }
@@ -55,7 +55,7 @@ public class AffineTransformations {
             LOGGER.warn(supplier.get());
             return new AffineTransformation(null, null, new Vector3f(0.0f, 0.0f, 0.0f), null);
         }
-        AffineTransformation lv3 = INVERSED_DIRECTION_ROTATIONS.get(arg2).multiply(lv2).multiply(DIRECTION_ROTATIONS.get(lv));
+        AffineTransformation lv3 = INVERTED_DIRECTION_ROTATIONS.get(arg2).multiply(lv2).multiply(DIRECTION_ROTATIONS.get(lv));
         return AffineTransformations.setupUvLock(lv3);
     }
 }

@@ -349,7 +349,7 @@ public class Schemas {
         dataFixerBuilder.addFixer((DataFix)new ChoiceTypesFix(schema55, "Add conduit", TypeReferences.BLOCK_ENTITY));
         Schema schema56 = dataFixerBuilder.addSchema(1483, Schema1483::new);
         dataFixerBuilder.addFixer((DataFix)new EntityPufferfishRenameFix(schema56, true));
-        dataFixerBuilder.addFixer(ItemNameFix.create(schema56, "Rename pufferfish egg item", Schemas.method_30070(EntityPufferfishRenameFix.RENAMED_FISHES)));
+        dataFixerBuilder.addFixer(ItemNameFix.create(schema56, "Rename pufferfish egg item", Schemas.method_30070(EntityPufferfishRenameFix.RENAMED_FISH)));
         Schema schema57 = dataFixerBuilder.addSchema(1484, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer(ItemNameFix.create(schema57, "Rename seagrass items", Schemas.method_30070((Map<String, String>)ImmutableMap.of((Object)"minecraft:sea_grass", (Object)"minecraft:seagrass", (Object)"minecraft:tall_sea_grass", (Object)"minecraft:tall_seagrass"))));
         dataFixerBuilder.addFixer(BlockNameFix.create(schema57, "Rename seagrass blocks", Schemas.method_30070((Map<String, String>)ImmutableMap.of((Object)"minecraft:sea_grass", (Object)"minecraft:seagrass", (Object)"minecraft:tall_sea_grass", (Object)"minecraft:tall_seagrass"))));

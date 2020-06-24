@@ -95,7 +95,7 @@ implements Spawner {
         Optional<BlockPos> optional = lv3.getPosition(PointOfInterestType.MEETING.getCompletionCondition(), arg -> true, lv2, 48, PointOfInterestStorage.OccupationStatus.ANY);
         BlockPos lv4 = optional.orElse(lv2);
         BlockPos lv5 = this.getNearbySpawnPos(arg2, lv4, 48);
-        if (lv5 != null && this.wontSuffocateAt(arg2, lv5)) {
+        if (lv5 != null && this.doesNotSuffocateAt(arg2, lv5)) {
             if (arg2.getBiome(lv5) == Biomes.THE_VOID) {
                 return false;
             }
@@ -141,7 +141,7 @@ implements Spawner {
         return lv;
     }
 
-    private boolean wontSuffocateAt(BlockView arg, BlockPos arg2) {
+    private boolean doesNotSuffocateAt(BlockView arg, BlockPos arg2) {
         for (BlockPos lv : BlockPos.iterate(arg2, arg2.add(1, 2, 1))) {
             if (arg.getBlockState(lv).getCollisionShape(arg, lv).isEmpty()) continue;
             return false;

@@ -380,7 +380,7 @@ implements Monster {
                     BlockState lv2 = this.world.getBlockState(lv);
                     Block lv3 = lv2.getBlock();
                     if (lv2.isAir() || lv2.getMaterial() == Material.FIRE) continue;
-                    if (!this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING) || BlockTags.DRAGON_IMMUNE.contains(lv3)) {
+                    if (!this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) || BlockTags.DRAGON_IMMUNE.contains(lv3)) {
                         bl = true;
                         continue;
                     }

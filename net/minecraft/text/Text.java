@@ -132,6 +132,11 @@ StringRenderable {
         return arg.accept(this.asString());
     }
 
+    @Environment(value=EnvType.CLIENT)
+    public static Text method_30163(@Nullable String string) {
+        return string != null ? new LiteralText(string) : LiteralText.EMPTY;
+    }
+
     public static class Serializer
     implements JsonDeserializer<MutableText>,
     JsonSerializer<Text> {

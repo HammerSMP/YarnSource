@@ -1090,7 +1090,7 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void positAfterTeleport(double d, double e, double f) {
+    public void refreshPositionAfterTeleport(double d, double e, double f) {
         this.networkHandler.requestTeleport(d, e, f, this.yaw, this.pitch);
         this.networkHandler.syncWithPlayerPosition();
     }

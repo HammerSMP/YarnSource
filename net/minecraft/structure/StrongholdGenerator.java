@@ -435,7 +435,7 @@ public class StrongholdGenerator {
             }
             this.fillWithOutline((WorldAccess)arg, arg4, 0, 0, 0, 13, i - 1, 14, true, random, STONE_BRICK_RANDOMIZER);
             this.generateEntrance(arg, random, arg4, this.entryDoor, 4, 1, 0);
-            this.fillWithOutlineUnderSealevel(arg, arg4, random, 0.07f, 2, 1, 1, 11, 4, 13, Blocks.COBWEB.getDefaultState(), Blocks.COBWEB.getDefaultState(), false, false);
+            this.fillWithOutlineUnderSeaLevel(arg, arg4, random, 0.07f, 2, 1, 1, 11, 4, 13, Blocks.COBWEB.getDefaultState(), Blocks.COBWEB.getDefaultState(), false, false);
             boolean j = true;
             int k = 12;
             for (int l = 1; l <= 13; ++l) {
@@ -910,7 +910,7 @@ public class StrongholdGenerator {
     public static class Corridor
     extends Piece {
         private final boolean leftExitExists;
-        private final boolean rightExitExixts;
+        private final boolean rightExitExists;
 
         public Corridor(int i, Random random, BlockBox arg, Direction arg2) {
             super(StructurePieceType.STRONGHOLD_CORRIDOR, i);
@@ -918,20 +918,20 @@ public class StrongholdGenerator {
             this.entryDoor = this.getRandomEntrance(random);
             this.boundingBox = arg;
             this.leftExitExists = random.nextInt(2) == 0;
-            this.rightExitExixts = random.nextInt(2) == 0;
+            this.rightExitExists = random.nextInt(2) == 0;
         }
 
         public Corridor(StructureManager arg, CompoundTag arg2) {
             super(StructurePieceType.STRONGHOLD_CORRIDOR, arg2);
             this.leftExitExists = arg2.getBoolean("Left");
-            this.rightExitExixts = arg2.getBoolean("Right");
+            this.rightExitExists = arg2.getBoolean("Right");
         }
 
         @Override
         protected void toNbt(CompoundTag arg) {
             super.toNbt(arg);
             arg.putBoolean("Left", this.leftExitExists);
-            arg.putBoolean("Right", this.rightExitExixts);
+            arg.putBoolean("Right", this.rightExitExists);
         }
 
         @Override
@@ -940,7 +940,7 @@ public class StrongholdGenerator {
             if (this.leftExitExists) {
                 this.method_14870((Start)arg, list, random, 1, 2);
             }
-            if (this.rightExitExixts) {
+            if (this.rightExitExists) {
                 this.method_14873((Start)arg, list, random, 1, 2);
             }
         }
@@ -967,7 +967,7 @@ public class StrongholdGenerator {
             if (this.leftExitExists) {
                 this.fillWithOutline((WorldAccess)arg, arg4, 0, 1, 2, 0, 3, 4, AIR, AIR, false);
             }
-            if (this.rightExitExixts) {
+            if (this.rightExitExists) {
                 this.fillWithOutline((WorldAccess)arg, arg4, 4, 1, 2, 4, 3, 4, AIR, AIR, false);
             }
             return true;

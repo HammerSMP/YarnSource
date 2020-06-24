@@ -405,7 +405,7 @@ implements CrossbowUser {
 
     @Override
     public boolean canGather(ItemStack arg) {
-        return this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING) && PiglinBrain.canGather(this, arg);
+        return this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) && PiglinBrain.canGather(this, arg);
     }
 
     protected boolean method_24846(ItemStack arg) {

@@ -688,8 +688,8 @@ public final class ItemStack {
         return Lists.newArrayList((Object[])new Text[]{new LiteralText("missingno").formatted(Formatting.DARK_GRAY)});
     }
 
-    public boolean hasEnchantmentGlint() {
-        return this.getItem().hasEnchantmentGlint(this);
+    public boolean hasGlint() {
+        return this.getItem().hasGlint(this);
     }
 
     public Rarity getRarity() {

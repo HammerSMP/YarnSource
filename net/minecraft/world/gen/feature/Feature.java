@@ -158,18 +158,18 @@ public abstract class Feature<FC extends FeatureConfig> {
     public static final Feature<RandomBooleanFeatureConfig> RANDOM_BOOLEAN_SELECTOR = Feature.register("random_boolean_selector", new RandomBooleanFeature(RandomBooleanFeatureConfig.CODEC));
     public static final Feature<DecoratedFeatureConfig> DECORATED = Feature.register("decorated", new DecoratedFeature(DecoratedFeatureConfig.CODEC));
     public static final Feature<DecoratedFeatureConfig> DECORATED_FLOWER = Feature.register("decorated_flower", new DecoratedFlowerFeature(DecoratedFeatureConfig.CODEC));
-    private final Codec<ConfiguredFeature<FC, Feature<FC>>> field_24837;
+    private final Codec<ConfiguredFeature<FC, Feature<FC>>> codec;
 
     private static <C extends FeatureConfig, F extends Feature<C>> F register(String string, F arg) {
         return (F)Registry.register(Registry.FEATURE, string, arg);
     }
 
     public Feature(Codec<FC> codec) {
-        this.field_24837 = codec.fieldOf("config").xmap(arg -> new ConfiguredFeature<FeatureConfig, Feature>(this, (FeatureConfig)arg), arg -> arg.config).codec();
+        this.codec = codec.fieldOf("config").xmap(arg -> new ConfiguredFeature<FeatureConfig, Feature>(this, (FeatureConfig)arg), arg -> arg.config).codec();
     }
 
-    public Codec<ConfiguredFeature<FC, Feature<FC>>> method_28627() {
-        return this.field_24837;
+    public Codec<ConfiguredFeature<FC, Feature<FC>>> getCodec() {
+        return this.codec;
     }
 
     public ConfiguredFeature<FC, ?> configure(FC arg) {
@@ -186,15 +186,15 @@ public abstract class Feature<FC extends FeatureConfig> {
         return arg == Blocks.STONE || arg == Blocks.GRANITE || arg == Blocks.DIORITE || arg == Blocks.ANDESITE;
     }
 
-    public static boolean isDirt(Block arg) {
+    public static boolean isSoil(Block arg) {
         return arg == Blocks.DIRT || arg == Blocks.GRASS_BLOCK || arg == Blocks.PODZOL || arg == Blocks.COARSE_DIRT || arg == Blocks.MYCELIUM;
     }
 
-    public static boolean method_27368(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> Feature.isDirt(arg.getBlock()));
+    public static boolean isSoil(TestableWorld arg2, BlockPos arg22) {
+        return arg2.testBlockState(arg22, arg -> Feature.isSoil(arg.getBlock()));
     }
 
-    public static boolean method_27370(TestableWorld arg, BlockPos arg2) {
+    public static boolean isAir(TestableWorld arg, BlockPos arg2) {
         return arg.testBlockState(arg2, AbstractBlock.AbstractBlockState::isAir);
     }
 }

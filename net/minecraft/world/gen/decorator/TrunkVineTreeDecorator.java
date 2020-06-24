@@ -35,16 +35,16 @@ extends TreeDecorator {
             BlockPos lv3;
             BlockPos lv2;
             BlockPos lv;
-            if (random.nextInt(3) > 0 && Feature.method_27370(arg, lv = arg3.west())) {
+            if (random.nextInt(3) > 0 && Feature.isAir(arg, lv = arg3.west())) {
                 this.placeVine(arg, lv, VineBlock.EAST, set, arg2);
             }
-            if (random.nextInt(3) > 0 && Feature.method_27370(arg, lv2 = arg3.east())) {
+            if (random.nextInt(3) > 0 && Feature.isAir(arg, lv2 = arg3.east())) {
                 this.placeVine(arg, lv2, VineBlock.WEST, set, arg2);
             }
-            if (random.nextInt(3) > 0 && Feature.method_27370(arg, lv3 = arg3.north())) {
+            if (random.nextInt(3) > 0 && Feature.isAir(arg, lv3 = arg3.north())) {
                 this.placeVine(arg, lv3, VineBlock.SOUTH, set, arg2);
             }
-            if (random.nextInt(3) > 0 && Feature.method_27370(arg, lv4 = arg3.south())) {
+            if (random.nextInt(3) > 0 && Feature.isAir(arg, lv4 = arg3.south())) {
                 this.placeVine(arg, lv4, VineBlock.NORTH, set, arg2);
             }
         });

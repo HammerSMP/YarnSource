@@ -19,10 +19,10 @@ import net.minecraft.world.gen.feature.size.FeatureSizeType;
 
 public class TwoLayersFeatureSize
 extends FeatureSize {
-    public static final Codec<TwoLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.field_24155), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.field_24156), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.field_24157), TwoLayersFeatureSize.method_28820()).apply((Applicative)instance, TwoLayersFeatureSize::new));
-    private final int field_24155;
-    private final int field_24156;
-    private final int field_24157;
+    public static final Codec<TwoLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.limit), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.upperSize), TwoLayersFeatureSize.createCodecBuilder()).apply((Applicative)instance, TwoLayersFeatureSize::new));
+    private final int limit;
+    private final int lowerSize;
+    private final int upperSize;
 
     public TwoLayersFeatureSize(int i, int j, int k) {
         this(i, j, k, OptionalInt.empty());
@@ -30,19 +30,19 @@ extends FeatureSize {
 
     public TwoLayersFeatureSize(int i, int j, int k, OptionalInt optionalInt) {
         super(optionalInt);
-        this.field_24155 = i;
-        this.field_24156 = j;
-        this.field_24157 = k;
+        this.limit = i;
+        this.lowerSize = j;
+        this.upperSize = k;
     }
 
     @Override
-    protected FeatureSizeType<?> method_28824() {
+    protected FeatureSizeType<?> getType() {
         return FeatureSizeType.TWO_LAYERS_FEATURE_SIZE;
     }
 
     @Override
     public int method_27378(int i, int j) {
-        return j < this.field_24155 ? this.field_24156 : this.field_24157;
+        return j < this.limit ? this.lowerSize : this.upperSize;
     }
 }
 

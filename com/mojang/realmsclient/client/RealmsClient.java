@@ -363,7 +363,7 @@ public class RealmsClient {
                     LOGGER.error("Realms error code: " + i + " message: " + string);
                     throw new RealmsServiceException(i, string, i, "");
                 }
-                RealmsError lv = new RealmsError(string);
+                RealmsError lv = RealmsError.method_30162(string);
                 LOGGER.error("Realms http code: " + i + " -  error code: " + lv.getErrorCode() + " -  message: " + lv.getErrorMessage() + " - raw body: " + string);
                 throw new RealmsServiceException(i, string, lv);
             }

@@ -373,7 +373,7 @@ WindowEventHandler {
     private static int currentFps;
     public String fpsDebugString = "";
     public boolean debugChunkInfo;
-    public boolean debugChunkOcculsion;
+    public boolean debugChunkOcclusion;
     public boolean chunkCullingEnabled = true;
     private boolean windowFocused;
     private final Queue<Runnable> renderTaskQueue = Queues.newConcurrentLinkedQueue();
@@ -516,7 +516,7 @@ WindowEventHandler {
         }
         SplashScreen.init(this);
         List<ResourcePack> list = this.resourcePackManager.createResourcePacks();
-        this.setOverlay(new SplashScreen(this, this.resourceManager.beginMonitoredReload(Util.getServerWorkerExecutor(), this, COMPLETED_UNIT_FUTURE, list), optional -> Util.ifPresentOrElse(optional, this::handleResourceReloadExecption, () -> {
+        this.setOverlay(new SplashScreen(this, this.resourceManager.beginMonitoredReload(Util.getServerWorkerExecutor(), this, COMPLETED_UNIT_FUTURE, list), optional -> Util.ifPresentOrElse(optional, this::handleResourceReloadException, () -> {
             if (SharedConstants.isDevelopment) {
                 this.checkGameData();
             }
@@ -554,7 +554,7 @@ WindowEventHandler {
         return !"vanilla".equals(ClientBrandRetriever.getClientModName()) || MinecraftClient.class.getSigners() == null;
     }
 
-    private void handleResourceReloadExecption(Throwable throwable) {
+    private void handleResourceReloadException(Throwable throwable) {
         if (this.resourcePackManager.getEnabledNames().size() > 1) {
             Text lv2;
             if (throwable instanceof ReloadableResourceManagerImpl.PackAdditionFailedException) {
@@ -703,7 +703,7 @@ WindowEventHandler {
         }
         this.resourcePackManager.scanPacks();
         List<ResourcePack> list = this.resourcePackManager.createResourcePacks();
-        this.setOverlay(new SplashScreen(this, this.resourceManager.beginMonitoredReload(Util.getServerWorkerExecutor(), this, COMPLETED_UNIT_FUTURE, list), optional -> Util.ifPresentOrElse(optional, this::handleResourceReloadExecption, () -> {
+        this.setOverlay(new SplashScreen(this, this.resourceManager.beginMonitoredReload(Util.getServerWorkerExecutor(), this, COMPLETED_UNIT_FUTURE, list), optional -> Util.ifPresentOrElse(optional, this::handleResourceReloadException, () -> {
             this.worldRenderer.reload();
             completableFuture.complete(null);
         }), true));
@@ -2229,7 +2229,7 @@ WindowEventHandler {
         int i = arg2.getPackFormat();
         Supplier<ResourcePack> supplier2 = supplier;
         if (i <= 3) {
-            supplier2 = MinecraftClient.createV3ResoucePackFactory(supplier2);
+            supplier2 = MinecraftClient.createV3ResourcePackFactory(supplier2);
         }
         if (i <= 4) {
             supplier2 = MinecraftClient.createV4ResourcePackFactory(supplier2);
@@ -2237,7 +2237,7 @@ WindowEventHandler {
         return new ClientResourcePackProfile(string, bl, supplier2, arg, arg2, arg3, arg4);
     }
 
-    private static Supplier<ResourcePack> createV3ResoucePackFactory(Supplier<ResourcePack> supplier) {
+    private static Supplier<ResourcePack> createV3ResourcePackFactory(Supplier<ResourcePack> supplier) {
         return () -> new Format3ResourcePack((ResourcePack)supplier.get(), Format3ResourcePack.NEW_TO_OLD_MAP);
     }
 

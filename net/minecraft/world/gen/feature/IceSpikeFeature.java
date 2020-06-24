@@ -49,13 +49,13 @@ extends Feature<DefaultFeatureConfig> {
                     if ((m != 0 || n != 0) && g * g + h * h > f * f || (m == -l || m == l || n == -l || n == l) && random.nextFloat() > 0.75f) continue;
                     BlockState lv = arg.getBlockState(arg4.add(m, k, n));
                     Block lv2 = lv.getBlock();
-                    if (lv.isAir() || IceSpikeFeature.isDirt(lv2) || lv2 == Blocks.SNOW_BLOCK || lv2 == Blocks.ICE) {
+                    if (lv.isAir() || IceSpikeFeature.isSoil(lv2) || lv2 == Blocks.SNOW_BLOCK || lv2 == Blocks.ICE) {
                         this.setBlockState(arg, arg4.add(m, k, n), Blocks.PACKED_ICE.getDefaultState());
                     }
                     if (k == 0 || l <= 1) continue;
                     lv = arg.getBlockState(arg4.add(m, -k, n));
                     lv2 = lv.getBlock();
-                    if (!lv.isAir() && !IceSpikeFeature.isDirt(lv2) && lv2 != Blocks.SNOW_BLOCK && lv2 != Blocks.ICE) continue;
+                    if (!lv.isAir() && !IceSpikeFeature.isSoil(lv2) && lv2 != Blocks.SNOW_BLOCK && lv2 != Blocks.ICE) continue;
                     this.setBlockState(arg, arg4.add(m, -k, n), Blocks.PACKED_ICE.getDefaultState());
                 }
             }
@@ -76,7 +76,7 @@ extends Feature<DefaultFeatureConfig> {
                 while (lv3.getY() > 50) {
                     BlockState lv4 = arg.getBlockState(lv3);
                     Block lv5 = lv4.getBlock();
-                    if (!lv4.isAir() && !IceSpikeFeature.isDirt(lv5) && lv5 != Blocks.SNOW_BLOCK && lv5 != Blocks.ICE && lv5 != Blocks.PACKED_ICE) continue block5;
+                    if (!lv4.isAir() && !IceSpikeFeature.isSoil(lv5) && lv5 != Blocks.SNOW_BLOCK && lv5 != Blocks.ICE && lv5 != Blocks.PACKED_ICE) continue block5;
                     this.setBlockState(arg, lv3, Blocks.PACKED_ICE.getDefaultState());
                     lv3 = lv3.down();
                     if (--r > 0) continue;

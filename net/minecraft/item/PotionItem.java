@@ -107,8 +107,8 @@ extends Item {
     }
 
     @Override
-    public boolean hasEnchantmentGlint(ItemStack arg) {
-        return super.hasEnchantmentGlint(arg) || !PotionUtil.getPotionEffects(arg).isEmpty();
+    public boolean hasGlint(ItemStack arg) {
+        return super.hasGlint(arg) || !PotionUtil.getPotionEffects(arg).isEmpty();
     }
 
     @Override

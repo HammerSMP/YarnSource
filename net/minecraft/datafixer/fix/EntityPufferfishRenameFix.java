@@ -15,7 +15,7 @@ import net.minecraft.datafixer.fix.EntityRenameFix;
 
 public class EntityPufferfishRenameFix
 extends EntityRenameFix {
-    public static final Map<String, String> RENAMED_FISHES = ImmutableMap.builder().put((Object)"minecraft:puffer_fish_spawn_egg", (Object)"minecraft:pufferfish_spawn_egg").build();
+    public static final Map<String, String> RENAMED_FISH = ImmutableMap.builder().put((Object)"minecraft:puffer_fish_spawn_egg", (Object)"minecraft:pufferfish_spawn_egg").build();
 
     public EntityPufferfishRenameFix(Schema schema, boolean bl) {
         super("EntityPufferfishRenameFix", schema, bl);

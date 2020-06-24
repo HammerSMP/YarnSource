@@ -43,7 +43,7 @@ extends Feature<IcePatchFeatureConfig> {
                 for (int o = arg4.getY() - 1; o <= arg4.getY() + 1; ++o) {
                     BlockPos lv = new BlockPos(k, o, l);
                     Block lv2 = arg.getBlockState(lv).getBlock();
-                    if (!IcePatchFeature.isDirt(lv2) && lv2 != Blocks.SNOW_BLOCK && lv2 != Blocks.ICE) continue;
+                    if (!IcePatchFeature.isSoil(lv2) && lv2 != Blocks.SNOW_BLOCK && lv2 != Blocks.ICE) continue;
                     arg.setBlockState(lv, this.ICE.getDefaultState(), 2);
                 }
             }

@@ -174,7 +174,7 @@ extends SpellcastingIllagerEntity {
             if (EvokerEntity.this.age < this.startTime) {
                 return false;
             }
-            if (!EvokerEntity.this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+            if (!EvokerEntity.this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                 return false;
             }
             List<SheepEntity> list = EvokerEntity.this.world.getTargets(SheepEntity.class, this.convertibleSheepPredicate, EvokerEntity.this, EvokerEntity.this.getBoundingBox().expand(16.0, 4.0, 16.0));

@@ -377,7 +377,7 @@ implements ItemConvertible {
     public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
         arg.syncWorldEvent(arg4, 2001, arg2, Block.getRawIdFromState(arg3));
         if (this.isIn(BlockTags.GUARDED_BY_PIGLINS)) {
-            PiglinBrain.onGoldBlockBroken(arg4, false);
+            PiglinBrain.onGuardedBlockBroken(arg4, false);
         }
     }
 

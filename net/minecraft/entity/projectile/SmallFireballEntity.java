@@ -60,7 +60,7 @@ extends AbstractFireballEntity {
             return;
         }
         Entity lv = this.getOwner();
-        if ((lv == null || !(lv instanceof MobEntity) || this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) && this.world.isAir(lv3 = (lv2 = arg).getBlockPos().offset(lv2.getSide()))) {
+        if ((lv == null || !(lv instanceof MobEntity) || this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) && this.world.isAir(lv3 = (lv2 = arg).getBlockPos().offset(lv2.getSide()))) {
             this.world.setBlockState(lv3, AbstractFireBlock.getState(this.world, lv3));
         }
     }

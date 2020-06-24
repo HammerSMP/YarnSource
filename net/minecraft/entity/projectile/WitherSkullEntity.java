@@ -105,7 +105,7 @@ extends ExplosiveProjectileEntity {
     protected void onCollision(HitResult arg) {
         super.onCollision(arg);
         if (!this.world.isClient) {
-            Explosion.DestructionType lv = this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE;
+            Explosion.DestructionType lv = this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE;
             this.world.createExplosion(this, this.getX(), this.getY(), this.getZ(), 1.0f, false, lv);
             this.remove();
         }

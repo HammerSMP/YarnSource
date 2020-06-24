@@ -104,7 +104,7 @@ implements Vanishable {
             float n = MathHelper.sqrt(h * h + l * l + m * m);
             float o = 3.0f * ((1.0f + (float)k) / 4.0f);
             lv.addVelocity(h *= o / n, l *= o / n, m *= o / n);
-            lv.setPushCooldown(20);
+            lv.setRiptideTicks(20);
             if (lv.isOnGround()) {
                 float p = 1.1999999f;
                 lv.move(MovementType.SELF, new Vec3d(0.0, 1.1999999284744263, 0.0));

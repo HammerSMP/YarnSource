@@ -54,6 +54,7 @@ import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.TickableElement;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.realms.Realms;
@@ -143,7 +144,7 @@ extends RealmsScreen {
         this.rateLimiter = RateLimiter.create((double)0.01666666753590107);
     }
 
-    public boolean shouldShowMessageInList() {
+    private boolean shouldShowMessageInList() {
         if (!RealmsMainScreen.hasParentalConsent() || !this.hasFetchedServers) {
             return false;
         }
@@ -320,7 +321,7 @@ extends RealmsScreen {
                 }
                 this.realmsServers = list;
                 if (this.shouldShowMessageInList()) {
-                    this.realmSelectionList.addEntry(new RealmSelectionListTrialEntry());
+                    this.realmSelectionList.method_30161(new RealmSelectionListTrialEntry());
                 }
                 for (RealmsServer lv2 : this.realmsServers) {
                     this.realmSelectionList.addEntry(new RealmSelectionListEntry(lv2));
@@ -990,7 +991,9 @@ extends RealmsScreen {
     }
 
     public RealmsMainScreen newScreen() {
-        return new RealmsMainScreen(this.lastScreen);
+        RealmsMainScreen lv = new RealmsMainScreen(this.lastScreen);
+        lv.init(this.client, this.width, this.height);
+        return lv;
     }
 
     public static void method_23765(ResourceManager arg2) {
@@ -1248,8 +1251,21 @@ extends RealmsScreen {
     @Environment(value=EnvType.CLIENT)
     class RealmSelectionList
     extends RealmsObjectSelectionList<Entry> {
+        private boolean field_25723;
+
         public RealmSelectionList() {
             super(RealmsMainScreen.this.width, RealmsMainScreen.this.height, 32, RealmsMainScreen.this.height - 40, 36);
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            this.field_25723 = false;
+        }
+
+        public int method_30161(Entry arg) {
+            this.field_25723 = true;
+            return this.addEntry(arg);
         }
 
         @Override
@@ -1293,7 +1309,7 @@ extends RealmsScreen {
             if (i == -1) {
                 return;
             }
-            if (RealmsMainScreen.this.shouldShowMessageInList()) {
+            if (this.field_25723) {
                 if (i == 0) {
                     Realms.narrateNow(I18n.translate("mco.trial.message.line1", new Object[0]), I18n.translate("mco.trial.message.line2", new Object[0]));
                     Object lv = null;
@@ -1331,14 +1347,17 @@ extends RealmsScreen {
         @Override
         public void setSelected(@Nullable Entry arg) {
             super.setSelected(arg);
-            RealmsServer lv = (RealmsServer)RealmsMainScreen.this.realmsServers.get(this.children().indexOf(arg) - (RealmsMainScreen.this.shouldShowMessageInList() ? 1 : 0));
-            RealmsMainScreen.this.selectedServerId = lv.id;
-            RealmsMainScreen.this.updateButtonStates(lv);
+            int i = this.children().indexOf(arg);
+            if (!this.field_25723 || i > 0) {
+                RealmsServer lv = (RealmsServer)RealmsMainScreen.this.realmsServers.get(i - (this.field_25723 ? 1 : 0));
+                RealmsMainScreen.this.selectedServerId = lv.id;
+                RealmsMainScreen.this.updateButtonStates(lv);
+            }
         }
 
         @Override
         public void itemClicked(int i, int j, double d, double e, int k) {
-            if (RealmsMainScreen.this.shouldShowMessageInList()) {
+            if (this.field_25723) {
                 if (j == 0) {
                     RealmsMainScreen.this.popupOpenedByUser = true;
                     return;
@@ -1377,6 +1396,11 @@ extends RealmsScreen {
         @Override
         public int getRowWidth() {
             return 300;
+        }
+
+        @Override
+        public /* synthetic */ void setSelected(@Nullable EntryListWidget.Entry arg) {
+            this.setSelected((Entry)arg);
         }
     }
 

@@ -19,7 +19,7 @@ import net.minecraft.world.gen.feature.size.FeatureSizeType;
 
 public class ThreeLayersFeatureSize
 extends FeatureSize {
-    public static final Codec<ThreeLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.limit), (App)Codec.INT.fieldOf("upper_limit").withDefault((Object)1).forGetter(arg -> arg.upperLimit), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.INT.fieldOf("middle_size").withDefault((Object)1).forGetter(arg -> arg.middleSize), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.upperSize), ThreeLayersFeatureSize.method_28820()).apply((Applicative)instance, ThreeLayersFeatureSize::new));
+    public static final Codec<ThreeLayersFeatureSize> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("limit").withDefault((Object)1).forGetter(arg -> arg.limit), (App)Codec.INT.fieldOf("upper_limit").withDefault((Object)1).forGetter(arg -> arg.upperLimit), (App)Codec.INT.fieldOf("lower_size").withDefault((Object)0).forGetter(arg -> arg.lowerSize), (App)Codec.INT.fieldOf("middle_size").withDefault((Object)1).forGetter(arg -> arg.middleSize), (App)Codec.INT.fieldOf("upper_size").withDefault((Object)1).forGetter(arg -> arg.upperSize), ThreeLayersFeatureSize.createCodecBuilder()).apply((Applicative)instance, ThreeLayersFeatureSize::new));
     private final int limit;
     private final int upperLimit;
     private final int lowerSize;
@@ -36,7 +36,7 @@ extends FeatureSize {
     }
 
     @Override
-    protected FeatureSizeType<?> method_28824() {
+    protected FeatureSizeType<?> getType() {
         return FeatureSizeType.THREE_LAYERS_FEATURE_SIZE;
     }
 

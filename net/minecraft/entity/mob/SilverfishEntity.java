@@ -156,7 +156,7 @@ extends HostileEntity {
                 return false;
             }
             Random random = this.mob.getRandom();
-            if (this.mob.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING) && random.nextInt(10) == 0) {
+            if (this.mob.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) && random.nextInt(10) == 0) {
                 this.direction = Direction.random(random);
                 BlockPos lv = new BlockPos(this.mob.getX(), this.mob.getY() + 0.5, this.mob.getZ()).offset(this.direction);
                 BlockState lv2 = this.mob.world.getBlockState(lv);
@@ -231,7 +231,7 @@ extends HostileEntity {
                             BlockState lv4 = lv.getBlockState(lv3);
                             Block lv5 = lv4.getBlock();
                             if (lv5 instanceof InfestedBlock) {
-                                if (lv.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+                                if (lv.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                                     lv.breakBlock(lv3, true, this.silverfish);
                                 } else {
                                     lv.setBlockState(lv3, ((InfestedBlock)lv5).getRegularBlock().getDefaultState(), 3);

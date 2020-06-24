@@ -71,7 +71,7 @@ implements ResourcePack {
 
     protected abstract boolean containsFile(String var1);
 
-    protected void warnNonLowercaseNamespace(String string) {
+    protected void warnNonLowerCaseNamespace(String string) {
         LOGGER.warn("ResourcePack: ignored non-lowercase namespace: {} in {}", (Object)string, (Object)this.base);
     }
 

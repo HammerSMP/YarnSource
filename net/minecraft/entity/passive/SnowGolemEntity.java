@@ -110,7 +110,7 @@ RangedAttackMob {
             if (this.world.getBiome(blockPos).getTemperature(blockPos2) > 1.0f) {
                 this.damage(DamageSource.ON_FIRE, 1.0f);
             }
-            if (!this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+            if (!this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                 return;
             }
             BlockState lv = Blocks.SNOW.getDefaultState();

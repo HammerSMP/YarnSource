@@ -223,7 +223,7 @@ extends Entity {
     private Optional<BlockPos> climbingPos = Optional.empty();
     private DamageSource lastDamageSource;
     private long lastDamageTime;
-    protected int pushCooldown;
+    protected int riptideTicks;
     private float leaningPitch;
     private float lastLeaningPitch;
     protected Brain<?> brain;
@@ -1115,7 +1115,7 @@ extends Entity {
         }
         boolean bl = false;
         if (arg instanceof WitherEntity) {
-            if (this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+            if (this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                 BlockPos lv = this.getBlockPos();
                 BlockState lv2 = Blocks.WITHER_ROSE.getDefaultState();
                 if (this.world.getBlockState(lv).isAir() && lv2.canPlaceAt(this.world, lv)) {
@@ -2216,9 +2216,9 @@ extends Entity {
         this.travel(new Vec3d(this.sidewaysSpeed, this.upwardSpeed, this.forwardSpeed));
         this.world.getProfiler().pop();
         this.world.getProfiler().push("push");
-        if (this.pushCooldown > 0) {
-            --this.pushCooldown;
-            this.push(lv2, this.getBoundingBox());
+        if (this.riptideTicks > 0) {
+            --this.riptideTicks;
+            this.tickRiptide(lv2, this.getBoundingBox());
         }
         this.tickCramming();
         this.world.getProfiler().pop();
@@ -2275,7 +2275,7 @@ extends Entity {
         }
     }
 
-    protected void push(Box arg, Box arg2) {
+    protected void tickRiptide(Box arg, Box arg2) {
         Box lv = arg.union(arg2);
         List<Entity> list = this.world.getEntities(this, lv);
         if (!list.isEmpty()) {
@@ -2283,14 +2283,14 @@ extends Entity {
                 Entity lv2 = list.get(i);
                 if (!(lv2 instanceof LivingEntity)) continue;
                 this.attackLivingEntity((LivingEntity)lv2);
-                this.pushCooldown = 0;
+                this.riptideTicks = 0;
                 this.setVelocity(this.getVelocity().multiply(-0.2));
                 break;
             }
         } else if (this.horizontalCollision) {
-            this.pushCooldown = 0;
+            this.riptideTicks = 0;
         }
-        if (!this.world.isClient && this.pushCooldown <= 0) {
+        if (!this.world.isClient && this.riptideTicks <= 0) {
             this.setLivingFlag(4, false);
         }
     }
@@ -2302,8 +2302,8 @@ extends Entity {
     protected void attackLivingEntity(LivingEntity arg) {
     }
 
-    public void setPushCooldown(int i) {
-        this.pushCooldown = i;
+    public void setRiptideTicks(int i) {
+        this.riptideTicks = i;
         if (!this.world.isClient) {
             this.setLivingFlag(4, true);
         }

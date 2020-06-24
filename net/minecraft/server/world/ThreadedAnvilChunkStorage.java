@@ -144,7 +144,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     private final LongSet unloadedChunks = new LongOpenHashSet();
     private boolean chunkHolderListDirty;
     private final ChunkTaskPrioritySystem chunkTaskPrioritySystem;
-    private final MessageListener<ChunkTaskPrioritySystem.Task<Runnable>> worldgenExecutor;
+    private final MessageListener<ChunkTaskPrioritySystem.Task<Runnable>> worldGenExecutor;
     private final MessageListener<ChunkTaskPrioritySystem.Task<Runnable>> mainExecutor;
     private final WorldGenerationProgressListener worldGenerationProgressListener;
     private final TicketManager ticketManager;
@@ -169,7 +169,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         this.worldGenerationProgressListener = arg7;
         TaskExecutor<Runnable> lv3 = TaskExecutor.create(executor, "light");
         this.chunkTaskPrioritySystem = new ChunkTaskPrioritySystem((List<MessageListener<?>>)ImmutableList.of(lv, lv2, lv3), executor, Integer.MAX_VALUE);
-        this.worldgenExecutor = this.chunkTaskPrioritySystem.createExecutor(lv, false);
+        this.worldGenExecutor = this.chunkTaskPrioritySystem.createExecutor(lv, false);
         this.mainExecutor = this.chunkTaskPrioritySystem.createExecutor(lv2, false);
         this.serverLightingProvider = new ServerLightingProvider(arg5, this, this.world.getDimension().hasSkyLight(), lv3, this.chunkTaskPrioritySystem.createExecutor(lv3, false));
         this.ticketManager = new TicketManager(executor, arg4);
@@ -526,7 +526,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         }, arg2 -> {
             this.releaseLightTicket(lv);
             return CompletableFuture.completedFuture(Either.right((Object)arg2));
-        }), runnable -> this.worldgenExecutor.send(ChunkTaskPrioritySystem.createMessage(arg, runnable)));
+        }), runnable -> this.worldGenExecutor.send(ChunkTaskPrioritySystem.createMessage(arg, runnable)));
     }
 
     protected void releaseLightTicket(ChunkPos arg) {

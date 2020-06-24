@@ -368,7 +368,7 @@ implements Angerable {
             if (this.enderman.getCarriedBlock() != null) {
                 return false;
             }
-            if (!this.enderman.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+            if (!this.enderman.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                 return false;
             }
             return this.enderman.getRandom().nextInt(20) == 0;
@@ -408,7 +408,7 @@ implements Angerable {
             if (this.enderman.getCarriedBlock() == null) {
                 return false;
             }
-            if (!this.enderman.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+            if (!this.enderman.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
                 return false;
             }
             return this.enderman.getRandom().nextInt(2000) == 0;

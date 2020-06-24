@@ -107,7 +107,7 @@ extends TameableEntity {
     private float tailCurlAnimation;
     private float prevTailCurlAnimation;
     private float headDownAnimation;
-    private float prevHeadDownAniamtion;
+    private float prevHeadDownAnimation;
 
     public CatEntity(EntityType<? extends CatEntity> arg, World arg2) {
         super((EntityType<? extends TameableEntity>)arg, arg2);
@@ -306,7 +306,7 @@ extends TameableEntity {
     }
 
     private void updateHeadDownAnimation() {
-        this.prevHeadDownAniamtion = this.headDownAnimation;
+        this.prevHeadDownAnimation = this.headDownAnimation;
         this.headDownAnimation = this.isHeadDown() ? Math.min(1.0f, this.headDownAnimation + 0.1f) : Math.max(0.0f, this.headDownAnimation - 0.13f);
     }
 
@@ -322,7 +322,7 @@ extends TameableEntity {
 
     @Environment(value=EnvType.CLIENT)
     public float getHeadDownAnimation(float f) {
-        return MathHelper.lerp(f, this.prevHeadDownAniamtion, this.headDownAnimation);
+        return MathHelper.lerp(f, this.prevHeadDownAnimation, this.headDownAnimation);
     }
 
     @Override

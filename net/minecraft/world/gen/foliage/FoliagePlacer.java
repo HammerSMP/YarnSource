@@ -25,7 +25,7 @@ import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public abstract class FoliagePlacer {
-    public static final Codec<FoliagePlacer> field_24931 = Registry.FOLIAGE_PLACER_TYPE.dispatch(FoliagePlacer::method_28843, FoliagePlacerType::method_28849);
+    public static final Codec<FoliagePlacer> CODEC = Registry.FOLIAGE_PLACER_TYPE.dispatch(FoliagePlacer::getType, FoliagePlacerType::getCodec);
     protected final int radius;
     protected final int randomRadius;
     protected final int offset;
@@ -42,7 +42,7 @@ public abstract class FoliagePlacer {
         this.randomOffset = l;
     }
 
-    protected abstract FoliagePlacerType<?> method_28843();
+    protected abstract FoliagePlacerType<?> getType();
 
     public void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, TreeNode arg3, int j, int k, Set<BlockPos> set, BlockBox arg4) {
         this.generate(arg, random, arg2, i, arg3, j, k, set, this.method_27386(random), arg4);

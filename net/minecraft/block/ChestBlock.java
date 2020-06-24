@@ -278,7 +278,7 @@ implements Waterloggable {
         if (lv != null) {
             arg4.openHandledScreen(lv);
             arg4.incrementStat(this.getOpenStat());
-            PiglinBrain.onGoldBlockBroken(arg4, true);
+            PiglinBrain.onGuardedBlockBroken(arg4, true);
         }
         return ActionResult.CONSUME;
     }

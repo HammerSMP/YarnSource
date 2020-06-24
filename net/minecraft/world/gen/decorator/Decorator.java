@@ -112,22 +112,22 @@ public abstract class Decorator<DC extends DecoratorConfig> {
     public static final Decorator<NopeDecoratorConfig> END_ISLAND = Decorator.register("end_island", new EndIslandDecorator(NopeDecoratorConfig.field_24891));
     public static final Decorator<NopeDecoratorConfig> CHORUS_PLANT = Decorator.register("chorus_plant", new ChorusPlantDecorator(NopeDecoratorConfig.field_24891));
     public static final Decorator<NopeDecoratorConfig> END_GATEWAY = Decorator.register("end_gateway", new EndGatewayDecorator(NopeDecoratorConfig.field_24891));
-    private final Codec<ConfiguredDecorator<DC>> field_24983;
+    private final Codec<ConfiguredDecorator<DC>> codec;
 
     private static <T extends DecoratorConfig, G extends Decorator<T>> G register(String string, G arg) {
         return (G)Registry.register(Registry.DECORATOR, string, arg);
     }
 
     public Decorator(Codec<DC> codec) {
-        this.field_24983 = codec.fieldOf("config").xmap(arg -> new ConfiguredDecorator<DecoratorConfig>(this, (DecoratorConfig)arg), arg -> arg.config).codec();
+        this.codec = codec.fieldOf("config").xmap(arg -> new ConfiguredDecorator<DecoratorConfig>(this, (DecoratorConfig)arg), arg -> arg.config).codec();
     }
 
     public ConfiguredDecorator<DC> configure(DC arg) {
         return new ConfiguredDecorator<DC>(this, arg);
     }
 
-    public Codec<ConfiguredDecorator<DC>> method_28928() {
-        return this.field_24983;
+    public Codec<ConfiguredDecorator<DC>> getCodec() {
+        return this.codec;
     }
 
     protected <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DC arg52, ConfiguredFeature<FC, F> arg6) {

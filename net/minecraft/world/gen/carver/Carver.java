@@ -49,7 +49,7 @@ public abstract class Carver<C extends CarverConfig> {
     protected static final FluidState LAVA = Fluids.LAVA.getDefaultState();
     protected Set<Block> alwaysCarvableBlocks = ImmutableSet.of((Object)Blocks.STONE, (Object)Blocks.GRANITE, (Object)Blocks.DIORITE, (Object)Blocks.ANDESITE, (Object)Blocks.DIRT, (Object)Blocks.COARSE_DIRT, (Object[])new Block[]{Blocks.PODZOL, Blocks.GRASS_BLOCK, Blocks.TERRACOTTA, Blocks.WHITE_TERRACOTTA, Blocks.ORANGE_TERRACOTTA, Blocks.MAGENTA_TERRACOTTA, Blocks.LIGHT_BLUE_TERRACOTTA, Blocks.YELLOW_TERRACOTTA, Blocks.LIME_TERRACOTTA, Blocks.PINK_TERRACOTTA, Blocks.GRAY_TERRACOTTA, Blocks.LIGHT_GRAY_TERRACOTTA, Blocks.CYAN_TERRACOTTA, Blocks.PURPLE_TERRACOTTA, Blocks.BLUE_TERRACOTTA, Blocks.BROWN_TERRACOTTA, Blocks.GREEN_TERRACOTTA, Blocks.RED_TERRACOTTA, Blocks.BLACK_TERRACOTTA, Blocks.SANDSTONE, Blocks.RED_SANDSTONE, Blocks.MYCELIUM, Blocks.SNOW, Blocks.PACKED_ICE});
     protected Set<Fluid> carvableFluids = ImmutableSet.of((Object)Fluids.WATER);
-    private final Codec<ConfiguredCarver<C>> field_24831;
+    private final Codec<ConfiguredCarver<C>> codec;
     protected final int heightLimit;
 
     private static <C extends CarverConfig, F extends Carver<C>> F register(String string, F arg) {
@@ -58,11 +58,11 @@ public abstract class Carver<C extends CarverConfig> {
 
     public Carver(Codec<C> codec, int i) {
         this.heightLimit = i;
-        this.field_24831 = codec.fieldOf("config").xmap(arg -> new ConfiguredCarver<CarverConfig>(this, (CarverConfig)arg), arg -> arg.config).codec();
+        this.codec = codec.fieldOf("config").xmap(arg -> new ConfiguredCarver<CarverConfig>(this, (CarverConfig)arg), arg -> arg.config).codec();
     }
 
-    public Codec<ConfiguredCarver<C>> method_28616() {
-        return this.field_24831;
+    public Codec<ConfiguredCarver<C>> getCodec() {
+        return this.codec;
     }
 
     public int getBranchFactor() {

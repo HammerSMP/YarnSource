@@ -50,7 +50,7 @@ extends PersistentProjectileEntity {
         super(EntityType.TRIDENT, arg2, arg);
         this.tridentStack = arg3.copy();
         this.dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(arg3));
-        this.dataTracker.set(ENCHANTED, arg3.hasEnchantmentGlint());
+        this.dataTracker.set(ENCHANTED, arg3.hasGlint());
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -154,7 +154,7 @@ extends PersistentProjectileEntity {
         if (this.world instanceof ServerWorld && this.world.isThundering() && EnchantmentHelper.hasChanneling(this.tridentStack) && this.world.isSkyVisible(lv7 = lv.getBlockPos())) {
             LightningEntity lv8 = EntityType.LIGHTNING_BOLT.create(this.world);
             lv8.method_29495(Vec3d.ofBottomCenter(lv7));
-            lv8.setChanneller(lv3 instanceof ServerPlayerEntity ? (ServerPlayerEntity)lv3 : null);
+            lv8.setChanneler(lv3 instanceof ServerPlayerEntity ? (ServerPlayerEntity)lv3 : null);
             this.world.spawnEntity(lv8);
             lv5 = SoundEvents.ITEM_TRIDENT_THUNDER;
             g = 5.0f;

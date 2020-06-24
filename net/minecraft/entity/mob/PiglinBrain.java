@@ -387,7 +387,7 @@ public class PiglinBrain {
         List<PiglinEntity> list = arg.world.getNonSpectatingEntities(PiglinEntity.class, arg.getBoundingBox().expand(16.0));
         list.stream().filter(PiglinBrain::hasIdleActivity).filter(arg2 -> !bl || LookTargetUtil.isVisibleInMemory(arg2, arg)).forEach(arg2 -> {
             if (arg2.world.getGameRules().getBoolean(GameRules.UNIVERSAL_ANGER)) {
-                PiglinBrain.angerAtNearestPlayer(arg2, arg);
+                PiglinBrain.method_29946(arg2, arg);
             } else {
                 PiglinBrain.angerAt(arg2, arg);
             }
@@ -455,8 +455,8 @@ public class PiglinBrain {
             return;
         }
         if (arg2.getType() == EntityType.PLAYER && arg.world.getGameRules().getBoolean(GameRules.UNIVERSAL_ANGER)) {
-            PiglinBrain.angerAtNearestPlayer(arg, arg2);
-            PiglinBrain.angerNearbyPiglins(arg);
+            PiglinBrain.method_29946(arg, arg2);
+            PiglinBrain.method_29945(arg);
         } else {
             PiglinBrain.angerAt(arg, arg2);
             PiglinBrain.angerAtCloserTargets(arg, arg2);
@@ -540,8 +540,8 @@ public class PiglinBrain {
         });
     }
 
-    protected static void angerNearbyPiglins(PiglinEntity arg2) {
-        PiglinBrain.getNearbyPiglins(arg2).forEach(arg -> PiglinBrain.getNearestDetectedPlayer(arg).ifPresent(arg2 -> PiglinBrain.angerAt(arg, arg2)));
+    protected static void method_29945(PiglinEntity arg2) {
+        PiglinBrain.getNearbyPiglins(arg2).forEach(arg -> PiglinBrain.method_29947(arg).ifPresent(arg2 -> PiglinBrain.angerAt(arg, arg2)));
     }
 
     protected static void rememberGroupHunting(PiglinEntity arg) {
@@ -562,8 +562,8 @@ public class PiglinBrain {
         }
     }
 
-    private static void angerAtNearestPlayer(PiglinEntity arg, LivingEntity arg2) {
-        Optional<PlayerEntity> optional = PiglinBrain.getNearestDetectedPlayer(arg);
+    private static void method_29946(PiglinEntity arg, LivingEntity arg2) {
+        Optional<PlayerEntity> optional = PiglinBrain.method_29947(arg);
         if (optional.isPresent()) {
             PiglinBrain.angerAt(arg, optional.get());
         } else {
@@ -591,7 +591,7 @@ public class PiglinBrain {
         return Optional.empty();
     }
 
-    public static Optional<PlayerEntity> getNearestDetectedPlayer(PiglinEntity arg) {
+    public static Optional<PlayerEntity> method_29947(PiglinEntity arg) {
         if (arg.getBrain().hasMemoryModule(MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER)) {
             return arg.getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER);
         }

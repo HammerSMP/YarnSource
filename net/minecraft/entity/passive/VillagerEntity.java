@@ -119,7 +119,7 @@ VillagerDataContainer {
     public static final Map<Item, Integer> ITEM_FOOD_VALUES = ImmutableMap.of((Object)Items.BREAD, (Object)4, (Object)Items.POTATO, (Object)1, (Object)Items.CARROT, (Object)1, (Object)Items.BEETROOT, (Object)1);
     private static final Set<Item> GATHERABLE_ITEMS = ImmutableSet.of((Object)Items.BREAD, (Object)Items.POTATO, (Object)Items.CARROT, (Object)Items.WHEAT, (Object)Items.WHEAT_SEEDS, (Object)Items.BEETROOT, (Object[])new Item[]{Items.BEETROOT_SEEDS});
     private int levelUpTimer;
-    private boolean levellingUp;
+    private boolean levelingUp;
     @Nullable
     private PlayerEntity lastCustomer;
     private byte foodLevel;
@@ -220,9 +220,9 @@ VillagerDataContainer {
         if (!this.hasCustomer() && this.levelUpTimer > 0) {
             --this.levelUpTimer;
             if (this.levelUpTimer <= 0) {
-                if (this.levellingUp) {
+                if (this.levelingUp) {
                     this.levelUp();
-                    this.levellingUp = false;
+                    this.levelingUp = false;
                 }
                 this.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 0));
             }
@@ -495,7 +495,7 @@ VillagerDataContainer {
         this.lastCustomer = this.getCurrentCustomer();
         if (this.canLevelUp()) {
             this.levelUpTimer = 40;
-            this.levellingUp = true;
+            this.levelingUp = true;
             i += 5;
         }
         if (arg.shouldRewardPlayerExperience()) {

@@ -36,7 +36,7 @@ extends Goal {
         this.skeletonHorse.setTame(true);
         this.skeletonHorse.setBreedingAge(0);
         LightningEntity lv2 = EntityType.LIGHTNING_BOLT.create(this.skeletonHorse.world);
-        lv2.positAfterTeleport(this.skeletonHorse.getX(), this.skeletonHorse.getY(), this.skeletonHorse.getZ());
+        lv2.refreshPositionAfterTeleport(this.skeletonHorse.getX(), this.skeletonHorse.getY(), this.skeletonHorse.getZ());
         lv2.method_29498(true);
         this.skeletonHorse.world.spawnEntity(lv2);
         SkeletonEntity lv3 = this.getSkeleton(lv, this.skeletonHorse);

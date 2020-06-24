@@ -269,7 +269,7 @@ public abstract class StructurePiece {
         }
     }
 
-    protected void fillWithOutlineUnderSealevel(WorldAccess arg, BlockBox arg2, Random random, float f, int i, int j, int k, int l, int m, int n, BlockState arg3, BlockState arg4, boolean bl, boolean bl2) {
+    protected void fillWithOutlineUnderSeaLevel(WorldAccess arg, BlockBox arg2, Random random, float f, int i, int j, int k, int l, int m, int n, BlockState arg3, BlockState arg4, boolean bl, boolean bl2) {
         for (int o = j; o <= m; ++o) {
             for (int p = i; p <= l; ++p) {
                 for (int q = k; q <= n; ++q) {

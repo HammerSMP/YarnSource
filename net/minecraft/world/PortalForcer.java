@@ -49,7 +49,7 @@ public class PortalForcer {
         Vec3d lv5 = lv3.velocity;
         arg.setVelocity(lv5);
         arg.yaw = f + (float)lv3.yaw;
-        arg.positAfterTeleport(lv4.x, lv4.y, lv4.z);
+        arg.refreshPositionAfterTeleport(lv4.x, lv4.y, lv4.z);
         return true;
     }
 

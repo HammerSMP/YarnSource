@@ -20,7 +20,7 @@ import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class ConfiguredDecorator<DC extends DecoratorConfig> {
-    public static final Codec<ConfiguredDecorator<?>> field_24981 = Registry.DECORATOR.dispatch("name", arg -> arg.decorator, Decorator::method_28928);
+    public static final Codec<ConfiguredDecorator<?>> field_24981 = Registry.DECORATOR.dispatch("name", arg -> arg.decorator, Decorator::getCodec);
     public final Decorator<DC> decorator;
     public final DC config;
 

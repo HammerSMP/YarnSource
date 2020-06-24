@@ -37,16 +37,16 @@ extends TreeDecorator {
             BlockPos lv3;
             BlockPos lv2;
             BlockPos lv;
-            if (random.nextInt(4) == 0 && Feature.method_27370(arg, lv = arg3.west())) {
+            if (random.nextInt(4) == 0 && Feature.isAir(arg, lv = arg3.west())) {
                 this.method_23467(arg, lv, VineBlock.EAST, set, arg2);
             }
-            if (random.nextInt(4) == 0 && Feature.method_27370(arg, lv2 = arg3.east())) {
+            if (random.nextInt(4) == 0 && Feature.isAir(arg, lv2 = arg3.east())) {
                 this.method_23467(arg, lv2, VineBlock.WEST, set, arg2);
             }
-            if (random.nextInt(4) == 0 && Feature.method_27370(arg, lv3 = arg3.north())) {
+            if (random.nextInt(4) == 0 && Feature.isAir(arg, lv3 = arg3.north())) {
                 this.method_23467(arg, lv3, VineBlock.SOUTH, set, arg2);
             }
-            if (random.nextInt(4) == 0 && Feature.method_27370(arg, lv4 = arg3.south())) {
+            if (random.nextInt(4) == 0 && Feature.isAir(arg, lv4 = arg3.south())) {
                 this.method_23467(arg, lv4, VineBlock.NORTH, set, arg2);
             }
         });
@@ -55,7 +55,7 @@ extends TreeDecorator {
     private void method_23467(ModifiableTestableWorld arg, BlockPos arg2, BooleanProperty arg3, Set<BlockPos> set, BlockBox arg4) {
         this.placeVine(arg, arg2, arg3, set, arg4);
         arg2 = arg2.down();
-        for (int i = 4; Feature.method_27370(arg, arg2) && i > 0; --i) {
+        for (int i = 4; Feature.isAir(arg, arg2) && i > 0; --i) {
             this.placeVine(arg, arg2, arg3, set, arg4);
             arg2 = arg2.down();
         }

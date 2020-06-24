@@ -170,7 +170,7 @@ extends Block {
             return false;
         }
         if (arg2 instanceof LivingEntity) {
-            return arg2 instanceof PlayerEntity || arg.getGameRules().getBoolean(GameRules.MOB_GRIEFING);
+            return arg2 instanceof PlayerEntity || arg.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING);
         }
         return false;
     }

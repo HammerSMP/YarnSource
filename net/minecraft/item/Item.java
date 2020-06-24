@@ -238,7 +238,7 @@ implements ItemConvertible {
         return new TranslatableText(this.getTranslationKey(arg));
     }
 
-    public boolean hasEnchantmentGlint(ItemStack arg) {
+    public boolean hasGlint(ItemStack arg) {
         return arg.hasEnchantments();
     }
 

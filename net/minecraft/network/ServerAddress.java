@@ -63,14 +63,14 @@ public class ServerAddress {
         String string4 = strings[0];
         int n = j = strings.length > 1 ? ServerAddress.portOrDefault(strings[1], 25565) : 25565;
         if (j == 25565) {
-            Pair<String, Integer> pair = ServerAddress.resolveSrv(string4);
+            Pair<String, Integer> pair = ServerAddress.resolveServer(string4);
             string4 = (String)pair.getFirst();
             j = (Integer)pair.getSecond();
         }
         return new ServerAddress(string4, j);
     }
 
-    private static Pair<String, Integer> resolveSrv(String string) {
+    private static Pair<String, Integer> resolveServer(String string) {
         try {
             String string2 = "com.sun.jndi.dns.DnsContextFactory";
             Class.forName("com.sun.jndi.dns.DnsContextFactory");

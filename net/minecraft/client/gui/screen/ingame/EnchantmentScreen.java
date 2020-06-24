@@ -41,7 +41,7 @@ import net.minecraft.util.math.Matrix4f;
 public class EnchantmentScreen
 extends HandledScreen<EnchantmentScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/enchanting_table.png");
-    private static final Identifier BOOK_TEXURE = new Identifier("textures/entity/enchanting_table_book.png");
+    private static final Identifier BOOK_TEXTURE = new Identifier("textures/entity/enchanting_table_book.png");
     private static final BookModel BOOK_MODEL = new BookModel();
     private final Random random = new Random();
     public int ticks;
@@ -126,7 +126,7 @@ extends HandledScreen<EnchantmentScreenHandler> {
         RenderSystem.enableRescaleNormal();
         BOOK_MODEL.setPageAngles(0.0f, o, p, h);
         VertexConsumerProvider.Immediate lv2 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        VertexConsumer lv3 = lv2.getBuffer(BOOK_MODEL.getLayer(BOOK_TEXURE));
+        VertexConsumer lv3 = lv2.getBuffer(BOOK_MODEL.getLayer(BOOK_TEXTURE));
         BOOK_MODEL.render(arg, lv3, 0xF000F0, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
         lv2.draw();
         arg.pop();

@@ -342,7 +342,7 @@ public abstract class PlayerManager {
         lv.removePlayer(arg);
         arg.getAdvancementTracker().clearCriteria();
         this.players.remove(arg);
-        this.server.getBossBarManager().onPlayerDisconnenct(arg);
+        this.server.getBossBarManager().onPlayerDisconnect(arg);
         UUID uUID = arg.getUuid();
         ServerPlayerEntity lv4 = this.playerMap.get(uUID);
         if (lv4 == arg) {

@@ -45,7 +45,7 @@ extends TreeDecorator {
             for (Direction lv : Direction.Type.HORIZONTAL) {
                 Direction lv2;
                 BlockPos lv3;
-                if (!(random.nextFloat() <= 0.25f) || !Feature.method_27370(arg2, lv3 = arg3.add((lv2 = lv.getOpposite()).getOffsetX(), 0, lv2.getOffsetZ()))) continue;
+                if (!(random.nextFloat() <= 0.25f) || !Feature.isAir(arg2, lv3 = arg3.add((lv2 = lv.getOpposite()).getOffsetX(), 0, lv2.getOffsetZ()))) continue;
                 BlockState lv4 = (BlockState)((BlockState)Blocks.COCOA.getDefaultState().with(CocoaBlock.AGE, random.nextInt(3))).with(CocoaBlock.FACING, lv);
                 this.setBlockStateAndEncompassPosition(arg2, lv3, lv4, set, arg22);
             }

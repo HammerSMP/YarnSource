@@ -36,7 +36,7 @@ extends DoorInteractGoal {
         if (!super.canStart()) {
             return false;
         }
-        if (!this.mob.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) {
+        if (!this.mob.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
             return false;
         }
         return this.isDifficultySufficient(this.mob.world.getDifficulty()) && !this.isDoorOpen();

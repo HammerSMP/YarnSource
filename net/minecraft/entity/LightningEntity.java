@@ -36,7 +36,7 @@ extends Entity {
     private int remainingActions;
     private boolean cosmetic;
     @Nullable
-    private ServerPlayerEntity channeller;
+    private ServerPlayerEntity channeler;
 
     public LightningEntity(EntityType<? extends LightningEntity> arg, World arg2) {
         super(arg, arg2);
@@ -55,8 +55,8 @@ extends Entity {
         return SoundCategory.WEATHER;
     }
 
-    public void setChanneller(@Nullable ServerPlayerEntity arg) {
-        this.channeller = arg;
+    public void setChanneler(@Nullable ServerPlayerEntity arg) {
+        this.channeler = arg;
     }
 
     @Override
@@ -90,8 +90,8 @@ extends Entity {
                 for (Entity lv2 : list) {
                     lv2.onStruckByLightning(this);
                 }
-                if (this.channeller != null) {
-                    Criteria.CHANNELED_LIGHTNING.trigger(this.channeller, list);
+                if (this.channeler != null) {
+                    Criteria.CHANNELED_LIGHTNING.trigger(this.channeler, list);
                 }
             }
         }

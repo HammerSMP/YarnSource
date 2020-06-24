@@ -43,7 +43,7 @@ extends AbstractFireballEntity {
         super.onCollision(arg);
         if (!this.world.isClient) {
             boolean bl;
-            this.world.createExplosion(null, this.getX(), this.getY(), this.getZ(), this.explosionPower, bl, (bl = this.world.getGameRules().getBoolean(GameRules.MOB_GRIEFING)) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE);
+            this.world.createExplosion(null, this.getX(), this.getY(), this.getZ(), this.explosionPower, bl, (bl = this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE);
             this.remove();
         }
     }

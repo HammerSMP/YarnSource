@@ -103,7 +103,7 @@ public class StatePredicate {
     }
 
     public static class Builder {
-        private final List<Condition> conditons = Lists.newArrayList();
+        private final List<Condition> conditions = Lists.newArrayList();
 
         private Builder() {
         }
@@ -113,7 +113,7 @@ public class StatePredicate {
         }
 
         public Builder exactMatch(Property<?> arg, String string) {
-            this.conditons.add(new ExactValueCondition(arg.getName(), string));
+            this.conditions.add(new ExactValueCondition(arg.getName(), string));
             return this;
         }
 
@@ -130,7 +130,7 @@ public class StatePredicate {
         }
 
         public StatePredicate build() {
-            return new StatePredicate(this.conditons);
+            return new StatePredicate(this.conditions);
         }
     }
 

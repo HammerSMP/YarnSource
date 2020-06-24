@@ -521,7 +521,7 @@ implements ClientPlayPacketListener {
         if (lv42 != null) {
             int i = arg.getId();
             lv42.updateTrackedPosition(d, e, f);
-            lv42.positAfterTeleport(d, e, f);
+            lv42.refreshPositionAfterTeleport(d, e, f);
             lv42.pitch = (float)(arg.getPitch() * 360) / 256.0f;
             lv42.yaw = (float)(arg.getYaw() * 360) / 256.0f;
             lv42.setEntityId(i);

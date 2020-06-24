@@ -509,7 +509,7 @@ implements DedicatedServer {
     @Override
     public String executeRconCommand(String string) {
         this.rconCommandOutput.clear();
-        this.submitAndJoin(() -> this.getCommandManager().execute(this.rconCommandOutput.createReconCommandSource(), string));
+        this.submitAndJoin(() -> this.getCommandManager().execute(this.rconCommandOutput.createRconCommandSource(), string));
         return this.rconCommandOutput.asString();
     }
 
