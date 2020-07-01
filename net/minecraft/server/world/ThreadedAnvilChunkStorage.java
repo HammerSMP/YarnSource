@@ -133,7 +133,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     public static final int MAX_LEVEL = 33 + ChunkStatus.getMaxTargetGenerationRadius();
     private final Long2ObjectLinkedOpenHashMap<ChunkHolder> currentChunkHolders = new Long2ObjectLinkedOpenHashMap();
     private volatile Long2ObjectLinkedOpenHashMap<ChunkHolder> chunkHolders = this.currentChunkHolders.clone();
-    private final Long2ObjectLinkedOpenHashMap<ChunkHolder> field_18807 = new Long2ObjectLinkedOpenHashMap();
+    private final Long2ObjectLinkedOpenHashMap<ChunkHolder> chunkHolderHashMap = new Long2ObjectLinkedOpenHashMap();
     private final LongSet loadedChunks = new LongOpenHashSet();
     private final ServerWorld world;
     private final ServerLightingProvider serverLightingProvider;

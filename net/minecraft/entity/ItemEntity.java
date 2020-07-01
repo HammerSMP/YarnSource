@@ -111,7 +111,6 @@ extends Entity {
         if (this.world.isClient) {
             this.noClip = false;
         } else {
-            boolean bl = this.noClip = !this.world.doesNotCollide(this);
             if (this.noClip) {
                 this.pushOutOfBlocks(this.getX(), (this.getBoundingBox().minY + this.getBoundingBox().maxY) / 2.0, this.getZ());
             }
@@ -128,7 +127,7 @@ extends Entity {
             }
         }
         boolean bl = MathHelper.floor(this.prevX) != MathHelper.floor(this.getX()) || MathHelper.floor(this.prevY) != MathHelper.floor(this.getY()) || MathHelper.floor(this.prevZ) != MathHelper.floor(this.getZ());
-        int n = i = bl ? 2 : 40;
+        i = bl ? 2 : 40;
         if (this.age % i == 0) {
             if (this.world.getFluidState(this.getBlockPos()).isIn(FluidTags.LAVA) && !this.isFireImmune()) {
                 this.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4f, 2.0f + this.random.nextFloat() * 0.4f);
