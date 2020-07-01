@@ -43,11 +43,11 @@ import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.dynamic.GlobalPos;
 
-public class class_5420 {
+public class PiglinBruteBrain {
     protected static Brain<?> method_30252(PiglinBrute arg, Brain<PiglinBrute> arg2) {
-        class_5420.method_30257(arg, arg2);
-        class_5420.method_30260(arg, arg2);
-        class_5420.method_30262(arg, arg2);
+        PiglinBruteBrain.method_30257(arg, arg2);
+        PiglinBruteBrain.method_30260(arg, arg2);
+        PiglinBruteBrain.method_30262(arg, arg2);
         arg2.setCoreActivities((Set<Activity>)ImmutableSet.of((Object)Activity.CORE));
         arg2.setDefaultActivity(Activity.IDLE);
         arg2.resetPossibleActivities();
@@ -64,11 +64,11 @@ public class class_5420 {
     }
 
     private static void method_30260(PiglinBrute arg, Brain<PiglinBrute> arg2) {
-        arg2.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<PiglinBrute>>)ImmutableList.of(new UpdateAttackTargetTask<PiglinBrute>(class_5420::method_30247), class_5420.method_30244(), class_5420.method_30254(), (Object)new FindInteractionTargetTask(EntityType.PLAYER, 4)));
+        arg2.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<PiglinBrute>>)ImmutableList.of(new UpdateAttackTargetTask<PiglinBrute>(PiglinBruteBrain::method_30247), PiglinBruteBrain.method_30244(), PiglinBruteBrain.method_30254(), (Object)new FindInteractionTargetTask(EntityType.PLAYER, 4)));
     }
 
     private static void method_30262(PiglinBrute arg, Brain<PiglinBrute> arg22) {
-        arg22.setTaskList(Activity.FIGHT, 10, (ImmutableList<Task<PiglinBrute>>)ImmutableList.of(new ForgetAttackTargetTask(arg2 -> !class_5420.method_30248(arg, arg2)), (Object)new RangedApproachTask(1.0f), (Object)new MeleeAttackTask(20)), MemoryModuleType.ATTACK_TARGET);
+        arg22.setTaskList(Activity.FIGHT, 10, (ImmutableList<Task<PiglinBrute>>)ImmutableList.of(new ForgetAttackTargetTask(arg2 -> !PiglinBruteBrain.method_30248(arg, arg2)), (Object)new RangedApproachTask(1.0f), (Object)new MeleeAttackTask(20)), MemoryModuleType.ATTACK_TARGET);
     }
 
     private static RandomTask<PiglinBrute> method_30244() {
@@ -85,21 +85,21 @@ public class class_5420 {
         lv.resetPossibleActivities((List<Activity>)ImmutableList.of((Object)Activity.FIGHT, (Object)Activity.IDLE));
         Activity lv3 = lv.getFirstPossibleNonCoreActivity().orElse(null);
         if (lv2 != lv3) {
-            class_5420.method_30261(arg);
+            PiglinBruteBrain.method_30261(arg);
         }
         arg.setAttacking(lv.hasMemoryModule(MemoryModuleType.ATTACK_TARGET));
     }
 
     private static boolean method_30248(AbstractPiglinEntity arg, LivingEntity arg22) {
-        return class_5420.method_30247(arg).filter(arg2 -> arg2 == arg22).isPresent();
+        return PiglinBruteBrain.method_30247(arg).filter(arg2 -> arg2 == arg22).isPresent();
     }
 
     private static Optional<? extends LivingEntity> method_30247(AbstractPiglinEntity arg) {
         Optional<LivingEntity> optional = LookTargetUtil.getEntity(arg, MemoryModuleType.ANGRY_AT);
-        if (optional.isPresent() && class_5420.method_30245(optional.get())) {
+        if (optional.isPresent() && PiglinBruteBrain.method_30245(optional.get())) {
             return optional;
         }
-        Optional<? extends LivingEntity> optional2 = class_5420.method_30249(arg, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER);
+        Optional<? extends LivingEntity> optional2 = PiglinBruteBrain.method_30249(arg, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER);
         if (optional2.isPresent()) {
             return optional2;
         }
@@ -123,7 +123,7 @@ public class class_5420 {
 
     protected static void method_30258(PiglinBrute arg) {
         if ((double)arg.world.random.nextFloat() < 0.0125) {
-            class_5420.method_30261(arg);
+            PiglinBruteBrain.method_30261(arg);
         }
     }
 

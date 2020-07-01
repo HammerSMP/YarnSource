@@ -18,7 +18,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.class_4837;
 import net.minecraft.AbstractPiglinEntity;
-import net.minecraft.class_5420;
+import net.minecraft.PiglinBruteBrain;
 import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -60,7 +60,7 @@ extends AbstractPiglinEntity {
     @Override
     @Nullable
     public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        class_5420.method_30250(this);
+        PiglinBruteBrain.method_30250(this);
         this.initEquipment(arg2);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
@@ -76,7 +76,7 @@ extends AbstractPiglinEntity {
 
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return class_5420.method_30252(this, this.createBrainProfile().deserialize(dynamic));
+        return PiglinBruteBrain.method_30252(this, this.createBrainProfile().deserialize(dynamic));
     }
 
     public Brain<PiglinBrute> getBrain() {
@@ -101,8 +101,8 @@ extends AbstractPiglinEntity {
         this.world.getProfiler().push("piglinBruteBrain");
         this.getBrain().tick((ServerWorld)this.world, this);
         this.world.getProfiler().pop();
-        class_5420.method_30256(this);
-        class_5420.method_30258(this);
+        PiglinBruteBrain.method_30256(this);
+        PiglinBruteBrain.method_30258(this);
         super.mobTick();
     }
 
@@ -122,7 +122,7 @@ extends AbstractPiglinEntity {
             return false;
         }
         if (bl && arg.getAttacker() instanceof LivingEntity) {
-            class_5420.method_30251(this, (LivingEntity)arg.getAttacker());
+            PiglinBruteBrain.method_30251(this, (LivingEntity)arg.getAttacker());
         }
         return bl;
     }
