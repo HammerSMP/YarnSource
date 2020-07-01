@@ -32,12 +32,12 @@ import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
-public abstract class class_5418
+public abstract class AbstractPiglinEntity
 extends HostileEntity {
-    protected static final TrackedData<Boolean> field_25758 = DataTracker.registerData(class_5418.class, TrackedDataHandlerRegistry.BOOLEAN);
+    protected static final TrackedData<Boolean> field_25758 = DataTracker.registerData(AbstractPiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     protected int field_25759 = 0;
 
-    public class_5418(EntityType<? extends class_5418> arg, World arg2) {
+    public AbstractPiglinEntity(EntityType<? extends AbstractPiglinEntity> arg, World arg2) {
         super((EntityType<? extends HostileEntity>)arg, arg2);
         this.setCanPickUpLoot(true);
         this.method_30239();

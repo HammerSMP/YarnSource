@@ -18,8 +18,8 @@ import java.util.Set;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
-import net.minecraft.class_5418;
-import net.minecraft.class_5419;
+import net.minecraft.AbstractPiglinEntity;
+import net.minecraft.PiglinBrute;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -71,8 +71,8 @@ extends Sensor<LivingEntity> {
                 optional2 = Optional.of(lv3);
                 continue;
             }
-            if (lv2 instanceof class_5419) {
-                list.add((class_5419)lv2);
+            if (lv2 instanceof PiglinBrute) {
+                list.add((PiglinBrute)lv2);
                 continue;
             }
             if (lv2 instanceof PiglinEntity) {
@@ -103,8 +103,8 @@ extends Sensor<LivingEntity> {
         }
         List<LivingEntity> list4 = lv.getOptionalMemory(MemoryModuleType.MOBS).orElse((List<LivingEntity>)ImmutableList.of());
         for (LivingEntity lv6 : list4) {
-            if (!(lv6 instanceof class_5418) || !((class_5418)lv6).method_30236()) continue;
-            list2.add((class_5418)lv6);
+            if (!(lv6 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv6).method_30236()) continue;
+            list2.add((AbstractPiglinEntity)lv6);
         }
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, optional2);

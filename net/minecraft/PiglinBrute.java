@@ -17,7 +17,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.class_4837;
-import net.minecraft.class_5418;
+import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.class_5420;
 import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
@@ -43,13 +43,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 
-public class class_5419
-extends class_5418 {
-    protected static final ImmutableList<SensorType<? extends Sensor<? super class_5419>>> field_25761 = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.INTERACTABLE_DOORS, SensorType.PIGLIN_BRUTE_SPECIFIC_SENSOR);
+public class PiglinBrute
+extends AbstractPiglinEntity {
+    protected static final ImmutableList<SensorType<? extends Sensor<? super PiglinBrute>>> field_25761 = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.INTERACTABLE_DOORS, SensorType.PIGLIN_BRUTE_SPECIFIC_SENSOR);
     protected static final ImmutableList<MemoryModuleType<?>> field_25760 = ImmutableList.of(MemoryModuleType.LOOK_TARGET, MemoryModuleType.INTERACTABLE_DOORS, MemoryModuleType.OPENED_DOORS, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEARBY_ADULT_PIGLINS, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.WALK_TARGET, (Object[])new MemoryModuleType[]{MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.PATH, MemoryModuleType.ANGRY_AT, MemoryModuleType.NEAREST_VISIBLE_NEMESIS, MemoryModuleType.HOME});
 
-    public class_5419(EntityType<? extends class_5419> arg, World arg2) {
-        super((EntityType<? extends class_5418>)arg, arg2);
+    public PiglinBrute(EntityType<? extends PiglinBrute> arg, World arg2) {
+        super((EntityType<? extends AbstractPiglinEntity>)arg, arg2);
         this.experiencePoints = 20;
     }
 
@@ -70,7 +70,7 @@ extends class_5418 {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.GOLDEN_AXE));
     }
 
-    protected Brain.Profile<class_5419> createBrainProfile() {
+    protected Brain.Profile<PiglinBrute> createBrainProfile() {
         return Brain.createProfile(field_25760, field_25761);
     }
 
@@ -79,7 +79,7 @@ extends class_5418 {
         return class_5420.method_30252(this, this.createBrainProfile().deserialize(dynamic));
     }
 
-    public Brain<class_5419> getBrain() {
+    public Brain<PiglinBrute> getBrain() {
         return super.getBrain();
     }
 

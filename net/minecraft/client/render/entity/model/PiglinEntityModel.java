@@ -10,7 +10,7 @@ package net.minecraft.client.render.entity.model;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.class_4837;
-import net.minecraft.class_5418;
+import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.CrossbowPosing;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
@@ -68,8 +68,8 @@ extends PlayerEntityModel<T> {
         float m = 0.08f + g * 0.4f;
         this.rightEar.roll = -0.5235988f - MathHelper.cos(l * 1.2f) * m;
         this.leftEar.roll = 0.5235988f + MathHelper.cos(l) * m;
-        if (arg instanceof class_5418) {
-            class_5418 lv = (class_5418)arg;
+        if (arg instanceof AbstractPiglinEntity) {
+            AbstractPiglinEntity lv = (AbstractPiglinEntity)arg;
             class_4837 lv2 = lv.getActivity();
             if (lv2 == class_4837.DANCING) {
                 float n = h / 60.0f;

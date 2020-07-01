@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import net.minecraft.class_5418;
+import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -45,8 +45,8 @@ extends Sensor<LivingEntity> {
         }
         List<LivingEntity> list3 = lv.getOptionalMemory(MemoryModuleType.MOBS).orElse((List<LivingEntity>)ImmutableList.of());
         for (LivingEntity lv3 : list3) {
-            if (!(lv3 instanceof class_5418) || !((class_5418)lv3).method_30236()) continue;
-            list.add((class_5418)lv3);
+            if (!(lv3 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv3).method_30236()) continue;
+            list.add((AbstractPiglinEntity)lv3);
         }
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);
         lv.remember(MemoryModuleType.NEARBY_ADULT_PIGLINS, list);

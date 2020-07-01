@@ -7,7 +7,7 @@
 package net.minecraft.entity.mob;
 
 import javax.annotation.Nullable;
-import net.minecraft.class_5418;
+import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -44,7 +44,7 @@ extends AbstractSkeletonEntity {
 
     @Override
     protected void initGoals() {
-        this.targetSelector.add(3, new FollowTargetGoal<class_5418>((MobEntity)this, class_5418.class, true));
+        this.targetSelector.add(3, new FollowTargetGoal<AbstractPiglinEntity>((MobEntity)this, AbstractPiglinEntity.class, true));
         super.initGoals();
     }
 
