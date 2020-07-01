@@ -5,6 +5,7 @@ package net.minecraft.structure;
 
 import java.util.List;
 import java.util.Random;
+import net.minecraft.class_5425;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.structure.SimpleStructurePiece;
 import net.minecraft.structure.Structure;
@@ -21,7 +22,6 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
@@ -67,7 +67,7 @@ public class NetherFossilGenerator {
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
         }
 
         @Override

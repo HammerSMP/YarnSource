@@ -83,7 +83,7 @@ extends AlwaysSelectedEntryListWidget<ResourcePackEntry> {
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
                 DrawableHelper.fill(arg, k - 1, j - 1, k + l - 9, j + m + 1, -8978432);
             }
-            this.pack.render(this.client.getTextureManager());
+            this.client.getTextureManager().bindTexture(this.pack.method_30286());
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             DrawableHelper.drawTexture(arg, k, j, 0.0f, 0.0f, 32, 32, 32, 32);
             Text lv2 = this.pack.getDisplayName();

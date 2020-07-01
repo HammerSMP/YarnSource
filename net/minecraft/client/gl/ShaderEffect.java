@@ -208,13 +208,13 @@ implements AutoCloseable {
                                 RenderSystem.texParameter(3553, 10241, 9728);
                                 RenderSystem.texParameter(3553, 10240, 9728);
                             }
-                            lv3.addAuxTarget(string4, lv7.getGlId(), j, k);
+                            lv3.addAuxTarget(string4, lv7::getGlId, j, k);
                             break block20;
                         }
                         if (bl2) {
-                            lv3.addAuxTarget(string4, lv4.depthAttachment, lv4.textureWidth, lv4.textureHeight);
+                            lv3.addAuxTarget(string4, lv4::method_30278, lv4.textureWidth, lv4.textureHeight);
                         } else {
-                            lv3.addAuxTarget(string4, lv4, lv4.textureWidth, lv4.textureHeight);
+                            lv3.addAuxTarget(string4, lv4::method_30277, lv4.textureWidth, lv4.textureHeight);
                         }
                     }
                     catch (Exception exception) {

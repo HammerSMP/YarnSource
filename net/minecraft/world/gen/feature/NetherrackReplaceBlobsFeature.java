@@ -17,7 +17,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NetherrackReplaceBlobsFeatureConfig;
@@ -29,20 +28,20 @@ extends Feature<NetherrackReplaceBlobsFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, NetherrackReplaceBlobsFeatureConfig arg5) {
-        Block lv = arg5.target.getBlock();
-        BlockPos lv2 = NetherrackReplaceBlobsFeature.method_27107(arg, arg4.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), lv);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, NetherrackReplaceBlobsFeatureConfig arg4) {
+        Block lv = arg4.target.getBlock();
+        BlockPos lv2 = NetherrackReplaceBlobsFeature.method_27107(arg, arg3.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), lv);
         if (lv2 == null) {
             return false;
         }
-        Vec3i lv3 = NetherrackReplaceBlobsFeature.method_27108(random, arg5);
+        Vec3i lv3 = NetherrackReplaceBlobsFeature.method_27108(random, arg4);
         int i = Math.max(lv3.getX(), Math.max(lv3.getY(), lv3.getZ()));
         boolean bl = false;
         for (BlockPos lv4 : BlockPos.iterateOutwards(lv2, lv3.getX(), lv3.getY(), lv3.getZ())) {
             if (lv4.getManhattanDistance(lv2) > i) break;
             BlockState lv5 = arg.getBlockState(lv4);
             if (!lv5.isOf(lv)) continue;
-            this.setBlockState(arg, lv4, arg5.state);
+            this.setBlockState(arg, lv4, arg4.state);
             bl = true;
         }
         return bl;

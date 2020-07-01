@@ -14,6 +14,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
@@ -66,10 +67,10 @@ extends AbstractDonkeyEntity {
     }
 
     @Override
-    public PassiveEntity createChild(PassiveEntity arg) {
-        EntityType<AbstractDonkeyEntity> lv = arg instanceof HorseEntity ? EntityType.MULE : EntityType.DONKEY;
-        HorseBaseEntity lv2 = lv.create(this.world);
-        this.setChildAttributes(arg, lv2);
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        EntityType<AbstractDonkeyEntity> lv = arg2 instanceof HorseEntity ? EntityType.MULE : EntityType.DONKEY;
+        HorseBaseEntity lv2 = lv.create(arg);
+        this.setChildAttributes(arg2, lv2);
         return lv2;
     }
 }

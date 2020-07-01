@@ -56,7 +56,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.GeneratorType;
 import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.resource.VanillaDataPackProvider;
@@ -193,7 +192,7 @@ Drawable {
                 return;
             }
             RegistryTracker.Modifiable lv2 = RegistryTracker.create();
-            ResourcePackManager<ResourcePackProfile> lv3 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
+            ResourcePackManager lv3 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
             try {
                 MinecraftServer.loadDataPacks(lv3, arg.field_25479, false);
                 CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv3.createResourcePacks(), CommandManager.RegistrationEnvironment.INTEGRATED, 2, Util.getServerWorkerExecutor(), arg22);

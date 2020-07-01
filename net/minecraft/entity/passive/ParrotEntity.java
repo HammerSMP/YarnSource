@@ -25,6 +25,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -61,6 +62,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -146,7 +148,7 @@ implements Flutterer {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setVariant(this.random.nextInt(5));
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
@@ -310,7 +312,7 @@ implements Flutterer {
 
     @Override
     @Nullable
-    public PassiveEntity createChild(PassiveEntity arg) {
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
         return null;
     }
 

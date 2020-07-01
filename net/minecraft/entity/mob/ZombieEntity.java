@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -47,7 +48,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieVillagerEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AbstractTraderEntity;
@@ -61,6 +62,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -97,7 +99,7 @@ extends HostileEntity {
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(4, new DestroyEggGoal((MobEntityWithAi)this, 1.0, 3));
+        this.goalSelector.add(4, new DestroyEggGoal((PathAwareEntity)this, 1.0, 3));
         this.goalSelector.add(8, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
         this.goalSelector.add(8, new LookAroundGoal(this));
         this.initCustomGoals();
@@ -265,37 +267,41 @@ extends HostileEntity {
 
     @Override
     public boolean damage(DamageSource arg, float f) {
-        if (super.damage(arg, f)) {
-            LivingEntity lv = this.getTarget();
-            if (lv == null && arg.getAttacker() instanceof LivingEntity) {
-                lv = (LivingEntity)arg.getAttacker();
-            }
-            if (lv != null && this.world.getDifficulty() == Difficulty.HARD && (double)this.random.nextFloat() < this.getAttributeValue(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS) && this.world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
-                int i = MathHelper.floor(this.getX());
-                int j = MathHelper.floor(this.getY());
-                int k = MathHelper.floor(this.getZ());
-                ZombieEntity lv2 = new ZombieEntity(this.world);
-                for (int l = 0; l < 50; ++l) {
-                    int m = i + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
-                    int n = j + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
-                    int o = k + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
-                    BlockPos lv3 = new BlockPos(m, n, o);
-                    EntityType<?> lv4 = lv2.getType();
-                    SpawnRestriction.Location lv5 = SpawnRestriction.getLocation(lv4);
-                    if (!SpawnHelper.canSpawn(lv5, this.world, lv3, lv4) || !SpawnRestriction.canSpawn(lv4, this.world, SpawnReason.REINFORCEMENT, lv3, this.world.random)) continue;
-                    lv2.updatePosition(m, n, o);
-                    if (this.world.isPlayerInRange(m, n, o, 7.0) || !this.world.intersectsEntities(lv2) || !this.world.doesNotCollide(lv2) || this.world.containsFluid(lv2.getBoundingBox())) continue;
-                    this.world.spawnEntity(lv2);
-                    lv2.setTarget(lv);
-                    lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.REINFORCEMENT, null, null);
-                    this.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).addPersistentModifier(new EntityAttributeModifier("Zombie reinforcement caller charge", -0.05f, EntityAttributeModifier.Operation.ADDITION));
-                    lv2.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).addPersistentModifier(new EntityAttributeModifier("Zombie reinforcement callee charge", -0.05f, EntityAttributeModifier.Operation.ADDITION));
-                    break;
-                }
-            }
-            return true;
+        if (!super.damage(arg, f)) {
+            return false;
         }
-        return false;
+        if (!(this.world instanceof ServerWorld)) {
+            return false;
+        }
+        ServerWorld lv = (ServerWorld)this.world;
+        LivingEntity lv2 = this.getTarget();
+        if (lv2 == null && arg.getAttacker() instanceof LivingEntity) {
+            lv2 = (LivingEntity)arg.getAttacker();
+        }
+        if (lv2 != null && this.world.getDifficulty() == Difficulty.HARD && (double)this.random.nextFloat() < this.getAttributeValue(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS) && this.world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
+            int i = MathHelper.floor(this.getX());
+            int j = MathHelper.floor(this.getY());
+            int k = MathHelper.floor(this.getZ());
+            ZombieEntity lv3 = new ZombieEntity(this.world);
+            for (int l = 0; l < 50; ++l) {
+                int m = i + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
+                int n = j + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
+                int o = k + MathHelper.nextInt(this.random, 7, 40) * MathHelper.nextInt(this.random, -1, 1);
+                BlockPos lv4 = new BlockPos(m, n, o);
+                EntityType<?> lv5 = lv3.getType();
+                SpawnRestriction.Location lv6 = SpawnRestriction.getLocation(lv5);
+                if (!SpawnHelper.canSpawn(lv6, this.world, lv4, lv5) || !SpawnRestriction.canSpawn(lv5, lv, SpawnReason.REINFORCEMENT, lv4, this.world.random)) continue;
+                lv3.updatePosition(m, n, o);
+                if (this.world.isPlayerInRange(m, n, o, 7.0) || !this.world.intersectsEntities(lv3) || !this.world.doesNotCollide(lv3) || this.world.containsFluid(lv3.getBoundingBox())) continue;
+                this.world.spawnEntity(lv3);
+                lv3.setTarget(lv2);
+                lv3.initialize(lv, this.world.getLocalDifficulty(lv3.getBlockPos()), SpawnReason.REINFORCEMENT, null, null);
+                this.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).addPersistentModifier(new EntityAttributeModifier("Zombie reinforcement caller charge", -0.05f, EntityAttributeModifier.Operation.ADDITION));
+                lv3.getAttributeInstance(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS).addPersistentModifier(new EntityAttributeModifier("Zombie reinforcement callee charge", -0.05f, EntityAttributeModifier.Operation.ADDITION));
+                break;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -378,17 +384,17 @@ extends HostileEntity {
     }
 
     @Override
-    public void onKilledOther(LivingEntity arg) {
-        super.onKilledOther(arg);
-        if ((this.world.getDifficulty() == Difficulty.NORMAL || this.world.getDifficulty() == Difficulty.HARD) && arg instanceof VillagerEntity) {
-            if (this.world.getDifficulty() != Difficulty.HARD && this.random.nextBoolean()) {
+    public void onKilledOther(ServerWorld arg, LivingEntity arg2) {
+        super.onKilledOther(arg, arg2);
+        if ((arg.getDifficulty() == Difficulty.NORMAL || arg.getDifficulty() == Difficulty.HARD) && arg2 instanceof VillagerEntity) {
+            if (arg.getDifficulty() != Difficulty.HARD && this.random.nextBoolean()) {
                 return;
             }
-            VillagerEntity lv = (VillagerEntity)arg;
-            ZombieVillagerEntity lv2 = EntityType.ZOMBIE_VILLAGER.create(this.world);
+            VillagerEntity lv = (VillagerEntity)arg2;
+            ZombieVillagerEntity lv2 = EntityType.ZOMBIE_VILLAGER.create(arg);
             lv2.copyPositionAndRotation(lv);
             lv.remove();
-            lv2.initialize(this.world, this.world.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.CONVERSION, new ZombieData(false, true), null);
+            lv2.initialize(arg, arg.getLocalDifficulty(lv2.getBlockPos()), SpawnReason.CONVERSION, new ZombieData(false, true), null);
             lv2.setVillagerData(lv.getVillagerData());
             lv2.setGossipData((Tag)lv.getGossip().serialize(NbtOps.INSTANCE).getValue());
             lv2.setOfferData(lv.getOffers().toTag());
@@ -403,9 +409,9 @@ extends HostileEntity {
                 lv2.setPersistent();
             }
             lv2.setInvulnerable(this.isInvulnerable());
-            this.world.spawnEntity(lv2);
+            arg.spawnEntity(lv2);
             if (!this.isSilent()) {
-                this.world.syncWorldEvent(null, 1026, this.getBlockPos(), 0);
+                arg.syncWorldEvent(null, 1026, this.getBlockPos(), 0);
             }
         }
     }
@@ -425,7 +431,7 @@ extends HostileEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
         float f = arg2.getClampedLocalDifficulty();
         this.setCanPickUpLoot(this.random.nextFloat() < 0.55f * f);
@@ -518,7 +524,7 @@ extends HostileEntity {
 
     class DestroyEggGoal
     extends StepAndDestroyBlockGoal {
-        DestroyEggGoal(MobEntityWithAi arg2, double d, int i) {
+        DestroyEggGoal(PathAwareEntity arg2, double d, int i) {
             super(Blocks.TURTLE_EGG, arg2, d, i);
         }
 

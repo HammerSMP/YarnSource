@@ -70,7 +70,7 @@ extends Screen {
         try (MinecraftClient.IntegratedResourceManager lv2 = arg.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, arg2);){
             SaveProperties lv3 = lv2.getSaveProperties();
             arg2.method_27425(lv, lv3);
-            ImmutableSet<RegistryKey<World>> immutableSet = lv3.getGeneratorOptions().method_29575();
+            ImmutableSet<RegistryKey<World>> immutableSet = lv3.getGeneratorOptions().getWorlds();
             OptimizeWorldScreen optimizeWorldScreen = new OptimizeWorldScreen(booleanConsumer, dataFixer, arg2, lv3.getLevelInfo(), bl, immutableSet);
             return optimizeWorldScreen;
         }

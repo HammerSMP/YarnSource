@@ -18,6 +18,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -170,7 +171,7 @@ Hoglin {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg.getRandom().nextFloat() < 0.2f) {
             this.setBaby(true);
         }
@@ -296,8 +297,8 @@ Hoglin {
 
     @Override
     @Nullable
-    public PassiveEntity createChild(PassiveEntity arg) {
-        HoglinEntity lv = EntityType.HOGLIN.create(this.world);
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        HoglinEntity lv = EntityType.HOGLIN.create(arg);
         if (lv != null) {
             lv.setPersistent();
         }

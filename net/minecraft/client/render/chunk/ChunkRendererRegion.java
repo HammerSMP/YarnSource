@@ -61,7 +61,7 @@ implements BlockRenderView {
         for (int k = arg.getX() >> 4; k <= arg2.getX() >> 4; ++k) {
             for (int l = arg.getZ() >> 4; l <= arg2.getZ() >> 4; ++l) {
                 WorldChunk lv = args[k - i][l - j];
-                if (lv.method_12228(arg.getY(), arg2.getY())) continue;
+                if (lv.areSectionsEmptyBetween(arg.getY(), arg2.getY())) continue;
                 return false;
             }
         }

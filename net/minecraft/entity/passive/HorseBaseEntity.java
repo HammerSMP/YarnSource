@@ -17,6 +17,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
@@ -61,6 +62,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.ServerConfigHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -74,7 +76,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public abstract class HorseBaseEntity
 extends AnimalEntity
@@ -757,7 +758,7 @@ Saddleable {
 
     @Override
     @Nullable
-    public PassiveEntity createChild(PassiveEntity arg) {
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
         return null;
     }
 
@@ -972,7 +973,7 @@ Saddleable {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
             ((PassiveEntity.PassiveData)arg4).setBabyChance(0.2f);

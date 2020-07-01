@@ -1052,7 +1052,9 @@ AutoCloseable {
         lv6.draw(RenderLayer.getArmorGlint());
         lv6.draw(RenderLayer.getArmorEntityGlint());
         lv6.draw(RenderLayer.getGlint());
+        lv6.draw(RenderLayer.getGlintDirect());
         lv6.draw(RenderLayer.getEntityGlint());
+        lv6.draw(RenderLayer.getEntityGlintDirect());
         lv6.draw(RenderLayer.getWaterMask());
         this.bufferBuilders.getEffectVertexConsumers().draw();
         lv6.draw(RenderLayer.getLines());
@@ -1414,7 +1416,7 @@ AutoCloseable {
         RenderSystem.disableAlphaTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        float[] fs = this.world.getSkyProperties().getSkyColor(this.world.getSkyAngle(f), f);
+        float[] fs = this.world.getSkyProperties().getSkyColor(this.world.method_30274(f), f);
         if (fs != null) {
             RenderSystem.disableTexture();
             RenderSystem.shadeModel(7425);
@@ -1447,7 +1449,7 @@ AutoCloseable {
         float s = 1.0f - this.world.getRainGradient(f);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, s);
         arg.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-90.0f));
-        arg.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(this.world.getSkyAngle(f) * 360.0f));
+        arg.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(this.world.method_30274(f) * 360.0f));
         Matrix4f lv4 = arg.peek().getModel();
         float t = 30.0f;
         this.textureManager.bindTexture(SUN);
@@ -1460,7 +1462,7 @@ AutoCloseable {
         BufferRenderer.draw(lv2);
         t = 20.0f;
         this.textureManager.bindTexture(MOON_PHASES);
-        int u = this.world.getMoonPhase();
+        int u = this.world.method_30273();
         int v = u % 4;
         int w = u / 4 % 2;
         float x = (float)(v + 0) / 4.0f;

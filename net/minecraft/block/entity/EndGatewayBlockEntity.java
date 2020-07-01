@@ -26,6 +26,7 @@ import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Tickable;
@@ -96,7 +97,7 @@ implements Tickable {
         if (bl2) {
             --this.teleportCooldown;
         } else if (!this.world.isClient) {
-            List<Entity> list = this.world.getNonSpectatingEntities(Entity.class, new Box(this.getPos()));
+            List<Entity> list = this.world.getEntities(Entity.class, new Box(this.getPos()), EndGatewayBlockEntity::method_30276);
             if (!list.isEmpty()) {
                 this.tryTeleportingEntity(list.get(this.world.random.nextInt(list.size())));
             }
@@ -107,6 +108,10 @@ implements Tickable {
         if (bl != this.isRecentlyGenerated() || bl2 != this.needsCooldownBeforeTeleporting()) {
             this.markDirty();
         }
+    }
+
+    public static boolean method_30276(Entity arg) {
+        return EntityPredicates.EXCEPT_SPECTATOR.test(arg) && !arg.getRootVehicle().method_30230();
     }
 
     public boolean isRecentlyGenerated() {
@@ -181,13 +186,14 @@ implements Tickable {
             } else {
                 lv5 = arg.getRootVehicle();
             }
+            lv5.method_30229();
             lv5.teleport((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
         this.startTeleportCooldown();
     }
 
     private BlockPos findBestPortalExitPos() {
-        BlockPos lv = EndGatewayBlockEntity.findExitPortalPos(this.world, this.exitPortalPos, 5, false);
+        BlockPos lv = EndGatewayBlockEntity.findExitPortalPos(this.world, this.exitPortalPos.add(0, 2, 0), 5, false);
         LOGGER.debug("Best exit position for portal at {} is {}", (Object)this.exitPortalPos, (Object)lv);
         return lv.up();
     }
@@ -211,7 +217,7 @@ implements Tickable {
         if (this.exitPortalPos == null) {
             this.exitPortalPos = new BlockPos(lv2.x + 0.5, 75.0, lv2.z + 0.5);
             LOGGER.debug("Failed to find suitable block, settling on {}", (Object)this.exitPortalPos);
-            Feature.END_ISLAND.configure(FeatureConfig.DEFAULT).generate(arg, arg.getStructureAccessor(), arg.getChunkManager().getChunkGenerator(), new Random(this.exitPortalPos.asLong()), this.exitPortalPos);
+            Feature.END_ISLAND.configure(FeatureConfig.DEFAULT).generate(arg, arg.getChunkManager().getChunkGenerator(), new Random(this.exitPortalPos.asLong()), this.exitPortalPos);
         } else {
             LOGGER.debug("Found block at {}", (Object)this.exitPortalPos);
         }
@@ -265,7 +271,7 @@ implements Tickable {
     }
 
     private void createPortal(ServerWorld arg, BlockPos arg2) {
-        Feature.END_GATEWAY.configure(EndGatewayFeatureConfig.createConfig(this.getPos(), false)).generate(arg, arg.getStructureAccessor(), arg.getChunkManager().getChunkGenerator(), new Random(), arg2);
+        Feature.END_GATEWAY.configure(EndGatewayFeatureConfig.createConfig(this.getPos(), false)).generate(arg, arg.getChunkManager().getChunkGenerator(), new Random(), arg2);
     }
 
     @Override

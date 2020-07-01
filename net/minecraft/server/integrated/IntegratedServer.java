@@ -30,7 +30,6 @@ import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.NetworkEncryptionUtils;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.LanServerPinger;
 import net.minecraft.server.MinecraftServer;
@@ -58,7 +57,7 @@ extends MinecraftServer {
     private LanServerPinger lanPinger;
     private UUID localPlayerUuid;
 
-    public IntegratedServer(Thread thread, MinecraftClient arg, RegistryTracker.Modifiable arg2, LevelStorage.Session arg3, ResourcePackManager<ResourcePackProfile> arg4, ServerResourceManager arg5, SaveProperties arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+    public IntegratedServer(Thread thread, MinecraftClient arg, RegistryTracker.Modifiable arg2, LevelStorage.Session arg3, ResourcePackManager arg4, ServerResourceManager arg5, SaveProperties arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg2, arg3, arg6, arg4, arg.getNetworkProxy(), arg.getDataFixer(), arg5, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.setServerName(arg.getSession().getUsername());
         this.setDemo(arg.isDemo());

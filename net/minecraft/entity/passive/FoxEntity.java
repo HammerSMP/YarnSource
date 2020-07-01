@@ -28,6 +28,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SweetBerryBushBlock;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -94,7 +95,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -261,15 +261,15 @@ extends AnimalEntity {
     }
 
     @Override
-    public FoxEntity createChild(PassiveEntity arg) {
-        FoxEntity lv = EntityType.FOX.create(this.world);
-        lv.setType(this.random.nextBoolean() ? this.getFoxType() : ((FoxEntity)arg).getFoxType());
+    public FoxEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        FoxEntity lv = EntityType.FOX.create(arg);
+        lv.setType(this.random.nextBoolean() ? this.getFoxType() : ((FoxEntity)arg2).getFoxType());
         return lv;
     }
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         Biome lv = arg.getBiome(this.getBlockPos());
         Type lv2 = Type.fromBiome(lv);
         boolean bl = false;
@@ -350,7 +350,7 @@ extends AnimalEntity {
         ListTag lv = new ListTag();
         for (UUID uUID : list) {
             if (uUID == null) continue;
-            lv.add(NbtHelper.fromUuidNew(uUID));
+            lv.add(NbtHelper.fromUuid(uUID));
         }
         arg.put("Trusted", lv);
         arg.putBoolean("Sleeping", this.isSleeping());
@@ -364,7 +364,7 @@ extends AnimalEntity {
         super.readCustomDataFromTag(arg);
         ListTag lv = arg.getList("Trusted", 11);
         for (int i = 0; i < lv.size(); ++i) {
-            this.addTrustedUuid(NbtHelper.toUuidNew(lv.get(i)));
+            this.addTrustedUuid(NbtHelper.toUuid(lv.get(i)));
         }
         this.setSleeping(arg.getBoolean("Sleeping"));
         this.setType(Type.byName(arg.getString("Type")));
@@ -651,8 +651,8 @@ extends AnimalEntity {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     class LookAtEntityGoal
@@ -1213,7 +1213,7 @@ extends AnimalEntity {
 
         @Override
         protected void breed() {
-            FoxEntity lv = (FoxEntity)this.animal.createChild(this.mate);
+            FoxEntity lv = (FoxEntity)this.animal.createChild((ServerWorld)this.world, this.mate);
             if (lv == null) {
                 return;
             }

@@ -22,23 +22,23 @@ import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class StructureAccessor {
-    private final WorldAccess field_24404;
-    private final GeneratorOptions field_24497;
+    private final WorldAccess world;
+    private final GeneratorOptions options;
 
     public StructureAccessor(WorldAccess arg, GeneratorOptions arg2) {
-        this.field_24404 = arg;
-        this.field_24497 = arg2;
+        this.world = arg;
+        this.options = arg2;
     }
 
     public StructureAccessor method_29951(ChunkRegion arg) {
-        if (arg.getWorld() != this.field_24404) {
+        if (arg.getWorld() != this.world) {
             throw new IllegalStateException("Using invalid feature manager (source level: " + arg.getWorld() + ", region: " + arg);
         }
-        return new StructureAccessor(arg, this.field_24497);
+        return new StructureAccessor(arg, this.options);
     }
 
     public Stream<? extends StructureStart<?>> getStructuresWithChildren(ChunkSectionPos arg3, StructureFeature<?> arg22) {
-        return this.field_24404.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22).stream().map(long_ -> ChunkSectionPos.from(new ChunkPos((long)long_), 0)).map(arg2 -> this.getStructureStart((ChunkSectionPos)arg2, arg22, this.field_24404.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
+        return this.world.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22).stream().map(long_ -> ChunkSectionPos.from(new ChunkPos((long)long_), 0)).map(arg2 -> this.getStructureStart((ChunkSectionPos)arg2, arg22, this.world.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
     }
 
     @Nullable
@@ -54,8 +54,8 @@ public class StructureAccessor {
         arg3.addStructureReference(arg2, l);
     }
 
-    public boolean method_27834() {
-        return this.field_24497.shouldGenerateStructures();
+    public boolean shouldGenerateStructures() {
+        return this.options.shouldGenerateStructures();
     }
 
     public StructureStart<?> method_28388(BlockPos arg, boolean bl, StructureFeature<?> arg23) {

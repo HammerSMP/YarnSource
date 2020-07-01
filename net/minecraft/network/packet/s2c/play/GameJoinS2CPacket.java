@@ -65,20 +65,19 @@ implements Packet<ClientPlayPacketListener> {
     @Override
     public void read(PacketByteBuf arg) throws IOException {
         this.playerEntityId = arg.readInt();
-        int i = arg.readUnsignedByte();
-        this.hardcore = (i & 8) == 8;
-        this.gameMode = GameMode.byId(i &= 0xFFFFFFF7);
-        this.field_25713 = GameMode.byId(arg.readUnsignedByte());
-        int j = arg.readVarInt();
+        this.hardcore = arg.readBoolean();
+        this.gameMode = GameMode.byId(arg.readByte());
+        this.field_25713 = GameMode.byId(arg.readByte());
+        int i = arg.readVarInt();
         this.field_25320 = Sets.newHashSet();
-        for (int k = 0; k < j; ++k) {
+        for (int j = 0; j < i; ++j) {
             this.field_25320.add(RegistryKey.of(Registry.DIMENSION, arg.readIdentifier()));
         }
         this.dimensionTracker = arg.decode(RegistryTracker.Modifiable.CODEC);
         this.field_25321 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
         this.dimensionId = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
         this.sha256Seed = arg.readLong();
-        this.maxPlayers = arg.readUnsignedByte();
+        this.maxPlayers = arg.readVarInt();
         this.chunkLoadDistance = arg.readVarInt();
         this.reducedDebugInfo = arg.readBoolean();
         this.showDeathScreen = arg.readBoolean();
@@ -89,11 +88,8 @@ implements Packet<ClientPlayPacketListener> {
     @Override
     public void write(PacketByteBuf arg) throws IOException {
         arg.writeInt(this.playerEntityId);
-        int i = this.gameMode.getId();
-        if (this.hardcore) {
-            i |= 8;
-        }
-        arg.writeByte(i);
+        arg.writeBoolean(this.hardcore);
+        arg.writeByte(this.gameMode.getId());
         arg.writeByte(this.field_25713.getId());
         arg.writeVarInt(this.field_25320.size());
         for (RegistryKey<World> lv : this.field_25320) {
@@ -103,7 +99,7 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeIdentifier(this.field_25321.getValue());
         arg.writeIdentifier(this.dimensionId.getValue());
         arg.writeLong(this.sha256Seed);
-        arg.writeByte(this.maxPlayers);
+        arg.writeVarInt(this.maxPlayers);
         arg.writeVarInt(this.chunkLoadDistance);
         arg.writeBoolean(this.reducedDebugInfo);
         arg.writeBoolean(this.showDeathScreen);

@@ -5,13 +5,13 @@ package net.minecraft.entity.ai.goal;
 
 import java.util.EnumSet;
 import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
 public abstract class MoveToTargetPosGoal
 extends Goal {
-    protected final MobEntityWithAi mob;
+    protected final PathAwareEntity mob;
     public final double speed;
     protected int cooldown;
     protected int tryingTime;
@@ -22,11 +22,11 @@ extends Goal {
     private final int maxYDifference;
     protected int lowestY;
 
-    public MoveToTargetPosGoal(MobEntityWithAi arg, double d, int i) {
+    public MoveToTargetPosGoal(PathAwareEntity arg, double d, int i) {
         this(arg, d, i, 1);
     }
 
-    public MoveToTargetPosGoal(MobEntityWithAi arg, double d, int i, int j) {
+    public MoveToTargetPosGoal(PathAwareEntity arg, double d, int i, int j) {
         this.mob = arg;
         this.speed = d;
         this.range = i;
@@ -45,7 +45,7 @@ extends Goal {
         return this.findTargetPos();
     }
 
-    protected int getInterval(MobEntityWithAi arg) {
+    protected int getInterval(PathAwareEntity arg) {
         return 200 + arg.getRandom().nextInt(200);
     }
 

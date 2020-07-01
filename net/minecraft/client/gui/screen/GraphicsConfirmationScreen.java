@@ -6,7 +6,7 @@
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
-package net.minecraft;
+package net.minecraft.client.gui.screen;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -20,42 +20,42 @@ import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 
 @Environment(value=EnvType.CLIENT)
-public class class_5405
+public class GraphicsConfirmationScreen
 extends Screen {
-    private final StringRenderable field_25675;
-    private final ImmutableList<class_5406> field_25676;
-    private List<StringRenderable> field_25677;
+    private final StringRenderable message;
+    private final ImmutableList<ChoiceButton> choiceButtons;
+    private List<StringRenderable> lines;
     private int field_25678;
     private int field_25679;
 
-    protected class_5405(Text arg, List<StringRenderable> list, ImmutableList<class_5406> immutableList) {
+    protected GraphicsConfirmationScreen(Text arg, List<StringRenderable> list, ImmutableList<ChoiceButton> immutableList) {
         super(arg);
-        this.field_25675 = StringRenderable.concat(list);
-        this.field_25676 = immutableList;
+        this.message = StringRenderable.concat(list);
+        this.choiceButtons = immutableList;
     }
 
     @Override
     public String getNarrationMessage() {
-        return super.getNarrationMessage() + ". " + this.field_25675.getString();
+        return super.getNarrationMessage() + ". " + this.message.getString();
     }
 
     @Override
     public void init(MinecraftClient arg, int i, int j) {
         super.init(arg, i, j);
-        for (class_5406 lv : this.field_25676) {
-            this.field_25679 = Math.max(this.field_25679, 20 + this.textRenderer.getWidth(lv.field_25680) + 20);
+        for (ChoiceButton lv : this.choiceButtons) {
+            this.field_25679 = Math.max(this.field_25679, 20 + this.textRenderer.getWidth(lv.message) + 20);
         }
         int k = 5 + this.field_25679 + 5;
-        int l = k * this.field_25676.size();
-        this.field_25677 = this.textRenderer.wrapLines(this.field_25675, l);
+        int l = k * this.choiceButtons.size();
+        this.lines = this.textRenderer.wrapLines(this.message, l);
         this.textRenderer.getClass();
-        int m = this.field_25677.size() * 9;
+        int m = this.lines.size() * 9;
         this.field_25678 = (int)((double)j / 2.0 - (double)m / 2.0);
         this.textRenderer.getClass();
         int n = this.field_25678 + m + 9 * 2;
         int o = (int)((double)i / 2.0 - (double)l / 2.0);
-        for (class_5406 lv2 : this.field_25676) {
-            this.addButton(new ButtonWidget(o, n, this.field_25679, 20, lv2.field_25680, lv2.field_25681));
+        for (ChoiceButton lv2 : this.choiceButtons) {
+            this.addButton(new ButtonWidget(o, n, this.field_25679, 20, lv2.message, lv2.pressAction));
             o += k;
         }
     }
@@ -66,7 +66,7 @@ extends Screen {
         this.textRenderer.getClass();
         this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, this.field_25678 - 9 * 2, -1);
         int k = this.field_25678;
-        for (StringRenderable lv : this.field_25677) {
+        for (StringRenderable lv : this.lines) {
             this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, -1);
             this.textRenderer.getClass();
             k += 9;
@@ -80,13 +80,13 @@ extends Screen {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static final class class_5406 {
-        private final Text field_25680;
-        private final ButtonWidget.PressAction field_25681;
+    public static final class ChoiceButton {
+        private final Text message;
+        private final ButtonWidget.PressAction pressAction;
 
-        public class_5406(Text arg, ButtonWidget.PressAction arg2) {
-            this.field_25680 = arg;
-            this.field_25681 = arg2;
+        public ChoiceButton(Text arg, ButtonWidget.PressAction arg2) {
+            this.message = arg;
+            this.pressAction = arg2;
         }
     }
 }

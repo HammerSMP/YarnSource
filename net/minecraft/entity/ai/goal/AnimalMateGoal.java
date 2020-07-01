@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 public class AnimalMateGoal
@@ -80,7 +81,7 @@ extends Goal {
     }
 
     protected void breed() {
-        this.animal.breed(this.world, this.mate);
+        this.animal.breed((ServerWorld)this.world, this.mate);
     }
 }
 

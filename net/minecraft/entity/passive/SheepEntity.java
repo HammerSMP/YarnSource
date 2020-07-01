@@ -19,6 +19,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -42,7 +43,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,6 +57,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -68,7 +70,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public class SheepEntity
 extends AnimalEntity
@@ -120,7 +121,7 @@ implements Shearable {
         this.goalSelector.add(0, new SwimGoal(this));
         this.goalSelector.add(1, new EscapeDangerGoal(this, 1.25));
         this.goalSelector.add(2, new AnimalMateGoal(this, 1.0));
-        this.goalSelector.add(3, new TemptGoal((MobEntityWithAi)this, 1.1, Ingredient.ofItems(Items.WHEAT), false));
+        this.goalSelector.add(3, new TemptGoal((PathAwareEntity)this, 1.1, Ingredient.ofItems(Items.WHEAT), false));
         this.goalSelector.add(4, new FollowParentGoal(this, 1.1));
         this.goalSelector.add(5, this.eatGrassGoal);
         this.goalSelector.add(6, new WanderAroundFarGoal(this, 1.0));
@@ -352,9 +353,9 @@ implements Shearable {
     }
 
     @Override
-    public SheepEntity createChild(PassiveEntity arg) {
-        SheepEntity lv = (SheepEntity)arg;
-        SheepEntity lv2 = EntityType.SHEEP.create(this.world);
+    public SheepEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        SheepEntity lv = (SheepEntity)arg2;
+        SheepEntity lv2 = EntityType.SHEEP.create(arg);
         lv2.setColor(this.getChildColor(this, lv));
         return lv2;
     }
@@ -369,7 +370,7 @@ implements Shearable {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setColor(SheepEntity.generateDefaultColor(arg.getRandom()));
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }
@@ -400,8 +401,8 @@ implements Shearable {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 }
 

@@ -82,7 +82,7 @@ extends BlockWithEntity {
         return ActionResult.CONSUME;
     }
 
-    protected void dispense(World arg, BlockPos arg2) {
+    protected void dispense(ServerWorld arg, BlockPos arg2) {
         BlockPointerImpl lv = new BlockPointerImpl(arg, arg2);
         DispenserBlockEntity lv2 = (DispenserBlockEntity)lv.getBlockEntity();
         int i = lv2.chooseNonEmptySlot();

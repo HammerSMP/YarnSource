@@ -82,7 +82,7 @@ StructureHolder {
 
     public void setStructureStarts(Map<StructureFeature<?>, StructureStart<?>> var1);
 
-    default public boolean method_12228(int i, int j) {
+    default public boolean areSectionsEmptyBetween(int i, int j) {
         if (i < 0) {
             i = 0;
         }
@@ -122,10 +122,10 @@ StructureHolder {
     }
 
     @Nullable
-    public CompoundTag getBlockEntityTagAt(BlockPos var1);
+    public CompoundTag getBlockEntityTag(BlockPos var1);
 
     @Nullable
-    public CompoundTag method_20598(BlockPos var1);
+    public CompoundTag getPackedBlockEntityTag(BlockPos var1);
 
     public Stream<BlockPos> getLightSourcesStream();
 

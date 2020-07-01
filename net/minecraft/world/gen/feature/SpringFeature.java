@@ -11,7 +11,6 @@ import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.SpringFeatureConfig;
@@ -23,53 +22,53 @@ extends Feature<SpringFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SpringFeatureConfig arg5) {
-        if (!arg5.validBlocks.contains(arg.getBlockState(arg4.up()).getBlock())) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, SpringFeatureConfig arg4) {
+        if (!arg4.validBlocks.contains(arg.getBlockState(arg3.up()).getBlock())) {
             return false;
         }
-        if (arg5.requiresBlockBelow && !arg5.validBlocks.contains(arg.getBlockState(arg4.down()).getBlock())) {
+        if (arg4.requiresBlockBelow && !arg4.validBlocks.contains(arg.getBlockState(arg3.down()).getBlock())) {
             return false;
         }
-        BlockState lv = arg.getBlockState(arg4);
-        if (!lv.isAir() && !arg5.validBlocks.contains(lv.getBlock())) {
+        BlockState lv = arg.getBlockState(arg3);
+        if (!lv.isAir() && !arg4.validBlocks.contains(lv.getBlock())) {
             return false;
         }
         int i = 0;
         int j = 0;
-        if (arg5.validBlocks.contains(arg.getBlockState(arg4.west()).getBlock())) {
+        if (arg4.validBlocks.contains(arg.getBlockState(arg3.west()).getBlock())) {
             ++j;
         }
-        if (arg5.validBlocks.contains(arg.getBlockState(arg4.east()).getBlock())) {
+        if (arg4.validBlocks.contains(arg.getBlockState(arg3.east()).getBlock())) {
             ++j;
         }
-        if (arg5.validBlocks.contains(arg.getBlockState(arg4.north()).getBlock())) {
+        if (arg4.validBlocks.contains(arg.getBlockState(arg3.north()).getBlock())) {
             ++j;
         }
-        if (arg5.validBlocks.contains(arg.getBlockState(arg4.south()).getBlock())) {
+        if (arg4.validBlocks.contains(arg.getBlockState(arg3.south()).getBlock())) {
             ++j;
         }
-        if (arg5.validBlocks.contains(arg.getBlockState(arg4.down()).getBlock())) {
+        if (arg4.validBlocks.contains(arg.getBlockState(arg3.down()).getBlock())) {
             ++j;
         }
         int k = 0;
-        if (arg.isAir(arg4.west())) {
+        if (arg.isAir(arg3.west())) {
             ++k;
         }
-        if (arg.isAir(arg4.east())) {
+        if (arg.isAir(arg3.east())) {
             ++k;
         }
-        if (arg.isAir(arg4.north())) {
+        if (arg.isAir(arg3.north())) {
             ++k;
         }
-        if (arg.isAir(arg4.south())) {
+        if (arg.isAir(arg3.south())) {
             ++k;
         }
-        if (arg.isAir(arg4.down())) {
+        if (arg.isAir(arg3.down())) {
             ++k;
         }
-        if (j == arg5.rockCount && k == arg5.holeCount) {
-            arg.setBlockState(arg4, arg5.state.getBlockState(), 2);
-            arg.getFluidTickScheduler().schedule(arg4, arg5.state.getFluid(), 0);
+        if (j == arg4.rockCount && k == arg4.holeCount) {
+            arg.setBlockState(arg3, arg4.state.getBlockState(), 2);
+            arg.getFluidTickScheduler().schedule(arg3, arg4.state.getFluid(), 0);
             ++i;
         }
         return i > 0;

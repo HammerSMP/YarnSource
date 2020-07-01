@@ -177,7 +177,7 @@ implements Predicate<ItemStack> {
         }
         if (jsonObject.has("tag")) {
             Identifier lv3 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            Tag<Item> lv4 = TagContainers.instance().items().get(lv3);
+            Tag<Item> lv4 = TagContainers.instance().method_30218().method_30210(lv3);
             if (lv4 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv3 + "'");
             }
@@ -211,7 +211,7 @@ implements Predicate<ItemStack> {
         @Override
         public JsonObject toJson() {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("tag", TagContainers.instance().items().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", TagContainers.instance().method_30218().method_30212(this.tag).toString());
             return jsonObject;
         }
     }

@@ -2,12 +2,14 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
 package net.minecraft.network.packet.s2c.play;
 
 import java.io.IOException;
+import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
@@ -32,6 +34,19 @@ implements Packet<ClientPlayPacketListener> {
 
     public static long encodePacketCoordinate(double d) {
         return MathHelper.lfloor(d * 4096.0);
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public static double method_30301(long l) {
+        return (double)l / 4096.0;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_30302(Vec3d arg) {
+        double d = this.deltaX == 0 ? arg.x : EntityS2CPacket.method_30301(EntityS2CPacket.encodePacketCoordinate(arg.x) + (long)this.deltaX);
+        double e = this.deltaY == 0 ? arg.y : EntityS2CPacket.method_30301(EntityS2CPacket.encodePacketCoordinate(arg.y) + (long)this.deltaY);
+        double f = this.deltaZ == 0 ? arg.z : EntityS2CPacket.method_30301(EntityS2CPacket.encodePacketCoordinate(arg.z) + (long)this.deltaZ);
+        return new Vec3d(d, e, f);
     }
 
     public static Vec3d decodePacketCoordinates(long l, long m, long n) {
@@ -64,24 +79,10 @@ implements Packet<ClientPlayPacketListener> {
         return "Entity_" + super.toString();
     }
 
+    @Nullable
     @Environment(value=EnvType.CLIENT)
     public Entity getEntity(World arg) {
         return arg.getEntityById(this.id);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public short getDeltaXShort() {
-        return this.deltaX;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public short getDeltaYShort() {
-        return this.deltaY;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public short getDeltaZShort() {
-        return this.deltaZ;
     }
 
     @Environment(value=EnvType.CLIENT)

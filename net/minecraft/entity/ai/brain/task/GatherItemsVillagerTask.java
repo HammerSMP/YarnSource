@@ -58,7 +58,7 @@ extends Task<VillagerEntity> {
             return;
         }
         LookTargetUtil.lookAtAndWalkTowardsEachOther(arg2, lv, 0.5f);
-        arg2.talkWithVillager(lv, l);
+        arg2.talkWithVillager(arg, lv, l);
         if (arg2.wantsToStartBreeding() && (arg2.getVillagerData().getProfession() == VillagerProfession.FARMER || lv.canBreed())) {
             GatherItemsVillagerTask.giveHalfOfStack(arg2, VillagerEntity.ITEM_FOOD_VALUES.keySet(), lv);
         }

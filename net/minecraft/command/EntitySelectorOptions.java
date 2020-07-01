@@ -252,10 +252,10 @@ public class EntitySelectorOptions {
         EntitySelectorOptions.putOption("type", arg -> {
             arg.setSuggestionProvider((suggestionsBuilder, consumer) -> {
                 CommandSource.suggestIdentifiers(Registry.ENTITY_TYPE.getIds(), suggestionsBuilder, String.valueOf('!'));
-                CommandSource.suggestIdentifiers(EntityTypeTags.getContainer().getKeys(), suggestionsBuilder, "!#");
+                CommandSource.suggestIdentifiers(EntityTypeTags.getContainer().method_30211(), suggestionsBuilder, "!#");
                 if (!arg.excludesEntityType()) {
                     CommandSource.suggestIdentifiers(Registry.ENTITY_TYPE.getIds(), suggestionsBuilder);
-                    CommandSource.suggestIdentifiers(EntityTypeTags.getContainer().getKeys(), suggestionsBuilder, String.valueOf('#'));
+                    CommandSource.suggestIdentifiers(EntityTypeTags.getContainer().method_30211(), suggestionsBuilder, String.valueOf('#'));
                 }
                 return suggestionsBuilder.buildFuture();
             });
@@ -270,7 +270,7 @@ public class EntitySelectorOptions {
             }
             if (arg.readTagCharacter()) {
                 Identifier lv = Identifier.fromCommandInput(arg.getReader());
-                arg.setPredicate(arg2 -> arg2.getServer().getTagManager().entityTypes().getOrCreate(lv).contains(arg2.getType()) != bl);
+                arg.setPredicate(arg2 -> arg2.getServer().getTagManager().method_30221().method_30213(lv).contains(arg2.getType()) != bl);
             } else {
                 Identifier lv2 = Identifier.fromCommandInput(arg.getReader());
                 EntityType lv3 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> {

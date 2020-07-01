@@ -19,7 +19,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -45,7 +46,7 @@ extends AnimalEntity {
         this.goalSelector.add(0, new SwimGoal(this));
         this.goalSelector.add(1, new EscapeDangerGoal(this, 2.0));
         this.goalSelector.add(2, new AnimalMateGoal(this, 1.0));
-        this.goalSelector.add(3, new TemptGoal((MobEntityWithAi)this, 1.25, Ingredient.ofItems(Items.WHEAT), false));
+        this.goalSelector.add(3, new TemptGoal((PathAwareEntity)this, 1.25, Ingredient.ofItems(Items.WHEAT), false));
         this.goalSelector.add(4, new FollowParentGoal(this, 1.25));
         this.goalSelector.add(5, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 6.0f));
@@ -94,8 +95,8 @@ extends AnimalEntity {
     }
 
     @Override
-    public CowEntity createChild(PassiveEntity arg) {
-        return EntityType.COW.create(this.world);
+    public CowEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.COW.create(arg);
     }
 
     @Override
@@ -107,8 +108,8 @@ extends AnimalEntity {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 }
 

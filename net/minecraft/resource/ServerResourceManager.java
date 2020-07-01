@@ -6,6 +6,7 @@ package net.minecraft.resource;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import net.minecraft.class_5415;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.recipe.RecipeManager;
@@ -55,8 +56,8 @@ implements AutoCloseable {
         return this.lootManager;
     }
 
-    public RegistryTagManager getRegistryTagManager() {
-        return this.registryTagManager;
+    public class_5415 getRegistryTagManager() {
+        return this.registryTagManager.method_30223();
     }
 
     public RecipeManager getRecipeManager() {
@@ -86,7 +87,7 @@ implements AutoCloseable {
     }
 
     public void loadRegistryTags() {
-        this.registryTagManager.apply();
+        this.registryTagManager.method_30223().method_30222();
     }
 
     @Override

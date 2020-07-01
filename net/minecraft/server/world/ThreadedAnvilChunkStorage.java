@@ -133,7 +133,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     public static final int MAX_LEVEL = 33 + ChunkStatus.getMaxTargetGenerationRadius();
     private final Long2ObjectLinkedOpenHashMap<ChunkHolder> currentChunkHolders = new Long2ObjectLinkedOpenHashMap();
     private volatile Long2ObjectLinkedOpenHashMap<ChunkHolder> chunkHolders = this.currentChunkHolders.clone();
-    private final Long2ObjectLinkedOpenHashMap<ChunkHolder> chunkHolderHashMap = new Long2ObjectLinkedOpenHashMap();
+    private final Long2ObjectLinkedOpenHashMap<ChunkHolder> field_18807 = new Long2ObjectLinkedOpenHashMap();
     private final LongSet loadedChunks = new LongOpenHashSet();
     private final ServerWorld world;
     private final ServerLightingProvider serverLightingProvider;
@@ -158,9 +158,9 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
     private int watchDistance;
 
     public ThreadedAnvilChunkStorage(ServerWorld arg, LevelStorage.Session arg2, DataFixer dataFixer, StructureManager arg3, Executor executor, ThreadExecutor<Runnable> arg4, ChunkProvider arg5, ChunkGenerator arg6, WorldGenerationProgressListener arg7, Supplier<PersistentStateManager> supplier, int i, boolean bl) {
-        super(new File(arg2.method_27424(arg.getRegistryKey()), "region"), dataFixer, bl);
+        super(new File(arg2.getWorldDirectory(arg.getRegistryKey()), "region"), dataFixer, bl);
         this.structureManager = arg3;
-        this.saveDir = arg2.method_27424(arg.getRegistryKey());
+        this.saveDir = arg2.getWorldDirectory(arg.getRegistryKey());
         this.world = arg;
         this.chunkGenerator = arg6;
         this.mainThreadExecutor = arg4;
@@ -455,7 +455,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
                 if (arg2 == ChunkStatus.LIGHT) {
                     CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> completableFuture = this.generateChunk(arg, arg2);
                 } else {
-                    completableFuture2 = arg2.runNoGenTask(this.world, this.structureManager, this.serverLightingProvider, arg2 -> this.convertToFullChunk(arg), lv);
+                    completableFuture2 = arg2.runLoadTask(this.world, this.structureManager, this.serverLightingProvider, arg2 -> this.convertToFullChunk(arg), lv);
                 }
                 this.worldGenerationProgressListener.setChunkStatus(lv, arg2);
                 return completableFuture2;
@@ -511,7 +511,7 @@ implements ChunkHolder.PlayersWatchingChunkProvider {
         this.world.getProfiler().visit(() -> "chunkGenerate " + arg2.getId());
         return completableFuture.thenComposeAsync(either -> (CompletableFuture)either.map(list -> {
             try {
-                CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> completableFuture = arg2.runTask(this.world, this.chunkGenerator, this.structureManager, this.serverLightingProvider, arg2 -> this.convertToFullChunk(arg), (List<Chunk>)list);
+                CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> completableFuture = arg2.runGenerationTask(this.world, this.chunkGenerator, this.structureManager, this.serverLightingProvider, arg2 -> this.convertToFullChunk(arg), (List<Chunk>)list);
                 this.worldGenerationProgressListener.setChunkStatus(lv, arg2);
                 return completableFuture;
             }

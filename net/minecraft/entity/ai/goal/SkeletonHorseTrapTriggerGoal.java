@@ -14,6 +14,7 @@ import net.minecraft.entity.mob.SkeletonHorseEntity;
 import net.minecraft.entity.passive.HorseBaseEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.LocalDifficulty;
 
 public class SkeletonHorseTrapTriggerGoal
@@ -51,7 +52,7 @@ extends Goal {
 
     private HorseBaseEntity getHorse(LocalDifficulty arg) {
         SkeletonHorseEntity lv = EntityType.SKELETON_HORSE.create(this.skeletonHorse.world);
-        lv.initialize(this.skeletonHorse.world, arg, SpawnReason.TRIGGERED, null, null);
+        lv.initialize((ServerWorld)this.skeletonHorse.world, arg, SpawnReason.TRIGGERED, null, null);
         lv.updatePosition(this.skeletonHorse.getX(), this.skeletonHorse.getY(), this.skeletonHorse.getZ());
         lv.timeUntilRegen = 60;
         lv.setPersistent();
@@ -63,7 +64,7 @@ extends Goal {
 
     private SkeletonEntity getSkeleton(LocalDifficulty arg, HorseBaseEntity arg2) {
         SkeletonEntity lv = EntityType.SKELETON.create(arg2.world);
-        lv.initialize(arg2.world, arg, SpawnReason.TRIGGERED, null, null);
+        lv.initialize((ServerWorld)arg2.world, arg, SpawnReason.TRIGGERED, null, null);
         lv.updatePosition(arg2.getX(), arg2.getY(), arg2.getZ());
         lv.timeUntilRegen = 60;
         lv.setPersistent();

@@ -259,7 +259,7 @@ extends DrawableHelper {
                         long l = 0L;
                         float h = 0.0f;
                         if (lv9 != null) {
-                            h = lv7.getMoonSize();
+                            h = lv7.method_30272();
                             l = lv9.getInhabitedTime();
                         }
                         LocalDifficulty lv13 = new LocalDifficulty(lv7.getDifficulty(), lv7.getTimeOfDay(), l, h);
@@ -352,7 +352,7 @@ extends DrawableHelper {
             for (Map.Entry entry : lv2.getEntries().entrySet()) {
                 list.add(this.propertyToString(entry));
             }
-            for (Identifier lv3 : this.client.getNetworkHandler().getTagManager().blocks().getTagsFor(lv2.getBlock())) {
+            for (Identifier lv3 : this.client.getNetworkHandler().getTagManager().method_30215().method_30206(lv2.getBlock())) {
                 list.add("#" + lv3);
             }
         }
@@ -365,7 +365,7 @@ extends DrawableHelper {
             for (Map.Entry entry2 : lv5.getEntries().entrySet()) {
                 list.add(this.propertyToString(entry2));
             }
-            for (Identifier lv6 : this.client.getNetworkHandler().getTagManager().fluids().getTagsFor(lv5.getFluid())) {
+            for (Identifier lv6 : this.client.getNetworkHandler().getTagManager().method_30220().method_30206(lv5.getFluid())) {
                 list.add("#" + lv6);
             }
         }

@@ -37,7 +37,7 @@ import net.minecraft.command.arguments.RotationArgumentType;
 import net.minecraft.command.arguments.Vec3ArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -158,8 +158,8 @@ public class TeleportCommand {
             arg2.setVelocity(arg2.getVelocity().multiply(1.0, 0.0, 1.0));
             arg2.setOnGround(true);
         }
-        if (arg2 instanceof MobEntityWithAi) {
-            ((MobEntityWithAi)arg2).getNavigation().stop();
+        if (arg2 instanceof PathAwareEntity) {
+            ((PathAwareEntity)arg2).getNavigation().stop();
         }
     }
 

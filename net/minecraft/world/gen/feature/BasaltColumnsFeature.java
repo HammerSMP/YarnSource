@@ -19,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.BasaltColumnsFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -33,13 +32,13 @@ extends Feature<BasaltColumnsFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, BasaltColumnsFeatureConfig arg5) {
-        int i = arg3.getSeaLevel();
-        BlockPos lv = BasaltColumnsFeature.method_27094(arg, i, arg4.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), Integer.MAX_VALUE);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, BasaltColumnsFeatureConfig arg4) {
+        int i = arg2.getSeaLevel();
+        BlockPos lv = BasaltColumnsFeature.method_27094(arg, i, arg3.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), Integer.MAX_VALUE);
         if (lv == null) {
             return false;
         }
-        int j = BasaltColumnsFeature.method_27099(random, arg5);
+        int j = BasaltColumnsFeature.method_27099(random, arg4);
         boolean bl = random.nextFloat() < 0.9f;
         int k = Math.min(j, bl ? 5 : 8);
         int l = bl ? 50 : 15;
@@ -47,7 +46,7 @@ extends Feature<BasaltColumnsFeatureConfig> {
         for (BlockPos lv2 : BlockPos.method_27156(random, l, lv.getX() - k, lv.getY(), lv.getZ() - k, lv.getX() + k, lv.getY(), lv.getZ() + k)) {
             int m = j - lv2.getManhattanDistance(lv);
             if (m < 0) continue;
-            bl2 |= this.method_27096(arg, i, lv2, m, BasaltColumnsFeature.method_27100(random, arg5));
+            bl2 |= this.method_27096(arg, i, lv2, m, BasaltColumnsFeature.method_27100(random, arg4));
         }
         return bl2;
     }

@@ -51,7 +51,7 @@ extends RealmsScreen {
     private static final Identifier field_22686 = new Identifier("realms", "textures/gui/realms/plus_icon.png");
     private static final Identifier field_22687 = new Identifier("realms", "textures/gui/realms/restore_icon.png");
     private static int lastScrollPosition = -1;
-    private final RealmsConfigureWorldScreen lastScreen;
+    private final RealmsConfigureWorldScreen parent;
     private List<Backup> backups = Collections.emptyList();
     private String toolTip;
     private BackupObjectSelectionList backupObjectSelectionList;
@@ -65,7 +65,7 @@ extends RealmsScreen {
     private RealmsLabel titleLabel;
 
     public RealmsBackupScreen(RealmsConfigureWorldScreen arg, RealmsServer arg2, int i) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.serverData = arg2;
         this.slotId = i;
     }
@@ -105,7 +105,7 @@ extends RealmsScreen {
             this.client.openScreen(new RealmsBackupInfoScreen(this, this.backups.get(this.selectedBackup)));
             this.selectedBackup = -1;
         }));
-        this.addButton(new ButtonWidget(this.width - 100, this.height - 35, 85, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.lastScreen)));
+        this.addButton(new ButtonWidget(this.width - 100, this.height - 35, 85, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.parent)));
         this.addChild(this.backupObjectSelectionList);
         this.titleLabel = this.addChild(new RealmsLabel(new TranslatableText("mco.configure.world.backup"), this.width / 2, 12, 0xFFFFFF));
         this.focusOn(this.backupObjectSelectionList);
@@ -164,7 +164,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.lastScreen);
+            this.client.openScreen(this.parent);
             return true;
         }
         return super.keyPressed(i, j, k);
@@ -202,13 +202,13 @@ extends RealmsScreen {
     }
 
     private void downloadWorldData() {
-        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.lastScreen.getNewScreen(), new DownloadTask(this.serverData.id, this.slotId, this.serverData.name + " (" + this.serverData.slots.get(this.serverData.activeSlot).getSlotName(this.serverData.activeSlot) + ")", this)));
+        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent.getNewScreen(), new DownloadTask(this.serverData.id, this.slotId, this.serverData.name + " (" + this.serverData.slots.get(this.serverData.activeSlot).getSlotName(this.serverData.activeSlot) + ")", this)));
     }
 
     private void restore() {
         Backup lv = this.backups.get(this.selectedBackup);
         this.selectedBackup = -1;
-        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.lastScreen.getNewScreen(), new RestoreTask(lv, this.serverData.id, this.lastScreen)));
+        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent.getNewScreen(), new RestoreTask(lv, this.serverData.id, this.parent)));
     }
 
     @Override

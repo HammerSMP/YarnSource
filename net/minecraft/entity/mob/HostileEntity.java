@@ -5,14 +5,15 @@ package net.minecraft.entity.mob;
 
 import java.util.Random;
 import java.util.function.Predicate;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -28,10 +29,10 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class HostileEntity
-extends MobEntityWithAi
+extends PathAwareEntity
 implements Monster {
     protected HostileEntity(EntityType<? extends HostileEntity> arg, World arg2) {
-        super((EntityType<? extends MobEntityWithAi>)arg, arg2);
+        super((EntityType<? extends PathAwareEntity>)arg, arg2);
         this.experiencePoints = 5;
     }
 
@@ -100,7 +101,7 @@ implements Monster {
         return 0.5f - arg2.getBrightness(arg);
     }
 
-    public static boolean isSpawnDark(WorldAccess arg, BlockPos arg2, Random random) {
+    public static boolean isSpawnDark(class_5425 arg, BlockPos arg2, Random random) {
         if (arg.getLightLevel(LightType.SKY, arg2) > random.nextInt(32)) {
             return false;
         }
@@ -108,7 +109,7 @@ implements Monster {
         return i <= random.nextInt(8);
     }
 
-    public static boolean canSpawnInDark(EntityType<? extends HostileEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawnInDark(EntityType<? extends HostileEntity> arg, class_5425 arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         return arg2.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.isSpawnDark(arg2, arg4, random) && HostileEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
     }
 

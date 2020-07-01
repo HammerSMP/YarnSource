@@ -248,7 +248,7 @@ public class ChunkSerializer {
         }
         ListTag lv12 = new ListTag();
         for (BlockPos lv13 : arg22.getBlockEntityPositions()) {
-            CompoundTag lv14 = arg22.method_20598(lv13);
+            CompoundTag lv14 = arg22.getPackedBlockEntityTag(lv13);
             if (lv14 == null) continue;
             lv12.add(lv14);
         }

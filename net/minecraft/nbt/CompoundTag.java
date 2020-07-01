@@ -168,11 +168,11 @@ implements Tag {
     }
 
     public void putUuid(String string, UUID uUID) {
-        this.tags.put(string, NbtHelper.fromUuidNew(uUID));
+        this.tags.put(string, NbtHelper.fromUuid(uUID));
     }
 
     public UUID getUuid(String string) {
-        return NbtHelper.toUuidNew(this.get(string));
+        return NbtHelper.toUuid(this.get(string));
     }
 
     public boolean containsUuid(String string) {

@@ -57,11 +57,11 @@ import org.apache.logging.log4j.Logger;
 public class WorldUpdater {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final ThreadFactory UPDATE_THREAD_FACTORY = new ThreadFactoryBuilder().setDaemon(true).build();
-    private final ImmutableSet<RegistryKey<World>> field_25354;
+    private final ImmutableSet<RegistryKey<World>> worlds;
     private final boolean eraseCache;
-    private final LevelStorage.Session field_24083;
+    private final LevelStorage.Session session;
     private final Thread updateThread;
-    private final DataFixer field_24084;
+    private final DataFixer dataFixer;
     private volatile boolean keepUpgradingChunks = true;
     private volatile boolean isDone;
     private volatile float progress;
@@ -74,11 +74,11 @@ public class WorldUpdater {
     private final PersistentStateManager persistentStateManager;
 
     public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, ImmutableSet<RegistryKey<World>> immutableSet, boolean bl) {
-        this.field_25354 = immutableSet;
+        this.worlds = immutableSet;
         this.eraseCache = bl;
-        this.field_24084 = dataFixer;
-        this.field_24083 = arg;
-        this.persistentStateManager = new PersistentStateManager(new File(this.field_24083.method_27424(World.OVERWORLD), "data"), dataFixer);
+        this.dataFixer = dataFixer;
+        this.session = arg;
+        this.persistentStateManager = new PersistentStateManager(new File(this.session.getWorldDirectory(World.OVERWORLD), "data"), dataFixer);
         this.updateThread = UPDATE_THREAD_FACTORY.newThread(this::updateWorld);
         this.updateThread.setUncaughtExceptionHandler((thread, throwable) -> {
             LOGGER.error("Error upgrading world", throwable);
@@ -101,7 +101,7 @@ public class WorldUpdater {
     private void updateWorld() {
         this.totalChunkCount = 0;
         ImmutableMap.Builder builder = ImmutableMap.builder();
-        for (RegistryKey lv : this.field_25354) {
+        for (RegistryKey lv : this.worlds) {
             List<ChunkPos> list = this.getChunkPositions(lv);
             builder.put((Object)lv, list.listIterator());
             this.totalChunkCount += list.size();
@@ -113,9 +113,9 @@ public class WorldUpdater {
         float f = this.totalChunkCount;
         ImmutableMap immutableMap = builder.build();
         ImmutableMap.Builder builder2 = ImmutableMap.builder();
-        for (RegistryKey lv2 : this.field_25354) {
-            File file = this.field_24083.method_27424(lv2);
-            builder2.put((Object)lv2, (Object)new VersionedChunkStorage(new File(file, "region"), this.field_24084, true));
+        for (RegistryKey lv2 : this.worlds) {
+            File file = this.session.getWorldDirectory(lv2);
+            builder2.put((Object)lv2, (Object)new VersionedChunkStorage(new File(file, "region"), this.dataFixer, true));
         }
         ImmutableMap immutableMap2 = builder2.build();
         long l = Util.getMeasuringTimeMs();
@@ -123,7 +123,7 @@ public class WorldUpdater {
         while (this.keepUpgradingChunks) {
             boolean bl = false;
             float g = 0.0f;
-            for (RegistryKey lv3 : this.field_25354) {
+            for (RegistryKey lv3 : this.worlds) {
                 ListIterator listIterator = (ListIterator)immutableMap.get((Object)lv3);
                 VersionedChunkStorage lv4 = (VersionedChunkStorage)immutableMap2.get((Object)lv3);
                 if (listIterator.hasNext()) {
@@ -194,7 +194,7 @@ public class WorldUpdater {
     }
 
     private List<ChunkPos> getChunkPositions(RegistryKey<World> arg) {
-        File file2 = this.field_24083.method_27424(arg);
+        File file2 = this.session.getWorldDirectory(arg);
         File file22 = new File(file2, "region");
         File[] files = file22.listFiles((file, string) -> string.endsWith(".mca"));
         if (files == null) {
@@ -228,7 +228,7 @@ public class WorldUpdater {
 
     @Environment(value=EnvType.CLIENT)
     public ImmutableSet<RegistryKey<World>> method_28304() {
-        return this.field_25354;
+        return this.worlds;
     }
 
     @Environment(value=EnvType.CLIENT)

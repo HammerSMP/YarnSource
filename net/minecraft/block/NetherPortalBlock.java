@@ -49,14 +49,14 @@ extends Block {
     protected static final VoxelShape X_SHAPE = Block.createCuboidShape(0.0, 0.0, 6.0, 16.0, 16.0, 10.0);
     protected static final VoxelShape Z_SHAPE = Block.createCuboidShape(6.0, 0.0, 0.0, 10.0, 16.0, 16.0);
 
-    public NetherPortalBlock(AbstractBlock.Settings blockSettings) {
-        super(blockSettings);
+    public NetherPortalBlock(AbstractBlock.Settings arg) {
+        super(arg);
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(AXIS, Direction.Axis.X));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState blockState, BlockView blockView, BlockPos blockPos, ShapeContext shapeContext) {
-        switch (blockState.get(AXIS)) {
+    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+        switch (arg.get(AXIS)) {
             case Z: {
                 return Z_SHAPE;
             }
@@ -72,7 +72,7 @@ extends Block {
                 arg3 = arg3.down();
             }
             if (arg2.getBlockState(arg3).allowsSpawning(arg2, arg3, EntityType.ZOMBIFIED_PIGLIN) && (lv = EntityType.ZOMBIFIED_PIGLIN.spawn(arg2, null, null, null, arg3.up(), SpawnReason.STRUCTURE, false, false)) != null) {
-                lv.netherPortalCooldown = lv.getDefaultNetherPortalCooldown();
+                lv.method_30229();
             }
         }
     }
@@ -104,7 +104,7 @@ extends Block {
         boolean bl;
         Direction.Axis lv = arg2.getAxis();
         Direction.Axis lv2 = arg.get(AXIS);
-        bl = lv2 != lv && lv.isHorizontal();
+        boolean bl2 = bl = lv2 != lv && lv.isHorizontal();
         if (bl || arg3.isOf(this) || new AreaHelper(arg4, arg5, lv2).wasAlreadyValid()) {
             return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
         }

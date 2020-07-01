@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 public class BlockPlacementDispenserBehavior
 extends FallibleItemDispenserBehavior {
@@ -23,7 +24,7 @@ extends FallibleItemDispenserBehavior {
             Direction lv2 = arg.getBlockState().get(DispenserBlock.FACING);
             BlockPos lv3 = arg.getBlockPos().offset(lv2);
             Direction lv4 = arg.getWorld().isAir(lv3.down()) ? lv2 : Direction.UP;
-            this.setSuccess(((BlockItem)lv).place(new AutomaticItemPlacementContext(arg.getWorld(), lv3, lv2, arg2, lv4)).isAccepted());
+            this.setSuccess(((BlockItem)lv).place(new AutomaticItemPlacementContext((World)arg.getWorld(), lv3, lv2, arg2, lv4)).isAccepted());
         }
         return arg2;
     }

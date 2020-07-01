@@ -71,7 +71,7 @@ public class FluidPredicate {
         Tag<Fluid> lv3 = null;
         if (jsonObject.has("tag")) {
             Identifier lv4 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv3 = TagContainers.instance().fluids().get(lv4);
+            lv3 = TagContainers.instance().method_30220().method_30210(lv4);
             if (lv3 == null) {
                 throw new JsonSyntaxException("Unknown fluid tag '" + lv4 + "'");
             }
@@ -89,7 +89,7 @@ public class FluidPredicate {
             jsonObject.addProperty("fluid", Registry.FLUID.getId(this.fluid).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().fluids().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", TagContainers.instance().method_30220().method_30212(this.tag).toString());
         }
         jsonObject.add("state", this.state.toJson());
         return jsonObject;

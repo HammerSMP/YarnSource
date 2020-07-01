@@ -29,7 +29,7 @@ public abstract class SaplingGenerator {
         }
         arg.setBlockState(arg3, Blocks.AIR.getDefaultState(), 4);
         ((TreeFeatureConfig)lv.config).ignoreFluidCheck();
-        if (lv.generate(arg, arg.getStructureAccessor(), arg2, random, arg3)) {
+        if (lv.generate(arg, arg2, random, arg3)) {
             return true;
         }
         arg.setBlockState(arg3, arg4, 4);

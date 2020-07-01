@@ -14,6 +14,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityPose;
@@ -36,7 +37,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.PassiveEntity;
@@ -49,6 +50,7 @@ import net.minecraft.particle.DefaultParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
@@ -108,7 +110,7 @@ extends AnimalEntity {
         this.goalSelector.add(7, new PounceAtTargetGoal(this, 0.3f));
         this.goalSelector.add(8, new AttackGoal(this));
         this.goalSelector.add(9, new AnimalMateGoal(this, 0.8));
-        this.goalSelector.add(10, new WanderAroundFarGoal((MobEntityWithAi)this, 0.8, 1.0000001E-5f));
+        this.goalSelector.add(10, new WanderAroundFarGoal((PathAwareEntity)this, 0.8, 1.0000001E-5f));
         this.goalSelector.add(11, new LookAtEntityGoal(this, PlayerEntity.class, 10.0f));
         this.targetSelector.add(1, new FollowTargetGoal<ChickenEntity>((MobEntity)this, ChickenEntity.class, false));
         this.targetSelector.add(1, new FollowTargetGoal<TurtleEntity>(this, TurtleEntity.class, 10, false, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
@@ -242,8 +244,8 @@ extends AnimalEntity {
     }
 
     @Override
-    public OcelotEntity createChild(PassiveEntity arg) {
-        return EntityType.OCELOT.create(this.world);
+    public OcelotEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.OCELOT.create(arg);
     }
 
     @Override
@@ -272,7 +274,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
             ((PassiveEntity.PassiveData)arg4).setBabyChance(1.0f);
@@ -287,8 +289,8 @@ extends AnimalEntity {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     static class OcelotTemptGoal
@@ -296,7 +298,7 @@ extends AnimalEntity {
         private final OcelotEntity ocelot;
 
         public OcelotTemptGoal(OcelotEntity arg, double d, Ingredient arg2, boolean bl) {
-            super((MobEntityWithAi)arg, d, arg2, bl);
+            super((PathAwareEntity)arg, d, arg2, bl);
             this.ocelot = arg;
         }
 

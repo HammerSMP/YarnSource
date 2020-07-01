@@ -15,6 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.DrownedEntity;
@@ -42,7 +43,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.OceanRuinFeature;
@@ -170,7 +170,7 @@ public class OceanRuinGenerator {
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
             if ("chest".equals(string)) {
                 arg2.setBlockState(arg, (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.WATERLOGGED, arg2.getFluidState(arg).isIn(FluidTags.WATER)), 2);
                 BlockEntity lv = arg2.getBlockEntity(arg);

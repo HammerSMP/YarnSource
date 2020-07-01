@@ -29,6 +29,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidFillable;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -182,16 +183,16 @@ public class Structure {
         return Structure.transformAround(arg2, arg.getMirror(), arg.getRotation(), arg.getPosition());
     }
 
-    public void place(WorldAccess arg, BlockPos arg2, StructurePlacementData arg3, Random random) {
+    public void place(class_5425 arg, BlockPos arg2, StructurePlacementData arg3, Random random) {
         arg3.calculateBoundingBox();
         this.placeAndNotifyListeners(arg, arg2, arg3, random);
     }
 
-    public void placeAndNotifyListeners(WorldAccess arg, BlockPos arg2, StructurePlacementData arg3, Random random) {
+    public void placeAndNotifyListeners(class_5425 arg, BlockPos arg2, StructurePlacementData arg3, Random random) {
         this.place(arg, arg2, arg2, arg3, random, 2);
     }
 
-    public boolean place(WorldAccess arg, BlockPos arg2, BlockPos arg3, StructurePlacementData arg4, Random random, int i) {
+    public boolean place(class_5425 arg, BlockPos arg2, BlockPos arg3, StructurePlacementData arg4, Random random, int i) {
         if (this.blockInfoLists.isEmpty()) {
             return false;
         }
@@ -333,7 +334,7 @@ public class Structure {
         return list2;
     }
 
-    private void spawnEntities(WorldAccess arg, BlockPos arg2, BlockMirror arg3, BlockRotation arg4, BlockPos arg5, @Nullable BlockBox arg62, boolean bl) {
+    private void spawnEntities(class_5425 arg, BlockPos arg2, BlockMirror arg3, BlockRotation arg4, BlockPos arg5, @Nullable BlockBox arg62, boolean bl) {
         for (StructureEntityInfo lv : this.entities) {
             BlockPos lv2 = Structure.transformAround(lv.blockPos, arg3, arg4, arg5).add(arg2);
             if (arg62 != null && !arg62.contains(lv2)) continue;
@@ -357,7 +358,7 @@ public class Structure {
         }
     }
 
-    private static Optional<Entity> getEntity(WorldAccess arg, CompoundTag arg2) {
+    private static Optional<Entity> getEntity(class_5425 arg, CompoundTag arg2) {
         try {
             return EntityType.getEntityFromTag(arg2, arg.getWorld());
         }

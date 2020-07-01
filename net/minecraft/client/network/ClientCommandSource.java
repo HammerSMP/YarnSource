@@ -130,8 +130,8 @@ implements CommandSource {
     }
 
     @Override
-    public Set<RegistryKey<World>> method_29310() {
-        return this.networkHandler.method_29356();
+    public Set<RegistryKey<World>> getWorldKeys() {
+        return this.networkHandler.getWorldKeys();
     }
 
     public void onCommandSuggestions(int i, Suggestions suggestions) {

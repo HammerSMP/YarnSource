@@ -18,6 +18,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.TurtleEggBlock;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityType;
@@ -55,6 +56,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -175,7 +177,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setHomePos(this.getBlockPos());
         this.setTravelPos(BlockPos.ORIGIN);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
@@ -287,8 +289,8 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public PassiveEntity createChild(PassiveEntity arg) {
-        return EntityType.TURTLE.create(this.world);
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.TURTLE.create(arg);
     }
 
     @Override
@@ -344,7 +346,7 @@ extends AnimalEntity {
     }
 
     @Override
-    public void onStruckByLightning(LightningEntity arg) {
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
         this.damage(DamageSource.LIGHTNING_BOLT, Float.MAX_VALUE);
     }
 

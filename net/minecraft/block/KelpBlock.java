@@ -69,7 +69,7 @@ implements FluidFillable {
     public BlockState getPlacementState(ItemPlacementContext arg) {
         FluidState lv = arg.getWorld().getFluidState(arg.getBlockPos());
         if (lv.isIn(FluidTags.WATER) && lv.getLevel() == 8) {
-            return this.getRandomGrowthState(arg.getWorld());
+            return super.getPlacementState(arg);
         }
         return null;
     }

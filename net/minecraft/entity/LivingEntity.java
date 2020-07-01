@@ -85,7 +85,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -1093,15 +1093,15 @@ extends Entity {
         if (this.scoreAmount >= 0 && lv2 != null) {
             lv2.updateKilledAdvancementCriterion(this, this.scoreAmount, arg);
         }
-        if (lv != null) {
-            lv.onKilledOther(this);
-        }
         if (this.isSleeping()) {
             this.wakeUp();
         }
         this.dead = true;
         this.getDamageTracker().update();
-        if (!this.world.isClient) {
+        if (this.world instanceof ServerWorld) {
+            if (lv != null) {
+                lv.onKilledOther((ServerWorld)this.world, this);
+            }
             this.drop(arg);
             this.onKilledBy(lv2);
         }
@@ -2557,13 +2557,17 @@ extends Entity {
     }
 
     protected void consumeItem() {
-        if (!this.activeItemStack.equals(this.getStackInHand(this.getActiveHand()))) {
+        Hand lv = this.getActiveHand();
+        if (!this.activeItemStack.equals(this.getStackInHand(lv))) {
             this.stopUsingItem();
             return;
         }
         if (!this.activeItemStack.isEmpty() && this.isUsingItem()) {
             this.spawnConsumptionEffects(this.activeItemStack, 16);
-            this.setStackInHand(this.getActiveHand(), this.activeItemStack.finishUsing(this.world, this));
+            ItemStack lv2 = this.activeItemStack.finishUsing(this.world, this);
+            if (lv2 != this.activeItemStack) {
+                this.setStackInHand(lv, lv2);
+            }
             this.clearActiveItem();
         }
     }
@@ -2664,8 +2668,8 @@ extends Entity {
         if (bl) {
             lv2.sendEntityStatus(this, (byte)46);
         }
-        if (this instanceof MobEntityWithAi) {
-            ((MobEntityWithAi)this).getNavigation().stop();
+        if (this instanceof PathAwareEntity) {
+            ((PathAwareEntity)this).getNavigation().stop();
         }
         return true;
     }
@@ -2839,6 +2843,16 @@ extends Entity {
 
     public void sendToolBreakStatus(Hand arg) {
         this.sendEquipmentBreakStatus(arg == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public Box getVisibilityBoundingBox() {
+        if (this.getEquippedStack(EquipmentSlot.HEAD).getItem() == Items.DRAGON_HEAD) {
+            float f = 0.5f;
+            return this.getBoundingBox().expand(0.5, 0.5, 0.5);
+        }
+        return super.getVisibilityBoundingBox();
     }
 }
 

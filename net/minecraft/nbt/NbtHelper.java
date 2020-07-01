@@ -155,11 +155,11 @@ public final class NbtHelper {
         return arg.equals(arg2);
     }
 
-    public static IntArrayTag fromUuidNew(UUID uUID) {
+    public static IntArrayTag fromUuid(UUID uUID) {
         return new IntArrayTag(DynamicSerializableUuid.toIntArray(uUID));
     }
 
-    public static UUID toUuidNew(Tag arg) {
+    public static UUID toUuid(Tag arg) {
         if (arg.getReader() != IntArrayTag.READER) {
             throw new IllegalArgumentException("Expected UUID-Tag to be of type " + IntArrayTag.READER.getCrashReportName() + ", but found " + arg.getReader().getCrashReportName() + ".");
         }

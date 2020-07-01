@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.mob.ShulkerEntity;
@@ -31,7 +32,6 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
 
 public class EndCityGenerator {
     private static final StructurePlacementData PLACEMENT_DATA = new StructurePlacementData().setIgnoreEntities(true).addProcessor(BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS);
@@ -253,7 +253,7 @@ public class EndCityGenerator {
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
             if (string.startsWith("Chest")) {
                 BlockPos lv = arg.down();
                 if (arg3.contains(lv)) {

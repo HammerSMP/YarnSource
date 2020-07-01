@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 public class RealmsSubscriptionInfoScreen
 extends RealmsScreen {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final Screen lastScreen;
+    private final Screen parent;
     private final RealmsServer serverData;
     private final Screen mainScreen;
     private final String subscriptionTitle;
@@ -49,7 +49,7 @@ extends RealmsScreen {
     private Subscription.SubscriptionType type;
 
     public RealmsSubscriptionInfoScreen(Screen arg, RealmsServer arg2, Screen arg3) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.serverData = arg2;
         this.mainScreen = arg3;
         this.subscriptionTitle = I18n.translate("mco.configure.world.subscription.title", new Object[0]);
@@ -68,7 +68,7 @@ extends RealmsScreen {
             this.client.keyboard.setClipboard(string);
             Util.getOperatingSystem().open(string);
         }));
-        this.addButton(new ButtonWidget(this.width / 2 - 100, RealmsSubscriptionInfoScreen.row(12), 200, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.lastScreen)));
+        this.addButton(new ButtonWidget(this.width / 2 - 100, RealmsSubscriptionInfoScreen.row(12), 200, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.parent)));
         if (this.serverData.expired) {
             this.addButton(new ButtonWidget(this.width / 2 - 100, RealmsSubscriptionInfoScreen.row(10), 200, 20, new TranslatableText("mco.configure.world.delete.button"), arg -> {
                 TranslatableText lv = new TranslatableText("mco.configure.world.delete.question.line1");
@@ -109,7 +109,7 @@ extends RealmsScreen {
         }
         catch (RealmsServiceException lv3) {
             LOGGER.error("Couldn't get subscription");
-            this.client.openScreen(new RealmsGenericErrorScreen(lv3, this.lastScreen));
+            this.client.openScreen(new RealmsGenericErrorScreen(lv3, this.parent));
         }
     }
 
@@ -127,7 +127,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.lastScreen);
+            this.client.openScreen(this.parent);
             return true;
         }
         return super.keyPressed(i, j, k);

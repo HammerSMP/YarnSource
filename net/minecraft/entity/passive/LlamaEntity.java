@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CarpetBlock;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -52,6 +53,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.ItemTags;
@@ -60,7 +62,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public class LlamaEntity
 extends AbstractDonkeyEntity
@@ -239,7 +240,7 @@ implements RangedAttackMob {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         int j;
         this.initializeStrength();
         if (arg4 instanceof LlamaData) {
@@ -371,10 +372,10 @@ implements RangedAttackMob {
     }
 
     @Override
-    public LlamaEntity createChild(PassiveEntity arg) {
+    public LlamaEntity createChild(ServerWorld arg, PassiveEntity arg2) {
         LlamaEntity lv = this.createChild();
-        this.setChildAttributes(arg, lv);
-        LlamaEntity lv2 = (LlamaEntity)arg;
+        this.setChildAttributes(arg2, lv);
+        LlamaEntity lv2 = (LlamaEntity)arg2;
         int i = this.random.nextInt(Math.max(this.getStrength(), lv2.getStrength())) + 1;
         if (this.random.nextFloat() < 0.03f) {
             ++i;
@@ -472,8 +473,8 @@ implements RangedAttackMob {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     static class ChaseWolvesGoal

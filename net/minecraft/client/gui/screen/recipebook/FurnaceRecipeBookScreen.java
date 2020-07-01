@@ -20,26 +20,6 @@ import net.minecraft.text.TranslatableText;
 public class FurnaceRecipeBookScreen
 extends AbstractFurnaceRecipeBookScreen {
     @Override
-    protected boolean isFilteringCraftable() {
-        return this.recipeBook.isFurnaceFilteringCraftable();
-    }
-
-    @Override
-    protected void setFilteringCraftable(boolean bl) {
-        this.recipeBook.setFurnaceFilteringCraftable(bl);
-    }
-
-    @Override
-    protected boolean isGuiOpen() {
-        return this.recipeBook.isFurnaceGuiOpen();
-    }
-
-    @Override
-    protected void setGuiOpen(boolean bl) {
-        this.recipeBook.setFurnaceGuiOpen(bl);
-    }
-
-    @Override
     protected Text getToggleCraftableButtonText() {
         return new TranslatableText("gui.recipebook.toggleRecipes.smeltable");
     }

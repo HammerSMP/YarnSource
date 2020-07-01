@@ -92,7 +92,7 @@ extends ChunkManager {
         this.mainThreadExecutor = new MainThreadExecutor(arg);
         this.chunkGenerator = arg4;
         this.serverThread = Thread.currentThread();
-        File file = arg2.method_27424(arg.getRegistryKey());
+        File file = arg2.getWorldDirectory(arg.getRegistryKey());
         File file2 = new File(file, "data");
         file2.mkdirs();
         this.persistentStateManager = new PersistentStateManager(file2, dataFixer);

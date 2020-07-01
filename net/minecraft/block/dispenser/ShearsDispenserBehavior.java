@@ -21,16 +21,15 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
 
 public class ShearsDispenserBehavior
 extends FallibleItemDispenserBehavior {
     @Override
     protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-        World lv = arg.getWorld();
+        ServerWorld lv = arg.getWorld();
         if (!lv.isClient()) {
             BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
-            this.setSuccess(ShearsDispenserBehavior.tryShearBlock((ServerWorld)lv, lv2) || ShearsDispenserBehavior.tryShearEntity((ServerWorld)lv, lv2));
+            this.setSuccess(ShearsDispenserBehavior.tryShearBlock(lv, lv2) || ShearsDispenserBehavior.tryShearEntity(lv, lv2));
             if (this.isSuccess() && arg2.damage(1, lv.getRandom(), null)) {
                 arg2.setCount(0);
             }

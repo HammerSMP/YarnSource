@@ -17,7 +17,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -29,8 +28,8 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        return TwistingVinesFeature.method_26265(arg, random, arg4, 8, 4, 8);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        return TwistingVinesFeature.method_26265(arg, random, arg3, 8, 4, 8);
     }
 
     public static boolean method_26265(WorldAccess arg, Random random, BlockPos arg2, int i, int j, int k) {

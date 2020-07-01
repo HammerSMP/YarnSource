@@ -55,6 +55,7 @@ import net.minecraft.entity.mob.Hoglin;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.DebugInfoSender;
@@ -147,6 +148,11 @@ Hoglin {
         this.world.sendEntityStatus(this, (byte)4);
         this.playSound(SoundEvents.ENTITY_ZOGLIN_ATTACK, 1.0f, this.getSoundPitch());
         return Hoglin.tryAttack(this, (LivingEntity)arg);
+    }
+
+    @Override
+    public boolean canBeLeashedBy(PlayerEntity arg) {
+        return !this.isLeashed();
     }
 
     @Override

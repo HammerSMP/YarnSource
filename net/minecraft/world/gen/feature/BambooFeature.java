@@ -17,7 +17,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.ProbabilityConfig;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 
@@ -33,20 +32,20 @@ extends Feature<ProbabilityConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, ProbabilityConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, ProbabilityConfig arg4) {
         int i = 0;
-        BlockPos.Mutable lv = arg4.mutableCopy();
-        BlockPos.Mutable lv2 = arg4.mutableCopy();
+        BlockPos.Mutable lv = arg3.mutableCopy();
+        BlockPos.Mutable lv2 = arg3.mutableCopy();
         if (arg.isAir(lv)) {
             if (Blocks.BAMBOO.getDefaultState().canPlaceAt(arg, lv)) {
                 int j = random.nextInt(12) + 5;
-                if (random.nextFloat() < arg5.probability) {
+                if (random.nextFloat() < arg4.probability) {
                     int k = random.nextInt(4) + 1;
-                    for (int l = arg4.getX() - k; l <= arg4.getX() + k; ++l) {
-                        for (int m = arg4.getZ() - k; m <= arg4.getZ() + k; ++m) {
+                    for (int l = arg3.getX() - k; l <= arg3.getX() + k; ++l) {
+                        for (int m = arg3.getZ() - k; m <= arg3.getZ() + k; ++m) {
                             int o;
-                            int n = l - arg4.getX();
-                            if (n * n + (o = m - arg4.getZ()) * o > k * k) continue;
+                            int n = l - arg3.getX();
+                            if (n * n + (o = m - arg3.getZ()) * o > k * k) continue;
                             lv2.set(l, arg.getTopY(Heightmap.Type.WORLD_SURFACE, l, m) - 1, m);
                             if (!BambooFeature.isSoil(arg.getBlockState(lv2).getBlock())) continue;
                             arg.setBlockState(lv2, Blocks.PODZOL.getDefaultState(), 2);
@@ -57,7 +56,7 @@ extends Feature<ProbabilityConfig> {
                     arg.setBlockState(lv, BAMBOO, 2);
                     lv.move(Direction.UP, 1);
                 }
-                if (lv.getY() - arg4.getY() >= 3) {
+                if (lv.getY() - arg3.getY() >= 3) {
                     arg.setBlockState(lv, BAMBOO_TOP_1, 2);
                     arg.setBlockState(lv.move(Direction.DOWN, 1), BAMBOO_TOP_2, 2);
                     arg.setBlockState(lv.move(Direction.DOWN, 1), BAMBOO_TOP_3, 2);

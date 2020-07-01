@@ -78,7 +78,7 @@ public class ScreenshotUtils {
         i = arg.textureWidth;
         j = arg.textureHeight;
         NativeImage lv = new NativeImage(i, j, false);
-        RenderSystem.bindTexture(arg.colorAttachment);
+        RenderSystem.bindTexture(arg.method_30277());
         lv.loadFromTextureImage(0, true);
         lv.mirrorVertically();
         return lv;

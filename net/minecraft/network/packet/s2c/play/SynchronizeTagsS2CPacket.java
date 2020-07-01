@@ -10,30 +10,30 @@ package net.minecraft.network.packet.s2c.play;
 import java.io.IOException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5415;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.tag.RegistryTagManager;
 
 public class SynchronizeTagsS2CPacket
 implements Packet<ClientPlayPacketListener> {
-    private RegistryTagManager tagManager;
+    private class_5415 tagManager;
 
     public SynchronizeTagsS2CPacket() {
     }
 
-    public SynchronizeTagsS2CPacket(RegistryTagManager arg) {
+    public SynchronizeTagsS2CPacket(class_5415 arg) {
         this.tagManager = arg;
     }
 
     @Override
     public void read(PacketByteBuf arg) throws IOException {
-        this.tagManager = RegistryTagManager.fromPacket(arg);
+        this.tagManager = class_5415.method_30219(arg);
     }
 
     @Override
     public void write(PacketByteBuf arg) throws IOException {
-        this.tagManager.toPacket(arg);
+        this.tagManager.method_30217(arg);
     }
 
     @Override
@@ -42,7 +42,7 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public RegistryTagManager getTagManager() {
+    public class_5415 getTagManager() {
         return this.tagManager;
     }
 }

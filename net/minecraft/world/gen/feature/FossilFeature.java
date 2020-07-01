@@ -22,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -53,13 +52,13 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
         BlockRotation lv = BlockRotation.random(random);
         int i = random.nextInt(FOSSILS.length);
         StructureManager lv2 = ((ServerWorld)arg.getWorld()).getServer().getStructureManager();
         Structure lv3 = lv2.getStructureOrBlank(FOSSILS[i]);
         Structure lv4 = lv2.getStructureOrBlank(COAL_FOSSILS[i]);
-        ChunkPos lv5 = new ChunkPos(arg4);
+        ChunkPos lv5 = new ChunkPos(arg3);
         BlockBox lv6 = new BlockBox(lv5.getStartX(), 0, lv5.getStartZ(), lv5.getEndX(), 256, lv5.getEndZ());
         StructurePlacementData lv7 = new StructurePlacementData().setRotation(lv).setBoundingBox(lv6).setRandom(random).addProcessor(BlockIgnoreStructureProcessor.IGNORE_AIR_AND_STRUCTURE_BLOCKS);
         BlockPos lv8 = lv3.getRotatedSize(lv);
@@ -68,11 +67,11 @@ extends Feature<DefaultFeatureConfig> {
         int l = 256;
         for (int m = 0; m < lv8.getX(); ++m) {
             for (int n = 0; n < lv8.getZ(); ++n) {
-                l = Math.min(l, arg.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, arg4.getX() + m + j, arg4.getZ() + n + k));
+                l = Math.min(l, arg.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, arg3.getX() + m + j, arg3.getZ() + n + k));
             }
         }
         int o = Math.max(l - 15 - random.nextInt(10), 10);
-        BlockPos lv9 = lv3.offsetByTransformedSize(arg4.add(j, o, k), BlockMirror.NONE, lv);
+        BlockPos lv9 = lv3.offsetByTransformedSize(arg3.add(j, o, k), BlockMirror.NONE, lv);
         BlockRotStructureProcessor lv10 = new BlockRotStructureProcessor(0.9f);
         lv7.clearProcessors().addProcessor(lv10);
         lv3.place(arg, lv9, lv9, lv7, random, 4);

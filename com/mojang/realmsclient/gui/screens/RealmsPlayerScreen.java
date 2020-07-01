@@ -50,8 +50,8 @@ extends RealmsScreen {
     private static final Identifier USER_ICON = new Identifier("realms", "textures/gui/realms/user_icon.png");
     private static final Identifier CROSS_PLAYER_ICON = new Identifier("realms", "textures/gui/realms/cross_player_icon.png");
     private static final Identifier OPTIONS_BACKGROUND = new Identifier("minecraft", "textures/gui/options_background.png");
-    private String toolTip;
-    private final RealmsConfigureWorldScreen lastScreen;
+    private String tooltipText;
+    private final RealmsConfigureWorldScreen parent;
     private final RealmsServer serverData;
     private InvitedObjectSelectionList invitedObjectSelectionList;
     private int column1_x;
@@ -66,7 +66,7 @@ extends RealmsScreen {
     private RealmsLabel titleLabel;
 
     public RealmsPlayerScreen(RealmsConfigureWorldScreen arg, RealmsServer arg2) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.serverData = arg2;
     }
 
@@ -82,7 +82,7 @@ extends RealmsScreen {
         for (PlayerInfo lv : this.serverData.players) {
             this.invitedObjectSelectionList.addEntry(lv);
         }
-        this.addButton(new ButtonWidget(this.column2_x, RealmsPlayerScreen.row(1), this.column_width + 10, 20, new TranslatableText("mco.configure.world.buttons.invite"), arg -> this.client.openScreen(new RealmsInviteScreen(this.lastScreen, this, this.serverData))));
+        this.addButton(new ButtonWidget(this.column2_x, RealmsPlayerScreen.row(1), this.column_width + 10, 20, new TranslatableText("mco.configure.world.buttons.invite"), arg -> this.client.openScreen(new RealmsInviteScreen(this.parent, this, this.serverData))));
         this.removeButton = this.addButton(new ButtonWidget(this.column2_x, RealmsPlayerScreen.row(7), this.column_width + 10, 20, new TranslatableText("mco.configure.world.invites.remove.tooltip"), arg -> this.uninvite(this.player)));
         this.opdeopButton = this.addButton(new ButtonWidget(this.column2_x, RealmsPlayerScreen.row(9), this.column_width + 10, 20, new TranslatableText("mco.configure.world.invites.ops.tooltip"), arg -> {
             if (this.serverData.players.get(this.player).isOperator()) {
@@ -122,9 +122,9 @@ extends RealmsScreen {
 
     private void backButtonClicked() {
         if (this.stateChanged) {
-            this.client.openScreen(this.lastScreen.getNewScreen());
+            this.client.openScreen(this.parent.getNewScreen());
         } else {
-            this.client.openScreen(this.lastScreen);
+            this.client.openScreen(this.parent);
         }
     }
 
@@ -190,7 +190,7 @@ extends RealmsScreen {
 
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
-        this.toolTip = null;
+        this.tooltipText = null;
         this.renderBackground(arg);
         if (this.invitedObjectSelectionList != null) {
             this.invitedObjectSelectionList.render(arg, i, j, f);
@@ -217,8 +217,8 @@ extends RealmsScreen {
         if (this.serverData == null) {
             return;
         }
-        if (this.toolTip != null) {
-            this.renderMousehoverTooltip(arg, this.toolTip, i, j);
+        if (this.tooltipText != null) {
+            this.renderMousehoverTooltip(arg, this.tooltipText, i, j);
         }
     }
 
@@ -240,7 +240,7 @@ extends RealmsScreen {
         float f = bl ? 7.0f : 0.0f;
         DrawableHelper.drawTexture(arg, i, j, 0.0f, f, 8, 7, 8, 14);
         if (bl) {
-            this.toolTip = I18n.translate("mco.configure.world.invites.remove.tooltip", new Object[0]);
+            this.tooltipText = I18n.translate("mco.configure.world.invites.remove.tooltip", new Object[0]);
         }
     }
 
@@ -251,7 +251,7 @@ extends RealmsScreen {
         float f = bl ? 8.0f : 0.0f;
         DrawableHelper.drawTexture(arg, i, j, 0.0f, f, 8, 8, 8, 16);
         if (bl) {
-            this.toolTip = I18n.translate("mco.configure.world.invites.ops.tooltip", new Object[0]);
+            this.tooltipText = I18n.translate("mco.configure.world.invites.ops.tooltip", new Object[0]);
         }
     }
 
@@ -262,22 +262,22 @@ extends RealmsScreen {
         float f = bl ? 8.0f : 0.0f;
         DrawableHelper.drawTexture(arg, i, j, 0.0f, f, 8, 8, 8, 16);
         if (bl) {
-            this.toolTip = I18n.translate("mco.configure.world.invites.normal.tooltip", new Object[0]);
+            this.tooltipText = I18n.translate("mco.configure.world.invites.normal.tooltip", new Object[0]);
         }
     }
 
     @Environment(value=EnvType.CLIENT)
     class InvitedObjectSelectionListEntry
     extends AlwaysSelectedEntryListWidget.Entry<InvitedObjectSelectionListEntry> {
-        private final PlayerInfo mPlayerInfo;
+        private final PlayerInfo playerInfo;
 
         public InvitedObjectSelectionListEntry(PlayerInfo arg2) {
-            this.mPlayerInfo = arg2;
+            this.playerInfo = arg2;
         }
 
         @Override
         public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.renderInvitedItem(arg, this.mPlayerInfo, k, j, n, o);
+            this.renderInvitedItem(arg, this.playerInfo, k, j, n, o);
         }
 
         private void renderInvitedItem(MatrixStack arg, PlayerInfo arg2, int i, int j, int k, int l) {
@@ -344,16 +344,16 @@ extends RealmsScreen {
 
         @Override
         public void itemClicked(int i, int j, double d, double e, int k) {
-            if (j < 0 || j > ((RealmsPlayerScreen)RealmsPlayerScreen.this).serverData.players.size() || RealmsPlayerScreen.this.toolTip == null) {
+            if (j < 0 || j > ((RealmsPlayerScreen)RealmsPlayerScreen.this).serverData.players.size() || RealmsPlayerScreen.this.tooltipText == null) {
                 return;
             }
-            if (RealmsPlayerScreen.this.toolTip.equals(I18n.translate("mco.configure.world.invites.ops.tooltip", new Object[0])) || RealmsPlayerScreen.this.toolTip.equals(I18n.translate("mco.configure.world.invites.normal.tooltip", new Object[0]))) {
+            if (RealmsPlayerScreen.this.tooltipText.equals(I18n.translate("mco.configure.world.invites.ops.tooltip", new Object[0])) || RealmsPlayerScreen.this.tooltipText.equals(I18n.translate("mco.configure.world.invites.normal.tooltip", new Object[0]))) {
                 if (((RealmsPlayerScreen)RealmsPlayerScreen.this).serverData.players.get(j).isOperator()) {
                     RealmsPlayerScreen.this.deop(j);
                 } else {
                     RealmsPlayerScreen.this.op(j);
                 }
-            } else if (RealmsPlayerScreen.this.toolTip.equals(I18n.translate("mco.configure.world.invites.remove.tooltip", new Object[0]))) {
+            } else if (RealmsPlayerScreen.this.tooltipText.equals(I18n.translate("mco.configure.world.invites.remove.tooltip", new Object[0]))) {
                 RealmsPlayerScreen.this.uninvite(j);
             }
         }

@@ -16,9 +16,9 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 
 public class SpawnerBlock
 extends BlockWithEntity {
@@ -32,7 +32,7 @@ extends BlockWithEntity {
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, World arg2, BlockPos arg3, ItemStack arg4) {
+    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
         super.onStacksDropped(arg, arg2, arg3, arg4);
         int i = 15 + arg2.random.nextInt(15) + arg2.random.nextInt(15);
         this.dropExperience(arg2, arg3, i);

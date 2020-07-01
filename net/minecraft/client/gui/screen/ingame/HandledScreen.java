@@ -508,11 +508,11 @@ implements ScreenHandlerProvider<T> {
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
-            return true;
-        }
         if (i == 256 || this.client.options.keyInventory.matchesKey(i, j)) {
             this.client.player.closeHandledScreen();
+            return true;
+        }
+        if (super.keyPressed(i, j, k)) {
             return true;
         }
         this.handleHotbarKeyPressed(i, j);

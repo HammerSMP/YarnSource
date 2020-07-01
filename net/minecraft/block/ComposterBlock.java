@@ -223,7 +223,6 @@ implements InventoryProvider {
         if (i < 7 && ITEM_TO_LEVEL_INCREASE_CHANCE.containsKey((Object)arg3.getItem())) {
             BlockState lv = ComposterBlock.addToComposter(arg, arg2, arg4, arg3);
             arg3.decrement(1);
-            arg2.syncWorldEvent(1500, arg4, arg != lv ? 1 : 0);
             return lv;
         }
         return arg;

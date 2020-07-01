@@ -20,6 +20,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
@@ -262,7 +263,7 @@ extends Entity {
     }
 
     @Override
-    public void onStruckByLightning(LightningEntity arg) {
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
     }
 
     @Override

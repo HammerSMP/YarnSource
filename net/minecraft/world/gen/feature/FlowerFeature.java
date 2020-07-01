@@ -12,7 +12,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
@@ -24,12 +23,12 @@ extends Feature<U> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, U arg5) {
-        BlockState lv = this.getFlowerState(random, arg4, arg5);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, U arg4) {
+        BlockState lv = this.getFlowerState(random, arg3, arg4);
         int i = 0;
-        for (int j = 0; j < this.getFlowerAmount(arg5); ++j) {
-            BlockPos lv2 = this.getPos(random, arg4, arg5);
-            if (!arg.isAir(lv2) || lv2.getY() >= 255 || !lv.canPlaceAt(arg, lv2) || !this.isPosValid(arg, lv2, arg5)) continue;
+        for (int j = 0; j < this.getFlowerAmount(arg4); ++j) {
+            BlockPos lv2 = this.getPos(random, arg3, arg4);
+            if (!arg.isAir(lv2) || lv2.getY() >= 255 || !lv.canPlaceAt(arg, lv2) || !this.isPosValid(arg, lv2, arg4)) continue;
             arg.setBlockState(lv2, lv, 2);
             ++i;
         }

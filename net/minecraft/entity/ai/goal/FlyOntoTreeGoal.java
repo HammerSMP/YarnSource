@@ -11,7 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class FlyOntoTreeGoal
 extends WanderAroundFarGoal {
-    public FlyOntoTreeGoal(MobEntityWithAi arg, double d) {
+    public FlyOntoTreeGoal(PathAwareEntity arg, double d) {
         super(arg, d);
     }
 

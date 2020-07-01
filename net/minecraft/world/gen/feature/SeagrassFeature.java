@@ -15,7 +15,6 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.SeagrassFeatureConfig;
@@ -27,16 +26,16 @@ extends Feature<SeagrassFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SeagrassFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, SeagrassFeatureConfig arg4) {
         int i = 0;
-        for (int j = 0; j < arg5.count; ++j) {
+        for (int j = 0; j < arg4.count; ++j) {
             BlockState lv2;
             int k = random.nextInt(8) - random.nextInt(8);
             int l = random.nextInt(8) - random.nextInt(8);
-            int m = arg.getTopY(Heightmap.Type.OCEAN_FLOOR, arg4.getX() + k, arg4.getZ() + l);
-            BlockPos lv = new BlockPos(arg4.getX() + k, m, arg4.getZ() + l);
+            int m = arg.getTopY(Heightmap.Type.OCEAN_FLOOR, arg3.getX() + k, arg3.getZ() + l);
+            BlockPos lv = new BlockPos(arg3.getX() + k, m, arg3.getZ() + l);
             if (!arg.getBlockState(lv).isOf(Blocks.WATER)) continue;
-            boolean bl = random.nextDouble() < arg5.tallSeagrassProbability;
+            boolean bl = random.nextDouble() < arg4.tallSeagrassProbability;
             BlockState blockState = lv2 = bl ? Blocks.TALL_SEAGRASS.getDefaultState() : Blocks.SEAGRASS.getDefaultState();
             if (!lv2.canPlaceAt(arg, lv)) continue;
             if (bl) {

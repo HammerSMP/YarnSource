@@ -45,7 +45,7 @@ import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.EndermiteEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -79,8 +79,8 @@ implements Angerable {
     private int lastAngrySoundAge = Integer.MIN_VALUE;
     private int ageWhenTargetSet;
     private static final IntRange field_25378 = Durations.betweenSeconds(20, 39);
-    private int field_25376;
-    private UUID field_25377;
+    private int angerTime;
+    private UUID targetUuid;
 
     public EndermanEntity(EntityType<? extends EndermanEntity> arg, World arg2) {
         super((EntityType<? extends HostileEntity>)arg, arg2);
@@ -93,7 +93,7 @@ implements Angerable {
         this.goalSelector.add(0, new SwimGoal(this));
         this.goalSelector.add(1, new ChasePlayerGoal(this));
         this.goalSelector.add(2, new MeleeAttackGoal(this, 1.0, false));
-        this.goalSelector.add(7, new WanderAroundFarGoal((MobEntityWithAi)this, 1.0, 0.0f));
+        this.goalSelector.add(7, new WanderAroundFarGoal((PathAwareEntity)this, 1.0, 0.0f));
         this.goalSelector.add(8, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
         this.goalSelector.add(8, new LookAroundGoal(this));
         this.goalSelector.add(10, new PlaceBlockGoal(this));
@@ -142,22 +142,22 @@ implements Angerable {
 
     @Override
     public void setAngerTime(int i) {
-        this.field_25376 = i;
+        this.angerTime = i;
     }
 
     @Override
     public int getAngerTime() {
-        return this.field_25376;
+        return this.angerTime;
     }
 
     @Override
     public void setAngryAt(@Nullable UUID uUID) {
-        this.field_25377 = uUID;
+        this.targetUuid = uUID;
     }
 
     @Override
     public UUID getAngryAt() {
-        return this.field_25377;
+        return this.targetUuid;
     }
 
     public void playAngrySound() {

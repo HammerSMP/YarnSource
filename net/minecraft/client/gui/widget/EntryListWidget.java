@@ -63,7 +63,7 @@ implements Drawable {
         this.right = i;
     }
 
-    public void method_29344(boolean bl) {
+    public void setRenderSelection(boolean bl) {
         this.renderSelection = bl;
     }
 
@@ -354,18 +354,18 @@ implements Drawable {
             return true;
         }
         if (i == 264) {
-            this.moveSelection(class_5403.DOWN);
+            this.moveSelection(MoveDirection.DOWN);
             return true;
         }
         if (i == 265) {
-            this.moveSelection(class_5403.UP);
+            this.moveSelection(MoveDirection.UP);
             return true;
         }
         return false;
     }
 
-    protected void moveSelection(class_5403 arg2) {
-        this.method_30013(arg2, arg -> true);
+    protected void moveSelection(MoveDirection arg2) {
+        this.moveSelectionIf(arg2, arg -> true);
     }
 
     protected void method_30015() {
@@ -376,9 +376,9 @@ implements Drawable {
         }
     }
 
-    protected void method_30013(class_5403 arg, Predicate<E> predicate) {
+    protected void moveSelectionIf(MoveDirection arg, Predicate<E> predicate) {
         int i;
-        int n = i = arg == class_5403.UP ? -1 : 1;
+        int n = i = arg == MoveDirection.UP ? -1 : 1;
         if (!this.children().isEmpty()) {
             int k;
             int j = this.children().indexOf(this.getSelected());
@@ -551,7 +551,7 @@ implements Drawable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static enum class_5403 {
+    public static enum MoveDirection {
         UP,
         DOWN;
 

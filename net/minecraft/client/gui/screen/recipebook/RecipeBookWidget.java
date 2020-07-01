@@ -22,6 +22,8 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5421;
+import net.minecraft.class_5427;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
@@ -41,7 +43,6 @@ import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.search.SearchManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.RecipeBookDataC2SPacket;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
@@ -73,9 +74,9 @@ RecipeGridAligner<Ingredient> {
     protected MinecraftClient client;
     private TextFieldWidget searchField;
     private String searchText = "";
-    protected ClientRecipeBook recipeBook;
-    protected final RecipeBookResults recipesArea = new RecipeBookResults();
-    protected final RecipeFinder recipeFinder = new RecipeFinder();
+    private ClientRecipeBook recipeBook;
+    private final RecipeBookResults recipesArea = new RecipeBookResults();
+    private final RecipeFinder recipeFinder = new RecipeFinder();
     private int cachedInvChangeCount;
     private boolean searching;
 
@@ -113,7 +114,7 @@ RecipeGridAligner<Ingredient> {
         this.toggleCraftableButton = new ToggleButtonWidget(i + 110, j + 12, 26, 16, this.recipeBook.isFilteringCraftable(this.craftingScreenHandler));
         this.setBookButtonTexture();
         this.tabButtons.clear();
-        for (RecipeBookGroup lv : ClientRecipeBook.getGroups(this.craftingScreenHandler)) {
+        for (RecipeBookGroup lv : RecipeBookGroup.method_30285(this.craftingScreenHandler.method_30264())) {
             this.tabButtons.add(new RecipeGroupButtonWidget(lv));
         }
         if (this.currentTab != null) {
@@ -157,11 +158,11 @@ RecipeGridAligner<Ingredient> {
     }
 
     public boolean isOpen() {
-        return this.recipeBook.isGuiOpen();
+        return this.recipeBook.isGuiOpen(this.craftingScreenHandler.method_30264());
     }
 
     protected void setOpen(boolean bl) {
-        this.recipeBook.setGuiOpen(bl);
+        this.recipeBook.setGuiOpen(this.craftingScreenHandler.method_30264(), bl);
         if (!bl) {
             this.recipesArea.hideAlternates();
         }
@@ -201,7 +202,7 @@ RecipeGridAligner<Ingredient> {
         int l = 0;
         for (RecipeGroupButtonWidget lv : this.tabButtons) {
             RecipeBookGroup lv2 = lv.getCategory();
-            if (lv2 == RecipeBookGroup.SEARCH || lv2 == RecipeBookGroup.FURNACE_SEARCH) {
+            if (lv2 == RecipeBookGroup.CRAFTING_SEARCH || lv2 == RecipeBookGroup.FURNACE_SEARCH) {
                 lv.visible = true;
                 lv.setPos(i, j + 27 * l++);
                 continue;
@@ -333,9 +334,10 @@ RecipeGridAligner<Ingredient> {
         return false;
     }
 
-    protected boolean toggleFilteringCraftable() {
-        boolean bl = !this.recipeBook.isFilteringCraftable();
-        this.recipeBook.setFilteringCraftable(bl);
+    private boolean toggleFilteringCraftable() {
+        class_5421 lv = this.craftingScreenHandler.method_30264();
+        boolean bl = !this.recipeBook.method_30176(lv);
+        this.recipeBook.method_30177(lv, bl);
         return bl;
     }
 
@@ -458,7 +460,10 @@ RecipeGridAligner<Ingredient> {
 
     protected void sendBookDataPacket() {
         if (this.client.getNetworkHandler() != null) {
-            this.client.getNetworkHandler().sendPacket(new RecipeBookDataC2SPacket(this.recipeBook.isGuiOpen(), this.recipeBook.isFilteringCraftable(), this.recipeBook.isFurnaceGuiOpen(), this.recipeBook.isFurnaceFilteringCraftable(), this.recipeBook.isBlastFurnaceGuiOpen(), this.recipeBook.isBlastFurnaceFilteringCraftable()));
+            class_5421 lv = this.craftingScreenHandler.method_30264();
+            boolean bl = this.recipeBook.method_30173().method_30180(lv);
+            boolean bl2 = this.recipeBook.method_30173().method_30187(lv);
+            this.client.getNetworkHandler().sendPacket(new class_5427(lv, bl, bl2));
         }
     }
 

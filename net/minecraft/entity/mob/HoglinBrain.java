@@ -42,7 +42,7 @@ import net.minecraft.entity.ai.brain.task.WalkTowardClosestAdultTask;
 import net.minecraft.entity.ai.brain.task.WanderAroundTask;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvent;
@@ -70,7 +70,7 @@ public class HoglinBrain {
     }
 
     private static void addIdleTasks(Brain<HoglinEntity> arg) {
-        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<HoglinEntity>>)ImmutableList.of((Object)new PacifyTask(MemoryModuleType.NEAREST_REPELLENT, 200), (Object)new BreedTask(EntityType.HOGLIN, 0.6f), GoToRememberedPositionTask.toBlock(MemoryModuleType.NEAREST_REPELLENT, 1.0f, 8, true), new UpdateAttackTargetTask<HoglinEntity>(HoglinBrain::getNearestVisibleTargetablePlayer), new ConditionalTask<MobEntityWithAi>(HoglinEntity::isAdult, GoToRememberedPositionTask.toEntity(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, 0.4f, 8, false)), new TimeLimitedTask<LivingEntity>(new FollowMobTask(8.0f), IntRange.between(30, 60)), new WalkTowardClosestAdultTask(WALK_TOWARD_CLOSEST_ADULT_RANGE, 0.6f), HoglinBrain.makeRandomWalkTask()));
+        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<HoglinEntity>>)ImmutableList.of((Object)new PacifyTask(MemoryModuleType.NEAREST_REPELLENT, 200), (Object)new BreedTask(EntityType.HOGLIN, 0.6f), GoToRememberedPositionTask.toBlock(MemoryModuleType.NEAREST_REPELLENT, 1.0f, 8, true), new UpdateAttackTargetTask<HoglinEntity>(HoglinBrain::getNearestVisibleTargetablePlayer), new ConditionalTask<PathAwareEntity>(HoglinEntity::isAdult, GoToRememberedPositionTask.toEntity(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLIN, 0.4f, 8, false)), new TimeLimitedTask<LivingEntity>(new FollowMobTask(8.0f), IntRange.between(30, 60)), new WalkTowardClosestAdultTask(WALK_TOWARD_CLOSEST_ADULT_RANGE, 0.6f), HoglinBrain.makeRandomWalkTask()));
     }
 
     private static void addFightTasks(Brain<HoglinEntity> arg) {

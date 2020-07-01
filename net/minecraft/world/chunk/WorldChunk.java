@@ -403,7 +403,7 @@ implements Chunk {
 
     @Override
     @Nullable
-    public CompoundTag method_20598(BlockPos arg) {
+    public CompoundTag getPackedBlockEntityTag(BlockPos arg) {
         BlockEntity lv = this.getBlockEntity(arg);
         if (lv != null && !lv.isRemoved()) {
             CompoundTag lv2 = lv.toTag(new CompoundTag());
@@ -555,7 +555,7 @@ implements Chunk {
     }
 
     @Override
-    public CompoundTag getBlockEntityTagAt(BlockPos arg) {
+    public CompoundTag getBlockEntityTag(BlockPos arg) {
         return this.pendingBlockEntityTags.get(arg);
     }
 

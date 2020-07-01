@@ -23,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
+import net.minecraft.class_5419;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
@@ -141,6 +142,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.Text;
@@ -222,6 +224,7 @@ public class EntityType<T extends Entity> {
     public static final EntityType<PhantomEntity> PHANTOM = EntityType.register("phantom", Builder.create(PhantomEntity::new, SpawnGroup.MONSTER).setDimensions(0.9f, 0.5f).maxTrackingRange(8));
     public static final EntityType<PigEntity> PIG = EntityType.register("pig", Builder.create(PigEntity::new, SpawnGroup.CREATURE).setDimensions(0.9f, 0.9f).maxTrackingRange(10));
     public static final EntityType<PiglinEntity> PIGLIN = EntityType.register("piglin", Builder.create(PiglinEntity::new, SpawnGroup.MONSTER).setDimensions(0.6f, 1.95f).maxTrackingRange(8));
+    public static final EntityType<class_5419> PIGLIN_BRUTE = EntityType.register("piglin_brute", Builder.create(class_5419::new, SpawnGroup.MONSTER).setDimensions(0.6f, 1.95f).maxTrackingRange(8));
     public static final EntityType<PillagerEntity> PILLAGER = EntityType.register("pillager", Builder.create(PillagerEntity::new, SpawnGroup.MONSTER).spawnableFarFromPlayer().setDimensions(0.6f, 1.95f).maxTrackingRange(8));
     public static final EntityType<PolarBearEntity> POLAR_BEAR = EntityType.register("polar_bear", Builder.create(PolarBearEntity::new, SpawnGroup.CREATURE).setDimensions(1.4f, 1.4f).maxTrackingRange(10));
     public static final EntityType<TntEntity> TNT = EntityType.register("tnt", Builder.create(TntEntity::new, SpawnGroup.MISC).makeFireImmune().setDimensions(0.98f, 0.98f).maxTrackingRange(10).trackingTickInterval(10));
@@ -311,19 +314,19 @@ public class EntityType<T extends Entity> {
     }
 
     @Nullable
-    public Entity spawnFromItemStack(World arg, @Nullable ItemStack arg2, @Nullable PlayerEntity arg3, BlockPos arg4, SpawnReason arg5, boolean bl, boolean bl2) {
+    public Entity spawnFromItemStack(ServerWorld arg, @Nullable ItemStack arg2, @Nullable PlayerEntity arg3, BlockPos arg4, SpawnReason arg5, boolean bl, boolean bl2) {
         return this.spawn(arg, arg2 == null ? null : arg2.getTag(), arg2 != null && arg2.hasCustomName() ? arg2.getName() : null, arg3, arg4, arg5, bl, bl2);
     }
 
     @Nullable
-    public T spawn(World arg, @Nullable CompoundTag arg2, @Nullable Text arg3, @Nullable PlayerEntity arg4, BlockPos arg5, SpawnReason arg6, boolean bl, boolean bl2) {
+    public T spawn(ServerWorld arg, @Nullable CompoundTag arg2, @Nullable Text arg3, @Nullable PlayerEntity arg4, BlockPos arg5, SpawnReason arg6, boolean bl, boolean bl2) {
         T lv = this.create(arg, arg2, arg3, arg4, arg5, arg6, bl, bl2);
         arg.spawnEntity((Entity)lv);
         return lv;
     }
 
     @Nullable
-    public T create(World arg, @Nullable CompoundTag arg2, @Nullable Text arg3, @Nullable PlayerEntity arg4, BlockPos arg5, SpawnReason arg6, boolean bl, boolean bl2) {
+    public T create(ServerWorld arg, @Nullable CompoundTag arg2, @Nullable Text arg3, @Nullable PlayerEntity arg4, BlockPos arg5, SpawnReason arg6, boolean bl, boolean bl2) {
         double e;
         T lv = this.create(arg);
         if (lv == null) {

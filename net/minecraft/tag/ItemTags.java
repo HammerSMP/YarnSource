@@ -1,23 +1,18 @@
 /*
  * Decompiled with CFR 0.149.
- * 
- * Could not load the following classes:
- *  net.fabricmc.api.EnvType
- *  net.fabricmc.api.Environment
  */
 package net.minecraft.tag;
 
-import java.util.Set;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.class_5413;
+import net.minecraft.class_5414;
+import net.minecraft.class_5415;
 import net.minecraft.item.Item;
 import net.minecraft.tag.GlobalTagAccessor;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainer;
 import net.minecraft.util.Identifier;
 
-public class ItemTags {
-    private static final GlobalTagAccessor<Item> ACCESSOR = new GlobalTagAccessor();
+public final class ItemTags {
+    protected static final GlobalTagAccessor<Item> ACCESSOR = class_5413.method_30201(new Identifier("item"), class_5415::method_30218);
     public static final Tag.Identified<Item> WOOL = ItemTags.register("wool");
     public static final Tag.Identified<Item> PLANKS = ItemTags.register("planks");
     public static final Tag.Identified<Item> STONE_BRICKS = ItemTags.register("stone_bricks");
@@ -77,21 +72,8 @@ public class ItemTags {
         return ACCESSOR.get(string);
     }
 
-    public static void setContainer(TagContainer<Item> arg) {
-        ACCESSOR.setContainer(arg);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public static void markReady() {
-        ACCESSOR.markReady();
-    }
-
-    public static TagContainer<Item> getContainer() {
+    public static class_5414<Item> getContainer() {
         return ACCESSOR.getContainer();
-    }
-
-    public static Set<Identifier> method_29217(TagContainer<Item> arg) {
-        return ACCESSOR.method_29224(arg);
     }
 }
 

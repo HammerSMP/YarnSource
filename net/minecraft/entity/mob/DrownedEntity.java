@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -33,7 +34,7 @@ import net.minecraft.entity.ai.pathing.SwimNavigation;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AbstractTraderEntity;
@@ -91,7 +92,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
         if (this.getEquippedStack(EquipmentSlot.OFFHAND).isEmpty() && this.random.nextFloat() < 0.03f) {
             this.equipStack(EquipmentSlot.OFFHAND, new ItemStack(Items.NAUTILUS_SHELL));
@@ -100,7 +101,7 @@ implements RangedAttackMob {
         return arg4;
     }
 
-    public static boolean canSpawn(EntityType<DrownedEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<DrownedEntity> arg, class_5425 arg2, SpawnReason arg3, BlockPos arg4, Random random) {
         boolean bl;
         Biome lv = arg2.getBiome(arg4);
         boolean bl2 = bl = arg2.getDifficulty() != Difficulty.PEACEFUL && DrownedEntity.isSpawnDark(arg2, arg4, random) && (arg3 == SpawnReason.SPAWNER || arg2.getFluidState(arg4).isIn(FluidTags.WATER));
@@ -325,14 +326,14 @@ implements RangedAttackMob {
 
     static class WanderAroundOnSurfaceGoal
     extends Goal {
-        private final MobEntityWithAi mob;
+        private final PathAwareEntity mob;
         private double x;
         private double y;
         private double z;
         private final double speed;
         private final World world;
 
-        public WanderAroundOnSurfaceGoal(MobEntityWithAi arg, double d) {
+        public WanderAroundOnSurfaceGoal(PathAwareEntity arg, double d) {
             this.mob = arg;
             this.speed = d;
             this.world = arg.world;

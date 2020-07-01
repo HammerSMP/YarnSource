@@ -23,6 +23,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityData;
@@ -58,7 +59,6 @@ import net.minecraft.village.VillagerProfession;
 import net.minecraft.village.VillagerType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.apache.logging.log4j.Logger;
 
 public class ZombieVillagerEntity
@@ -299,7 +299,7 @@ implements VillagerDataContainer {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setVillagerData(this.getVillagerData().withType(VillagerType.forBiome(arg.getBiome(this.getBlockPos()))));
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }

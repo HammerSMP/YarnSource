@@ -12,7 +12,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ChorusFlowerBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -24,9 +23,9 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        if (arg.isAir(arg4.up()) && arg.getBlockState(arg4).isOf(Blocks.END_STONE)) {
-            ChorusFlowerBlock.generate(arg, arg4.up(), random, 8);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        if (arg.isAir(arg3.up()) && arg.getBlockState(arg3).isOf(Blocks.END_STONE)) {
+            ChorusFlowerBlock.generate(arg, arg3.up(), random, 8);
             return true;
         }
         return false;

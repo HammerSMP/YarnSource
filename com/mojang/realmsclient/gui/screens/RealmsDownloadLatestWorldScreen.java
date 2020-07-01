@@ -48,7 +48,7 @@ public class RealmsDownloadLatestWorldScreen
 extends RealmsScreen {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final ReentrantLock downloadLock = new ReentrantLock();
-    private final Screen lastScreen;
+    private final Screen parent;
     private final WorldDownload worldDownload;
     private final Text downloadTitle;
     private final RateLimiter narrationRateLimiter;
@@ -73,7 +73,7 @@ extends RealmsScreen {
 
     public RealmsDownloadLatestWorldScreen(Screen arg, WorldDownload arg2, String string, BooleanConsumer booleanConsumer) {
         this.field_22693 = booleanConsumer;
-        this.lastScreen = arg;
+        this.parent = arg;
         this.worldName = string;
         this.worldDownload = arg2;
         this.downloadStatus = new DownloadStatus();
@@ -147,7 +147,7 @@ extends RealmsScreen {
         if (this.finished && this.field_22693 != null && this.field_20494 == null) {
             this.field_22693.accept(true);
         }
-        this.client.openScreen(this.lastScreen);
+        this.client.openScreen(this.parent);
     }
 
     @Override

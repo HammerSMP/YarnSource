@@ -14,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.BlockPileFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -26,21 +25,21 @@ extends Feature<BlockPileFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, BlockPileFeatureConfig arg5) {
-        if (arg4.getY() < 5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, BlockPileFeatureConfig arg4) {
+        if (arg3.getY() < 5) {
             return false;
         }
         int i = 2 + random.nextInt(2);
         int j = 2 + random.nextInt(2);
-        for (BlockPos lv : BlockPos.iterate(arg4.add(-i, 0, -j), arg4.add(i, 1, j))) {
+        for (BlockPos lv : BlockPos.iterate(arg3.add(-i, 0, -j), arg3.add(i, 1, j))) {
             int l;
-            int k = arg4.getX() - lv.getX();
-            if ((float)(k * k + (l = arg4.getZ() - lv.getZ()) * l) <= random.nextFloat() * 10.0f - random.nextFloat() * 6.0f) {
-                this.addPileBlock(arg, lv, random, arg5);
+            int k = arg3.getX() - lv.getX();
+            if ((float)(k * k + (l = arg3.getZ() - lv.getZ()) * l) <= random.nextFloat() * 10.0f - random.nextFloat() * 6.0f) {
+                this.addPileBlock(arg, lv, random, arg4);
                 continue;
             }
             if (!((double)random.nextFloat() < 0.031)) continue;
-            this.addPileBlock(arg, lv, random, arg5);
+            this.addPileBlock(arg, lv, random, arg4);
         }
         return true;
     }

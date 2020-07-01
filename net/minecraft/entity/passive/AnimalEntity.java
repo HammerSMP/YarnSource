@@ -27,6 +27,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -211,8 +212,8 @@ extends PassiveEntity {
         return this.isInLove() && arg.isInLove();
     }
 
-    public void breed(World arg, AnimalEntity arg2) {
-        PassiveEntity lv = this.createChild(arg2);
+    public void breed(ServerWorld arg, AnimalEntity arg2) {
+        PassiveEntity lv = this.createChild(arg, arg2);
         if (lv == null) {
             return;
         }

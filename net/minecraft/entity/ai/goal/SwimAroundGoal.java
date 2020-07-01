@@ -10,13 +10,13 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.goal.WanderAroundGoal;
 import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class SwimAroundGoal
 extends WanderAroundGoal {
-    public SwimAroundGoal(MobEntityWithAi arg, double d, int i) {
+    public SwimAroundGoal(PathAwareEntity arg, double d, int i) {
         super(arg, d, i);
     }
 

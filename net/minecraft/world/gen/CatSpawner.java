@@ -15,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SpawnHelper;
-import net.minecraft.world.World;
 import net.minecraft.world.gen.Spawner;
 import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.poi.PointOfInterestStorage;
@@ -66,7 +65,7 @@ implements Spawner {
         return 0;
     }
 
-    private int spawnInSwampHut(World arg, BlockPos arg2) {
+    private int spawnInSwampHut(ServerWorld arg, BlockPos arg2) {
         int i = 16;
         List<CatEntity> list = arg.getNonSpectatingEntities(CatEntity.class, new Box(arg2).expand(16.0, 8.0, 16.0));
         if (list.size() < 1) {
@@ -75,7 +74,7 @@ implements Spawner {
         return 0;
     }
 
-    private int spawn(BlockPos arg, World arg2) {
+    private int spawn(BlockPos arg, ServerWorld arg2) {
         CatEntity lv = EntityType.CAT.create(arg2);
         if (lv == null) {
             return 0;

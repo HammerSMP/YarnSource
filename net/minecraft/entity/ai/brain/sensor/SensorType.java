@@ -4,6 +4,7 @@
 package net.minecraft.entity.ai.brain.sensor;
 
 import java.util.function.Supplier;
+import net.minecraft.class_5417;
 import net.minecraft.entity.ai.brain.sensor.DummySensor;
 import net.minecraft.entity.ai.brain.sensor.GolemLastSeenSensor;
 import net.minecraft.entity.ai.brain.sensor.HoglinSpecificSensor;
@@ -33,8 +34,9 @@ public class SensorType<U extends Sensor<?>> {
     public static final SensorType<VillagerHostilesSensor> VILLAGER_HOSTILES = SensorType.register("villager_hostiles", VillagerHostilesSensor::new);
     public static final SensorType<VillagerBabiesSensor> VILLAGER_BABIES = SensorType.register("villager_babies", VillagerBabiesSensor::new);
     public static final SensorType<SecondaryPointsOfInterestSensor> SECONDARY_POIS = SensorType.register("secondary_pois", SecondaryPointsOfInterestSensor::new);
-    public static final SensorType<GolemLastSeenSensor> GOLEM_LAST_SEEN = SensorType.register("golem_last_seen", GolemLastSeenSensor::new);
+    public static final SensorType<GolemLastSeenSensor> GOLEM_DETECTED = SensorType.register("golem_detected", GolemLastSeenSensor::new);
     public static final SensorType<PiglinSpecificSensor> PIGLIN_SPECIFIC_SENSOR = SensorType.register("piglin_specific_sensor", PiglinSpecificSensor::new);
+    public static final SensorType<class_5417> PIGLIN_BRUTE_SPECIFIC_SENSOR = SensorType.register("piglin_brute_specific_sensor", class_5417::new);
     public static final SensorType<HoglinSpecificSensor> HOGLIN_SPECIFIC_SENSOR = SensorType.register("hoglin_specific_sensor", HoglinSpecificSensor::new);
     public static final SensorType<NearestVisibleAdultSensor> NEAREST_ADULT = SensorType.register("nearest_adult", NearestVisibleAdultSensor::new);
     private final Supplier<U> factory;

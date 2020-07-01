@@ -7,6 +7,8 @@
 package net.minecraft.entity.mob;
 
 import javax.annotation.Nullable;
+import net.minecraft.class_5418;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -24,7 +26,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.AbstractSkeletonEntity;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -33,7 +34,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public class WitherSkeletonEntity
 extends AbstractSkeletonEntity {
@@ -44,7 +44,7 @@ extends AbstractSkeletonEntity {
 
     @Override
     protected void initGoals() {
-        this.targetSelector.add(3, new FollowTargetGoal<PiglinEntity>((MobEntity)this, PiglinEntity.class, true));
+        this.targetSelector.add(3, new FollowTargetGoal<class_5418>((MobEntity)this, class_5418.class, true));
         super.initGoals();
     }
 
@@ -90,7 +90,7 @@ extends AbstractSkeletonEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         EntityData lv = super.initialize(arg, arg2, arg3, arg4, arg5);
         this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4.0);
         this.updateAttackType();

@@ -111,7 +111,7 @@ extends WorldChunk {
     }
 
     @Override
-    public boolean method_12228(int i, int j) {
+    public boolean areSectionsEmptyBetween(int i, int j) {
         return true;
     }
 

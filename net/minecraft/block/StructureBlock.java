@@ -19,6 +19,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
@@ -79,7 +80,7 @@ extends BlockWithEntity {
 
     @Override
     public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (arg2.isClient) {
+        if (!(arg2 instanceof ServerWorld)) {
             return;
         }
         BlockEntity lv = arg2.getBlockEntity(arg3);
@@ -91,24 +92,24 @@ extends BlockWithEntity {
         boolean bl3 = lv2.isPowered();
         if (bl2 && !bl3) {
             lv2.setPowered(true);
-            this.doAction(lv2);
+            this.doAction((ServerWorld)arg2, lv2);
         } else if (!bl2 && bl3) {
             lv2.setPowered(false);
         }
     }
 
-    private void doAction(StructureBlockBlockEntity arg) {
-        switch (arg.getMode()) {
+    private void doAction(ServerWorld arg, StructureBlockBlockEntity arg2) {
+        switch (arg2.getMode()) {
             case SAVE: {
-                arg.saveStructure(false);
+                arg2.saveStructure(false);
                 break;
             }
             case LOAD: {
-                arg.loadStructure(false);
+                arg2.loadStructure(arg, false);
                 break;
             }
             case CORNER: {
-                arg.unloadStructure();
+                arg2.unloadStructure();
                 break;
             }
             case DATA: {

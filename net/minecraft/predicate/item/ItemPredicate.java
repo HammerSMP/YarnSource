@@ -136,7 +136,7 @@ public class ItemPredicate {
         Tag<Item> lv6 = null;
         if (jsonObject.has("tag")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv6 = TagContainers.instance().items().get(lv7);
+            lv6 = TagContainers.instance().method_30218().method_30210(lv7);
             if (lv6 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv7 + "'");
             }
@@ -160,7 +160,7 @@ public class ItemPredicate {
             jsonObject.addProperty("item", Registry.ITEM.getId(this.item).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().items().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", TagContainers.instance().method_30218().method_30212(this.tag).toString());
         }
         jsonObject.add("count", this.count.toJson());
         jsonObject.add("durability", this.durability.toJson());

@@ -44,6 +44,7 @@ import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.JigsawBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
+import net.minecraft.class_5427;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -399,18 +400,13 @@ implements ServerPlayPacketListener {
     @Override
     public void onRecipeBookData(RecipeBookDataC2SPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.player.getServerWorld());
-        if (arg.getMode() == RecipeBookDataC2SPacket.Mode.SHOWN) {
-            this.server.getRecipeManager().get(arg.getRecipeId()).ifPresent(this.player.getRecipeBook()::onRecipeDisplayed);
-        } else if (arg.getMode() == RecipeBookDataC2SPacket.Mode.SETTINGS) {
-            this.player.getRecipeBook().setGuiOpen(arg.isGuiOpen());
-            this.player.getRecipeBook().setFilteringCraftable(arg.isFilteringCraftable());
-            this.player.getRecipeBook().setFurnaceGuiOpen(arg.isFurnaceGuiOpen());
-            this.player.getRecipeBook().setFurnaceFilteringCraftable(arg.isFurnaceFilteringCraftable());
-            this.player.getRecipeBook().setBlastFurnaceGuiOpen(arg.isBlastFurnaceGuiOpen());
-            this.player.getRecipeBook().setBlastFurnaceFilteringCraftable(arg.isBlastFurnaceFilteringCraftable());
-            this.player.getRecipeBook().setSmokerGuiOpen(arg.isSmokerGuiOpen());
-            this.player.getRecipeBook().setSmokerFilteringCraftable(arg.isSmokerGuiFilteringCraftable());
-        }
+        this.server.getRecipeManager().get(arg.getRecipeId()).ifPresent(this.player.getRecipeBook()::onRecipeDisplayed);
+    }
+
+    @Override
+    public void method_30303(class_5427 arg) {
+        NetworkThreadUtils.forceMainThread(arg, this, this.player.getServerWorld());
+        this.player.getRecipeBook().method_30175(arg.method_30305(), arg.method_30306(), arg.method_30307());
     }
 
     @Override
@@ -580,7 +576,7 @@ implements ServerPlayPacketListener {
                 } else if (arg.getAction() == StructureBlockBlockEntity.Action.LOAD_AREA) {
                     if (!lv4.isStructureAvailable()) {
                         this.player.sendMessage(new TranslatableText("structure_block.load_not_found", string), false);
-                    } else if (lv4.loadStructure()) {
+                    } else if (lv4.loadStructure(this.player.getServerWorld())) {
                         this.player.sendMessage(new TranslatableText("structure_block.load_success", string), false);
                     } else {
                         this.player.sendMessage(new TranslatableText("structure_block.load_prepare", string), false);
@@ -1112,6 +1108,7 @@ implements ServerPlayPacketListener {
             double d = 36.0;
             if (this.player.squaredDistanceTo(lv2) < 36.0) {
                 Hand lv3 = arg.getHand();
+                ItemStack lv4 = lv3 != null ? this.player.getStackInHand(lv3).copy() : ItemStack.EMPTY;
                 Optional<Object> optional = Optional.empty();
                 if (arg.getType() == PlayerInteractEntityC2SPacket.InteractionType.INTERACT) {
                     optional = Optional.of(this.player.interact(lv2, lv3));
@@ -1126,7 +1123,7 @@ implements ServerPlayPacketListener {
                     this.player.attack(lv2);
                 }
                 if (optional.isPresent() && ((ActionResult)((Object)optional.get())).isAccepted()) {
-                    Criteria.PLAYER_INTERACTED_WITH_ENTITY.test(this.player, this.player.getStackInHand(lv3), lv2);
+                    Criteria.PLAYER_INTERACTED_WITH_ENTITY.test(this.player, lv4, lv2);
                     if (((ActionResult)((Object)optional.get())).shouldSwingHand()) {
                         this.player.swingHand(lv3, true);
                     }

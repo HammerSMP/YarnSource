@@ -30,7 +30,7 @@ extends Task<E> {
     @Override
     protected void run(ServerWorld arg, E arg2, long l) {
         HoglinEntity lv = ((PiglinEntity)arg2).getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN).get();
-        PiglinBrain.angerAt(arg2, lv);
+        PiglinBrain.becomeAngryWith(arg2, lv);
         PiglinBrain.rememberHunting(arg2);
         PiglinBrain.angerAtCloserTargets(arg2, lv);
         PiglinBrain.rememberGroupHunting(arg2);

@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.dynamic.GlobalPos;
+import net.minecraft.util.math.BlockPos;
 
 public class FarmerWorkTask
 extends VillagerWorkTask {
@@ -41,29 +42,37 @@ extends VillagerWorkTask {
     }
 
     private void compostSeeds(ServerWorld arg, VillagerEntity arg2, GlobalPos arg3, BlockState arg4) {
+        BlockPos lv = arg3.getPos();
         if (arg4.get(ComposterBlock.LEVEL) == 8) {
-            arg4 = ComposterBlock.emptyFullComposter(arg4, arg, arg3.getPos());
+            arg4 = ComposterBlock.emptyFullComposter(arg4, arg, lv);
         }
         int i = 20;
         int j = 10;
         int[] is = new int[COMPOSTABLES.size()];
-        SimpleInventory lv = arg2.getInventory();
-        int k = lv.size();
+        SimpleInventory lv2 = arg2.getInventory();
+        int k = lv2.size();
+        BlockState lv3 = arg4;
         for (int l = k - 1; l >= 0 && i > 0; --l) {
             int o;
-            ItemStack lv2 = lv.getStack(l);
-            int m = COMPOSTABLES.indexOf(lv2.getItem());
+            ItemStack lv4 = lv2.getStack(l);
+            int m = COMPOSTABLES.indexOf(lv4.getItem());
             if (m == -1) continue;
-            int n = lv2.getCount();
+            int n = lv4.getCount();
             is[m] = o = is[m] + n;
             int p = Math.min(Math.min(o - 10, i), n);
             if (p <= 0) continue;
             i -= p;
             for (int q = 0; q < p; ++q) {
-                if ((arg4 = ComposterBlock.compost(arg4, arg, lv2, arg3.getPos())).get(ComposterBlock.LEVEL) != 7) continue;
+                if ((lv3 = ComposterBlock.compost(lv3, arg, lv4, lv)).get(ComposterBlock.LEVEL) != 7) continue;
+                this.method_30232(arg, arg4, lv, lv3);
                 return;
             }
         }
+        this.method_30232(arg, arg4, lv, lv3);
+    }
+
+    private void method_30232(ServerWorld arg, BlockState arg2, BlockPos arg3, BlockState arg4) {
+        arg.syncWorldEvent(1500, arg3, arg4 != arg2 ? 1 : 0);
     }
 
     private void craftAndDropBread(VillagerEntity arg) {

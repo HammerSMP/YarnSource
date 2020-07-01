@@ -14,32 +14,31 @@ import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.resource.ResourcePackCompatibility;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 @Environment(value=EnvType.CLIENT)
-public class ResourcePackOrganizer<T extends ResourcePackProfile> {
-    private final ResourcePackManager<T> field_25626;
-    private final List<T> enabledPacks;
-    private final List<T> disabledPacks;
-    private final BiConsumer<T, TextureManager> renderer;
+public class ResourcePackOrganizer {
+    private final ResourcePackManager field_25626;
+    private final List<ResourcePackProfile> enabledPacks;
+    private final List<ResourcePackProfile> disabledPacks;
+    private final Function<ResourcePackProfile, Identifier> field_25785;
     private final Runnable updateCallback;
-    private final Consumer<ResourcePackManager<T>> applier;
+    private final Consumer<ResourcePackManager> applier;
 
-    public ResourcePackOrganizer(Runnable runnable, BiConsumer<T, TextureManager> biConsumer, ResourcePackManager<T> arg, Consumer<ResourcePackManager<T>> consumer) {
+    public ResourcePackOrganizer(Runnable runnable, Function<ResourcePackProfile, Identifier> function, ResourcePackManager arg, Consumer<ResourcePackManager> consumer) {
         this.updateCallback = runnable;
-        this.renderer = biConsumer;
+        this.field_25785 = function;
         this.field_25626 = arg;
         this.enabledPacks = Lists.newArrayList(arg.getEnabledProfiles());
         Collections.reverse(this.enabledPacks);
@@ -49,11 +48,11 @@ public class ResourcePackOrganizer<T extends ResourcePackProfile> {
     }
 
     public Stream<Pack> getDisabledPacks() {
-        return this.disabledPacks.stream().map(arg -> new DisabledPack(this, arg));
+        return this.disabledPacks.stream().map(arg -> new DisabledPack((ResourcePackProfile)arg));
     }
 
     public Stream<Pack> getEnabledPacks() {
-        return this.enabledPacks.stream().map(arg -> new EnabledPack(this, arg));
+        return this.enabledPacks.stream().map(arg -> new EnabledPack((ResourcePackProfile)arg));
     }
 
     public void apply() {
@@ -63,29 +62,29 @@ public class ResourcePackOrganizer<T extends ResourcePackProfile> {
 
     public void method_29981() {
         this.field_25626.scanPacks();
+        this.enabledPacks.clear();
+        this.enabledPacks.addAll(this.field_25626.getEnabledProfiles());
+        Collections.reverse(this.enabledPacks);
         this.disabledPacks.clear();
         this.disabledPacks.addAll(this.field_25626.getProfiles());
         this.disabledPacks.removeAll(this.enabledPacks);
     }
 
     @Environment(value=EnvType.CLIENT)
-    static class DisabledPack
+    class DisabledPack
     extends AbstractPack {
-        final /* synthetic */ ResourcePackOrganizer field_25463;
-
-        public DisabledPack(T arg2) {
-            this.field_25463 = arg;
-            super((ResourcePackOrganizer)arg, arg2);
+        public DisabledPack(ResourcePackProfile arg2) {
+            super(arg2);
         }
 
         @Override
-        protected List<T> getCurrentList() {
-            return this.field_25463.disabledPacks;
+        protected List<ResourcePackProfile> getCurrentList() {
+            return ResourcePackOrganizer.this.disabledPacks;
         }
 
         @Override
-        protected List<T> getOppositeList() {
-            return this.field_25463.enabledPacks;
+        protected List<ResourcePackProfile> getOppositeList() {
+            return ResourcePackOrganizer.this.enabledPacks;
         }
 
         @Override
@@ -104,23 +103,20 @@ public class ResourcePackOrganizer<T extends ResourcePackProfile> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    static class EnabledPack
+    class EnabledPack
     extends AbstractPack {
-        final /* synthetic */ ResourcePackOrganizer field_25462;
-
-        public EnabledPack(T arg2) {
-            this.field_25462 = arg;
-            super((ResourcePackOrganizer)arg, arg2);
+        public EnabledPack(ResourcePackProfile arg2) {
+            super(arg2);
         }
 
         @Override
-        protected List<T> getCurrentList() {
-            return this.field_25462.enabledPacks;
+        protected List<ResourcePackProfile> getCurrentList() {
+            return ResourcePackOrganizer.this.enabledPacks;
         }
 
         @Override
-        protected List<T> getOppositeList() {
-            return this.field_25462.disabledPacks;
+        protected List<ResourcePackProfile> getOppositeList() {
+            return ResourcePackOrganizer.this.disabledPacks;
         }
 
         @Override
@@ -139,74 +135,72 @@ public class ResourcePackOrganizer<T extends ResourcePackProfile> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    static abstract class AbstractPack
+    abstract class AbstractPack
     implements Pack {
-        private final T profile;
-        final /* synthetic */ ResourcePackOrganizer field_25460;
+        private final ResourcePackProfile profile;
 
-        public AbstractPack(T arg2) {
-            this.field_25460 = arg;
+        public AbstractPack(ResourcePackProfile arg2) {
             this.profile = arg2;
         }
 
-        protected abstract List<T> getCurrentList();
+        protected abstract List<ResourcePackProfile> getCurrentList();
 
-        protected abstract List<T> getOppositeList();
+        protected abstract List<ResourcePackProfile> getOppositeList();
 
         @Override
-        public void render(TextureManager arg) {
-            this.field_25460.renderer.accept(this.profile, arg);
+        public Identifier method_30286() {
+            return (Identifier)ResourcePackOrganizer.this.field_25785.apply(this.profile);
         }
 
         @Override
         public ResourcePackCompatibility getCompatibility() {
-            return ((ResourcePackProfile)this.profile).getCompatibility();
+            return this.profile.getCompatibility();
         }
 
         @Override
         public Text getDisplayName() {
-            return ((ResourcePackProfile)this.profile).getDisplayName();
+            return this.profile.getDisplayName();
         }
 
         @Override
         public Text getDescription() {
-            return ((ResourcePackProfile)this.profile).getDescription();
+            return this.profile.getDescription();
         }
 
         @Override
         public ResourcePackSource getSource() {
-            return ((ResourcePackProfile)this.profile).getSource();
+            return this.profile.getSource();
         }
 
         @Override
         public boolean isPinned() {
-            return ((ResourcePackProfile)this.profile).isPinned();
+            return this.profile.isPinned();
         }
 
         @Override
         public boolean isAlwaysEnabled() {
-            return ((ResourcePackProfile)this.profile).isAlwaysEnabled();
+            return this.profile.isAlwaysEnabled();
         }
 
         protected void toggle() {
             this.getCurrentList().remove(this.profile);
-            ((ResourcePackProfile)this.profile).getInitialPosition().insert(this.getOppositeList(), this.profile, Function.identity(), true);
-            this.field_25460.updateCallback.run();
+            this.profile.getInitialPosition().insert(this.getOppositeList(), this.profile, Function.identity(), true);
+            ResourcePackOrganizer.this.updateCallback.run();
         }
 
         protected void move(int i) {
-            List list = this.getCurrentList();
+            List<ResourcePackProfile> list = this.getCurrentList();
             int j = list.indexOf(this.profile);
             list.remove(j);
             list.add(j + i, this.profile);
-            this.field_25460.updateCallback.run();
+            ResourcePackOrganizer.this.updateCallback.run();
         }
 
         @Override
         public boolean canMoveTowardStart() {
-            List list = this.getCurrentList();
+            List<ResourcePackProfile> list = this.getCurrentList();
             int i = list.indexOf(this.profile);
-            return i > 0 && !((ResourcePackProfile)list.get(i - 1)).isPinned();
+            return i > 0 && !list.get(i - 1).isPinned();
         }
 
         @Override
@@ -216,9 +210,9 @@ public class ResourcePackOrganizer<T extends ResourcePackProfile> {
 
         @Override
         public boolean canMoveTowardEnd() {
-            List list = this.getCurrentList();
+            List<ResourcePackProfile> list = this.getCurrentList();
             int i = list.indexOf(this.profile);
-            return i >= 0 && i < list.size() - 1 && !((ResourcePackProfile)list.get(i + 1)).isPinned();
+            return i >= 0 && i < list.size() - 1 && !list.get(i + 1).isPinned();
         }
 
         @Override
@@ -229,7 +223,7 @@ public class ResourcePackOrganizer<T extends ResourcePackProfile> {
 
     @Environment(value=EnvType.CLIENT)
     public static interface Pack {
-        public void render(TextureManager var1);
+        public Identifier method_30286();
 
         public ResourcePackCompatibility getCompatibility();
 

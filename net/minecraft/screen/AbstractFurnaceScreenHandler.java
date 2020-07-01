@@ -10,6 +10,7 @@ package net.minecraft.screen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.class_5421;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -37,31 +38,33 @@ extends AbstractRecipeScreenHandler<Inventory> {
     private final PropertyDelegate propertyDelegate;
     protected final World world;
     private final RecipeType<? extends AbstractCookingRecipe> recipeType;
+    private final class_5421 field_25762;
 
-    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, int i, PlayerInventory arg3) {
-        this(arg, arg2, i, arg3, new SimpleInventory(3), new ArrayPropertyDelegate(4));
+    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, class_5421 arg3, int i, PlayerInventory arg4) {
+        this(arg, arg2, arg3, i, arg4, new SimpleInventory(3), new ArrayPropertyDelegate(4));
     }
 
-    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, int i, PlayerInventory arg3, Inventory arg4, PropertyDelegate arg5) {
+    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, class_5421 arg3, int i, PlayerInventory arg4, Inventory arg5, PropertyDelegate arg6) {
         super(arg, i);
         this.recipeType = arg2;
-        AbstractFurnaceScreenHandler.checkSize(arg4, 3);
-        AbstractFurnaceScreenHandler.checkDataCount(arg5, 4);
-        this.inventory = arg4;
-        this.propertyDelegate = arg5;
-        this.world = arg3.player.world;
-        this.addSlot(new Slot(arg4, 0, 56, 17));
-        this.addSlot(new FurnaceFuelSlot(this, arg4, 1, 56, 53));
-        this.addSlot(new FurnaceOutputSlot(arg3.player, arg4, 2, 116, 35));
+        this.field_25762 = arg3;
+        AbstractFurnaceScreenHandler.checkSize(arg5, 3);
+        AbstractFurnaceScreenHandler.checkDataCount(arg6, 4);
+        this.inventory = arg5;
+        this.propertyDelegate = arg6;
+        this.world = arg4.player.world;
+        this.addSlot(new Slot(arg5, 0, 56, 17));
+        this.addSlot(new FurnaceFuelSlot(this, arg5, 1, 56, 53));
+        this.addSlot(new FurnaceOutputSlot(arg4.player, arg5, 2, 116, 35));
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 9; ++k) {
-                this.addSlot(new Slot(arg3, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+                this.addSlot(new Slot(arg4, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
             }
         }
         for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(arg3, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(arg4, l, 8 + l * 18, 142));
         }
-        this.addProperties(arg5);
+        this.addProperties(arg6);
     }
 
     @Override
@@ -170,6 +173,12 @@ extends AbstractRecipeScreenHandler<Inventory> {
     @Environment(value=EnvType.CLIENT)
     public boolean isBurning() {
         return this.propertyDelegate.get(0) > 0;
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public class_5421 method_30264() {
+        return this.field_25762;
     }
 }
 

@@ -26,12 +26,12 @@ import net.minecraft.text.Text;
 @Environment(value=EnvType.CLIENT)
 public class RealmsBackupInfoScreen
 extends RealmsScreen {
-    private final Screen lastScreen;
+    private final Screen parent;
     private final Backup backup;
     private BackupInfoList backupInfoList;
 
     public RealmsBackupInfoScreen(Screen arg, Backup arg2) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.backup = arg2;
     }
 
@@ -42,7 +42,7 @@ extends RealmsScreen {
     @Override
     public void init() {
         this.client.keyboard.enableRepeatEvents(true);
-        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 120 + 24, 200, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.lastScreen)));
+        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 120 + 24, 200, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.parent)));
         this.backupInfoList = new BackupInfoList(this.client);
         this.addChild(this.backupInfoList);
         this.focusOn(this.backupInfoList);
@@ -56,7 +56,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.lastScreen);
+            this.client.openScreen(this.parent);
             return true;
         }
         return super.keyPressed(i, j, k);
@@ -104,7 +104,7 @@ extends RealmsScreen {
     extends AlwaysSelectedEntryListWidget<class_5344> {
         public BackupInfoList(MinecraftClient arg2) {
             super(arg2, RealmsBackupInfoScreen.this.width, RealmsBackupInfoScreen.this.height, 32, RealmsBackupInfoScreen.this.height - 64, 36);
-            this.method_29344(false);
+            this.setRenderSelection(false);
             if (((RealmsBackupInfoScreen)RealmsBackupInfoScreen.this).backup.changeList != null) {
                 ((RealmsBackupInfoScreen)RealmsBackupInfoScreen.this).backup.changeList.forEach((string, string2) -> this.addEntry(new class_5344((String)string, (String)string2)));
             }

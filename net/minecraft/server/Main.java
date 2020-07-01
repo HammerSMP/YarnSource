@@ -50,7 +50,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.resource.VanillaDataPackProvider;
@@ -142,7 +141,7 @@ public class Main {
             if (bl) {
                 LOGGER.warn("Safe mode active, only vanilla datapack will be loaded");
             }
-            ResourcePackManager<ResourcePackProfile> lv7 = new ResourcePackManager<ResourcePackProfile>(ResourcePackProfile::new, new VanillaDataPackProvider(), new FileResourcePackProvider(lv5.getDirectory(WorldSavePath.DATAPACKS).toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
+            ResourcePackManager lv7 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(lv5.getDirectory(WorldSavePath.DATAPACKS).toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
             DataPackSettings lv8 = MinecraftServer.loadDataPacks(lv7, lv6 == null ? DataPackSettings.SAFE_MODE : lv6, bl);
             CompletableFuture<ServerResourceManager> completableFuture = ServerResourceManager.reload(lv7.createResourcePacks(), CommandManager.RegistrationEnvironment.DEDICATED, lv.getPropertiesHandler().functionPermissionLevel, Util.getServerWorkerExecutor(), Runnable::run);
             try {
@@ -171,7 +170,7 @@ public class Main {
                 lv13 = new LevelProperties(lv17, lv18, Lifecycle.stable());
             }
             if (optionSet.has((OptionSpec)optionSpec5)) {
-                Main.method_29173(lv5, Schemas.getFixer(), optionSet.has((OptionSpec)optionSpec6), () -> true, lv13.getGeneratorOptions().method_29575());
+                Main.forceUpgradeWorld(lv5, Schemas.getFixer(), optionSet.has((OptionSpec)optionSpec6), () -> true, lv13.getGeneratorOptions().getWorlds());
             }
             lv5.method_27425(lv11, lv13);
             SaveProperties lv19 = lv13;
@@ -191,7 +190,7 @@ public class Main {
         }
     }
 
-    private static void method_29173(LevelStorage.Session arg, DataFixer dataFixer, boolean bl, BooleanSupplier booleanSupplier, ImmutableSet<RegistryKey<World>> immutableSet) {
+    private static void forceUpgradeWorld(LevelStorage.Session arg, DataFixer dataFixer, boolean bl, BooleanSupplier booleanSupplier, ImmutableSet<RegistryKey<World>> immutableSet) {
         LOGGER.info("Forcing world upgrade!");
         WorldUpdater lv = new WorldUpdater(arg, dataFixer, immutableSet, bl);
         Text lv2 = null;

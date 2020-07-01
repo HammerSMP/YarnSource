@@ -9,6 +9,7 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -58,15 +59,8 @@ extends Item {
     }
 
     protected ItemStack fill(ItemStack arg, PlayerEntity arg2, ItemStack arg3) {
-        arg.decrement(1);
         arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        if (arg.isEmpty()) {
-            return arg3;
-        }
-        if (!arg2.inventory.insertStack(arg3)) {
-            arg2.dropItem(arg3, false);
-        }
-        return arg;
+        return ItemUsage.method_30012(arg, arg2, arg3);
     }
 }
 

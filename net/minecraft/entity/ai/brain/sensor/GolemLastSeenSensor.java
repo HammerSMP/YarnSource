@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.server.world.ServerWorld;
@@ -29,7 +28,7 @@ extends Sensor<LivingEntity> {
 
     @Override
     protected void sense(ServerWorld arg, LivingEntity arg2) {
-        GolemLastSeenSensor.senseIronGolem(arg.getTime(), arg2);
+        GolemLastSeenSensor.senseIronGolem(arg2);
     }
 
     @Override
@@ -37,16 +36,19 @@ extends Sensor<LivingEntity> {
         return ImmutableSet.of(MemoryModuleType.MOBS);
     }
 
-    public static void senseIronGolem(long l, LivingEntity arg2) {
-        Brain<?> lv = arg2.getBrain();
-        Optional<List<LivingEntity>> optional = lv.getOptionalMemory(MemoryModuleType.MOBS);
+    public static void senseIronGolem(LivingEntity arg2) {
+        Optional<List<LivingEntity>> optional = arg2.getBrain().getOptionalMemory(MemoryModuleType.MOBS);
         if (!optional.isPresent()) {
             return;
         }
         boolean bl = optional.get().stream().anyMatch(arg -> arg.getType().equals(EntityType.IRON_GOLEM));
         if (bl) {
-            lv.remember(MemoryModuleType.GOLEM_LAST_SEEN_TIME, l);
+            GolemLastSeenSensor.method_30233(arg2);
         }
+    }
+
+    public static void method_30233(LivingEntity arg) {
+        arg.getBrain().remember(MemoryModuleType.GOLEM_DETECTED_RECENTLY, true, 600L);
     }
 }
 

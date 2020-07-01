@@ -8,6 +8,7 @@ package net.minecraft.entity.passive;
 
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -30,6 +31,7 @@ import net.minecraft.item.HorseArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -38,7 +40,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public class HorseEntity
 extends HorseBaseEntity {
@@ -230,15 +231,15 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public PassiveEntity createChild(PassiveEntity arg) {
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
         HorseBaseEntity lv3;
-        if (arg instanceof DonkeyEntity) {
-            HorseBaseEntity lv = EntityType.MULE.create(this.world);
+        if (arg2 instanceof DonkeyEntity) {
+            HorseBaseEntity lv = EntityType.MULE.create(arg);
         } else {
             HorseMarking lv9;
             HorseColor lv6;
-            HorseEntity lv2 = (HorseEntity)arg;
-            lv3 = EntityType.HORSE.create(this.world);
+            HorseEntity lv2 = (HorseEntity)arg2;
+            lv3 = EntityType.HORSE.create(arg);
             int i = this.random.nextInt(9);
             if (i < 4) {
                 HorseColor lv4 = this.getColor();
@@ -257,7 +258,7 @@ extends HorseBaseEntity {
             }
             ((HorseEntity)lv3).setVariant(lv6, lv9);
         }
-        this.setChildAttributes(arg, lv3);
+        this.setChildAttributes(arg2, lv3);
         return lv3;
     }
 
@@ -273,7 +274,7 @@ extends HorseBaseEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         HorseColor lv2;
         if (arg4 instanceof HorseData) {
             HorseColor lv = ((HorseData)arg4).color;

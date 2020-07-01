@@ -202,9 +202,9 @@ public abstract class Option {
     public static final CyclingOption VISIBILITY = new CyclingOption("options.chat.visibility", (arg, integer) -> {
         arg.chatVisibility = ChatVisibility.byId((arg.chatVisibility.getId() + integer) % 3);
     }, (arg, arg2) -> arg2.getDisplayPrefix().append(new TranslatableText(arg.chatVisibility.getTranslationKey())));
-    private static final Text field_25672 = new TranslatableText("options.graphics.fast.tooltip");
-    private static final Text field_25673 = new TranslatableText("options.graphics.fabulous.tooltip", new TranslatableText("options.graphics.fabulous").formatted(Formatting.ITALIC));
-    private static final Text field_25674 = new TranslatableText("options.graphics.fancy.tooltip");
+    private static final Text FAST_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fast.tooltip");
+    private static final Text FABULOUS_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fabulous.tooltip", new TranslatableText("options.graphics.fabulous").formatted(Formatting.ITALIC));
+    private static final Text FANCY_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fancy.tooltip");
     public static final CyclingOption GRAPHICS = new CyclingOption("options.graphics", (arg, integer) -> {
         MinecraftClient lv = MinecraftClient.getInstance();
         class_5407 lv2 = lv.method_30049();
@@ -220,15 +220,15 @@ public abstract class Option {
     }, (arg, arg2) -> {
         switch (arg.graphicsMode) {
             case FAST: {
-                arg2.method_29618(MinecraftClient.getInstance().textRenderer.wrapLines(field_25672, 200));
+                arg2.setTooltip(MinecraftClient.getInstance().textRenderer.wrapLines(FAST_GRAPHICS_TOOLTIP, 200));
                 break;
             }
             case FANCY: {
-                arg2.method_29618(MinecraftClient.getInstance().textRenderer.wrapLines(field_25674, 200));
+                arg2.setTooltip(MinecraftClient.getInstance().textRenderer.wrapLines(FANCY_GRAPHICS_TOOLTIP, 200));
                 break;
             }
             case FABULOUS: {
-                arg2.method_29618(MinecraftClient.getInstance().textRenderer.wrapLines(field_25673, 200));
+                arg2.setTooltip(MinecraftClient.getInstance().textRenderer.wrapLines(FABULOUS_GRAPHICS_TOOLTIP, 200));
             }
         }
         TranslatableText lv = new TranslatableText(arg.graphicsMode.getTranslationKey());
@@ -346,11 +346,11 @@ public abstract class Option {
         arg.bobView = boolean_;
     });
     private final String key;
-    private Optional<List<StringRenderable>> field_25442;
+    private Optional<List<StringRenderable>> tooltip;
 
     public Option(String string) {
         this.key = string;
-        this.field_25442 = Optional.empty();
+        this.tooltip = Optional.empty();
     }
 
     public abstract AbstractButtonWidget createButton(GameOptions var1, int var2, int var3, int var4);
@@ -359,12 +359,12 @@ public abstract class Option {
         return new TranslatableText(this.key).append(": ");
     }
 
-    public void method_29618(List<StringRenderable> list) {
-        this.field_25442 = Optional.of(list);
+    public void setTooltip(List<StringRenderable> list) {
+        this.tooltip = Optional.of(list);
     }
 
-    public Optional<List<StringRenderable>> method_29619() {
-        return this.field_25442;
+    public Optional<List<StringRenderable>> getTooltip() {
+        return this.tooltip;
     }
 }
 

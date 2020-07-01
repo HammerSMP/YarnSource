@@ -15,7 +15,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -27,12 +26,12 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        if (!arg.isAir(arg4) || arg.isAir(arg4.up())) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        if (!arg.isAir(arg3) || arg.isAir(arg3.up())) {
             return false;
         }
-        BlockPos.Mutable lv = arg4.mutableCopy();
-        BlockPos.Mutable lv2 = arg4.mutableCopy();
+        BlockPos.Mutable lv = arg3.mutableCopy();
+        BlockPos.Mutable lv2 = arg3.mutableCopy();
         boolean bl = true;
         boolean bl2 = true;
         boolean bl3 = true;

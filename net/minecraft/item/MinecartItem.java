@@ -13,6 +13,7 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPointer;
@@ -33,7 +34,7 @@ extends Item {
             void k;
             RailShape lv5;
             Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
-            World lv2 = arg.getWorld();
+            ServerWorld lv2 = arg.getWorld();
             double d = arg.getX() + (double)lv.getOffsetX() * 1.125;
             double e = Math.floor(arg.getY()) + (double)lv.getOffsetY();
             double f = arg.getZ() + (double)lv.getOffsetZ() * 1.125;

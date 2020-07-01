@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.AbstractDonkeyEntity;
 import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
@@ -57,8 +58,8 @@ extends AbstractDonkeyEntity {
     }
 
     @Override
-    public PassiveEntity createChild(PassiveEntity arg) {
-        return EntityType.MULE.create(this.world);
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.MULE.create(arg);
     }
 }
 

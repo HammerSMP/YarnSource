@@ -13,7 +13,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.EndGatewayFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -25,21 +24,21 @@ extends Feature<EndGatewayFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg42, EndGatewayFeatureConfig arg5) {
-        for (BlockPos lv : BlockPos.iterate(arg42.add(-1, -2, -1), arg42.add(1, 2, 1))) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, EndGatewayFeatureConfig arg42) {
+        for (BlockPos lv : BlockPos.iterate(arg3.add(-1, -2, -1), arg3.add(1, 2, 1))) {
             boolean bl4;
-            boolean bl = lv.getX() == arg42.getX();
-            boolean bl2 = lv.getY() == arg42.getY();
-            boolean bl3 = lv.getZ() == arg42.getZ();
-            boolean bl5 = bl4 = Math.abs(lv.getY() - arg42.getY()) == 2;
+            boolean bl = lv.getX() == arg3.getX();
+            boolean bl2 = lv.getY() == arg3.getY();
+            boolean bl3 = lv.getZ() == arg3.getZ();
+            boolean bl5 = bl4 = Math.abs(lv.getY() - arg3.getY()) == 2;
             if (bl && bl2 && bl3) {
                 BlockPos lv2 = lv.toImmutable();
                 this.setBlockState(arg, lv2, Blocks.END_GATEWAY.getDefaultState());
-                arg5.getExitPos().ifPresent(arg4 -> {
+                arg42.getExitPos().ifPresent(arg4 -> {
                     BlockEntity lv = arg.getBlockEntity(lv2);
                     if (lv instanceof EndGatewayBlockEntity) {
                         EndGatewayBlockEntity lv2 = (EndGatewayBlockEntity)lv;
-                        lv2.setExitPortalPos((BlockPos)arg4, arg5.isExact());
+                        lv2.setExitPortalPos((BlockPos)arg4, arg42.isExact());
                         lv.markDirty();
                     }
                 });

@@ -156,7 +156,7 @@ implements ItemConvertible {
         return lv;
     }
 
-    public static void method_30094(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
+    public static void replaced(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
         Block.replaceBlock(arg, arg2, arg3, arg4, i, 512);
     }
 
@@ -164,7 +164,7 @@ implements ItemConvertible {
         if (arg2 != arg) {
             if (arg2.isAir()) {
                 if (!arg3.isClient()) {
-                    arg3.method_30093(arg4, (i & 0x20) == 0, null, j);
+                    arg3.breakBlock(arg4, (i & 0x20) == 0, null, j);
                 }
             } else {
                 arg3.setBlockState(arg4, arg2, i & 0xFFFFFFDF, j);
@@ -264,22 +264,22 @@ implements ItemConvertible {
     public static void dropStacks(BlockState arg, World arg2, BlockPos arg32) {
         if (arg2 instanceof ServerWorld) {
             Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, null).forEach(arg3 -> Block.dropStack(arg2, arg32, arg3));
+            arg.onStacksDropped((ServerWorld)arg2, arg32, ItemStack.EMPTY);
         }
-        arg.onStacksDropped(arg2, arg32, ItemStack.EMPTY);
     }
 
-    public static void dropStacks(BlockState arg, World arg2, BlockPos arg32, @Nullable BlockEntity arg4) {
+    public static void dropStacks(BlockState arg, WorldAccess arg2, BlockPos arg32, @Nullable BlockEntity arg4) {
         if (arg2 instanceof ServerWorld) {
-            Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, arg4).forEach(arg3 -> Block.dropStack(arg2, arg32, arg3));
+            Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, arg4).forEach(arg3 -> Block.dropStack((ServerWorld)arg2, arg32, arg3));
+            arg.onStacksDropped((ServerWorld)arg2, arg32, ItemStack.EMPTY);
         }
-        arg.onStacksDropped(arg2, arg32, ItemStack.EMPTY);
     }
 
     public static void dropStacks(BlockState arg, World arg2, BlockPos arg32, @Nullable BlockEntity arg4, Entity arg5, ItemStack arg6) {
         if (arg2 instanceof ServerWorld) {
             Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, arg4, arg5, arg6).forEach(arg3 -> Block.dropStack(arg2, arg32, arg3));
+            arg.onStacksDropped((ServerWorld)arg2, arg32, arg6);
         }
-        arg.onStacksDropped(arg2, arg32, arg6);
     }
 
     public static void dropStack(World arg, BlockPos arg2, ItemStack arg3) {
@@ -295,8 +295,8 @@ implements ItemConvertible {
         arg.spawnEntity(lv);
     }
 
-    protected void dropExperience(World arg, BlockPos arg2, int i) {
-        if (!arg.isClient && arg.getGameRules().getBoolean(GameRules.DO_TILE_DROPS)) {
+    protected void dropExperience(ServerWorld arg, BlockPos arg2, int i) {
+        if (arg.getGameRules().getBoolean(GameRules.DO_TILE_DROPS)) {
             while (i > 0) {
                 int j = ExperienceOrbEntity.roundToOrbSize(i);
                 i -= j;

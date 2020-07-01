@@ -23,7 +23,7 @@ import net.minecraft.text.TranslatableText;
 @Environment(value=EnvType.CLIENT)
 public class RealmsResetNormalWorldScreen
 extends RealmsScreen {
-    private final RealmsResetWorldScreen lastScreen;
+    private final RealmsResetWorldScreen parent;
     private RealmsLabel titleLabel;
     private TextFieldWidget seedEdit;
     private Boolean generateStructures = true;
@@ -32,7 +32,7 @@ extends RealmsScreen {
     private Text field_24206;
 
     public RealmsResetNormalWorldScreen(RealmsResetWorldScreen arg, Text arg2) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.field_24206 = arg2;
     }
 
@@ -59,8 +59,8 @@ extends RealmsScreen {
             this.generateStructures = this.generateStructures == false;
             arg.setMessage(this.method_27459());
         }));
-        this.addButton(new ButtonWidget(this.width / 2 - 102, RealmsResetNormalWorldScreen.row(12), 97, 20, this.field_24206, arg -> this.lastScreen.resetWorld(new RealmsResetWorldScreen.ResetWorldInfo(this.seedEdit.getText(), this.levelTypeIndex, this.generateStructures))));
-        this.addButton(new ButtonWidget(this.width / 2 + 8, RealmsResetNormalWorldScreen.row(12), 97, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.lastScreen)));
+        this.addButton(new ButtonWidget(this.width / 2 - 102, RealmsResetNormalWorldScreen.row(12), 97, 20, this.field_24206, arg -> this.parent.resetWorld(new RealmsResetWorldScreen.ResetWorldInfo(this.seedEdit.getText(), this.levelTypeIndex, this.generateStructures))));
+        this.addButton(new ButtonWidget(this.width / 2 + 8, RealmsResetNormalWorldScreen.row(12), 97, 20, ScreenTexts.BACK, arg -> this.client.openScreen(this.parent)));
         this.narrateLabels();
     }
 
@@ -72,7 +72,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.lastScreen);
+            this.client.openScreen(this.parent);
             return true;
         }
         return super.keyPressed(i, j, k);

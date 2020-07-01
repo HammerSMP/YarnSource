@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -48,7 +49,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -59,6 +60,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -158,7 +160,7 @@ Saddleable {
         this.escapeDangerGoal = new EscapeDangerGoal(this, 1.65);
         this.goalSelector.add(1, this.escapeDangerGoal);
         this.goalSelector.add(3, new AnimalMateGoal(this, 1.0));
-        this.temptGoal = new TemptGoal((MobEntityWithAi)this, 1.4, false, ATTRACTING_INGREDIENT);
+        this.temptGoal = new TemptGoal((PathAwareEntity)this, 1.4, false, ATTRACTING_INGREDIENT);
         this.goalSelector.add(4, this.temptGoal);
         this.goalSelector.add(5, new FollowParentGoal(this, 1.1));
         this.goalSelector.add(7, new WanderAroundGoal(this, 1.0, 60));
@@ -392,8 +394,8 @@ Saddleable {
     }
 
     @Override
-    public StriderEntity createChild(PassiveEntity arg) {
-        return EntityType.STRIDER.create(this.world);
+    public StriderEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.STRIDER.create(arg);
     }
 
     @Override
@@ -412,7 +414,7 @@ Saddleable {
     @Override
     public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         boolean bl = this.isBreedingItem(arg.getStackInHand(arg2));
-        if (!bl && this.isSaddled() && !this.hasPassengers()) {
+        if (!bl && this.isSaddled() && !this.hasPassengers() && !arg.shouldCancelInteraction()) {
             if (!this.world.isClient) {
                 arg.startRiding(this);
             }
@@ -440,7 +442,7 @@ Saddleable {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         ZombifiedPiglinEntity lv9;
         StriderData.RiderType lv6;
         ZombieEntity.ZombieData lv = null;
@@ -461,7 +463,7 @@ Saddleable {
         } else {
             lv6 = StriderData.RiderType.NO_RIDER;
         }
-        MobEntityWithAi lv7 = null;
+        PathAwareEntity lv7 = null;
         if (lv6 == StriderData.RiderType.BABY_RIDER) {
             StriderEntity lv8 = EntityType.STRIDER.create(arg.getWorld());
             if (lv8 != null) {
@@ -482,8 +484,8 @@ Saddleable {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     static class Navigation

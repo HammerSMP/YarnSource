@@ -21,7 +21,7 @@ import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -45,7 +45,7 @@ extends Task<LivingEntity> {
         if (arg.getTime() - this.expiryTimeLimit < 20L) {
             return false;
         }
-        MobEntityWithAi lv = (MobEntityWithAi)arg2;
+        PathAwareEntity lv = (PathAwareEntity)arg2;
         PointOfInterestStorage lv2 = arg.getPointOfInterestStorage();
         Optional<BlockPos> optional = lv2.getNearestPosition(PointOfInterestType.HOME.getCompletionCondition(), arg2.getBlockPos(), 48, PointOfInterestStorage.OccupationStatus.ANY);
         return optional.isPresent() && !(optional.get().getSquaredDistance(lv.getBlockPos()) <= 4.0);
@@ -55,7 +55,7 @@ extends Task<LivingEntity> {
     protected void run(ServerWorld arg2, LivingEntity arg22, long l) {
         this.tries = 0;
         this.expiryTimeLimit = arg2.getTime() + (long)arg2.getRandom().nextInt(20);
-        MobEntityWithAi lv = (MobEntityWithAi)arg22;
+        PathAwareEntity lv = (PathAwareEntity)arg22;
         PointOfInterestStorage lv2 = arg2.getPointOfInterestStorage();
         Predicate<BlockPos> predicate = arg -> {
             long l = arg.asLong();

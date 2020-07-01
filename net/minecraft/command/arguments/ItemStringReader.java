@@ -28,12 +28,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
+import net.minecraft.class_5414;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.command.CommandSource;
 import net.minecraft.state.property.Property;
-import net.minecraft.tag.TagContainer;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -41,7 +41,7 @@ import net.minecraft.util.registry.Registry;
 public class ItemStringReader {
     public static final SimpleCommandExceptionType TAG_DISALLOWED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("argument.item.tag.disallowed"));
     public static final DynamicCommandExceptionType ID_INVALID_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("argument.item.id.invalid", object));
-    private static final BiFunction<SuggestionsBuilder, TagContainer<Item>, CompletableFuture<Suggestions>> NBT_SUGGESTION_PROVIDER = (suggestionsBuilder, arg) -> suggestionsBuilder.buildFuture();
+    private static final BiFunction<SuggestionsBuilder, class_5414<Item>, CompletableFuture<Suggestions>> NBT_SUGGESTION_PROVIDER = (suggestionsBuilder, arg) -> suggestionsBuilder.buildFuture();
     private final StringReader reader;
     private final boolean allowTag;
     private final Map<Property<?>, Comparable<?>> field_10801 = Maps.newHashMap();
@@ -50,7 +50,7 @@ public class ItemStringReader {
     private CompoundTag tag;
     private Identifier id = new Identifier("");
     private int cursor;
-    private BiFunction<SuggestionsBuilder, TagContainer<Item>, CompletableFuture<Suggestions>> suggestions = NBT_SUGGESTION_PROVIDER;
+    private BiFunction<SuggestionsBuilder, class_5414<Item>, CompletableFuture<Suggestions>> suggestions = NBT_SUGGESTION_PROVIDER;
 
     public ItemStringReader(StringReader stringReader, boolean bl) {
         this.reader = stringReader;
@@ -108,25 +108,25 @@ public class ItemStringReader {
         return this;
     }
 
-    private CompletableFuture<Suggestions> suggestItem(SuggestionsBuilder suggestionsBuilder, TagContainer<Item> arg) {
+    private CompletableFuture<Suggestions> suggestItem(SuggestionsBuilder suggestionsBuilder, class_5414<Item> arg) {
         if (suggestionsBuilder.getRemaining().isEmpty()) {
             suggestionsBuilder.suggest(String.valueOf('{'));
         }
         return suggestionsBuilder.buildFuture();
     }
 
-    private CompletableFuture<Suggestions> suggestTag(SuggestionsBuilder suggestionsBuilder, TagContainer<Item> arg) {
-        return CommandSource.suggestIdentifiers(arg.getKeys(), suggestionsBuilder.createOffset(this.cursor));
+    private CompletableFuture<Suggestions> suggestTag(SuggestionsBuilder suggestionsBuilder, class_5414<Item> arg) {
+        return CommandSource.suggestIdentifiers(arg.method_30211(), suggestionsBuilder.createOffset(this.cursor));
     }
 
-    private CompletableFuture<Suggestions> suggestAny(SuggestionsBuilder suggestionsBuilder, TagContainer<Item> arg) {
+    private CompletableFuture<Suggestions> suggestAny(SuggestionsBuilder suggestionsBuilder, class_5414<Item> arg) {
         if (this.allowTag) {
-            CommandSource.suggestIdentifiers(arg.getKeys(), suggestionsBuilder, String.valueOf('#'));
+            CommandSource.suggestIdentifiers(arg.method_30211(), suggestionsBuilder, String.valueOf('#'));
         }
         return CommandSource.suggestIdentifiers(Registry.ITEM.getIds(), suggestionsBuilder);
     }
 
-    public CompletableFuture<Suggestions> getSuggestions(SuggestionsBuilder suggestionsBuilder, TagContainer<Item> arg) {
+    public CompletableFuture<Suggestions> getSuggestions(SuggestionsBuilder suggestionsBuilder, class_5414<Item> arg) {
         return this.suggestions.apply(suggestionsBuilder.createOffset(this.reader.getCursor()), arg);
     }
 }

@@ -40,7 +40,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.network.NetworkEncryptionUtils;
 import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ServerResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -90,7 +89,7 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager<ResourcePackProfile> arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+    public MinecraftDedicatedServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg, arg2, arg5, arg3, Proxy.NO_PROXY, dataFixer, arg4, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.propertiesLoader = arg6;
         this.rconCommandOutput = new RconCommandOutput(this);

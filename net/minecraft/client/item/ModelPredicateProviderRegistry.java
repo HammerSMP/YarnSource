@@ -113,7 +113,7 @@ public class ModelPredicateProviderRegistry {
                     return 0.0f;
                 }
                 if (arg2.getDimension().isNatural()) {
-                    double d = arg2.getSkyAngle(1.0f);
+                    double d = arg2.method_30274(1.0f);
                 } else {
                     e = Math.random();
                 }

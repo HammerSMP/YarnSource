@@ -11,13 +11,16 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.EulerAngle;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ArmorStandItem
@@ -27,25 +30,31 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
-        Direction lv = arg.getSide();
+    public ActionResult useOnBlock(ItemUsageContext arg2) {
+        Direction lv = arg2.getSide();
         if (lv == Direction.DOWN) {
             return ActionResult.FAIL;
         }
-        World lv2 = arg.getWorld();
-        ItemPlacementContext lv3 = new ItemPlacementContext(arg);
+        World lv2 = arg2.getWorld();
+        ItemPlacementContext lv3 = new ItemPlacementContext(arg2);
         BlockPos lv4 = lv3.getBlockPos();
-        ItemStack lv5 = arg.getStack();
-        ArmorStandEntity lv6 = EntityType.ARMOR_STAND.create(lv2, lv5.getTag(), null, arg.getPlayer(), lv4, SpawnReason.SPAWN_EGG, true, true);
-        if (!lv2.doesNotCollide(lv6) || !lv2.getEntities(lv6, lv6.getBoundingBox()).isEmpty()) {
+        ItemStack lv5 = arg2.getStack();
+        Vec3d lv6 = Vec3d.ofBottomCenter(lv4);
+        Box lv7 = EntityType.ARMOR_STAND.getDimensions().method_30231(lv6.getX(), lv6.getY(), lv6.getZ());
+        if (!lv2.doesNotCollide(null, lv7, arg -> true) || !lv2.getEntities(null, lv7).isEmpty()) {
             return ActionResult.FAIL;
         }
-        if (!lv2.isClient) {
-            float f = (float)MathHelper.floor((MathHelper.wrapDegrees(arg.getPlayerYaw() - 180.0f) + 22.5f) / 45.0f) * 45.0f;
-            lv6.refreshPositionAndAngles(lv6.getX(), lv6.getY(), lv6.getZ(), f, 0.0f);
-            this.setRotations(lv6, lv2.random);
-            lv2.spawnEntity(lv6);
-            lv2.playSound(null, lv6.getX(), lv6.getY(), lv6.getZ(), SoundEvents.ENTITY_ARMOR_STAND_PLACE, SoundCategory.BLOCKS, 0.75f, 0.8f);
+        if (lv2 instanceof ServerWorld) {
+            ArmorStandEntity lv8 = EntityType.ARMOR_STAND.create((ServerWorld)lv2, lv5.getTag(), null, arg2.getPlayer(), lv4, SpawnReason.SPAWN_EGG, true, true);
+            if (lv8 == null) {
+                return ActionResult.FAIL;
+            }
+            lv2.spawnEntity(lv8);
+            float f = (float)MathHelper.floor((MathHelper.wrapDegrees(arg2.getPlayerYaw() - 180.0f) + 22.5f) / 45.0f) * 45.0f;
+            lv8.refreshPositionAndAngles(lv8.getX(), lv8.getY(), lv8.getZ(), f, 0.0f);
+            this.setRotations(lv8, lv2.random);
+            lv2.spawnEntity(lv8);
+            lv2.playSound(null, lv8.getX(), lv8.getY(), lv8.getZ(), SoundEvents.ENTITY_ARMOR_STAND_PLACE, SoundCategory.BLOCKS, 0.75f, 0.8f);
         }
         lv5.decrement(1);
         return ActionResult.success(lv2.isClient);

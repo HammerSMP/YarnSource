@@ -26,6 +26,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -51,7 +52,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.DirectBiomeAccessType;
@@ -251,7 +251,7 @@ public final class SpawnHelper {
         return new BlockPos(i, l, j);
     }
 
-    public static boolean isClearForSpawn(BlockView arg, BlockPos arg2, BlockState arg3, FluidState arg4, EntityType arg5) {
+    public static boolean isClearForSpawn(BlockView arg, BlockPos arg2, BlockState arg3, FluidState arg4, EntityType<?> arg5) {
         if (arg3.isFullCube(arg, arg2)) {
             return false;
         }
@@ -296,7 +296,7 @@ public final class SpawnHelper {
     /*
      * WARNING - void declaration
      */
-    public static void populateEntities(WorldAccess arg, Biome arg2, int i, int j, Random random) {
+    public static void populateEntities(class_5425 arg, Biome arg2, int i, int j, Random random) {
         List<Biome.SpawnEntry> list = arg2.getEntitySpawnList(SpawnGroup.CREATURE);
         if (list.isEmpty()) {
             return;

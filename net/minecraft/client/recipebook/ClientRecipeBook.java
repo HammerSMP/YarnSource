@@ -3,6 +3,9 @@
  * 
  * Could not load the following classes:
  *  com.google.common.collect.HashBasedTable
+ *  com.google.common.collect.ImmutableList
+ *  com.google.common.collect.ImmutableList$Builder
+ *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  net.fabricmc.api.EnvType
@@ -14,9 +17,12 @@
 package net.minecraft.client.recipebook;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.api.EnvType;
@@ -27,15 +33,8 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.book.RecipeBook;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
-import net.minecraft.screen.BlastFurnaceScreenHandler;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.FurnaceScreenHandler;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.SmokerScreenHandler;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,54 +44,43 @@ import org.apache.logging.log4j.util.Supplier;
 public class ClientRecipeBook
 extends RecipeBook {
     private static final Logger field_25622 = LogManager.getLogger();
-    private final RecipeManager manager;
-    private final Map<RecipeBookGroup, List<RecipeResultCollection>> resultsByGroup = Maps.newHashMap();
-    private final List<RecipeResultCollection> orderedResults = Lists.newArrayList();
+    private Map<RecipeBookGroup, List<RecipeResultCollection>> resultsByGroup = ImmutableMap.of();
+    private List<RecipeResultCollection> field_25778 = ImmutableList.of();
 
-    public ClientRecipeBook(RecipeManager arg) {
-        this.manager = arg;
+    public void reload(Iterable<Recipe<?>> iterable) {
+        Map<RecipeBookGroup, List<List<Recipe<?>>>> map = ClientRecipeBook.method_30283(iterable);
+        HashMap map2 = Maps.newHashMap();
+        ImmutableList.Builder builder = ImmutableList.builder();
+        map.forEach((arg, list) -> {
+            List cfr_ignored_0 = (List)map2.put(arg, list.stream().map(RecipeResultCollection::new).peek(((ImmutableList.Builder)builder)::add).collect(ImmutableList.toImmutableList()));
+        });
+        RecipeBookGroup.field_25783.forEach((arg2, list) -> {
+            List cfr_ignored_0 = (List)map2.put(arg2, list.stream().flatMap(arg -> ((List)map2.getOrDefault(arg, ImmutableList.of())).stream()).collect(ImmutableList.toImmutableList()));
+        });
+        this.resultsByGroup = ImmutableMap.copyOf((Map)map2);
+        this.field_25778 = builder.build();
     }
 
-    public void reload() {
-        this.orderedResults.clear();
-        this.resultsByGroup.clear();
+    private static Map<RecipeBookGroup, List<List<Recipe<?>>>> method_30283(Iterable<Recipe<?>> iterable) {
+        HashMap map = Maps.newHashMap();
         HashBasedTable table = HashBasedTable.create();
-        for (Recipe<?> lv : this.manager.values()) {
-            RecipeResultCollection lv4;
+        for (Recipe<?> lv : iterable) {
             if (lv.isIgnoredInRecipeBook()) continue;
             RecipeBookGroup lv2 = ClientRecipeBook.getGroupForRecipe(lv);
             String string = lv.getGroup();
             if (string.isEmpty()) {
-                RecipeResultCollection lv3 = this.addGroup(lv2);
-            } else {
-                lv4 = (RecipeResultCollection)table.get((Object)lv2, (Object)string);
-                if (lv4 == null) {
-                    lv4 = this.addGroup(lv2);
-                    table.put((Object)lv2, (Object)string, (Object)lv4);
-                }
+                map.computeIfAbsent(lv2, arg -> Lists.newArrayList()).add(ImmutableList.of(lv));
+                continue;
             }
-            lv4.addRecipe(lv);
+            List list = (List)table.get((Object)lv2, (Object)string);
+            if (list == null) {
+                list = Lists.newArrayList();
+                table.put((Object)lv2, (Object)string, (Object)list);
+                map.computeIfAbsent(lv2, arg -> Lists.newArrayList()).add(list);
+            }
+            list.add(lv);
         }
-    }
-
-    private RecipeResultCollection addGroup(RecipeBookGroup arg2) {
-        RecipeResultCollection lv = new RecipeResultCollection();
-        this.orderedResults.add(lv);
-        this.resultsByGroup.computeIfAbsent(arg2, arg -> Lists.newArrayList()).add(lv);
-        if (arg2 == RecipeBookGroup.FURNACE_BLOCKS || arg2 == RecipeBookGroup.FURNACE_FOOD || arg2 == RecipeBookGroup.FURNACE_MISC) {
-            this.addGroupResults(RecipeBookGroup.FURNACE_SEARCH, lv);
-        } else if (arg2 == RecipeBookGroup.BLAST_FURNACE_BLOCKS || arg2 == RecipeBookGroup.BLAST_FURNACE_MISC) {
-            this.addGroupResults(RecipeBookGroup.BLAST_FURNACE_SEARCH, lv);
-        } else if (arg2 == RecipeBookGroup.SMOKER_FOOD) {
-            this.addGroupResults(RecipeBookGroup.SMOKER_SEARCH, lv);
-        } else if (arg2 == RecipeBookGroup.CRAFTING_BUILDING_BLOCKS || arg2 == RecipeBookGroup.CRAFTING_REDSTONE || arg2 == RecipeBookGroup.CRAFTING_EQUIPMENT || arg2 == RecipeBookGroup.CRAFTING_MISC) {
-            this.addGroupResults(RecipeBookGroup.SEARCH, lv);
-        }
-        return lv;
-    }
-
-    private void addGroupResults(RecipeBookGroup arg2, RecipeResultCollection arg22) {
-        this.resultsByGroup.computeIfAbsent(arg2, arg -> Lists.newArrayList()).add(arg22);
+        return map;
     }
 
     private static RecipeBookGroup getGroupForRecipe(Recipe<?> arg) {
@@ -145,24 +133,8 @@ extends RecipeBook {
         return RecipeBookGroup.UNKNOWN;
     }
 
-    public static List<RecipeBookGroup> getGroups(AbstractRecipeScreenHandler<?> arg) {
-        if (arg instanceof CraftingScreenHandler || arg instanceof PlayerScreenHandler) {
-            return Lists.newArrayList((Object[])new RecipeBookGroup[]{RecipeBookGroup.SEARCH, RecipeBookGroup.CRAFTING_EQUIPMENT, RecipeBookGroup.CRAFTING_BUILDING_BLOCKS, RecipeBookGroup.CRAFTING_MISC, RecipeBookGroup.CRAFTING_REDSTONE});
-        }
-        if (arg instanceof FurnaceScreenHandler) {
-            return Lists.newArrayList((Object[])new RecipeBookGroup[]{RecipeBookGroup.FURNACE_SEARCH, RecipeBookGroup.FURNACE_FOOD, RecipeBookGroup.FURNACE_BLOCKS, RecipeBookGroup.FURNACE_MISC});
-        }
-        if (arg instanceof BlastFurnaceScreenHandler) {
-            return Lists.newArrayList((Object[])new RecipeBookGroup[]{RecipeBookGroup.BLAST_FURNACE_SEARCH, RecipeBookGroup.BLAST_FURNACE_BLOCKS, RecipeBookGroup.BLAST_FURNACE_MISC});
-        }
-        if (arg instanceof SmokerScreenHandler) {
-            return Lists.newArrayList((Object[])new RecipeBookGroup[]{RecipeBookGroup.SMOKER_SEARCH, RecipeBookGroup.SMOKER_FOOD});
-        }
-        return Lists.newArrayList();
-    }
-
     public List<RecipeResultCollection> getOrderedResults() {
-        return this.orderedResults;
+        return this.field_25778;
     }
 
     public List<RecipeResultCollection> getResultsForGroup(RecipeBookGroup arg) {

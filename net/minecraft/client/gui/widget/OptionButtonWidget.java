@@ -23,7 +23,7 @@ extends ButtonWidget {
         this.option = arg;
     }
 
-    public Option method_29623() {
+    public Option getOption() {
         return this.option;
     }
 }

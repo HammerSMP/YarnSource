@@ -130,7 +130,7 @@ public abstract class PlayerManager {
     private final Map<UUID, PlayerAdvancementTracker> advancementTrackers = Maps.newHashMap();
     private final WorldSaveHandler saveHandler;
     private boolean whitelistEnabled;
-    private final RegistryTracker.Modifiable field_24626;
+    private final RegistryTracker.Modifiable registryTracker;
     protected final int maxPlayers;
     private int viewDistance;
     private GameMode gameMode;
@@ -139,7 +139,7 @@ public abstract class PlayerManager {
 
     public PlayerManager(MinecraftServer minecraftServer, RegistryTracker.Modifiable arg, WorldSaveHandler arg2, int i) {
         this.server = minecraftServer;
-        this.field_24626 = arg;
+        this.registryTracker = arg;
         this.maxPlayers = i;
         this.saveHandler = arg2;
     }
@@ -176,7 +176,7 @@ public abstract class PlayerManager {
         GameRules lv9 = lv6.getGameRules();
         boolean bl = lv9.getBoolean(GameRules.DO_IMMEDIATE_RESPAWN);
         boolean bl2 = lv9.getBoolean(GameRules.REDUCED_DEBUG_INFO);
-        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), arg22.interactionManager.method_30119(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.field_24626, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.isFlat()));
+        lv8.sendPacket(new GameJoinS2CPacket(arg22.getEntityId(), arg22.interactionManager.getGameMode(), arg22.interactionManager.method_30119(), BiomeAccess.hashSeed(lv6.getSeed()), lv7.isHardcore(), this.server.getWorldRegistryKeys(), this.registryTracker, lv6.getDimensionRegistryKey(), lv6.getRegistryKey(), this.getMaxPlayerCount(), this.viewDistance, bl2, !bl, lv6.isDebugWorld(), lv6.isFlat()));
         lv8.sendPacket(new CustomPayloadS2CPacket(CustomPayloadS2CPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(this.getServer().getServerModName())));
         lv8.sendPacket(new DifficultyS2CPacket(lv7.getDifficulty(), lv7.isDifficultyLocked()));
         lv8.sendPacket(new PlayerAbilitiesS2CPacket(arg22.abilities));

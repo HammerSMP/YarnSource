@@ -21,7 +21,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidDrainable;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
@@ -35,7 +34,6 @@ import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -177,17 +175,6 @@ implements FluidDrainable {
             return this.fluid;
         }
         return Fluids.EMPTY;
-    }
-
-    @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (this.fluid.isIn(FluidTags.LAVA)) {
-            float f = (float)arg3.getY() + arg.getFluidState().getHeight(arg2, arg3);
-            Box lv = arg4.getBoundingBox();
-            if (lv.minY < (double)f || (double)f > lv.maxY) {
-                arg4.setInLava();
-            }
-        }
     }
 }
 

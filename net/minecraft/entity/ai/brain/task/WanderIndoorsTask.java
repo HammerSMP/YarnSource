@@ -16,12 +16,12 @@ import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.brain.task.Task;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 public class WanderIndoorsTask
-extends Task<MobEntityWithAi> {
+extends Task<PathAwareEntity> {
     private final float speed;
 
     public WanderIndoorsTask(float f) {
@@ -30,12 +30,12 @@ extends Task<MobEntityWithAi> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, MobEntityWithAi arg2) {
+    protected boolean shouldRun(ServerWorld arg, PathAwareEntity arg2) {
         return !arg.isSkyVisible(arg2.getBlockPos());
     }
 
     @Override
-    protected void run(ServerWorld arg, MobEntityWithAi arg22, long l) {
+    protected void run(ServerWorld arg, PathAwareEntity arg22, long l) {
         BlockPos lv = arg22.getBlockPos();
         List list = BlockPos.stream(lv.add(-1, -1, -1), lv.add(1, 1, 1)).map(BlockPos::toImmutable).collect(Collectors.toList());
         Collections.shuffle(list);

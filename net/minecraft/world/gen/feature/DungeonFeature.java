@@ -23,7 +23,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -41,7 +40,7 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
         int i = 3;
         int j = random.nextInt(2) + 2;
         int k = -j - 1;
@@ -55,7 +54,7 @@ extends Feature<DefaultFeatureConfig> {
         for (int s = k; s <= l; ++s) {
             for (int t = -1; t <= 4; ++t) {
                 for (int u = p; u <= q; ++u) {
-                    BlockPos lv = arg4.add(s, t, u);
+                    BlockPos lv = arg3.add(s, t, u);
                     Material lv2 = arg.getBlockState(lv).getMaterial();
                     boolean bl = lv2.isSolid();
                     if (t == -1 && !bl) {
@@ -75,7 +74,7 @@ extends Feature<DefaultFeatureConfig> {
         for (int v = k; v <= l; ++v) {
             for (int w = 3; w >= -1; --w) {
                 for (int x = p; x <= q; ++x) {
-                    BlockPos lv3 = arg4.add(v, w, x);
+                    BlockPos lv3 = arg3.add(v, w, x);
                     BlockState lv4 = arg.getBlockState(lv3);
                     if (v == k || w == -1 || x == p || v == l || w == 4 || x == q) {
                         if (lv3.getY() >= 0 && !arg.getBlockState(lv3.down()).getMaterial().isSolid()) {
@@ -99,8 +98,8 @@ extends Feature<DefaultFeatureConfig> {
             for (int z = 0; z < 3; ++z) {
                 int ac;
                 int ab;
-                int aa = arg4.getX() + random.nextInt(j * 2 + 1) - j;
-                BlockPos lv5 = new BlockPos(aa, ab = arg4.getY(), ac = arg4.getZ() + random.nextInt(o * 2 + 1) - o);
+                int aa = arg3.getX() + random.nextInt(j * 2 + 1) - j;
+                BlockPos lv5 = new BlockPos(aa, ab = arg3.getY(), ac = arg3.getZ() + random.nextInt(o * 2 + 1) - o);
                 if (!arg.isAir(lv5)) continue;
                 int ad = 0;
                 for (Direction lv6 : Direction.Type.HORIZONTAL) {
@@ -113,12 +112,12 @@ extends Feature<DefaultFeatureConfig> {
                 continue block6;
             }
         }
-        arg.setBlockState(arg4, Blocks.SPAWNER.getDefaultState(), 2);
-        BlockEntity lv7 = arg.getBlockEntity(arg4);
+        arg.setBlockState(arg3, Blocks.SPAWNER.getDefaultState(), 2);
+        BlockEntity lv7 = arg.getBlockEntity(arg3);
         if (lv7 instanceof MobSpawnerBlockEntity) {
             ((MobSpawnerBlockEntity)lv7).getLogic().setEntityId(this.getMobSpawnerEntity(random));
         } else {
-            LOGGER.error("Failed to fetch mob spawner entity at ({}, {}, {})", (Object)arg4.getX(), (Object)arg4.getY(), (Object)arg4.getZ());
+            LOGGER.error("Failed to fetch mob spawner entity at ({}, {}, {})", (Object)arg3.getX(), (Object)arg3.getY(), (Object)arg3.getZ());
         }
         return true;
     }

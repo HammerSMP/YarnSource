@@ -19,6 +19,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -47,7 +48,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -59,6 +60,7 @@ import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -69,7 +71,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public class PandaEntity
 extends AnimalEntity {
@@ -242,10 +243,10 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public PassiveEntity createChild(PassiveEntity arg) {
-        PandaEntity lv = EntityType.PANDA.create(this.world);
-        if (arg instanceof PandaEntity) {
-            lv.initGenes(this, (PandaEntity)arg);
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        PandaEntity lv = EntityType.PANDA.create(arg);
+        if (arg2 instanceof PandaEntity) {
+            lv.initGenes(this, (PandaEntity)arg2);
         }
         lv.resetAttributes();
         return lv;
@@ -257,7 +258,7 @@ extends AnimalEntity {
         this.goalSelector.add(2, new ExtinguishFireGoal(this, 2.0));
         this.goalSelector.add(2, new PandaMateGoal(this, 1.0));
         this.goalSelector.add(3, new AttackGoal(this, (double)1.2f, true));
-        this.goalSelector.add(4, new TemptGoal((MobEntityWithAi)this, 1.0, Ingredient.ofItems(Blocks.BAMBOO.asItem()), false));
+        this.goalSelector.add(4, new TemptGoal((PathAwareEntity)this, 1.0, Ingredient.ofItems(Blocks.BAMBOO.asItem()), false));
         this.goalSelector.add(6, new PandaFleeGoal<PlayerEntity>(this, PlayerEntity.class, 8.0f, 2.0, 2.0));
         this.goalSelector.add(6, new PandaFleeGoal<HostileEntity>(this, HostileEntity.class, 4.0f, 2.0, 2.0));
         this.goalSelector.add(7, new PickUpFoodGoal());
@@ -489,7 +490,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setMainGene(Gene.createRandom(this.random));
         this.setHiddenGene(Gene.createRandom(this.random));
         this.resetAttributes();

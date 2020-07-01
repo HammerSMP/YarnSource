@@ -2,26 +2,15 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.BiMap
- *  com.google.common.collect.HashBiMap
- *  com.google.common.collect.ImmutableBiMap
- *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
  *  com.google.gson.Gson
  *  com.google.gson.JsonObject
- *  javax.annotation.Nullable
- *  net.fabricmc.api.EnvType
- *  net.fabricmc.api.Environment
  *  org.apache.commons.io.IOUtils
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.tag;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -32,8 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,12 +30,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.class_5414;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.tag.SetTag;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -60,8 +44,6 @@ public class TagContainer<T> {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON = new Gson();
     private static final int JSON_EXTENSION_LENGTH = ".json".length();
-    private final Tag<T> empty = SetTag.empty();
-    private volatile BiMap<Identifier, Tag<T>> entries = HashBiMap.create();
     private final Function<Identifier, Optional<T>> getter;
     private final String dataType;
     private final String entryType;
@@ -70,45 +52,6 @@ public class TagContainer<T> {
         this.getter = function;
         this.dataType = string;
         this.entryType = string2;
-    }
-
-    @Nullable
-    public Tag<T> get(Identifier arg) {
-        return (Tag)this.entries.get((Object)arg);
-    }
-
-    public Tag<T> getOrCreate(Identifier arg) {
-        return (Tag)this.entries.getOrDefault((Object)arg, this.empty);
-    }
-
-    @Nullable
-    public Identifier getId(Tag<T> arg) {
-        if (arg instanceof Tag.Identified) {
-            return ((Tag.Identified)arg).getId();
-        }
-        return (Identifier)this.entries.inverse().get(arg);
-    }
-
-    public Identifier checkId(Tag<T> arg) {
-        Identifier lv = this.getId(arg);
-        if (lv == null) {
-            throw new IllegalStateException("Unrecognized tag");
-        }
-        return lv;
-    }
-
-    public Collection<Identifier> getKeys() {
-        return this.entries.keySet();
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public Collection<Identifier> getTagsFor(T object) {
-        ArrayList list = Lists.newArrayList();
-        for (Map.Entry entry : this.entries.entrySet()) {
-            if (!((Tag)entry.getValue()).contains(object)) continue;
-            list.add(entry.getKey());
-        }
-        return list;
     }
 
     public CompletableFuture<Map<Identifier, Tag.Builder>> prepareReload(ResourceManager arg, Executor executor) {
@@ -185,7 +128,7 @@ public class TagContainer<T> {
         }, executor);
     }
 
-    public void applyReload(Map<Identifier, Tag.Builder> map) {
+    public class_5414<T> applyReload(Map<Identifier, Tag.Builder> map) {
         HashMap map2 = Maps.newHashMap();
         Function function = map2::get;
         Function<Identifier, Object> function2 = arg -> this.getter.apply((Identifier)arg).orElse(null);
@@ -204,15 +147,7 @@ public class TagContainer<T> {
             break;
         }
         map.forEach((arg, arg2) -> LOGGER.error("Couldn't load {} tag {} as it is missing following references: {}", (Object)this.entryType, arg, (Object)arg2.streamUnresolvedEntries(function, function2).map(Objects::toString).collect(Collectors.joining(","))));
-        this.setEntries(map2);
-    }
-
-    protected void setEntries(Map<Identifier, Tag<T>> map) {
-        this.entries = ImmutableBiMap.copyOf(map);
-    }
-
-    public Map<Identifier, Tag<T>> getEntries() {
-        return this.entries;
+        return class_5414.method_30207(map2);
     }
 }
 

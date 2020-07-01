@@ -21,7 +21,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -33,8 +32,8 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        ChunkPos lv = new ChunkPos(arg4);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        ChunkPos lv = new ChunkPos(arg3);
         List list = IntStream.rangeClosed(lv.getStartX(), lv.getEndX()).boxed().collect(Collectors.toList());
         Collections.shuffle(list, random);
         List list2 = IntStream.rangeClosed(lv.getStartZ(), lv.getEndZ()).boxed().collect(Collectors.toList());

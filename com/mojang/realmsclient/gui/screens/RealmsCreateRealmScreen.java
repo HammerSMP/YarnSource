@@ -27,7 +27,7 @@ import net.minecraft.text.TranslatableText;
 public class RealmsCreateRealmScreen
 extends RealmsScreen {
     private final RealmsServer server;
-    private final RealmsMainScreen lastScreen;
+    private final RealmsMainScreen parent;
     private TextFieldWidget nameBox;
     private TextFieldWidget descriptionBox;
     private ButtonWidget createButton;
@@ -35,7 +35,7 @@ extends RealmsScreen {
 
     public RealmsCreateRealmScreen(RealmsServer arg, RealmsMainScreen arg2) {
         this.server = arg;
-        this.lastScreen = arg2;
+        this.parent = arg2;
     }
 
     @Override
@@ -52,7 +52,7 @@ extends RealmsScreen {
     public void init() {
         this.client.keyboard.enableRepeatEvents(true);
         this.createButton = this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 120 + 17, 97, 20, new TranslatableText("mco.create.world"), arg -> this.createWorld()));
-        this.addButton(new ButtonWidget(this.width / 2 + 5, this.height / 4 + 120 + 17, 95, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.lastScreen)));
+        this.addButton(new ButtonWidget(this.width / 2 + 5, this.height / 4 + 120 + 17, 95, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.parent)));
         this.createButton.active = false;
         this.nameBox = new TextFieldWidget(this.client.textRenderer, this.width / 2 - 100, 65, 200, 20, null, new TranslatableText("mco.configure.world.name"));
         this.addChild(this.nameBox);
@@ -79,7 +79,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.lastScreen);
+            this.client.openScreen(this.parent);
             return true;
         }
         boolean bl = super.keyPressed(i, j, k);
@@ -89,9 +89,9 @@ extends RealmsScreen {
 
     private void createWorld() {
         if (this.valid()) {
-            RealmsResetWorldScreen lv = new RealmsResetWorldScreen(this.lastScreen, this.server, new TranslatableText("mco.selectServer.create"), new TranslatableText("mco.create.world.subtitle"), 0xA0A0A0, new TranslatableText("mco.create.world.skip"), () -> this.client.openScreen(this.lastScreen.newScreen()), () -> this.client.openScreen(this.lastScreen.newScreen()));
+            RealmsResetWorldScreen lv = new RealmsResetWorldScreen(this.parent, this.server, new TranslatableText("mco.selectServer.create"), new TranslatableText("mco.create.world.subtitle"), 0xA0A0A0, new TranslatableText("mco.create.world.skip"), () -> this.client.openScreen(this.parent.newScreen()), () -> this.client.openScreen(this.parent.newScreen()));
             lv.setResetTitle(I18n.translate("mco.create.world.reset.title", new Object[0]));
-            this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.lastScreen, new WorldCreationTask(this.server.id, this.nameBox.getText(), this.descriptionBox.getText(), lv)));
+            this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new WorldCreationTask(this.server.id, this.nameBox.getText(), this.descriptionBox.getText(), lv)));
         }
     }
 

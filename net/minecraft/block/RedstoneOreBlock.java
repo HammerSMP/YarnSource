@@ -87,7 +87,7 @@ extends Block {
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, World arg2, BlockPos arg3, ItemStack arg4) {
+    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
         super.onStacksDropped(arg, arg2, arg3, arg4);
         if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg4) == 0) {
             int i = 1 + arg2.random.nextInt(5);

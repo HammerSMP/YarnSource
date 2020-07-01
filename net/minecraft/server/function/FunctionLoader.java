@@ -29,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import net.minecraft.class_5414;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloadListener;
@@ -53,6 +54,7 @@ implements ResourceReloadListener {
     private static final int PATH_SUFFIX_LENGTH = ".mcfunction".length();
     private volatile Map<Identifier, CommandFunction> functions = ImmutableMap.of();
     private final TagContainer<CommandFunction> tags = new TagContainer(this::get, "tags/functions", "function");
+    private volatile class_5414<CommandFunction> field_25801 = class_5414.method_30214();
     private final int level;
     private final CommandDispatcher<ServerCommandSource> commandDispatcher;
 
@@ -64,12 +66,12 @@ implements ResourceReloadListener {
         return this.functions;
     }
 
-    public TagContainer<CommandFunction> getTags() {
-        return this.tags;
+    public class_5414<CommandFunction> getTags() {
+        return this.field_25801;
     }
 
     public Tag<CommandFunction> getOrCreateTag(Identifier arg) {
-        return this.tags.getOrCreate(arg);
+        return this.field_25801.method_30213(arg);
     }
 
     public FunctionLoader(int i, CommandDispatcher<ServerCommandSource> commandDispatcher) {
@@ -106,7 +108,7 @@ implements ResourceReloadListener {
                 return null;
             })).join());
             this.functions = builder.build();
-            this.tags.applyReload((Map)pair.getFirst());
+            this.field_25801 = this.tags.applyReload((Map)pair.getFirst());
         }, executor2);
     }
 

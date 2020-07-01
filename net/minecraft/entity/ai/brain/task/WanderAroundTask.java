@@ -21,7 +21,7 @@ import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -120,7 +120,7 @@ extends Task<MobEntity> {
             if (this.path != null) {
                 return true;
             }
-            Vec3d lv3 = TargetFinder.findTargetTowards((MobEntityWithAi)arg, 10, 7, Vec3d.ofBottomCenter(lv));
+            Vec3d lv3 = TargetFinder.findTargetTowards((PathAwareEntity)arg, 10, 7, Vec3d.ofBottomCenter(lv));
             if (lv3 != null) {
                 this.path = arg.getNavigation().findPathTo(lv3.x, lv3.y, lv3.z, 0);
                 return this.path != null;

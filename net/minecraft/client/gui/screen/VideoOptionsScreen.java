@@ -18,9 +18,9 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5405;
 import net.minecraft.class_5407;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.GraphicsConfirmationScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.screen.options.GameOptionsScreen;
@@ -42,15 +42,15 @@ import net.minecraft.util.Formatting;
 @Environment(value=EnvType.CLIENT)
 public class VideoOptionsScreen
 extends GameOptionsScreen {
-    private static final Text field_25682 = new TranslatableText("options.graphics.fabulous").formatted(Formatting.ITALIC);
-    private static final Text field_25683 = new TranslatableText("options.graphics.warning.message", field_25682, field_25682);
-    private static final Text field_25684 = new TranslatableText("options.graphics.warning.title").formatted(Formatting.RED);
-    private static final Text field_25685 = new TranslatableText("options.graphics.warning.accept");
-    private static final Text field_25686 = new TranslatableText("options.graphics.warning.cancel");
-    private static final Text field_25687 = new LiteralText("\n");
+    private static final Text GRAPHICS_FABULOUS_TEXT = new TranslatableText("options.graphics.fabulous").formatted(Formatting.ITALIC);
+    private static final Text GRAPHICS_WARNING_MESSAGE_TEXT = new TranslatableText("options.graphics.warning.message", GRAPHICS_FABULOUS_TEXT, GRAPHICS_FABULOUS_TEXT);
+    private static final Text GRAPHICS_WARNING_TITLE_TEXT = new TranslatableText("options.graphics.warning.title").formatted(Formatting.RED);
+    private static final Text GRAPHICS_WARNING_ACCEPT_TEXT = new TranslatableText("options.graphics.warning.accept");
+    private static final Text GRAPHICS_WARNING_CANCEL_TEXT = new TranslatableText("options.graphics.warning.cancel");
+    private static final Text NEWLINE_TEXT = new LiteralText("\n");
     private static final Option[] OPTIONS = new Option[]{Option.GRAPHICS, Option.RENDER_DISTANCE, Option.AO, Option.FRAMERATE_LIMIT, Option.VSYNC, Option.VIEW_BOBBING, Option.GUI_SCALE, Option.ATTACK_INDICATOR, Option.GAMMA, Option.CLOUDS, Option.FULLSCREEN, Option.PARTICLES, Option.MIPMAP_LEVELS, Option.ENTITY_SHADOWS, Option.ENTITY_DISTANCE_SCALING};
     @Nullable
-    private List<StringRenderable> field_25453;
+    private List<StringRenderable> tooltip;
     private ButtonListWidget list;
     private final class_5407 field_25688;
     private final int mipmapLevels;
@@ -99,26 +99,26 @@ extends GameOptionsScreen {
             if (this.field_25688.method_30141()) {
                 String string3;
                 String string2;
-                ArrayList list = Lists.newArrayList((Object[])new StringRenderable[]{field_25683, field_25687});
+                ArrayList list = Lists.newArrayList((Object[])new StringRenderable[]{GRAPHICS_WARNING_MESSAGE_TEXT, NEWLINE_TEXT});
                 String string = this.field_25688.method_30060();
                 if (string != null) {
-                    list.add(field_25687);
+                    list.add(NEWLINE_TEXT);
                     list.add(new TranslatableText("options.graphics.warning.renderer", string).formatted(Formatting.GRAY));
                 }
                 if ((string2 = this.field_25688.method_30063()) != null) {
-                    list.add(field_25687);
+                    list.add(NEWLINE_TEXT);
                     list.add(new TranslatableText("options.graphics.warning.vendor", string2).formatted(Formatting.GRAY));
                 }
                 if ((string3 = this.field_25688.method_30062()) != null) {
-                    list.add(field_25687);
+                    list.add(NEWLINE_TEXT);
                     list.add(new TranslatableText("options.graphics.warning.version", string3).formatted(Formatting.GRAY));
                 }
-                this.client.openScreen(new class_5405(field_25684, list, (ImmutableList<class_5405.class_5406>)ImmutableList.of((Object)new class_5405.class_5406(field_25685, arg -> {
+                this.client.openScreen(new GraphicsConfirmationScreen(GRAPHICS_WARNING_TITLE_TEXT, list, (ImmutableList<GraphicsConfirmationScreen.ChoiceButton>)ImmutableList.of((Object)new GraphicsConfirmationScreen.ChoiceButton(GRAPHICS_WARNING_ACCEPT_TEXT, arg -> {
                     this.gameOptions.graphicsMode = GraphicsMode.FABULOUS;
                     MinecraftClient.getInstance().worldRenderer.reload();
                     this.field_25688.method_30139();
                     this.client.openScreen(this);
-                }), (Object)new class_5405.class_5406(field_25686, arg -> {
+                }), (Object)new GraphicsConfirmationScreen.ChoiceButton(GRAPHICS_WARNING_CANCEL_TEXT, arg -> {
                     this.field_25688.method_30140();
                     this.client.openScreen(this);
                 }))));
@@ -145,20 +145,20 @@ extends GameOptionsScreen {
 
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
-        this.field_25453 = null;
-        Optional<AbstractButtonWidget> optional = this.list.method_29624(i, j);
+        this.tooltip = null;
+        Optional<AbstractButtonWidget> optional = this.list.getHoveredButton(i, j);
         if (optional.isPresent() && optional.get() instanceof OptionButtonWidget) {
-            Optional<List<StringRenderable>> optional2 = ((OptionButtonWidget)optional.get()).method_29623().method_29619();
+            Optional<List<StringRenderable>> optional2 = ((OptionButtonWidget)optional.get()).getOption().getTooltip();
             optional2.ifPresent(list -> {
-                this.field_25453 = list;
+                this.tooltip = list;
             });
         }
         this.renderBackground(arg);
         this.list.render(arg, i, j, f);
         this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 5, 0xFFFFFF);
         super.render(arg, i, j, f);
-        if (this.field_25453 != null) {
-            this.renderTooltip(arg, this.field_25453, i, j);
+        if (this.tooltip != null) {
+            this.renderTooltip(arg, this.tooltip, i, j);
         }
     }
 }

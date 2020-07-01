@@ -18,6 +18,8 @@ import java.util.Set;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
+import net.minecraft.class_5418;
+import net.minecraft.class_5419;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -38,7 +40,7 @@ public class PiglinSpecificSensor
 extends Sensor<LivingEntity> {
     @Override
     public Set<MemoryModuleType<?>> getOutputMemoryModules() {
-        return ImmutableSet.of(MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.MOBS, MemoryModuleType.NEAREST_VISIBLE_NEMESIS, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, (Object[])new MemoryModuleType[]{MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEAREST_ADULT_PIGLINS, MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, MemoryModuleType.NEAREST_REPELLENT});
+        return ImmutableSet.of(MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.MOBS, MemoryModuleType.NEAREST_VISIBLE_NEMESIS, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, (Object[])new MemoryModuleType[]{MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEARBY_ADULT_PIGLINS, MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, MemoryModuleType.NEAREST_REPELLENT});
     }
 
     @Override
@@ -69,13 +71,17 @@ extends Sensor<LivingEntity> {
                 optional2 = Optional.of(lv3);
                 continue;
             }
+            if (lv2 instanceof class_5419) {
+                list.add((class_5419)lv2);
+                continue;
+            }
             if (lv2 instanceof PiglinEntity) {
                 PiglinEntity lv4 = (PiglinEntity)lv2;
                 if (lv4.isBaby() && !optional4.isPresent()) {
                     optional4 = Optional.of(lv4);
                     continue;
                 }
-                if (!lv4.isAdult()) continue;
+                if (!lv4.method_30236()) continue;
                 list.add(lv4);
                 continue;
             }
@@ -97,17 +103,16 @@ extends Sensor<LivingEntity> {
         }
         List<LivingEntity> list4 = lv.getOptionalMemory(MemoryModuleType.MOBS).orElse((List<LivingEntity>)ImmutableList.of());
         for (LivingEntity lv6 : list4) {
-            if (!(lv6 instanceof PiglinEntity) || !((PiglinEntity)lv6).isAdult()) continue;
-            list2.add((PiglinEntity)lv6);
+            if (!(lv6 instanceof class_5418) || !((class_5418)lv6).method_30236()) continue;
+            list2.add((class_5418)lv6);
         }
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, optional2);
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, optional3);
-        lv.remember(MemoryModuleType.NEAREST_VISIBLE_BABY_PIGLIN, optional4);
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, optional5);
         lv.remember(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, optional6);
         lv.remember(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, optional7);
-        lv.remember(MemoryModuleType.NEAREST_ADULT_PIGLINS, list2);
+        lv.remember(MemoryModuleType.NEARBY_ADULT_PIGLINS, list2);
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, list);
         lv.remember(MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, list.size());
         lv.remember(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, i);

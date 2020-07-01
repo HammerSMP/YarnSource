@@ -71,7 +71,7 @@ public class GeneratorOptions {
     private final long seed;
     private final boolean generateStructures;
     private final boolean bonusChest;
-    private final SimpleRegistry<DimensionOptions> field_24827;
+    private final SimpleRegistry<DimensionOptions> options;
     private final Optional<String> legacyCustomOptions;
 
     private DataResult<GeneratorOptions> method_28610() {
@@ -82,7 +82,7 @@ public class GeneratorOptions {
     }
 
     private boolean method_28611() {
-        return DimensionOptions.method_29567(this.seed, this.field_24827);
+        return DimensionOptions.method_29567(this.seed, this.options);
     }
 
     public GeneratorOptions(long l, boolean bl, boolean bl2, SimpleRegistry<DimensionOptions> arg) {
@@ -93,7 +93,7 @@ public class GeneratorOptions {
         this.seed = l;
         this.generateStructures = bl;
         this.bonusChest = bl2;
-        this.field_24827 = arg;
+        this.options = arg;
         this.legacyCustomOptions = optional;
     }
 
@@ -139,18 +139,18 @@ public class GeneratorOptions {
     }
 
     public SimpleRegistry<DimensionOptions> getDimensionMap() {
-        return this.field_24827;
+        return this.options;
     }
 
     public ChunkGenerator getChunkGenerator() {
-        DimensionOptions lv = this.field_24827.get(DimensionOptions.OVERWORLD);
+        DimensionOptions lv = this.options.get(DimensionOptions.OVERWORLD);
         if (lv == null) {
             return GeneratorOptions.createOverworldGenerator(new Random().nextLong());
         }
         return lv.getChunkGenerator();
     }
 
-    public ImmutableSet<RegistryKey<World>> method_29575() {
+    public ImmutableSet<RegistryKey<World>> getWorlds() {
         return (ImmutableSet)this.getDimensionMap().getEntries().stream().map(entry -> RegistryKey.of(Registry.DIMENSION, ((RegistryKey)entry.getKey()).getValue())).collect(ImmutableSet.toImmutableSet());
     }
 
@@ -168,17 +168,17 @@ public class GeneratorOptions {
     }
 
     public GeneratorOptions withBonusChest() {
-        return new GeneratorOptions(this.seed, this.generateStructures, true, this.field_24827, this.legacyCustomOptions);
+        return new GeneratorOptions(this.seed, this.generateStructures, true, this.options, this.legacyCustomOptions);
     }
 
     @Environment(value=EnvType.CLIENT)
     public GeneratorOptions toggleGenerateStructures() {
-        return new GeneratorOptions(this.seed, !this.generateStructures, this.bonusChest, this.field_24827);
+        return new GeneratorOptions(this.seed, !this.generateStructures, this.bonusChest, this.options);
     }
 
     @Environment(value=EnvType.CLIENT)
     public GeneratorOptions toggleBonusChest() {
-        return new GeneratorOptions(this.seed, this.generateStructures, !this.bonusChest, this.field_24827);
+        return new GeneratorOptions(this.seed, this.generateStructures, !this.bonusChest, this.options);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -237,14 +237,14 @@ public class GeneratorOptions {
         if (optionalLong.isPresent()) {
             SimpleRegistry<DimensionOptions> lv = new SimpleRegistry<DimensionOptions>(Registry.DIMENSION_OPTIONS, Lifecycle.experimental());
             long m = optionalLong.getAsLong();
-            for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : this.field_24827.getEntries()) {
+            for (Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : this.options.getEntries()) {
                 RegistryKey<DimensionOptions> lv2 = entry.getKey();
                 lv.add(lv2, new DimensionOptions(entry.getValue().getDimensionTypeSupplier(), entry.getValue().getChunkGenerator().withSeed(m)));
-                if (!this.field_24827.isLoaded(lv2)) continue;
+                if (!this.options.isLoaded(lv2)) continue;
                 lv.markLoaded(lv2);
             }
         } else {
-            lv3 = this.field_24827;
+            lv3 = this.options;
         }
         if (this.isDebugWorld()) {
             GeneratorOptions lv4 = new GeneratorOptions(l, false, false, lv3);

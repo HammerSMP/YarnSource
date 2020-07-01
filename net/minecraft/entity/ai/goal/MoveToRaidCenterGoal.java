@@ -14,7 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.raid.RaiderEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
@@ -48,7 +48,7 @@ extends Goal {
             if (((RaiderEntity)this.actor).age % 20 == 0) {
                 this.includeFreeRaiders(lv);
             }
-            if (!((MobEntityWithAi)this.actor).isNavigating() && (lv2 = TargetFinder.findTargetTowards(this.actor, 15, 4, Vec3d.ofBottomCenter(lv.getCenter()))) != null) {
+            if (!((PathAwareEntity)this.actor).isNavigating() && (lv2 = TargetFinder.findTargetTowards(this.actor, 15, 4, Vec3d.ofBottomCenter(lv.getCenter()))) != null) {
                 ((MobEntity)this.actor).getNavigation().startMovingTo(lv2.x, lv2.y, lv2.z, 1.0);
             }
         }

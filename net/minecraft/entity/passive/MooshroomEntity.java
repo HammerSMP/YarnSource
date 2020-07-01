@@ -75,8 +75,8 @@ implements Shearable {
     }
 
     @Override
-    public void onStruckByLightning(LightningEntity arg) {
-        UUID uUID = arg.getUuid();
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
+        UUID uUID = arg2.getUuid();
         if (!uUID.equals(this.lightningId)) {
             this.setType(this.getMooshroomType() == Type.RED ? Type.BROWN : Type.RED);
             this.lightningId = uUID;
@@ -106,7 +106,7 @@ implements Shearable {
             } else {
                 lv3 = new ItemStack(Items.MUSHROOM_STEW);
             }
-            ItemStack lv4 = ItemUsage.method_30012(lv, arg, lv3);
+            ItemStack lv4 = ItemUsage.method_30270(lv, arg, lv3, false);
             arg.setStackInHand(arg22, lv4);
             if (bl) {
                 SoundEvent lv5 = SoundEvents.ENTITY_MOOSHROOM_SUSPICIOUS_MILK;
@@ -220,9 +220,9 @@ implements Shearable {
     }
 
     @Override
-    public MooshroomEntity createChild(PassiveEntity arg) {
-        MooshroomEntity lv = EntityType.MOOSHROOM.create(this.world);
-        lv.setType(this.chooseBabyType((MooshroomEntity)arg));
+    public MooshroomEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        MooshroomEntity lv = EntityType.MOOSHROOM.create(arg);
+        lv.setType(this.chooseBabyType((MooshroomEntity)arg2));
         return lv;
     }
 
@@ -239,13 +239,13 @@ implements Shearable {
     }
 
     @Override
-    public /* synthetic */ CowEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ CowEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     public static enum Type {

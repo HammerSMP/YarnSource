@@ -312,7 +312,7 @@ public abstract class AbstractBlock {
     }
 
     @Deprecated
-    public void onStacksDropped(BlockState arg, World arg2, BlockPos arg3, ItemStack arg4) {
+    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
     }
 
     @Deprecated
@@ -641,7 +641,7 @@ public abstract class AbstractBlock {
             this.getBlock().onEntityCollision(this.asBlockState(), arg, arg2, arg3);
         }
 
-        public void onStacksDropped(World arg, BlockPos arg2, ItemStack arg3) {
+        public void onStacksDropped(ServerWorld arg, BlockPos arg2, ItemStack arg3) {
             this.getBlock().onStacksDropped(this.asBlockState(), arg, arg2, arg3);
         }
 

@@ -53,7 +53,7 @@ implements ArgumentType<ItemPredicateArgument> {
         }
         Identifier lv3 = lv.getId();
         return commandContext -> {
-            Tag<Item> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getTagManager().items().get(lv3);
+            Tag<Item> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getTagManager().method_30218().method_30210(lv3);
             if (lv == null) {
                 throw UNKNOWN_TAG_EXCEPTION.create((Object)lv3.toString());
             }

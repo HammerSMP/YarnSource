@@ -31,6 +31,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.VineBlock;
+import net.minecraft.class_5425;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -154,7 +155,7 @@ extends SimpleStructurePiece {
     }
 
     @Override
-    protected void handleMetadata(String string, BlockPos arg, WorldAccess arg2, Random random, BlockBox arg3) {
+    protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
     }
 
     private void generateVines(Random random, WorldAccess arg, BlockPos arg2) {
@@ -233,7 +234,7 @@ extends SimpleStructurePiece {
 
     private boolean canFillNetherrack(WorldAccess arg, BlockPos arg2) {
         BlockState lv = arg.getBlockState(arg2);
-        return !lv.isOf(Blocks.AIR) && !lv.isOf(Blocks.OBSIDIAN) && (this.verticalPlacement == VerticalPlacement.IN_NETHER || !lv.isOf(Blocks.LAVA));
+        return !lv.isOf(Blocks.AIR) && !lv.isOf(Blocks.OBSIDIAN) && !lv.isOf(Blocks.CHEST) && (this.verticalPlacement == VerticalPlacement.IN_NETHER || !lv.isOf(Blocks.LAVA));
     }
 
     private void placeNetherrackBottom(Random random, WorldAccess arg, BlockPos arg2) {

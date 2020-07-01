@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5425;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -51,6 +52,7 @@ import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.Schedule;
+import net.minecraft.entity.ai.brain.sensor.GolemLastSeenSensor;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.ai.brain.task.Task;
@@ -106,7 +108,6 @@ import net.minecraft.village.raid.Raid;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 import org.apache.logging.log4j.Logger;
@@ -131,8 +132,8 @@ VillagerDataContainer {
     private int restocksToday;
     private long lastRestockCheckTime;
     private boolean natural;
-    private static final ImmutableList<MemoryModuleType<?>> MEMORY_MODULES = ImmutableList.of(MemoryModuleType.HOME, MemoryModuleType.JOB_SITE, MemoryModuleType.POTENTIAL_JOB_SITE, MemoryModuleType.MEETING_POINT, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.VISIBLE_VILLAGER_BABIES, MemoryModuleType.NEAREST_PLAYERS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, MemoryModuleType.WALK_TARGET, (Object[])new MemoryModuleType[]{MemoryModuleType.LOOK_TARGET, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.BREED_TARGET, MemoryModuleType.PATH, MemoryModuleType.INTERACTABLE_DOORS, MemoryModuleType.OPENED_DOORS, MemoryModuleType.NEAREST_BED, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.NEAREST_HOSTILE, MemoryModuleType.SECONDARY_JOB_SITE, MemoryModuleType.HIDING_PLACE, MemoryModuleType.HEARD_BELL_TIME, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.LAST_SLEPT, MemoryModuleType.LAST_WOKEN, MemoryModuleType.LAST_WORKED_AT_POI, MemoryModuleType.GOLEM_LAST_SEEN_TIME});
-    private static final ImmutableList<SensorType<? extends Sensor<? super VillagerEntity>>> SENSORS = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.INTERACTABLE_DOORS, SensorType.NEAREST_BED, SensorType.HURT_BY, SensorType.VILLAGER_HOSTILES, SensorType.VILLAGER_BABIES, SensorType.SECONDARY_POIS, SensorType.GOLEM_LAST_SEEN);
+    private static final ImmutableList<MemoryModuleType<?>> MEMORY_MODULES = ImmutableList.of(MemoryModuleType.HOME, MemoryModuleType.JOB_SITE, MemoryModuleType.POTENTIAL_JOB_SITE, MemoryModuleType.MEETING_POINT, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.VISIBLE_VILLAGER_BABIES, MemoryModuleType.NEAREST_PLAYERS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, MemoryModuleType.WALK_TARGET, (Object[])new MemoryModuleType[]{MemoryModuleType.LOOK_TARGET, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.BREED_TARGET, MemoryModuleType.PATH, MemoryModuleType.INTERACTABLE_DOORS, MemoryModuleType.OPENED_DOORS, MemoryModuleType.NEAREST_BED, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.NEAREST_HOSTILE, MemoryModuleType.SECONDARY_JOB_SITE, MemoryModuleType.HIDING_PLACE, MemoryModuleType.HEARD_BELL_TIME, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.LAST_SLEPT, MemoryModuleType.LAST_WOKEN, MemoryModuleType.LAST_WORKED_AT_POI, MemoryModuleType.GOLEM_DETECTED_RECENTLY});
+    private static final ImmutableList<SensorType<? extends Sensor<? super VillagerEntity>>> SENSORS = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.INTERACTABLE_DOORS, SensorType.NEAREST_BED, SensorType.HURT_BY, SensorType.VILLAGER_HOSTILES, SensorType.VILLAGER_BABIES, SensorType.SECONDARY_POIS, SensorType.GOLEM_DETECTED);
     public static final Map<MemoryModuleType<GlobalPos>, BiPredicate<VillagerEntity, PointOfInterestType>> POINTS_OF_INTEREST = ImmutableMap.of(MemoryModuleType.HOME, (arg, arg2) -> arg2 == PointOfInterestType.HOME, MemoryModuleType.JOB_SITE, (arg, arg2) -> arg.getVillagerData().getProfession().getWorkStation() == arg2, MemoryModuleType.POTENTIAL_JOB_SITE, (arg, arg2) -> PointOfInterestType.IS_USED_BY_PROFESSION.test((PointOfInterestType)arg2), MemoryModuleType.MEETING_POINT, (arg, arg2) -> arg2 == PointOfInterestType.MEETING);
 
     public VillagerEntity(EntityType<? extends VillagerEntity> arg, World arg2) {
@@ -636,7 +637,7 @@ VillagerDataContainer {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg3 == SpawnReason.BREEDING) {
             this.setVillagerData(this.getVillagerData().withProfession(VillagerProfession.NONE));
         }
@@ -650,38 +651,38 @@ VillagerDataContainer {
     }
 
     @Override
-    public VillagerEntity createChild(PassiveEntity arg) {
+    public VillagerEntity createChild(ServerWorld arg, PassiveEntity arg2) {
         VillagerType lv3;
         double d = this.random.nextDouble();
         if (d < 0.5) {
-            VillagerType lv = VillagerType.forBiome(this.world.getBiome(this.getBlockPos()));
+            VillagerType lv = VillagerType.forBiome(arg.getBiome(this.getBlockPos()));
         } else if (d < 0.75) {
             VillagerType lv2 = this.getVillagerData().getType();
         } else {
-            lv3 = ((VillagerEntity)arg).getVillagerData().getType();
+            lv3 = ((VillagerEntity)arg2).getVillagerData().getType();
         }
-        VillagerEntity lv4 = new VillagerEntity(EntityType.VILLAGER, this.world, lv3);
-        lv4.initialize(this.world, this.world.getLocalDifficulty(lv4.getBlockPos()), SpawnReason.BREEDING, null, null);
+        VillagerEntity lv4 = new VillagerEntity(EntityType.VILLAGER, arg, lv3);
+        lv4.initialize(arg, arg.getLocalDifficulty(lv4.getBlockPos()), SpawnReason.BREEDING, null, null);
         return lv4;
     }
 
     @Override
-    public void onStruckByLightning(LightningEntity arg) {
-        if (this.world.getDifficulty() != Difficulty.PEACEFUL) {
-            LOGGER.info("Villager {} was struck by lightning {}.", (Object)this, (Object)arg);
-            WitchEntity lv = EntityType.WITCH.create(this.world);
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
+        if (arg.getDifficulty() != Difficulty.PEACEFUL) {
+            LOGGER.info("Villager {} was struck by lightning {}.", (Object)this, (Object)arg2);
+            WitchEntity lv = EntityType.WITCH.create(arg);
             lv.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
-            lv.initialize(this.world, this.world.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, null, null);
+            lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, null, null);
             lv.setAiDisabled(this.isAiDisabled());
             if (this.hasCustomName()) {
                 lv.setCustomName(this.getCustomName());
                 lv.setCustomNameVisible(this.isCustomNameVisible());
             }
             lv.setPersistent();
-            this.world.spawnEntity(lv);
+            arg.spawnEntity(lv);
             this.remove();
         } else {
-            super.onStruckByLightning(arg);
+            super.onStruckByLightning(arg, arg2);
         }
     }
 
@@ -743,14 +744,14 @@ VillagerDataContainer {
         this.fillRecipesFromPool(lv2, lvs, 2);
     }
 
-    public void talkWithVillager(VillagerEntity arg, long l) {
-        if (l >= this.gossipStartTime && l < this.gossipStartTime + 1200L || l >= arg.gossipStartTime && l < arg.gossipStartTime + 1200L) {
+    public void talkWithVillager(ServerWorld arg, VillagerEntity arg2, long l) {
+        if (l >= this.gossipStartTime && l < this.gossipStartTime + 1200L || l >= arg2.gossipStartTime && l < arg2.gossipStartTime + 1200L) {
             return;
         }
-        this.gossip.shareGossipFrom(arg.gossip, this.random, 10);
+        this.gossip.shareGossipFrom(arg2.gossip, this.random, 10);
         this.gossipStartTime = l;
-        arg.gossipStartTime = l;
-        this.summonGolem(l, 5);
+        arg2.gossipStartTime = l;
+        this.summonGolem(arg, l, 5);
     }
 
     private void decayGossip() {
@@ -766,54 +767,41 @@ VillagerDataContainer {
         this.lastGossipDecayTime = l;
     }
 
-    public void summonGolem(long l, int i) {
+    public void summonGolem(ServerWorld arg2, long l, int i) {
         if (!this.canSummonGolem(l)) {
             return;
         }
         Box lv = this.getBoundingBox().expand(10.0, 10.0, 10.0);
-        List<VillagerEntity> list = this.world.getNonSpectatingEntities(VillagerEntity.class, lv);
+        List<VillagerEntity> list = arg2.getNonSpectatingEntities(VillagerEntity.class, lv);
         List list2 = list.stream().filter(arg -> arg.canSummonGolem(l)).limit(5L).collect(Collectors.toList());
         if (list2.size() < i) {
             return;
         }
-        IronGolemEntity lv2 = this.spawnIronGolem();
+        IronGolemEntity lv2 = this.spawnIronGolem(arg2);
         if (lv2 == null) {
             return;
         }
-        list.forEach(arg -> arg.setGolemLastSeenTime(l));
-    }
-
-    private void setGolemLastSeenTime(long l) {
-        this.brain.remember(MemoryModuleType.GOLEM_LAST_SEEN_TIME, l);
-    }
-
-    private boolean hasSeenGolemRecently(long l) {
-        Optional<Long> optional = this.brain.getOptionalMemory(MemoryModuleType.GOLEM_LAST_SEEN_TIME);
-        if (!optional.isPresent()) {
-            return false;
-        }
-        Long long_ = optional.get();
-        return l - long_ <= 600L;
+        list.forEach(GolemLastSeenSensor::method_30233);
     }
 
     public boolean canSummonGolem(long l) {
         if (!this.hasRecentlyWorkedAndSlept(this.world.getTime())) {
             return false;
         }
-        return !this.hasSeenGolemRecently(l);
+        return !this.brain.hasMemoryModule(MemoryModuleType.GOLEM_DETECTED_RECENTLY);
     }
 
     @Nullable
-    private IronGolemEntity spawnIronGolem() {
+    private IronGolemEntity spawnIronGolem(ServerWorld arg) {
         BlockPos lv = this.getBlockPos();
         for (int i = 0; i < 10; ++i) {
             IronGolemEntity lv3;
             double e;
-            double d = this.world.random.nextInt(16) - 8;
-            BlockPos lv2 = this.method_30023(lv, d, e = (double)(this.world.random.nextInt(16) - 8));
-            if (lv2 == null || (lv3 = EntityType.IRON_GOLEM.create(this.world, null, null, null, lv2, SpawnReason.MOB_SUMMONED, false, false)) == null) continue;
-            if (lv3.canSpawn(this.world, SpawnReason.MOB_SUMMONED) && lv3.canSpawn(this.world)) {
-                this.world.spawnEntity(lv3);
+            double d = arg.random.nextInt(16) - 8;
+            BlockPos lv2 = this.method_30023(lv, d, e = (double)(arg.random.nextInt(16) - 8));
+            if (lv2 == null || (lv3 = EntityType.IRON_GOLEM.create(arg, null, null, null, lv2, SpawnReason.MOB_SUMMONED, false, false)) == null) continue;
+            if (lv3.canSpawn(arg, SpawnReason.MOB_SUMMONED) && lv3.canSpawn(arg)) {
+                arg.spawnEntity(lv3);
                 return lv3;
             }
             lv3.remove();
@@ -902,8 +890,8 @@ VillagerDataContainer {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 }
 

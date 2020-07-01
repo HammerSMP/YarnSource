@@ -76,7 +76,7 @@ extends Task<VillagerEntity> {
             arg.sendEntityStatus(arg3, (byte)13);
             arg.sendEntityStatus(arg2, (byte)13);
         } else {
-            Optional<VillagerEntity> optional2 = this.createChild(arg2, arg3);
+            Optional<VillagerEntity> optional2 = this.createChild(arg, arg2, arg3);
             if (optional2.isPresent()) {
                 this.setChildHome(arg, optional2.get(), optional.get());
             } else {
@@ -109,17 +109,17 @@ extends Task<VillagerEntity> {
         return lv != null && lv.reachesTarget();
     }
 
-    private Optional<VillagerEntity> createChild(VillagerEntity arg, VillagerEntity arg2) {
-        VillagerEntity lv = arg.createChild(arg2);
+    private Optional<VillagerEntity> createChild(ServerWorld arg, VillagerEntity arg2, VillagerEntity arg3) {
+        VillagerEntity lv = arg2.createChild(arg, arg3);
         if (lv == null) {
             return Optional.empty();
         }
-        arg.setBreedingAge(6000);
         arg2.setBreedingAge(6000);
+        arg3.setBreedingAge(6000);
         lv.setBreedingAge(-24000);
-        lv.refreshPositionAndAngles(arg.getX(), arg.getY(), arg.getZ(), 0.0f, 0.0f);
-        arg.world.spawnEntity(lv);
-        arg.world.sendEntityStatus(lv, (byte)12);
+        lv.refreshPositionAndAngles(arg2.getX(), arg2.getY(), arg2.getZ(), 0.0f, 0.0f);
+        arg2.world.spawnEntity(lv);
+        arg2.world.sendEntityStatus(lv, (byte)12);
         return Optional.of(lv);
     }
 

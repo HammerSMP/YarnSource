@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.goal.WanderAroundGoal;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -23,7 +23,7 @@ import net.minecraft.world.poi.PointOfInterestStorage;
 
 public class IronGolemWanderAroundGoal
 extends WanderAroundGoal {
-    public IronGolemWanderAroundGoal(MobEntityWithAi arg, double d) {
+    public IronGolemWanderAroundGoal(PathAwareEntity arg, double d) {
         super(arg, d, 240, false);
     }
 

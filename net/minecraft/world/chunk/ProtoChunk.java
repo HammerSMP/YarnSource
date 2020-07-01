@@ -427,13 +427,13 @@ implements Chunk {
     }
 
     @Override
-    public CompoundTag getBlockEntityTagAt(BlockPos arg) {
+    public CompoundTag getBlockEntityTag(BlockPos arg) {
         return this.blockEntityTags.get(arg);
     }
 
     @Override
     @Nullable
-    public CompoundTag method_20598(BlockPos arg) {
+    public CompoundTag getPackedBlockEntityTag(BlockPos arg) {
         BlockEntity lv = this.getBlockEntity(arg);
         if (lv != null) {
             return lv.toTag(new CompoundTag());
@@ -452,7 +452,7 @@ implements Chunk {
         return this.carvingMasks.get(arg);
     }
 
-    public BitSet method_28510(GenerationStep.Carver arg2) {
+    public BitSet getOrCreateCarvingMask(GenerationStep.Carver arg2) {
         return this.carvingMasks.computeIfAbsent(arg2, arg -> new BitSet(65536));
     }
 

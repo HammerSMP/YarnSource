@@ -14,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.SpawnHelper;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Spawner;
 
@@ -83,7 +82,7 @@ implements Spawner {
         return m;
     }
 
-    private boolean spawnOneEntity(World arg, BlockPos arg2, Random random, boolean bl) {
+    private boolean spawnOneEntity(ServerWorld arg, BlockPos arg2, Random random, boolean bl) {
         BlockState lv = arg.getBlockState(arg2);
         if (!SpawnHelper.isClearForSpawn(arg, arg2, lv, lv.getFluidState(), EntityType.PILLAGER)) {
             return false;

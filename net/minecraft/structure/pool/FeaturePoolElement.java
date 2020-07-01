@@ -86,7 +86,7 @@ extends StructurePoolElement {
 
     @Override
     public boolean generate(StructureManager arg, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
-        return this.feature.generate(arg2, arg3, arg4, random, arg5);
+        return this.feature.generate(arg2, arg4, random, arg5);
     }
 
     @Override

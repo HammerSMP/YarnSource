@@ -43,7 +43,7 @@ implements ArgumentType<Identifier> {
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
         if (commandContext.getSource() instanceof CommandSource) {
-            return CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).method_29310().stream().map(RegistryKey::getValue), suggestionsBuilder);
+            return CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).getWorldKeys().stream().map(RegistryKey::getValue), suggestionsBuilder);
         }
         return Suggestions.empty();
     }

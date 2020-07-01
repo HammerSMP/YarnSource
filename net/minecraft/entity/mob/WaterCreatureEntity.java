@@ -7,15 +7,15 @@ import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
 public abstract class WaterCreatureEntity
-extends MobEntityWithAi {
+extends PathAwareEntity {
     protected WaterCreatureEntity(EntityType<? extends WaterCreatureEntity> arg, World arg2) {
-        super((EntityType<? extends MobEntityWithAi>)arg, arg2);
+        super((EntityType<? extends PathAwareEntity>)arg, arg2);
         this.setPathfindingPenalty(PathNodeType.WATER, 0.0f);
     }
 

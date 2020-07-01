@@ -8,6 +8,7 @@ package net.minecraft.entity.mob;
 
 import java.util.EnumSet;
 import javax.annotation.Nullable;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -30,7 +31,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.raid.RaiderEntity;
 import net.minecraft.item.ItemStack;
@@ -43,7 +44,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public class VexEntity
 extends HostileEntity {
@@ -188,7 +188,7 @@ extends HostileEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.initEquipment(arg2);
         this.updateEnchantments(arg2);
         return super.initialize(arg, arg2, arg3, arg4, arg5);
@@ -204,7 +204,7 @@ extends HostileEntity {
     extends TrackTargetGoal {
         private final TargetPredicate TRACK_OWNER_PREDICATE;
 
-        public TrackOwnerTargetGoal(MobEntityWithAi arg2) {
+        public TrackOwnerTargetGoal(PathAwareEntity arg2) {
             super(arg2, false);
             this.TRACK_OWNER_PREDICATE = new TargetPredicate().includeHidden().ignoreDistanceScalingFactor();
         }

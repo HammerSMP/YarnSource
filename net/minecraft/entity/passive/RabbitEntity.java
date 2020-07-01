@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CarrotsBlock;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -42,7 +43,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.WolfEntity;
@@ -52,6 +53,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -90,7 +92,7 @@ extends AnimalEntity {
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(1, new EscapeDangerGoal(this, 2.2));
         this.goalSelector.add(2, new AnimalMateGoal(this, 0.8));
-        this.goalSelector.add(3, new TemptGoal((MobEntityWithAi)this, 1.0, Ingredient.ofItems(Items.CARROT, Items.GOLDEN_CARROT, Blocks.DANDELION), false));
+        this.goalSelector.add(3, new TemptGoal((PathAwareEntity)this, 1.0, Ingredient.ofItems(Items.CARROT, Items.GOLDEN_CARROT, Blocks.DANDELION), false));
         this.goalSelector.add(4, new FleeGoal<PlayerEntity>(this, PlayerEntity.class, 8.0f, 2.2, 2.2));
         this.goalSelector.add(4, new FleeGoal<WolfEntity>(this, WolfEntity.class, 10.0f, 2.2, 2.2));
         this.goalSelector.add(4, new FleeGoal<HostileEntity>(this, HostileEntity.class, 4.0f, 2.2, 2.2));
@@ -306,11 +308,11 @@ extends AnimalEntity {
     }
 
     @Override
-    public RabbitEntity createChild(PassiveEntity arg) {
-        RabbitEntity lv = EntityType.RABBIT.create(this.world);
-        int i = this.chooseType(this.world);
+    public RabbitEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        RabbitEntity lv = EntityType.RABBIT.create(arg);
+        int i = this.chooseType(arg);
         if (this.random.nextInt(20) != 0) {
-            i = arg instanceof RabbitEntity && this.random.nextBoolean() ? ((RabbitEntity)arg).getRabbitType() : this.getRabbitType();
+            i = arg2 instanceof RabbitEntity && this.random.nextBoolean() ? ((RabbitEntity)arg2).getRabbitType() : this.getRabbitType();
         }
         lv.setRabbitType(i);
         return lv;
@@ -341,7 +343,7 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         int i = this.chooseType(arg);
         if (arg4 instanceof RabbitData) {
             i = ((RabbitData)arg4).type;
@@ -392,8 +394,8 @@ extends AnimalEntity {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     static class RabbitAttackGoal

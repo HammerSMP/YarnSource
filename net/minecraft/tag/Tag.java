@@ -29,14 +29,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import net.minecraft.class_5414;
 import net.minecraft.tag.SetTag;
-import net.minecraft.tag.TagContainer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 public interface Tag<T> {
-    public static <T> Codec<Tag<T>> method_28134(Supplier<TagContainer<T>> supplier) {
-        return Identifier.CODEC.flatXmap(arg -> Optional.ofNullable(((TagContainer)supplier.get()).get((Identifier)arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))), arg -> Optional.ofNullable(((TagContainer)supplier.get()).getId(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))));
+    public static <T> Codec<Tag<T>> method_28134(Supplier<class_5414<T>> supplier) {
+        return Identifier.CODEC.flatXmap(arg -> Optional.ofNullable(((class_5414)supplier.get()).method_30210((Identifier)arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))), arg -> Optional.ofNullable(((class_5414)supplier.get()).method_30205(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown tag: " + arg))));
     }
 
     public boolean contains(T var1);

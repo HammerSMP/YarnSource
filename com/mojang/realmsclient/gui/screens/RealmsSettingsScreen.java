@@ -24,7 +24,7 @@ import net.minecraft.text.TranslatableText;
 @Environment(value=EnvType.CLIENT)
 public class RealmsSettingsScreen
 extends RealmsScreen {
-    private final RealmsConfigureWorldScreen configureWorldScreen;
+    private final RealmsConfigureWorldScreen parent;
     private final RealmsServer serverData;
     private ButtonWidget doneButton;
     private TextFieldWidget descEdit;
@@ -32,7 +32,7 @@ extends RealmsScreen {
     private RealmsLabel titleLabel;
 
     public RealmsSettingsScreen(RealmsConfigureWorldScreen arg, RealmsServer arg2) {
-        this.configureWorldScreen = arg;
+        this.parent = arg;
         this.serverData = arg2;
     }
 
@@ -48,7 +48,7 @@ extends RealmsScreen {
         this.client.keyboard.enableRepeatEvents(true);
         int i = this.width / 2 - 106;
         this.doneButton = this.addButton(new ButtonWidget(i - 2, RealmsSettingsScreen.row(12), 106, 20, new TranslatableText("mco.configure.world.buttons.done"), arg -> this.save()));
-        this.addButton(new ButtonWidget(this.width / 2 + 2, RealmsSettingsScreen.row(12), 106, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.configureWorldScreen)));
+        this.addButton(new ButtonWidget(this.width / 2 + 2, RealmsSettingsScreen.row(12), 106, 20, ScreenTexts.CANCEL, arg -> this.client.openScreen(this.parent)));
         String string = this.serverData.state == RealmsServer.State.OPEN ? "mco.configure.world.buttons.close" : "mco.configure.world.buttons.open";
         ButtonWidget lv = new ButtonWidget(this.width / 2 - 53, RealmsSettingsScreen.row(0), 106, 20, new TranslatableText(string), arg -> {
             if (this.serverData.state == RealmsServer.State.OPEN) {
@@ -56,13 +56,13 @@ extends RealmsScreen {
                 TranslatableText lv2 = new TranslatableText("mco.configure.world.close.question.line2");
                 this.client.openScreen(new RealmsLongConfirmationScreen(bl -> {
                     if (bl) {
-                        this.configureWorldScreen.closeTheWorld(this);
+                        this.parent.closeTheWorld(this);
                     } else {
                         this.client.openScreen(this);
                     }
                 }, RealmsLongConfirmationScreen.Type.Info, lv, lv2, true));
             } else {
-                this.configureWorldScreen.openTheWorld(false, this);
+                this.parent.openTheWorld(false, this);
             }
         });
         this.addButton(lv);
@@ -87,7 +87,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.configureWorldScreen);
+            this.client.openScreen(this.parent);
             return true;
         }
         return super.keyPressed(i, j, k);
@@ -105,7 +105,7 @@ extends RealmsScreen {
     }
 
     public void save() {
-        this.configureWorldScreen.saveSettings(this.nameEdit.getText(), this.descEdit.getText());
+        this.parent.saveSettings(this.nameEdit.getText(), this.descEdit.getText());
     }
 }
 

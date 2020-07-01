@@ -15,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.HugeMushroomFeatureConfig;
@@ -48,7 +47,7 @@ extends Feature<HugeMushroomFeatureConfig> {
             return false;
         }
         Block lv = arg.getBlockState(arg2.down()).getBlock();
-        if (!HugeMushroomFeature.isSoil(lv)) {
+        if (!HugeMushroomFeature.isSoil(lv) && !lv.isIn(BlockTags.MUSHROOM_GROW_BLOCK)) {
             return false;
         }
         for (int k = 0; k <= i; ++k) {
@@ -65,14 +64,14 @@ extends Feature<HugeMushroomFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, HugeMushroomFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, HugeMushroomFeatureConfig arg4) {
         BlockPos.Mutable lv;
         int i = this.getHeight(random);
-        if (!this.canGenerate(arg, arg4, i, lv = new BlockPos.Mutable(), arg5)) {
+        if (!this.canGenerate(arg, arg3, i, lv = new BlockPos.Mutable(), arg4)) {
             return false;
         }
-        this.generateCap(arg, random, arg4, i, lv, arg5);
-        this.generateStem(arg, random, arg4, arg5, i, lv);
+        this.generateCap(arg, random, arg3, i, lv, arg4);
+        this.generateStem(arg, random, arg3, arg4, i, lv);
         return true;
     }
 

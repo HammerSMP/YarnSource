@@ -8,7 +8,7 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.BirdNavigation;
 import net.minecraft.entity.ai.pathing.MobNavigation;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -16,7 +16,7 @@ import net.minecraft.recipe.Ingredient;
 public class TemptGoal
 extends Goal {
     private static final TargetPredicate TEMPTING_ENTITY_PREDICATE = new TargetPredicate().setBaseMaxDistance(10.0).includeInvulnerable().includeTeammates().ignoreEntityTargetRules().includeHidden();
-    protected final MobEntityWithAi mob;
+    protected final PathAwareEntity mob;
     private final double speed;
     private double lastPlayerX;
     private double lastPlayerY;
@@ -29,11 +29,11 @@ extends Goal {
     private final Ingredient food;
     private final boolean canBeScared;
 
-    public TemptGoal(MobEntityWithAi arg, double d, Ingredient arg2, boolean bl) {
+    public TemptGoal(PathAwareEntity arg, double d, Ingredient arg2, boolean bl) {
         this(arg, d, bl, arg2);
     }
 
-    public TemptGoal(MobEntityWithAi arg, double d, boolean bl, Ingredient arg2) {
+    public TemptGoal(PathAwareEntity arg, double d, boolean bl, Ingredient arg2) {
         this.mob = arg;
         this.speed = d;
         this.food = arg2;

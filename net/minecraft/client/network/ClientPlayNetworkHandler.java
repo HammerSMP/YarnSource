@@ -4,6 +4,7 @@
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Maps
+ *  com.google.common.collect.Multimap
  *  com.google.common.collect.Sets
  *  com.mojang.authlib.GameProfile
  *  com.mojang.brigadier.CommandDispatcher
@@ -18,6 +19,7 @@ package net.minecraft.client.network;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
@@ -56,6 +58,8 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
+import net.minecraft.class_5413;
+import net.minecraft.class_5415;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -292,11 +296,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatHandler;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.EntityTypeTags;
-import net.minecraft.tag.FluidTags;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -340,15 +339,15 @@ implements ClientPlayPacketListener {
     private final Map<UUID, PlayerListEntry> playerListEntries = Maps.newHashMap();
     private final ClientAdvancementManager advancementHandler;
     private final ClientCommandSource commandSource;
-    private RegistryTagManager tagManager = new RegistryTagManager();
+    private class_5415 tagManager = class_5415.field_25744;
     private final DataQueryHandler dataQueryHandler = new DataQueryHandler(this);
     private int chunkLoadDistance = 3;
     private final Random random = new Random();
     private CommandDispatcher<CommandSource> commandDispatcher = new CommandDispatcher();
     private final RecipeManager recipeManager = new RecipeManager();
     private final UUID sessionId = UUID.randomUUID();
-    private Set<RegistryKey<World>> field_25273;
-    private RegistryTracker dimensionTracker = RegistryTracker.create();
+    private Set<RegistryKey<World>> worldKeys;
+    private RegistryTracker registryTracker = RegistryTracker.create();
 
     public ClientPlayNetworkHandler(MinecraftClient arg, Screen arg2, ClientConnection arg3, GameProfile gameProfile) {
         this.client = arg;
@@ -377,18 +376,15 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         this.client.interactionManager = new ClientPlayerInteractionManager(this.client, this);
         if (!this.connection.isLocal()) {
-            BlockTags.markReady();
-            ItemTags.markReady();
-            FluidTags.markReady();
-            EntityTypeTags.markReady();
+            class_5413.method_30196();
         }
         ArrayList arrayList = Lists.newArrayList(arg.method_29443());
         Collections.shuffle(arrayList);
-        this.field_25273 = Sets.newLinkedHashSet((Iterable)arrayList);
-        this.dimensionTracker = arg.getDimension();
+        this.worldKeys = Sets.newLinkedHashSet((Iterable)arrayList);
+        this.registryTracker = arg.getDimension();
         RegistryKey<DimensionType> lv = arg.method_29444();
         RegistryKey<World> lv2 = arg.getDimensionId();
-        DimensionType lv3 = this.dimensionTracker.getDimensionTypeRegistry().get(lv);
+        DimensionType lv3 = this.registryTracker.getDimensionTypeRegistry().get(lv);
         this.chunkLoadDistance = arg.getChunkLoadDistance();
         boolean bl = arg.isDebugWorld();
         boolean bl2 = arg.isFlatWorld();
@@ -396,7 +392,7 @@ implements ClientPlayPacketListener {
         this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
         this.client.joinWorld(this.world);
         if (this.client.player == null) {
-            this.client.player = this.client.interactionManager.method_29357(this.world, new StatHandler(), new ClientRecipeBook(this.world.getRecipeManager()));
+            this.client.player = this.client.interactionManager.method_29357(this.world, new StatHandler(), new ClientRecipeBook());
             this.client.player.yaw = -180.0f;
             if (this.client.getServer() != null) {
                 this.client.getServer().setLocalPlayerUuid(this.client.player.getUuid());
@@ -606,11 +602,7 @@ implements ClientPlayPacketListener {
         if (!lv.isLogicalSideForUpdatingMovement()) {
             float g = (float)(arg.getYaw() * 360) / 256.0f;
             float h = (float)(arg.getPitch() * 360) / 256.0f;
-            if (Math.abs(lv.getX() - d) >= 0.03125 || Math.abs(lv.getY() - e) >= 0.015625 || Math.abs(lv.getZ() - f) >= 0.03125) {
-                lv.updateTrackedPositionAndAngles(d, e, f, g, h, 3, true);
-            } else {
-                lv.updateTrackedPositionAndAngles(lv.getX(), lv.getY(), lv.getZ(), g, h, 3, true);
-            }
+            lv.updateTrackedPositionAndAngles(d, e, f, g, h, 3, true);
             lv.setOnGround(arg.isOnGround());
         }
     }
@@ -632,13 +624,11 @@ implements ClientPlayPacketListener {
         }
         if (!lv.isLogicalSideForUpdatingMovement()) {
             if (arg.isPositionChanged()) {
-                lv.trackedX += (long)arg.getDeltaXShort();
-                lv.trackedY += (long)arg.getDeltaYShort();
-                lv.trackedZ += (long)arg.getDeltaZShort();
-                Vec3d lv2 = EntityS2CPacket.decodePacketCoordinates(lv.trackedX, lv.trackedY, lv.trackedZ);
+                Vec3d lv2 = arg.method_30302(lv.method_30227());
+                lv.method_30228(lv2);
                 float f = arg.hasRotation() ? (float)(arg.getYaw() * 360) / 256.0f : lv.yaw;
                 float g = arg.hasRotation() ? (float)(arg.getPitch() * 360) / 256.0f : lv.pitch;
-                lv.updateTrackedPositionAndAngles(lv2.x, lv2.y, lv2.z, f, g, 3, false);
+                lv.updateTrackedPositionAndAngles(lv2.getX(), lv2.getY(), lv2.getZ(), f, g, 3, false);
             } else if (arg.hasRotation()) {
                 float h = (float)(arg.getYaw() * 360) / 256.0f;
                 float i = (float)(arg.getPitch() * 360) / 256.0f;
@@ -1002,7 +992,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         RegistryKey<DimensionType> lv = arg.method_29445();
         RegistryKey<World> lv2 = arg.getDimension();
-        DimensionType lv3 = this.dimensionTracker.getDimensionTypeRegistry().get(lv);
+        DimensionType lv3 = this.registryTracker.getDimensionTypeRegistry().get(lv);
         ClientPlayerEntity lv4 = this.client.player;
         int i = lv4.getEntityId();
         this.positionLookSetup = false;
@@ -1320,7 +1310,7 @@ implements ClientPlayPacketListener {
         SearchableContainer<RecipeResultCollection> lv = this.client.getSearchableContainer(SearchManager.RECIPE_OUTPUT);
         lv.clear();
         ClientRecipeBook lv2 = this.client.player.getRecipeBook();
-        lv2.reload();
+        lv2.reload(this.recipeManager.values());
         lv2.getOrderedResults().forEach(lv::add);
         lv.reload();
     }
@@ -1359,10 +1349,7 @@ implements ClientPlayPacketListener {
     public void onUnlockRecipes(UnlockRecipesS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         ClientRecipeBook lv = this.client.player.getRecipeBook();
-        lv.setGuiOpen(arg.isGuiOpen());
-        lv.setFilteringCraftable(arg.isFilteringCraftable());
-        lv.setFurnaceGuiOpen(arg.isFurnaceGuiOpen());
-        lv.setFurnaceFilteringCraftable(arg.isFurnaceFilteringCraftable());
+        lv.method_30174(arg.isFurnaceFilteringCraftable());
         UnlockRecipesS2CPacket.Action lv2 = arg.getAction();
         switch (lv2) {
             case REMOVE: {
@@ -1416,9 +1403,16 @@ implements ClientPlayPacketListener {
     @Override
     public void onSynchronizeTags(SynchronizeTagsS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.tagManager = arg.getTagManager();
+        class_5415 lv = arg.getTagManager();
+        Multimap<Identifier, Identifier> multimap = class_5413.method_30203(lv);
+        if (!multimap.isEmpty()) {
+            LOGGER.warn("Incomplete server tags, disconnecting. Missing: {}", multimap);
+            this.connection.disconnect(new TranslatableText("multiplayer.disconnect.missing_tags"));
+            return;
+        }
+        this.tagManager = lv;
         if (!this.connection.isLocal()) {
-            this.tagManager.apply();
+            lv.method_30222();
         }
         this.client.getSearchableContainer(SearchManager.ITEM_TAG).reload();
     }
@@ -1727,7 +1721,7 @@ implements ClientPlayPacketListener {
                 }
                 this.client.debugRenderer.caveDebugRenderer.method_3704(lv5, list, list2);
             } else if (CustomPayloadS2CPacket.DEBUG_STRUCTURES.equals(lv)) {
-                DimensionType lv6 = this.dimensionTracker.getDimensionTypeRegistry().get(lv2.readIdentifier());
+                DimensionType lv6 = this.registryTracker.getDimensionTypeRegistry().get(lv2.readIdentifier());
                 BlockBox lv7 = new BlockBox(lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt());
                 int m = lv2.readInt();
                 ArrayList list3 = Lists.newArrayList();
@@ -2152,7 +2146,7 @@ implements ClientPlayPacketListener {
         return this.world;
     }
 
-    public RegistryTagManager getTagManager() {
+    public class_5415 getTagManager() {
         return this.tagManager;
     }
 
@@ -2164,12 +2158,12 @@ implements ClientPlayPacketListener {
         return this.sessionId;
     }
 
-    public Set<RegistryKey<World>> method_29356() {
-        return this.field_25273;
+    public Set<RegistryKey<World>> getWorldKeys() {
+        return this.worldKeys;
     }
 
-    public RegistryTracker method_29091() {
-        return this.dimensionTracker;
+    public RegistryTracker getRegistryTracker() {
+        return this.registryTracker;
     }
 }
 

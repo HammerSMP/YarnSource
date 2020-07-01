@@ -16,7 +16,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -30,16 +29,16 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        if (!arg.isAir(arg4)) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        if (!arg.isAir(arg3)) {
             return false;
         }
-        BlockState lv = arg.getBlockState(arg4.up());
+        BlockState lv = arg.getBlockState(arg3.up());
         if (!lv.isOf(Blocks.NETHERRACK) && !lv.isOf(Blocks.NETHER_WART_BLOCK)) {
             return false;
         }
-        this.generateNetherWartBlocksInArea(arg, random, arg4);
-        this.generateVinesInArea(arg, random, arg4);
+        this.generateNetherWartBlocksInArea(arg, random, arg3);
+        this.generateVinesInArea(arg, random, arg3);
         return true;
     }
 

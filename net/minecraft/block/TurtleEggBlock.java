@@ -121,7 +121,7 @@ extends Block {
     }
 
     private boolean shouldHatchProgress(World arg) {
-        float f = arg.getSkyAngle(1.0f);
+        float f = arg.method_30274(1.0f);
         if ((double)f < 0.69 && (double)f > 0.65) {
             return true;
         }

@@ -14,7 +14,6 @@ import net.minecraft.block.KelpBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -26,10 +25,10 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
         int i = 0;
-        int j = arg.getTopY(Heightmap.Type.OCEAN_FLOOR, arg4.getX(), arg4.getZ());
-        BlockPos lv = new BlockPos(arg4.getX(), j, arg4.getZ());
+        int j = arg.getTopY(Heightmap.Type.OCEAN_FLOOR, arg3.getX(), arg3.getZ());
+        BlockPos lv = new BlockPos(arg3.getX(), j, arg3.getZ());
         if (arg.getBlockState(lv).isOf(Blocks.WATER)) {
             BlockState lv2 = Blocks.KELP.getDefaultState();
             BlockState lv3 = Blocks.KELP_PLANT.getDefaultState();

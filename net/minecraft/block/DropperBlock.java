@@ -13,11 +13,11 @@ import net.minecraft.block.entity.DropperBlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPointerImpl;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 
 public class DropperBlock
 extends DispenserBlock {
@@ -38,7 +38,7 @@ extends DispenserBlock {
     }
 
     @Override
-    protected void dispense(World arg, BlockPos arg2) {
+    protected void dispense(ServerWorld arg, BlockPos arg2) {
         ItemStack lv7;
         BlockPointerImpl lv = new BlockPointerImpl(arg, arg2);
         DispenserBlockEntity lv2 = (DispenserBlockEntity)lv.getBlockEntity();

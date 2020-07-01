@@ -23,22 +23,22 @@ import net.minecraft.text.TranslatableText;
 @Environment(value=EnvType.CLIENT)
 public class RealmsGenericErrorScreen
 extends RealmsScreen {
-    private final Screen field_22695;
+    private final Screen parent;
     private Text line1;
     private Text line2;
 
     public RealmsGenericErrorScreen(RealmsServiceException arg, Screen arg2) {
-        this.field_22695 = arg2;
+        this.parent = arg2;
         this.errorMessage(arg);
     }
 
     public RealmsGenericErrorScreen(Text arg, Screen arg2) {
-        this.field_22695 = arg2;
+        this.parent = arg2;
         this.errorMessage(arg);
     }
 
     public RealmsGenericErrorScreen(Text arg, Text arg2, Screen arg3) {
-        this.field_22695 = arg3;
+        this.parent = arg3;
         this.errorMessage(arg, arg2);
     }
 
@@ -66,7 +66,7 @@ extends RealmsScreen {
     @Override
     public void init() {
         Realms.narrateNow(this.line1.getString() + ": " + this.line2.getString());
-        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 52, 200, 20, new LiteralText("Ok"), arg -> this.client.openScreen(this.field_22695)));
+        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 52, 200, 20, new LiteralText("Ok"), arg -> this.client.openScreen(this.parent)));
     }
 
     @Override

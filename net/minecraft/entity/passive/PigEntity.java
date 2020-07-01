@@ -37,7 +37,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
@@ -46,6 +46,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -77,8 +78,8 @@ Saddleable {
         this.goalSelector.add(0, new SwimGoal(this));
         this.goalSelector.add(1, new EscapeDangerGoal(this, 1.25));
         this.goalSelector.add(3, new AnimalMateGoal(this, 1.0));
-        this.goalSelector.add(4, new TemptGoal((MobEntityWithAi)this, 1.2, Ingredient.ofItems(Items.CARROT_ON_A_STICK), false));
-        this.goalSelector.add(4, new TemptGoal((MobEntityWithAi)this, 1.2, false, BREEDING_INGREDIENT));
+        this.goalSelector.add(4, new TemptGoal((PathAwareEntity)this, 1.2, Ingredient.ofItems(Items.CARROT_ON_A_STICK), false));
+        this.goalSelector.add(4, new TemptGoal((PathAwareEntity)this, 1.2, false, BREEDING_INGREDIENT));
         this.goalSelector.add(5, new FollowParentGoal(this, 1.1));
         this.goalSelector.add(6, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 6.0f));
@@ -158,7 +159,7 @@ Saddleable {
     @Override
     public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
         boolean bl = this.isBreedingItem(arg.getStackInHand(arg2));
-        if (!bl && this.isSaddled() && !this.hasPassengers()) {
+        if (!bl && this.isSaddled() && !this.hasPassengers() && !arg.shouldCancelInteraction()) {
             if (!this.world.isClient) {
                 arg.startRiding(this);
             }
@@ -225,9 +226,9 @@ Saddleable {
     }
 
     @Override
-    public void onStruckByLightning(LightningEntity arg) {
-        if (this.world.getDifficulty() != Difficulty.PEACEFUL) {
-            ZombifiedPiglinEntity lv = EntityType.ZOMBIFIED_PIGLIN.create(this.world);
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
+        if (arg.getDifficulty() != Difficulty.PEACEFUL) {
+            ZombifiedPiglinEntity lv = EntityType.ZOMBIFIED_PIGLIN.create(arg);
             lv.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.GOLDEN_SWORD));
             lv.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, this.pitch);
             lv.setAiDisabled(this.isAiDisabled());
@@ -237,10 +238,10 @@ Saddleable {
                 lv.setCustomNameVisible(this.isCustomNameVisible());
             }
             lv.setPersistent();
-            this.world.spawnEntity(lv);
+            arg.spawnEntity(lv);
             this.remove();
         } else {
-            super.onStruckByLightning(arg);
+            super.onStruckByLightning(arg, arg2);
         }
     }
 
@@ -265,8 +266,8 @@ Saddleable {
     }
 
     @Override
-    public PigEntity createChild(PassiveEntity arg) {
-        return EntityType.PIG.create(this.world);
+    public PigEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.PIG.create(arg);
     }
 
     @Override
@@ -281,8 +282,8 @@ Saddleable {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 }
 

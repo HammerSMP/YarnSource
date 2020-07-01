@@ -52,8 +52,8 @@ implements Angerable {
     private static final IntRange field_25382 = Durations.betweenSeconds(0, 1);
     private int angrySoundDelay;
     private static final IntRange field_25379 = Durations.betweenSeconds(20, 39);
-    private int field_25380;
-    private UUID field_25381;
+    private int angerTime;
+    private UUID targetUuid;
     private static final IntRange field_25609 = Durations.betweenSeconds(4, 6);
     private int field_25608;
 
@@ -64,7 +64,7 @@ implements Angerable {
 
     @Override
     public void setAngryAt(@Nullable UUID uUID) {
-        this.field_25381 = uUID;
+        this.targetUuid = uUID;
     }
 
     @Override
@@ -181,12 +181,12 @@ implements Angerable {
 
     @Override
     public void setAngerTime(int i) {
-        this.field_25380 = i;
+        this.angerTime = i;
     }
 
     @Override
     public int getAngerTime() {
-        return this.field_25380;
+        return this.angerTime;
     }
 
     @Override
@@ -229,7 +229,7 @@ implements Angerable {
 
     @Override
     public UUID getAngryAt() {
-        return this.field_25381;
+        return this.targetUuid;
     }
 
     @Override

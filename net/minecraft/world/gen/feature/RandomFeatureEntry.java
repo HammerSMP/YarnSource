@@ -16,7 +16,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.FeatureConfig;
@@ -31,8 +30,8 @@ public class RandomFeatureEntry<FC extends FeatureConfig> {
         this.chance = f;
     }
 
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4) {
-        return this.feature.generate(arg, arg2, arg3, random, arg4);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3) {
+        return this.feature.generate(arg, arg2, random, arg3);
     }
 }
 

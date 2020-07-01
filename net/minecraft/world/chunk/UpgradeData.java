@@ -109,7 +109,7 @@ public class UpgradeData {
                 lv3.set(lv4, lv7);
                 lv6 = UpgradeData.applyAdjacentBlock(lv6, lv7, lv, lv4, lv3);
             }
-            Block.method_30094(lv5, lv6, lv, lv4, 18);
+            Block.replaced(lv5, lv6, lv, lv4, 18);
         }
     }
 
@@ -141,7 +141,7 @@ public class UpgradeData {
                     if (lv.getX() >> 4 != lv3.x || lv.getZ() >> 4 != lv3.z) continue;
                     lv8 = UpgradeData.applyAdjacentBlock(lv8, lv9, lv4, lv, lv2);
                 }
-                Block.method_30094(lv7, lv8, lv4, lv, 18);
+                Block.replaced(lv7, lv8, lv4, lv, 18);
             }
         }
         for (int n = 0; n < this.centerIndicesToUpgrade.length; ++n) {

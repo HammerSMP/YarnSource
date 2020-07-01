@@ -99,6 +99,10 @@ implements Fertilizable {
                 int i = lv2.get(AGE) > 0 ? 1 : 0;
                 return (BlockState)this.getDefaultState().with(AGE, i);
             }
+            BlockState lv3 = arg.getWorld().getBlockState(arg.getBlockPos().up());
+            if (lv3.isOf(Blocks.BAMBOO) || lv3.isOf(Blocks.BAMBOO_SAPLING)) {
+                return (BlockState)this.getDefaultState().with(AGE, lv3.get(AGE));
+            }
             return Blocks.BAMBOO_SAPLING.getDefaultState();
         }
         return null;

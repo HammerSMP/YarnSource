@@ -38,7 +38,7 @@ implements Spawner {
             this.spawned = false;
             return 0;
         }
-        float f = arg.getSkyAngle(0.0f);
+        float f = arg.method_30274(0.0f);
         if ((double)f == 0.5) {
             State state = this.state = arg.random.nextInt(10) == 0 ? State.SIEGE_TONIGHT : State.SIEGE_DONE;
         }

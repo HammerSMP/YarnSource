@@ -25,6 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 import net.minecraft.SharedConstants;
 import net.minecraft.class_5404;
+import net.minecraft.class_5416;
 import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.datafixer.fix.AddTrappedChestFix;
 import net.minecraft.datafixer.fix.AdvancementRenameFix;
@@ -536,6 +537,8 @@ public class Schemas {
         Schema schema123 = dataFixerBuilder.addSchema(2558, EMPTY_IDENTIFIER_NORMALIZE);
         dataFixerBuilder.addFixer((DataFix)new MissingDimensionFix(schema123, false));
         dataFixerBuilder.addFixer((DataFix)new class_5404(schema123, false, "Rename swapHands setting", "key_key.swapHands", "key_key.swapOffhand"));
+        Schema schema124 = dataFixerBuilder.addSchema(2568, class_5416::new);
+        dataFixerBuilder.addFixer((DataFix)new ChoiceTypesFix(schema124, "Added Piglin Brute", TypeReferences.ENTITY));
     }
 
     private static UnaryOperator<String> method_30070(Map<String, String> map) {

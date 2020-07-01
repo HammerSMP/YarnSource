@@ -36,13 +36,6 @@ implements Fertilizable {
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.breakBlock(arg3, true);
-        }
-    }
-
-    @Override
     public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
         Block lv2;
         if (arg2 == this.growthDirection.getOpposite() && !arg.canPlaceAt(arg4, arg5)) {

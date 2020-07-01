@@ -21,6 +21,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
@@ -952,7 +953,7 @@ extends LivingEntity {
     }
 
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).addPersistentModifier(new EntityAttributeModifier("Random spawn bonus", this.random.nextGaussian() * 0.05, EntityAttributeModifier.Operation.MULTIPLY_BASE));
         if (this.random.nextFloat() < 0.05f) {
             this.setLeftHanded(true);
@@ -1032,9 +1033,9 @@ extends LivingEntity {
             return lv2;
         }
         if (lv.getItem() instanceof SpawnEggItem) {
-            if (!this.world.isClient) {
+            if (this.world instanceof ServerWorld) {
                 SpawnEggItem lv3 = (SpawnEggItem)lv.getItem();
-                Optional<MobEntity> optional = lv3.spawnBaby(arg, this, this.getType(), this.world, this.getPos(), lv);
+                Optional<MobEntity> optional = lv3.spawnBaby(arg, this, this.getType(), (ServerWorld)this.world, this.getPos(), lv);
                 optional.ifPresent(arg2 -> this.onPlayerSpawnedChild(arg, (MobEntity)arg2));
                 return optional.isPresent() ? ActionResult.SUCCESS : ActionResult.PASS;
             }

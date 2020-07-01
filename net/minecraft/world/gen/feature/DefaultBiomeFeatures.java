@@ -293,17 +293,17 @@ public class DefaultBiomeFeatures {
     public static final BlockPileFeatureConfig WARPED_ROOTS_CONFIG = new BlockPileFeatureConfig(new WeightedBlockStateProvider().addState(Blocks.WARPED_ROOTS.getDefaultState(), 85).addState(Blocks.CRIMSON_ROOTS.getDefaultState(), 1).addState(Blocks.WARPED_FUNGUS.getDefaultState(), 13).addState(Blocks.CRIMSON_FUNGUS.getDefaultState(), 1));
     public static final BlockPileFeatureConfig NETHER_SPROUTS_CONFIG = new BlockPileFeatureConfig(new SimpleBlockStateProvider(Blocks.NETHER_SPROUTS.getDefaultState()));
 
-    public static void method_28437(Biome arg) {
+    public static void addBadlandsUndergroundStructures(Biome arg) {
         arg.addStructureFeature(MESA_MINESHAFT);
         arg.addStructureFeature(STRONGHOLD);
     }
 
-    public static void method_28440(Biome arg) {
+    public static void addDefaultUndergroundStructures(Biome arg) {
         arg.addStructureFeature(NORMAL_MINESHAFT);
         arg.addStructureFeature(STRONGHOLD);
     }
 
-    public static void method_28441(Biome arg) {
+    public static void addOceanStructures(Biome arg) {
         arg.addStructureFeature(NORMAL_MINESHAFT);
         arg.addStructureFeature(SUNKEN_SHIPWRECK);
     }

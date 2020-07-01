@@ -73,7 +73,6 @@ import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -181,7 +180,6 @@ CommandOutput {
     protected boolean submergedInWater;
     @Nullable
     protected Tag<Fluid> field_25599;
-    protected boolean inLava;
     public int timeUntilRegen;
     protected boolean firstUpdate = true;
     protected final DataTracker dataTracker;
@@ -197,12 +195,10 @@ CommandOutput {
     public int chunkY;
     public int chunkZ;
     private boolean field_25154;
-    public long trackedX;
-    public long trackedY;
-    public long trackedZ;
+    private Vec3d field_25750;
     public boolean ignoreCameraFrustum;
     public boolean velocityDirty;
-    public int netherPortalCooldown;
+    private int netherPortalCooldown;
     protected boolean inNetherPortal;
     protected int netherPortalTime;
     protected BlockPos lastNetherPortalPosition;
@@ -225,6 +221,7 @@ CommandOutput {
         this.dimensions = arg.getDimensions();
         this.pos = Vec3d.ZERO;
         this.blockPos = BlockPos.ORIGIN;
+        this.field_25750 = Vec3d.ZERO;
         this.updatePosition(0.0, 0.0, 0.0);
         this.dataTracker = new DataTracker(this);
         this.dataTracker.startTracking(FLAGS, (byte)0);
@@ -261,9 +258,16 @@ CommandOutput {
     }
 
     public void updateTrackedPosition(double d, double e, double f) {
-        this.trackedX = EntityS2CPacket.encodePacketCoordinate(d);
-        this.trackedY = EntityS2CPacket.encodePacketCoordinate(e);
-        this.trackedZ = EntityS2CPacket.encodePacketCoordinate(f);
+        this.method_30228(new Vec3d(d, e, f));
+    }
+
+    public void method_30228(Vec3d arg) {
+        this.field_25750 = arg;
+    }
+
+    @Environment(value=EnvType.CLIENT)
+    public Vec3d method_30227() {
+        return this.field_25750;
     }
 
     public EntityType<?> getType() {
@@ -353,9 +357,7 @@ CommandOutput {
 
     public void updatePosition(double d, double e, double f) {
         this.setPos(d, e, f);
-        float g = this.dimensions.width / 2.0f;
-        float h = this.dimensions.height;
-        this.setBoundingBox(new Box(d - (double)g, e, f - (double)g, d + (double)g, e + (double)h, f + (double)g));
+        this.setBoundingBox(this.dimensions.method_30231(d, e, f));
     }
 
     protected void refreshPosition() {
@@ -431,8 +433,16 @@ CommandOutput {
         this.world.getProfiler().pop();
     }
 
+    public void method_30229() {
+        this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
+    }
+
+    public boolean method_30230() {
+        return this.netherPortalCooldown > 0;
+    }
+
     protected void tickNetherPortalCooldown() {
-        if (this.netherPortalCooldown > 0) {
+        if (this.method_30230()) {
             --this.netherPortalCooldown;
         }
     }
@@ -561,7 +571,6 @@ CommandOutput {
             }
         }
         try {
-            this.inLava = false;
             this.checkBlockCollision();
         }
         catch (Throwable throwable) {
@@ -944,7 +953,7 @@ CommandOutput {
         }
         BlockPos lv4 = new BlockPos(lv);
         FluidState lv5 = this.world.getFluidState(lv4);
-        for (Tag tag : FluidTags.method_29897()) {
+        for (Tag<Fluid> tag : FluidTags.method_29897()) {
             if (!lv5.isIn(tag)) continue;
             double e = (float)lv4.getY() + lv5.getHeight(this.world, lv4);
             if (e > d) {
@@ -1008,12 +1017,8 @@ CommandOutput {
         return this.field_25599 == arg;
     }
 
-    public void setInLava() {
-        this.inLava = true;
-    }
-
     public boolean isInLava() {
-        return this.inLava;
+        return !this.firstUpdate && this.fluidHeight.getDouble(FluidTags.LAVA) > 0.0;
     }
 
     public void updateVelocity(float f, Vec3d arg) {
@@ -1270,7 +1275,7 @@ CommandOutput {
     public CompoundTag toTag(CompoundTag arg) {
         try {
             if (this.vehicle != null) {
-                arg.put("Pos", this.toListTag(this.vehicle.getX(), this.vehicle.getY(), this.vehicle.getZ()));
+                arg.put("Pos", this.toListTag(this.vehicle.getX(), this.getY(), this.vehicle.getZ()));
             } else {
                 arg.put("Pos", this.toListTag(this.getX(), this.getY(), this.getZ()));
             }
@@ -1620,8 +1625,8 @@ CommandOutput {
     }
 
     public void setInNetherPortal(BlockPos arg) {
-        if (this.netherPortalCooldown > 0) {
-            this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
+        if (this.method_30230()) {
+            this.method_30229();
             return;
         }
         if (!this.world.isClient && !arg.equals(this.lastNetherPortalPosition)) {
@@ -1650,7 +1655,7 @@ CommandOutput {
             if (lv3 != null && minecraftServer.isNetherAllowed() && !this.hasVehicle() && this.netherPortalTime++ >= i) {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
-                this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
+                this.method_30229();
                 this.changeDimension(lv3);
                 this.world.getProfiler().pop();
             }
@@ -1845,7 +1850,7 @@ CommandOutput {
         this.dataTracker.set(AIR, i);
     }
 
-    public void onStruckByLightning(LightningEntity arg) {
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
         this.setFireTicks(this.fireTicks + 1);
         if (this.fireTicks == 0) {
             this.setOnFireFor(8);
@@ -1876,7 +1881,7 @@ CommandOutput {
         this.fallDistance = 0.0f;
     }
 
-    public void onKilledOther(LivingEntity arg) {
+    public void onKilledOther(ServerWorld arg, LivingEntity arg2) {
     }
 
     protected void pushOutOfBlocks(double d, double e, double f) {

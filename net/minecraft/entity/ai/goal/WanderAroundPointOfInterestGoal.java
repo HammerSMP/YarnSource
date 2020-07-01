@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.ai.TargetFinder;
 import net.minecraft.entity.ai.brain.task.LookTargetUtil;
 import net.minecraft.entity.ai.goal.WanderAroundGoal;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
@@ -18,7 +18,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class WanderAroundPointOfInterestGoal
 extends WanderAroundGoal {
-    public WanderAroundPointOfInterestGoal(MobEntityWithAi arg, double d, boolean bl) {
+    public WanderAroundPointOfInterestGoal(PathAwareEntity arg, double d, boolean bl) {
         super(arg, d, 10, bl);
     }
 

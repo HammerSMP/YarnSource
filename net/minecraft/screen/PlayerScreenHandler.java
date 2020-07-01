@@ -11,6 +11,7 @@ package net.minecraft.screen;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5421;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;
@@ -198,6 +199,12 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
 
     public CraftingInventory method_29281() {
         return this.craftingInput;
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public class_5421 method_30264() {
+        return class_5421.CRAFTING;
     }
 }
 

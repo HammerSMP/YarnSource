@@ -9,6 +9,7 @@ package net.minecraft.screen;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5421;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.InputSlotFiller;
 import net.minecraft.recipe.Recipe;
@@ -41,5 +42,8 @@ extends ScreenHandler {
 
     @Environment(value=EnvType.CLIENT)
     public abstract int getCraftingSlotCount();
+
+    @Environment(value=EnvType.CLIENT)
+    public abstract class_5421 method_30264();
 }
 

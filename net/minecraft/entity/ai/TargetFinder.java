@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.PathNodeType;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -21,68 +21,68 @@ import net.minecraft.util.math.Vec3d;
 
 public class TargetFinder {
     @Nullable
-    public static Vec3d findTarget(MobEntityWithAi arg, int i, int j) {
+    public static Vec3d findTarget(PathAwareEntity arg, int i, int j) {
         return TargetFinder.findTarget(arg, i, j, 0, null, true, 1.5707963705062866, arg::getPathfindingFavor, false, 0, 0, true);
     }
 
     @Nullable
-    public static Vec3d findGroundTarget(MobEntityWithAi arg, int i, int j, int k, @Nullable Vec3d arg2, double d) {
+    public static Vec3d findGroundTarget(PathAwareEntity arg, int i, int j, int k, @Nullable Vec3d arg2, double d) {
         return TargetFinder.findTarget(arg, i, j, k, arg2, true, d, arg::getPathfindingFavor, true, 0, 0, false);
     }
 
     @Nullable
-    public static Vec3d findGroundTarget(MobEntityWithAi arg, int i, int j) {
+    public static Vec3d findGroundTarget(PathAwareEntity arg, int i, int j) {
         return TargetFinder.findGroundTarget(arg, i, j, arg::getPathfindingFavor);
     }
 
     @Nullable
-    public static Vec3d findGroundTarget(MobEntityWithAi arg, int i, int j, ToDoubleFunction<BlockPos> toDoubleFunction) {
+    public static Vec3d findGroundTarget(PathAwareEntity arg, int i, int j, ToDoubleFunction<BlockPos> toDoubleFunction) {
         return TargetFinder.findTarget(arg, i, j, 0, null, false, 0.0, toDoubleFunction, true, 0, 0, true);
     }
 
     @Nullable
-    public static Vec3d findAirTarget(MobEntityWithAi arg, int i, int j, Vec3d arg2, float f, int k, int l) {
+    public static Vec3d findAirTarget(PathAwareEntity arg, int i, int j, Vec3d arg2, float f, int k, int l) {
         return TargetFinder.findTarget(arg, i, j, 0, arg2, false, f, arg::getPathfindingFavor, true, k, l, true);
     }
 
     @Nullable
-    public static Vec3d method_27929(MobEntityWithAi arg, int i, int j, Vec3d arg2) {
+    public static Vec3d method_27929(PathAwareEntity arg, int i, int j, Vec3d arg2) {
         Vec3d lv = arg2.subtract(arg.getX(), arg.getY(), arg.getZ());
         return TargetFinder.findTarget(arg, i, j, 0, lv, false, 1.5707963705062866, arg::getPathfindingFavor, true, 0, 0, true);
     }
 
     @Nullable
-    public static Vec3d findTargetTowards(MobEntityWithAi arg, int i, int j, Vec3d arg2) {
+    public static Vec3d findTargetTowards(PathAwareEntity arg, int i, int j, Vec3d arg2) {
         Vec3d lv = arg2.subtract(arg.getX(), arg.getY(), arg.getZ());
         return TargetFinder.findTarget(arg, i, j, 0, lv, true, 1.5707963705062866, arg::getPathfindingFavor, false, 0, 0, true);
     }
 
     @Nullable
-    public static Vec3d findTargetTowards(MobEntityWithAi arg, int i, int j, Vec3d arg2, double d) {
+    public static Vec3d findTargetTowards(PathAwareEntity arg, int i, int j, Vec3d arg2, double d) {
         Vec3d lv = arg2.subtract(arg.getX(), arg.getY(), arg.getZ());
         return TargetFinder.findTarget(arg, i, j, 0, lv, true, d, arg::getPathfindingFavor, false, 0, 0, true);
     }
 
     @Nullable
-    public static Vec3d findGroundTargetTowards(MobEntityWithAi arg, int i, int j, int k, Vec3d arg2, double d) {
+    public static Vec3d findGroundTargetTowards(PathAwareEntity arg, int i, int j, int k, Vec3d arg2, double d) {
         Vec3d lv = arg2.subtract(arg.getX(), arg.getY(), arg.getZ());
         return TargetFinder.findTarget(arg, i, j, k, lv, false, d, arg::getPathfindingFavor, true, 0, 0, false);
     }
 
     @Nullable
-    public static Vec3d findTargetAwayFrom(MobEntityWithAi arg, int i, int j, Vec3d arg2) {
+    public static Vec3d findTargetAwayFrom(PathAwareEntity arg, int i, int j, Vec3d arg2) {
         Vec3d lv = arg.getPos().subtract(arg2);
         return TargetFinder.findTarget(arg, i, j, 0, lv, true, 1.5707963705062866, arg::getPathfindingFavor, false, 0, 0, true);
     }
 
     @Nullable
-    public static Vec3d findGroundTargetAwayFrom(MobEntityWithAi arg, int i, int j, Vec3d arg2) {
+    public static Vec3d findGroundTargetAwayFrom(PathAwareEntity arg, int i, int j, Vec3d arg2) {
         Vec3d lv = arg.getPos().subtract(arg2);
         return TargetFinder.findTarget(arg, i, j, 0, lv, false, 1.5707963705062866, arg::getPathfindingFavor, true, 0, 0, true);
     }
 
     @Nullable
-    private static Vec3d findTarget(MobEntityWithAi arg, int i, int j, int k, @Nullable Vec3d arg22, boolean bl, double d, ToDoubleFunction<BlockPos> toDoubleFunction, boolean bl2, int l, int m, boolean bl3) {
+    private static Vec3d findTarget(PathAwareEntity arg, int i, int j, int k, @Nullable Vec3d arg22, boolean bl, double d, ToDoubleFunction<BlockPos> toDoubleFunction, boolean bl2, int l, int m, boolean bl3) {
         boolean bl5;
         EntityNavigation lv = arg.getNavigation();
         Random random = arg.getRandom();

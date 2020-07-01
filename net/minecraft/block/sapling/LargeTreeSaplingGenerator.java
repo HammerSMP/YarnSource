@@ -46,7 +46,7 @@ extends SaplingGenerator {
         arg.setBlockState(arg3.add(i + 1, 0, j), lv2, 4);
         arg.setBlockState(arg3.add(i, 0, j + 1), lv2, 4);
         arg.setBlockState(arg3.add(i + 1, 0, j + 1), lv2, 4);
-        if (lv.generate(arg, arg.getStructureAccessor(), arg2, random, arg3.add(i, 0, j))) {
+        if (lv.generate(arg, arg2, random, arg3.add(i, 0, j))) {
             return true;
         }
         arg.setBlockState(arg3.add(i, 0, j), arg4, 4);

@@ -69,7 +69,7 @@ public enum EnderDragonSpawnState {
                         }
                         arg.createExplosion(null, (float)lv.getCenterX() + 0.5f, lv.getHeight(), (float)lv.getCenterZ() + 0.5f, 5.0f, Explosion.DestructionType.DESTROY);
                         EndSpikeFeatureConfig lv4 = new EndSpikeFeatureConfig(true, (List<EndSpikeFeature.Spike>)ImmutableList.of((Object)lv), new BlockPos(0, 128, 0));
-                        Feature.END_SPIKE.configure(lv4).generate(arg, arg.getStructureAccessor(), arg.getChunkManager().getChunkGenerator(), new Random(), new BlockPos(lv.getCenterX(), 45, lv.getCenterZ()));
+                        Feature.END_SPIKE.configure(lv4).generate(arg, arg.getChunkManager().getChunkGenerator(), new Random(), new BlockPos(lv.getCenterX(), 45, lv.getCenterZ()));
                     }
                 } else if (bl) {
                     arg2.setSpawnState(SUMMONING_DRAGON);

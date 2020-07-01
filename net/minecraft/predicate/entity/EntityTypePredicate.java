@@ -50,7 +50,7 @@ public abstract class EntityTypePredicate {
         String string = JsonHelper.asString(jsonElement, "type");
         if (string.startsWith("#")) {
             Identifier lv = new Identifier(string.substring(1));
-            return new Tagged(TagContainers.instance().entityTypes().getOrCreate(lv));
+            return new Tagged(TagContainers.instance().method_30221().method_30213(lv));
         }
         Identifier lv2 = new Identifier(string);
         EntityType lv3 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown entity type '" + lv2 + "', valid types are: " + COMMA_JOINER.join(Registry.ENTITY_TYPE.getIds())));
@@ -80,7 +80,7 @@ public abstract class EntityTypePredicate {
 
         @Override
         public JsonElement toJson() {
-            return new JsonPrimitive("#" + TagContainers.instance().entityTypes().checkId(this.tag));
+            return new JsonPrimitive("#" + TagContainers.instance().method_30221().method_30212(this.tag));
         }
     }
 

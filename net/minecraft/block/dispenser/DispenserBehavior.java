@@ -61,6 +61,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
@@ -206,7 +207,7 @@ public interface DispenserBehavior {
             public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
                 BlockPos lv2 = arg.getBlockPos().offset(lv);
-                World lv3 = arg.getWorld();
+                ServerWorld lv3 = arg.getWorld();
                 ArmorStandEntity lv4 = new ArmorStandEntity(lv3, (double)lv2.getX() + 0.5, lv2.getY(), (double)lv2.getZ() + 0.5);
                 EntityType.loadFromEntityTag(lv3, null, lv4, arg2.getTag());
                 lv4.yaw = lv.asRotation();
@@ -291,7 +292,7 @@ public interface DispenserBehavior {
             @Override
             public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
-                FireworkRocketEntity lv2 = new FireworkRocketEntity(arg.getWorld(), arg2, arg.getX(), arg.getY(), arg.getX(), true);
+                FireworkRocketEntity lv2 = new FireworkRocketEntity((World)arg.getWorld(), arg2, arg.getX(), arg.getY(), arg.getX(), true);
                 DispenserBehavior.method_27042(arg, lv2, lv);
                 lv2.setVelocity(lv.getOffsetX(), lv.getOffsetY(), lv.getOffsetZ(), 0.5f, 1.0f);
                 arg.getWorld().spawnEntity(lv2);
@@ -313,7 +314,7 @@ public interface DispenserBehavior {
                 double d = lv2.getX() + (double)((float)lv.getOffsetX() * 0.3f);
                 double e = lv2.getY() + (double)((float)lv.getOffsetY() * 0.3f);
                 double f = lv2.getZ() + (double)((float)lv.getOffsetZ() * 0.3f);
-                World lv3 = arg.getWorld();
+                ServerWorld lv3 = arg.getWorld();
                 Random random = lv3.random;
                 double g = random.nextGaussian() * 0.05 + (double)lv.getOffsetX();
                 double h = random.nextGaussian() * 0.05 + (double)lv.getOffsetY();
@@ -341,7 +342,7 @@ public interface DispenserBehavior {
             public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 BucketItem lv = (BucketItem)arg2.getItem();
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
-                World lv3 = arg.getWorld();
+                ServerWorld lv3 = arg.getWorld();
                 if (lv.placeFluid(null, lv3, lv2, null)) {
                     lv.onEmptied(lv3, arg2, lv2);
                     return new ItemStack(Items.BUCKET);
@@ -366,7 +367,7 @@ public interface DispenserBehavior {
                 void lv7;
                 Fluid lv5;
                 BlockPos lv2;
-                World lv = arg.getWorld();
+                ServerWorld lv = arg.getWorld();
                 BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING)));
                 Block lv4 = lv3.getBlock();
                 if (lv4 instanceof FluidDrainable) {
@@ -392,7 +393,7 @@ public interface DispenserBehavior {
 
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-                World lv = arg.getWorld();
+                ServerWorld lv = arg.getWorld();
                 this.setSuccess(true);
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
                 BlockState lv3 = lv.getBlockState(lv2);
@@ -417,7 +418,7 @@ public interface DispenserBehavior {
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 this.setSuccess(true);
-                World lv = arg.getWorld();
+                ServerWorld lv = arg.getWorld();
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
                 if (BoneMealItem.useOnFertilizable(arg2, lv, lv2) || BoneMealItem.useOnGround(arg2, lv, lv2, null)) {
                     if (!lv.isClient) {
@@ -433,11 +434,11 @@ public interface DispenserBehavior {
 
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-                World lv = arg.getWorld();
+                ServerWorld lv = arg.getWorld();
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
                 TntEntity lv3 = new TntEntity(lv, (double)lv2.getX() + 0.5, lv2.getY(), (double)lv2.getZ() + 0.5, null);
                 lv.spawnEntity(lv3);
-                lv.playSound(null, lv3.getX(), lv3.getY(), lv3.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                ((World)lv).playSound(null, lv3.getX(), lv3.getY(), lv3.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 arg2.decrement(1);
                 return arg2;
             }
@@ -459,7 +460,7 @@ public interface DispenserBehavior {
 
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-                World lv = arg.getWorld();
+                ServerWorld lv = arg.getWorld();
                 Direction lv2 = arg.getBlockState().get(DispenserBlock.FACING);
                 BlockPos lv3 = arg.getBlockPos().offset(lv2);
                 if (lv.isAir(lv3) && WitherSkullBlock.canDispense(lv, lv3, arg2)) {
@@ -480,7 +481,7 @@ public interface DispenserBehavior {
 
             @Override
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-                World lv = arg.getWorld();
+                ServerWorld lv = arg.getWorld();
                 BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
                 CarvedPumpkinBlock lv3 = (CarvedPumpkinBlock)Blocks.CARVED_PUMPKIN;
                 if (lv.isAir(lv2) && lv3.canDispense(lv, lv2)) {
@@ -516,11 +517,11 @@ public interface DispenserBehavior {
             @Override
             public ItemStack dispenseSilently(BlockPointer arg2, ItemStack arg22) {
                 this.setSuccess(false);
-                World lv = arg2.getWorld();
+                ServerWorld lv = arg2.getWorld();
                 BlockPos lv2 = arg2.getBlockPos().offset(arg2.getBlockState().get(DispenserBlock.FACING));
                 BlockState lv3 = lv.getBlockState(lv2);
                 if (lv3.method_27851(BlockTags.BEEHIVES, arg -> arg.contains(BeehiveBlock.HONEY_LEVEL)) && lv3.get(BeehiveBlock.HONEY_LEVEL) >= 5) {
-                    ((BeehiveBlock)lv3.getBlock()).takeHoney(lv.getWorld(), lv3, lv2, null, BeehiveBlockEntity.BeeState.BEE_RELEASED);
+                    ((BeehiveBlock)lv3.getBlock()).takeHoney(lv, lv3, lv2, null, BeehiveBlockEntity.BeeState.BEE_RELEASED);
                     this.setSuccess(true);
                     return this.method_22141(arg2, arg22, new ItemStack(Items.HONEY_BOTTLE));
                 }
@@ -537,7 +538,7 @@ public interface DispenserBehavior {
             public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
                 BlockPos lv2 = arg.getBlockPos().offset(lv);
-                World lv3 = arg.getWorld();
+                ServerWorld lv3 = arg.getWorld();
                 BlockState lv4 = lv3.getBlockState(lv2);
                 this.setSuccess(true);
                 if (lv4.isOf(Blocks.RESPAWN_ANCHOR)) {

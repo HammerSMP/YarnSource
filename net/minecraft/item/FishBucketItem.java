@@ -24,6 +24,7 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -44,8 +45,8 @@ extends BucketItem {
 
     @Override
     public void onEmptied(World arg, ItemStack arg2, BlockPos arg3) {
-        if (!arg.isClient) {
-            this.spawnFish(arg, arg2, arg3);
+        if (arg instanceof ServerWorld) {
+            this.spawnFish((ServerWorld)arg, arg2, arg3);
         }
     }
 
@@ -54,7 +55,7 @@ extends BucketItem {
         arg2.playSound(arg, arg3, SoundEvents.ITEM_BUCKET_EMPTY_FISH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
     }
 
-    private void spawnFish(World arg, ItemStack arg2, BlockPos arg3) {
+    private void spawnFish(ServerWorld arg, ItemStack arg2, BlockPos arg3) {
         Entity lv = this.fishType.spawnFromItemStack(arg, arg2, null, arg3, SpawnReason.BUCKET, true, false);
         if (lv != null) {
             ((FishEntity)lv).setFromBucket(true);

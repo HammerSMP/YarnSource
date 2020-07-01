@@ -21,17 +21,17 @@ import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.options.LanguageOptionsScreen;
 import net.minecraft.client.gui.screen.options.SkinOptionsScreen;
 import net.minecraft.client.gui.screen.options.SoundOptionsScreen;
-import net.minecraft.client.gui.screen.pack.ResourcePackScreen;
+import net.minecraft.client.gui.screen.pack.AbstractPackScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.LockButtonWidget;
 import net.minecraft.client.gui.widget.OptionButtonWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.Option;
-import net.minecraft.client.resource.ClientResourcePackProfile;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.UpdateDifficultyC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateDifficultyLockC2SPacket;
 import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.Difficulty;
@@ -90,16 +90,16 @@ extends Screen {
         this.addButton(new ButtonWidget(this.width / 2 + 5, this.height / 6 + 72 - 6, 150, 20, new TranslatableText("options.controls"), arg -> this.client.openScreen(new ControlsOptionsScreen(this, this.settings))));
         this.addButton(new ButtonWidget(this.width / 2 - 155, this.height / 6 + 96 - 6, 150, 20, new TranslatableText("options.language"), arg -> this.client.openScreen(new LanguageOptionsScreen((Screen)this, this.settings, this.client.getLanguageManager()))));
         this.addButton(new ButtonWidget(this.width / 2 + 5, this.height / 6 + 96 - 6, 150, 20, new TranslatableText("options.chat.title"), arg -> this.client.openScreen(new ChatOptionsScreen(this, this.settings))));
-        this.addButton(new ButtonWidget(this.width / 2 - 155, this.height / 6 + 120 - 6, 150, 20, new TranslatableText("options.resourcepack"), arg -> this.client.openScreen(new ResourcePackScreen((Screen)this, this.client.getResourcePackManager(), this::method_29975, this.client.getResourcePackDir()))));
+        this.addButton(new ButtonWidget(this.width / 2 - 155, this.height / 6 + 120 - 6, 150, 20, new TranslatableText("options.resourcepack"), arg -> this.client.openScreen(new AbstractPackScreen(this, this.client.getResourcePackManager(), this::method_29975, this.client.getResourcePackDir(), new TranslatableText("resourcePack.title")))));
         this.addButton(new ButtonWidget(this.width / 2 + 5, this.height / 6 + 120 - 6, 150, 20, new TranslatableText("options.accessibility.title"), arg -> this.client.openScreen(new AccessibilityOptionsScreen(this, this.settings))));
         this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 6 + 168, 200, 20, ScreenTexts.DONE, arg -> this.client.openScreen(this.parent)));
     }
 
-    private void method_29975(ResourcePackManager<ClientResourcePackProfile> arg) {
+    private void method_29975(ResourcePackManager arg) {
         ImmutableList list = ImmutableList.copyOf(this.settings.resourcePacks);
         this.settings.resourcePacks.clear();
         this.settings.incompatibleResourcePacks.clear();
-        for (ClientResourcePackProfile lv : arg.getEnabledProfiles()) {
+        for (ResourcePackProfile lv : arg.getEnabledProfiles()) {
             if (lv.isPinned()) continue;
             this.settings.resourcePacks.add(lv.getName());
             if (lv.getCompatibility().isCompatible()) continue;

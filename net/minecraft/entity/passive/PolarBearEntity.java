@@ -16,6 +16,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -68,16 +69,16 @@ implements Angerable {
     private float warningAnimationProgress;
     private int warningSoundCooldown;
     private static final IntRange field_25369 = Durations.betweenSeconds(20, 39);
-    private int field_25370;
-    private UUID field_25368;
+    private int angerTime;
+    private UUID targetUuid;
 
     public PolarBearEntity(EntityType<? extends PolarBearEntity> arg, World arg2) {
         super((EntityType<? extends AnimalEntity>)arg, arg2);
     }
 
     @Override
-    public PassiveEntity createChild(PassiveEntity arg) {
-        return EntityType.POLAR_BEAR.create(this.world);
+    public PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.POLAR_BEAR.create(arg);
     }
 
     @Override
@@ -133,22 +134,22 @@ implements Angerable {
 
     @Override
     public void setAngerTime(int i) {
-        this.field_25370 = i;
+        this.angerTime = i;
     }
 
     @Override
     public int getAngerTime() {
-        return this.field_25370;
+        return this.angerTime;
     }
 
     @Override
     public void setAngryAt(@Nullable UUID uUID) {
-        this.field_25368 = uUID;
+        this.targetUuid = uUID;
     }
 
     @Override
     public UUID getAngryAt() {
-        return this.field_25368;
+        return this.targetUuid;
     }
 
     @Override
@@ -243,7 +244,7 @@ implements Angerable {
     }
 
     @Override
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
             arg4 = new PassiveEntity.PassiveData();
             ((PassiveEntity.PassiveData)arg4).setBabyChance(1.0f);

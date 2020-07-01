@@ -25,10 +25,10 @@ public interface ModifiableWorld {
     }
 
     default public boolean breakBlock(BlockPos arg, boolean bl, @Nullable Entity arg2) {
-        return this.method_30093(arg, bl, arg2, 512);
+        return this.breakBlock(arg, bl, arg2, 512);
     }
 
-    public boolean method_30093(BlockPos var1, boolean var2, @Nullable Entity var3, int var4);
+    public boolean breakBlock(BlockPos var1, boolean var2, @Nullable Entity var3, int var4);
 
     default public boolean spawnEntity(Entity arg) {
         return false;

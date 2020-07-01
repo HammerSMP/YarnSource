@@ -18,6 +18,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -46,7 +47,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.RabbitEntity;
@@ -77,7 +78,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class CatEntity
@@ -130,7 +130,7 @@ extends TameableEntity {
         this.goalSelector.add(8, new PounceAtTargetGoal(this, 0.3f));
         this.goalSelector.add(9, new AttackGoal(this));
         this.goalSelector.add(10, new AnimalMateGoal(this, 0.8));
-        this.goalSelector.add(11, new WanderAroundFarGoal((MobEntityWithAi)this, 0.8, 1.0000001E-5f));
+        this.goalSelector.add(11, new WanderAroundFarGoal((PathAwareEntity)this, 0.8, 1.0000001E-5f));
         this.goalSelector.add(12, new LookAtEntityGoal(this, PlayerEntity.class, 10.0f));
         this.targetSelector.add(1, new FollowTargetIfTamedGoal<RabbitEntity>(this, RabbitEntity.class, false, null));
         this.targetSelector.add(1, new FollowTargetIfTamedGoal<TurtleEntity>(this, TurtleEntity.class, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
@@ -326,13 +326,13 @@ extends TameableEntity {
     }
 
     @Override
-    public CatEntity createChild(PassiveEntity arg) {
-        CatEntity lv = EntityType.CAT.create(this.world);
-        if (arg instanceof CatEntity) {
+    public CatEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        CatEntity lv = EntityType.CAT.create(arg);
+        if (arg2 instanceof CatEntity) {
             if (this.random.nextBoolean()) {
                 lv.setCatType(this.getCatType());
             } else {
-                lv.setCatType(((CatEntity)arg).getCatType());
+                lv.setCatType(((CatEntity)arg2).getCatType());
             }
             if (this.isTamed()) {
                 lv.setOwnerUuid(this.getOwnerUuid());
@@ -340,7 +340,7 @@ extends TameableEntity {
                 if (this.random.nextBoolean()) {
                     lv.setCollarColor(this.getCollarColor());
                 } else {
-                    lv.setCollarColor(((CatEntity)arg).getCollarColor());
+                    lv.setCollarColor(((CatEntity)arg2).getCollarColor());
                 }
             }
         }
@@ -361,9 +361,9 @@ extends TameableEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
-        if (arg.getMoonSize() > 0.9f) {
+        if (arg.method_30272() > 0.9f) {
             this.setCatType(this.random.nextInt(11));
         } else {
             this.setCatType(this.random.nextInt(10));
@@ -429,8 +429,8 @@ extends TameableEntity {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     static class SleepWithOwnerGoal
@@ -496,7 +496,7 @@ extends TameableEntity {
         @Override
         public void stop() {
             this.cat.setSleepingWithOwner(false);
-            float f = this.cat.world.getSkyAngle(1.0f);
+            float f = this.cat.world.method_30274(1.0f);
             if (this.owner.getSleepTimer() >= 100 && (double)f > 0.77 && (double)f < 0.8 && (double)this.cat.world.getRandom().nextFloat() < 0.7) {
                 this.dropMorningGifts();
             }
@@ -547,7 +547,7 @@ extends TameableEntity {
         private final CatEntity cat;
 
         public TemptGoal(CatEntity arg, double d, Ingredient arg2, boolean bl) {
-            super((MobEntityWithAi)arg, d, arg2, bl);
+            super((PathAwareEntity)arg, d, arg2, bl);
             this.cat = arg;
         }
 

@@ -56,7 +56,7 @@ extends RealmsScreen {
     private static final Identifier LINK_ICONS = new Identifier("realms", "textures/gui/realms/link_icons.png");
     private static final Identifier TRAILER_ICONS = new Identifier("realms", "textures/gui/realms/trailer_icons.png");
     private static final Identifier SLOT_FRAME = new Identifier("realms", "textures/gui/realms/slot_frame.png");
-    private final RealmsScreenWithCallback lastScreen;
+    private final RealmsScreenWithCallback parent;
     private WorldTemplateObjectSelectionList templateList;
     private int selectedTemplate = -1;
     private Text title;
@@ -79,7 +79,7 @@ extends RealmsScreen {
     }
 
     public RealmsSelectWorldTemplateScreen(RealmsScreenWithCallback arg, RealmsServer.WorldType arg2, @Nullable WorldTemplatePaginatedList arg3) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.worldType = arg2;
         if (arg3 == null) {
             this.templateList = new WorldTemplateObjectSelectionList();
@@ -172,13 +172,13 @@ extends RealmsScreen {
     }
 
     private void backButtonClicked() {
-        this.lastScreen.callback(null);
-        this.client.openScreen(this.lastScreen);
+        this.parent.callback(null);
+        this.client.openScreen(this.parent);
     }
 
     private void selectTemplate() {
         if (this.method_25247()) {
-            this.lastScreen.callback(this.method_21434());
+            this.parent.callback(this.method_21434());
         }
     }
 

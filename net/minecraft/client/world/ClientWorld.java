@@ -32,6 +32,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5415;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -59,7 +60,6 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.CuboidBlockIterator;
 import net.minecraft.util.Util;
@@ -117,7 +117,7 @@ extends World {
         this.clientWorldProperties = arg2;
         this.netHandler = arg;
         this.worldRenderer = arg6;
-        this.skyProperties = SkyProperties.byDimensionType(arg.method_29091().getDimensionTypeRegistry().getKey(arg5));
+        this.skyProperties = SkyProperties.byDimensionType(arg.getRegistryTracker().getDimensionTypeRegistry().getKey(arg5));
         this.setSpawnPos(new BlockPos(8, 64, 8));
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
@@ -517,7 +517,7 @@ extends World {
     }
 
     @Override
-    public RegistryTagManager getTagManager() {
+    public class_5415 getTagManager() {
         return this.netHandler.getTagManager();
     }
 
@@ -591,7 +591,7 @@ extends World {
     }
 
     public float method_23783(float f) {
-        float g = this.getSkyAngle(f);
+        float g = this.method_30274(f);
         float h = 1.0f - (MathHelper.cos(g * ((float)Math.PI * 2)) * 2.0f + 0.2f);
         h = MathHelper.clamp(h, 0.0f, 1.0f);
         h = 1.0f - h;
@@ -602,7 +602,7 @@ extends World {
 
     public Vec3d method_23777(BlockPos arg, float f) {
         float p;
-        float g = this.getSkyAngle(f);
+        float g = this.method_30274(f);
         float h = MathHelper.cos(g * ((float)Math.PI * 2)) * 2.0f + 0.5f;
         h = MathHelper.clamp(h, 0.0f, 1.0f);
         Biome lv = this.getBiome(arg);
@@ -641,7 +641,7 @@ extends World {
     }
 
     public Vec3d getCloudsColor(float f) {
-        float g = this.getSkyAngle(f);
+        float g = this.method_30274(f);
         float h = MathHelper.cos(g * ((float)Math.PI * 2)) * 2.0f + 0.5f;
         h = MathHelper.clamp(h, 0.0f, 1.0f);
         float i = 1.0f;
@@ -670,7 +670,7 @@ extends World {
     }
 
     public float method_23787(float f) {
-        float g = this.getSkyAngle(f);
+        float g = this.method_30274(f);
         float h = 1.0f - (MathHelper.cos(g * ((float)Math.PI * 2)) * 2.0f + 0.25f);
         h = MathHelper.clamp(h, 0.0f, 1.0f);
         return h * h * 0.5f;

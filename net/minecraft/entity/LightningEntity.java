@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -82,13 +83,13 @@ extends Entity {
             }
         }
         if (this.ambientTick >= 0) {
-            if (this.world.isClient) {
+            if (!(this.world instanceof ServerWorld)) {
                 this.world.setLightningTicksLeft(2);
             } else if (!this.cosmetic) {
                 double d = 3.0;
                 List<Entity> list = this.world.getEntities(this, new Box(this.getX() - 3.0, this.getY() - 3.0, this.getZ() - 3.0, this.getX() + 3.0, this.getY() + 6.0 + 3.0, this.getZ() + 3.0), Entity::isAlive);
                 for (Entity lv2 : list) {
-                    lv2.onStruckByLightning(this);
+                    lv2.onStruckByLightning((ServerWorld)this.world, this);
                 }
                 if (this.channeler != null) {
                     Criteria.CHANNELED_LIGHTNING.trigger(this.channeler, list);

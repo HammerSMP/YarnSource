@@ -3,6 +3,7 @@
  */
 package net.minecraft.network.listener;
 
+import net.minecraft.class_5427;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.c2s.play.AdvancementTabC2SPacket;
 import net.minecraft.network.packet.c2s.play.BoatPaddleStateC2SPacket;
@@ -106,6 +107,8 @@ extends PacketListener {
     public void onTeleportConfirm(TeleportConfirmC2SPacket var1);
 
     public void onRecipeBookData(RecipeBookDataC2SPacket var1);
+
+    public void method_30303(class_5427 var1);
 
     public void onAdvancementTab(AdvancementTabC2SPacket var1);
 

@@ -36,6 +36,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
@@ -133,7 +134,7 @@ public abstract class ChunkGenerator {
         int j = lv3.x;
         int k = lv3.z;
         Biome lv4 = this.biomeSource.getBiomeForNoiseGen(lv3.x << 2, 0, lv3.z << 2);
-        BitSet bitSet = ((ProtoChunk)arg2).method_28510(arg3);
+        BitSet bitSet = ((ProtoChunk)arg2).getOrCreateCarvingMask(arg3);
         for (int m = j - 8; m <= j + 8; ++m) {
             for (int n = k - 8; n <= k + 8; ++n) {
                 List<ConfiguredCarver<?>> list = lv4.getCarversForStep(arg3);
@@ -238,7 +239,7 @@ public abstract class ChunkGenerator {
         arg2.setStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.field_24835, lv2, arg3);
     }
 
-    public void addStructureReferences(WorldAccess arg, StructureAccessor arg2, Chunk arg3) {
+    public void addStructureReferences(ServerWorldAccess arg, StructureAccessor arg2, Chunk arg3) {
         int i = 8;
         int j = arg3.getPos().x;
         int k = arg3.getPos().z;

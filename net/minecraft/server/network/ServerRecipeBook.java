@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.class_5411;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -64,19 +65,12 @@ extends RecipeBook {
     }
 
     private void sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action arg, ServerPlayerEntity arg2, List<Identifier> list) {
-        arg2.networkHandler.sendPacket(new UnlockRecipesS2CPacket(arg, list, Collections.emptyList(), this.guiOpen, this.filteringCraftable, this.furnaceGuiOpen, this.furnaceFilteringCraftable));
+        arg2.networkHandler.sendPacket(new UnlockRecipesS2CPacket(arg, list, Collections.emptyList(), this.method_30173()));
     }
 
     public CompoundTag toTag() {
         CompoundTag lv = new CompoundTag();
-        lv.putBoolean("isGuiOpen", this.guiOpen);
-        lv.putBoolean("isFilteringCraftable", this.filteringCraftable);
-        lv.putBoolean("isFurnaceGuiOpen", this.furnaceGuiOpen);
-        lv.putBoolean("isFurnaceFilteringCraftable", this.furnaceFilteringCraftable);
-        lv.putBoolean("isBlastingFurnaceGuiOpen", this.blastFurnaceGuiOpen);
-        lv.putBoolean("isBlastingFurnaceFilteringCraftable", this.blastFurnaceFilteringCraftable);
-        lv.putBoolean("isSmokerGuiOpen", this.smokerGuiOpen);
-        lv.putBoolean("isSmokerFilteringCraftable", this.smokerFilteringCraftable);
+        this.method_30173().method_30189(lv);
         ListTag lv2 = new ListTag();
         for (Identifier lv3 : this.recipes) {
             lv2.add(StringTag.of(lv3.toString()));
@@ -91,14 +85,7 @@ extends RecipeBook {
     }
 
     public void fromTag(CompoundTag arg, RecipeManager arg2) {
-        this.guiOpen = arg.getBoolean("isGuiOpen");
-        this.filteringCraftable = arg.getBoolean("isFilteringCraftable");
-        this.furnaceGuiOpen = arg.getBoolean("isFurnaceGuiOpen");
-        this.furnaceFilteringCraftable = arg.getBoolean("isFurnaceFilteringCraftable");
-        this.blastFurnaceGuiOpen = arg.getBoolean("isBlastingFurnaceGuiOpen");
-        this.blastFurnaceFilteringCraftable = arg.getBoolean("isBlastingFurnaceFilteringCraftable");
-        this.smokerGuiOpen = arg.getBoolean("isSmokerGuiOpen");
-        this.smokerFilteringCraftable = arg.getBoolean("isSmokerFilteringCraftable");
+        this.method_30174(class_5411.method_30183(arg));
         ListTag lv = arg.getList("recipes", 8);
         this.handleList(lv, this::add, arg2);
         ListTag lv2 = arg.getList("toBeDisplayed", 8);
@@ -125,7 +112,7 @@ extends RecipeBook {
     }
 
     public void sendInitRecipesPacket(ServerPlayerEntity arg) {
-        arg.networkHandler.sendPacket(new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, this.recipes, this.toBeDisplayed, this.guiOpen, this.filteringCraftable, this.furnaceGuiOpen, this.furnaceFilteringCraftable));
+        arg.networkHandler.sendPacket(new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, this.recipes, this.toBeDisplayed, this.method_30173()));
     }
 }
 

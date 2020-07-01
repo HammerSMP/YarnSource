@@ -53,7 +53,7 @@ CollisionView {
         for (int m = arg2.getX() >> 4; m <= arg3.getX() >> 4; ++m) {
             for (int n = arg2.getZ() >> 4; n <= arg3.getZ() >> 4; ++n) {
                 Chunk lv2 = this.chunks[m - this.minX][n - this.minZ];
-                if (lv2 == null || lv2.method_12228(arg2.getY(), arg3.getY())) continue;
+                if (lv2 == null || lv2.areSectionsEmptyBetween(arg2.getY(), arg3.getY())) continue;
                 this.empty = false;
                 return;
             }

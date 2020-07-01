@@ -32,14 +32,14 @@ import org.apache.logging.log4j.Logger;
 public class RealmsTermsScreen
 extends RealmsScreen {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final Screen field_22727;
+    private final Screen parent;
     private final RealmsMainScreen mainScreen;
     private final RealmsServer realmsServer;
     private boolean onLink;
     private final String realmsToSUrl = "https://minecraft.net/realms/terms";
 
     public RealmsTermsScreen(Screen arg, RealmsMainScreen arg2, RealmsServer arg3) {
-        this.field_22727 = arg;
+        this.parent = arg;
         this.mainScreen = arg2;
         this.realmsServer = arg3;
     }
@@ -49,7 +49,7 @@ extends RealmsScreen {
         this.client.keyboard.enableRepeatEvents(true);
         int i = this.width / 4 - 2;
         this.addButton(new ButtonWidget(this.width / 4, RealmsTermsScreen.row(12), i, 20, new TranslatableText("mco.terms.buttons.agree"), arg -> this.agreedToTos()));
-        this.addButton(new ButtonWidget(this.width / 2 + 4, RealmsTermsScreen.row(12), i, 20, new TranslatableText("mco.terms.buttons.disagree"), arg -> this.client.openScreen(this.field_22727)));
+        this.addButton(new ButtonWidget(this.width / 2 + 4, RealmsTermsScreen.row(12), i, 20, new TranslatableText("mco.terms.buttons.disagree"), arg -> this.client.openScreen(this.parent)));
     }
 
     @Override
@@ -60,7 +60,7 @@ extends RealmsScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == 256) {
-            this.client.openScreen(this.field_22727);
+            this.client.openScreen(this.parent);
             return true;
         }
         return super.keyPressed(i, j, k);
@@ -70,7 +70,7 @@ extends RealmsScreen {
         RealmsClient lv = RealmsClient.createRealmsClient();
         try {
             lv.agreeToTos();
-            this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.field_22727, new RealmsGetServerDetailsTask(this.mainScreen, this.field_22727, this.realmsServer, new ReentrantLock())));
+            this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new RealmsGetServerDetailsTask(this.mainScreen, this.parent, this.realmsServer, new ReentrantLock())));
         }
         catch (RealmsServiceException lv2) {
             LOGGER.error("Couldn't agree to TOS");

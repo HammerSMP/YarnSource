@@ -119,7 +119,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         String string = supplier.get().toLowerCase(Locale.ROOT);
         for (LevelSummary lv3 : this.levels) {
             if (!lv3.getDisplayName().toLowerCase(Locale.ROOT).contains(string) && !lv3.getName().toLowerCase(Locale.ROOT).contains(string)) continue;
-            this.addEntry(new Entry(this, lv3, this.client.getLevelStorage()));
+            this.addEntry(new Entry(this, lv3));
         }
     }
 
@@ -149,8 +149,8 @@ extends AlwaysSelectedEntryListWidget<Entry> {
     }
 
     @Override
-    protected void moveSelection(EntryListWidget.class_5403 arg2) {
-        this.method_30013(arg2, arg -> !((Entry)arg).level.isLocked());
+    protected void moveSelection(EntryListWidget.MoveDirection arg2) {
+        this.moveSelectionIf(arg2, arg -> !((Entry)arg).level.isLocked());
     }
 
     public Optional<Entry> method_20159() {
@@ -174,11 +174,12 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         private final NativeImageBackedTexture icon;
         private long time;
 
-        public Entry(WorldListWidget arg2, LevelSummary arg3, LevelStorage arg4) {
+        public Entry(WorldListWidget arg2, LevelSummary arg3) {
             this.screen = arg2.getParent();
             this.level = arg3;
             this.client = MinecraftClient.getInstance();
-            this.iconLocation = new Identifier("worlds/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)arg3.getName()) + "/icon");
+            String string = arg3.getName();
+            this.iconLocation = new Identifier("worlds/" + Util.method_30309(string) + "/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)string) + "/icon");
             this.iconFile = arg3.getFile();
             if (!this.iconFile.isFile()) {
                 this.iconFile = null;

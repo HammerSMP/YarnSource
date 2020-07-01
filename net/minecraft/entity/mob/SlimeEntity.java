@@ -9,6 +9,7 @@ package net.minecraft.entity.mob;
 import java.util.EnumSet;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.class_5425;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
@@ -282,7 +283,7 @@ implements Monster {
         if (arg2.getDifficulty() != Difficulty.PEACEFUL) {
             boolean bl;
             Biome lv = arg2.getBiome(arg4);
-            if (lv == Biomes.SWAMP && arg4.getY() > 50 && arg4.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < arg2.getMoonSize() && arg2.getLightLevel(arg4) <= random.nextInt(8)) {
+            if (lv == Biomes.SWAMP && arg4.getY() > 50 && arg4.getY() < 70 && random.nextFloat() < 0.5f && random.nextFloat() < arg2.method_30272() && arg2.getLightLevel(arg4) <= random.nextInt(8)) {
                 return SlimeEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
             }
             if (!(arg2 instanceof ServerWorldAccess)) {
@@ -320,7 +321,7 @@ implements Monster {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         int i = this.random.nextInt(3);
         if (i < 2 && this.random.nextFloat() < 0.5f * arg2.getClampedLocalDifficulty()) {
             ++i;

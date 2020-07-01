@@ -32,6 +32,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -65,7 +66,7 @@ extends Item {
         BlockPos lv10;
         BlockEntity lv6;
         World lv = arg.getWorld();
-        if (lv.isClient) {
+        if (!(lv instanceof ServerWorld)) {
             return ActionResult.SUCCESS;
         }
         ItemStack lv2 = arg.getStack();
@@ -87,7 +88,7 @@ extends Item {
             lv10 = lv3.offset(lv4);
         }
         EntityType<?> lv11 = this.getEntityType(lv2.getTag());
-        if (lv11.spawnFromItemStack(lv, lv2, arg.getPlayer(), lv10, SpawnReason.SPAWN_EGG, true, !Objects.equals(lv3, lv10) && lv4 == Direction.UP) != null) {
+        if (lv11.spawnFromItemStack((ServerWorld)lv, lv2, arg.getPlayer(), lv10, SpawnReason.SPAWN_EGG, true, !Objects.equals(lv3, lv10) && lv4 == Direction.UP) != null) {
             lv2.decrement(1);
         }
         return ActionResult.CONSUME;
@@ -100,7 +101,7 @@ extends Item {
         if (((HitResult)lv2).getType() != HitResult.Type.BLOCK) {
             return TypedActionResult.pass(lv);
         }
-        if (arg.isClient) {
+        if (!(arg instanceof ServerWorld)) {
             return TypedActionResult.success(lv);
         }
         BlockHitResult lv3 = lv2;
@@ -112,7 +113,7 @@ extends Item {
             return TypedActionResult.fail(lv);
         }
         EntityType<?> lv5 = this.getEntityType(lv.getTag());
-        if (lv5.spawnFromItemStack(arg, lv, arg2, lv4, SpawnReason.SPAWN_EGG, false, false) == null) {
+        if (lv5.spawnFromItemStack((ServerWorld)arg, lv, arg2, lv4, SpawnReason.SPAWN_EGG, false, false) == null) {
             return TypedActionResult.pass(lv);
         }
         if (!arg2.abilities.creativeMode) {
@@ -149,13 +150,13 @@ extends Item {
         return this.type;
     }
 
-    public Optional<MobEntity> spawnBaby(PlayerEntity arg, MobEntity arg2, EntityType<? extends MobEntity> arg3, World arg4, Vec3d arg5, ItemStack arg6) {
+    public Optional<MobEntity> spawnBaby(PlayerEntity arg, MobEntity arg2, EntityType<? extends MobEntity> arg3, ServerWorld arg4, Vec3d arg5, ItemStack arg6) {
         MobEntity lv2;
         if (!this.isOfSameEntityType(arg6.getTag(), arg3)) {
             return Optional.empty();
         }
         if (arg2 instanceof PassiveEntity) {
-            PassiveEntity lv = ((PassiveEntity)arg2).createChild((PassiveEntity)arg2);
+            PassiveEntity lv = ((PassiveEntity)arg2).createChild(arg4, (PassiveEntity)arg2);
         } else {
             lv2 = arg3.create(arg4);
         }

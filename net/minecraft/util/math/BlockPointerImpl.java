@@ -5,22 +5,22 @@ package net.minecraft.util.math;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class BlockPointerImpl
 implements BlockPointer {
-    private final World world;
+    private final ServerWorld world;
     private final BlockPos pos;
 
-    public BlockPointerImpl(World arg, BlockPos arg2) {
+    public BlockPointerImpl(ServerWorld arg, BlockPos arg2) {
         this.world = arg;
         this.pos = arg2;
     }
 
     @Override
-    public World getWorld() {
+    public ServerWorld getWorld() {
         return this.world;
     }
 

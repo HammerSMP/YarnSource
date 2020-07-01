@@ -14,7 +14,6 @@ import net.minecraft.block.VineBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -28,10 +27,10 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        BlockPos.Mutable lv = arg4.mutableCopy();
-        block0: for (int i = arg4.getY(); i < 256; ++i) {
-            lv.set(arg4);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        BlockPos.Mutable lv = arg3.mutableCopy();
+        block0: for (int i = arg3.getY(); i < 256; ++i) {
+            lv.set(arg3);
             lv.move(random.nextInt(4) - random.nextInt(4), 0, random.nextInt(4) - random.nextInt(4));
             lv.setY(i);
             if (!arg.isAir(lv)) continue;

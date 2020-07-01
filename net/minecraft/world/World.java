@@ -33,6 +33,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.class_5415;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -50,7 +51,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.crash.CrashException;
@@ -288,7 +288,7 @@ AutoCloseable {
     }
 
     @Override
-    public boolean method_30093(BlockPos arg, boolean bl, @Nullable Entity arg2, int i) {
+    public boolean breakBlock(BlockPos arg, boolean bl, @Nullable Entity arg2, int i) {
         BlockState lv = this.getBlockState(arg);
         if (lv.isAir()) {
             return false;
@@ -438,7 +438,7 @@ AutoCloseable {
     }
 
     public float getSkyAngleRadians(float f) {
-        float g = this.getSkyAngle(f);
+        float g = this.method_30274(f);
         return g * ((float)Math.PI * 2);
     }
 
@@ -655,7 +655,7 @@ AutoCloseable {
     public void calculateAmbientDarkness() {
         double d = 1.0 - (double)(this.getRainGradient(1.0f) * 5.0f) / 16.0;
         double e = 1.0 - (double)(this.getThunderGradient(1.0f) * 5.0f) / 16.0;
-        double f = 0.5 + 2.0 * MathHelper.clamp((double)MathHelper.cos(this.getSkyAngle(1.0f) * ((float)Math.PI * 2)), -0.25, 0.25);
+        double f = 0.5 + 2.0 * MathHelper.clamp((double)MathHelper.cos(this.method_30274(1.0f) * ((float)Math.PI * 2)), -0.25, 0.25);
         this.ambientDarkness = (int)((1.0 - f * d * e) * 11.0);
     }
 
@@ -769,11 +769,6 @@ AutoCloseable {
     @Override
     public int getSeaLevel() {
         return 63;
-    }
-
-    @Override
-    public World getWorld() {
-        return this;
     }
 
     public int getReceivedStrongRedstonePower(BlockPos arg) {
@@ -977,7 +972,7 @@ AutoCloseable {
         long l = 0L;
         float f = 0.0f;
         if (this.isChunkLoaded(arg)) {
-            f = this.getMoonSize();
+            f = this.method_30272();
             l = this.getWorldChunk(arg).getInhabitedTime();
         }
         return new LocalDifficulty(this.getDifficulty(), this.getTimeOfDay(), l, f);
@@ -1025,7 +1020,7 @@ AutoCloseable {
 
     public abstract RecipeManager getRecipeManager();
 
-    public abstract RegistryTagManager getTagManager();
+    public abstract class_5415 getTagManager();
 
     public BlockPos getRandomPosInChunk(int i, int j, int k, int l) {
         this.lcgBlockSeed = this.lcgBlockSeed * 3 + 1013904223;

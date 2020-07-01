@@ -8,7 +8,6 @@
  */
 package net.minecraft.client.font;
 
-import java.io.Closeable;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,8 +22,7 @@ import net.minecraft.util.Identifier;
 
 @Environment(value=EnvType.CLIENT)
 public class GlyphAtlasTexture
-extends AbstractTexture
-implements Closeable {
+extends AbstractTexture {
     private final Identifier id;
     private final RenderLayer field_21690;
     private final RenderLayer field_21691;

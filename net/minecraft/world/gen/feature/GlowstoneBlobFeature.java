@@ -13,7 +13,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -25,17 +24,17 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        if (!arg.isAir(arg4)) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        if (!arg.isAir(arg3)) {
             return false;
         }
-        BlockState lv = arg.getBlockState(arg4.up());
+        BlockState lv = arg.getBlockState(arg3.up());
         if (!(lv.isOf(Blocks.NETHERRACK) || lv.isOf(Blocks.BASALT) || lv.isOf(Blocks.BLACKSTONE))) {
             return false;
         }
-        arg.setBlockState(arg4, Blocks.GLOWSTONE.getDefaultState(), 2);
+        arg.setBlockState(arg3, Blocks.GLOWSTONE.getDefaultState(), 2);
         for (int i = 0; i < 1500; ++i) {
-            BlockPos lv2 = arg4.add(random.nextInt(8) - random.nextInt(8), -random.nextInt(12), random.nextInt(8) - random.nextInt(8));
+            BlockPos lv2 = arg3.add(random.nextInt(8) - random.nextInt(8), -random.nextInt(12), random.nextInt(8) - random.nextInt(8));
             if (!arg.getBlockState(lv2).isAir()) continue;
             int j = 0;
             for (Direction lv3 : Direction.values()) {

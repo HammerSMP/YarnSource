@@ -24,24 +24,24 @@ import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.brain.task.Task;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class PlayWithVillagerBabiesTask
-extends Task<MobEntityWithAi> {
+extends Task<PathAwareEntity> {
     public PlayWithVillagerBabiesTask() {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.VISIBLE_VILLAGER_BABIES, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.INTERACTION_TARGET, (Object)((Object)MemoryModuleState.REGISTERED)));
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, MobEntityWithAi arg2) {
+    protected boolean shouldRun(ServerWorld arg, PathAwareEntity arg2) {
         return arg.getRandom().nextInt(10) == 0 && this.hasVisibleVillagerBabies(arg2);
     }
 
     @Override
-    protected void run(ServerWorld arg, MobEntityWithAi arg22, long l) {
+    protected void run(ServerWorld arg, PathAwareEntity arg22, long l) {
         LivingEntity lv = this.findVisibleVillagerBaby(arg22);
         if (lv != null) {
             this.setGroundTarget(arg, arg22, lv);
@@ -55,7 +55,7 @@ extends Task<MobEntityWithAi> {
         this.getVisibleMob(arg22).ifPresent(arg2 -> PlayWithVillagerBabiesTask.setPlayTarget(arg22, arg2));
     }
 
-    private void setGroundTarget(ServerWorld arg, MobEntityWithAi arg2, LivingEntity arg3) {
+    private void setGroundTarget(ServerWorld arg, PathAwareEntity arg2, LivingEntity arg3) {
         for (int i = 0; i < 10; ++i) {
             Vec3d lv = TargetFinder.findGroundTarget(arg2, 20, 8);
             if (lv == null || !arg.isNearOccupiedPointOfInterest(new BlockPos(lv))) continue;
@@ -64,29 +64,29 @@ extends Task<MobEntityWithAi> {
         }
     }
 
-    private static void setPlayTarget(MobEntityWithAi arg, LivingEntity arg2) {
+    private static void setPlayTarget(PathAwareEntity arg, LivingEntity arg2) {
         Brain<?> lv = arg.getBrain();
         lv.remember(MemoryModuleType.INTERACTION_TARGET, arg2);
         lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg2, true));
         lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget(arg2, false), 0.6f, 1));
     }
 
-    private Optional<LivingEntity> getVisibleMob(MobEntityWithAi arg) {
+    private Optional<LivingEntity> getVisibleMob(PathAwareEntity arg) {
         return this.getVisibleVillagerBabies(arg).stream().findAny();
     }
 
-    private Optional<LivingEntity> getLeastPopularBabyInteractionTarget(MobEntityWithAi arg) {
+    private Optional<LivingEntity> getLeastPopularBabyInteractionTarget(PathAwareEntity arg) {
         Map<LivingEntity, Integer> map = this.getBabyInteractionTargetCounts(arg);
         return map.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).filter(entry -> (Integer)entry.getValue() > 0 && (Integer)entry.getValue() <= 5).map(Map.Entry::getKey).findFirst();
     }
 
-    private Map<LivingEntity, Integer> getBabyInteractionTargetCounts(MobEntityWithAi arg) {
+    private Map<LivingEntity, Integer> getBabyInteractionTargetCounts(PathAwareEntity arg) {
         HashMap map = Maps.newHashMap();
         this.getVisibleVillagerBabies(arg).stream().filter(this::hasInteractionTarget).forEach(arg2 -> map.compute(this.getInteractionTarget((LivingEntity)arg2), (arg, integer) -> integer == null ? 1 : integer + 1));
         return map;
     }
 
-    private List<LivingEntity> getVisibleVillagerBabies(MobEntityWithAi arg) {
+    private List<LivingEntity> getVisibleVillagerBabies(PathAwareEntity arg) {
         return arg.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_VILLAGER_BABIES).get();
     }
 
@@ -107,7 +107,7 @@ extends Task<MobEntityWithAi> {
         return arg22.getBrain().getOptionalMemory(MemoryModuleType.INTERACTION_TARGET).filter(arg2 -> arg2 == arg).isPresent();
     }
 
-    private boolean hasVisibleVillagerBabies(MobEntityWithAi arg) {
+    private boolean hasVisibleVillagerBabies(PathAwareEntity arg) {
         return arg.getBrain().hasMemoryModule(MemoryModuleType.VISIBLE_VILLAGER_BABIES);
     }
 }

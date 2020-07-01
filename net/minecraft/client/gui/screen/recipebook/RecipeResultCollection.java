@@ -2,6 +2,7 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
+ *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Lists
  *  com.google.common.collect.Sets
  *  net.fabricmc.api.EnvType
@@ -9,6 +10,7 @@
  */
 package net.minecraft.client.gui.screen.recipebook;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
@@ -23,11 +25,27 @@ import net.minecraft.recipe.book.RecipeBook;
 
 @Environment(value=EnvType.CLIENT)
 public class RecipeResultCollection {
-    private final List<Recipe<?>> recipes = Lists.newArrayList();
+    private final List<Recipe<?>> recipes;
+    private final boolean singleOutput;
     private final Set<Recipe<?>> craftableRecipes = Sets.newHashSet();
     private final Set<Recipe<?>> fittingRecipes = Sets.newHashSet();
     private final Set<Recipe<?>> unlockedRecipes = Sets.newHashSet();
-    private boolean singleOutput = true;
+
+    public RecipeResultCollection(List<Recipe<?>> list) {
+        this.recipes = ImmutableList.copyOf(list);
+        this.singleOutput = list.size() <= 1 ? true : RecipeResultCollection.method_30295(list);
+    }
+
+    private static boolean method_30295(List<Recipe<?>> list) {
+        int i = list.size();
+        ItemStack lv = list.get(0).getOutput();
+        for (int j = 1; j < i; ++j) {
+            ItemStack lv2 = list.get(j).getOutput();
+            if (ItemStack.areItemsEqualIgnoreDamage(lv, lv2) && ItemStack.areTagsEqual(lv, lv2)) continue;
+            return false;
+        }
+        return true;
+    }
 
     public boolean isInitialized() {
         return !this.unlockedRecipes.isEmpty();
@@ -41,9 +59,8 @@ public class RecipeResultCollection {
     }
 
     public void computeCraftables(RecipeFinder arg, int i, int j, RecipeBook arg2) {
-        for (int k = 0; k < this.recipes.size(); ++k) {
+        for (Recipe<?> lv : this.recipes) {
             boolean bl;
-            Recipe<?> lv = this.recipes.get(k);
             boolean bl2 = bl = lv.fits(i, j) && arg2.contains(lv);
             if (bl) {
                 this.fittingRecipes.add(lv);
@@ -91,15 +108,6 @@ public class RecipeResultCollection {
             list.add(lv);
         }
         return list;
-    }
-
-    public void addRecipe(Recipe<?> arg) {
-        this.recipes.add(arg);
-        if (this.singleOutput) {
-            ItemStack lv2;
-            ItemStack lv = this.recipes.get(0).getOutput();
-            this.singleOutput = ItemStack.areItemsEqualIgnoreDamage(lv, lv2 = arg.getOutput()) && ItemStack.areTagsEqual(lv, lv2);
-        }
     }
 
     public boolean hasSingleOutput() {

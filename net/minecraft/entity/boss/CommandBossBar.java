@@ -135,7 +135,7 @@ extends ServerBossBar {
         lv.putBoolean("CreateWorldFog", this.getThickenFog());
         ListTag lv2 = new ListTag();
         for (UUID uUID : this.playerUuids) {
-            lv2.add(NbtHelper.fromUuidNew(uUID));
+            lv2.add(NbtHelper.fromUuid(uUID));
         }
         lv.put("Players", lv2);
         return lv;
@@ -153,7 +153,7 @@ extends ServerBossBar {
         lv.setThickenFog(arg.getBoolean("CreateWorldFog"));
         ListTag lv2 = arg.getList("Players", 11);
         for (int i = 0; i < lv2.size(); ++i) {
-            lv.addPlayer(NbtHelper.toUuidNew(lv2.get(i)));
+            lv.addPlayer(NbtHelper.toUuid(lv2.get(i)));
         }
         return lv;
     }

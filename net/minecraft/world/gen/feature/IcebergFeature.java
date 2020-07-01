@@ -17,7 +17,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.SingleStateFeatureConfig;
@@ -29,12 +28,12 @@ extends Feature<SingleStateFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SingleStateFeatureConfig arg5) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, SingleStateFeatureConfig arg4) {
         boolean bl3;
         int l;
-        arg4 = new BlockPos(arg4.getX(), arg3.getSeaLevel(), arg4.getZ());
+        arg3 = new BlockPos(arg3.getX(), arg2.getSeaLevel(), arg3.getZ());
         boolean bl = random.nextDouble() > 0.7;
-        BlockState lv = arg5.state;
+        BlockState lv = arg4.state;
         double d = random.nextDouble() * 2.0 * Math.PI;
         int i = 11 - random.nextInt(5);
         int j = 3 + random.nextInt(3);
@@ -53,24 +52,24 @@ extends Feature<SingleStateFeatureConfig> {
                     int s;
                     int n3 = s = bl2 ? this.method_13417(r, l, n2) : this.method_13419(random, r, l, n2);
                     if (!bl2 && p >= s) continue;
-                    this.method_13426(arg, random, arg4, l, p, r, q, s, o, bl2, j, d, bl, lv);
+                    this.method_13426(arg, random, arg3, l, p, r, q, s, o, bl2, j, d, bl, lv);
                 }
             }
         }
-        this.method_13418(arg, arg4, n2, l, bl2, i);
+        this.method_13418(arg, arg3, n2, l, bl2, i);
         for (int t = -o; t < o; ++t) {
             for (int u = -o; u < o; ++u) {
                 for (int v = -1; v > -m; --v) {
                     int w = bl2 ? MathHelper.ceil((float)o * (1.0f - (float)Math.pow(v, 2.0) / ((float)m * 8.0f))) : o;
                     int x = this.method_13427(random, -v, m, n2);
                     if (t >= x) continue;
-                    this.method_13426(arg, random, arg4, m, t, v, u, x, w, bl2, j, d, bl, lv);
+                    this.method_13426(arg, random, arg3, m, t, v, u, x, w, bl2, j, d, bl, lv);
                 }
             }
         }
         boolean bl4 = bl2 ? random.nextDouble() > 0.1 : (bl3 = random.nextDouble() > 0.7);
         if (bl3) {
-            this.method_13428(random, arg, n2, l, arg4, bl2, i, d, j);
+            this.method_13428(random, arg, n2, l, arg3, bl2, i, d, j);
         }
         return true;
     }

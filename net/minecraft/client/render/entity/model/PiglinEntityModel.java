@@ -9,6 +9,8 @@ package net.minecraft.client.render.entity.model;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_4837;
+import net.minecraft.class_5418;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.CrossbowPosing;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
@@ -66,10 +68,10 @@ extends PlayerEntityModel<T> {
         float m = 0.08f + g * 0.4f;
         this.rightEar.roll = -0.5235988f - MathHelper.cos(l * 1.2f) * m;
         this.leftEar.roll = 0.5235988f + MathHelper.cos(l) * m;
-        if (((Entity)arg).getType() == EntityType.PIGLIN) {
-            PiglinEntity lv = (PiglinEntity)arg;
-            PiglinEntity.Activity lv2 = lv.getActivity();
-            if (lv2 == PiglinEntity.Activity.DANCING) {
+        if (arg instanceof class_5418) {
+            class_5418 lv = (class_5418)arg;
+            class_4837 lv2 = lv.getActivity();
+            if (lv2 == class_4837.DANCING) {
                 float n = h / 60.0f;
                 this.leftEar.roll = 0.5235988f + (float)Math.PI / 180 * MathHelper.sin(n * 30.0f) * 10.0f;
                 this.rightEar.roll = -0.5235988f - (float)Math.PI / 180 * MathHelper.cos(n * 30.0f) * 10.0f;
@@ -80,13 +82,13 @@ extends PlayerEntityModel<T> {
                 this.rightArm.pivotY = MathHelper.sin(n * 40.0f) * 0.5f + 1.5f;
                 this.leftArm.pivotY = MathHelper.sin(n * 40.0f) * 0.5f + 1.5f;
                 this.torso.pivotY = MathHelper.sin(n * 40.0f) * 0.35f;
-            } else if (lv2 == PiglinEntity.Activity.ATTACKING_WITH_MELEE_WEAPON && this.handSwingProgress == 0.0f) {
+            } else if (lv2 == class_4837.ATTACKING_WITH_MELEE_WEAPON && this.handSwingProgress == 0.0f) {
                 this.method_29354(arg);
-            } else if (lv2 == PiglinEntity.Activity.CROSSBOW_HOLD) {
+            } else if (lv2 == class_4837.CROSSBOW_HOLD) {
                 CrossbowPosing.hold(this.rightArm, this.leftArm, this.head, !((MobEntity)arg).isLeftHanded());
-            } else if (lv2 == PiglinEntity.Activity.CROSSBOW_CHARGE) {
+            } else if (lv2 == class_4837.CROSSBOW_CHARGE) {
                 CrossbowPosing.charge(this.rightArm, this.leftArm, arg, !((MobEntity)arg).isLeftHanded());
-            } else if (lv2 == PiglinEntity.Activity.ADMIRING_ITEM) {
+            } else if (lv2 == class_4837.ADMIRING_ITEM) {
                 this.head.pitch = 0.5f;
                 this.head.yaw = 0.0f;
                 if (((MobEntity)arg).isLeftHanded()) {
@@ -109,7 +111,7 @@ extends PlayerEntityModel<T> {
 
     @Override
     protected void method_29353(T arg, float f) {
-        if (this.handSwingProgress > 0.0f && arg instanceof PiglinEntity && ((PiglinEntity)arg).getActivity() == PiglinEntity.Activity.ATTACKING_WITH_MELEE_WEAPON) {
+        if (this.handSwingProgress > 0.0f && arg instanceof PiglinEntity && ((PiglinEntity)arg).getActivity() == class_4837.ATTACKING_WITH_MELEE_WEAPON) {
             CrossbowPosing.method_29351(this.rightArm, this.leftArm, arg, this.handSwingProgress, f);
             return;
         }

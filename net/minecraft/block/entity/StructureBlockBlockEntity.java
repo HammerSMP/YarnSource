@@ -400,8 +400,8 @@ extends BlockEntity {
         return true;
     }
 
-    public boolean loadStructure() {
-        return this.loadStructure(true);
+    public boolean loadStructure(ServerWorld arg) {
+        return this.loadStructure(arg, true);
     }
 
     private static Random createRandom(long l) {
@@ -414,37 +414,36 @@ extends BlockEntity {
     /*
      * WARNING - void declaration
      */
-    public boolean loadStructure(boolean bl) {
-        void lv5;
-        if (this.mode != StructureBlockMode.LOAD || this.world.isClient || this.structureName == null) {
+    public boolean loadStructure(ServerWorld arg, boolean bl) {
+        void lv4;
+        if (this.mode != StructureBlockMode.LOAD || this.structureName == null) {
             return false;
         }
-        ServerWorld lv = (ServerWorld)this.world;
-        StructureManager lv2 = lv.getStructureManager();
+        StructureManager lv = arg.getStructureManager();
         try {
-            Structure lv3 = lv2.getStructure(this.structureName);
+            Structure lv2 = lv.getStructure(this.structureName);
         }
-        catch (InvalidIdentifierException lv4) {
+        catch (InvalidIdentifierException lv3) {
             return false;
         }
-        if (lv5 == null) {
+        if (lv4 == null) {
             return false;
         }
-        return this.place(bl, (Structure)lv5);
+        return this.place(arg, bl, (Structure)lv4);
     }
 
-    public boolean place(boolean bl, Structure arg) {
+    public boolean place(ServerWorld arg, boolean bl, Structure arg2) {
         BlockPos lv2;
         boolean bl2;
         BlockPos lv = this.getPos();
-        if (!ChatUtil.isEmpty(arg.getAuthor())) {
-            this.author = arg.getAuthor();
+        if (!ChatUtil.isEmpty(arg2.getAuthor())) {
+            this.author = arg2.getAuthor();
         }
-        if (!(bl2 = this.size.equals(lv2 = arg.getSize()))) {
+        if (!(bl2 = this.size.equals(lv2 = arg2.getSize()))) {
             this.size = lv2;
             this.markDirty();
-            BlockState lv3 = this.world.getBlockState(lv);
-            this.world.updateListeners(lv, lv3, lv3, 3);
+            BlockState lv3 = arg.getBlockState(lv);
+            arg.updateListeners(lv, lv3, lv3, 3);
         }
         if (!bl || bl2) {
             StructurePlacementData lv4 = new StructurePlacementData().setMirror(this.mirror).setRotation(this.rotation).setIgnoreEntities(this.ignoreEntities).setChunkPosition(null);
@@ -452,7 +451,7 @@ extends BlockEntity {
                 lv4.clearProcessors().addProcessor(new BlockRotStructureProcessor(MathHelper.clamp(this.integrity, 0.0f, 1.0f))).setRandom(StructureBlockBlockEntity.createRandom(this.seed));
             }
             BlockPos lv5 = lv.add(this.offset);
-            arg.place(this.world, lv5, lv4, StructureBlockBlockEntity.createRandom(this.seed));
+            arg2.place(arg, lv5, lv4, StructureBlockBlockEntity.createRandom(this.seed));
             return true;
         }
         return false;

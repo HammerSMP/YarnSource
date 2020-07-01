@@ -755,7 +755,7 @@ extends LivingEntity {
     }
 
     @Override
-    public void onStruckByLightning(LightningEntity arg) {
+    public void onStruckByLightning(ServerWorld arg, LightningEntity arg2) {
     }
 
     @Override

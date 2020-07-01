@@ -14,36 +14,21 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5411;
+import net.minecraft.class_5421;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
-import net.minecraft.screen.BlastFurnaceScreenHandler;
-import net.minecraft.screen.FurnaceScreenHandler;
-import net.minecraft.screen.SmokerScreenHandler;
 import net.minecraft.util.Identifier;
 
 public class RecipeBook {
     protected final Set<Identifier> recipes = Sets.newHashSet();
     protected final Set<Identifier> toBeDisplayed = Sets.newHashSet();
-    protected boolean guiOpen;
-    protected boolean filteringCraftable;
-    protected boolean furnaceGuiOpen;
-    protected boolean furnaceFilteringCraftable;
-    protected boolean blastFurnaceGuiOpen;
-    protected boolean blastFurnaceFilteringCraftable;
-    protected boolean smokerGuiOpen;
-    protected boolean smokerFilteringCraftable;
+    private final class_5411 field_25734 = new class_5411();
 
     public void copyFrom(RecipeBook arg) {
         this.recipes.clear();
         this.toBeDisplayed.clear();
-        this.guiOpen = arg.guiOpen;
-        this.filteringCraftable = arg.filteringCraftable;
-        this.furnaceGuiOpen = arg.furnaceGuiOpen;
-        this.furnaceFilteringCraftable = arg.furnaceFilteringCraftable;
-        this.blastFurnaceGuiOpen = arg.blastFurnaceGuiOpen;
-        this.blastFurnaceFilteringCraftable = arg.blastFurnaceFilteringCraftable;
-        this.smokerGuiOpen = arg.smokerGuiOpen;
-        this.smokerFilteringCraftable = arg.smokerFilteringCraftable;
+        this.field_25734.method_30179(arg.field_25734);
         this.recipes.addAll(arg.recipes);
         this.toBeDisplayed.addAll(arg.toBeDisplayed);
     }
@@ -97,89 +82,41 @@ public class RecipeBook {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isGuiOpen() {
-        return this.guiOpen;
+    public boolean isGuiOpen(class_5421 arg) {
+        return this.field_25734.method_30180(arg);
     }
 
-    public void setGuiOpen(boolean bl) {
-        this.guiOpen = bl;
+    @Environment(value=EnvType.CLIENT)
+    public void setGuiOpen(class_5421 arg, boolean bl) {
+        this.field_25734.method_30181(arg, bl);
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean isFilteringCraftable(AbstractRecipeScreenHandler<?> arg) {
-        if (arg instanceof FurnaceScreenHandler) {
-            return this.furnaceFilteringCraftable;
-        }
-        if (arg instanceof BlastFurnaceScreenHandler) {
-            return this.blastFurnaceFilteringCraftable;
-        }
-        if (arg instanceof SmokerScreenHandler) {
-            return this.smokerFilteringCraftable;
-        }
-        return this.filteringCraftable;
+        return this.method_30176(arg.method_30264());
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isFilteringCraftable() {
-        return this.filteringCraftable;
-    }
-
-    public void setFilteringCraftable(boolean bl) {
-        this.filteringCraftable = bl;
+    public boolean method_30176(class_5421 arg) {
+        return this.field_25734.method_30187(arg);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isFurnaceGuiOpen() {
-        return this.furnaceGuiOpen;
+    public void method_30177(class_5421 arg, boolean bl) {
+        this.field_25734.method_30188(arg, bl);
     }
 
-    public void setFurnaceGuiOpen(boolean bl) {
-        this.furnaceGuiOpen = bl;
+    public void method_30174(class_5411 arg) {
+        this.field_25734.method_30179(arg);
     }
 
-    @Environment(value=EnvType.CLIENT)
-    public boolean isFurnaceFilteringCraftable() {
-        return this.furnaceFilteringCraftable;
+    public class_5411 method_30173() {
+        return this.field_25734.method_30178();
     }
 
-    public void setFurnaceFilteringCraftable(boolean bl) {
-        this.furnaceFilteringCraftable = bl;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public boolean isBlastFurnaceGuiOpen() {
-        return this.blastFurnaceGuiOpen;
-    }
-
-    public void setBlastFurnaceGuiOpen(boolean bl) {
-        this.blastFurnaceGuiOpen = bl;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public boolean isBlastFurnaceFilteringCraftable() {
-        return this.blastFurnaceFilteringCraftable;
-    }
-
-    public void setBlastFurnaceFilteringCraftable(boolean bl) {
-        this.blastFurnaceFilteringCraftable = bl;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public boolean isSmokerGuiOpen() {
-        return this.smokerGuiOpen;
-    }
-
-    public void setSmokerGuiOpen(boolean bl) {
-        this.smokerGuiOpen = bl;
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public boolean isSmokerFilteringCraftable() {
-        return this.smokerFilteringCraftable;
-    }
-
-    public void setSmokerFilteringCraftable(boolean bl) {
-        this.smokerFilteringCraftable = bl;
+    public void method_30175(class_5421 arg, boolean bl, boolean bl2) {
+        this.field_25734.method_30181(arg, bl);
+        this.field_25734.method_30188(arg, bl2);
     }
 }
 

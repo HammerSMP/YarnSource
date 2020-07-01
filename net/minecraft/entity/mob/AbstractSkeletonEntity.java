@@ -11,6 +11,7 @@ import java.time.temporal.ChronoField;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityGroup;
@@ -34,7 +35,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
@@ -52,7 +53,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 
 public abstract class AbstractSkeletonEntity
 extends HostileEntity
@@ -133,8 +133,8 @@ implements RangedAttackMob {
     @Override
     public void tickRiding() {
         super.tickRiding();
-        if (this.getVehicle() instanceof MobEntityWithAi) {
-            MobEntityWithAi lv = (MobEntityWithAi)this.getVehicle();
+        if (this.getVehicle() instanceof PathAwareEntity) {
+            PathAwareEntity lv = (PathAwareEntity)this.getVehicle();
             this.bodyYaw = lv.bodyYaw;
         }
     }
@@ -147,7 +147,7 @@ implements RangedAttackMob {
 
     @Override
     @Nullable
-    public EntityData initialize(WorldAccess arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
         this.initEquipment(arg2);
         this.updateEnchantments(arg2);

@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.enums.StairShape;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.WitchEntity;
@@ -21,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
@@ -55,17 +55,17 @@ extends StructurePieceWithDimensions {
         if (!this.method_14839(arg, arg4, 0)) {
             return false;
         }
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 1, 1, 5, 1, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 4, 2, 5, 4, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 1, 0, 4, 1, 0, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 2, 2, 3, 3, 2, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 2, 3, 1, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 5, 2, 3, 5, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 2, 7, 4, 3, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 0, 2, 1, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 5, 0, 2, 5, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 0, 7, 1, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 5, 0, 7, 5, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 1, 1, 1, 5, 1, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 1, 4, 2, 5, 4, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 2, 1, 0, 4, 1, 0, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 2, 2, 2, 3, 3, 2, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 1, 2, 3, 1, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 5, 2, 3, 5, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 2, 2, 7, 4, 3, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 1, 0, 2, 1, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 5, 0, 2, 5, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 1, 0, 7, 1, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, arg4, 5, 0, 7, 5, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
         this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 2, 3, 2, arg4);
         this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 3, 3, 7, arg4);
         this.addBlock(arg, Blocks.AIR.getDefaultState(), 1, 3, 4, arg4);
@@ -80,10 +80,10 @@ extends StructurePieceWithDimensions {
         BlockState lv2 = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
         BlockState lv3 = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST);
         BlockState lv4 = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH);
-        this.fillWithOutline((WorldAccess)arg, arg4, 0, 4, 1, 6, 4, 1, lv, lv, false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 0, 4, 2, 0, 4, 7, lv2, lv2, false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 6, 4, 2, 6, 4, 7, lv3, lv3, false);
-        this.fillWithOutline((WorldAccess)arg, arg4, 0, 4, 8, 6, 4, 8, lv4, lv4, false);
+        this.fillWithOutline(arg, arg4, 0, 4, 1, 6, 4, 1, lv, lv, false);
+        this.fillWithOutline(arg, arg4, 0, 4, 2, 0, 4, 7, lv2, lv2, false);
+        this.fillWithOutline(arg, arg4, 6, 4, 2, 6, 4, 7, lv3, lv3, false);
+        this.fillWithOutline(arg, arg4, 0, 4, 8, 6, 4, 8, lv4, lv4, false);
         this.addBlock(arg, (BlockState)lv.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT), 0, 4, 1, arg4);
         this.addBlock(arg, (BlockState)lv.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT), 6, 4, 1, arg4);
         this.addBlock(arg, (BlockState)lv4.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT), 0, 4, 8, arg4);
@@ -105,7 +105,7 @@ extends StructurePieceWithDimensions {
         return true;
     }
 
-    private void method_16181(WorldAccess arg, BlockBox arg2) {
+    private void method_16181(class_5425 arg, BlockBox arg2) {
         int k;
         int j;
         int i;

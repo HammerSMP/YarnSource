@@ -7,14 +7,14 @@ import java.util.EnumSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.util.Hand;
 
 public class MeleeAttackGoal
 extends Goal {
-    protected final MobEntityWithAi mob;
+    protected final PathAwareEntity mob;
     private final double speed;
     private final boolean pauseWhenMobIdle;
     private Path path;
@@ -26,7 +26,7 @@ extends Goal {
     private final int attackIntervalTicks = 20;
     private long lastUpdateTime;
 
-    public MeleeAttackGoal(MobEntityWithAi arg, double d, boolean bl) {
+    public MeleeAttackGoal(PathAwareEntity arg, double d, boolean bl) {
         this.mob = arg;
         this.speed = d;
         this.pauseWhenMobIdle = bl;

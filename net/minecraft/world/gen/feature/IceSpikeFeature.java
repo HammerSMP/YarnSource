@@ -14,7 +14,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -26,18 +25,18 @@ extends Feature<DefaultFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DefaultFeatureConfig arg5) {
-        while (arg.isAir(arg4) && arg4.getY() > 2) {
-            arg4 = arg4.down();
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
+        while (arg.isAir(arg3) && arg3.getY() > 2) {
+            arg3 = arg3.down();
         }
-        if (!arg.getBlockState(arg4).isOf(Blocks.SNOW_BLOCK)) {
+        if (!arg.getBlockState(arg3).isOf(Blocks.SNOW_BLOCK)) {
             return false;
         }
-        arg4 = arg4.up(random.nextInt(4));
+        arg3 = arg3.up(random.nextInt(4));
         int i = random.nextInt(4) + 7;
         int j = i / 4 + random.nextInt(2);
         if (j > 1 && random.nextInt(60) == 0) {
-            arg4 = arg4.up(10 + random.nextInt(30));
+            arg3 = arg3.up(10 + random.nextInt(30));
         }
         for (int k = 0; k < i; ++k) {
             float f = (1.0f - (float)k / (float)i) * (float)j;
@@ -47,16 +46,16 @@ extends Feature<DefaultFeatureConfig> {
                 for (int n = -l; n <= l; ++n) {
                     float h = (float)MathHelper.abs(n) - 0.25f;
                     if ((m != 0 || n != 0) && g * g + h * h > f * f || (m == -l || m == l || n == -l || n == l) && random.nextFloat() > 0.75f) continue;
-                    BlockState lv = arg.getBlockState(arg4.add(m, k, n));
+                    BlockState lv = arg.getBlockState(arg3.add(m, k, n));
                     Block lv2 = lv.getBlock();
                     if (lv.isAir() || IceSpikeFeature.isSoil(lv2) || lv2 == Blocks.SNOW_BLOCK || lv2 == Blocks.ICE) {
-                        this.setBlockState(arg, arg4.add(m, k, n), Blocks.PACKED_ICE.getDefaultState());
+                        this.setBlockState(arg, arg3.add(m, k, n), Blocks.PACKED_ICE.getDefaultState());
                     }
                     if (k == 0 || l <= 1) continue;
-                    lv = arg.getBlockState(arg4.add(m, -k, n));
+                    lv = arg.getBlockState(arg3.add(m, -k, n));
                     lv2 = lv.getBlock();
                     if (!lv.isAir() && !IceSpikeFeature.isSoil(lv2) && lv2 != Blocks.SNOW_BLOCK && lv2 != Blocks.ICE) continue;
-                    this.setBlockState(arg, arg4.add(m, -k, n), Blocks.PACKED_ICE.getDefaultState());
+                    this.setBlockState(arg, arg3.add(m, -k, n), Blocks.PACKED_ICE.getDefaultState());
                 }
             }
         }
@@ -68,7 +67,7 @@ extends Feature<DefaultFeatureConfig> {
         }
         for (int p = -o; p <= o; ++p) {
             block5: for (int q = -o; q <= o; ++q) {
-                BlockPos lv3 = arg4.add(p, -1, q);
+                BlockPos lv3 = arg3.add(p, -1, q);
                 int r = 50;
                 if (Math.abs(p) == 1 && Math.abs(q) == 1) {
                     r = random.nextInt(5);

@@ -85,6 +85,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
+import net.minecraft.class_5415;
 import net.minecraft.command.DataCommandStorage;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -121,7 +122,6 @@ import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.RegistryTagManager;
 import net.minecraft.test.TestManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -247,7 +247,7 @@ AutoCloseable {
     private boolean waitingForNextTick;
     @Environment(value=EnvType.CLIENT)
     private boolean iconFilePresent;
-    private final ResourcePackManager<ResourcePackProfile> dataPackManager;
+    private final ResourcePackManager dataPackManager;
     private final ServerScoreboard scoreboard = new ServerScoreboard(this);
     @Nullable
     private DataCommandStorage dataCommandStorage;
@@ -265,7 +265,7 @@ AutoCloseable {
 
     public static <S extends MinecraftServer> S startServer(Function<Thread, S> function) {
         AtomicReference<MinecraftServer> atomicReference = new AtomicReference<MinecraftServer>();
-        Thread thread2 = new Thread(() -> ((MinecraftServer)atomicReference.get()).method_29741(), "Server thread");
+        Thread thread2 = new Thread(() -> ((MinecraftServer)atomicReference.get()).runServer(), "Server thread");
         thread2.setUncaughtExceptionHandler((thread, throwable) -> LOGGER.error((Object)throwable));
         MinecraftServer minecraftServer = (MinecraftServer)function.apply(thread2);
         atomicReference.set(minecraftServer);
@@ -273,7 +273,7 @@ AutoCloseable {
         return (S)minecraftServer;
     }
 
-    public MinecraftServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, SaveProperties arg3, ResourcePackManager<ResourcePackProfile> arg4, Proxy proxy, DataFixer dataFixer, ServerResourceManager arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+    public MinecraftServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, SaveProperties arg3, ResourcePackManager arg4, Proxy proxy, DataFixer dataFixer, ServerResourceManager arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
         super("Server");
         this.dimensionTracker = arg;
         this.saveProperties = arg3;
@@ -460,7 +460,7 @@ AutoCloseable {
         }
         if (bl) {
             ConfiguredFeature<DefaultFeatureConfig, ?> lv7 = Feature.BONUS_CHEST.configure(FeatureConfig.DEFAULT);
-            lv7.generate(arg, arg.getStructureAccessor(), lv, arg.random, new BlockPos(arg2.getSpawnX(), arg2.getSpawnY(), arg2.getSpawnZ()));
+            lv7.generate(arg, lv, arg.random, new BlockPos(arg2.getSpawnX(), arg2.getSpawnY(), arg2.getSpawnZ()));
         }
     }
 
@@ -620,7 +620,7 @@ AutoCloseable {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    protected void method_29741() {
+    protected void runServer() {
         try {
             if (this.setupServer()) {
                 this.timeReference = Util.getMeasuringTimeMs();
@@ -1263,7 +1263,7 @@ AutoCloseable {
         return completableFuture;
     }
 
-    public static DataPackSettings loadDataPacks(ResourcePackManager<ResourcePackProfile> arg, DataPackSettings arg2, boolean bl) {
+    public static DataPackSettings loadDataPacks(ResourcePackManager arg, DataPackSettings arg2, boolean bl) {
         arg.scanPacks();
         if (bl) {
             arg.setEnabledProfiles(Collections.singleton("vanilla"));
@@ -1291,7 +1291,7 @@ AutoCloseable {
         return MinecraftServer.method_29735(arg);
     }
 
-    private static DataPackSettings method_29735(ResourcePackManager<?> arg) {
+    private static DataPackSettings method_29735(ResourcePackManager arg) {
         Collection<String> collection = arg.getEnabledNames();
         ImmutableList list = ImmutableList.copyOf(collection);
         List list2 = (List)arg.getNames().stream().filter(string -> !collection.contains(string)).collect(ImmutableList.toImmutableList());
@@ -1311,7 +1311,7 @@ AutoCloseable {
         }
     }
 
-    public ResourcePackManager<ResourcePackProfile> getDataPackManager() {
+    public ResourcePackManager getDataPackManager() {
         return this.dataPackManager;
     }
 
@@ -1338,7 +1338,7 @@ AutoCloseable {
         return this.serverResourceManager.getRecipeManager();
     }
 
-    public RegistryTagManager getTagManager() {
+    public class_5415 getTagManager() {
         return this.serverResourceManager.getRegistryTagManager();
     }
 

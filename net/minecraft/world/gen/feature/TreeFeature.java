@@ -37,7 +37,6 @@ import net.minecraft.world.ModifiableWorld;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.TestableWorld;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
@@ -148,21 +147,21 @@ extends Feature<TreeFeatureConfig> {
     }
 
     @Override
-    public final boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg32, Random random, BlockPos arg4, TreeFeatureConfig arg5) {
+    public final boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg32, TreeFeatureConfig arg4) {
         HashSet set = Sets.newHashSet();
         HashSet set2 = Sets.newHashSet();
         HashSet set3 = Sets.newHashSet();
         BlockBox lv = BlockBox.empty();
-        boolean bl = this.generate(arg, random, arg4, set, set2, lv, arg5);
+        boolean bl = this.generate(arg, random, arg32, set, set2, lv, arg4);
         if (lv.minX > lv.maxX || !bl || set.isEmpty()) {
             return false;
         }
-        if (!arg5.decorators.isEmpty()) {
+        if (!arg4.decorators.isEmpty()) {
             ArrayList list = Lists.newArrayList((Iterable)set);
             ArrayList list2 = Lists.newArrayList((Iterable)set2);
             list.sort(Comparator.comparingInt(Vec3i::getY));
             list2.sort(Comparator.comparingInt(Vec3i::getY));
-            arg5.decorators.forEach(arg3 -> arg3.generate(arg, random, list, list2, set3, lv));
+            arg4.decorators.forEach(arg3 -> arg3.generate(arg, random, list, list2, set3, lv));
         }
         VoxelSet lv2 = this.placeLogsAndLeaves(arg, lv, set, set3);
         Structure.updateCorner(arg, 3, lv2, lv.minX, lv.minY, lv.minZ);

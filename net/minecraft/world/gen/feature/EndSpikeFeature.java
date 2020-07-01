@@ -31,14 +31,13 @@ import java.util.stream.IntStream;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PaneBlock;
+import net.minecraft.class_5425;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.EndSpikeFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -58,19 +57,19 @@ extends Feature<EndSpikeFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, EndSpikeFeatureConfig arg5) {
-        List<Spike> list = arg5.getSpikes();
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, EndSpikeFeatureConfig arg4) {
+        List<Spike> list = arg4.getSpikes();
         if (list.isEmpty()) {
             list = EndSpikeFeature.getSpikes(arg);
         }
         for (Spike lv : list) {
-            if (!lv.isInChunk(arg4)) continue;
-            this.generateSpike(arg, random, arg5, lv);
+            if (!lv.isInChunk(arg3)) continue;
+            this.generateSpike(arg, random, arg4, lv);
         }
         return true;
     }
 
-    private void generateSpike(WorldAccess arg, Random random, EndSpikeFeatureConfig arg2, Spike arg3) {
+    private void generateSpike(class_5425 arg, Random random, EndSpikeFeatureConfig arg2, Spike arg3) {
         int i = arg3.getRadius();
         for (BlockPos lv : BlockPos.iterate(new BlockPos(arg3.getCenterX() - i, 0, arg3.getCenterZ() - i), new BlockPos(arg3.getCenterX() + i, arg3.getHeight() + 10, arg3.getCenterZ() + i))) {
             if (lv.getSquaredDistance(arg3.getCenterX(), lv.getY(), arg3.getCenterZ(), false) <= (double)(i * i + 1) && lv.getY() < arg3.getHeight()) {

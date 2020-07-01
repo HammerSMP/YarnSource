@@ -40,7 +40,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 public class ChunkStatus {
     private static final EnumSet<Heightmap.Type> PRE_CARVER_HEIGHTMAPS = EnumSet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG);
     private static final EnumSet<Heightmap.Type> POST_CARVER_HEIGHTMAPS = EnumSet.of(Heightmap.Type.OCEAN_FLOOR, Heightmap.Type.WORLD_SURFACE, Heightmap.Type.MOTION_BLOCKING, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES);
-    private static final NoGenTask STATUS_BUMP_NO_GEN_TASK = (arg, arg2, arg3, arg4, function, arg5) -> {
+    private static final LoadTask STATUS_BUMP_NO_GEN_TASK = (arg, arg2, arg3, arg4, function, arg5) -> {
         if (arg5 instanceof ProtoChunk && !arg5.getStatus().isAtLeast(arg)) {
             ((ProtoChunk)arg5).setStatus(arg);
         }
@@ -98,8 +98,8 @@ public class ChunkStatus {
     private final String id;
     private final int index;
     private final ChunkStatus previous;
-    private final Task task;
-    private final NoGenTask noGenTask;
+    private final GenerationTask generationTask;
+    private final LoadTask loadTask;
     private final int taskMargin;
     private final ChunkType chunkType;
     private final EnumSet<Heightmap.Type> heightMapTypes;
@@ -112,15 +112,15 @@ public class ChunkStatus {
         return arg2.light(arg3, bl).thenApply(Either::left);
     }
 
-    private static ChunkStatus register(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, SimpleTask arg3) {
-        return ChunkStatus.register(string, arg, i, enumSet, arg2, (Task)arg3);
+    private static ChunkStatus register(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, SimpleGenerationTask arg3) {
+        return ChunkStatus.register(string, arg, i, enumSet, arg2, (GenerationTask)arg3);
     }
 
-    private static ChunkStatus register(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, Task arg3) {
+    private static ChunkStatus register(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, GenerationTask arg3) {
         return ChunkStatus.register(string, arg, i, enumSet, arg2, arg3, STATUS_BUMP_NO_GEN_TASK);
     }
 
-    private static ChunkStatus register(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, Task arg3, NoGenTask arg4) {
+    private static ChunkStatus register(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, GenerationTask arg3, LoadTask arg4) {
         return Registry.register(Registry.CHUNK_STATUS, string, new ChunkStatus(string, arg, i, enumSet, arg2, arg3, arg4));
     }
 
@@ -157,11 +157,11 @@ public class ChunkStatus {
         return STATUS_TO_TARGET_GENERATION_RADIUS.getInt(arg.getIndex());
     }
 
-    ChunkStatus(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, Task arg3, NoGenTask arg4) {
+    ChunkStatus(String string, @Nullable ChunkStatus arg, int i, EnumSet<Heightmap.Type> enumSet, ChunkType arg2, GenerationTask arg3, LoadTask arg4) {
         this.id = string;
         this.previous = arg == null ? this : arg;
-        this.task = arg3;
-        this.noGenTask = arg4;
+        this.generationTask = arg3;
+        this.loadTask = arg4;
         this.taskMargin = i;
         this.chunkType = arg2;
         this.heightMapTypes = enumSet;
@@ -180,12 +180,12 @@ public class ChunkStatus {
         return this.previous;
     }
 
-    public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> runTask(ServerWorld arg, ChunkGenerator arg2, StructureManager arg3, ServerLightingProvider arg4, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> list) {
-        return this.task.doWork(this, arg, arg2, arg3, arg4, function, list, list.get(list.size() / 2));
+    public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> runGenerationTask(ServerWorld arg, ChunkGenerator arg2, StructureManager arg3, ServerLightingProvider arg4, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> list) {
+        return this.generationTask.doWork(this, arg, arg2, arg3, arg4, function, list, list.get(list.size() / 2));
     }
 
-    public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> runNoGenTask(ServerWorld arg, StructureManager arg2, ServerLightingProvider arg3, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, Chunk arg4) {
-        return this.noGenTask.doWork(this, arg, arg2, arg3, function, arg4);
+    public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> runLoadTask(ServerWorld arg, StructureManager arg2, ServerLightingProvider arg3, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, Chunk arg4) {
+        return this.loadTask.doWork(this, arg, arg2, arg3, function, arg4);
     }
 
     public int getTaskMargin() {
@@ -218,8 +218,8 @@ public class ChunkStatus {
 
     }
 
-    static interface SimpleTask
-    extends Task {
+    static interface SimpleGenerationTask
+    extends GenerationTask {
         @Override
         default public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> doWork(ChunkStatus arg, ServerWorld arg2, ChunkGenerator arg3, StructureManager arg4, ServerLightingProvider arg5, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> list, Chunk arg6) {
             if (!arg6.getStatus().isAtLeast(arg)) {
@@ -234,11 +234,11 @@ public class ChunkStatus {
         public void doWork(ServerWorld var1, ChunkGenerator var2, List<Chunk> var3, Chunk var4);
     }
 
-    static interface NoGenTask {
+    static interface LoadTask {
         public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> doWork(ChunkStatus var1, ServerWorld var2, StructureManager var3, ServerLightingProvider var4, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> var5, Chunk var6);
     }
 
-    static interface Task {
+    static interface GenerationTask {
         public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> doWork(ChunkStatus var1, ServerWorld var2, ChunkGenerator var3, StructureManager var4, ServerLightingProvider var5, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> var6, List<Chunk> var7, Chunk var8);
     }
 }

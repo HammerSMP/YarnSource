@@ -20,26 +20,6 @@ import net.minecraft.text.TranslatableText;
 public class SmokerRecipeBookScreen
 extends AbstractFurnaceRecipeBookScreen {
     @Override
-    protected boolean isFilteringCraftable() {
-        return this.recipeBook.isSmokerFilteringCraftable();
-    }
-
-    @Override
-    protected void setFilteringCraftable(boolean bl) {
-        this.recipeBook.setSmokerFilteringCraftable(bl);
-    }
-
-    @Override
-    protected boolean isGuiOpen() {
-        return this.recipeBook.isSmokerGuiOpen();
-    }
-
-    @Override
-    protected void setGuiOpen(boolean bl) {
-        this.recipeBook.setSmokerGuiOpen(bl);
-    }
-
-    @Override
     protected Text getToggleCraftableButtonText() {
         return new TranslatableText("gui.recipebook.toggleRecipes.smokable");
     }

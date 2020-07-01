@@ -1,24 +1,19 @@
 /*
  * Decompiled with CFR 0.149.
- * 
- * Could not load the following classes:
- *  net.fabricmc.api.EnvType
- *  net.fabricmc.api.Environment
  */
 package net.minecraft.tag;
 
 import java.util.List;
-import java.util.Set;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.class_5413;
+import net.minecraft.class_5414;
+import net.minecraft.class_5415;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.tag.GlobalTagAccessor;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainer;
 import net.minecraft.util.Identifier;
 
-public class FluidTags {
-    private static final GlobalTagAccessor<Fluid> ACCESSOR = new GlobalTagAccessor();
+public final class FluidTags {
+    protected static final GlobalTagAccessor<Fluid> ACCESSOR = class_5413.method_30201(new Identifier("fluid"), class_5415::method_30220);
     public static final Tag.Identified<Fluid> WATER = FluidTags.register("water");
     public static final Tag.Identified<Fluid> LAVA = FluidTags.register("lava");
 
@@ -26,25 +21,12 @@ public class FluidTags {
         return ACCESSOR.get(string);
     }
 
-    public static void setContainer(TagContainer<Fluid> arg) {
-        ACCESSOR.setContainer(arg);
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public static void markReady() {
-        ACCESSOR.markReady();
-    }
-
-    public static TagContainer<Fluid> getContainer() {
+    public static class_5414<Fluid> getContainer() {
         return ACCESSOR.getContainer();
     }
 
-    public static List<GlobalTagAccessor.CachedTag<Fluid>> method_29897() {
+    public static List<? extends Tag<Fluid>> method_29897() {
         return ACCESSOR.method_29902();
-    }
-
-    public static Set<Identifier> method_29216(TagContainer<Fluid> arg) {
-        return ACCESSOR.method_29224(arg);
     }
 }
 

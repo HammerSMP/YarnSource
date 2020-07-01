@@ -16,6 +16,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SilverfishEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -40,7 +41,7 @@ extends Block {
         return REGULAR_TO_INFESTED.containsKey(arg.getBlock());
     }
 
-    private void spawnSilverfish(World arg, BlockPos arg2) {
+    private void spawnSilverfish(ServerWorld arg, BlockPos arg2) {
         SilverfishEntity lv = EntityType.SILVERFISH.create(arg);
         lv.refreshPositionAndAngles((double)arg2.getX() + 0.5, arg2.getY(), (double)arg2.getZ() + 0.5, 0.0f, 0.0f);
         arg.spawnEntity(lv);
@@ -48,17 +49,17 @@ extends Block {
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, World arg2, BlockPos arg3, ItemStack arg4) {
+    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
         super.onStacksDropped(arg, arg2, arg3, arg4);
-        if (!arg2.isClient && arg2.getGameRules().getBoolean(GameRules.DO_TILE_DROPS) && EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg4) == 0) {
+        if (arg2.getGameRules().getBoolean(GameRules.DO_TILE_DROPS) && EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg4) == 0) {
             this.spawnSilverfish(arg2, arg3);
         }
     }
 
     @Override
     public void onDestroyedByExplosion(World arg, BlockPos arg2, Explosion arg3) {
-        if (!arg.isClient) {
-            this.spawnSilverfish(arg, arg2);
+        if (arg instanceof ServerWorld) {
+            this.spawnSilverfish((ServerWorld)arg, arg2);
         }
     }
 

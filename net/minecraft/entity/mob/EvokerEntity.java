@@ -35,6 +35,7 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.raid.RaiderEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.DyeColor;
@@ -264,7 +265,7 @@ extends SpellcastingIllagerEntity {
                 BlockPos lv = EvokerEntity.this.getBlockPos().add(-2 + EvokerEntity.this.random.nextInt(5), 1, -2 + EvokerEntity.this.random.nextInt(5));
                 VexEntity lv2 = EntityType.VEX.create(EvokerEntity.this.world);
                 lv2.refreshPositionAndAngles(lv, 0.0f, 0.0f);
-                lv2.initialize(EvokerEntity.this.world, EvokerEntity.this.world.getLocalDifficulty(lv), SpawnReason.MOB_SUMMONED, null, null);
+                lv2.initialize((ServerWorld)EvokerEntity.this.world, EvokerEntity.this.world.getLocalDifficulty(lv), SpawnReason.MOB_SUMMONED, null, null);
                 lv2.setOwner(EvokerEntity.this);
                 lv2.setBounds(lv);
                 lv2.setLifeTicks(20 * (30 + EvokerEntity.this.random.nextInt(90)));

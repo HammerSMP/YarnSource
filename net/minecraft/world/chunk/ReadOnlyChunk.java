@@ -195,14 +195,14 @@ extends ProtoChunk {
 
     @Override
     @Nullable
-    public CompoundTag getBlockEntityTagAt(BlockPos arg) {
-        return this.wrapped.getBlockEntityTagAt(arg);
+    public CompoundTag getBlockEntityTag(BlockPos arg) {
+        return this.wrapped.getBlockEntityTag(arg);
     }
 
     @Override
     @Nullable
-    public CompoundTag method_20598(BlockPos arg) {
-        return this.wrapped.method_20598(arg);
+    public CompoundTag getPackedBlockEntityTag(BlockPos arg) {
+        return this.wrapped.getPackedBlockEntityTag(arg);
     }
 
     @Override
@@ -230,7 +230,7 @@ extends ProtoChunk {
     }
 
     @Override
-    public BitSet method_28510(GenerationStep.Carver arg) {
+    public BitSet getOrCreateCarvingMask(GenerationStep.Carver arg) {
         throw Util.throwOrPause(new UnsupportedOperationException("Meaningless in this context"));
     }
 

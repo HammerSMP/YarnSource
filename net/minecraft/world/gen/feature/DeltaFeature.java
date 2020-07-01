@@ -19,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DeltaFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -42,30 +41,30 @@ extends Feature<DeltaFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DeltaFeatureConfig arg5) {
-        BlockPos lv = DeltaFeature.method_27102(arg, arg4.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1));
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DeltaFeatureConfig arg4) {
+        BlockPos lv = DeltaFeature.method_27102(arg, arg3.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1));
         if (lv == null) {
             return false;
         }
         boolean bl = false;
         boolean bl2 = random.nextDouble() < 0.9;
-        int i = bl2 ? DeltaFeature.method_27105(random, arg5) : 0;
-        int j = bl2 ? DeltaFeature.method_27105(random, arg5) : 0;
+        int i = bl2 ? DeltaFeature.method_27105(random, arg4) : 0;
+        int j = bl2 ? DeltaFeature.method_27105(random, arg4) : 0;
         boolean bl3 = bl2 && i != 0 && j != 0;
-        int k = DeltaFeature.method_27104(random, arg5);
-        int l = DeltaFeature.method_27104(random, arg5);
+        int k = DeltaFeature.method_27104(random, arg4);
+        int l = DeltaFeature.method_27104(random, arg4);
         int m = Math.max(k, l);
         for (BlockPos lv2 : BlockPos.iterateOutwards(lv, k, 0, l)) {
             BlockPos lv3;
             if (lv2.getManhattanDistance(lv) > m) break;
-            if (!DeltaFeature.method_27103(arg, lv2, arg5)) continue;
+            if (!DeltaFeature.method_27103(arg, lv2, arg4)) continue;
             if (bl3) {
                 bl = true;
-                this.setBlockState(arg, lv2, arg5.rim);
+                this.setBlockState(arg, lv2, arg4.rim);
             }
-            if (!DeltaFeature.method_27103(arg, lv3 = lv2.add(i, 0, j), arg5)) continue;
+            if (!DeltaFeature.method_27103(arg, lv3 = lv2.add(i, 0, j), arg4)) continue;
             bl = true;
-            this.setBlockState(arg, lv3, arg5.contents);
+            this.setBlockState(arg, lv3, arg4.contents);
         }
         return bl;
     }

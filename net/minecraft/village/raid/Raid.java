@@ -121,7 +121,7 @@ public class Raid {
         if (arg2.contains("HeroesOfTheVillage", 9)) {
             ListTag lv = arg2.getList("HeroesOfTheVillage", 11);
             for (int i = 0; i < lv.size(); ++i) {
-                this.heroesOfTheVillage.add(NbtHelper.toUuidNew(lv.get(i)));
+                this.heroesOfTheVillage.add(NbtHelper.toUuid(lv.get(i)));
             }
         }
     }
@@ -511,7 +511,7 @@ public class Raid {
         CompoundTag lv2 = lv.getOrCreateSubTag("BlockEntityTag");
         ListTag lv3 = new BannerPattern.Patterns().add(BannerPattern.RHOMBUS_MIDDLE, DyeColor.CYAN).add(BannerPattern.STRIPE_BOTTOM, DyeColor.LIGHT_GRAY).add(BannerPattern.STRIPE_CENTER, DyeColor.GRAY).add(BannerPattern.BORDER, DyeColor.LIGHT_GRAY).add(BannerPattern.STRIPE_MIDDLE, DyeColor.BLACK).add(BannerPattern.HALF_HORIZONTAL, DyeColor.LIGHT_GRAY).add(BannerPattern.CIRCLE_MIDDLE, DyeColor.LIGHT_GRAY).add(BannerPattern.BORDER, DyeColor.BLACK).toTag();
         lv2.put("Patterns", lv3);
-        lv.getOrCreateTag().putInt("HideFlags", 32);
+        lv.method_30268(ItemStack.class_5422.ADDITIONAL);
         lv.setCustomName(new TranslatableText("block.minecraft.ominous_banner").formatted(Formatting.GOLD));
         return lv;
     }
@@ -650,7 +650,7 @@ public class Raid {
         arg.putInt("CZ", this.center.getZ());
         ListTag lv = new ListTag();
         for (UUID uUID : this.heroesOfTheVillage) {
-            lv.add(NbtHelper.fromUuidNew(uUID));
+            lv.add(NbtHelper.fromUuid(uUID));
         }
         arg.put("HeroesOfTheVillage", lv);
         return arg;

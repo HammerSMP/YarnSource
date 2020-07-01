@@ -21,7 +21,7 @@ import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.ai.pathing.Path;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.dynamic.GlobalPos;
@@ -30,7 +30,7 @@ import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 
 public class FindPointOfInterestTask
-extends Task<MobEntityWithAi> {
+extends Task<PathAwareEntity> {
     private final PointOfInterestType poiType;
     private final MemoryModuleType<GlobalPos> targetMemoryModuleType;
     private final boolean onlyRunIfChild;
@@ -58,7 +58,7 @@ extends Task<MobEntityWithAi> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, MobEntityWithAi arg2) {
+    protected boolean shouldRun(ServerWorld arg, PathAwareEntity arg2) {
         if (this.onlyRunIfChild && arg2.isBaby()) {
             return false;
         }
@@ -70,7 +70,7 @@ extends Task<MobEntityWithAi> {
     }
 
     @Override
-    protected void run(ServerWorld arg2, MobEntityWithAi arg22, long l) {
+    protected void run(ServerWorld arg2, PathAwareEntity arg22, long l) {
         this.positionExpireTimeLimit = l + 20L + (long)arg2.getRandom().nextInt(20);
         PointOfInterestStorage lv = arg2.getPointOfInterestStorage();
         this.foundPositionsToExpiry.long2ObjectEntrySet().removeIf(entry -> !((RetryMarker)entry.getValue()).method_29927(l));

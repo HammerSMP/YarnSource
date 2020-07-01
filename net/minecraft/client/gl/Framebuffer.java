@@ -25,8 +25,8 @@ public class Framebuffer {
     public int viewportHeight;
     public final boolean useDepthAttachment;
     public int fbo;
-    public int colorAttachment;
-    public int depthAttachment;
+    private int colorAttachment;
+    private int depthAttachment;
     public final float[] clearColor;
     public int texFilter;
 
@@ -267,6 +267,14 @@ public class Framebuffer {
         }
         GlStateManager.clear(i, bl);
         this.endWrite();
+    }
+
+    public int method_30277() {
+        return this.colorAttachment;
+    }
+
+    public int method_30278() {
+        return this.depthAttachment;
     }
 }
 

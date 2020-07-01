@@ -11,7 +11,7 @@ import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.TrackTargetGoal;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.GameRules;
@@ -24,7 +24,7 @@ extends TrackTargetGoal {
     private final Class<?>[] noRevengeTypes;
     private Class<?>[] noHelpTypes;
 
-    public RevengeGoal(MobEntityWithAi arg, Class<?> ... classs) {
+    public RevengeGoal(PathAwareEntity arg, Class<?> ... classs) {
         super(arg, true);
         this.noRevengeTypes = classs;
         this.setControls(EnumSet.of(Goal.Control.TARGET));

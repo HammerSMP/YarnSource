@@ -20,6 +20,7 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.DispenserBlockEntity;
+import net.minecraft.class_5425;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.structure.StructurePieceType;
@@ -34,7 +35,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
@@ -189,7 +189,7 @@ public abstract class StructurePiece {
         return j;
     }
 
-    protected void addBlock(WorldAccess arg, BlockState arg2, int i, int j, int k, BlockBox arg3) {
+    protected void addBlock(ServerWorldAccess arg, BlockState arg2, int i, int j, int k, BlockBox arg3) {
         BlockPos lv = new BlockPos(this.applyXTransform(i, k), this.applyYTransform(j), this.applyZTransform(i, k));
         if (!arg3.contains(lv)) {
             return;
@@ -232,7 +232,7 @@ public abstract class StructurePiece {
         return m < arg.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, l, n);
     }
 
-    protected void fill(WorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n) {
+    protected void fill(ServerWorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n) {
         for (int o = j; o <= m; ++o) {
             for (int p = i; p <= l; ++p) {
                 for (int q = k; q <= n; ++q) {
@@ -242,7 +242,7 @@ public abstract class StructurePiece {
         }
     }
 
-    protected void fillWithOutline(WorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n, BlockState arg3, BlockState arg4, boolean bl) {
+    protected void fillWithOutline(ServerWorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n, BlockState arg3, BlockState arg4, boolean bl) {
         for (int o = j; o <= m; ++o) {
             for (int p = i; p <= l; ++p) {
                 for (int q = k; q <= n; ++q) {
@@ -257,7 +257,7 @@ public abstract class StructurePiece {
         }
     }
 
-    protected void fillWithOutline(WorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n, boolean bl, Random random, BlockRandomizer arg3) {
+    protected void fillWithOutline(ServerWorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n, boolean bl, Random random, BlockRandomizer arg3) {
         for (int o = j; o <= m; ++o) {
             for (int p = i; p <= l; ++p) {
                 for (int q = k; q <= n; ++q) {
@@ -269,7 +269,7 @@ public abstract class StructurePiece {
         }
     }
 
-    protected void fillWithOutlineUnderSeaLevel(WorldAccess arg, BlockBox arg2, Random random, float f, int i, int j, int k, int l, int m, int n, BlockState arg3, BlockState arg4, boolean bl, boolean bl2) {
+    protected void fillWithOutlineUnderSeaLevel(ServerWorldAccess arg, BlockBox arg2, Random random, float f, int i, int j, int k, int l, int m, int n, BlockState arg3, BlockState arg4, boolean bl, boolean bl2) {
         for (int o = j; o <= m; ++o) {
             for (int p = i; p <= l; ++p) {
                 for (int q = k; q <= n; ++q) {
@@ -284,13 +284,13 @@ public abstract class StructurePiece {
         }
     }
 
-    protected void addBlockWithRandomThreshold(WorldAccess arg, BlockBox arg2, Random random, float f, int i, int j, int k, BlockState arg3) {
+    protected void addBlockWithRandomThreshold(ServerWorldAccess arg, BlockBox arg2, Random random, float f, int i, int j, int k, BlockState arg3) {
         if (random.nextFloat() < f) {
             this.addBlock(arg, arg3, i, j, k, arg2);
         }
     }
 
-    protected void method_14919(WorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n, BlockState arg3, boolean bl) {
+    protected void method_14919(ServerWorldAccess arg, BlockBox arg2, int i, int j, int k, int l, int m, int n, BlockState arg3, boolean bl) {
         float f = l - i + 1;
         float g = m - j + 1;
         float h = n - k + 1;
@@ -310,7 +310,7 @@ public abstract class StructurePiece {
         }
     }
 
-    protected void method_14936(WorldAccess arg, BlockState arg2, int i, int j, int k, BlockBox arg3) {
+    protected void method_14936(ServerWorldAccess arg, BlockState arg2, int i, int j, int k, BlockBox arg3) {
         int n;
         int m;
         int l = this.applyXTransform(i, k);
@@ -323,7 +323,7 @@ public abstract class StructurePiece {
         }
     }
 
-    protected boolean addChest(WorldAccess arg, BlockBox arg2, Random random, int i, int j, int k, Identifier arg3) {
+    protected boolean addChest(ServerWorldAccess arg, BlockBox arg2, Random random, int i, int j, int k, Identifier arg3) {
         BlockPos lv = new BlockPos(this.applyXTransform(i, k), this.applyYTransform(j), this.applyZTransform(i, k));
         return this.addChest(arg, arg2, random, lv, arg3, null);
     }
@@ -364,7 +364,7 @@ public abstract class StructurePiece {
         return (BlockState)arg3.with(HorizontalFacingBlock.FACING, lv5);
     }
 
-    protected boolean addChest(WorldAccess arg, BlockBox arg2, Random random, BlockPos arg3, Identifier arg4, @Nullable BlockState arg5) {
+    protected boolean addChest(class_5425 arg, BlockBox arg2, Random random, BlockPos arg3, Identifier arg4, @Nullable BlockState arg5) {
         if (!arg2.contains(arg3) || arg.getBlockState(arg3).isOf(Blocks.CHEST)) {
             return false;
         }
@@ -379,7 +379,7 @@ public abstract class StructurePiece {
         return true;
     }
 
-    protected boolean addDispenser(WorldAccess arg, BlockBox arg2, Random random, int i, int j, int k, Direction arg3, Identifier arg4) {
+    protected boolean addDispenser(ServerWorldAccess arg, BlockBox arg2, Random random, int i, int j, int k, Direction arg3, Identifier arg4) {
         BlockPos lv = new BlockPos(this.applyXTransform(i, k), this.applyYTransform(j), this.applyZTransform(i, k));
         if (arg2.contains(lv) && !arg.getBlockState(lv).isOf(Blocks.DISPENSER)) {
             this.addBlock(arg, (BlockState)Blocks.DISPENSER.getDefaultState().with(DispenserBlock.FACING, arg3), i, j, k, arg2);

@@ -19,7 +19,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.HugeFungusFeatureConfig;
@@ -32,16 +31,16 @@ extends Feature<HugeFungusFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, HugeFungusFeatureConfig arg5) {
-        Block lv = arg5.validBaseBlock.getBlock();
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, HugeFungusFeatureConfig arg4) {
+        Block lv = arg4.validBaseBlock.getBlock();
         BlockPos lv2 = null;
-        if (arg5.planted) {
-            Block lv3 = arg.getBlockState(arg4.down()).getBlock();
+        if (arg4.planted) {
+            Block lv3 = arg.getBlockState(arg3.down()).getBlock();
             if (lv3 == lv) {
-                lv2 = arg4;
+                lv2 = arg3;
             }
         } else {
-            lv2 = HugeFungusFeature.getStartPos(arg, arg4, lv);
+            lv2 = HugeFungusFeature.getStartPos(arg, arg3, lv);
         }
         if (lv2 == null) {
             return false;
@@ -50,16 +49,16 @@ extends Feature<HugeFungusFeatureConfig> {
         if (random.nextInt(12) == 0) {
             i *= 2;
         }
-        if (!arg5.planted) {
-            int j = arg3.getMaxY();
+        if (!arg4.planted) {
+            int j = arg2.getMaxY();
             if (lv2.getY() + i + 1 >= j) {
                 return false;
             }
         }
-        boolean bl = !arg5.planted && random.nextFloat() < 0.06f;
-        arg.setBlockState(arg4, Blocks.AIR.getDefaultState(), 4);
-        this.generateStem(arg, random, arg5, lv2, i, bl);
-        this.generateHat(arg, random, arg5, lv2, i, bl);
+        boolean bl = !arg4.planted && random.nextFloat() < 0.06f;
+        arg.setBlockState(arg3, Blocks.AIR.getDefaultState(), 4);
+        this.generateStem(arg, random, arg4, lv2, i, bl);
+        this.generateHat(arg, random, arg4, lv2, i, bl);
         return true;
     }
 

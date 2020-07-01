@@ -10,7 +10,6 @@ import com.mojang.serialization.Codec;
 import java.util.Random;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.EmeraldOreFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -22,9 +21,9 @@ extends Feature<EmeraldOreFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, EmeraldOreFeatureConfig arg5) {
-        if (arg.getBlockState(arg4).isOf(arg5.target.getBlock())) {
-            arg.setBlockState(arg4, arg5.state, 2);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, EmeraldOreFeatureConfig arg4) {
+        if (arg.getBlockState(arg3).isOf(arg4.target.getBlock())) {
+            arg.setBlockState(arg3, arg4.state, 2);
         }
         return true;
     }

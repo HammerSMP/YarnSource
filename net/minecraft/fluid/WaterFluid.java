@@ -80,7 +80,7 @@ extends FlowableFluid {
     @Override
     protected void beforeBreakingBlock(WorldAccess arg, BlockPos arg2, BlockState arg3) {
         BlockEntity lv = arg3.getBlock().hasBlockEntity() ? arg.getBlockEntity(arg2) : null;
-        Block.dropStacks(arg3, arg.getWorld(), arg2, lv);
+        Block.dropStacks(arg3, arg, arg2, lv);
     }
 
     @Override

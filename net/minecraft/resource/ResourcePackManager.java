@@ -29,16 +29,20 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.ResourcePackProvider;
 
-public class ResourcePackManager<T extends ResourcePackProfile>
+public class ResourcePackManager
 implements AutoCloseable {
     private final Set<ResourcePackProvider> providers;
-    private Map<String, T> profiles = ImmutableMap.of();
-    private List<T> enabled = ImmutableList.of();
-    private final ResourcePackProfile.Factory<T> profileFactory;
+    private Map<String, ResourcePackProfile> profiles = ImmutableMap.of();
+    private List<ResourcePackProfile> enabled = ImmutableList.of();
+    private final ResourcePackProfile.Factory profileFactory;
 
-    public ResourcePackManager(ResourcePackProfile.Factory<T> arg, ResourcePackProvider ... args) {
+    public ResourcePackManager(ResourcePackProfile.Factory arg, ResourcePackProvider ... args) {
         this.profileFactory = arg;
         this.providers = ImmutableSet.copyOf((Object[])args);
+    }
+
+    public ResourcePackManager(ResourcePackProvider ... args) {
+        this(ResourcePackProfile::new, args);
     }
 
     public void scanPacks() {
@@ -48,7 +52,7 @@ implements AutoCloseable {
         this.enabled = this.buildEnabledProfiles(list);
     }
 
-    private Map<String, T> providePackProfiles() {
+    private Map<String, ResourcePackProfile> providePackProfiles() {
         TreeMap map = Maps.newTreeMap();
         for (ResourcePackProvider lv : this.providers) {
             lv.register(arg -> map.put(arg.getName(), arg), this.profileFactory);
@@ -60,7 +64,7 @@ implements AutoCloseable {
         this.enabled = this.buildEnabledProfiles(collection);
     }
 
-    private List<T> buildEnabledProfiles(Collection<String> collection) {
+    private List<ResourcePackProfile> buildEnabledProfiles(Collection<String> collection) {
         List list = this.streamProfilesByName(collection).collect(Collectors.toList());
         for (ResourcePackProfile lv : this.profiles.values()) {
             if (!lv.isAlwaysEnabled() || list.contains(lv)) continue;
@@ -69,7 +73,7 @@ implements AutoCloseable {
         return ImmutableList.copyOf(list);
     }
 
-    private Stream<T> streamProfilesByName(Collection<String> collection) {
+    private Stream<ResourcePackProfile> streamProfilesByName(Collection<String> collection) {
         return collection.stream().map(this.profiles::get).filter(Objects::nonNull);
     }
 
@@ -77,7 +81,7 @@ implements AutoCloseable {
         return this.profiles.keySet();
     }
 
-    public Collection<T> getProfiles() {
+    public Collection<ResourcePackProfile> getProfiles() {
         return this.profiles.values();
     }
 
@@ -85,13 +89,13 @@ implements AutoCloseable {
         return (Collection)this.enabled.stream().map(ResourcePackProfile::getName).collect(ImmutableSet.toImmutableSet());
     }
 
-    public Collection<T> getEnabledProfiles() {
+    public Collection<ResourcePackProfile> getEnabledProfiles() {
         return this.enabled;
     }
 
     @Nullable
-    public T getProfile(String string) {
-        return (T)((ResourcePackProfile)this.profiles.get(string));
+    public ResourcePackProfile getProfile(String string) {
+        return this.profiles.get(string);
     }
 
     @Override

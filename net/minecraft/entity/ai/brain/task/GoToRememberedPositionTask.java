@@ -15,13 +15,13 @@ import net.minecraft.entity.ai.brain.MemoryModuleState;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.brain.task.Task;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class GoToRememberedPositionTask<T>
-extends Task<MobEntityWithAi> {
+extends Task<PathAwareEntity> {
     private final MemoryModuleType<T> entityMemory;
     private final float speed;
     private final int range;
@@ -44,18 +44,18 @@ extends Task<MobEntityWithAi> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, MobEntityWithAi arg2) {
+    protected boolean shouldRun(ServerWorld arg, PathAwareEntity arg2) {
         if (this.isWalkTargetPresentAndFar(arg2)) {
             return false;
         }
         return arg2.getPos().isInRange(this.getPos(arg2), this.range);
     }
 
-    private Vec3d getPos(MobEntityWithAi arg) {
+    private Vec3d getPos(PathAwareEntity arg) {
         return this.posRetriever.apply(arg.getBrain().getOptionalMemory(this.entityMemory).get());
     }
 
-    private boolean isWalkTargetPresentAndFar(MobEntityWithAi arg) {
+    private boolean isWalkTargetPresentAndFar(PathAwareEntity arg) {
         Vec3d lv3;
         if (!arg.getBrain().hasMemoryModule(MemoryModuleType.WALK_TARGET)) {
             return false;
@@ -69,11 +69,11 @@ extends Task<MobEntityWithAi> {
     }
 
     @Override
-    protected void run(ServerWorld arg, MobEntityWithAi arg2, long l) {
+    protected void run(ServerWorld arg, PathAwareEntity arg2, long l) {
         GoToRememberedPositionTask.setWalkTarget(arg2, this.getPos(arg2), this.speed);
     }
 
-    private static void setWalkTarget(MobEntityWithAi arg, Vec3d arg2, float f) {
+    private static void setWalkTarget(PathAwareEntity arg, Vec3d arg2, float f) {
         for (int i = 0; i < 10; ++i) {
             Vec3d lv = TargetFinder.findGroundTargetAwayFrom(arg, 16, 7, arg2);
             if (lv == null) continue;

@@ -11,6 +11,7 @@ import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5421;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
@@ -164,6 +165,12 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
     @Environment(value=EnvType.CLIENT)
     public int getCraftingSlotCount() {
         return 10;
+    }
+
+    @Override
+    @Environment(value=EnvType.CLIENT)
+    public class_5421 method_30264() {
+        return class_5421.CRAFTING;
     }
 }
 

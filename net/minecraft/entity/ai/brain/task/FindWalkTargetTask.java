@@ -15,14 +15,14 @@ import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
 import net.minecraft.entity.ai.brain.task.LookTargetUtil;
 import net.minecraft.entity.ai.brain.task.Task;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
 
 public class FindWalkTargetTask
-extends Task<MobEntityWithAi> {
+extends Task<PathAwareEntity> {
     private final float walkSpeed;
     private final int maxHorizontalDistance;
     private final int maxVerticalDistance;
@@ -39,7 +39,7 @@ extends Task<MobEntityWithAi> {
     }
 
     @Override
-    protected void run(ServerWorld arg, MobEntityWithAi arg2, long l) {
+    protected void run(ServerWorld arg, PathAwareEntity arg2, long l) {
         BlockPos lv = arg2.getBlockPos();
         if (arg.isNearOccupiedPointOfInterest(lv)) {
             this.updateWalkTarget(arg2);
@@ -54,12 +54,12 @@ extends Task<MobEntityWithAi> {
         }
     }
 
-    private void updateWalkTarget(MobEntityWithAi arg2, ChunkSectionPos arg22) {
+    private void updateWalkTarget(PathAwareEntity arg2, ChunkSectionPos arg22) {
         Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findTargetTowards(arg2, this.maxHorizontalDistance, this.maxVerticalDistance, Vec3d.ofBottomCenter(arg22.getCenterPos())));
         arg2.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
     }
 
-    private void updateWalkTarget(MobEntityWithAi arg2) {
+    private void updateWalkTarget(PathAwareEntity arg2) {
         Optional<Vec3d> optional = Optional.ofNullable(TargetFinder.findGroundTarget(arg2, this.maxHorizontalDistance, this.maxVerticalDistance));
         arg2.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.walkSpeed, 0)));
     }

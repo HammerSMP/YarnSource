@@ -67,7 +67,7 @@ extends ProjectileEntity {
                 bl = true;
             } else if (lv3.isOf(Blocks.END_GATEWAY)) {
                 BlockEntity lv4 = this.world.getBlockEntity(lv2);
-                if (lv4 instanceof EndGatewayBlockEntity) {
+                if (lv4 instanceof EndGatewayBlockEntity && EndGatewayBlockEntity.method_30276(this)) {
                     ((EndGatewayBlockEntity)lv4).tryTeleportingEntity(this);
                 }
                 bl = true;

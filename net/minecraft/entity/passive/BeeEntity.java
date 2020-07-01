@@ -66,7 +66,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -103,7 +103,7 @@ Flutterer {
     private static final TrackedData<Byte> multipleByteTracker = DataTracker.registerData(BeeEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Integer> anger = DataTracker.registerData(BeeEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final IntRange field_25363 = Durations.betweenSeconds(20, 39);
-    private UUID field_25364;
+    private UUID targetUuid;
     private float currentPitch;
     private float lastPitch;
     private int ticksSinceSting;
@@ -152,7 +152,7 @@ Flutterer {
         this.goalSelector.add(0, new StingGoal(this, 1.4f, true));
         this.goalSelector.add(1, new EnterHiveGoal());
         this.goalSelector.add(2, new AnimalMateGoal(this, 1.0));
-        this.goalSelector.add(3, new TemptGoal((MobEntityWithAi)this, 1.25, Ingredient.fromTag(ItemTags.FLOWERS), false));
+        this.goalSelector.add(3, new TemptGoal((PathAwareEntity)this, 1.25, Ingredient.fromTag(ItemTags.FLOWERS), false));
         this.pollinateGoal = new PollinateGoal();
         this.goalSelector.add(4, this.pollinateGoal);
         this.goalSelector.add(5, new FollowParentGoal(this, 1.25));
@@ -353,12 +353,12 @@ Flutterer {
 
     @Override
     public UUID getAngryAt() {
-        return this.field_25364;
+        return this.targetUuid;
     }
 
     @Override
     public void setAngryAt(@Nullable UUID uUID) {
-        this.field_25364 = uUID;
+        this.targetUuid = uUID;
     }
 
     @Override
@@ -534,8 +534,8 @@ Flutterer {
     }
 
     @Override
-    public BeeEntity createChild(PassiveEntity arg) {
-        return EntityType.BEE.create(this.world);
+    public BeeEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return EntityType.BEE.create(arg);
     }
 
     @Override
@@ -598,8 +598,8 @@ Flutterer {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     class EnterHiveGoal
@@ -638,7 +638,7 @@ Flutterer {
 
     class StingGoal
     extends MeleeAttackGoal {
-        StingGoal(MobEntityWithAi arg2, double d, boolean bl) {
+        StingGoal(PathAwareEntity arg2, double d, boolean bl) {
             super(arg2, d, bl);
         }
 

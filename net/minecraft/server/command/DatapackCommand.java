@@ -42,7 +42,7 @@ public class DatapackCommand {
     private static final DynamicCommandExceptionType ALREADY_DISABLED_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("commands.datapack.disable.failed", object));
     private static final SuggestionProvider<ServerCommandSource> ENABLED_CONTAINERS_SUGGESTION_PROVIDER = (commandContext, suggestionsBuilder) -> CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getDataPackManager().getEnabledNames().stream().map(StringArgumentType::escapeIfRequired), suggestionsBuilder);
     private static final SuggestionProvider<ServerCommandSource> DISABLED_CONTAINERS_SUGGESTION_PROVIDER = (commandContext, suggestionsBuilder) -> {
-        ResourcePackManager<ResourcePackProfile> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getDataPackManager();
+        ResourcePackManager lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getDataPackManager();
         Collection<String> collection = lv.getEnabledNames();
         return CommandSource.suggestMatching(lv.getNames().stream().filter(string -> !collection.contains(string)).map(StringArgumentType::escapeIfRequired), suggestionsBuilder);
     };
@@ -52,7 +52,7 @@ public class DatapackCommand {
     }
 
     private static int executeEnable(ServerCommandSource arg, ResourcePackProfile arg2, PackAdder arg3) throws CommandSyntaxException {
-        ResourcePackManager<ResourcePackProfile> lv = arg.getMinecraftServer().getDataPackManager();
+        ResourcePackManager lv = arg.getMinecraftServer().getDataPackManager();
         ArrayList list = Lists.newArrayList(lv.getEnabledProfiles());
         arg3.apply(list, arg2);
         arg.sendFeedback(new TranslatableText("commands.datapack.modify.enable", arg2.getInformationText(true)), true);
@@ -61,7 +61,7 @@ public class DatapackCommand {
     }
 
     private static int executeDisable(ServerCommandSource arg, ResourcePackProfile arg2) {
-        ResourcePackManager<ResourcePackProfile> lv = arg.getMinecraftServer().getDataPackManager();
+        ResourcePackManager lv = arg.getMinecraftServer().getDataPackManager();
         ArrayList list = Lists.newArrayList(lv.getEnabledProfiles());
         list.remove(arg2);
         arg.sendFeedback(new TranslatableText("commands.datapack.modify.disable", arg2.getInformationText(true)), true);
@@ -74,7 +74,7 @@ public class DatapackCommand {
     }
 
     private static int executeListAvailable(ServerCommandSource arg2) {
-        ResourcePackManager<ResourcePackProfile> lv = arg2.getMinecraftServer().getDataPackManager();
+        ResourcePackManager lv = arg2.getMinecraftServer().getDataPackManager();
         lv.scanPacks();
         Collection<ResourcePackProfile> collection = lv.getEnabledProfiles();
         Collection<ResourcePackProfile> collection2 = lv.getProfiles();
@@ -88,7 +88,7 @@ public class DatapackCommand {
     }
 
     private static int executeListEnabled(ServerCommandSource arg2) {
-        ResourcePackManager<ResourcePackProfile> lv = arg2.getMinecraftServer().getDataPackManager();
+        ResourcePackManager lv = arg2.getMinecraftServer().getDataPackManager();
         lv.scanPacks();
         Collection<ResourcePackProfile> collection = lv.getEnabledProfiles();
         if (collection.isEmpty()) {
@@ -101,7 +101,7 @@ public class DatapackCommand {
 
     private static ResourcePackProfile getPackContainer(CommandContext<ServerCommandSource> commandContext, String string, boolean bl) throws CommandSyntaxException {
         String string2 = StringArgumentType.getString(commandContext, (String)string);
-        ResourcePackManager<ResourcePackProfile> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getDataPackManager();
+        ResourcePackManager lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getDataPackManager();
         ResourcePackProfile lv2 = lv.getProfile(string2);
         if (lv2 == null) {
             throw UNKNOWN_DATAPACK_EXCEPTION.create((Object)string2);

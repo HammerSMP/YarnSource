@@ -91,7 +91,7 @@ implements Angerable {
     private float shakeProgress;
     private float lastShakeProgress;
     private static final IntRange ANGER_TIME_RANGE = Durations.betweenSeconds(20, 39);
-    private UUID angryAt;
+    private UUID targetUuid;
 
     public WolfEntity(EntityType<? extends WolfEntity> arg, World arg2) {
         super((EntityType<? extends TameableEntity>)arg, arg2);
@@ -422,12 +422,12 @@ implements Angerable {
     @Override
     @Nullable
     public UUID getAngryAt() {
-        return this.angryAt;
+        return this.targetUuid;
     }
 
     @Override
     public void setAngryAt(@Nullable UUID uUID) {
-        this.angryAt = uUID;
+        this.targetUuid = uUID;
     }
 
     public DyeColor getCollarColor() {
@@ -439,8 +439,8 @@ implements Angerable {
     }
 
     @Override
-    public WolfEntity createChild(PassiveEntity arg) {
-        WolfEntity lv = EntityType.WOLF.create(this.world);
+    public WolfEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        WolfEntity lv = EntityType.WOLF.create(arg);
         UUID uUID = this.getOwnerUuid();
         if (uUID != null) {
             lv.setOwnerUuid(uUID);
@@ -508,8 +508,8 @@ implements Angerable {
     }
 
     @Override
-    public /* synthetic */ PassiveEntity createChild(PassiveEntity arg) {
-        return this.createChild(arg);
+    public /* synthetic */ PassiveEntity createChild(ServerWorld arg, PassiveEntity arg2) {
+        return this.createChild(arg, arg2);
     }
 
     class AvoidLlamaGoal<T extends LivingEntity>

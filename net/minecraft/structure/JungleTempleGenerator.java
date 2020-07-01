@@ -27,7 +27,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
@@ -65,19 +64,19 @@ extends StructurePieceWithDimensions {
         if (!this.method_14839(arg, arg4, 0)) {
             return false;
         }
-        this.fillWithOutline((WorldAccess)arg, arg4, 0, -4, 0, this.width - 1, 0, this.depth - 1, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 1, 2, 9, 2, 2, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 1, 12, 9, 2, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 1, 3, 2, 2, 11, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 9, 1, 3, 9, 2, 11, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 3, 1, 10, 6, 1, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 3, 13, 10, 6, 13, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 1, 3, 2, 1, 6, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 10, 3, 2, 10, 6, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 3, 2, 9, 3, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 6, 2, 9, 6, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 3, 7, 3, 8, 7, 11, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 4, 8, 4, 7, 8, 10, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 0, -4, 0, this.width - 1, 0, this.depth - 1, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 1, 2, 9, 2, 2, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 1, 12, 9, 2, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 1, 3, 2, 2, 11, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 9, 1, 3, 9, 2, 11, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 1, 3, 1, 10, 6, 1, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 1, 3, 13, 10, 6, 13, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 1, 3, 2, 1, 6, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 10, 3, 2, 10, 6, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 3, 2, 9, 3, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 6, 2, 9, 6, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 3, 7, 3, 8, 7, 11, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 4, 8, 4, 7, 8, 10, false, random, COBBLESTONE_RANDOMIZER);
         this.fill(arg, arg4, 3, 1, 3, 8, 2, 11);
         this.fill(arg, arg4, 4, 3, 6, 7, 3, 9);
         this.fill(arg, arg4, 2, 4, 2, 9, 5, 12);
@@ -92,28 +91,28 @@ extends StructurePieceWithDimensions {
         this.addBlock(arg, Blocks.AIR.getDefaultState(), 1, 5, 9, arg4);
         this.addBlock(arg, Blocks.AIR.getDefaultState(), 10, 5, 9, arg4);
         for (int i = 0; i <= 14; i += 14) {
-            this.fillWithOutline((WorldAccess)arg, arg4, 2, 4, i, 2, 5, i, false, random, COBBLESTONE_RANDOMIZER);
-            this.fillWithOutline((WorldAccess)arg, arg4, 4, 4, i, 4, 5, i, false, random, COBBLESTONE_RANDOMIZER);
-            this.fillWithOutline((WorldAccess)arg, arg4, 7, 4, i, 7, 5, i, false, random, COBBLESTONE_RANDOMIZER);
-            this.fillWithOutline((WorldAccess)arg, arg4, 9, 4, i, 9, 5, i, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, 2, 4, i, 2, 5, i, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, 4, 4, i, 4, 5, i, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, 7, 4, i, 7, 5, i, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, 9, 4, i, 9, 5, i, false, random, COBBLESTONE_RANDOMIZER);
         }
-        this.fillWithOutline((WorldAccess)arg, arg4, 5, 6, 0, 6, 6, 0, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 5, 6, 0, 6, 6, 0, false, random, COBBLESTONE_RANDOMIZER);
         for (int j = 0; j <= 11; j += 11) {
             for (int k = 2; k <= 12; k += 2) {
-                this.fillWithOutline((WorldAccess)arg, arg4, j, 4, k, j, 5, k, false, random, COBBLESTONE_RANDOMIZER);
+                this.fillWithOutline(arg, arg4, j, 4, k, j, 5, k, false, random, COBBLESTONE_RANDOMIZER);
             }
-            this.fillWithOutline((WorldAccess)arg, arg4, j, 6, 5, j, 6, 5, false, random, COBBLESTONE_RANDOMIZER);
-            this.fillWithOutline((WorldAccess)arg, arg4, j, 6, 9, j, 6, 9, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, j, 6, 5, j, 6, 5, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, j, 6, 9, j, 6, 9, false, random, COBBLESTONE_RANDOMIZER);
         }
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 7, 2, 2, 9, 2, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 9, 7, 2, 9, 9, 2, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, 7, 12, 2, 9, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 9, 7, 12, 9, 9, 12, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 4, 9, 4, 4, 9, 4, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 7, 9, 4, 7, 9, 4, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 4, 9, 10, 4, 9, 10, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 7, 9, 10, 7, 9, 10, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 5, 9, 7, 6, 9, 7, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 7, 2, 2, 9, 2, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 9, 7, 2, 9, 9, 2, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, 7, 12, 2, 9, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 9, 7, 12, 9, 9, 12, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 4, 9, 4, 4, 9, 4, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 7, 9, 4, 7, 9, 4, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 4, 9, 10, 4, 9, 10, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 7, 9, 10, 7, 9, 10, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 5, 9, 7, 6, 9, 7, false, random, COBBLESTONE_RANDOMIZER);
         BlockState lv = (BlockState)Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
         BlockState lv2 = (BlockState)Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST);
         BlockState lv3 = (BlockState)Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH);
@@ -132,10 +131,10 @@ extends StructurePieceWithDimensions {
         this.addBlock(arg, lv4, 7, 1, 8, arg4);
         this.addBlock(arg, lv4, 7, 2, 9, arg4);
         this.addBlock(arg, lv4, 7, 3, 10, arg4);
-        this.fillWithOutline((WorldAccess)arg, arg4, 4, 1, 9, 4, 1, 9, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 7, 1, 9, 7, 1, 9, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 4, 1, 10, 7, 2, 10, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 5, 4, 5, 6, 4, 5, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 4, 1, 9, 4, 1, 9, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 7, 1, 9, 7, 1, 9, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 4, 1, 10, 7, 2, 10, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 5, 4, 5, 6, 4, 5, false, random, COBBLESTONE_RANDOMIZER);
         this.addBlock(arg, lv, 4, 4, 5, arg4);
         this.addBlock(arg, lv2, 7, 4, 5, arg4);
         for (int l = 0; l < 4; ++l) {
@@ -147,15 +146,15 @@ extends StructurePieceWithDimensions {
         this.fill(arg, arg4, 1, -3, 1, 3, -1, 13);
         this.fill(arg, arg4, 1, -3, 1, 9, -1, 5);
         for (int m = 1; m <= 13; m += 2) {
-            this.fillWithOutline((WorldAccess)arg, arg4, 1, -3, m, 1, -2, m, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, 1, -3, m, 1, -2, m, false, random, COBBLESTONE_RANDOMIZER);
         }
         for (int n = 2; n <= 12; n += 2) {
-            this.fillWithOutline((WorldAccess)arg, arg4, 1, -1, n, 3, -1, n, false, random, COBBLESTONE_RANDOMIZER);
+            this.fillWithOutline(arg, arg4, 1, -1, n, 3, -1, n, false, random, COBBLESTONE_RANDOMIZER);
         }
-        this.fillWithOutline((WorldAccess)arg, arg4, 2, -2, 1, 5, -2, 1, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 7, -2, 1, 9, -2, 1, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 6, -3, 1, 6, -3, 1, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 6, -1, 1, 6, -1, 1, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 2, -2, 1, 5, -2, 1, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 7, -2, 1, 9, -2, 1, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 6, -3, 1, 6, -3, 1, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 6, -1, 1, 6, -1, 1, false, random, COBBLESTONE_RANDOMIZER);
         this.addBlock(arg, (BlockState)((BlockState)Blocks.TRIPWIRE_HOOK.getDefaultState().with(TripwireHookBlock.FACING, Direction.EAST)).with(TripwireHookBlock.ATTACHED, true), 1, -3, 8, arg4);
         this.addBlock(arg, (BlockState)((BlockState)Blocks.TRIPWIRE_HOOK.getDefaultState().with(TripwireHookBlock.FACING, Direction.WEST)).with(TripwireHookBlock.ATTACHED, true), 4, -3, 8, arg4);
         this.addBlock(arg, (BlockState)((BlockState)((BlockState)Blocks.TRIPWIRE.getDefaultState().with(TripwireBlock.EAST, true)).with(TripwireBlock.WEST, true)).with(TripwireBlock.ATTACHED, true), 2, -3, 8, arg4);
@@ -201,7 +200,7 @@ extends StructurePieceWithDimensions {
         this.addBlock(arg, Blocks.MOSSY_COBBLESTONE.getDefaultState(), 7, -2, 5, arg4);
         this.addBlock(arg, Blocks.MOSSY_COBBLESTONE.getDefaultState(), 7, -1, 5, arg4);
         this.addBlock(arg, Blocks.MOSSY_COBBLESTONE.getDefaultState(), 8, -3, 5, arg4);
-        this.fillWithOutline((WorldAccess)arg, arg4, 9, -1, 1, 9, -1, 5, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 9, -1, 1, 9, -1, 5, false, random, COBBLESTONE_RANDOMIZER);
         this.fill(arg, arg4, 8, -3, 8, 10, -1, 10);
         this.addBlock(arg, Blocks.CHISELED_STONE_BRICKS.getDefaultState(), 8, -2, 11, arg4);
         this.addBlock(arg, Blocks.CHISELED_STONE_BRICKS.getDefaultState(), 9, -2, 11, arg4);
@@ -210,8 +209,8 @@ extends StructurePieceWithDimensions {
         this.addBlock(arg, lv6, 8, -2, 12, arg4);
         this.addBlock(arg, lv6, 9, -2, 12, arg4);
         this.addBlock(arg, lv6, 10, -2, 12, arg4);
-        this.fillWithOutline((WorldAccess)arg, arg4, 8, -3, 8, 8, -3, 10, false, random, COBBLESTONE_RANDOMIZER);
-        this.fillWithOutline((WorldAccess)arg, arg4, 10, -3, 8, 10, -3, 10, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 8, -3, 8, 8, -3, 10, false, random, COBBLESTONE_RANDOMIZER);
+        this.fillWithOutline(arg, arg4, 10, -3, 8, 10, -3, 10, false, random, COBBLESTONE_RANDOMIZER);
         this.addBlock(arg, Blocks.MOSSY_COBBLESTONE.getDefaultState(), 10, -2, 9, arg4);
         this.addBlock(arg, lv5, 8, -2, 9, arg4);
         this.addBlock(arg, lv5, 8, -2, 10, arg4);

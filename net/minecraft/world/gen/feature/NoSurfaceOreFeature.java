@@ -12,7 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.OreFeatureConfig;
@@ -24,13 +23,13 @@ extends Feature<OreFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, OreFeatureConfig arg5) {
-        int i = random.nextInt(arg5.size + 1);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, OreFeatureConfig arg4) {
+        int i = random.nextInt(arg4.size + 1);
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int j = 0; j < i; ++j) {
-            this.getStartPos(lv, random, arg4, Math.min(j, 7));
-            if (!arg5.target.getCondition().test(arg.getBlockState(lv)) || this.checkAir(arg, lv)) continue;
-            arg.setBlockState(lv, arg5.state, 2);
+            this.getStartPos(lv, random, arg3, Math.min(j, 7));
+            if (!arg4.target.getCondition().test(arg.getBlockState(lv)) || this.checkAir(arg, lv)) continue;
+            arg.setBlockState(lv, arg4.state, 2);
         }
         return true;
     }

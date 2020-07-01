@@ -53,7 +53,7 @@ implements AutoCloseable {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    public static <T extends ResourcePackProfile> T of(String string, boolean bl, Supplier<ResourcePack> supplier, Factory<T> arg, InsertionPosition arg2, ResourcePackSource arg3) {
+    public static ResourcePackProfile of(String string, boolean bl, Supplier<ResourcePack> supplier, Factory arg, InsertionPosition arg2, ResourcePackSource arg3) {
         try (ResourcePack lv = supplier.get();){
             PackResourceMetadata lv2 = lv.parseMetadata(PackResourceMetadata.READER);
             if (bl && lv2 == null) {
@@ -61,8 +61,8 @@ implements AutoCloseable {
                 lv2 = BROKEN_PACK_META;
             }
             if (lv2 != null) {
-                T t = arg.create(string, bl, supplier, lv, lv2, arg2, arg3);
-                return t;
+                ResourcePackProfile resourcePackProfile = arg.create(string, bl, supplier, lv, lv2, arg2, arg3);
+                return resourcePackProfile;
             }
             LOGGER.warn("Couldn't find pack meta for pack {}", (Object)string);
             return null;
@@ -156,7 +156,7 @@ implements AutoCloseable {
         BOTTOM;
 
 
-        public <T, P extends ResourcePackProfile> int insert(List<T> list, T object, Function<T, P> function, boolean bl) {
+        public <T> int insert(List<T> list, T object, Function<T, ResourcePackProfile> function, boolean bl) {
             ResourcePackProfile lv3;
             int j;
             InsertionPosition lv;
@@ -164,12 +164,12 @@ implements AutoCloseable {
             if (lv == BOTTOM) {
                 ResourcePackProfile lv2;
                 int i;
-                for (i = 0; i < list.size() && (lv2 = (ResourcePackProfile)function.apply(list.get(i))).isPinned() && lv2.getInitialPosition() == this; ++i) {
+                for (i = 0; i < list.size() && (lv2 = function.apply(list.get(i))).isPinned() && lv2.getInitialPosition() == this; ++i) {
                 }
                 list.add(i, object);
                 return i;
             }
-            for (j = list.size() - 1; j >= 0 && (lv3 = (ResourcePackProfile)function.apply(list.get(j))).isPinned() && lv3.getInitialPosition() == this; --j) {
+            for (j = list.size() - 1; j >= 0 && (lv3 = function.apply(list.get(j))).isPinned() && lv3.getInitialPosition() == this; --j) {
             }
             list.add(j + 1, object);
             return j + 1;
@@ -181,9 +181,9 @@ implements AutoCloseable {
     }
 
     @FunctionalInterface
-    public static interface Factory<T extends ResourcePackProfile> {
+    public static interface Factory {
         @Nullable
-        public T create(String var1, boolean var2, Supplier<ResourcePack> var3, ResourcePack var4, PackResourceMetadata var5, InsertionPosition var6, ResourcePackSource var7);
+        public ResourcePackProfile create(String var1, boolean var2, Supplier<ResourcePack> var3, ResourcePack var4, PackResourceMetadata var5, InsertionPosition var6, ResourcePackSource var7);
     }
 }
 

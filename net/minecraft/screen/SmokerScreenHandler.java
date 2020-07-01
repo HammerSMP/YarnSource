@@ -3,6 +3,7 @@
  */
 package net.minecraft.screen;
 
+import net.minecraft.class_5421;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.RecipeType;
@@ -13,11 +14,11 @@ import net.minecraft.screen.ScreenHandlerType;
 public class SmokerScreenHandler
 extends AbstractFurnaceScreenHandler {
     public SmokerScreenHandler(int i, PlayerInventory arg) {
-        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, i, arg);
+        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, class_5421.SMOKER, i, arg);
     }
 
     public SmokerScreenHandler(int i, PlayerInventory arg, Inventory arg2, PropertyDelegate arg3) {
-        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, i, arg, arg2, arg3);
+        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, class_5421.SMOKER, i, arg, arg2, arg3);
     }
 }
 

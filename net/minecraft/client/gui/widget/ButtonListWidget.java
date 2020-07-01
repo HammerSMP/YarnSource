@@ -55,7 +55,7 @@ extends ElementListWidget<ButtonEntry> {
         return super.getScrollbarPositionX() + 32;
     }
 
-    public Optional<AbstractButtonWidget> method_29624(double d, double e) {
+    public Optional<AbstractButtonWidget> getHoveredButton(double d, double e) {
         for (ButtonEntry lv : this.children()) {
             for (AbstractButtonWidget lv2 : lv.buttons) {
                 if (!lv2.isMouseOver(d, e)) continue;

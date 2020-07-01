@@ -81,7 +81,7 @@ public class BlockPredicate {
         Tag<Block> lv4 = null;
         if (jsonObject.has("tag")) {
             Identifier lv5 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv4 = TagContainers.instance().blocks().get(lv5);
+            lv4 = TagContainers.instance().method_30215().method_30210(lv5);
             if (lv4 == null) {
                 throw new JsonSyntaxException("Unknown block tag '" + lv5 + "'");
             }
@@ -99,7 +99,7 @@ public class BlockPredicate {
             jsonObject.addProperty("block", Registry.BLOCK.getId(this.block).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().blocks().checkId(this.tag).toString());
+            jsonObject.addProperty("tag", TagContainers.instance().method_30215().method_30212(this.tag).toString());
         }
         jsonObject.add("nbt", this.nbt.toJson());
         jsonObject.add("state", this.state.toJson());

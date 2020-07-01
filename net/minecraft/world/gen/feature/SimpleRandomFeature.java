@@ -10,7 +10,6 @@ import com.mojang.serialization.Codec;
 import java.util.Random;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Feature;
@@ -23,10 +22,10 @@ extends Feature<SimpleRandomFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, SimpleRandomFeatureConfig arg5) {
-        int i = random.nextInt(arg5.features.size());
-        ConfiguredFeature<?, ?> lv = arg5.features.get(i);
-        return lv.generate(arg, arg2, arg3, random, arg4);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, SimpleRandomFeatureConfig arg4) {
+        int i = random.nextInt(arg4.features.size());
+        ConfiguredFeature<?, ?> lv = arg4.features.get(i);
+        return lv.generate(arg, arg2, random, arg3);
     }
 }
 

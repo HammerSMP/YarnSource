@@ -279,7 +279,7 @@ public class LevelStorage {
         private final SessionLock lock;
         private final Path directory;
         private final String directoryName;
-        private final Map<WorldSavePath, Path> field_24190 = Maps.newHashMap();
+        private final Map<WorldSavePath, Path> paths = Maps.newHashMap();
 
         public Session(String string) throws IOException {
             this.directoryName = string;
@@ -292,10 +292,10 @@ public class LevelStorage {
         }
 
         public Path getDirectory(WorldSavePath arg2) {
-            return this.field_24190.computeIfAbsent(arg2, arg -> this.directory.resolve(arg.getRelativePath()));
+            return this.paths.computeIfAbsent(arg2, arg -> this.directory.resolve(arg.getRelativePath()));
         }
 
-        public File method_27424(RegistryKey<World> arg) {
+        public File getWorldDirectory(RegistryKey<World> arg) {
             return DimensionType.getSaveDirectory(arg, this.directory.toFile());
         }
 

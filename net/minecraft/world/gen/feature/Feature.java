@@ -18,7 +18,6 @@ import net.minecraft.world.ModifiableWorld;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.TestableWorld;
 import net.minecraft.world.gen.ProbabilityConfig;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.AbstractPileFeature;
 import net.minecraft.world.gen.feature.BambooFeature;
@@ -180,7 +179,7 @@ public abstract class Feature<FC extends FeatureConfig> {
         arg.setBlockState(arg2, arg3, 3);
     }
 
-    public abstract boolean generate(ServerWorldAccess var1, StructureAccessor var2, ChunkGenerator var3, Random var4, BlockPos var5, FC var6);
+    public abstract boolean generate(ServerWorldAccess var1, ChunkGenerator var2, Random var3, BlockPos var4, FC var5);
 
     protected static boolean isStone(Block arg) {
         return arg == Blocks.STONE || arg == Blocks.GRANITE || arg == Blocks.DIORITE || arg == Blocks.ANDESITE;

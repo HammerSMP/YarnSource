@@ -12,7 +12,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DiskFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -24,23 +23,23 @@ extends Feature<DiskFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DiskFeatureConfig arg5) {
-        if (!arg.getFluidState(arg4).isIn(FluidTags.WATER)) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DiskFeatureConfig arg4) {
+        if (!arg.getFluidState(arg3).isIn(FluidTags.WATER)) {
             return false;
         }
         int i = 0;
-        int j = random.nextInt(arg5.radius - 2) + 2;
-        for (int k = arg4.getX() - j; k <= arg4.getX() + j; ++k) {
-            for (int l = arg4.getZ() - j; l <= arg4.getZ() + j; ++l) {
+        int j = random.nextInt(arg4.radius - 2) + 2;
+        for (int k = arg3.getX() - j; k <= arg3.getX() + j; ++k) {
+            for (int l = arg3.getZ() - j; l <= arg3.getZ() + j; ++l) {
                 int n;
-                int m = k - arg4.getX();
-                if (m * m + (n = l - arg4.getZ()) * n > j * j) continue;
-                block2: for (int o = arg4.getY() - arg5.ySize; o <= arg4.getY() + arg5.ySize; ++o) {
+                int m = k - arg3.getX();
+                if (m * m + (n = l - arg3.getZ()) * n > j * j) continue;
+                block2: for (int o = arg3.getY() - arg4.ySize; o <= arg3.getY() + arg4.ySize; ++o) {
                     BlockPos lv = new BlockPos(k, o, l);
                     BlockState lv2 = arg.getBlockState(lv);
-                    for (BlockState lv3 : arg5.targets) {
+                    for (BlockState lv3 : arg4.targets) {
                         if (!lv3.isOf(lv2.getBlock())) continue;
-                        arg.setBlockState(lv, arg5.state, 2);
+                        arg.setBlockState(lv, arg4.state, 2);
                         ++i;
                         continue block2;
                     }

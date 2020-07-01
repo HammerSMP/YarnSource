@@ -54,7 +54,7 @@ public interface CommandSource {
         return Collections.singleton(RelativePosition.ZERO_WORLD);
     }
 
-    public Set<RegistryKey<World>> method_29310();
+    public Set<RegistryKey<World>> getWorldKeys();
 
     public boolean hasPermissionLevel(int var1);
 

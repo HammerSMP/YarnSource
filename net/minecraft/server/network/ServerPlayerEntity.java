@@ -1234,8 +1234,8 @@ implements ScreenHandlerListener {
 
     @Override
     protected void tickNetherPortalCooldown() {
-        if (this.netherPortalCooldown > 0 && !this.inTeleportationState) {
-            --this.netherPortalCooldown;
+        if (!this.inTeleportationState) {
+            super.tickNetherPortalCooldown();
         }
     }
 

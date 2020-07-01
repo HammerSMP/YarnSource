@@ -33,15 +33,9 @@ implements Fertilizable {
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(AGE, 0));
     }
 
+    @Override
     public BlockState getRandomGrowthState(WorldAccess arg) {
         return (BlockState)this.getDefaultState().with(AGE, arg.getRandom().nextInt(25));
-    }
-
-    @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.breakBlock(arg3, true);
-        }
     }
 
     @Override
@@ -62,7 +56,7 @@ implements Fertilizable {
         if (arg2 == this.growthDirection.getOpposite() && !arg.canPlaceAt(arg4, arg5)) {
             arg4.getBlockTickScheduler().schedule(arg5, this, 1);
         }
-        if (arg2 == this.growthDirection && arg3.isOf(this)) {
+        if (arg2 == this.growthDirection && (arg3.isOf(this) || arg3.isOf(this.getPlant()))) {
             return this.getPlant().getDefaultState();
         }
         if (this.tickWater) {

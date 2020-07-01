@@ -102,7 +102,7 @@ implements Spawner {
             WanderingTraderEntity lv6 = EntityType.WANDERING_TRADER.spawn(arg2, null, null, null, lv5, SpawnReason.EVENT, false, false);
             if (lv6 != null) {
                 for (int j = 0; j < 2; ++j) {
-                    this.spawnLlama(lv6, 4);
+                    this.spawnLlama(arg2, lv6, 4);
                 }
                 this.field_24387.setWanderingTraderId(lv6.getUuid());
                 lv6.setDespawnDelay(48000);
@@ -114,16 +114,16 @@ implements Spawner {
         return false;
     }
 
-    private void spawnLlama(WanderingTraderEntity arg, int i) {
-        BlockPos lv = this.getNearbySpawnPos(arg.world, arg.getBlockPos(), i);
+    private void spawnLlama(ServerWorld arg, WanderingTraderEntity arg2, int i) {
+        BlockPos lv = this.getNearbySpawnPos(arg, arg2.getBlockPos(), i);
         if (lv == null) {
             return;
         }
-        TraderLlamaEntity lv2 = EntityType.TRADER_LLAMA.spawn(arg.world, null, null, null, lv, SpawnReason.EVENT, false, false);
+        TraderLlamaEntity lv2 = EntityType.TRADER_LLAMA.spawn(arg, null, null, null, lv, SpawnReason.EVENT, false, false);
         if (lv2 == null) {
             return;
         }
-        lv2.attachLeash(arg, true);
+        lv2.attachLeash(arg2, true);
     }
 
     @Nullable

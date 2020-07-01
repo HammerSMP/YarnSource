@@ -214,12 +214,12 @@ public class StructureTestUtil {
         lv.setRotation(arg2);
         lv.setIgnoreEntities(false);
         lv.setStructureName(new Identifier(string));
-        lv.loadStructure(bl);
+        lv.loadStructure(arg3, bl);
         if (lv.getSize() != BlockPos.ORIGIN) {
             return lv;
         }
         Structure lv2 = StructureTestUtil.createStructure(string, arg3);
-        lv.place(bl, lv2);
+        lv.place(arg3, bl, lv2);
         if (lv.getSize() == BlockPos.ORIGIN) {
             throw new RuntimeException("Failed to load structure " + string);
         }

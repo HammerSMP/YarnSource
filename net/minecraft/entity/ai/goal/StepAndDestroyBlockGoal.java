@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.entity.ai.goal.MoveToTargetPosGoal;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.MobEntityWithAi;
+import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ItemStackParticleEffect;
@@ -33,7 +33,7 @@ extends MoveToTargetPosGoal {
     private final MobEntity stepAndDestroyMob;
     private int counter;
 
-    public StepAndDestroyBlockGoal(Block arg, MobEntityWithAi arg2, double d, int i) {
+    public StepAndDestroyBlockGoal(Block arg, PathAwareEntity arg2, double d, int i) {
         super(arg2, d, 24, i);
         this.targetBlock = arg;
         this.stepAndDestroyMob = arg2;

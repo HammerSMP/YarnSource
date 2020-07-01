@@ -51,7 +51,7 @@ import org.apache.logging.log4j.Logger;
 public class RealmsBrokenWorldScreen
 extends RealmsScreen {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final Screen lastScreen;
+    private final Screen parent;
     private final RealmsMainScreen mainScreen;
     private RealmsServer field_20492;
     private final long serverId;
@@ -63,7 +63,7 @@ extends RealmsScreen {
     private int animTick;
 
     public RealmsBrokenWorldScreen(Screen arg, RealmsMainScreen arg2, long l, boolean bl) {
-        this.lastScreen = arg;
+        this.parent = arg;
         this.mainScreen = arg2;
         this.serverId = l;
         this.field_24204 = bl ? new TranslatableText("mco.brokenworld.minigame.title") : new TranslatableText("mco.brokenworld.title");
@@ -100,7 +100,7 @@ extends RealmsScreen {
                         lv.setResetTitle(I18n.translate("mco.create.world.reset.title", new Object[0]));
                         this.client.openScreen(lv);
                     } else {
-                        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.lastScreen, new SwitchSlotTask(this.field_20492.id, i, this::method_25123)));
+                        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new SwitchSlotTask(this.field_20492.id, i, this::method_25123)));
                     }
                 });
             } else {
@@ -178,7 +178,7 @@ extends RealmsScreen {
     }
 
     private void backButtonClicked() {
-        this.client.openScreen(this.lastScreen);
+        this.client.openScreen(this.parent);
     }
 
     private void fetchServerData(long l) {
@@ -190,7 +190,7 @@ extends RealmsScreen {
             }
             catch (RealmsServiceException lv2) {
                 LOGGER.error("Couldn't get own world");
-                this.client.openScreen(new RealmsGenericErrorScreen(Text.method_30163(lv2.getMessage()), this.lastScreen));
+                this.client.openScreen(new RealmsGenericErrorScreen(Text.method_30163(lv2.getMessage()), this.parent));
             }
         }).start();
     }
@@ -206,7 +206,7 @@ extends RealmsScreen {
                 }
                 catch (RealmsServiceException lv2) {
                     LOGGER.error("Couldn't get own world");
-                    this.client.execute(() -> this.client.openScreen(this.lastScreen));
+                    this.client.execute(() -> this.client.openScreen(this.parent));
                 }
             }
         }).start();

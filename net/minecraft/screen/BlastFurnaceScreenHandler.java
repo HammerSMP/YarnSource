@@ -3,6 +3,7 @@
  */
 package net.minecraft.screen;
 
+import net.minecraft.class_5421;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.RecipeType;
@@ -13,11 +14,11 @@ import net.minecraft.screen.ScreenHandlerType;
 public class BlastFurnaceScreenHandler
 extends AbstractFurnaceScreenHandler {
     public BlastFurnaceScreenHandler(int i, PlayerInventory arg) {
-        super(ScreenHandlerType.BLAST_FURNACE, RecipeType.BLASTING, i, arg);
+        super(ScreenHandlerType.BLAST_FURNACE, RecipeType.BLASTING, class_5421.BLAST_FURNACE, i, arg);
     }
 
     public BlastFurnaceScreenHandler(int i, PlayerInventory arg, Inventory arg2, PropertyDelegate arg3) {
-        super(ScreenHandlerType.BLAST_FURNACE, RecipeType.BLASTING, i, arg, arg2, arg3);
+        super(ScreenHandlerType.BLAST_FURNACE, RecipeType.BLASTING, class_5421.BLAST_FURNACE, i, arg, arg2, arg3);
     }
 }
 

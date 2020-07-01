@@ -170,7 +170,7 @@ implements Waterloggable {
         BlockEntity lv;
         if (arg.isClient()) {
             for (int i = 0; i < 20; ++i) {
-                CampfireBlock.spawnSmokeParticle(arg.getWorld(), arg2, arg3.get(SIGNAL_FIRE), true);
+                CampfireBlock.spawnSmokeParticle((World)arg, arg2, arg3.get(SIGNAL_FIRE), true);
             }
         }
         if ((lv = arg.getBlockEntity(arg2)) instanceof CampfireBlockEntity) {

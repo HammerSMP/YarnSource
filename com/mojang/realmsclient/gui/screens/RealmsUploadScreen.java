@@ -65,9 +65,9 @@ import org.apache.logging.log4j.Logger;
 public class RealmsUploadScreen
 extends RealmsScreen {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final ReentrantLock uploadLock = new ReentrantLock();
+    private static final ReentrantLock UPLOAD_LOCK = new ReentrantLock();
     private static final String[] DOTS = new String[]{"", ".", ". .", ". . ."};
-    private final RealmsResetWorldScreen lastScreen;
+    private final RealmsResetWorldScreen parent;
     private final LevelSummary selectedLevel;
     private final long worldId;
     private final int slotId;
@@ -91,7 +91,7 @@ extends RealmsScreen {
     public RealmsUploadScreen(long l, int i, RealmsResetWorldScreen arg, LevelSummary arg2, Runnable runnable) {
         this.worldId = l;
         this.slotId = i;
-        this.lastScreen = arg;
+        this.parent = arg;
         this.selectedLevel = arg2;
         this.uploadStatus = new UploadStatus();
         this.narrationRateLimiter = RateLimiter.create((double)0.1f);
@@ -104,10 +104,10 @@ extends RealmsScreen {
         this.backButton = new ButtonWidget(this.width / 2 - 100, this.height - 42, 200, 20, ScreenTexts.BACK, arg -> this.onBack());
         this.cancelButton = this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 42, 200, 20, ScreenTexts.CANCEL, arg -> this.onCancel()));
         if (!this.uploadStarted) {
-            if (this.lastScreen.slot == -1) {
+            if (this.parent.slot == -1) {
                 this.upload();
             } else {
-                this.lastScreen.switchSlot(() -> {
+                this.parent.switchSlot(() -> {
                     if (!this.uploadStarted) {
                         this.uploadStarted = true;
                         this.client.openScreen(this);
@@ -129,7 +129,7 @@ extends RealmsScreen {
 
     private void onCancel() {
         this.cancelled = true;
-        this.client.openScreen(this.lastScreen);
+        this.client.openScreen(this.parent);
     }
 
     @Override
@@ -248,7 +248,7 @@ extends RealmsScreen {
             RealmsClient lv = RealmsClient.createRealmsClient();
             long l = this.worldId;
             try {
-                if (!uploadLock.tryLock(1L, TimeUnit.SECONDS)) {
+                if (!UPLOAD_LOCK.tryLock(1L, TimeUnit.SECONDS)) {
                     this.status = new TranslatableText("mco.upload.close.failure");
                     return;
                 }
@@ -338,10 +338,10 @@ extends RealmsScreen {
             }
             finally {
                 this.uploadFinished = true;
-                if (!uploadLock.isHeldByCurrentThread()) {
+                if (!UPLOAD_LOCK.isHeldByCurrentThread()) {
                     return;
                 }
-                uploadLock.unlock();
+                UPLOAD_LOCK.unlock();
                 this.showDots = false;
                 this.children.clear();
                 this.addButton(this.backButton);

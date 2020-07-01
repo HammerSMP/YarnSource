@@ -11,7 +11,6 @@ import java.util.Random;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.DecoratedFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -23,8 +22,8 @@ extends Feature<DecoratedFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockPos arg4, DecoratedFeatureConfig arg5) {
-        return arg5.decorator.generate(arg, arg2, arg3, random, arg4, arg5.feature);
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DecoratedFeatureConfig arg4) {
+        return arg4.decorator.generate(arg, arg2, random, arg3, arg4.feature);
     }
 
     public String toString() {

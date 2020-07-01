@@ -56,6 +56,7 @@ import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
@@ -64,6 +65,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_5415;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityInteraction;
 import net.minecraft.entity.EntityType;
@@ -113,7 +115,7 @@ import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.structure.StructureManager;
-import net.minecraft.tag.RegistryTagManager;
+import net.minecraft.structure.StructureStart;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ProgressListener;
@@ -997,7 +999,7 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public RegistryTagManager getTagManager() {
+    public class_5415 getTagManager() {
         return this.server.getTagManager();
     }
 
@@ -1282,6 +1284,16 @@ implements ServerWorldAccess {
     @Nullable
     public EnderDragonFight getEnderDragonFight() {
         return this.enderDragonFight;
+    }
+
+    @Override
+    public Stream<? extends StructureStart<?>> method_30275(ChunkSectionPos arg, StructureFeature<?> arg2) {
+        return this.getStructureAccessor().getStructuresWithChildren(arg, arg2);
+    }
+
+    @Override
+    public World getWorld() {
+        return this;
     }
 
     public static void createEndSpawnPlatform(ServerWorld arg) {

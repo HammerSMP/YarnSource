@@ -82,13 +82,25 @@ AutoCloseable {
         AbstractTexture lv = this.textures.put(arg, arg2 = this.method_24303(arg, arg2));
         if (lv != arg2) {
             if (lv != null && lv != MissingSprite.getMissingSpriteTexture()) {
-                lv.clearGlId();
                 this.tickListeners.remove(lv);
+                this.method_30299(arg, lv);
             }
             if (arg2 instanceof TextureTickListener) {
                 this.tickListeners.add((TextureTickListener)((Object)arg2));
             }
         }
+    }
+
+    private void method_30299(Identifier arg, AbstractTexture arg2) {
+        if (arg2 != MissingSprite.getMissingSpriteTexture()) {
+            try {
+                arg2.close();
+            }
+            catch (Exception exception) {
+                LOGGER.warn("Failed to close texture {}", (Object)arg, (Object)exception);
+            }
+        }
+        arg2.clearGlId();
     }
 
     private AbstractTexture method_24303(Identifier arg, AbstractTexture arg2) {
@@ -105,9 +117,8 @@ AutoCloseable {
         catch (Throwable throwable) {
             CrashReport lv = CrashReport.create(throwable, "Registering texture");
             CrashReportSection lv2 = lv.addElement("Resource location being registered");
-            AbstractTexture lv3 = arg2;
             lv2.add("Resource location", arg);
-            lv2.add("Texture object class", () -> lv3.getClass().getName());
+            lv2.add("Texture object class", () -> arg2.getClass().getName());
             throw new CrashException(lv);
         }
     }
@@ -160,7 +171,7 @@ AutoCloseable {
 
     @Override
     public void close() {
-        this.textures.values().forEach(AbstractTexture::clearGlId);
+        this.textures.forEach((arg_0, arg_1) -> this.method_30299(arg_0, arg_1));
         this.textures.clear();
         this.tickListeners.clear();
         this.dynamicIdCounters.clear();

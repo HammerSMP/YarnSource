@@ -329,7 +329,7 @@ public class Biome {
 
     public void generateFeatureStep(GenerationStep.Feature arg, StructureAccessor arg2, ChunkGenerator arg3, ServerWorldAccess arg4, long l, ChunkRandom arg52, BlockPos arg6) {
         int i = 0;
-        if (arg2.method_27834()) {
+        if (arg2.shouldGenerateStructures()) {
             for (StructureFeature structureFeature : Registry.STRUCTURE_FEATURE) {
                 if (structureFeature.method_28663() != arg) continue;
                 arg52.setDecoratorSeed(l, i, arg.ordinal());
@@ -351,7 +351,7 @@ public class Biome {
         for (ConfiguredFeature<?, ?> configuredFeature : this.features.get(arg)) {
             arg52.setDecoratorSeed(l, i, arg.ordinal());
             try {
-                configuredFeature.generate(arg4, arg2, arg3, arg52, arg6);
+                configuredFeature.generate(arg4, arg3, arg52, arg6);
             }
             catch (Exception exception2) {
                 CrashReport lv4 = CrashReport.create(exception2, "Feature placement");

@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.dispenser.DispenserBehavior;
+import net.minecraft.class_5413;
 import net.minecraft.command.EntitySelectorOptions;
 import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.enchantment.Enchantment;
@@ -56,6 +57,7 @@ public class Bootstrap {
         EntitySelectorOptions.register();
         DispenserBehavior.registerDefaults();
         ArgumentTypes.register();
+        class_5413.method_30202();
         Bootstrap.setOutputStreams();
     }
 

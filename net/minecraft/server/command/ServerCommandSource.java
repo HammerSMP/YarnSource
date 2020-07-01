@@ -282,7 +282,7 @@ implements CommandSource {
     }
 
     @Override
-    public Set<RegistryKey<World>> method_29310() {
+    public Set<RegistryKey<World>> getWorldKeys() {
         return this.server.getWorldRegistryKeys();
     }
 }
