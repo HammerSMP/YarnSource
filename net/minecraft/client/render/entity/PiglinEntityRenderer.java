@@ -12,7 +12,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
@@ -20,6 +19,7 @@ import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.PiglinEntityModel;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.util.Identifier;
 
@@ -52,7 +52,7 @@ extends BipedEntityRenderer<MobEntity, PiglinEntityModel<MobEntity>> {
 
     @Override
     protected boolean isShaking(MobEntity arg) {
-        return arg instanceof AbstractPiglinEntity && ((AbstractPiglinEntity)arg).method_30235();
+        return arg instanceof AbstractPiglinEntity && ((AbstractPiglinEntity)arg).shouldZombify();
     }
 
     @Override

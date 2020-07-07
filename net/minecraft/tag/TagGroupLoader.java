@@ -30,26 +30,26 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.minecraft.class_5414;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TagContainer<T> {
+public class TagGroupLoader<T> {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON = new Gson();
     private static final int JSON_EXTENSION_LENGTH = ".json".length();
-    private final Function<Identifier, Optional<T>> getter;
+    private final Function<Identifier, Optional<T>> registryGetter;
     private final String dataType;
     private final String entryType;
 
-    public TagContainer(Function<Identifier, Optional<T>> function, String string, String string2) {
-        this.getter = function;
+    public TagGroupLoader(Function<Identifier, Optional<T>> function, String string, String string2) {
+        this.registryGetter = function;
         this.dataType = string;
         this.entryType = string2;
     }
@@ -128,10 +128,10 @@ public class TagContainer<T> {
         }, executor);
     }
 
-    public class_5414<T> applyReload(Map<Identifier, Tag.Builder> map) {
+    public TagGroup<T> applyReload(Map<Identifier, Tag.Builder> map) {
         HashMap map2 = Maps.newHashMap();
         Function function = map2::get;
-        Function<Identifier, Object> function2 = arg -> this.getter.apply((Identifier)arg).orElse(null);
+        Function<Identifier, Object> function2 = arg -> this.registryGetter.apply((Identifier)arg).orElse(null);
         while (!map.isEmpty()) {
             boolean bl = false;
             Iterator<Map.Entry<Identifier, Tag.Builder>> iterator = map.entrySet().iterator();
@@ -147,7 +147,7 @@ public class TagContainer<T> {
             break;
         }
         map.forEach((arg, arg2) -> LOGGER.error("Couldn't load {} tag {} as it is missing following references: {}", (Object)this.entryType, arg, (Object)arg2.streamUnresolvedEntries(function, function2).map(Objects::toString).collect(Collectors.joining(","))));
-        return class_5414.method_30207(map2);
+        return TagGroup.create(map2);
     }
 }
 

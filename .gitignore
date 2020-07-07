@@ -6,3 +6,5 @@ summary.txt
 .idea/vcs.xml
 .idea/libraries/source.xml
 .idea
+fabric.iml
+pusher

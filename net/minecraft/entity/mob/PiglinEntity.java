@@ -16,8 +16,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_4837;
-import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.class_5425;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CrossbowUser;
@@ -42,8 +40,10 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.PiglinActivity;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -68,9 +68,9 @@ public class PiglinEntity
 extends AbstractPiglinEntity
 implements CrossbowUser {
     private static final TrackedData<Boolean> BABY = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> IMMUNE_TO_ZOMBIFICATION = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> OLD_IMMUNE_TO_ZOMBIFICATION = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Boolean> CHARGING = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> dancing = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> DANCING = DataTracker.registerData(PiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final UUID BABY_SPEED_BOOST_ID = UUID.fromString("766bfa64-11f3-11ea-8d71-362b9e155667");
     private static final EntityAttributeModifier BABY_SPEED_BOOST = new EntityAttributeModifier(BABY_SPEED_BOOST_ID, "Baby speed boost", (double)0.2f, EntityAttributeModifier.Operation.MULTIPLY_BASE);
     private int conversionTicks = 0;
@@ -123,8 +123,8 @@ implements CrossbowUser {
         super.initDataTracker();
         this.dataTracker.startTracking(BABY, false);
         this.dataTracker.startTracking(CHARGING, false);
-        this.dataTracker.startTracking(IMMUNE_TO_ZOMBIFICATION, false);
-        this.dataTracker.startTracking(dancing, false);
+        this.dataTracker.startTracking(OLD_IMMUNE_TO_ZOMBIFICATION, false);
+        this.dataTracker.startTracking(DANCING, false);
     }
 
     @Override
@@ -149,7 +149,7 @@ implements CrossbowUser {
         if (arg3 != SpawnReason.STRUCTURE) {
             if (arg.getRandom().nextFloat() < 0.2f) {
                 this.setBaby(true);
-            } else if (this.method_30236()) {
+            } else if (this.isAdult()) {
                 this.equipStack(EquipmentSlot.MAINHAND, this.makeInitialWeapon());
             }
         }
@@ -171,7 +171,7 @@ implements CrossbowUser {
 
     @Override
     protected void initEquipment(LocalDifficulty arg) {
-        if (this.method_30236()) {
+        if (this.isAdult()) {
             this.equipAtChance(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
             this.equipAtChance(EquipmentSlot.CHEST, new ItemStack(Items.GOLDEN_CHESTPLATE));
             this.equipAtChance(EquipmentSlot.LEGS, new ItemStack(Items.GOLDEN_LEGGINGS));
@@ -205,7 +205,7 @@ implements CrossbowUser {
             return lv;
         }
         if (this.world.isClient) {
-            boolean bl = PiglinBrain.isWillingToTrade(this, arg.getStackInHand(arg2)) && this.getActivity() != class_4837.ADMIRING_ITEM;
+            boolean bl = PiglinBrain.isWillingToTrade(this, arg.getStackInHand(arg2)) && this.getActivity() != PiglinActivity.ADMIRING_ITEM;
             return bl ? ActionResult.SUCCESS : ActionResult.PASS;
         }
         return PiglinBrain.playerInteract(this, arg, arg2);
@@ -259,9 +259,9 @@ implements CrossbowUser {
         this.getBrain().tick((ServerWorld)this.world, this);
         this.world.getProfiler().pop();
         PiglinBrain.tickActivities(this);
-        this.conversionTicks = this.method_30235() ? ++this.conversionTicks : 0;
+        this.conversionTicks = this.shouldZombify() ? ++this.conversionTicks : 0;
         if (this.conversionTicks > 300) {
-            this.method_30238();
+            this.playZombificationSound();
             this.zombify((ServerWorld)this.world);
         }
     }
@@ -300,31 +300,31 @@ implements CrossbowUser {
     }
 
     @Override
-    public class_4837 getActivity() {
+    public PiglinActivity getActivity() {
         if (this.isDancing()) {
-            return class_4837.DANCING;
+            return PiglinActivity.DANCING;
         }
         if (PiglinBrain.isGoldenItem(this.getOffHandStack().getItem())) {
-            return class_4837.ADMIRING_ITEM;
+            return PiglinActivity.ADMIRING_ITEM;
         }
-        if (this.isAttacking() && this.method_30237()) {
-            return class_4837.ATTACKING_WITH_MELEE_WEAPON;
+        if (this.isAttacking() && this.isHoldingTool()) {
+            return PiglinActivity.ATTACKING_WITH_MELEE_WEAPON;
         }
         if (this.isCharging()) {
-            return class_4837.CROSSBOW_CHARGE;
+            return PiglinActivity.CROSSBOW_CHARGE;
         }
         if (this.isAttacking() && this.isHolding(Items.CROSSBOW)) {
-            return class_4837.CROSSBOW_HOLD;
+            return PiglinActivity.CROSSBOW_HOLD;
         }
-        return class_4837.DEFAULT;
+        return PiglinActivity.DEFAULT;
     }
 
     public boolean isDancing() {
-        return this.dataTracker.get(dancing);
+        return this.dataTracker.get(DANCING);
     }
 
     public void setDancing(boolean bl) {
-        this.dataTracker.set(dancing, bl);
+        this.dataTracker.set(DANCING, bl);
     }
 
     @Override
@@ -392,7 +392,7 @@ implements CrossbowUser {
         if (!bl && bl2) {
             return false;
         }
-        if (this.method_30236() && arg.getItem() != Items.CROSSBOW && arg2.getItem() == Items.CROSSBOW) {
+        if (this.isAdult() && arg.getItem() != Items.CROSSBOW && arg2.getItem() == Items.CROSSBOW) {
             return false;
         }
         return super.prefersNewEquipment(arg, arg2);
@@ -443,7 +443,7 @@ implements CrossbowUser {
         this.playSound(SoundEvents.ENTITY_PIGLIN_STEP, 0.15f, 1.0f);
     }
 
-    protected void method_30086(SoundEvent arg) {
+    protected void playSound(SoundEvent arg) {
         this.playSound(arg, this.getSoundVolume(), this.getSoundPitch());
     }
 
@@ -454,8 +454,8 @@ implements CrossbowUser {
     }
 
     @Override
-    protected void method_30238() {
-        this.method_30086(SoundEvents.ENTITY_PIGLIN_CONVERTED_TO_ZOMBIFIED);
+    protected void playZombificationSound() {
+        this.playSound(SoundEvents.ENTITY_PIGLIN_CONVERTED_TO_ZOMBIFIED);
     }
 }
 

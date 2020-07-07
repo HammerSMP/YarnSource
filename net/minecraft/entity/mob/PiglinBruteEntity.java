@@ -8,7 +8,7 @@
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
-package net.minecraft;
+package net.minecraft.entity.mob;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
@@ -16,9 +16,6 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.class_4837;
-import net.minecraft.AbstractPiglinEntity;
-import net.minecraft.PiglinBruteBrain;
 import net.minecraft.class_5425;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -32,7 +29,10 @@ import net.minecraft.entity.ai.brain.sensor.SensorType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.PiglinActivity;
+import net.minecraft.entity.mob.PiglinBruteBrain;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
@@ -43,17 +43,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.World;
 
-public class PiglinBrute
+public class PiglinBruteEntity
 extends AbstractPiglinEntity {
-    protected static final ImmutableList<SensorType<? extends Sensor<? super PiglinBrute>>> field_25761 = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.INTERACTABLE_DOORS, SensorType.PIGLIN_BRUTE_SPECIFIC_SENSOR);
-    protected static final ImmutableList<MemoryModuleType<?>> field_25760 = ImmutableList.of(MemoryModuleType.LOOK_TARGET, MemoryModuleType.INTERACTABLE_DOORS, MemoryModuleType.OPENED_DOORS, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEARBY_ADULT_PIGLINS, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.WALK_TARGET, (Object[])new MemoryModuleType[]{MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.PATH, MemoryModuleType.ANGRY_AT, MemoryModuleType.NEAREST_VISIBLE_NEMESIS, MemoryModuleType.HOME});
+    protected static final ImmutableList<SensorType<? extends Sensor<? super PiglinBruteEntity>>> SENSOR_TYPES = ImmutableList.of(SensorType.NEAREST_LIVING_ENTITIES, SensorType.NEAREST_PLAYERS, SensorType.NEAREST_ITEMS, SensorType.HURT_BY, SensorType.INTERACTABLE_DOORS, SensorType.PIGLIN_BRUTE_SPECIFIC_SENSOR);
+    protected static final ImmutableList<MemoryModuleType<?>> MEMORY_MODULE_TYPES = ImmutableList.of(MemoryModuleType.LOOK_TARGET, MemoryModuleType.INTERACTABLE_DOORS, MemoryModuleType.OPENED_DOORS, MemoryModuleType.MOBS, MemoryModuleType.VISIBLE_MOBS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, MemoryModuleType.NEARBY_ADULT_PIGLINS, MemoryModuleType.HURT_BY, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.WALK_TARGET, (Object[])new MemoryModuleType[]{MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.INTERACTION_TARGET, MemoryModuleType.PATH, MemoryModuleType.ANGRY_AT, MemoryModuleType.NEAREST_VISIBLE_NEMESIS, MemoryModuleType.HOME});
 
-    public PiglinBrute(EntityType<? extends PiglinBrute> arg, World arg2) {
+    public PiglinBruteEntity(EntityType<? extends PiglinBruteEntity> arg, World arg2) {
         super((EntityType<? extends AbstractPiglinEntity>)arg, arg2);
         this.experiencePoints = 20;
     }
 
-    public static DefaultAttributeContainer.Builder method_30242() {
+    public static DefaultAttributeContainer.Builder createPiglinBruteAttributes() {
         return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 50.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35f).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 7.0);
     }
 
@@ -70,16 +70,16 @@ extends AbstractPiglinEntity {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.GOLDEN_AXE));
     }
 
-    protected Brain.Profile<PiglinBrute> createBrainProfile() {
-        return Brain.createProfile(field_25760, field_25761);
+    protected Brain.Profile<PiglinBruteEntity> createBrainProfile() {
+        return Brain.createProfile(MEMORY_MODULE_TYPES, SENSOR_TYPES);
     }
 
     @Override
     protected Brain<?> deserializeBrain(Dynamic<?> dynamic) {
-        return PiglinBruteBrain.method_30252(this, this.createBrainProfile().deserialize(dynamic));
+        return PiglinBruteBrain.create(this, this.createBrainProfile().deserialize(dynamic));
     }
 
-    public Brain<PiglinBrute> getBrain() {
+    public Brain<PiglinBruteEntity> getBrain() {
         return super.getBrain();
     }
 
@@ -108,11 +108,11 @@ extends AbstractPiglinEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public class_4837 getActivity() {
-        if (this.isAttacking() && this.method_30237()) {
-            return class_4837.ATTACKING_WITH_MELEE_WEAPON;
+    public PiglinActivity getActivity() {
+        if (this.isAttacking() && this.isHoldingTool()) {
+            return PiglinActivity.ATTACKING_WITH_MELEE_WEAPON;
         }
-        return class_4837.DEFAULT;
+        return PiglinActivity.DEFAULT;
     }
 
     @Override
@@ -147,12 +147,12 @@ extends AbstractPiglinEntity {
         this.playSound(SoundEvents.ENTITY_PIGLIN_BRUTE_STEP, 0.15f, 1.0f);
     }
 
-    protected void method_30243() {
+    protected void playAngrySound() {
         this.playSound(SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY, 1.0f, this.getSoundPitch());
     }
 
     @Override
-    protected void method_30238() {
+    protected void playZombificationSound() {
         this.playSound(SoundEvents.ENTITY_PIGLIN_BRUTE_CONVERTED_TO_ZOMBIFIED, 1.0f, this.getSoundPitch());
     }
 }

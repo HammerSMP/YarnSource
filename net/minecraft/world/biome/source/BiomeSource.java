@@ -59,7 +59,7 @@ implements BiomeAccess.Storage {
         return SPAWN_BIOMES;
     }
 
-    public List<Biome> method_28443() {
+    public List<Biome> getBiomes() {
         return this.biomes;
     }
 

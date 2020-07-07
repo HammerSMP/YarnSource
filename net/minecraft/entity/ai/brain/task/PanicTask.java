@@ -44,9 +44,9 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected void keepRunning(ServerWorld arg, VillagerEntity arg2, long worldTime) {
-        if (worldTime % 100L == 0L) {
-            arg2.summonGolem(arg, worldTime, 3);
+    protected void keepRunning(ServerWorld arg, VillagerEntity arg2, long l) {
+        if (l % 100L == 0L) {
+            arg2.summonGolem(arg, l, 3);
         }
     }
 

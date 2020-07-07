@@ -58,8 +58,6 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
-import net.minecraft.class_5413;
-import net.minecraft.class_5415;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -296,6 +294,8 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatHandler;
+import net.minecraft.tag.RequiredTagListRegistry;
+import net.minecraft.tag.TagManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -339,7 +339,7 @@ implements ClientPlayPacketListener {
     private final Map<UUID, PlayerListEntry> playerListEntries = Maps.newHashMap();
     private final ClientAdvancementManager advancementHandler;
     private final ClientCommandSource commandSource;
-    private class_5415 tagManager = class_5415.field_25744;
+    private TagManager tagManager = TagManager.EMPTY;
     private final DataQueryHandler dataQueryHandler = new DataQueryHandler(this);
     private int chunkLoadDistance = 3;
     private final Random random = new Random();
@@ -376,7 +376,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         this.client.interactionManager = new ClientPlayerInteractionManager(this.client, this);
         if (!this.connection.isLocal()) {
-            class_5413.method_30196();
+            RequiredTagListRegistry.clearAllTags();
         }
         ArrayList arrayList = Lists.newArrayList(arg.method_29443());
         Collections.shuffle(arrayList);
@@ -1403,8 +1403,8 @@ implements ClientPlayPacketListener {
     @Override
     public void onSynchronizeTags(SynchronizeTagsS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        class_5415 lv = arg.getTagManager();
-        Multimap<Identifier, Identifier> multimap = class_5413.method_30203(lv);
+        TagManager lv = arg.getTagManager();
+        Multimap<Identifier, Identifier> multimap = RequiredTagListRegistry.getMissingTags(lv);
         if (!multimap.isEmpty()) {
             LOGGER.warn("Incomplete server tags, disconnecting. Missing: {}", multimap);
             this.connection.disconnect(new TranslatableText("multiplayer.disconnect.missing_tags"));
@@ -1412,7 +1412,7 @@ implements ClientPlayPacketListener {
         }
         this.tagManager = lv;
         if (!this.connection.isLocal()) {
-            lv.method_30222();
+            lv.apply();
         }
         this.client.getSearchableContainer(SearchManager.ITEM_TAG).reload();
     }
@@ -2146,7 +2146,7 @@ implements ClientPlayPacketListener {
         return this.world;
     }
 
-    public class_5415 getTagManager() {
+    public TagManager getTagManager() {
         return this.tagManager;
     }
 

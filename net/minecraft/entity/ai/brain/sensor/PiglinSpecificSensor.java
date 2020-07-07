@@ -18,16 +18,16 @@ import java.util.Set;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
-import net.minecraft.AbstractPiglinEntity;
-import net.minecraft.PiglinBrute;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PiglinBrain;
+import net.minecraft.entity.mob.PiglinBruteEntity;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -71,8 +71,8 @@ extends Sensor<LivingEntity> {
                 optional2 = Optional.of(lv3);
                 continue;
             }
-            if (lv2 instanceof PiglinBrute) {
-                list.add((PiglinBrute)lv2);
+            if (lv2 instanceof PiglinBruteEntity) {
+                list.add((PiglinBruteEntity)lv2);
                 continue;
             }
             if (lv2 instanceof PiglinEntity) {
@@ -81,7 +81,7 @@ extends Sensor<LivingEntity> {
                     optional4 = Optional.of(lv4);
                     continue;
                 }
-                if (!lv4.method_30236()) continue;
+                if (!lv4.isAdult()) continue;
                 list.add(lv4);
                 continue;
             }
@@ -103,7 +103,7 @@ extends Sensor<LivingEntity> {
         }
         List<LivingEntity> list4 = lv.getOptionalMemory(MemoryModuleType.MOBS).orElse((List<LivingEntity>)ImmutableList.of());
         for (LivingEntity lv6 : list4) {
-            if (!(lv6 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv6).method_30236()) continue;
+            if (!(lv6 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv6).isAdult()) continue;
             list2.add((AbstractPiglinEntity)lv6);
         }
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);

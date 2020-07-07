@@ -44,7 +44,7 @@ extends EntityRenderer<TntEntity> {
         arg2.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-90.0f));
         arg2.translate(-0.5, -0.5, 0.5);
         arg2.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
-        TntMinecartEntityRenderer.method_23190(Blocks.TNT.getDefaultState(), arg2, arg3, i, arg.getFuseTimer() / 5 % 2 == 0);
+        TntMinecartEntityRenderer.renderFlashingBlock(Blocks.TNT.getDefaultState(), arg2, arg3, i, arg.getFuseTimer() / 5 % 2 == 0);
         arg2.pop();
         super.render(arg, f, g, arg2, arg3, i);
     }

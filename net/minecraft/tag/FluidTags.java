@@ -4,29 +4,29 @@
 package net.minecraft.tag;
 
 import java.util.List;
-import net.minecraft.class_5413;
-import net.minecraft.class_5414;
-import net.minecraft.class_5415;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.tag.GlobalTagAccessor;
+import net.minecraft.tag.RequiredTagList;
+import net.minecraft.tag.RequiredTagListRegistry;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagManager;
 import net.minecraft.util.Identifier;
 
 public final class FluidTags {
-    protected static final GlobalTagAccessor<Fluid> ACCESSOR = class_5413.method_30201(new Identifier("fluid"), class_5415::method_30220);
+    protected static final RequiredTagList<Fluid> REQUIRED_TAGS = RequiredTagListRegistry.register(new Identifier("fluid"), TagManager::getFluids);
     public static final Tag.Identified<Fluid> WATER = FluidTags.register("water");
     public static final Tag.Identified<Fluid> LAVA = FluidTags.register("lava");
 
     private static Tag.Identified<Fluid> register(String string) {
-        return ACCESSOR.get(string);
+        return REQUIRED_TAGS.add(string);
     }
 
-    public static class_5414<Fluid> getContainer() {
-        return ACCESSOR.getContainer();
+    public static TagGroup<Fluid> getTagGroup() {
+        return REQUIRED_TAGS.getGroup();
     }
 
-    public static List<? extends Tag<Fluid>> method_29897() {
-        return ACCESSOR.method_29902();
+    public static List<? extends Tag<Fluid>> all() {
+        return REQUIRED_TAGS.getTags();
     }
 }
 

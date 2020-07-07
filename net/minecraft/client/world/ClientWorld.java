@@ -32,7 +32,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5415;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -60,6 +59,7 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.TagManager;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.CuboidBlockIterator;
 import net.minecraft.util.Util;
@@ -517,7 +517,7 @@ extends World {
     }
 
     @Override
-    public class_5415 getTagManager() {
+    public TagManager getTagManager() {
         return this.netHandler.getTagManager();
     }
 

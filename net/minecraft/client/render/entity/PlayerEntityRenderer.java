@@ -96,7 +96,7 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
             lv.rightPantLeg.visible = arg.isPartVisible(PlayerModelPart.RIGHT_PANTS_LEG);
             lv.leftSleeve.visible = arg.isPartVisible(PlayerModelPart.LEFT_SLEEVE);
             lv.rightSleeve.visible = arg.isPartVisible(PlayerModelPart.RIGHT_SLEEVE);
-            lv.isSneaking = arg.isInSneakingPose();
+            lv.sneaking = arg.isInSneakingPose();
             BipedEntityModel.ArmPose lv2 = PlayerEntityRenderer.getArmPose(arg, Hand.MAIN_HAND);
             BipedEntityModel.ArmPose lv3 = PlayerEntityRenderer.getArmPose(arg, Hand.OFF_HAND);
             if (lv2.method_30156()) {
@@ -176,7 +176,7 @@ extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<Abstr
         PlayerEntityModel lv = (PlayerEntityModel)this.getModel();
         this.setModelPose(arg3);
         lv.handSwingProgress = 0.0f;
-        lv.isSneaking = false;
+        lv.sneaking = false;
         lv.leaningPitch = 0.0f;
         lv.setAngles(arg3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
         arg4.pitch = 0.0f;

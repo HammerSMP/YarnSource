@@ -6,12 +6,11 @@
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
-package net.minecraft;
+package net.minecraft.entity.mob;
 
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_4837;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -24,6 +23,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.PiglinActivity;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.item.ToolItem;
@@ -34,18 +34,18 @@ import net.minecraft.world.World;
 
 public abstract class AbstractPiglinEntity
 extends HostileEntity {
-    protected static final TrackedData<Boolean> field_25758 = DataTracker.registerData(AbstractPiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    protected int field_25759 = 0;
+    protected static final TrackedData<Boolean> IMMUNE_TO_ZOMBIFICATION = DataTracker.registerData(AbstractPiglinEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    protected int timeInOverworld = 0;
 
     public AbstractPiglinEntity(EntityType<? extends AbstractPiglinEntity> arg, World arg2) {
         super((EntityType<? extends HostileEntity>)arg, arg2);
         this.setCanPickUpLoot(true);
-        this.method_30239();
+        this.setCanPathThroughDoors();
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, 16.0f);
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0f);
     }
 
-    private void method_30239() {
+    private void setCanPathThroughDoors() {
         EntityNavigation lv = this.getNavigation();
         if (lv instanceof MobNavigation) {
             ((MobNavigation)lv).setCanPathThroughDoors(true);
@@ -54,48 +54,48 @@ extends HostileEntity {
 
     protected abstract boolean canHunt();
 
-    public void method_30240(boolean bl) {
-        this.getDataTracker().set(field_25758, bl);
+    public void setImmuneToZombification(boolean bl) {
+        this.getDataTracker().set(IMMUNE_TO_ZOMBIFICATION, bl);
     }
 
-    protected boolean method_30234() {
-        return this.getDataTracker().get(field_25758);
+    protected boolean isImmuneToZombification() {
+        return this.getDataTracker().get(IMMUNE_TO_ZOMBIFICATION);
     }
 
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(field_25758, false);
+        this.dataTracker.startTracking(IMMUNE_TO_ZOMBIFICATION, false);
     }
 
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        if (this.method_30234()) {
+        if (this.isImmuneToZombification()) {
             arg.putBoolean("IsImmuneToZombification", true);
         }
-        arg.putInt("TimeInOverworld", this.field_25759);
+        arg.putInt("TimeInOverworld", this.timeInOverworld);
     }
 
     @Override
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
-        this.method_30240(arg.getBoolean("IsImmuneToZombification"));
-        this.field_25759 = arg.getInt("TimeInOverworld");
+        this.setImmuneToZombification(arg.getBoolean("IsImmuneToZombification"));
+        this.timeInOverworld = arg.getInt("TimeInOverworld");
     }
 
     @Override
     protected void mobTick() {
         super.mobTick();
-        this.field_25759 = this.method_30235() ? ++this.field_25759 : 0;
-        if (this.field_25759 > 300) {
-            this.method_30238();
+        this.timeInOverworld = this.shouldZombify() ? ++this.timeInOverworld : 0;
+        if (this.timeInOverworld > 300) {
+            this.playZombificationSound();
             this.zombify((ServerWorld)this.world);
         }
     }
 
-    public boolean method_30235() {
-        return !this.world.getDimension().isPiglinSafe() && !this.method_30234() && !this.isAiDisabled();
+    public boolean shouldZombify() {
+        return !this.world.getDimension().isPiglinSafe() && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
     protected void zombify(ServerWorld arg) {
@@ -103,12 +103,12 @@ extends HostileEntity {
         lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
     }
 
-    public boolean method_30236() {
+    public boolean isAdult() {
         return !this.isBaby();
     }
 
     @Environment(value=EnvType.CLIENT)
-    public abstract class_4837 getActivity();
+    public abstract PiglinActivity getActivity();
 
     @Override
     @Nullable
@@ -116,7 +116,7 @@ extends HostileEntity {
         return this.brain.getOptionalMemory(MemoryModuleType.ATTACK_TARGET).orElse(null);
     }
 
-    protected boolean method_30237() {
+    protected boolean isHoldingTool() {
         return this.getMainHandStack().getItem() instanceof ToolItem;
     }
 
@@ -133,6 +133,6 @@ extends HostileEntity {
         DebugInfoSender.sendBrainDebugData(this);
     }
 
-    protected abstract void method_30238();
+    protected abstract void playZombificationSound();
 }
 

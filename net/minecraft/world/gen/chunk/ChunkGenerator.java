@@ -85,7 +85,7 @@ public abstract class ChunkGenerator {
             return;
         }
         ArrayList list = Lists.newArrayList();
-        for (Biome lv2 : this.biomeSource.method_28443()) {
+        for (Biome lv2 : this.biomeSource.getBiomes()) {
             if (!lv2.hasStructureFeature(StructureFeature.STRONGHOLD)) continue;
             list.add(lv2);
         }

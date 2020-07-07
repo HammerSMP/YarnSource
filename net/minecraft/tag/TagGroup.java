@@ -12,7 +12,7 @@
  *  net.fabricmc.api.EnvType
  *  net.fabricmc.api.Environment
  */
-package net.minecraft;
+package net.minecraft.tag;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
@@ -33,43 +33,43 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.DefaultedRegistry;
 import net.minecraft.util.registry.Registry;
 
-public interface class_5414<T> {
-    public Map<Identifier, Tag<T>> method_30204();
+public interface TagGroup<T> {
+    public Map<Identifier, Tag<T>> getTags();
 
     @Nullable
-    default public Tag<T> method_30210(Identifier arg) {
-        return this.method_30204().get(arg);
+    default public Tag<T> getTag(Identifier arg) {
+        return this.getTags().get(arg);
     }
 
-    public Tag<T> method_30213(Identifier var1);
+    public Tag<T> getTagOrEmpty(Identifier var1);
 
     @Nullable
-    public Identifier method_30205(Tag<T> var1);
+    public Identifier getUncheckedTagId(Tag<T> var1);
 
-    default public Identifier method_30212(Tag<T> arg) {
-        Identifier lv = this.method_30205(arg);
+    default public Identifier getTagId(Tag<T> arg) {
+        Identifier lv = this.getUncheckedTagId(arg);
         if (lv == null) {
             throw new IllegalStateException("Unrecognized tag");
         }
         return lv;
     }
 
-    default public Collection<Identifier> method_30211() {
-        return this.method_30204().keySet();
+    default public Collection<Identifier> getTagIds() {
+        return this.getTags().keySet();
     }
 
     @Environment(value=EnvType.CLIENT)
-    default public Collection<Identifier> method_30206(T object) {
+    default public Collection<Identifier> getTagsFor(T object) {
         ArrayList list = Lists.newArrayList();
-        for (Map.Entry<Identifier, Tag<T>> entry : this.method_30204().entrySet()) {
+        for (Map.Entry<Identifier, Tag<T>> entry : this.getTags().entrySet()) {
             if (!entry.getValue().contains(object)) continue;
             list.add(entry.getKey());
         }
         return list;
     }
 
-    default public void method_30208(PacketByteBuf arg, DefaultedRegistry<T> arg2) {
-        Map<Identifier, Tag<T>> map = this.method_30204();
+    default public void toPacket(PacketByteBuf arg, DefaultedRegistry<T> arg2) {
+        Map<Identifier, Tag<T>> map = this.getTags();
         arg.writeVarInt(map.size());
         for (Map.Entry<Identifier, Tag<T>> entry : map.entrySet()) {
             arg.writeIdentifier(entry.getKey());
@@ -80,7 +80,7 @@ public interface class_5414<T> {
         }
     }
 
-    public static <T> class_5414<T> method_30209(PacketByteBuf arg, Registry<T> arg2) {
+    public static <T> TagGroup<T> fromPacket(PacketByteBuf arg, Registry<T> arg2) {
         HashMap map = Maps.newHashMap();
         int i = arg.readVarInt();
         for (int j = 0; j < i; ++j) {
@@ -92,39 +92,39 @@ public interface class_5414<T> {
             }
             map.put(lv, Tag.of(builder.build()));
         }
-        return class_5414.method_30207(map);
+        return TagGroup.create(map);
     }
 
-    public static <T> class_5414<T> method_30214() {
-        return class_5414.method_30207(ImmutableBiMap.of());
+    public static <T> TagGroup<T> createEmpty() {
+        return TagGroup.create(ImmutableBiMap.of());
     }
 
-    public static <T> class_5414<T> method_30207(Map<Identifier, Tag<T>> map) {
+    public static <T> TagGroup<T> create(Map<Identifier, Tag<T>> map) {
         ImmutableBiMap biMap = ImmutableBiMap.copyOf(map);
-        return new class_5414<T>((BiMap)biMap){
-            private final Tag<T> field_25743 = SetTag.empty();
-            final /* synthetic */ BiMap field_25742;
+        return new TagGroup<T>((BiMap)biMap){
+            private final Tag<T> emptyTag = SetTag.empty();
+            final /* synthetic */ BiMap tags;
             {
-                this.field_25742 = biMap;
+                this.tags = biMap;
             }
 
             @Override
-            public Tag<T> method_30213(Identifier arg) {
-                return (Tag)this.field_25742.getOrDefault((Object)arg, this.field_25743);
+            public Tag<T> getTagOrEmpty(Identifier arg) {
+                return (Tag)this.tags.getOrDefault((Object)arg, this.emptyTag);
             }
 
             @Override
             @Nullable
-            public Identifier method_30205(Tag<T> arg) {
+            public Identifier getUncheckedTagId(Tag<T> arg) {
                 if (arg instanceof Tag.Identified) {
                     return ((Tag.Identified)arg).getId();
                 }
-                return (Identifier)this.field_25742.inverse().get(arg);
+                return (Identifier)this.tags.inverse().get(arg);
             }
 
             @Override
-            public Map<Identifier, Tag<T>> method_30204() {
-                return this.field_25742;
+            public Map<Identifier, Tag<T>> getTags() {
+                return this.tags;
             }
         };
     }

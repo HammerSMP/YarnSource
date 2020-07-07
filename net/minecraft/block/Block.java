@@ -156,11 +156,11 @@ implements ItemConvertible {
         return lv;
     }
 
-    public static void replaced(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
-        Block.replaceBlock(arg, arg2, arg3, arg4, i, 512);
+    public static void replace(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
+        Block.replace(arg, arg2, arg3, arg4, i, 512);
     }
 
-    public static void replaceBlock(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i, int j) {
+    public static void replace(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i, int j) {
         if (arg2 != arg) {
             if (arg2.isAir()) {
                 if (!arg3.isClient()) {
@@ -424,7 +424,7 @@ implements ItemConvertible {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void buildTooltip(ItemStack arg, @Nullable BlockView arg2, List<Text> list, TooltipContext arg3) {
+    public void appendTooltip(ItemStack arg, @Nullable BlockView arg2, List<Text> list, TooltipContext arg3) {
     }
 
     @Override

@@ -352,7 +352,7 @@ extends DrawableHelper {
             for (Map.Entry entry : lv2.getEntries().entrySet()) {
                 list.add(this.propertyToString(entry));
             }
-            for (Identifier lv3 : this.client.getNetworkHandler().getTagManager().method_30215().method_30206(lv2.getBlock())) {
+            for (Identifier lv3 : this.client.getNetworkHandler().getTagManager().getBlocks().getTagsFor(lv2.getBlock())) {
                 list.add("#" + lv3);
             }
         }
@@ -365,7 +365,7 @@ extends DrawableHelper {
             for (Map.Entry entry2 : lv5.getEntries().entrySet()) {
                 list.add(this.propertyToString(entry2));
             }
-            for (Identifier lv6 : this.client.getNetworkHandler().getTagManager().method_30220().method_30206(lv5.getFluid())) {
+            for (Identifier lv6 : this.client.getNetworkHandler().getTagManager().getFluids().getTagsFor(lv5.getFluid())) {
                 list.add("#" + lv6);
             }
         }

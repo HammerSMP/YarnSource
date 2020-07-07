@@ -50,7 +50,6 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.pattern.CachedBlockPosition;
-import net.minecraft.class_5415;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.command.arguments.BlockArgumentParser;
 import net.minecraft.command.arguments.BlockPredicateArgumentType;
@@ -79,6 +78,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.stat.Stats;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.TagManager;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -695,7 +695,7 @@ public final class ItemStack {
                 if (bl) {
                     return Lists.newArrayList((Object[])new Text[]{lv2.getBlock().getName().formatted(Formatting.DARK_GRAY)});
                 }
-                net.minecraft.tag.Tag<Block> lv4 = BlockTags.getContainer().method_30210(lv3);
+                net.minecraft.tag.Tag<Block> lv4 = BlockTags.getTagGroup().getTag(lv3);
                 if (lv4 != null && !(collection = lv4.values()).isEmpty()) {
                     return collection.stream().map(Block::getName).map(arg -> arg.formatted(Formatting.DARK_GRAY)).collect(Collectors.toList());
                 }
@@ -831,7 +831,7 @@ public final class ItemStack {
         return Objects.equals(arg.getBlockEntity().toTag(new CompoundTag()), arg2.getBlockEntity().toTag(new CompoundTag()));
     }
 
-    public boolean canDestroy(class_5415 arg, CachedBlockPosition arg2) {
+    public boolean canDestroy(TagManager arg, CachedBlockPosition arg2) {
         if (ItemStack.areBlocksEqual(arg2, this.lastDestroyPos)) {
             return this.lastDestroyResult;
         }
@@ -857,7 +857,7 @@ public final class ItemStack {
         return false;
     }
 
-    public boolean canPlaceOn(class_5415 arg, CachedBlockPosition arg2) {
+    public boolean canPlaceOn(TagManager arg, CachedBlockPosition arg2) {
         if (ItemStack.areBlocksEqual(arg2, this.lastPlaceOnPos)) {
             return this.lastPlaceOnResult;
         }

@@ -3,16 +3,16 @@
  */
 package net.minecraft.tag;
 
-import net.minecraft.class_5413;
-import net.minecraft.class_5414;
-import net.minecraft.class_5415;
 import net.minecraft.item.Item;
-import net.minecraft.tag.GlobalTagAccessor;
+import net.minecraft.tag.RequiredTagList;
+import net.minecraft.tag.RequiredTagListRegistry;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagManager;
 import net.minecraft.util.Identifier;
 
 public final class ItemTags {
-    protected static final GlobalTagAccessor<Item> ACCESSOR = class_5413.method_30201(new Identifier("item"), class_5415::method_30218);
+    protected static final RequiredTagList<Item> REQUIRED_TAGS = RequiredTagListRegistry.register(new Identifier("item"), TagManager::getItems);
     public static final Tag.Identified<Item> WOOL = ItemTags.register("wool");
     public static final Tag.Identified<Item> PLANKS = ItemTags.register("planks");
     public static final Tag.Identified<Item> STONE_BRICKS = ItemTags.register("stone_bricks");
@@ -69,11 +69,11 @@ public final class ItemTags {
     public static final Tag.Identified<Item> FURNACE_MATERIALS = ItemTags.register("furnace_materials");
 
     private static Tag.Identified<Item> register(String string) {
-        return ACCESSOR.get(string);
+        return REQUIRED_TAGS.add(string);
     }
 
-    public static class_5414<Item> getContainer() {
-        return ACCESSOR.getContainer();
+    public static TagGroup<Item> getTagGroup() {
+        return REQUIRED_TAGS.getGroup();
     }
 }
 

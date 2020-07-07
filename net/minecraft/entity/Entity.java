@@ -953,7 +953,7 @@ CommandOutput {
         }
         BlockPos lv4 = new BlockPos(lv);
         FluidState lv5 = this.world.getFluidState(lv4);
-        for (Tag<Fluid> tag : FluidTags.method_29897()) {
+        for (Tag<Fluid> tag : FluidTags.all()) {
             if (!lv5.isIn(tag)) continue;
             double e = (float)lv4.getY() + lv5.getHeight(this.world, lv4);
             if (e > d) {

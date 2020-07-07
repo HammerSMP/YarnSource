@@ -52,7 +52,7 @@ implements ArgumentType<BlockStateArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder, BlockTags.getContainer());
+        return lv.getSuggestions(suggestionsBuilder, BlockTags.getTagGroup());
     }
 
     public Collection<String> getExamples() {

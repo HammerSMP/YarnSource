@@ -41,35 +41,35 @@ public abstract class GeneratorType {
     public static final GeneratorType DEFAULT = new GeneratorType("default"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     private static final GeneratorType FLAT = new GeneratorType("flat"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new FlatChunkGenerator(FlatChunkGeneratorConfig.getDefaultConfig());
         }
     };
     private static final GeneratorType LARGE_BIOMES = new GeneratorType("large_biomes"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     public static final GeneratorType AMPLIFIED = new GeneratorType("amplified"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.AMPLIFIED.getChunkGeneratorType());
         }
     };
     private static final GeneratorType SINGLE_BIOME_SURFACE = new GeneratorType("single_biome_surface"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
@@ -77,25 +77,25 @@ public abstract class GeneratorType {
 
         @Override
         public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
-            return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_29962(DimensionType.method_28517(l), DimensionType::getOverworldCavesDimensionType, this.method_29076(l)));
+            return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_29962(DimensionType.method_28517(l), DimensionType::getOverworldCavesDimensionType, this.getChunkGenerator(l)));
         }
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), l, ChunkGeneratorType.Preset.CAVES.getChunkGeneratorType());
         }
     };
     private static final GeneratorType SINGLE_BIOME_FLOATING_ISLANDS = new GeneratorType("single_biome_floating_islands"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), l, ChunkGeneratorType.Preset.FLOATING_ISLANDS.getChunkGeneratorType());
         }
     };
     private static final GeneratorType DEBUG_ALL_BLOCK_STATES = new GeneratorType("debug_all_block_states"){
 
         @Override
-        protected ChunkGenerator method_29076(long l) {
+        protected ChunkGenerator getChunkGenerator(long l) {
             return DebugChunkGenerator.INSTANCE;
         }
     };
@@ -103,7 +103,7 @@ public abstract class GeneratorType {
     protected static final Map<Optional<GeneratorType>, ScreenProvider> field_25053 = ImmutableMap.of(Optional.of(FLAT), (arg, arg2) -> {
         ChunkGenerator lv = arg2.getChunkGenerator();
         return new CustomizeFlatLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(new GeneratorOptions(arg2.getSeed(), arg2.shouldGenerateStructures(), arg2.hasBonusChest(), GeneratorOptions.method_28608(arg2.getDimensionMap(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
-    }, Optional.of(SINGLE_BIOME_SURFACE), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_SURFACE, arg3)), GeneratorType.method_29083(arg2)), Optional.of(SINGLE_BIOME_CAVES), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_CAVES, arg3)), GeneratorType.method_29083(arg2)), Optional.of(SINGLE_BIOME_FLOATING_ISLANDS), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_FLOATING_ISLANDS, arg3)), GeneratorType.method_29083(arg2)));
+    }, Optional.of(SINGLE_BIOME_SURFACE), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_SURFACE, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_CAVES), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_CAVES, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_FLOATING_ISLANDS), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_FLOATING_ISLANDS, arg3)), GeneratorType.getFirstBiome(arg2)));
     private final Text translationKey;
 
     private GeneratorType(String string) {
@@ -123,8 +123,8 @@ public abstract class GeneratorType {
         return new GeneratorOptions(arg.getSeed(), arg.shouldGenerateStructures(), arg.hasBonusChest(), GeneratorOptions.method_28608(arg.getDimensionMap(), new SurfaceChunkGenerator(lv, arg.getSeed(), lv4)));
     }
 
-    private static Biome method_29083(GeneratorOptions arg) {
-        return arg.getChunkGenerator().getBiomeSource().method_28443().stream().findFirst().orElse(Biomes.PLAINS);
+    private static Biome getFirstBiome(GeneratorOptions arg) {
+        return arg.getChunkGenerator().getBiomeSource().getBiomes().stream().findFirst().orElse(Biomes.PLAINS);
     }
 
     public static Optional<GeneratorType> method_29078(GeneratorOptions arg) {
@@ -143,10 +143,10 @@ public abstract class GeneratorType {
     }
 
     public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
-        return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_28608(DimensionType.method_28517(l), this.method_29076(l)));
+        return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_28608(DimensionType.method_28517(l), this.getChunkGenerator(l)));
     }
 
-    protected abstract ChunkGenerator method_29076(long var1);
+    protected abstract ChunkGenerator getChunkGenerator(long var1);
 
     @Environment(value=EnvType.CLIENT)
     public static interface ScreenProvider {

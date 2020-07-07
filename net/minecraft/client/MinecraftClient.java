@@ -625,7 +625,7 @@ WindowEventHandler {
 
     private void initializeSearchableContainers() {
         TextSearchableContainer<ItemStack> lv = new TextSearchableContainer<ItemStack>(arg2 -> arg2.getTooltip(null, TooltipContext.Default.NORMAL).stream().map(arg -> Formatting.strip(arg.getString()).trim()).filter(string -> !string.isEmpty()), arg -> Stream.of(Registry.ITEM.getId(arg.getItem())));
-        IdentifierSearchableContainer<ItemStack> lv2 = new IdentifierSearchableContainer<ItemStack>(arg -> ItemTags.getContainer().method_30206(arg.getItem()).stream());
+        IdentifierSearchableContainer<ItemStack> lv2 = new IdentifierSearchableContainer<ItemStack>(arg -> ItemTags.getTagGroup().getTagsFor(arg.getItem()).stream());
         DefaultedList<ItemStack> lv3 = DefaultedList.of();
         for (Item lv4 : Registry.ITEM) {
             lv4.appendStacks(ItemGroup.SEARCH, lv3);

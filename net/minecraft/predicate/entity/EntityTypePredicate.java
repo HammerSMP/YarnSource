@@ -18,8 +18,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import javax.annotation.Nullable;
 import net.minecraft.entity.EntityType;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -50,7 +50,7 @@ public abstract class EntityTypePredicate {
         String string = JsonHelper.asString(jsonElement, "type");
         if (string.startsWith("#")) {
             Identifier lv = new Identifier(string.substring(1));
-            return new Tagged(TagContainers.instance().method_30221().method_30213(lv));
+            return new Tagged(ServerTagManagerHolder.getTagManager().getEntityTypes().getTagOrEmpty(lv));
         }
         Identifier lv2 = new Identifier(string);
         EntityType lv3 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown entity type '" + lv2 + "', valid types are: " + COMMA_JOINER.join(Registry.ENTITY_TYPE.getIds())));
@@ -80,7 +80,7 @@ public abstract class EntityTypePredicate {
 
         @Override
         public JsonElement toJson() {
-            return new JsonPrimitive("#" + TagContainers.instance().method_30221().method_30212(this.tag));
+            return new JsonPrimitive("#" + ServerTagManagerHolder.getTagManager().getEntityTypes().getTagId(this.tag));
         }
     }
 

@@ -33,7 +33,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.class_5415;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -51,6 +50,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.tag.TagManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.crash.CrashException;
@@ -1020,7 +1020,7 @@ AutoCloseable {
 
     public abstract RecipeManager getRecipeManager();
 
-    public abstract class_5415 getTagManager();
+    public abstract TagManager getTagManager();
 
     public BlockPos getRandomPosInChunk(int i, int j, int k, int l) {
         this.lcgBlockSeed = this.lcgBlockSeed * 3 + 1013904223;

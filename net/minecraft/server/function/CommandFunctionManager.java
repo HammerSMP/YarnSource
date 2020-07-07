@@ -50,7 +50,7 @@ public class CommandFunctionManager {
         this.method_29460(this.tickFunctions, TICK_FUNCTION);
         if (this.needToRunLoadFunctions) {
             this.needToRunLoadFunctions = false;
-            List<CommandFunction> collection = this.field_25333.getTags().method_30213(LOAD_FUNCTION).values();
+            List<CommandFunction> collection = this.field_25333.getTags().getTagOrEmpty(LOAD_FUNCTION).values();
             this.method_29460(collection, LOAD_FUNCTION);
         }
     }
@@ -115,7 +115,7 @@ public class CommandFunctionManager {
 
     private void method_29773(FunctionLoader arg) {
         this.tickFunctions.clear();
-        this.tickFunctions.addAll(arg.getTags().method_30213(TICK_FUNCTION).values());
+        this.tickFunctions.addAll(arg.getTags().getTagOrEmpty(TICK_FUNCTION).values());
         this.needToRunLoadFunctions = true;
     }
 
@@ -136,7 +136,7 @@ public class CommandFunctionManager {
     }
 
     public Iterable<Identifier> method_29464() {
-        return this.field_25333.getTags().method_30211();
+        return this.field_25333.getTags().getTagIds();
     }
 
     public static class Entry {

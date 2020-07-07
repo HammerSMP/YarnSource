@@ -51,7 +51,7 @@ implements ArgumentType<ItemStackArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder, ItemTags.getContainer());
+        return lv.getSuggestions(suggestionsBuilder, ItemTags.getTagGroup());
     }
 
     public Collection<String> getExamples() {

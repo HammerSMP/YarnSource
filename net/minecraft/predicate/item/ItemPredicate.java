@@ -35,8 +35,8 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.predicate.NbtPredicate;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.predicate.item.EnchantmentPredicate;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
@@ -136,7 +136,7 @@ public class ItemPredicate {
         Tag<Item> lv6 = null;
         if (jsonObject.has("tag")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv6 = TagContainers.instance().method_30218().method_30210(lv7);
+            lv6 = ServerTagManagerHolder.getTagManager().getItems().getTag(lv7);
             if (lv6 == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + lv7 + "'");
             }
@@ -160,7 +160,7 @@ public class ItemPredicate {
             jsonObject.addProperty("item", Registry.ITEM.getId(this.item).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().method_30218().method_30212(this.tag).toString());
+            jsonObject.addProperty("tag", ServerTagManagerHolder.getTagManager().getItems().getTagId(this.tag).toString());
         }
         jsonObject.add("count", this.count.toJson());
         jsonObject.add("durability", this.durability.toJson());

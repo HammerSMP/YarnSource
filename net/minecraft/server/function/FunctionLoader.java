@@ -29,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
-import net.minecraft.class_5414;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloadListener;
@@ -37,7 +36,8 @@ import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.function.CommandFunction;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainer;
+import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagGroupLoader;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
@@ -53,8 +53,8 @@ implements ResourceReloadListener {
     private static final int PATH_PREFIX_LENGTH = "functions/".length();
     private static final int PATH_SUFFIX_LENGTH = ".mcfunction".length();
     private volatile Map<Identifier, CommandFunction> functions = ImmutableMap.of();
-    private final TagContainer<CommandFunction> tags = new TagContainer(this::get, "tags/functions", "function");
-    private volatile class_5414<CommandFunction> field_25801 = class_5414.method_30214();
+    private final TagGroupLoader<CommandFunction> tags = new TagGroupLoader(this::get, "tags/functions", "function");
+    private volatile TagGroup<CommandFunction> field_25801 = TagGroup.createEmpty();
     private final int level;
     private final CommandDispatcher<ServerCommandSource> commandDispatcher;
 
@@ -66,12 +66,12 @@ implements ResourceReloadListener {
         return this.functions;
     }
 
-    public class_5414<CommandFunction> getTags() {
+    public TagGroup<CommandFunction> getTags() {
         return this.field_25801;
     }
 
     public Tag<CommandFunction> getOrCreateTag(Identifier arg) {
-        return this.field_25801.method_30213(arg);
+        return this.field_25801.getTagOrEmpty(arg);
     }
 
     public FunctionLoader(int i, CommandDispatcher<ServerCommandSource> commandDispatcher) {

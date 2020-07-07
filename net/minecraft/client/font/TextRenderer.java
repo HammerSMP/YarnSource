@@ -157,13 +157,13 @@ public class TextRenderer {
     }
 
     private float drawLayer(String string, float f, float g, int i, boolean bl, Matrix4f arg, VertexConsumerProvider arg2, boolean bl2, int j, int k) {
-        ShadowDrawer lv = new ShadowDrawer(arg2, f, g, i, bl, arg, bl2, k);
+        Drawer lv = new Drawer(arg2, f, g, i, bl, arg, bl2, k);
         TextVisitFactory.visitFormatted(string, Style.EMPTY, (TextVisitFactory.CharacterVisitor)lv);
         return lv.drawLayer(j, f);
     }
 
     private float drawLayer(StringRenderable arg, float f, float g, int i, boolean bl, Matrix4f arg2, VertexConsumerProvider arg3, boolean bl2, int j, int k) {
-        ShadowDrawer lv = new ShadowDrawer(arg3, f, g, i, bl, arg2, bl2, k);
+        Drawer lv = new Drawer(arg3, f, g, i, bl, arg2, bl2, k);
         TextVisitFactory.visitFormatted(arg, Style.EMPTY, (TextVisitFactory.CharacterVisitor)lv);
         return lv.drawLayer(j, f);
     }
@@ -220,7 +220,7 @@ public class TextRenderer {
     }
 
     @Environment(value=EnvType.CLIENT)
-    class ShadowDrawer
+    class Drawer
     implements TextVisitFactory.CharacterVisitor {
         final VertexConsumerProvider vertexConsumers;
         private final boolean shadow;
@@ -244,7 +244,7 @@ public class TextRenderer {
             this.rectangles.add(arg);
         }
 
-        public ShadowDrawer(VertexConsumerProvider arg2, float f, float g, int i, boolean bl, Matrix4f arg3, boolean bl2, int j) {
+        public Drawer(VertexConsumerProvider arg2, float f, float g, int i, boolean bl, Matrix4f arg3, boolean bl2, int j) {
             this.vertexConsumers = arg2;
             this.x = f;
             this.y = g;

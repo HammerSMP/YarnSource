@@ -37,10 +37,10 @@ extends MinecartEntityRenderer<TntMinecartEntity> {
             float h = 1.0f + g * 0.3f;
             arg3.scale(h, h, h);
         }
-        TntMinecartEntityRenderer.method_23190(arg2, arg3, arg4, i, j > -1 && j / 5 % 2 == 0);
+        TntMinecartEntityRenderer.renderFlashingBlock(arg2, arg3, arg4, i, j > -1 && j / 5 % 2 == 0);
     }
 
-    public static void method_23190(BlockState arg, MatrixStack arg2, VertexConsumerProvider arg3, int i, boolean bl) {
+    public static void renderFlashingBlock(BlockState arg, MatrixStack arg2, VertexConsumerProvider arg3, int i, boolean bl) {
         int k;
         if (bl) {
             int j = OverlayTexture.packUv(OverlayTexture.getU(1.0f), 10);

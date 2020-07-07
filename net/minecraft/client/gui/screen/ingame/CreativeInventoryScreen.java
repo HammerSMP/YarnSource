@@ -27,7 +27,6 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5414;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryListener;
@@ -58,6 +57,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -369,8 +369,8 @@ extends AbstractInventoryScreen<CreativeScreenHandler> {
             String string3 = string.substring(i + 1).trim();
             predicate2 = arg -> arg.getNamespace().contains(string2) && arg.getPath().contains(string3);
         }
-        class_5414<Item> lv = ItemTags.getContainer();
-        lv.method_30211().stream().filter(predicate2).forEach(arg2 -> this.searchResultTags.put((Identifier)arg2, lv.method_30210((Identifier)arg2)));
+        TagGroup<Item> lv = ItemTags.getTagGroup();
+        lv.getTagIds().stream().filter(predicate2).forEach(arg2 -> this.searchResultTags.put((Identifier)arg2, lv.getTag((Identifier)arg2)));
     }
 
     @Override

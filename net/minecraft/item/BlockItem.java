@@ -193,7 +193,7 @@ extends Item {
     @Environment(value=EnvType.CLIENT)
     public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
         super.appendTooltip(arg, arg2, list, arg3);
-        this.getBlock().buildTooltip(arg, arg2, list, arg3);
+        this.getBlock().appendTooltip(arg, arg2, list, arg3);
     }
 
     public Block getBlock() {

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -60,6 +59,7 @@ import net.minecraft.entity.ai.brain.task.WaitTask;
 import net.minecraft.entity.ai.brain.task.WalkToNearestVisibleWantedItemTask;
 import net.minecraft.entity.ai.brain.task.WanderAroundTask;
 import net.minecraft.entity.ai.brain.task.WantNewItemTask;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.HoglinEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PiglinEntity;
@@ -120,7 +120,7 @@ public class PiglinBrain {
     }
 
     private static void addIdleActivities(Brain<PiglinEntity> arg) {
-        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of((Object)new FollowMobTask(PiglinBrain::isGoldHoldingPlayer, 14.0f), new UpdateAttackTargetTask<PiglinEntity>(AbstractPiglinEntity::method_30236, PiglinBrain::getPreferredTarget), new ConditionalTask<PiglinEntity>(PiglinEntity::canHunt, new HuntHoglinTask()), PiglinBrain.makeGoToSoulFireTask(), PiglinBrain.makeRememberRideableHoglinTask(), PiglinBrain.makeRandomFollowTask(), PiglinBrain.makeRandomWanderTask(), (Object)new FindInteractionTargetTask(EntityType.PLAYER, 4)));
+        arg.setTaskList(Activity.IDLE, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of((Object)new FollowMobTask(PiglinBrain::isGoldHoldingPlayer, 14.0f), new UpdateAttackTargetTask<PiglinEntity>(AbstractPiglinEntity::isAdult, PiglinBrain::getPreferredTarget), new ConditionalTask<PiglinEntity>(PiglinEntity::canHunt, new HuntHoglinTask()), PiglinBrain.makeGoToSoulFireTask(), PiglinBrain.makeRememberRideableHoglinTask(), PiglinBrain.makeRandomFollowTask(), PiglinBrain.makeRandomWanderTask(), (Object)new FindInteractionTargetTask(EntityType.PLAYER, 4)));
     }
 
     private static void addFightActivities(PiglinEntity arg, Brain<PiglinEntity> arg22) {
@@ -128,7 +128,7 @@ public class PiglinBrain {
     }
 
     private static void addCelebrateActivities(Brain<PiglinEntity> arg2) {
-        arg2.setTaskList(Activity.CELEBRATE, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of(PiglinBrain.makeGoToSoulFireTask(), (Object)new FollowMobTask(PiglinBrain::isGoldHoldingPlayer, 14.0f), new UpdateAttackTargetTask<PiglinEntity>(AbstractPiglinEntity::method_30236, PiglinBrain::getPreferredTarget), new ConditionalTask<PiglinEntity>(arg -> !arg.isDancing(), new GoToCelebrateTask(2, 1.0f)), new ConditionalTask<PiglinEntity>(PiglinEntity::isDancing, new GoToCelebrateTask(4, 0.6f)), new RandomTask(ImmutableList.of((Object)Pair.of((Object)new FollowMobTask(EntityType.PIGLIN, 8.0f), (Object)1), (Object)Pair.of((Object)new StrollTask(0.6f, 2, 1), (Object)1), (Object)Pair.of((Object)new WaitTask(10, 20), (Object)1)))), MemoryModuleType.CELEBRATE_LOCATION);
+        arg2.setTaskList(Activity.CELEBRATE, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of(PiglinBrain.makeGoToSoulFireTask(), (Object)new FollowMobTask(PiglinBrain::isGoldHoldingPlayer, 14.0f), new UpdateAttackTargetTask<PiglinEntity>(AbstractPiglinEntity::isAdult, PiglinBrain::getPreferredTarget), new ConditionalTask<PiglinEntity>(arg -> !arg.isDancing(), new GoToCelebrateTask(2, 1.0f)), new ConditionalTask<PiglinEntity>(PiglinEntity::isDancing, new GoToCelebrateTask(4, 0.6f)), new RandomTask(ImmutableList.of((Object)Pair.of((Object)new FollowMobTask(EntityType.PIGLIN, 8.0f), (Object)1), (Object)Pair.of((Object)new StrollTask(0.6f, 2, 1), (Object)1), (Object)Pair.of((Object)new WaitTask(10, 20), (Object)1)))), MemoryModuleType.CELEBRATE_LOCATION);
     }
 
     private static void addAdmireItemActivities(Brain<PiglinEntity> arg) {
@@ -169,7 +169,7 @@ public class PiglinBrain {
         lv.resetPossibleActivities((List<Activity>)ImmutableList.of((Object)Activity.ADMIRE_ITEM, (Object)Activity.FIGHT, (Object)Activity.AVOID, (Object)Activity.CELEBRATE, (Object)Activity.RIDE, (Object)Activity.IDLE));
         Activity lv3 = lv.getFirstPossibleNonCoreActivity().orElse(null);
         if (lv2 != lv3) {
-            PiglinBrain.method_30091(arg).ifPresent(arg::method_30086);
+            PiglinBrain.method_30091(arg).ifPresent(arg::playSound);
         }
         arg.setAttacking(lv.hasMemoryModule(MemoryModuleType.ATTACK_TARGET));
         if (!lv.hasMemoryModule(MemoryModuleType.RIDE_TARGET) && PiglinBrain.canRideHoglin(arg)) {
@@ -238,7 +238,7 @@ public class PiglinBrain {
     protected static void consumeOffHandItem(PiglinEntity arg, boolean bl) {
         ItemStack lv = arg.getStackInHand(Hand.OFF_HAND);
         arg.setStackInHand(Hand.OFF_HAND, ItemStack.EMPTY);
-        if (arg.method_30236()) {
+        if (arg.isAdult()) {
             boolean bl3;
             boolean bl2 = PiglinBrain.acceptsForBarter(lv.getItem());
             if (bl && bl2) {
@@ -408,7 +408,7 @@ public class PiglinBrain {
     }
 
     protected static boolean isWillingToTrade(PiglinEntity arg, ItemStack arg2) {
-        return !PiglinBrain.hasBeenHitByPlayer(arg) && !PiglinBrain.isAdmiringItem(arg) && arg.method_30236() && PiglinBrain.acceptsForBarter(arg2.getItem());
+        return !PiglinBrain.hasBeenHitByPlayer(arg) && !PiglinBrain.isAdmiringItem(arg) && arg.isAdult() && PiglinBrain.acceptsForBarter(arg2.getItem());
     }
 
     protected static void onAttacked(PiglinEntity arg, LivingEntity arg2) {
@@ -472,7 +472,7 @@ public class PiglinBrain {
         if (arg2 == Activity.FIGHT) {
             return SoundEvents.ENTITY_PIGLIN_ANGRY;
         }
-        if (arg.method_30235()) {
+        if (arg.shouldZombify()) {
             return SoundEvents.ENTITY_PIGLIN_RETREAT;
         }
         if (arg2 == Activity.AVOID && PiglinBrain.hasTargetToAvoid(arg)) {

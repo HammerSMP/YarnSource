@@ -17,36 +17,36 @@ import net.minecraft.tag.Tag;
 
 public class SetTag<T>
 implements Tag<T> {
-    private final ImmutableList<T> values;
-    private final Set<T> field_25594;
+    private final ImmutableList<T> valueList;
+    private final Set<T> valueSet;
     @VisibleForTesting
-    protected final Class<?> field_25591;
+    protected final Class<?> type;
 
     protected SetTag(Set<T> set, Class<?> class_) {
-        this.field_25591 = class_;
-        this.field_25594 = set;
-        this.values = ImmutableList.copyOf(set);
+        this.type = class_;
+        this.valueSet = set;
+        this.valueList = ImmutableList.copyOf(set);
     }
 
     public static <T> SetTag<T> empty() {
         return new SetTag<T>(ImmutableSet.of(), Void.class);
     }
 
-    public static <T> SetTag<T> method_29900(Set<T> set) {
-        return new SetTag<T>(set, SetTag.method_29901(set));
+    public static <T> SetTag<T> of(Set<T> set) {
+        return new SetTag<T>(set, SetTag.getCommonType(set));
     }
 
     @Override
     public boolean contains(T object) {
-        return this.field_25591.isInstance(object) && this.field_25594.contains(object);
+        return this.type.isInstance(object) && this.valueSet.contains(object);
     }
 
     @Override
     public List<T> values() {
-        return this.values;
+        return this.valueList;
     }
 
-    private static <T> Class<?> method_29901(Set<T> set) {
+    private static <T> Class<?> getCommonType(Set<T> set) {
         if (set.isEmpty()) {
             return Void.class;
         }
@@ -56,12 +56,12 @@ implements Tag<T> {
                 class_ = object.getClass();
                 continue;
             }
-            class_ = SetTag.method_29899(class_, object.getClass());
+            class_ = SetTag.getCommonType(class_, object.getClass());
         }
         return class_;
     }
 
-    private static Class<?> method_29899(Class<?> class_, Class<?> class2) {
+    private static Class<?> getCommonType(Class<?> class_, Class<?> class2) {
         while (!class_.isAssignableFrom(class2)) {
             class_ = class_.getSuperclass();
         }

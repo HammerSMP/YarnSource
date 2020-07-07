@@ -27,8 +27,8 @@ import net.minecraft.world.World;
 public abstract class ProjectileEntity
 extends Entity {
     private UUID ownerUuid;
-    private int field_23739;
-    private boolean field_23740;
+    private int ownerEntityId;
+    private boolean leftOwner;
 
     ProjectileEntity(EntityType<? extends ProjectileEntity> arg, World arg2) {
         super(arg, arg2);
@@ -37,7 +37,7 @@ extends Entity {
     public void setOwner(@Nullable Entity arg) {
         if (arg != null) {
             this.ownerUuid = arg.getUuid();
-            this.field_23739 = arg.getEntityId();
+            this.ownerEntityId = arg.getEntityId();
         }
     }
 
@@ -46,8 +46,8 @@ extends Entity {
         if (this.ownerUuid != null && this.world instanceof ServerWorld) {
             return ((ServerWorld)this.world).getEntity(this.ownerUuid);
         }
-        if (this.field_23739 != 0) {
-            return this.world.getEntityById(this.field_23739);
+        if (this.ownerEntityId != 0) {
+            return this.world.getEntityById(this.ownerEntityId);
         }
         return null;
     }
@@ -57,7 +57,7 @@ extends Entity {
         if (this.ownerUuid != null) {
             arg.putUuid("Owner", this.ownerUuid);
         }
-        if (this.field_23740) {
+        if (this.leftOwner) {
             arg.putBoolean("LeftOwner", true);
         }
     }
@@ -67,13 +67,13 @@ extends Entity {
         if (arg.containsUuid("Owner")) {
             this.ownerUuid = arg.getUuid("Owner");
         }
-        this.field_23740 = arg.getBoolean("LeftOwner");
+        this.leftOwner = arg.getBoolean("LeftOwner");
     }
 
     @Override
     public void tick() {
-        if (!this.field_23740) {
-            this.field_23740 = this.method_26961();
+        if (!this.leftOwner) {
+            this.leftOwner = this.method_26961();
         }
         super.tick();
     }
@@ -145,7 +145,7 @@ extends Entity {
             return false;
         }
         Entity lv = this.getOwner();
-        return lv == null || this.field_23740 || !lv.isConnectedThroughVehicle(arg);
+        return lv == null || this.leftOwner || !lv.isConnectedThroughVehicle(arg);
     }
 
     protected void method_26962() {

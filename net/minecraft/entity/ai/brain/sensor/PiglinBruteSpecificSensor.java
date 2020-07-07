@@ -6,7 +6,7 @@
  *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
  */
-package net.minecraft;
+package net.minecraft.entity.ai.brain.sensor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -15,17 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import net.minecraft.AbstractPiglinEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.sensor.Sensor;
 import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.server.world.ServerWorld;
 
-public class class_5417
+public class PiglinBruteSpecificSensor
 extends Sensor<LivingEntity> {
     @Override
     public Set<MemoryModuleType<?>> getOutputMemoryModules() {
@@ -45,7 +45,7 @@ extends Sensor<LivingEntity> {
         }
         List<LivingEntity> list3 = lv.getOptionalMemory(MemoryModuleType.MOBS).orElse((List<LivingEntity>)ImmutableList.of());
         for (LivingEntity lv3 : list3) {
-            if (!(lv3 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv3).method_30236()) continue;
+            if (!(lv3 instanceof AbstractPiglinEntity) || !((AbstractPiglinEntity)lv3).isAdult()) continue;
             list.add((AbstractPiglinEntity)lv3);
         }
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);

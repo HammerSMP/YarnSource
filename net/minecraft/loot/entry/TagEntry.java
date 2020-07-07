@@ -24,8 +24,8 @@ import net.minecraft.loot.entry.LeafEntry;
 import net.minecraft.loot.entry.LootPoolEntryType;
 import net.minecraft.loot.entry.LootPoolEntryTypes;
 import net.minecraft.loot.function.LootFunction;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
@@ -83,14 +83,14 @@ extends LeafEntry {
         @Override
         public void addEntryFields(JsonObject jsonObject, TagEntry arg, JsonSerializationContext jsonSerializationContext) {
             super.addEntryFields(jsonObject, arg, jsonSerializationContext);
-            jsonObject.addProperty("name", TagContainers.instance().method_30218().method_30212(arg.name).toString());
+            jsonObject.addProperty("name", ServerTagManagerHolder.getTagManager().getItems().getTagId(arg.name).toString());
             jsonObject.addProperty("expand", Boolean.valueOf(arg.expand));
         }
 
         @Override
         protected TagEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "name"));
-            Tag<Item> lv2 = TagContainers.instance().method_30218().method_30210(lv);
+            Tag<Item> lv2 = ServerTagManagerHolder.getTagManager().getItems().getTag(lv);
             if (lv2 == null) {
                 throw new JsonParseException("Can't find tag: " + lv);
             }

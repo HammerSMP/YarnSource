@@ -30,7 +30,7 @@ implements RecipeBookProvider {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/crafting_table.png");
     private static final Identifier RECIPE_BUTTON_TEXTURE = new Identifier("textures/gui/recipe_button.png");
     private final RecipeBookWidget recipeBook = new RecipeBookWidget();
-    private boolean isNarrow;
+    private boolean narrow;
 
     public CraftingScreen(CraftingScreenHandler arg, PlayerInventory arg2, Text arg3) {
         super(arg, arg2, arg3);
@@ -39,15 +39,15 @@ implements RecipeBookProvider {
     @Override
     protected void init() {
         super.init();
-        this.isNarrow = this.width < 379;
-        this.recipeBook.initialize(this.width, this.height, this.client, this.isNarrow, (AbstractRecipeScreenHandler)this.handler);
-        this.x = this.recipeBook.findLeftEdge(this.isNarrow, this.width, this.backgroundWidth);
+        this.narrow = this.width < 379;
+        this.recipeBook.initialize(this.width, this.height, this.client, this.narrow, (AbstractRecipeScreenHandler)this.handler);
+        this.x = this.recipeBook.findLeftEdge(this.narrow, this.width, this.backgroundWidth);
         this.children.add(this.recipeBook);
         this.setInitialFocus(this.recipeBook);
         this.addButton(new TexturedButtonWidget(this.x + 5, this.height / 2 - 49, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, arg -> {
-            this.recipeBook.reset(this.isNarrow);
+            this.recipeBook.reset(this.narrow);
             this.recipeBook.toggleOpen();
-            this.x = this.recipeBook.findLeftEdge(this.isNarrow, this.width, this.backgroundWidth);
+            this.x = this.recipeBook.findLeftEdge(this.narrow, this.width, this.backgroundWidth);
             ((TexturedButtonWidget)arg).setPos(this.x + 5, this.height / 2 - 49);
         }));
         this.titleX = 29;
@@ -62,7 +62,7 @@ implements RecipeBookProvider {
     @Override
     public void render(MatrixStack arg, int i, int j, float f) {
         this.renderBackground(arg);
-        if (this.recipeBook.isOpen() && this.isNarrow) {
+        if (this.recipeBook.isOpen() && this.narrow) {
             this.drawBackground(arg, f, i, j);
             this.recipeBook.render(arg, i, j, f);
         } else {
@@ -85,7 +85,7 @@ implements RecipeBookProvider {
 
     @Override
     protected boolean isPointWithinBounds(int i, int j, int k, int l, double d, double e) {
-        return (!this.isNarrow || !this.recipeBook.isOpen()) && super.isPointWithinBounds(i, j, k, l, d, e);
+        return (!this.narrow || !this.recipeBook.isOpen()) && super.isPointWithinBounds(i, j, k, l, d, e);
     }
 
     @Override
@@ -94,7 +94,7 @@ implements RecipeBookProvider {
             this.setFocused(this.recipeBook);
             return true;
         }
-        if (this.isNarrow && this.recipeBook.isOpen()) {
+        if (this.narrow && this.recipeBook.isOpen()) {
             return true;
         }
         return super.mouseClicked(d, e, i);

@@ -21,62 +21,62 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5414;
-import net.minecraft.class_5415;
 import net.minecraft.tag.SetTag;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
+import net.minecraft.tag.TagManager;
 import net.minecraft.util.Identifier;
 
-public class GlobalTagAccessor<T> {
-    private class_5414<T> currentContainer = class_5414.method_30214();
-    private final List<CachedTag<T>> tags = Lists.newArrayList();
-    private final Function<class_5415, class_5414<T>> field_25740;
+public class RequiredTagList<T> {
+    private TagGroup<T> group = TagGroup.createEmpty();
+    private final List<TagWrapper<T>> tags = Lists.newArrayList();
+    private final Function<TagManager, TagGroup<T>> groupGetter;
 
-    public GlobalTagAccessor(Function<class_5415, class_5414<T>> function) {
-        this.field_25740 = function;
+    public RequiredTagList(Function<TagManager, TagGroup<T>> function) {
+        this.groupGetter = function;
     }
 
-    public Tag.Identified<T> get(String string) {
-        CachedTag lv = new CachedTag(new Identifier(string));
+    public Tag.Identified<T> add(String string) {
+        TagWrapper lv = new TagWrapper(new Identifier(string));
         this.tags.add(lv);
         return lv;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void markReady() {
-        this.currentContainer = class_5414.method_30214();
+    public void clearAllTags() {
+        this.group = TagGroup.createEmpty();
         SetTag lv = SetTag.empty();
-        this.tags.forEach(arg22 -> arg22.updateContainer(arg2 -> lv));
+        this.tags.forEach(arg22 -> arg22.updateDelegate(arg2 -> lv));
     }
 
-    public void setContainer(class_5415 arg) {
-        class_5414 lv = this.field_25740.apply(arg);
-        this.currentContainer = lv;
-        this.tags.forEach(arg2 -> arg2.updateContainer(lv::method_30210));
+    public void updateTagManager(TagManager arg) {
+        TagGroup lv = this.groupGetter.apply(arg);
+        this.group = lv;
+        this.tags.forEach(arg2 -> arg2.updateDelegate(lv::getTag));
     }
 
-    public class_5414<T> getContainer() {
-        return this.currentContainer;
+    public TagGroup<T> getGroup() {
+        return this.group;
     }
 
-    public List<? extends Tag<T>> method_29902() {
+    public List<? extends Tag<T>> getTags() {
         return this.tags;
     }
 
-    public Set<Identifier> method_29224(class_5415 arg) {
-        class_5414<T> lv = this.field_25740.apply(arg);
-        Set set = this.tags.stream().map(CachedTag::getId).collect(Collectors.toSet());
-        ImmutableSet immutableSet = ImmutableSet.copyOf(lv.method_30211());
+    public Set<Identifier> getMissingTags(TagManager arg) {
+        TagGroup<T> lv = this.groupGetter.apply(arg);
+        Set set = this.tags.stream().map(TagWrapper::getId).collect(Collectors.toSet());
+        ImmutableSet immutableSet = ImmutableSet.copyOf(lv.getTagIds());
         return Sets.difference(set, (Set)immutableSet);
     }
 
-    static class CachedTag<T>
+    static class TagWrapper<T>
     implements Tag.Identified<T> {
         @Nullable
-        private Tag<T> currentTag;
+        private Tag<T> delegate;
         protected final Identifier id;
 
-        private CachedTag(Identifier arg) {
+        private TagWrapper(Identifier arg) {
             this.id = arg;
         }
 
@@ -86,14 +86,14 @@ public class GlobalTagAccessor<T> {
         }
 
         private Tag<T> get() {
-            if (this.currentTag == null) {
+            if (this.delegate == null) {
                 throw new IllegalStateException("Tag " + this.id + " used before it was bound");
             }
-            return this.currentTag;
+            return this.delegate;
         }
 
-        void updateContainer(Function<Identifier, Tag<T>> function) {
-            this.currentTag = function.apply(this.id);
+        void updateDelegate(Function<Identifier, Tag<T>> function) {
+            this.delegate = function.apply(this.id);
         }
 
         @Override

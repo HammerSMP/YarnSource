@@ -609,7 +609,7 @@ public abstract class AbstractBlock {
                 lv.set(arg2, lv2);
                 BlockState lv3 = arg.getBlockState(lv);
                 BlockState lv4 = lv3.getStateForNeighborUpdate(lv2.getOpposite(), this.asBlockState(), arg, lv, arg2);
-                Block.replaceBlock(lv3, lv4, arg, lv, i, j);
+                Block.replace(lv3, lv4, arg, lv, i, j);
             }
         }
 

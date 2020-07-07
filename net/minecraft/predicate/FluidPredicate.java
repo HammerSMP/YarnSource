@@ -19,8 +19,8 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.predicate.StatePredicate;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagContainers;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.BlockPos;
@@ -71,7 +71,7 @@ public class FluidPredicate {
         Tag<Fluid> lv3 = null;
         if (jsonObject.has("tag")) {
             Identifier lv4 = new Identifier(JsonHelper.getString(jsonObject, "tag"));
-            lv3 = TagContainers.instance().method_30220().method_30210(lv4);
+            lv3 = ServerTagManagerHolder.getTagManager().getFluids().getTag(lv4);
             if (lv3 == null) {
                 throw new JsonSyntaxException("Unknown fluid tag '" + lv4 + "'");
             }
@@ -89,7 +89,7 @@ public class FluidPredicate {
             jsonObject.addProperty("fluid", Registry.FLUID.getId(this.fluid).toString());
         }
         if (this.tag != null) {
-            jsonObject.addProperty("tag", TagContainers.instance().method_30220().method_30212(this.tag).toString());
+            jsonObject.addProperty("tag", ServerTagManagerHolder.getTagManager().getFluids().getTagId(this.tag).toString());
         }
         jsonObject.add("state", this.state.toJson());
         return jsonObject;

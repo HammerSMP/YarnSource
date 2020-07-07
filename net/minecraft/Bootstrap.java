@@ -16,7 +16,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.class_5413;
 import net.minecraft.command.EntitySelectorOptions;
 import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.enchantment.Enchantment;
@@ -26,6 +25,7 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.BrewingRecipeRegistry;
+import net.minecraft.tag.RequiredTagListRegistry;
 import net.minecraft.util.Language;
 import net.minecraft.util.logging.DebugLoggerPrintStream;
 import net.minecraft.util.logging.LoggerPrintStream;
@@ -57,7 +57,7 @@ public class Bootstrap {
         EntitySelectorOptions.register();
         DispenserBehavior.registerDefaults();
         ArgumentTypes.register();
-        class_5413.method_30202();
+        RequiredTagListRegistry.validateRegistrations();
         Bootstrap.setOutputStreams();
     }
 

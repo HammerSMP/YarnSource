@@ -67,14 +67,14 @@ implements ScreenHandlerProvider<T> {
     private ItemStack touchDropReturningStack = ItemStack.EMPTY;
     private long touchDropTimer;
     protected final Set<Slot> cursorDragSlots = Sets.newHashSet();
-    protected boolean isCursorDragging;
+    protected boolean cursorDragging;
     private int heldButtonType;
     private int heldButtonCode;
     private boolean cancelNextRelease;
     private int draggedStackRemainder;
     private long lastButtonClickTime;
     private int lastClickedButton;
-    private boolean isDoubleClicking;
+    private boolean doubleClicking;
     private ItemStack quickMovingStack = ItemStack.EMPTY;
 
     public HandledScreen(T arg, PlayerInventory arg2, Text arg3) {
@@ -138,7 +138,7 @@ implements ScreenHandlerProvider<T> {
             if (!this.touchDragStack.isEmpty() && this.touchIsRightClickDrag) {
                 lv3 = lv3.copy();
                 lv3.setCount(MathHelper.ceil((float)lv3.getCount() / 2.0f));
-            } else if (this.isCursorDragging && this.cursorDragSlots.size() > 1) {
+            } else if (this.cursorDragging && this.cursorDragSlots.size() > 1) {
                 lv3 = lv3.copy();
                 lv3.setCount(this.draggedStackRemainder);
                 if (lv3.isEmpty()) {
@@ -198,7 +198,7 @@ implements ScreenHandlerProvider<T> {
         if (arg2 == this.touchDragSlotStart && !this.touchDragStack.isEmpty() && this.touchIsRightClickDrag && !lv.isEmpty()) {
             lv = lv.copy();
             lv.setCount(lv.getCount() / 2);
-        } else if (this.isCursorDragging && this.cursorDragSlots.contains(arg2) && !lv2.isEmpty()) {
+        } else if (this.cursorDragging && this.cursorDragSlots.contains(arg2) && !lv2.isEmpty()) {
             if (this.cursorDragSlots.size() == 1) {
                 return;
             }
@@ -238,7 +238,7 @@ implements ScreenHandlerProvider<T> {
 
     private void calculateOffset() {
         ItemStack lv = this.client.player.inventory.getCursorStack();
-        if (lv.isEmpty() || !this.isCursorDragging) {
+        if (lv.isEmpty() || !this.cursorDragging) {
             return;
         }
         if (this.heldButtonType == 2) {
@@ -277,7 +277,7 @@ implements ScreenHandlerProvider<T> {
         boolean bl = this.client.options.keyPickItem.matchesMouse(i);
         Slot lv = this.getSlotAt(d, e);
         long l = Util.getMeasuringTimeMs();
-        this.isDoubleClicking = this.lastClickedSlot == lv && l - this.lastButtonClickTime < 250L && this.lastClickedButton == i;
+        this.doubleClicking = this.lastClickedSlot == lv && l - this.lastButtonClickTime < 250L && this.lastClickedButton == i;
         this.cancelNextRelease = false;
         if (i == 0 || i == 1 || bl) {
             int j = this.x;
@@ -303,7 +303,7 @@ implements ScreenHandlerProvider<T> {
                     } else {
                         this.touchDragSlotStart = null;
                     }
-                } else if (!this.isCursorDragging) {
+                } else if (!this.cursorDragging) {
                     if (this.client.player.inventory.getCursorStack().isEmpty()) {
                         if (this.client.options.keyPickItem.matchesMouse(i)) {
                             this.onMouseClick(lv, m, i, SlotActionType.CLONE);
@@ -320,7 +320,7 @@ implements ScreenHandlerProvider<T> {
                         }
                         this.cancelNextRelease = true;
                     } else {
-                        this.isCursorDragging = true;
+                        this.cursorDragging = true;
                         this.heldButtonCode = i;
                         this.cursorDragSlots.clear();
                         if (i == 0) {
@@ -385,7 +385,7 @@ implements ScreenHandlerProvider<T> {
                     }
                 }
             }
-        } else if (this.isCursorDragging && lv != null && !lv2.isEmpty() && (lv2.getCount() > this.cursorDragSlots.size() || this.heldButtonType == 2) && ScreenHandler.canInsertItemIntoSlot(lv, lv2, true) && lv.canInsert(lv2) && ((ScreenHandler)this.handler).canInsertIntoSlot(lv)) {
+        } else if (this.cursorDragging && lv != null && !lv2.isEmpty() && (lv2.getCount() > this.cursorDragSlots.size() || this.heldButtonType == 2) && ScreenHandler.canInsertItemIntoSlot(lv, lv2, true) && lv.canInsert(lv2) && ((ScreenHandler)this.handler).canInsertIntoSlot(lv)) {
             this.cursorDragSlots.add(lv);
             this.calculateOffset();
         }
@@ -405,7 +405,7 @@ implements ScreenHandlerProvider<T> {
         if (bl) {
             l = -999;
         }
-        if (this.isDoubleClicking && lv != null && i == 0 && ((ScreenHandler)this.handler).canInsertIntoSlot(ItemStack.EMPTY, lv)) {
+        if (this.doubleClicking && lv != null && i == 0 && ((ScreenHandler)this.handler).canInsertIntoSlot(ItemStack.EMPTY, lv)) {
             if (HandledScreen.hasShiftDown()) {
                 if (!this.quickMovingStack.isEmpty()) {
                     for (Slot lv2 : ((ScreenHandler)this.handler).slots) {
@@ -416,11 +416,11 @@ implements ScreenHandlerProvider<T> {
             } else {
                 this.onMouseClick(lv, l, i, SlotActionType.PICKUP_ALL);
             }
-            this.isDoubleClicking = false;
+            this.doubleClicking = false;
             this.lastButtonClickTime = 0L;
         } else {
-            if (this.isCursorDragging && this.heldButtonCode != i) {
-                this.isCursorDragging = false;
+            if (this.cursorDragging && this.heldButtonCode != i) {
+                this.cursorDragging = false;
                 this.cursorDragSlots.clear();
                 this.cancelNextRelease = true;
                 return true;
@@ -458,7 +458,7 @@ implements ScreenHandlerProvider<T> {
                     this.touchDragStack = ItemStack.EMPTY;
                     this.touchDragSlotStart = null;
                 }
-            } else if (this.isCursorDragging && !this.cursorDragSlots.isEmpty()) {
+            } else if (this.cursorDragging && !this.cursorDragSlots.isEmpty()) {
                 this.onMouseClick(null, -999, ScreenHandler.packQuickCraftData(0, this.heldButtonType), SlotActionType.QUICK_CRAFT);
                 for (Slot lv3 : this.cursorDragSlots) {
                     this.onMouseClick(lv3, lv3.id, ScreenHandler.packQuickCraftData(1, this.heldButtonType), SlotActionType.QUICK_CRAFT);
@@ -480,7 +480,7 @@ implements ScreenHandlerProvider<T> {
         if (this.client.player.inventory.getCursorStack().isEmpty()) {
             this.lastButtonClickTime = 0L;
         }
-        this.isCursorDragging = false;
+        this.cursorDragging = false;
         return true;
     }
 

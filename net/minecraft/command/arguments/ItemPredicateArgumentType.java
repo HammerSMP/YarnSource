@@ -53,7 +53,7 @@ implements ArgumentType<ItemPredicateArgument> {
         }
         Identifier lv3 = lv.getId();
         return commandContext -> {
-            Tag<Item> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getTagManager().method_30218().method_30210(lv3);
+            Tag<Item> lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getTagManager().getItems().getTag(lv3);
             if (lv == null) {
                 throw UNKNOWN_TAG_EXCEPTION.create((Object)lv3.toString());
             }
@@ -75,7 +75,7 @@ implements ArgumentType<ItemPredicateArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder, ItemTags.getContainer());
+        return lv.getSuggestions(suggestionsBuilder, ItemTags.getTagGroup());
     }
 
     public Collection<String> getExamples() {

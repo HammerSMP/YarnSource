@@ -85,7 +85,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
-import net.minecraft.class_5415;
 import net.minecraft.command.DataCommandStorage;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -122,6 +121,7 @@ import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.TagManager;
 import net.minecraft.test.TestManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -1338,7 +1338,7 @@ AutoCloseable {
         return this.serverResourceManager.getRecipeManager();
     }
 
-    public class_5415 getTagManager() {
+    public TagManager getTagManager() {
         return this.serverResourceManager.getRegistryTagManager();
     }
 

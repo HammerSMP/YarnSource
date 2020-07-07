@@ -182,8 +182,8 @@ extends BlockWithEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void buildTooltip(ItemStack arg, @Nullable BlockView arg2, List<Text> list, TooltipContext arg3) {
-        super.buildTooltip(arg, arg2, list, arg3);
+    public void appendTooltip(ItemStack arg, @Nullable BlockView arg2, List<Text> list, TooltipContext arg3) {
+        super.appendTooltip(arg, arg2, list, arg3);
         CompoundTag lv = arg.getSubTag("BlockEntityTag");
         if (lv != null) {
             if (lv.contains("LootTable", 8)) {

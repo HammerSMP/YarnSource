@@ -41,10 +41,10 @@ public enum RecipeBookGroup {
     CAMPFIRE(new ItemStack(Items.PORKCHOP)),
     UNKNOWN(new ItemStack(Items.BARRIER));
 
-    public static final List<RecipeBookGroup> field_25779;
-    public static final List<RecipeBookGroup> field_25780;
-    public static final List<RecipeBookGroup> field_25781;
-    public static final List<RecipeBookGroup> field_25782;
+    public static final List<RecipeBookGroup> SMOKER;
+    public static final List<RecipeBookGroup> BLAST_FURNACE;
+    public static final List<RecipeBookGroup> FURNACE;
+    public static final List<RecipeBookGroup> CRAFTING;
     public static final Map<RecipeBookGroup, List<RecipeBookGroup>> field_25783;
     private final List<ItemStack> icons;
 
@@ -55,16 +55,16 @@ public enum RecipeBookGroup {
     public static List<RecipeBookGroup> method_30285(class_5421 arg) {
         switch (arg) {
             case CRAFTING: {
-                return field_25782;
+                return CRAFTING;
             }
             case FURNACE: {
-                return field_25781;
+                return FURNACE;
             }
             case BLAST_FURNACE: {
-                return field_25780;
+                return BLAST_FURNACE;
             }
             case SMOKER: {
-                return field_25779;
+                return SMOKER;
             }
         }
         return ImmutableList.of();
@@ -75,10 +75,10 @@ public enum RecipeBookGroup {
     }
 
     static {
-        field_25779 = ImmutableList.of((Object)((Object)SMOKER_SEARCH), (Object)((Object)SMOKER_FOOD));
-        field_25780 = ImmutableList.of((Object)((Object)BLAST_FURNACE_SEARCH), (Object)((Object)BLAST_FURNACE_BLOCKS), (Object)((Object)BLAST_FURNACE_MISC));
-        field_25781 = ImmutableList.of((Object)((Object)FURNACE_SEARCH), (Object)((Object)FURNACE_FOOD), (Object)((Object)FURNACE_BLOCKS), (Object)((Object)FURNACE_MISC));
-        field_25782 = ImmutableList.of((Object)((Object)CRAFTING_SEARCH), (Object)((Object)CRAFTING_EQUIPMENT), (Object)((Object)CRAFTING_BUILDING_BLOCKS), (Object)((Object)CRAFTING_MISC), (Object)((Object)CRAFTING_REDSTONE));
+        SMOKER = ImmutableList.of((Object)((Object)SMOKER_SEARCH), (Object)((Object)SMOKER_FOOD));
+        BLAST_FURNACE = ImmutableList.of((Object)((Object)BLAST_FURNACE_SEARCH), (Object)((Object)BLAST_FURNACE_BLOCKS), (Object)((Object)BLAST_FURNACE_MISC));
+        FURNACE = ImmutableList.of((Object)((Object)FURNACE_SEARCH), (Object)((Object)FURNACE_FOOD), (Object)((Object)FURNACE_BLOCKS), (Object)((Object)FURNACE_MISC));
+        CRAFTING = ImmutableList.of((Object)((Object)CRAFTING_SEARCH), (Object)((Object)CRAFTING_EQUIPMENT), (Object)((Object)CRAFTING_BUILDING_BLOCKS), (Object)((Object)CRAFTING_MISC), (Object)((Object)CRAFTING_REDSTONE));
         field_25783 = ImmutableMap.of((Object)((Object)CRAFTING_SEARCH), (Object)ImmutableList.of((Object)((Object)CRAFTING_EQUIPMENT), (Object)((Object)CRAFTING_BUILDING_BLOCKS), (Object)((Object)CRAFTING_MISC), (Object)((Object)CRAFTING_REDSTONE)), (Object)((Object)FURNACE_SEARCH), (Object)ImmutableList.of((Object)((Object)FURNACE_FOOD), (Object)((Object)FURNACE_BLOCKS), (Object)((Object)FURNACE_MISC)), (Object)((Object)BLAST_FURNACE_SEARCH), (Object)ImmutableList.of((Object)((Object)BLAST_FURNACE_BLOCKS), (Object)((Object)BLAST_FURNACE_MISC)), (Object)((Object)SMOKER_SEARCH), (Object)ImmutableList.of((Object)((Object)SMOKER_FOOD)));
     }
 }

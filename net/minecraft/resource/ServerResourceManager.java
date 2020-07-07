@@ -6,7 +6,6 @@ package net.minecraft.resource;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import net.minecraft.class_5415;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.condition.LootConditionManager;
 import net.minecraft.recipe.RecipeManager;
@@ -18,7 +17,8 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.function.FunctionLoader;
-import net.minecraft.tag.RegistryTagManager;
+import net.minecraft.tag.TagManager;
+import net.minecraft.tag.TagManagerLoader;
 import net.minecraft.util.Unit;
 
 public class ServerResourceManager
@@ -27,7 +27,7 @@ implements AutoCloseable {
     private final ReloadableResourceManager resourceManager = new ReloadableResourceManagerImpl(ResourceType.SERVER_DATA);
     private final CommandManager commandManager;
     private final RecipeManager recipeManager = new RecipeManager();
-    private final RegistryTagManager registryTagManager = new RegistryTagManager();
+    private final TagManagerLoader registryTagManager = new TagManagerLoader();
     private final LootConditionManager lootConditionManager = new LootConditionManager();
     private final LootManager lootManager = new LootManager(this.lootConditionManager);
     private final ServerAdvancementLoader serverAdvancementLoader = new ServerAdvancementLoader(this.lootConditionManager);
@@ -56,8 +56,8 @@ implements AutoCloseable {
         return this.lootManager;
     }
 
-    public class_5415 getRegistryTagManager() {
-        return this.registryTagManager.method_30223();
+    public TagManager getRegistryTagManager() {
+        return this.registryTagManager.getTagManager();
     }
 
     public RecipeManager getRecipeManager() {
@@ -87,7 +87,7 @@ implements AutoCloseable {
     }
 
     public void loadRegistryTags() {
-        this.registryTagManager.method_30223().method_30222();
+        this.registryTagManager.getTagManager().apply();
     }
 
     @Override

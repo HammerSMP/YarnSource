@@ -173,14 +173,14 @@ extends Block {
             if (!lv4.isOf(Blocks.OBSERVER)) {
                 BlockPos lv5 = lv.offset(lv2.getOpposite());
                 BlockState lv6 = lv4.getStateForNeighborUpdate(lv2.getOpposite(), arg2.getBlockState(lv5), arg2, lv, lv5);
-                RedstoneWireBlock.replaceBlock(lv4, lv6, arg2, lv, i, j);
+                RedstoneWireBlock.replace(lv4, lv6, arg2, lv, i, j);
             }
             lv.set(arg3, lv2).move(Direction.UP);
             BlockState lv7 = arg2.getBlockState(lv);
             if (lv7.isOf(Blocks.OBSERVER)) continue;
             BlockPos lv8 = lv.offset(lv2.getOpposite());
             BlockState lv9 = lv7.getStateForNeighborUpdate(lv2.getOpposite(), arg2.getBlockState(lv8), arg2, lv, lv8);
-            RedstoneWireBlock.replaceBlock(lv7, lv9, arg2, lv, i, j);
+            RedstoneWireBlock.replace(lv7, lv9, arg2, lv, i, j);
         }
     }
 

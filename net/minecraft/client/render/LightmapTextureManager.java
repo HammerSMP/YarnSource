@@ -26,13 +26,13 @@ implements AutoCloseable {
     private final NativeImageBackedTexture texture;
     private final NativeImage image;
     private final Identifier textureIdentifier;
-    private boolean isDirty;
+    private boolean dirty;
     private float field_21528;
-    private final GameRenderer worldRenderer;
+    private final GameRenderer renderer;
     private final MinecraftClient client;
 
     public LightmapTextureManager(GameRenderer arg, MinecraftClient arg2) {
-        this.worldRenderer = arg;
+        this.renderer = arg;
         this.client = arg2;
         this.texture = new NativeImageBackedTexture(16, 16, false);
         this.textureIdentifier = this.client.getTextureManager().registerDynamicTexture("light_map", this.texture);
@@ -53,7 +53,7 @@ implements AutoCloseable {
     public void tick() {
         this.field_21528 = (float)((double)this.field_21528 + (Math.random() - Math.random()) * Math.random() * Math.random() * 0.1);
         this.field_21528 = (float)((double)this.field_21528 * 0.9);
-        this.isDirty = true;
+        this.dirty = true;
     }
 
     public void disable() {
@@ -83,10 +83,10 @@ implements AutoCloseable {
     public void update(float f) {
         float m;
         float i;
-        if (!this.isDirty) {
+        if (!this.dirty) {
             return;
         }
-        this.isDirty = false;
+        this.dirty = false;
         this.client.getProfiler().push("lightTex");
         ClientWorld lv = this.client.world;
         if (lv == null) {
@@ -126,8 +126,8 @@ implements AutoCloseable {
                     lv4.scale(q);
                     lv3.add(lv4);
                     lv3.lerp(new Vector3f(0.75f, 0.75f, 0.75f), 0.04f);
-                    if (this.worldRenderer.getSkyDarkness(f) > 0.0f) {
-                        float v = this.worldRenderer.getSkyDarkness(f);
+                    if (this.renderer.getSkyDarkness(f) > 0.0f) {
+                        float v = this.renderer.getSkyDarkness(f);
                         Vector3f lv5 = lv3.copy();
                         lv5.multiplyComponentwise(0.7f, 0.6f, 0.6f);
                         lv3.lerp(lv5, v);

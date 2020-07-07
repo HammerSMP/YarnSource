@@ -31,7 +31,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.pattern.CachedBlockPosition;
-import net.minecraft.class_5415;
 import net.minecraft.command.arguments.BlockArgumentParser;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
@@ -39,6 +38,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.state.property.Property;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagManager;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
@@ -59,7 +59,7 @@ implements ArgumentType<BlockPredicate> {
         }
         Identifier lv3 = lv.getTagId();
         return arg3 -> {
-            Tag<Block> lv = arg3.method_30215().method_30210(lv3);
+            Tag<Block> lv = arg3.getBlocks().getTag(lv3);
             if (lv == null) {
                 throw UNKNOWN_TAG_EXCEPTION.create((Object)lv3.toString());
             }
@@ -81,7 +81,7 @@ implements ArgumentType<BlockPredicate> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder, BlockTags.getContainer());
+        return lv.getSuggestions(suggestionsBuilder, BlockTags.getTagGroup());
     }
 
     public Collection<String> getExamples() {
@@ -173,7 +173,7 @@ implements ArgumentType<BlockPredicate> {
     }
 
     public static interface BlockPredicate {
-        public Predicate<CachedBlockPosition> create(class_5415 var1) throws CommandSyntaxException;
+        public Predicate<CachedBlockPosition> create(TagManager var1) throws CommandSyntaxException;
     }
 }
 
