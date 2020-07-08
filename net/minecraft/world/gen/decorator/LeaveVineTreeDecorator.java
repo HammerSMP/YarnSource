@@ -22,8 +22,8 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class LeaveVineTreeDecorator
 extends TreeDecorator {
-    public static final Codec<LeaveVineTreeDecorator> field_24960 = Codec.unit(() -> field_24961);
-    public static final LeaveVineTreeDecorator field_24961 = new LeaveVineTreeDecorator();
+    public static final Codec<LeaveVineTreeDecorator> CODEC = Codec.unit(() -> INSTANCE);
+    public static final LeaveVineTreeDecorator INSTANCE = new LeaveVineTreeDecorator();
 
     @Override
     protected TreeDecoratorType<?> getType() {

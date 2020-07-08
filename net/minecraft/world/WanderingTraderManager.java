@@ -32,13 +32,13 @@ import net.minecraft.world.poi.PointOfInterestType;
 public class WanderingTraderManager
 implements Spawner {
     private final Random random = new Random();
-    private final ServerWorldProperties field_24387;
+    private final ServerWorldProperties properties;
     private int spawnTimer;
     private int spawnDelay;
     private int spawnChance;
 
     public WanderingTraderManager(ServerWorldProperties arg) {
-        this.field_24387 = arg;
+        this.properties = arg;
         this.spawnTimer = 1200;
         this.spawnDelay = arg.getWanderingTraderSpawnDelay();
         this.spawnChance = arg.getWanderingTraderSpawnChance();
@@ -60,7 +60,7 @@ implements Spawner {
         }
         this.spawnTimer = 1200;
         this.spawnDelay -= 1200;
-        this.field_24387.setWanderingTraderSpawnDelay(this.spawnDelay);
+        this.properties.setWanderingTraderSpawnDelay(this.spawnDelay);
         if (this.spawnDelay > 0) {
             return 0;
         }
@@ -70,7 +70,7 @@ implements Spawner {
         }
         int i = this.spawnChance;
         this.spawnChance = MathHelper.clamp(this.spawnChance + 25, 25, 75);
-        this.field_24387.setWanderingTraderSpawnChance(this.spawnChance);
+        this.properties.setWanderingTraderSpawnChance(this.spawnChance);
         if (this.random.nextInt(100) > i) {
             return 0;
         }
@@ -104,7 +104,7 @@ implements Spawner {
                 for (int j = 0; j < 2; ++j) {
                     this.spawnLlama(arg2, lv6, 4);
                 }
-                this.field_24387.setWanderingTraderId(lv6.getUuid());
+                this.properties.setWanderingTraderId(lv6.getUuid());
                 lv6.setDespawnDelay(48000);
                 lv6.setWanderTarget(lv4);
                 lv6.setPositionTarget(lv4, 16);

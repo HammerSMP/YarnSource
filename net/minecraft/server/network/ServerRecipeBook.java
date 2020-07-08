@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.class_5411;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -24,6 +23,7 @@ import net.minecraft.network.packet.s2c.play.UnlockRecipesS2CPacket;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.book.RecipeBook;
+import net.minecraft.recipe.book.RecipeBookOptions;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
@@ -65,12 +65,12 @@ extends RecipeBook {
     }
 
     private void sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action arg, ServerPlayerEntity arg2, List<Identifier> list) {
-        arg2.networkHandler.sendPacket(new UnlockRecipesS2CPacket(arg, list, Collections.emptyList(), this.method_30173()));
+        arg2.networkHandler.sendPacket(new UnlockRecipesS2CPacket(arg, list, Collections.emptyList(), this.getOptions()));
     }
 
     public CompoundTag toTag() {
         CompoundTag lv = new CompoundTag();
-        this.method_30173().method_30189(lv);
+        this.getOptions().toTag(lv);
         ListTag lv2 = new ListTag();
         for (Identifier lv3 : this.recipes) {
             lv2.add(StringTag.of(lv3.toString()));
@@ -85,7 +85,7 @@ extends RecipeBook {
     }
 
     public void fromTag(CompoundTag arg, RecipeManager arg2) {
-        this.method_30174(class_5411.method_30183(arg));
+        this.setOptions(RecipeBookOptions.fromTag(arg));
         ListTag lv = arg.getList("recipes", 8);
         this.handleList(lv, this::add, arg2);
         ListTag lv2 = arg.getList("toBeDisplayed", 8);
@@ -112,7 +112,7 @@ extends RecipeBook {
     }
 
     public void sendInitRecipesPacket(ServerPlayerEntity arg) {
-        arg.networkHandler.sendPacket(new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, this.recipes, this.toBeDisplayed, this.method_30173()));
+        arg.networkHandler.sendPacket(new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, this.recipes, this.toBeDisplayed, this.getOptions()));
     }
 }
 

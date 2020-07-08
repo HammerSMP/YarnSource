@@ -44,7 +44,6 @@ import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.JigsawBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
-import net.minecraft.class_5427;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -97,6 +96,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.QueryBlockNbtC2SPacket;
 import net.minecraft.network.packet.c2s.play.QueryEntityNbtC2SPacket;
 import net.minecraft.network.packet.c2s.play.RecipeBookDataC2SPacket;
+import net.minecraft.network.packet.c2s.play.RecipeCategoryOptionsC2SPacket;
 import net.minecraft.network.packet.c2s.play.RenameItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.RequestCommandCompletionsC2SPacket;
 import net.minecraft.network.packet.c2s.play.ResourcePackStatusC2SPacket;
@@ -404,9 +404,9 @@ implements ServerPlayPacketListener {
     }
 
     @Override
-    public void method_30303(class_5427 arg) {
+    public void onRecipeCategoryOptions(RecipeCategoryOptionsC2SPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.player.getServerWorld());
-        this.player.getRecipeBook().method_30175(arg.method_30305(), arg.method_30306(), arg.method_30307());
+        this.player.getRecipeBook().setCategoryOptions(arg.getCategory(), arg.isGuiOpen(), arg.isFilteringCraftable());
     }
 
     @Override

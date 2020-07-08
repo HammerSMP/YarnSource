@@ -91,6 +91,8 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.ServerList;
 import net.minecraft.client.particle.ItemPickupParticle;
+import net.minecraft.client.realms.DisconnectedRealmsScreen;
+import net.minecraft.client.realms.RealmsScreen;
 import net.minecraft.client.recipebook.ClientRecipeBook;
 import net.minecraft.client.render.debug.BeeDebugRenderer;
 import net.minecraft.client.render.debug.GoalSelectorDebugRenderer;
@@ -275,8 +277,6 @@ import net.minecraft.network.packet.s2c.play.WorldBorderS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldEventS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.realms.DisconnectedRealmsScreen;
-import net.minecraft.realms.RealmsScreen;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.resource.ResourcePackSource;
@@ -392,7 +392,7 @@ implements ClientPlayPacketListener {
         this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
         this.client.joinWorld(this.world);
         if (this.client.player == null) {
-            this.client.player = this.client.interactionManager.method_29357(this.world, new StatHandler(), new ClientRecipeBook());
+            this.client.player = this.client.interactionManager.createPlayer(this.world, new StatHandler(), new ClientRecipeBook());
             this.client.player.yaw = -180.0f;
             if (this.client.getServer() != null) {
                 this.client.getServer().setLocalPlayerUuid(this.client.player.getUuid());
@@ -1349,7 +1349,7 @@ implements ClientPlayPacketListener {
     public void onUnlockRecipes(UnlockRecipesS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         ClientRecipeBook lv = this.client.player.getRecipeBook();
-        lv.method_30174(arg.isFurnaceFilteringCraftable());
+        lv.setOptions(arg.isFurnaceFilteringCraftable());
         UnlockRecipesS2CPacket.Action lv2 = arg.getAction();
         switch (lv2) {
             case REMOVE: {

@@ -63,7 +63,7 @@ extends StructureFeature<OceanRuinFeatureConfig> {
         }
 
         static {
-            field_24990 = StringIdentifiable.method_28140(BiomeType::values, BiomeType::byName);
+            field_24990 = StringIdentifiable.createCodec(BiomeType::values, BiomeType::byName);
             nameMap = Arrays.stream(BiomeType.values()).collect(Collectors.toMap(BiomeType::getName, arg -> arg));
         }
     }

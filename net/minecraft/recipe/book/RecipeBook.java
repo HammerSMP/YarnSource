@@ -14,21 +14,21 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5411;
-import net.minecraft.class_5421;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.book.RecipeBookOptions;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.util.Identifier;
 
 public class RecipeBook {
     protected final Set<Identifier> recipes = Sets.newHashSet();
     protected final Set<Identifier> toBeDisplayed = Sets.newHashSet();
-    private final class_5411 field_25734 = new class_5411();
+    private final RecipeBookOptions options = new RecipeBookOptions();
 
     public void copyFrom(RecipeBook arg) {
         this.recipes.clear();
         this.toBeDisplayed.clear();
-        this.field_25734.method_30179(arg.field_25734);
+        this.options.copyFrom(arg.options);
         this.recipes.addAll(arg.recipes);
         this.toBeDisplayed.addAll(arg.toBeDisplayed);
     }
@@ -82,41 +82,41 @@ public class RecipeBook {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isGuiOpen(class_5421 arg) {
-        return this.field_25734.method_30180(arg);
+    public boolean isGuiOpen(RecipeBookCategory arg) {
+        return this.options.isGuiOpen(arg);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setGuiOpen(class_5421 arg, boolean bl) {
-        this.field_25734.method_30181(arg, bl);
+    public void setGuiOpen(RecipeBookCategory arg, boolean bl) {
+        this.options.setGuiOpen(arg, bl);
     }
 
     @Environment(value=EnvType.CLIENT)
     public boolean isFilteringCraftable(AbstractRecipeScreenHandler<?> arg) {
-        return this.method_30176(arg.method_30264());
+        return this.isFilteringCraftable(arg.getCategory());
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean method_30176(class_5421 arg) {
-        return this.field_25734.method_30187(arg);
+    public boolean isFilteringCraftable(RecipeBookCategory arg) {
+        return this.options.isFilteringCraftable(arg);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void method_30177(class_5421 arg, boolean bl) {
-        this.field_25734.method_30188(arg, bl);
+    public void setFilteringCraftable(RecipeBookCategory arg, boolean bl) {
+        this.options.setFilteringCraftable(arg, bl);
     }
 
-    public void method_30174(class_5411 arg) {
-        this.field_25734.method_30179(arg);
+    public void setOptions(RecipeBookOptions arg) {
+        this.options.copyFrom(arg);
     }
 
-    public class_5411 method_30173() {
-        return this.field_25734.method_30178();
+    public RecipeBookOptions getOptions() {
+        return this.options.copy();
     }
 
-    public void method_30175(class_5421 arg, boolean bl, boolean bl2) {
-        this.field_25734.method_30181(arg, bl);
-        this.field_25734.method_30188(arg, bl2);
+    public void setCategoryOptions(RecipeBookCategory arg, boolean bl, boolean bl2) {
+        this.options.setGuiOpen(arg, bl);
+        this.options.setFilteringCraftable(arg, bl2);
     }
 }
 

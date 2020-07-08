@@ -16,10 +16,10 @@ import java.util.Collection;
 import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5411;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.recipe.book.RecipeBookOptions;
 import net.minecraft.util.Identifier;
 
 public class UnlockRecipesS2CPacket
@@ -27,12 +27,12 @@ implements Packet<ClientPlayPacketListener> {
     private Action action;
     private List<Identifier> recipeIdsToChange;
     private List<Identifier> recipeIdsToInit;
-    private class_5411 field_25797;
+    private RecipeBookOptions field_25797;
 
     public UnlockRecipesS2CPacket() {
     }
 
-    public UnlockRecipesS2CPacket(Action arg, Collection<Identifier> collection, Collection<Identifier> collection2, class_5411 arg2) {
+    public UnlockRecipesS2CPacket(Action arg, Collection<Identifier> collection, Collection<Identifier> collection2, RecipeBookOptions arg2) {
         this.action = arg;
         this.recipeIdsToChange = ImmutableList.copyOf(collection);
         this.recipeIdsToInit = ImmutableList.copyOf(collection2);
@@ -47,7 +47,7 @@ implements Packet<ClientPlayPacketListener> {
     @Override
     public void read(PacketByteBuf arg) throws IOException {
         this.action = arg.readEnumConstant(Action.class);
-        this.field_25797 = class_5411.method_30186(arg);
+        this.field_25797 = RecipeBookOptions.fromPacket(arg);
         int i = arg.readVarInt();
         this.recipeIdsToChange = Lists.newArrayList();
         for (int j = 0; j < i; ++j) {
@@ -65,7 +65,7 @@ implements Packet<ClientPlayPacketListener> {
     @Override
     public void write(PacketByteBuf arg) throws IOException {
         arg.writeEnumConstant(this.action);
-        this.field_25797.method_30190(arg);
+        this.field_25797.toPacket(arg);
         arg.writeVarInt(this.recipeIdsToChange.size());
         for (Identifier lv : this.recipeIdsToChange) {
             arg.writeIdentifier(lv);
@@ -89,7 +89,7 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public class_5411 isFurnaceFilteringCraftable() {
+    public RecipeBookOptions isFurnaceFilteringCraftable() {
         return this.field_25797;
     }
 

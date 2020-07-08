@@ -195,7 +195,7 @@ implements ServerWorldAccess {
     protected final RaidManager raidManager;
     private final ObjectLinkedOpenHashSet<BlockEvent> syncedBlockEventQueue = new ObjectLinkedOpenHashSet();
     private boolean inBlockTick;
-    private final List<Spawner> field_25141;
+    private final List<Spawner> spawners;
     @Nullable
     private final EnderDragonFight enderDragonFight;
     private final StructureAccessor structureAccessor;
@@ -205,7 +205,7 @@ implements ServerWorldAccess {
         super(arg22, arg3, arg4, arg5, minecraftServer::getProfiler, false, bl, l);
         this.field_25143 = bl2;
         this.server = minecraftServer;
-        this.field_25141 = list;
+        this.spawners = list;
         this.field_24456 = arg22;
         this.serverChunkManager = new ServerChunkManager(this, arg2, minecraftServer.getDataFixer(), minecraftServer.getStructureManager(), executor, arg7, minecraftServer.getPlayerManager().getViewDistance(), minecraftServer.syncChunkWrites(), arg6, () -> minecraftServer.getOverworld().getPersistentStateManager());
         this.portalForcer = new PortalForcer(this);
@@ -396,8 +396,8 @@ implements ServerWorldAccess {
         this.field_24456.method_29035(l);
     }
 
-    public void method_29202(boolean bl, boolean bl2) {
-        for (Spawner lv : this.field_25141) {
+    public void tickSpawners(boolean bl, boolean bl2) {
+        for (Spawner lv : this.spawners) {
             lv.spawn(this, bl, bl2);
         }
     }

@@ -16,9 +16,9 @@ import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5421;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.recipe.book.RecipeBookCategory;
 
 @Environment(value=EnvType.CLIENT)
 public enum RecipeBookGroup {
@@ -52,7 +52,7 @@ public enum RecipeBookGroup {
         this.icons = ImmutableList.copyOf((Object[])args);
     }
 
-    public static List<RecipeBookGroup> method_30285(class_5421 arg) {
+    public static List<RecipeBookGroup> method_30285(RecipeBookCategory arg) {
         switch (arg) {
             case CRAFTING: {
                 return CRAFTING;

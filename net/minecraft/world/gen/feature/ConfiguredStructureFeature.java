@@ -20,17 +20,17 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
 
 public class ConfiguredStructureFeature<FC extends FeatureConfig, F extends StructureFeature<FC>> {
-    public static final Codec<ConfiguredStructureFeature<?, ?>> field_24834 = Registry.STRUCTURE_FEATURE.dispatch("name", arg -> arg.field_24835, StructureFeature::method_28665);
-    public final F field_24835;
-    public final FC field_24836;
+    public static final Codec<ConfiguredStructureFeature<?, ?>> TYPE_CODEC = Registry.STRUCTURE_FEATURE.dispatch("name", arg -> arg.feature, StructureFeature::getCodec);
+    public final F feature;
+    public final FC config;
 
     public ConfiguredStructureFeature(F arg, FC arg2) {
-        this.field_24835 = arg;
-        this.field_24836 = arg2;
+        this.feature = arg;
+        this.config = arg2;
     }
 
     public StructureStart<?> method_28622(ChunkGenerator arg, BiomeSource arg2, StructureManager arg3, long l, ChunkPos arg4, Biome arg5, int i, StructureConfig arg6) {
-        return ((StructureFeature)this.field_24835).method_28657(arg, arg2, arg3, l, arg4, arg5, i, new ChunkRandom(), arg6, this.field_24836);
+        return ((StructureFeature)this.feature).method_28657(arg, arg2, arg3, l, arg4, arg5, i, new ChunkRandom(), arg6, this.config);
     }
 }
 

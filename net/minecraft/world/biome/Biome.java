@@ -97,7 +97,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Biome {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final Codec<Biome> field_24677 = RecordCodecBuilder.create(instance -> instance.group((App)Precipitation.field_24680.fieldOf("precipitation").forGetter(arg -> arg.precipitation), (App)Category.field_24678.fieldOf("category").forGetter(arg -> arg.category), (App)Codec.FLOAT.fieldOf("depth").forGetter(arg -> Float.valueOf(arg.depth)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale)), (App)Codec.FLOAT.fieldOf("temperature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("downfall").forGetter(arg -> Float.valueOf(arg.downfall)), (App)BiomeEffects.CODEC.fieldOf("effects").forGetter(arg -> arg.effects), (App)Codec.INT.fieldOf("sky_color").forGetter(arg -> arg.skyColor), (App)ConfiguredSurfaceBuilder.field_25015.fieldOf("surface_builder").forGetter(arg -> arg.surfaceBuilder), (App)Codec.simpleMap(GenerationStep.Carver.field_24770, (Codec)ConfiguredCarver.field_24828.listOf().promotePartial(Util.method_29188("Carver: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Carver.values())).fieldOf("carvers").forGetter(arg -> arg.carvers), (App)Codec.simpleMap(GenerationStep.Feature.CODEC, (Codec)ConfiguredFeature.CODEC.listOf().promotePartial(Util.method_29188("Feature: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Feature.values())).fieldOf("features").forGetter(arg -> arg.features), (App)ConfiguredStructureFeature.field_24834.listOf().promotePartial(Util.method_29188("Structure start: ", ((Logger)LOGGER)::error)).fieldOf("starts").forGetter(arg2 -> arg2.structureFeatures.values().stream().sorted(Comparator.comparing(arg -> Registry.STRUCTURE_FEATURE.getId((StructureFeature<?>)arg.field_24835))).collect(Collectors.toList())), (App)Codec.simpleMap(SpawnGroup.field_24655, (Codec)SpawnEntry.CODEC.listOf().promotePartial(Util.method_29188("Spawn data: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(SpawnGroup.values())).fieldOf("spawners").forGetter(arg -> arg.spawns), (App)MixedNoisePoint.CODEC.listOf().fieldOf("climate_parameters").forGetter(arg -> arg.noisePoints), (App)Codec.STRING.optionalFieldOf("parent").forGetter(arg -> Optional.ofNullable(arg.parent))).apply((Applicative)instance, Biome::new));
+    public static final Codec<Biome> field_24677 = RecordCodecBuilder.create(instance -> instance.group((App)Precipitation.field_24680.fieldOf("precipitation").forGetter(arg -> arg.precipitation), (App)Category.field_24678.fieldOf("category").forGetter(arg -> arg.category), (App)Codec.FLOAT.fieldOf("depth").forGetter(arg -> Float.valueOf(arg.depth)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale)), (App)Codec.FLOAT.fieldOf("temperature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("downfall").forGetter(arg -> Float.valueOf(arg.downfall)), (App)BiomeEffects.CODEC.fieldOf("effects").forGetter(arg -> arg.effects), (App)Codec.INT.fieldOf("sky_color").forGetter(arg -> arg.skyColor), (App)ConfiguredSurfaceBuilder.field_25015.fieldOf("surface_builder").forGetter(arg -> arg.surfaceBuilder), (App)Codec.simpleMap(GenerationStep.Carver.field_24770, (Codec)ConfiguredCarver.field_24828.listOf().promotePartial(Util.method_29188("Carver: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Carver.values())).fieldOf("carvers").forGetter(arg -> arg.carvers), (App)Codec.simpleMap(GenerationStep.Feature.CODEC, (Codec)ConfiguredFeature.CODEC.listOf().promotePartial(Util.method_29188("Feature: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Feature.values())).fieldOf("features").forGetter(arg -> arg.features), (App)ConfiguredStructureFeature.TYPE_CODEC.listOf().promotePartial(Util.method_29188("Structure start: ", ((Logger)LOGGER)::error)).fieldOf("starts").forGetter(arg2 -> arg2.structureFeatures.values().stream().sorted(Comparator.comparing(arg -> Registry.STRUCTURE_FEATURE.getId((StructureFeature<?>)arg.feature))).collect(Collectors.toList())), (App)Codec.simpleMap(SpawnGroup.field_24655, (Codec)SpawnEntry.CODEC.listOf().promotePartial(Util.method_29188("Spawn data: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(SpawnGroup.values())).fieldOf("spawners").forGetter(arg -> arg.spawns), (App)MixedNoisePoint.CODEC.listOf().fieldOf("climate_parameters").forGetter(arg -> arg.noisePoints), (App)Codec.STRING.optionalFieldOf("parent").forGetter(arg -> Optional.ofNullable(arg.parent))).apply((Applicative)instance, Biome::new));
     public static final Set<Biome> BIOMES = Sets.newHashSet();
     public static final IdList<Biome> PARENT_BIOME_ID_MAP = new IdList();
     protected static final OctaveSimplexNoiseSampler TEMPERATURE_NOISE = new OctaveSimplexNoiseSampler(new ChunkRandom(1234L), (List<Integer>)ImmutableList.of((Object)0));
@@ -180,7 +180,7 @@ public class Biome {
         this.surfaceBuilder = arg4;
         this.carvers = map;
         this.features = map2;
-        this.structureFeatures = list.stream().collect(Collectors.toMap(arg -> arg.field_24835, Function.identity()));
+        this.structureFeatures = list.stream().collect(Collectors.toMap(arg -> arg.feature, Function.identity()));
         this.spawns = map3;
         this.noisePoints = list2;
         this.parent = optional.orElse(null);
@@ -304,7 +304,7 @@ public class Biome {
     }
 
     public void addStructureFeature(ConfiguredStructureFeature<?, ?> arg) {
-        this.structureFeatures.put((StructureFeature<?>)arg.field_24835, arg);
+        this.structureFeatures.put((StructureFeature<?>)arg.feature, arg);
     }
 
     public boolean hasStructureFeature(StructureFeature<?> arg) {
@@ -316,7 +316,7 @@ public class Biome {
     }
 
     public ConfiguredStructureFeature<?, ?> method_28405(ConfiguredStructureFeature<?, ?> arg) {
-        return this.structureFeatures.getOrDefault(arg.field_24835, arg);
+        return this.structureFeatures.getOrDefault(arg.feature, arg);
     }
 
     public List<ConfiguredFeature<?, ?>> getFlowerFeatures() {
@@ -683,7 +683,7 @@ public class Biome {
         }
 
         static {
-            field_24680 = StringIdentifiable.method_28140(Precipitation::values, Precipitation::method_28431);
+            field_24680 = StringIdentifiable.createCodec(Precipitation::values, Precipitation::method_28431);
             NAME_MAP = Arrays.stream(Precipitation.values()).collect(Collectors.toMap(Precipitation::getName, arg -> arg));
         }
     }
@@ -730,7 +730,7 @@ public class Biome {
         }
 
         static {
-            field_24678 = StringIdentifiable.method_28140(Category::values, Category::method_28424);
+            field_24678 = StringIdentifiable.createCodec(Category::values, Category::method_28424);
             NAME_MAP = Arrays.stream(Category.values()).collect(Collectors.toMap(Category::getName, arg -> arg));
         }
     }

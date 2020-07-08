@@ -70,11 +70,11 @@ implements Spawner {
             ++m;
             lv2.setY(arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv2).getY());
             if (o == 0) {
-                if (!this.spawnOneEntity(arg, lv2, random, true)) {
+                if (!this.spawnPillager(arg, lv2, random, true)) {
                     break;
                 }
             } else {
-                this.spawnOneEntity(arg, lv2, random, false);
+                this.spawnPillager(arg, lv2, random, false);
             }
             lv2.setX(lv2.getX() + random.nextInt(5) - random.nextInt(5));
             lv2.setZ(lv2.getZ() + random.nextInt(5) - random.nextInt(5));
@@ -82,7 +82,7 @@ implements Spawner {
         return m;
     }
 
-    private boolean spawnOneEntity(ServerWorld arg, BlockPos arg2, Random random, boolean bl) {
+    private boolean spawnPillager(ServerWorld arg, BlockPos arg2, Random random, boolean bl) {
         BlockState lv = arg.getBlockState(arg2);
         if (!SpawnHelper.isClearForSpawn(arg, arg2, lv, lv.getFluidState(), EntityType.PILLAGER)) {
             return false;

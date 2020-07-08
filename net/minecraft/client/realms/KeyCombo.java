@@ -1,0 +1,49 @@
+/*
+ * Decompiled with CFR 0.149.
+ * 
+ * Could not load the following classes:
+ *  net.fabricmc.api.EnvType
+ *  net.fabricmc.api.Environment
+ */
+package net.minecraft.client.realms;
+
+import java.util.Arrays;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+@Environment(value=EnvType.CLIENT)
+public class KeyCombo {
+    private final char[] chars;
+    private int matchIndex;
+    private final Runnable onCompletion;
+
+    public KeyCombo(char[] cs, Runnable runnable) {
+        this.onCompletion = runnable;
+        if (cs.length < 1) {
+            throw new IllegalArgumentException("Must have at least one char");
+        }
+        this.chars = cs;
+    }
+
+    public boolean keyPressed(char c) {
+        if (c == this.chars[this.matchIndex++]) {
+            if (this.matchIndex == this.chars.length) {
+                this.reset();
+                this.onCompletion.run();
+                return true;
+            }
+        } else {
+            this.reset();
+        }
+        return false;
+    }
+
+    public void reset() {
+        this.matchIndex = 0;
+    }
+
+    public String toString() {
+        return "KeyCombo{chars=" + Arrays.toString(this.chars) + ", matchIndex=" + this.matchIndex + '}';
+    }
+}
+

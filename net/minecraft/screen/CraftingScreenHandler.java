@@ -11,7 +11,6 @@ import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5421;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
@@ -23,6 +22,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
@@ -169,8 +169,8 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public class_5421 method_30264() {
-        return class_5421.CRAFTING;
+    public RecipeBookCategory getCategory() {
+        return RecipeBookCategory.CRAFTING;
     }
 }
 

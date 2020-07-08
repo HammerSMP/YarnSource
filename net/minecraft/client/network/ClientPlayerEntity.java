@@ -102,8 +102,8 @@ extends AbstractClientPlayerEntity {
     private float lastYaw;
     private float lastPitch;
     private boolean lastOnGround;
-    private boolean field_23093;
-    private boolean lastIsHoldingSneakKey;
+    private boolean inSneakingPose;
+    private boolean lastSneaking;
     private boolean lastSprinting;
     private int ticksSinceLastPositionPacketSent;
     private boolean healthInitialized;
@@ -135,7 +135,7 @@ extends AbstractClientPlayerEntity {
         this.networkHandler = arg3;
         this.statHandler = arg4;
         this.recipeBook = arg5;
-        this.lastIsHoldingSneakKey = bl;
+        this.lastSneaking = bl;
         this.lastSprinting = bl2;
         this.tickables.add(new AmbientSoundPlayer(this, arg.getSoundManager()));
         this.tickables.add(new BubbleColumnSoundPlayer(this));
@@ -223,10 +223,10 @@ extends AbstractClientPlayerEntity {
             this.networkHandler.sendPacket(new ClientCommandC2SPacket(this, lv));
             this.lastSprinting = bl;
         }
-        if ((bl2 = this.isSneaking()) != this.lastIsHoldingSneakKey) {
+        if ((bl2 = this.isSneaking()) != this.lastSneaking) {
             ClientCommandC2SPacket.Mode lv2 = bl2 ? ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY : ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY;
             this.networkHandler.sendPacket(new ClientCommandC2SPacket(this, lv2));
-            this.lastIsHoldingSneakKey = bl2;
+            this.lastSneaking = bl2;
         }
         if (this.isCamera()) {
             boolean bl4;
@@ -614,10 +614,10 @@ extends AbstractClientPlayerEntity {
 
     @Override
     public boolean isInSneakingPose() {
-        return this.field_23093;
+        return this.inSneakingPose;
     }
 
-    public boolean isHoldingSneakKey() {
+    public boolean shouldSlowDown() {
         return this.isInSneakingPose() || this.shouldLeaveSwimmingPose();
     }
 
@@ -651,8 +651,8 @@ extends AbstractClientPlayerEntity {
         boolean bl = this.input.jumping;
         boolean bl2 = this.input.sneaking;
         boolean bl3 = this.isWalking();
-        this.field_23093 = !this.abilities.flying && !this.isSwimming() && this.wouldPoseNotCollide(EntityPose.CROUCHING) && (this.isSneaking() || !this.isSleeping() && !this.wouldPoseNotCollide(EntityPose.STANDING));
-        this.input.tick(this.isHoldingSneakKey());
+        this.inSneakingPose = !this.abilities.flying && !this.isSwimming() && this.wouldPoseNotCollide(EntityPose.CROUCHING) && (this.isSneaking() || !this.isSleeping() && !this.wouldPoseNotCollide(EntityPose.STANDING));
+        this.input.tick(this.shouldSlowDown());
         this.client.getTutorialManager().onMovement(this.input);
         if (this.isUsingItem() && !this.hasVehicle()) {
             this.input.movementSideways *= 0.2f;

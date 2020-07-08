@@ -309,7 +309,7 @@ public class ClientPlayerInteractionManager {
         return lv2.getResult();
     }
 
-    public ClientPlayerEntity method_29357(ClientWorld arg, StatHandler arg2, ClientRecipeBook arg3) {
+    public ClientPlayerEntity createPlayer(ClientWorld arg, StatHandler arg2, ClientRecipeBook arg3) {
         return this.createPlayer(arg, arg2, arg3, false, false);
     }
 

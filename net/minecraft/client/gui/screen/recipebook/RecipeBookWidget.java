@@ -22,8 +22,6 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5421;
-import net.minecraft.class_5427;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
@@ -43,10 +41,12 @@ import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.search.SearchManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.RecipeCategoryOptionsC2SPacket;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeGridAligner;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
@@ -114,7 +114,7 @@ RecipeGridAligner<Ingredient> {
         this.toggleCraftableButton = new ToggleButtonWidget(i + 110, j + 12, 26, 16, this.recipeBook.isFilteringCraftable(this.craftingScreenHandler));
         this.setBookButtonTexture();
         this.tabButtons.clear();
-        for (RecipeBookGroup lv : RecipeBookGroup.method_30285(this.craftingScreenHandler.method_30264())) {
+        for (RecipeBookGroup lv : RecipeBookGroup.method_30285(this.craftingScreenHandler.getCategory())) {
             this.tabButtons.add(new RecipeGroupButtonWidget(lv));
         }
         if (this.currentTab != null) {
@@ -158,11 +158,11 @@ RecipeGridAligner<Ingredient> {
     }
 
     public boolean isOpen() {
-        return this.recipeBook.isGuiOpen(this.craftingScreenHandler.method_30264());
+        return this.recipeBook.isGuiOpen(this.craftingScreenHandler.getCategory());
     }
 
     protected void setOpen(boolean bl) {
-        this.recipeBook.setGuiOpen(this.craftingScreenHandler.method_30264(), bl);
+        this.recipeBook.setGuiOpen(this.craftingScreenHandler.getCategory(), bl);
         if (!bl) {
             this.recipesArea.hideAlternates();
         }
@@ -335,9 +335,9 @@ RecipeGridAligner<Ingredient> {
     }
 
     private boolean toggleFilteringCraftable() {
-        class_5421 lv = this.craftingScreenHandler.method_30264();
-        boolean bl = !this.recipeBook.method_30176(lv);
-        this.recipeBook.method_30177(lv, bl);
+        RecipeBookCategory lv = this.craftingScreenHandler.getCategory();
+        boolean bl = !this.recipeBook.isFilteringCraftable(lv);
+        this.recipeBook.setFilteringCraftable(lv, bl);
         return bl;
     }
 
@@ -460,10 +460,10 @@ RecipeGridAligner<Ingredient> {
 
     protected void sendBookDataPacket() {
         if (this.client.getNetworkHandler() != null) {
-            class_5421 lv = this.craftingScreenHandler.method_30264();
-            boolean bl = this.recipeBook.method_30173().method_30180(lv);
-            boolean bl2 = this.recipeBook.method_30173().method_30187(lv);
-            this.client.getNetworkHandler().sendPacket(new class_5427(lv, bl, bl2));
+            RecipeBookCategory lv = this.craftingScreenHandler.getCategory();
+            boolean bl = this.recipeBook.getOptions().isGuiOpen(lv);
+            boolean bl2 = this.recipeBook.getOptions().isFilteringCraftable(lv);
+            this.client.getNetworkHandler().sendPacket(new RecipeCategoryOptionsC2SPacket(lv, bl, bl2));
         }
     }
 

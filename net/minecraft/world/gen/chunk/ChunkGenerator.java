@@ -233,10 +233,10 @@ public abstract class ChunkGenerator {
     }
 
     private void method_28508(ConfiguredStructureFeature<?, ?> arg, StructureAccessor arg2, Chunk arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6) {
-        StructureStart<?> lv = arg2.getStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.field_24835, arg3);
+        StructureStart<?> lv = arg2.getStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.feature, arg3);
         int i = lv != null ? lv.getReferences() : 0;
-        StructureStart<?> lv2 = arg.method_28622(this, this.biomeSource, arg4, l, arg5, arg6, i, this.config.method_28600((StructureFeature<?>)arg.field_24835));
-        arg2.setStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.field_24835, lv2, arg3);
+        StructureStart<?> lv2 = arg.method_28622(this, this.biomeSource, arg4, l, arg5, arg6, i, this.config.method_28600((StructureFeature<?>)arg.feature));
+        arg2.setStructureStart(ChunkSectionPos.from(arg3.getPos(), 0), (StructureFeature<?>)arg.feature, lv2, arg3);
     }
 
     public void addStructureReferences(ServerWorldAccess arg, StructureAccessor arg2, Chunk arg3) {

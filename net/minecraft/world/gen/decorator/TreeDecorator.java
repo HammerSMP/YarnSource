@@ -21,7 +21,7 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.decorator.TreeDecoratorType;
 
 public abstract class TreeDecorator {
-    public static final Codec<TreeDecorator> field_24962 = Registry.TREE_DECORATOR_TYPE.dispatch(TreeDecorator::getType, TreeDecoratorType::method_28894);
+    public static final Codec<TreeDecorator> TYPE_CODEC = Registry.TREE_DECORATOR_TYPE.dispatch(TreeDecorator::getType, TreeDecoratorType::getCodec);
 
     protected abstract TreeDecoratorType<?> getType();
 

@@ -20,8 +20,8 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class TrunkVineTreeDecorator
 extends TreeDecorator {
-    public static final Codec<TrunkVineTreeDecorator> field_24964 = Codec.unit(() -> field_24965);
-    public static final TrunkVineTreeDecorator field_24965 = new TrunkVineTreeDecorator();
+    public static final Codec<TrunkVineTreeDecorator> CODEC = Codec.unit(() -> INSTANCE);
+    public static final TrunkVineTreeDecorator INSTANCE = new TrunkVineTreeDecorator();
 
     @Override
     protected TreeDecoratorType<?> getType() {

@@ -11,7 +11,6 @@ package net.minecraft.screen;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5421;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;
@@ -23,6 +22,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.CraftingResultSlot;
@@ -203,8 +203,8 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public class_5421 method_30264() {
-        return class_5421.CRAFTING;
+    public RecipeBookCategory getCategory() {
+        return RecipeBookCategory.CRAFTING;
     }
 }
 

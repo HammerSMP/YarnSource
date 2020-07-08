@@ -44,7 +44,7 @@ public class GenerationStep {
         }
 
         static {
-            field_24770 = StringIdentifiable.method_28140(Carver::values, Carver::method_28546);
+            field_24770 = StringIdentifiable.createCodec(Carver::values, Carver::method_28546);
             BY_NAME = Arrays.stream(Carver.values()).collect(Collectors.toMap(Carver::getName, arg -> arg));
         }
     }
@@ -84,7 +84,7 @@ public class GenerationStep {
         }
 
         static {
-            CODEC = StringIdentifiable.method_28140(Feature::values, Feature::method_28547);
+            CODEC = StringIdentifiable.createCodec(Feature::values, Feature::method_28547);
             BY_NAME = Arrays.stream(Feature.values()).collect(Collectors.toMap(Feature::getName, arg -> arg));
         }
     }

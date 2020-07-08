@@ -27,12 +27,12 @@ import java.util.stream.Stream;
 public interface StringIdentifiable {
     public String asString();
 
-    public static <E extends Enum<E>> Codec<E> method_28140(Supplier<E[]> supplier, Function<? super String, ? extends E> function) {
+    public static <E extends Enum<E>> Codec<E> createCodec(Supplier<E[]> supplier, Function<? super String, ? extends E> function) {
         Enum[] enums = (Enum[])supplier.get();
-        return StringIdentifiable.method_28141(Enum::ordinal, i -> enums[i], function);
+        return StringIdentifiable.createCodec(Enum::ordinal, i -> enums[i], function);
     }
 
-    public static <E extends StringIdentifiable> Codec<E> method_28141(final ToIntFunction<E> toIntFunction, final IntFunction<E> intFunction, final Function<? super String, ? extends E> function) {
+    public static <E extends StringIdentifiable> Codec<E> createCodec(final ToIntFunction<E> toIntFunction, final IntFunction<E> intFunction, final Function<? super String, ? extends E> function) {
         return new Codec<E>(){
 
             public <T> DataResult<T> encode(E arg, DynamicOps<T> dynamicOps, T object) {

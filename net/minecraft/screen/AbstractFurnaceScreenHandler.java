@@ -10,7 +10,6 @@ package net.minecraft.screen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.class_5421;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -22,6 +21,7 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
@@ -38,13 +38,13 @@ extends AbstractRecipeScreenHandler<Inventory> {
     private final PropertyDelegate propertyDelegate;
     protected final World world;
     private final RecipeType<? extends AbstractCookingRecipe> recipeType;
-    private final class_5421 field_25762;
+    private final RecipeBookCategory field_25762;
 
-    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, class_5421 arg3, int i, PlayerInventory arg4) {
+    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, RecipeBookCategory arg3, int i, PlayerInventory arg4) {
         this(arg, arg2, arg3, i, arg4, new SimpleInventory(3), new ArrayPropertyDelegate(4));
     }
 
-    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, class_5421 arg3, int i, PlayerInventory arg4, Inventory arg5, PropertyDelegate arg6) {
+    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, RecipeBookCategory arg3, int i, PlayerInventory arg4, Inventory arg5, PropertyDelegate arg6) {
         super(arg, i);
         this.recipeType = arg2;
         this.field_25762 = arg3;
@@ -177,7 +177,7 @@ extends AbstractRecipeScreenHandler<Inventory> {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public class_5421 method_30264() {
+    public RecipeBookCategory getCategory() {
         return this.field_25762;
     }
 }
