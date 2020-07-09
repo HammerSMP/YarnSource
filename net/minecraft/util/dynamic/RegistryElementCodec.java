@@ -23,14 +23,14 @@ import net.minecraft.util.registry.RegistryKey;
 
 public final class RegistryElementCodec<E>
 implements Codec<Supplier<E>> {
-    private final RegistryKey<Registry<E>> registryRef;
+    private final RegistryKey<? extends Registry<E>> registryRef;
     private final MapCodec<E> elementCodec;
 
-    public static <E> RegistryElementCodec<E> of(RegistryKey<Registry<E>> arg, MapCodec<E> mapCodec) {
+    public static <E> RegistryElementCodec<E> of(RegistryKey<? extends Registry<E>> arg, MapCodec<E> mapCodec) {
         return new RegistryElementCodec<E>(arg, mapCodec);
     }
 
-    private RegistryElementCodec(RegistryKey<Registry<E>> arg, MapCodec<E> mapCodec) {
+    private RegistryElementCodec(RegistryKey<? extends Registry<E>> arg, MapCodec<E> mapCodec) {
         this.registryRef = arg;
         this.elementCodec = mapCodec;
     }

@@ -575,8 +575,8 @@ extends AnimalEntity {
         public final int type;
 
         public RabbitData(int i) {
+            super(1.0f);
             this.type = i;
-            this.setBabyChance(1.0f);
         }
     }
 }

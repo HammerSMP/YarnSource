@@ -9,6 +9,7 @@
 package net.minecraft.util.registry;
 
 import com.mojang.serialization.Lifecycle;
+import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,7 +23,7 @@ extends SimpleRegistry<T> {
     private final Identifier defaultId;
     private T defaultValue;
 
-    public DefaultedRegistry(String string, RegistryKey<Registry<T>> arg, Lifecycle lifecycle) {
+    public DefaultedRegistry(String string, RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle) {
         super(arg, lifecycle);
         this.defaultId = new Identifier(string);
     }
@@ -53,6 +54,11 @@ extends SimpleRegistry<T> {
     public T get(@Nullable Identifier arg) {
         Object object = super.get(arg);
         return object == null ? this.defaultValue : object;
+    }
+
+    @Override
+    public Optional<T> getOrEmpty(@Nullable Identifier arg) {
+        return Optional.ofNullable(super.get(arg));
     }
 
     @Override

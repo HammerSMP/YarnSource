@@ -65,8 +65,7 @@ Trader {
     @Override
     public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData();
-            ((PassiveEntity.PassiveData)arg4).setBabyAllowed(false);
+            arg4 = new PassiveEntity.PassiveData(false);
         }
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }

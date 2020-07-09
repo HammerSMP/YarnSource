@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -22,7 +23,9 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 
 @Environment(value=EnvType.CLIENT)
@@ -30,15 +33,17 @@ public class CustomizeBuffetLevelScreen
 extends Screen {
     private final Screen field_24562;
     private final Consumer<Biome> field_24563;
+    private final MutableRegistry<Biome> field_25888;
     private BuffetBiomesListWidget biomeSelectionList;
     private Biome field_25040;
     private ButtonWidget confirmButton;
 
-    public CustomizeBuffetLevelScreen(Screen arg, Consumer<Biome> consumer, Biome arg2) {
+    public CustomizeBuffetLevelScreen(Screen arg, class_5455 arg2, Consumer<Biome> consumer, Biome arg3) {
         super(new TranslatableText("createWorld.customize.buffet.title"));
         this.field_24562 = arg;
         this.field_24563 = consumer;
-        this.field_25040 = arg2;
+        this.field_25040 = arg3;
+        this.field_25888 = arg2.method_30530(Registry.BIOME_KEY);
     }
 
     @Override
@@ -77,7 +82,7 @@ extends Screen {
     extends AlwaysSelectedEntryListWidget<BuffetBiomeItem> {
         private BuffetBiomesListWidget() {
             super(CustomizeBuffetLevelScreen.this.client, CustomizeBuffetLevelScreen.this.width, CustomizeBuffetLevelScreen.this.height, 40, CustomizeBuffetLevelScreen.this.height - 37, 16);
-            Registry.BIOME.stream().sorted(Comparator.comparing(arg -> arg.getName().getString())).forEach(arg -> this.addEntry(new BuffetBiomeItem((Biome)arg)));
+            CustomizeBuffetLevelScreen.this.field_25888.getEntries().stream().sorted(Comparator.comparing(entry -> ((RegistryKey)entry.getKey()).getValue().toString())).forEach(entry -> this.addEntry(new BuffetBiomeItem((Biome)entry.getValue())));
         }
 
         @Override
@@ -90,7 +95,7 @@ extends Screen {
             super.setSelected(arg);
             if (arg != null) {
                 CustomizeBuffetLevelScreen.this.field_25040 = arg.field_24564;
-                NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", arg.field_24564.getName().getString()).getString());
+                NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", CustomizeBuffetLevelScreen.this.field_25888.getId(arg.field_24564)).getString());
             }
             CustomizeBuffetLevelScreen.this.refreshConfirmButton();
         }
@@ -106,7 +111,7 @@ extends Screen {
 
             @Override
             public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-                BuffetBiomesListWidget.this.drawStringWithShadow(arg, CustomizeBuffetLevelScreen.this.textRenderer, this.field_24564.getName().getString(), k + 5, j + 2, 0xFFFFFF);
+                BuffetBiomesListWidget.this.drawStringWithShadow(arg, CustomizeBuffetLevelScreen.this.textRenderer, CustomizeBuffetLevelScreen.this.field_25888.getId(this.field_24564).toString(), k + 5, j + 2, 0xFFFFFF);
             }
 
             @Override

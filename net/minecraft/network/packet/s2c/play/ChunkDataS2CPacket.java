@@ -40,7 +40,7 @@ implements Packet<ClientPlayPacketListener> {
     private int verticalStripBitmask;
     private CompoundTag heightmaps;
     @Nullable
-    private BiomeArray biomeArray;
+    private int[] biomeArray;
     private byte[] data;
     private List<CompoundTag> blockEntities;
     private boolean isFullChunk;
@@ -61,7 +61,7 @@ implements Packet<ClientPlayPacketListener> {
             this.heightmaps.put(entry.getKey().getName(), new LongArrayTag(entry.getValue().asLongArray()));
         }
         if (this.isFullChunk) {
-            this.biomeArray = arg.getBiomeArray().copy();
+            this.biomeArray = arg.getBiomeArray().toIntArray();
         }
         this.data = new byte[this.getDataSize(arg, i)];
         this.verticalStripBitmask = this.writeData(new PacketByteBuf(this.getWriteBuffer()), arg, i);
@@ -86,7 +86,7 @@ implements Packet<ClientPlayPacketListener> {
         this.verticalStripBitmask = arg.readVarInt();
         this.heightmaps = arg.readCompoundTag();
         if (this.isFullChunk) {
-            this.biomeArray = new BiomeArray(arg);
+            this.biomeArray = arg.readIntArray(BiomeArray.DEFAULT_LENGTH);
         }
         if ((i = arg.readVarInt()) > 0x200000) {
             throw new RuntimeException("Chunk Packet trying to allocate too much memory on read.");
@@ -109,7 +109,7 @@ implements Packet<ClientPlayPacketListener> {
         arg.writeVarInt(this.verticalStripBitmask);
         arg.writeCompoundTag(this.heightmaps);
         if (this.biomeArray != null) {
-            this.biomeArray.toPacket(arg);
+            arg.writeIntArray(this.biomeArray);
         }
         arg.writeVarInt(this.data.length);
         arg.writeBytes(this.data);
@@ -196,8 +196,8 @@ implements Packet<ClientPlayPacketListener> {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public BiomeArray getBiomeArray() {
-        return this.biomeArray == null ? null : this.biomeArray.copy();
+    public int[] getBiomeArray() {
+        return this.biomeArray;
     }
 }
 

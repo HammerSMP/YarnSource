@@ -1057,9 +1057,9 @@ AutoCloseable {
         lv6.draw(RenderLayer.getEntityGlintDirect());
         lv6.draw(RenderLayer.getWaterMask());
         this.bufferBuilders.getEffectVertexConsumers().draw();
-        lv6.draw(RenderLayer.getLines());
-        lv6.draw();
         if (this.transparencyShader != null) {
+            lv6.draw(RenderLayer.getLines());
+            lv6.draw();
             this.translucentFramebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
             this.translucentFramebuffer.copyDepthFrom(this.client.getFramebuffer());
             lv.swap("translucent");
@@ -1079,6 +1079,8 @@ AutoCloseable {
             this.renderLayer(RenderLayer.getTripwire(), arg, d, e, g);
             lv.swap("particles");
             this.client.particleManager.renderParticles(arg, lv6, arg4, arg2, f);
+            lv6.draw(RenderLayer.getLines());
+            lv6.draw();
         }
         RenderSystem.pushMatrix();
         RenderSystem.multMatrix(arg.peek().getModel());

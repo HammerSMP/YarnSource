@@ -34,13 +34,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.LongFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.noise.DoublePerlinNoiseSampler;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.BiomeSource;
@@ -48,23 +48,23 @@ import net.minecraft.world.gen.ChunkRandom;
 
 public class MultiNoiseBiomeSource
 extends BiomeSource {
-    public static final MapCodec<MultiNoiseBiomeSource> field_24718 = RecordCodecBuilder.mapCodec(instance2 -> instance2.group((App)Codec.LONG.fieldOf("seed").forGetter(arg -> arg.seed), (App)RecordCodecBuilder.create(instance -> instance.group((App)Biome.MixedNoisePoint.CODEC.fieldOf("parameters").forGetter(Pair::getFirst), (App)Registry.BIOME.fieldOf("biome").forGetter(Pair::getSecond)).apply((Applicative)instance, Pair::of)).listOf().fieldOf("biomes").forGetter(arg -> arg.biomePoints)).apply((Applicative)instance2, MultiNoiseBiomeSource::new));
+    public static final MapCodec<MultiNoiseBiomeSource> field_24718 = RecordCodecBuilder.mapCodec(instance2 -> instance2.group((App)Codec.LONG.fieldOf("seed").forGetter(arg -> arg.seed), (App)RecordCodecBuilder.create(instance -> instance.group((App)Biome.MixedNoisePoint.CODEC.fieldOf("parameters").forGetter(Pair::getFirst), (App)Biome.field_24677.fieldOf("biome").forGetter(Pair::getSecond)).apply((Applicative)instance, Pair::of)).listOf().fieldOf("biomes").forGetter(arg -> arg.biomePoints)).apply((Applicative)instance2, MultiNoiseBiomeSource::new));
     public static final Codec<MultiNoiseBiomeSource> CODEC = Codec.mapEither(Preset.CODEC, field_24718).xmap(either -> (MultiNoiseBiomeSource)either.map(pair -> ((Preset)pair.getFirst()).getBiomeSource((Long)pair.getSecond()), Function.identity()), arg -> arg.field_24721.map(arg2 -> Either.left((Object)Pair.of((Object)arg2, (Object)arg.seed))).orElseGet(() -> Either.right((Object)arg))).codec();
     private final DoublePerlinNoiseSampler temperatureNoise;
     private final DoublePerlinNoiseSampler humidityNoise;
     private final DoublePerlinNoiseSampler altitudeNoise;
     private final DoublePerlinNoiseSampler weirdnessNoise;
-    private final List<Pair<Biome.MixedNoisePoint, Biome>> biomePoints;
+    private final List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> biomePoints;
     private final boolean threeDimensionalSampling;
     private final long seed;
     private final Optional<Preset> field_24721;
 
-    private MultiNoiseBiomeSource(long l, List<Pair<Biome.MixedNoisePoint, Biome>> list) {
+    private MultiNoiseBiomeSource(long l, List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> list) {
         this(l, list, Optional.empty());
     }
 
-    public MultiNoiseBiomeSource(long l, List<Pair<Biome.MixedNoisePoint, Biome>> list, Optional<Preset> optional) {
-        super(list.stream().map(Pair::getSecond).collect(Collectors.toList()));
+    public MultiNoiseBiomeSource(long l, List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> list, Optional<Preset> optional) {
+        super(list.stream().map(Pair::getSecond).map(Supplier::get).collect(Collectors.toList()));
         this.seed = l;
         this.field_24721 = optional;
         IntStream intStream = IntStream.rangeClosed(-7, -6);
@@ -80,8 +80,7 @@ extends BiomeSource {
     }
 
     private static MultiNoiseBiomeSource method_28467(long l) {
-        ImmutableList immutableList = ImmutableList.of((Object)Biomes.NETHER_WASTES, (Object)Biomes.SOUL_SAND_VALLEY, (Object)Biomes.CRIMSON_FOREST, (Object)Biomes.WARPED_FOREST, (Object)Biomes.BASALT_DELTAS);
-        return new MultiNoiseBiomeSource(l, (List)immutableList.stream().flatMap(arg -> arg.streamNoises().map(arg2 -> Pair.of((Object)arg2, (Object)arg))).collect(ImmutableList.toImmutableList()), Optional.of(Preset.NETHER));
+        return new MultiNoiseBiomeSource(l, (List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>>)ImmutableList.of((Object)Pair.of((Object)new Biome.MixedNoisePoint(0.0f, 0.0f, 0.0f, 0.0f, 0.0f), () -> Biomes.NETHER_WASTES), (Object)Pair.of((Object)new Biome.MixedNoisePoint(0.0f, -0.5f, 0.0f, 0.0f, 0.0f), () -> Biomes.SOUL_SAND_VALLEY), (Object)Pair.of((Object)new Biome.MixedNoisePoint(0.4f, 0.0f, 0.0f, 0.0f, 0.0f), () -> Biomes.CRIMSON_FOREST), (Object)Pair.of((Object)new Biome.MixedNoisePoint(0.0f, 0.5f, 0.0f, 0.0f, 0.375f), () -> Biomes.WARPED_FOREST), (Object)Pair.of((Object)new Biome.MixedNoisePoint(-0.5f, 0.0f, 0.0f, 0.0f, 0.175f), () -> Biomes.BASALT_DELTAS)), Optional.of(Preset.NETHER));
     }
 
     @Override
@@ -99,7 +98,7 @@ extends BiomeSource {
     public Biome getBiomeForNoiseGen(int i, int j, int k) {
         int l = this.threeDimensionalSampling ? j : 0;
         Biome.MixedNoisePoint lv = new Biome.MixedNoisePoint((float)this.temperatureNoise.sample(i, l, k), (float)this.humidityNoise.sample(i, l, k), (float)this.altitudeNoise.sample(i, l, k), (float)this.weirdnessNoise.sample(i, l, k), 0.0f);
-        return this.biomePoints.stream().min(Comparator.comparing(pair -> Float.valueOf(((Biome.MixedNoisePoint)pair.getFirst()).calculateDistanceTo(lv)))).map(Pair::getSecond).orElse(Biomes.THE_VOID);
+        return this.biomePoints.stream().min(Comparator.comparing(pair -> Float.valueOf(((Biome.MixedNoisePoint)pair.getFirst()).calculateDistanceTo(lv)))).map(Pair::getSecond).map(Supplier::get).orElse(Biomes.THE_VOID);
     }
 
     public boolean method_28462(long l) {

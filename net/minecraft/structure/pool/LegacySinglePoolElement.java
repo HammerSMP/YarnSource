@@ -15,7 +15,7 @@ import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.List;
+import java.util.function.Supplier;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.pool.SinglePoolElement;
@@ -31,18 +31,8 @@ public class LegacySinglePoolElement
 extends SinglePoolElement {
     public static final Codec<LegacySinglePoolElement> CODEC = RecordCodecBuilder.create(instance -> instance.group(LegacySinglePoolElement.method_28882(), LegacySinglePoolElement.method_28880(), LegacySinglePoolElement.method_28883()).apply((Applicative)instance, LegacySinglePoolElement::new));
 
-    @Deprecated
-    public LegacySinglePoolElement(String string, List<StructureProcessor> list) {
-        super(string, list);
-    }
-
-    private LegacySinglePoolElement(Either<Identifier, Structure> either, List<StructureProcessor> list, StructurePool.Projection arg) {
-        super(either, list, arg);
-    }
-
-    @Deprecated
-    public LegacySinglePoolElement(String string) {
-        super(string, (List<StructureProcessor>)ImmutableList.of());
+    protected LegacySinglePoolElement(Either<Identifier, Structure> either, Supplier<ImmutableList<StructureProcessor>> supplier, StructurePool.Projection arg) {
+        super(either, supplier, arg);
     }
 
     @Override

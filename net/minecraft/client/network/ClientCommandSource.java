@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -132,6 +133,11 @@ implements CommandSource {
     @Override
     public Set<RegistryKey<World>> getWorldKeys() {
         return this.networkHandler.getWorldKeys();
+    }
+
+    @Override
+    public class_5455 method_30497() {
+        return this.networkHandler.getRegistryTracker();
     }
 
     public void onCommandSuggestions(int i, Suggestions suggestions) {

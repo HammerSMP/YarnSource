@@ -64,17 +64,19 @@ implements Packet<ServerPlayPacketListener> {
         this.action = arg.readEnumConstant(StructureBlockBlockEntity.Action.class);
         this.mode = arg.readEnumConstant(StructureBlockMode.class);
         this.structureName = arg.readString(32767);
-        this.offset = new BlockPos(MathHelper.clamp(arg.readByte(), -32, 32), MathHelper.clamp(arg.readByte(), -32, 32), MathHelper.clamp(arg.readByte(), -32, 32));
-        this.size = new BlockPos(MathHelper.clamp(arg.readByte(), 0, 32), MathHelper.clamp(arg.readByte(), 0, 32), MathHelper.clamp(arg.readByte(), 0, 32));
+        int i = 48;
+        this.offset = new BlockPos(MathHelper.clamp(arg.readByte(), -48, 48), MathHelper.clamp(arg.readByte(), -48, 48), MathHelper.clamp(arg.readByte(), -48, 48));
+        int j = 48;
+        this.size = new BlockPos(MathHelper.clamp(arg.readByte(), 0, 48), MathHelper.clamp(arg.readByte(), 0, 48), MathHelper.clamp(arg.readByte(), 0, 48));
         this.mirror = arg.readEnumConstant(BlockMirror.class);
         this.rotation = arg.readEnumConstant(BlockRotation.class);
         this.metadata = arg.readString(12);
         this.integrity = MathHelper.clamp(arg.readFloat(), 0.0f, 1.0f);
         this.seed = arg.readVarLong();
-        byte i = arg.readByte();
-        this.ignoreEntities = (i & 1) != 0;
-        this.showAir = (i & 2) != 0;
-        this.showBoundingBox = (i & 4) != 0;
+        byte k = arg.readByte();
+        this.ignoreEntities = (k & 1) != 0;
+        this.showAir = (k & 2) != 0;
+        this.showBoundingBox = (k & 4) != 0;
     }
 
     @Override

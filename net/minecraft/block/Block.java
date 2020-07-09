@@ -29,6 +29,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_5431;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -86,8 +87,6 @@ implements ItemConvertible {
             return this.load((VoxelShape)object);
         }
     });
-    private static final VoxelShape SOLID_MEDIUM_SQUARE_SHAPE = VoxelShapes.combineAndSimplify(VoxelShapes.fullCube(), Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 16.0, 14.0), BooleanBiFunction.ONLY_FIRST);
-    private static final VoxelShape SOLID_SMALL_SQUARE_SHAPE = Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 10.0, 9.0);
     protected final StateManager<Block, BlockState> stateManager;
     private BlockState defaultState;
     @Nullable
@@ -108,7 +107,7 @@ implements ItemConvertible {
         if (arg == null) {
             return 0;
         }
-        int i = STATE_IDS.getId(arg);
+        int i = STATE_IDS.getRawId(arg);
         return i == -1 ? 0 : i;
     }
 
@@ -215,8 +214,7 @@ implements ItemConvertible {
     }
 
     public static boolean hasTopRim(BlockView arg, BlockPos arg2) {
-        BlockState lv = arg.getBlockState(arg2);
-        return lv.isFullCube(arg, arg2) && lv.isSideSolidFullSquare(arg, arg2, Direction.UP) || !VoxelShapes.matchesAnywhere(lv.getSidesShape(arg, arg2).getFace(Direction.UP), SOLID_MEDIUM_SQUARE_SHAPE, BooleanBiFunction.ONLY_SECOND);
+        return arg.getBlockState(arg2).method_30368(arg, arg2, Direction.UP, class_5431.RIGID);
     }
 
     public static boolean sideCoversSmallSquare(WorldView arg, BlockPos arg2, Direction arg3) {
@@ -224,11 +222,7 @@ implements ItemConvertible {
         if (arg3 == Direction.DOWN && lv.isIn(BlockTags.UNSTABLE_BOTTOM_CENTER)) {
             return false;
         }
-        return !VoxelShapes.matchesAnywhere(lv.getSidesShape(arg, arg2).getFace(arg3), SOLID_SMALL_SQUARE_SHAPE, BooleanBiFunction.ONLY_SECOND);
-    }
-
-    public static boolean isSideSolidFullSquare(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return Block.isFaceFullSquare(arg.getSidesShape(arg2, arg3), arg4);
+        return lv.method_30368(arg, arg2, arg3, class_5431.CENTER);
     }
 
     public static boolean isFaceFullSquare(VoxelShape arg, Direction arg2) {

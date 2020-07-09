@@ -50,7 +50,8 @@ implements IndexedIterable<T> {
         this.set(object, this.nextId);
     }
 
-    public int getId(T object) {
+    @Override
+    public int getRawId(T object) {
         Integer integer = this.idMap.get(object);
         return integer == null ? -1 : integer;
     }

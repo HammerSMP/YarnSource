@@ -265,7 +265,7 @@ extends DataFix {
     }
 
     public static int addTo(Int2ObjectBiMap<Dynamic<?>> arg, Dynamic<?> dynamic) {
-        int i = arg.getId(dynamic);
+        int i = arg.getRawId(dynamic);
         if (i == -1) {
             i = arg.add(dynamic);
         }

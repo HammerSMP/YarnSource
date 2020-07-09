@@ -17,7 +17,7 @@ import net.minecraft.tag.Tag;
 
 public class TagMatchRuleTest
 extends RuleTest {
-    public static final Codec<TagMatchRuleTest> field_25014 = Tag.codec(ServerTagManagerHolder.getTagManager()::getBlocks).fieldOf("tag").xmap(TagMatchRuleTest::new, arg -> arg.tag).codec();
+    public static final Codec<TagMatchRuleTest> field_25014 = Tag.codec(() -> ServerTagManagerHolder.getTagManager().getBlocks()).fieldOf("tag").xmap(TagMatchRuleTest::new, arg -> arg.tag).codec();
     private final Tag<Block> tag;
 
     public TagMatchRuleTest(Tag<Block> arg) {

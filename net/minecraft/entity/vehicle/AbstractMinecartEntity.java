@@ -28,7 +28,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PoweredRailBlock;
-import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
@@ -201,13 +200,8 @@ extends Entity {
                     Vec3d lv7;
                     Box lv6;
                     lv3.set(lv2.getX() + js[0], lv2.getY() + i, lv2.getZ() + js[1]);
-                    double d = this.world.getCollisionHeightAt(lv3, arg -> {
-                        if (arg.isIn(BlockTags.CLIMBABLE)) {
-                            return true;
-                        }
-                        return arg.getBlock() instanceof TrapdoorBlock && arg.get(TrapdoorBlock.OPEN) != false;
-                    });
-                    if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, arg2, (lv6 = new Box(-f, d, -f, f, d + (double)lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
+                    double d = this.world.method_30346(Dismounting.method_30341(this.world, lv3), () -> Dismounting.method_30341(this.world, (BlockPos)lv3.down()));
+                    if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, arg2, (lv6 = new Box(-f, 0.0, -f, f, lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
                     arg2.setPose(lv4);
                     return lv7;
                 }
@@ -217,7 +211,8 @@ extends Entity {
         lv3.set((double)lv2.getX(), e, (double)lv2.getZ());
         for (EntityPose lv8 : immutableList) {
             double g = arg2.getDimensions((EntityPose)lv8).height;
-            double h = (double)lv3.getY() + this.world.method_26096(lv3, e - (double)lv3.getY() + g);
+            int j = MathHelper.ceil(e - (double)lv3.getY() + g);
+            double h = Dismounting.method_30343(lv3, j, arg -> this.world.getBlockState((BlockPos)arg).getCollisionShape(this.world, (BlockPos)arg));
             if (!(e + g <= h)) continue;
             arg2.setPose(lv8);
             break;
@@ -379,6 +374,7 @@ extends Entity {
             this.setOnFireFromLava();
             this.fallDistance *= 0.5f;
         }
+        this.firstUpdate = false;
     }
 
     protected double getMaxOffRailSpeed() {

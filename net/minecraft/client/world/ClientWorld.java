@@ -32,6 +32,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -113,11 +114,11 @@ extends World {
 
     public ClientWorld(ClientPlayNetworkHandler arg, Properties arg2, RegistryKey<World> arg3, RegistryKey<DimensionType> arg4, DimensionType arg5, int i, Supplier<Profiler> supplier, WorldRenderer arg6, boolean bl, long l) {
         super(arg2, arg3, arg4, arg5, supplier, true, bl, l);
+        this.netHandler = arg;
         this.chunkManager = new ClientChunkManager(this, i);
         this.clientWorldProperties = arg2;
-        this.netHandler = arg;
         this.worldRenderer = arg6;
-        this.skyProperties = SkyProperties.byDimensionType(arg.getRegistryTracker().getDimensionTypeRegistry().getKey(arg5));
+        this.skyProperties = SkyProperties.byDimensionType(arg.getRegistryTracker().method_30518().getKey(arg5));
         this.setSpawnPos(new BlockPos(8, 64, 8));
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
@@ -519,6 +520,11 @@ extends World {
     @Override
     public TagManager getTagManager() {
         return this.netHandler.getTagManager();
+    }
+
+    @Override
+    public class_5455 method_30349() {
+        return this.netHandler.getRegistryTracker();
     }
 
     @Override

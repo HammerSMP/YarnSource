@@ -362,9 +362,7 @@ extends HostileEntity {
     @Override
     public void writeCustomDataToTag(CompoundTag arg) {
         super.writeCustomDataToTag(arg);
-        if (this.isBaby()) {
-            arg.putBoolean("IsBaby", true);
-        }
+        arg.putBoolean("IsBaby", this.isBaby());
         arg.putBoolean("CanBreakDoors", this.canBreakDoors());
         arg.putInt("InWaterTime", this.isTouchingWater() ? this.inWaterTime : -1);
         arg.putInt("DrownedConversionTime", this.isConvertingInWater() ? this.ticksUntilWaterConversion : -1);
@@ -373,9 +371,7 @@ extends HostileEntity {
     @Override
     public void readCustomDataFromTag(CompoundTag arg) {
         super.readCustomDataFromTag(arg);
-        if (arg.getBoolean("IsBaby")) {
-            this.setBaby(true);
-        }
+        this.setBaby(arg.getBoolean("IsBaby"));
         this.setCanBreakDoors(arg.getBoolean("CanBreakDoors"));
         this.inWaterTime = arg.getInt("InWaterTime");
         if (arg.contains("DrownedConversionTime", 99) && arg.getInt("DrownedConversionTime") > -1) {

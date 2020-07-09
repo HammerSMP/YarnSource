@@ -1678,10 +1678,6 @@ extends LivingEntity {
         return this.addTellClickEvent(lv);
     }
 
-    public Text getNameAndUuid() {
-        return new LiteralText("").append(this.getName()).append(" (").append(this.gameProfile.getId().toString()).append(")");
-    }
-
     private MutableText addTellClickEvent(MutableText arg2) {
         String string = this.getGameProfile().getName();
         return arg2.styled(arg -> arg.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tell " + string + " ")).setHoverEvent(this.getHoverEvent()).withInsertion(string));

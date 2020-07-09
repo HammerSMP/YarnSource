@@ -15,6 +15,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.class_5428;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ModifiableTestableWorld;
@@ -24,14 +25,12 @@ import net.minecraft.world.gen.foliage.FoliagePlacerType;
 
 public class PineFoliagePlacer
 extends FoliagePlacer {
-    public static final Codec<PineFoliagePlacer> CODEC = RecordCodecBuilder.create(instance -> PineFoliagePlacer.method_28846(instance).and(instance.group((App)Codec.INT.fieldOf("height").forGetter(arg -> arg.height), (App)Codec.INT.fieldOf("height_random").forGetter(arg -> arg.randomHeight))).apply((Applicative)instance, PineFoliagePlacer::new));
-    private final int height;
-    private final int randomHeight;
+    public static final Codec<PineFoliagePlacer> CODEC = RecordCodecBuilder.create(instance -> PineFoliagePlacer.method_30411(instance).and((App)class_5428.method_30316(0, 16, 8).fieldOf("height").forGetter(arg -> arg.height)).apply((Applicative)instance, PineFoliagePlacer::new));
+    private final class_5428 height;
 
-    public PineFoliagePlacer(int i, int j, int k, int l, int m, int n) {
-        super(i, j, k, l);
-        this.height = m;
-        this.randomHeight = n;
+    public PineFoliagePlacer(class_5428 arg, class_5428 arg2, class_5428 arg3) {
+        super(arg, arg2);
+        this.height = arg3;
     }
 
     @Override
@@ -60,7 +59,7 @@ extends FoliagePlacer {
 
     @Override
     public int getHeight(Random random, int i, TreeFeatureConfig arg) {
-        return this.height + random.nextInt(this.randomHeight + 1);
+        return this.height.method_30321(random);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class ChunkStatus {
     public static final ChunkStatus STRUCTURE_STARTS = ChunkStatus.register("structure_starts", EMPTY, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ChunkStatus arg, ServerWorld arg2, ChunkGenerator arg3, StructureManager arg4, ServerLightingProvider arg5, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> list, Chunk arg6) -> {
         if (!arg6.getStatus().isAtLeast(arg)) {
             if (arg2.getServer().getSaveProperties().getGeneratorOptions().shouldGenerateStructures()) {
-                arg3.setStructureStarts(arg2.getStructureAccessor(), arg6, arg4, arg2.getSeed());
+                arg3.setStructureStarts(arg2.method_30349(), arg2.getStructureAccessor(), arg6, arg4, arg2.getSeed());
             }
             if (arg6 instanceof ProtoChunk) {
                 ((ProtoChunk)arg6).setStatus(arg);
@@ -62,7 +62,7 @@ public class ChunkStatus {
         ChunkRegion lv = new ChunkRegion(arg, list);
         arg2.addStructureReferences(lv, arg.getStructureAccessor().method_29951(lv), arg3);
     });
-    public static final ChunkStatus BIOMES = ChunkStatus.register("biomes", STRUCTURE_REFERENCES, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.populateBiomes(arg3));
+    public static final ChunkStatus BIOMES = ChunkStatus.register("biomes", STRUCTURE_REFERENCES, 0, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> arg2.populateBiomes(arg.method_30349().method_30530(Registry.BIOME_KEY), arg3));
     public static final ChunkStatus NOISE = ChunkStatus.register("noise", BIOMES, 8, PRE_CARVER_HEIGHTMAPS, ChunkType.PROTOCHUNK, (ServerWorld arg, ChunkGenerator arg2, List<Chunk> list, Chunk arg3) -> {
         ChunkRegion lv = new ChunkRegion(arg, list);
         arg2.populateNoise(lv, arg.getStructureAccessor().method_29951(lv), arg3);

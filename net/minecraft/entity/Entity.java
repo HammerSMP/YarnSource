@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.AreaHelper;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -42,10 +43,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.HoneyBlock;
-import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.piston.PistonBehavior;
+import net.minecraft.class_5454;
+import net.minecraft.class_5459;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.ProtectionEnchantment;
@@ -87,6 +88,7 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Properties;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.tag.Tag;
@@ -121,6 +123,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.logging.log4j.LogManager;
@@ -202,8 +205,6 @@ CommandOutput {
     protected boolean inNetherPortal;
     protected int netherPortalTime;
     protected BlockPos lastNetherPortalPosition;
-    protected Vec3d lastNetherPortalDirectionVector;
-    protected Direction lastNetherPortalDirection;
     private boolean invulnerable;
     protected UUID uuid = MathHelper.randomUuid(this.random);
     protected String uuidString = this.uuid.toString();
@@ -433,22 +434,22 @@ CommandOutput {
         this.world.getProfiler().pop();
     }
 
-    public void method_30229() {
+    public void resetNetherPortalCooldown() {
         this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
     }
 
-    public boolean method_30230() {
+    public boolean isReadyToGoThroughPortal() {
         return this.netherPortalCooldown > 0;
     }
 
     protected void tickNetherPortalCooldown() {
-        if (this.method_30230()) {
+        if (this.isReadyToGoThroughPortal()) {
             --this.netherPortalCooldown;
         }
     }
 
     public int getMaxNetherPortalTime() {
-        return 1;
+        return 0;
     }
 
     protected void setOnFireFromLava() {
@@ -919,11 +920,9 @@ CommandOutput {
     protected boolean updateWaterState() {
         this.fluidHeight.clear();
         this.checkWaterState();
-        if (this.isTouchingWater()) {
-            return true;
-        }
         double d = this.world.getDimension().isUltrawarm() ? 0.007 : 0.0023333333333333335;
-        return this.updateMovementInFluid(FluidTags.LAVA, d);
+        boolean bl = this.updateMovementInFluid(FluidTags.LAVA, d);
+        return this.isTouchingWater() || bl;
     }
 
     void checkWaterState() {
@@ -1625,19 +1624,12 @@ CommandOutput {
     }
 
     public void setInNetherPortal(BlockPos arg) {
-        if (this.method_30230()) {
-            this.method_30229();
+        if (this.isReadyToGoThroughPortal()) {
+            this.resetNetherPortalCooldown();
             return;
         }
         if (!this.world.isClient && !arg.equals(this.lastNetherPortalPosition)) {
-            this.lastNetherPortalPosition = new BlockPos(arg);
-            NetherPortalBlock cfr_ignored_0 = (NetherPortalBlock)Blocks.NETHER_PORTAL;
-            BlockPattern.Result lv = NetherPortalBlock.findPortal(this.world, this.lastNetherPortalPosition);
-            double d = lv.getForwards().getAxis() == Direction.Axis.X ? (double)lv.getFrontTopLeft().getZ() : (double)lv.getFrontTopLeft().getX();
-            double e = MathHelper.clamp(Math.abs(MathHelper.getLerpProgress((lv.getForwards().getAxis() == Direction.Axis.X ? this.getZ() : this.getX()) - (double)(lv.getForwards().rotateYClockwise().getDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d, d - (double)lv.getWidth())), 0.0, 1.0);
-            double f = MathHelper.clamp(MathHelper.getLerpProgress(this.getY() - 1.0, lv.getFrontTopLeft().getY(), lv.getFrontTopLeft().getY() - lv.getHeight()), 0.0, 1.0);
-            this.lastNetherPortalDirectionVector = new Vec3d(e, f, 0.0);
-            this.lastNetherPortalDirection = lv.getForwards();
+            this.lastNetherPortalPosition = arg.toImmutable();
         }
         this.inNetherPortal = true;
     }
@@ -1655,7 +1647,7 @@ CommandOutput {
             if (lv3 != null && minecraftServer.isNetherAllowed() && !this.hasVehicle() && this.netherPortalTime++ >= i) {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
-                this.method_30229();
+                this.resetNetherPortalCooldown();
                 this.changeDimension(lv3);
                 this.world.getProfiler().pop();
             }
@@ -1986,61 +1978,27 @@ CommandOutput {
         this.fromTag(lv);
         this.netherPortalCooldown = arg.netherPortalCooldown;
         this.lastNetherPortalPosition = arg.lastNetherPortalPosition;
-        this.lastNetherPortalDirectionVector = arg.lastNetherPortalDirectionVector;
-        this.lastNetherPortalDirection = arg.lastNetherPortalDirection;
     }
 
     @Nullable
     public Entity changeDimension(ServerWorld arg) {
-        BlockPos lv7;
         if (!(this.world instanceof ServerWorld) || this.removed) {
             return null;
         }
         this.world.getProfiler().push("changeDimension");
         this.detach();
         this.world.getProfiler().push("reposition");
-        Vec3d lv = this.getVelocity();
-        float f = 0.0f;
-        if (this.world.getRegistryKey() == World.END && arg.getRegistryKey() == World.OVERWORLD) {
-            BlockPos lv2 = arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, arg.getSpawnPos());
-        } else if (arg.getRegistryKey() == World.END) {
-            BlockPos lv3 = ServerWorld.END_SPAWN_POS;
-        } else {
-            double d = this.getX();
-            double e = this.getZ();
-            DimensionType lv4 = this.world.getDimension();
-            DimensionType lv5 = arg.getDimension();
-            double g = 8.0;
-            if (!lv4.isShrunk() && lv5.isShrunk()) {
-                d /= 8.0;
-                e /= 8.0;
-            } else if (lv4.isShrunk() && !lv5.isShrunk()) {
-                d *= 8.0;
-                e *= 8.0;
-            }
-            double h = Math.min(-2.9999872E7, arg.getWorldBorder().getBoundWest() + 16.0);
-            double i = Math.min(-2.9999872E7, arg.getWorldBorder().getBoundNorth() + 16.0);
-            double j = Math.min(2.9999872E7, arg.getWorldBorder().getBoundEast() - 16.0);
-            double k = Math.min(2.9999872E7, arg.getWorldBorder().getBoundSouth() - 16.0);
-            d = MathHelper.clamp(d, h, j);
-            e = MathHelper.clamp(e, i, k);
-            Vec3d lv6 = this.getLastNetherPortalDirectionVector();
-            lv7 = new BlockPos(d, this.getY(), e);
-            BlockPattern.TeleportTarget lv8 = arg.getPortalForcer().getPortal(lv7, lv, this.getLastNetherPortalDirection(), lv6.x, lv6.y, this instanceof PlayerEntity);
-            if (lv8 == null) {
-                return null;
-            }
-            lv7 = new BlockPos(lv8.pos);
-            lv = lv8.velocity;
-            f = lv8.yaw;
+        class_5454 lv = this.method_30329(arg);
+        if (lv == null) {
+            return null;
         }
         this.world.getProfiler().swap("reloading");
-        Object lv9 = this.getType().create(arg);
-        if (lv9 != null) {
-            ((Entity)lv9).copyFrom(this);
-            ((Entity)lv9).refreshPositionAndAngles(lv7, ((Entity)lv9).yaw + f, ((Entity)lv9).pitch);
-            ((Entity)lv9).setVelocity(lv);
-            arg.onDimensionChanged((Entity)lv9);
+        Object lv2 = this.getType().create(arg);
+        if (lv2 != null) {
+            ((Entity)lv2).copyFrom(this);
+            ((Entity)lv2).refreshPositionAndAngles(lv.field_25879.x, lv.field_25879.y, lv.field_25879.z, lv.field_25881, ((Entity)lv2).pitch);
+            ((Entity)lv2).setVelocity(lv.field_25880);
+            arg.onDimensionChanged((Entity)lv2);
             if (arg.getRegistryKey() == World.END) {
                 ServerWorld.createEndSpawnPlatform(arg);
             }
@@ -2050,11 +2008,69 @@ CommandOutput {
         ((ServerWorld)this.world).resetIdleTimeout();
         arg.resetIdleTimeout();
         this.world.getProfiler().pop();
-        return lv9;
+        return lv2;
     }
 
     protected void method_30076() {
         this.removed = true;
+    }
+
+    @Nullable
+    protected class_5454 method_30329(ServerWorld arg) {
+        boolean bl3;
+        boolean bl2;
+        boolean bl = this.world.getRegistryKey() == World.END && arg.getRegistryKey() == World.OVERWORLD;
+        boolean bl4 = bl2 = arg.getRegistryKey() == World.END;
+        if (bl || bl2) {
+            BlockPos lv2;
+            if (bl2) {
+                BlockPos lv = ServerWorld.END_SPAWN_POS;
+            } else {
+                lv2 = arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, arg.getSpawnPos());
+            }
+            return new class_5454(new Vec3d((double)lv2.getX() + 0.5, lv2.getY(), (double)lv2.getZ() + 0.5), this.getVelocity(), this.yaw, this.pitch);
+        }
+        boolean bl5 = bl3 = arg.getRegistryKey() == World.NETHER;
+        if (this.world.getRegistryKey() != World.NETHER && !bl3) {
+            return null;
+        }
+        WorldBorder lv3 = arg.getWorldBorder();
+        double d = Math.max(-2.9999872E7, lv3.getBoundWest() + 16.0);
+        double e = Math.max(-2.9999872E7, lv3.getBoundNorth() + 16.0);
+        double f = Math.min(2.9999872E7, lv3.getBoundEast() - 16.0);
+        double g = Math.min(2.9999872E7, lv3.getBoundSouth() - 16.0);
+        double h = Entity.method_30333(this.world.getDimension(), arg.getDimension());
+        BlockPos lv4 = new BlockPos(MathHelper.clamp(this.getX() * h, d, f), this.getY(), MathHelper.clamp(this.getZ() * h, e, g));
+        return this.method_30330(arg, lv4, bl3).map(arg22 -> {
+            Vec3d lv6;
+            Direction.Axis lv5;
+            BlockState lv = this.world.getBlockState(this.lastNetherPortalPosition);
+            if (lv.contains(Properties.HORIZONTAL_AXIS)) {
+                Direction.Axis lv2 = lv.get(Properties.HORIZONTAL_AXIS);
+                class_5459.class_5460 lv3 = class_5459.method_30574(this.lastNetherPortalPosition, lv2, 21, Direction.Axis.Y, 21, arg2 -> this.world.getBlockState((BlockPos)arg2) == lv);
+                Vec3d lv4 = AreaHelper.method_30494(lv3, lv2, this.getPos(), this.getDimensions(this.getPose()));
+            } else {
+                lv5 = Direction.Axis.X;
+                lv6 = new Vec3d(0.5, 0.0, 0.0);
+            }
+            return AreaHelper.method_30484(arg, arg22, lv5, lv6, this.getDimensions(this.getPose()), this.getVelocity(), this.yaw, this.pitch);
+        }).orElse(null);
+    }
+
+    protected Optional<class_5459.class_5460> method_30330(ServerWorld arg, BlockPos arg2, boolean bl) {
+        return arg.getPortalForcer().method_30483(arg2, bl);
+    }
+
+    private static double method_30333(DimensionType arg, DimensionType arg2) {
+        boolean bl = arg.isShrunk();
+        boolean bl2 = arg2.isShrunk();
+        if (!bl && bl2) {
+            return 0.125;
+        }
+        if (bl && !bl2) {
+            return 8.0;
+        }
+        return 1.0;
     }
 
     public boolean canUsePortals() {
@@ -2071,14 +2087,6 @@ CommandOutput {
 
     public int getSafeFallDistance() {
         return 3;
-    }
-
-    public Vec3d getLastNetherPortalDirectionVector() {
-        return this.lastNetherPortalDirectionVector;
-    }
-
-    public Direction getLastNetherPortalDirection() {
-        return this.lastNetherPortalDirection;
     }
 
     public boolean canAvoidTraps() {

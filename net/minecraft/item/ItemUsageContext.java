@@ -17,11 +17,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ItemUsageContext {
-    protected final PlayerEntity player;
-    protected final Hand hand;
-    protected final BlockHitResult hit;
-    protected final World world;
-    protected final ItemStack stack;
+    @Nullable
+    private final PlayerEntity player;
+    private final Hand hand;
+    private final BlockHitResult hit;
+    private final World world;
+    private final ItemStack stack;
 
     public ItemUsageContext(PlayerEntity arg, Hand arg2, BlockHitResult arg3) {
         this(arg.world, arg, arg2, arg.getStackInHand(arg2), arg3);
@@ -33,6 +34,10 @@ public class ItemUsageContext {
         this.hit = arg5;
         this.stack = arg4;
         this.world = arg;
+    }
+
+    protected final BlockHitResult method_30344() {
+        return this.hit;
     }
 
     public BlockPos getBlockPos() {

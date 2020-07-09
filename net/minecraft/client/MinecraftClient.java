@@ -71,6 +71,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.class_5407;
+import net.minecraft.class_5455;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClientGame;
@@ -248,7 +249,6 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.ProfilerTiming;
 import net.minecraft.util.profiler.TickTimeTracker;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
@@ -1459,7 +1459,7 @@ WindowEventHandler {
         return lv;
     }
 
-    public static SaveProperties createSaveProperties(LevelStorage.Session arg, RegistryTracker.Modifiable arg2, ResourceManager arg3, DataPackSettings arg4) {
+    public static SaveProperties createSaveProperties(LevelStorage.Session arg, class_5455.class_5457 arg2, ResourceManager arg3, DataPackSettings arg4) {
         RegistryOps<Tag> lv = RegistryOps.of(NbtOps.INSTANCE, arg3, arg2);
         SaveProperties lv2 = arg.readLevelProperties(lv, arg4);
         if (lv2 == null) {
@@ -1469,11 +1469,11 @@ WindowEventHandler {
     }
 
     public void startIntegratedServer(String string) {
-        this.startIntegratedServer(string, RegistryTracker.create(), MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, WorldLoadAction.BACKUP);
+        this.startIntegratedServer(string, class_5455.method_30528(), MinecraftClient::method_29598, (Function4<LevelStorage.Session, class_5455.class_5457, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, WorldLoadAction.BACKUP);
     }
 
-    public void method_29607(String string, LevelInfo arg, RegistryTracker.Modifiable arg22, GeneratorOptions arg3) {
-        this.startIntegratedServer(string, arg22, arg2 -> arg.method_29558(), (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)(arg4, arg5, arg6, arg7) -> {
+    public void method_29607(String string, LevelInfo arg, class_5455.class_5457 arg22, GeneratorOptions arg3) {
+        this.startIntegratedServer(string, arg22, arg2 -> arg.method_29558(), (Function4<LevelStorage.Session, class_5455.class_5457, ResourceManager, DataPackSettings, SaveProperties>)((Function4)(arg4, arg5, arg6, arg7) -> {
             RegistryOps lv = RegistryOps.of(JsonOps.INSTANCE, arg6, arg22);
             DataResult<SimpleRegistry<DimensionOptions>> dataResult = lv.loadToRegistry(arg3.getDimensionMap(), Registry.DIMENSION_OPTIONS, DimensionOptions.CODEC);
             SimpleRegistry<DimensionOptions> lv2 = dataResult.resultOrPartial(((Logger)LOGGER)::error).orElse(arg3.getDimensionMap());
@@ -1484,7 +1484,7 @@ WindowEventHandler {
     /*
      * WARNING - void declaration
      */
-    private void startIntegratedServer(String string, RegistryTracker.Modifiable arg2, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, WorldLoadAction arg22) {
+    private void startIntegratedServer(String string, class_5455.class_5457 arg2, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, class_5455.class_5457, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, WorldLoadAction arg22) {
         boolean bl3;
         void lv4;
         void lv2;
@@ -1610,7 +1610,7 @@ WindowEventHandler {
         }
     }
 
-    public IntegratedResourceManager method_29604(RegistryTracker.Modifiable arg, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, LevelStorage.Session arg2) throws InterruptedException, ExecutionException {
+    public IntegratedResourceManager method_29604(class_5455.class_5457 arg, Function<LevelStorage.Session, DataPackSettings> function, Function4<LevelStorage.Session, class_5455.class_5457, ResourceManager, DataPackSettings, SaveProperties> function4, boolean bl, LevelStorage.Session arg2) throws InterruptedException, ExecutionException {
         DataPackSettings lv = function.apply(arg2);
         ResourcePackManager lv2 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(arg2.getDirectory(WorldSavePath.DATAPACKS).toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
         try {
@@ -2248,7 +2248,7 @@ WindowEventHandler {
         this.bakedModelManager.resetMipmapLevels(i);
     }
 
-    private /* synthetic */ IntegratedServer method_29603(RegistryTracker.Modifiable arg, LevelStorage.Session arg2, IntegratedResourceManager arg3, SaveProperties arg4, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg5, Thread thread) {
+    private /* synthetic */ IntegratedServer method_29603(class_5455.class_5457 arg, LevelStorage.Session arg2, IntegratedResourceManager arg3, SaveProperties arg4, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg5, Thread thread) {
         return new IntegratedServer(thread, this, arg, arg2, arg3.getResourcePackManager(), arg3.getServerResourceManager(), arg4, minecraftSessionService, gameProfileRepository, arg5, i -> {
             WorldGenerationProgressTracker lv = new WorldGenerationProgressTracker(i + 0);
             lv.start();

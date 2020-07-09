@@ -65,6 +65,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_5455;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityInteraction;
 import net.minecraft.entity.EntityType;
@@ -1006,6 +1007,11 @@ implements ServerWorldAccess {
     @Override
     public boolean isSavingDisabled() {
         return this.savingDisabled;
+    }
+
+    @Override
+    public class_5455 method_30349() {
+        return this.server.method_30611();
     }
 
     public PersistentStateManager getPersistentStateManager() {

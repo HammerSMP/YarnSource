@@ -41,7 +41,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.explosion.DefaultExplosionBehavior;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
 
@@ -120,12 +119,7 @@ extends Block {
                 if (arg32.equals(arg3) && bl2) {
                     return Optional.of(Float.valueOf(Blocks.WATER.getBlastResistance()));
                 }
-                return DefaultExplosionBehavior.INSTANCE.getBlastResistance(arg, arg2, arg32, arg4, arg5);
-            }
-
-            @Override
-            public boolean canDestroyBlock(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, float f) {
-                return DefaultExplosionBehavior.INSTANCE.canDestroyBlock(arg, arg2, arg32, arg4, f);
+                return super.getBlastResistance(arg, arg2, arg32, arg4, arg5);
             }
         };
         arg22.createExplosion(null, DamageSource.badRespawnPoint(), lv, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);

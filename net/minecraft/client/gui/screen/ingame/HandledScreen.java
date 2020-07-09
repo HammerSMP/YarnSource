@@ -502,17 +502,12 @@ implements ScreenHandlerProvider<T> {
     }
 
     @Override
-    public boolean shouldCloseOnEsc() {
-        return false;
-    }
-
-    @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (i == 256 || this.client.options.keyInventory.matchesKey(i, j)) {
-            this.client.player.closeHandledScreen();
+        if (super.keyPressed(i, j, k)) {
             return true;
         }
-        if (super.keyPressed(i, j, k)) {
+        if (this.client.options.keyInventory.matchesKey(i, j)) {
+            this.onClose();
             return true;
         }
         this.handleHotbarKeyPressed(i, j);
@@ -565,6 +560,12 @@ implements ScreenHandlerProvider<T> {
     @Override
     public T getScreenHandler() {
         return this.handler;
+    }
+
+    @Override
+    public void onClose() {
+        this.client.player.closeHandledScreen();
+        super.onClose();
     }
 }
 

@@ -49,7 +49,7 @@ extends AbstractCriterion<Conditions> {
     private static Block getBlock(JsonObject jsonObject) {
         if (jsonObject.has("block")) {
             Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "block"));
-            return (Block)Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown block type '" + lv + "'"));
+            return Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown block type '" + lv + "'"));
         }
         return null;
     }

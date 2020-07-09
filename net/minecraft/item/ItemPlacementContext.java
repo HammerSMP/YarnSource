@@ -27,7 +27,7 @@ extends ItemUsageContext {
     }
 
     public ItemPlacementContext(ItemUsageContext arg) {
-        this(arg.getWorld(), arg.getPlayer(), arg.getHand(), arg.getStack(), arg.hit);
+        this(arg.getWorld(), arg.getPlayer(), arg.getHand(), arg.getStack(), arg.method_30344());
     }
 
     protected ItemPlacementContext(World arg, @Nullable PlayerEntity arg2, Hand arg3, ItemStack arg4, BlockHitResult arg5) {
@@ -54,12 +54,12 @@ extends ItemUsageContext {
     }
 
     public Direction getPlayerLookDirection() {
-        return Direction.getEntityFacingOrder(this.player)[0];
+        return Direction.getEntityFacingOrder(this.getPlayer())[0];
     }
 
     public Direction[] getPlacementDirections() {
         int i;
-        Direction[] lvs = Direction.getEntityFacingOrder(this.player);
+        Direction[] lvs = Direction.getEntityFacingOrder(this.getPlayer());
         if (this.canReplaceExisting) {
             return lvs;
         }

@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.class_5455;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.structure.StructureManager;
@@ -32,7 +33,7 @@ public abstract class StructureStart<C extends FeatureConfig> {
     public static final StructureStart<?> DEFAULT = new StructureStart<MineshaftFeatureConfig>(StructureFeature.MINESHAFT, 0, 0, BlockBox.empty(), 0, 0L){
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, MineshaftFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, MineshaftFeatureConfig arg5) {
         }
     };
     private final StructureFeature<C> feature;
@@ -53,7 +54,7 @@ public abstract class StructureStart<C extends FeatureConfig> {
         this.boundingBox = arg2;
     }
 
-    public abstract void init(ChunkGenerator var1, StructureManager var2, int var3, int var4, Biome var5, C var6);
+    public abstract void init(class_5455 var1, ChunkGenerator var2, StructureManager var3, int var4, int var5, Biome var6, C var7);
 
     public BlockBox getBoundingBox() {
         return this.boundingBox;

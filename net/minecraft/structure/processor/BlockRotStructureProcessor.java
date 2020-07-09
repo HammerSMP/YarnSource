@@ -19,7 +19,7 @@ import net.minecraft.world.WorldView;
 
 public class BlockRotStructureProcessor
 extends StructureProcessor {
-    public static final Codec<BlockRotStructureProcessor> CODEC = Codec.FLOAT.fieldOf("integrity").withDefault((Object)Float.valueOf(1.0f)).xmap(BlockRotStructureProcessor::new, arg -> Float.valueOf(arg.integrity)).codec();
+    public static final Codec<BlockRotStructureProcessor> CODEC = Codec.FLOAT.fieldOf("integrity").orElse((Object)Float.valueOf(1.0f)).xmap(BlockRotStructureProcessor::new, arg -> Float.valueOf(arg.integrity)).codec();
     private final float integrity;
 
     public BlockRotStructureProcessor(float f) {

@@ -216,7 +216,7 @@ Saddleable {
             for (int[] js : is) {
                 Vec3d lv6;
                 lv3.set(lv2.getX() + js[0], lv2.getY(), lv2.getZ() + js[1]);
-                double d = this.world.getCollisionHeightAt(lv3);
+                double d = this.world.method_30347(lv3);
                 if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, arg, lv5.offset(lv6 = Vec3d.ofCenter(lv3, d)))) continue;
                 arg.setPose(lv4);
                 return lv6;

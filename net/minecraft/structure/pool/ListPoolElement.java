@@ -33,11 +33,6 @@ extends StructurePoolElement {
     public static final Codec<ListPoolElement> field_24950 = RecordCodecBuilder.create(instance -> instance.group((App)StructurePoolElement.field_24953.listOf().fieldOf("elements").forGetter(arg -> arg.elements), ListPoolElement.method_28883()).apply((Applicative)instance, ListPoolElement::new));
     private final List<StructurePoolElement> elements;
 
-    @Deprecated
-    public ListPoolElement(List<StructurePoolElement> list) {
-        this(list, StructurePool.Projection.RIGID);
-    }
-
     public ListPoolElement(List<StructurePoolElement> list, StructurePool.Projection arg) {
         super(arg);
         if (list.isEmpty()) {

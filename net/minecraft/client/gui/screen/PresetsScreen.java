@@ -29,6 +29,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.CustomizeFlatLevelScreen;
@@ -127,7 +128,7 @@ extends Screen {
         return list;
     }
 
-    public static FlatChunkGeneratorConfig method_29060(String string, FlatChunkGeneratorConfig arg) {
+    public static FlatChunkGeneratorConfig method_29060(Registry<Biome> arg, String string, FlatChunkGeneratorConfig arg2) {
         Iterator iterator = Splitter.on((char)';').split((CharSequence)string).iterator();
         if (!iterator.hasNext()) {
             return FlatChunkGeneratorConfig.getDefaultConfig();
@@ -136,12 +137,12 @@ extends Screen {
         if (list.isEmpty()) {
             return FlatChunkGeneratorConfig.getDefaultConfig();
         }
-        FlatChunkGeneratorConfig lv = arg.method_29965(list, arg.getConfig());
+        FlatChunkGeneratorConfig lv = arg2.method_29965(list, arg2.getConfig());
         Biome lv2 = Biomes.PLAINS;
         if (iterator.hasNext()) {
             try {
                 Identifier lv3 = new Identifier((String)iterator.next());
-                lv2 = Registry.BIOME.getOrEmpty(lv3).orElseThrow(() -> new IllegalArgumentException("Invalid Biome: " + lv3));
+                lv2 = arg.getOrEmpty(lv3).orElseThrow(() -> new IllegalArgumentException("Invalid Biome: " + lv3));
             }
             catch (Exception exception) {
                 field_25043.error("Error while parsing flat world string => {}", (Object)exception.getMessage());
@@ -151,16 +152,16 @@ extends Screen {
         return lv;
     }
 
-    private static String method_29062(FlatChunkGeneratorConfig arg) {
+    private static String method_29062(class_5455 arg, FlatChunkGeneratorConfig arg2) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < arg.getLayers().size(); ++i) {
+        for (int i = 0; i < arg2.getLayers().size(); ++i) {
             if (i > 0) {
                 stringBuilder.append(",");
             }
-            stringBuilder.append(arg.getLayers().get(i));
+            stringBuilder.append(arg2.getLayers().get(i));
         }
         stringBuilder.append(";");
-        stringBuilder.append(Registry.BIOME.getId(arg.getBiome()));
+        stringBuilder.append(arg.method_30530(Registry.BIOME_KEY).getId(arg2.getBiome()));
         return stringBuilder.toString();
     }
 
@@ -171,13 +172,13 @@ extends Screen {
         this.listText = new TranslatableText("createWorld.customize.presets.list");
         this.customPresetField = new TextFieldWidget(this.textRenderer, 50, 40, this.width - 100, 20, this.shareText);
         this.customPresetField.setMaxLength(1230);
-        this.customPresetField.setText(PresetsScreen.method_29062(this.parent.method_29055()));
+        this.customPresetField.setText(PresetsScreen.method_29062(this.parent.parent.moreOptionsDialog.method_29700(), this.parent.method_29055()));
         this.field_25044 = this.parent.method_29055();
         this.children.add(this.customPresetField);
         this.listWidget = new SuperflatPresetsListWidget();
         this.children.add(this.listWidget);
         this.selectPresetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("createWorld.customize.presets.select"), arg -> {
-            FlatChunkGeneratorConfig lv = PresetsScreen.method_29060(this.customPresetField.getText(), this.field_25044);
+            FlatChunkGeneratorConfig lv = PresetsScreen.method_29060(this.parent.parent.moreOptionsDialog.method_29700().method_30530(Registry.BIOME_KEY), this.customPresetField.getText(), this.field_25044);
             this.parent.method_29054(lv);
             this.client.openScreen(this.parent);
         }));
@@ -337,7 +338,7 @@ extends Screen {
             private void setPreset() {
                 SuperflatPresetsListWidget.this.setSelected(this);
                 SuperflatPreset lv = (SuperflatPreset)presets.get(SuperflatPresetsListWidget.this.children().indexOf(this));
-                PresetsScreen.this.customPresetField.setText(PresetsScreen.method_29062(lv.field_25045));
+                PresetsScreen.this.customPresetField.setText(PresetsScreen.method_29062(((PresetsScreen)PresetsScreen.this).parent.parent.moreOptionsDialog.method_29700(), lv.field_25045));
                 PresetsScreen.this.customPresetField.setCursorToStart();
                 PresetsScreen.this.field_25044 = lv.field_25045;
             }

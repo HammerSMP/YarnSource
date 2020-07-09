@@ -113,6 +113,7 @@ implements Flutterer {
         hashMap.put(EntityType.MAGMA_CUBE, SoundEvents.ENTITY_PARROT_IMITATE_MAGMA_CUBE);
         hashMap.put(EntityType.PHANTOM, SoundEvents.ENTITY_PARROT_IMITATE_PHANTOM);
         hashMap.put(EntityType.PIGLIN, SoundEvents.ENTITY_PARROT_IMITATE_PIGLIN);
+        hashMap.put(EntityType.PIGLIN_BRUTE, SoundEvents.ENTITY_PARROT_IMITATE_PIGLIN_BRUTE);
         hashMap.put(EntityType.PILLAGER, SoundEvents.ENTITY_PARROT_IMITATE_PILLAGER);
         hashMap.put(EntityType.RAVAGER, SoundEvents.ENTITY_PARROT_IMITATE_RAVAGER);
         hashMap.put(EntityType.SHULKER, SoundEvents.ENTITY_PARROT_IMITATE_SHULKER);
@@ -151,8 +152,7 @@ implements Flutterer {
     public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         this.setVariant(this.random.nextInt(5));
         if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData();
-            ((PassiveEntity.PassiveData)arg4).setBabyAllowed(false);
+            arg4 = new PassiveEntity.PassiveData(false);
         }
         return super.initialize(arg, arg2, arg3, arg4, arg5);
     }

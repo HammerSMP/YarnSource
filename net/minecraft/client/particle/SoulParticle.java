@@ -55,7 +55,6 @@ extends AbstractSlowingParticle {
         public Particle createParticle(DefaultParticleType arg, ClientWorld arg2, double d, double e, double f, double g, double h, double i) {
             SoulParticle lv = new SoulParticle(arg2, d, e, f, g, h, i, this.spriteProvider);
             lv.setColorAlpha(1.0f);
-            lv.setSprite(this.spriteProvider);
             return lv;
         }
     }

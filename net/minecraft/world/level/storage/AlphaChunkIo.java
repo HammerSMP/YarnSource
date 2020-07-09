@@ -3,9 +3,11 @@
  */
 package net.minecraft.world.level.storage;
 
+import net.minecraft.class_5455;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.ChunkNibbleArray;
@@ -34,16 +36,16 @@ public class AlphaChunkIo {
         return lv;
     }
 
-    public static void convertAlphaChunk(AlphaChunk arg, CompoundTag arg2, BiomeSource arg3) {
-        arg2.putInt("xPos", arg.x);
-        arg2.putInt("zPos", arg.z);
-        arg2.putLong("LastUpdate", arg.lastUpdate);
-        int[] is = new int[arg.heightMap.length];
-        for (int i = 0; i < arg.heightMap.length; ++i) {
-            is[i] = arg.heightMap[i];
+    public static void convertAlphaChunk(class_5455.class_5457 arg, AlphaChunk arg2, CompoundTag arg3, BiomeSource arg4) {
+        arg3.putInt("xPos", arg2.x);
+        arg3.putInt("zPos", arg2.z);
+        arg3.putLong("LastUpdate", arg2.lastUpdate);
+        int[] is = new int[arg2.heightMap.length];
+        for (int i = 0; i < arg2.heightMap.length; ++i) {
+            is[i] = arg2.heightMap[i];
         }
-        arg2.putIntArray("HeightMap", is);
-        arg2.putBoolean("TerrainPopulated", arg.terrainPopulated);
+        arg3.putIntArray("HeightMap", is);
+        arg3.putBoolean("TerrainPopulated", arg2.terrainPopulated);
         ListTag lv = new ListTag();
         for (int j = 0; j < 8; ++j) {
             boolean bl = true;
@@ -51,7 +53,7 @@ public class AlphaChunkIo {
                 block3: for (int l = 0; l < 16 && bl; ++l) {
                     for (int m = 0; m < 16; ++m) {
                         int n = k << 11 | m << 7 | l + (j << 4);
-                        byte o = arg.blocks[n];
+                        byte o = arg2.blocks[n];
                         if (o == 0) continue;
                         bl = false;
                         continue block3;
@@ -67,11 +69,11 @@ public class AlphaChunkIo {
                 for (int q = 0; q < 16; ++q) {
                     for (int r = 0; r < 16; ++r) {
                         int s = p << 11 | r << 7 | q + (j << 4);
-                        byte t = arg.blocks[s];
+                        byte t = arg2.blocks[s];
                         bs[q << 8 | r << 4 | p] = (byte)(t & 0xFF);
-                        lv2.set(p, q, r, arg.data.get(p, q + (j << 4), r));
-                        lv3.set(p, q, r, arg.skyLight.get(p, q + (j << 4), r));
-                        lv4.set(p, q, r, arg.blockLight.get(p, q + (j << 4), r));
+                        lv2.set(p, q, r, arg2.data.get(p, q + (j << 4), r));
+                        lv3.set(p, q, r, arg2.skyLight.get(p, q + (j << 4), r));
+                        lv4.set(p, q, r, arg2.blockLight.get(p, q + (j << 4), r));
                     }
                 }
             }
@@ -83,14 +85,14 @@ public class AlphaChunkIo {
             lv5.putByteArray("BlockLight", lv4.asByteArray());
             lv.add(lv5);
         }
-        arg2.put("Sections", lv);
-        arg2.putIntArray("Biomes", new BiomeArray(new ChunkPos(arg.x, arg.z), arg3).toIntArray());
-        arg2.put("Entities", arg.entities);
-        arg2.put("TileEntities", arg.blockEntities);
-        if (arg.blockTicks != null) {
-            arg2.put("TileTicks", arg.blockTicks);
+        arg3.put("Sections", lv);
+        arg3.putIntArray("Biomes", new BiomeArray(arg.method_30530(Registry.BIOME_KEY), new ChunkPos(arg2.x, arg2.z), arg4).toIntArray());
+        arg3.put("Entities", arg2.entities);
+        arg3.put("TileEntities", arg2.blockEntities);
+        if (arg2.blockTicks != null) {
+            arg3.put("TileTicks", arg2.blockTicks);
         }
-        arg2.putBoolean("convertedFromAlphaFormat", true);
+        arg3.putBoolean("convertedFromAlphaFormat", true);
     }
 
     public static class AlphaChunk {

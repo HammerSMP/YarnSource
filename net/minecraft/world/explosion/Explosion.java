@@ -55,11 +55,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.DefaultExplosionBehavior;
 import net.minecraft.world.explosion.EntityExplosionBehavior;
 import net.minecraft.world.explosion.ExplosionBehavior;
 
 public class Explosion {
+    private static final ExplosionBehavior field_25818 = new ExplosionBehavior();
     private final boolean createFire;
     private final DestructionType destructionType;
     private final Random random = new Random();
@@ -105,7 +105,7 @@ public class Explosion {
     }
 
     private ExplosionBehavior chooseBehavior(@Nullable Entity arg) {
-        return arg == null ? DefaultExplosionBehavior.INSTANCE : new EntityExplosionBehavior(arg);
+        return arg == null ? field_25818 : new EntityExplosionBehavior(arg);
     }
 
     public static float getExposure(Vec3d arg, Entity arg2) {

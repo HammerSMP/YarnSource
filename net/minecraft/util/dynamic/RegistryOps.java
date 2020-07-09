@@ -26,14 +26,13 @@ import com.mojang.serialization.MapCodec;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import net.minecraft.class_5455;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.ForwardingDynamicOps;
-import net.minecraft.util.dynamic.NumberCodecs;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.registry.SimpleRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,28 +41,28 @@ public class RegistryOps<T>
 extends ForwardingDynamicOps<T> {
     private static final Logger LOGGER = LogManager.getLogger();
     private final ResourceManager resourceManager;
-    private final RegistryTracker registryTracker;
+    private final class_5455 registryTracker;
     private final Map<RegistryKey<? extends Registry<?>>, ValueHolder<?>> valueHolders = Maps.newIdentityHashMap();
 
-    public static <T> RegistryOps<T> of(DynamicOps<T> dynamicOps, ResourceManager arg, RegistryTracker arg2) {
+    public static <T> RegistryOps<T> of(DynamicOps<T> dynamicOps, ResourceManager arg, class_5455 arg2) {
         return new RegistryOps<T>(dynamicOps, arg, arg2);
     }
 
-    private RegistryOps(DynamicOps<T> dynamicOps, ResourceManager arg, RegistryTracker arg2) {
+    private RegistryOps(DynamicOps<T> dynamicOps, ResourceManager arg, class_5455 arg2) {
         super(dynamicOps);
         this.resourceManager = arg;
         this.registryTracker = arg2;
     }
 
-    protected <E> DataResult<Pair<java.util.function.Supplier<E>, T>> decodeOrId(T object, RegistryKey<Registry<E>> arg, MapCodec<E> mapCodec) {
-        Optional<MutableRegistry<E>> optional = this.registryTracker.get(arg);
+    protected <E> DataResult<Pair<java.util.function.Supplier<E>, T>> decodeOrId(T object, RegistryKey<? extends Registry<E>> arg, MapCodec<E> mapCodec) {
+        Optional optional = this.registryTracker.method_30527(arg);
         if (!optional.isPresent()) {
             return DataResult.error((String)("Unknown registry: " + arg));
         }
         MutableRegistry lv = optional.get();
         DataResult dataResult = Identifier.CODEC.decode(this.delegate, object);
         if (!dataResult.result().isPresent()) {
-            return NumberCodecs.method_29906(arg, mapCodec).codec().decode(this.delegate, object).map(pair2 -> pair2.mapFirst(pair -> {
+            return SimpleRegistry.method_30516(arg, mapCodec).codec().decode(this.delegate, object).map(pair2 -> pair2.mapFirst(pair -> {
                 lv.add((RegistryKey)pair.getFirst(), pair.getSecond());
                 lv.markLoaded((RegistryKey)pair.getFirst());
                 return ((Pair)pair)::getSecond;
@@ -74,7 +73,7 @@ extends ForwardingDynamicOps<T> {
         return this.readSupplier(arg, lv, mapCodec, lv2).map(supplier -> Pair.of((Object)supplier, (Object)pair.getSecond()));
     }
 
-    public <E> DataResult<SimpleRegistry<E>> loadToRegistry(SimpleRegistry<E> arg, RegistryKey<Registry<E>> arg2, MapCodec<E> mapCodec) {
+    public <E> DataResult<SimpleRegistry<E>> loadToRegistry(SimpleRegistry<E> arg, RegistryKey<? extends Registry<E>> arg2, MapCodec<E> mapCodec) {
         Identifier lv = arg2.getValue();
         Collection<Identifier> collection = this.resourceManager.findResources(lv, string -> string.endsWith(".json"));
         DataResult dataResult = DataResult.success(arg, (Lifecycle)Lifecycle.stable());
@@ -102,7 +101,7 @@ extends ForwardingDynamicOps<T> {
         return dataResult.setPartial(arg);
     }
 
-    private <E> DataResult<java.util.function.Supplier<E>> readSupplier(RegistryKey<Registry<E>> arg, MutableRegistry<E> arg2, MapCodec<E> mapCodec, Identifier arg3) {
+    private <E> DataResult<java.util.function.Supplier<E>> readSupplier(RegistryKey<? extends Registry<E>> arg, MutableRegistry<E> arg2, MapCodec<E> mapCodec, Identifier arg3) {
         RegistryKey lv = RegistryKey.of(arg, arg3);
         Object object2 = arg2.get(lv);
         if (object2 != null) {
@@ -121,7 +120,7 @@ extends ForwardingDynamicOps<T> {
             return object;
         });
         ((ValueHolder)lv2).values.put(lv, DataResult.success((Object)supplier));
-        DataResult<E> dataResult2 = this.readElement(arg, lv, mapCodec);
+        DataResult dataResult2 = this.readElement(arg, lv, mapCodec);
         dataResult2.result().ifPresent(object -> arg2.add(lv, object));
         DataResult dataResult3 = dataResult2.map(object -> () -> object);
         ((ValueHolder)lv2).values.put(lv, dataResult3);
@@ -131,7 +130,7 @@ extends ForwardingDynamicOps<T> {
     /*
      * Exception decompiling
      */
-    private <E> DataResult<E> readElement(RegistryKey<Registry<E>> arg, RegistryKey<E> arg2, MapCodec<E> mapCodec) {
+    private <E> DataResult<E> readElement(RegistryKey<? extends Registry<E>> arg, RegistryKey<E> arg2, MapCodec<E> mapCodec) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [1[TRYBLOCK]], but top level block is 5[TRYBLOCK]
@@ -153,7 +152,7 @@ extends ForwardingDynamicOps<T> {
         throw new IllegalStateException(Decompilation failed);
     }
 
-    private <E> ValueHolder<E> getValueHolder(RegistryKey<Registry<E>> arg2) {
+    private <E> ValueHolder<E> getValueHolder(RegistryKey<? extends Registry<E>> arg2) {
         return this.valueHolders.computeIfAbsent(arg2, arg -> new ValueHolder());
     }
 

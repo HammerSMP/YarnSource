@@ -8,6 +8,7 @@ package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
 import java.util.List;
+import net.minecraft.class_5455;
 import net.minecraft.structure.StrongholdGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructurePiece;
@@ -47,7 +48,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             StrongholdGenerator.Start lv;
             int k = 0;
             do {
@@ -65,7 +66,7 @@ extends StructureFeature<DefaultFeatureConfig> {
                     lv2.placeJigsaw(lv, this.children, this.random);
                 }
                 this.setBoundingBoxFromChildren();
-                this.method_14978(arg.getSeaLevel(), this.random, 10);
+                this.method_14978(arg2.getSeaLevel(), this.random, 10);
             } while (this.children.isEmpty() || lv.field_15283 == null);
         }
     }

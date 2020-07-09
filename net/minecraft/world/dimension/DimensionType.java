@@ -30,15 +30,15 @@ import java.util.function.Supplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
+import net.minecraft.class_5455;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.NumberCodecs;
 import net.minecraft.util.dynamic.RegistryElementCodec;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeAccessType;
@@ -52,7 +52,7 @@ import net.minecraft.world.gen.chunk.ChunkGeneratorType;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 
 public class DimensionType {
-    public static final MapCodec<DimensionType> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.fixedTime), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::hasCeiling), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::isUltrawarm), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::isNatural), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::isShrunk), (App)Codec.BOOL.fieldOf("piglin_safe").forGetter(DimensionType::isPiglinSafe), (App)Codec.BOOL.fieldOf("bed_works").forGetter(DimensionType::isBedWorking), (App)Codec.BOOL.fieldOf("respawn_anchor_works").forGetter(DimensionType::isRespawnAnchorWorking), (App)Codec.BOOL.fieldOf("has_raids").forGetter(DimensionType::hasRaids), (App)NumberCodecs.rangedInt(0, 256).fieldOf("logical_height").forGetter(DimensionType::getLogicalHeight), (App)Identifier.CODEC.fieldOf("infiniburn").forGetter(arg -> arg.infiniburn), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.ambientLight))).apply((Applicative)instance, DimensionType::new));
+    public static final MapCodec<DimensionType> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Codec.LONG.optionalFieldOf("fixed_time").xmap(optional -> optional.map(OptionalLong::of).orElseGet(OptionalLong::empty), optionalLong -> optionalLong.isPresent() ? Optional.of(optionalLong.getAsLong()) : Optional.empty()).forGetter(arg -> arg.fixedTime), (App)Codec.BOOL.fieldOf("has_skylight").forGetter(DimensionType::hasSkyLight), (App)Codec.BOOL.fieldOf("has_ceiling").forGetter(DimensionType::hasCeiling), (App)Codec.BOOL.fieldOf("ultrawarm").forGetter(DimensionType::isUltrawarm), (App)Codec.BOOL.fieldOf("natural").forGetter(DimensionType::isNatural), (App)Codec.BOOL.fieldOf("shrunk").forGetter(DimensionType::isShrunk), (App)Codec.BOOL.fieldOf("piglin_safe").forGetter(DimensionType::isPiglinSafe), (App)Codec.BOOL.fieldOf("bed_works").forGetter(DimensionType::isBedWorking), (App)Codec.BOOL.fieldOf("respawn_anchor_works").forGetter(DimensionType::isRespawnAnchorWorking), (App)Codec.BOOL.fieldOf("has_raids").forGetter(DimensionType::hasRaids), (App)Codec.intRange((int)0, (int)256).fieldOf("logical_height").forGetter(DimensionType::getLogicalHeight), (App)Identifier.CODEC.fieldOf("infiniburn").forGetter(arg -> arg.infiniburn), (App)Codec.FLOAT.fieldOf("ambient_light").forGetter(arg -> Float.valueOf(arg.ambientLight))).apply((Applicative)instance, DimensionType::new));
     public static final float[] field_24752 = new float[]{1.0f, 0.75f, 0.5f, 0.25f, 0.0f, 0.25f, 0.5f, 0.75f};
     public static final RegistryKey<DimensionType> OVERWORLD_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld"));
     public static final RegistryKey<DimensionType> THE_NETHER_REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("the_nether"));
@@ -140,11 +140,12 @@ public class DimensionType {
         return World.CODEC.parse(dynamic);
     }
 
-    public static RegistryTracker.Modifiable addRegistryDefaults(RegistryTracker.Modifiable arg) {
-        arg.addDimensionType(OVERWORLD_REGISTRY_KEY, OVERWORLD);
-        arg.addDimensionType(OVERWORLD_CAVES_REGISTRY_KEY, OVERWORLD_CAVES);
-        arg.addDimensionType(THE_NETHER_REGISTRY_KEY, THE_NETHER);
-        arg.addDimensionType(THE_END_REGISTRY_KEY, THE_END);
+    public static class_5455.class_5457 addRegistryDefaults(class_5455.class_5457 arg) {
+        MutableRegistry<DimensionType> lv = arg.method_30530(Registry.DIMENSION_TYPE_KEY);
+        lv.add(OVERWORLD_REGISTRY_KEY, OVERWORLD);
+        lv.add(OVERWORLD_CAVES_REGISTRY_KEY, OVERWORLD_CAVES);
+        lv.add(THE_NETHER_REGISTRY_KEY, THE_NETHER);
+        lv.add(THE_END_REGISTRY_KEY, THE_END);
         return arg;
     }
 

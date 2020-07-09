@@ -23,7 +23,7 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class EndSpikeFeatureConfig
 implements FeatureConfig {
-    public static final Codec<EndSpikeFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.BOOL.fieldOf("crystal_invulnerable").withDefault((Object)false).forGetter(arg -> arg.crystalInvulnerable), (App)EndSpikeFeature.Spike.CODEC.listOf().fieldOf("spikes").forGetter(arg -> arg.spikes), (App)BlockPos.field_25064.optionalFieldOf("crystal_beam_target").forGetter(arg -> Optional.ofNullable(arg.crystalBeamTarget))).apply((Applicative)instance, EndSpikeFeatureConfig::new));
+    public static final Codec<EndSpikeFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.BOOL.fieldOf("crystal_invulnerable").orElse((Object)false).forGetter(arg -> arg.crystalInvulnerable), (App)EndSpikeFeature.Spike.CODEC.listOf().fieldOf("spikes").forGetter(arg -> arg.spikes), (App)BlockPos.field_25064.optionalFieldOf("crystal_beam_target").forGetter(arg -> Optional.ofNullable(arg.crystalBeamTarget))).apply((Applicative)instance, EndSpikeFeatureConfig::new));
     private final boolean crystalInvulnerable;
     private final List<EndSpikeFeature.Spike> spikes;
     @Nullable

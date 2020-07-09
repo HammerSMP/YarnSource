@@ -85,6 +85,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
+import net.minecraft.class_5455;
+import net.minecraft.class_5464;
 import net.minecraft.command.DataCommandStorage;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.player.PlayerEntity;
@@ -147,7 +149,6 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.TickTimeTracker;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.util.snooper.SnooperListener;
@@ -178,9 +179,6 @@ import net.minecraft.world.gen.Spawner;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.SurfaceChunkGenerator;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.DefaultFeatureConfig;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.FeatureConfig;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.UnmodifiableLevelProperties;
@@ -201,7 +199,7 @@ AutoCloseable {
     protected final WorldSaveHandler field_24371;
     private final Snooper snooper = new Snooper("server", this, Util.getMeasuringTimeMs());
     private final List<Runnable> serverGuiTickables = Lists.newArrayList();
-    private TickTimeTracker tickTimeTracker = new TickTimeTracker(Util.nanoTimeSupplier, this::getTicks);
+    private final TickTimeTracker tickTimeTracker = new TickTimeTracker(Util.nanoTimeSupplier, this::getTicks);
     private Profiler profiler = DummyProfiler.INSTANCE;
     private final ServerNetworkIo networkIo;
     private final WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory;
@@ -210,7 +208,7 @@ AutoCloseable {
     private final DataFixer dataFixer;
     private String serverIp;
     private int serverPort = -1;
-    protected final RegistryTracker.Modifiable dimensionTracker;
+    protected final class_5455.class_5457 dimensionTracker;
     private final Map<RegistryKey<World>, ServerWorld> worlds = Maps.newLinkedHashMap();
     private PlayerManager playerManager;
     private volatile boolean running = true;
@@ -273,7 +271,7 @@ AutoCloseable {
         return (S)minecraftServer;
     }
 
-    public MinecraftServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, SaveProperties arg3, ResourcePackManager arg4, Proxy proxy, DataFixer dataFixer, ServerResourceManager arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
+    public MinecraftServer(Thread thread, class_5455.class_5457 arg, LevelStorage.Session arg2, SaveProperties arg3, ResourcePackManager arg4, Proxy proxy, DataFixer dataFixer, ServerResourceManager arg5, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg6, WorldGenerationProgressListenerFactory arg7) {
         super("Server");
         this.dimensionTracker = arg;
         this.saveProperties = arg3;
@@ -367,7 +365,7 @@ AutoCloseable {
             lv7 = lv4.getDimensionType();
             lv8 = lv4.getChunkGenerator();
         }
-        RegistryKey<DimensionType> lv9 = this.dimensionTracker.getDimensionTypeRegistry().getKey(lv7).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv7));
+        RegistryKey<DimensionType> lv9 = this.dimensionTracker.method_30518().getKey(lv7).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv7));
         ServerWorld lv10 = new ServerWorld(this, this.workerExecutor, this.session, lv, World.OVERWORLD, lv9, lv7, arg, lv8, bl, m, (List<Spawner>)list, true);
         this.worlds.put(World.OVERWORLD, lv10);
         PersistentStateManager lv11 = lv10.getPersistentStateManager();
@@ -404,7 +402,7 @@ AutoCloseable {
             if (lv14 == DimensionOptions.OVERWORLD) continue;
             RegistryKey<World> lv15 = RegistryKey.of(Registry.DIMENSION, lv14.getValue());
             DimensionType lv16 = entry.getValue().getDimensionType();
-            RegistryKey<DimensionType> lv17 = this.dimensionTracker.getDimensionTypeRegistry().getKey(lv16).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv16));
+            RegistryKey<DimensionType> lv17 = this.dimensionTracker.method_30518().getKey(lv16).orElseThrow(() -> new IllegalStateException("Unregistered dimension type: " + lv16));
             ChunkGenerator lv18 = entry.getValue().getChunkGenerator();
             UnmodifiableLevelProperties lv19 = new UnmodifiableLevelProperties(this.saveProperties, lv);
             ServerWorld lv20 = new ServerWorld(this, this.workerExecutor, this.session, lv19, lv15, lv17, lv16, arg, lv18, bl, m, (List<Spawner>)ImmutableList.of(), false);
@@ -459,7 +457,7 @@ AutoCloseable {
             j += l;
         }
         if (bl) {
-            ConfiguredFeature<DefaultFeatureConfig, ?> lv7 = Feature.BONUS_CHEST.configure(FeatureConfig.DEFAULT);
+            ConfiguredFeature<?, ?> lv7 = class_5464.BONUS_CHEST;
             lv7.generate(arg, lv, arg.random, new BlockPos(arg2.getSpawnX(), arg2.getSpawnY(), arg2.getSpawnZ()));
         }
     }
@@ -1053,6 +1051,8 @@ AutoCloseable {
 
     public abstract boolean isDedicated();
 
+    public abstract int method_30612();
+
     public boolean isOnlineMode() {
         return this.onlineMode;
     }
@@ -1524,6 +1524,10 @@ AutoCloseable {
 
     public SaveProperties getSaveProperties() {
         return this.saveProperties;
+    }
+
+    public class_5455 method_30611() {
+        return this.dimensionTracker;
     }
 
     @Override

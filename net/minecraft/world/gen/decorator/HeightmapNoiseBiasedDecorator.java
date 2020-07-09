@@ -11,28 +11,21 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.decorator.Decorator;
+import net.minecraft.world.gen.decorator.SimpleDecorator;
 import net.minecraft.world.gen.decorator.TopSolidHeightmapNoiseBiasedDecoratorConfig;
 
 public class HeightmapNoiseBiasedDecorator
-extends Decorator<TopSolidHeightmapNoiseBiasedDecoratorConfig> {
+extends SimpleDecorator<TopSolidHeightmapNoiseBiasedDecoratorConfig> {
     public HeightmapNoiseBiasedDecorator(Codec<TopSolidHeightmapNoiseBiasedDecoratorConfig> codec) {
         super(codec);
     }
 
     @Override
-    public Stream<BlockPos> getPositions(WorldAccess arg, ChunkGenerator arg2, Random random, TopSolidHeightmapNoiseBiasedDecoratorConfig arg3, BlockPos arg4) {
-        double d = Biome.FOLIAGE_NOISE.sample((double)arg4.getX() / arg3.noiseFactor, (double)arg4.getZ() / arg3.noiseFactor, false);
-        int i2 = (int)Math.ceil((d + arg3.noiseOffset) * (double)arg3.noiseToCountRatio);
-        return IntStream.range(0, i2).mapToObj(i -> {
-            int j = random.nextInt(16) + arg4.getX();
-            int k = random.nextInt(16) + arg4.getZ();
-            int l = arg.getTopY(arg3.heightmap, j, k);
-            return new BlockPos(j, l, k);
-        });
+    public Stream<BlockPos> getPositions(Random random, TopSolidHeightmapNoiseBiasedDecoratorConfig arg, BlockPos arg2) {
+        double d = Biome.FOLIAGE_NOISE.sample((double)arg2.getX() / arg.noiseFactor, (double)arg2.getZ() / arg.noiseFactor, false);
+        int i2 = (int)Math.ceil((d + arg.noiseOffset) * (double)arg.noiseToCountRatio);
+        return IntStream.range(0, i2).mapToObj(i -> arg2);
     }
 }
 

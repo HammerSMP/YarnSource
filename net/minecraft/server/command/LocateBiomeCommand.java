@@ -33,7 +33,7 @@ public class LocateBiomeCommand {
     }
 
     private static int execute(ServerCommandSource arg, Identifier arg2) throws CommandSyntaxException {
-        Biome lv = Registry.BIOME.getOrEmpty(arg2).orElseThrow(() -> INVALID_EXCEPTION.create((Object)arg2));
+        Biome lv = (Biome)arg.getMinecraftServer().method_30611().method_30530(Registry.BIOME_KEY).getOrEmpty(arg2).orElseThrow(() -> INVALID_EXCEPTION.create((Object)arg2));
         BlockPos lv2 = new BlockPos(arg.getPosition());
         BlockPos lv3 = arg.getWorld().locateBiome(lv, lv2, 6400, 8);
         String string = arg2.toString();

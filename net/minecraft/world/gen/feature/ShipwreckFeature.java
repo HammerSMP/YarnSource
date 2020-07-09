@@ -7,6 +7,7 @@
 package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.class_5455;
 import net.minecraft.structure.ShipwreckGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
@@ -36,10 +37,10 @@ extends StructureFeature<ShipwreckFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, ShipwreckFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, ShipwreckFeatureConfig arg5) {
             BlockRotation lv = BlockRotation.random(this.random);
             BlockPos lv2 = new BlockPos(i * 16, 90, j * 16);
-            ShipwreckGenerator.addParts(arg2, lv2, lv, this.children, this.random, arg4);
+            ShipwreckGenerator.addParts(arg3, lv2, lv, this.children, this.random, arg5);
             this.setBoundingBoxFromChildren();
         }
     }

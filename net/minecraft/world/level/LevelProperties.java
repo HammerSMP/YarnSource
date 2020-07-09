@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5455;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
@@ -44,7 +45,6 @@ import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.dynamic.DynamicSerializableUuid;
 import net.minecraft.util.dynamic.RegistryReadingOps;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -139,7 +139,7 @@ SaveProperties {
     }
 
     @Override
-    public CompoundTag cloneWorldTag(RegistryTracker arg, @Nullable CompoundTag arg2) {
+    public CompoundTag cloneWorldTag(class_5455 arg, @Nullable CompoundTag arg2) {
         this.loadPlayerData();
         if (arg2 == null) {
             arg2 = this.playerData;
@@ -149,7 +149,7 @@ SaveProperties {
         return lv;
     }
 
-    private void updateProperties(RegistryTracker arg, CompoundTag arg22, @Nullable CompoundTag arg3) {
+    private void updateProperties(class_5455 arg, CompoundTag arg22, @Nullable CompoundTag arg3) {
         ListTag lv = new ListTag();
         this.serverBrands.stream().map(StringTag::of).forEach(lv::add);
         arg22.put("ServerBrands", lv);

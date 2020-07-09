@@ -23,7 +23,7 @@ import net.minecraft.village.VillagerType;
 
 public class VillagerData {
     private static final int[] LEVEL_BASE_EXPERIENCE = new int[]{0, 10, 70, 150, 250};
-    public static final Codec<VillagerData> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Registry.VILLAGER_TYPE.fieldOf("type").withDefault(() -> VillagerType.PLAINS).forGetter(arg -> arg.type), (App)Registry.VILLAGER_PROFESSION.fieldOf("profession").withDefault(() -> VillagerProfession.NONE).forGetter(arg -> arg.profession), (App)Codec.INT.fieldOf("level").withDefault((Object)1).forGetter(arg -> arg.level)).apply((Applicative)instance, VillagerData::new));
+    public static final Codec<VillagerData> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Registry.VILLAGER_TYPE.fieldOf("type").orElseGet(() -> VillagerType.PLAINS).forGetter(arg -> arg.type), (App)Registry.VILLAGER_PROFESSION.fieldOf("profession").orElseGet(() -> VillagerProfession.NONE).forGetter(arg -> arg.profession), (App)Codec.INT.fieldOf("level").orElse((Object)1).forGetter(arg -> arg.level)).apply((Applicative)instance, VillagerData::new));
     private final VillagerType type;
     private final VillagerProfession profession;
     private final int level;

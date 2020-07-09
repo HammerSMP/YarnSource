@@ -44,6 +44,7 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import net.minecraft.Bootstrap;
+import net.minecraft.class_5455;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.Schemas;
 import net.minecraft.nbt.Tag;
@@ -69,7 +70,6 @@ import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.World;
@@ -153,7 +153,7 @@ public class Main {
                 return;
             }
             lv10.loadRegistryTags();
-            RegistryTracker.Modifiable lv11 = RegistryTracker.create();
+            class_5455.class_5457 lv11 = class_5455.method_30528();
             RegistryOps<Tag> lv12 = RegistryOps.of(NbtOps.INSTANCE, lv10.getResourceManager(), lv11);
             SaveProperties lv13 = lv5.readLevelProperties(lv12, lv8);
             if (lv13 == null) {
@@ -216,7 +216,7 @@ public class Main {
         }
     }
 
-    private static /* synthetic */ MinecraftDedicatedServer method_29734(RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, OptionSet optionSet, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, Thread thread) {
+    private static /* synthetic */ MinecraftDedicatedServer method_29734(class_5455.class_5457 arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, OptionSet optionSet, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, Thread thread) {
         boolean bl;
         MinecraftDedicatedServer lv = new MinecraftDedicatedServer(thread, arg, arg2, arg3, arg4, arg5, arg6, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, arg7, WorldGenerationProgressLogger::new);
         lv.setServerName((String)optionSet.valueOf(optionSpec));

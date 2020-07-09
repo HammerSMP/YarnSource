@@ -73,7 +73,7 @@ public class ItemStringReader {
     public void readItem() throws CommandSyntaxException {
         int i = this.reader.getCursor();
         Identifier lv = Identifier.fromCommandInput(this.reader);
-        this.item = (Item)Registry.ITEM.getOrEmpty(lv).orElseThrow(() -> {
+        this.item = Registry.ITEM.getOrEmpty(lv).orElseThrow(() -> {
             this.reader.setCursor(i);
             return ID_INVALID_EXCEPTION.createWithContext((ImmutableStringReader)this.reader, (Object)lv.toString());
         });

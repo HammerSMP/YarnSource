@@ -7,6 +7,7 @@
 package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.class_5455;
 import net.minecraft.structure.DesertTempleGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
@@ -34,7 +35,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             DesertTempleGenerator lv = new DesertTempleGenerator(this.random, i * 16, j * 16);
             this.children.add(lv);
             this.setBoundingBoxFromChildren();

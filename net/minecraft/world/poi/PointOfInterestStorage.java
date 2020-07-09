@@ -73,7 +73,10 @@ extends SerializingRegionBasedStorage<PointOfInterestSet> {
 
     public Stream<PointOfInterest> getInSquare(Predicate<PointOfInterestType> predicate, BlockPos arg, int i, OccupationStatus arg22) {
         int j = Math.floorDiv(i, 16) + 1;
-        return ChunkPos.stream(new ChunkPos(arg), j).flatMap(arg2 -> this.getInChunk(predicate, (ChunkPos)arg2, arg22));
+        return ChunkPos.stream(new ChunkPos(arg), j).flatMap(arg2 -> this.getInChunk(predicate, (ChunkPos)arg2, arg22)).filter(arg2 -> {
+            BlockPos lv = arg2.getPos();
+            return Math.abs(lv.getX() - arg.getX()) <= i && Math.abs(lv.getZ() - arg.getZ()) <= i;
+        });
     }
 
     public Stream<PointOfInterest> getInCircle(Predicate<PointOfInterestType> predicate, BlockPos arg, int i, OccupationStatus arg22) {

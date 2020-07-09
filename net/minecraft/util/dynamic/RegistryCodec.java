@@ -25,14 +25,14 @@ import net.minecraft.util.registry.SimpleRegistry;
 public final class RegistryCodec<E>
 implements Codec<SimpleRegistry<E>> {
     private final Codec<SimpleRegistry<E>> delegate;
-    private final RegistryKey<Registry<E>> registryRef;
+    private final RegistryKey<? extends Registry<E>> registryRef;
     private final MapCodec<E> elementCodec;
 
-    public static <E> RegistryCodec<E> of(RegistryKey<Registry<E>> arg, Lifecycle lifecycle, MapCodec<E> mapCodec) {
+    public static <E> RegistryCodec<E> of(RegistryKey<? extends Registry<E>> arg, Lifecycle lifecycle, MapCodec<E> mapCodec) {
         return new RegistryCodec<E>(arg, lifecycle, mapCodec);
     }
 
-    private RegistryCodec(RegistryKey<Registry<E>> arg, Lifecycle lifecycle, MapCodec<E> mapCodec) {
+    private RegistryCodec(RegistryKey<? extends Registry<E>> arg, Lifecycle lifecycle, MapCodec<E> mapCodec) {
         this.delegate = SimpleRegistry.createEmptyCodec(arg, lifecycle, mapCodec);
         this.registryRef = arg;
         this.elementCodec = mapCodec;
@@ -51,7 +51,7 @@ implements Codec<SimpleRegistry<E>> {
     }
 
     public String toString() {
-        return "RegistryDapaPackCodec[" + this.delegate + " " + this.registryRef + " " + this.elementCodec + "]";
+        return "RegistryDataPackCodec[" + this.delegate + " " + this.registryRef + " " + this.elementCodec + "]";
     }
 
     public /* synthetic */ DataResult encode(Object object, DynamicOps dynamicOps, Object object2) {

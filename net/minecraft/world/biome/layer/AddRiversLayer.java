@@ -3,7 +3,7 @@
  */
 package net.minecraft.world.biome.layer;
 
-import net.minecraft.util.registry.Registry;
+import net.minecraft.class_5458;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.layer.BiomeLayers;
 import net.minecraft.world.biome.layer.type.MergingLayer;
@@ -42,11 +42,11 @@ IdentityCoordinateTransformer
     }
 
     static {
-        FROZEN_RIVER_ID = Registry.BIOME.getRawId(Biomes.FROZEN_RIVER);
-        SNOWY_TUNDRA_ID = Registry.BIOME.getRawId(Biomes.SNOWY_TUNDRA);
-        MUSHROOM_FIELDS_ID = Registry.BIOME.getRawId(Biomes.MUSHROOM_FIELDS);
-        MUSHROOM_FIELD_SHORE_ID = Registry.BIOME.getRawId(Biomes.MUSHROOM_FIELD_SHORE);
-        RIVER_ID = Registry.BIOME.getRawId(Biomes.RIVER);
+        FROZEN_RIVER_ID = class_5458.field_25933.getRawId(Biomes.FROZEN_RIVER);
+        SNOWY_TUNDRA_ID = class_5458.field_25933.getRawId(Biomes.SNOWY_TUNDRA);
+        MUSHROOM_FIELDS_ID = class_5458.field_25933.getRawId(Biomes.MUSHROOM_FIELDS);
+        MUSHROOM_FIELD_SHORE_ID = class_5458.field_25933.getRawId(Biomes.MUSHROOM_FIELD_SHORE);
+        RIVER_ID = class_5458.field_25933.getRawId(Biomes.RIVER);
     }
 }
 

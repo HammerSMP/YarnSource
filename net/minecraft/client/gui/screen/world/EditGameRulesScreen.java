@@ -211,14 +211,10 @@ extends Screen {
 
                 @Override
                 protected MutableText getNarrationMessage() {
-                    return BooleanRuleWidget.this.createBooleanRuleText(arg22, arg3.get()).shallowCopy().append("\n").append(string);
+                    return ScreenTexts.method_30619(arg22, arg3.get()).append("\n").append(string);
                 }
             };
             this.children.add(this.toggleButton);
-        }
-
-        private MutableText createBooleanRuleText(Text arg, boolean bl) {
-            return new LiteralText("").append(arg).append(": ").append(ScreenTexts.getToggleText(bl));
         }
 
         @Override

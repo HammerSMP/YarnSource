@@ -21,6 +21,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.EndPortalBlockEntity;
+import net.minecraft.class_5464;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +43,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.feature.EndGatewayFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.FeatureConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -111,7 +111,7 @@ implements Tickable {
     }
 
     public static boolean method_30276(Entity arg) {
-        return EntityPredicates.EXCEPT_SPECTATOR.test(arg) && !arg.getRootVehicle().method_30230();
+        return EntityPredicates.EXCEPT_SPECTATOR.test(arg) && !arg.getRootVehicle().isReadyToGoThroughPortal();
     }
 
     public boolean isRecentlyGenerated() {
@@ -186,7 +186,7 @@ implements Tickable {
             } else {
                 lv5 = arg.getRootVehicle();
             }
-            lv5.method_30229();
+            lv5.resetNetherPortalCooldown();
             lv5.teleport((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
         this.startTeleportCooldown();
@@ -217,7 +217,7 @@ implements Tickable {
         if (this.exitPortalPos == null) {
             this.exitPortalPos = new BlockPos(lv2.x + 0.5, 75.0, lv2.z + 0.5);
             LOGGER.debug("Failed to find suitable block, settling on {}", (Object)this.exitPortalPos);
-            Feature.END_ISLAND.configure(FeatureConfig.DEFAULT).generate(arg, arg.getChunkManager().getChunkGenerator(), new Random(this.exitPortalPos.asLong()), this.exitPortalPos);
+            class_5464.END_ISLAND.generate(arg, arg.getChunkManager().getChunkGenerator(), new Random(this.exitPortalPos.asLong()), this.exitPortalPos);
         } else {
             LOGGER.debug("Found block at {}", (Object)this.exitPortalPos);
         }

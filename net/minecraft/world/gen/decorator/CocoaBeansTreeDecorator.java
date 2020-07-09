@@ -23,7 +23,7 @@ import net.minecraft.world.gen.feature.Feature;
 
 public class CocoaBeansTreeDecorator
 extends TreeDecorator {
-    public static final Codec<CocoaBeansTreeDecorator> CODEC = Codec.FLOAT.fieldOf("probability").xmap(CocoaBeansTreeDecorator::new, arg -> Float.valueOf(arg.field_21318)).codec();
+    public static final Codec<CocoaBeansTreeDecorator> CODEC = Codec.floatRange((float)0.0f, (float)1.0f).fieldOf("probability").xmap(CocoaBeansTreeDecorator::new, arg -> Float.valueOf(arg.field_21318)).codec();
     private final float field_21318;
 
     public CocoaBeansTreeDecorator(float f) {

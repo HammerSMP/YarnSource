@@ -26,6 +26,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.ParsableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class Texts {
@@ -110,7 +111,7 @@ public class Texts {
     }
 
     public static MutableText bracketed(Text arg) {
-        return new LiteralText("[").append(arg).append("]");
+        return new TranslatableText("chat.square_brackets", arg);
     }
 
     public static Text toText(Message message) {

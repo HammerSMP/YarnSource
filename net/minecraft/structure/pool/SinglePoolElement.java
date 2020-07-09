@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.StructureBlockMode;
 import net.minecraft.structure.Structure;
@@ -54,7 +55,7 @@ extends StructurePoolElement {
     private static final Codec<Either<Identifier, Structure>> field_24951 = Codec.of(SinglePoolElement::method_28877, (Decoder)Identifier.CODEC.map(Either::left));
     public static final Codec<SinglePoolElement> field_24952 = RecordCodecBuilder.create(instance -> instance.group(SinglePoolElement.method_28882(), SinglePoolElement.method_28880(), SinglePoolElement.method_28883()).apply((Applicative)instance, SinglePoolElement::new));
     protected final Either<Identifier, Structure> field_24015;
-    protected final ImmutableList<StructureProcessor> processors;
+    protected final Supplier<ImmutableList<StructureProcessor>> processors;
 
     private static <T> DataResult<T> method_28877(Either<Identifier, Structure> either, DynamicOps<T> dynamicOps, T object) {
         Optional optional = either.left();
@@ -64,32 +65,22 @@ extends StructurePoolElement {
         return Identifier.CODEC.encode(optional.get(), dynamicOps, object);
     }
 
-    protected static <E extends SinglePoolElement> RecordCodecBuilder<E, List<StructureProcessor>> method_28880() {
-        return StructureProcessorType.CODEC.listOf().fieldOf("processors").forGetter(arg -> arg.processors);
+    protected static <E extends SinglePoolElement> RecordCodecBuilder<E, Supplier<ImmutableList<StructureProcessor>>> method_28880() {
+        return StructureProcessorType.field_25877.fieldOf("processors").forGetter(arg -> arg.processors);
     }
 
     protected static <E extends SinglePoolElement> RecordCodecBuilder<E, Either<Identifier, Structure>> method_28882() {
         return field_24951.fieldOf("location").forGetter(arg -> arg.field_24015);
     }
 
-    @Deprecated
-    public SinglePoolElement(String string, List<StructureProcessor> list) {
-        this((Either<Identifier, Structure>)Either.left((Object)new Identifier(string)), list, StructurePool.Projection.RIGID);
-    }
-
-    protected SinglePoolElement(Either<Identifier, Structure> either, List<StructureProcessor> list, StructurePool.Projection arg) {
+    protected SinglePoolElement(Either<Identifier, Structure> either, Supplier<ImmutableList<StructureProcessor>> supplier, StructurePool.Projection arg) {
         super(arg);
         this.field_24015 = either;
-        this.processors = ImmutableList.copyOf(list);
+        this.processors = supplier;
     }
 
-    public SinglePoolElement(Structure arg, List<StructureProcessor> list, StructurePool.Projection arg2) {
-        this((Either<Identifier, Structure>)Either.right((Object)arg), list, arg2);
-    }
-
-    @Deprecated
-    public SinglePoolElement(String string) {
-        this(string, (List<StructureProcessor>)ImmutableList.of());
+    public SinglePoolElement(Structure arg) {
+        this((Either<Identifier, Structure>)Either.right((Object)arg), ImmutableList::of, StructurePool.Projection.RIGID);
     }
 
     private Structure method_27233(StructureManager arg) {
@@ -147,7 +138,7 @@ extends StructurePoolElement {
         if (!bl) {
             lv.addProcessor(JigsawReplacementStructureProcessor.INSTANCE);
         }
-        this.processors.forEach(lv::addProcessor);
+        this.processors.get().forEach(lv::addProcessor);
         this.getProjection().getProcessors().forEach(lv::addProcessor);
         return lv;
     }

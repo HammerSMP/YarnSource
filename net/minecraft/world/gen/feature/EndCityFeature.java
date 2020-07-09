@@ -8,6 +8,7 @@ package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
 import java.util.Random;
+import net.minecraft.class_5455;
 import net.minecraft.structure.EndCityGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
@@ -73,14 +74,14 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             BlockRotation lv = BlockRotation.random(this.random);
-            int k = EndCityFeature.getGenerationHeight(i, j, arg);
+            int k = EndCityFeature.getGenerationHeight(i, j, arg2);
             if (k < 60) {
                 return;
             }
             BlockPos lv2 = new BlockPos(i * 16 + 8, k, j * 16 + 8);
-            EndCityGenerator.addPieces(arg2, lv2, lv, this.children, this.random);
+            EndCityGenerator.addPieces(arg3, lv2, lv, this.children, this.random);
             this.setBoundingBoxFromChildren();
         }
     }

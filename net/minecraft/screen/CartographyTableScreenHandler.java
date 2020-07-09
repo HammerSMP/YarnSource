@@ -25,7 +25,6 @@ import net.minecraft.util.math.BlockPos;
 public class CartographyTableScreenHandler
 extends ScreenHandler {
     private final ScreenHandlerContext context;
-    private boolean currentlyTakingItem;
     private long lastTakeResultTime;
     public final Inventory inventory = new SimpleInventory(2){
 
@@ -74,29 +73,9 @@ extends ScreenHandler {
             }
 
             @Override
-            public ItemStack takeStack(int i) {
-                ItemStack lv = super.takeStack(i);
-                ItemStack lv2 = arg2.run((arg2, arg3) -> {
-                    ItemStack lv;
-                    if (!CartographyTableScreenHandler.this.currentlyTakingItem && CartographyTableScreenHandler.this.inventory.getStack(1).getItem() == Items.GLASS_PANE && (lv = FilledMapItem.copyMap(arg2, CartographyTableScreenHandler.this.inventory.getStack(0))) != null) {
-                        lv.setCount(1);
-                        return lv;
-                    }
-                    return lv;
-                }).orElse(lv);
-                CartographyTableScreenHandler.this.inventory.removeStack(0, 1);
-                CartographyTableScreenHandler.this.inventory.removeStack(1, 1);
-                return lv2;
-            }
-
-            @Override
-            protected void onCrafted(ItemStack arg, int i) {
-                this.takeStack(i);
-                super.onCrafted(arg, i);
-            }
-
-            @Override
             public ItemStack onTakeItem(PlayerEntity arg3, ItemStack arg22) {
+                ((Slot)CartographyTableScreenHandler.this.slots.get(0)).takeStack(1);
+                ((Slot)CartographyTableScreenHandler.this.slots.get(1)).takeStack(1);
                 arg22.getItem().onCraft(arg22, arg3.world, arg3);
                 arg2.run((arg, arg2) -> {
                     long l = arg.getTime();
@@ -151,6 +130,7 @@ extends ScreenHandler {
             } else if (lv == Items.GLASS_PANE && !lv2.locked) {
                 ItemStack lv4 = arg.copy();
                 lv4.setCount(1);
+                lv4.getOrCreateTag().putBoolean("map_to_lock", true);
                 this.sendContentUpdates();
             } else if (lv == Items.MAP) {
                 ItemStack lv5 = arg.copy();
@@ -183,16 +163,6 @@ extends ScreenHandler {
             Item lv5 = lv4.getItem();
             lv = lv4.copy();
             if (i == 2) {
-                if (this.inventory.getStack(1).getItem() == Items.GLASS_PANE) {
-                    lv4 = this.context.run((arg2, arg3) -> {
-                        ItemStack lv = FilledMapItem.copyMap(arg2, this.inventory.getStack(0));
-                        if (lv != null) {
-                            lv.setCount(1);
-                            return lv;
-                        }
-                        return lv3;
-                    }).orElse(lv4);
-                }
                 lv5.onCraft(lv4, arg.world, arg);
                 if (!this.insertItem(lv4, 3, 39, true)) {
                     return ItemStack.EMPTY;
@@ -208,9 +178,7 @@ extends ScreenHandler {
             if (lv4.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            this.currentlyTakingItem = true;
             lv2.onTakeItem(arg, lv4);
-            this.currentlyTakingItem = false;
             this.sendContentUpdates();
         }
         return lv;

@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.entity.SkullBlockEntity;
+import net.minecraft.class_5455;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
@@ -66,7 +67,6 @@ import net.minecraft.util.logging.UncaughtExceptionHandler;
 import net.minecraft.util.logging.UncaughtExceptionLogger;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.util.snooper.Snooper;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -89,7 +89,7 @@ implements DedicatedServer {
     @Nullable
     private DedicatedServerGui gui;
 
-    public MinecraftDedicatedServer(Thread thread, RegistryTracker.Modifiable arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
+    public MinecraftDedicatedServer(Thread thread, class_5455.class_5457 arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, WorldGenerationProgressListenerFactory arg8) {
         super(thread, arg, arg2, arg5, arg3, Proxy.NO_PROXY, dataFixer, arg4, minecraftSessionService, gameProfileRepository, arg7, arg8);
         this.propertiesLoader = arg6;
         this.rconCommandOutput = new RconCommandOutput(this);
@@ -322,6 +322,11 @@ implements DedicatedServer {
     @Override
     public boolean isDedicated() {
         return true;
+    }
+
+    @Override
+    public int method_30612() {
+        return this.getProperties().rateLimit;
     }
 
     @Override

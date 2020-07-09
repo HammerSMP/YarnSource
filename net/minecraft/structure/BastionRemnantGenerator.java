@@ -2,34 +2,28 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableMap
+ *  com.google.common.collect.ImmutableList
+ *  com.mojang.datafixers.util.Pair
  */
 package net.minecraft.structure;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
+import com.mojang.datafixers.util.Pair;
 import java.util.List;
-import net.minecraft.nbt.CompoundTag;
+import java.util.function.Function;
+import net.minecraft.class_5468;
+import net.minecraft.class_5469;
 import net.minecraft.structure.BastionBridgeData;
 import net.minecraft.structure.BastionData;
 import net.minecraft.structure.BastionTreasureData;
 import net.minecraft.structure.BastionUnitsData;
 import net.minecraft.structure.HoglinStableData;
-import net.minecraft.structure.PoolStructurePiece;
-import net.minecraft.structure.StructureManager;
-import net.minecraft.structure.StructurePiece;
-import net.minecraft.structure.StructurePieceType;
-import net.minecraft.structure.pool.StructurePoolBasedGenerator;
+import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolElement;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.ChunkRandom;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.feature.BastionRemnantFeatureConfig;
-import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
+import net.minecraft.util.Identifier;
 
 public class BastionRemnantGenerator {
-    public static final ImmutableMap<String, Integer> START_POOLS_TO_SIZES = ImmutableMap.builder().put((Object)"bastion/units/base", (Object)60).put((Object)"bastion/hoglin_stable/origin", (Object)60).put((Object)"bastion/treasure/starters", (Object)60).put((Object)"bastion/bridge/start", (Object)60).build();
+    public static final StructurePool field_25941 = class_5468.method_30600(new StructurePool(new Identifier("bastion/starts"), new Identifier("empty"), (List<Pair<Function<StructurePool.Projection, ? extends StructurePoolElement>, Integer>>)ImmutableList.of((Object)Pair.of(StructurePoolElement.method_30435("bastion/units/air_base", class_5469.BASTION_GENERIC_DEGRADATION), (Object)1), (Object)Pair.of(StructurePoolElement.method_30435("bastion/hoglin_stable/air_base", class_5469.BASTION_GENERIC_DEGRADATION), (Object)1), (Object)Pair.of(StructurePoolElement.method_30435("bastion/treasure/big_air_full", class_5469.BASTION_GENERIC_DEGRADATION), (Object)1), (Object)Pair.of(StructurePoolElement.method_30435("bastion/bridge/starting_pieces/entrance_base", class_5469.BASTION_GENERIC_DEGRADATION), (Object)1)), StructurePool.Projection.RIGID));
 
     public static void init() {
         BastionUnitsData.init();
@@ -37,23 +31,6 @@ public class BastionRemnantGenerator {
         BastionTreasureData.init();
         BastionBridgeData.init();
         BastionData.init();
-    }
-
-    public static void addPieces(ChunkGenerator arg, StructureManager arg2, BlockPos arg3, List<StructurePiece> list, ChunkRandom arg4, BastionRemnantFeatureConfig arg5) {
-        BastionRemnantGenerator.init();
-        StructurePoolFeatureConfig lv = arg5.getRandom(arg4);
-        StructurePoolBasedGenerator.addPieces(lv.startPool, lv.size, Piece::new, arg, arg2, arg3, list, arg4, false, false);
-    }
-
-    public static class Piece
-    extends PoolStructurePiece {
-        public Piece(StructureManager arg, StructurePoolElement arg2, BlockPos arg3, int i, BlockRotation arg4, BlockBox arg5) {
-            super(StructurePieceType.BASTION_REMNANT, arg, arg2, arg3, i, arg4, arg5);
-        }
-
-        public Piece(StructureManager arg, CompoundTag arg2) {
-            super(arg, arg2, StructurePieceType.BASTION_REMNANT);
-        }
     }
 }
 

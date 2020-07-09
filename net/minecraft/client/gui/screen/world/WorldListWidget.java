@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
@@ -66,7 +67,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
@@ -179,7 +179,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             this.level = arg3;
             this.client = MinecraftClient.getInstance();
             String string = arg3.getName();
-            this.iconLocation = new Identifier("worlds/" + Util.method_30309(string) + "/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)string) + "/icon");
+            this.iconLocation = new Identifier("minecraft", "worlds/" + Util.method_30309(string, Identifier::method_29184) + "/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)string) + "/icon");
             this.iconFile = arg3.getFile();
             if (!this.iconFile.isFile()) {
                 this.iconFile = null;
@@ -342,16 +342,17 @@ extends AlwaysSelectedEntryListWidget<Entry> {
 
         public void recreate() {
             this.method_29990();
-            RegistryTracker.Modifiable lv = RegistryTracker.create();
+            class_5455.class_5457 lv = class_5455.method_30528();
             try (LevelStorage.Session lv2 = this.client.getLevelStorage().createSession(this.level.getName());
-                 MinecraftClient.IntegratedResourceManager lv3 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, lv2);){
+                 MinecraftClient.IntegratedResourceManager lv3 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, class_5455.class_5457, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, lv2);){
                 LevelInfo lv4 = lv3.getSaveProperties().getLevelInfo();
-                GeneratorOptions lv5 = lv3.getSaveProperties().getGeneratorOptions();
+                DataPackSettings lv5 = lv4.method_29558();
+                GeneratorOptions lv6 = lv3.getSaveProperties().getGeneratorOptions();
                 Path path = CreateWorldScreen.method_29685(lv2.getDirectory(WorldSavePath.DATAPACKS), this.client);
-                if (lv5.isLegacyCustomizedType()) {
-                    this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? new CreateWorldScreen(this.screen, lv4, lv5, path, lv) : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
+                if (lv6.isLegacyCustomizedType()) {
+                    this.client.openScreen(new ConfirmScreen(bl -> this.client.openScreen(bl ? new CreateWorldScreen(this.screen, lv4, lv6, path, lv5, lv) : this.screen), new TranslatableText("selectWorld.recreate.customized.title"), new TranslatableText("selectWorld.recreate.customized.text"), ScreenTexts.PROCEED, ScreenTexts.CANCEL));
                 } else {
-                    this.client.openScreen(new CreateWorldScreen(this.screen, lv4, lv5, path, lv));
+                    this.client.openScreen(new CreateWorldScreen(this.screen, lv4, lv6, path, lv5, lv));
                 }
             }
             catch (Exception exception) {

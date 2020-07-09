@@ -2,7 +2,6 @@
  * Decompiled with CFR 0.149.
  * 
  * Could not load the following classes:
- *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Lists
  *  javax.annotation.Nullable
  *  net.fabricmc.api.EnvType
@@ -10,11 +9,9 @@
  */
 package net.minecraft.block.entity;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nullable;
@@ -30,12 +27,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructureManager;
-import net.minecraft.structure.StructurePieceType;
 import net.minecraft.structure.pool.SinglePoolElement;
-import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolBasedGenerator;
-import net.minecraft.structure.pool.StructurePoolElement;
-import net.minecraft.structure.processor.StructureProcessor;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -146,22 +139,11 @@ extends BlockEntity {
         ArrayList list = Lists.newArrayList();
         Structure lv5 = new Structure();
         lv5.saveFromWorld(arg, lv4, new BlockPos(1, 1, 1), false, null);
-        SinglePoolElement lv6 = new SinglePoolElement(lv5, (List<StructureProcessor>)ImmutableList.of(), StructurePool.Projection.RIGID);
-        RuntimeStructurePiece lv7 = new RuntimeStructurePiece(lv2, lv6, lv4, 1, BlockRotation.NONE, new BlockBox(lv4, lv4));
-        StructurePoolBasedGenerator.method_27230(lv7, i, RuntimeStructurePiece::new, lv, lv2, list, random);
+        SinglePoolElement lv6 = new SinglePoolElement(lv5);
+        PoolStructurePiece lv7 = new PoolStructurePiece(lv2, lv6, lv4, 1, BlockRotation.NONE, new BlockBox(lv4, lv4));
+        StructurePoolBasedGenerator.method_27230(arg.method_30349(), lv7, i, PoolStructurePiece::new, lv, lv2, list, random);
         for (PoolStructurePiece lv8 : list) {
             lv8.method_27236(arg, lv3, lv, random, BlockBox.infinite(), lv4, bl);
-        }
-    }
-
-    public static final class RuntimeStructurePiece
-    extends PoolStructurePiece {
-        public RuntimeStructurePiece(StructureManager arg, StructurePoolElement arg2, BlockPos arg3, int i, BlockRotation arg4, BlockBox arg5) {
-            super(StructurePieceType.RUNTIME, arg, arg2, arg3, i, arg4, arg5);
-        }
-
-        public RuntimeStructurePiece(StructureManager arg, CompoundTag arg2) {
-            super(arg, arg2, StructurePieceType.RUNTIME);
         }
     }
 

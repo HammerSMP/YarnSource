@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.util.Set;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -31,7 +31,7 @@ implements Packet<ClientPlayPacketListener> {
     private GameMode gameMode;
     private GameMode field_25713;
     private Set<RegistryKey<World>> field_25320;
-    private RegistryTracker.Modifiable dimensionTracker;
+    private class_5455.class_5457 dimensionTracker;
     private RegistryKey<DimensionType> field_25321;
     private RegistryKey<World> dimensionId;
     private int maxPlayers;
@@ -44,7 +44,7 @@ implements Packet<ClientPlayPacketListener> {
     public GameJoinS2CPacket() {
     }
 
-    public GameJoinS2CPacket(int i, GameMode arg, GameMode arg2, long l, boolean bl, Set<RegistryKey<World>> set, RegistryTracker.Modifiable arg3, RegistryKey<DimensionType> arg4, RegistryKey<World> arg5, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
+    public GameJoinS2CPacket(int i, GameMode arg, GameMode arg2, long l, boolean bl, Set<RegistryKey<World>> set, class_5455.class_5457 arg3, RegistryKey<DimensionType> arg4, RegistryKey<World> arg5, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
         this.playerEntityId = i;
         this.field_25320 = set;
         this.dimensionTracker = arg3;
@@ -73,7 +73,7 @@ implements Packet<ClientPlayPacketListener> {
         for (int j = 0; j < i; ++j) {
             this.field_25320.add(RegistryKey.of(Registry.DIMENSION, arg.readIdentifier()));
         }
-        this.dimensionTracker = arg.decode(RegistryTracker.Modifiable.CODEC);
+        this.dimensionTracker = arg.decode(class_5455.class_5457.field_25923);
         this.field_25321 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
         this.dimensionId = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
         this.sha256Seed = arg.readLong();
@@ -95,7 +95,7 @@ implements Packet<ClientPlayPacketListener> {
         for (RegistryKey<World> lv : this.field_25320) {
             arg.writeIdentifier(lv.getValue());
         }
-        arg.encode(RegistryTracker.Modifiable.CODEC, this.dimensionTracker);
+        arg.encode(class_5455.class_5457.field_25923, this.dimensionTracker);
         arg.writeIdentifier(this.field_25321.getValue());
         arg.writeIdentifier(this.dimensionId.getValue());
         arg.writeLong(this.sha256Seed);
@@ -143,7 +143,7 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public RegistryTracker getDimension() {
+    public class_5455 getDimension() {
         return this.dimensionTracker;
     }
 

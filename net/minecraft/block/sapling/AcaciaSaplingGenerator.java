@@ -9,9 +9,8 @@ package net.minecraft.block.sapling;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.sapling.SaplingGenerator;
+import net.minecraft.class_5464;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 
 public class AcaciaSaplingGenerator
@@ -19,7 +18,7 @@ extends SaplingGenerator {
     @Override
     @Nullable
     protected ConfiguredFeature<TreeFeatureConfig, ?> createTreeFeature(Random random, boolean bl) {
-        return Feature.TREE.configure(DefaultBiomeFeatures.ACACIA_TREE_CONFIG);
+        return class_5464.ACACIA;
     }
 }
 

@@ -54,10 +54,8 @@ extends Enchantment {
                 arg22.damage(DamageSource.thorns(arg2), ThornsEnchantment.getDamageAmount(i, random));
             }
             if (entry != null) {
-                entry.getValue().damage(3, arg2, arg -> arg.sendEquipmentBreakStatus((EquipmentSlot)((Object)((Object)entry.getKey()))));
+                entry.getValue().damage(2, arg2, arg -> arg.sendEquipmentBreakStatus((EquipmentSlot)((Object)((Object)entry.getKey()))));
             }
-        } else if (entry != null) {
-            entry.getValue().damage(1, arg2, arg -> arg.sendEquipmentBreakStatus((EquipmentSlot)((Object)((Object)entry.getKey()))));
         }
     }
 

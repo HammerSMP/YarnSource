@@ -8,6 +8,8 @@ package net.minecraft.world.biome;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import net.minecraft.class_5470;
+import net.minecraft.class_5471;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.sound.BiomeMoodSound;
@@ -17,17 +19,16 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.gen.ChunkRandom;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
-import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 
 public final class FrozenOceanBiome
 extends Biome {
     protected static final OctaveSimplexNoiseSampler field_9487 = new OctaveSimplexNoiseSampler(new ChunkRandom(3456L), (List<Integer>)ImmutableList.of((Object)-2, (Object)-1, (Object)0));
 
     public FrozenOceanBiome() {
-        super(new Biome.Settings().configureSurfaceBuilder(SurfaceBuilder.FROZEN_OCEAN, SurfaceBuilder.GRASS_CONFIG).precipitation(Biome.Precipitation.SNOW).category(Biome.Category.OCEAN).depth(-1.0f).scale(0.1f).temperature(0.0f).downfall(0.5f).effects(new BiomeEffects.Builder().waterColor(3750089).waterFogColor(329011).fogColor(12638463).moodSound(BiomeMoodSound.CAVE).build()).parent(null));
-        this.addStructureFeature(DefaultBiomeFeatures.COLD_OCEAN_RUIN);
+        super(new Biome.Settings().configureSurfaceBuilder(class_5471.FROZEN_OCEAN).precipitation(Biome.Precipitation.SNOW).category(Biome.Category.OCEAN).depth(-1.0f).scale(0.1f).temperature(0.0f).downfall(0.5f).effects(new BiomeEffects.Builder().waterColor(3750089).waterFogColor(329011).fogColor(12638463).moodSound(BiomeMoodSound.CAVE).build()).parent(null));
+        this.addStructureFeature(class_5470.OCEAN_RUIN_COLD);
         DefaultBiomeFeatures.addOceanStructures(this);
-        this.addStructureFeature(DefaultBiomeFeatures.OCEAN_RUINED_PORTAL);
+        this.addStructureFeature(class_5470.RUINED_PORTAL_OCEAN);
         DefaultBiomeFeatures.addOceanCarvers(this);
         DefaultBiomeFeatures.addDefaultLakes(this);
         DefaultBiomeFeatures.addIcebergs(this);
@@ -46,16 +47,8 @@ extends Biome {
         this.addSpawn(SpawnGroup.WATER_CREATURE, new Biome.SpawnEntry(EntityType.SQUID, 1, 1, 4));
         this.addSpawn(SpawnGroup.WATER_AMBIENT, new Biome.SpawnEntry(EntityType.SALMON, 15, 1, 5));
         this.addSpawn(SpawnGroup.CREATURE, new Biome.SpawnEntry(EntityType.POLAR_BEAR, 1, 1, 2));
-        this.addSpawn(SpawnGroup.AMBIENT, new Biome.SpawnEntry(EntityType.BAT, 10, 8, 8));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.SPIDER, 100, 4, 4));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.ZOMBIE, 95, 4, 4));
+        DefaultBiomeFeatures.method_30581(this);
         this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.DROWNED, 5, 1, 1));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.ZOMBIE_VILLAGER, 5, 1, 1));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.SKELETON, 100, 4, 4));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.CREEPER, 100, 4, 4));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.SLIME, 100, 4, 4));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.ENDERMAN, 10, 1, 4));
-        this.addSpawn(SpawnGroup.MONSTER, new Biome.SpawnEntry(EntityType.WITCH, 5, 1, 1));
     }
 
     @Override

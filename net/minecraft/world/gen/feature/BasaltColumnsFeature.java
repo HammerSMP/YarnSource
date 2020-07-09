@@ -34,19 +34,18 @@ extends Feature<BasaltColumnsFeatureConfig> {
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, BasaltColumnsFeatureConfig arg4) {
         int i = arg2.getSeaLevel();
-        BlockPos lv = BasaltColumnsFeature.method_27094(arg, i, arg3.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), Integer.MAX_VALUE);
-        if (lv == null) {
+        if (!BasaltColumnsFeature.method_30379(arg, i, arg3.mutableCopy())) {
             return false;
         }
-        int j = BasaltColumnsFeature.method_27099(random, arg4);
+        int j = arg4.method_30394().method_30321(random);
         boolean bl = random.nextFloat() < 0.9f;
         int k = Math.min(j, bl ? 5 : 8);
         int l = bl ? 50 : 15;
         boolean bl2 = false;
-        for (BlockPos lv2 : BlockPos.method_27156(random, l, lv.getX() - k, lv.getY(), lv.getZ() - k, lv.getX() + k, lv.getY(), lv.getZ() + k)) {
-            int m = j - lv2.getManhattanDistance(lv);
+        for (BlockPos lv : BlockPos.method_27156(random, l, arg3.getX() - k, arg3.getY(), arg3.getZ() - k, arg3.getX() + k, arg3.getY(), arg3.getZ() + k)) {
+            int m = j - lv.getManhattanDistance(arg3);
             if (m < 0) continue;
-            bl2 |= this.method_27096(arg, i, lv2, m, BasaltColumnsFeature.method_27100(random, arg4));
+            bl2 |= this.method_27096(arg, i, lv, m, arg4.method_30391().method_30321(random));
         }
         return bl2;
     }
@@ -77,16 +76,21 @@ extends Feature<BasaltColumnsFeatureConfig> {
     private static BlockPos method_27094(WorldAccess arg, int i, BlockPos.Mutable arg2, int j) {
         while (arg2.getY() > 1 && j > 0) {
             --j;
-            if (BasaltColumnsFeature.method_27095(arg, i, arg2)) {
-                BlockState lv = arg.getBlockState(arg2.move(Direction.DOWN));
-                arg2.move(Direction.UP);
-                if (!lv.isAir() && !field_24132.contains((Object)lv.getBlock())) {
-                    return arg2;
-                }
+            if (BasaltColumnsFeature.method_30379(arg, i, arg2)) {
+                return arg2;
             }
             arg2.move(Direction.DOWN);
         }
         return null;
+    }
+
+    private static boolean method_30379(WorldAccess arg, int i, BlockPos.Mutable arg2) {
+        if (BasaltColumnsFeature.method_27095(arg, i, arg2)) {
+            BlockState lv = arg.getBlockState(arg2.move(Direction.DOWN));
+            arg2.move(Direction.UP);
+            return !lv.isAir() && !field_24132.contains((Object)lv.getBlock());
+        }
+        return false;
     }
 
     @Nullable
@@ -103,14 +107,6 @@ extends Feature<BasaltColumnsFeatureConfig> {
             arg2.move(Direction.UP);
         }
         return null;
-    }
-
-    private static int method_27099(Random random, BasaltColumnsFeatureConfig arg) {
-        return arg.minHeight + random.nextInt(arg.maxHeight - arg.minHeight + 1);
-    }
-
-    private static int method_27100(Random random, BasaltColumnsFeatureConfig arg) {
-        return arg.minReach + random.nextInt(arg.maxReach - arg.minReach + 1);
     }
 
     private static boolean method_27095(WorldAccess arg, int i, BlockPos arg2) {

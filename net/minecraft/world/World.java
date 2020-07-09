@@ -33,6 +33,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.class_5455;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -63,8 +64,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
@@ -175,40 +174,6 @@ AutoCloseable {
 
     public static boolean isHeightInvalid(int i) {
         return i < 0 || i >= 256;
-    }
-
-    public double getCollisionHeightAt(BlockPos arg2) {
-        return this.getCollisionHeightAt(arg2, arg -> false);
-    }
-
-    public double getCollisionHeightAt(BlockPos arg, Predicate<BlockState> predicate) {
-        VoxelShape lv2;
-        BlockState lv = this.getBlockState(arg);
-        VoxelShape voxelShape = lv2 = predicate.test(lv) ? VoxelShapes.empty() : lv.getCollisionShape(this, arg);
-        if (lv2.isEmpty()) {
-            BlockPos lv3 = arg.down();
-            BlockState lv4 = this.getBlockState(lv3);
-            VoxelShape lv5 = predicate.test(lv4) ? VoxelShapes.empty() : lv4.getCollisionShape(this, lv3);
-            double d = lv5.getMax(Direction.Axis.Y);
-            if (d >= 1.0) {
-                return d - 1.0;
-            }
-            return Double.NEGATIVE_INFINITY;
-        }
-        return lv2.getMax(Direction.Axis.Y);
-    }
-
-    public double method_26096(BlockPos arg, double d) {
-        BlockPos.Mutable lv = arg.mutableCopy();
-        int i = MathHelper.ceil(d);
-        for (int j = 0; j < i; ++j) {
-            VoxelShape lv2 = this.getBlockState(lv).getCollisionShape(this, lv);
-            if (!lv2.isEmpty()) {
-                return (double)j + lv2.getMin(Direction.Axis.Y);
-            }
-            lv.move(Direction.UP);
-        }
-        return Double.POSITIVE_INFINITY;
     }
 
     public WorldChunk getWorldChunk(BlockPos arg) {
@@ -1048,6 +1013,8 @@ AutoCloseable {
     public final boolean isDebugWorld() {
         return this.debugWorld;
     }
+
+    public abstract class_5455 method_30349();
 
     @Override
     public /* synthetic */ Chunk getChunk(int i, int j) {

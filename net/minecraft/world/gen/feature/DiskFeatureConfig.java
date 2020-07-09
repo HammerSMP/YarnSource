@@ -15,20 +15,21 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5428;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DiskFeatureConfig
 implements FeatureConfig {
-    public static final Codec<DiskFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("radius").withDefault((Object)0).forGetter(arg -> arg.radius), (App)Codec.INT.fieldOf("y_size").withDefault((Object)0).forGetter(arg -> arg.ySize), (App)BlockState.CODEC.listOf().fieldOf("targets").forGetter(arg -> arg.targets)).apply((Applicative)instance, DiskFeatureConfig::new));
+    public static final Codec<DiskFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)class_5428.method_30316(0, 4, 4).fieldOf("radius").forGetter(arg -> arg.radius), (App)Codec.intRange((int)0, (int)4).fieldOf("half_height").forGetter(arg -> arg.ySize), (App)BlockState.CODEC.listOf().fieldOf("targets").forGetter(arg -> arg.targets)).apply((Applicative)instance, DiskFeatureConfig::new));
     public final BlockState state;
-    public final int radius;
+    public final class_5428 radius;
     public final int ySize;
     public final List<BlockState> targets;
 
-    public DiskFeatureConfig(BlockState arg, int i, int j, List<BlockState> list) {
+    public DiskFeatureConfig(BlockState arg, class_5428 arg2, int i, List<BlockState> list) {
         this.state = arg;
-        this.radius = i;
-        this.ySize = j;
+        this.radius = arg2;
+        this.ySize = i;
         this.targets = list;
     }
 }

@@ -941,7 +941,7 @@ Saddleable {
             do {
                 Vec3d lv4;
                 Box lv3;
-                double h = this.world.getCollisionHeightAt(lv);
+                double h = this.world.method_30347(lv);
                 if ((double)lv.getY() + h > g) continue block0;
                 if (Dismounting.canDismountInBlock(h) && Dismounting.canPlaceEntityAt(this.world, arg2, (lv3 = arg2.getBoundingBox(lv2)).offset(lv4 = new Vec3d(d, (double)lv.getY() + h, f)))) {
                     arg2.setPose(lv2);
@@ -975,8 +975,7 @@ Saddleable {
     @Nullable
     public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
         if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData();
-            ((PassiveEntity.PassiveData)arg4).setBabyChance(0.2f);
+            arg4 = new PassiveEntity.PassiveData(0.2f);
         }
         this.initAttributes();
         return super.initialize(arg, arg2, arg3, arg4, arg5);

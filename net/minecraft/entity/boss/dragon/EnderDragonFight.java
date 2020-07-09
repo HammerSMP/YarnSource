@@ -34,6 +34,7 @@ import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
+import net.minecraft.class_5464;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.boss.BossBar;
@@ -64,10 +65,8 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.gen.feature.EndGatewayFeatureConfig;
 import net.minecraft.world.gen.feature.EndPortalFeature;
 import net.minecraft.world.gen.feature.EndSpikeFeature;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FeatureConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -339,7 +338,7 @@ public class EnderDragonFight {
 
     private void generateEndGateway(BlockPos arg) {
         this.world.syncWorldEvent(3000, arg, 0);
-        Feature.END_GATEWAY.configure(EndGatewayFeatureConfig.createConfig()).generate(this.world, this.world.getChunkManager().getChunkGenerator(), new Random(), arg);
+        class_5464.END_GATEWAY_DELAYED.generate(this.world, this.world.getChunkManager().getChunkGenerator(), new Random(), arg);
     }
 
     private void generateEndPortal(boolean bl) {

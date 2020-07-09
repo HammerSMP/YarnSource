@@ -53,7 +53,7 @@ extends Item {
     public ActionResult useOnBlock(ItemUsageContext arg) {
         ActionResult lv = this.place(new ItemPlacementContext(arg));
         if (!lv.isAccepted() && this.isFood()) {
-            return this.use(arg.world, arg.player, arg.hand).getResult();
+            return this.use(arg.getWorld(), arg.getPlayer(), arg.getHand()).getResult();
         }
         return lv;
     }

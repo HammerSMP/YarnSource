@@ -511,6 +511,7 @@ implements RangedAttackMob {
         public final int variant;
 
         private LlamaData(int i) {
+            super(true);
             this.variant = i;
         }
     }

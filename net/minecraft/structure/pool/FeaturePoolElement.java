@@ -18,6 +18,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.JigsawBlock;
@@ -43,17 +44,12 @@ import net.minecraft.world.gen.feature.Feature;
 public class FeaturePoolElement
 extends StructurePoolElement {
     public static final Codec<FeaturePoolElement> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)ConfiguredFeature.CODEC.fieldOf("feature").forGetter(arg -> arg.feature), FeaturePoolElement.method_28883()).apply((Applicative)instance, FeaturePoolElement::new));
-    private final ConfiguredFeature<?, ?> feature;
+    private final Supplier<ConfiguredFeature<?, ?>> feature;
     private final CompoundTag tag;
 
-    @Deprecated
-    public FeaturePoolElement(ConfiguredFeature<?, ?> arg) {
-        this(arg, StructurePool.Projection.RIGID);
-    }
-
-    private FeaturePoolElement(ConfiguredFeature<?, ?> arg, StructurePool.Projection arg2) {
-        super(arg2);
-        this.feature = arg;
+    protected FeaturePoolElement(Supplier<ConfiguredFeature<?, ?>> supplier, StructurePool.Projection arg) {
+        super(arg);
+        this.feature = supplier;
         this.tag = this.createDefaultJigsawTag();
     }
 
@@ -86,7 +82,7 @@ extends StructurePoolElement {
 
     @Override
     public boolean generate(StructureManager arg, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
-        return this.feature.generate(arg2, arg4, random, arg5);
+        return this.feature.get().generate(arg2, arg4, random, arg5);
     }
 
     @Override
@@ -95,7 +91,7 @@ extends StructurePoolElement {
     }
 
     public String toString() {
-        return "Feature[" + Registry.FEATURE.getId((Feature<?>)this.feature.feature) + "]";
+        return "Feature[" + Registry.FEATURE.getId((Feature<?>)this.feature.get().method_30380()) + "]";
     }
 }
 

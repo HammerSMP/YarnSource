@@ -10,6 +10,7 @@ import com.mojang.serialization.Codec;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+import net.minecraft.class_5455;
 import net.minecraft.structure.MineshaftGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructurePiece;
@@ -49,20 +50,20 @@ extends StructureFeature<MineshaftFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, MineshaftFeatureConfig arg4) {
-            MineshaftGenerator.MineshaftRoom lv = new MineshaftGenerator.MineshaftRoom(0, this.random, (i << 4) + 2, (j << 4) + 2, arg4.type);
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, MineshaftFeatureConfig arg5) {
+            MineshaftGenerator.MineshaftRoom lv = new MineshaftGenerator.MineshaftRoom(0, this.random, (i << 4) + 2, (j << 4) + 2, arg5.type);
             this.children.add(lv);
             lv.placeJigsaw(lv, this.children, this.random);
             this.setBoundingBoxFromChildren();
-            if (arg4.type == Type.MESA) {
+            if (arg5.type == Type.MESA) {
                 int k = -5;
-                int l = arg.getSeaLevel() - this.boundingBox.maxY + this.boundingBox.getBlockCountY() / 2 - -5;
+                int l = arg2.getSeaLevel() - this.boundingBox.maxY + this.boundingBox.getBlockCountY() / 2 - -5;
                 this.boundingBox.offset(0, l, 0);
                 for (StructurePiece lv2 : this.children) {
                     lv2.translate(0, l, 0);
                 }
             } else {
-                this.method_14978(arg.getSeaLevel(), this.random, 10);
+                this.method_14978(arg2.getSeaLevel(), this.random, 10);
             }
         }
     }

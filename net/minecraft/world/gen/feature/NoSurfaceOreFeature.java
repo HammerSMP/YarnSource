@@ -28,7 +28,7 @@ extends Feature<OreFeatureConfig> {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int j = 0; j < i; ++j) {
             this.getStartPos(lv, random, arg3, Math.min(j, 7));
-            if (!arg4.target.getCondition().test(arg.getBlockState(lv)) || this.checkAir(arg, lv)) continue;
+            if (!arg4.target.test(arg.getBlockState(lv), random) || this.checkAir(arg, lv)) continue;
             arg.setBlockState(lv, arg4.state, 2);
         }
         return true;

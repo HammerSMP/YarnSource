@@ -41,7 +41,7 @@ implements Palette<T> {
 
     @Override
     public int getIndex(T object) {
-        int i = this.map.getId(object);
+        int i = this.map.getRawId(object);
         if (i == -1 && (i = this.map.add(object)) >= 1 << this.indexBits) {
             i = this.resizeHandler.onResize(this.indexBits + 1, object);
         }
@@ -78,7 +78,7 @@ implements Palette<T> {
         int i = this.getIndexBits();
         arg.writeVarInt(i);
         for (int j = 0; j < i; ++j) {
-            arg.writeVarInt(this.idList.getId(this.map.get(j)));
+            arg.writeVarInt(this.idList.getRawId(this.map.get(j)));
         }
     }
 
@@ -86,7 +86,7 @@ implements Palette<T> {
     public int getPacketSize() {
         int i = PacketByteBuf.getVarIntSizeBytes(this.getIndexBits());
         for (int j = 0; j < this.getIndexBits(); ++j) {
-            i += PacketByteBuf.getVarIntSizeBytes(this.idList.getId(this.map.get(j)));
+            i += PacketByteBuf.getVarIntSizeBytes(this.idList.getRawId(this.map.get(j)));
         }
         return i;
     }

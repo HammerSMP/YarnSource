@@ -13,6 +13,7 @@ import java.util.Optional;
 import net.minecraft.block.Blocks;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -74,26 +75,29 @@ implements Vanishable {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext arg) {
-        BlockPos lv = arg.hit.getBlockPos();
-        if (arg.world.getBlockState(lv).isOf(Blocks.LODESTONE)) {
+        BlockPos lv = arg.getBlockPos();
+        World lv2 = arg.getWorld();
+        if (lv2.getBlockState(lv).isOf(Blocks.LODESTONE)) {
             boolean bl;
-            arg.world.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            boolean bl2 = bl = !arg.player.abilities.creativeMode && arg.stack.getCount() == 1;
+            lv2.playSound(null, lv, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            PlayerEntity lv3 = arg.getPlayer();
+            ItemStack lv4 = arg.getStack();
+            boolean bl2 = bl = !lv3.abilities.creativeMode && lv4.getCount() == 1;
             if (bl) {
-                this.method_27315(arg.world.getRegistryKey(), lv, arg.stack.getOrCreateTag());
+                this.method_27315(lv2.getRegistryKey(), lv, lv4.getOrCreateTag());
             } else {
-                ItemStack lv2 = new ItemStack(Items.COMPASS, 1);
-                CompoundTag lv3 = arg.stack.hasTag() ? arg.stack.getTag().copy() : new CompoundTag();
-                lv2.setTag(lv3);
-                if (!arg.player.abilities.creativeMode) {
-                    arg.stack.decrement(1);
+                ItemStack lv5 = new ItemStack(Items.COMPASS, 1);
+                CompoundTag lv6 = lv4.hasTag() ? lv4.getTag().copy() : new CompoundTag();
+                lv5.setTag(lv6);
+                if (!lv3.abilities.creativeMode) {
+                    lv4.decrement(1);
                 }
-                this.method_27315(arg.world.getRegistryKey(), lv, lv3);
-                if (!arg.player.inventory.insertStack(lv2)) {
-                    arg.player.dropItem(lv2, false);
+                this.method_27315(lv2.getRegistryKey(), lv, lv6);
+                if (!lv3.inventory.insertStack(lv5)) {
+                    lv3.dropItem(lv5, false);
                 }
             }
-            return ActionResult.success(arg.world.isClient);
+            return ActionResult.success(lv2.isClient);
         }
         return super.useOnBlock(arg);
     }

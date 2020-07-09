@@ -40,7 +40,7 @@ extends Item {
             return ActionResult.success(lv2.isClient());
         }
         BlockPos lv5 = lv3.offset(arg.getSide());
-        if (AbstractFireBlock.method_30032(lv2, lv5)) {
+        if (AbstractFireBlock.method_30032(lv2, lv5, arg.getPlayerFacing())) {
             lv2.playSound(lv, lv5, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0f, RANDOM.nextFloat() * 0.4f + 0.8f);
             BlockState lv6 = AbstractFireBlock.getState(lv2, lv5);
             lv2.setBlockState(lv5, lv6, 11);

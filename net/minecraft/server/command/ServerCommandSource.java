@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import net.minecraft.class_5455;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -284,6 +285,11 @@ implements CommandSource {
     @Override
     public Set<RegistryKey<World>> getWorldKeys() {
         return this.server.getWorldRegistryKeys();
+    }
+
+    @Override
+    public class_5455 method_30497() {
+        return this.server.method_30611();
     }
 }
 

@@ -8,6 +8,7 @@ package net.minecraft.world;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
@@ -73,6 +74,24 @@ public interface BlockView {
             return lv.withSide(lv2.getSide());
         }
         return lv;
+    }
+
+    default public double method_30346(VoxelShape arg, Supplier<VoxelShape> supplier) {
+        if (!arg.isEmpty()) {
+            return arg.getMax(Direction.Axis.Y);
+        }
+        double d = supplier.get().getMax(Direction.Axis.Y);
+        if (d >= 1.0) {
+            return d - 1.0;
+        }
+        return Double.NEGATIVE_INFINITY;
+    }
+
+    default public double method_30347(BlockPos arg) {
+        return this.method_30346(this.getBlockState(arg).getCollisionShape(this, arg), () -> {
+            BlockPos lv = arg.down();
+            return this.getBlockState(lv).getCollisionShape(this, lv);
+        });
     }
 
     public static <T> T rayTrace(RayTraceContext arg, BiFunction<RayTraceContext, BlockPos, T> biFunction, Function<RayTraceContext, T> function) {

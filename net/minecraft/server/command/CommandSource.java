@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import net.minecraft.class_5455;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -55,6 +56,8 @@ public interface CommandSource {
     }
 
     public Set<RegistryKey<World>> getWorldKeys();
+
+    public class_5455 method_30497();
 
     public boolean hasPermissionLevel(int var1);
 

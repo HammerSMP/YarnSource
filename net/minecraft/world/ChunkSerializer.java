@@ -82,7 +82,7 @@ public class ChunkSerializer {
         if (!Objects.equals(arg4, lv4)) {
             LOGGER.error("Chunk file at {} is in the wrong location; relocating. (Expected {}, got {})", (Object)arg4, (Object)arg4, (Object)lv4);
         }
-        BiomeArray lv5 = new BiomeArray(arg4, lv2, lv3.contains("Biomes", 11) ? lv3.getIntArray("Biomes") : null);
+        BiomeArray lv5 = new BiomeArray(arg3.method_30349().method_30530(Registry.BIOME_KEY), arg4, lv2, lv3.contains("Biomes", 11) ? lv3.getIntArray("Biomes") : null);
         UpgradeData lv6 = lv3.contains("UpgradeData", 10) ? new UpgradeData(lv3.getCompound("UpgradeData")) : UpgradeData.NO_UPGRADE_DATA;
         ChunkTickScheduler<Block> lv7 = new ChunkTickScheduler<Block>(arg -> arg == null || arg.getDefaultState().isAir(), arg4, lv3.getList("ToBeTicked", 9));
         ChunkTickScheduler<Fluid> lv8 = new ChunkTickScheduler<Fluid>(arg -> arg == null || arg == Fluids.EMPTY, arg4, lv3.getList("LiquidsToBeTicked", 9));

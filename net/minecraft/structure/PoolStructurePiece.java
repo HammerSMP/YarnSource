@@ -35,7 +35,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class PoolStructurePiece
+public class PoolStructurePiece
 extends StructurePiece {
     private static final Logger field_24991 = LogManager.getLogger();
     protected final StructurePoolElement poolElement;
@@ -45,18 +45,18 @@ extends StructurePiece {
     private final List<JigsawJunction> junctions = Lists.newArrayList();
     private final StructureManager structureManager;
 
-    public PoolStructurePiece(StructurePieceType arg, StructureManager arg2, StructurePoolElement arg3, BlockPos arg4, int i, BlockRotation arg5, BlockBox arg6) {
-        super(arg, 0);
-        this.structureManager = arg2;
-        this.poolElement = arg3;
-        this.pos = arg4;
+    public PoolStructurePiece(StructureManager arg, StructurePoolElement arg2, BlockPos arg3, int i, BlockRotation arg4, BlockBox arg5) {
+        super(StructurePieceType.JIGSAW, 0);
+        this.structureManager = arg;
+        this.poolElement = arg2;
+        this.pos = arg3;
         this.groundLevelDelta = i;
-        this.rotation = arg5;
-        this.boundingBox = arg6;
+        this.rotation = arg4;
+        this.boundingBox = arg5;
     }
 
-    public PoolStructurePiece(StructureManager arg2, CompoundTag arg22, StructurePieceType arg3) {
-        super(arg3, arg22);
+    public PoolStructurePiece(StructureManager arg2, CompoundTag arg22) {
+        super(StructurePieceType.JIGSAW, arg22);
         this.structureManager = arg2;
         this.pos = new BlockPos(arg22.getInt("PosX"), arg22.getInt("PosY"), arg22.getInt("PosZ"));
         this.groundLevelDelta = arg22.getInt("ground_level_delta");

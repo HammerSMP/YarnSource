@@ -22,6 +22,7 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.block.CampfireBlock;
+import net.minecraft.class_5458;
 import net.minecraft.predicate.BlockPredicate;
 import net.minecraft.predicate.FluidPredicate;
 import net.minecraft.predicate.LightPredicate;
@@ -137,7 +138,7 @@ public class LocationPredicate {
             jsonObject.addProperty("feature", this.feature.getName());
         }
         if (this.biome != null) {
-            jsonObject.addProperty("biome", Registry.BIOME.getId(this.biome).toString());
+            jsonObject.addProperty("biome", class_5458.field_25933.getId(this.biome).toString());
         }
         if (this.smokey != null) {
             jsonObject.addProperty("smokey", this.smokey);
@@ -162,7 +163,7 @@ public class LocationPredicate {
         Biome lv6 = null;
         if (jsonObject.has("biome")) {
             Identifier lv7 = new Identifier(JsonHelper.getString(jsonObject, "biome"));
-            lv6 = Registry.BIOME.getOrEmpty(lv7).orElseThrow(() -> new JsonSyntaxException("Unknown biome '" + lv7 + "'"));
+            lv6 = class_5458.field_25933.getOrEmpty(lv7).orElseThrow(() -> new JsonSyntaxException("Unknown biome '" + lv7 + "'"));
         }
         Boolean boolean_ = jsonObject.has("smokey") ? Boolean.valueOf(jsonObject.get("smokey").getAsBoolean()) : null;
         LightPredicate lv8 = LightPredicate.fromJson(jsonObject.get("light"));

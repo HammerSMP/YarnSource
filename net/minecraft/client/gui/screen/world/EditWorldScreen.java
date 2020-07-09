@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.BackupPromptScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -58,7 +59,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.dynamic.RegistryReadingOps;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.SaveProperties;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.storage.LevelStorage;
@@ -119,8 +119,8 @@ extends Screen {
         }, new TranslatableText("optimizeWorld.confirm.title"), new TranslatableText("optimizeWorld.confirm.description"), true))));
         this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 120 + 5, 200, 20, new TranslatableText("selectWorld.edit.export_worldgen_settings"), arg -> {
             DataResult dataResult4;
-            RegistryTracker.Modifiable lv = RegistryTracker.create();
-            try (MinecraftClient.IntegratedResourceManager lv2 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, RegistryTracker.Modifiable, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, this.field_23777);){
+            class_5455.class_5457 lv = class_5455.method_30528();
+            try (MinecraftClient.IntegratedResourceManager lv2 = this.client.method_29604(lv, MinecraftClient::method_29598, (Function4<LevelStorage.Session, class_5455.class_5457, ResourceManager, DataPackSettings, SaveProperties>)((Function4)MinecraftClient::createSaveProperties), false, this.field_23777);){
                 RegistryReadingOps dynamicOps = RegistryReadingOps.of(JsonOps.INSTANCE, lv);
                 DataResult dataResult = GeneratorOptions.CODEC.encodeStart(dynamicOps, (Object)lv2.getSaveProperties().getGeneratorOptions());
                 DataResult dataResult2 = dataResult.flatMap(jsonElement -> {

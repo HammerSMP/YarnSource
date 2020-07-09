@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import net.minecraft.class_5455;
 import net.minecraft.structure.OceanRuinGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
@@ -75,12 +76,12 @@ extends StructureFeature<OceanRuinFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, OceanRuinFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, OceanRuinFeatureConfig arg5) {
             int k = i * 16;
             int l = j * 16;
             BlockPos lv = new BlockPos(k, 90, l);
             BlockRotation lv2 = BlockRotation.random(this.random);
-            OceanRuinGenerator.addPieces(arg2, lv, lv2, this.children, this.random, arg4);
+            OceanRuinGenerator.addPieces(arg3, lv, lv2, this.children, this.random, arg5);
             this.setBoundingBoxFromChildren();
         }
     }

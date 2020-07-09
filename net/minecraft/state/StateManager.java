@@ -46,7 +46,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.dynamic.NumberCodecs;
 
 public class StateManager<O, S extends State<O, S>> {
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-z0-9_]+$");
@@ -86,7 +85,7 @@ public class StateManager<O, S extends State<O, S>> {
     }
 
     private static <S extends State<?, S>, T extends Comparable<T>> MapCodec<S> method_30040(MapCodec<S> mapCodec, Supplier<S> supplier, String string, Property<T> arg) {
-        return Codec.mapPair(mapCodec, NumberCodecs.method_30018(arg.method_30044().fieldOf(string), () -> arg.method_30041((State)supplier.get()))).xmap(pair -> (State)((State)pair.getFirst()).with(arg, ((Property.class_4933)pair.getSecond()).method_30045()), arg2 -> Pair.of((Object)arg2, arg.method_30041((State<?, ?>)arg2)));
+        return Codec.mapPair(mapCodec, (MapCodec)arg.method_30044().fieldOf(string).setPartial(() -> arg.method_30041((State)supplier.get()))).xmap(pair -> (State)((State)pair.getFirst()).with(arg, ((Property.class_4933)pair.getSecond()).method_30045()), arg2 -> Pair.of((Object)arg2, arg.method_30041((State<?, ?>)arg2)));
     }
 
     public ImmutableList<S> getStates() {

@@ -58,6 +58,7 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
+import net.minecraft.class_5455;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.MapRenderer;
@@ -311,12 +312,12 @@ import net.minecraft.util.math.PositionImpl;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
@@ -347,7 +348,7 @@ implements ClientPlayPacketListener {
     private final RecipeManager recipeManager = new RecipeManager();
     private final UUID sessionId = UUID.randomUUID();
     private Set<RegistryKey<World>> worldKeys;
-    private RegistryTracker registryTracker = RegistryTracker.create();
+    private class_5455 registryTracker = class_5455.method_30528();
 
     public ClientPlayNetworkHandler(MinecraftClient arg, Screen arg2, ClientConnection arg3, GameProfile gameProfile) {
         this.client = arg;
@@ -384,7 +385,7 @@ implements ClientPlayPacketListener {
         this.registryTracker = arg.getDimension();
         RegistryKey<DimensionType> lv = arg.method_29444();
         RegistryKey<World> lv2 = arg.getDimensionId();
-        DimensionType lv3 = this.registryTracker.getDimensionTypeRegistry().get(lv);
+        DimensionType lv3 = this.registryTracker.method_30518().get(lv);
         this.chunkLoadDistance = arg.getChunkLoadDistance();
         boolean bl = arg.isDebugWorld();
         boolean bl2 = arg.isFlatWorld();
@@ -724,9 +725,7 @@ implements ClientPlayPacketListener {
     @Override
     public void onChunkDeltaUpdate(ChunkDeltaUpdateS2CPacket arg) {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        for (ChunkDeltaUpdateS2CPacket.ChunkDeltaRecord lv : arg.getRecords()) {
-            this.world.setBlockStateWithoutNeighborUpdates(lv.getBlockPos(), lv.getState());
-        }
+        arg.method_30621((arg_0, arg_1) -> this.world.setBlockStateWithoutNeighborUpdates(arg_0, arg_1));
     }
 
     @Override
@@ -734,30 +733,31 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         int i = arg.getX();
         int j = arg.getZ();
-        WorldChunk lv = this.world.getChunkManager().loadChunkFromPacket(i, j, arg.getBiomeArray(), arg.getReadBuffer(), arg.getHeightmaps(), arg.getVerticalStripBitmask(), arg.isFullChunk());
-        if (lv != null && arg.isFullChunk()) {
-            this.world.addEntitiesToChunk(lv);
+        BiomeArray lv = arg.getBiomeArray() == null ? null : new BiomeArray(this.registryTracker.method_30530(Registry.BIOME_KEY), arg.getBiomeArray());
+        WorldChunk lv2 = this.world.getChunkManager().loadChunkFromPacket(i, j, lv, arg.getReadBuffer(), arg.getHeightmaps(), arg.getVerticalStripBitmask(), arg.isFullChunk());
+        if (lv2 != null && arg.isFullChunk()) {
+            this.world.addEntitiesToChunk(lv2);
         }
         for (int k = 0; k < 16; ++k) {
             this.world.scheduleBlockRenders(i, k, j);
         }
-        for (CompoundTag lv2 : arg.getBlockEntityTagList()) {
-            BlockPos lv3 = new BlockPos(lv2.getInt("x"), lv2.getInt("y"), lv2.getInt("z"));
-            BlockEntity lv4 = this.world.getBlockEntity(lv3);
-            if (lv4 == null) continue;
-            lv4.fromTag(this.world.getBlockState(lv3), lv2);
+        for (CompoundTag lv3 : arg.getBlockEntityTagList()) {
+            BlockPos lv4 = new BlockPos(lv3.getInt("x"), lv3.getInt("y"), lv3.getInt("z"));
+            BlockEntity lv5 = this.world.getBlockEntity(lv4);
+            if (lv5 == null) continue;
+            lv5.fromTag(this.world.getBlockState(lv4), lv3);
         }
         if (!arg.method_30144()) {
-            this.world.getLightingProvider().setLightEnabled(lv.getPos(), false);
+            this.world.getLightingProvider().setLightEnabled(lv2.getPos(), false);
             int l = arg.getVerticalStripBitmask();
             for (int m = 0; m < 16; ++m) {
                 if ((l & 1 << m) == 0) continue;
-                this.world.getLightingProvider().queueData(LightType.BLOCK, ChunkSectionPos.from(lv.getPos(), m), new ChunkNibbleArray(), false);
-                this.world.getLightingProvider().queueData(LightType.SKY, ChunkSectionPos.from(lv.getPos(), m), new ChunkNibbleArray(), false);
+                this.world.getLightingProvider().queueData(LightType.BLOCK, ChunkSectionPos.from(lv2.getPos(), m), new ChunkNibbleArray(), false);
+                this.world.getLightingProvider().queueData(LightType.SKY, ChunkSectionPos.from(lv2.getPos(), m), new ChunkNibbleArray(), false);
             }
             this.world.getLightingProvider().doLightUpdates(Integer.MAX_VALUE, true, true);
-            this.world.getLightingProvider().setLightEnabled(lv.getPos(), true);
-            lv.getLightSourcesStream().forEach(arg2 -> this.world.getLightingProvider().addLightSource((BlockPos)arg2, lv.getLuminance((BlockPos)arg2)));
+            this.world.getLightingProvider().setLightEnabled(lv2.getPos(), true);
+            lv2.getLightSourcesStream().forEach(arg2 -> this.world.getLightingProvider().addLightSource((BlockPos)arg2, lv2.getLuminance((BlockPos)arg2)));
         }
     }
 
@@ -992,7 +992,7 @@ implements ClientPlayPacketListener {
         NetworkThreadUtils.forceMainThread(arg, this, this.client);
         RegistryKey<DimensionType> lv = arg.method_29445();
         RegistryKey<World> lv2 = arg.getDimension();
-        DimensionType lv3 = this.registryTracker.getDimensionTypeRegistry().get(lv);
+        DimensionType lv3 = this.registryTracker.method_30518().get(lv);
         ClientPlayerEntity lv4 = this.client.player;
         int i = lv4.getEntityId();
         this.positionLookSetup = false;
@@ -1721,7 +1721,7 @@ implements ClientPlayPacketListener {
                 }
                 this.client.debugRenderer.caveDebugRenderer.method_3704(lv5, list, list2);
             } else if (CustomPayloadS2CPacket.DEBUG_STRUCTURES.equals(lv)) {
-                DimensionType lv6 = this.registryTracker.getDimensionTypeRegistry().get(lv2.readIdentifier());
+                DimensionType lv6 = this.registryTracker.method_30518().get(lv2.readIdentifier());
                 BlockBox lv7 = new BlockBox(lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt(), lv2.readInt());
                 int m = lv2.readInt();
                 ArrayList list3 = Lists.newArrayList();
@@ -2162,7 +2162,7 @@ implements ClientPlayPacketListener {
         return this.worldKeys;
     }
 
-    public RegistryTracker getRegistryTracker() {
+    public class_5455 getRegistryTracker() {
         return this.registryTracker;
     }
 }

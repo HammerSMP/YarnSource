@@ -18,7 +18,7 @@ public class RegistryKey<T> {
     private final Identifier registry;
     private final Identifier value;
 
-    public static <T> RegistryKey<T> of(RegistryKey<Registry<T>> arg, Identifier arg2) {
+    public static <T> RegistryKey<T> of(RegistryKey<? extends Registry<T>> arg, Identifier arg2) {
         return RegistryKey.of(arg.value, arg2);
     }
 
@@ -44,7 +44,7 @@ public class RegistryKey<T> {
         return this.value;
     }
 
-    public static <T> Function<Identifier, RegistryKey<T>> createKeyFactory(RegistryKey<Registry<T>> arg) {
+    public static <T> Function<Identifier, RegistryKey<T>> createKeyFactory(RegistryKey<? extends Registry<T>> arg) {
         return arg2 -> RegistryKey.of(arg, arg2);
     }
 }

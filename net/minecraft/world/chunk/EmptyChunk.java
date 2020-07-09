@@ -21,6 +21,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -33,7 +34,7 @@ extends WorldChunk {
     private static final Biome[] BIOMES = Util.make(new Biome[BiomeArray.DEFAULT_LENGTH], args -> Arrays.fill(args, Biomes.PLAINS));
 
     public EmptyChunk(World arg, ChunkPos arg2) {
-        super(arg, arg2, new BiomeArray(BIOMES));
+        super(arg, arg2, new BiomeArray(arg.method_30349().method_30530(Registry.BIOME_KEY), BIOMES));
     }
 
     @Override

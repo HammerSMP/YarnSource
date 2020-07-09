@@ -350,10 +350,10 @@ public class FileDownload {
     private static void readNbtFile(File file) {
         if (file.exists()) {
             try {
-                CompoundTag lv = NbtIo.readCompressed(new FileInputStream(file));
+                CompoundTag lv = NbtIo.method_30613(file);
                 CompoundTag lv2 = lv.getCompound("Data");
                 lv2.remove("Player");
-                NbtIo.writeCompressed(lv, new FileOutputStream(file));
+                NbtIo.method_30614(lv, file);
             }
             catch (Exception exception) {
                 exception.printStackTrace();

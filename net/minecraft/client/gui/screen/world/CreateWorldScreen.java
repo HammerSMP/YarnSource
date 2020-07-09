@@ -23,10 +23,13 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -42,6 +45,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.GeneratorType;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.FileResourcePackProvider;
 import net.minecraft.resource.ResourcePackManager;
@@ -56,7 +60,6 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -71,6 +74,7 @@ import org.apache.logging.log4j.Logger;
 public class CreateWorldScreen
 extends Screen {
     private static final Logger field_25480 = LogManager.getLogger();
+    private static final TranslatableText field_25898 = new TranslatableText("selectWorld.gameMode");
     private final Screen parent;
     private TextFieldWidget levelNameField;
     private String saveDirectoryName;
@@ -82,7 +86,7 @@ extends Screen {
     private boolean cheatsEnabled;
     private boolean tweakedCheats;
     public boolean hardcore;
-    protected DataPackSettings field_25479 = DataPackSettings.SAFE_MODE;
+    protected DataPackSettings field_25479;
     @Nullable
     private Path field_25477;
     @Nullable
@@ -101,14 +105,13 @@ extends Screen {
     private GameRules gameRules = new GameRules();
     public final MoreOptionsDialog moreOptionsDialog;
 
-    public CreateWorldScreen(@Nullable Screen arg, LevelInfo arg2, GeneratorOptions arg3, @Nullable Path path, RegistryTracker.Modifiable arg4) {
-        this(arg, new MoreOptionsDialog(arg4, arg3));
+    public CreateWorldScreen(@Nullable Screen arg, LevelInfo arg2, GeneratorOptions arg3, @Nullable Path path, DataPackSettings arg4, class_5455.class_5457 arg5) {
+        this(arg, arg4, new MoreOptionsDialog(arg5, arg3, GeneratorType.method_29078(arg3), OptionalLong.of(arg3.getSeed())));
         this.levelName = arg2.getLevelName();
         this.cheatsEnabled = arg2.isHardcore();
         this.tweakedCheats = true;
         this.field_24290 = this.field_24289 = arg2.getDifficulty();
         this.gameRules.setAllValues(arg2.getGameRules(), null);
-        this.field_25479 = arg2.method_29558();
         if (arg2.hasStructures()) {
             this.currentMode = Mode.HARDCORE;
         } else if (arg2.getGameMode().isSurvivalLike()) {
@@ -120,14 +123,15 @@ extends Screen {
     }
 
     public CreateWorldScreen(@Nullable Screen arg) {
-        this(arg, new MoreOptionsDialog());
+        this(arg, DataPackSettings.SAFE_MODE, new MoreOptionsDialog(class_5455.method_30528(), GeneratorOptions.getDefaultOptions(), Optional.of(GeneratorType.DEFAULT), OptionalLong.empty()));
     }
 
-    private CreateWorldScreen(@Nullable Screen arg, MoreOptionsDialog arg2) {
+    private CreateWorldScreen(@Nullable Screen arg, DataPackSettings arg2, MoreOptionsDialog arg3) {
         super(new TranslatableText("selectWorld.create"));
         this.parent = arg;
         this.levelName = I18n.translate("selectWorld.newWorld", new Object[0]);
-        this.moreOptionsDialog = arg2;
+        this.field_25479 = arg2;
+        this.moreOptionsDialog = arg3;
     }
 
     @Override
@@ -155,7 +159,7 @@ extends Screen {
         this.children.add(this.levelNameField);
         int i = this.width / 2 - 155;
         int j = this.width / 2 + 5;
-        this.gameModeSwitchButton = this.addButton(new ButtonWidget(i, 100, 150, 20, new TranslatableText("selectWorld.gameMode"), arg -> {
+        this.gameModeSwitchButton = this.addButton(new ButtonWidget(i, 100, 150, 20, LiteralText.EMPTY, arg -> {
             switch (this.currentMode) {
                 case SURVIVAL: {
                     this.tweakDefaultsTo(Mode.HARDCORE);
@@ -174,7 +178,7 @@ extends Screen {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(": ").append(new TranslatableText("selectWorld.gameMode." + CreateWorldScreen.this.currentMode.translationSuffix));
+                return new TranslatableText("options.generic_value", field_25898, new TranslatableText("selectWorld.gameMode." + CreateWorldScreen.this.currentMode.translationSuffix));
             }
 
             @Override
@@ -200,7 +204,7 @@ extends Screen {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(CreateWorldScreen.this.cheatsEnabled && !CreateWorldScreen.this.hardcore));
+                return ScreenTexts.method_30619(super.getMessage(), CreateWorldScreen.this.cheatsEnabled && !CreateWorldScreen.this.hardcore);
             }
 
             @Override
@@ -441,6 +445,8 @@ extends Screen {
             } else {
                 this.client.send(() -> {
                     this.field_25479 = lv;
+                    this.moreOptionsDialog.method_30509(class_5455.method_30519(arg2.getResourceManager()));
+                    arg2.close();
                     this.client.openScreen(this);
                 });
             }

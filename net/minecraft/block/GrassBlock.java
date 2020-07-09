@@ -53,7 +53,7 @@ implements Fertilizable {
             if (random.nextInt(8) == 0) {
                 List<ConfiguredFeature<?, ?>> list = arg.getBiome(lv3).getFlowerFeatures();
                 if (list.isEmpty()) continue;
-                ConfiguredFeature<?, ?> lv5 = ((DecoratedFeatureConfig)list.get((int)0).config).feature;
+                ConfiguredFeature<?, ?> lv5 = ((DecoratedFeatureConfig)list.get((int)0).config).feature.get();
                 BlockState lv6 = ((FlowerFeature)lv5.feature).getFlowerState(random, lv3, lv5.config);
             } else {
                 lv7 = lv2;

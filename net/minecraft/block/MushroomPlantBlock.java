@@ -11,6 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.block.PlantBlock;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.class_5464;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
@@ -19,9 +20,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.HugeMushroomFeatureConfig;
 
 public class MushroomPlantBlock
 extends PlantBlock
@@ -81,9 +79,9 @@ implements Fertilizable {
         void lv3;
         arg.removeBlock(arg2, false);
         if (this == Blocks.BROWN_MUSHROOM) {
-            ConfiguredFeature<HugeMushroomFeatureConfig, ?> lv = Feature.HUGE_BROWN_MUSHROOM.configure(DefaultBiomeFeatures.HUGE_BROWN_MUSHROOM_CONFIG);
+            ConfiguredFeature<?, ?> lv = class_5464.HUGE_BROWN_MUSHROOM;
         } else if (this == Blocks.RED_MUSHROOM) {
-            ConfiguredFeature<HugeMushroomFeatureConfig, ?> lv2 = Feature.HUGE_RED_MUSHROOM.configure(DefaultBiomeFeatures.HUGE_RED_MUSHROOM_CONFIG);
+            ConfiguredFeature<?, ?> lv2 = class_5464.HUGE_RED_MUSHROOM;
         } else {
             arg.setBlockState(arg2, arg3, 3);
             return false;

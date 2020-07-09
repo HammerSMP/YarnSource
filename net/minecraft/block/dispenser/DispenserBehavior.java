@@ -395,15 +395,16 @@ public interface DispenserBehavior {
             protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
                 ServerWorld lv = arg.getWorld();
                 this.setSuccess(true);
-                BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
-                BlockState lv3 = lv.getBlockState(lv2);
-                if (AbstractFireBlock.method_30032(lv, lv2)) {
-                    lv.setBlockState(lv2, AbstractFireBlock.getState(lv, lv2));
-                } else if (CampfireBlock.method_30035(lv3)) {
-                    lv.setBlockState(lv2, (BlockState)lv3.with(Properties.LIT, true));
-                } else if (lv3.getBlock() instanceof TntBlock) {
-                    TntBlock.primeTnt(lv, lv2);
-                    lv.removeBlock(lv2, false);
+                Direction lv2 = arg.getBlockState().get(DispenserBlock.FACING);
+                BlockPos lv3 = arg.getBlockPos().offset(lv2);
+                BlockState lv4 = lv.getBlockState(lv3);
+                if (AbstractFireBlock.method_30032(lv, lv3, lv2)) {
+                    lv.setBlockState(lv3, AbstractFireBlock.getState(lv, lv3));
+                } else if (CampfireBlock.method_30035(lv4)) {
+                    lv.setBlockState(lv3, (BlockState)lv4.with(Properties.LIT, true));
+                } else if (lv4.getBlock() instanceof TntBlock) {
+                    TntBlock.primeTnt(lv, lv3);
+                    lv.removeBlock(lv3, false);
                 } else {
                     this.setSuccess(false);
                 }

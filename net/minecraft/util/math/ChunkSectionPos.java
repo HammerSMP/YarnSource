@@ -61,7 +61,35 @@ extends Vec3i {
         int i = ChunkSectionPos.getLocalCoord(arg.getX());
         int j = ChunkSectionPos.getLocalCoord(arg.getY());
         int k = ChunkSectionPos.getLocalCoord(arg.getZ());
-        return (short)(i << 8 | k << 4 | j);
+        return (short)(i << 8 | k << 4 | j << 0);
+    }
+
+    public static int method_30551(short s) {
+        return s >>> 8 & 0xF;
+    }
+
+    public static int method_30552(short s) {
+        return s >>> 0 & 0xF;
+    }
+
+    public static int method_30553(short s) {
+        return s >>> 4 & 0xF;
+    }
+
+    public int method_30554(short s) {
+        return this.getMinX() + ChunkSectionPos.method_30551(s);
+    }
+
+    public int method_30555(short s) {
+        return this.getMinY() + ChunkSectionPos.method_30552(s);
+    }
+
+    public int method_30556(short s) {
+        return this.getMinZ() + ChunkSectionPos.method_30553(s);
+    }
+
+    public BlockPos method_30557(short s) {
+        return new BlockPos(this.method_30554(s), this.method_30555(s), this.method_30556(s));
     }
 
     public static int getWorldCoord(int i) {

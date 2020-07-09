@@ -44,7 +44,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.mob.EndermiteEntity;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -98,11 +97,10 @@ implements Angerable {
         this.goalSelector.add(8, new LookAroundGoal(this));
         this.goalSelector.add(10, new PlaceBlockGoal(this));
         this.goalSelector.add(11, new PickUpBlockGoal(this));
-        this.targetSelector.add(1, new FollowTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, this::shouldAngerAt));
-        this.targetSelector.add(2, new TeleportTowardsPlayerGoal(this));
-        this.targetSelector.add(3, new RevengeGoal(this, new Class[0]));
-        this.targetSelector.add(4, new FollowTargetGoal<EndermiteEntity>(this, EndermiteEntity.class, 10, true, false, PLAYER_ENDERMITE_PREDICATE));
-        this.targetSelector.add(5, new UniversalAngerGoal<EndermanEntity>(this, false));
+        this.targetSelector.add(1, new TeleportTowardsPlayerGoal(this, this::shouldAngerAt));
+        this.targetSelector.add(2, new RevengeGoal(this, new Class[0]));
+        this.targetSelector.add(3, new FollowTargetGoal<EndermiteEntity>(this, EndermiteEntity.class, 10, true, false, PLAYER_ENDERMITE_PREDICATE));
+        this.targetSelector.add(4, new UniversalAngerGoal<EndermanEntity>(this, false));
     }
 
     public static DefaultAttributeContainer.Builder createEndermanAttributes() {
@@ -332,7 +330,7 @@ implements Angerable {
             return false;
         }
         boolean bl = super.damage(arg, f);
-        if (!this.world.isClient() && this.random.nextInt(10) != 0) {
+        if (!this.world.isClient() && !(arg.getAttacker() instanceof LivingEntity) && this.random.nextInt(10) != 0) {
             this.teleportRandomly();
         }
         return bl;
@@ -480,8 +478,8 @@ implements Angerable {
         private final TargetPredicate staringPlayerPredicate;
         private final TargetPredicate validTargetPredicate = new TargetPredicate().includeHidden();
 
-        public TeleportTowardsPlayerGoal(EndermanEntity arg) {
-            super((MobEntity)arg, PlayerEntity.class, false);
+        public TeleportTowardsPlayerGoal(EndermanEntity arg, @Nullable Predicate<LivingEntity> predicate) {
+            super(arg, PlayerEntity.class, 10, false, false, predicate);
             this.enderman = arg;
             this.staringPlayerPredicate = new TargetPredicate().setBaseMaxDistance(this.getFollowRange()).setPredicate(arg2 -> arg.isPlayerStaring((PlayerEntity)arg2));
         }

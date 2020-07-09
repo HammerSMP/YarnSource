@@ -26,9 +26,13 @@ implements Packet<ClientPlayPacketListener> {
     public BlockUpdateS2CPacket() {
     }
 
+    public BlockUpdateS2CPacket(BlockPos arg, BlockState arg2) {
+        this.pos = arg;
+        this.state = arg2;
+    }
+
     public BlockUpdateS2CPacket(BlockView arg, BlockPos arg2) {
-        this.pos = arg2;
-        this.state = arg.getBlockState(arg2);
+        this(arg2, arg.getBlockState(arg2));
     }
 
     @Override

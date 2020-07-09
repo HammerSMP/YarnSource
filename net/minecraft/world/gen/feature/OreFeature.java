@@ -27,12 +27,12 @@ extends Feature<OreFeatureConfig> {
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, OreFeatureConfig arg4) {
         float f = random.nextFloat() * (float)Math.PI;
-        float g = (float)arg4.size / 8.0f;
-        int i = MathHelper.ceil(((float)arg4.size / 16.0f * 2.0f + 1.0f) / 2.0f);
-        double d = (float)arg3.getX() + MathHelper.sin(f) * g;
-        double e = (float)arg3.getX() - MathHelper.sin(f) * g;
-        double h = (float)arg3.getZ() + MathHelper.cos(f) * g;
-        double j = (float)arg3.getZ() - MathHelper.cos(f) * g;
+        float g = (float)arg4.SIZE / 8.0f;
+        int i = MathHelper.ceil(((float)arg4.SIZE / 16.0f * 2.0f + 1.0f) / 2.0f);
+        double d = (double)arg3.getX() + Math.sin(f) * (double)g;
+        double e = (double)arg3.getX() - Math.sin(f) * (double)g;
+        double h = (double)arg3.getZ() + Math.cos(f) * (double)g;
+        double j = (double)arg3.getZ() - Math.cos(f) * (double)g;
         int k = 2;
         double l = arg3.getY() + random.nextInt(3) - 2;
         double m = arg3.getY() + random.nextInt(3) - 2;
@@ -54,60 +54,61 @@ extends Feature<OreFeatureConfig> {
         int o = 0;
         BitSet bitSet = new BitSet(m * n * m);
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        double[] ds = new double[arg2.size * 4];
-        for (int p = 0; p < arg2.size; ++p) {
-            float q = (float)p / (float)arg2.size;
-            double r = MathHelper.lerp((double)q, d, e);
-            double s = MathHelper.lerp((double)q, h, i);
-            double t = MathHelper.lerp((double)q, f, g);
-            double u = random.nextDouble() * (double)arg2.size / 16.0;
-            double v = ((double)(MathHelper.sin((float)Math.PI * q) + 1.0f) * u + 1.0) / 2.0;
-            ds[p * 4 + 0] = r;
-            ds[p * 4 + 1] = s;
-            ds[p * 4 + 2] = t;
-            ds[p * 4 + 3] = v;
+        int p = arg2.SIZE;
+        double[] ds = new double[p * 4];
+        for (int q = 0; q < p; ++q) {
+            float r = (float)q / (float)p;
+            double s = MathHelper.lerp((double)r, d, e);
+            double t = MathHelper.lerp((double)r, h, i);
+            double u = MathHelper.lerp((double)r, f, g);
+            double v = random.nextDouble() * (double)p / 16.0;
+            double w = ((double)(MathHelper.sin((float)Math.PI * r) + 1.0f) * v + 1.0) / 2.0;
+            ds[q * 4 + 0] = s;
+            ds[q * 4 + 1] = t;
+            ds[q * 4 + 2] = u;
+            ds[q * 4 + 3] = w;
         }
-        for (int w = 0; w < arg2.size - 1; ++w) {
-            if (ds[w * 4 + 3] <= 0.0) continue;
-            for (int x = w + 1; x < arg2.size; ++x) {
+        for (int x = 0; x < p - 1; ++x) {
+            if (ds[x * 4 + 3] <= 0.0) continue;
+            for (int y = x + 1; y < p; ++y) {
+                double ab;
                 double aa;
                 double z;
-                double y;
-                double ab;
-                if (ds[x * 4 + 3] <= 0.0 || !((ab = ds[w * 4 + 3] - ds[x * 4 + 3]) * ab > (y = ds[w * 4 + 0] - ds[x * 4 + 0]) * y + (z = ds[w * 4 + 1] - ds[x * 4 + 1]) * z + (aa = ds[w * 4 + 2] - ds[x * 4 + 2]) * aa)) continue;
-                if (ab > 0.0) {
-                    ds[x * 4 + 3] = -1.0;
+                double ac;
+                if (ds[y * 4 + 3] <= 0.0 || !((ac = ds[x * 4 + 3] - ds[y * 4 + 3]) * ac > (z = ds[x * 4 + 0] - ds[y * 4 + 0]) * z + (aa = ds[x * 4 + 1] - ds[y * 4 + 1]) * aa + (ab = ds[x * 4 + 2] - ds[y * 4 + 2]) * ab)) continue;
+                if (ac > 0.0) {
+                    ds[y * 4 + 3] = -1.0;
                     continue;
                 }
-                ds[w * 4 + 3] = -1.0;
+                ds[x * 4 + 3] = -1.0;
             }
         }
-        for (int ac = 0; ac < arg2.size; ++ac) {
-            double ad = ds[ac * 4 + 3];
-            if (ad < 0.0) continue;
-            double ae = ds[ac * 4 + 0];
-            double af = ds[ac * 4 + 1];
-            double ag = ds[ac * 4 + 2];
-            int ah = Math.max(MathHelper.floor(ae - ad), j);
-            int ai = Math.max(MathHelper.floor(af - ad), k);
-            int aj = Math.max(MathHelper.floor(ag - ad), l);
-            int ak = Math.max(MathHelper.floor(ae + ad), ah);
-            int al = Math.max(MathHelper.floor(af + ad), ai);
-            int am = Math.max(MathHelper.floor(ag + ad), aj);
-            for (int an = ah; an <= ak; ++an) {
-                double ao = ((double)an + 0.5 - ae) / ad;
-                if (!(ao * ao < 1.0)) continue;
-                for (int ap = ai; ap <= al; ++ap) {
-                    double aq = ((double)ap + 0.5 - af) / ad;
-                    if (!(ao * ao + aq * aq < 1.0)) continue;
-                    for (int ar = aj; ar <= am; ++ar) {
-                        int at;
-                        double as = ((double)ar + 0.5 - ag) / ad;
-                        if (!(ao * ao + aq * aq + as * as < 1.0) || bitSet.get(at = an - j + (ap - k) * m + (ar - l) * m * n)) continue;
-                        bitSet.set(at);
-                        lv.set(an, ap, ar);
-                        if (!arg2.target.getCondition().test(arg.getBlockState(lv))) continue;
-                        arg.setBlockState(lv, arg2.state, 2);
+        for (int ad = 0; ad < p; ++ad) {
+            double ae = ds[ad * 4 + 3];
+            if (ae < 0.0) continue;
+            double af = ds[ad * 4 + 0];
+            double ag = ds[ad * 4 + 1];
+            double ah = ds[ad * 4 + 2];
+            int ai = Math.max(MathHelper.floor(af - ae), j);
+            int aj = Math.max(MathHelper.floor(ag - ae), k);
+            int ak = Math.max(MathHelper.floor(ah - ae), l);
+            int al = Math.max(MathHelper.floor(af + ae), ai);
+            int am = Math.max(MathHelper.floor(ag + ae), aj);
+            int an = Math.max(MathHelper.floor(ah + ae), ak);
+            for (int ao = ai; ao <= al; ++ao) {
+                double ap = ((double)ao + 0.5 - af) / ae;
+                if (!(ap * ap < 1.0)) continue;
+                for (int aq = aj; aq <= am; ++aq) {
+                    double ar = ((double)aq + 0.5 - ag) / ae;
+                    if (!(ap * ap + ar * ar < 1.0)) continue;
+                    for (int as = ak; as <= an; ++as) {
+                        int au;
+                        double at = ((double)as + 0.5 - ah) / ae;
+                        if (!(ap * ap + ar * ar + at * at < 1.0) || bitSet.get(au = ao - j + (aq - k) * m + (as - l) * m * n)) continue;
+                        bitSet.set(au);
+                        lv.set(ao, aq, as);
+                        if (!arg2.RULE_TEST.test(arg.getBlockState(lv), random)) continue;
+                        arg.setBlockState(lv, arg2.DEFAULT_STATE, 2);
                         ++o;
                     }
                 }

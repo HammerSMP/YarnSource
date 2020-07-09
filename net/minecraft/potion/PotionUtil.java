@@ -30,6 +30,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -37,6 +38,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class PotionUtil {
+    private static final MutableText noEffect = new TranslatableText("effect.none").formatted(Formatting.GRAY);
+
     public static List<StatusEffectInstance> getPotionEffects(ItemStack arg) {
         return PotionUtil.getPotionEffects(arg.getTag());
     }
@@ -155,7 +158,7 @@ public class PotionUtil {
         List<StatusEffectInstance> list2 = PotionUtil.getPotionEffects(arg);
         ArrayList list3 = Lists.newArrayList();
         if (list2.isEmpty()) {
-            list.add(new TranslatableText("effect.none").formatted(Formatting.GRAY));
+            list.add(noEffect);
         } else {
             for (StatusEffectInstance lv : list2) {
                 TranslatableText lv2 = new TranslatableText(lv.getTranslationKey());
@@ -169,10 +172,10 @@ public class PotionUtil {
                     }
                 }
                 if (lv.getAmplifier() > 0) {
-                    lv2.append(" ").append(new TranslatableText("potion.potency." + lv.getAmplifier()));
+                    lv2 = new TranslatableText("potion.withAmplifier", lv2, new TranslatableText("potion.potency." + lv.getAmplifier()));
                 }
                 if (lv.getDuration() > 20) {
-                    lv2.append(" (").append(StatusEffectUtil.durationToString(lv, f)).append(")");
+                    lv2 = new TranslatableText("potion.withDuration", lv2, StatusEffectUtil.durationToString(lv, f));
                 }
                 list.add(lv2.formatted(lv3.getType().getFormatting()));
             }

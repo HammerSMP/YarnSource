@@ -30,8 +30,8 @@ public class ListCommand {
         return ListCommand.execute(arg, PlayerEntity::getDisplayName);
     }
 
-    private static int executeUuids(ServerCommandSource arg) {
-        return ListCommand.execute(arg, PlayerEntity::getNameAndUuid);
+    private static int executeUuids(ServerCommandSource arg2) {
+        return ListCommand.execute(arg2, arg -> new TranslatableText("commands.list.nameAndId", arg.getName(), arg.getGameProfile().getId()));
     }
 
     private static int execute(ServerCommandSource arg, Function<ServerPlayerEntity, Text> function) {

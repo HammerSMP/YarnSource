@@ -17,15 +17,13 @@ import net.minecraft.world.gen.decorator.DecoratorConfig;
 
 public class CountDepthDecoratorConfig
 implements DecoratorConfig {
-    public static final Codec<CountDepthDecoratorConfig> field_24982 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("count").forGetter(arg -> arg.count), (App)Codec.INT.fieldOf("baseline").forGetter(arg -> arg.baseline), (App)Codec.INT.fieldOf("spread").forGetter(arg -> arg.spread)).apply((Applicative)instance, CountDepthDecoratorConfig::new));
+    public static final Codec<CountDepthDecoratorConfig> field_24982 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.fieldOf("baseline").forGetter(arg -> arg.count), (App)Codec.INT.fieldOf("spread").forGetter(arg -> arg.spread)).apply((Applicative)instance, CountDepthDecoratorConfig::new));
     public final int count;
-    public final int baseline;
     public final int spread;
 
-    public CountDepthDecoratorConfig(int i, int j, int k) {
+    public CountDepthDecoratorConfig(int i, int j) {
         this.count = i;
-        this.baseline = j;
-        this.spread = k;
+        this.spread = j;
     }
 }
 

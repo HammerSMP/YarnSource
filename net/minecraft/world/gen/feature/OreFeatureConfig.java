@@ -13,76 +13,31 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.predicate.block.BlockPredicate;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.structure.rule.BlockMatchRuleTest;
+import net.minecraft.structure.rule.RuleTest;
+import net.minecraft.structure.rule.TagMatchRuleTest;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class OreFeatureConfig
 implements FeatureConfig {
-    public static final Codec<OreFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Target.CODEC.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.INT.fieldOf("size").withDefault((Object)0).forGetter(arg -> arg.size)).apply((Applicative)instance, OreFeatureConfig::new));
-    public final Target target;
-    public final int size;
-    public final BlockState state;
+    public static final Codec<OreFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)RuleTest.field_25012.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.intRange((int)0, (int)64).fieldOf("size").forGetter(arg -> arg.size)).apply((Applicative)instance, OreFeatureConfig::new));
+    public final RuleTest RULE_TEST;
+    public final int SIZE;
+    public final BlockState DEFAULT_STATE;
 
-    public OreFeatureConfig(Target arg, BlockState arg2, int i) {
-        this.size = i;
-        this.state = arg2;
-        this.target = arg;
+    public OreFeatureConfig(RuleTest arg, BlockState arg2, int i) {
+        this.SIZE = i;
+        this.DEFAULT_STATE = arg2;
+        this.RULE_TEST = arg;
     }
 
-    public static enum Target implements StringIdentifiable
-    {
-        NATURAL_STONE("natural_stone", arg -> {
-            if (arg != null) {
-                return arg.isOf(Blocks.STONE) || arg.isOf(Blocks.GRANITE) || arg.isOf(Blocks.DIORITE) || arg.isOf(Blocks.ANDESITE);
-            }
-            return false;
-        }),
-        NETHERRACK("netherrack", new BlockPredicate(Blocks.NETHERRACK)),
-        NETHER_ORE_REPLACEABLES("nether_ore_replaceables", arg -> {
-            if (arg != null) {
-                return arg.isOf(Blocks.NETHERRACK) || arg.isOf(Blocks.BASALT) || arg.isOf(Blocks.BLACKSTONE);
-            }
-            return false;
-        });
-
-        public static final Codec<Target> CODEC;
-        private static final Map<String, Target> nameMap;
-        private final String name;
-        private final Predicate<BlockState> predicate;
-
-        private Target(String string2, Predicate<BlockState> predicate) {
-            this.name = string2;
-            this.predicate = predicate;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public static Target byName(String string) {
-            return nameMap.get(string);
-        }
-
-        public Predicate<BlockState> getCondition() {
-            return this.predicate;
-        }
-
-        @Override
-        public String asString() {
-            return this.name;
-        }
-
-        static {
-            CODEC = StringIdentifiable.createCodec(Target::values, Target::byName);
-            nameMap = Arrays.stream(Target.values()).collect(Collectors.toMap(Target::getName, arg -> arg));
-        }
+    public static final class class_5436 {
+        public static final RuleTest field_25845 = new TagMatchRuleTest(BlockTags.BASE_STONE_OVERWORLD);
+        public static final RuleTest field_25846 = new BlockMatchRuleTest(Blocks.NETHERRACK);
+        public static final RuleTest field_25847 = new TagMatchRuleTest(BlockTags.BASE_STONE_NETHER);
     }
 }
 

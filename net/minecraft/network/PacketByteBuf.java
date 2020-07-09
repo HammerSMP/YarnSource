@@ -77,7 +77,7 @@ extends ByteBuf {
     }
 
     public <T> T decode(Codec<T> codec) throws IOException {
-        CompoundTag lv = this.readCompoundTag();
+        CompoundTag lv = this.method_30617();
         DataResult dataResult = codec.parse((DynamicOps)NbtOps.INSTANCE, (Object)lv);
         if (dataResult.error().isPresent()) {
             throw new IOException("Failed to decode: " + ((DataResult.PartialResult)dataResult.error().get()).message() + " " + lv);
@@ -269,6 +269,16 @@ extends ByteBuf {
 
     @Nullable
     public CompoundTag readCompoundTag() {
+        return this.method_30616(new PositionTracker(0x200000L));
+    }
+
+    @Nullable
+    public CompoundTag method_30617() {
+        return this.method_30616(PositionTracker.DEFAULT);
+    }
+
+    @Nullable
+    public CompoundTag method_30616(PositionTracker arg) {
         int i = this.readerIndex();
         byte b = this.readByte();
         if (b == 0) {
@@ -276,7 +286,7 @@ extends ByteBuf {
         }
         this.readerIndex(i);
         try {
-            return NbtIo.read((DataInput)new ByteBufInputStream((ByteBuf)this), new PositionTracker(0x200000L));
+            return NbtIo.read((DataInput)new ByteBufInputStream((ByteBuf)this), arg);
         }
         catch (IOException iOException) {
             throw new EncoderException((Throwable)iOException);

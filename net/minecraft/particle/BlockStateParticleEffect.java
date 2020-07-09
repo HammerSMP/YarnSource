@@ -62,7 +62,7 @@ implements ParticleEffect {
 
     @Override
     public void write(PacketByteBuf arg) {
-        arg.writeVarInt(Block.STATE_IDS.getId(this.blockState));
+        arg.writeVarInt(Block.STATE_IDS.getRawId(this.blockState));
     }
 
     @Override

@@ -17,6 +17,8 @@
  *  com.mojang.authlib.GameProfileRepository
  *  com.mojang.authlib.ProfileLookupCallback
  *  javax.annotation.Nullable
+ *  org.apache.logging.log4j.LogManager
+ *  org.apache.logging.log4j.Logger
  */
 package net.minecraft.util;
 
@@ -37,6 +39,7 @@ import com.mojang.authlib.ProfileLookupCallback;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
@@ -57,8 +60,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.PlayerEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class UserCache {
+    private static final Logger field_25805 = LogManager.getLogger();
     private static boolean useRemote;
     private final Map<String, Entry> byName = Maps.newConcurrentMap();
     private final Map<UUID, Entry> byUuid = Maps.newConcurrentMap();
@@ -172,10 +178,19 @@ public class UserCache {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     }
 
+    /*
+     * Enabled aggressive block sorting
+     * Enabled unnecessary exception pruning
+     * Enabled aggressive exception aggregation
+     */
     public List<Entry> load() {
         ArrayList list = Lists.newArrayList();
-        try (BufferedReader reader = Files.newReader((File)this.cacheFile, (Charset)StandardCharsets.UTF_8);){
-            JsonArray jsonArray = (JsonArray)this.gson.fromJson((Reader)reader, JsonArray.class);
+        try (BufferedReader reader2 = Files.newReader((File)this.cacheFile, (Charset)StandardCharsets.UTF_8);){
+            JsonArray jsonArray = (JsonArray)this.gson.fromJson((Reader)reader2, JsonArray.class);
+            if (jsonArray == null) {
+                ArrayList arrayList = list;
+                return arrayList;
+            }
             DateFormat dateFormat = UserCache.method_30170();
             jsonArray.forEach(jsonElement -> {
                 Entry lv = UserCache.method_30167(jsonElement, dateFormat);
@@ -183,9 +198,13 @@ public class UserCache {
                     list.add(lv);
                 }
             });
+            return list;
         }
-        catch (JsonParseException | IOException throwable) {
-            // empty catch block
+        catch (FileNotFoundException reader2) {
+            return list;
+        }
+        catch (JsonParseException | IOException exception) {
+            field_25805.warn("Failed to load profile cache {}", (Object)this.cacheFile, (Object)exception);
         }
         return list;
     }

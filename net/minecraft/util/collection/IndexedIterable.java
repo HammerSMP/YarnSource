@@ -10,6 +10,8 @@ import javax.annotation.Nullable;
 
 public interface IndexedIterable<T>
 extends Iterable<T> {
+    public int getRawId(T var1);
+
     @Nullable
     public T get(int var1);
 }

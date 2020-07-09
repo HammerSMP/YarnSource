@@ -51,7 +51,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -245,14 +244,14 @@ Saddleable {
             }
         }
         for (BlockPos lv3 : set) {
-            if (this.world.getFluidState(lv3).isIn(FluidTags.LAVA)) continue;
-            for (EntityPose lv4 : arg.getPoses()) {
-                Vec3d lv6;
-                Box lv5;
-                double g = this.world.getCollisionHeightAt(lv3);
-                if (!Dismounting.canDismountInBlock(g) || !Dismounting.canPlaceEntityAt(this.world, arg, (lv5 = arg.getBoundingBox(lv4)).offset(lv6 = Vec3d.ofCenter(lv3, g)))) continue;
-                arg.setPose(lv4);
-                return lv6;
+            double g;
+            if (this.world.getFluidState(lv3).isIn(FluidTags.LAVA) || !Dismounting.canDismountInBlock(g = this.world.method_30347(lv3))) continue;
+            Vec3d lv4 = Vec3d.ofCenter(lv3, g);
+            for (EntityPose lv5 : arg.getPoses()) {
+                Box lv6 = arg.getBoundingBox(lv5);
+                if (!Dismounting.canPlaceEntityAt(this.world, arg, lv6.offset(lv4))) continue;
+                arg.setPose(lv5);
+                return lv4;
             }
         }
         return new Vec3d(this.getX(), this.getBoundingBox().maxY, this.getZ());
@@ -443,44 +442,29 @@ Saddleable {
     @Override
     @Nullable
     public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        ZombifiedPiglinEntity lv9;
-        StriderData.RiderType lv6;
-        ZombieEntity.ZombieData lv = null;
-        if (arg4 instanceof StriderData) {
-            StriderData.RiderType lv2 = ((StriderData)arg4).type;
-        } else if (!this.isBaby()) {
-            StriderData.RiderType lv5;
-            if (this.random.nextInt(30) == 0) {
-                StriderData.RiderType lv3 = StriderData.RiderType.PIGLIN_RIDER;
-                lv = new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false);
-            } else if (this.random.nextInt(10) == 0) {
-                StriderData.RiderType lv4 = StriderData.RiderType.BABY_RIDER;
-            } else {
-                lv5 = StriderData.RiderType.NO_RIDER;
-            }
-            arg4 = new StriderData(lv5);
-            ((PassiveEntity.PassiveData)arg4).setBabyChance(lv5 == StriderData.RiderType.NO_RIDER ? 0.5f : 0.0f);
-        } else {
-            lv6 = StriderData.RiderType.NO_RIDER;
+        if (this.isBaby()) {
+            return super.initialize(arg, arg2, arg3, arg4, arg5);
         }
-        PathAwareEntity lv7 = null;
-        if (lv6 == StriderData.RiderType.BABY_RIDER) {
-            StriderEntity lv8 = EntityType.STRIDER.create(arg.getWorld());
-            if (lv8 != null) {
-                lv7 = lv8;
-                lv8.setBreedingAge(-24000);
-            }
-        } else if (lv6 == StriderData.RiderType.PIGLIN_RIDER && (lv9 = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld())) != null) {
-            lv7 = lv9;
+        if (this.random.nextInt(30) == 0) {
+            MobEntity lv = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld());
+            arg4 = this.method_30336(arg, arg2, lv, new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false));
             this.saddle(null);
-        }
-        if (lv7 != null) {
-            lv7.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-            lv7.initialize(arg, arg2, SpawnReason.JOCKEY, lv, null);
-            lv7.startRiding(this, true);
-            arg.spawnEntity(lv7);
+        } else if (this.random.nextInt(10) == 0) {
+            PassiveEntity lv2 = EntityType.STRIDER.create(arg.getWorld());
+            lv2.setBreedingAge(-24000);
+            arg4 = this.method_30336(arg, arg2, lv2, null);
+        } else {
+            arg4 = new PassiveEntity.PassiveData(0.5f);
         }
         return super.initialize(arg, arg2, arg3, arg4, arg5);
+    }
+
+    private EntityData method_30336(class_5425 arg, LocalDifficulty arg2, MobEntity arg3, @Nullable EntityData arg4) {
+        arg3.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
+        arg3.initialize(arg, arg2, SpawnReason.JOCKEY, arg4, null);
+        arg3.startRiding(this, true);
+        arg.spawnEntity(arg3);
+        return new PassiveEntity.PassiveData(0.0f);
     }
 
     @Override
@@ -511,22 +495,6 @@ Saddleable {
         @Override
         public boolean isValidPosition(BlockPos arg) {
             return this.world.getBlockState(arg).isOf(Blocks.LAVA) || super.isValidPosition(arg);
-        }
-    }
-
-    public static class StriderData
-    extends PassiveEntity.PassiveData {
-        public final RiderType type;
-
-        public StriderData(RiderType arg) {
-            this.type = arg;
-        }
-
-        public static enum RiderType {
-            NO_RIDER,
-            BABY_RIDER,
-            PIGLIN_RIDER;
-
         }
     }
 }

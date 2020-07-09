@@ -40,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
@@ -67,7 +68,6 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
 import net.minecraft.util.dynamic.RegistryOps;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.gen.GeneratorOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -89,32 +89,25 @@ Drawable {
     private ButtonWidget mapTypeButton;
     private ButtonWidget customizeTypeButton;
     private ButtonWidget field_25048;
-    private RegistryTracker.Modifiable field_25483;
+    private class_5455.class_5457 field_25483;
     private GeneratorOptions generatorOptions;
     private Optional<GeneratorType> field_25049;
-    private String seedText;
+    private OptionalLong seedText;
 
-    public MoreOptionsDialog() {
-        this.field_25483 = RegistryTracker.create();
-        this.generatorOptions = GeneratorOptions.getDefaultOptions();
-        this.field_25049 = Optional.of(GeneratorType.DEFAULT);
-        this.seedText = "";
-    }
-
-    public MoreOptionsDialog(RegistryTracker.Modifiable arg, GeneratorOptions arg2) {
+    public MoreOptionsDialog(class_5455.class_5457 arg, GeneratorOptions arg2, Optional<GeneratorType> optional, OptionalLong optionalLong) {
         this.field_25483 = arg;
         this.generatorOptions = arg2;
-        this.field_25049 = GeneratorType.method_29078(arg2);
-        this.seedText = Long.toString(arg2.getSeed());
+        this.field_25049 = optional;
+        this.seedText = optionalLong;
     }
 
     public void method_28092(final CreateWorldScreen arg4, MinecraftClient arg22, TextRenderer arg32) {
         this.textRenderer = arg32;
         this.parentWidth = arg4.width;
         this.seedTextField = new TextFieldWidget(this.textRenderer, this.parentWidth / 2 - 100, 60, 200, 20, new TranslatableText("selectWorld.enterSeed"));
-        this.seedTextField.setText(this.seedText);
+        this.seedTextField.setText(MoreOptionsDialog.method_30510(this.seedText));
         this.seedTextField.setChangedListener(string -> {
-            this.seedText = this.seedTextField.getText();
+            this.seedText = this.method_30511();
         });
         arg4.addChild(this.seedTextField);
         int i = this.parentWidth / 2 - 155;
@@ -126,7 +119,7 @@ Drawable {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(MoreOptionsDialog.this.generatorOptions.shouldGenerateStructures()));
+                return ScreenTexts.method_30619(super.getMessage(), MoreOptionsDialog.this.generatorOptions.shouldGenerateStructures());
             }
 
             @Override
@@ -179,7 +172,7 @@ Drawable {
 
             @Override
             public Text getMessage() {
-                return super.getMessage().shallowCopy().append(" ").append(ScreenTexts.getToggleText(MoreOptionsDialog.this.generatorOptions.hasBonusChest() && !arg4.hardcore));
+                return ScreenTexts.method_30619(super.getMessage(), MoreOptionsDialog.this.generatorOptions.hasBonusChest() && !arg4.hardcore);
             }
         });
         this.bonusItemsButton.visible = false;
@@ -191,7 +184,7 @@ Drawable {
             if (string == null) {
                 return;
             }
-            RegistryTracker.Modifiable lv2 = RegistryTracker.create();
+            class_5455.class_5457 lv2 = class_5455.method_30528();
             ResourcePackManager lv3 = new ResourcePackManager(new VanillaDataPackProvider(), new FileResourcePackProvider(arg4.method_29693().toFile(), ResourcePackSource.PACK_SOURCE_WORLD));
             try {
                 MinecraftServer.loadDataPacks(lv3, arg.field_25479, false);
@@ -223,6 +216,7 @@ Drawable {
                 LiteralText lv10 = new LiteralText(string2);
                 arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv9, lv10));
             }
+            lv7.close();
             Lifecycle lifecycle = dataResult3.lifecycle();
             dataResult3.resultOrPartial(((Logger)field_25046)::error).ifPresent(arg4 -> {
                 BooleanConsumer booleanConsumer = bl -> {
@@ -243,12 +237,12 @@ Drawable {
         this.field_25048.visible = false;
     }
 
-    private void method_29073(RegistryTracker.Modifiable arg, GeneratorOptions arg2) {
-        this.field_25483 = arg;
+    private void method_29073(class_5455.class_5457 arg, GeneratorOptions arg2) {
+        this.method_30509(arg);
         this.generatorOptions = arg2;
         this.field_25049 = GeneratorType.method_29078(arg2);
-        this.seedText = Long.toString(arg2.getSeed());
-        this.seedTextField.setText(this.seedText);
+        this.seedText = OptionalLong.of(arg2.getSeed());
+        this.seedTextField.setText(MoreOptionsDialog.method_30510(this.seedText));
         this.mapTypeButton.active = this.field_25049.isPresent();
     }
 
@@ -272,6 +266,13 @@ Drawable {
         this.generatorOptions = arg;
     }
 
+    private static String method_30510(OptionalLong optionalLong) {
+        if (optionalLong.isPresent()) {
+            return Long.toString(optionalLong.getAsLong());
+        }
+        return "";
+    }
+
     private static OptionalLong tryParseLong(String string) {
         try {
             return OptionalLong.of(Long.parseLong(string));
@@ -282,6 +283,11 @@ Drawable {
     }
 
     public GeneratorOptions getGeneratorOptions(boolean bl) {
+        OptionalLong optionalLong = this.method_30511();
+        return this.generatorOptions.withHardcore(bl, optionalLong);
+    }
+
+    private OptionalLong method_30511() {
         OptionalLong optionalLong4;
         String string = this.seedTextField.getText();
         if (StringUtils.isEmpty((CharSequence)string)) {
@@ -294,7 +300,7 @@ Drawable {
                 optionalLong4 = OptionalLong.of(string.hashCode());
             }
         }
-        return this.generatorOptions.withHardcore(bl, optionalLong4);
+        return optionalLong4;
     }
 
     public boolean isDebugWorld() {
@@ -317,8 +323,12 @@ Drawable {
         this.seedTextField.setVisible(bl);
     }
 
-    public RegistryTracker.Modifiable method_29700() {
+    public class_5455.class_5457 method_29700() {
         return this.field_25483;
+    }
+
+    protected void method_30509(class_5455.class_5457 arg) {
+        this.field_25483 = arg;
     }
 }
 

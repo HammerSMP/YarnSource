@@ -31,9 +31,8 @@ extends Feature<BlockPileFeatureConfig> {
 
     public static boolean method_26264(WorldAccess arg, Random random, BlockPos arg2, BlockPileFeatureConfig arg3, int i, int j) {
         Block lv = arg.getBlockState(arg2.down()).getBlock();
-        while (!lv.isIn(BlockTags.NYLIUM) && arg2.getY() > 0) {
-            arg2 = arg2.down();
-            lv = arg.getBlockState(arg2).getBlock();
+        if (!lv.isIn(BlockTags.NYLIUM)) {
+            return false;
         }
         int k = arg2.getY();
         if (k < 1 || k + 1 >= 256) {

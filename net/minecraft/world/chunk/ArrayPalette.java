@@ -82,7 +82,7 @@ implements Palette<T> {
     public void toPacket(PacketByteBuf arg) {
         arg.writeVarInt(this.size);
         for (int i = 0; i < this.size; ++i) {
-            arg.writeVarInt(this.idList.getId(this.array[i]));
+            arg.writeVarInt(this.idList.getRawId(this.array[i]));
         }
     }
 
@@ -90,7 +90,7 @@ implements Palette<T> {
     public int getPacketSize() {
         int i = PacketByteBuf.getVarIntSizeBytes(this.getSize());
         for (int j = 0; j < this.getSize(); ++j) {
-            i += PacketByteBuf.getVarIntSizeBytes(this.idList.getId(this.array[j]));
+            i += PacketByteBuf.getVarIntSizeBytes(this.idList.getRawId(this.array[j]));
         }
         return i;
     }

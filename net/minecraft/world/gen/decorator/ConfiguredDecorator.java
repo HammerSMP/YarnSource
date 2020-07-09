@@ -8,28 +8,46 @@ package net.minecraft.world.gen.decorator;
 
 import com.mojang.serialization.Codec;
 import java.util.Random;
+import java.util.stream.Stream;
+import net.minecraft.class_5432;
+import net.minecraft.class_5443;
+import net.minecraft.class_5444;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.decorator.Decorator;
 import net.minecraft.world.gen.decorator.DecoratorConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.FeatureConfig;
 
-public class ConfiguredDecorator<DC extends DecoratorConfig> {
+public class ConfiguredDecorator<DC extends DecoratorConfig>
+implements class_5432<ConfiguredDecorator<?>> {
     public static final Codec<ConfiguredDecorator<?>> field_24981 = Registry.DECORATOR.dispatch("name", arg -> arg.decorator, Decorator::getCodec);
-    public final Decorator<DC> decorator;
-    public final DC config;
+    private final Decorator<DC> decorator;
+    private final DC config;
 
     public ConfiguredDecorator(Decorator<DC> arg, DC arg2) {
         this.decorator = arg;
         this.config = arg2;
     }
 
-    public <FC extends FeatureConfig, F extends Feature<FC>> boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, ConfiguredFeature<FC, F> arg4) {
-        return this.decorator.generate(arg, arg2, random, arg3, this.config, arg4);
+    public Stream<BlockPos> method_30444(class_5444 arg, Random random, BlockPos arg2) {
+        return this.decorator.getPositions(arg, random, this.config, arg2);
+    }
+
+    public String toString() {
+        return String.format("[%s %s]", Registry.DECORATOR.getId(this.decorator), this.config);
+    }
+
+    @Override
+    public ConfiguredDecorator<?> method_30374(ConfiguredDecorator<?> arg) {
+        return new ConfiguredDecorator<class_5443>(Decorator.DECORATED, new class_5443(arg, this));
+    }
+
+    public DC method_30445() {
+        return this.config;
+    }
+
+    @Override
+    public /* synthetic */ Object method_30374(ConfiguredDecorator arg) {
+        return this.method_30374(arg);
     }
 }
 

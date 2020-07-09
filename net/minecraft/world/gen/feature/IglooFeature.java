@@ -7,6 +7,7 @@
 package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.class_5455;
 import net.minecraft.structure.IglooGenerator;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.structure.StructureStart;
@@ -36,12 +37,12 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             int k = i * 16;
             int l = j * 16;
             BlockPos lv = new BlockPos(k, 90, l);
             BlockRotation lv2 = BlockRotation.random(this.random);
-            IglooGenerator.addPieces(arg2, lv, lv2, this.children, this.random);
+            IglooGenerator.addPieces(arg3, lv, lv2, this.children, this.random);
             this.setBoundingBoxFromChildren();
         }
     }

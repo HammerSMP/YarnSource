@@ -14,10 +14,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.util.crash.CrashReportSection;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -67,7 +67,7 @@ public interface SaveProperties {
     @Environment(value=EnvType.CLIENT)
     public LevelInfo getLevelInfo();
 
-    public CompoundTag cloneWorldTag(RegistryTracker var1, @Nullable CompoundTag var2);
+    public CompoundTag cloneWorldTag(class_5455 var1, @Nullable CompoundTag var2);
 
     public boolean isHardcore();
 

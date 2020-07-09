@@ -711,7 +711,7 @@ public class Structure {
         }
 
         public int getId(BlockState arg) {
-            int i = this.ids.getId(arg);
+            int i = this.ids.getRawId(arg);
             if (i == -1) {
                 i = this.currentIndex++;
                 this.ids.set(arg, i);

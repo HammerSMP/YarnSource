@@ -58,7 +58,7 @@ extends GameOptionsScreen {
     }
 
     private Text getPlayerModelPartDisplayString(PlayerModelPart arg) {
-        return arg.getOptionName().shallowCopy().append(": ").append(ScreenTexts.getToggleText(this.gameOptions.getEnabledPlayerModelParts().contains((Object)arg)));
+        return ScreenTexts.method_30619(arg.getOptionName(), this.gameOptions.getEnabledPlayerModelParts().contains((Object)arg));
     }
 }
 

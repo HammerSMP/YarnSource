@@ -146,6 +146,10 @@ implements Comparable<Vec3i> {
         return (int)(f + g + h);
     }
 
+    public int method_30558(Direction.Axis arg) {
+        return arg.choose(this.x, this.y, this.z);
+    }
+
     public String toString() {
         return MoreObjects.toStringHelper((Object)this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ()).toString();
     }

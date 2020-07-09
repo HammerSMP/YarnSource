@@ -16,13 +16,13 @@ import java.util.Map;
 import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.class_5455;
 import net.minecraft.client.gui.screen.CustomizeBuffetLevelScreen;
 import net.minecraft.client.gui.screen.CustomizeFlatLevelScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.source.FixedBiomeSource;
@@ -76,7 +76,7 @@ public abstract class GeneratorType {
     private static final GeneratorType SINGLE_BIOME_CAVES = new GeneratorType("single_biome_caves"){
 
         @Override
-        public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
+        public GeneratorOptions method_29077(class_5455.class_5457 arg, long l, boolean bl, boolean bl2) {
             return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_29962(DimensionType.method_28517(l), DimensionType::getOverworldCavesDimensionType, this.getChunkGenerator(l)));
         }
 
@@ -103,7 +103,7 @@ public abstract class GeneratorType {
     protected static final Map<Optional<GeneratorType>, ScreenProvider> field_25053 = ImmutableMap.of(Optional.of(FLAT), (arg, arg2) -> {
         ChunkGenerator lv = arg2.getChunkGenerator();
         return new CustomizeFlatLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(new GeneratorOptions(arg2.getSeed(), arg2.shouldGenerateStructures(), arg2.hasBonusChest(), GeneratorOptions.method_28608(arg2.getDimensionMap(), new FlatChunkGenerator((FlatChunkGeneratorConfig)arg3)))), lv instanceof FlatChunkGenerator ? ((FlatChunkGenerator)lv).method_28545() : FlatChunkGeneratorConfig.getDefaultConfig());
-    }, Optional.of(SINGLE_BIOME_SURFACE), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_SURFACE, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_CAVES), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_CAVES, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_FLOATING_ISLANDS), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_FLOATING_ISLANDS, arg3)), GeneratorType.getFirstBiome(arg2)));
+    }, Optional.of(SINGLE_BIOME_SURFACE), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg.moreOptionsDialog.method_29700(), arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_SURFACE, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_CAVES), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg.moreOptionsDialog.method_29700(), arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_CAVES, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_FLOATING_ISLANDS), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg.moreOptionsDialog.method_29700(), arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_FLOATING_ISLANDS, arg3)), GeneratorType.getFirstBiome(arg2)));
     private final Text translationKey;
 
     private GeneratorType(String string) {
@@ -142,7 +142,7 @@ public abstract class GeneratorType {
         return this.translationKey;
     }
 
-    public GeneratorOptions method_29077(RegistryTracker.Modifiable arg, long l, boolean bl, boolean bl2) {
+    public GeneratorOptions method_29077(class_5455.class_5457 arg, long l, boolean bl, boolean bl2) {
         return new GeneratorOptions(l, bl, bl2, GeneratorOptions.method_28608(DimensionType.method_28517(l), this.getChunkGenerator(l)));
     }
 

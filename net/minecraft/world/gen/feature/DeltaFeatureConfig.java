@@ -13,63 +13,39 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.Optional;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_5428;
 import net.minecraft.world.gen.feature.FeatureConfig;
 
 public class DeltaFeatureConfig
 implements FeatureConfig {
-    public static final Codec<DeltaFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("contents").forGetter(arg -> arg.contents), (App)BlockState.CODEC.fieldOf("rim").forGetter(arg -> arg.rim), (App)Codec.INT.fieldOf("minimum_radius").forGetter(arg -> arg.minRadius), (App)Codec.INT.fieldOf("maximum_radius").forGetter(arg -> arg.maxRadius), (App)Codec.INT.fieldOf("maximum_rim").forGetter(arg -> arg.maxRim)).apply((Applicative)instance, DeltaFeatureConfig::new));
-    public final BlockState contents;
-    public final BlockState rim;
-    public final int minRadius;
-    public final int maxRadius;
-    public final int maxRim;
+    public static final Codec<DeltaFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BlockState.CODEC.fieldOf("contents").forGetter(arg -> arg.contents), (App)BlockState.CODEC.fieldOf("rim").forGetter(arg -> arg.rim), (App)class_5428.method_30316(0, 8, 8).fieldOf("size").forGetter(arg -> arg.field_25843), (App)class_5428.method_30316(0, 8, 8).fieldOf("rim_size").forGetter(arg -> arg.field_25844)).apply((Applicative)instance, DeltaFeatureConfig::new));
+    private final BlockState contents;
+    private final BlockState rim;
+    private final class_5428 field_25843;
+    private final class_5428 field_25844;
 
-    public DeltaFeatureConfig(BlockState arg, BlockState arg2, int i, int j, int k) {
+    public DeltaFeatureConfig(BlockState arg, BlockState arg2, class_5428 arg3, class_5428 arg4) {
         this.contents = arg;
         this.rim = arg2;
-        this.minRadius = i;
-        this.maxRadius = j;
-        this.maxRim = k;
+        this.field_25843 = arg3;
+        this.field_25844 = arg4;
     }
 
-    public static class Builder {
-        Optional<BlockState> contents = Optional.empty();
-        Optional<BlockState> rim = Optional.empty();
-        int minRadius;
-        int maxRadius;
-        int maxRim;
+    public BlockState method_30397() {
+        return this.contents;
+    }
 
-        public Builder radius(int i, int j) {
-            this.minRadius = i;
-            this.maxRadius = j;
-            return this;
-        }
+    public BlockState method_30400() {
+        return this.rim;
+    }
 
-        public Builder contents(BlockState arg) {
-            this.contents = Optional.of(arg);
-            return this;
-        }
+    public class_5428 method_30402() {
+        return this.field_25843;
+    }
 
-        public Builder rim(BlockState arg, int i) {
-            this.rim = Optional.of(arg);
-            this.maxRim = i;
-            return this;
-        }
-
-        public DeltaFeatureConfig build() {
-            if (!this.contents.isPresent()) {
-                throw new IllegalArgumentException("Missing contents");
-            }
-            if (!this.rim.isPresent()) {
-                throw new IllegalArgumentException("Missing rim");
-            }
-            if (this.minRadius > this.maxRadius) {
-                throw new IllegalArgumentException("Minimum radius cannot be greater than maximum radius");
-            }
-            return new DeltaFeatureConfig(this.contents.get(), this.rim.get(), this.minRadius, this.maxRadius, this.maxRim);
-        }
+    public class_5428 method_30403() {
+        return this.field_25844;
     }
 }
 

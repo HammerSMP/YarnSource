@@ -12,19 +12,14 @@ package net.minecraft.world;
 
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.DataFixer;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PushbackInputStream;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.SharedConstants;
-import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.PersistentState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,44 +81,28 @@ public class PersistentStateManager {
     }
 
     /*
-     * WARNING - void declaration
+     * Exception decompiling
      */
     public CompoundTag readTag(String string, int i) throws IOException {
-        File file = this.getFile(string);
-        try (PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(file), 2);){
-            void lv3;
-            Object object;
-            if (this.isCompressed(pushbackInputStream)) {
-                CompoundTag lv = NbtIo.readCompressed(pushbackInputStream);
-            } else {
-                DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
-                object = null;
-                try {
-                    CompoundTag lv2 = NbtIo.read(dataInputStream);
-                }
-                catch (Throwable throwable) {
-                    object = throwable;
-                    throw throwable;
-                }
-                finally {
-                    if (dataInputStream != null) {
-                        if (object != null) {
-                            try {
-                                dataInputStream.close();
-                            }
-                            catch (Throwable throwable) {
-                                ((Throwable)object).addSuppressed(throwable);
-                            }
-                        } else {
-                            dataInputStream.close();
-                        }
-                    }
-                }
-            }
-            int j = lv3.contains("DataVersion", 99) ? lv3.getInt("DataVersion") : 1343;
-            object = NbtHelper.update(this.dataFixer, DataFixTypes.SAVED_DATA, (CompoundTag)lv3, j, i);
-            return object;
-        }
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [0[TRYBLOCK]], but top level block is 8[TRYBLOCK]
+         * org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:428)
+         * org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:477)
+         * org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:619)
+         * org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:779)
+         * org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:251)
+         * org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:185)
+         * org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         * org.benf.cfr.reader.entities.Method.analyse(Method.java:463)
+         * org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1001)
+         * org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:888)
+         * org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:252)
+         * org.benf.cfr.reader.Driver.doJar(Driver.java:134)
+         * org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:65)
+         * org.benf.cfr.reader.Main.main(Main.java:49)
+         */
+        throw new IllegalStateException(Decompilation failed);
     }
 
     private boolean isCompressed(PushbackInputStream pushbackInputStream) throws IOException {

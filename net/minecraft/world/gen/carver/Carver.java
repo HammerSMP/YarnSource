@@ -58,7 +58,11 @@ public abstract class Carver<C extends CarverConfig> {
 
     public Carver(Codec<C> codec, int i) {
         this.heightLimit = i;
-        this.codec = codec.fieldOf("config").xmap(arg -> new ConfiguredCarver<CarverConfig>(this, (CarverConfig)arg), arg -> arg.config).codec();
+        this.codec = codec.fieldOf("config").xmap(this::method_28614, ConfiguredCarver::method_30378).codec();
+    }
+
+    public ConfiguredCarver<C> method_28614(C arg) {
+        return new ConfiguredCarver<C>(this, arg);
     }
 
     public Codec<ConfiguredCarver<C>> getCodec() {

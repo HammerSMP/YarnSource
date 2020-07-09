@@ -20,6 +20,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.PresetsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
+import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -36,7 +37,7 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 @Environment(value=EnvType.CLIENT)
 public class CustomizeFlatLevelScreen
 extends Screen {
-    private final Screen parent;
+    protected final CreateWorldScreen parent;
     private final Consumer<FlatChunkGeneratorConfig> field_24565;
     private FlatChunkGeneratorConfig config;
     private Text tileText;
@@ -44,7 +45,7 @@ extends Screen {
     private SuperflatLayersListWidget layers;
     private ButtonWidget widgetButtonRemoveLayer;
 
-    public CustomizeFlatLevelScreen(Screen arg, Consumer<FlatChunkGeneratorConfig> consumer, FlatChunkGeneratorConfig arg2) {
+    public CustomizeFlatLevelScreen(CreateWorldScreen arg, Consumer<FlatChunkGeneratorConfig> consumer, FlatChunkGeneratorConfig arg2) {
         super(new TranslatableText("createWorld.customize.flat.title"));
         this.parent = arg;
         this.field_24565 = consumer;

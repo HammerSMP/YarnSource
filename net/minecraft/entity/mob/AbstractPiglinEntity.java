@@ -100,7 +100,9 @@ extends HostileEntity {
 
     protected void zombify(ServerWorld arg) {
         ZombifiedPiglinEntity lv = this.method_29243(EntityType.ZOMBIFIED_PIGLIN);
-        lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
+        if (lv != null) {
+            lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
+        }
     }
 
     public boolean isAdult() {

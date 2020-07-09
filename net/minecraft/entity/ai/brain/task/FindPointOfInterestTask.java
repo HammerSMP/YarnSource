@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -34,18 +35,20 @@ extends Task<PathAwareEntity> {
     private final PointOfInterestType poiType;
     private final MemoryModuleType<GlobalPos> targetMemoryModuleType;
     private final boolean onlyRunIfChild;
+    private final Optional<Byte> field_25812;
     private long positionExpireTimeLimit;
     private final Long2ObjectMap<RetryMarker> foundPositionsToExpiry = new Long2ObjectOpenHashMap();
 
-    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, MemoryModuleType<GlobalPos> arg3, boolean bl) {
+    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, MemoryModuleType<GlobalPos> arg3, boolean bl, Optional<Byte> optional) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)FindPointOfInterestTask.method_29245(arg2, arg3));
         this.poiType = arg;
         this.targetMemoryModuleType = arg3;
         this.onlyRunIfChild = bl;
+        this.field_25812 = optional;
     }
 
-    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, boolean bl) {
-        this(arg, arg2, arg2, bl);
+    public FindPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2, boolean bl, Optional<Byte> optional) {
+        this(arg, arg2, arg2, bl, optional);
     }
 
     private static ImmutableMap<MemoryModuleType<?>, MemoryModuleState> method_29245(MemoryModuleType<GlobalPos> arg, MemoryModuleType<GlobalPos> arg2) {
@@ -92,6 +95,7 @@ extends Task<PathAwareEntity> {
             lv.getType(lv3).ifPresent(arg5 -> {
                 lv.getPosition(this.poiType.getCompletionCondition(), arg2 -> arg2.equals(lv3), lv3, 1);
                 arg22.getBrain().remember(this.targetMemoryModuleType, GlobalPos.create(arg2.getRegistryKey(), lv3));
+                this.field_25812.ifPresent(byte_ -> arg2.sendEntityStatus(arg22, (byte)byte_));
                 this.foundPositionsToExpiry.clear();
                 DebugInfoSender.sendPointOfInterest(arg2, lv3);
             });

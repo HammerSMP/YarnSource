@@ -79,7 +79,7 @@ public class Advancement {
             Formatting lv2 = arg3.getFrame().getTitleFormat();
             MutableText lv3 = Texts.setStyleIfAbsent(lv.shallowCopy(), Style.EMPTY.withColor(lv2)).append("\n").append(arg3.getDescription());
             MutableText lv4 = lv.shallowCopy().styled(arg2 -> arg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv3)));
-            this.text = new LiteralText("[").append(lv4).append("]").formatted(lv2);
+            this.text = Texts.bracketed(lv4).formatted(lv2);
         }
     }
 

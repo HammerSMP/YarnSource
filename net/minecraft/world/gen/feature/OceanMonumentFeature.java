@@ -12,6 +12,7 @@ import com.mojang.serialization.Codec;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import net.minecraft.class_5455;
 import net.minecraft.entity.EntityType;
 import net.minecraft.structure.OceanMonumentGenerator;
 import net.minecraft.structure.StructureManager;
@@ -75,7 +76,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             this.method_16588(i, j);
         }
 

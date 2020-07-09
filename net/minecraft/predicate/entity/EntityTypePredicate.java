@@ -53,7 +53,7 @@ public abstract class EntityTypePredicate {
             return new Tagged(ServerTagManagerHolder.getTagManager().getEntityTypes().getTagOrEmpty(lv));
         }
         Identifier lv2 = new Identifier(string);
-        EntityType lv3 = (EntityType)Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown entity type '" + lv2 + "', valid types are: " + COMMA_JOINER.join(Registry.ENTITY_TYPE.getIds())));
+        EntityType<?> lv3 = Registry.ENTITY_TYPE.getOrEmpty(lv2).orElseThrow(() -> new JsonSyntaxException("Unknown entity type '" + lv2 + "', valid types are: " + COMMA_JOINER.join(Registry.ENTITY_TYPE.getIds())));
         return new Single(lv3);
     }
 

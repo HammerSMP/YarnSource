@@ -291,6 +291,7 @@ extends HorseBaseEntity {
         public final HorseColor color;
 
         public HorseData(HorseColor arg) {
+            super(true);
             this.color = arg;
         }
     }

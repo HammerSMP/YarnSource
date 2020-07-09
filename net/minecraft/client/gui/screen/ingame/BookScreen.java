@@ -21,7 +21,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.PageTurnWidget;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
@@ -60,6 +59,7 @@ extends Screen {
     private int pageIndex;
     private List<StringRenderable> cachedPage = Collections.emptyList();
     private int cachedPageIndex = -1;
+    private StringRenderable field_25897 = StringRenderable.EMPTY;
     private PageTurnWidget nextPageButton;
     private PageTurnWidget previousPageButton;
     private final boolean pageTurnSound;
@@ -167,14 +167,14 @@ extends Screen {
         int k = (this.width - 192) / 2;
         int l = 2;
         this.drawTexture(arg, k, 2, 0, 0, 192, 192);
-        String string = I18n.translate("book.pageIndicator", this.pageIndex + 1, Math.max(this.getPageCount(), 1));
         if (this.cachedPageIndex != this.pageIndex) {
             StringRenderable lv = this.contents.getPage(this.pageIndex);
             this.cachedPage = this.textRenderer.getTextHandler().wrapLines(lv, 114, Style.EMPTY);
+            this.field_25897 = new TranslatableText("book.pageIndicator", this.pageIndex + 1, Math.max(this.getPageCount(), 1));
         }
         this.cachedPageIndex = this.pageIndex;
-        int m = this.getStringWidth(string);
-        this.textRenderer.draw(arg, string, (float)(k - m + 192 - 44), 18.0f, 0);
+        int m = this.textRenderer.getWidth(this.field_25897);
+        this.textRenderer.draw(arg, this.field_25897, (float)(k - m + 192 - 44), 18.0f, 0);
         this.textRenderer.getClass();
         int n = Math.min(128 / 9, this.cachedPage.size());
         for (int o = 0; o < n; ++o) {
@@ -187,10 +187,6 @@ extends Screen {
             this.renderTextHoverEffect(arg, lv3, i, j);
         }
         super.render(arg, i, j, f);
-    }
-
-    private int getStringWidth(String string) {
-        return this.textRenderer.getWidth(this.textRenderer.isRightToLeft() ? this.textRenderer.mirror(string) : string);
     }
 
     @Override

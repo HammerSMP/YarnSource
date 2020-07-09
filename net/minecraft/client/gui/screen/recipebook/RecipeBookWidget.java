@@ -53,6 +53,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Language;
 
 @Environment(value=EnvType.CLIENT)
 public class RecipeBookWidget
@@ -186,7 +187,7 @@ RecipeGridAligner<Ingredient> {
         list2.removeIf(arg -> !arg.hasFittingRecipes());
         String string = this.searchField.getText();
         if (!string.isEmpty()) {
-            ObjectLinkedOpenHashSet objectSet = new ObjectLinkedOpenHashSet(this.client.getSearchableContainer(SearchManager.RECIPE_OUTPUT).findAll(string.toLowerCase(Locale.ROOT)));
+            ObjectLinkedOpenHashSet objectSet = new ObjectLinkedOpenHashSet(this.client.getSearchableContainer(SearchManager.RECIPE_OUTPUT).findAll(Language.getInstance().reorder(string.toLowerCase(Locale.ROOT), false)));
             list2.removeIf(arg_0 -> RecipeBookWidget.method_2594((ObjectSet)objectSet, arg_0));
         }
         if (this.recipeBook.isFilteringCraftable(this.craftingScreenHandler)) {

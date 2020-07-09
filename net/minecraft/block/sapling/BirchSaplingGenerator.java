@@ -9,9 +9,8 @@ package net.minecraft.block.sapling;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.sapling.SaplingGenerator;
+import net.minecraft.class_5464;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 
 public class BirchSaplingGenerator
@@ -19,7 +18,7 @@ extends SaplingGenerator {
     @Override
     @Nullable
     protected ConfiguredFeature<TreeFeatureConfig, ?> createTreeFeature(Random random, boolean bl) {
-        return Feature.TREE.configure(bl ? DefaultBiomeFeatures.BIRCH_TREE_WITH_MORE_BEEHIVES_CONFIG : DefaultBiomeFeatures.BIRCH_TREE_CONFIG);
+        return bl ? class_5464.BIRCH_BEES_005 : class_5464.BIRCH;
     }
 }
 

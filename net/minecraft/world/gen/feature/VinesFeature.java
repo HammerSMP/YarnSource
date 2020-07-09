@@ -29,7 +29,7 @@ extends Feature<DefaultFeatureConfig> {
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, DefaultFeatureConfig arg4) {
         BlockPos.Mutable lv = arg3.mutableCopy();
-        block0: for (int i = arg3.getY(); i < 256; ++i) {
+        block0: for (int i = 64; i < 256; ++i) {
             lv.set(arg3);
             lv.move(random.nextInt(4) - random.nextInt(4), 0, random.nextInt(4) - random.nextInt(4));
             lv.setY(i);

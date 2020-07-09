@@ -23,11 +23,11 @@ extends Feature<RandomFeatureConfig> {
 
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, RandomFeatureConfig arg4) {
-        for (RandomFeatureEntry<?> lv : arg4.features) {
+        for (RandomFeatureEntry lv : arg4.features) {
             if (!(random.nextFloat() < lv.chance)) continue;
             return lv.generate(arg, arg2, random, arg3);
         }
-        return arg4.defaultFeature.generate(arg, arg2, random, arg3);
+        return arg4.defaultFeature.get().generate(arg, arg2, random, arg3);
     }
 }
 

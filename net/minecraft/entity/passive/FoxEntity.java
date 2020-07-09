@@ -898,7 +898,7 @@ extends AnimalEntity {
         public final Type type;
 
         public FoxData(Type arg) {
-            this.setBabyAllowed(false);
+            super(false);
             this.type = arg;
         }
     }

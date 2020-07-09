@@ -10,6 +10,7 @@ package net.minecraft.world.gen.feature;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import java.util.List;
+import net.minecraft.class_5455;
 import net.minecraft.entity.EntityType;
 import net.minecraft.structure.NetherFortressGenerator;
 import net.minecraft.structure.StructureManager;
@@ -54,7 +55,7 @@ extends StructureFeature<DefaultFeatureConfig> {
         }
 
         @Override
-        public void init(ChunkGenerator arg, StructureManager arg2, int i, int j, Biome arg3, DefaultFeatureConfig arg4) {
+        public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, DefaultFeatureConfig arg5) {
             NetherFortressGenerator.Start lv = new NetherFortressGenerator.Start(this.random, (i << 4) + 2, (j << 4) + 2);
             this.children.add(lv);
             lv.placeJigsaw(lv, this.children, this.random);

@@ -299,8 +299,9 @@ public class TestCommand {
             BufferedReader bufferedReader = Files.newBufferedReader(path);
             String string2 = IOUtils.toString((Reader)bufferedReader);
             Files.createDirectories(path2.getParent(), new FileAttribute[0]);
-            OutputStream outputStream = Files.newOutputStream(path2, new OpenOption[0]);
-            NbtIo.writeCompressed(StringNbtReader.parse(string2), outputStream);
+            try (OutputStream outputStream = Files.newOutputStream(path2, new OpenOption[0]);){
+                NbtIo.writeCompressed(StringNbtReader.parse(string2), outputStream);
+            }
             TestCommand.sendMessage(arg, "Imported to " + path2.toAbsolutePath());
             return 0;
         }

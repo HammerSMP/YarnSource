@@ -238,7 +238,7 @@ implements CraftingRecipe {
 
     public static ItemStack getItemStack(JsonObject jsonObject) {
         String string = JsonHelper.getString(jsonObject, "item");
-        Item lv = (Item)Registry.ITEM.getOrEmpty(new Identifier(string)).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + string + "'"));
+        Item lv = Registry.ITEM.getOrEmpty(new Identifier(string)).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + string + "'"));
         if (jsonObject.has("data")) {
             throw new JsonParseException("Disallowed data tag found");
         }

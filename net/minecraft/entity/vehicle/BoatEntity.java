@@ -614,19 +614,18 @@ extends Entity {
         BlockPos lv2 = new BlockPos(d, this.getBoundingBox().maxY, e = this.getZ() + lv.z);
         BlockPos lv3 = lv2.down();
         if (!this.world.isWater(lv3)) {
+            double f = (double)lv2.getY() + this.world.method_30347(lv2);
+            double g = (double)lv2.getY() + this.world.method_30347(lv3);
             for (EntityPose lv4 : arg.getPoses()) {
-                Vec3d lv7;
-                Vec3d lv6;
-                Box lv5 = arg.getBoundingBox(lv4);
-                double f = this.world.getCollisionHeightAt(lv2);
-                if (Dismounting.canDismountInBlock(f) && Dismounting.canPlaceEntityAt(this.world, arg, lv5.offset(lv6 = new Vec3d(d, (double)lv2.getY() + f, e)))) {
+                Vec3d lv5 = Dismounting.method_30342(this.world, d, f, e, arg, lv4);
+                if (lv5 != null) {
                     arg.setPose(lv4);
-                    return lv6;
+                    return lv5;
                 }
-                double g = this.world.getCollisionHeightAt(lv3);
-                if (!Dismounting.canDismountInBlock(g) || !Dismounting.canPlaceEntityAt(this.world, arg, lv5.offset(lv7 = new Vec3d(d, (double)lv3.getY() + g, e)))) continue;
+                Vec3d lv6 = Dismounting.method_30342(this.world, d, g, e, arg, lv4);
+                if (lv6 == null) continue;
                 arg.setPose(lv4);
-                return lv7;
+                return lv6;
             }
         }
         return super.updatePassengerForDismount(arg);

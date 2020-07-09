@@ -3,13 +3,11 @@
  * 
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
- *  javax.annotation.Nullable
  */
 package net.minecraft.world.gen.feature;
 
 import com.mojang.serialization.Codec;
 import java.util.Random;
-import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -34,13 +32,9 @@ extends Feature<HugeFungusFeatureConfig> {
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, HugeFungusFeatureConfig arg4) {
         Block lv = arg4.validBaseBlock.getBlock();
         BlockPos lv2 = null;
-        if (arg4.planted) {
-            Block lv3 = arg.getBlockState(arg3.down()).getBlock();
-            if (lv3 == lv) {
-                lv2 = arg3;
-            }
-        } else {
-            lv2 = HugeFungusFeature.getStartPos(arg, arg3, lv);
+        Block lv3 = arg.getBlockState(arg3.down()).getBlock();
+        if (lv3 == lv) {
+            lv2 = arg3;
         }
         if (lv2 == null) {
             return false;
@@ -65,7 +59,7 @@ extends Feature<HugeFungusFeatureConfig> {
     private static boolean method_24866(WorldAccess arg2, BlockPos arg22, boolean bl) {
         return arg2.testBlockState(arg22, arg -> {
             Material lv = arg.getMaterial();
-            return arg.isAir() || arg.isOf(Blocks.WATER) || arg.isOf(Blocks.LAVA) || lv == Material.REPLACEABLE_PLANT || bl && lv == Material.PLANT;
+            return arg.getMaterial().isReplaceable() || bl && lv == Material.PLANT;
         });
     }
 
@@ -162,18 +156,6 @@ extends Feature<HugeFungusFeatureConfig> {
                 HugeFungusFeature.generateVines(arg2, arg, random);
             }
         }
-    }
-
-    @Nullable
-    private static BlockPos.Mutable getStartPos(WorldAccess arg, BlockPos arg2, Block arg3) {
-        BlockPos.Mutable lv = arg2.mutableCopy();
-        for (int i = arg2.getY(); i >= 1; --i) {
-            lv.setY(i);
-            Block lv2 = arg.getBlockState((BlockPos)lv.down()).getBlock();
-            if (lv2 != arg3) continue;
-            return lv;
-        }
-        return null;
     }
 
     private static void generateVines(BlockPos arg, WorldAccess arg2, Random random) {

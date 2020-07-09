@@ -26,7 +26,7 @@ import net.minecraft.world.WorldView;
 
 public class GravityStructureProcessor
 extends StructureProcessor {
-    public static final Codec<GravityStructureProcessor> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Heightmap.Type.field_24772.fieldOf("heightmap").withDefault((Object)Heightmap.Type.WORLD_SURFACE_WG).forGetter(arg -> arg.heightmap), (App)Codec.INT.fieldOf("offset").withDefault((Object)0).forGetter(arg -> arg.offset)).apply((Applicative)instance, GravityStructureProcessor::new));
+    public static final Codec<GravityStructureProcessor> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Heightmap.Type.field_24772.fieldOf("heightmap").orElse((Object)Heightmap.Type.WORLD_SURFACE_WG).forGetter(arg -> arg.heightmap), (App)Codec.INT.fieldOf("offset").orElse((Object)0).forGetter(arg -> arg.offset)).apply((Applicative)instance, GravityStructureProcessor::new));
     private final Heightmap.Type heightmap;
     private final int offset;
 

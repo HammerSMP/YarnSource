@@ -239,44 +239,34 @@ extends PathNodeMaker {
             }
         }
         if (lv3 == PathNodeType.OPEN) {
-            PathNodeType lv6;
-            Box lv5 = new Box((double)i - g + 0.5, (double)j + 0.001, (double)k - g + 0.5, (double)i + g + 0.5, (float)j + this.entity.getHeight(), (double)k + g + 0.5);
-            if (this.method_29304(lv5)) {
-                return null;
-            }
-            if (this.entity.getWidth() >= 1.0f && (lv6 = this.method_29303(this.entity, i, j - 1, k)) == PathNodeType.BLOCKED) {
-                lv = this.getNode(i, j, k);
-                lv.type = PathNodeType.WALKABLE;
-                lv.penalty = Math.max(lv.penalty, f);
-                return lv;
-            }
             int n = 0;
             int o = j;
             while (lv3 == PathNodeType.OPEN) {
                 if (--j < 0) {
-                    PathNode lv7 = this.getNode(i, o, k);
-                    lv7.type = PathNodeType.BLOCKED;
-                    lv7.penalty = -1.0f;
-                    return lv7;
+                    PathNode lv5 = this.getNode(i, o, k);
+                    lv5.type = PathNodeType.BLOCKED;
+                    lv5.penalty = -1.0f;
+                    return lv5;
                 }
-                PathNode lv8 = this.getNode(i, j, k);
                 if (n++ >= this.entity.getSafeFallDistance()) {
-                    lv8.type = PathNodeType.BLOCKED;
-                    lv8.penalty = -1.0f;
-                    return lv8;
+                    PathNode lv6 = this.getNode(i, j, k);
+                    lv6.type = PathNodeType.BLOCKED;
+                    lv6.penalty = -1.0f;
+                    return lv6;
                 }
                 lv3 = this.method_29303(this.entity, i, j, k);
                 f = this.entity.getPathfindingPenalty(lv3);
                 if (lv3 != PathNodeType.OPEN && f >= 0.0f) {
-                    lv = lv8;
+                    lv = this.getNode(i, j, k);
                     lv.type = lv3;
                     lv.penalty = Math.max(lv.penalty, f);
                     break;
                 }
                 if (!(f < 0.0f)) continue;
-                lv8.type = PathNodeType.BLOCKED;
-                lv8.penalty = -1.0f;
-                return lv8;
+                PathNode lv7 = this.getNode(i, j, k);
+                lv7.type = PathNodeType.BLOCKED;
+                lv7.penalty = -1.0f;
+                return lv7;
             }
         }
         if (lv3 == PathNodeType.FENCE) {
@@ -312,7 +302,7 @@ extends PathNodeMaker {
             if (!(arg2.getPathfindingPenalty(lv4) >= arg2.getPathfindingPenalty(lv3))) continue;
             lv3 = lv4;
         }
-        if (lv == PathNodeType.OPEN && arg2.getPathfindingPenalty(lv3) == 0.0f) {
+        if (lv == PathNodeType.OPEN && arg2.getPathfindingPenalty(lv3) == 0.0f && l <= 1) {
             return PathNodeType.OPEN;
         }
         return lv3;

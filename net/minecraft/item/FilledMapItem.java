@@ -320,6 +320,9 @@ extends NetworkSyncedItem {
         if (lv != null && lv.contains("map_scale_direction", 99)) {
             FilledMapItem.scale(arg, arg2, lv.getInt("map_scale_direction"));
             lv.remove("map_scale_direction");
+        } else if (lv != null && lv.contains("map_to_lock", 1) && lv.getBoolean("map_to_lock")) {
+            FilledMapItem.copyMap(arg2, arg);
+            lv.remove("map_to_lock");
         }
     }
 
@@ -330,16 +333,12 @@ extends NetworkSyncedItem {
         }
     }
 
-    @Nullable
-    public static ItemStack copyMap(World arg, ItemStack arg2) {
+    public static void copyMap(World arg, ItemStack arg2) {
         MapState lv = FilledMapItem.getOrCreateMapState(arg2, arg);
         if (lv != null) {
-            ItemStack lv2 = arg2.copy();
-            MapState lv3 = FilledMapItem.createMapState(lv2, arg, 0, 0, lv.scale, lv.showIcons, lv.unlimitedTracking, lv.dimension);
-            lv3.copyFrom(lv);
-            return lv2;
+            MapState lv2 = FilledMapItem.createMapState(arg2, arg, 0, 0, lv.scale, lv.showIcons, lv.unlimitedTracking, lv.dimension);
+            lv2.copyFrom(lv);
         }
-        return null;
     }
 
     @Override
@@ -375,11 +374,11 @@ extends NetworkSyncedItem {
     public ActionResult useOnBlock(ItemUsageContext arg) {
         BlockState lv = arg.getWorld().getBlockState(arg.getBlockPos());
         if (lv.isIn(BlockTags.BANNERS)) {
-            if (!arg.world.isClient) {
+            if (!arg.getWorld().isClient) {
                 MapState lv2 = FilledMapItem.getOrCreateMapState(arg.getStack(), arg.getWorld());
                 lv2.addBanner(arg.getWorld(), arg.getBlockPos());
             }
-            return ActionResult.success(arg.world.isClient);
+            return ActionResult.success(arg.getWorld().isClient);
         }
         return super.useOnBlock(arg);
     }

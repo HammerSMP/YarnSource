@@ -255,7 +255,7 @@ extends DrawableHelper {
                     }
                     list.add(stringBuilder.toString());
                     if (lv3.getY() >= 0 && lv3.getY() < 256) {
-                        list.add("Biome: " + Registry.BIOME.getId(this.client.world.getBiome(lv3)));
+                        list.add("Biome: " + this.client.world.method_30349().method_30530(Registry.BIOME_KEY).getId(this.client.world.getBiome(lv3)));
                         long l = 0L;
                         float h = 0.0f;
                         if (lv9 != null) {

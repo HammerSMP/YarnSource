@@ -39,6 +39,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.block.RespawnAnchorBlock;
+import net.minecraft.class_5455;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -99,7 +100,6 @@ import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -130,14 +130,14 @@ public abstract class PlayerManager {
     private final Map<UUID, PlayerAdvancementTracker> advancementTrackers = Maps.newHashMap();
     private final WorldSaveHandler saveHandler;
     private boolean whitelistEnabled;
-    private final RegistryTracker.Modifiable registryTracker;
+    private final class_5455.class_5457 registryTracker;
     protected final int maxPlayers;
     private int viewDistance;
     private GameMode gameMode;
     private boolean cheatsAllowed;
     private int latencyUpdateTimer;
 
-    public PlayerManager(MinecraftServer minecraftServer, RegistryTracker.Modifiable arg, WorldSaveHandler arg2, int i) {
+    public PlayerManager(MinecraftServer minecraftServer, class_5455.class_5457 arg, WorldSaveHandler arg2, int i) {
         this.server = minecraftServer;
         this.registryTracker = arg;
         this.maxPlayers = i;
