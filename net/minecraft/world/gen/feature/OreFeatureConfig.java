@@ -24,14 +24,14 @@ import net.minecraft.world.gen.feature.FeatureConfig;
 public class OreFeatureConfig
 implements FeatureConfig {
     public static final Codec<OreFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)RuleTest.field_25012.fieldOf("target").forGetter(arg -> arg.target), (App)BlockState.CODEC.fieldOf("state").forGetter(arg -> arg.state), (App)Codec.intRange((int)0, (int)64).fieldOf("size").forGetter(arg -> arg.size)).apply((Applicative)instance, OreFeatureConfig::new));
-    public final RuleTest RULE_TEST;
-    public final int SIZE;
-    public final BlockState DEFAULT_STATE;
+    public final RuleTest target;
+    public final int size;
+    public final BlockState state;
 
     public OreFeatureConfig(RuleTest arg, BlockState arg2, int i) {
-        this.SIZE = i;
-        this.DEFAULT_STATE = arg2;
-        this.RULE_TEST = arg;
+        this.size = i;
+        this.state = arg2;
+        this.target = arg;
     }
 
     public static final class class_5436 {

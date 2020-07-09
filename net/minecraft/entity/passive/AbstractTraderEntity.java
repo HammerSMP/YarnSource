@@ -189,9 +189,9 @@ Trader {
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld arg) {
         this.resetCustomer();
-        return super.changeDimension(arg);
+        return super.moveToWorld(arg);
     }
 
     protected void resetCustomer() {

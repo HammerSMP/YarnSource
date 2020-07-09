@@ -38,7 +38,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class PotionUtil {
-    private static final MutableText noEffect = new TranslatableText("effect.none").formatted(Formatting.GRAY);
+    private static final MutableText field_25817 = new TranslatableText("effect.none").formatted(Formatting.GRAY);
 
     public static List<StatusEffectInstance> getPotionEffects(ItemStack arg) {
         return PotionUtil.getPotionEffects(arg.getTag());
@@ -158,7 +158,7 @@ public class PotionUtil {
         List<StatusEffectInstance> list2 = PotionUtil.getPotionEffects(arg);
         ArrayList list3 = Lists.newArrayList();
         if (list2.isEmpty()) {
-            list.add(noEffect);
+            list.add(field_25817);
         } else {
             for (StatusEffectInstance lv : list2) {
                 TranslatableText lv2 = new TranslatableText(lv.getTranslationKey());

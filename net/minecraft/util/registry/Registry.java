@@ -36,7 +36,6 @@ import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.class_5458;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
@@ -79,6 +78,7 @@ import net.minecraft.structure.rule.PosRuleTestType;
 import net.minecraft.structure.rule.RuleTestType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.IndexedIterable;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DefaultedRegistry;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.RegistryKey;
@@ -273,7 +273,7 @@ IndexedIterable<T> {
         this.lifecycle = lifecycle;
     }
 
-    public RegistryKey<? extends Registry<T>> method_30517() {
+    public RegistryKey<? extends Registry<T>> getKey() {
         return this.registryKey;
     }
 
@@ -360,7 +360,7 @@ IndexedIterable<T> {
     }
 
     static {
-        class_5458.method_30559();
+        BuiltinRegistries.init();
         DEFAULT_ENTRIES.forEach((? super K arg, ? super V supplier) -> {
             if (supplier.get() == null) {
                 LOGGER.error("Unable to bootstrap registry '{}'", arg);

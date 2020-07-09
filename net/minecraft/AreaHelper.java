@@ -13,7 +13,6 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.NetherPortalBlock;
-import net.minecraft.class_5454;
 import net.minecraft.class_5459;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.server.world.ServerWorld;
@@ -23,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.WorldAccess;
 
 public class AreaHelper {
@@ -184,7 +184,7 @@ public class AreaHelper {
         return new Vec3d(h, j, k);
     }
 
-    public static class_5454 method_30484(ServerWorld arg, class_5459.class_5460 arg2, Direction.Axis arg3, Vec3d arg4, EntityDimensions arg5, Vec3d arg6, float f, float g) {
+    public static TeleportTarget method_30484(ServerWorld arg, class_5459.class_5460 arg2, Direction.Axis arg3, Vec3d arg4, EntityDimensions arg5, Vec3d arg6, float f, float g) {
         BlockPos lv = arg2.field_25936;
         BlockState lv2 = arg.getBlockState(lv);
         Direction.Axis lv3 = lv2.get(Properties.HORIZONTAL_AXIS);
@@ -197,7 +197,7 @@ public class AreaHelper {
         double k = 0.5 + arg4.getZ();
         boolean bl = lv3 == Direction.Axis.X;
         Vec3d lv5 = new Vec3d((double)lv.getX() + (bl ? h : k), (double)lv.getY() + j, (double)lv.getZ() + (bl ? k : h));
-        return new class_5454(lv5, lv4, f + (float)i, g);
+        return new TeleportTarget(lv5, lv4, f + (float)i, g);
     }
 }
 

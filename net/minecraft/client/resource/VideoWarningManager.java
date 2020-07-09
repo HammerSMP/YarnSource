@@ -15,7 +15,7 @@
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
  */
-package net.minecraft;
+package net.minecraft.client.resource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -45,102 +45,102 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Environment(value=EnvType.CLIENT)
-public class class_5407
-extends SinglePreparationResourceReloadListener<class_5408> {
-    private static final Logger field_25716 = LogManager.getLogger();
-    private static final Identifier field_25689 = new Identifier("gpu_warnlist.json");
-    private ImmutableMap<String, String> field_25690 = ImmutableMap.of();
-    private boolean field_25717;
-    private boolean field_25718;
-    private boolean field_25719;
+public class VideoWarningManager
+extends SinglePreparationResourceReloadListener<WarningPatternLoader> {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Identifier GPU_WARNLIST_ID = new Identifier("gpu_warnlist.json");
+    private ImmutableMap<String, String> warnings = ImmutableMap.of();
+    private boolean warningScheduled;
+    private boolean warned;
+    private boolean cancelledAfterWarning;
 
-    public boolean method_30055() {
-        return !this.field_25690.isEmpty();
+    public boolean hasWarning() {
+        return !this.warnings.isEmpty();
     }
 
-    public boolean method_30137() {
-        return this.method_30055() && !this.field_25718;
+    public boolean canWarn() {
+        return this.hasWarning() && !this.warned;
     }
 
-    public void method_30138() {
-        this.field_25717 = true;
+    public void scheduleWarning() {
+        this.warningScheduled = true;
     }
 
-    public void method_30139() {
-        this.field_25718 = true;
+    public void acceptAfterWarnings() {
+        this.warned = true;
     }
 
-    public void method_30140() {
-        this.field_25718 = true;
-        this.field_25719 = true;
+    public void cancelAfterWarnings() {
+        this.warned = true;
+        this.cancelledAfterWarning = true;
     }
 
-    public boolean method_30141() {
-        return this.field_25717 && !this.field_25718;
+    public boolean shouldWarn() {
+        return this.warningScheduled && !this.warned;
     }
 
-    public boolean method_30142() {
-        return this.field_25719;
+    public boolean hasCancelledAfterWarning() {
+        return this.cancelledAfterWarning;
     }
 
-    public void method_30143() {
-        this.field_25717 = false;
-        this.field_25718 = false;
-        this.field_25719 = false;
-    }
-
-    @Nullable
-    public String method_30060() {
-        return (String)this.field_25690.get((Object)"renderer");
+    public void reset() {
+        this.warningScheduled = false;
+        this.warned = false;
+        this.cancelledAfterWarning = false;
     }
 
     @Nullable
-    public String method_30062() {
-        return (String)this.field_25690.get((Object)"version");
+    public String getRendererWarning() {
+        return (String)this.warnings.get((Object)"renderer");
     }
 
     @Nullable
-    public String method_30063() {
-        return (String)this.field_25690.get((Object)"vendor");
+    public String getVersionWarning() {
+        return (String)this.warnings.get((Object)"version");
+    }
+
+    @Nullable
+    public String getVendorWarning() {
+        return (String)this.warnings.get((Object)"vendor");
     }
 
     @Override
-    protected class_5408 prepare(ResourceManager arg, Profiler arg2) {
+    protected WarningPatternLoader prepare(ResourceManager arg, Profiler arg2) {
         ArrayList list = Lists.newArrayList();
         ArrayList list2 = Lists.newArrayList();
         ArrayList list3 = Lists.newArrayList();
         arg2.startTick();
-        JsonObject jsonObject = class_5407.method_30061(arg, arg2);
+        JsonObject jsonObject = VideoWarningManager.loadWarnlist(arg, arg2);
         if (jsonObject != null) {
             arg2.push("compile_regex");
-            class_5407.method_30057(jsonObject.getAsJsonArray("renderer"), list);
-            class_5407.method_30057(jsonObject.getAsJsonArray("version"), list2);
-            class_5407.method_30057(jsonObject.getAsJsonArray("vendor"), list3);
+            VideoWarningManager.compilePatterns(jsonObject.getAsJsonArray("renderer"), list);
+            VideoWarningManager.compilePatterns(jsonObject.getAsJsonArray("version"), list2);
+            VideoWarningManager.compilePatterns(jsonObject.getAsJsonArray("vendor"), list3);
             arg2.pop();
         }
         arg2.endTick();
-        return new class_5408(list, list2, list3);
+        return new WarningPatternLoader(list, list2, list3);
     }
 
     @Override
-    protected void apply(class_5408 arg, ResourceManager arg2, Profiler arg3) {
-        this.field_25690 = arg.method_30064();
+    protected void apply(WarningPatternLoader arg, ResourceManager arg2, Profiler arg3) {
+        this.warnings = arg.buildWarnings();
     }
 
-    private static void method_30057(JsonArray jsonArray, List<Pattern> list) {
+    private static void compilePatterns(JsonArray jsonArray, List<Pattern> list) {
         jsonArray.forEach(jsonElement -> list.add(Pattern.compile(jsonElement.getAsString(), 2)));
     }
 
     @Nullable
-    private static JsonObject method_30061(ResourceManager arg, Profiler arg2) {
+    private static JsonObject loadWarnlist(ResourceManager arg, Profiler arg2) {
         arg2.push("parse_json");
         JsonObject jsonObject = null;
-        try (Resource lv = arg.getResource(field_25689);
+        try (Resource lv = arg.getResource(GPU_WARNLIST_ID);
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(lv.getInputStream(), StandardCharsets.UTF_8));){
             jsonObject = new JsonParser().parse((Reader)bufferedReader).getAsJsonObject();
         }
         catch (JsonSyntaxException | IOException exception) {
-            field_25716.warn("Failed to load GPU warnlist");
+            LOGGER.warn("Failed to load GPU warnlist");
         }
         arg2.pop();
         return jsonObject;
@@ -152,18 +152,18 @@ extends SinglePreparationResourceReloadListener<class_5408> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static final class class_5408 {
-        private final List<Pattern> field_25691;
-        private final List<Pattern> field_25692;
-        private final List<Pattern> field_25693;
+    public static final class WarningPatternLoader {
+        private final List<Pattern> rendererPatterns;
+        private final List<Pattern> versionPatterns;
+        private final List<Pattern> vendorPatterns;
 
-        private class_5408(List<Pattern> list, List<Pattern> list2, List<Pattern> list3) {
-            this.field_25691 = list;
-            this.field_25692 = list2;
-            this.field_25693 = list3;
+        private WarningPatternLoader(List<Pattern> list, List<Pattern> list2, List<Pattern> list3) {
+            this.rendererPatterns = list;
+            this.versionPatterns = list2;
+            this.vendorPatterns = list3;
         }
 
-        private static String method_30066(List<Pattern> list, String string) {
+        private static String buildWarning(List<Pattern> list, String string) {
             ArrayList list2 = Lists.newArrayList();
             for (Pattern pattern : list) {
                 Matcher matcher = pattern.matcher(string);
@@ -174,18 +174,18 @@ extends SinglePreparationResourceReloadListener<class_5408> {
             return String.join((CharSequence)", ", list2);
         }
 
-        private ImmutableMap<String, String> method_30064() {
+        private ImmutableMap<String, String> buildWarnings() {
             String string3;
             String string2;
             ImmutableMap.Builder builder = new ImmutableMap.Builder();
-            String string = class_5408.method_30066(this.field_25691, GlDebugInfo.getRenderer());
+            String string = WarningPatternLoader.buildWarning(this.rendererPatterns, GlDebugInfo.getRenderer());
             if (!string.isEmpty()) {
                 builder.put((Object)"renderer", (Object)string);
             }
-            if (!(string2 = class_5408.method_30066(this.field_25692, GlDebugInfo.getVersion())).isEmpty()) {
+            if (!(string2 = WarningPatternLoader.buildWarning(this.versionPatterns, GlDebugInfo.getVersion())).isEmpty()) {
                 builder.put((Object)"version", (Object)string2);
             }
-            if (!(string3 = class_5408.method_30066(this.field_25693, GlDebugInfo.getVendor())).isEmpty()) {
+            if (!(string3 = WarningPatternLoader.buildWarning(this.vendorPatterns, GlDebugInfo.getVendor())).isEmpty()) {
                 builder.put((Object)"vendor", (Object)string3);
             }
             return builder.build();

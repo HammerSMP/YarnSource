@@ -115,7 +115,7 @@ implements SynchronousResourceReloadListener {
         } else {
             VertexConsumer lv7;
             boolean bl4;
-            if (arg2 != ModelTransformation.Mode.GUI && !arg2.method_29998() && arg.getItem() instanceof BlockItem) {
+            if (arg2 != ModelTransformation.Mode.GUI && !arg2.isFirstPerson() && arg.getItem() instanceof BlockItem) {
                 Block lv = ((BlockItem)arg.getItem()).getBlock();
                 boolean bl32 = !(lv instanceof TransparentBlock) && !(lv instanceof StainedGlassPaneBlock);
             } else {
@@ -127,48 +127,48 @@ implements SynchronousResourceReloadListener {
                 MatrixStack.Entry lv3 = arg3.peek();
                 if (arg2 == ModelTransformation.Mode.GUI) {
                     lv3.getModel().multiply(0.5f);
-                } else if (arg2.method_29998()) {
+                } else if (arg2.isFirstPerson()) {
                     lv3.getModel().multiply(0.75f);
                 }
                 if (bl4) {
-                    VertexConsumer lv4 = ItemRenderer.method_30115(arg4, lv2, lv3);
+                    VertexConsumer lv4 = ItemRenderer.getTransformingDirectGlintVertexConsumer(arg4, lv2, lv3);
                 } else {
-                    VertexConsumer lv5 = ItemRenderer.method_30114(arg4, lv2, lv3);
+                    VertexConsumer lv5 = ItemRenderer.getTransformingGlintVertexConsumer(arg4, lv2, lv3);
                 }
                 arg3.pop();
             } else if (bl4) {
-                VertexConsumer lv6 = ItemRenderer.method_29711(arg4, lv2, true, arg.hasGlint());
+                VertexConsumer lv6 = ItemRenderer.getDirectGlintVertexConsumer(arg4, lv2, true, arg.hasGlint());
             } else {
-                lv7 = ItemRenderer.getArmorVertexConsumer(arg4, lv2, true, arg.hasGlint());
+                lv7 = ItemRenderer.getGlintVertexConsumer(arg4, lv2, true, arg.hasGlint());
             }
             this.renderBakedItemModel(arg5, arg, i, j, arg3, lv7);
         }
         arg3.pop();
     }
 
-    public static VertexConsumer method_27952(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
+    public static VertexConsumer getArmorVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
             return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getArmorGlint() : RenderLayer.getArmorEntityGlint()), arg.getBuffer(arg2));
         }
         return arg.getBuffer(arg2);
     }
 
-    public static VertexConsumer method_30114(VertexConsumerProvider arg, RenderLayer arg2, MatrixStack.Entry arg3) {
+    public static VertexConsumer getTransformingGlintVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, MatrixStack.Entry arg3) {
         return VertexConsumers.dual(new TransformingVertexConsumer(arg.getBuffer(RenderLayer.getGlint()), arg3.getModel(), arg3.getNormal()), arg.getBuffer(arg2));
     }
 
-    public static VertexConsumer method_30115(VertexConsumerProvider arg, RenderLayer arg2, MatrixStack.Entry arg3) {
+    public static VertexConsumer getTransformingDirectGlintVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, MatrixStack.Entry arg3) {
         return VertexConsumers.dual(new TransformingVertexConsumer(arg.getBuffer(RenderLayer.getGlintDirect()), arg3.getModel(), arg3.getNormal()), arg.getBuffer(arg2));
     }
 
-    public static VertexConsumer getArmorVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
+    public static VertexConsumer getGlintVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
             return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getGlint() : RenderLayer.getEntityGlint()), arg.getBuffer(arg2));
         }
         return arg.getBuffer(arg2);
     }
 
-    public static VertexConsumer method_29711(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
+    public static VertexConsumer getDirectGlintVertexConsumer(VertexConsumerProvider arg, RenderLayer arg2, boolean bl, boolean bl2) {
         if (bl2) {
             return VertexConsumers.dual(arg.getBuffer(bl ? RenderLayer.getGlintDirect() : RenderLayer.getEntityGlintDirect()), arg.getBuffer(arg2));
         }

@@ -32,13 +32,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5458;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.processor.StructureProcessorType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.dynamic.RegistryOps;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -89,7 +89,7 @@ public interface class_5455 {
     }
 
     public static <R extends Registry<?>> void method_30525(class_5457 arg, RegistryKey<R> arg2) {
-        Registry<Registry<?>> lv = class_5458.field_25926;
+        Registry<Registry<?>> lv = BuiltinRegistries.REGISTRIES;
         Registry<?> lv2 = lv.get(arg2);
         if (lv2 == null) {
             throw new IllegalStateException("Missing builtin registry: " + arg2);
@@ -98,7 +98,7 @@ public interface class_5455 {
     }
 
     public static <E> void method_30524(class_5457 arg, Registry<E> arg2) {
-        MutableRegistry<E> lv = arg.method_30527(arg2.method_30517()).orElseThrow(() -> new IllegalStateException("Missing registry: " + arg2.method_30517()));
+        MutableRegistry<E> lv = arg.method_30527(arg2.getKey()).orElseThrow(() -> new IllegalStateException("Missing registry: " + arg2.getKey()));
         for (Map.Entry<RegistryKey<E>, E> entry : arg2.getEntries()) {
             lv.add(entry.getKey(), entry.getValue());
         }
@@ -129,7 +129,7 @@ public interface class_5455 {
 
         private static <E> Codec<class_5457> method_30546() {
             Codec codec = Identifier.CODEC.xmap(RegistryKey::ofRegistry, RegistryKey::getValue);
-            Codec codec2 = codec.partialDispatch("type", arg -> DataResult.success(arg.method_30517()), arg -> class_5457.method_30547(arg).map(mapCodec -> SimpleRegistry.method_29098(arg, Lifecycle.experimental(), mapCodec)));
+            Codec codec2 = codec.partialDispatch("type", arg -> DataResult.success(arg.getKey()), arg -> class_5457.method_30547(arg).map(mapCodec -> SimpleRegistry.method_29098(arg, Lifecycle.experimental(), mapCodec)));
             UnboundedMapCodec unboundedMapCodec = Codec.unboundedMap((Codec)codec, (Codec)codec2);
             return class_5457.method_30538(unboundedMapCodec);
         }

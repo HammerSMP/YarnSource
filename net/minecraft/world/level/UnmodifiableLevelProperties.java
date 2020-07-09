@@ -102,11 +102,11 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void method_29034(long l) {
+    public void setTime(long l) {
     }
 
     @Override
-    public void method_29035(long l) {
+    public void setTimeOfDay(long l) {
     }
 
     @Override

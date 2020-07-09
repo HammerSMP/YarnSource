@@ -20,7 +20,6 @@ import net.minecraft.advancement.criterion.TargetHitCriterion;
 import net.minecraft.advancement.criterion.UsedTotemCriterion;
 import net.minecraft.advancement.criterion.VillagerTradeCriterion;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5458;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
 import net.minecraft.predicate.DamagePredicate;
@@ -34,6 +33,7 @@ import net.minecraft.tag.EntityTypeTags;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.village.raid.Raid;
 import net.minecraft.world.biome.Biome;
@@ -77,7 +77,7 @@ implements Consumer<Consumer<Advancement>> {
 
     protected static Advancement.Task requireListedBiomesVisited(Advancement.Task arg, Biome[] args) {
         for (Biome lv : args) {
-            arg.criterion(class_5458.field_25933.getId(lv).toString(), LocationArrivalCriterion.Conditions.create(LocationPredicate.biome(lv)));
+            arg.criterion(BuiltinRegistries.BIOME.getId(lv).toString(), LocationArrivalCriterion.Conditions.create(LocationPredicate.biome(lv)));
         }
         return arg;
     }

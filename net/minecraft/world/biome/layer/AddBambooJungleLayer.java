@@ -3,7 +3,7 @@
  */
 package net.minecraft.world.biome.layer;
 
-import net.minecraft.class_5458;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.layer.type.SouthEastSamplingLayer;
 import net.minecraft.world.biome.layer.util.LayerRandomnessSource;
@@ -24,8 +24,8 @@ public enum AddBambooJungleLayer implements SouthEastSamplingLayer
     }
 
     static {
-        JUNGLE_ID = class_5458.field_25933.getRawId(Biomes.JUNGLE);
-        BAMBOO_JUNGLE_ID = class_5458.field_25933.getRawId(Biomes.BAMBOO_JUNGLE);
+        JUNGLE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.JUNGLE);
+        BAMBOO_JUNGLE_ID = BuiltinRegistries.BIOME.getRawId(Biomes.BAMBOO_JUNGLE);
     }
 }
 

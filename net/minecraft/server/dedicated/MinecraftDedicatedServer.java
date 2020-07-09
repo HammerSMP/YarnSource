@@ -325,7 +325,7 @@ implements DedicatedServer {
     }
 
     @Override
-    public int method_30612() {
+    public int getRateLimit() {
         return this.getProperties().rateLimit;
     }
 

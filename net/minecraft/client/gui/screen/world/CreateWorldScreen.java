@@ -408,7 +408,7 @@ extends Screen {
             }
             catch (IOException iOException) {
                 field_25480.warn("Failed to create temporary dir", (Throwable)iOException);
-                SystemToast.method_29627(this.client, this.saveDirectoryName);
+                SystemToast.addPackCopyFailure(this.client, this.saveDirectoryName);
                 this.method_30297();
             }
         }
@@ -493,7 +493,7 @@ extends Screen {
             }
             catch (IOException | WorldCreationException exception) {
                 field_25480.warn("Failed to copy datapacks to world {}", (Object)this.saveDirectoryName, (Object)exception);
-                SystemToast.method_29627(this.client, this.saveDirectoryName);
+                SystemToast.addPackCopyFailure(this.client, this.saveDirectoryName);
                 this.method_30297();
                 return false;
             }
@@ -522,7 +522,7 @@ extends Screen {
         }
         catch (IOException | WorldCreationException exception) {
             field_25480.warn("Failed to copy datapacks from world {}", (Object)path, (Object)exception);
-            SystemToast.method_29627(arg, path.toString());
+            SystemToast.addPackCopyFailure(arg, path.toString());
             return null;
         }
         return (Path)mutableObject.getValue();

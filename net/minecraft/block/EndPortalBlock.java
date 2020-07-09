@@ -56,7 +56,7 @@ extends BlockWithEntity {
             if (lv2 == null) {
                 return;
             }
-            arg4.changeDimension(lv2);
+            arg4.moveToWorld(lv2);
         }
     }
 

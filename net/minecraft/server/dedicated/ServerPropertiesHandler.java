@@ -61,7 +61,7 @@ extends AbstractPropertiesHandler<ServerPropertiesHandler> {
     public final int entityBroadcastRangePercentage;
     public final AbstractPropertiesHandler.PropertyAccessor<Integer> playerIdleTimeout;
     public final AbstractPropertiesHandler.PropertyAccessor<Boolean> whiteList;
-    public final GeneratorOptions field_24623;
+    public final GeneratorOptions generatorOptions;
 
     public ServerPropertiesHandler(Properties properties) {
         super(properties);
@@ -88,7 +88,7 @@ extends AbstractPropertiesHandler<ServerPropertiesHandler> {
         this.entityBroadcastRangePercentage = this.transformedParseInt("entity-broadcast-range-percentage", integer -> MathHelper.clamp(integer, 10, 1000), 100);
         this.playerIdleTimeout = this.intAccessor("player-idle-timeout", 0);
         this.whiteList = this.booleanAccessor("white-list", false);
-        this.field_24623 = GeneratorOptions.fromProperties(properties);
+        this.generatorOptions = GeneratorOptions.fromProperties(properties);
     }
 
     public static ServerPropertiesHandler load(Path path) {

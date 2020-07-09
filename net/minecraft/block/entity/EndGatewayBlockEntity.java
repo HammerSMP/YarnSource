@@ -111,7 +111,7 @@ implements Tickable {
     }
 
     public static boolean method_30276(Entity arg) {
-        return EntityPredicates.EXCEPT_SPECTATOR.test(arg) && !arg.getRootVehicle().isReadyToGoThroughPortal();
+        return EntityPredicates.EXCEPT_SPECTATOR.test(arg) && !arg.getRootVehicle().method_30230();
     }
 
     public boolean isRecentlyGenerated() {
@@ -186,7 +186,7 @@ implements Tickable {
             } else {
                 lv5 = arg.getRootVehicle();
             }
-            lv5.resetNetherPortalCooldown();
+            lv5.method_30229();
             lv5.teleport((double)lv.getX() + 0.5, lv.getY(), (double)lv.getZ() + 0.5);
         }
         this.startTeleportCooldown();

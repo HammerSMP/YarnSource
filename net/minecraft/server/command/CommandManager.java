@@ -258,7 +258,7 @@ public class CommandManager {
                     lv4.append("\n\n").append(stackTraceElements[j].getMethodName()).append("\n ").append(stackTraceElements[j].getFileName()).append(":").append(String.valueOf(stackTraceElements[j].getLineNumber()));
                 }
             }
-            arg3.sendError(new TranslatableText("command.failed").styled(arg2 -> arg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv4))));
+            arg3.sendError(new TranslatableText("command.failed").styled(arg2 -> arg2.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv4))));
             if (SharedConstants.isDevelopment) {
                 arg3.sendError(new LiteralText(Util.getInnermostMessage(exception)));
                 LOGGER.error("'" + string + "' threw an exception", (Throwable)exception);

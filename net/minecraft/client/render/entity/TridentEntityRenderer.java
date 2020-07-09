@@ -37,7 +37,7 @@ extends EntityRenderer<TridentEntity> {
         arg2.push();
         arg2.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.lerp(g, arg.prevYaw, arg.yaw) - 90.0f));
         arg2.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(MathHelper.lerp(g, arg.prevPitch, arg.pitch) + 90.0f));
-        VertexConsumer lv = ItemRenderer.method_29711(arg3, this.model.getLayer(this.getTexture(arg)), false, arg.isEnchanted());
+        VertexConsumer lv = ItemRenderer.getDirectGlintVertexConsumer(arg3, this.model.getLayer(this.getTexture(arg)), false, arg.isEnchanted());
         this.model.render(arg2, lv, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
         arg2.pop();
         super.render(arg, f, g, arg2, arg3, i);

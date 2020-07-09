@@ -196,7 +196,7 @@ Drawable {
                 field_25046.error("Error loading data packs when importing world settings", (Throwable)exception);
                 TranslatableText lv5 = new TranslatableText("selectWorld.import_worldgen_settings.failure");
                 LiteralText lv6 = new LiteralText(exception.getMessage());
-                arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv5, lv6));
+                arg22.getToastManager().add(SystemToast.create(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv5, lv6));
                 lv3.close();
                 return;
             }
@@ -214,7 +214,7 @@ Drawable {
                 String string2 = ((DataResult.PartialResult)dataResult3.error().get()).message();
                 field_25046.error("Error parsing world settings: {}", (Object)string2);
                 LiteralText lv10 = new LiteralText(string2);
-                arg22.getToastManager().add(SystemToast.method_29047(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv9, lv10));
+                arg22.getToastManager().add(SystemToast.create(arg22, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv9, lv10));
             }
             lv7.close();
             Lifecycle lifecycle = dataResult3.lifecycle();

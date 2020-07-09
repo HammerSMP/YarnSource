@@ -140,7 +140,7 @@ extends Screen {
             LiteralText lv3 = new LiteralText((String)dataResult4.get().map(Function.identity(), DataResult.PartialResult::message));
             TranslatableText lv4 = new TranslatableText(dataResult4.result().isPresent() ? "selectWorld.edit.export_worldgen_settings.success" : "selectWorld.edit.export_worldgen_settings.failure");
             dataResult4.error().ifPresent(partialResult -> field_23776.error("Error exporting world settings: {}", partialResult));
-            this.client.getToastManager().add(SystemToast.method_29047(this.client, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv4, lv3));
+            this.client.getToastManager().add(SystemToast.create(this.client, SystemToast.Type.WORLD_GEN_SETTINGS_TRANSFER, lv4, lv3));
         }));
         this.saveButton = this.addButton(new ButtonWidget(this.width / 2 - 100, this.height / 4 + 144 + 5, 98, 20, new TranslatableText("selectWorld.edit.save"), arg -> this.commit()));
         this.addButton(new ButtonWidget(this.width / 2 + 2, this.height / 4 + 144 + 5, 98, 20, ScreenTexts.CANCEL, arg -> this.callback.accept(false)));

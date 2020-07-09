@@ -29,8 +29,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.block.MaterialColor;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.block.SideShapeType;
 import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.class_5431;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
@@ -730,14 +730,14 @@ public abstract class AbstractBlock {
         }
 
         public boolean isSideSolidFullSquare(BlockView arg, BlockPos arg2, Direction arg3) {
-            return this.method_30368(arg, arg2, arg3, class_5431.FULL);
+            return this.isSideSolid(arg, arg2, arg3, SideShapeType.FULL);
         }
 
-        public boolean method_30368(BlockView arg, BlockPos arg2, Direction arg3, class_5431 arg4) {
+        public boolean isSideSolid(BlockView arg, BlockPos arg2, Direction arg3, SideShapeType arg4) {
             if (this.shapeCache != null) {
-                return this.shapeCache.method_30369(arg3, arg4);
+                return this.shapeCache.isSideSolid(arg3, arg4);
             }
-            return arg4.method_30367(this.asBlockState(), arg, arg2, arg3);
+            return arg4.matches(this.asBlockState(), arg, arg2, arg3);
         }
 
         public boolean isFullCube(BlockView arg, BlockPos arg2) {
@@ -755,7 +755,7 @@ public abstract class AbstractBlock {
 
         static final class ShapeCache {
             private static final Direction[] DIRECTIONS = Direction.values();
-            private static final int field_25830 = class_5431.values().length;
+            private static final int SHAPE_TYPE_LENGTH = SideShapeType.values().length;
             protected final boolean fullOpaque;
             private final boolean translucent;
             private final int lightSubtracted;
@@ -763,7 +763,7 @@ public abstract class AbstractBlock {
             private final VoxelShape[] extrudedFaces;
             protected final VoxelShape collisionShape;
             protected final boolean exceedsCube;
-            private final boolean[] solidFullSquare;
+            private final boolean[] solidSides;
             protected final boolean isFullCube;
 
             private ShapeCache(BlockState arg2) {
@@ -785,21 +785,21 @@ public abstract class AbstractBlock {
                 }
                 this.collisionShape = lv.getCollisionShape(arg2, EmptyBlockView.INSTANCE, BlockPos.ORIGIN, ShapeContext.absent());
                 this.exceedsCube = Arrays.stream(Direction.Axis.values()).anyMatch(arg -> this.collisionShape.getMin((Direction.Axis)arg) < 0.0 || this.collisionShape.getMax((Direction.Axis)arg) > 1.0);
-                this.solidFullSquare = new boolean[DIRECTIONS.length * field_25830];
+                this.solidSides = new boolean[DIRECTIONS.length * SHAPE_TYPE_LENGTH];
                 for (Direction lv4 : DIRECTIONS) {
-                    for (class_5431 lv5 : class_5431.values()) {
-                        this.solidFullSquare[ShapeCache.method_30370((Direction)lv4, (class_5431)lv5)] = lv5.method_30367(arg2, EmptyBlockView.INSTANCE, BlockPos.ORIGIN, lv4);
+                    for (SideShapeType lv5 : SideShapeType.values()) {
+                        this.solidSides[ShapeCache.indexSolidSide((Direction)lv4, (SideShapeType)lv5)] = lv5.matches(arg2, EmptyBlockView.INSTANCE, BlockPos.ORIGIN, lv4);
                     }
                 }
                 this.isFullCube = Block.isShapeFullCube(arg2.getCollisionShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN));
             }
 
-            public boolean method_30369(Direction arg, class_5431 arg2) {
-                return this.solidFullSquare[ShapeCache.method_30370(arg, arg2)];
+            public boolean isSideSolid(Direction arg, SideShapeType arg2) {
+                return this.solidSides[ShapeCache.indexSolidSide(arg, arg2)];
             }
 
-            private static int method_30370(Direction arg, class_5431 arg2) {
-                return arg.ordinal() * field_25830 + arg2.ordinal();
+            private static int indexSolidSide(Direction arg, SideShapeType arg2) {
+                return arg.ordinal() * SHAPE_TYPE_LENGTH + arg2.ordinal();
             }
         }
     }

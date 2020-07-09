@@ -50,7 +50,7 @@ public class LocateCommand {
 
     public static int sendCoordinates(ServerCommandSource arg, String string, BlockPos arg22, BlockPos arg3, String string2) {
         int i = MathHelper.floor(LocateCommand.getDistance(arg22.getX(), arg22.getZ(), arg3.getX(), arg3.getZ()));
-        MutableText lv = Texts.bracketed(new TranslatableText("chat.coordinates", arg3.getX(), "~", arg3.getZ())).styled(arg2 -> arg2.withColor(Formatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + arg3.getX() + " ~ " + arg3.getZ())).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableText("chat.coordinates.tooltip"))));
+        MutableText lv = Texts.bracketed(new TranslatableText("chat.coordinates", arg3.getX(), "~", arg3.getZ())).styled(arg2 -> arg2.withColor(Formatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + arg3.getX() + " ~ " + arg3.getZ())).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableText("chat.coordinates.tooltip"))));
         arg.sendFeedback(new TranslatableText(string2, string, lv, i), false);
         return i;
     }

@@ -124,9 +124,9 @@ NamedScreenHandlerFactory {
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld arg) {
         this.field_7733 = false;
-        return super.changeDimension(arg);
+        return super.moveToWorld(arg);
     }
 
     @Override

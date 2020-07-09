@@ -1680,7 +1680,7 @@ extends LivingEntity {
 
     private MutableText addTellClickEvent(MutableText arg2) {
         String string = this.getGameProfile().getName();
-        return arg2.styled(arg -> arg.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tell " + string + " ")).setHoverEvent(this.getHoverEvent()).withInsertion(string));
+        return arg2.styled(arg -> arg.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tell " + string + " ")).withHoverEvent(this.getHoverEvent()).withInsertion(string));
     }
 
     @Override

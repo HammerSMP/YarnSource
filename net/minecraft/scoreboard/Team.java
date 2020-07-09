@@ -45,7 +45,7 @@ extends AbstractTeam {
         this.scoreboard = arg;
         this.name = string;
         this.displayName = new LiteralText(string);
-        this.field_24195 = Style.EMPTY.withInsertion(string).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(string)));
+        this.field_24195 = Style.EMPTY.withInsertion(string).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(string)));
     }
 
     @Override

@@ -59,7 +59,7 @@ extends FeatureRenderer<T, M> {
         arg.translate(0.0, 0.0, 0.125);
         ((EntityModel)this.getContextModel()).copyStateTo(this.elytra);
         this.elytra.setAngles(arg3, f, g, j, k, l);
-        VertexConsumer lv7 = ItemRenderer.method_29711(arg2, this.elytra.getLayer(lv6), false, lv.hasGlint());
+        VertexConsumer lv7 = ItemRenderer.getDirectGlintVertexConsumer(arg2, this.elytra.getLayer(lv6), false, lv.hasGlint());
         this.elytra.render(arg, lv7, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
         arg.pop();
     }

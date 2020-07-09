@@ -27,8 +27,8 @@ extends Feature<OreFeatureConfig> {
     @Override
     public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, OreFeatureConfig arg4) {
         float f = random.nextFloat() * (float)Math.PI;
-        float g = (float)arg4.SIZE / 8.0f;
-        int i = MathHelper.ceil(((float)arg4.SIZE / 16.0f * 2.0f + 1.0f) / 2.0f);
+        float g = (float)arg4.size / 8.0f;
+        int i = MathHelper.ceil(((float)arg4.size / 16.0f * 2.0f + 1.0f) / 2.0f);
         double d = (double)arg3.getX() + Math.sin(f) * (double)g;
         double e = (double)arg3.getX() - Math.sin(f) * (double)g;
         double h = (double)arg3.getZ() + Math.cos(f) * (double)g;
@@ -54,7 +54,7 @@ extends Feature<OreFeatureConfig> {
         int o = 0;
         BitSet bitSet = new BitSet(m * n * m);
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        int p = arg2.SIZE;
+        int p = arg2.size;
         double[] ds = new double[p * 4];
         for (int q = 0; q < p; ++q) {
             float r = (float)q / (float)p;
@@ -107,8 +107,8 @@ extends Feature<OreFeatureConfig> {
                         if (!(ap * ap + ar * ar + at * at < 1.0) || bitSet.get(au = ao - j + (aq - k) * m + (as - l) * m * n)) continue;
                         bitSet.set(au);
                         lv.set(ao, aq, as);
-                        if (!arg2.RULE_TEST.test(arg.getBlockState(lv), random)) continue;
-                        arg.setBlockState(lv, arg2.DEFAULT_STATE, 2);
+                        if (!arg2.target.test(arg.getBlockState(lv), random)) continue;
+                        arg.setBlockState(lv, arg2.state, 2);
                         ++o;
                     }
                 }

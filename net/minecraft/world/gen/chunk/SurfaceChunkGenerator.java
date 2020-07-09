@@ -71,7 +71,7 @@ import net.minecraft.world.gen.feature.StructureFeature;
 
 public final class SurfaceChunkGenerator
 extends ChunkGenerator {
-    public static final Codec<SurfaceChunkGenerator> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BiomeSource.field_24713.fieldOf("biome_source").forGetter(arg -> arg.biomeSource), (App)Codec.LONG.fieldOf("seed").stable().forGetter(arg -> arg.field_24778), (App)ChunkGeneratorType.field_24781.fieldOf("settings").forGetter(arg -> arg.field_24774)).apply((Applicative)instance, instance.stable((Object)((Function3)SurfaceChunkGenerator::new))));
+    public static final Codec<SurfaceChunkGenerator> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)BiomeSource.field_24713.fieldOf("biome_source").forGetter(arg -> arg.biomeSource), (App)Codec.LONG.fieldOf("seed").stable().forGetter(arg -> arg.worldSeed), (App)ChunkGeneratorType.field_24781.fieldOf("settings").forGetter(arg -> arg.field_24774)).apply((Applicative)instance, instance.stable((Object)((Function3)SurfaceChunkGenerator::new))));
     private static final float[] field_16649 = Util.make(new float[13824], fs -> {
         for (int i = 0; i < 24; ++i) {
             for (int j = 0; j < 24; ++j) {
@@ -105,7 +105,7 @@ extends ChunkGenerator {
     private final SimplexNoiseSampler field_24777;
     protected final BlockState defaultBlock;
     protected final BlockState defaultFluid;
-    private final long field_24778;
+    private final long worldSeed;
     protected final ChunkGeneratorType field_24774;
     private final int field_24779;
 
@@ -115,7 +115,7 @@ extends ChunkGenerator {
 
     private SurfaceChunkGenerator(BiomeSource arg, BiomeSource arg2, long l, ChunkGeneratorType arg3) {
         super(arg, arg2, arg3.getConfig(), l);
-        this.field_24778 = l;
+        this.worldSeed = l;
         this.field_24774 = arg3;
         NoiseConfig lv = arg3.method_28559();
         this.field_24779 = lv.getHeight();
@@ -154,7 +154,7 @@ extends ChunkGenerator {
     }
 
     public boolean method_28548(long l, ChunkGeneratorType.Preset arg) {
-        return this.field_24778 == l && this.field_24774.method_28555(arg);
+        return this.worldSeed == l && this.field_24774.method_28555(arg);
     }
 
     private double sampleNoise(int i, int j, int k, double d, double e, double f, double g) {

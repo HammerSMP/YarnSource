@@ -51,7 +51,7 @@ public class ScoreboardObjective {
     }
 
     private Text method_27441() {
-        return Texts.bracketed(this.displayName.shallowCopy().styled(arg -> arg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.name)))));
+        return Texts.bracketed(this.displayName.shallowCopy().styled(arg -> arg.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.name)))));
     }
 
     public Text toHoverableText() {

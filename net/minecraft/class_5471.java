@@ -4,7 +4,7 @@
 package net.minecraft;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5458;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 import net.minecraft.world.gen.surfacebuilder.SurfaceConfig;
@@ -36,7 +36,7 @@ public class class_5471 {
     public static final ConfiguredSurfaceBuilder<TernarySurfaceConfig> WOODED_BADLANDS = class_5471.method_30610("wooded_badlands", SurfaceBuilder.WOODED_BADLANDS.method_30478(SurfaceBuilder.BADLANDS_CONFIG));
 
     private static <SC extends SurfaceConfig> ConfiguredSurfaceBuilder<SC> method_30610(String string, ConfiguredSurfaceBuilder<SC> arg) {
-        return class_5458.method_30561(class_5458.field_25927, string, arg);
+        return BuiltinRegistries.add(BuiltinRegistries.CONGINURED_SURFACE_BUILDER, string, arg);
     }
 }
 

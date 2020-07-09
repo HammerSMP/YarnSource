@@ -31,16 +31,16 @@ public class SystemToast
 implements Toast {
     private final Type type;
     private StringRenderable title;
-    private List<StringRenderable> field_25037;
+    private List<StringRenderable> lines;
     private long startTime;
     private boolean justUpdated;
-    private final int field_25038;
+    private final int width;
 
     public SystemToast(Type arg, Text arg2, @Nullable Text arg3) {
-        this(arg, arg2, (List<StringRenderable>)SystemToast.method_29626(arg3), 160);
+        this(arg, arg2, (List<StringRenderable>)SystemToast.getTextAsList(arg3), 160);
     }
 
-    public static SystemToast method_29047(MinecraftClient arg, Type arg2, Text arg3, Text arg4) {
+    public static SystemToast create(MinecraftClient arg, Type arg2, Text arg3, Text arg4) {
         TextRenderer lv = arg.textRenderer;
         List<StringRenderable> list = lv.getTextHandler().wrapLines(arg4, 200, Style.EMPTY);
         int i = Math.max(200, list.stream().mapToInt(lv::getWidth).max().orElse(200));
@@ -50,17 +50,17 @@ implements Toast {
     private SystemToast(Type arg, Text arg2, List<StringRenderable> list, int i) {
         this.type = arg;
         this.title = arg2;
-        this.field_25037 = list;
-        this.field_25038 = i;
+        this.lines = list;
+        this.width = i;
     }
 
-    private static ImmutableList<StringRenderable> method_29626(@Nullable Text arg) {
+    private static ImmutableList<StringRenderable> getTextAsList(@Nullable Text arg) {
         return arg == null ? ImmutableList.of() : ImmutableList.of((Object)arg);
     }
 
     @Override
-    public int method_29049() {
-        return this.field_25038;
+    public int getWidth() {
+        return this.width;
     }
 
     @Override
@@ -71,32 +71,32 @@ implements Toast {
         }
         arg2.getGame().getTextureManager().bindTexture(TOASTS_TEX);
         RenderSystem.color3f(1.0f, 1.0f, 1.0f);
-        int i = this.method_29049();
+        int i = this.getWidth();
         int j = 12;
-        if (i == 160 && this.field_25037.size() <= 1) {
-            arg2.drawTexture(arg, 0, 0, 0, 64, i, this.method_29050());
+        if (i == 160 && this.lines.size() <= 1) {
+            arg2.drawTexture(arg, 0, 0, 0, 64, i, this.getHeight());
         } else {
-            int k = this.method_29050() + Math.max(0, this.field_25037.size() - 1) * 12;
+            int k = this.getHeight() + Math.max(0, this.lines.size() - 1) * 12;
             int m = 28;
             int n = Math.min(4, k - 28);
-            this.method_29046(arg, arg2, i, 0, 0, 28);
+            this.drawPart(arg, arg2, i, 0, 0, 28);
             for (int o = 28; o < k - n; o += 10) {
-                this.method_29046(arg, arg2, i, 16, o, Math.min(16, k - o - n));
+                this.drawPart(arg, arg2, i, 16, o, Math.min(16, k - o - n));
             }
-            this.method_29046(arg, arg2, i, 32 - n, k - n, n);
+            this.drawPart(arg, arg2, i, 32 - n, k - n, n);
         }
-        if (this.field_25037 == null) {
+        if (this.lines == null) {
             arg2.getGame().textRenderer.draw(arg, this.title, 18.0f, 12.0f, -256);
         } else {
             arg2.getGame().textRenderer.draw(arg, this.title, 18.0f, 7.0f, -256);
-            for (int p = 0; p < this.field_25037.size(); ++p) {
-                arg2.getGame().textRenderer.draw(arg, this.field_25037.get(p), 18.0f, (float)(18 + p * 12), -1);
+            for (int p = 0; p < this.lines.size(); ++p) {
+                arg2.getGame().textRenderer.draw(arg, this.lines.get(p), 18.0f, (float)(18 + p * 12), -1);
             }
         }
         return l - this.startTime < 5000L ? Toast.Visibility.SHOW : Toast.Visibility.HIDE;
     }
 
-    private void method_29046(MatrixStack arg, ToastManager arg2, int i, int j, int k, int l) {
+    private void drawPart(MatrixStack arg, ToastManager arg2, int i, int j, int k, int l) {
         int m = j == 0 ? 20 : 5;
         int n = Math.min(60, i - m);
         arg2.drawTexture(arg, 0, k, 0, 64 + j, m, l);
@@ -108,7 +108,7 @@ implements Toast {
 
     public void setContent(Text arg, @Nullable Text arg2) {
         this.title = arg;
-        this.field_25037 = SystemToast.method_29626(arg2);
+        this.lines = SystemToast.getTextAsList(arg2);
         this.justUpdated = true;
     }
 
@@ -137,7 +137,7 @@ implements Toast {
         SystemToast.add(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.delete_failure"), new LiteralText(string));
     }
 
-    public static void method_29627(MinecraftClient arg, String string) {
+    public static void addPackCopyFailure(MinecraftClient arg, String string) {
         SystemToast.add(arg.getToastManager(), Type.PACK_COPY_FAILURE, new TranslatableText("pack.copyFailure"), new LiteralText(string));
     }
 

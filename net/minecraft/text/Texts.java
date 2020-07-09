@@ -60,7 +60,7 @@ public class Texts {
         HoverEvent lv = arg2.getHoverEvent();
         if (lv != null && (lv2 = lv.getValue(HoverEvent.Action.SHOW_TEXT)) != null) {
             HoverEvent lv3 = new HoverEvent(HoverEvent.Action.SHOW_TEXT, Texts.parse(arg, lv2, arg3, i + 1));
-            return arg2.setHoverEvent(lv3);
+            return arg2.withHoverEvent(lv3);
         }
         return arg2;
     }

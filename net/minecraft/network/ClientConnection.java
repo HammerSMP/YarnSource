@@ -269,11 +269,11 @@ extends SimpleChannelInboundHandler<Packet<?>> {
             this.channel.flush();
         }
         if (this.ticks++ % 20 == 0) {
-            this.method_30615();
+            this.updateStats();
         }
     }
 
-    protected void method_30615() {
+    protected void updateStats() {
         this.avgPacketsSent = MathHelper.lerp(0.75f, this.packetsSentCounter, this.avgPacketsSent);
         this.avgPacketsReceived = MathHelper.lerp(0.75f, this.packetsReceivedCounter, this.avgPacketsReceived);
         this.packetsSentCounter = 0;

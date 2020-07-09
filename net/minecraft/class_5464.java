@@ -20,10 +20,10 @@ import net.minecraft.block.MushroomBlock;
 import net.minecraft.block.SweetBerryBushBlock;
 import net.minecraft.class_5428;
 import net.minecraft.class_5437;
-import net.minecraft.class_5458;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.gen.GenerationStep;
@@ -290,7 +290,7 @@ public class class_5464 {
     public static final ConfiguredFeature<?, ?> MUSHROOM_FIELD_VEGETATION = class_5464.method_30590("mushroom_field_vegetation", Feature.RANDOM_BOOLEAN_SELECTOR.configure(new RandomBooleanFeatureConfig(() -> HUGE_RED_MUSHROOM, () -> HUGE_BROWN_MUSHROOM)).method_30374((ConfiguredDecorator)class_5466.field_26165));
 
     private static <FC extends FeatureConfig> ConfiguredFeature<FC, ?> method_30590(String string, ConfiguredFeature<FC, ?> arg) {
-        return Registry.register(class_5458.field_25929, string, arg);
+        return Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, string, arg);
     }
 
     public static final class class_5465 {

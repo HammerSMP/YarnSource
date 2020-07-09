@@ -35,8 +35,8 @@ public class ConfiguredStructureFeature<FC extends FeatureConfig, F extends Stru
         this.config = arg2;
     }
 
-    public StructureStart<?> method_28622(class_5455 arg, ChunkGenerator arg2, BiomeSource arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6, int i, StructureConfig arg7) {
-        return ((StructureFeature)this.feature).method_28657(arg, arg2, arg3, arg4, l, arg5, arg6, i, new ChunkRandom(), arg7, this.config);
+    public StructureStart<?> tryPlaceStart(class_5455 arg, ChunkGenerator arg2, BiomeSource arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6, int i, StructureConfig arg7) {
+        return ((StructureFeature)this.feature).tryPlaceStart(arg, arg2, arg3, arg4, l, arg5, arg6, i, new ChunkRandom(), arg7, this.config);
     }
 }
 

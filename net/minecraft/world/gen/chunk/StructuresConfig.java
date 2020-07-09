@@ -48,7 +48,7 @@ public class StructuresConfig {
         return this.structures;
     }
 
-    public StructureConfig method_28600(StructureFeature<?> arg) {
+    public StructureConfig getForType(StructureFeature<?> arg) {
         return this.structures.getOrDefault(arg, new StructureConfig(1, 0, 0));
     }
 

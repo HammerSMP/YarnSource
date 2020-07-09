@@ -139,12 +139,12 @@ public class FlatChunkGeneratorConfig {
         }
         boolean bl2 = bl = (!this.hasNoTerrain || lv == Biomes.THE_VOID) && this.field_24976;
         if (bl) {
-            List<List<Supplier<ConfiguredFeature<?, ?>>>> list = lv.method_30357();
+            List<List<Supplier<ConfiguredFeature<?, ?>>>> list = lv.getFeatures();
             for (int i = 0; i < list.size(); ++i) {
                 if (i == GenerationStep.Feature.UNDERGROUND_STRUCTURES.ordinal() || i == GenerationStep.Feature.SURFACE_STRUCTURES.ordinal()) continue;
                 List<Supplier<ConfiguredFeature<?, ?>>> list2 = list.get(i);
                 for (Supplier<ConfiguredFeature<?, ?>> supplier : list2) {
-                    lv2.method_30350(i, supplier);
+                    lv2.addFeature(i, supplier);
                 }
             }
         }

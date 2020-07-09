@@ -324,8 +324,8 @@ extends Entity {
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
-        Entity lv = super.changeDimension(arg);
+    public Entity moveToWorld(ServerWorld arg) {
+        Entity lv = super.moveToWorld(arg);
         if (!this.world.isClient && lv instanceof ItemEntity) {
             ((ItemEntity)lv).tryMerge();
         }

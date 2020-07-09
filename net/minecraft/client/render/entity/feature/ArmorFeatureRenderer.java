@@ -105,7 +105,7 @@ extends FeatureRenderer<T, M> {
     }
 
     private void renderArmorParts(MatrixStack arg, VertexConsumerProvider arg2, int i, ArmorItem arg3, boolean bl, A arg4, boolean bl2, float f, float g, float h, @Nullable String string) {
-        VertexConsumer lv = ItemRenderer.method_27952(arg2, RenderLayer.getArmorCutoutNoCull(this.getArmorTexture(arg3, bl2, string)), false, bl);
+        VertexConsumer lv = ItemRenderer.getArmorVertexConsumer(arg2, RenderLayer.getArmorCutoutNoCull(this.getArmorTexture(arg3, bl2, string)), false, bl);
         ((AnimalModel)arg4).render(arg, lv, i, OverlayTexture.DEFAULT_UV, f, g, h, 1.0f);
     }
 

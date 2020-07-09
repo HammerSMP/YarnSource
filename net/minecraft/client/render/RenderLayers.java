@@ -292,7 +292,7 @@ public class RenderLayers {
         return RenderLayer.getSolid();
     }
 
-    public static RenderLayer method_29359(BlockState arg) {
+    public static RenderLayer getMovingBlockLayer(BlockState arg) {
         Block lv = arg.getBlock();
         if (lv instanceof LeavesBlock) {
             return fancyGraphicsOrBetter ? RenderLayer.getCutoutMipped() : RenderLayer.getSolid();
@@ -313,7 +313,7 @@ public class RenderLayers {
             if (!MinecraftClient.isFabulousGraphicsOrBetter()) {
                 return TexturedRenderLayers.getEntityTranslucentCull();
             }
-            return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.method_29382();
+            return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.getItemEntityTranslucentCull();
         }
         return TexturedRenderLayers.getEntityCutout();
     }
@@ -324,7 +324,7 @@ public class RenderLayers {
             Block lv2 = ((BlockItem)lv).getBlock();
             return RenderLayers.getEntityBlockLayer(lv2.getDefaultState(), bl);
         }
-        return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.method_29382();
+        return bl ? TexturedRenderLayers.getEntityTranslucentCull() : TexturedRenderLayers.getItemEntityTranslucentCull();
     }
 
     public static RenderLayer getFluidLayer(FluidState arg) {

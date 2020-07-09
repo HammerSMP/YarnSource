@@ -100,7 +100,7 @@ implements AutoCloseable {
     }
 
     public Text getInformationText(boolean bl) {
-        return Texts.bracketed(this.source.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
+        return Texts.bracketed(this.source.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
     }
 
     public ResourcePackCompatibility getCompatibility() {

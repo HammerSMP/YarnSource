@@ -64,8 +64,8 @@ public abstract class ChunkGenerator {
     protected final BiomeSource biomeSource;
     protected final BiomeSource field_24747;
     private final StructuresConfig config;
-    private final long field_24748;
-    private final List<ChunkPos> field_24749 = Lists.newArrayList();
+    private final long worldSeed;
+    private final List<ChunkPos> strongholds = Lists.newArrayList();
 
     public ChunkGenerator(BiomeSource arg, StructuresConfig arg2) {
         this(arg, arg, arg2, 0L);
@@ -75,11 +75,11 @@ public abstract class ChunkGenerator {
         this.biomeSource = arg;
         this.field_24747 = arg2;
         this.config = arg3;
-        this.field_24748 = l;
+        this.worldSeed = l;
     }
 
-    private void method_28509() {
-        if (!this.field_24749.isEmpty()) {
+    private void generateStrongholdPositions() {
+        if (!this.strongholds.isEmpty()) {
             return;
         }
         StrongholdConfig lv = this.config.getStronghold();
@@ -95,7 +95,7 @@ public abstract class ChunkGenerator {
         int j = lv.getCount();
         int k = lv.getSpread();
         Random random = new Random();
-        random.setSeed(this.field_24748);
+        random.setSeed(this.worldSeed);
         double d = random.nextDouble() * Math.PI * 2.0;
         int l = 0;
         int m = 0;
@@ -108,7 +108,7 @@ public abstract class ChunkGenerator {
                 o = lv3.getX() >> 4;
                 p = lv3.getZ() >> 4;
             }
-            this.field_24749.add(new ChunkPos(o, p));
+            this.strongholds.add(new ChunkPos(o, p));
             d += Math.PI * 2 / (double)k;
             if (++l != k) continue;
             l = 0;
@@ -158,11 +158,11 @@ public abstract class ChunkGenerator {
             return null;
         }
         if (arg2 == StructureFeature.STRONGHOLD) {
-            this.method_28509();
+            this.generateStrongholdPositions();
             BlockPos lv = null;
             double d = Double.MAX_VALUE;
             BlockPos.Mutable lv2 = new BlockPos.Mutable();
-            for (ChunkPos lv3 : this.field_24749) {
+            for (ChunkPos lv3 : this.strongholds) {
                 lv2.set((lv3.x << 4) + 8, 32, (lv3.z << 4) + 8);
                 double e = lv2.getSquaredDistance(arg3);
                 if (lv == null) {
@@ -176,7 +176,7 @@ public abstract class ChunkGenerator {
             }
             return lv;
         }
-        return arg2.locateStructure(arg, arg.getStructureAccessor(), arg3, i, bl, arg.getSeed(), this.config.method_28600(arg2));
+        return arg2.locateStructure(arg, arg.getStructureAccessor(), arg3, i, bl, arg.getSeed(), this.config.getForType(arg2));
     }
 
     public void generateFeatures(ChunkRegion arg, StructureAccessor arg2) {
@@ -226,16 +226,16 @@ public abstract class ChunkGenerator {
     public void setStructureStarts(class_5455 arg, StructureAccessor arg2, Chunk arg3, StructureManager arg4, long l) {
         ChunkPos lv = arg3.getPos();
         Biome lv2 = this.biomeSource.getBiomeForNoiseGen((lv.x << 2) + 2, 0, (lv.z << 2) + 2);
-        this.method_28508(class_5470.STRONGHOLD, arg, arg2, arg3, arg4, l, lv, lv2);
-        for (Supplier<ConfiguredStructureFeature<?, ?>> supplier : lv2.method_28413()) {
-            this.method_28508(supplier.get(), arg, arg2, arg3, arg4, l, lv, lv2);
+        this.setStructureStart(class_5470.STRONGHOLD, arg, arg2, arg3, arg4, l, lv, lv2);
+        for (Supplier<ConfiguredStructureFeature<?, ?>> supplier : lv2.getStructureFeatures()) {
+            this.setStructureStart(supplier.get(), arg, arg2, arg3, arg4, l, lv, lv2);
         }
     }
 
-    private void method_28508(ConfiguredStructureFeature<?, ?> arg, class_5455 arg2, StructureAccessor arg3, Chunk arg4, StructureManager arg5, long l, ChunkPos arg6, Biome arg7) {
+    private void setStructureStart(ConfiguredStructureFeature<?, ?> arg, class_5455 arg2, StructureAccessor arg3, Chunk arg4, StructureManager arg5, long l, ChunkPos arg6, Biome arg7) {
         StructureStart<?> lv = arg3.getStructureStart(ChunkSectionPos.from(arg4.getPos(), 0), (StructureFeature<?>)arg.feature, arg4);
         int i = lv != null ? lv.getReferences() : 0;
-        StructureStart<?> lv2 = arg.method_28622(arg2, this, this.biomeSource, arg5, l, arg6, arg7, i, this.config.method_28600((StructureFeature<?>)arg.feature));
+        StructureStart<?> lv2 = arg.tryPlaceStart(arg2, this, this.biomeSource, arg5, l, arg6, arg7, i, this.config.getForType((StructureFeature<?>)arg.feature));
         arg3.setStructureStart(ChunkSectionPos.from(arg4.getPos(), 0), (StructureFeature<?>)arg.feature, lv2, arg4);
     }
 
@@ -286,9 +286,9 @@ public abstract class ChunkGenerator {
         return this.getHeight(i, j, arg) - 1;
     }
 
-    public boolean method_28507(ChunkPos arg) {
-        this.method_28509();
-        return this.field_24749.contains(arg);
+    public boolean isStrongholdStartingChunk(ChunkPos arg) {
+        this.generateStrongholdPositions();
+        return this.strongholds.contains(arg);
     }
 
     static {

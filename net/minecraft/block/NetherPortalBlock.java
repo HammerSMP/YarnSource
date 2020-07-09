@@ -66,7 +66,7 @@ extends Block {
                 arg3 = arg3.down();
             }
             if (arg2.getBlockState(arg3).allowsSpawning(arg2, arg3, EntityType.ZOMBIFIED_PIGLIN) && (lv = EntityType.ZOMBIFIED_PIGLIN.spawn(arg2, null, null, null, arg3.up(), SpawnReason.STRUCTURE, false, false)) != null) {
-                lv.resetNetherPortalCooldown();
+                lv.method_30229();
             }
         }
     }

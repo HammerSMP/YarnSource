@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5407;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.hud.ChatHud;
@@ -30,6 +29,7 @@ import net.minecraft.client.options.GraphicsMode;
 import net.minecraft.client.options.LogarithmicOption;
 import net.minecraft.client.options.NarratorOption;
 import net.minecraft.client.options.ParticlesOption;
+import net.minecraft.client.resource.VideoWarningManager;
 import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.LiteralText;
@@ -199,13 +199,13 @@ public abstract class Option {
     private static final Text FANCY_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fancy.tooltip");
     public static final CyclingOption GRAPHICS = new CyclingOption("options.graphics", (arg, integer) -> {
         MinecraftClient lv = MinecraftClient.getInstance();
-        class_5407 lv2 = lv.method_30049();
-        if (arg.graphicsMode == GraphicsMode.FANCY && lv2.method_30137()) {
-            lv2.method_30138();
+        VideoWarningManager lv2 = lv.getVideoWarningManager();
+        if (arg.graphicsMode == GraphicsMode.FANCY && lv2.canWarn()) {
+            lv2.scheduleWarning();
             return;
         }
         arg.graphicsMode = arg.graphicsMode.next();
-        if (arg.graphicsMode == GraphicsMode.FABULOUS && (!GlStateManager.supportsGl30() || lv2.method_30142())) {
+        if (arg.graphicsMode == GraphicsMode.FABULOUS && (!GlStateManager.supportsGl30() || lv2.hasCancelledAfterWarning())) {
             arg.graphicsMode = GraphicsMode.FAST;
         }
         lv.worldRenderer.reload();

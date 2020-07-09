@@ -44,7 +44,7 @@ extends class_5434 {
         }
         for (int n = i - 10; n <= i + 10; ++n) {
             for (int o = j - 10; o <= j + 10; ++o) {
-                ChunkPos lv = StructureFeature.VILLAGE.method_27218(arg.getConfig().method_28600(StructureFeature.VILLAGE), l, arg3, n, o);
+                ChunkPos lv = StructureFeature.VILLAGE.getStartChunk(arg.getConfig().getForType(StructureFeature.VILLAGE), l, arg3, n, o);
                 if (n != lv.x || o != lv.z) continue;
                 return false;
             }

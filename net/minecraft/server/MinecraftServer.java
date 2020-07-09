@@ -469,7 +469,7 @@ AutoCloseable {
         lv.setRaining(false);
         lv.setThundering(false);
         lv.setClearWeatherTime(1000000000);
-        lv.method_29035(6000L);
+        lv.setTimeOfDay(6000L);
         lv.setGameMode(GameMode.SPECTATOR);
     }
 
@@ -1051,7 +1051,7 @@ AutoCloseable {
 
     public abstract boolean isDedicated();
 
-    public abstract int method_30612();
+    public abstract int getRateLimit();
 
     public boolean isOnlineMode() {
         return this.onlineMode;

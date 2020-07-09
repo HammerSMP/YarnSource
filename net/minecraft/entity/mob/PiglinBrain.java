@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import net.minecraft.class_5430;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -27,6 +26,7 @@ import net.minecraft.entity.ai.brain.Activity;
 import net.minecraft.entity.ai.brain.Brain;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.task.AdmireItemTask;
+import net.minecraft.entity.ai.brain.task.AdmireItemTimeLimitTask;
 import net.minecraft.entity.ai.brain.task.AttackTask;
 import net.minecraft.entity.ai.brain.task.ConditionalTask;
 import net.minecraft.entity.ai.brain.task.CrossbowAttackTask;
@@ -133,7 +133,7 @@ public class PiglinBrain {
     }
 
     private static void addAdmireItemActivities(Brain<PiglinEntity> arg) {
-        arg.setTaskList(Activity.ADMIRE_ITEM, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of(new WalkToNearestVisibleWantedItemTask<PiglinEntity>(PiglinBrain::doesNotHaveGoldInOffHand, 1.0f, true, 9), new WantNewItemTask(9), new class_5430(200, 200)), MemoryModuleType.ADMIRING_ITEM);
+        arg.setTaskList(Activity.ADMIRE_ITEM, 10, (ImmutableList<Task<PiglinEntity>>)ImmutableList.of(new WalkToNearestVisibleWantedItemTask<PiglinEntity>(PiglinBrain::doesNotHaveGoldInOffHand, 1.0f, true, 9), new WantNewItemTask(9), new AdmireItemTimeLimitTask(200, 200)), MemoryModuleType.ADMIRING_ITEM);
     }
 
     private static void addAvoidActivities(Brain<PiglinEntity> arg) {

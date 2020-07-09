@@ -114,7 +114,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         this.codec = codec.fieldOf("config").xmap(arg -> new ConfiguredStructureFeature<FeatureConfig, StructureFeature>(this, (FeatureConfig)arg), arg -> arg.config).codec();
     }
 
-    public GenerationStep.Feature method_28663() {
+    public GenerationStep.Feature getGenerationStep() {
         return STRUCTURE_TO_GENERATION_STEP.get(this);
     }
 
@@ -122,7 +122,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
     }
 
     @Nullable
-    public static StructureStart<?> method_28660(StructureManager arg, CompoundTag arg2, long l) {
+    public static StructureStart<?> readStructureStart(StructureManager arg, CompoundTag arg2, long l) {
         String string = arg2.getString("id");
         if ("INVALID".equals(string)) {
             return StructureStart.DEFAULT;
@@ -138,7 +138,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         BlockBox lv2 = arg2.contains("BB") ? new BlockBox(arg2.getIntArray("BB")) : BlockBox.empty();
         ListTag lv3 = arg2.getList("Children", 10);
         try {
-            StructureStart<?> lv4 = super.method_28656(i, j, lv2, k, l);
+            StructureStart<?> lv4 = super.createStart(i, j, lv2, k, l);
             for (int m = 0; m < lv3.size(); ++m) {
                 CompoundTag lv5 = lv3.getCompound(m);
                 String string2 = lv5.getString("id").toLowerCase(Locale.ROOT);
@@ -188,7 +188,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
                     if (!bl2 && !bl3) continue;
                     int q = k + j * o;
                     int r = m + j * p;
-                    ChunkPos lv2 = this.method_27218(arg4, l, lv, q, r);
+                    ChunkPos lv2 = this.getStartChunk(arg4, l, lv, q, r);
                     Chunk lv3 = arg.getChunk(lv2.x, lv2.z, ChunkStatus.STRUCTURE_STARTS);
                     StructureStart<?> lv4 = arg2.getStructureStart(ChunkSectionPos.from(lv3.getPos(), 0), this, lv3);
                     if (lv4 != null && lv4.hasChildren()) {
@@ -208,11 +208,11 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         return null;
     }
 
-    protected boolean method_27219() {
+    protected boolean isUniformDistribution() {
         return true;
     }
 
-    public final ChunkPos method_27218(StructureConfig arg, long l, ChunkRandom arg2, int i, int j) {
+    public final ChunkPos getStartChunk(StructureConfig arg, long l, ChunkRandom arg2, int i, int j) {
         int s;
         int r;
         int k = arg.getSpacing();
@@ -220,7 +220,7 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         int n = Math.floorDiv(i, k);
         int o = Math.floorDiv(j, k);
         arg2.setRegionSeed(l, n, o, arg.getSalt());
-        if (this.method_27219()) {
+        if (this.isUniformDistribution()) {
             int p = arg2.nextInt(k - m);
             int q = arg2.nextInt(k - m);
         } else {
@@ -234,14 +234,14 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         return true;
     }
 
-    private StructureStart<C> method_28656(int i, int j, BlockBox arg, int k, long l) {
+    private StructureStart<C> createStart(int i, int j, BlockBox arg, int k, long l) {
         return this.getStructureStartFactory().create(this, i, j, arg, k, l);
     }
 
-    public StructureStart<?> method_28657(class_5455 arg, ChunkGenerator arg2, BiomeSource arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6, int i, ChunkRandom arg7, StructureConfig arg8, C arg9) {
-        ChunkPos lv = this.method_27218(arg8, l, arg7, arg5.x, arg5.z);
+    public StructureStart<?> tryPlaceStart(class_5455 arg, ChunkGenerator arg2, BiomeSource arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6, int i, ChunkRandom arg7, StructureConfig arg8, C arg9) {
+        ChunkPos lv = this.getStartChunk(arg8, l, arg7, arg5.x, arg5.z);
         if (arg5.x == lv.x && arg5.z == lv.z && this.shouldStartAt(arg2, arg3, l, arg7, arg5.x, arg5.z, arg6, lv, arg9)) {
-            StructureStart<C> lv2 = this.method_28656(arg5.x, arg5.z, BlockBox.empty(), i, l);
+            StructureStart<C> lv2 = this.createStart(arg5.x, arg5.z, BlockBox.empty(), i, l);
             lv2.init(arg, arg2, arg4, arg5.x, arg5.z, arg6, arg9);
             if (lv2.hasChildren()) {
                 return lv2;

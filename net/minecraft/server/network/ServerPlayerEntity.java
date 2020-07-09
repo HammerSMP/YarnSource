@@ -38,7 +38,6 @@ import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.class_5454;
 import net.minecraft.class_5459;
 import net.minecraft.client.options.ChatVisibility;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
@@ -147,6 +146,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.village.TraderOfferList;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.source.BiomeAccess;
@@ -474,7 +474,7 @@ implements ScreenHandlerListener {
                     int i = 256;
                     String string = lv.asTruncatedString(256);
                     TranslatableText lv = new TranslatableText("death.attack.message_too_long", new LiteralText(string).formatted(Formatting.YELLOW));
-                    MutableText lv2 = new TranslatableText("death.attack.even_more_magic", this.getDisplayName()).styled(arg2 -> arg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv)));
+                    MutableText lv2 = new TranslatableText("death.attack.even_more_magic", this.getDisplayName()).styled(arg2 -> arg2.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lv)));
                     this.networkHandler.sendPacket(new CombatEventS2CPacket(this.getDamageTracker(), CombatEventS2CPacket.Type.ENTITY_DIED, lv2));
                 }
             }));
@@ -584,18 +584,18 @@ implements ScreenHandlerListener {
 
     @Override
     @Nullable
-    protected class_5454 method_30329(ServerWorld arg) {
-        class_5454 lv = super.method_30329(arg);
+    protected TeleportTarget getTeleportTarget(ServerWorld arg) {
+        TeleportTarget lv = super.getTeleportTarget(arg);
         if (lv != null && this.world.getRegistryKey() == World.OVERWORLD && arg.getRegistryKey() == World.END) {
-            Vec3d lv2 = lv.field_25879.add(0.0, -1.0, 0.0);
-            return new class_5454(lv2, Vec3d.ZERO, 90.0f, 0.0f);
+            Vec3d lv2 = lv.position.add(0.0, -1.0, 0.0);
+            return new TeleportTarget(lv2, Vec3d.ZERO, 90.0f, 0.0f);
         }
         return lv;
     }
 
     @Override
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld arg) {
         this.inTeleportationState = true;
         ServerWorld lv = this.getServerWorld();
         RegistryKey<World> lv2 = lv.getRegistryKey();
@@ -616,21 +616,21 @@ implements ScreenHandlerListener {
         lv4.sendCommandTree(this);
         lv.removePlayer(this);
         this.removed = false;
-        class_5454 lv5 = this.method_30329(arg);
+        TeleportTarget lv5 = this.getTeleportTarget(arg);
         if (lv5 != null) {
             lv.getProfiler().push("moving");
             if (lv2 == World.OVERWORLD && arg.getRegistryKey() == World.NETHER) {
                 this.enteredNetherPos = this.getPos();
             } else if (arg.getRegistryKey() == World.END) {
-                this.method_30313(arg, new BlockPos(lv5.field_25879));
+                this.createEndSpawnPlatform(arg, new BlockPos(lv5.position));
             }
             lv.getProfiler().pop();
             lv.getProfiler().push("placing");
             this.setWorld(arg);
             arg.onPlayerChangeDimension(this);
-            this.dimensionChanged(lv);
-            this.setRotation(lv5.field_25881, lv5.field_25882);
-            this.refreshPositionAfterTeleport(lv5.field_25879.x, lv5.field_25879.y, lv5.field_25879.z);
+            this.worldChanged(lv);
+            this.setRotation(lv5.yaw, lv5.pitch);
+            this.refreshPositionAfterTeleport(lv5.position.x, lv5.position.y, lv5.position.z);
             lv.getProfiler().pop();
             this.interactionManager.setWorld(arg);
             this.networkHandler.sendPacket(new PlayerAbilitiesS2CPacket(this.abilities));
@@ -647,7 +647,7 @@ implements ScreenHandlerListener {
         return this;
     }
 
-    private void method_30313(ServerWorld arg, BlockPos arg2) {
+    private void createEndSpawnPlatform(ServerWorld arg, BlockPos arg2) {
         BlockPos.Mutable lv = arg2.mutableCopy();
         for (int i = -2; i <= 2; ++i) {
             for (int j = -2; j <= 2; ++j) {
@@ -673,7 +673,7 @@ implements ScreenHandlerListener {
         return optional2;
     }
 
-    private void dimensionChanged(ServerWorld arg) {
+    private void worldChanged(ServerWorld arg) {
         RegistryKey<World> lv = arg.getRegistryKey();
         RegistryKey<World> lv2 = this.world.getRegistryKey();
         Criteria.CHANGED_DIMENSION.trigger(this, lv, lv2);
@@ -1292,7 +1292,7 @@ implements ScreenHandlerListener {
             this.refreshPositionAndAngles(d, e, f, g, h);
             this.setWorld(arg);
             arg.onPlayerTeleport(this);
-            this.dimensionChanged(lv);
+            this.worldChanged(lv);
             this.networkHandler.requestTeleport(d, e, f, g, h);
             this.interactionManager.setWorld(arg);
             this.server.getPlayerManager().sendWorldInfo(this, arg);

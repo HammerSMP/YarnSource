@@ -57,7 +57,7 @@ public class SpriteIdentifier {
     }
 
     public VertexConsumer method_30001(VertexConsumerProvider arg, Function<Identifier, RenderLayer> function, boolean bl) {
-        return this.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.method_29711(arg, this.getRenderLayer(function), true, bl));
+        return this.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.getDirectGlintVertexConsumer(arg, this.getRenderLayer(function), true, bl));
     }
 
     public boolean equals(Object object) {

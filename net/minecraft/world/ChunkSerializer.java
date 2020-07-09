@@ -364,7 +364,7 @@ public class ChunkSerializer {
                 LOGGER.error("Unknown structure start: {}", (Object)string2);
                 continue;
             }
-            StructureStart<?> lv3 = StructureFeature.method_28660(arg, lv.getCompound(string), l);
+            StructureStart<?> lv3 = StructureFeature.readStructureStart(arg, lv.getCompound(string), l);
             if (lv3 == null) continue;
             map.put(lv2, lv3);
         }

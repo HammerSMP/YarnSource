@@ -813,7 +813,7 @@ public final class ItemStack {
         }
         MutableText lv2 = Texts.bracketed(lv);
         if (!this.empty) {
-            lv2.formatted(this.getRarity().formatting).styled(arg -> arg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(this))));
+            lv2.formatted(this.getRarity().formatting).styled(arg -> arg.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(this))));
         }
         return lv2;
     }

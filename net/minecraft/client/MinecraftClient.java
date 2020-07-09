@@ -70,7 +70,6 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SkullBlockEntity;
-import net.minecraft.class_5407;
 import net.minecraft.class_5455;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Keyboard;
@@ -149,6 +148,7 @@ import net.minecraft.client.resource.Format3ResourcePack;
 import net.minecraft.client.resource.Format4ResourcePack;
 import net.minecraft.client.resource.GrassColormapResourceSupplier;
 import net.minecraft.client.resource.SplashTextResourceSupplier;
+import net.minecraft.client.resource.VideoWarningManager;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.search.IdentifierSearchableContainer;
@@ -322,7 +322,7 @@ WindowEventHandler {
     private final MusicTracker musicTracker;
     private final FontManager fontManager;
     private final SplashTextResourceSupplier splashTextLoader;
-    private final class_5407 field_25671;
+    private final VideoWarningManager videoWarningManager;
     private final MinecraftSessionService sessionService;
     private final PlayerSkinProvider skinProvider;
     private final BakedModelManager bakedModelManager;
@@ -495,8 +495,8 @@ WindowEventHandler {
         this.resourceManager.registerListener(this.paintingManager);
         this.statusEffectSpriteManager = new StatusEffectSpriteManager(this.textureManager);
         this.resourceManager.registerListener(this.statusEffectSpriteManager);
-        this.field_25671 = new class_5407();
-        this.resourceManager.registerListener(this.field_25671);
+        this.videoWarningManager = new VideoWarningManager();
+        this.resourceManager.registerListener(this.videoWarningManager);
         this.inGameHud = new InGameHud(this);
         this.debugRenderer = new DebugRenderer(this);
         RenderSystem.setErrorCallback((arg_0, arg_1) -> this.handleGlErrorByDisableVsync(arg_0, arg_1));
@@ -2042,8 +2042,8 @@ WindowEventHandler {
         return this.paused;
     }
 
-    public class_5407 method_30049() {
-        return this.field_25671;
+    public VideoWarningManager getVideoWarningManager() {
+        return this.videoWarningManager;
     }
 
     public SoundManager getSoundManager() {

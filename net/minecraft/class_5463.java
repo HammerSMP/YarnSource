@@ -3,7 +3,7 @@
  */
 package net.minecraft;
 
-import net.minecraft.class_5458;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.gen.ProbabilityConfig;
 import net.minecraft.world.gen.carver.Carver;
 import net.minecraft.world.gen.carver.CarverConfig;
@@ -18,7 +18,7 @@ public class class_5463 {
     public static final ConfiguredCarver<ProbabilityConfig> NETHER_CAVE = class_5463.method_30588("nether_cave", Carver.NETHER_CAVE.method_28614(new ProbabilityConfig(0.2f)));
 
     private static <WC extends CarverConfig> ConfiguredCarver<WC> method_30588(String string, ConfiguredCarver<WC> arg) {
-        return class_5458.method_30561(class_5458.field_25928, string, arg);
+        return BuiltinRegistries.add(BuiltinRegistries.CONFIGURED_CARVER, string, arg);
     }
 }
 

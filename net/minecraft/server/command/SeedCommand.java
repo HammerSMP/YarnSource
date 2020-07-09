@@ -23,7 +23,7 @@ public class SeedCommand {
     public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher, boolean bl) {
         commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("seed").requires(arg -> !bl || arg.hasPermissionLevel(2))).executes(commandContext -> {
             long l = ((ServerCommandSource)commandContext.getSource()).getWorld().getSeed();
-            MutableText lv = Texts.bracketed(new LiteralText(String.valueOf(l)).styled(arg -> arg.withColor(Formatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(l))).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableText("chat.copy.click"))).withInsertion(String.valueOf(l))));
+            MutableText lv = Texts.bracketed(new LiteralText(String.valueOf(l)).styled(arg -> arg.withColor(Formatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(l))).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableText("chat.copy.click"))).withInsertion(String.valueOf(l))));
             ((ServerCommandSource)commandContext.getSource()).sendFeedback(new TranslatableText("commands.seed.success", lv), false);
             return (int)l;
         }));

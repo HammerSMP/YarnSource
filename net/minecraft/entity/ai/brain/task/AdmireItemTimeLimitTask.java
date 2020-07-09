@@ -4,7 +4,7 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
  */
-package net.minecraft;
+package net.minecraft.entity.ai.brain.task;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
@@ -17,15 +17,15 @@ import net.minecraft.entity.ai.brain.task.Task;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.server.world.ServerWorld;
 
-public class class_5430<E extends PiglinEntity>
+public class AdmireItemTimeLimitTask<E extends PiglinEntity>
 extends Task<E> {
-    private final int field_25815;
-    private final int field_25816;
+    private final int timeLimit;
+    private final int cooldown;
 
-    public class_5430(int i, int j) {
+    public AdmireItemTimeLimitTask(int i, int j) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ADMIRING_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.field_25815 = i;
-        this.field_25816 = j;
+        this.timeLimit = i;
+        this.cooldown = j;
     }
 
     @Override
@@ -41,10 +41,10 @@ extends Task<E> {
             lv.remember(MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, 0);
         } else {
             int i = optional.get();
-            if (i > this.field_25815) {
+            if (i > this.timeLimit) {
                 lv.forget(MemoryModuleType.ADMIRING_ITEM);
                 lv.forget(MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM);
-                lv.remember(MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, true, this.field_25816);
+                lv.remember(MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, true, this.cooldown);
             } else {
                 lv.remember(MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, i + 1);
             }

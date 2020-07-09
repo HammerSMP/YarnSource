@@ -123,7 +123,7 @@ extends MinecraftServer {
     }
 
     @Override
-    public int method_30612() {
+    public int getRateLimit() {
         return 0;
     }
 

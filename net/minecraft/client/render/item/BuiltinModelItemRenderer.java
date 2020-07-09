@@ -124,7 +124,7 @@ public class BuiltinModelItemRenderer {
             arg3.push();
             arg3.scale(1.0f, -1.0f, -1.0f);
             SpriteIdentifier lv14 = bl ? ModelLoader.SHIELD_BASE : ModelLoader.SHIELD_BASE_NO_PATTERN;
-            VertexConsumer lv15 = lv14.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.method_29711(arg4, this.modelShield.getLayer(lv14.getAtlasId()), true, arg.hasGlint()));
+            VertexConsumer lv15 = lv14.getSprite().getTextureSpecificVertexConsumer(ItemRenderer.getDirectGlintVertexConsumer(arg4, this.modelShield.getLayer(lv14.getAtlasId()), true, arg.hasGlint()));
             this.modelShield.method_23775().render(arg3, lv15, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             if (bl) {
                 List<Pair<BannerPattern, DyeColor>> list = BannerBlockEntity.method_24280(ShieldItem.getColor(arg), BannerBlockEntity.getPatternListTag(arg));
@@ -136,7 +136,7 @@ public class BuiltinModelItemRenderer {
         } else if (lv == Items.TRIDENT) {
             arg3.push();
             arg3.scale(1.0f, -1.0f, -1.0f);
-            VertexConsumer lv16 = ItemRenderer.method_29711(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasGlint());
+            VertexConsumer lv16 = ItemRenderer.getDirectGlintVertexConsumer(arg4, this.modelTrident.getLayer(TridentEntityModel.TEXTURE), false, arg.hasGlint());
             this.modelTrident.render(arg3, lv16, i, j, 1.0f, 1.0f, 1.0f, 1.0f);
             arg3.pop();
         }

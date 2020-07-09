@@ -59,12 +59,12 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.class_5472;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.DecoderHandler;
 import net.minecraft.network.LegacyQueryHandler;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.PacketEncoder;
+import net.minecraft.network.RateLimitedConnection;
 import net.minecraft.network.SizePrepender;
 import net.minecraft.network.SplitterHandler;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
@@ -119,8 +119,8 @@ public class ServerNetworkIo {
                         // empty catch block
                     }
                     channel.pipeline().addLast("timeout", (ChannelHandler)new ReadTimeoutHandler(30)).addLast("legacy_query", (ChannelHandler)new LegacyQueryHandler(ServerNetworkIo.this)).addLast("splitter", (ChannelHandler)new SplitterHandler()).addLast("decoder", (ChannelHandler)new DecoderHandler(NetworkSide.SERVERBOUND)).addLast("prepender", (ChannelHandler)new SizePrepender()).addLast("encoder", (ChannelHandler)new PacketEncoder(NetworkSide.CLIENTBOUND));
-                    int i = ServerNetworkIo.this.server.method_30612();
-                    ClientConnection lv = i > 0 ? new class_5472(i) : new ClientConnection(NetworkSide.SERVERBOUND);
+                    int i = ServerNetworkIo.this.server.getRateLimit();
+                    ClientConnection lv = i > 0 ? new RateLimitedConnection(i) : new ClientConnection(NetworkSide.SERVERBOUND);
                     ServerNetworkIo.this.connections.add(lv);
                     channel.pipeline().addLast("packet_handler", (ChannelHandler)lv);
                     lv.setPacketListener(new ServerHandshakeNetworkHandler(ServerNetworkIo.this.server, lv));

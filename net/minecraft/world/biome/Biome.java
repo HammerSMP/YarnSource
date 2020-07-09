@@ -49,7 +49,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
-import net.minecraft.class_5458;
 import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.client.color.world.GrassColors;
 import net.minecraft.entity.EntityType;
@@ -73,6 +72,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.noise.OctaveSimplexNoiseSampler;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.LightType;
@@ -97,25 +97,7 @@ import org.apache.logging.log4j.Logger;
 
 public class Biome {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final MapCodec<Biome> field_25819 = RecordCodecBuilder.mapCodec(instance -> 
-	    instance.group((App)Precipitation.field_24680.fieldOf("precipitation").forGetter(arg -> 
-	    arg.precipitation), (App)Category.field_24678.fieldOf("category").forGetter(arg -> 
-	    arg.category), (App)Codec.FLOAT.fieldOf("depth").forGetter(arg -> 
-	    Float.valueOf(arg.depth)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> 
-	    Float.valueOf(arg.scale)), (App)Codec.FLOAT.fieldOf("temperature").forGetter(arg -> 
-	    Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("downfall").forGetter(arg -> 
-	    Float.valueOf(arg.downfall)), (App)BiomeEffects.CODEC.fieldOf("effects").forGetter(arg -> 
-	    arg.effects), (App)Codec.INT.fieldOf("sky_color").forGetter(arg -> 
-	    arg.skyColor), (App)ConfiguredSurfaceBuilder.field_25015.fieldOf("surface_builder").forGetter(arg -> 
-	    arg.surfaceBuilder), (App)Codec.simpleMap(GenerationStep.Carver.field_24770, (Codec)ConfiguredCarver.field_24828.listOf().promotePartial(Util.method_29188("Carver: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Carver.values())).fieldOf("carvers").forGetter(arg -> 
-	    arg.carvers), (App)ConfiguredFeature.CODEC.listOf().promotePartial(Util.method_29188("Feature: ", ((Logger)LOGGER)::error)).listOf().fieldOf("features").forGetter(arg -> 
-	    arg.features), (App)ConfiguredStructureFeature.TYPE_CODEC.listOf().promotePartial(Util.method_29188("Structure start: ", ((Logger)LOGGER)::error)).fieldOf("starts").forGetter(arg -> 
-	    arg.noisePoints), (App)Codec.simpleMap(SpawnGroup.field_24655, (Codec)SpawnEntry.CODEC.listOf().promotePartial(Util.method_29188("Spawn data: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(SpawnGroup.values())).fieldOf("spawners").forGetter(arg -> 
-	    arg.spawns), (App)Codec.STRING.optionalFieldOf("parent").forGetter(arg -> 
-	    Optional.ofNullable(arg.parent)), (App)Codec.simpleMap(Registry.ENTITY_TYPE, SpawnDensity.field_25820, Registry.ENTITY_TYPE).fieldOf("spawn_costs").forGetter(arg -> 
-        arg.spawnDensities)).apply((Applicative)instance, Biome::new
-    ));
-        
+    public static final MapCodec<Biome> field_25819 = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Precipitation.field_24680.fieldOf("precipitation").forGetter(arg -> arg.precipitation), (App)Category.field_24678.fieldOf("category").forGetter(arg -> arg.category), (App)Codec.FLOAT.fieldOf("depth").forGetter(arg -> Float.valueOf(arg.depth)), (App)Codec.FLOAT.fieldOf("scale").forGetter(arg -> Float.valueOf(arg.scale)), (App)Codec.FLOAT.fieldOf("temperature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.FLOAT.fieldOf("downfall").forGetter(arg -> Float.valueOf(arg.downfall)), (App)BiomeEffects.CODEC.fieldOf("effects").forGetter(arg -> arg.effects), (App)Codec.INT.fieldOf("sky_color").forGetter(arg -> arg.skyColor), (App)ConfiguredSurfaceBuilder.field_25015.fieldOf("surface_builder").forGetter(arg -> arg.surfaceBuilder), (App)Codec.simpleMap(GenerationStep.Carver.field_24770, (Codec)ConfiguredCarver.field_24828.listOf().promotePartial(Util.method_29188("Carver: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(GenerationStep.Carver.values())).fieldOf("carvers").forGetter(arg -> arg.carvers), (App)ConfiguredFeature.CODEC.listOf().promotePartial(Util.method_29188("Feature: ", ((Logger)LOGGER)::error)).listOf().fieldOf("features").forGetter(arg -> arg.features), (App)ConfiguredStructureFeature.TYPE_CODEC.listOf().promotePartial(Util.method_29188("Structure start: ", ((Logger)LOGGER)::error)).fieldOf("starts").forGetter(arg -> arg.structureFeatures), (App)Codec.simpleMap(SpawnGroup.field_24655, (Codec)SpawnEntry.CODEC.listOf().promotePartial(Util.method_29188("Spawn data: ", ((Logger)LOGGER)::error)), (Keyable)StringIdentifiable.method_28142(SpawnGroup.values())).fieldOf("spawners").forGetter(arg -> arg.spawns), (App)Codec.STRING.optionalFieldOf("parent").forGetter(arg -> Optional.ofNullable(arg.parent)), (App)Codec.simpleMap(Registry.ENTITY_TYPE, SpawnDensity.field_25820, Registry.ENTITY_TYPE).fieldOf("spawn_costs").forGetter(arg -> arg.spawnDensities)).apply((Applicative)instance, Biome::new));
     public static final Codec<Supplier<Biome>> field_24677 = RegistryElementCodec.of(Registry.BIOME_KEY, field_25819);
     public static final Set<Biome> BIOMES = Sets.newHashSet();
     protected static final OctaveSimplexNoiseSampler TEMPERATURE_NOISE = new OctaveSimplexNoiseSampler(new ChunkRandom(1234L), (List<Integer>)ImmutableList.of((Object)0));
@@ -134,12 +116,10 @@ public class Biome {
     private final Map<GenerationStep.Carver, List<Supplier<ConfiguredCarver<?>>>> carvers;
     private final List<List<Supplier<ConfiguredFeature<?, ?>>>> features;
     private final List<ConfiguredFeature<?, ?>> flowerFeatures;
-    private final List<Supplier<ConfiguredStructureFeature<?, ?>>> noisePoints;
+    private final List<Supplier<ConfiguredStructureFeature<?, ?>>> structureFeatures;
     private final Map<SpawnGroup, List<SpawnEntry>> spawns;
     private final Map<EntityType<?>, SpawnDensity> spawnDensities;
-    private final ThreadLocal<Long2FloatLinkedOpenHashMap> temperatureCache = ThreadLocal.withInitial(() -> 
-	 Util.make(() -> 
-	 {
+    private final ThreadLocal<Long2FloatLinkedOpenHashMap> temperatureCache = ThreadLocal.withInitial(() -> Util.make(() -> {
         Long2FloatLinkedOpenHashMap long2FloatLinkedOpenHashMap = new Long2FloatLinkedOpenHashMap(1024, 0.25f){
 
             protected void rehash(int i) {
@@ -164,7 +144,7 @@ public class Biome {
         this.parent = arg.parent;
         this.effects = arg.specialEffects;
         this.carvers = Maps.newHashMap();
-        this.noisePoints = Lists.newArrayList();
+        this.structureFeatures = Lists.newArrayList();
         this.features = Lists.newArrayList();
         this.spawns = Maps.newHashMap();
         for (SpawnGroup lv : SpawnGroup.values()) {
@@ -186,12 +166,11 @@ public class Biome {
         this.surfaceBuilder = supplier;
         this.carvers = map;
         this.features = list;
-        this.noisePoints = list2;
+        this.structureFeatures = list2;
         this.spawns = map2;
         this.parent = optional.orElse(null);
         this.spawnDensities = map3;
-        this.flowerFeatures = list.stream().flatMap(Collection::stream).map(Supplier::get).filter(arg -> 
-	 arg.feature == Feature.DECORATED_FLOWER).collect(Collectors.toList());
+        this.flowerFeatures = list.stream().flatMap(Collection::stream).map(Supplier::get).filter(arg -> arg.feature == Feature.DECORATED_FLOWER).collect(Collectors.toList());
     }
 
     public boolean hasParent() {
@@ -296,11 +275,10 @@ public class Biome {
     }
 
     public void addFeature(GenerationStep.Feature arg, ConfiguredFeature<?, ?> arg2) {
-        this.method_30350(arg.ordinal(), () -> 
-	 arg2);
+        this.addFeature(arg.ordinal(), () -> arg2);
     }
 
-    public void method_30350(int i, Supplier<ConfiguredFeature<?, ?>> supplier) {
+    public void addFeature(int i, Supplier<ConfiguredFeature<?, ?>> supplier) {
         if (supplier.get().feature == Feature.DECORATED_FLOWER) {
             this.flowerFeatures.add(supplier.get());
         }
@@ -311,9 +289,7 @@ public class Biome {
     }
 
     public <C extends CarverConfig> void addCarver(GenerationStep.Carver arg2, ConfiguredCarver<C> arg22) {
-        this.carvers.computeIfAbsent(arg2, arg -> 
-	 Lists.newArrayList()).add(() -> 
-	 arg22);
+        this.carvers.computeIfAbsent(arg2, arg -> Lists.newArrayList()).add(() -> arg22);
     }
 
     public List<Supplier<ConfiguredCarver<?>>> getCarversForStep(GenerationStep.Carver arg) {
@@ -321,29 +297,26 @@ public class Biome {
     }
 
     public void addStructureFeature(ConfiguredStructureFeature<?, ?> arg) {
-        this.noisePoints.add(() -> 
-	 arg);
+        this.structureFeatures.add(() -> arg);
     }
 
     public boolean hasStructureFeature(StructureFeature<?> arg) {
-        return this.noisePoints.stream().anyMatch(supplier -> 
-	 ((ConfiguredStructureFeature)supplier.get()).feature == arg);
+        return this.structureFeatures.stream().anyMatch(supplier -> ((ConfiguredStructureFeature)supplier.get()).feature == arg);
     }
 
-    public Iterable<Supplier<ConfiguredStructureFeature<?, ?>>> method_28413() {
-        return this.noisePoints;
+    public Iterable<Supplier<ConfiguredStructureFeature<?, ?>>> getStructureFeatures() {
+        return this.structureFeatures;
     }
 
     public ConfiguredStructureFeature<?, ?> method_28405(ConfiguredStructureFeature<?, ?> arg) {
-        return (ConfiguredStructureFeature)DataFixUtils.orElse(this.noisePoints.stream().map(Supplier::get).filter(arg2 -> 
-	 arg2.feature == arg.feature).findAny(), arg);
+        return (ConfiguredStructureFeature)DataFixUtils.orElse(this.structureFeatures.stream().map(Supplier::get).filter(arg2 -> arg2.feature == arg.feature).findAny(), arg);
     }
 
     public List<ConfiguredFeature<?, ?>> getFlowerFeatures() {
         return this.flowerFeatures;
     }
 
-    public List<List<Supplier<ConfiguredFeature<?, ?>>>> method_30357() {
+    public List<List<Supplier<ConfiguredFeature<?, ?>>>> getFeatures() {
         return this.features;
     }
 
@@ -352,20 +325,18 @@ public class Biome {
             int j = 0;
             if (arg.shouldGenerateStructures()) {
                 for (StructureFeature structureFeature : Registry.STRUCTURE_FEATURE) {
-                    if (structureFeature.method_28663().ordinal() != i) continue;
+                    if (structureFeature.getGenerationStep().ordinal() != i) continue;
                     arg4.setDecoratorSeed(l, j, i);
                     int k = arg52.getX() >> 4;
                     int m = arg52.getZ() >> 4;
                     int n = k << 4;
                     int o = m << 4;
                     try {
-                        arg.getStructuresWithChildren(ChunkSectionPos.from(arg52), structureFeature).forEach(arg5 -> 
-	 arg5.generateStructure(arg3, arg, arg2, arg4, new BlockBox(n, o, n + 15, o + 15), new ChunkPos(k, m)));
+                        arg.getStructuresWithChildren(ChunkSectionPos.from(arg52), structureFeature).forEach(arg5 -> arg5.generateStructure(arg3, arg, arg2, arg4, new BlockBox(n, o, n + 15, o + 15), new ChunkPos(k, m)));
                     }
                     catch (Exception exception) {
                         CrashReport lv2 = CrashReport.create(exception, "Feature placement");
-                        lv2.addElement("Feature").add("Id", Registry.STRUCTURE_FEATURE.getId(structureFeature)).add("Description", () -> 
-	 lv.toString());
+                        lv2.addElement("Feature").add("Id", Registry.STRUCTURE_FEATURE.getId(structureFeature)).add("Description", () -> lv.toString());
                         throw new CrashException(lv2);
                     }
                     ++j;
@@ -379,8 +350,7 @@ public class Biome {
                 }
                 catch (Exception exception2) {
                     CrashReport lv4 = CrashReport.create(exception2, "Feature placement");
-                    lv4.addElement("Feature").add("Id", Registry.FEATURE.getId((Feature<?>)lv3.feature)).add("Config", lv3.config).add("Description", () -> 
-	 arg.feature.toString());
+                    lv4.addElement("Feature").add("Id", Registry.FEATURE.getId((Feature<?>)lv3.feature)).add("Config", lv3.config).add("Description", () -> arg.feature.toString());
                     throw new CrashException(lv4);
                 }
                 ++j;
@@ -499,18 +469,12 @@ public class Biome {
     }
 
     public String toString() {
-        Identifier lv = class_5458.field_25933.getId(this);
+        Identifier lv = BuiltinRegistries.BIOME.getId(this);
         return lv == null ? super.toString() : lv.toString();
     }
 
     public static class MixedNoisePoint {
-        public static final Codec<MixedNoisePoint> CODEC = RecordCodecBuilder.create(instance -> 
-	        instance.group((App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("temperature").forGetter(arg -> 
-	        Float.valueOf(arg.temperature)), (App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("humidity").forGetter(arg -> 
-	        Float.valueOf(arg.humidity)), (App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("altitude").forGetter(arg -> 
-	        Float.valueOf(arg.altitude)), (App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("weirdness").forGetter(arg -> 
-	        Float.valueOf(arg.weirdness)), (App)Codec.floatRange((float)0.0f, (float)1.0f).fieldOf("offset").forGetter(arg -> 
-	        Float.valueOf(arg.weight))).apply((Applicative)instance, MixedNoisePoint::new));
+        public static final Codec<MixedNoisePoint> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("temperature").forGetter(arg -> Float.valueOf(arg.temperature)), (App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("humidity").forGetter(arg -> Float.valueOf(arg.humidity)), (App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("altitude").forGetter(arg -> Float.valueOf(arg.altitude)), (App)Codec.floatRange((float)-2.0f, (float)2.0f).fieldOf("weirdness").forGetter(arg -> Float.valueOf(arg.weirdness)), (App)Codec.floatRange((float)0.0f, (float)1.0f).fieldOf("offset").forGetter(arg -> Float.valueOf(arg.weight))).apply((Applicative)instance, MixedNoisePoint::new));
         private final float temperature;
         private final float humidity;
         private final float altitude;
@@ -634,12 +598,7 @@ public class Biome {
 
     public static class SpawnEntry
     extends WeightedPicker.Entry {
-        public static final Codec<SpawnEntry> CODEC = RecordCodecBuilder.create(instance -> 
-	 instance.group((App)Registry.ENTITY_TYPE.fieldOf("type").forGetter(arg -> 
-	 arg.type), (App)Codec.INT.fieldOf("weight").forGetter(arg -> 
-	 arg.weight), (App)Codec.INT.fieldOf("minCount").forGetter(arg -> 
-	 arg.minGroupSize), (App)Codec.INT.fieldOf("maxCount").forGetter(arg -> 
-	 arg.maxGroupSize)).apply((Applicative)instance, SpawnEntry::new));
+        public static final Codec<SpawnEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Registry.ENTITY_TYPE.fieldOf("type").forGetter(arg -> arg.type), (App)Codec.INT.fieldOf("weight").forGetter(arg -> arg.weight), (App)Codec.INT.fieldOf("minCount").forGetter(arg -> arg.minGroupSize), (App)Codec.INT.fieldOf("maxCount").forGetter(arg -> arg.maxGroupSize)).apply((Applicative)instance, SpawnEntry::new));
         public final EntityType<?> type;
         public final int minGroupSize;
         public final int maxGroupSize;
@@ -657,8 +616,7 @@ public class Biome {
     }
 
     public static class SpawnDensity {
-        public static final Codec<SpawnDensity> field_25820 = RecordCodecBuilder.create(instance -> 
-	 instance.group((App)Codec.DOUBLE.fieldOf("energy_budget").forGetter(SpawnDensity::getGravityLimit), (App)Codec.DOUBLE.fieldOf("charge").forGetter(SpawnDensity::getMass)).apply((Applicative)instance, SpawnDensity::new));
+        public static final Codec<SpawnDensity> field_25820 = RecordCodecBuilder.create(instance -> instance.group((App)Codec.DOUBLE.fieldOf("energy_budget").forGetter(SpawnDensity::getGravityLimit), (App)Codec.DOUBLE.fieldOf("charge").forGetter(SpawnDensity::getMass)).apply((Applicative)instance, SpawnDensity::new));
         private final double gravityLimit;
         private final double mass;
 
@@ -705,8 +663,7 @@ public class Biome {
 
         static {
             field_24680 = StringIdentifiable.createCodec(Precipitation::values, Precipitation::method_28431);
-            NAME_MAP = Arrays.stream(Precipitation.values()).collect(Collectors.toMap(Precipitation::getName, arg -> 
-	 arg));
+            NAME_MAP = Arrays.stream(Precipitation.values()).collect(Collectors.toMap(Precipitation::getName, arg -> arg));
         }
     }
 
@@ -753,8 +710,7 @@ public class Biome {
 
         static {
             field_24678 = StringIdentifiable.createCodec(Category::values, Category::method_28424);
-            NAME_MAP = Arrays.stream(Category.values()).collect(Collectors.toMap(Category::getName, arg -> 
-	 arg));
+            NAME_MAP = Arrays.stream(Category.values()).collect(Collectors.toMap(Category::getName, arg -> arg));
         }
     }
 
@@ -776,8 +732,7 @@ public class Biome {
         }
 
         static {
-            NAME_MAP = Arrays.stream(TemperatureGroup.values()).collect(Collectors.toMap(TemperatureGroup::getName, arg -> 
-	 arg));
+            NAME_MAP = Arrays.stream(TemperatureGroup.values()).collect(Collectors.toMap(TemperatureGroup::getName, arg -> arg));
         }
     }
 }

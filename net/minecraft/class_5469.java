@@ -12,7 +12,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.PaneBlock;
-import net.minecraft.class_5458;
 import net.minecraft.structure.processor.RuleStructureProcessor;
 import net.minecraft.structure.processor.StructureProcessor;
 import net.minecraft.structure.processor.StructureProcessorRule;
@@ -24,6 +23,7 @@ import net.minecraft.structure.rule.RandomBlockMatchRuleTest;
 import net.minecraft.structure.rule.TagMatchRuleTest;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.BuiltinRegistries;
 
 public class class_5469 {
     private static final StructureProcessorRule field_26258 = new StructureProcessorRule(new RandomBlockMatchRuleTest(Blocks.BLACKSTONE, 0.01f), AlwaysTrueRuleTest.INSTANCE, Blocks.GILDED_BLACKSTONE.getDefaultState());
@@ -57,7 +57,7 @@ public class class_5469 {
     public static final ImmutableList<StructureProcessor> HIGH_RAMPART = class_5469.method_30601("high_rampart", (ImmutableList<StructureProcessor>)ImmutableList.of((Object)new RuleStructureProcessor((List<? extends StructureProcessorRule>)ImmutableList.of((Object)new StructureProcessorRule(new RandomBlockMatchRuleTest(Blocks.GOLD_BLOCK, 0.3f), AlwaysTrueRuleTest.INSTANCE, Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS.getDefaultState()), (Object)new StructureProcessorRule(AlwaysTrueRuleTest.INSTANCE, AlwaysTrueRuleTest.INSTANCE, new AxisAlignedLinearPosRuleTest(0.0f, 0.05f, 0, 100, Direction.Axis.Y), Blocks.AIR.getDefaultState())))));
 
     private static ImmutableList<StructureProcessor> method_30601(String string, ImmutableList<StructureProcessor> immutableList) {
-        return class_5458.method_30561(class_5458.field_25931, string, immutableList);
+        return BuiltinRegistries.add(BuiltinRegistries.STRUCTURE_PROCESSORS, string, immutableList);
     }
 }
 

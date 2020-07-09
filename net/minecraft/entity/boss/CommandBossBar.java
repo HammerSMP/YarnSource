@@ -82,7 +82,7 @@ extends ServerBossBar {
     }
 
     public final Text toHoverableText() {
-        return Texts.bracketed(this.getName()).styled(arg -> arg.withColor(this.getColor().getTextFormat()).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.getId().toString()))).withInsertion(this.getId().toString()));
+        return Texts.bracketed(this.getName()).styled(arg -> arg.withColor(this.getColor().getTextFormat()).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(this.getId().toString()))).withInsertion(this.getId().toString()));
     }
 
     public boolean addPlayers(Collection<ServerPlayerEntity> collection) {

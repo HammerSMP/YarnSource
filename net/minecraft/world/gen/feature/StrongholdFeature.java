@@ -35,7 +35,7 @@ extends StructureFeature<DefaultFeatureConfig> {
 
     @Override
     protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, DefaultFeatureConfig arg6) {
-        return arg.method_28507(new ChunkPos(i, j));
+        return arg.isStrongholdStartingChunk(new ChunkPos(i, j));
     }
 
     public static class Start

@@ -28,8 +28,8 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.SideShapeType;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.class_5431;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -214,7 +214,7 @@ implements ItemConvertible {
     }
 
     public static boolean hasTopRim(BlockView arg, BlockPos arg2) {
-        return arg.getBlockState(arg2).method_30368(arg, arg2, Direction.UP, class_5431.RIGID);
+        return arg.getBlockState(arg2).isSideSolid(arg, arg2, Direction.UP, SideShapeType.RIGID);
     }
 
     public static boolean sideCoversSmallSquare(WorldView arg, BlockPos arg2, Direction arg3) {
@@ -222,7 +222,7 @@ implements ItemConvertible {
         if (arg3 == Direction.DOWN && lv.isIn(BlockTags.UNSTABLE_BOTTOM_CENTER)) {
             return false;
         }
-        return lv.method_30368(arg, arg2, arg3, class_5431.CENTER);
+        return lv.isSideSolid(arg, arg2, arg3, SideShapeType.CENTER);
     }
 
     public static boolean isFaceFullSquare(VoxelShape arg, Direction arg2) {

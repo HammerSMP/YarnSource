@@ -165,7 +165,7 @@ public class Main {
                 } else {
                     ServerPropertiesHandler lv16 = lv.getPropertiesHandler();
                     lv17 = new LevelInfo(lv16.levelName, lv16.gameMode, lv16.hardcore, lv16.difficulty, false, new GameRules(), lv8);
-                    lv18 = optionSet.has((OptionSpec)optionSpec4) ? lv16.field_24623.withBonusChest() : lv16.field_24623;
+                    lv18 = optionSet.has((OptionSpec)optionSpec4) ? lv16.generatorOptions.withBonusChest() : lv16.generatorOptions;
                 }
                 lv13 = new LevelProperties(lv17, lv18, Lifecycle.stable());
             }

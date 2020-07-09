@@ -45,7 +45,6 @@ import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.HoneyBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.class_5454;
 import net.minecraft.class_5459;
 import net.minecraft.command.arguments.EntityAnchorArgumentType;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -121,6 +120,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.border.WorldBorder;
@@ -434,16 +434,16 @@ CommandOutput {
         this.world.getProfiler().pop();
     }
 
-    public void resetNetherPortalCooldown() {
+    public void method_30229() {
         this.netherPortalCooldown = this.getDefaultNetherPortalCooldown();
     }
 
-    public boolean isReadyToGoThroughPortal() {
+    public boolean method_30230() {
         return this.netherPortalCooldown > 0;
     }
 
     protected void tickNetherPortalCooldown() {
-        if (this.isReadyToGoThroughPortal()) {
+        if (this.method_30230()) {
             --this.netherPortalCooldown;
         }
     }
@@ -1624,8 +1624,8 @@ CommandOutput {
     }
 
     public void setInNetherPortal(BlockPos arg) {
-        if (this.isReadyToGoThroughPortal()) {
-            this.resetNetherPortalCooldown();
+        if (this.method_30230()) {
+            this.method_30229();
             return;
         }
         if (!this.world.isClient && !arg.equals(this.lastNetherPortalPosition)) {
@@ -1647,8 +1647,8 @@ CommandOutput {
             if (lv3 != null && minecraftServer.isNetherAllowed() && !this.hasVehicle() && this.netherPortalTime++ >= i) {
                 this.world.getProfiler().push("portal");
                 this.netherPortalTime = i;
-                this.resetNetherPortalCooldown();
-                this.changeDimension(lv3);
+                this.method_30229();
+                this.moveToWorld(lv3);
                 this.world.getProfiler().pop();
             }
             this.inNetherPortal = false;
@@ -1981,14 +1981,14 @@ CommandOutput {
     }
 
     @Nullable
-    public Entity changeDimension(ServerWorld arg) {
+    public Entity moveToWorld(ServerWorld arg) {
         if (!(this.world instanceof ServerWorld) || this.removed) {
             return null;
         }
         this.world.getProfiler().push("changeDimension");
         this.detach();
         this.world.getProfiler().push("reposition");
-        class_5454 lv = this.method_30329(arg);
+        TeleportTarget lv = this.getTeleportTarget(arg);
         if (lv == null) {
             return null;
         }
@@ -1996,8 +1996,8 @@ CommandOutput {
         Object lv2 = this.getType().create(arg);
         if (lv2 != null) {
             ((Entity)lv2).copyFrom(this);
-            ((Entity)lv2).refreshPositionAndAngles(lv.field_25879.x, lv.field_25879.y, lv.field_25879.z, lv.field_25881, ((Entity)lv2).pitch);
-            ((Entity)lv2).setVelocity(lv.field_25880);
+            ((Entity)lv2).refreshPositionAndAngles(lv.position.x, lv.position.y, lv.position.z, lv.yaw, ((Entity)lv2).pitch);
+            ((Entity)lv2).setVelocity(lv.velocity);
             arg.onDimensionChanged((Entity)lv2);
             if (arg.getRegistryKey() == World.END) {
                 ServerWorld.createEndSpawnPlatform(arg);
@@ -2016,7 +2016,7 @@ CommandOutput {
     }
 
     @Nullable
-    protected class_5454 method_30329(ServerWorld arg) {
+    protected TeleportTarget getTeleportTarget(ServerWorld arg) {
         boolean bl3;
         boolean bl2;
         boolean bl = this.world.getRegistryKey() == World.END && arg.getRegistryKey() == World.OVERWORLD;
@@ -2028,7 +2028,7 @@ CommandOutput {
             } else {
                 lv2 = arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, arg.getSpawnPos());
             }
-            return new class_5454(new Vec3d((double)lv2.getX() + 0.5, lv2.getY(), (double)lv2.getZ() + 0.5), this.getVelocity(), this.yaw, this.pitch);
+            return new TeleportTarget(new Vec3d((double)lv2.getX() + 0.5, lv2.getY(), (double)lv2.getZ() + 0.5), this.getVelocity(), this.yaw, this.pitch);
         }
         boolean bl5 = bl3 = arg.getRegistryKey() == World.NETHER;
         if (this.world.getRegistryKey() != World.NETHER && !bl3) {
@@ -2039,7 +2039,7 @@ CommandOutput {
         double e = Math.max(-2.9999872E7, lv3.getBoundNorth() + 16.0);
         double f = Math.min(2.9999872E7, lv3.getBoundEast() - 16.0);
         double g = Math.min(2.9999872E7, lv3.getBoundSouth() - 16.0);
-        double h = Entity.method_30333(this.world.getDimension(), arg.getDimension());
+        double h = Entity.getTeleportationScale(this.world.getDimension(), arg.getDimension());
         BlockPos lv4 = new BlockPos(MathHelper.clamp(this.getX() * h, d, f), this.getY(), MathHelper.clamp(this.getZ() * h, e, g));
         return this.method_30330(arg, lv4, bl3).map(arg22 -> {
             Vec3d lv6;
@@ -2061,7 +2061,7 @@ CommandOutput {
         return arg.getPortalForcer().method_30483(arg2, bl);
     }
 
-    private static double method_30333(DimensionType arg, DimensionType arg2) {
+    private static double getTeleportationScale(DimensionType arg, DimensionType arg2) {
         boolean bl = arg.isShrunk();
         boolean bl2 = arg2.isShrunk();
         if (!bl && bl2) {
@@ -2143,7 +2143,7 @@ CommandOutput {
 
     @Override
     public Text getDisplayName() {
-        return Team.modifyText(this.getScoreboardTeam(), this.getName()).styled(arg -> arg.setHoverEvent(this.getHoverEvent()).withInsertion(this.getUuidAsString()));
+        return Team.modifyText(this.getScoreboardTeam(), this.getName()).styled(arg -> arg.withHoverEvent(this.getHoverEvent()).withInsertion(this.getUuidAsString()));
     }
 
     public void setCustomName(@Nullable Text arg) {

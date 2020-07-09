@@ -436,7 +436,7 @@ Drawable {
         return true;
     }
 
-    public void method_29638(List<Path> list) {
+    public void filesDragged(List<Path> list) {
     }
 }
 

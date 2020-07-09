@@ -4,7 +4,7 @@
 package net.minecraft.world.biome.layer;
 
 import java.util.function.LongFunction;
-import net.minecraft.class_5458;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.layer.AddBambooJungleLayer;
@@ -36,16 +36,16 @@ import net.minecraft.world.biome.layer.util.LayerSampler;
 import net.minecraft.world.biome.source.BiomeLayerSampler;
 
 public class BiomeLayers {
-    protected static final int WARM_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.WARM_OCEAN);
-    protected static final int LUKEWARM_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.LUKEWARM_OCEAN);
-    protected static final int OCEAN_ID = class_5458.field_25933.getRawId(Biomes.OCEAN);
-    protected static final int COLD_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.COLD_OCEAN);
-    protected static final int FROZEN_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.FROZEN_OCEAN);
-    protected static final int DEEP_WARM_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.DEEP_WARM_OCEAN);
-    protected static final int DEEP_LUKEWARM_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.DEEP_LUKEWARM_OCEAN);
-    protected static final int DEEP_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.DEEP_OCEAN);
-    protected static final int DEEP_COLD_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.DEEP_COLD_OCEAN);
-    protected static final int DEEP_FROZEN_OCEAN_ID = class_5458.field_25933.getRawId(Biomes.DEEP_FROZEN_OCEAN);
+    protected static final int WARM_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.WARM_OCEAN);
+    protected static final int LUKEWARM_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.LUKEWARM_OCEAN);
+    protected static final int OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.OCEAN);
+    protected static final int COLD_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.COLD_OCEAN);
+    protected static final int FROZEN_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.FROZEN_OCEAN);
+    protected static final int DEEP_WARM_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DEEP_WARM_OCEAN);
+    protected static final int DEEP_LUKEWARM_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DEEP_LUKEWARM_OCEAN);
+    protected static final int DEEP_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DEEP_OCEAN);
+    protected static final int DEEP_COLD_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DEEP_COLD_OCEAN);
+    protected static final int DEEP_FROZEN_OCEAN_ID = BuiltinRegistries.BIOME.getRawId(Biomes.DEEP_FROZEN_OCEAN);
 
     private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> stack(long l, ParentedLayer arg, LayerFactory<T> arg2, int i, LongFunction<C> longFunction) {
         LayerFactory<T> lv = arg2;
@@ -116,8 +116,8 @@ public class BiomeLayers {
         if (i == j) {
             return true;
         }
-        Biome lv = (Biome)class_5458.field_25933.get(i);
-        Biome lv2 = (Biome)class_5458.field_25933.get(j);
+        Biome lv = (Biome)BuiltinRegistries.BIOME.get(i);
+        Biome lv2 = (Biome)BuiltinRegistries.BIOME.get(j);
         if (lv == null || lv2 == null) {
             return false;
         }

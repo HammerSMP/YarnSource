@@ -145,17 +145,17 @@ public class ChunkHolder {
         return this.future;
     }
 
-    public void markForBlockUpdate(BlockPos pos) {
+    public void markForBlockUpdate(BlockPos arg) {
         WorldChunk lv = this.getWorldChunk();
         if (lv == null) {
             return;
         }
-        byte b = (byte)ChunkSectionPos.getSectionCoord(pos.getY());
+        byte b = (byte)ChunkSectionPos.getSectionCoord(arg.getY());
         if (this.field_25804[b] == null) {
             this.field_25803 = true;
             this.field_25804[b] = new ShortArraySet();
         }
-        this.field_25804[b].add(ChunkSectionPos.getPackedLocalPos(pos));
+        this.field_25804[b].add(ChunkSectionPos.getPackedLocalPos(arg));
     }
 
     public void markForLightUpdate(LightType arg, int i) {

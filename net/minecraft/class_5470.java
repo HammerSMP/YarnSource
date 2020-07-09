@@ -3,7 +3,6 @@
  */
 package net.minecraft;
 
-import net.minecraft.class_5458;
 import net.minecraft.structure.BastionRemnantGenerator;
 import net.minecraft.structure.DesertVillageData;
 import net.minecraft.structure.PillagerOutpostGenerator;
@@ -11,6 +10,7 @@ import net.minecraft.structure.PlainsVillageData;
 import net.minecraft.structure.SavannaVillageData;
 import net.minecraft.structure.SnowyVillageData;
 import net.minecraft.structure.TaigaVillageData;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.gen.ProbabilityConfig;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
@@ -59,7 +59,7 @@ public class class_5470 {
     public static final ConfiguredStructureFeature<RuinedPortalFeatureConfig, ? extends StructureFeature<RuinedPortalFeatureConfig>> RUINED_PORTAL_NETHER = class_5470.method_30603("ruined_portal_nether", StructureFeature.RUINED_PORTAL.configure(new RuinedPortalFeatureConfig(RuinedPortalFeature.Type.NETHER)));
 
     private static <FC extends FeatureConfig, F extends StructureFeature<FC>> ConfiguredStructureFeature<FC, F> method_30603(String string, ConfiguredStructureFeature<FC, F> arg) {
-        return class_5458.method_30561(class_5458.field_25930, string, arg);
+        return BuiltinRegistries.add(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, string, arg);
     }
 }
 

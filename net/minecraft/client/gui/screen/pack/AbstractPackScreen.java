@@ -178,12 +178,12 @@ extends Screen {
             }
         });
         if (mutableBoolean.isTrue()) {
-            SystemToast.method_29627(arg, path.toString());
+            SystemToast.addPackCopyFailure(arg, path.toString());
         }
     }
 
     @Override
-    public void method_29638(List<Path> list) {
+    public void filesDragged(List<Path> list) {
         String string = list.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
         this.client.openScreen(new ConfirmScreen(bl -> {
             if (bl) {

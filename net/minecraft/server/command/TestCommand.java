@@ -116,7 +116,7 @@ public class TestCommand {
         BlockPos lv5 = lv2.subtract(optional.get());
         String string2 = lv5.getX() + ", " + lv5.getY() + ", " + lv5.getZ();
         String string3 = lv4.getStructurePath();
-        MutableText lv6 = new LiteralText(string2).setStyle(Style.EMPTY.withBold(true).withColor(Formatting.GREEN).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard"))).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "final BlockPos " + string + " = new BlockPos(" + string2 + ");")));
+        MutableText lv6 = new LiteralText(string2).setStyle(Style.EMPTY.withBold(true).withColor(Formatting.GREEN).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to copy to clipboard"))).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "final BlockPos " + string + " = new BlockPos(" + string2 + ");")));
         arg.sendFeedback(new LiteralText("Position relative to " + string3 + ": ").append(lv6), false);
         DebugInfoSender.addGameTestMarker(lv3, new BlockPos(lv2), string2, -2147418368, 10000);
         return 1;

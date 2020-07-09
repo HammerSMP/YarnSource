@@ -8,9 +8,9 @@ package net.minecraft.world.biome;
 
 import java.util.Collections;
 import javax.annotation.Nullable;
-import net.minecraft.class_5458;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.IdList;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.BadlandsBiome;
 import net.minecraft.world.biome.BadlandsPlateauBiome;
 import net.minecraft.world.biome.BambooJungleBiome;
@@ -176,16 +176,16 @@ public abstract class Biomes {
     public static final Biome BASALT_DELTAS;
 
     private static Biome register(int i, String string, Biome arg) {
-        class_5458.method_30560(class_5458.field_25933, i, string, arg);
+        BuiltinRegistries.set(BuiltinRegistries.BIOME, i, string, arg);
         if (arg.hasParent()) {
-            field_25821.set(arg, class_5458.field_25933.getRawId(class_5458.field_25933.get(new Identifier(arg.parent))));
+            field_25821.set(arg, BuiltinRegistries.BIOME.getRawId(BuiltinRegistries.BIOME.get(new Identifier(arg.parent))));
         }
         return arg;
     }
 
     @Nullable
     public static Biome method_30360(Biome arg) {
-        return field_25821.get(class_5458.field_25933.getRawId(arg));
+        return field_25821.get(BuiltinRegistries.BIOME.getRawId(arg));
     }
 
     static {

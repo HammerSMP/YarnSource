@@ -142,7 +142,7 @@ public class Style {
         return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, arg, this.hoverEvent, this.insertion, this.font);
     }
 
-    public Style setHoverEvent(@Nullable HoverEvent arg) {
+    public Style withHoverEvent(@Nullable HoverEvent arg) {
         return new Style(this.color, this.bold, this.italic, this.underlined, this.strikethrough, this.obfuscated, this.clickEvent, arg, this.insertion, this.font);
     }
 

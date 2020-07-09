@@ -38,7 +38,7 @@ extends StructureFeature<DefaultFeatureConfig> {
     }
 
     @Override
-    protected boolean method_27219() {
+    protected boolean isUniformDistribution() {
         return false;
     }
 

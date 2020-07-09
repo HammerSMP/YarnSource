@@ -73,7 +73,7 @@ extends BlockEntityRenderer<PistonBlockEntity> {
     }
 
     private void method_3575(BlockPos arg, BlockState arg2, MatrixStack arg3, VertexConsumerProvider arg4, World arg5, boolean bl, int i) {
-        RenderLayer lv = RenderLayers.method_29359(arg2);
+        RenderLayer lv = RenderLayers.getMovingBlockLayer(arg2);
         VertexConsumer lv2 = arg4.getBuffer(lv);
         this.manager.getModelRenderer().render(arg5, this.manager.getModel(arg2), arg2, arg, arg3, lv2, bl, new Random(), arg2.getRenderingSeed(arg), i);
     }
