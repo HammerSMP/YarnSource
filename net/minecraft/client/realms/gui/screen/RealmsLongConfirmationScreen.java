@@ -28,12 +28,12 @@ extends RealmsScreen {
     protected final BooleanConsumer field_22697;
     private final boolean yesNoQuestion;
 
-    public RealmsLongConfirmationScreen(BooleanConsumer booleanConsumer, Type arg, Text arg2, Text arg3, boolean bl) {
+    public RealmsLongConfirmationScreen(BooleanConsumer booleanConsumer, Type type, Text arg2, Text arg3, boolean yesNoQuestion) {
         this.field_22697 = booleanConsumer;
-        this.type = arg;
+        this.type = type;
         this.line2 = arg2;
         this.line3 = arg3;
-        this.yesNoQuestion = bl;
+        this.yesNoQuestion = yesNoQuestion;
     }
 
     @Override
@@ -48,21 +48,21 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.field_22697.accept(false);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredString(arg, this.textRenderer, this.type.text, this.width / 2, RealmsLongConfirmationScreen.row(2), this.type.colorCode);
-        this.drawCenteredText(arg, this.textRenderer, this.line2, this.width / 2, RealmsLongConfirmationScreen.row(4), 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, this.line3, this.width / 2, RealmsLongConfirmationScreen.row(6), 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredString(matrices, this.textRenderer, this.type.text, this.width / 2, RealmsLongConfirmationScreen.row(2), this.type.colorCode);
+        this.drawCenteredText(matrices, this.textRenderer, this.line2, this.width / 2, RealmsLongConfirmationScreen.row(4), 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.line3, this.width / 2, RealmsLongConfirmationScreen.row(6), 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -73,9 +73,9 @@ extends RealmsScreen {
         public final int colorCode;
         public final String text;
 
-        private Type(String string2, int j) {
-            this.text = string2;
-            this.colorCode = j;
+        private Type(String text, int colorCode) {
+            this.text = text;
+            this.colorCode = colorCode;
         }
     }
 }

@@ -17,18 +17,18 @@ extends WeightedPicker.Entry {
         this.entityTag.putString("id", "minecraft:pig");
     }
 
-    public MobSpawnerEntry(CompoundTag arg) {
-        this(arg.contains("Weight", 99) ? arg.getInt("Weight") : 1, arg.getCompound("Entity"));
+    public MobSpawnerEntry(CompoundTag tag) {
+        this(tag.contains("Weight", 99) ? tag.getInt("Weight") : 1, tag.getCompound("Entity"));
     }
 
-    public MobSpawnerEntry(int i, CompoundTag arg) {
-        super(i);
-        this.entityTag = arg;
-        Identifier lv = Identifier.tryParse(arg.getString("id"));
+    public MobSpawnerEntry(int weight, CompoundTag entityTag) {
+        super(weight);
+        this.entityTag = entityTag;
+        Identifier lv = Identifier.tryParse(entityTag.getString("id"));
         if (lv != null) {
-            arg.putString("id", lv.toString());
+            entityTag.putString("id", lv.toString());
         } else {
-            arg.putString("id", "minecraft:pig");
+            entityTag.putString("id", "minecraft:pig");
         }
     }
 

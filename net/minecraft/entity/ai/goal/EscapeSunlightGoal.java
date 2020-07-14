@@ -25,10 +25,10 @@ extends Goal {
     private final double speed;
     private final World world;
 
-    public EscapeSunlightGoal(PathAwareEntity arg, double d) {
-        this.mob = arg;
-        this.speed = d;
-        this.world = arg.world;
+    public EscapeSunlightGoal(PathAwareEntity mob, double speed) {
+        this.mob = mob;
+        this.speed = speed;
+        this.world = mob.world;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 

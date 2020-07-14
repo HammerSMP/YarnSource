@@ -28,9 +28,9 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 public class NetherFossilGenerator {
     private static final Identifier[] FOSSILS = new Identifier[]{new Identifier("nether_fossils/fossil_1"), new Identifier("nether_fossils/fossil_2"), new Identifier("nether_fossils/fossil_3"), new Identifier("nether_fossils/fossil_4"), new Identifier("nether_fossils/fossil_5"), new Identifier("nether_fossils/fossil_6"), new Identifier("nether_fossils/fossil_7"), new Identifier("nether_fossils/fossil_8"), new Identifier("nether_fossils/fossil_9"), new Identifier("nether_fossils/fossil_10"), new Identifier("nether_fossils/fossil_11"), new Identifier("nether_fossils/fossil_12"), new Identifier("nether_fossils/fossil_13"), new Identifier("nether_fossils/fossil_14")};
 
-    public static void addPieces(StructureManager arg, List<StructurePiece> list, Random random, BlockPos arg2) {
+    public static void addPieces(StructureManager manager, List<StructurePiece> pieces, Random random, BlockPos pos) {
         BlockRotation lv = BlockRotation.random(random);
-        list.add(new Piece(arg, Util.getRandom(FOSSILS, random), arg2, lv));
+        pieces.add(new Piece(manager, Util.getRandom(FOSSILS, random), pos, lv));
     }
 
     public static class Piece
@@ -38,42 +38,42 @@ public class NetherFossilGenerator {
         private final Identifier template;
         private final BlockRotation structureRotation;
 
-        public Piece(StructureManager arg, Identifier arg2, BlockPos arg3, BlockRotation arg4) {
+        public Piece(StructureManager manager, Identifier template, BlockPos pos, BlockRotation rotation) {
             super(StructurePieceType.NETHER_FOSSIL, 0);
-            this.template = arg2;
-            this.pos = arg3;
-            this.structureRotation = arg4;
-            this.initializeStructureData(arg);
+            this.template = template;
+            this.pos = pos;
+            this.structureRotation = rotation;
+            this.initializeStructureData(manager);
         }
 
-        public Piece(StructureManager arg, CompoundTag arg2) {
-            super(StructurePieceType.NETHER_FOSSIL, arg2);
-            this.template = new Identifier(arg2.getString("Template"));
-            this.structureRotation = BlockRotation.valueOf(arg2.getString("Rot"));
-            this.initializeStructureData(arg);
+        public Piece(StructureManager manager, CompoundTag tag) {
+            super(StructurePieceType.NETHER_FOSSIL, tag);
+            this.template = new Identifier(tag.getString("Template"));
+            this.structureRotation = BlockRotation.valueOf(tag.getString("Rot"));
+            this.initializeStructureData(manager);
         }
 
-        private void initializeStructureData(StructureManager arg) {
-            Structure lv = arg.getStructureOrBlank(this.template);
+        private void initializeStructureData(StructureManager manager) {
+            Structure lv = manager.getStructureOrBlank(this.template);
             StructurePlacementData lv2 = new StructurePlacementData().setRotation(this.structureRotation).setMirror(BlockMirror.NONE).addProcessor(BlockIgnoreStructureProcessor.IGNORE_AIR_AND_STRUCTURE_BLOCKS);
             this.setStructureData(lv, this.pos, lv2);
         }
 
         @Override
-        protected void toNbt(CompoundTag arg) {
-            super.toNbt(arg);
-            arg.putString("Template", this.template.toString());
-            arg.putString("Rot", this.structureRotation.name());
+        protected void toNbt(CompoundTag tag) {
+            super.toNbt(tag);
+            tag.putString("Template", this.template.toString());
+            tag.putString("Rot", this.structureRotation.name());
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
+        protected void handleMetadata(String metadata, BlockPos pos, class_5425 arg2, Random random, BlockBox boundingBox) {
         }
 
         @Override
-        public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
-            arg4.encompass(this.structure.calculateBoundingBox(this.placementData, this.pos));
-            return super.generate(arg, arg2, arg3, random, arg4, arg5, arg6);
+        public boolean generate(ServerWorldAccess arg, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox boundingBox, ChunkPos arg5, BlockPos arg6) {
+            boundingBox.encompass(this.structure.calculateBoundingBox(this.placementData, this.pos));
+            return super.generate(arg, structureAccessor, chunkGenerator, random, boundingBox, arg5, arg6);
         }
     }
 }

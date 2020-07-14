@@ -24,17 +24,17 @@ import net.minecraft.util.Formatting;
 public class ChatMessages {
     private static final StringRenderable field_25263 = StringRenderable.plain(" ");
 
-    private static String getRenderedChatMessage(String string) {
-        return MinecraftClient.getInstance().options.chatColors ? string : Formatting.strip(string);
+    private static String getRenderedChatMessage(String message) {
+        return MinecraftClient.getInstance().options.chatColors ? message : Formatting.strip(message);
     }
 
-    public static List<StringRenderable> breakRenderedChatMessageLines(StringRenderable arg, int i, TextRenderer arg22) {
+    public static List<StringRenderable> breakRenderedChatMessageLines(StringRenderable arg, int width, TextRenderer textRenderer) {
         TextCollector lv = new TextCollector();
         arg.visit((arg2, string) -> {
             lv.add(StringRenderable.styled(ChatMessages.getRenderedChatMessage(string), arg2));
             return Optional.empty();
         }, Style.EMPTY);
-        List<StringRenderable> list = arg22.getTextHandler().method_29971(lv.getCombined(), i, Style.EMPTY, field_25263);
+        List<StringRenderable> list = textRenderer.getTextHandler().method_29971(lv.getCombined(), width, Style.EMPTY, field_25263);
         if (list.isEmpty()) {
             return Lists.newArrayList((Object[])new StringRenderable[]{StringRenderable.EMPTY});
         }

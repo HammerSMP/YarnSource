@@ -74,10 +74,10 @@ StringRenderable {
         return StringRenderable.super.getString();
     }
 
-    default public String asTruncatedString(int i) {
+    default public String asTruncatedString(int length) {
         StringBuilder stringBuilder = new StringBuilder();
         this.visit(string -> {
-            int j = i - stringBuilder.length();
+            int j = length - stringBuilder.length();
             if (j <= 0) {
                 return TERMINATE_VISIT;
             }
@@ -95,14 +95,14 @@ StringRenderable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    default public <T> Optional<T> visit(StringRenderable.StyledVisitor<T> arg, Style arg2) {
-        Style lv = this.getStyle().withParent(arg2);
-        Optional<T> optional = this.visitSelf(arg, lv);
+    default public <T> Optional<T> visit(StringRenderable.StyledVisitor<T> styledVisitor, Style style) {
+        Style lv = this.getStyle().withParent(style);
+        Optional<T> optional = this.visitSelf(styledVisitor, lv);
         if (optional.isPresent()) {
             return optional;
         }
         for (Text lv2 : this.getSiblings()) {
-            Optional<T> optional2 = lv2.visit(arg, lv);
+            Optional<T> optional2 = lv2.visit(styledVisitor, lv);
             if (!optional2.isPresent()) continue;
             return optional2;
         }
@@ -110,13 +110,13 @@ StringRenderable {
     }
 
     @Override
-    default public <T> Optional<T> visit(StringRenderable.Visitor<T> arg) {
-        Optional<T> optional = this.visitSelf(arg);
+    default public <T> Optional<T> visit(StringRenderable.Visitor<T> visitor) {
+        Optional<T> optional = this.visitSelf(visitor);
         if (optional.isPresent()) {
             return optional;
         }
         for (Text lv : this.getSiblings()) {
-            Optional<T> optional2 = lv.visit(arg);
+            Optional<T> optional2 = lv.visit(visitor);
             if (!optional2.isPresent()) continue;
             return optional2;
         }
@@ -124,12 +124,12 @@ StringRenderable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    default public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> arg, Style arg2) {
-        return arg.accept(arg2, this.asString());
+    default public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> visitor, Style style) {
+        return visitor.accept(style, this.asString());
     }
 
-    default public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> arg) {
-        return arg.accept(this.asString());
+    default public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> visitor) {
+        return visitor.accept(this.asString());
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -245,12 +245,12 @@ StringRenderable {
             return lv14;
         }
 
-        private void addStyle(Style arg, JsonObject jsonObject, JsonSerializationContext jsonSerializationContext) {
-            JsonElement jsonElement = jsonSerializationContext.serialize((Object)arg);
+        private void addStyle(Style style, JsonObject json, JsonSerializationContext context) {
+            JsonElement jsonElement = context.serialize((Object)style);
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject2 = (JsonObject)jsonElement;
                 for (Map.Entry entry : jsonObject2.entrySet()) {
-                    jsonObject.add((String)entry.getKey(), (JsonElement)entry.getValue());
+                    json.add((String)entry.getKey(), (JsonElement)entry.getValue());
                 }
             }
         }
@@ -325,35 +325,35 @@ StringRenderable {
             return jsonObject;
         }
 
-        public static String toJson(Text arg) {
-            return GSON.toJson((Object)arg);
+        public static String toJson(Text text) {
+            return GSON.toJson((Object)text);
         }
 
-        public static JsonElement toJsonTree(Text arg) {
-            return GSON.toJsonTree((Object)arg);
-        }
-
-        @Nullable
-        public static MutableText fromJson(String string) {
-            return JsonHelper.deserialize(GSON, string, MutableText.class, false);
+        public static JsonElement toJsonTree(Text text) {
+            return GSON.toJsonTree((Object)text);
         }
 
         @Nullable
-        public static MutableText fromJson(JsonElement jsonElement) {
-            return (MutableText)GSON.fromJson(jsonElement, MutableText.class);
+        public static MutableText fromJson(String json) {
+            return JsonHelper.deserialize(GSON, json, MutableText.class, false);
         }
 
         @Nullable
-        public static MutableText fromLenientJson(String string) {
-            return JsonHelper.deserialize(GSON, string, MutableText.class, true);
+        public static MutableText fromJson(JsonElement json) {
+            return (MutableText)GSON.fromJson(json, MutableText.class);
         }
 
-        public static MutableText fromJson(com.mojang.brigadier.StringReader stringReader) {
+        @Nullable
+        public static MutableText fromLenientJson(String json) {
+            return JsonHelper.deserialize(GSON, json, MutableText.class, true);
+        }
+
+        public static MutableText fromJson(com.mojang.brigadier.StringReader reader) {
             try {
-                JsonReader jsonReader = new JsonReader((Reader)new StringReader(stringReader.getRemaining()));
+                JsonReader jsonReader = new JsonReader((Reader)new StringReader(reader.getRemaining()));
                 jsonReader.setLenient(false);
                 MutableText lv = (MutableText)GSON.getAdapter(MutableText.class).read(jsonReader);
-                stringReader.setCursor(stringReader.getCursor() + Serializer.getPosition(jsonReader));
+                reader.setCursor(reader.getCursor() + Serializer.getPosition(jsonReader));
                 return lv;
             }
             catch (IOException | StackOverflowError throwable) {
@@ -361,21 +361,21 @@ StringRenderable {
             }
         }
 
-        private static int getPosition(JsonReader jsonReader) {
+        private static int getPosition(JsonReader reader) {
             try {
-                return JSON_READER_POS.getInt((Object)jsonReader) - JSON_READER_LINE_START.getInt((Object)jsonReader) + 1;
+                return JSON_READER_POS.getInt((Object)reader) - JSON_READER_LINE_START.getInt((Object)reader) + 1;
             }
             catch (IllegalAccessException illegalAccessException) {
                 throw new IllegalStateException("Couldn't read position of JsonReader", illegalAccessException);
             }
         }
 
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((Text)object, type, jsonSerializationContext);
+        public /* synthetic */ JsonElement serialize(Object text, Type type, JsonSerializationContext context) {
+            return this.serialize((Text)text, type, context);
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(json, type, context);
         }
     }
 }

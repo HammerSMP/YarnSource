@@ -60,24 +60,24 @@ public class Bootstrap {
         Bootstrap.setOutputStreams();
     }
 
-    private static <T> void collectMissingTranslations(Iterable<T> iterable, Function<T, String> function, Set<String> set) {
+    private static <T> void collectMissingTranslations(Iterable<T> iterable, Function<T, String> keyExtractor, Set<String> translationKeys) {
         Language lv = Language.getInstance();
         iterable.forEach(object -> {
-            String string = (String)function.apply(object);
+            String string = (String)keyExtractor.apply(object);
             if (!lv.hasTranslation(string)) {
-                set.add(string);
+                translationKeys.add(string);
             }
         });
     }
 
-    private static void method_27732(final Set<String> set) {
+    private static void collectMissingGameRuleTranslations(final Set<String> translations) {
         final Language lv = Language.getInstance();
-        GameRules.forEachType(new GameRules.TypeConsumer(){
+        GameRules.accept(new GameRules.Visitor(){
 
             @Override
-            public <T extends GameRules.Rule<T>> void accept(GameRules.Key<T> arg, GameRules.Type<T> arg2) {
-                if (!lv.hasTranslation(arg.getTranslationKey())) {
-                    set.add(arg.getName());
+            public <T extends GameRules.Rule<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
+                if (!lv.hasTranslation(key.getTranslationKey())) {
+                    translations.add(key.getName());
                 }
             }
         });
@@ -92,7 +92,7 @@ public class Bootstrap {
         Bootstrap.collectMissingTranslations(Registry.ENCHANTMENT, Enchantment::getTranslationKey, set);
         Bootstrap.collectMissingTranslations(Registry.BLOCK, Block::getTranslationKey, set);
         Bootstrap.collectMissingTranslations(Registry.CUSTOM_STAT, arg -> "stat." + arg.toString().replace(':', '.'), set);
-        Bootstrap.method_27732(set);
+        Bootstrap.collectMissingGameRuleTranslations(set);
         return set;
     }
 
@@ -116,8 +116,8 @@ public class Bootstrap {
         }
     }
 
-    public static void println(String string) {
-        SYSOUT.println(string);
+    public static void println(String str) {
+        SYSOUT.println(str);
     }
 
     static {

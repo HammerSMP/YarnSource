@@ -20,20 +20,20 @@ extends Task<E> {
     private final Predicate<E> condition;
     private final MemoryModuleType<?> memory;
 
-    public ForgetTask(Predicate<E> predicate, MemoryModuleType<?> arg) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.condition = predicate;
-        this.memory = arg;
+    public ForgetTask(Predicate<E> condition, MemoryModuleType<?> memory) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(memory, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.condition = condition;
+        this.memory = memory;
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
-        return this.condition.test(arg2);
+    protected boolean shouldRun(ServerWorld world, E entity) {
+        return this.condition.test(entity);
     }
 
     @Override
-    protected void run(ServerWorld arg, E arg2, long l) {
-        ((LivingEntity)arg2).getBrain().forget(this.memory);
+    protected void run(ServerWorld world, E entity, long time) {
+        ((LivingEntity)entity).getBrain().forget(this.memory);
     }
 }
 

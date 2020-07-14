@@ -25,8 +25,8 @@ public class RandomFeatureEntry {
     public final Supplier<ConfiguredFeature<?, ?>> feature;
     public final float chance;
 
-    public RandomFeatureEntry(ConfiguredFeature<?, ?> arg, float f) {
-        this(() -> arg, f);
+    public RandomFeatureEntry(ConfiguredFeature<?, ?> feature, float chance) {
+        this(() -> feature, chance);
     }
 
     private RandomFeatureEntry(Supplier<ConfiguredFeature<?, ?>> supplier, float f) {

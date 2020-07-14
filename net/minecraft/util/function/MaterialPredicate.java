@@ -27,12 +27,12 @@ implements Predicate<BlockState> {
     };
     private final Material material;
 
-    private MaterialPredicate(Material arg) {
-        this.material = arg;
+    private MaterialPredicate(Material material) {
+        this.material = material;
     }
 
-    public static MaterialPredicate create(Material arg) {
-        return arg == Material.AIR ? IS_AIR : new MaterialPredicate(arg);
+    public static MaterialPredicate create(Material material) {
+        return material == Material.AIR ? IS_AIR : new MaterialPredicate(material);
     }
 
     @Override
@@ -41,8 +41,8 @@ implements Predicate<BlockState> {
     }
 
     @Override
-    public /* synthetic */ boolean test(@Nullable Object object) {
-        return this.test((BlockState)object);
+    public /* synthetic */ boolean test(@Nullable Object state) {
+        return this.test((BlockState)state);
     }
 }
 

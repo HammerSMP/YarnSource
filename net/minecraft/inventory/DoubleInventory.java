@@ -12,15 +12,15 @@ implements Inventory {
     private final Inventory first;
     private final Inventory second;
 
-    public DoubleInventory(Inventory arg, Inventory arg2) {
-        if (arg == null) {
-            arg = arg2;
+    public DoubleInventory(Inventory first, Inventory second) {
+        if (first == null) {
+            first = second;
         }
-        if (arg2 == null) {
-            arg2 = arg;
+        if (second == null) {
+            second = first;
         }
-        this.first = arg;
-        this.second = arg2;
+        this.first = first;
+        this.second = second;
     }
 
     @Override
@@ -33,40 +33,40 @@ implements Inventory {
         return this.first.isEmpty() && this.second.isEmpty();
     }
 
-    public boolean isPart(Inventory arg) {
-        return this.first == arg || this.second == arg;
+    public boolean isPart(Inventory inventory) {
+        return this.first == inventory || this.second == inventory;
     }
 
     @Override
-    public ItemStack getStack(int i) {
-        if (i >= this.first.size()) {
-            return this.second.getStack(i - this.first.size());
+    public ItemStack getStack(int slot) {
+        if (slot >= this.first.size()) {
+            return this.second.getStack(slot - this.first.size());
         }
-        return this.first.getStack(i);
+        return this.first.getStack(slot);
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
-        if (i >= this.first.size()) {
-            return this.second.removeStack(i - this.first.size(), j);
+    public ItemStack removeStack(int slot, int amount) {
+        if (slot >= this.first.size()) {
+            return this.second.removeStack(slot - this.first.size(), amount);
         }
-        return this.first.removeStack(i, j);
+        return this.first.removeStack(slot, amount);
     }
 
     @Override
-    public ItemStack removeStack(int i) {
-        if (i >= this.first.size()) {
-            return this.second.removeStack(i - this.first.size());
+    public ItemStack removeStack(int slot) {
+        if (slot >= this.first.size()) {
+            return this.second.removeStack(slot - this.first.size());
         }
-        return this.first.removeStack(i);
+        return this.first.removeStack(slot);
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        if (i >= this.first.size()) {
-            this.second.setStack(i - this.first.size(), arg);
+    public void setStack(int slot, ItemStack stack) {
+        if (slot >= this.first.size()) {
+            this.second.setStack(slot - this.first.size(), stack);
         } else {
-            this.first.setStack(i, arg);
+            this.first.setStack(slot, stack);
         }
     }
 
@@ -82,28 +82,28 @@ implements Inventory {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
-        return this.first.canPlayerUse(arg) && this.second.canPlayerUse(arg);
+    public boolean canPlayerUse(PlayerEntity player) {
+        return this.first.canPlayerUse(player) && this.second.canPlayerUse(player);
     }
 
     @Override
-    public void onOpen(PlayerEntity arg) {
-        this.first.onOpen(arg);
-        this.second.onOpen(arg);
+    public void onOpen(PlayerEntity player) {
+        this.first.onOpen(player);
+        this.second.onOpen(player);
     }
 
     @Override
-    public void onClose(PlayerEntity arg) {
-        this.first.onClose(arg);
-        this.second.onClose(arg);
+    public void onClose(PlayerEntity player) {
+        this.first.onClose(player);
+        this.second.onClose(player);
     }
 
     @Override
-    public boolean isValid(int i, ItemStack arg) {
-        if (i >= this.first.size()) {
-            return this.second.isValid(i - this.first.size(), arg);
+    public boolean isValid(int slot, ItemStack stack) {
+        if (slot >= this.first.size()) {
+            return this.second.isValid(slot - this.first.size(), stack);
         }
-        return this.first.isValid(i, arg);
+        return this.first.isValid(slot, stack);
     }
 
     @Override

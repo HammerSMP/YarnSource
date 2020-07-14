@@ -19,8 +19,8 @@ extends PathNode {
     private PathNode nearestNode;
     private boolean reached;
 
-    public TargetPathNode(PathNode arg) {
-        super(arg.x, arg.y, arg.z);
+    public TargetPathNode(PathNode node) {
+        super(node.x, node.y, node.z);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -28,10 +28,10 @@ extends PathNode {
         super(i, j, k);
     }
 
-    public void updateNearestNode(float f, PathNode arg) {
-        if (f < this.nearestNodeDistance) {
-            this.nearestNodeDistance = f;
-            this.nearestNode = arg;
+    public void updateNearestNode(float distance, PathNode node) {
+        if (distance < this.nearestNodeDistance) {
+            this.nearestNodeDistance = distance;
+            this.nearestNode = node;
         }
     }
 
@@ -44,13 +44,13 @@ extends PathNode {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static TargetPathNode fromBuffer(PacketByteBuf arg) {
-        TargetPathNode lv = new TargetPathNode(arg.readInt(), arg.readInt(), arg.readInt());
-        lv.pathLength = arg.readFloat();
-        lv.penalty = arg.readFloat();
-        lv.visited = arg.readBoolean();
-        lv.type = PathNodeType.values()[arg.readInt()];
-        lv.heapWeight = arg.readFloat();
+    public static TargetPathNode fromBuffer(PacketByteBuf buffer) {
+        TargetPathNode lv = new TargetPathNode(buffer.readInt(), buffer.readInt(), buffer.readInt());
+        lv.pathLength = buffer.readFloat();
+        lv.penalty = buffer.readFloat();
+        lv.visited = buffer.readBoolean();
+        lv.type = PathNodeType.values()[buffer.readInt()];
+        lv.heapWeight = buffer.readFloat();
         return lv;
     }
 }

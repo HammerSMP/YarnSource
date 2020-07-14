@@ -33,62 +33,62 @@ public class DamageSourcePredicate {
     private final EntityPredicate directEntity;
     private final EntityPredicate sourceEntity;
 
-    public DamageSourcePredicate(@Nullable Boolean boolean_, @Nullable Boolean boolean2, @Nullable Boolean boolean3, @Nullable Boolean boolean4, @Nullable Boolean boolean5, @Nullable Boolean boolean6, @Nullable Boolean boolean7, @Nullable Boolean boolean8, EntityPredicate arg, EntityPredicate arg2) {
-        this.isProjectile = boolean_;
-        this.isExplosion = boolean2;
-        this.bypassesArmor = boolean3;
-        this.bypassesInvulnerability = boolean4;
-        this.bypassesMagic = boolean5;
-        this.isFire = boolean6;
-        this.isMagic = boolean7;
-        this.isLightning = boolean8;
-        this.directEntity = arg;
-        this.sourceEntity = arg2;
+    public DamageSourcePredicate(@Nullable Boolean isProjectile, @Nullable Boolean isExplosion, @Nullable Boolean bypassesArmor, @Nullable Boolean bypassesInvulnerability, @Nullable Boolean bypassesMagic, @Nullable Boolean isFire, @Nullable Boolean isMagic, @Nullable Boolean isLightning, EntityPredicate directEntity, EntityPredicate sourceEntity) {
+        this.isProjectile = isProjectile;
+        this.isExplosion = isExplosion;
+        this.bypassesArmor = bypassesArmor;
+        this.bypassesInvulnerability = bypassesInvulnerability;
+        this.bypassesMagic = bypassesMagic;
+        this.isFire = isFire;
+        this.isMagic = isMagic;
+        this.isLightning = isLightning;
+        this.directEntity = directEntity;
+        this.sourceEntity = sourceEntity;
     }
 
-    public boolean test(ServerPlayerEntity arg, DamageSource arg2) {
-        return this.test(arg.getServerWorld(), arg.getPos(), arg2);
+    public boolean test(ServerPlayerEntity player, DamageSource damageSource) {
+        return this.test(player.getServerWorld(), player.getPos(), damageSource);
     }
 
-    public boolean test(ServerWorld arg, Vec3d arg2, DamageSource arg3) {
+    public boolean test(ServerWorld world, Vec3d pos, DamageSource damageSource) {
         if (this == EMPTY) {
             return true;
         }
-        if (this.isProjectile != null && this.isProjectile.booleanValue() != arg3.isProjectile()) {
+        if (this.isProjectile != null && this.isProjectile.booleanValue() != damageSource.isProjectile()) {
             return false;
         }
-        if (this.isExplosion != null && this.isExplosion.booleanValue() != arg3.isExplosive()) {
+        if (this.isExplosion != null && this.isExplosion.booleanValue() != damageSource.isExplosive()) {
             return false;
         }
-        if (this.bypassesArmor != null && this.bypassesArmor.booleanValue() != arg3.bypassesArmor()) {
+        if (this.bypassesArmor != null && this.bypassesArmor.booleanValue() != damageSource.bypassesArmor()) {
             return false;
         }
-        if (this.bypassesInvulnerability != null && this.bypassesInvulnerability.booleanValue() != arg3.isOutOfWorld()) {
+        if (this.bypassesInvulnerability != null && this.bypassesInvulnerability.booleanValue() != damageSource.isOutOfWorld()) {
             return false;
         }
-        if (this.bypassesMagic != null && this.bypassesMagic.booleanValue() != arg3.isUnblockable()) {
+        if (this.bypassesMagic != null && this.bypassesMagic.booleanValue() != damageSource.isUnblockable()) {
             return false;
         }
-        if (this.isFire != null && this.isFire.booleanValue() != arg3.isFire()) {
+        if (this.isFire != null && this.isFire.booleanValue() != damageSource.isFire()) {
             return false;
         }
-        if (this.isMagic != null && this.isMagic.booleanValue() != arg3.getMagic()) {
+        if (this.isMagic != null && this.isMagic.booleanValue() != damageSource.getMagic()) {
             return false;
         }
-        if (this.isLightning != null && this.isLightning != (arg3 == DamageSource.LIGHTNING_BOLT)) {
+        if (this.isLightning != null && this.isLightning != (damageSource == DamageSource.LIGHTNING_BOLT)) {
             return false;
         }
-        if (!this.directEntity.test(arg, arg2, arg3.getSource())) {
+        if (!this.directEntity.test(world, pos, damageSource.getSource())) {
             return false;
         }
-        return this.sourceEntity.test(arg, arg2, arg3.getAttacker());
+        return this.sourceEntity.test(world, pos, damageSource.getAttacker());
     }
 
-    public static DamageSourcePredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static DamageSourcePredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return EMPTY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "damage type");
+        JsonObject jsonObject = JsonHelper.asObject(json, "damage type");
         Boolean boolean_ = DamageSourcePredicate.getBoolean(jsonObject, "is_projectile");
         Boolean boolean2 = DamageSourcePredicate.getBoolean(jsonObject, "is_explosion");
         Boolean boolean3 = DamageSourcePredicate.getBoolean(jsonObject, "bypasses_armor");
@@ -103,8 +103,8 @@ public class DamageSourcePredicate {
     }
 
     @Nullable
-    private static Boolean getBoolean(JsonObject jsonObject, String string) {
-        return jsonObject.has(string) ? Boolean.valueOf(JsonHelper.getBoolean(jsonObject, string)) : null;
+    private static Boolean getBoolean(JsonObject obj, String name) {
+        return obj.has(name) ? Boolean.valueOf(JsonHelper.getBoolean(obj, name)) : null;
     }
 
     public JsonElement toJson() {
@@ -125,9 +125,9 @@ public class DamageSourcePredicate {
         return jsonObject;
     }
 
-    private void addProperty(JsonObject jsonObject, String string, @Nullable Boolean boolean_) {
-        if (boolean_ != null) {
-            jsonObject.addProperty(string, boolean_);
+    private void addProperty(JsonObject json, String key, @Nullable Boolean value) {
+        if (value != null) {
+            json.addProperty(key, value);
         }
     }
 
@@ -147,13 +147,13 @@ public class DamageSourcePredicate {
             return new Builder();
         }
 
-        public Builder projectile(Boolean boolean_) {
-            this.isProjectile = boolean_;
+        public Builder projectile(Boolean projectile) {
+            this.isProjectile = projectile;
             return this;
         }
 
-        public Builder lightning(Boolean boolean_) {
-            this.isLightning = boolean_;
+        public Builder lightning(Boolean lightning) {
+            this.isLightning = lightning;
             return this;
         }
 

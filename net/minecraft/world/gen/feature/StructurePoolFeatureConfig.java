@@ -23,9 +23,9 @@ implements FeatureConfig {
     private final Supplier<StructurePool> startPool;
     private final int size;
 
-    public StructurePoolFeatureConfig(Supplier<StructurePool> supplier, int i) {
+    public StructurePoolFeatureConfig(Supplier<StructurePool> supplier, int size) {
         this.startPool = supplier;
-        this.size = i;
+        this.size = size;
     }
 
     public int getSize() {

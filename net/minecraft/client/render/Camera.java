@@ -42,21 +42,21 @@ public class Camera {
     private float cameraY;
     private float lastCameraY;
 
-    public void update(BlockView arg, Entity arg2, boolean bl, boolean bl2, float f) {
+    public void update(BlockView area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta) {
         this.ready = true;
-        this.area = arg;
-        this.focusedEntity = arg2;
-        this.thirdPerson = bl;
-        this.inverseView = bl2;
-        this.setRotation(arg2.getYaw(f), arg2.getPitch(f));
-        this.setPos(MathHelper.lerp((double)f, arg2.prevX, arg2.getX()), MathHelper.lerp((double)f, arg2.prevY, arg2.getY()) + (double)MathHelper.lerp(f, this.lastCameraY, this.cameraY), MathHelper.lerp((double)f, arg2.prevZ, arg2.getZ()));
-        if (bl) {
-            if (bl2) {
+        this.area = area;
+        this.focusedEntity = focusedEntity;
+        this.thirdPerson = thirdPerson;
+        this.inverseView = inverseView;
+        this.setRotation(focusedEntity.getYaw(tickDelta), focusedEntity.getPitch(tickDelta));
+        this.setPos(MathHelper.lerp((double)tickDelta, focusedEntity.prevX, focusedEntity.getX()), MathHelper.lerp((double)tickDelta, focusedEntity.prevY, focusedEntity.getY()) + (double)MathHelper.lerp(tickDelta, this.lastCameraY, this.cameraY), MathHelper.lerp((double)tickDelta, focusedEntity.prevZ, focusedEntity.getZ()));
+        if (thirdPerson) {
+            if (inverseView) {
                 this.setRotation(this.yaw + 180.0f, -this.pitch);
             }
             this.moveBy(-this.clipToSpace(4.0), 0.0, 0.0);
-        } else if (arg2 instanceof LivingEntity && ((LivingEntity)arg2).isSleeping()) {
-            Direction lv = ((LivingEntity)arg2).getSleepingDirection();
+        } else if (focusedEntity instanceof LivingEntity && ((LivingEntity)focusedEntity).isSleeping()) {
+            Direction lv = ((LivingEntity)focusedEntity).getSleepingDirection();
             this.setRotation(lv != null ? lv.asRotation() - 180.0f : 0.0f, 0.0f);
             this.moveBy(0.0, 0.3, 0.0);
         }
@@ -69,7 +69,7 @@ public class Camera {
         }
     }
 
-    private double clipToSpace(double d) {
+    private double clipToSpace(double desiredCameraDistance) {
         for (int i = 0; i < 8; ++i) {
             double e;
             Vec3d lv2;
@@ -78,25 +78,25 @@ public class Camera {
             float g = (i >> 1 & 1) * 2 - 1;
             float h = (i >> 2 & 1) * 2 - 1;
             Vec3d lv = this.pos.add(f *= 0.1f, g *= 0.1f, h *= 0.1f);
-            if (((HitResult)(lv3 = this.area.rayTrace(new RayTraceContext(lv, lv2 = new Vec3d(this.pos.x - (double)this.horizontalPlane.getX() * d + (double)f + (double)h, this.pos.y - (double)this.horizontalPlane.getY() * d + (double)g, this.pos.z - (double)this.horizontalPlane.getZ() * d + (double)h), RayTraceContext.ShapeType.VISUAL, RayTraceContext.FluidHandling.NONE, this.focusedEntity)))).getType() == HitResult.Type.MISS || !((e = lv3.getPos().distanceTo(this.pos)) < d)) continue;
-            d = e;
+            if (((HitResult)(lv3 = this.area.rayTrace(new RayTraceContext(lv, lv2 = new Vec3d(this.pos.x - (double)this.horizontalPlane.getX() * desiredCameraDistance + (double)f + (double)h, this.pos.y - (double)this.horizontalPlane.getY() * desiredCameraDistance + (double)g, this.pos.z - (double)this.horizontalPlane.getZ() * desiredCameraDistance + (double)h), RayTraceContext.ShapeType.VISUAL, RayTraceContext.FluidHandling.NONE, this.focusedEntity)))).getType() == HitResult.Type.MISS || !((e = lv3.getPos().distanceTo(this.pos)) < desiredCameraDistance)) continue;
+            desiredCameraDistance = e;
         }
-        return d;
+        return desiredCameraDistance;
     }
 
-    protected void moveBy(double d, double e, double f) {
-        double g = (double)this.horizontalPlane.getX() * d + (double)this.verticalPlane.getX() * e + (double)this.diagonalPlane.getX() * f;
-        double h = (double)this.horizontalPlane.getY() * d + (double)this.verticalPlane.getY() * e + (double)this.diagonalPlane.getY() * f;
-        double i = (double)this.horizontalPlane.getZ() * d + (double)this.verticalPlane.getZ() * e + (double)this.diagonalPlane.getZ() * f;
+    protected void moveBy(double x, double y, double z) {
+        double g = (double)this.horizontalPlane.getX() * x + (double)this.verticalPlane.getX() * y + (double)this.diagonalPlane.getX() * z;
+        double h = (double)this.horizontalPlane.getY() * x + (double)this.verticalPlane.getY() * y + (double)this.diagonalPlane.getY() * z;
+        double i = (double)this.horizontalPlane.getZ() * x + (double)this.verticalPlane.getZ() * y + (double)this.diagonalPlane.getZ() * z;
         this.setPos(new Vec3d(this.pos.x + g, this.pos.y + h, this.pos.z + i));
     }
 
-    protected void setRotation(float f, float g) {
-        this.pitch = g;
-        this.yaw = f;
+    protected void setRotation(float yaw, float pitch) {
+        this.pitch = pitch;
+        this.yaw = yaw;
         this.rotation.set(0.0f, 0.0f, 0.0f, 1.0f);
-        this.rotation.hamiltonProduct(Vector3f.POSITIVE_Y.getDegreesQuaternion(-f));
-        this.rotation.hamiltonProduct(Vector3f.POSITIVE_X.getDegreesQuaternion(g));
+        this.rotation.hamiltonProduct(Vector3f.POSITIVE_Y.getDegreesQuaternion(-yaw));
+        this.rotation.hamiltonProduct(Vector3f.POSITIVE_X.getDegreesQuaternion(pitch));
         this.horizontalPlane.set(0.0f, 0.0f, 1.0f);
         this.horizontalPlane.rotate(this.rotation);
         this.verticalPlane.set(0.0f, 1.0f, 0.0f);
@@ -105,13 +105,13 @@ public class Camera {
         this.diagonalPlane.rotate(this.rotation);
     }
 
-    protected void setPos(double d, double e, double f) {
-        this.setPos(new Vec3d(d, e, f));
+    protected void setPos(double x, double y, double z) {
+        this.setPos(new Vec3d(x, y, z));
     }
 
-    protected void setPos(Vec3d arg) {
-        this.pos = arg;
-        this.blockPos.set(arg.x, arg.y, arg.z);
+    protected void setPos(Vec3d pos) {
+        this.pos = pos;
+        this.blockPos.set(pos.x, pos.y, pos.z);
     }
 
     public Vec3d getPos() {

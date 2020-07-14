@@ -81,9 +81,9 @@ extends LivingEntity {
         this.stepHeight = 0.0f;
     }
 
-    public ArmorStandEntity(World arg, double d, double e, double f) {
-        this((EntityType<? extends ArmorStandEntity>)EntityType.ARMOR_STAND, arg);
-        this.updatePosition(d, e, f);
+    public ArmorStandEntity(World world, double x, double y, double z) {
+        this((EntityType<? extends ArmorStandEntity>)EntityType.ARMOR_STAND, world);
+        this.updatePosition(x, y, z);
     }
 
     @Override
@@ -127,29 +127,29 @@ extends LivingEntity {
     }
 
     @Override
-    public ItemStack getEquippedStack(EquipmentSlot arg) {
-        switch (arg.getType()) {
+    public ItemStack getEquippedStack(EquipmentSlot slot) {
+        switch (slot.getType()) {
             case HAND: {
-                return this.heldItems.get(arg.getEntitySlotId());
+                return this.heldItems.get(slot.getEntitySlotId());
             }
             case ARMOR: {
-                return this.armorItems.get(arg.getEntitySlotId());
+                return this.armorItems.get(slot.getEntitySlotId());
             }
         }
         return ItemStack.EMPTY;
     }
 
     @Override
-    public void equipStack(EquipmentSlot arg, ItemStack arg2) {
-        switch (arg.getType()) {
+    public void equipStack(EquipmentSlot slot, ItemStack stack) {
+        switch (slot.getType()) {
             case HAND: {
-                this.onEquipStack(arg2);
-                this.heldItems.set(arg.getEntitySlotId(), arg2);
+                this.onEquipStack(stack);
+                this.heldItems.set(slot.getEntitySlotId(), stack);
                 break;
             }
             case ARMOR: {
-                this.onEquipStack(arg2);
-                this.armorItems.set(arg.getEntitySlotId(), arg2);
+                this.onEquipStack(stack);
+                this.armorItems.set(slot.getEntitySlotId(), stack);
             }
         }
     }
@@ -158,39 +158,39 @@ extends LivingEntity {
      * WARNING - void declaration
      */
     @Override
-    public boolean equip(int i, ItemStack arg) {
+    public boolean equip(int slot, ItemStack item) {
         void lv7;
-        if (i == 98) {
+        if (slot == 98) {
             EquipmentSlot lv = EquipmentSlot.MAINHAND;
-        } else if (i == 99) {
+        } else if (slot == 99) {
             EquipmentSlot lv2 = EquipmentSlot.OFFHAND;
-        } else if (i == 100 + EquipmentSlot.HEAD.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.HEAD.getEntitySlotId()) {
             EquipmentSlot lv3 = EquipmentSlot.HEAD;
-        } else if (i == 100 + EquipmentSlot.CHEST.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.CHEST.getEntitySlotId()) {
             EquipmentSlot lv4 = EquipmentSlot.CHEST;
-        } else if (i == 100 + EquipmentSlot.LEGS.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.LEGS.getEntitySlotId()) {
             EquipmentSlot lv5 = EquipmentSlot.LEGS;
-        } else if (i == 100 + EquipmentSlot.FEET.getEntitySlotId()) {
+        } else if (slot == 100 + EquipmentSlot.FEET.getEntitySlotId()) {
             EquipmentSlot lv6 = EquipmentSlot.FEET;
         } else {
             return false;
         }
-        if (arg.isEmpty() || MobEntity.canEquipmentSlotContain((EquipmentSlot)lv7, arg) || lv7 == EquipmentSlot.HEAD) {
-            this.equipStack((EquipmentSlot)lv7, arg);
+        if (item.isEmpty() || MobEntity.canEquipmentSlotContain((EquipmentSlot)lv7, item) || lv7 == EquipmentSlot.HEAD) {
+            this.equipStack((EquipmentSlot)lv7, item);
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean canPickUp(ItemStack arg) {
-        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
+    public boolean canPickUp(ItemStack stack) {
+        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(stack);
         return this.getEquippedStack(lv).isEmpty() && !this.isSlotDisabled(lv);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         ListTag lv = new ListTag();
         for (ItemStack lv2 : this.armorItems) {
             CompoundTag lv3 = new CompoundTag();
@@ -199,7 +199,7 @@ extends LivingEntity {
             }
             lv.add(lv3);
         }
-        arg.put("ArmorItems", lv);
+        tag.put("ArmorItems", lv);
         ListTag lv4 = new ListTag();
         for (ItemStack lv5 : this.heldItems) {
             CompoundTag lv6 = new CompoundTag();
@@ -208,41 +208,41 @@ extends LivingEntity {
             }
             lv4.add(lv6);
         }
-        arg.put("HandItems", lv4);
-        arg.putBoolean("Invisible", this.isInvisible());
-        arg.putBoolean("Small", this.isSmall());
-        arg.putBoolean("ShowArms", this.shouldShowArms());
-        arg.putInt("DisabledSlots", this.disabledSlots);
-        arg.putBoolean("NoBasePlate", this.shouldHideBasePlate());
+        tag.put("HandItems", lv4);
+        tag.putBoolean("Invisible", this.isInvisible());
+        tag.putBoolean("Small", this.isSmall());
+        tag.putBoolean("ShowArms", this.shouldShowArms());
+        tag.putInt("DisabledSlots", this.disabledSlots);
+        tag.putBoolean("NoBasePlate", this.shouldHideBasePlate());
         if (this.isMarker()) {
-            arg.putBoolean("Marker", this.isMarker());
+            tag.putBoolean("Marker", this.isMarker());
         }
-        arg.put("Pose", this.serializePose());
+        tag.put("Pose", this.serializePose());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("ArmorItems", 9)) {
-            ListTag lv = arg.getList("ArmorItems", 10);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("ArmorItems", 9)) {
+            ListTag lv = tag.getList("ArmorItems", 10);
             for (int i = 0; i < this.armorItems.size(); ++i) {
                 this.armorItems.set(i, ItemStack.fromTag(lv.getCompound(i)));
             }
         }
-        if (arg.contains("HandItems", 9)) {
-            ListTag lv2 = arg.getList("HandItems", 10);
+        if (tag.contains("HandItems", 9)) {
+            ListTag lv2 = tag.getList("HandItems", 10);
             for (int j = 0; j < this.heldItems.size(); ++j) {
                 this.heldItems.set(j, ItemStack.fromTag(lv2.getCompound(j)));
             }
         }
-        this.setInvisible(arg.getBoolean("Invisible"));
-        this.setSmall(arg.getBoolean("Small"));
-        this.setShowArms(arg.getBoolean("ShowArms"));
-        this.disabledSlots = arg.getInt("DisabledSlots");
-        this.setHideBasePlate(arg.getBoolean("NoBasePlate"));
-        this.setMarker(arg.getBoolean("Marker"));
+        this.setInvisible(tag.getBoolean("Invisible"));
+        this.setSmall(tag.getBoolean("Small"));
+        this.setShowArms(tag.getBoolean("ShowArms"));
+        this.disabledSlots = tag.getInt("DisabledSlots");
+        this.setHideBasePlate(tag.getBoolean("NoBasePlate"));
+        this.setMarker(tag.getBoolean("Marker"));
         this.noClip = !this.canClip();
-        CompoundTag lv3 = arg.getCompound("Pose");
+        CompoundTag lv3 = tag.getCompound("Pose");
         this.deserializePose(lv3);
     }
 
@@ -290,7 +290,7 @@ extends LivingEntity {
     }
 
     @Override
-    protected void pushAway(Entity arg) {
+    protected void pushAway(Entity entity) {
     }
 
     @Override
@@ -304,23 +304,23 @@ extends LivingEntity {
     }
 
     @Override
-    public ActionResult interactAt(PlayerEntity arg, Vec3d arg2, Hand arg3) {
-        ItemStack lv = arg.getStackInHand(arg3);
+    public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (this.isMarker() || lv.getItem() == Items.NAME_TAG) {
             return ActionResult.PASS;
         }
-        if (arg.isSpectator()) {
+        if (player.isSpectator()) {
             return ActionResult.SUCCESS;
         }
-        if (arg.world.isClient) {
+        if (player.world.isClient) {
             return ActionResult.CONSUME;
         }
         EquipmentSlot lv2 = MobEntity.getPreferredEquipmentSlot(lv);
         if (lv.isEmpty()) {
             EquipmentSlot lv4;
-            EquipmentSlot lv3 = this.slotFromPosition(arg2);
+            EquipmentSlot lv3 = this.slotFromPosition(hitPos);
             EquipmentSlot equipmentSlot = lv4 = this.isSlotDisabled(lv3) ? lv2 : lv3;
-            if (this.hasStackEquipped(lv4) && this.equip(arg, lv4, lv, arg3)) {
+            if (this.hasStackEquipped(lv4) && this.equip(player, lv4, lv, hand)) {
                 return ActionResult.SUCCESS;
             }
         } else {
@@ -330,7 +330,7 @@ extends LivingEntity {
             if (lv2.getType() == EquipmentSlot.Type.HAND && !this.shouldShowArms()) {
                 return ActionResult.FAIL;
             }
-            if (this.equip(arg, lv2, lv, arg3)) {
+            if (this.equip(player, lv2, lv, hand)) {
                 return ActionResult.SUCCESS;
             }
         }
@@ -373,78 +373,78 @@ extends LivingEntity {
         return EquipmentSlot.OFFHAND;
     }
 
-    private boolean isSlotDisabled(EquipmentSlot arg) {
-        return (this.disabledSlots & 1 << arg.getArmorStandSlotId()) != 0 || arg.getType() == EquipmentSlot.Type.HAND && !this.shouldShowArms();
+    private boolean isSlotDisabled(EquipmentSlot slot) {
+        return (this.disabledSlots & 1 << slot.getArmorStandSlotId()) != 0 || slot.getType() == EquipmentSlot.Type.HAND && !this.shouldShowArms();
     }
 
-    private boolean equip(PlayerEntity arg, EquipmentSlot arg2, ItemStack arg3, Hand arg4) {
-        ItemStack lv = this.getEquippedStack(arg2);
-        if (!lv.isEmpty() && (this.disabledSlots & 1 << arg2.getArmorStandSlotId() + 8) != 0) {
+    private boolean equip(PlayerEntity player, EquipmentSlot slot, ItemStack stack, Hand hand) {
+        ItemStack lv = this.getEquippedStack(slot);
+        if (!lv.isEmpty() && (this.disabledSlots & 1 << slot.getArmorStandSlotId() + 8) != 0) {
             return false;
         }
-        if (lv.isEmpty() && (this.disabledSlots & 1 << arg2.getArmorStandSlotId() + 16) != 0) {
+        if (lv.isEmpty() && (this.disabledSlots & 1 << slot.getArmorStandSlotId() + 16) != 0) {
             return false;
         }
-        if (arg.abilities.creativeMode && lv.isEmpty() && !arg3.isEmpty()) {
-            ItemStack lv2 = arg3.copy();
+        if (player.abilities.creativeMode && lv.isEmpty() && !stack.isEmpty()) {
+            ItemStack lv2 = stack.copy();
             lv2.setCount(1);
-            this.equipStack(arg2, lv2);
+            this.equipStack(slot, lv2);
             return true;
         }
-        if (!arg3.isEmpty() && arg3.getCount() > 1) {
+        if (!stack.isEmpty() && stack.getCount() > 1) {
             if (!lv.isEmpty()) {
                 return false;
             }
-            ItemStack lv3 = arg3.copy();
+            ItemStack lv3 = stack.copy();
             lv3.setCount(1);
-            this.equipStack(arg2, lv3);
-            arg3.decrement(1);
+            this.equipStack(slot, lv3);
+            stack.decrement(1);
             return true;
         }
-        this.equipStack(arg2, arg3);
-        arg.setStackInHand(arg4, lv);
+        this.equipStack(slot, stack);
+        player.setStackInHand(hand, lv);
         return true;
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         if (this.world.isClient || this.removed) {
             return false;
         }
-        if (DamageSource.OUT_OF_WORLD.equals(arg)) {
+        if (DamageSource.OUT_OF_WORLD.equals(source)) {
             this.remove();
             return false;
         }
-        if (this.isInvulnerableTo(arg) || this.invisible || this.isMarker()) {
+        if (this.isInvulnerableTo(source) || this.invisible || this.isMarker()) {
             return false;
         }
-        if (arg.isExplosive()) {
-            this.onBreak(arg);
+        if (source.isExplosive()) {
+            this.onBreak(source);
             this.remove();
             return false;
         }
-        if (DamageSource.IN_FIRE.equals(arg)) {
+        if (DamageSource.IN_FIRE.equals(source)) {
             if (this.isOnFire()) {
-                this.updateHealth(arg, 0.15f);
+                this.updateHealth(source, 0.15f);
             } else {
                 this.setOnFireFor(5);
             }
             return false;
         }
-        if (DamageSource.ON_FIRE.equals(arg) && this.getHealth() > 0.5f) {
-            this.updateHealth(arg, 4.0f);
+        if (DamageSource.ON_FIRE.equals(source) && this.getHealth() > 0.5f) {
+            this.updateHealth(source, 4.0f);
             return false;
         }
-        boolean bl = arg.getSource() instanceof PersistentProjectileEntity;
-        boolean bl2 = bl && ((PersistentProjectileEntity)arg.getSource()).getPierceLevel() > 0;
-        boolean bl3 = "player".equals(arg.getName());
+        boolean bl = source.getSource() instanceof PersistentProjectileEntity;
+        boolean bl2 = bl && ((PersistentProjectileEntity)source.getSource()).getPierceLevel() > 0;
+        boolean bl3 = "player".equals(source.getName());
         if (!bl3 && !bl) {
             return false;
         }
-        if (arg.getAttacker() instanceof PlayerEntity && !((PlayerEntity)arg.getAttacker()).abilities.allowModifyWorld) {
+        if (source.getAttacker() instanceof PlayerEntity && !((PlayerEntity)source.getAttacker()).abilities.allowModifyWorld) {
             return false;
         }
-        if (arg.isSourceCreativePlayer()) {
+        if (source.isSourceCreativePlayer()) {
             this.playBreakSound();
             this.spawnBreakParticles();
             this.remove();
@@ -452,7 +452,7 @@ extends LivingEntity {
         }
         long l = this.world.getTime();
         if (l - this.lastHitTime <= 5L || bl) {
-            this.breakAndDropItem(arg);
+            this.breakAndDropItem(source);
             this.spawnBreakParticles();
             this.remove();
         } else {
@@ -464,25 +464,25 @@ extends LivingEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 32) {
+    public void handleStatus(byte status) {
+        if (status == 32) {
             if (this.world.isClient) {
                 this.world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_ARMOR_STAND_HIT, this.getSoundCategory(), 0.3f, 1.0f, false);
                 this.lastHitTime = this.world.getTime();
             }
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
+    public boolean shouldRender(double distance) {
         double e = this.getBoundingBox().getAverageSideLength() * 4.0;
         if (Double.isNaN(e) || e == 0.0) {
             e = 4.0;
         }
-        return d < (e *= 64.0) * e;
+        return distance < (e *= 64.0) * e;
     }
 
     private void spawnBreakParticles() {
@@ -491,24 +491,24 @@ extends LivingEntity {
         }
     }
 
-    private void updateHealth(DamageSource arg, float f) {
+    private void updateHealth(DamageSource damageSource, float amount) {
         float g = this.getHealth();
-        if ((g -= f) <= 0.5f) {
-            this.onBreak(arg);
+        if ((g -= amount) <= 0.5f) {
+            this.onBreak(damageSource);
             this.remove();
         } else {
             this.setHealth(g);
         }
     }
 
-    private void breakAndDropItem(DamageSource arg) {
+    private void breakAndDropItem(DamageSource damageSource) {
         Block.dropStack(this.world, this.getBlockPos(), new ItemStack(Items.ARMOR_STAND));
-        this.onBreak(arg);
+        this.onBreak(damageSource);
     }
 
-    private void onBreak(DamageSource arg) {
+    private void onBreak(DamageSource damageSource) {
         this.playBreakSound();
-        this.drop(arg);
+        this.drop(damageSource);
         for (int i = 0; i < this.heldItems.size(); ++i) {
             ItemStack lv = this.heldItems.get(i);
             if (lv.isEmpty()) continue;
@@ -528,15 +528,15 @@ extends LivingEntity {
     }
 
     @Override
-    protected float turnHead(float f, float g) {
+    protected float turnHead(float bodyRotation, float headRotation) {
         this.prevBodyYaw = this.prevYaw;
         this.bodyYaw = this.yaw;
         return 0.0f;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * (this.isBaby() ? 0.5f : 0.9f);
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * (this.isBaby() ? 0.5f : 0.9f);
     }
 
     @Override
@@ -545,23 +545,23 @@ extends LivingEntity {
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         if (!this.canClip()) {
             return;
         }
-        super.travel(arg);
+        super.travel(movementInput);
     }
 
     @Override
-    public void setYaw(float f) {
-        this.prevBodyYaw = this.prevYaw = f;
-        this.prevHeadYaw = this.headYaw = f;
+    public void setYaw(float yaw) {
+        this.prevBodyYaw = this.prevYaw = yaw;
+        this.prevHeadYaw = this.headYaw = yaw;
     }
 
     @Override
-    public void setHeadYaw(float f) {
-        this.prevBodyYaw = this.prevYaw = f;
-        this.prevHeadYaw = this.headYaw = f;
+    public void setHeadYaw(float headYaw) {
+        this.prevBodyYaw = this.prevYaw = headYaw;
+        this.prevHeadYaw = this.headYaw = headYaw;
     }
 
     @Override
@@ -599,9 +599,9 @@ extends LivingEntity {
     }
 
     @Override
-    public void setInvisible(boolean bl) {
-        this.invisible = bl;
-        super.setInvisible(bl);
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+        super.setInvisible(invisible);
     }
 
     @Override
@@ -627,41 +627,41 @@ extends LivingEntity {
         return super.getPistonBehavior();
     }
 
-    private void setSmall(boolean bl) {
-        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 1, bl));
+    private void setSmall(boolean small) {
+        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 1, small));
     }
 
     public boolean isSmall() {
         return (this.dataTracker.get(ARMOR_STAND_FLAGS) & 1) != 0;
     }
 
-    private void setShowArms(boolean bl) {
-        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 4, bl));
+    private void setShowArms(boolean showArms) {
+        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 4, showArms));
     }
 
     public boolean shouldShowArms() {
         return (this.dataTracker.get(ARMOR_STAND_FLAGS) & 4) != 0;
     }
 
-    private void setHideBasePlate(boolean bl) {
-        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 8, bl));
+    private void setHideBasePlate(boolean hideBasePlate) {
+        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 8, hideBasePlate));
     }
 
     public boolean shouldHideBasePlate() {
         return (this.dataTracker.get(ARMOR_STAND_FLAGS) & 8) != 0;
     }
 
-    private void setMarker(boolean bl) {
-        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 16, bl));
+    private void setMarker(boolean marker) {
+        this.dataTracker.set(ARMOR_STAND_FLAGS, this.setBitField(this.dataTracker.get(ARMOR_STAND_FLAGS), 16, marker));
     }
 
     public boolean isMarker() {
         return (this.dataTracker.get(ARMOR_STAND_FLAGS) & 0x10) != 0;
     }
 
-    private byte setBitField(byte b, int i, boolean bl) {
-        b = bl ? (byte)(b | i) : (byte)(b & ~i);
-        return b;
+    private byte setBitField(byte value, int bitField, boolean set) {
+        value = set ? (byte)(value | bitField) : (byte)(value & ~bitField);
+        return value;
     }
 
     public void setHeadRotation(EulerAngle arg) {
@@ -728,8 +728,8 @@ extends LivingEntity {
     }
 
     @Override
-    public boolean handleAttack(Entity arg) {
-        return arg instanceof PlayerEntity && !this.world.canPlayerModifyAt((PlayerEntity)arg, this.getBlockPos());
+    public boolean handleAttack(Entity attacker) {
+        return attacker instanceof PlayerEntity && !this.world.canPlayerModifyAt((PlayerEntity)attacker, this.getBlockPos());
     }
 
     @Override
@@ -738,13 +738,13 @@ extends LivingEntity {
     }
 
     @Override
-    protected SoundEvent getFallSound(int i) {
+    protected SoundEvent getFallSound(int distance) {
         return SoundEvents.ENTITY_ARMOR_STAND_FALL;
     }
 
     @Override
     @Nullable
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ARMOR_STAND_HIT;
     }
 
@@ -764,12 +764,12 @@ extends LivingEntity {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (ARMOR_STAND_FLAGS.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (ARMOR_STAND_FLAGS.equals(data)) {
             this.calculateDimensions();
             this.inanimate = !this.isMarker();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -778,7 +778,7 @@ extends LivingEntity {
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose arg) {
+    public EntityDimensions getDimensions(EntityPose pose) {
         float f = this.isMarker() ? 0.0f : (this.isBaby() ? 0.5f : 1.0f);
         return this.getType().getDimensions().scaled(f);
     }

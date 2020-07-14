@@ -93,12 +93,12 @@ extends Screen {
     private StringRenderable field_25891 = StringRenderable.EMPTY;
     private final StringRenderable field_25892;
 
-    public BookEditScreen(PlayerEntity arg, ItemStack arg2, Hand arg3) {
+    public BookEditScreen(PlayerEntity arg, ItemStack itemStack, Hand hand) {
         super(NarratorManager.EMPTY);
         this.player = arg;
-        this.itemStack = arg2;
-        this.hand = arg3;
-        CompoundTag lv = arg2.getTag();
+        this.itemStack = itemStack;
+        this.hand = hand;
+        CompoundTag lv = itemStack.getTag();
         if (lv != null) {
             ListTag lv2 = lv.getList("pages", 8).copy();
             for (int i = 0; i < lv2.size(); ++i) {
@@ -205,7 +205,7 @@ extends Screen {
         }
     }
 
-    private void finalizeBook(boolean bl) {
+    private void finalizeBook(boolean signBook) {
         if (!this.dirty) {
             return;
         }
@@ -215,11 +215,11 @@ extends Screen {
         if (!this.pages.isEmpty()) {
             this.itemStack.putSubTag("pages", lv);
         }
-        if (bl) {
+        if (signBook) {
             this.itemStack.putSubTag("author", StringTag.of(this.player.getGameProfile().getName()));
             this.itemStack.putSubTag("title", StringTag.of(this.title.trim()));
         }
-        this.client.getNetworkHandler().sendPacket(new BookUpdateC2SPacket(this.itemStack, bl, this.hand));
+        this.client.getNetworkHandler().sendPacket(new BookUpdateC2SPacket(this.itemStack, signBook, this.hand));
     }
 
     private void appendNewPage() {
@@ -231,14 +231,14 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
         if (this.signing) {
-            return this.keyPressedSignMode(i, j, k);
+            return this.keyPressedSignMode(keyCode, scanCode, modifiers);
         }
-        boolean bl = this.method_27592(i, j, k);
+        boolean bl = this.method_27592(keyCode, scanCode, modifiers);
         if (bl) {
             this.invalidatePageContent();
             return true;
@@ -247,12 +247,12 @@ extends Screen {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
-        if (super.charTyped(c, i)) {
+    public boolean charTyped(char chr, int keyCode) {
+        if (super.charTyped(chr, keyCode)) {
             return true;
         }
         if (this.signing) {
-            boolean bl = this.field_24270.insert(c);
+            boolean bl = this.field_24270.insert(chr);
             if (bl) {
                 this.updateButtons();
                 this.dirty = true;
@@ -260,8 +260,8 @@ extends Screen {
             }
             return false;
         }
-        if (SharedConstants.isValidChar(c)) {
-            this.field_24269.insert(Character.toString(c));
+        if (SharedConstants.isValidChar(chr)) {
+            this.field_24269.insert(Character.toString(chr));
             this.invalidatePageContent();
             return true;
         }
@@ -362,8 +362,8 @@ extends Screen {
         this.field_24269.method_27560(j, Screen.hasShiftDown());
     }
 
-    private boolean keyPressedSignMode(int i, int j, int k) {
-        switch (i) {
+    private boolean keyPressedSignMode(int keyCode, int scanCode, int modifiers) {
+        switch (keyCode) {
             case 259: {
                 this.field_24270.delete(-1);
                 this.updateButtons();
@@ -389,44 +389,44 @@ extends Screen {
         return "";
     }
 
-    private void setPageContent(String string) {
+    private void setPageContent(String newContent) {
         if (this.currentPage >= 0 && this.currentPage < this.pages.size()) {
-            this.pages.set(this.currentPage, string);
+            this.pages.set(this.currentPage, newContent);
             this.dirty = true;
             this.invalidatePageContent();
         }
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         this.setFocused(null);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(BookScreen.BOOK_TEXTURE);
         int k = (this.width - 192) / 2;
         int l = 2;
-        this.drawTexture(arg, k, 2, 0, 0, 192, 192);
+        this.drawTexture(matrices, k, 2, 0, 0, 192, 192);
         if (this.signing) {
             boolean bl = this.tickCounter / 6 % 2 == 0;
             StringRenderable lv = StringRenderable.concat(StringRenderable.plain(this.title), bl ? field_25895 : field_25896);
             int m = this.textRenderer.getWidth(field_25893);
-            this.textRenderer.draw(arg, field_25893, (float)(k + 36 + (114 - m) / 2), 34.0f, 0);
+            this.textRenderer.draw(matrices, field_25893, (float)(k + 36 + (114 - m) / 2), 34.0f, 0);
             int n = this.textRenderer.getWidth(lv);
-            this.textRenderer.draw(arg, lv, (float)(k + 36 + (114 - n) / 2), 50.0f, 0);
+            this.textRenderer.draw(matrices, lv, (float)(k + 36 + (114 - n) / 2), 50.0f, 0);
             int o = this.textRenderer.getWidth(this.field_25892);
-            this.textRenderer.draw(arg, this.field_25892, (float)(k + 36 + (114 - o) / 2), 60.0f, 0);
+            this.textRenderer.draw(matrices, this.field_25892, (float)(k + 36 + (114 - o) / 2), 60.0f, 0);
             this.textRenderer.drawTrimmed(field_25894, k + 36, 82, 114, 0);
         } else {
             int p = this.textRenderer.getWidth(this.field_25891);
-            this.textRenderer.draw(arg, this.field_25891, (float)(k - p + 192 - 44), 18.0f, 0);
+            this.textRenderer.draw(matrices, this.field_25891, (float)(k - p + 192 - 44), 18.0f, 0);
             PageContent lv2 = this.getPageContent();
             for (Line lv3 : lv2.lines) {
-                this.textRenderer.draw(arg, lv3.text, (float)lv3.x, (float)lv3.y, -16777216);
+                this.textRenderer.draw(matrices, lv3.text, (float)lv3.x, (float)lv3.y, -16777216);
             }
             this.method_27588(lv2.field_24277);
-            this.method_27581(arg, lv2.position, lv2.field_24274);
+            this.method_27581(matrices, lv2.position, lv2.field_24274);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     private void method_27581(MatrixStack arg, Position arg2, boolean bl) {
@@ -473,14 +473,14 @@ extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (super.mouseClicked(d, e, i)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (i == 0) {
+        if (button == 0) {
             long l = Util.getMeasuringTimeMs();
             PageContent lv = this.getPageContent();
-            int j = lv.method_27602(this.textRenderer, this.method_27582(new Position((int)d, (int)e)));
+            int j = lv.method_27602(this.textRenderer, this.method_27582(new Position((int)mouseX, (int)mouseY)));
             if (j >= 0) {
                 if (j == this.lastClickIndex && l - this.lastClickTime < 250L) {
                     if (!this.field_24269.method_27568()) {
@@ -505,13 +505,13 @@ extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (super.mouseDragged(d, e, i, f, g)) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
             return true;
         }
-        if (i == 0) {
+        if (button == 0) {
             PageContent lv = this.getPageContent();
-            int j = lv.method_27602(this.textRenderer, this.method_27582(new Position((int)d, (int)e)));
+            int j = lv.method_27602(this.textRenderer, this.method_27582(new Position((int)mouseX, (int)mouseY)));
             this.field_24269.method_27560(j, true);
             this.invalidatePageContent();
         }
@@ -640,12 +640,12 @@ extends Screen {
         private final Line[] lines;
         private final Rect2i[] field_24277;
 
-        public PageContent(String string, Position arg, boolean bl, int[] is, Line[] args, Rect2i[] args2) {
-            this.pageContent = string;
+        public PageContent(String pageContent, Position arg, boolean bl, int[] is, Line[] lines, Rect2i[] args2) {
+            this.pageContent = pageContent;
             this.position = arg;
             this.field_24274 = bl;
             this.field_24275 = is;
-            this.lines = args;
+            this.lines = lines;
             this.field_24277 = args2;
         }
 
@@ -695,12 +695,12 @@ extends Screen {
         private final int x;
         private final int y;
 
-        public Line(Style arg, String string, int i, int j) {
+        public Line(Style arg, String content, int x, int y) {
             this.style = arg;
-            this.content = string;
-            this.x = i;
-            this.y = j;
-            this.text = new LiteralText(string).setStyle(arg);
+            this.content = content;
+            this.x = x;
+            this.y = y;
+            this.text = new LiteralText(content).setStyle(arg);
         }
     }
 
@@ -709,9 +709,9 @@ extends Screen {
         public final int x;
         public final int y;
 
-        Position(int i, int j) {
-            this.x = i;
-            this.y = j;
+        Position(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
     }
 }

@@ -25,15 +25,15 @@ implements SoundContainer<Sound> {
     private final boolean preload;
     private final int attenuation;
 
-    public Sound(String string, float f, float g, int i, RegistrationType arg, boolean bl, boolean bl2, int j) {
-        this.id = new Identifier(string);
-        this.volume = f;
-        this.pitch = g;
-        this.weight = i;
-        this.registrationType = arg;
-        this.stream = bl;
-        this.preload = bl2;
-        this.attenuation = j;
+    public Sound(String id, float volume, float pitch, int weight, RegistrationType registrationType, boolean stream, boolean preload, int attenuation) {
+        this.id = new Identifier(id);
+        this.volume = volume;
+        this.pitch = pitch;
+        this.weight = weight;
+        this.registrationType = registrationType;
+        this.stream = stream;
+        this.preload = preload;
+        this.attenuation = attenuation;
     }
 
     public Identifier getIdentifier() {
@@ -63,9 +63,9 @@ implements SoundContainer<Sound> {
     }
 
     @Override
-    public void preload(SoundSystem arg) {
+    public void preload(SoundSystem soundSystem) {
         if (this.preload) {
-            arg.addPreloadedSound(this);
+            soundSystem.addPreloadedSound(this);
         }
     }
 
@@ -101,8 +101,8 @@ implements SoundContainer<Sound> {
 
         private final String name;
 
-        private RegistrationType(String string2) {
-            this.name = string2;
+        private RegistrationType(String name) {
+            this.name = name;
         }
 
         public static RegistrationType getByName(String string) {

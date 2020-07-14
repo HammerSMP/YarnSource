@@ -38,10 +38,10 @@ extends RealmsScreen {
     private String errorMsg;
     private boolean showError;
 
-    public RealmsInviteScreen(RealmsConfigureWorldScreen arg, Screen arg2, RealmsServer arg3) {
-        this.configureScreen = arg;
-        this.parent = arg2;
-        this.serverData = arg3;
+    public RealmsInviteScreen(RealmsConfigureWorldScreen configureScreen, Screen parent, RealmsServer serverData) {
+        this.configureScreen = configureScreen;
+        this.parent = parent;
+        this.serverData = serverData;
     }
 
     @Override
@@ -85,30 +85,30 @@ extends RealmsScreen {
         }
     }
 
-    private void showError(String string) {
+    private void showError(String errorMsg) {
         this.showError = true;
-        this.errorMsg = string;
-        Realms.narrateNow(string);
+        this.errorMsg = errorMsg;
+        Realms.narrateNow(errorMsg);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.textRenderer.draw(arg, I18n.translate("mco.configure.world.invite.profile.name", new Object[0]), (float)(this.width / 2 - 100), (float)RealmsInviteScreen.row(1), 0xA0A0A0);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.textRenderer.draw(matrices, I18n.translate("mco.configure.world.invite.profile.name", new Object[0]), (float)(this.width / 2 - 100), (float)RealmsInviteScreen.row(1), 0xA0A0A0);
         if (this.showError) {
-            this.drawCenteredString(arg, this.textRenderer, this.errorMsg, this.width / 2, RealmsInviteScreen.row(5), 0xFF0000);
+            this.drawCenteredString(matrices, this.textRenderer, this.errorMsg, this.width / 2, RealmsInviteScreen.row(5), 0xFF0000);
         }
-        this.field_22696.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+        this.field_22696.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

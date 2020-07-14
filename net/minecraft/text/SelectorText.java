@@ -32,15 +32,15 @@ implements ParsableText {
     @Nullable
     private final EntitySelector selector;
 
-    public SelectorText(String string) {
-        this.pattern = string;
+    public SelectorText(String pattern) {
+        this.pattern = pattern;
         EntitySelector lv = null;
         try {
-            EntitySelectorReader lv2 = new EntitySelectorReader(new StringReader(string));
+            EntitySelectorReader lv2 = new EntitySelectorReader(new StringReader(pattern));
             lv = lv2.read();
         }
         catch (CommandSyntaxException commandSyntaxException) {
-            LOGGER.warn("Invalid selector component: {}", (Object)string, (Object)commandSyntaxException.getMessage());
+            LOGGER.warn("Invalid selector component: {}", (Object)pattern, (Object)commandSyntaxException.getMessage());
         }
         this.selector = lv;
     }
@@ -50,11 +50,11 @@ implements ParsableText {
     }
 
     @Override
-    public MutableText parse(@Nullable ServerCommandSource arg, @Nullable Entity arg2, int i) throws CommandSyntaxException {
-        if (arg == null || this.selector == null) {
+    public MutableText parse(@Nullable ServerCommandSource source, @Nullable Entity sender, int depth) throws CommandSyntaxException {
+        if (source == null || this.selector == null) {
             return new LiteralText("");
         }
-        return EntitySelector.getNames(this.selector.getEntities(arg));
+        return EntitySelector.getNames(this.selector.getEntities(source));
     }
 
     @Override

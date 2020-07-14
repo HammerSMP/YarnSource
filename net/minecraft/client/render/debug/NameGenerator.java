@@ -18,17 +18,17 @@ public class NameGenerator {
     private static final String[] PREFIX = new String[]{"Slim", "Far", "River", "Silly", "Fat", "Thin", "Fish", "Bat", "Dark", "Oak", "Sly", "Bush", "Zen", "Bark", "Cry", "Slack", "Soup", "Grim", "Hook", "Dirt", "Mud", "Sad", "Hard", "Crook", "Sneak", "Stink", "Weird", "Fire", "Soot", "Soft", "Rough", "Cling", "Scar"};
     private static final String[] SUFFIX = new String[]{"Fox", "Tail", "Jaw", "Whisper", "Twig", "Root", "Finder", "Nose", "Brow", "Blade", "Fry", "Seek", "Wart", "Tooth", "Foot", "Leaf", "Stone", "Fall", "Face", "Tongue", "Voice", "Lip", "Mouth", "Snail", "Toe", "Ear", "Hair", "Beard", "Shirt", "Fist"};
 
-    public static String name(UUID uUID) {
-        Random random = NameGenerator.randomFromUuid(uUID);
+    public static String name(UUID uuid) {
+        Random random = NameGenerator.randomFromUuid(uuid);
         return NameGenerator.getRandom(random, PREFIX) + NameGenerator.getRandom(random, SUFFIX);
     }
 
-    private static String getRandom(Random random, String[] strings) {
-        return Util.getRandom(strings, random);
+    private static String getRandom(Random random, String[] options) {
+        return Util.getRandom(options, random);
     }
 
-    private static Random randomFromUuid(UUID uUID) {
-        return new Random(uUID.hashCode() >> 2);
+    private static Random randomFromUuid(UUID uuid) {
+        return new Random(uuid.hashCode() >> 2);
     }
 }
 

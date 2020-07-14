@@ -49,8 +49,8 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        switch (arg.get(AXIS)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        switch (state.get(AXIS)) {
             case Z: {
                 return Z_SHAPE;
             }
@@ -59,90 +59,90 @@ extends Block {
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.getDimension().isNatural() && arg2.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING) && random.nextInt(2000) < arg2.getDifficulty().getId()) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.getDimension().isNatural() && world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING) && random.nextInt(2000) < world.getDifficulty().getId()) {
             ZombifiedPiglinEntity lv;
-            while (arg2.getBlockState(arg3).isOf(this)) {
-                arg3 = arg3.down();
+            while (world.getBlockState(pos).isOf(this)) {
+                pos = pos.down();
             }
-            if (arg2.getBlockState(arg3).allowsSpawning(arg2, arg3, EntityType.ZOMBIFIED_PIGLIN) && (lv = EntityType.ZOMBIFIED_PIGLIN.spawn(arg2, null, null, null, arg3.up(), SpawnReason.STRUCTURE, false, false)) != null) {
+            if (world.getBlockState(pos).allowsSpawning(world, pos, EntityType.ZOMBIFIED_PIGLIN) && (lv = EntityType.ZOMBIFIED_PIGLIN.spawn(world, null, null, null, pos.up(), SpawnReason.STRUCTURE, false, false)) != null) {
                 lv.method_30229();
             }
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
         boolean bl;
-        Direction.Axis lv = arg2.getAxis();
-        Direction.Axis lv2 = arg.get(AXIS);
+        Direction.Axis lv = direction.getAxis();
+        Direction.Axis lv2 = state.get(AXIS);
         boolean bl2 = bl = lv2 != lv && lv.isHorizontal();
-        if (bl || arg3.isOf(this) || new AreaHelper(arg4, arg5, lv2).wasAlreadyValid()) {
-            return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        if (bl || newState.isOf(this) || new AreaHelper(world, pos, lv2).wasAlreadyValid()) {
+            return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
         }
         return Blocks.AIR.getDefaultState();
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (!arg4.hasVehicle() && !arg4.hasPassengers() && arg4.canUsePortals()) {
-            arg4.setInNetherPortal(arg3);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (!entity.hasVehicle() && !entity.hasPassengers() && entity.canUsePortals()) {
+            entity.setInNetherPortal(pos);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         if (random.nextInt(100) == 0) {
-            arg2.playSound((double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_PORTAL_AMBIENT, SoundCategory.BLOCKS, 0.5f, random.nextFloat() * 0.4f + 0.8f, false);
+            world.playSound((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_PORTAL_AMBIENT, SoundCategory.BLOCKS, 0.5f, random.nextFloat() * 0.4f + 0.8f, false);
         }
         for (int i = 0; i < 4; ++i) {
-            double d = (double)arg3.getX() + random.nextDouble();
-            double e = (double)arg3.getY() + random.nextDouble();
-            double f = (double)arg3.getZ() + random.nextDouble();
+            double d = (double)pos.getX() + random.nextDouble();
+            double e = (double)pos.getY() + random.nextDouble();
+            double f = (double)pos.getZ() + random.nextDouble();
             double g = ((double)random.nextFloat() - 0.5) * 0.5;
             double h = ((double)random.nextFloat() - 0.5) * 0.5;
             double j = ((double)random.nextFloat() - 0.5) * 0.5;
             int k = random.nextInt(2) * 2 - 1;
-            if (arg2.getBlockState(arg3.west()).isOf(this) || arg2.getBlockState(arg3.east()).isOf(this)) {
-                f = (double)arg3.getZ() + 0.5 + 0.25 * (double)k;
+            if (world.getBlockState(pos.west()).isOf(this) || world.getBlockState(pos.east()).isOf(this)) {
+                f = (double)pos.getZ() + 0.5 + 0.25 * (double)k;
                 j = random.nextFloat() * 2.0f * (float)k;
             } else {
-                d = (double)arg3.getX() + 0.5 + 0.25 * (double)k;
+                d = (double)pos.getX() + 0.5 + 0.25 * (double)k;
                 g = random.nextFloat() * 2.0f * (float)k;
             }
-            arg2.addParticle(ParticleTypes.PORTAL, d, e, f, g, h, j);
+            world.addParticle(ParticleTypes.PORTAL, d, e, f, g, h, j);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        switch (arg2) {
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        switch (rotation) {
             case COUNTERCLOCKWISE_90: 
             case CLOCKWISE_90: {
-                switch (arg.get(AXIS)) {
+                switch (state.get(AXIS)) {
                     case X: {
-                        return (BlockState)arg.with(AXIS, Direction.Axis.Z);
+                        return (BlockState)state.with(AXIS, Direction.Axis.Z);
                     }
                     case Z: {
-                        return (BlockState)arg.with(AXIS, Direction.Axis.X);
+                        return (BlockState)state.with(AXIS, Direction.Axis.X);
                     }
                 }
-                return arg;
+                return state;
             }
         }
-        return arg;
+        return state;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AXIS);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AXIS);
     }
 }
 

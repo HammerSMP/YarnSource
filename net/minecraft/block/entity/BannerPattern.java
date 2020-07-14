@@ -73,13 +73,13 @@ public enum BannerPattern {
     private final String name;
     private final String id;
 
-    private BannerPattern(String string2, String string3) {
-        this(string2, string3, false);
+    private BannerPattern(String name, String id) {
+        this(name, id, false);
     }
 
-    private BannerPattern(String string2, String string3, boolean bl) {
-        this.name = string2;
-        this.id = string3;
+    private BannerPattern(String name, String id, boolean bl) {
+        this.name = name;
+        this.id = id;
         this.field_24419 = bl;
     }
 
@@ -100,9 +100,9 @@ public enum BannerPattern {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public static BannerPattern byId(String string) {
+    public static BannerPattern byId(String id) {
         for (BannerPattern lv : BannerPattern.values()) {
-            if (!lv.id.equals(string)) continue;
+            if (!lv.id.equals(id)) continue;
             return lv;
         }
         return null;
@@ -118,8 +118,8 @@ public enum BannerPattern {
     public static class Patterns {
         private final List<Pair<BannerPattern, DyeColor>> entries = Lists.newArrayList();
 
-        public Patterns add(BannerPattern arg, DyeColor arg2) {
-            this.entries.add((Pair<BannerPattern, DyeColor>)Pair.of((Object)((Object)arg), (Object)arg2));
+        public Patterns add(BannerPattern pattern, DyeColor color) {
+            this.entries.add((Pair<BannerPattern, DyeColor>)Pair.of((Object)((Object)pattern), (Object)color));
             return this;
         }
 

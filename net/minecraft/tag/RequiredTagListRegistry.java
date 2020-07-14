@@ -30,17 +30,17 @@ import net.minecraft.util.Identifier;
 public class RequiredTagListRegistry {
     private static final Map<Identifier, RequiredTagList<?>> REQUIRED_TAG_LISTS = Maps.newHashMap();
 
-    public static <T> RequiredTagList<T> register(Identifier arg, Function<TagManager, TagGroup<T>> function) {
-        RequiredTagList<T> lv = new RequiredTagList<T>(function);
-        RequiredTagList<T> lv2 = REQUIRED_TAG_LISTS.putIfAbsent(arg, lv);
+    public static <T> RequiredTagList<T> register(Identifier id, Function<TagManager, TagGroup<T>> containerGetter) {
+        RequiredTagList<T> lv = new RequiredTagList<T>(containerGetter);
+        RequiredTagList<T> lv2 = REQUIRED_TAG_LISTS.putIfAbsent(id, lv);
         if (lv2 != null) {
-            throw new IllegalStateException("Duplicate entry for static tag collection: " + arg);
+            throw new IllegalStateException("Duplicate entry for static tag collection: " + id);
         }
         return lv;
     }
 
-    public static void updateTagManager(TagManager arg) {
-        REQUIRED_TAG_LISTS.values().forEach(arg2 -> arg2.updateTagManager(arg));
+    public static void updateTagManager(TagManager tagManager) {
+        REQUIRED_TAG_LISTS.values().forEach(list -> list.updateTagManager(tagManager));
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -48,22 +48,22 @@ public class RequiredTagListRegistry {
         REQUIRED_TAG_LISTS.values().forEach(RequiredTagList::clearAllTags);
     }
 
-    public static Multimap<Identifier, Identifier> getMissingTags(TagManager arg) {
+    public static Multimap<Identifier, Identifier> getMissingTags(TagManager tagManager) {
         HashMultimap multimap = HashMultimap.create();
-        REQUIRED_TAG_LISTS.forEach((arg_0, arg_1) -> RequiredTagListRegistry.method_30200((Multimap)multimap, arg, arg_0, arg_1));
+        REQUIRED_TAG_LISTS.forEach((arg_0, arg_1) -> RequiredTagListRegistry.method_30200((Multimap)multimap, tagManager, arg_0, arg_1));
         return multimap;
     }
 
     public static void validateRegistrations() {
         RequiredTagList[] lvs = new RequiredTagList[]{BlockTags.REQUIRED_TAGS, ItemTags.REQUIRED_TAGS, FluidTags.REQUIRED_TAGS, EntityTypeTags.REQUIRED_TAGS};
-        boolean bl = Stream.of(lvs).anyMatch(arg -> !REQUIRED_TAG_LISTS.containsValue(arg));
+        boolean bl = Stream.of(lvs).anyMatch(list -> !REQUIRED_TAG_LISTS.containsValue(list));
         if (bl) {
             throw new IllegalStateException("Missing helper registrations");
         }
     }
 
-    private static /* synthetic */ void method_30200(Multimap multimap, TagManager arg, Identifier arg2, RequiredTagList arg3) {
-        multimap.putAll((Object)arg2, arg3.getMissingTags(arg));
+    private static /* synthetic */ void method_30200(Multimap multimap, TagManager arg, Identifier id, RequiredTagList list) {
+        multimap.putAll((Object)id, list.getMissingTags(arg));
     }
 }
 

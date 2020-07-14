@@ -36,24 +36,24 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerListS2CPacket() {
     }
 
-    public PlayerListS2CPacket(Action arg, ServerPlayerEntity ... args) {
-        this.action = arg;
-        for (ServerPlayerEntity lv : args) {
+    public PlayerListS2CPacket(Action action, ServerPlayerEntity ... players) {
+        this.action = action;
+        for (ServerPlayerEntity lv : players) {
             this.entries.add(new Entry(lv.getGameProfile(), lv.pingMilliseconds, lv.interactionManager.getGameMode(), lv.getPlayerListName()));
         }
     }
 
-    public PlayerListS2CPacket(Action arg, Iterable<ServerPlayerEntity> iterable) {
-        this.action = arg;
+    public PlayerListS2CPacket(Action action, Iterable<ServerPlayerEntity> iterable) {
+        this.action = action;
         for (ServerPlayerEntity lv : iterable) {
             this.entries.add(new Entry(lv.getGameProfile(), lv.pingMilliseconds, lv.interactionManager.getGameMode(), lv.getPlayerListName()));
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.action = arg.readEnumConstant(Action.class);
-        int i = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.action = buf.readEnumConstant(Action.class);
+        int i = buf.readVarInt();
         for (int j = 0; j < i; ++j) {
             GameProfile gameProfile = null;
             int k = 0;
@@ -61,41 +61,41 @@ implements Packet<ClientPlayPacketListener> {
             Text lv2 = null;
             switch (this.action) {
                 case ADD_PLAYER: {
-                    gameProfile = new GameProfile(arg.readUuid(), arg.readString(16));
-                    int l = arg.readVarInt();
+                    gameProfile = new GameProfile(buf.readUuid(), buf.readString(16));
+                    int l = buf.readVarInt();
                     for (int m = 0; m < l; ++m) {
-                        String string = arg.readString(32767);
-                        String string2 = arg.readString(32767);
-                        if (arg.readBoolean()) {
-                            gameProfile.getProperties().put((Object)string, (Object)new Property(string, string2, arg.readString(32767)));
+                        String string = buf.readString(32767);
+                        String string2 = buf.readString(32767);
+                        if (buf.readBoolean()) {
+                            gameProfile.getProperties().put((Object)string, (Object)new Property(string, string2, buf.readString(32767)));
                             continue;
                         }
                         gameProfile.getProperties().put((Object)string, (Object)new Property(string, string2));
                     }
-                    lv = GameMode.byId(arg.readVarInt());
-                    k = arg.readVarInt();
-                    if (!arg.readBoolean()) break;
-                    lv2 = arg.readText();
+                    lv = GameMode.byId(buf.readVarInt());
+                    k = buf.readVarInt();
+                    if (!buf.readBoolean()) break;
+                    lv2 = buf.readText();
                     break;
                 }
                 case UPDATE_GAME_MODE: {
-                    gameProfile = new GameProfile(arg.readUuid(), null);
-                    lv = GameMode.byId(arg.readVarInt());
+                    gameProfile = new GameProfile(buf.readUuid(), null);
+                    lv = GameMode.byId(buf.readVarInt());
                     break;
                 }
                 case UPDATE_LATENCY: {
-                    gameProfile = new GameProfile(arg.readUuid(), null);
-                    k = arg.readVarInt();
+                    gameProfile = new GameProfile(buf.readUuid(), null);
+                    k = buf.readVarInt();
                     break;
                 }
                 case UPDATE_DISPLAY_NAME: {
-                    gameProfile = new GameProfile(arg.readUuid(), null);
-                    if (!arg.readBoolean()) break;
-                    lv2 = arg.readText();
+                    gameProfile = new GameProfile(buf.readUuid(), null);
+                    if (!buf.readBoolean()) break;
+                    lv2 = buf.readText();
                     break;
                 }
                 case REMOVE_PLAYER: {
-                    gameProfile = new GameProfile(arg.readUuid(), null);
+                    gameProfile = new GameProfile(buf.readUuid(), null);
                 }
             }
             this.entries.add(new Entry(gameProfile, k, lv, lv2));
@@ -103,57 +103,57 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.action);
-        arg.writeVarInt(this.entries.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.action);
+        buf.writeVarInt(this.entries.size());
         for (Entry lv : this.entries) {
             switch (this.action) {
                 case ADD_PLAYER: {
-                    arg.writeUuid(lv.getProfile().getId());
-                    arg.writeString(lv.getProfile().getName());
-                    arg.writeVarInt(lv.getProfile().getProperties().size());
+                    buf.writeUuid(lv.getProfile().getId());
+                    buf.writeString(lv.getProfile().getName());
+                    buf.writeVarInt(lv.getProfile().getProperties().size());
                     for (Property property : lv.getProfile().getProperties().values()) {
-                        arg.writeString(property.getName());
-                        arg.writeString(property.getValue());
+                        buf.writeString(property.getName());
+                        buf.writeString(property.getValue());
                         if (property.hasSignature()) {
-                            arg.writeBoolean(true);
-                            arg.writeString(property.getSignature());
+                            buf.writeBoolean(true);
+                            buf.writeString(property.getSignature());
                             continue;
                         }
-                        arg.writeBoolean(false);
+                        buf.writeBoolean(false);
                     }
-                    arg.writeVarInt(lv.getGameMode().getId());
-                    arg.writeVarInt(lv.getLatency());
+                    buf.writeVarInt(lv.getGameMode().getId());
+                    buf.writeVarInt(lv.getLatency());
                     if (lv.getDisplayName() == null) {
-                        arg.writeBoolean(false);
+                        buf.writeBoolean(false);
                         break;
                     }
-                    arg.writeBoolean(true);
-                    arg.writeText(lv.getDisplayName());
+                    buf.writeBoolean(true);
+                    buf.writeText(lv.getDisplayName());
                     break;
                 }
                 case UPDATE_GAME_MODE: {
-                    arg.writeUuid(lv.getProfile().getId());
-                    arg.writeVarInt(lv.getGameMode().getId());
+                    buf.writeUuid(lv.getProfile().getId());
+                    buf.writeVarInt(lv.getGameMode().getId());
                     break;
                 }
                 case UPDATE_LATENCY: {
-                    arg.writeUuid(lv.getProfile().getId());
-                    arg.writeVarInt(lv.getLatency());
+                    buf.writeUuid(lv.getProfile().getId());
+                    buf.writeVarInt(lv.getLatency());
                     break;
                 }
                 case UPDATE_DISPLAY_NAME: {
-                    arg.writeUuid(lv.getProfile().getId());
+                    buf.writeUuid(lv.getProfile().getId());
                     if (lv.getDisplayName() == null) {
-                        arg.writeBoolean(false);
+                        buf.writeBoolean(false);
                         break;
                     }
-                    arg.writeBoolean(true);
-                    arg.writeText(lv.getDisplayName());
+                    buf.writeBoolean(true);
+                    buf.writeText(lv.getDisplayName());
                     break;
                 }
                 case REMOVE_PLAYER: {
-                    arg.writeUuid(lv.getProfile().getId());
+                    buf.writeUuid(lv.getProfile().getId());
                 }
             }
         }
@@ -184,11 +184,11 @@ implements Packet<ClientPlayPacketListener> {
         private final GameProfile profile;
         private final Text displayName;
 
-        public Entry(GameProfile gameProfile, int i, @Nullable GameMode arg2, @Nullable Text arg3) {
-            this.profile = gameProfile;
-            this.latency = i;
-            this.gameMode = arg2;
-            this.displayName = arg3;
+        public Entry(GameProfile profile, int latency, @Nullable GameMode gameMode, @Nullable Text displayName) {
+            this.profile = profile;
+            this.latency = latency;
+            this.gameMode = gameMode;
+            this.displayName = displayName;
         }
 
         public GameProfile getProfile() {

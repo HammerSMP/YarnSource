@@ -23,17 +23,17 @@ extends SimpleRegistry<T> {
     private final Identifier defaultId;
     private T defaultValue;
 
-    public DefaultedRegistry(String string, RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle) {
+    public DefaultedRegistry(String defaultId, RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle) {
         super(arg, lifecycle);
-        this.defaultId = new Identifier(string);
+        this.defaultId = new Identifier(defaultId);
     }
 
     @Override
-    public <V extends T> V set(int i, RegistryKey<T> arg, V object) {
-        if (this.defaultId.equals(arg.getValue())) {
-            this.defaultValue = object;
+    public <V extends T> V set(int rawId, RegistryKey<T> key, V entry) {
+        if (this.defaultId.equals(key.getValue())) {
+            this.defaultValue = entry;
         }
-        return super.set(i, arg, object);
+        return super.set(rawId, key, entry);
     }
 
     @Override
@@ -44,27 +44,27 @@ extends SimpleRegistry<T> {
 
     @Override
     @Nonnull
-    public Identifier getId(T object) {
-        Identifier lv = super.getId(object);
+    public Identifier getId(T entry) {
+        Identifier lv = super.getId(entry);
         return lv == null ? this.defaultId : lv;
     }
 
     @Override
     @Nonnull
-    public T get(@Nullable Identifier arg) {
-        Object object = super.get(arg);
+    public T get(@Nullable Identifier id) {
+        Object object = super.get(id);
         return object == null ? this.defaultValue : object;
     }
 
     @Override
-    public Optional<T> getOrEmpty(@Nullable Identifier arg) {
-        return Optional.ofNullable(super.get(arg));
+    public Optional<T> getOrEmpty(@Nullable Identifier id) {
+        return Optional.ofNullable(super.get(id));
     }
 
     @Override
     @Nonnull
-    public T get(int i) {
-        Object object = super.get(i);
+    public T get(int index) {
+        Object object = super.get(index);
         return object == null ? this.defaultValue : object;
     }
 

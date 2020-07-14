@@ -46,8 +46,8 @@ implements BiomeAccess.Storage {
     protected final Set<BlockState> topMaterials = Sets.newHashSet();
     protected final List<Biome> biomes;
 
-    protected BiomeSource(List<Biome> list) {
-        this.biomes = list;
+    protected BiomeSource(List<Biome> biomes) {
+        this.biomes = biomes;
     }
 
     protected abstract Codec<? extends BiomeSource> method_28442();
@@ -63,24 +63,24 @@ implements BiomeAccess.Storage {
         return this.biomes;
     }
 
-    public Set<Biome> getBiomesInArea(int i, int j, int k, int l) {
-        int m = i - l >> 2;
-        int n = j - l >> 2;
-        int o = k - l >> 2;
-        int p = i + l >> 2;
-        int q = j + l >> 2;
-        int r = k + l >> 2;
+    public Set<Biome> getBiomesInArea(int x, int y, int z, int radius) {
+        int m = x - radius >> 2;
+        int n = y - radius >> 2;
+        int o = z - radius >> 2;
+        int p = x + radius >> 2;
+        int q = y + radius >> 2;
+        int r = z + radius >> 2;
         int s = p - m + 1;
         int t = q - n + 1;
         int u = r - o + 1;
         HashSet set = Sets.newHashSet();
         for (int v = 0; v < u; ++v) {
             for (int w = 0; w < s; ++w) {
-                for (int x = 0; x < t; ++x) {
-                    int y = m + w;
-                    int z = n + x;
+                for (int x2 = 0; x2 < t; ++x2) {
+                    int y2 = m + w;
+                    int z2 = n + x2;
                     int aa = o + v;
-                    set.add(this.getBiomeForNoiseGen(y, z, aa));
+                    set.add(this.getBiomeForNoiseGen(y2, z2, aa));
                 }
             }
         }
@@ -88,33 +88,33 @@ implements BiomeAccess.Storage {
     }
 
     @Nullable
-    public BlockPos locateBiome(int i, int j, int k, int l, List<Biome> list, Random random) {
-        return this.locateBiome(i, j, k, l, 1, list, random, false);
+    public BlockPos locateBiome(int x, int y, int z, int radius, List<Biome> biomes, Random random) {
+        return this.locateBiome(x, y, z, radius, 1, biomes, random, false);
     }
 
     @Nullable
-    public BlockPos locateBiome(int i, int j, int k, int l, int m, List<Biome> list, Random random, boolean bl) {
+    public BlockPos locateBiome(int x, int y, int z, int radius, int m, List<Biome> biomes, Random random, boolean bl) {
         int s;
-        int n = i >> 2;
-        int o = k >> 2;
-        int p = l >> 2;
-        int q = j >> 2;
+        int n = x >> 2;
+        int o = z >> 2;
+        int p = radius >> 2;
+        int q = y >> 2;
         BlockPos lv = null;
         int r = 0;
         for (int t = s = bl ? 0 : p; t <= p; t += m) {
             for (int u = -t; u <= t; u += m) {
                 boolean bl2 = Math.abs(u) == t;
                 for (int v = -t; v <= t; v += m) {
-                    int x;
+                    int x2;
                     int w;
                     if (bl) {
                         boolean bl3;
                         boolean bl4 = bl3 = Math.abs(v) == t;
                         if (!bl3 && !bl2) continue;
                     }
-                    if (!list.contains(this.getBiomeForNoiseGen(w = n + v, q, x = o + u))) continue;
+                    if (!biomes.contains(this.getBiomeForNoiseGen(w = n + v, q, x2 = o + u))) continue;
                     if (lv == null || random.nextInt(r + 1) == 0) {
-                        lv = new BlockPos(w << 2, j, x << 2);
+                        lv = new BlockPos(w << 2, y, x2 << 2);
                         if (bl) {
                             return lv;
                         }
@@ -126,8 +126,8 @@ implements BiomeAccess.Storage {
         return lv;
     }
 
-    public boolean hasStructureFeature(StructureFeature<?> arg2) {
-        return this.structureFeatures.computeIfAbsent(arg2, arg -> this.biomes.stream().anyMatch(arg2 -> arg2.hasStructureFeature((StructureFeature<?>)arg)));
+    public boolean hasStructureFeature(StructureFeature<?> feature) {
+        return this.structureFeatures.computeIfAbsent(feature, arg -> this.biomes.stream().anyMatch(arg2 -> arg2.hasStructureFeature((StructureFeature<?>)arg)));
     }
 
     public Set<BlockState> getTopMaterials() {

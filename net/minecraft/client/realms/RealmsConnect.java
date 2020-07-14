@@ -34,11 +34,11 @@ public class RealmsConnect {
     private volatile boolean aborted;
     private ClientConnection connection;
 
-    public RealmsConnect(Screen arg) {
-        this.onlineScreen = arg;
+    public RealmsConnect(Screen onlineScreen) {
+        this.onlineScreen = onlineScreen;
     }
 
-    public void connect(final String string, final int i) {
+    public void connect(final String address, final int port) {
         final MinecraftClient lv = MinecraftClient.getInstance();
         lv.setConnectedToRealms(true);
         Realms.narrateNow(I18n.translate("mco.connect.success", new Object[0]));
@@ -48,11 +48,11 @@ public class RealmsConnect {
             public void run() {
                 InetAddress inetAddress = null;
                 try {
-                    inetAddress = InetAddress.getByName(string);
+                    inetAddress = InetAddress.getByName(address);
                     if (RealmsConnect.this.aborted) {
                         return;
                     }
-                    RealmsConnect.this.connection = ClientConnection.connect(inetAddress, i, lv.options.shouldUseNativeTransport());
+                    RealmsConnect.this.connection = ClientConnection.connect(inetAddress, port, lv.options.shouldUseNativeTransport());
                     if (RealmsConnect.this.aborted) {
                         return;
                     }
@@ -60,7 +60,7 @@ public class RealmsConnect {
                     if (RealmsConnect.this.aborted) {
                         return;
                     }
-                    RealmsConnect.this.connection.send(new HandshakeC2SPacket(string, i, NetworkState.LOGIN));
+                    RealmsConnect.this.connection.send(new HandshakeC2SPacket(address, port, NetworkState.LOGIN));
                     if (RealmsConnect.this.aborted) {
                         return;
                     }
@@ -72,7 +72,7 @@ public class RealmsConnect {
                         return;
                     }
                     LOGGER.error("Couldn't connect to world", (Throwable)unknownHostException);
-                    DisconnectedRealmsScreen lv3 = new DisconnectedRealmsScreen(RealmsConnect.this.onlineScreen, "connect.failed", new TranslatableText("disconnect.genericReason", "Unknown host '" + string + "'"));
+                    DisconnectedRealmsScreen lv3 = new DisconnectedRealmsScreen(RealmsConnect.this.onlineScreen, "connect.failed", new TranslatableText("disconnect.genericReason", "Unknown host '" + address + "'"));
                     lv.execute(() -> lv.openScreen(lv3));
                 }
                 catch (Exception exception) {
@@ -81,12 +81,12 @@ public class RealmsConnect {
                         return;
                     }
                     LOGGER.error("Couldn't connect to world", (Throwable)exception);
-                    String string3 = exception.toString();
+                    String string = exception.toString();
                     if (inetAddress != null) {
-                        String string2 = inetAddress + ":" + i;
-                        string3 = string3.replaceAll(string2, "");
+                        String string2 = inetAddress + ":" + port;
+                        string = string.replaceAll(string2, "");
                     }
-                    DisconnectedRealmsScreen lv2 = new DisconnectedRealmsScreen(RealmsConnect.this.onlineScreen, "connect.failed", new TranslatableText("disconnect.genericReason", string3));
+                    DisconnectedRealmsScreen lv2 = new DisconnectedRealmsScreen(RealmsConnect.this.onlineScreen, "connect.failed", new TranslatableText("disconnect.genericReason", string));
                     lv.execute(() -> lv.openScreen(lv2));
                 }
             }

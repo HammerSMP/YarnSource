@@ -44,39 +44,39 @@ extends AbstractSkullBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return FACING_TO_SHAPE.get(arg.get(FACING));
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return FACING_TO_SHAPE.get(state.get(FACING));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction[] lvs;
         BlockState lv = this.getDefaultState();
-        World lv2 = arg.getWorld();
-        BlockPos lv3 = arg.getBlockPos();
-        for (Direction lv4 : lvs = arg.getPlacementDirections()) {
+        World lv2 = ctx.getWorld();
+        BlockPos lv3 = ctx.getBlockPos();
+        for (Direction lv4 : lvs = ctx.getPlacementDirections()) {
             if (!lv4.getAxis().isHorizontal()) continue;
             Direction lv5 = lv4.getOpposite();
             lv = (BlockState)lv.with(FACING, lv5);
-            if (lv2.getBlockState(lv3.offset(lv4)).canReplace(arg)) continue;
+            if (lv2.getBlockState(lv3.offset(lv4)).canReplace(ctx)) continue;
             return lv;
         }
         return null;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 }
 

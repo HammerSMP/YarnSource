@@ -14,8 +14,8 @@ implements ResourcePackProvider {
     private final DefaultResourcePack pack = new DefaultResourcePack("minecraft");
 
     @Override
-    public void register(Consumer<ResourcePackProfile> consumer, ResourcePackProfile.Factory arg) {
-        ResourcePackProfile lv = ResourcePackProfile.of("vanilla", false, () -> this.pack, arg, ResourcePackProfile.InsertionPosition.BOTTOM, ResourcePackSource.PACK_SOURCE_BUILTIN);
+    public void register(Consumer<ResourcePackProfile> consumer, ResourcePackProfile.Factory factory) {
+        ResourcePackProfile lv = ResourcePackProfile.of("vanilla", false, () -> this.pack, factory, ResourcePackProfile.InsertionPosition.BOTTOM, ResourcePackSource.PACK_SOURCE_BUILTIN);
         if (lv != null) {
             consumer.accept(lv);
         }

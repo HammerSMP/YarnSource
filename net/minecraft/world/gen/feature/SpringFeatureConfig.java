@@ -32,12 +32,12 @@ implements FeatureConfig {
     public final int holeCount;
     public final Set<Block> validBlocks;
 
-    public SpringFeatureConfig(FluidState arg, boolean bl, int i, int j, Set<Block> set) {
-        this.state = arg;
-        this.requiresBlockBelow = bl;
-        this.rockCount = i;
-        this.holeCount = j;
-        this.validBlocks = set;
+    public SpringFeatureConfig(FluidState state, boolean requiresBlockBelow, int rockCount, int holeCount, Set<Block> validBlocks) {
+        this.state = state;
+        this.requiresBlockBelow = requiresBlockBelow;
+        this.rockCount = rockCount;
+        this.holeCount = holeCount;
+        this.validBlocks = validBlocks;
     }
 }
 

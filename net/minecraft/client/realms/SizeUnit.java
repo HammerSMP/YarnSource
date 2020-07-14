@@ -19,12 +19,12 @@ public enum SizeUnit {
     GB;
 
 
-    public static SizeUnit getLargestUnit(long l) {
-        if (l < 1024L) {
+    public static SizeUnit getLargestUnit(long bytes) {
+        if (bytes < 1024L) {
             return B;
         }
         try {
-            int i = (int)(Math.log(l) / Math.log(1024.0));
+            int i = (int)(Math.log(bytes) / Math.log(1024.0));
             String string = String.valueOf("KMGTPE".charAt(i - 1));
             return SizeUnit.valueOf(string + "B");
         }
@@ -33,25 +33,25 @@ public enum SizeUnit {
         }
     }
 
-    public static double convertToUnit(long l, SizeUnit arg) {
-        if (arg == B) {
-            return l;
+    public static double convertToUnit(long bytes, SizeUnit unit) {
+        if (unit == B) {
+            return bytes;
         }
-        return (double)l / Math.pow(1024.0, arg.ordinal());
+        return (double)bytes / Math.pow(1024.0, unit.ordinal());
     }
 
-    public static String getUserFriendlyString(long l) {
+    public static String getUserFriendlyString(long bytes) {
         int i = 1024;
-        if (l < 1024L) {
-            return l + " B";
+        if (bytes < 1024L) {
+            return bytes + " B";
         }
-        int j = (int)(Math.log(l) / Math.log(1024.0));
+        int j = (int)(Math.log(bytes) / Math.log(1024.0));
         String string = "KMGTPE".charAt(j - 1) + "";
-        return String.format(Locale.ROOT, "%.1f %sB", (double)l / Math.pow(1024.0, j), string);
+        return String.format(Locale.ROOT, "%.1f %sB", (double)bytes / Math.pow(1024.0, j), string);
     }
 
-    public static String humanReadableSize(long l, SizeUnit arg) {
-        return String.format("%." + (arg == GB ? "1" : "0") + "f %s", SizeUnit.convertToUnit(l, arg), arg.name());
+    public static String humanReadableSize(long bytes, SizeUnit unit) {
+        return String.format("%." + (unit == GB ? "1" : "0") + "f %s", SizeUnit.convertToUnit(bytes, unit), unit.name());
     }
 }
 

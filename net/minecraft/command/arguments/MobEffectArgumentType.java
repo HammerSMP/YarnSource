@@ -47,8 +47,8 @@ implements ArgumentType<StatusEffect> {
         return Registry.STATUS_EFFECT.getOrEmpty(lv).orElseThrow(() -> INVALID_EFFECT_EXCEPTION.create((Object)lv));
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestIdentifiers(Registry.STATUS_EFFECT.getIds(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestIdentifiers(Registry.STATUS_EFFECT.getIds(), builder);
     }
 
     public Collection<String> getExamples() {

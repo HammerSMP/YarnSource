@@ -33,19 +33,19 @@ public class NoiseConfig {
     private final boolean islandNoiseOverride;
     private final boolean amplified;
 
-    public NoiseConfig(int i, NoiseSamplingConfig arg, SlideConfig arg2, SlideConfig arg3, int j, int k, double d, double e, boolean bl, boolean bl2, boolean bl3, boolean bl4) {
-        this.height = i;
-        this.sampling = arg;
-        this.topSlide = arg2;
-        this.bottomSlide = arg3;
-        this.horizontalSize = j;
-        this.verticalSize = k;
-        this.densityFactor = d;
-        this.densityOffset = e;
-        this.simplexSurfaceNoise = bl;
-        this.randomDensityOffset = bl2;
-        this.islandNoiseOverride = bl3;
-        this.amplified = bl4;
+    public NoiseConfig(int height, NoiseSamplingConfig sampling, SlideConfig topSlide, SlideConfig bottomSlide, int sizeHorizontal, int sizeVertical, double densityFactor, double densityOffset, boolean simplexSurfaceNoise, boolean randomDensityOffset, boolean islandNoiseOverride, boolean amplified) {
+        this.height = height;
+        this.sampling = sampling;
+        this.topSlide = topSlide;
+        this.bottomSlide = bottomSlide;
+        this.horizontalSize = sizeHorizontal;
+        this.verticalSize = sizeVertical;
+        this.densityFactor = densityFactor;
+        this.densityOffset = densityOffset;
+        this.simplexSurfaceNoise = simplexSurfaceNoise;
+        this.randomDensityOffset = randomDensityOffset;
+        this.islandNoiseOverride = islandNoiseOverride;
+        this.amplified = amplified;
     }
 
     public int getHeight() {

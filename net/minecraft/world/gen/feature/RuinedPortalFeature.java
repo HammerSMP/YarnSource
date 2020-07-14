@@ -54,9 +54,9 @@ extends StructureFeature<RuinedPortalFeatureConfig> {
         return arg2.getTemperature(arg) < 0.15f;
     }
 
-    private static int method_27211(Random random, ChunkGenerator arg, RuinedPortalStructurePiece.VerticalPlacement arg22, boolean bl, int i, int j, BlockBox arg3) {
+    private static int method_27211(Random random, ChunkGenerator chunkGenerator, RuinedPortalStructurePiece.VerticalPlacement verticalPlacement, boolean bl, int i, int j, BlockBox arg3) {
         int t;
-        if (arg22 == RuinedPortalStructurePiece.VerticalPlacement.IN_NETHER) {
+        if (verticalPlacement == RuinedPortalStructurePiece.VerticalPlacement.IN_NETHER) {
             if (bl) {
                 int k = RuinedPortalFeature.choose(random, 32, 100);
             } else if (random.nextFloat() < 0.5f) {
@@ -64,20 +64,20 @@ extends StructureFeature<RuinedPortalFeatureConfig> {
             } else {
                 int m = RuinedPortalFeature.choose(random, 29, 100);
             }
-        } else if (arg22 == RuinedPortalStructurePiece.VerticalPlacement.IN_MOUNTAIN) {
+        } else if (verticalPlacement == RuinedPortalStructurePiece.VerticalPlacement.IN_MOUNTAIN) {
             int n = i - j;
             int o = RuinedPortalFeature.choosePlacementHeight(random, 70, n);
-        } else if (arg22 == RuinedPortalStructurePiece.VerticalPlacement.UNDERGROUND) {
+        } else if (verticalPlacement == RuinedPortalStructurePiece.VerticalPlacement.UNDERGROUND) {
             int p = i - j;
             int q = RuinedPortalFeature.choosePlacementHeight(random, 15, p);
-        } else if (arg22 == RuinedPortalStructurePiece.VerticalPlacement.PARTLY_BURIED) {
+        } else if (verticalPlacement == RuinedPortalStructurePiece.VerticalPlacement.PARTLY_BURIED) {
             int r = i - j + RuinedPortalFeature.choose(random, 2, 8);
         } else {
             int s = i;
         }
         ImmutableList list = ImmutableList.of((Object)new BlockPos(arg3.minX, 0, arg3.minZ), (Object)new BlockPos(arg3.maxX, 0, arg3.minZ), (Object)new BlockPos(arg3.minX, 0, arg3.maxZ), (Object)new BlockPos(arg3.maxX, 0, arg3.maxZ));
-        List list2 = list.stream().map(arg2 -> arg.getColumnSample(arg2.getX(), arg2.getZ())).collect(Collectors.toList());
-        Heightmap.Type lv = arg22 == RuinedPortalStructurePiece.VerticalPlacement.ON_OCEAN_FLOOR ? Heightmap.Type.OCEAN_FLOOR_WG : Heightmap.Type.WORLD_SURFACE_WG;
+        List list2 = list.stream().map(arg2 -> chunkGenerator.getColumnSample(arg2.getX(), arg2.getZ())).collect(Collectors.toList());
+        Heightmap.Type lv = verticalPlacement == RuinedPortalStructurePiece.VerticalPlacement.ON_OCEAN_FLOOR ? Heightmap.Type.OCEAN_FLOOR_WG : Heightmap.Type.WORLD_SURFACE_WG;
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
         block0: for (t = s; t > 15; --t) {
             int u = 0;
@@ -91,15 +91,15 @@ extends StructureFeature<RuinedPortalFeatureConfig> {
         return t;
     }
 
-    private static int choose(Random random, int i, int j) {
-        return random.nextInt(j - i + 1) + i;
+    private static int choose(Random random, int min, int max) {
+        return random.nextInt(max - min + 1) + min;
     }
 
-    private static int choosePlacementHeight(Random random, int i, int j) {
-        if (i < j) {
-            return RuinedPortalFeature.choose(random, i, j);
+    private static int choosePlacementHeight(Random random, int min, int max) {
+        if (min < max) {
+            return RuinedPortalFeature.choose(random, min, max);
         }
-        return j;
+        return max;
     }
 
     public static enum Type implements StringIdentifiable
@@ -116,16 +116,16 @@ extends StructureFeature<RuinedPortalFeatureConfig> {
         private static final Map<String, Type> BY_NAME;
         private final String name;
 
-        private Type(String string2) {
-            this.name = string2;
+        private Type(String name) {
+            this.name = name;
         }
 
         public String getName() {
             return this.name;
         }
 
-        public static Type byName(String string) {
-            return BY_NAME.get(string);
+        public static Type byName(String name) {
+            return BY_NAME.get(name);
         }
 
         @Override

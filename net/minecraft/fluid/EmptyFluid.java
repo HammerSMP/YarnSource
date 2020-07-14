@@ -25,17 +25,17 @@ extends Fluid {
     }
 
     @Override
-    public boolean canBeReplacedWith(FluidState arg, BlockView arg2, BlockPos arg3, Fluid arg4, Direction arg5) {
+    public boolean canBeReplacedWith(FluidState state, BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
         return true;
     }
 
     @Override
-    public Vec3d getVelocity(BlockView arg, BlockPos arg2, FluidState arg3) {
+    public Vec3d getVelocity(BlockView world, BlockPos pos, FluidState state) {
         return Vec3d.ZERO;
     }
 
     @Override
-    public int getTickRate(WorldView arg) {
+    public int getTickRate(WorldView world) {
         return 0;
     }
 
@@ -50,32 +50,32 @@ extends Fluid {
     }
 
     @Override
-    public float getHeight(FluidState arg, BlockView arg2, BlockPos arg3) {
+    public float getHeight(FluidState state, BlockView world, BlockPos pos) {
         return 0.0f;
     }
 
     @Override
-    public float getHeight(FluidState arg) {
+    public float getHeight(FluidState state) {
         return 0.0f;
     }
 
     @Override
-    protected BlockState toBlockState(FluidState arg) {
+    protected BlockState toBlockState(FluidState state) {
         return Blocks.AIR.getDefaultState();
     }
 
     @Override
-    public boolean isStill(FluidState arg) {
+    public boolean isStill(FluidState state) {
         return false;
     }
 
     @Override
-    public int getLevel(FluidState arg) {
+    public int getLevel(FluidState state) {
         return 0;
     }
 
     @Override
-    public VoxelShape getShape(FluidState arg, BlockView arg2, BlockPos arg3) {
+    public VoxelShape getShape(FluidState state, BlockView world, BlockPos pos) {
         return VoxelShapes.empty();
     }
 }

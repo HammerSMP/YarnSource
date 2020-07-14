@@ -16,20 +16,20 @@ implements TickScheduler<T> {
     }
 
     @Override
-    public boolean isScheduled(BlockPos arg, T object) {
+    public boolean isScheduled(BlockPos pos, T object) {
         return false;
     }
 
     @Override
-    public void schedule(BlockPos arg, T object, int i) {
+    public void schedule(BlockPos pos, T object, int delay) {
     }
 
     @Override
-    public void schedule(BlockPos arg, T object, int i, TickPriority arg2) {
+    public void schedule(BlockPos pos, T object, int delay, TickPriority priority) {
     }
 
     @Override
-    public boolean isTicking(BlockPos arg, T object) {
+    public boolean isTicking(BlockPos pos, T object) {
         return false;
     }
 }

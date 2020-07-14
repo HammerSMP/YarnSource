@@ -19,8 +19,8 @@ public class BlockPlacerType<P extends BlockPlacer> {
     public static final BlockPlacerType<ColumnPlacer> COLUMN_PLACER = BlockPlacerType.register("column_placer", ColumnPlacer.CODEC);
     private final Codec<P> field_24866;
 
-    private static <P extends BlockPlacer> BlockPlacerType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.BLOCK_PLACER_TYPE, string, new BlockPlacerType<P>(codec));
+    private static <P extends BlockPlacer> BlockPlacerType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.BLOCK_PLACER_TYPE, id, new BlockPlacerType<P>(codec));
     }
 
     private BlockPlacerType(Codec<P> codec) {

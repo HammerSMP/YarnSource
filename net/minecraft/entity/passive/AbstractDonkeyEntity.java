@@ -49,8 +49,8 @@ extends HorseBaseEntity {
         return this.dataTracker.get(CHEST);
     }
 
-    public void setHasChest(boolean bl) {
-        this.dataTracker.set(CHEST, bl);
+    public void setHasChest(boolean hasChest) {
+        this.dataTracker.set(CHEST, hasChest);
     }
 
     @Override
@@ -78,9 +78,9 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("ChestedHorse", this.hasChest());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("ChestedHorse", this.hasChest());
         if (this.hasChest()) {
             ListTag lv = new ListTag();
             for (int i = 2; i < this.items.size(); ++i) {
@@ -91,16 +91,16 @@ extends HorseBaseEntity {
                 lv2.toTag(lv3);
                 lv.add(lv3);
             }
-            arg.put("Items", lv);
+            tag.put("Items", lv);
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setHasChest(arg.getBoolean("ChestedHorse"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setHasChest(tag.getBoolean("ChestedHorse"));
         if (this.hasChest()) {
-            ListTag lv = arg.getList("Items", 10);
+            ListTag lv = tag.getList("Items", 10);
             this.onChestedStatusChanged();
             for (int i = 0; i < lv.size(); ++i) {
                 CompoundTag lv2 = lv.getCompound(i);
@@ -113,37 +113,37 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public boolean equip(int i, ItemStack arg) {
-        if (i == 499) {
-            if (this.hasChest() && arg.isEmpty()) {
+    public boolean equip(int slot, ItemStack item) {
+        if (slot == 499) {
+            if (this.hasChest() && item.isEmpty()) {
                 this.setHasChest(false);
                 this.onChestedStatusChanged();
                 return true;
             }
-            if (!this.hasChest() && arg.getItem() == Blocks.CHEST.asItem()) {
+            if (!this.hasChest() && item.getItem() == Blocks.CHEST.asItem()) {
                 this.setHasChest(true);
                 this.onChestedStatusChanged();
                 return true;
             }
         }
-        return super.equip(i, arg);
+        return super.equip(slot, item);
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (!this.isBaby()) {
-            if (this.isTame() && arg.shouldCancelInteraction()) {
-                this.openInventory(arg);
+            if (this.isTame() && player.shouldCancelInteraction()) {
+                this.openInventory(player);
                 return ActionResult.success(this.world.isClient);
             }
             if (this.hasPassengers()) {
-                return super.interactMob(arg, arg2);
+                return super.interactMob(player, hand);
             }
         }
         if (!lv.isEmpty()) {
             if (this.isBreedingItem(lv)) {
-                return this.method_30009(arg, lv);
+                return this.method_30009(player, lv);
             }
             if (!this.isTame()) {
                 this.playAngrySound();
@@ -152,21 +152,21 @@ extends HorseBaseEntity {
             if (!this.hasChest() && lv.getItem() == Blocks.CHEST.asItem()) {
                 this.setHasChest(true);
                 this.playAddChestSound();
-                if (!arg.abilities.creativeMode) {
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                 }
                 this.onChestedStatusChanged();
                 return ActionResult.success(this.world.isClient);
             }
             if (!this.isBaby() && !this.isSaddled() && lv.getItem() == Items.SADDLE) {
-                this.openInventory(arg);
+                this.openInventory(player);
                 return ActionResult.success(this.world.isClient);
             }
         }
         if (this.isBaby()) {
-            return super.interactMob(arg, arg2);
+            return super.interactMob(player, hand);
         }
-        this.putPlayerOnBack(arg);
+        this.putPlayerOnBack(player);
         return ActionResult.success(this.world.isClient);
     }
 

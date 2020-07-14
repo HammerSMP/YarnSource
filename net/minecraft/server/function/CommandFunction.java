@@ -30,9 +30,9 @@ public class CommandFunction {
     private final Element[] elements;
     private final Identifier id;
 
-    public CommandFunction(Identifier arg, Element[] args) {
-        this.id = arg;
-        this.elements = args;
+    public CommandFunction(Identifier id, Element[] elements) {
+        this.id = id;
+        this.elements = elements;
     }
 
     public Identifier getId() {
@@ -43,7 +43,7 @@ public class CommandFunction {
         return this.elements;
     }
 
-    public static CommandFunction create(Identifier arg, CommandDispatcher<ServerCommandSource> commandDispatcher, ServerCommandSource arg2, List<String> list) {
+    public static CommandFunction create(Identifier id, CommandDispatcher<ServerCommandSource> commandDispatcher, ServerCommandSource arg2, List<String> list) {
         ArrayList list2 = Lists.newArrayListWithCapacity((int)list.size());
         for (int i = 0; i < list.size(); ++i) {
             int j = i + 1;
@@ -70,7 +70,7 @@ public class CommandFunction {
                 throw new IllegalArgumentException("Whilst parsing command on line " + j + ": " + commandSyntaxException.getMessage());
             }
         }
-        return new CommandFunction(arg, list2.toArray(new Element[0]));
+        return new CommandFunction(id, list2.toArray(new Element[0]));
     }
 
     public static class LazyContainer {
@@ -80,20 +80,20 @@ public class CommandFunction {
         private boolean initialized;
         private Optional<CommandFunction> function = Optional.empty();
 
-        public LazyContainer(@Nullable Identifier arg) {
-            this.id = arg;
+        public LazyContainer(@Nullable Identifier id) {
+            this.id = id;
         }
 
-        public LazyContainer(CommandFunction arg) {
+        public LazyContainer(CommandFunction function) {
             this.initialized = true;
             this.id = null;
-            this.function = Optional.of(arg);
+            this.function = Optional.of(function);
         }
 
-        public Optional<CommandFunction> get(CommandFunctionManager arg) {
+        public Optional<CommandFunction> get(CommandFunctionManager manager) {
             if (!this.initialized) {
                 if (this.id != null) {
-                    this.function = arg.getFunction(this.id);
+                    this.function = manager.getFunction(this.id);
                 }
                 this.initialized = true;
             }
@@ -115,13 +115,13 @@ public class CommandFunction {
         }
 
         @Override
-        public void execute(CommandFunctionManager arg, ServerCommandSource arg2, ArrayDeque<CommandFunctionManager.Entry> arrayDeque, int i) {
-            this.function.get(arg).ifPresent(arg3 -> {
+        public void execute(CommandFunctionManager manager, ServerCommandSource source, ArrayDeque<CommandFunctionManager.Entry> stack, int maxChainLength) {
+            this.function.get(manager).ifPresent(arg3 -> {
                 Element[] lvs = arg3.getElements();
-                int j = i - arrayDeque.size();
+                int j = maxChainLength - stack.size();
                 int k = Math.min(lvs.length, j);
                 for (int l = k - 1; l >= 0; --l) {
-                    arrayDeque.addFirst(new CommandFunctionManager.Entry(arg, arg2, lvs[l]));
+                    stack.addFirst(new CommandFunctionManager.Entry(manager, source, lvs[l]));
                 }
             });
         }
@@ -135,13 +135,13 @@ public class CommandFunction {
     implements Element {
         private final ParseResults<ServerCommandSource> parsed;
 
-        public CommandElement(ParseResults<ServerCommandSource> parseResults) {
-            this.parsed = parseResults;
+        public CommandElement(ParseResults<ServerCommandSource> parsed) {
+            this.parsed = parsed;
         }
 
         @Override
-        public void execute(CommandFunctionManager arg, ServerCommandSource arg2, ArrayDeque<CommandFunctionManager.Entry> arrayDeque, int i) throws CommandSyntaxException {
-            arg.getDispatcher().execute(new ParseResults(this.parsed.getContext().withSource((Object)arg2), this.parsed.getReader(), this.parsed.getExceptions()));
+        public void execute(CommandFunctionManager manager, ServerCommandSource source, ArrayDeque<CommandFunctionManager.Entry> stack, int maxChainLength) throws CommandSyntaxException {
+            manager.getDispatcher().execute(new ParseResults(this.parsed.getContext().withSource((Object)source), this.parsed.getReader(), this.parsed.getExceptions()));
         }
 
         public String toString() {

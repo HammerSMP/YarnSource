@@ -24,13 +24,13 @@ implements ResourcePackProvider {
     private final File packsFolder;
     private final ResourcePackSource field_25345;
 
-    public FileResourcePackProvider(File file, ResourcePackSource arg) {
-        this.packsFolder = file;
+    public FileResourcePackProvider(File packsFolder, ResourcePackSource arg) {
+        this.packsFolder = packsFolder;
         this.field_25345 = arg;
     }
 
     @Override
-    public void register(Consumer<ResourcePackProfile> consumer, ResourcePackProfile.Factory arg) {
+    public void register(Consumer<ResourcePackProfile> consumer, ResourcePackProfile.Factory factory) {
         File[] files;
         if (!this.packsFolder.isDirectory()) {
             this.packsFolder.mkdirs();
@@ -40,7 +40,7 @@ implements ResourcePackProvider {
         }
         for (File file : files) {
             String string = "file/" + file.getName();
-            ResourcePackProfile lv = ResourcePackProfile.of(string, false, this.createResourcePack(file), arg, ResourcePackProfile.InsertionPosition.TOP, this.field_25345);
+            ResourcePackProfile lv = ResourcePackProfile.of(string, false, this.createResourcePack(file), factory, ResourcePackProfile.InsertionPosition.TOP, this.field_25345);
             if (lv == null) continue;
             consumer.accept(lv);
         }

@@ -36,10 +36,10 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos lv2;
-        World lv = arg.getWorld();
-        BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
+        World lv = context.getWorld();
+        BlockState lv3 = lv.getBlockState(lv2 = context.getBlockPos());
         if (!lv3.isOf(Blocks.END_PORTAL_FRAME) || lv3.get(EndPortalFrameBlock.EYE).booleanValue()) {
             return ActionResult.PASS;
         }
@@ -50,7 +50,7 @@ extends Item {
         Block.pushEntitiesUpBeforeBlockChange(lv3, lv4, lv, lv2);
         lv.setBlockState(lv2, lv4, 2);
         lv.updateComparators(lv2, Blocks.END_PORTAL_FRAME);
-        arg.getStack().decrement(1);
+        context.getStack().decrement(1);
         lv.syncWorldEvent(1503, lv2, 0);
         BlockPattern.Result lv5 = EndPortalFrameBlock.getCompletedFramePattern().searchAround(lv, lv2);
         if (lv5 != null) {
@@ -66,29 +66,29 @@ extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         BlockPos lv3;
-        ItemStack lv = arg2.getStackInHand(arg3);
-        BlockHitResult lv2 = EnderEyeItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.NONE);
-        if (((HitResult)lv2).getType() == HitResult.Type.BLOCK && arg.getBlockState(lv2.getBlockPos()).isOf(Blocks.END_PORTAL_FRAME)) {
+        ItemStack lv = user.getStackInHand(hand);
+        BlockHitResult lv2 = EnderEyeItem.rayTrace(world, user, RayTraceContext.FluidHandling.NONE);
+        if (((HitResult)lv2).getType() == HitResult.Type.BLOCK && world.getBlockState(lv2.getBlockPos()).isOf(Blocks.END_PORTAL_FRAME)) {
             return TypedActionResult.pass(lv);
         }
-        arg2.setCurrentHand(arg3);
-        if (arg instanceof ServerWorld && (lv3 = ((ServerWorld)arg).getChunkManager().getChunkGenerator().locateStructure((ServerWorld)arg, StructureFeature.STRONGHOLD, arg2.getBlockPos(), 100, false)) != null) {
-            EyeOfEnderEntity lv4 = new EyeOfEnderEntity(arg, arg2.getX(), arg2.getBodyY(0.5), arg2.getZ());
+        user.setCurrentHand(hand);
+        if (world instanceof ServerWorld && (lv3 = ((ServerWorld)world).getChunkManager().getChunkGenerator().locateStructure((ServerWorld)world, StructureFeature.STRONGHOLD, user.getBlockPos(), 100, false)) != null) {
+            EyeOfEnderEntity lv4 = new EyeOfEnderEntity(world, user.getX(), user.getBodyY(0.5), user.getZ());
             lv4.setItem(lv);
             lv4.moveTowards(lv3);
-            arg.spawnEntity(lv4);
-            if (arg2 instanceof ServerPlayerEntity) {
-                Criteria.USED_ENDER_EYE.trigger((ServerPlayerEntity)arg2, lv3);
+            world.spawnEntity(lv4);
+            if (user instanceof ServerPlayerEntity) {
+                Criteria.USED_ENDER_EYE.trigger((ServerPlayerEntity)user, lv3);
             }
-            arg.playSound(null, arg2.getX(), arg2.getY(), arg2.getZ(), SoundEvents.ENTITY_ENDER_EYE_LAUNCH, SoundCategory.NEUTRAL, 0.5f, 0.4f / (RANDOM.nextFloat() * 0.4f + 0.8f));
-            arg.syncWorldEvent(null, 1003, arg2.getBlockPos(), 0);
-            if (!arg2.abilities.creativeMode) {
+            world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_ENDER_EYE_LAUNCH, SoundCategory.NEUTRAL, 0.5f, 0.4f / (RANDOM.nextFloat() * 0.4f + 0.8f));
+            world.syncWorldEvent(null, 1003, user.getBlockPos(), 0);
+            if (!user.abilities.creativeMode) {
                 lv.decrement(1);
             }
-            arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-            arg2.swingHand(arg3, true);
+            user.incrementStat(Stats.USED.getOrCreateStat(this));
+            user.swingHand(hand, true);
             return TypedActionResult.success(lv);
         }
         return TypedActionResult.consume(lv);

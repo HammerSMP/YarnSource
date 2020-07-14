@@ -14,13 +14,13 @@ extends Goal {
     private int moveDelay;
     private int checkSurroundingDelay;
 
-    public FollowGroupLeaderGoal(SchoolingFishEntity arg) {
-        this.fish = arg;
-        this.checkSurroundingDelay = this.getSurroundingSearchDelay(arg);
+    public FollowGroupLeaderGoal(SchoolingFishEntity fish) {
+        this.fish = fish;
+        this.checkSurroundingDelay = this.getSurroundingSearchDelay(fish);
     }
 
-    protected int getSurroundingSearchDelay(SchoolingFishEntity arg) {
-        return 200 + arg.getRandom().nextInt(200) % 20;
+    protected int getSurroundingSearchDelay(SchoolingFishEntity fish) {
+        return 200 + fish.getRandom().nextInt(200) % 20;
     }
 
     @Override

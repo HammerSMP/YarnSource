@@ -51,13 +51,13 @@ implements CraftingRecipe {
     private final Identifier id;
     private final String group;
 
-    public ShapedRecipe(Identifier arg, String string, int i, int j, DefaultedList<Ingredient> arg2, ItemStack arg3) {
-        this.id = arg;
-        this.group = string;
-        this.width = i;
-        this.height = j;
-        this.inputs = arg2;
-        this.output = arg3;
+    public ShapedRecipe(Identifier id, String group, int width, int height, DefaultedList<Ingredient> ingredients, ItemStack output) {
+        this.id = id;
+        this.group = group;
+        this.width = width;
+        this.height = height;
+        this.inputs = ingredients;
+        this.output = output;
     }
 
     @Override
@@ -88,8 +88,8 @@ implements CraftingRecipe {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean fits(int i, int j) {
-        return i >= this.width && j >= this.height;
+    public boolean fits(int width, int height) {
+        return width >= this.width && height >= this.height;
     }
 
     @Override
@@ -106,16 +106,16 @@ implements CraftingRecipe {
         return false;
     }
 
-    private boolean matchesSmall(CraftingInventory arg, int i, int j, boolean bl) {
-        for (int k = 0; k < arg.getWidth(); ++k) {
-            for (int l = 0; l < arg.getHeight(); ++l) {
-                int m = k - i;
-                int n = l - j;
+    private boolean matchesSmall(CraftingInventory inv, int offsetX, int offsetY, boolean bl) {
+        for (int k = 0; k < inv.getWidth(); ++k) {
+            for (int l = 0; l < inv.getHeight(); ++l) {
+                int m = k - offsetX;
+                int n = l - offsetY;
                 Ingredient lv = Ingredient.EMPTY;
                 if (m >= 0 && n >= 0 && m < this.width && n < this.height) {
                     lv = bl ? this.inputs.get(this.width - m - 1 + n * this.width) : this.inputs.get(m + n * this.width);
                 }
-                if (lv.test(arg.getStack(k + l * arg.getWidth()))) continue;
+                if (lv.test(inv.getStack(k + l * inv.getWidth()))) continue;
                 return false;
             }
         }
@@ -135,19 +135,19 @@ implements CraftingRecipe {
         return this.height;
     }
 
-    private static DefaultedList<Ingredient> getIngredients(String[] strings, Map<String, Ingredient> map, int i, int j) {
-        DefaultedList<Ingredient> lv = DefaultedList.ofSize(i * j, Ingredient.EMPTY);
-        HashSet set = Sets.newHashSet(map.keySet());
+    private static DefaultedList<Ingredient> getIngredients(String[] pattern, Map<String, Ingredient> key, int width, int height) {
+        DefaultedList<Ingredient> lv = DefaultedList.ofSize(width * height, Ingredient.EMPTY);
+        HashSet set = Sets.newHashSet(key.keySet());
         set.remove(" ");
-        for (int k = 0; k < strings.length; ++k) {
-            for (int l = 0; l < strings[k].length(); ++l) {
-                String string = strings[k].substring(l, l + 1);
-                Ingredient lv2 = map.get(string);
+        for (int k = 0; k < pattern.length; ++k) {
+            for (int l = 0; l < pattern[k].length(); ++l) {
+                String string = pattern[k].substring(l, l + 1);
+                Ingredient lv2 = key.get(string);
                 if (lv2 == null) {
                     throw new JsonSyntaxException("Pattern references symbol '" + string + "' but it's not defined in the key");
                 }
                 set.remove(string);
-                lv.set(l + i * k, lv2);
+                lv.set(l + width * k, lv2);
             }
         }
         if (!set.isEmpty()) {
@@ -157,13 +157,13 @@ implements CraftingRecipe {
     }
 
     @VisibleForTesting
-    static String[] combinePattern(String ... strings) {
+    static String[] combinePattern(String ... lines) {
         int i = Integer.MAX_VALUE;
         int j = 0;
         int k = 0;
         int l = 0;
-        for (int m = 0; m < strings.length; ++m) {
-            String string = strings[m];
+        for (int m = 0; m < lines.length; ++m) {
+            String string = lines[m];
             i = Math.min(i, ShapedRecipe.findNextIngredient(string));
             int n = ShapedRecipe.findNextIngredientReverse(string);
             j = Math.max(j, n);
@@ -176,32 +176,32 @@ implements CraftingRecipe {
             }
             l = 0;
         }
-        if (strings.length == l) {
+        if (lines.length == l) {
             return new String[0];
         }
-        String[] strings2 = new String[strings.length - l - k];
+        String[] strings2 = new String[lines.length - l - k];
         for (int o = 0; o < strings2.length; ++o) {
-            strings2[o] = strings[o + k].substring(i, j + 1);
+            strings2[o] = lines[o + k].substring(i, j + 1);
         }
         return strings2;
     }
 
-    private static int findNextIngredient(String string) {
+    private static int findNextIngredient(String pattern) {
         int i;
-        for (i = 0; i < string.length() && string.charAt(i) == ' '; ++i) {
+        for (i = 0; i < pattern.length() && pattern.charAt(i) == ' '; ++i) {
         }
         return i;
     }
 
-    private static int findNextIngredientReverse(String string) {
+    private static int findNextIngredientReverse(String pattern) {
         int i;
-        for (i = string.length() - 1; i >= 0 && string.charAt(i) == ' '; --i) {
+        for (i = pattern.length() - 1; i >= 0 && pattern.charAt(i) == ' '; --i) {
         }
         return i;
     }
 
-    private static String[] getPattern(JsonArray jsonArray) {
-        String[] strings = new String[jsonArray.size()];
+    private static String[] getPattern(JsonArray json) {
+        String[] strings = new String[json.size()];
         if (strings.length > 3) {
             throw new JsonSyntaxException("Invalid pattern: too many rows, 3 is maximum");
         }
@@ -209,7 +209,7 @@ implements CraftingRecipe {
             throw new JsonSyntaxException("Invalid pattern: empty pattern not allowed");
         }
         for (int i = 0; i < strings.length; ++i) {
-            String string = JsonHelper.asString(jsonArray.get(i), "pattern[" + i + "]");
+            String string = JsonHelper.asString(json.get(i), "pattern[" + i + "]");
             if (string.length() > 3) {
                 throw new JsonSyntaxException("Invalid pattern: too many columns, 3 is maximum");
             }
@@ -221,9 +221,9 @@ implements CraftingRecipe {
         return strings;
     }
 
-    private static Map<String, Ingredient> getComponents(JsonObject jsonObject) {
+    private static Map<String, Ingredient> getComponents(JsonObject json) {
         HashMap map = Maps.newHashMap();
-        for (Map.Entry entry : jsonObject.entrySet()) {
+        for (Map.Entry entry : json.entrySet()) {
             if (((String)entry.getKey()).length() != 1) {
                 throw new JsonSyntaxException("Invalid key entry: '" + (String)entry.getKey() + "' is an invalid symbol (must be 1 character only).");
             }
@@ -236,13 +236,13 @@ implements CraftingRecipe {
         return map;
     }
 
-    public static ItemStack getItemStack(JsonObject jsonObject) {
-        String string = JsonHelper.getString(jsonObject, "item");
+    public static ItemStack getItemStack(JsonObject json) {
+        String string = JsonHelper.getString(json, "item");
         Item lv = Registry.ITEM.getOrEmpty(new Identifier(string)).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + string + "'"));
-        if (jsonObject.has("data")) {
+        if (json.has("data")) {
             throw new JsonParseException("Disallowed data tag found");
         }
-        int i = JsonHelper.getInt(jsonObject, "count", 1);
+        int i = JsonHelper.getInt(json, "count", 1);
         return new ItemStack(lv, i);
     }
 
@@ -285,13 +285,13 @@ implements CraftingRecipe {
         }
 
         @Override
-        public /* synthetic */ Recipe read(Identifier arg, PacketByteBuf arg2) {
-            return this.read(arg, arg2);
+        public /* synthetic */ Recipe read(Identifier id, PacketByteBuf buf) {
+            return this.read(id, buf);
         }
 
         @Override
-        public /* synthetic */ Recipe read(Identifier arg, JsonObject jsonObject) {
-            return this.read(arg, jsonObject);
+        public /* synthetic */ Recipe read(Identifier id, JsonObject json) {
+            return this.read(id, json);
         }
     }
 }

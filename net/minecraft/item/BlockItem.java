@@ -44,25 +44,25 @@ extends Item {
     @Deprecated
     private final Block block;
 
-    public BlockItem(Block arg, Item.Settings arg2) {
-        super(arg2);
-        this.block = arg;
+    public BlockItem(Block block, Item.Settings settings) {
+        super(settings);
+        this.block = block;
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
-        ActionResult lv = this.place(new ItemPlacementContext(arg));
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        ActionResult lv = this.place(new ItemPlacementContext(context));
         if (!lv.isAccepted() && this.isFood()) {
-            return this.use(arg.getWorld(), arg.getPlayer(), arg.getHand()).getResult();
+            return this.use(context.getWorld(), context.getPlayer(), context.getHand()).getResult();
         }
         return lv;
     }
 
-    public ActionResult place(ItemPlacementContext arg) {
-        if (!arg.canPlace()) {
+    public ActionResult place(ItemPlacementContext context) {
+        if (!context.canPlace()) {
             return ActionResult.FAIL;
         }
-        ItemPlacementContext lv = this.getPlacementContext(arg);
+        ItemPlacementContext lv = this.getPlacementContext(context);
         if (lv == null) {
             return ActionResult.FAIL;
         }
@@ -95,28 +95,28 @@ extends Item {
         return ActionResult.success(lv4.isClient);
     }
 
-    protected SoundEvent getPlaceSound(BlockState arg) {
-        return arg.getSoundGroup().getPlaceSound();
+    protected SoundEvent getPlaceSound(BlockState state) {
+        return state.getSoundGroup().getPlaceSound();
     }
 
     @Nullable
-    public ItemPlacementContext getPlacementContext(ItemPlacementContext arg) {
-        return arg;
+    public ItemPlacementContext getPlacementContext(ItemPlacementContext context) {
+        return context;
     }
 
-    protected boolean postPlacement(BlockPos arg, World arg2, @Nullable PlayerEntity arg3, ItemStack arg4, BlockState arg5) {
-        return BlockItem.writeTagToBlockEntity(arg2, arg3, arg, arg4);
+    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
+        return BlockItem.writeTagToBlockEntity(world, player, pos, stack);
     }
 
     @Nullable
-    protected BlockState getPlacementState(ItemPlacementContext arg) {
-        BlockState lv = this.getBlock().getPlacementState(arg);
-        return lv != null && this.canPlace(arg, lv) ? lv : null;
+    protected BlockState getPlacementState(ItemPlacementContext context) {
+        BlockState lv = this.getBlock().getPlacementState(context);
+        return lv != null && this.canPlace(context, lv) ? lv : null;
     }
 
-    private BlockState placeFromTag(BlockPos arg, World arg2, ItemStack arg3, BlockState arg4) {
-        BlockState lv = arg4;
-        CompoundTag lv2 = arg3.getTag();
+    private BlockState placeFromTag(BlockPos pos, World world, ItemStack stack, BlockState state) {
+        BlockState lv = state;
+        CompoundTag lv2 = stack.getTag();
         if (lv2 != null) {
             CompoundTag lv3 = lv2.getCompound("BlockStateTag");
             StateManager<Block, BlockState> lv4 = lv.getBlock().getStateManager();
@@ -127,49 +127,49 @@ extends Item {
                 lv = BlockItem.with(lv, lv5, string2);
             }
         }
-        if (lv != arg4) {
-            arg2.setBlockState(arg, lv, 2);
+        if (lv != state) {
+            world.setBlockState(pos, lv, 2);
         }
         return lv;
     }
 
-    private static <T extends Comparable<T>> BlockState with(BlockState arg, Property<T> arg2, String string) {
-        return arg2.parse(string).map(comparable -> (BlockState)arg.with(arg2, comparable)).orElse(arg);
+    private static <T extends Comparable<T>> BlockState with(BlockState state, Property<T> property, String name) {
+        return property.parse(name).map(value -> (BlockState)state.with(property, value)).orElse(state);
     }
 
-    protected boolean canPlace(ItemPlacementContext arg, BlockState arg2) {
-        PlayerEntity lv = arg.getPlayer();
+    protected boolean canPlace(ItemPlacementContext context, BlockState state) {
+        PlayerEntity lv = context.getPlayer();
         ShapeContext lv2 = lv == null ? ShapeContext.absent() : ShapeContext.of(lv);
-        return (!this.checkStatePlacement() || arg2.canPlaceAt(arg.getWorld(), arg.getBlockPos())) && arg.getWorld().canPlace(arg2, arg.getBlockPos(), lv2);
+        return (!this.checkStatePlacement() || state.canPlaceAt(context.getWorld(), context.getBlockPos())) && context.getWorld().canPlace(state, context.getBlockPos(), lv2);
     }
 
     protected boolean checkStatePlacement() {
         return true;
     }
 
-    protected boolean place(ItemPlacementContext arg, BlockState arg2) {
-        return arg.getWorld().setBlockState(arg.getBlockPos(), arg2, 11);
+    protected boolean place(ItemPlacementContext context, BlockState state) {
+        return context.getWorld().setBlockState(context.getBlockPos(), state, 11);
     }
 
-    public static boolean writeTagToBlockEntity(World arg, @Nullable PlayerEntity arg2, BlockPos arg3, ItemStack arg4) {
+    public static boolean writeTagToBlockEntity(World world, @Nullable PlayerEntity player, BlockPos pos, ItemStack stack) {
         BlockEntity lv2;
-        MinecraftServer minecraftServer = arg.getServer();
+        MinecraftServer minecraftServer = world.getServer();
         if (minecraftServer == null) {
             return false;
         }
-        CompoundTag lv = arg4.getSubTag("BlockEntityTag");
-        if (lv != null && (lv2 = arg.getBlockEntity(arg3)) != null) {
-            if (!(arg.isClient || !lv2.copyItemDataRequiresOperator() || arg2 != null && arg2.isCreativeLevelTwoOp())) {
+        CompoundTag lv = stack.getSubTag("BlockEntityTag");
+        if (lv != null && (lv2 = world.getBlockEntity(pos)) != null) {
+            if (!(world.isClient || !lv2.copyItemDataRequiresOperator() || player != null && player.isCreativeLevelTwoOp())) {
                 return false;
             }
             CompoundTag lv3 = lv2.toTag(new CompoundTag());
             CompoundTag lv4 = lv3.copy();
             lv3.copyFrom(lv);
-            lv3.putInt("x", arg3.getX());
-            lv3.putInt("y", arg3.getY());
-            lv3.putInt("z", arg3.getZ());
+            lv3.putInt("x", pos.getX());
+            lv3.putInt("y", pos.getY());
+            lv3.putInt("z", pos.getZ());
             if (!lv3.equals(lv4)) {
-                lv2.fromTag(arg.getBlockState(arg3), lv3);
+                lv2.fromTag(world.getBlockState(pos), lv3);
                 lv2.markDirty();
                 return true;
             }
@@ -183,25 +183,25 @@ extends Item {
     }
 
     @Override
-    public void appendStacks(ItemGroup arg, DefaultedList<ItemStack> arg2) {
-        if (this.isIn(arg)) {
-            this.getBlock().addStacksForDisplay(arg, arg2);
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        if (this.isIn(group)) {
+            this.getBlock().addStacksForDisplay(group, stacks);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        super.appendTooltip(arg, arg2, list, arg3);
-        this.getBlock().appendTooltip(arg, arg2, list, arg3);
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        this.getBlock().appendTooltip(stack, world, tooltip, context);
     }
 
     public Block getBlock() {
         return this.block;
     }
 
-    public void appendBlocks(Map<Block, Item> map, Item arg) {
-        map.put(this.getBlock(), arg);
+    public void appendBlocks(Map<Block, Item> map, Item item) {
+        map.put(this.getBlock(), item);
     }
 }
 

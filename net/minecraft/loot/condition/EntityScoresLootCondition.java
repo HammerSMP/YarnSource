@@ -39,9 +39,9 @@ implements LootCondition {
     private final Map<String, UniformLootTableRange> scores;
     private final LootContext.EntityTarget target;
 
-    private EntityScoresLootCondition(Map<String, UniformLootTableRange> map, LootContext.EntityTarget arg) {
-        this.scores = ImmutableMap.copyOf(map);
-        this.target = arg;
+    private EntityScoresLootCondition(Map<String, UniformLootTableRange> scores, LootContext.EntityTarget target) {
+        this.scores = ImmutableMap.copyOf(scores);
+        this.target = target;
     }
 
     @Override
@@ -68,21 +68,21 @@ implements LootCondition {
         return true;
     }
 
-    protected boolean entityScoreIsInRange(Entity arg, Scoreboard arg2, String string, UniformLootTableRange arg3) {
-        ScoreboardObjective lv = arg2.getNullableObjective(string);
+    protected boolean entityScoreIsInRange(Entity entity, Scoreboard scoreboard, String objective, UniformLootTableRange scoreRange) {
+        ScoreboardObjective lv = scoreboard.getNullableObjective(objective);
         if (lv == null) {
             return false;
         }
-        String string2 = arg.getEntityName();
-        if (!arg2.playerHasObjective(string2, lv)) {
+        String string2 = entity.getEntityName();
+        if (!scoreboard.playerHasObjective(string2, lv)) {
             return false;
         }
-        return arg3.contains(arg2.getPlayerScore(string2, lv).getScore());
+        return scoreRange.contains(scoreboard.getPlayerScore(string2, lv).getScore());
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -108,8 +108,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

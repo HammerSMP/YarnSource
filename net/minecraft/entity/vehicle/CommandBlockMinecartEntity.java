@@ -39,8 +39,8 @@ extends AbstractMinecartEntity {
         super(arg, arg2);
     }
 
-    public CommandBlockMinecartEntity(World arg, double d, double e, double f) {
-        super(EntityType.COMMAND_BLOCK_MINECART, arg, d, e, f);
+    public CommandBlockMinecartEntity(World world, double x, double y, double z) {
+        super(EntityType.COMMAND_BLOCK_MINECART, world, x, y, z);
     }
 
     @Override
@@ -51,17 +51,17 @@ extends AbstractMinecartEntity {
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.commandExecutor.deserialize(arg);
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.commandExecutor.deserialize(tag);
         this.getDataTracker().set(COMMAND, this.getCommandExecutor().getCommand());
         this.getDataTracker().set(LAST_OUTPUT, this.getCommandExecutor().getLastOutput());
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.commandExecutor.serialize(arg);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.commandExecutor.serialize(tag);
     }
 
     @Override
@@ -79,27 +79,27 @@ extends AbstractMinecartEntity {
     }
 
     @Override
-    public void onActivatorRail(int i, int j, int k, boolean bl) {
-        if (bl && this.age - this.lastExecuted >= 4) {
+    public void onActivatorRail(int x, int y, int z, boolean powered) {
+        if (powered && this.age - this.lastExecuted >= 4) {
             this.getCommandExecutor().execute(this.world);
             this.lastExecuted = this.age;
         }
     }
 
     @Override
-    public ActionResult interact(PlayerEntity arg, Hand arg2) {
-        return this.commandExecutor.interact(arg);
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+        return this.commandExecutor.interact(player);
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        super.onTrackedDataSet(arg);
-        if (LAST_OUTPUT.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        super.onTrackedDataSet(data);
+        if (LAST_OUTPUT.equals(data)) {
             try {
                 this.commandExecutor.setLastOutput(this.getDataTracker().get(LAST_OUTPUT));
             }
             catch (Throwable throwable) {}
-        } else if (COMMAND.equals(arg)) {
+        } else if (COMMAND.equals(data)) {
             this.commandExecutor.setCommand(this.getDataTracker().get(COMMAND));
         }
     }

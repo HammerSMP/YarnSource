@@ -22,10 +22,10 @@ extends EntityNavigation {
     }
 
     @Override
-    protected PathNodeNavigator createPathNodeNavigator(int i) {
+    protected PathNodeNavigator createPathNodeNavigator(int range) {
         this.nodeMaker = new BirdPathNodeMaker();
         this.nodeMaker.setCanEnterOpenDoors(true);
-        return new PathNodeNavigator(this.nodeMaker, i);
+        return new PathNodeNavigator(this.nodeMaker, range);
     }
 
     @Override
@@ -39,8 +39,8 @@ extends EntityNavigation {
     }
 
     @Override
-    public Path findPathTo(Entity arg, int i) {
-        return this.findPathTo(arg.getBlockPos(), i);
+    public Path findPathTo(Entity entity, int distance) {
+        return this.findPathTo(entity.getBlockPos(), distance);
     }
 
     @Override
@@ -69,13 +69,13 @@ extends EntityNavigation {
     }
 
     @Override
-    protected boolean canPathDirectlyThrough(Vec3d arg, Vec3d arg2, int i, int j, int k) {
-        int l = MathHelper.floor(arg.x);
-        int m = MathHelper.floor(arg.y);
-        int n = MathHelper.floor(arg.z);
-        double d = arg2.x - arg.x;
-        double e = arg2.y - arg.y;
-        double f = arg2.z - arg.z;
+    protected boolean canPathDirectlyThrough(Vec3d origin, Vec3d target, int sizeX, int sizeY, int sizeZ) {
+        int l = MathHelper.floor(origin.x);
+        int m = MathHelper.floor(origin.y);
+        int n = MathHelper.floor(origin.z);
+        double d = target.x - origin.x;
+        double e = target.y - origin.y;
+        double f = target.z - origin.z;
         double g = d * d + e * e + f * f;
         if (g < 1.0E-8) {
             return false;
@@ -84,9 +84,9 @@ extends EntityNavigation {
         double o = 1.0 / Math.abs(d *= h);
         double p = 1.0 / Math.abs(e *= h);
         double q = 1.0 / Math.abs(f *= h);
-        double r = (double)l - arg.x;
-        double s = (double)m - arg.y;
-        double t = (double)n - arg.z;
+        double r = (double)l - origin.x;
+        double s = (double)m - origin.y;
+        double t = (double)n - origin.z;
         if (d >= 0.0) {
             r += 1.0;
         }
@@ -102,9 +102,9 @@ extends EntityNavigation {
         int u = d < 0.0 ? -1 : 1;
         int v = e < 0.0 ? -1 : 1;
         int w = f < 0.0 ? -1 : 1;
-        int x = MathHelper.floor(arg2.x);
-        int y = MathHelper.floor(arg2.y);
-        int z = MathHelper.floor(arg2.z);
+        int x = MathHelper.floor(target.x);
+        int y = MathHelper.floor(target.y);
+        int z = MathHelper.floor(target.z);
         int aa = x - l;
         int ab = y - m;
         int ac = z - n;
@@ -125,17 +125,17 @@ extends EntityNavigation {
         return true;
     }
 
-    public void setCanPathThroughDoors(boolean bl) {
-        this.nodeMaker.setCanOpenDoors(bl);
+    public void setCanPathThroughDoors(boolean canPathThroughDoors) {
+        this.nodeMaker.setCanOpenDoors(canPathThroughDoors);
     }
 
-    public void setCanEnterOpenDoors(boolean bl) {
-        this.nodeMaker.setCanEnterOpenDoors(bl);
+    public void setCanEnterOpenDoors(boolean canEnterOpenDoors) {
+        this.nodeMaker.setCanEnterOpenDoors(canEnterOpenDoors);
     }
 
     @Override
-    public boolean isValidPosition(BlockPos arg) {
-        return this.world.getBlockState(arg).hasSolidTopSurface(this.world, arg, this.entity);
+    public boolean isValidPosition(BlockPos pos) {
+        return this.world.getBlockState(pos).hasSolidTopSurface(this.world, pos, this.entity);
     }
 }
 

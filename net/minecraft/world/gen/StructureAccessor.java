@@ -25,41 +25,41 @@ public class StructureAccessor {
     private final WorldAccess world;
     private final GeneratorOptions options;
 
-    public StructureAccessor(WorldAccess arg, GeneratorOptions arg2) {
-        this.world = arg;
-        this.options = arg2;
+    public StructureAccessor(WorldAccess world, GeneratorOptions options) {
+        this.world = world;
+        this.options = options;
     }
 
-    public StructureAccessor method_29951(ChunkRegion arg) {
-        if (arg.getWorld() != this.world) {
-            throw new IllegalStateException("Using invalid feature manager (source level: " + arg.getWorld() + ", region: " + arg);
+    public StructureAccessor method_29951(ChunkRegion region) {
+        if (region.getWorld() != this.world) {
+            throw new IllegalStateException("Using invalid feature manager (source level: " + region.getWorld() + ", region: " + region);
         }
-        return new StructureAccessor(arg, this.options);
+        return new StructureAccessor(region, this.options);
     }
 
-    public Stream<? extends StructureStart<?>> getStructuresWithChildren(ChunkSectionPos arg3, StructureFeature<?> arg22) {
-        return this.world.getChunk(arg3.getSectionX(), arg3.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(arg22).stream().map(long_ -> ChunkSectionPos.from(new ChunkPos((long)long_), 0)).map(arg2 -> this.getStructureStart((ChunkSectionPos)arg2, arg22, this.world.getChunk(arg2.getSectionX(), arg2.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(arg -> arg != null && arg.hasChildren());
+    public Stream<? extends StructureStart<?>> getStructuresWithChildren(ChunkSectionPos pos2, StructureFeature<?> feature) {
+        return this.world.getChunk(pos2.getSectionX(), pos2.getSectionZ(), ChunkStatus.STRUCTURE_REFERENCES).getStructureReferences(feature).stream().map(pos -> ChunkSectionPos.from(new ChunkPos((long)pos), 0)).map(pos -> this.getStructureStart((ChunkSectionPos)pos, feature, this.world.getChunk(pos.getSectionX(), pos.getSectionZ(), ChunkStatus.STRUCTURE_STARTS))).filter(structureStart -> structureStart != null && structureStart.hasChildren());
     }
 
     @Nullable
-    public StructureStart<?> getStructureStart(ChunkSectionPos arg, StructureFeature<?> arg2, StructureHolder arg3) {
-        return arg3.getStructureStart(arg2);
+    public StructureStart<?> getStructureStart(ChunkSectionPos pos, StructureFeature<?> feature, StructureHolder holder) {
+        return holder.getStructureStart(feature);
     }
 
-    public void setStructureStart(ChunkSectionPos arg, StructureFeature<?> arg2, StructureStart<?> arg3, StructureHolder arg4) {
-        arg4.setStructureStart(arg2, arg3);
+    public void setStructureStart(ChunkSectionPos pos, StructureFeature<?> feature, StructureStart<?> structureStart, StructureHolder holder) {
+        holder.setStructureStart(feature, structureStart);
     }
 
-    public void addStructureReference(ChunkSectionPos arg, StructureFeature<?> arg2, long l, StructureHolder arg3) {
-        arg3.addStructureReference(arg2, l);
+    public void addStructureReference(ChunkSectionPos pos, StructureFeature<?> feature, long reference, StructureHolder holder) {
+        holder.addStructureReference(feature, reference);
     }
 
     public boolean shouldGenerateStructures() {
         return this.options.shouldGenerateStructures();
     }
 
-    public StructureStart<?> method_28388(BlockPos arg, boolean bl, StructureFeature<?> arg23) {
-        return (StructureStart)DataFixUtils.orElse(this.getStructuresWithChildren(ChunkSectionPos.from(arg), arg23).filter(arg2 -> arg2.getBoundingBox().contains(arg)).filter(arg22 -> !bl || arg22.getChildren().stream().anyMatch(arg2 -> arg2.getBoundingBox().contains(arg))).findFirst(), StructureStart.DEFAULT);
+    public StructureStart<?> method_28388(BlockPos arg, boolean bl, StructureFeature<?> arg2) {
+        return (StructureStart)DataFixUtils.orElse(this.getStructuresWithChildren(ChunkSectionPos.from(arg), arg2).filter(structureStart -> structureStart.getBoundingBox().contains(arg)).filter(structureStart -> !bl || structureStart.getChildren().stream().anyMatch(piece -> piece.getBoundingBox().contains(arg))).findFirst(), StructureStart.DEFAULT);
     }
 }
 

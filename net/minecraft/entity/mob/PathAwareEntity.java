@@ -21,17 +21,17 @@ extends MobEntity {
         super((EntityType<? extends MobEntity>)arg, arg2);
     }
 
-    public float getPathfindingFavor(BlockPos arg) {
-        return this.getPathfindingFavor(arg, this.world);
+    public float getPathfindingFavor(BlockPos pos) {
+        return this.getPathfindingFavor(pos, this.world);
     }
 
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
         return 0.0f;
     }
 
     @Override
-    public boolean canSpawn(WorldAccess arg, SpawnReason arg2) {
-        return this.getPathfindingFavor(this.getBlockPos(), arg) >= 0.0f;
+    public boolean canSpawn(WorldAccess world, SpawnReason spawnReason) {
+        return this.getPathfindingFavor(this.getBlockPos(), world) >= 0.0f;
     }
 
     public boolean isNavigating() {
@@ -73,7 +73,7 @@ extends MobEntity {
         return 1.0;
     }
 
-    protected void updateForLeashLength(float f) {
+    protected void updateForLeashLength(float leashLength) {
     }
 }
 

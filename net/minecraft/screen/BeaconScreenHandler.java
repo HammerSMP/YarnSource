@@ -30,8 +30,8 @@ extends ScreenHandler {
     private final Inventory payment = new SimpleInventory(1){
 
         @Override
-        public boolean isValid(int i, ItemStack arg) {
-            return arg.getItem().isIn(ItemTags.BEACON_PAYMENT_ITEMS);
+        public boolean isValid(int slot, ItemStack stack) {
+            return stack.getItem().isIn(ItemTags.BEACON_PAYMENT_ITEMS);
         }
 
         @Override
@@ -43,66 +43,66 @@ extends ScreenHandler {
     private final ScreenHandlerContext context;
     private final PropertyDelegate propertyDelegate;
 
-    public BeaconScreenHandler(int i, Inventory arg) {
-        this(i, arg, new ArrayPropertyDelegate(3), ScreenHandlerContext.EMPTY);
+    public BeaconScreenHandler(int syncId, Inventory inventory) {
+        this(syncId, inventory, new ArrayPropertyDelegate(3), ScreenHandlerContext.EMPTY);
     }
 
-    public BeaconScreenHandler(int i, Inventory arg, PropertyDelegate arg2, ScreenHandlerContext arg3) {
-        super(ScreenHandlerType.BEACON, i);
-        BeaconScreenHandler.checkDataCount(arg2, 3);
-        this.propertyDelegate = arg2;
-        this.context = arg3;
+    public BeaconScreenHandler(int syncId, Inventory inventory, PropertyDelegate propertyDelegate, ScreenHandlerContext context) {
+        super(ScreenHandlerType.BEACON, syncId);
+        BeaconScreenHandler.checkDataCount(propertyDelegate, 3);
+        this.propertyDelegate = propertyDelegate;
+        this.context = context;
         this.paymentSlot = new PaymentSlot(this.payment, 0, 136, 110);
         this.addSlot(this.paymentSlot);
-        this.addProperties(arg2);
+        this.addProperties(propertyDelegate);
         int j = 36;
         int k = 137;
         for (int l = 0; l < 3; ++l) {
             for (int m = 0; m < 9; ++m) {
-                this.addSlot(new Slot(arg, m + l * 9 + 9, 36 + m * 18, 137 + l * 18));
+                this.addSlot(new Slot(inventory, m + l * 9 + 9, 36 + m * 18, 137 + l * 18));
             }
         }
         for (int n = 0; n < 9; ++n) {
-            this.addSlot(new Slot(arg, n, 36 + n * 18, 195));
+            this.addSlot(new Slot(inventory, n, 36 + n * 18, 195));
         }
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
-        if (arg.world.isClient) {
+    public void close(PlayerEntity player) {
+        super.close(player);
+        if (player.world.isClient) {
             return;
         }
         ItemStack lv = this.paymentSlot.takeStack(this.paymentSlot.getMaxStackAmount());
         if (!lv.isEmpty()) {
-            arg.dropItem(lv, false);
+            player.dropItem(lv, false);
         }
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return BeaconScreenHandler.canUse(this.context, arg, Blocks.BEACON);
+    public boolean canUse(PlayerEntity player) {
+        return BeaconScreenHandler.canUse(this.context, player, Blocks.BEACON);
     }
 
     @Override
-    public void setProperty(int i, int j) {
-        super.setProperty(i, j);
+    public void setProperty(int id, int value) {
+        super.setProperty(id, value);
         this.sendContentUpdates();
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i == 0) {
+            if (index == 0) {
                 if (!this.insertItem(lv3, 1, 37, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (!this.paymentSlot.hasStack() && this.paymentSlot.canInsert(lv3) && lv3.getCount() == 1 ? !this.insertItem(lv3, 0, 1, false) : (i >= 1 && i < 28 ? !this.insertItem(lv3, 28, 37, false) : (i >= 28 && i < 37 ? !this.insertItem(lv3, 1, 28, false) : !this.insertItem(lv3, 1, 37, false)))) {
+            } else if (!this.paymentSlot.hasStack() && this.paymentSlot.canInsert(lv3) && lv3.getCount() == 1 ? !this.insertItem(lv3, 0, 1, false) : (index >= 1 && index < 28 ? !this.insertItem(lv3, 28, 37, false) : (index >= 28 && index < 37 ? !this.insertItem(lv3, 1, 28, false) : !this.insertItem(lv3, 1, 37, false)))) {
                 return ItemStack.EMPTY;
             }
             if (lv3.isEmpty()) {
@@ -113,7 +113,7 @@ extends ScreenHandler {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
         }
         return lv;
     }
@@ -135,10 +135,10 @@ extends ScreenHandler {
         return StatusEffect.byRawId(this.propertyDelegate.get(2));
     }
 
-    public void setEffects(int i, int j) {
+    public void setEffects(int primaryEffectId, int secondaryEffectId) {
         if (this.paymentSlot.hasStack()) {
-            this.propertyDelegate.set(1, i);
-            this.propertyDelegate.set(2, j);
+            this.propertyDelegate.set(1, primaryEffectId);
+            this.propertyDelegate.set(2, secondaryEffectId);
             this.paymentSlot.takeStack(1);
         }
     }
@@ -150,13 +150,13 @@ extends ScreenHandler {
 
     class PaymentSlot
     extends Slot {
-        public PaymentSlot(Inventory arg2, int i, int j, int k) {
-            super(arg2, i, j, k);
+        public PaymentSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
         }
 
         @Override
-        public boolean canInsert(ItemStack arg) {
-            return arg.getItem().isIn(ItemTags.BEACON_PAYMENT_ITEMS);
+        public boolean canInsert(ItemStack stack) {
+            return stack.getItem().isIn(ItemTags.BEACON_PAYMENT_ITEMS);
         }
 
         @Override

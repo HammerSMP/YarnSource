@@ -75,9 +75,9 @@ extends Entity {
     private static final TrackedData<Integer> CUSTOM_BLOCK_ID = DataTracker.registerData(AbstractMinecartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> CUSTOM_BLOCK_OFFSET = DataTracker.registerData(AbstractMinecartEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Boolean> CUSTOM_BLOCK_PRESENT = DataTracker.registerData(AbstractMinecartEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final ImmutableMap<EntityPose, ImmutableList<Integer>> field_24464 = ImmutableMap.of((Object)((Object)EntityPose.STANDING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.CROUCHING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.SWIMMING), (Object)ImmutableList.of((Object)0, (Object)1));
-    private boolean field_7660;
-    private static final Map<RailShape, Pair<Vec3i, Vec3i>> field_7664 = Util.make(Maps.newEnumMap(RailShape.class), enumMap -> {
+    private static final ImmutableMap<EntityPose, ImmutableList<Integer>> DISMOUNT_FREE_Y_SPACES_NEEDED = ImmutableMap.of((Object)((Object)EntityPose.STANDING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.CROUCHING), (Object)ImmutableList.of((Object)0, (Object)1, (Object)-1), (Object)((Object)EntityPose.SWIMMING), (Object)ImmutableList.of((Object)0, (Object)1));
+    private boolean yawFlipped;
+    private static final Map<RailShape, Pair<Vec3i, Vec3i>> ADJACENT_RAIL_POSITIONS_BY_SHAPE = Util.make(Maps.newEnumMap(RailShape.class), enumMap -> {
         Vec3i lv = Direction.WEST.getVector();
         Vec3i lv2 = Direction.EAST.getVector();
         Vec3i lv3 = Direction.NORTH.getVector();
@@ -115,35 +115,35 @@ extends Entity {
         this.inanimate = true;
     }
 
-    protected AbstractMinecartEntity(EntityType<?> arg, World arg2, double d, double e, double f) {
-        this(arg, arg2);
-        this.updatePosition(d, e, f);
+    protected AbstractMinecartEntity(EntityType<?> type, World world, double x, double y, double z) {
+        this(type, world);
+        this.updatePosition(x, y, z);
         this.setVelocity(Vec3d.ZERO);
-        this.prevX = d;
-        this.prevY = e;
-        this.prevZ = f;
+        this.prevX = x;
+        this.prevY = y;
+        this.prevZ = z;
     }
 
-    public static AbstractMinecartEntity create(World arg, double d, double e, double f, Type arg2) {
-        if (arg2 == Type.CHEST) {
-            return new ChestMinecartEntity(arg, d, e, f);
+    public static AbstractMinecartEntity create(World world, double x, double y, double z, Type type) {
+        if (type == Type.CHEST) {
+            return new ChestMinecartEntity(world, x, y, z);
         }
-        if (arg2 == Type.FURNACE) {
-            return new FurnaceMinecartEntity(arg, d, e, f);
+        if (type == Type.FURNACE) {
+            return new FurnaceMinecartEntity(world, x, y, z);
         }
-        if (arg2 == Type.TNT) {
-            return new TntMinecartEntity(arg, d, e, f);
+        if (type == Type.TNT) {
+            return new TntMinecartEntity(world, x, y, z);
         }
-        if (arg2 == Type.SPAWNER) {
-            return new SpawnerMinecartEntity(arg, d, e, f);
+        if (type == Type.SPAWNER) {
+            return new SpawnerMinecartEntity(world, x, y, z);
         }
-        if (arg2 == Type.HOPPER) {
-            return new HopperMinecartEntity(arg, d, e, f);
+        if (type == Type.HOPPER) {
+            return new HopperMinecartEntity(world, x, y, z);
         }
-        if (arg2 == Type.COMMAND_BLOCK) {
-            return new CommandBlockMinecartEntity(arg, d, e, f);
+        if (type == Type.COMMAND_BLOCK) {
+            return new CommandBlockMinecartEntity(world, x, y, z);
         }
-        return new MinecartEntity(arg, d, e, f);
+        return new MinecartEntity(world, x, y, z);
     }
 
     @Override
@@ -163,9 +163,9 @@ extends Entity {
 
     @Override
     @Nullable
-    public Box getHardCollisionBox(Entity arg) {
-        if (arg.isPushable()) {
-            return arg.getBoundingBox();
+    public Box getHardCollisionBox(Entity collidingEntity) {
+        if (collidingEntity.isPushable()) {
+            return collidingEntity.getBoundingBox();
         }
         return null;
     }
@@ -181,28 +181,28 @@ extends Entity {
     }
 
     @Override
-    public Vec3d updatePassengerForDismount(LivingEntity arg2) {
+    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
         Direction lv = this.getMovementDirection();
         if (lv.getAxis() == Direction.Axis.Y) {
-            return super.updatePassengerForDismount(arg2);
+            return super.updatePassengerForDismount(passenger);
         }
         int[][] is = Dismounting.getDismountOffsets(lv);
         BlockPos lv2 = this.getBlockPos();
         BlockPos.Mutable lv3 = new BlockPos.Mutable();
-        ImmutableList<EntityPose> immutableList = arg2.getPoses();
+        ImmutableList<EntityPose> immutableList = passenger.getPoses();
         for (EntityPose lv4 : immutableList) {
-            EntityDimensions lv5 = arg2.getDimensions(lv4);
+            EntityDimensions lv5 = passenger.getDimensions(lv4);
             float f = Math.min(lv5.width, 1.0f) / 2.0f;
-            UnmodifiableIterator unmodifiableIterator = ((ImmutableList)field_24464.get((Object)lv4)).iterator();
+            UnmodifiableIterator unmodifiableIterator = ((ImmutableList)DISMOUNT_FREE_Y_SPACES_NEEDED.get((Object)lv4)).iterator();
             while (unmodifiableIterator.hasNext()) {
                 int i = (Integer)unmodifiableIterator.next();
                 for (int[] js : is) {
                     Vec3d lv7;
                     Box lv6;
                     lv3.set(lv2.getX() + js[0], lv2.getY() + i, lv2.getZ() + js[1]);
-                    double d = this.world.method_30346(Dismounting.method_30341(this.world, lv3), () -> Dismounting.method_30341(this.world, (BlockPos)lv3.down()));
-                    if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, arg2, (lv6 = new Box(-f, 0.0, -f, f, lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
-                    arg2.setPose(lv4);
+                    double d = this.world.getDismountHeight(Dismounting.getCollisionShape(this.world, lv3), () -> Dismounting.getCollisionShape(this.world, (BlockPos)lv3.down()));
+                    if (!Dismounting.canDismountInBlock(d) || !Dismounting.canPlaceEntityAt(this.world, passenger, (lv6 = new Box(-f, 0.0, -f, f, lv5.height, f)).offset(lv7 = Vec3d.ofCenter(lv3, d)))) continue;
+                    passenger.setPose(lv4);
                     return lv7;
                 }
             }
@@ -210,34 +210,34 @@ extends Entity {
         double e = this.getBoundingBox().maxY;
         lv3.set((double)lv2.getX(), e, (double)lv2.getZ());
         for (EntityPose lv8 : immutableList) {
-            double g = arg2.getDimensions((EntityPose)lv8).height;
+            double g = passenger.getDimensions((EntityPose)lv8).height;
             int j = MathHelper.ceil(e - (double)lv3.getY() + g);
-            double h = Dismounting.method_30343(lv3, j, arg -> this.world.getBlockState((BlockPos)arg).getCollisionShape(this.world, (BlockPos)arg));
+            double h = Dismounting.getCeilingHeight(lv3, j, arg -> this.world.getBlockState((BlockPos)arg).getCollisionShape(this.world, (BlockPos)arg));
             if (!(e + g <= h)) continue;
-            arg2.setPose(lv8);
+            passenger.setPose(lv8);
             break;
         }
-        return super.updatePassengerForDismount(arg2);
+        return super.updatePassengerForDismount(passenger);
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         boolean bl;
         if (this.world.isClient || this.removed) {
             return true;
         }
-        if (this.isInvulnerableTo(arg)) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         this.setDamageWobbleSide(-this.getDamageWobbleSide());
         this.setDamageWobbleTicks(10);
         this.scheduleVelocityUpdate();
-        this.setDamageWobbleStrength(this.getDamageWobbleStrength() + f * 10.0f);
-        boolean bl2 = bl = arg.getAttacker() instanceof PlayerEntity && ((PlayerEntity)arg.getAttacker()).abilities.creativeMode;
+        this.setDamageWobbleStrength(this.getDamageWobbleStrength() + amount * 10.0f);
+        boolean bl2 = bl = source.getAttacker() instanceof PlayerEntity && ((PlayerEntity)source.getAttacker()).abilities.creativeMode;
         if (bl || this.getDamageWobbleStrength() > 40.0f) {
             this.removeAllPassengers();
             if (!bl || this.hasCustomName()) {
-                this.dropItems(arg);
+                this.dropItems(source);
             } else {
                 this.remove();
             }
@@ -254,7 +254,7 @@ extends Entity {
         return super.getVelocityMultiplier();
     }
 
-    public void dropItems(DamageSource arg) {
+    public void dropItems(DamageSource damageSource) {
         this.remove();
         if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             ItemStack lv = new ItemStack(Items.MINECART);
@@ -278,13 +278,13 @@ extends Entity {
         return !this.removed;
     }
 
-    private static Pair<Vec3i, Vec3i> method_22864(RailShape arg) {
-        return field_7664.get(arg);
+    private static Pair<Vec3i, Vec3i> getAdjacentRailPositionsByShape(RailShape shape) {
+        return ADJACENT_RAIL_POSITIONS_BY_SHAPE.get(shape);
     }
 
     @Override
     public Direction getMovementDirection() {
-        return this.field_7660 ? this.getHorizontalFacing().getOpposite().rotateYClockwise() : this.getHorizontalFacing().rotateYClockwise();
+        return this.yawFlipped ? this.getHorizontalFacing().getOpposite().rotateYClockwise() : this.getHorizontalFacing().rotateYClockwise();
     }
 
     @Override
@@ -342,13 +342,13 @@ extends Entity {
         double l = this.prevZ - this.getZ();
         if (h * h + l * l > 0.001) {
             this.yaw = (float)(MathHelper.atan2(l, h) * 180.0 / Math.PI);
-            if (this.field_7660) {
+            if (this.yawFlipped) {
                 this.yaw += 180.0f;
             }
         }
         if ((m = (double)MathHelper.wrapDegrees(this.yaw - this.prevYaw)) < -170.0 || m >= 170.0) {
             this.yaw += 180.0f;
-            this.field_7660 = !this.field_7660;
+            this.yawFlipped = !this.yawFlipped;
         }
         this.setRotation(this.yaw, this.pitch);
         if (this.getMinecartType() == Type.RIDEABLE && AbstractMinecartEntity.squaredHorizontalLength(this.getVelocity()) > 0.01) {
@@ -381,7 +381,7 @@ extends Entity {
         return 0.4;
     }
 
-    public void onActivatorRail(int i, int j, int k, boolean bl) {
+    public void onActivatorRail(int x, int y, int z, boolean powered) {
     }
 
     protected void moveOffRail() {
@@ -397,25 +397,25 @@ extends Entity {
         }
     }
 
-    protected void moveOnRail(BlockPos arg, BlockState arg2) {
+    protected void moveOnRail(BlockPos pos, BlockState state) {
         double x;
         Entity lv7;
         this.fallDistance = 0.0f;
         double d = this.getX();
         double e = this.getY();
         double f = this.getZ();
-        Vec3d lv = this.method_7508(d, e, f);
-        e = arg.getY();
+        Vec3d lv = this.snapPositionToRail(d, e, f);
+        e = pos.getY();
         boolean bl = false;
         boolean bl2 = false;
-        AbstractRailBlock lv2 = (AbstractRailBlock)arg2.getBlock();
+        AbstractRailBlock lv2 = (AbstractRailBlock)state.getBlock();
         if (lv2 == Blocks.POWERED_RAIL) {
-            bl = arg2.get(PoweredRailBlock.POWERED);
+            bl = state.get(PoweredRailBlock.POWERED);
             bl2 = !bl;
         }
         double g = 0.0078125;
         Vec3d lv3 = this.getVelocity();
-        RailShape lv4 = arg2.get(lv2.getShapeProperty());
+        RailShape lv4 = state.get(lv2.getShapeProperty());
         switch (lv4) {
             case ASCENDING_EAST: {
                 this.setVelocity(lv3.add(-0.0078125, 0.0, 0.0));
@@ -438,7 +438,7 @@ extends Entity {
             }
         }
         lv3 = this.getVelocity();
-        Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.method_22864(lv4);
+        Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.getAdjacentRailPositionsByShape(lv4);
         Vec3i lv5 = (Vec3i)pair.getFirst();
         Vec3i lv6 = (Vec3i)pair.getSecond();
         double h = lv6.getX() - lv5.getX();
@@ -470,16 +470,16 @@ extends Entity {
                 this.setVelocity(this.getVelocity().multiply(0.5, 0.0, 0.5));
             }
         }
-        double p = (double)arg.getX() + 0.5 + (double)lv5.getX() * 0.5;
-        double q = (double)arg.getZ() + 0.5 + (double)lv5.getZ() * 0.5;
-        double r = (double)arg.getX() + 0.5 + (double)lv6.getX() * 0.5;
-        double s = (double)arg.getZ() + 0.5 + (double)lv6.getZ() * 0.5;
+        double p = (double)pos.getX() + 0.5 + (double)lv5.getX() * 0.5;
+        double q = (double)pos.getZ() + 0.5 + (double)lv5.getZ() * 0.5;
+        double r = (double)pos.getX() + 0.5 + (double)lv6.getX() * 0.5;
+        double s = (double)pos.getZ() + 0.5 + (double)lv6.getZ() * 0.5;
         h = r - p;
         i = s - q;
         if (h == 0.0) {
-            double t = f - (double)arg.getZ();
+            double t = f - (double)pos.getZ();
         } else if (i == 0.0) {
-            double u = d - (double)arg.getX();
+            double u = d - (double)pos.getX();
         } else {
             double v = d - p;
             double w = f - q;
@@ -492,13 +492,13 @@ extends Entity {
         double z = this.getMaxOffRailSpeed();
         lv3 = this.getVelocity();
         this.move(MovementType.SELF, new Vec3d(MathHelper.clamp(y * lv3.x, -z, z), 0.0, MathHelper.clamp(y * lv3.z, -z, z)));
-        if (lv5.getY() != 0 && MathHelper.floor(this.getX()) - arg.getX() == lv5.getX() && MathHelper.floor(this.getZ()) - arg.getZ() == lv5.getZ()) {
+        if (lv5.getY() != 0 && MathHelper.floor(this.getX()) - pos.getX() == lv5.getX() && MathHelper.floor(this.getZ()) - pos.getZ() == lv5.getZ()) {
             this.updatePosition(this.getX(), this.getY() + (double)lv5.getY(), this.getZ());
-        } else if (lv6.getY() != 0 && MathHelper.floor(this.getX()) - arg.getX() == lv6.getX() && MathHelper.floor(this.getZ()) - arg.getZ() == lv6.getZ()) {
+        } else if (lv6.getY() != 0 && MathHelper.floor(this.getX()) - pos.getX() == lv6.getX() && MathHelper.floor(this.getZ()) - pos.getZ() == lv6.getZ()) {
             this.updatePosition(this.getX(), this.getY() + (double)lv6.getY(), this.getZ());
         }
         this.applySlowdown();
-        Vec3d lv9 = this.method_7508(this.getX(), this.getY(), this.getZ());
+        Vec3d lv9 = this.snapPositionToRail(this.getX(), this.getY(), this.getZ());
         if (lv9 != null && lv != null) {
             double aa = (lv.y - lv9.y) * 0.05;
             Vec3d lv10 = this.getVelocity();
@@ -510,10 +510,10 @@ extends Entity {
         }
         int ac = MathHelper.floor(this.getX());
         int ad = MathHelper.floor(this.getZ());
-        if (ac != arg.getX() || ad != arg.getZ()) {
+        if (ac != pos.getX() || ad != pos.getZ()) {
             Vec3d lv11 = this.getVelocity();
             double ae = Math.sqrt(AbstractMinecartEntity.squaredHorizontalLength(lv11));
-            this.setVelocity(ae * (double)(ac - arg.getX()), lv11.y, ae * (double)(ad - arg.getZ()));
+            this.setVelocity(ae * (double)(ac - pos.getX()), lv11.y, ae * (double)(ad - pos.getZ()));
         }
         if (bl) {
             Vec3d lv12 = this.getVelocity();
@@ -526,15 +526,15 @@ extends Entity {
                 double ah = lv13.x;
                 double ai = lv13.z;
                 if (lv4 == RailShape.EAST_WEST) {
-                    if (this.willHitBlockAt(arg.west())) {
+                    if (this.willHitBlockAt(pos.west())) {
                         ah = 0.02;
-                    } else if (this.willHitBlockAt(arg.east())) {
+                    } else if (this.willHitBlockAt(pos.east())) {
                         ah = -0.02;
                     }
                 } else if (lv4 == RailShape.NORTH_SOUTH) {
-                    if (this.willHitBlockAt(arg.north())) {
+                    if (this.willHitBlockAt(pos.north())) {
                         ai = 0.02;
-                    } else if (this.willHitBlockAt(arg.south())) {
+                    } else if (this.willHitBlockAt(pos.south())) {
                         ai = -0.02;
                     }
                 } else {
@@ -545,8 +545,8 @@ extends Entity {
         }
     }
 
-    private boolean willHitBlockAt(BlockPos arg) {
-        return this.world.getBlockState(arg).isSolidBlock(this.world, arg);
+    private boolean willHitBlockAt(BlockPos pos) {
+        return this.world.getBlockState(pos).isSolidBlock(this.world, pos);
     }
 
     protected void applySlowdown() {
@@ -556,49 +556,49 @@ extends Entity {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public Vec3d method_7505(double d, double e, double f, double g) {
+    public Vec3d snapPositionToRailWithOffset(double x, double y, double z, double offset) {
         BlockState lv;
         int k;
         int j;
-        int i = MathHelper.floor(d);
-        if (this.world.getBlockState(new BlockPos(i, (j = MathHelper.floor(e)) - 1, k = MathHelper.floor(f))).isIn(BlockTags.RAILS)) {
+        int i = MathHelper.floor(x);
+        if (this.world.getBlockState(new BlockPos(i, (j = MathHelper.floor(y)) - 1, k = MathHelper.floor(z))).isIn(BlockTags.RAILS)) {
             --j;
         }
         if (AbstractRailBlock.isRail(lv = this.world.getBlockState(new BlockPos(i, j, k)))) {
             RailShape lv2 = lv.get(((AbstractRailBlock)lv.getBlock()).getShapeProperty());
-            e = j;
+            y = j;
             if (lv2.isAscending()) {
-                e = j + 1;
+                y = j + 1;
             }
-            Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.method_22864(lv2);
+            Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.getAdjacentRailPositionsByShape(lv2);
             Vec3i lv3 = (Vec3i)pair.getFirst();
             Vec3i lv4 = (Vec3i)pair.getSecond();
             double h = lv4.getX() - lv3.getX();
             double l = lv4.getZ() - lv3.getZ();
             double m = Math.sqrt(h * h + l * l);
-            if (lv3.getY() != 0 && MathHelper.floor(d += (h /= m) * g) - i == lv3.getX() && MathHelper.floor(f += (l /= m) * g) - k == lv3.getZ()) {
-                e += (double)lv3.getY();
-            } else if (lv4.getY() != 0 && MathHelper.floor(d) - i == lv4.getX() && MathHelper.floor(f) - k == lv4.getZ()) {
-                e += (double)lv4.getY();
+            if (lv3.getY() != 0 && MathHelper.floor(x += (h /= m) * offset) - i == lv3.getX() && MathHelper.floor(z += (l /= m) * offset) - k == lv3.getZ()) {
+                y += (double)lv3.getY();
+            } else if (lv4.getY() != 0 && MathHelper.floor(x) - i == lv4.getX() && MathHelper.floor(z) - k == lv4.getZ()) {
+                y += (double)lv4.getY();
             }
-            return this.method_7508(d, e, f);
+            return this.snapPositionToRail(x, y, z);
         }
         return null;
     }
 
     @Nullable
-    public Vec3d method_7508(double d, double e, double f) {
+    public Vec3d snapPositionToRail(double x, double y, double z) {
         BlockState lv;
         int k;
         int j;
-        int i = MathHelper.floor(d);
-        if (this.world.getBlockState(new BlockPos(i, (j = MathHelper.floor(e)) - 1, k = MathHelper.floor(f))).isIn(BlockTags.RAILS)) {
+        int i = MathHelper.floor(x);
+        if (this.world.getBlockState(new BlockPos(i, (j = MathHelper.floor(y)) - 1, k = MathHelper.floor(z))).isIn(BlockTags.RAILS)) {
             --j;
         }
         if (AbstractRailBlock.isRail(lv = this.world.getBlockState(new BlockPos(i, j, k)))) {
             double w;
             RailShape lv2 = lv.get(((AbstractRailBlock)lv.getBlock()).getShapeProperty());
-            Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.method_22864(lv2);
+            Pair<Vec3i, Vec3i> pair = AbstractMinecartEntity.getAdjacentRailPositionsByShape(lv2);
             Vec3i lv3 = (Vec3i)pair.getFirst();
             Vec3i lv4 = (Vec3i)pair.getSecond();
             double g = (double)i + 0.5 + (double)lv3.getX() * 0.5;
@@ -611,23 +611,23 @@ extends Entity {
             double q = (n - h) * 2.0;
             double r = o - l;
             if (p == 0.0) {
-                double s = f - (double)k;
+                double s = z - (double)k;
             } else if (r == 0.0) {
-                double t = d - (double)i;
+                double t = x - (double)i;
             } else {
-                double u = d - g;
-                double v = f - l;
+                double u = x - g;
+                double v = z - l;
                 w = (u * p + v * r) * 2.0;
             }
-            d = g + p * w;
-            e = h + q * w;
-            f = l + r * w;
+            x = g + p * w;
+            y = h + q * w;
+            z = l + r * w;
             if (q < 0.0) {
-                e += 1.0;
+                y += 1.0;
             } else if (q > 0.0) {
-                e += 0.5;
+                y += 0.5;
             }
-            return new Vec3d(d, e, f);
+            return new Vec3d(x, y, z);
         }
         return null;
     }
@@ -643,36 +643,36 @@ extends Entity {
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        if (arg.getBoolean("CustomDisplayTile")) {
-            this.setCustomBlock(NbtHelper.toBlockState(arg.getCompound("DisplayState")));
-            this.setCustomBlockOffset(arg.getInt("DisplayOffset"));
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        if (tag.getBoolean("CustomDisplayTile")) {
+            this.setCustomBlock(NbtHelper.toBlockState(tag.getCompound("DisplayState")));
+            this.setCustomBlockOffset(tag.getInt("DisplayOffset"));
         }
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
+    protected void writeCustomDataToTag(CompoundTag tag) {
         if (this.hasCustomBlock()) {
-            arg.putBoolean("CustomDisplayTile", true);
-            arg.put("DisplayState", NbtHelper.fromBlockState(this.getContainedBlock()));
-            arg.putInt("DisplayOffset", this.getBlockOffset());
+            tag.putBoolean("CustomDisplayTile", true);
+            tag.put("DisplayState", NbtHelper.fromBlockState(this.getContainedBlock()));
+            tag.putInt("DisplayOffset", this.getBlockOffset());
         }
     }
 
     @Override
-    public void pushAwayFrom(Entity arg) {
+    public void pushAwayFrom(Entity entity) {
         double e;
         if (this.world.isClient) {
             return;
         }
-        if (arg.noClip || this.noClip) {
+        if (entity.noClip || this.noClip) {
             return;
         }
-        if (this.hasPassenger(arg)) {
+        if (this.hasPassenger(entity)) {
             return;
         }
-        double d = arg.getX() - this.getX();
-        double f = d * d + (e = arg.getZ() - this.getZ()) * e;
+        double d = entity.getX() - this.getX();
+        double f = d * d + (e = entity.getZ() - this.getZ()) * e;
         if (f >= (double)1.0E-4f) {
             f = MathHelper.sqrt(f);
             d /= f;
@@ -689,58 +689,58 @@ extends Entity {
             e *= (double)(1.0f - this.pushSpeedReduction);
             d *= 0.5;
             e *= 0.5;
-            if (arg instanceof AbstractMinecartEntity) {
+            if (entity instanceof AbstractMinecartEntity) {
                 Vec3d lv2;
                 double i;
-                double h = arg.getX() - this.getX();
-                Vec3d lv = new Vec3d(h, 0.0, i = arg.getZ() - this.getZ()).normalize();
+                double h = entity.getX() - this.getX();
+                Vec3d lv = new Vec3d(h, 0.0, i = entity.getZ() - this.getZ()).normalize();
                 double j = Math.abs(lv.dotProduct(lv2 = new Vec3d(MathHelper.cos(this.yaw * ((float)Math.PI / 180)), 0.0, MathHelper.sin(this.yaw * ((float)Math.PI / 180))).normalize()));
                 if (j < (double)0.8f) {
                     return;
                 }
                 Vec3d lv3 = this.getVelocity();
-                Vec3d lv4 = arg.getVelocity();
-                if (((AbstractMinecartEntity)arg).getMinecartType() == Type.FURNACE && this.getMinecartType() != Type.FURNACE) {
+                Vec3d lv4 = entity.getVelocity();
+                if (((AbstractMinecartEntity)entity).getMinecartType() == Type.FURNACE && this.getMinecartType() != Type.FURNACE) {
                     this.setVelocity(lv3.multiply(0.2, 1.0, 0.2));
                     this.addVelocity(lv4.x - d, 0.0, lv4.z - e);
-                    arg.setVelocity(lv4.multiply(0.95, 1.0, 0.95));
-                } else if (((AbstractMinecartEntity)arg).getMinecartType() != Type.FURNACE && this.getMinecartType() == Type.FURNACE) {
-                    arg.setVelocity(lv4.multiply(0.2, 1.0, 0.2));
-                    arg.addVelocity(lv3.x + d, 0.0, lv3.z + e);
+                    entity.setVelocity(lv4.multiply(0.95, 1.0, 0.95));
+                } else if (((AbstractMinecartEntity)entity).getMinecartType() != Type.FURNACE && this.getMinecartType() == Type.FURNACE) {
+                    entity.setVelocity(lv4.multiply(0.2, 1.0, 0.2));
+                    entity.addVelocity(lv3.x + d, 0.0, lv3.z + e);
                     this.setVelocity(lv3.multiply(0.95, 1.0, 0.95));
                 } else {
                     double k = (lv4.x + lv3.x) / 2.0;
                     double l = (lv4.z + lv3.z) / 2.0;
                     this.setVelocity(lv3.multiply(0.2, 1.0, 0.2));
                     this.addVelocity(k - d, 0.0, l - e);
-                    arg.setVelocity(lv4.multiply(0.2, 1.0, 0.2));
-                    arg.addVelocity(k + d, 0.0, l + e);
+                    entity.setVelocity(lv4.multiply(0.2, 1.0, 0.2));
+                    entity.addVelocity(k + d, 0.0, l + e);
                 }
             } else {
                 this.addVelocity(-d, 0.0, -e);
-                arg.addVelocity(d / 4.0, 0.0, e / 4.0);
+                entity.addVelocity(d / 4.0, 0.0, e / 4.0);
             }
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void updateTrackedPositionAndAngles(double d, double e, double f, float g, float h, int i, boolean bl) {
-        this.clientX = d;
-        this.clientY = e;
-        this.clientZ = f;
-        this.clientYaw = g;
-        this.clientPitch = h;
-        this.clientInterpolationSteps = i + 2;
+    public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
+        this.clientX = x;
+        this.clientY = y;
+        this.clientZ = z;
+        this.clientYaw = yaw;
+        this.clientPitch = pitch;
+        this.clientInterpolationSteps = interpolationSteps + 2;
         this.setVelocity(this.clientXVelocity, this.clientYVelocity, this.clientZVelocity);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void setVelocityClient(double d, double e, double f) {
-        this.clientXVelocity = d;
-        this.clientYVelocity = e;
-        this.clientZVelocity = f;
+    public void setVelocityClient(double x, double y, double z) {
+        this.clientXVelocity = x;
+        this.clientYVelocity = y;
+        this.clientZVelocity = z;
         this.setVelocity(this.clientXVelocity, this.clientYVelocity, this.clientZVelocity);
     }
 
@@ -752,16 +752,16 @@ extends Entity {
         return this.dataTracker.get(DAMAGE_WOBBLE_STRENGTH).floatValue();
     }
 
-    public void setDamageWobbleTicks(int i) {
-        this.dataTracker.set(DAMAGE_WOBBLE_TICKS, i);
+    public void setDamageWobbleTicks(int wobbleTicks) {
+        this.dataTracker.set(DAMAGE_WOBBLE_TICKS, wobbleTicks);
     }
 
     public int getDamageWobbleTicks() {
         return this.dataTracker.get(DAMAGE_WOBBLE_TICKS);
     }
 
-    public void setDamageWobbleSide(int i) {
-        this.dataTracker.set(DAMAGE_WOBBLE_SIDE, i);
+    public void setDamageWobbleSide(int wobbleSide) {
+        this.dataTracker.set(DAMAGE_WOBBLE_SIDE, wobbleSide);
     }
 
     public int getDamageWobbleSide() {
@@ -792,13 +792,13 @@ extends Entity {
         return 6;
     }
 
-    public void setCustomBlock(BlockState arg) {
-        this.getDataTracker().set(CUSTOM_BLOCK_ID, Block.getRawIdFromState(arg));
+    public void setCustomBlock(BlockState state) {
+        this.getDataTracker().set(CUSTOM_BLOCK_ID, Block.getRawIdFromState(state));
         this.setCustomBlockPresent(true);
     }
 
-    public void setCustomBlockOffset(int i) {
-        this.getDataTracker().set(CUSTOM_BLOCK_OFFSET, i);
+    public void setCustomBlockOffset(int offset) {
+        this.getDataTracker().set(CUSTOM_BLOCK_OFFSET, offset);
         this.setCustomBlockPresent(true);
     }
 
@@ -806,8 +806,8 @@ extends Entity {
         return this.getDataTracker().get(CUSTOM_BLOCK_PRESENT);
     }
 
-    public void setCustomBlockPresent(boolean bl) {
-        this.getDataTracker().set(CUSTOM_BLOCK_PRESENT, bl);
+    public void setCustomBlockPresent(boolean present) {
+        this.getDataTracker().set(CUSTOM_BLOCK_PRESENT, present);
     }
 
     @Override

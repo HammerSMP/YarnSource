@@ -13,8 +13,8 @@ public enum DirectBiomeAccessType implements BiomeAccessType
 
 
     @Override
-    public Biome getBiome(long l, int i, int j, int k, BiomeAccess.Storage arg) {
-        return arg.getBiomeForNoiseGen(i >> 2, j >> 2, k >> 2);
+    public Biome getBiome(long seed, int x, int y, int z, BiomeAccess.Storage storage) {
+        return storage.getBiomeForNoiseGen(x >> 2, y >> 2, z >> 2);
     }
 }
 

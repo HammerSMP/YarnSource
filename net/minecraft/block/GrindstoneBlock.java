@@ -106,13 +106,13 @@ extends WallMountedBlock {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
-    private VoxelShape getShape(BlockState arg) {
-        Direction lv = arg.get(FACING);
-        switch ((WallMountLocation)arg.get(FACE)) {
+    private VoxelShape getShape(BlockState state) {
+        Direction lv = state.get(FACING);
+        switch ((WallMountLocation)state.get(FACE)) {
             case FLOOR: {
                 if (lv == Direction.NORTH || lv == Direction.SOUTH) {
                     return Z_FLOOR_SHAPE;
@@ -142,52 +142,52 @@ extends WallMountedBlock {
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.getShape(arg);
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.getShape(state);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.getShape(arg);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.getShape(state);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         return true;
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
-        arg4.incrementStat(Stats.INTERACT_WITH_GRINDSTONE);
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        player.incrementStat(Stats.INTERACT_WITH_GRINDSTONE);
         return ActionResult.CONSUME;
     }
 
     @Override
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg32) {
-        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new GrindstoneScreenHandler(i, arg3, ScreenHandlerContext.create(arg2, arg32)), TITLE);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new GrindstoneScreenHandler(i, arg3, ScreenHandlerContext.create(world, pos)), TITLE);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, FACE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, FACE);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

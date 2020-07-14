@@ -22,10 +22,10 @@ public class ExplosionSmokeParticle
 extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    protected ExplosionSmokeParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f);
+    protected ExplosionSmokeParticle(ClientWorld world, double x, double y, double z, double g, double h, double i, SpriteProvider spriteProvider) {
+        super(world, x, y, z);
         float j;
-        this.spriteProvider = arg2;
+        this.spriteProvider = spriteProvider;
         this.velocityX = g + (Math.random() * 2.0 - 1.0) * (double)0.05f;
         this.velocityY = h + (Math.random() * 2.0 - 1.0) * (double)0.05f;
         this.velocityZ = i + (Math.random() * 2.0 - 1.0) * (double)0.05f;
@@ -34,7 +34,7 @@ extends SpriteBillboardParticle {
         this.colorBlue = j;
         this.scale = 0.1f * (this.random.nextFloat() * this.random.nextFloat() * 6.0f + 1.0f);
         this.maxAge = (int)(16.0 / ((double)this.random.nextFloat() * 0.8 + 0.2)) + 2;
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -68,8 +68,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

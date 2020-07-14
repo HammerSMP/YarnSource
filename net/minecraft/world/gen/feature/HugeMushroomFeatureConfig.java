@@ -23,10 +23,10 @@ implements FeatureConfig {
     public final BlockStateProvider stemProvider;
     public final int capSize;
 
-    public HugeMushroomFeatureConfig(BlockStateProvider arg, BlockStateProvider arg2, int i) {
-        this.capProvider = arg;
-        this.stemProvider = arg2;
-        this.capSize = i;
+    public HugeMushroomFeatureConfig(BlockStateProvider capProvider, BlockStateProvider stemProvider, int capSize) {
+        this.capProvider = capProvider;
+        this.stemProvider = stemProvider;
+        this.capSize = capSize;
     }
 }
 

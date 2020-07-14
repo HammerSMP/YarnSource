@@ -124,13 +124,13 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
     }
 
     @Override
-    public void initSeed(long l) {
-        if (this.seed != l || this.field_15644 == null || this.field_15642 == null) {
-            ChunkRandom lv = new ChunkRandom(l);
+    public void initSeed(long seed) {
+        if (this.seed != seed || this.field_15644 == null || this.field_15642 == null) {
+            ChunkRandom lv = new ChunkRandom(seed);
             this.field_15644 = new OctaveSimplexNoiseSampler(lv, IntStream.rangeClosed(-3, 0));
             this.field_15642 = new OctaveSimplexNoiseSampler(lv, (List<Integer>)ImmutableList.of((Object)0));
         }
-        this.seed = l;
+        this.seed = seed;
     }
 }
 

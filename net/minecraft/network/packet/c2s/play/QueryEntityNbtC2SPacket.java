@@ -23,21 +23,21 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public QueryEntityNbtC2SPacket(int i, int j) {
-        this.transactionId = i;
-        this.entityId = j;
+    public QueryEntityNbtC2SPacket(int transactionId, int entityId) {
+        this.transactionId = transactionId;
+        this.entityId = entityId;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.transactionId = arg.readVarInt();
-        this.entityId = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.transactionId = buf.readVarInt();
+        this.entityId = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.transactionId);
-        arg.writeVarInt(this.entityId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.transactionId);
+        buf.writeVarInt(this.entityId);
     }
 
     @Override

@@ -37,22 +37,22 @@ extends ProjectileEntity {
         super((EntityType<? extends ProjectileEntity>)arg, arg2);
     }
 
-    public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> arg, double d, double e, double f, double g, double h, double i, World arg2) {
-        this(arg, arg2);
-        this.refreshPositionAndAngles(d, e, f, this.yaw, this.pitch);
+    public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, double x, double y, double z, double directionX, double directionY, double directionZ, World world) {
+        this(type, world);
+        this.refreshPositionAndAngles(x, y, z, this.yaw, this.pitch);
         this.refreshPosition();
-        double j = MathHelper.sqrt(g * g + h * h + i * i);
+        double j = MathHelper.sqrt(directionX * directionX + directionY * directionY + directionZ * directionZ);
         if (j != 0.0) {
-            this.posX = g / j * 0.1;
-            this.posY = h / j * 0.1;
-            this.posZ = i / j * 0.1;
+            this.posX = directionX / j * 0.1;
+            this.posY = directionY / j * 0.1;
+            this.posZ = directionZ / j * 0.1;
         }
     }
 
-    public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> arg, LivingEntity arg2, double d, double e, double f, World arg3) {
-        this(arg, arg2.getX(), arg2.getY(), arg2.getZ(), d, e, f, arg3);
-        this.setOwner(arg2);
-        this.setRotation(arg2.yaw, arg2.pitch);
+    public ExplosiveProjectileEntity(EntityType<? extends ExplosiveProjectileEntity> type, LivingEntity owner, double directionX, double directionY, double directionZ, World world) {
+        this(type, owner.getX(), owner.getY(), owner.getZ(), directionX, directionY, directionZ, world);
+        this.setOwner(owner);
+        this.setRotation(owner.yaw, owner.pitch);
     }
 
     @Override
@@ -61,12 +61,12 @@ extends ProjectileEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
+    public boolean shouldRender(double distance) {
         double e = this.getBoundingBox().getAverageSideLength() * 4.0;
         if (Double.isNaN(e)) {
             e = 4.0;
         }
-        return d < (e *= 64.0) * e;
+        return distance < (e *= 64.0) * e;
     }
 
     @Override
@@ -120,16 +120,16 @@ extends ProjectileEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.put("power", this.toListTag(this.posX, this.posY, this.posZ));
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.put("power", this.toListTag(this.posX, this.posY, this.posZ));
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
+    public void readCustomDataFromTag(CompoundTag tag) {
         ListTag lv;
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("power", 9) && (lv = arg.getList("power", 6)).size() == 3) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("power", 9) && (lv = tag.getList("power", 6)).size() == 3) {
             this.posX = lv.getDouble(0);
             this.posY = lv.getDouble(1);
             this.posZ = lv.getDouble(2);
@@ -147,12 +147,12 @@ extends ProjectileEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         this.scheduleVelocityUpdate();
-        Entity lv = arg.getAttacker();
+        Entity lv = source.getAttacker();
         if (lv != null) {
             Vec3d lv2 = lv.getRotationVector();
             this.setVelocity(lv2);

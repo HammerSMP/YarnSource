@@ -32,12 +32,12 @@ extends Sprite {
     private static final Lazy<NativeImage> IMAGE;
     private static final Sprite.Info INFO;
 
-    private MissingSprite(SpriteAtlasTexture arg, int i, int j, int k, int l, int m) {
-        super(arg, INFO, i, j, k, l, m, IMAGE.get());
+    private MissingSprite(SpriteAtlasTexture arg, int maxLevel, int atlasWidth, int atlasHeight, int x, int y) {
+        super(arg, INFO, maxLevel, atlasWidth, atlasHeight, x, y, IMAGE.get());
     }
 
-    public static MissingSprite getMissingSprite(SpriteAtlasTexture arg, int i, int j, int k, int l, int m) {
-        return new MissingSprite(arg, i, j, k, l, m);
+    public static MissingSprite getMissingSprite(SpriteAtlasTexture arg, int maxLevel, int atlasWidth, int atlasHeight, int x, int y) {
+        return new MissingSprite(arg, maxLevel, atlasWidth, atlasHeight, x, y);
     }
 
     public static Identifier getMissingSpriteId() {

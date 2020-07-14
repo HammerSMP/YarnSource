@@ -40,28 +40,28 @@ implements Packet<ClientPlayPacketListener> {
     public CustomPayloadS2CPacket() {
     }
 
-    public CustomPayloadS2CPacket(Identifier arg, PacketByteBuf arg2) {
-        this.channel = arg;
-        this.data = arg2;
-        if (arg2.writerIndex() > 0x100000) {
+    public CustomPayloadS2CPacket(Identifier channel, PacketByteBuf data) {
+        this.channel = channel;
+        this.data = data;
+        if (data.writerIndex() > 0x100000) {
             throw new IllegalArgumentException("Payload may not be larger than 1048576 bytes");
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.channel = arg.readIdentifier();
-        int i = arg.readableBytes();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.channel = buf.readIdentifier();
+        int i = buf.readableBytes();
         if (i < 0 || i > 0x100000) {
             throw new IOException("Payload may not be larger than 1048576 bytes");
         }
-        this.data = new PacketByteBuf(arg.readBytes(i));
+        this.data = new PacketByteBuf(buf.readBytes(i));
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeIdentifier(this.channel);
-        arg.writeBytes(this.data.copy());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeIdentifier(this.channel);
+        buf.writeBytes(this.data.copy());
     }
 
     @Override

@@ -35,22 +35,22 @@ public class SpectateCommand {
     private static final SimpleCommandExceptionType SPECTATE_SELF_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.spectate.self"));
     private static final DynamicCommandExceptionType NOT_SPECTATOR_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("commands.spectate.not_spectator", object));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("spectate").requires(arg -> arg.hasPermissionLevel(2))).executes(commandContext -> SpectateCommand.execute((ServerCommandSource)commandContext.getSource(), null, ((ServerCommandSource)commandContext.getSource()).getPlayer()))).then(((RequiredArgumentBuilder)CommandManager.argument("target", EntityArgumentType.entity()).executes(commandContext -> SpectateCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "target"), ((ServerCommandSource)commandContext.getSource()).getPlayer()))).then(CommandManager.argument("player", EntityArgumentType.player()).executes(commandContext -> SpectateCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "target"), EntityArgumentType.getPlayer((CommandContext<ServerCommandSource>)commandContext, "player"))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("spectate").requires(arg -> arg.hasPermissionLevel(2))).executes(commandContext -> SpectateCommand.execute((ServerCommandSource)commandContext.getSource(), null, ((ServerCommandSource)commandContext.getSource()).getPlayer()))).then(((RequiredArgumentBuilder)CommandManager.argument("target", EntityArgumentType.entity()).executes(commandContext -> SpectateCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "target"), ((ServerCommandSource)commandContext.getSource()).getPlayer()))).then(CommandManager.argument("player", EntityArgumentType.player()).executes(commandContext -> SpectateCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getEntity((CommandContext<ServerCommandSource>)commandContext, "target"), EntityArgumentType.getPlayer((CommandContext<ServerCommandSource>)commandContext, "player"))))));
     }
 
-    private static int execute(ServerCommandSource arg, @Nullable Entity arg2, ServerPlayerEntity arg3) throws CommandSyntaxException {
-        if (arg3 == arg2) {
+    private static int execute(ServerCommandSource source, @Nullable Entity entity, ServerPlayerEntity player) throws CommandSyntaxException {
+        if (player == entity) {
             throw SPECTATE_SELF_EXCEPTION.create();
         }
-        if (arg3.interactionManager.getGameMode() != GameMode.SPECTATOR) {
-            throw NOT_SPECTATOR_EXCEPTION.create((Object)arg3.getDisplayName());
+        if (player.interactionManager.getGameMode() != GameMode.SPECTATOR) {
+            throw NOT_SPECTATOR_EXCEPTION.create((Object)player.getDisplayName());
         }
-        arg3.setCameraEntity(arg2);
-        if (arg2 != null) {
-            arg.sendFeedback(new TranslatableText("commands.spectate.success.started", arg2.getDisplayName()), false);
+        player.setCameraEntity(entity);
+        if (entity != null) {
+            source.sendFeedback(new TranslatableText("commands.spectate.success.started", entity.getDisplayName()), false);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.spectate.success.stopped"), false);
+            source.sendFeedback(new TranslatableText("commands.spectate.success.stopped"), false);
         }
         return 1;
     }

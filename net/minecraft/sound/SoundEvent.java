@@ -17,8 +17,8 @@ public class SoundEvent {
     public static final Codec<SoundEvent> field_24628 = Identifier.CODEC.xmap(SoundEvent::new, arg -> arg.id);
     private final Identifier id;
 
-    public SoundEvent(Identifier arg) {
-        this.id = arg;
+    public SoundEvent(Identifier id) {
+        this.id = id;
     }
 
     @Environment(value=EnvType.CLIENT)

@@ -76,7 +76,7 @@ implements TextureTickListener {
     }
 
     @Override
-    public void load(ResourceManager arg) throws IOException {
+    public void load(ResourceManager manager) throws IOException {
     }
 
     public void upload(Data arg) {
@@ -102,20 +102,20 @@ implements TextureTickListener {
         }
     }
 
-    public Data stitch(ResourceManager arg2, Stream<Identifier> stream, Profiler arg22, int i) {
+    public Data stitch(ResourceManager resourceManager, Stream<Identifier> idStream, Profiler profiler, int mipmapLevel) {
         int q;
-        arg22.push("preparing");
-        Set<Identifier> set = stream.peek(arg -> {
+        profiler.push("preparing");
+        Set<Identifier> set = idStream.peek(arg -> {
             if (arg == null) {
                 throw new IllegalArgumentException("Location cannot be null!");
             }
         }).collect(Collectors.toSet());
         int j = this.maxTextureSize;
-        TextureStitcher lv = new TextureStitcher(j, j, i);
+        TextureStitcher lv = new TextureStitcher(j, j, mipmapLevel);
         int k = Integer.MAX_VALUE;
-        int l = 1 << i;
-        arg22.swap("extracting_frames");
-        for (Sprite.Info lv2 : this.loadSprites(arg2, set)) {
+        int l = 1 << mipmapLevel;
+        profiler.swap("extracting_frames");
+        for (Sprite.Info lv2 : this.loadSprites(resourceManager, set)) {
             k = Math.min(k, Math.min(lv2.getWidth(), lv2.getHeight()));
             int m = Math.min(Integer.lowestOneBit(lv2.getWidth()), Integer.lowestOneBit(lv2.getHeight()));
             if (m < l) {
@@ -126,15 +126,15 @@ implements TextureTickListener {
         }
         int n = Math.min(k, l);
         int o = MathHelper.log2(n);
-        if (o < i) {
-            LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", (Object)this.id, (Object)i, (Object)o, (Object)n);
+        if (o < mipmapLevel) {
+            LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", (Object)this.id, (Object)mipmapLevel, (Object)o, (Object)n);
             int p = o;
         } else {
-            q = i;
+            q = mipmapLevel;
         }
-        arg22.swap("register");
+        profiler.swap("register");
         lv.add(MissingSprite.getMissingInfo());
-        arg22.swap("stitching");
+        profiler.swap("stitching");
         try {
             lv.stitch();
         }
@@ -145,21 +145,21 @@ implements TextureTickListener {
             lv5.add("Max Texture Size", j);
             throw new CrashException(lv4);
         }
-        arg22.swap("loading");
-        List<Sprite> list = this.loadSprites(arg2, lv, q);
-        arg22.pop();
+        profiler.swap("loading");
+        List<Sprite> list = this.loadSprites(resourceManager, lv, q);
+        profiler.pop();
         return new Data(set, lv.getWidth(), lv.getHeight(), q, list);
     }
 
-    private Collection<Sprite.Info> loadSprites(ResourceManager arg, Set<Identifier> set) {
+    private Collection<Sprite.Info> loadSprites(ResourceManager resourceManager, Set<Identifier> ids) {
         ArrayList list = Lists.newArrayList();
         ConcurrentLinkedQueue<Sprite.Info> concurrentLinkedQueue = new ConcurrentLinkedQueue<Sprite.Info>();
-        for (Identifier lv : set) {
+        for (Identifier lv : ids) {
             if (MissingSprite.getMissingSpriteId().equals(lv)) continue;
             list.add(CompletableFuture.runAsync(() -> {
                 void lv7;
                 Identifier lv = this.getTexturePath(lv);
-                try (Resource lv2 = arg.getResource(lv);){
+                try (Resource lv2 = resourceManager.getResource(lv);){
                     PngFile lv3 = new PngFile(lv2.toString(), lv2.getInputStream());
                     AnimationResourceMetadata lv4 = lv2.getMetadata(AnimationResourceMetadata.READER);
                     if (lv4 == null) {
@@ -183,16 +183,16 @@ implements TextureTickListener {
         return concurrentLinkedQueue;
     }
 
-    private List<Sprite> loadSprites(ResourceManager arg, TextureStitcher arg22, int i) {
+    private List<Sprite> loadSprites(ResourceManager arg, TextureStitcher arg22, int maxLevel) {
         ConcurrentLinkedQueue concurrentLinkedQueue = new ConcurrentLinkedQueue();
         ArrayList list = Lists.newArrayList();
-        arg22.getStitchedSprites((arg2, j, k, l, m) -> {
+        arg22.getStitchedSprites((arg2, atlasWidth, atlasHeight, x, y) -> {
             if (arg2 == MissingSprite.getMissingInfo()) {
-                MissingSprite lv = MissingSprite.getMissingSprite(this, i, j, k, l, m);
+                MissingSprite lv = MissingSprite.getMissingSprite(this, maxLevel, atlasWidth, atlasHeight, x, y);
                 concurrentLinkedQueue.add(lv);
             } else {
                 list.add(CompletableFuture.runAsync(() -> {
-                    Sprite lv = this.loadSprite(arg, arg2, j, k, i, l, m);
+                    Sprite lv = this.loadSprite(arg, arg2, atlasWidth, atlasHeight, maxLevel, x, y);
                     if (lv != null) {
                         concurrentLinkedQueue.add(lv);
                     }
@@ -209,11 +209,11 @@ implements TextureTickListener {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    private Sprite loadSprite(ResourceManager arg, Sprite.Info arg2, int i, int j, int k, int l, int m) {
+    private Sprite loadSprite(ResourceManager container, Sprite.Info arg2, int atlasWidth, int atlasHeight, int maxLevel, int x, int y) {
         Identifier lv = this.getTexturePath(arg2.getId());
-        try (Resource lv2 = arg.getResource(lv);){
+        try (Resource lv2 = container.getResource(lv);){
             NativeImage lv3 = NativeImage.read(lv2.getInputStream());
-            Sprite sprite = new Sprite(this, arg2, k, i, j, l, m, lv3);
+            Sprite sprite = new Sprite(this, arg2, maxLevel, atlasWidth, atlasHeight, x, y, lv3);
             return sprite;
         }
         catch (RuntimeException runtimeException) {
@@ -246,8 +246,8 @@ implements TextureTickListener {
         }
     }
 
-    public Sprite getSprite(Identifier arg) {
-        Sprite lv = this.sprites.get(arg);
+    public Sprite getSprite(Identifier id) {
+        Sprite lv = this.sprites.get(id);
         if (lv == null) {
             return this.sprites.get(MissingSprite.getMissingSpriteId());
         }
@@ -278,12 +278,12 @@ implements TextureTickListener {
         final int maxLevel;
         final List<Sprite> sprites;
 
-        public Data(Set<Identifier> set, int i, int j, int k, List<Sprite> list) {
-            this.spriteIds = set;
-            this.width = i;
-            this.height = j;
-            this.maxLevel = k;
-            this.sprites = list;
+        public Data(Set<Identifier> spriteIds, int width, int height, int maxLevel, List<Sprite> sprites) {
+            this.spriteIds = spriteIds;
+            this.width = width;
+            this.height = height;
+            this.maxLevel = maxLevel;
+            this.sprites = sprites;
         }
     }
 }

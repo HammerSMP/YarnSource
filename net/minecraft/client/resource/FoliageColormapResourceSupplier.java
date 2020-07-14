@@ -22,9 +22,9 @@ public class FoliageColormapResourceSupplier
 extends SinglePreparationResourceReloadListener<int[]> {
     private static final Identifier FOLIAGE_COLORMAP = new Identifier("textures/colormap/foliage.png");
 
-    protected int[] reload(ResourceManager arg, Profiler arg2) {
+    protected int[] reload(ResourceManager resourceManager, Profiler arg2) {
         try {
-            return RawTextureDataLoader.loadRawTextureData(arg, FOLIAGE_COLORMAP);
+            return RawTextureDataLoader.loadRawTextureData(resourceManager, FOLIAGE_COLORMAP);
         }
         catch (IOException iOException) {
             throw new IllegalStateException("Failed to load foliage color texture", iOException);
@@ -37,8 +37,8 @@ extends SinglePreparationResourceReloadListener<int[]> {
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.reload(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.reload(manager, profiler);
     }
 }
 

@@ -47,27 +47,27 @@ implements AutoCloseable {
         this.field_24468 = new TaskExecutor<TaskQueue.PrioritizedTask>(new TaskQueue.Prioritized(Priority.values().length), Util.method_27958(), "IOWorker-" + string);
     }
 
-    public CompletableFuture<Void> setResult(ChunkPos arg, CompoundTag arg2) {
+    public CompletableFuture<Void> setResult(ChunkPos pos, CompoundTag nbt) {
         return this.run(() -> {
-            Result lv = this.results.computeIfAbsent(arg, arg2 -> new Result(arg2));
-            lv.nbt = arg2;
+            Result lv = this.results.computeIfAbsent(pos, arg2 -> new Result(nbt));
+            lv.nbt = nbt;
             return Either.left((Object)lv.future);
         }).thenCompose(Function.identity());
     }
 
     @Nullable
-    public CompoundTag getNbt(ChunkPos arg) throws IOException {
+    public CompoundTag getNbt(ChunkPos pos) throws IOException {
         CompletableFuture completableFuture = this.run(() -> {
-            Result lv = this.results.get(arg);
+            Result lv = this.results.get(pos);
             if (lv != null) {
                 return Either.left((Object)lv.nbt);
             }
             try {
-                CompoundTag lv2 = this.storage.getTagAt(arg);
+                CompoundTag lv2 = this.storage.getTagAt(pos);
                 return Either.left((Object)lv2);
             }
             catch (Exception exception) {
-                LOGGER.warn("Failed to read chunk {}", (Object)arg, (Object)exception);
+                LOGGER.warn("Failed to read chunk {}", (Object)pos, (Object)exception);
                 return Either.right((Object)exception);
             }
         });
@@ -115,13 +115,13 @@ implements AutoCloseable {
         this.field_24468.send(new TaskQueue.PrioritizedTask(Priority.LOW.ordinal(), this::writeResult));
     }
 
-    private void write(ChunkPos arg, Result arg2) {
+    private void write(ChunkPos pos, Result arg2) {
         try {
-            this.storage.write(arg, arg2.nbt);
+            this.storage.write(pos, arg2.nbt);
             arg2.future.complete(null);
         }
         catch (Exception exception) {
-            LOGGER.error("Failed to store chunk {}", (Object)arg, (Object)exception);
+            LOGGER.error("Failed to store chunk {}", (Object)pos, (Object)exception);
             arg2.future.completeExceptionally(exception);
         }
     }

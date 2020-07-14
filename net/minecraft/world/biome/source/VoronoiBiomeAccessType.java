@@ -14,10 +14,10 @@ public enum VoronoiBiomeAccessType implements BiomeAccessType
 
 
     @Override
-    public Biome getBiome(long l, int i, int j, int k, BiomeAccess.Storage arg) {
-        int m = i - 2;
-        int n = j - 2;
-        int o = k - 2;
+    public Biome getBiome(long seed, int x, int y, int z, BiomeAccess.Storage storage) {
+        int m = x - 2;
+        int n = y - 2;
+        int o = z - 2;
         int p = m >> 2;
         int q = n >> 2;
         int r = o >> 2;
@@ -35,39 +35,39 @@ public enum VoronoiBiomeAccessType implements BiomeAccessType
             double g = bl ? d : d - 1.0;
             double h = bl2 ? e : e - 1.0;
             double w = bl3 ? f : f - 1.0;
-            ds[s] = VoronoiBiomeAccessType.calcSquaredDistance(l, t, u, v, g, h, w);
+            ds[s] = VoronoiBiomeAccessType.calcSquaredDistance(seed, t, u, v, g, h, w);
         }
-        int x = 0;
-        double y = ds[0];
-        for (int z = 1; z < 8; ++z) {
-            if (!(y > ds[z])) continue;
-            x = z;
-            y = ds[z];
+        int x2 = 0;
+        double y2 = ds[0];
+        for (int z2 = 1; z2 < 8; ++z2) {
+            if (!(y2 > ds[z2])) continue;
+            x2 = z2;
+            y2 = ds[z2];
         }
-        int aa = (x & 4) == 0 ? p : p + 1;
-        int ab = (x & 2) == 0 ? q : q + 1;
-        int ac = (x & 1) == 0 ? r : r + 1;
-        return arg.getBiomeForNoiseGen(aa, ab, ac);
+        int aa = (x2 & 4) == 0 ? p : p + 1;
+        int ab = (x2 & 2) == 0 ? q : q + 1;
+        int ac = (x2 & 1) == 0 ? r : r + 1;
+        return storage.getBiomeForNoiseGen(aa, ab, ac);
     }
 
-    private static double calcSquaredDistance(long l, int i, int j, int k, double d, double e, double f) {
-        long m = l;
-        m = SeedMixer.mixSeed(m, i);
-        m = SeedMixer.mixSeed(m, j);
-        m = SeedMixer.mixSeed(m, k);
-        m = SeedMixer.mixSeed(m, i);
-        m = SeedMixer.mixSeed(m, j);
-        m = SeedMixer.mixSeed(m, k);
+    private static double calcSquaredDistance(long seed, int x, int y, int z, double xFraction, double yFraction, double zFraction) {
+        long m = seed;
+        m = SeedMixer.mixSeed(m, x);
+        m = SeedMixer.mixSeed(m, y);
+        m = SeedMixer.mixSeed(m, z);
+        m = SeedMixer.mixSeed(m, x);
+        m = SeedMixer.mixSeed(m, y);
+        m = SeedMixer.mixSeed(m, z);
         double g = VoronoiBiomeAccessType.distribute(m);
-        m = SeedMixer.mixSeed(m, l);
+        m = SeedMixer.mixSeed(m, seed);
         double h = VoronoiBiomeAccessType.distribute(m);
-        m = SeedMixer.mixSeed(m, l);
+        m = SeedMixer.mixSeed(m, seed);
         double n = VoronoiBiomeAccessType.distribute(m);
-        return VoronoiBiomeAccessType.square(f + n) + VoronoiBiomeAccessType.square(e + h) + VoronoiBiomeAccessType.square(d + g);
+        return VoronoiBiomeAccessType.square(zFraction + n) + VoronoiBiomeAccessType.square(yFraction + h) + VoronoiBiomeAccessType.square(xFraction + g);
     }
 
-    private static double distribute(long l) {
-        double d = (double)((int)Math.floorMod(l >> 24, 1024L)) / 1024.0;
+    private static double distribute(long seed) {
+        double d = (double)((int)Math.floorMod(seed >> 24, 1024L)) / 1024.0;
         return (d - 0.5) * 0.9;
     }
 

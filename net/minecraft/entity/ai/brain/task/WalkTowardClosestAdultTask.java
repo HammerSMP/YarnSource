@@ -23,10 +23,10 @@ extends Task<E> {
     private final IntRange executionRange;
     private final float speed;
 
-    public WalkTowardClosestAdultTask(IntRange arg, float f) {
+    public WalkTowardClosestAdultTask(IntRange executionRange, float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.NEAREST_VISIBLE_ADULT, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.executionRange = arg;
-        this.speed = f;
+        this.executionRange = executionRange;
+        this.speed = speed;
     }
 
     @Override
@@ -43,8 +43,8 @@ extends Task<E> {
         LookTargetUtil.walkTowards(arg2, this.getNearestVisibleAdult(arg2), this.speed, this.executionRange.getMin() - 1);
     }
 
-    private PassiveEntity getNearestVisibleAdult(E arg) {
-        return ((LivingEntity)arg).getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_ADULT).get();
+    private PassiveEntity getNearestVisibleAdult(E entity) {
+        return ((LivingEntity)entity).getBrain().getOptionalMemory(MemoryModuleType.NEAREST_VISIBLE_ADULT).get();
     }
 }
 

@@ -108,10 +108,10 @@ implements Angerable {
     }
 
     @Override
-    public void setTarget(@Nullable LivingEntity arg) {
-        super.setTarget(arg);
+    public void setTarget(@Nullable LivingEntity target) {
+        super.setTarget(target);
         EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (arg == null) {
+        if (target == null) {
             this.ageWhenTargetSet = 0;
             this.dataTracker.set(ANGRY, false);
             this.dataTracker.set(PROVOKED, false);
@@ -139,8 +139,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngerTime(int i) {
-        this.angerTime = i;
+    public void setAngerTime(int ticks) {
+        this.angerTime = ticks;
     }
 
     @Override
@@ -149,8 +149,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngryAt(@Nullable UUID uUID) {
-        this.targetUuid = uUID;
+    public void setAngryAt(@Nullable UUID uuid) {
+        this.targetUuid = uuid;
     }
 
     @Override
@@ -168,51 +168,51 @@ implements Angerable {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (ANGRY.equals(arg) && this.isProvoked() && this.world.isClient) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (ANGRY.equals(data) && this.isProvoked() && this.world.isClient) {
             this.playAngrySound();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         BlockState lv = this.getCarriedBlock();
         if (lv != null) {
-            arg.put("carriedBlockState", NbtHelper.fromBlockState(lv));
+            tag.put("carriedBlockState", NbtHelper.fromBlockState(lv));
         }
-        this.angerToTag(arg);
+        this.angerToTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
         BlockState lv = null;
-        if (arg.contains("carriedBlockState", 10) && (lv = NbtHelper.toBlockState(arg.getCompound("carriedBlockState"))).isAir()) {
+        if (tag.contains("carriedBlockState", 10) && (lv = NbtHelper.toBlockState(tag.getCompound("carriedBlockState"))).isAir()) {
             lv = null;
         }
         this.setCarriedBlock(lv);
-        this.angerFromTag((ServerWorld)this.world, arg);
+        this.angerFromTag((ServerWorld)this.world, tag);
     }
 
-    private boolean isPlayerStaring(PlayerEntity arg) {
-        ItemStack lv = arg.inventory.armor.get(3);
+    private boolean isPlayerStaring(PlayerEntity player) {
+        ItemStack lv = player.inventory.armor.get(3);
         if (lv.getItem() == Blocks.CARVED_PUMPKIN.asItem()) {
             return false;
         }
-        Vec3d lv2 = arg.getRotationVec(1.0f).normalize();
-        Vec3d lv3 = new Vec3d(this.getX() - arg.getX(), this.getEyeY() - arg.getEyeY(), this.getZ() - arg.getZ());
+        Vec3d lv2 = player.getRotationVec(1.0f).normalize();
+        Vec3d lv3 = new Vec3d(this.getX() - player.getX(), this.getEyeY() - player.getEyeY(), this.getZ() - player.getZ());
         double d = lv3.length();
         double e = lv2.dotProduct(lv3 = lv3.normalize());
         if (e > 1.0 - 0.025 / d) {
-            return arg.canSee(this);
+            return player.canSee(this);
         }
         return false;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 2.55f;
     }
 
@@ -255,8 +255,8 @@ implements Angerable {
         return this.teleportTo(d, e, f);
     }
 
-    private boolean teleportTo(Entity arg) {
-        Vec3d lv = new Vec3d(this.getX() - arg.getX(), this.getBodyY(0.5) - arg.getEyeY(), this.getZ() - arg.getZ());
+    private boolean teleportTo(Entity entity) {
+        Vec3d lv = new Vec3d(this.getX() - entity.getX(), this.getBodyY(0.5) - entity.getEyeY(), this.getZ() - entity.getZ());
         lv = lv.normalize();
         double d = 16.0;
         double e = this.getX() + (this.random.nextDouble() - 0.5) * 8.0 - lv.x * 16.0;
@@ -265,8 +265,8 @@ implements Angerable {
         return this.teleportTo(e, f, g);
     }
 
-    private boolean teleportTo(double d, double e, double f) {
-        BlockPos.Mutable lv = new BlockPos.Mutable(d, e, f);
+    private boolean teleportTo(double x, double y, double z) {
+        BlockPos.Mutable lv = new BlockPos.Mutable(x, y, z);
         while (lv.getY() > 0 && !this.world.getBlockState(lv).getMaterial().blocksMovement()) {
             lv.move(Direction.DOWN);
         }
@@ -276,7 +276,7 @@ implements Angerable {
         if (!bl || bl2) {
             return false;
         }
-        boolean bl3 = this.teleport(d, e, f, true);
+        boolean bl3 = this.teleport(x, y, z, true);
         if (bl3 && !this.isSilent()) {
             this.world.playSound(null, this.prevX, this.prevY, this.prevZ, SoundEvents.ENTITY_ENDERMAN_TELEPORT, this.getSoundCategory(), 1.0f, 1.0f);
             this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
@@ -290,7 +290,7 @@ implements Angerable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ENDERMAN_HURT;
     }
 
@@ -300,16 +300,16 @@ implements Angerable {
     }
 
     @Override
-    protected void dropEquipment(DamageSource arg, int i, boolean bl) {
-        super.dropEquipment(arg, i, bl);
+    protected void dropEquipment(DamageSource source, int lootingMultiplier, boolean allowDrops) {
+        super.dropEquipment(source, lootingMultiplier, allowDrops);
         BlockState lv = this.getCarriedBlock();
         if (lv != null) {
             this.dropItem(lv.getBlock());
         }
     }
 
-    public void setCarriedBlock(@Nullable BlockState arg) {
-        this.dataTracker.set(CARRIED_BLOCK, Optional.ofNullable(arg));
+    public void setCarriedBlock(@Nullable BlockState state) {
+        this.dataTracker.set(CARRIED_BLOCK, Optional.ofNullable(state));
     }
 
     @Nullable
@@ -318,19 +318,19 @@ implements Angerable {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        if (arg instanceof ProjectileDamageSource) {
+        if (source instanceof ProjectileDamageSource) {
             for (int i = 0; i < 64; ++i) {
                 if (!this.teleportRandomly()) continue;
                 return true;
             }
             return false;
         }
-        boolean bl = super.damage(arg, f);
-        if (!this.world.isClient() && !(arg.getAttacker() instanceof LivingEntity) && this.random.nextInt(10) != 0) {
+        boolean bl = super.damage(source, amount);
+        if (!this.world.isClient() && !(source.getAttacker() instanceof LivingEntity) && this.random.nextInt(10) != 0) {
             this.teleportRandomly();
         }
         return bl;
@@ -357,8 +357,8 @@ implements Angerable {
     extends Goal {
         private final EndermanEntity enderman;
 
-        public PickUpBlockGoal(EndermanEntity arg) {
-            this.enderman = arg;
+        public PickUpBlockGoal(EndermanEntity enderman) {
+            this.enderman = enderman;
         }
 
         @Override
@@ -397,8 +397,8 @@ implements Angerable {
     extends Goal {
         private final EndermanEntity enderman;
 
-        public PlaceBlockGoal(EndermanEntity arg) {
-            this.enderman = arg;
+        public PlaceBlockGoal(EndermanEntity enderman) {
+            this.enderman = enderman;
         }
 
         @Override
@@ -430,8 +430,8 @@ implements Angerable {
             }
         }
 
-        private boolean canPlaceOn(WorldView arg, BlockPos arg2, BlockState arg3, BlockState arg4, BlockState arg5, BlockPos arg6) {
-            return arg4.isAir() && !arg5.isAir() && arg5.isFullCube(arg, arg6) && arg3.canPlaceAt(arg, arg2);
+        private boolean canPlaceOn(WorldView world, BlockPos posAbove, BlockState carriedState, BlockState stateAbove, BlockState state, BlockPos pos) {
+            return stateAbove.isAir() && !state.isAir() && state.isFullCube(world, pos) && carriedState.canPlaceAt(world, posAbove);
         }
     }
 
@@ -440,8 +440,8 @@ implements Angerable {
         private final EndermanEntity enderman;
         private LivingEntity target;
 
-        public ChasePlayerGoal(EndermanEntity arg) {
-            this.enderman = arg;
+        public ChasePlayerGoal(EndermanEntity enderman) {
+            this.enderman = enderman;
             this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
         }
 
@@ -478,10 +478,10 @@ implements Angerable {
         private final TargetPredicate staringPlayerPredicate;
         private final TargetPredicate validTargetPredicate = new TargetPredicate().includeHidden();
 
-        public TeleportTowardsPlayerGoal(EndermanEntity arg, @Nullable Predicate<LivingEntity> predicate) {
-            super(arg, PlayerEntity.class, 10, false, false, predicate);
-            this.enderman = arg;
-            this.staringPlayerPredicate = new TargetPredicate().setBaseMaxDistance(this.getFollowRange()).setPredicate(arg2 -> arg.isPlayerStaring((PlayerEntity)arg2));
+        public TeleportTowardsPlayerGoal(EndermanEntity enderman, @Nullable Predicate<LivingEntity> predicate) {
+            super(enderman, PlayerEntity.class, 10, false, false, predicate);
+            this.enderman = enderman;
+            this.staringPlayerPredicate = new TargetPredicate().setBaseMaxDistance(this.getFollowRange()).setPredicate(playerEntity -> enderman.isPlayerStaring((PlayerEntity)playerEntity));
         }
 
         @Override

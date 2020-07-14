@@ -36,8 +36,8 @@ extends ValueObject {
     public Map<String, String> metadata = Maps.newHashMap();
     public Map<String, String> changeList = Maps.newHashMap();
 
-    public static Backup parse(JsonElement jsonElement) {
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
+    public static Backup parse(JsonElement node) {
+        JsonObject jsonObject = node.getAsJsonObject();
         Backup lv = new Backup();
         try {
             lv.backupId = JsonUtils.getStringOr("backupId", jsonObject, "");
@@ -58,8 +58,8 @@ extends ValueObject {
         return lv;
     }
 
-    private static String format(String string) {
-        String[] strings = string.split("_");
+    private static String format(String key) {
+        String[] strings = key.split("_");
         StringBuilder stringBuilder = new StringBuilder();
         for (String string2 : strings) {
             if (string2 == null || string2.length() < 1) continue;
@@ -77,8 +77,8 @@ extends ValueObject {
         return this.uploadedVersion;
     }
 
-    public void setUploadedVersion(boolean bl) {
-        this.uploadedVersion = bl;
+    public void setUploadedVersion(boolean uploadedVersion) {
+        this.uploadedVersion = uploadedVersion;
     }
 }
 

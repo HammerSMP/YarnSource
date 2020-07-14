@@ -66,9 +66,9 @@ extends AlwaysSelectedEntryListWidget<Entry> {
     private final Entry scanningEntry = new ScanningEntry();
     private final List<LanServerEntry> lanServers = Lists.newArrayList();
 
-    public MultiplayerServerListWidget(MultiplayerScreen arg, MinecraftClient arg2, int i, int j, int k, int l, int m) {
-        super(arg2, i, j, k, l, m);
-        this.screen = arg;
+    public MultiplayerServerListWidget(MultiplayerScreen screen, MinecraftClient client, int width, int height, int top, int bottom, int entryHeight) {
+        super(client, width, height, top, bottom, entryHeight);
+        this.screen = screen;
     }
 
     private void updateEntries() {
@@ -88,27 +88,27 @@ extends AlwaysSelectedEntryListWidget<Entry> {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         Entry lv = (Entry)this.getSelected();
-        return lv != null && lv.keyPressed(i, j, k) || super.keyPressed(i, j, k);
+        return lv != null && lv.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    protected void moveSelection(EntryListWidget.MoveDirection arg2) {
-        this.moveSelectionIf(arg2, arg -> !(arg instanceof ScanningEntry));
+    protected void moveSelection(EntryListWidget.MoveDirection direction) {
+        this.moveSelectionIf(direction, arg -> !(arg instanceof ScanningEntry));
     }
 
-    public void setServers(ServerList arg) {
+    public void setServers(ServerList servers) {
         this.servers.clear();
-        for (int i = 0; i < arg.size(); ++i) {
-            this.servers.add(new ServerEntry(this.screen, arg.get(i)));
+        for (int i = 0; i < servers.size(); ++i) {
+            this.servers.add(new ServerEntry(this.screen, servers.get(i)));
         }
         this.updateEntries();
     }
 
-    public void setLanServers(List<LanServerInfo> list) {
+    public void setLanServers(List<LanServerInfo> lanServers) {
         this.lanServers.clear();
-        for (LanServerInfo lv : list) {
+        for (LanServerInfo lv : lanServers) {
             this.lanServers.add(new LanServerEntry(this.screen, lv));
         }
         this.updateEntries();
@@ -140,16 +140,16 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         private NativeImageBackedTexture icon;
         private long time;
 
-        protected ServerEntry(MultiplayerScreen arg2, ServerInfo arg3) {
-            this.screen = arg2;
-            this.server = arg3;
+        protected ServerEntry(MultiplayerScreen screen, ServerInfo server) {
+            this.screen = screen;
+            this.server = server;
             this.client = MinecraftClient.getInstance();
-            this.iconTextureId = new Identifier("servers/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)arg3.address) + "/icon");
+            this.iconTextureId = new Identifier("servers/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)server.address) + "/icon");
             this.icon = (NativeImageBackedTexture)this.client.getTextureManager().getTexture(this.iconTextureId);
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             List<Text> list5;
             TranslatableText lv5;
             int z;
@@ -175,15 +175,15 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             boolean bl2 = this.server.protocolVersion > SharedConstants.getGameVersion().getProtocolVersion();
             boolean bl3 = this.server.protocolVersion < SharedConstants.getGameVersion().getProtocolVersion();
             boolean bl4 = bl2 || bl3;
-            this.client.textRenderer.draw(arg, this.server.name, (float)(k + 32 + 3), (float)(j + 1), 0xFFFFFF);
-            List<StringRenderable> list = this.client.textRenderer.wrapLines(this.server.label, l - 32 - 2);
+            this.client.textRenderer.draw(matrices, this.server.name, (float)(x + 32 + 3), (float)(y + 1), 0xFFFFFF);
+            List<StringRenderable> list = this.client.textRenderer.wrapLines(this.server.label, entryWidth - 32 - 2);
             for (int p = 0; p < Math.min(list.size(), 2); ++p) {
                 this.client.textRenderer.getClass();
-                this.client.textRenderer.draw(arg, list.get(p), (float)(k + 32 + 3), (float)(j + 12 + 9 * p), 0x808080);
+                this.client.textRenderer.draw(matrices, list.get(p), (float)(x + 32 + 3), (float)(y + 12 + 9 * p), 0x808080);
             }
             Text lv = bl4 ? this.server.version.shallowCopy().formatted(Formatting.DARK_RED) : this.server.playerCountLabel;
             int q = this.client.textRenderer.getWidth(lv);
-            this.client.textRenderer.draw(arg, lv, (float)(k + l - q - 15 - 2), (float)(j + 1), 0x808080);
+            this.client.textRenderer.draw(matrices, lv, (float)(x + entryWidth - q - 15 - 2), (float)(y + 1), 0x808080);
             int r = 0;
             if (bl4) {
                 int s = 5;
@@ -199,9 +199,9 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 } else if (this.server.ping < 600L) {
                     int w = 2;
                 } else if (this.server.ping < 1000L) {
-                    int x = 3;
+                    int x2 = 3;
                 } else {
-                    int y = 4;
+                    int y2 = 4;
                 }
                 if (this.server.ping < 0L) {
                     TranslatableText lv3 = new TranslatableText("multiplayer.status.no_connection");
@@ -212,7 +212,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 }
             } else {
                 r = 1;
-                z = (int)(Util.getMeasuringTimeMs() / 100L + (long)(i * 2) & 7L);
+                z = (int)(Util.getMeasuringTimeMs() / 100L + (long)(index * 2) & 7L);
                 if (z > 4) {
                     z = 8 - z;
                 }
@@ -221,7 +221,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
             }
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             this.client.getTextureManager().bindTexture(DrawableHelper.GUI_ICONS_TEXTURE);
-            DrawableHelper.drawTexture(arg, k + l - 15, j, r * 10, 176 + z * 8, 10, 8, 256, 256);
+            DrawableHelper.drawTexture(matrices, x + entryWidth - 15, y, r * 10, 176 + z * 8, 10, 8, 256, 256);
             String string = this.server.getIcon();
             if (!Objects.equals(string, this.iconUri)) {
                 if (this.method_29979(string)) {
@@ -232,42 +232,42 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 }
             }
             if (this.icon != null) {
-                this.draw(arg, k, j, this.iconTextureId);
+                this.draw(matrices, x, y, this.iconTextureId);
             } else {
-                this.draw(arg, k, j, UNKNOWN_SERVER_TEXTURE);
+                this.draw(matrices, x, y, UNKNOWN_SERVER_TEXTURE);
             }
-            int aa = n - k;
-            int ab = o - j;
-            if (aa >= l - 15 && aa <= l - 5 && ab >= 0 && ab <= 8) {
+            int aa = mouseX - x;
+            int ab = mouseY - y;
+            if (aa >= entryWidth - 15 && aa <= entryWidth - 5 && ab >= 0 && ab <= 8) {
                 this.screen.setTooltip(Collections.singletonList(lv5));
-            } else if (aa >= l - q - 15 - 2 && aa <= l - 15 - 2 && ab >= 0 && ab <= 8) {
+            } else if (aa >= entryWidth - q - 15 - 2 && aa <= entryWidth - 15 - 2 && ab >= 0 && ab <= 8) {
                 this.screen.setTooltip(list5);
             }
-            if (this.client.options.touchscreen || bl) {
+            if (this.client.options.touchscreen || hovered) {
                 this.client.getTextureManager().bindTexture(SERVER_SELECTION_TEXTURE);
-                DrawableHelper.fill(arg, k, j, k + 32, j + 32, -1601138544);
+                DrawableHelper.fill(matrices, x, y, x + 32, y + 32, -1601138544);
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                int ac = n - k;
-                int ad = o - j;
+                int ac = mouseX - x;
+                int ad = mouseY - y;
                 if (this.method_20136()) {
                     if (ac < 32 && ac > 16) {
-                        DrawableHelper.drawTexture(arg, k, j, 0.0f, 32.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 0.0f, 32.0f, 32, 32, 256, 256);
                     } else {
-                        DrawableHelper.drawTexture(arg, k, j, 0.0f, 0.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 0.0f, 0.0f, 32, 32, 256, 256);
                     }
                 }
-                if (i > 0) {
+                if (index > 0) {
                     if (ac < 16 && ad < 16) {
-                        DrawableHelper.drawTexture(arg, k, j, 96.0f, 32.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 96.0f, 32.0f, 32, 32, 256, 256);
                     } else {
-                        DrawableHelper.drawTexture(arg, k, j, 96.0f, 0.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 96.0f, 0.0f, 32, 32, 256, 256);
                     }
                 }
-                if (i < this.screen.getServerList().size() - 1) {
+                if (index < this.screen.getServerList().size() - 1) {
                     if (ac < 16 && ad > 16) {
-                        DrawableHelper.drawTexture(arg, k, j, 64.0f, 32.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 64.0f, 32.0f, 32, 32, 256, 256);
                     } else {
-                        DrawableHelper.drawTexture(arg, k, j, 64.0f, 0.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 64.0f, 0.0f, 32, 32, 256, 256);
                     }
                 }
             }
@@ -317,16 +317,16 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
             if (Screen.hasShiftDown()) {
                 MultiplayerServerListWidget lv = this.screen.serverListWidget;
                 int l = lv.children().indexOf(this);
-                if (i == 264 && l < this.screen.getServerList().size() - 1 || i == 265 && l > 0) {
-                    this.swapEntries(l, i == 264 ? l + 1 : l - 1);
+                if (keyCode == 264 && l < this.screen.getServerList().size() - 1 || keyCode == 265 && l > 0) {
+                    this.swapEntries(l, keyCode == 264 ? l + 1 : l - 1);
                     return true;
                 }
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyCode, scanCode, modifiers);
         }
 
         private void swapEntries(int i, int j) {
@@ -338,9 +338,9 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            double f = d - (double)MultiplayerServerListWidget.this.getRowLeft();
-            double g = e - (double)MultiplayerServerListWidget.this.getRowTop(MultiplayerServerListWidget.this.children().indexOf(this));
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            double f = mouseX - (double)MultiplayerServerListWidget.this.getRowLeft();
+            double g = mouseY - (double)MultiplayerServerListWidget.this.getRowTop(MultiplayerServerListWidget.this.children().indexOf(this));
             if (f <= 32.0) {
                 if (f < 32.0 && f > 16.0 && this.method_20136()) {
                     this.screen.select(this);
@@ -378,25 +378,25 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         protected final LanServerInfo server;
         private long time;
 
-        protected LanServerEntry(MultiplayerScreen arg, LanServerInfo arg2) {
-            this.screen = arg;
-            this.server = arg2;
+        protected LanServerEntry(MultiplayerScreen screen, LanServerInfo server) {
+            this.screen = screen;
+            this.server = server;
             this.client = MinecraftClient.getInstance();
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.client.textRenderer.draw(arg, I18n.translate("lanServer.title", new Object[0]), (float)(k + 32 + 3), (float)(j + 1), 0xFFFFFF);
-            this.client.textRenderer.draw(arg, this.server.getMotd(), (float)(k + 32 + 3), (float)(j + 12), 0x808080);
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.client.textRenderer.draw(matrices, I18n.translate("lanServer.title", new Object[0]), (float)(x + 32 + 3), (float)(y + 1), 0xFFFFFF);
+            this.client.textRenderer.draw(matrices, this.server.getMotd(), (float)(x + 32 + 3), (float)(y + 12), 0x808080);
             if (this.client.options.hideServerAddress) {
-                this.client.textRenderer.draw(arg, I18n.translate("selectServer.hiddenAddress", new Object[0]), (float)(k + 32 + 3), (float)(j + 12 + 11), 0x303030);
+                this.client.textRenderer.draw(matrices, I18n.translate("selectServer.hiddenAddress", new Object[0]), (float)(x + 32 + 3), (float)(y + 12 + 11), 0x303030);
             } else {
-                this.client.textRenderer.draw(arg, this.server.getAddressPort(), (float)(k + 32 + 3), (float)(j + 12 + 11), 0x303030);
+                this.client.textRenderer.draw(matrices, this.server.getAddressPort(), (float)(x + 32 + 3), (float)(y + 12 + 11), 0x303030);
             }
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             this.screen.select(this);
             if (Util.getMeasuringTimeMs() - this.time < 250L) {
                 this.screen.connect();
@@ -416,11 +416,11 @@ extends AlwaysSelectedEntryListWidget<Entry> {
         private final MinecraftClient client = MinecraftClient.getInstance();
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             String string3;
             this.client.textRenderer.getClass();
-            int p = j + m / 2 - 9 / 2;
-            this.client.textRenderer.draw(arg, I18n.translate("lanServer.scanning", new Object[0]), (float)(this.client.currentScreen.width / 2 - this.client.textRenderer.getWidth(I18n.translate("lanServer.scanning", new Object[0])) / 2), (float)p, 0xFFFFFF);
+            int p = y + entryHeight / 2 - 9 / 2;
+            this.client.textRenderer.draw(matrices, I18n.translate("lanServer.scanning", new Object[0]), (float)(this.client.currentScreen.width / 2 - this.client.textRenderer.getWidth(I18n.translate("lanServer.scanning", new Object[0])) / 2), (float)p, 0xFFFFFF);
             switch ((int)(Util.getMeasuringTimeMs() / 300L % 4L)) {
                 default: {
                     String string = "O o o";
@@ -436,7 +436,7 @@ extends AlwaysSelectedEntryListWidget<Entry> {
                 }
             }
             this.client.textRenderer.getClass();
-            this.client.textRenderer.draw(arg, string3, (float)(this.client.currentScreen.width / 2 - this.client.textRenderer.getWidth(string3) / 2), (float)(p + 9), 0x808080);
+            this.client.textRenderer.draw(matrices, string3, (float)(this.client.currentScreen.width / 2 - this.client.textRenderer.getWidth(string3) / 2), (float)(p + 9), 0x808080);
         }
     }
 

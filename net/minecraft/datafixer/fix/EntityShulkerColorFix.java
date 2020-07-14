@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class EntityShulkerColorFix
 extends ChoiceFix {
-    public EntityShulkerColorFix(Schema schema, boolean bl) {
-        super(schema, bl, "EntityShulkerColorFix", TypeReferences.ENTITY, "minecraft:shulker");
+    public EntityShulkerColorFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "EntityShulkerColorFix", TypeReferences.ENTITY, "minecraft:shulker");
     }
 
     public Dynamic<?> fixShulkerColor(Dynamic<?> dynamic) {
@@ -30,8 +30,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixShulkerColor);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixShulkerColor);
     }
 }
 

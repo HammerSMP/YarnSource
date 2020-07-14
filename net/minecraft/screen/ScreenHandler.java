@@ -55,17 +55,17 @@ public abstract class ScreenHandler {
     private final List<ScreenHandlerListener> listeners = Lists.newArrayList();
     private final Set<PlayerEntity> restrictedPlayers = Sets.newHashSet();
 
-    protected ScreenHandler(@Nullable ScreenHandlerType<?> arg, int i) {
-        this.type = arg;
-        this.syncId = i;
+    protected ScreenHandler(@Nullable ScreenHandlerType<?> type, int syncId) {
+        this.type = type;
+        this.syncId = syncId;
     }
 
-    protected static boolean canUse(ScreenHandlerContext arg, PlayerEntity arg2, Block arg32) {
-        return arg.run((arg3, arg4) -> {
-            if (!arg3.getBlockState((BlockPos)arg4).isOf(arg32)) {
+    protected static boolean canUse(ScreenHandlerContext context, PlayerEntity player, Block block) {
+        return context.run((arg3, arg4) -> {
+            if (!arg3.getBlockState((BlockPos)arg4).isOf(block)) {
                 return false;
             }
-            return arg2.squaredDistanceTo((double)arg4.getX() + 0.5, (double)arg4.getY() + 0.5, (double)arg4.getZ() + 0.5) <= 64.0;
+            return player.squaredDistanceTo((double)arg4.getX() + 0.5, (double)arg4.getY() + 0.5, (double)arg4.getZ() + 0.5) <= 64.0;
         }, true);
     }
 
@@ -76,25 +76,25 @@ public abstract class ScreenHandler {
         return this.type;
     }
 
-    protected static void checkSize(Inventory arg, int i) {
-        int j = arg.size();
-        if (j < i) {
-            throw new IllegalArgumentException("Container size " + j + " is smaller than expected " + i);
+    protected static void checkSize(Inventory inventory, int expectedSize) {
+        int j = inventory.size();
+        if (j < expectedSize) {
+            throw new IllegalArgumentException("Container size " + j + " is smaller than expected " + expectedSize);
         }
     }
 
-    protected static void checkDataCount(PropertyDelegate arg, int i) {
-        int j = arg.size();
-        if (j < i) {
-            throw new IllegalArgumentException("Container data count " + j + " is smaller than expected " + i);
+    protected static void checkDataCount(PropertyDelegate data, int expectedCount) {
+        int j = data.size();
+        if (j < expectedCount) {
+            throw new IllegalArgumentException("Container data count " + j + " is smaller than expected " + expectedCount);
         }
     }
 
-    protected Slot addSlot(Slot arg) {
-        arg.id = this.slots.size();
-        this.slots.add(arg);
+    protected Slot addSlot(Slot slot) {
+        slot.id = this.slots.size();
+        this.slots.add(slot);
         this.trackedStacks.add(ItemStack.EMPTY);
-        return arg;
+        return slot;
     }
 
     protected Property addProperty(Property arg) {
@@ -108,18 +108,18 @@ public abstract class ScreenHandler {
         }
     }
 
-    public void addListener(ScreenHandlerListener arg) {
-        if (this.listeners.contains(arg)) {
+    public void addListener(ScreenHandlerListener listener) {
+        if (this.listeners.contains(listener)) {
             return;
         }
-        this.listeners.add(arg);
-        arg.onHandlerRegistered(this, this.getStacks());
+        this.listeners.add(listener);
+        listener.onHandlerRegistered(this, this.getStacks());
         this.sendContentUpdates();
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void removeListener(ScreenHandlerListener arg) {
-        this.listeners.remove(arg);
+    public void removeListener(ScreenHandlerListener listener) {
+        this.listeners.remove(listener);
     }
 
     public DefaultedList<ItemStack> getStacks() {
@@ -150,25 +150,25 @@ public abstract class ScreenHandler {
         }
     }
 
-    public boolean onButtonClick(PlayerEntity arg, int i) {
+    public boolean onButtonClick(PlayerEntity player, int id) {
         return false;
     }
 
-    public Slot getSlot(int i) {
-        return this.slots.get(i);
+    public Slot getSlot(int index) {
+        return this.slots.get(index);
     }
 
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
-        Slot lv = this.slots.get(i);
+    public ItemStack transferSlot(PlayerEntity player, int index) {
+        Slot lv = this.slots.get(index);
         if (lv != null) {
             return lv.getStack();
         }
         return ItemStack.EMPTY;
     }
 
-    public ItemStack onSlotClick(int i, int j, SlotActionType arg, PlayerEntity arg2) {
+    public ItemStack onSlotClick(int i, int j, SlotActionType actionType, PlayerEntity arg2) {
         try {
-            return this.method_30010(i, j, arg, arg2);
+            return this.method_30010(i, j, actionType, arg2);
         }
         catch (Exception exception) {
             CrashReport lv = CrashReport.create(exception, "Container click");
@@ -178,7 +178,7 @@ public abstract class ScreenHandler {
             lv2.add("Slot Count", this.slots.size());
             lv2.add("Slot", i);
             lv2.add("Button", j);
-            lv2.add("Type", (Object)arg);
+            lv2.add("Type", (Object)actionType);
             throw new CrashException(lv);
         }
     }
@@ -397,120 +397,120 @@ public abstract class ScreenHandler {
         return lv;
     }
 
-    public static boolean canStacksCombine(ItemStack arg, ItemStack arg2) {
-        return arg.getItem() == arg2.getItem() && ItemStack.areTagsEqual(arg, arg2);
+    public static boolean canStacksCombine(ItemStack first, ItemStack second) {
+        return first.getItem() == second.getItem() && ItemStack.areTagsEqual(first, second);
     }
 
-    public boolean canInsertIntoSlot(ItemStack arg, Slot arg2) {
+    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
         return true;
     }
 
-    public void close(PlayerEntity arg) {
-        PlayerInventory lv = arg.inventory;
+    public void close(PlayerEntity player) {
+        PlayerInventory lv = player.inventory;
         if (!lv.getCursorStack().isEmpty()) {
-            arg.dropItem(lv.getCursorStack(), false);
+            player.dropItem(lv.getCursorStack(), false);
             lv.setCursorStack(ItemStack.EMPTY);
         }
     }
 
-    protected void dropInventory(PlayerEntity arg, World arg2, Inventory arg3) {
-        if (!arg.isAlive() || arg instanceof ServerPlayerEntity && ((ServerPlayerEntity)arg).isDisconnected()) {
-            for (int i = 0; i < arg3.size(); ++i) {
-                arg.dropItem(arg3.removeStack(i), false);
+    protected void dropInventory(PlayerEntity player, World world, Inventory inventory) {
+        if (!player.isAlive() || player instanceof ServerPlayerEntity && ((ServerPlayerEntity)player).isDisconnected()) {
+            for (int i = 0; i < inventory.size(); ++i) {
+                player.dropItem(inventory.removeStack(i), false);
             }
             return;
         }
-        for (int j = 0; j < arg3.size(); ++j) {
-            arg.inventory.offerOrDrop(arg2, arg3.removeStack(j));
+        for (int j = 0; j < inventory.size(); ++j) {
+            player.inventory.offerOrDrop(world, inventory.removeStack(j));
         }
     }
 
-    public void onContentChanged(Inventory arg) {
+    public void onContentChanged(Inventory inventory) {
         this.sendContentUpdates();
     }
 
-    public void setStackInSlot(int i, ItemStack arg) {
-        this.getSlot(i).setStack(arg);
+    public void setStackInSlot(int slot, ItemStack stack) {
+        this.getSlot(slot).setStack(stack);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void updateSlotStacks(List<ItemStack> list) {
-        for (int i = 0; i < list.size(); ++i) {
-            this.getSlot(i).setStack(list.get(i));
+    public void updateSlotStacks(List<ItemStack> stacks) {
+        for (int i = 0; i < stacks.size(); ++i) {
+            this.getSlot(i).setStack(stacks.get(i));
         }
     }
 
-    public void setProperty(int i, int j) {
-        this.properties.get(i).set(j);
+    public void setProperty(int id, int value) {
+        this.properties.get(id).set(value);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public short getNextActionId(PlayerInventory arg) {
+    public short getNextActionId(PlayerInventory playerInventory) {
         this.actionId = (short)(this.actionId + 1);
         return this.actionId;
     }
 
-    public boolean isNotRestricted(PlayerEntity arg) {
-        return !this.restrictedPlayers.contains(arg);
+    public boolean isNotRestricted(PlayerEntity player) {
+        return !this.restrictedPlayers.contains(player);
     }
 
-    public void setPlayerRestriction(PlayerEntity arg, boolean bl) {
-        if (bl) {
-            this.restrictedPlayers.remove(arg);
+    public void setPlayerRestriction(PlayerEntity player, boolean unrestricted) {
+        if (unrestricted) {
+            this.restrictedPlayers.remove(player);
         } else {
-            this.restrictedPlayers.add(arg);
+            this.restrictedPlayers.add(player);
         }
     }
 
     public abstract boolean canUse(PlayerEntity var1);
 
-    protected boolean insertItem(ItemStack arg, int i, int j, boolean bl) {
+    protected boolean insertItem(ItemStack stack, int startIndex, int endIndex, boolean fromLast) {
         boolean bl2 = false;
-        int k = i;
-        if (bl) {
-            k = j - 1;
+        int k = startIndex;
+        if (fromLast) {
+            k = endIndex - 1;
         }
-        if (arg.isStackable()) {
-            while (!arg.isEmpty() && (bl ? k >= i : k < j)) {
+        if (stack.isStackable()) {
+            while (!stack.isEmpty() && (fromLast ? k >= startIndex : k < endIndex)) {
                 Slot lv = this.slots.get(k);
                 ItemStack lv2 = lv.getStack();
-                if (!lv2.isEmpty() && ScreenHandler.canStacksCombine(arg, lv2)) {
-                    int l = lv2.getCount() + arg.getCount();
-                    if (l <= arg.getMaxCount()) {
-                        arg.setCount(0);
+                if (!lv2.isEmpty() && ScreenHandler.canStacksCombine(stack, lv2)) {
+                    int l = lv2.getCount() + stack.getCount();
+                    if (l <= stack.getMaxCount()) {
+                        stack.setCount(0);
                         lv2.setCount(l);
                         lv.markDirty();
                         bl2 = true;
-                    } else if (lv2.getCount() < arg.getMaxCount()) {
-                        arg.decrement(arg.getMaxCount() - lv2.getCount());
-                        lv2.setCount(arg.getMaxCount());
+                    } else if (lv2.getCount() < stack.getMaxCount()) {
+                        stack.decrement(stack.getMaxCount() - lv2.getCount());
+                        lv2.setCount(stack.getMaxCount());
                         lv.markDirty();
                         bl2 = true;
                     }
                 }
-                if (bl) {
+                if (fromLast) {
                     --k;
                     continue;
                 }
                 ++k;
             }
         }
-        if (!arg.isEmpty()) {
-            k = bl ? j - 1 : i;
-            while (bl ? k >= i : k < j) {
+        if (!stack.isEmpty()) {
+            k = fromLast ? endIndex - 1 : startIndex;
+            while (fromLast ? k >= startIndex : k < endIndex) {
                 Slot lv3 = this.slots.get(k);
                 ItemStack lv4 = lv3.getStack();
-                if (lv4.isEmpty() && lv3.canInsert(arg)) {
-                    if (arg.getCount() > lv3.getMaxStackAmount()) {
-                        lv3.setStack(arg.split(lv3.getMaxStackAmount()));
+                if (lv4.isEmpty() && lv3.canInsert(stack)) {
+                    if (stack.getCount() > lv3.getMaxStackAmount()) {
+                        lv3.setStack(stack.split(lv3.getMaxStackAmount()));
                     } else {
-                        lv3.setStack(arg.split(arg.getCount()));
+                        lv3.setStack(stack.split(stack.getCount()));
                     }
                     lv3.markDirty();
                     bl2 = true;
                     break;
                 }
-                if (bl) {
+                if (fromLast) {
                     --k;
                     continue;
                 }
@@ -520,27 +520,27 @@ public abstract class ScreenHandler {
         return bl2;
     }
 
-    public static int unpackQuickCraftButton(int i) {
-        return i >> 2 & 3;
+    public static int unpackQuickCraftButton(int quickCraftData) {
+        return quickCraftData >> 2 & 3;
     }
 
-    public static int unpackQuickCraftStage(int i) {
-        return i & 3;
+    public static int unpackQuickCraftStage(int quickCraftData) {
+        return quickCraftData & 3;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static int packQuickCraftData(int i, int j) {
-        return i & 3 | (j & 3) << 2;
+    public static int packQuickCraftData(int quickCraftStage, int buttonId) {
+        return quickCraftStage & 3 | (buttonId & 3) << 2;
     }
 
-    public static boolean shouldQuickCraftContinue(int i, PlayerEntity arg) {
-        if (i == 0) {
+    public static boolean shouldQuickCraftContinue(int stage, PlayerEntity player) {
+        if (stage == 0) {
             return true;
         }
-        if (i == 1) {
+        if (stage == 1) {
             return true;
         }
-        return i == 2 && arg.abilities.creativeMode;
+        return stage == 2 && player.abilities.creativeMode;
     }
 
     protected void endQuickCraft() {
@@ -548,56 +548,56 @@ public abstract class ScreenHandler {
         this.quickCraftSlots.clear();
     }
 
-    public static boolean canInsertItemIntoSlot(@Nullable Slot arg, ItemStack arg2, boolean bl) {
+    public static boolean canInsertItemIntoSlot(@Nullable Slot slot, ItemStack stack, boolean allowOverflow) {
         boolean bl2;
-        boolean bl3 = bl2 = arg == null || !arg.hasStack();
-        if (!bl2 && arg2.isItemEqualIgnoreDamage(arg.getStack()) && ItemStack.areTagsEqual(arg.getStack(), arg2)) {
-            return arg.getStack().getCount() + (bl ? 0 : arg2.getCount()) <= arg2.getMaxCount();
+        boolean bl = bl2 = slot == null || !slot.hasStack();
+        if (!bl2 && stack.isItemEqualIgnoreDamage(slot.getStack()) && ItemStack.areTagsEqual(slot.getStack(), stack)) {
+            return slot.getStack().getCount() + (allowOverflow ? 0 : stack.getCount()) <= stack.getMaxCount();
         }
         return bl2;
     }
 
-    public static void calculateStackSize(Set<Slot> set, int i, ItemStack arg, int j) {
-        switch (i) {
+    public static void calculateStackSize(Set<Slot> slots, int mode, ItemStack stack, int stackSize) {
+        switch (mode) {
             case 0: {
-                arg.setCount(MathHelper.floor((float)arg.getCount() / (float)set.size()));
+                stack.setCount(MathHelper.floor((float)stack.getCount() / (float)slots.size()));
                 break;
             }
             case 1: {
-                arg.setCount(1);
+                stack.setCount(1);
                 break;
             }
             case 2: {
-                arg.setCount(arg.getItem().getMaxCount());
+                stack.setCount(stack.getItem().getMaxCount());
             }
         }
-        arg.increment(j);
+        stack.increment(stackSize);
     }
 
-    public boolean canInsertIntoSlot(Slot arg) {
+    public boolean canInsertIntoSlot(Slot slot) {
         return true;
     }
 
-    public static int calculateComparatorOutput(@Nullable BlockEntity arg) {
-        if (arg instanceof Inventory) {
-            return ScreenHandler.calculateComparatorOutput((Inventory)((Object)arg));
+    public static int calculateComparatorOutput(@Nullable BlockEntity entity) {
+        if (entity instanceof Inventory) {
+            return ScreenHandler.calculateComparatorOutput((Inventory)((Object)entity));
         }
         return 0;
     }
 
-    public static int calculateComparatorOutput(@Nullable Inventory arg) {
-        if (arg == null) {
+    public static int calculateComparatorOutput(@Nullable Inventory inventory) {
+        if (inventory == null) {
             return 0;
         }
         int i = 0;
         float f = 0.0f;
-        for (int j = 0; j < arg.size(); ++j) {
-            ItemStack lv = arg.getStack(j);
+        for (int j = 0; j < inventory.size(); ++j) {
+            ItemStack lv = inventory.getStack(j);
             if (lv.isEmpty()) continue;
-            f += (float)lv.getCount() / (float)Math.min(arg.getMaxCountPerStack(), lv.getMaxCount());
+            f += (float)lv.getCount() / (float)Math.min(inventory.getMaxCountPerStack(), lv.getMaxCount());
             ++i;
         }
-        return MathHelper.floor((f /= (float)arg.size()) * 14.0f) + (i > 0 ? 1 : 0);
+        return MathHelper.floor((f /= (float)inventory.size()) * 14.0f) + (i > 0 ? 1 : 0);
     }
 }
 

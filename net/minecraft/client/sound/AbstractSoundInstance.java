@@ -34,13 +34,13 @@ implements SoundInstance {
     protected boolean field_18935;
     protected boolean looping;
 
-    protected AbstractSoundInstance(SoundEvent arg, SoundCategory arg2) {
-        this(arg.getId(), arg2);
+    protected AbstractSoundInstance(SoundEvent sound, SoundCategory category) {
+        this(sound.getId(), category);
     }
 
-    protected AbstractSoundInstance(Identifier arg, SoundCategory arg2) {
-        this.id = arg;
-        this.category = arg2;
+    protected AbstractSoundInstance(Identifier soundId, SoundCategory category) {
+        this.id = soundId;
+        this.category = category;
     }
 
     @Override
@@ -49,8 +49,8 @@ implements SoundInstance {
     }
 
     @Override
-    public WeightedSoundSet getSoundSet(SoundManager arg) {
-        WeightedSoundSet lv = arg.get(this.id);
+    public WeightedSoundSet getSoundSet(SoundManager soundManager) {
+        WeightedSoundSet lv = soundManager.get(this.id);
         this.sound = lv == null ? SoundManager.MISSING_SOUND : lv.getSound();
         return lv;
     }

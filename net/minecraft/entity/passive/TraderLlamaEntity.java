@@ -50,16 +50,16 @@ extends LlamaEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("DespawnDelay", this.despawnDelay);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("DespawnDelay", this.despawnDelay);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("DespawnDelay", 99)) {
-            this.despawnDelay = arg.getInt("DespawnDelay");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("DespawnDelay", 99)) {
+            this.despawnDelay = tag.getInt("DespawnDelay");
         }
     }
 
@@ -71,12 +71,12 @@ extends LlamaEntity {
     }
 
     @Override
-    protected void putPlayerOnBack(PlayerEntity arg) {
+    protected void putPlayerOnBack(PlayerEntity player) {
         Entity lv = this.getHoldingEntity();
         if (lv instanceof WanderingTraderEntity) {
             return;
         }
-        super.putPlayerOnBack(arg);
+        super.putPlayerOnBack(player);
     }
 
     @Override
@@ -112,14 +112,14 @@ extends LlamaEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 == SpawnReason.EVENT) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (spawnReason == SpawnReason.EVENT) {
             this.setBreedingAge(0);
         }
-        if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData(false);
+        if (entityData == null) {
+            entityData = new PassiveEntity.PassiveData(false);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     public class DefendTraderGoal
@@ -128,9 +128,9 @@ extends LlamaEntity {
         private LivingEntity offender;
         private int traderLastAttackedTime;
 
-        public DefendTraderGoal(LlamaEntity arg2) {
-            super(arg2, false);
-            this.llama = arg2;
+        public DefendTraderGoal(LlamaEntity llama) {
+            super(llama, false);
+            this.llama = llama;
             this.setControls(EnumSet.of(Goal.Control.TARGET));
         }
 

@@ -31,13 +31,13 @@ extends Task<VillagerEntity> {
     @Nullable
     private GlobalPos chosenPosition;
 
-    public GoToSecondaryPositionTask(MemoryModuleType<List<GlobalPos>> arg, float f, int i, int j, MemoryModuleType<GlobalPos> arg2) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT), arg2, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.secondaryPositions = arg;
-        this.speed = f;
-        this.completionRange = i;
-        this.primaryPositionActivationDistance = j;
-        this.primaryPosition = arg2;
+    public GoToSecondaryPositionTask(MemoryModuleType<List<GlobalPos>> secondaryPositions, float speed, int completionRange, int primaryPositionActivationDistance, MemoryModuleType<GlobalPos> primaryPosition) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), secondaryPositions, (Object)((Object)MemoryModuleState.VALUE_PRESENT), primaryPosition, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.secondaryPositions = secondaryPositions;
+        this.speed = speed;
+        this.completionRange = completionRange;
+        this.primaryPositionActivationDistance = primaryPositionActivationDistance;
+        this.primaryPosition = primaryPosition;
     }
 
     @Override

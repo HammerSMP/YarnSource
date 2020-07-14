@@ -30,8 +30,8 @@ implements Packet<ClientPlayPacketListener> {
     public StatisticsS2CPacket() {
     }
 
-    public StatisticsS2CPacket(Object2IntMap<Stat<?>> object2IntMap) {
-        this.stats = object2IntMap;
+    public StatisticsS2CPacket(Object2IntMap<Stat<?>> stats) {
+        this.stats = stats;
     }
 
     @Override
@@ -40,33 +40,33 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        int i = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        int i = buf.readVarInt();
         this.stats = new Object2IntOpenHashMap(i);
         for (int j = 0; j < i; ++j) {
-            this.readStat((StatType)Registry.STAT_TYPE.get(arg.readVarInt()), arg);
+            this.readStat((StatType)Registry.STAT_TYPE.get(buf.readVarInt()), buf);
         }
     }
 
-    private <T> void readStat(StatType<T> arg, PacketByteBuf arg2) {
-        int i = arg2.readVarInt();
-        int j = arg2.readVarInt();
-        this.stats.put(arg.getOrCreateStat(arg.getRegistry().get(i)), j);
+    private <T> void readStat(StatType<T> type, PacketByteBuf buf) {
+        int i = buf.readVarInt();
+        int j = buf.readVarInt();
+        this.stats.put(type.getOrCreateStat(type.getRegistry().get(i)), j);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.stats.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.stats.size());
         for (Object2IntMap.Entry entry : this.stats.object2IntEntrySet()) {
             Stat lv = (Stat)entry.getKey();
-            arg.writeVarInt(Registry.STAT_TYPE.getRawId(lv.getType()));
-            arg.writeVarInt(this.getStatId(lv));
-            arg.writeVarInt(entry.getIntValue());
+            buf.writeVarInt(Registry.STAT_TYPE.getRawId(lv.getType()));
+            buf.writeVarInt(this.getStatId(lv));
+            buf.writeVarInt(entry.getIntValue());
         }
     }
 
-    private <T> int getStatId(Stat<T> arg) {
-        return arg.getType().getRegistry().getRawId(arg.getValue());
+    private <T> int getStatId(Stat<T> stat) {
+        return stat.getType().getRegistry().getRawId(stat.getValue());
     }
 
     @Environment(value=EnvType.CLIENT)

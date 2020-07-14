@@ -38,30 +38,30 @@ public class ModelTransformation {
         this(Transformation.IDENTITY, Transformation.IDENTITY, Transformation.IDENTITY, Transformation.IDENTITY, Transformation.IDENTITY, Transformation.IDENTITY, Transformation.IDENTITY, Transformation.IDENTITY);
     }
 
-    public ModelTransformation(ModelTransformation arg) {
-        this.thirdPersonLeftHand = arg.thirdPersonLeftHand;
-        this.thirdPersonRightHand = arg.thirdPersonRightHand;
-        this.firstPersonLeftHand = arg.firstPersonLeftHand;
-        this.firstPersonRightHand = arg.firstPersonRightHand;
-        this.head = arg.head;
-        this.gui = arg.gui;
-        this.ground = arg.ground;
-        this.fixed = arg.fixed;
+    public ModelTransformation(ModelTransformation other) {
+        this.thirdPersonLeftHand = other.thirdPersonLeftHand;
+        this.thirdPersonRightHand = other.thirdPersonRightHand;
+        this.firstPersonLeftHand = other.firstPersonLeftHand;
+        this.firstPersonRightHand = other.firstPersonRightHand;
+        this.head = other.head;
+        this.gui = other.gui;
+        this.ground = other.ground;
+        this.fixed = other.fixed;
     }
 
-    public ModelTransformation(Transformation arg, Transformation arg2, Transformation arg3, Transformation arg4, Transformation arg5, Transformation arg6, Transformation arg7, Transformation arg8) {
-        this.thirdPersonLeftHand = arg;
-        this.thirdPersonRightHand = arg2;
-        this.firstPersonLeftHand = arg3;
-        this.firstPersonRightHand = arg4;
-        this.head = arg5;
-        this.gui = arg6;
-        this.ground = arg7;
-        this.fixed = arg8;
+    public ModelTransformation(Transformation thirdPersonLeftHand, Transformation thirdPersonRightHand, Transformation firstPersonLeftHand, Transformation firstPersonRightHand, Transformation head, Transformation gui, Transformation ground, Transformation fixed) {
+        this.thirdPersonLeftHand = thirdPersonLeftHand;
+        this.thirdPersonRightHand = thirdPersonRightHand;
+        this.firstPersonLeftHand = firstPersonLeftHand;
+        this.firstPersonRightHand = firstPersonRightHand;
+        this.head = head;
+        this.gui = gui;
+        this.ground = ground;
+        this.fixed = fixed;
     }
 
-    public Transformation getTransformation(Mode arg) {
-        switch (arg) {
+    public Transformation getTransformation(Mode renderMode) {
+        switch (renderMode) {
             case THIRD_PERSON_LEFT_HAND: {
                 return this.thirdPersonLeftHand;
             }
@@ -90,8 +90,8 @@ public class ModelTransformation {
         return Transformation.IDENTITY;
     }
 
-    public boolean isTransformationDefined(Mode arg) {
-        return this.getTransformation(arg) != Transformation.IDENTITY;
+    public boolean isTransformationDefined(Mode renderMode) {
+        return this.getTransformation(renderMode) != Transformation.IDENTITY;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -119,15 +119,15 @@ public class ModelTransformation {
             return new ModelTransformation(lv2, lv, lv4, lv3, lv5, lv6, lv7, lv8);
         }
 
-        private Transformation parseModelTransformation(JsonDeserializationContext jsonDeserializationContext, JsonObject jsonObject, String string) {
-            if (jsonObject.has(string)) {
-                return (Transformation)jsonDeserializationContext.deserialize(jsonObject.get(string), Transformation.class);
+        private Transformation parseModelTransformation(JsonDeserializationContext ctx, JsonObject json, String key) {
+            if (json.has(key)) {
+                return (Transformation)ctx.deserialize(json.get(key), Transformation.class);
             }
             return Transformation.IDENTITY;
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
     }
 

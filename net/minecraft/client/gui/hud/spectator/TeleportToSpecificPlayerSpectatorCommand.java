@@ -42,7 +42,7 @@ implements SpectatorMenuCommand {
     }
 
     @Override
-    public void use(SpectatorMenu arg) {
+    public void use(SpectatorMenu menu) {
         MinecraftClient.getInstance().getNetworkHandler().sendPacket(new SpectatorTeleportC2SPacket(this.gameProfile.getId()));
     }
 

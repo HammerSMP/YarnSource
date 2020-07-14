@@ -34,10 +34,10 @@ extends LeafEntry {
     private final Tag<Item> name;
     private final boolean expand;
 
-    private TagEntry(Tag<Item> arg, boolean bl, int i, int j, LootCondition[] args, LootFunction[] args2) {
-        super(i, j, args, args2);
-        this.name = arg;
-        this.expand = bl;
+    private TagEntry(Tag<Item> name, boolean expand, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+        super(weight, quality, conditions, functions);
+        this.name = name;
+        this.expand = expand;
     }
 
     @Override
@@ -46,18 +46,18 @@ extends LeafEntry {
     }
 
     @Override
-    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg2) {
-        this.name.values().forEach(arg -> consumer.accept(new ItemStack((ItemConvertible)arg)));
+    public void generateLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
+        this.name.values().forEach(arg -> lootConsumer.accept(new ItemStack((ItemConvertible)arg)));
     }
 
-    private boolean grow(LootContext arg, Consumer<LootChoice> consumer) {
-        if (this.test(arg)) {
+    private boolean grow(LootContext context, Consumer<LootChoice> lootChoiceExpander) {
+        if (this.test(context)) {
             for (final Item lv : this.name.values()) {
-                consumer.accept(new LeafEntry.Choice(){
+                lootChoiceExpander.accept(new LeafEntry.Choice(){
 
                     @Override
-                    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
-                        consumer.accept(new ItemStack(lv));
+                    public void generateLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
+                        lootConsumer.accept(new ItemStack(lv));
                     }
                 });
             }
@@ -74,8 +74,8 @@ extends LeafEntry {
         return super.expand(arg, consumer);
     }
 
-    public static LeafEntry.Builder<?> builder(Tag<Item> arg) {
-        return TagEntry.builder((int i, int j, LootCondition[] args, LootFunction[] args2) -> new TagEntry(arg, true, i, j, args, args2));
+    public static LeafEntry.Builder<?> builder(Tag<Item> name) {
+        return TagEntry.builder((int weight, int quality, LootCondition[] conditions, LootFunction[] functions) -> new TagEntry(name, true, weight, quality, conditions, functions));
     }
 
     public static class Serializer
@@ -99,8 +99,8 @@ extends LeafEntry {
         }
 
         @Override
-        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, args2);
+        protected /* synthetic */ LeafEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+            return this.fromJson(entryJson, context, weight, quality, conditions, functions);
         }
     }
 }

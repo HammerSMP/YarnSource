@@ -32,27 +32,27 @@ extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg2, PlayerEntity arg22, Hand arg3) {
-        List<AreaEffectCloudEntity> list = arg2.getEntities(AreaEffectCloudEntity.class, arg22.getBoundingBox().expand(2.0), arg -> arg != null && arg.isAlive() && arg.getOwner() instanceof EnderDragonEntity);
-        ItemStack lv = arg22.getStackInHand(arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        List<AreaEffectCloudEntity> list = world.getEntities(AreaEffectCloudEntity.class, user.getBoundingBox().expand(2.0), entity -> entity != null && entity.isAlive() && entity.getOwner() instanceof EnderDragonEntity);
+        ItemStack lv = user.getStackInHand(hand);
         if (!list.isEmpty()) {
             AreaEffectCloudEntity lv2 = list.get(0);
             lv2.setRadius(lv2.getRadius() - 0.5f);
-            arg2.playSound(null, arg22.getX(), arg22.getY(), arg22.getZ(), SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-            return TypedActionResult.method_29237(this.fill(lv, arg22, new ItemStack(Items.DRAGON_BREATH)), arg2.isClient());
+            world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+            return TypedActionResult.method_29237(this.fill(lv, user, new ItemStack(Items.DRAGON_BREATH)), world.isClient());
         }
-        BlockHitResult lv3 = GlassBottleItem.rayTrace(arg2, arg22, RayTraceContext.FluidHandling.SOURCE_ONLY);
+        BlockHitResult lv3 = GlassBottleItem.rayTrace(world, user, RayTraceContext.FluidHandling.SOURCE_ONLY);
         if (((HitResult)lv3).getType() == HitResult.Type.MISS) {
             return TypedActionResult.pass(lv);
         }
         if (((HitResult)lv3).getType() == HitResult.Type.BLOCK) {
             BlockPos lv4 = lv3.getBlockPos();
-            if (!arg2.canPlayerModifyAt(arg22, lv4)) {
+            if (!world.canPlayerModifyAt(user, lv4)) {
                 return TypedActionResult.pass(lv);
             }
-            if (arg2.getFluidState(lv4).isIn(FluidTags.WATER)) {
-                arg2.playSound(arg22, arg22.getX(), arg22.getY(), arg22.getZ(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-                return TypedActionResult.method_29237(this.fill(lv, arg22, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)), arg2.isClient());
+            if (world.getFluidState(lv4).isIn(FluidTags.WATER)) {
+                world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+                return TypedActionResult.method_29237(this.fill(lv, user, PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER)), world.isClient());
             }
         }
         return TypedActionResult.pass(lv);

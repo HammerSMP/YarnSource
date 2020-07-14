@@ -21,8 +21,8 @@ import net.minecraft.particle.ParticleTypes;
 @Environment(value=EnvType.CLIENT)
 public class LavaEmberParticle
 extends SpriteBillboardParticle {
-    private LavaEmberParticle(ClientWorld arg, double d, double e, double f) {
-        super(arg, d, e, f, 0.0, 0.0, 0.0);
+    private LavaEmberParticle(ClientWorld world, double x, double y, double z) {
+        super(world, x, y, z, 0.0, 0.0, 0.0);
         this.velocityX *= (double)0.8f;
         this.velocityY *= (double)0.8f;
         this.velocityZ *= (double)0.8f;
@@ -37,16 +37,16 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public int getColorMultiplier(float f) {
-        int i = super.getColorMultiplier(f);
+    public int getColorMultiplier(float tint) {
+        int i = super.getColorMultiplier(tint);
         int j = 240;
         int k = i >> 16 & 0xFF;
         return 0xF0 | k << 16;
     }
 
     @Override
-    public float getSize(float f) {
-        float g = ((float)this.age + f) / (float)this.maxAge;
+    public float getSize(float tickDelta) {
+        float g = ((float)this.age + tickDelta) / (float)this.maxAge;
         return this.scale * (1.0f - g * g);
     }
 
@@ -79,8 +79,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

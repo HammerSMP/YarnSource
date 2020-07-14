@@ -26,8 +26,8 @@ import net.minecraft.text.Text;
 
 public class EntityCustomNameToTextFix
 extends DataFix {
-    public EntityCustomNameToTextFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public EntityCustomNameToTextFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     public TypeRewriteRule makeRule() {

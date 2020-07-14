@@ -72,67 +72,67 @@ extends BlockEntity {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.putString("name", this.getStructureName());
-        arg.putString("author", this.author);
-        arg.putString("metadata", this.metadata);
-        arg.putInt("posX", this.offset.getX());
-        arg.putInt("posY", this.offset.getY());
-        arg.putInt("posZ", this.offset.getZ());
-        arg.putInt("sizeX", this.size.getX());
-        arg.putInt("sizeY", this.size.getY());
-        arg.putInt("sizeZ", this.size.getZ());
-        arg.putString("rotation", this.rotation.toString());
-        arg.putString("mirror", this.mirror.toString());
-        arg.putString("mode", this.mode.toString());
-        arg.putBoolean("ignoreEntities", this.ignoreEntities);
-        arg.putBoolean("powered", this.powered);
-        arg.putBoolean("showair", this.showAir);
-        arg.putBoolean("showboundingbox", this.showBoundingBox);
-        arg.putFloat("integrity", this.integrity);
-        arg.putLong("seed", this.seed);
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putString("name", this.getStructureName());
+        tag.putString("author", this.author);
+        tag.putString("metadata", this.metadata);
+        tag.putInt("posX", this.offset.getX());
+        tag.putInt("posY", this.offset.getY());
+        tag.putInt("posZ", this.offset.getZ());
+        tag.putInt("sizeX", this.size.getX());
+        tag.putInt("sizeY", this.size.getY());
+        tag.putInt("sizeZ", this.size.getZ());
+        tag.putString("rotation", this.rotation.toString());
+        tag.putString("mirror", this.mirror.toString());
+        tag.putString("mode", this.mode.toString());
+        tag.putBoolean("ignoreEntities", this.ignoreEntities);
+        tag.putBoolean("powered", this.powered);
+        tag.putBoolean("showair", this.showAir);
+        tag.putBoolean("showboundingbox", this.showBoundingBox);
+        tag.putFloat("integrity", this.integrity);
+        tag.putLong("seed", this.seed);
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.setStructureName(arg2.getString("name"));
-        this.author = arg2.getString("author");
-        this.metadata = arg2.getString("metadata");
-        int i = MathHelper.clamp(arg2.getInt("posX"), -48, 48);
-        int j = MathHelper.clamp(arg2.getInt("posY"), -48, 48);
-        int k = MathHelper.clamp(arg2.getInt("posZ"), -48, 48);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.setStructureName(tag.getString("name"));
+        this.author = tag.getString("author");
+        this.metadata = tag.getString("metadata");
+        int i = MathHelper.clamp(tag.getInt("posX"), -48, 48);
+        int j = MathHelper.clamp(tag.getInt("posY"), -48, 48);
+        int k = MathHelper.clamp(tag.getInt("posZ"), -48, 48);
         this.offset = new BlockPos(i, j, k);
-        int l = MathHelper.clamp(arg2.getInt("sizeX"), 0, 48);
-        int m = MathHelper.clamp(arg2.getInt("sizeY"), 0, 48);
-        int n = MathHelper.clamp(arg2.getInt("sizeZ"), 0, 48);
+        int l = MathHelper.clamp(tag.getInt("sizeX"), 0, 48);
+        int m = MathHelper.clamp(tag.getInt("sizeY"), 0, 48);
+        int n = MathHelper.clamp(tag.getInt("sizeZ"), 0, 48);
         this.size = new BlockPos(l, m, n);
         try {
-            this.rotation = BlockRotation.valueOf(arg2.getString("rotation"));
+            this.rotation = BlockRotation.valueOf(tag.getString("rotation"));
         }
         catch (IllegalArgumentException illegalArgumentException) {
             this.rotation = BlockRotation.NONE;
         }
         try {
-            this.mirror = BlockMirror.valueOf(arg2.getString("mirror"));
+            this.mirror = BlockMirror.valueOf(tag.getString("mirror"));
         }
         catch (IllegalArgumentException illegalArgumentException2) {
             this.mirror = BlockMirror.NONE;
         }
         try {
-            this.mode = StructureBlockMode.valueOf(arg2.getString("mode"));
+            this.mode = StructureBlockMode.valueOf(tag.getString("mode"));
         }
         catch (IllegalArgumentException illegalArgumentException3) {
             this.mode = StructureBlockMode.DATA;
         }
-        this.ignoreEntities = arg2.getBoolean("ignoreEntities");
-        this.powered = arg2.getBoolean("powered");
-        this.showAir = arg2.getBoolean("showair");
-        this.showBoundingBox = arg2.getBoolean("showboundingbox");
-        this.integrity = arg2.contains("integrity") ? arg2.getFloat("integrity") : 1.0f;
-        this.seed = arg2.getLong("seed");
+        this.ignoreEntities = tag.getBoolean("ignoreEntities");
+        this.powered = tag.getBoolean("powered");
+        this.showAir = tag.getBoolean("showair");
+        this.showBoundingBox = tag.getBoolean("showboundingbox");
+        this.integrity = tag.contains("integrity") ? tag.getFloat("integrity") : 1.0f;
+        this.seed = tag.getLong("seed");
         this.updateBlockMode();
     }
 
@@ -158,12 +158,12 @@ extends BlockEntity {
         return this.toTag(new CompoundTag());
     }
 
-    public boolean openScreen(PlayerEntity arg) {
-        if (!arg.isCreativeLevelTwoOp()) {
+    public boolean openScreen(PlayerEntity player) {
+        if (!player.isCreativeLevelTwoOp()) {
             return false;
         }
-        if (arg.getEntityWorld().isClient) {
-            arg.openStructureBlockScreen(this);
+        if (player.getEntityWorld().isClient) {
+            player.openStructureBlockScreen(this);
         }
         return true;
     }
@@ -180,16 +180,16 @@ extends BlockEntity {
         return this.structureName != null;
     }
 
-    public void setStructureName(@Nullable String string) {
-        this.setStructureName(ChatUtil.isEmpty(string) ? null : Identifier.tryParse(string));
+    public void setStructureName(@Nullable String name) {
+        this.setStructureName(ChatUtil.isEmpty(name) ? null : Identifier.tryParse(name));
     }
 
     public void setStructureName(@Nullable Identifier arg) {
         this.structureName = arg;
     }
 
-    public void setAuthor(LivingEntity arg) {
-        this.author = arg.getName().getString();
+    public void setAuthor(LivingEntity entity) {
+        this.author = entity.getName().getString();
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -197,16 +197,16 @@ extends BlockEntity {
         return this.offset;
     }
 
-    public void setOffset(BlockPos arg) {
-        this.offset = arg;
+    public void setOffset(BlockPos pos) {
+        this.offset = pos;
     }
 
     public BlockPos getSize() {
         return this.size;
     }
 
-    public void setSize(BlockPos arg) {
-        this.size = arg;
+    public void setSize(BlockPos pos) {
+        this.size = pos;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -214,16 +214,16 @@ extends BlockEntity {
         return this.mirror;
     }
 
-    public void setMirror(BlockMirror arg) {
-        this.mirror = arg;
+    public void setMirror(BlockMirror mirror) {
+        this.mirror = mirror;
     }
 
     public BlockRotation getRotation() {
         return this.rotation;
     }
 
-    public void setRotation(BlockRotation arg) {
-        this.rotation = arg;
+    public void setRotation(BlockRotation rotation) {
+        this.rotation = rotation;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -231,19 +231,19 @@ extends BlockEntity {
         return this.metadata;
     }
 
-    public void setMetadata(String string) {
-        this.metadata = string;
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
     public StructureBlockMode getMode() {
         return this.mode;
     }
 
-    public void setMode(StructureBlockMode arg) {
-        this.mode = arg;
+    public void setMode(StructureBlockMode mode) {
+        this.mode = mode;
         BlockState lv = this.world.getBlockState(this.getPos());
         if (lv.isOf(Blocks.STRUCTURE_BLOCK)) {
-            this.world.setBlockState(this.getPos(), (BlockState)lv.with(StructureBlock.MODE, arg), 2);
+            this.world.setBlockState(this.getPos(), (BlockState)lv.with(StructureBlock.MODE, mode), 2);
         }
     }
 
@@ -273,8 +273,8 @@ extends BlockEntity {
         return this.ignoreEntities;
     }
 
-    public void setIgnoreEntities(boolean bl) {
-        this.ignoreEntities = bl;
+    public void setIgnoreEntities(boolean ignoreEntities) {
+        this.ignoreEntities = ignoreEntities;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -282,8 +282,8 @@ extends BlockEntity {
         return this.integrity;
     }
 
-    public void setIntegrity(float f) {
-        this.integrity = f;
+    public void setIntegrity(float integrity) {
+        this.integrity = integrity;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -291,8 +291,8 @@ extends BlockEntity {
         return this.seed;
     }
 
-    public void setSeed(long l) {
-        this.seed = l;
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
     public boolean detectStructureSize() {
@@ -320,14 +320,14 @@ extends BlockEntity {
         return false;
     }
 
-    private List<StructureBlockBlockEntity> findCorners(List<StructureBlockBlockEntity> list) {
+    private List<StructureBlockBlockEntity> findCorners(List<StructureBlockBlockEntity> structureBlockEntities) {
         Predicate<StructureBlockBlockEntity> predicate = arg -> arg.mode == StructureBlockMode.CORNER && Objects.equals(this.structureName, arg.structureName);
-        return list.stream().filter(predicate).collect(Collectors.toList());
+        return structureBlockEntities.stream().filter(predicate).collect(Collectors.toList());
     }
 
-    private List<StructureBlockBlockEntity> findStructureBlockEntities(BlockPos arg, BlockPos arg2) {
+    private List<StructureBlockBlockEntity> findStructureBlockEntities(BlockPos pos1, BlockPos pos2) {
         ArrayList list = Lists.newArrayList();
-        for (BlockPos lv : BlockPos.iterate(arg, arg2)) {
+        for (BlockPos lv : BlockPos.iterate(pos1, pos2)) {
             BlockEntity lv3;
             BlockState lv2 = this.world.getBlockState(lv);
             if (!lv2.isOf(Blocks.STRUCTURE_BLOCK) || (lv3 = this.world.getBlockEntity(lv)) == null || !(lv3 instanceof StructureBlockBlockEntity)) continue;
@@ -336,15 +336,15 @@ extends BlockEntity {
         return list;
     }
 
-    private BlockBox makeBoundingBox(BlockPos arg, List<StructureBlockBlockEntity> list) {
+    private BlockBox makeBoundingBox(BlockPos center, List<StructureBlockBlockEntity> corners) {
         BlockBox lv3;
-        if (list.size() > 1) {
-            BlockPos lv = list.get(0).getPos();
+        if (corners.size() > 1) {
+            BlockPos lv = corners.get(0).getPos();
             BlockBox lv2 = new BlockBox(lv, lv);
         } else {
-            lv3 = new BlockBox(arg, arg);
+            lv3 = new BlockBox(center, center);
         }
-        for (StructureBlockBlockEntity lv4 : list) {
+        for (StructureBlockBlockEntity lv4 : corners) {
             BlockPos lv5 = lv4.getPos();
             if (lv5.getX() < lv3.minX) {
                 lv3.minX = lv5.getX();
@@ -404,11 +404,11 @@ extends BlockEntity {
         return this.loadStructure(arg, true);
     }
 
-    private static Random createRandom(long l) {
-        if (l == 0L) {
+    private static Random createRandom(long seed) {
+        if (seed == 0L) {
             return new Random(Util.getMeasuringTimeMs());
         }
-        return new Random(l);
+        return new Random(seed);
     }
 
     /*
@@ -484,8 +484,8 @@ extends BlockEntity {
         return this.powered;
     }
 
-    public void setPowered(boolean bl) {
-        this.powered = bl;
+    public void setPowered(boolean powered) {
+        this.powered = powered;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -493,8 +493,8 @@ extends BlockEntity {
         return this.showAir;
     }
 
-    public void setShowAir(boolean bl) {
-        this.showAir = bl;
+    public void setShowAir(boolean showAir) {
+        this.showAir = showAir;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -502,8 +502,8 @@ extends BlockEntity {
         return this.showBoundingBox;
     }
 
-    public void setShowBoundingBox(boolean bl) {
-        this.showBoundingBox = bl;
+    public void setShowBoundingBox(boolean showBoundingBox) {
+        this.showBoundingBox = showBoundingBox;
     }
 
     public static enum Action {

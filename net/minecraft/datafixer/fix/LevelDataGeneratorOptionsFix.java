@@ -124,8 +124,8 @@ extends DataFix {
         hashMap.put("167", "minecraft:modified_badlands_plateau");
     });
 
-    public LevelDataGeneratorOptionsFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public LevelDataGeneratorOptionsFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     protected TypeRewriteRule makeRule() {
@@ -146,12 +146,12 @@ extends DataFix {
         }).map(Pair::getFirst).result().orElseThrow(() -> new IllegalStateException("Could not read new level type.")));
     }
 
-    private static <T> Dynamic<T> fixGeneratorOptions(String string, DynamicOps<T> dynamicOps) {
+    private static <T> Dynamic<T> fixGeneratorOptions(String generatorOptions, DynamicOps<T> dynamicOps) {
         ArrayList list2;
-        Iterator iterator = Splitter.on((char)';').split((CharSequence)string).iterator();
+        Iterator iterator = Splitter.on((char)';').split((CharSequence)generatorOptions).iterator();
         String string2 = "minecraft:plains";
         HashMap map = Maps.newHashMap();
-        if (!string.isEmpty() && iterator.hasNext()) {
+        if (!generatorOptions.isEmpty() && iterator.hasNext()) {
             List<Pair<Integer, String>> list = LevelDataGeneratorOptionsFix.parseFlatLayers((String)iterator.next());
             if (!list.isEmpty()) {
                 if (iterator.hasNext()) {
@@ -188,9 +188,9 @@ extends DataFix {
     }
 
     @Nullable
-    private static Pair<Integer, String> parseFlatLayer(String string) {
+    private static Pair<Integer, String> parseFlatLayer(String layer) {
         int j;
-        String[] strings = string.split("\\*", 2);
+        String[] strings = layer.split("\\*", 2);
         if (strings.length == 2) {
             try {
                 int i = Integer.parseInt(strings[0]);
@@ -205,10 +205,10 @@ extends DataFix {
         return Pair.of((Object)j, (Object)string2);
     }
 
-    private static List<Pair<Integer, String>> parseFlatLayers(String string) {
+    private static List<Pair<Integer, String>> parseFlatLayers(String layers) {
         String[] strings;
         ArrayList list = Lists.newArrayList();
-        for (String string2 : strings = string.split(",")) {
+        for (String string2 : strings = layers.split(",")) {
             Pair<Integer, String> pair = LevelDataGeneratorOptionsFix.parseFlatLayer(string2);
             if (pair == null) {
                 return Collections.emptyList();

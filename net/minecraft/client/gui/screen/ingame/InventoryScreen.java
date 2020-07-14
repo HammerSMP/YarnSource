@@ -42,8 +42,8 @@ implements RecipeBookProvider {
     private boolean narrow;
     private boolean mouseDown;
 
-    public InventoryScreen(PlayerEntity arg) {
-        super(arg.playerScreenHandler, arg.inventory, new TranslatableText("container.crafting"));
+    public InventoryScreen(PlayerEntity player) {
+        super(player.playerScreenHandler, player.inventory, new TranslatableText("container.crafting"));
         this.passEvents = true;
         this.titleX = 97;
     }
@@ -80,113 +80,113 @@ implements RecipeBookProvider {
     }
 
     @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.textRenderer.draw(arg, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         boolean bl = this.drawStatusEffects = !this.recipeBook.isOpen();
         if (this.recipeBook.isOpen() && this.narrow) {
-            this.drawBackground(arg, f, i, j);
-            this.recipeBook.render(arg, i, j, f);
+            this.drawBackground(matrices, delta, mouseX, mouseY);
+            this.recipeBook.render(matrices, mouseX, mouseY, delta);
         } else {
-            this.recipeBook.render(arg, i, j, f);
-            super.render(arg, i, j, f);
-            this.recipeBook.drawGhostSlots(arg, this.x, this.y, false, f);
+            this.recipeBook.render(matrices, mouseX, mouseY, delta);
+            super.render(matrices, mouseX, mouseY, delta);
+            this.recipeBook.drawGhostSlots(matrices, this.x, this.y, false, delta);
         }
-        this.drawMouseoverTooltip(arg, i, j);
-        this.recipeBook.drawTooltip(arg, this.x, this.y, i, j);
-        this.mouseX = i;
-        this.mouseY = j;
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+        this.recipeBook.drawTooltip(matrices, this.x, this.y, mouseX, mouseY);
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         int k = this.x;
         int l = this.y;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
         InventoryScreen.drawEntity(k + 51, l + 75, 30, (float)(k + 51) - this.mouseX, (float)(l + 75 - 50) - this.mouseY, this.client.player);
     }
 
-    public static void drawEntity(int i, int j, int k, float f, float g, LivingEntity arg) {
-        float h = (float)Math.atan(f / 40.0f);
-        float l = (float)Math.atan(g / 40.0f);
+    public static void drawEntity(int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
+        float h = (float)Math.atan(mouseX / 40.0f);
+        float l = (float)Math.atan(mouseY / 40.0f);
         RenderSystem.pushMatrix();
-        RenderSystem.translatef(i, j, 1050.0f);
+        RenderSystem.translatef(x, y, 1050.0f);
         RenderSystem.scalef(1.0f, 1.0f, -1.0f);
         MatrixStack lv = new MatrixStack();
         lv.translate(0.0, 0.0, 1000.0);
-        lv.scale(k, k, k);
+        lv.scale(size, size, size);
         Quaternion lv2 = Vector3f.POSITIVE_Z.getDegreesQuaternion(180.0f);
         Quaternion lv3 = Vector3f.POSITIVE_X.getDegreesQuaternion(l * 20.0f);
         lv2.hamiltonProduct(lv3);
         lv.multiply(lv2);
-        float m = arg.bodyYaw;
-        float n = arg.yaw;
-        float o = arg.pitch;
-        float p = arg.prevHeadYaw;
-        float q = arg.headYaw;
-        arg.bodyYaw = 180.0f + h * 20.0f;
-        arg.yaw = 180.0f + h * 40.0f;
-        arg.pitch = -l * 20.0f;
-        arg.headYaw = arg.yaw;
-        arg.prevHeadYaw = arg.yaw;
+        float m = entity.bodyYaw;
+        float n = entity.yaw;
+        float o = entity.pitch;
+        float p = entity.prevHeadYaw;
+        float q = entity.headYaw;
+        entity.bodyYaw = 180.0f + h * 20.0f;
+        entity.yaw = 180.0f + h * 40.0f;
+        entity.pitch = -l * 20.0f;
+        entity.headYaw = entity.yaw;
+        entity.prevHeadYaw = entity.yaw;
         EntityRenderDispatcher lv4 = MinecraftClient.getInstance().getEntityRenderManager();
         lv3.conjugate();
         lv4.setRotation(lv3);
         lv4.setRenderShadows(false);
         VertexConsumerProvider.Immediate lv5 = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-        RenderSystem.runAsFancy(() -> lv4.render(arg, 0.0, 0.0, 0.0, 0.0f, 1.0f, lv, lv5, 0xF000F0));
+        RenderSystem.runAsFancy(() -> lv4.render(entity, 0.0, 0.0, 0.0, 0.0f, 1.0f, lv, lv5, 0xF000F0));
         lv5.draw();
         lv4.setRenderShadows(true);
-        arg.bodyYaw = m;
-        arg.yaw = n;
-        arg.pitch = o;
-        arg.prevHeadYaw = p;
-        arg.headYaw = q;
+        entity.bodyYaw = m;
+        entity.yaw = n;
+        entity.pitch = o;
+        entity.prevHeadYaw = p;
+        entity.headYaw = q;
         RenderSystem.popMatrix();
     }
 
     @Override
-    protected boolean isPointWithinBounds(int i, int j, int k, int l, double d, double e) {
-        return (!this.narrow || !this.recipeBook.isOpen()) && super.isPointWithinBounds(i, j, k, l, d, e);
+    protected boolean isPointWithinBounds(int xPosition, int yPosition, int width, int height, double pointX, double pointY) {
+        return (!this.narrow || !this.recipeBook.isOpen()) && super.isPointWithinBounds(xPosition, yPosition, width, height, pointX, pointY);
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (this.recipeBook.mouseClicked(d, e, i)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.recipeBook.mouseClicked(mouseX, mouseY, button)) {
             this.setFocused(this.recipeBook);
             return true;
         }
         if (this.narrow && this.recipeBook.isOpen()) {
             return false;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (this.mouseDown) {
             this.mouseDown = false;
             return true;
         }
-        return super.mouseReleased(d, e, i);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
-    protected boolean isClickOutsideBounds(double d, double e, int i, int j, int k) {
-        boolean bl = d < (double)i || e < (double)j || d >= (double)(i + this.backgroundWidth) || e >= (double)(j + this.backgroundHeight);
-        return this.recipeBook.isClickOutsideBounds(d, e, this.x, this.y, this.backgroundWidth, this.backgroundHeight, k) && bl;
+    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+        boolean bl = mouseX < (double)left || mouseY < (double)top || mouseX >= (double)(left + this.backgroundWidth) || mouseY >= (double)(top + this.backgroundHeight);
+        return this.recipeBook.isClickOutsideBounds(mouseX, mouseY, this.x, this.y, this.backgroundWidth, this.backgroundHeight, button) && bl;
     }
 
     @Override
-    protected void onMouseClick(Slot arg, int i, int j, SlotActionType arg2) {
-        super.onMouseClick(arg, i, j, arg2);
-        this.recipeBook.slotClicked(arg);
+    protected void onMouseClick(Slot slot, int invSlot, int clickData, SlotActionType actionType) {
+        super.onMouseClick(slot, invSlot, clickData, actionType);
+        this.recipeBook.slotClicked(slot);
     }
 
     @Override

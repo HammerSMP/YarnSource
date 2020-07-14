@@ -21,8 +21,8 @@ extends ServerConfigList<GameProfile, BannedPlayerEntry> {
     }
 
     @Override
-    protected ServerConfigEntry<GameProfile> fromJson(JsonObject jsonObject) {
-        return new BannedPlayerEntry(jsonObject);
+    protected ServerConfigEntry<GameProfile> fromJson(JsonObject json) {
+        return new BannedPlayerEntry(json);
     }
 
     @Override
@@ -46,8 +46,8 @@ extends ServerConfigList<GameProfile, BannedPlayerEntry> {
     }
 
     @Override
-    protected /* synthetic */ String toString(Object object) {
-        return this.toString((GameProfile)object);
+    protected /* synthetic */ String toString(Object profile) {
+        return this.toString((GameProfile)profile);
     }
 }
 

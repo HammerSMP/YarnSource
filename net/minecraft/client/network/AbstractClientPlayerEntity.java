@@ -38,9 +38,9 @@ extends PlayerEntity {
     public float elytraRoll;
     public final ClientWorld clientWorld;
 
-    public AbstractClientPlayerEntity(ClientWorld arg, GameProfile gameProfile) {
-        super(arg, arg.getSpawnPos(), gameProfile);
-        this.clientWorld = arg;
+    public AbstractClientPlayerEntity(ClientWorld world, GameProfile profile) {
+        super(world, world.getSpawnPos(), profile);
+        this.clientWorld = world;
     }
 
     @Override
@@ -93,18 +93,18 @@ extends PlayerEntity {
         return lv == null ? null : lv.getElytraTexture();
     }
 
-    public static PlayerSkinTexture loadSkin(Identifier arg, String string) {
+    public static PlayerSkinTexture loadSkin(Identifier id, String playerName) {
         TextureManager lv = MinecraftClient.getInstance().getTextureManager();
-        AbstractTexture lv2 = lv.getTexture(arg);
+        AbstractTexture lv2 = lv.getTexture(id);
         if (lv2 == null) {
-            lv2 = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", ChatUtil.stripTextFormat(string)), DefaultSkinHelper.getTexture(AbstractClientPlayerEntity.getOfflinePlayerUuid(string)), true, null);
-            lv.registerTexture(arg, lv2);
+            lv2 = new PlayerSkinTexture(null, String.format("http://skins.minecraft.net/MinecraftSkins/%s.png", ChatUtil.stripTextFormat(playerName)), DefaultSkinHelper.getTexture(AbstractClientPlayerEntity.getOfflinePlayerUuid(playerName)), true, null);
+            lv.registerTexture(id, lv2);
         }
         return (PlayerSkinTexture)lv2;
     }
 
-    public static Identifier getSkinId(String string) {
-        return new Identifier("skins/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)ChatUtil.stripTextFormat(string)));
+    public static Identifier getSkinId(String playerName) {
+        return new Identifier("skins/" + (Object)Hashing.sha1().hashUnencodedChars((CharSequence)ChatUtil.stripTextFormat(playerName)));
     }
 
     public String getModel() {

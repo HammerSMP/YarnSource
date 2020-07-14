@@ -23,8 +23,8 @@ public class TreeDecoratorType<P extends TreeDecorator> {
     public static final TreeDecoratorType<AlterGroundTreeDecorator> ALTER_GROUND = TreeDecoratorType.register("alter_ground", AlterGroundTreeDecorator.CODEC);
     private final Codec<P> codec;
 
-    private static <P extends TreeDecorator> TreeDecoratorType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.TREE_DECORATOR_TYPE, string, new TreeDecoratorType<P>(codec));
+    private static <P extends TreeDecorator> TreeDecoratorType<P> register(String type, Codec<P> codec) {
+        return Registry.register(Registry.TREE_DECORATOR_TYPE, type, new TreeDecoratorType<P>(codec));
     }
 
     private TreeDecoratorType(Codec<P> codec) {

@@ -17,9 +17,9 @@ public class TextureStitcherCannotFitException
 extends RuntimeException {
     private final Collection<Sprite.Info> sprites;
 
-    public TextureStitcherCannotFitException(Sprite.Info arg, Collection<Sprite.Info> collection) {
-        super(String.format("Unable to fit: %s - size: %dx%d - Maybe try a lower resolution resourcepack?", arg.getId(), arg.getWidth(), arg.getHeight()));
-        this.sprites = collection;
+    public TextureStitcherCannotFitException(Sprite.Info sprite, Collection<Sprite.Info> sprites) {
+        super(String.format("Unable to fit: %s - size: %dx%d - Maybe try a lower resolution resourcepack?", sprite.getId(), sprite.getWidth(), sprite.getHeight()));
+        this.sprites = sprites;
     }
 
     public Collection<Sprite.Info> getSprites() {

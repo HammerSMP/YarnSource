@@ -79,21 +79,21 @@ extends AnimalEntity {
         return this.dataTracker.get(TRUSTING);
     }
 
-    private void setTrusting(boolean bl) {
-        this.dataTracker.set(TRUSTING, bl);
+    private void setTrusting(boolean trusting) {
+        this.dataTracker.set(TRUSTING, trusting);
         this.updateFleeing();
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("Trusting", this.isTrusting());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("Trusting", this.isTrusting());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setTrusting(arg.getBoolean("Trusting"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setTrusting(tag.getBoolean("Trusting"));
     }
 
     @Override
@@ -137,7 +137,7 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return !this.isTrusting() && this.age > 2400;
     }
 
@@ -146,7 +146,7 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
@@ -162,7 +162,7 @@ extends AnimalEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_OCELOT_HURT;
     }
 
@@ -176,23 +176,23 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        return arg.damage(DamageSource.mob(this), this.getAttackDamage());
+    public boolean tryAttack(Entity target) {
+        return target.damage(DamageSource.mob(this), this.getAttackDamage());
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
-        if ((this.temptGoal == null || this.temptGoal.isActive()) && !this.isTrusting() && this.isBreedingItem(lv) && arg.squaredDistanceTo(this) < 9.0) {
-            this.eat(arg, lv);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
+        if ((this.temptGoal == null || this.temptGoal.isActive()) && !this.isTrusting() && this.isBreedingItem(lv) && player.squaredDistanceTo(this) < 9.0) {
+            this.eat(player, lv);
             if (!this.world.isClient) {
                 if (this.random.nextInt(3) == 0) {
                     this.setTrusting(true);
@@ -205,24 +205,24 @@ extends AnimalEntity {
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 41) {
+    public void handleStatus(byte status) {
+        if (status == 41) {
             this.showEmoteParticle(true);
-        } else if (b == 40) {
+        } else if (status == 40) {
             this.showEmoteParticle(false);
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
-    private void showEmoteParticle(boolean bl) {
+    private void showEmoteParticle(boolean positive) {
         DefaultParticleType lv = ParticleTypes.HEART;
-        if (!bl) {
+        if (!positive) {
             lv = ParticleTypes.SMOKE;
         }
         for (int i = 0; i < 7; ++i) {
@@ -249,22 +249,22 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return TAMING_INGREDIENT.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return TAMING_INGREDIENT.test(stack);
     }
 
-    public static boolean canSpawn(EntityType<OcelotEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<OcelotEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
         return random.nextInt(3) != 0;
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        if (arg.intersectsEntities(this) && !arg.containsFluid(this.getBoundingBox())) {
+    public boolean canSpawn(WorldView world) {
+        if (world.intersectsEntities(this) && !world.containsFluid(this.getBoundingBox())) {
             BlockPos lv = this.getBlockPos();
-            if (lv.getY() < arg.getSeaLevel()) {
+            if (lv.getY() < world.getSeaLevel()) {
                 return false;
             }
-            BlockState lv2 = arg.getBlockState(lv.down());
+            BlockState lv2 = world.getBlockState(lv.down());
             if (lv2.isOf(Blocks.GRASS_BLOCK) || lv2.isIn(BlockTags.LEAVES)) {
                 return true;
             }
@@ -274,11 +274,11 @@ extends AnimalEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData(1.0f);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (entityData == null) {
+            entityData = new PassiveEntity.PassiveData(1.0f);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -296,9 +296,9 @@ extends AnimalEntity {
     extends TemptGoal {
         private final OcelotEntity ocelot;
 
-        public OcelotTemptGoal(OcelotEntity arg, double d, Ingredient arg2, boolean bl) {
-            super((PathAwareEntity)arg, d, arg2, bl);
-            this.ocelot = arg;
+        public OcelotTemptGoal(OcelotEntity ocelot, double speed, Ingredient food, boolean canBeScared) {
+            super((PathAwareEntity)ocelot, speed, food, canBeScared);
+            this.ocelot = ocelot;
         }
 
         @Override
@@ -311,9 +311,9 @@ extends AnimalEntity {
     extends FleeEntityGoal<T> {
         private final OcelotEntity ocelot;
 
-        public FleeGoal(OcelotEntity arg, Class<T> class_, float f, double d, double e) {
-            super(arg, class_, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
-            this.ocelot = arg;
+        public FleeGoal(OcelotEntity ocelot, Class<T> fleeFromType, float distance, double slowSpeed, double fastSpeed) {
+            super(ocelot, fleeFromType, distance, slowSpeed, fastSpeed, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
+            this.ocelot = ocelot;
         }
 
         @Override

@@ -100,7 +100,7 @@ Saddleable {
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, 0.0f);
     }
 
-    public static boolean canSpawn(EntityType<StriderEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<StriderEntity> type, WorldAccess arg2, SpawnReason spawnReason, BlockPos arg4, Random random) {
         BlockPos.Mutable lv = arg4.mutableCopy();
         do {
             lv.move(Direction.UP);
@@ -109,11 +109,11 @@ Saddleable {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (BOOST_TIME.equals(arg) && this.world.isClient) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (BOOST_TIME.equals(data) && this.world.isClient) {
             this.saddledComponent.boost();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -125,15 +125,15 @@ Saddleable {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.saddledComponent.toTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.saddledComponent.toTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.saddledComponent.fromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.saddledComponent.fromTag(tag);
     }
 
     @Override
@@ -147,10 +147,10 @@ Saddleable {
     }
 
     @Override
-    public void saddle(@Nullable SoundCategory arg) {
+    public void saddle(@Nullable SoundCategory sound) {
         this.saddledComponent.setSaddled(true);
-        if (arg != null) {
-            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_STRIDER_SADDLE, arg, 0.5f, 1.0f);
+        if (sound != null) {
+            this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_STRIDER_SADDLE, sound, 0.5f, 1.0f);
         }
     }
 
@@ -168,8 +168,8 @@ Saddleable {
         this.goalSelector.add(9, new LookAtEntityGoal(this, StriderEntity.class, 8.0f));
     }
 
-    public void setCold(boolean bl) {
-        this.dataTracker.set(COLD, bl);
+    public void setCold(boolean cold) {
+        this.dataTracker.set(COLD, cold);
     }
 
     public boolean isCold() {
@@ -180,15 +180,15 @@ Saddleable {
     }
 
     @Override
-    public boolean canWalkOnFluid(Fluid arg) {
-        return arg.isIn(FluidTags.LAVA);
+    public boolean canWalkOnFluid(Fluid fluid) {
+        return fluid.isIn(FluidTags.LAVA);
     }
 
     @Override
     @Nullable
-    public Box getHardCollisionBox(Entity arg) {
-        if (arg.isPushable()) {
-            return arg.getBoundingBox();
+    public Box getHardCollisionBox(Entity collidingEntity) {
+        if (collidingEntity.isPushable()) {
+            return collidingEntity.getBoundingBox();
         }
         return null;
     }
@@ -216,8 +216,8 @@ Saddleable {
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return arg.intersectsEntities(this);
+    public boolean canSpawn(WorldView world) {
+        return world.intersectsEntities(this);
     }
 
     @Override
@@ -230,8 +230,8 @@ Saddleable {
     }
 
     @Override
-    public Vec3d updatePassengerForDismount(LivingEntity arg) {
-        Vec3d[] lvs = new Vec3d[]{StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw - 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw + 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw - 45.0f), StriderEntity.getPassengerDismountOffset(this.getWidth(), arg.getWidth(), arg.yaw + 45.0f)};
+    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
+        Vec3d[] lvs = new Vec3d[]{StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw - 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw + 22.5f), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw - 45.0f), StriderEntity.getPassengerDismountOffset(this.getWidth(), passenger.getWidth(), passenger.yaw + 45.0f)};
         LinkedHashSet set = Sets.newLinkedHashSet();
         double d = this.getBoundingBox().maxY;
         double e = this.getBoundingBox().minY - 0.5;
@@ -245,12 +245,12 @@ Saddleable {
         }
         for (BlockPos lv3 : set) {
             double g;
-            if (this.world.getFluidState(lv3).isIn(FluidTags.LAVA) || !Dismounting.canDismountInBlock(g = this.world.method_30347(lv3))) continue;
+            if (this.world.getFluidState(lv3).isIn(FluidTags.LAVA) || !Dismounting.canDismountInBlock(g = this.world.getDismountHeight(lv3))) continue;
             Vec3d lv4 = Vec3d.ofCenter(lv3, g);
-            for (EntityPose lv5 : arg.getPoses()) {
-                Box lv6 = arg.getBoundingBox(lv5);
-                if (!Dismounting.canPlaceEntityAt(this.world, arg, lv6.offset(lv4))) continue;
-                arg.setPose(lv5);
+            for (EntityPose lv5 : passenger.getPoses()) {
+                Box lv6 = passenger.getBoundingBox(lv5);
+                if (!Dismounting.canPlaceEntityAt(this.world, passenger, lv6.offset(lv4))) continue;
+                passenger.setPose(lv5);
                 return lv4;
             }
         }
@@ -258,9 +258,9 @@ Saddleable {
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         this.setMovementSpeed(this.getSpeed());
-        this.travel(this, this.saddledComponent, arg);
+        this.travel(this, this.saddledComponent, movementInput);
     }
 
     public float getSpeed() {
@@ -273,8 +273,8 @@ Saddleable {
     }
 
     @Override
-    public void setMovementInput(Vec3d arg) {
-        super.travel(arg);
+    public void setMovementInput(Vec3d movementInput) {
+        super.travel(movementInput);
     }
 
     @Override
@@ -283,7 +283,7 @@ Saddleable {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(this.isInLava() ? SoundEvents.ENTITY_STRIDER_STEP_LAVA : SoundEvents.ENTITY_STRIDER_STEP, 1.0f, 1.0f);
     }
 
@@ -293,13 +293,13 @@ Saddleable {
     }
 
     @Override
-    protected void fall(double d, boolean bl, BlockState arg, BlockPos arg2) {
+    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
         this.checkBlockCollision();
         if (this.isInLava()) {
             this.fallDistance = 0.0f;
             return;
         }
-        super.fall(d, bl, arg, arg2);
+        super.fall(heightDifference, onGround, landedState, landedPosition);
     }
 
     @Override
@@ -355,7 +355,7 @@ Saddleable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_STRIDER_HURT;
     }
 
@@ -365,7 +365,7 @@ Saddleable {
     }
 
     @Override
-    protected boolean canAddPassenger(Entity arg) {
+    protected boolean canAddPassenger(Entity passenger) {
         return this.getPassengerList().isEmpty() && !this.isSubmergedIn(FluidTags.LAVA);
     }
 
@@ -380,13 +380,13 @@ Saddleable {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        return new Navigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new Navigation(this, world);
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (arg2.getBlockState(arg).getFluidState().isIn(FluidTags.LAVA)) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (world.getBlockState(pos).getFluidState().isIn(FluidTags.LAVA)) {
             return 10.0f;
         }
         return 0.0f;
@@ -398,8 +398,8 @@ Saddleable {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return BREEDING_INGREDIENT.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return BREEDING_INGREDIENT.test(stack);
     }
 
     @Override
@@ -411,19 +411,19 @@ Saddleable {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        boolean bl = this.isBreedingItem(arg.getStackInHand(arg2));
-        if (!bl && this.isSaddled() && !this.hasPassengers() && !arg.shouldCancelInteraction()) {
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        boolean bl = this.isBreedingItem(player.getStackInHand(hand));
+        if (!bl && this.isSaddled() && !this.hasPassengers() && !player.shouldCancelInteraction()) {
             if (!this.world.isClient) {
-                arg.startRiding(this);
+                player.startRiding(this);
             }
             return ActionResult.success(this.world.isClient);
         }
-        ActionResult lv = super.interactMob(arg, arg2);
+        ActionResult lv = super.interactMob(player, hand);
         if (!lv.isAccepted()) {
-            ItemStack lv2 = arg.getStackInHand(arg2);
+            ItemStack lv2 = player.getStackInHand(hand);
             if (lv2.getItem() == Items.SADDLE) {
-                return lv2.useOnEntity(arg, this, arg2);
+                return lv2.useOnEntity(player, this, hand);
             }
             return ActionResult.PASS;
         }
@@ -441,22 +441,22 @@ Saddleable {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         if (this.isBaby()) {
-            return super.initialize(arg, arg2, arg3, arg4, arg5);
+            return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         }
         if (this.random.nextInt(30) == 0) {
             MobEntity lv = EntityType.ZOMBIFIED_PIGLIN.create(arg.getWorld());
-            arg4 = this.method_30336(arg, arg2, lv, new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false));
+            entityData = this.method_30336(arg, difficulty, lv, new ZombieEntity.ZombieData(ZombieEntity.method_29936(this.random), false));
             this.saddle(null);
         } else if (this.random.nextInt(10) == 0) {
             PassiveEntity lv2 = EntityType.STRIDER.create(arg.getWorld());
             lv2.setBreedingAge(-24000);
-            arg4 = this.method_30336(arg, arg2, lv2, null);
+            entityData = this.method_30336(arg, difficulty, lv2, null);
         } else {
-            arg4 = new PassiveEntity.PassiveData(0.5f);
+            entityData = new PassiveEntity.PassiveData(0.5f);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     private EntityData method_30336(class_5425 arg, LocalDifficulty arg2, MobEntity arg3, @Nullable EntityData arg4) {
@@ -474,27 +474,27 @@ Saddleable {
 
     static class Navigation
     extends MobNavigation {
-        Navigation(StriderEntity arg, World arg2) {
-            super(arg, arg2);
+        Navigation(StriderEntity entity, World world) {
+            super(entity, world);
         }
 
         @Override
-        protected PathNodeNavigator createPathNodeNavigator(int i) {
+        protected PathNodeNavigator createPathNodeNavigator(int range) {
             this.nodeMaker = new LandPathNodeMaker();
-            return new PathNodeNavigator(this.nodeMaker, i);
+            return new PathNodeNavigator(this.nodeMaker, range);
         }
 
         @Override
-        protected boolean canWalkOnPath(PathNodeType arg) {
-            if (arg == PathNodeType.LAVA || arg == PathNodeType.DAMAGE_FIRE || arg == PathNodeType.DANGER_FIRE) {
+        protected boolean canWalkOnPath(PathNodeType pathType) {
+            if (pathType == PathNodeType.LAVA || pathType == PathNodeType.DAMAGE_FIRE || pathType == PathNodeType.DANGER_FIRE) {
                 return true;
             }
-            return super.canWalkOnPath(arg);
+            return super.canWalkOnPath(pathType);
         }
 
         @Override
-        public boolean isValidPosition(BlockPos arg) {
-            return this.world.getBlockState(arg).isOf(Blocks.LAVA) || super.isValidPosition(arg);
+        public boolean isValidPosition(BlockPos pos) {
+            return this.world.getBlockState(pos).isOf(Blocks.LAVA) || super.isValidPosition(pos);
         }
     }
 }

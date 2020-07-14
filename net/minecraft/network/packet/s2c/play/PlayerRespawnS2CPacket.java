@@ -50,27 +50,27 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.field_25322 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
-        this.dimension = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
-        this.sha256Seed = arg.readLong();
-        this.gameMode = GameMode.byId(arg.readUnsignedByte());
-        this.field_25714 = GameMode.byId(arg.readUnsignedByte());
-        this.debugWorld = arg.readBoolean();
-        this.flatWorld = arg.readBoolean();
-        this.keepPlayerAttributes = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.field_25322 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, buf.readIdentifier());
+        this.dimension = RegistryKey.of(Registry.DIMENSION, buf.readIdentifier());
+        this.sha256Seed = buf.readLong();
+        this.gameMode = GameMode.byId(buf.readUnsignedByte());
+        this.field_25714 = GameMode.byId(buf.readUnsignedByte());
+        this.debugWorld = buf.readBoolean();
+        this.flatWorld = buf.readBoolean();
+        this.keepPlayerAttributes = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeIdentifier(this.field_25322.getValue());
-        arg.writeIdentifier(this.dimension.getValue());
-        arg.writeLong(this.sha256Seed);
-        arg.writeByte(this.gameMode.getId());
-        arg.writeByte(this.field_25714.getId());
-        arg.writeBoolean(this.debugWorld);
-        arg.writeBoolean(this.flatWorld);
-        arg.writeBoolean(this.keepPlayerAttributes);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeIdentifier(this.field_25322.getValue());
+        buf.writeIdentifier(this.dimension.getValue());
+        buf.writeLong(this.sha256Seed);
+        buf.writeByte(this.gameMode.getId());
+        buf.writeByte(this.field_25714.getId());
+        buf.writeBoolean(this.debugWorld);
+        buf.writeBoolean(this.flatWorld);
+        buf.writeBoolean(this.keepPlayerAttributes);
     }
 
     @Environment(value=EnvType.CLIENT)

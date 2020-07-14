@@ -43,15 +43,15 @@ implements AutoCloseable {
     private BakedModel missingModel;
     private Object2IntMap<BlockState> stateLookup;
 
-    public BakedModelManager(TextureManager arg, BlockColors arg2, int i) {
-        this.textureManager = arg;
-        this.colorMap = arg2;
-        this.mipmap = i;
+    public BakedModelManager(TextureManager textureManager, BlockColors colorMap, int mipmap) {
+        this.textureManager = textureManager;
+        this.colorMap = colorMap;
+        this.mipmap = mipmap;
         this.blockModelCache = new BlockModels(this);
     }
 
-    public BakedModel getModel(ModelIdentifier arg) {
-        return this.models.getOrDefault(arg, this.missingModel);
+    public BakedModel getModel(ModelIdentifier id) {
+        return this.models.getOrDefault(id, this.missingModel);
     }
 
     public BakedModel getMissingModel() {
@@ -87,16 +87,16 @@ implements AutoCloseable {
         arg3.endTick();
     }
 
-    public boolean shouldRerender(BlockState arg, BlockState arg2) {
+    public boolean shouldRerender(BlockState from, BlockState to) {
         int j;
-        if (arg == arg2) {
+        if (from == to) {
             return false;
         }
-        int i = this.stateLookup.getInt((Object)arg);
-        if (i != -1 && i == (j = this.stateLookup.getInt((Object)arg2))) {
+        int i = this.stateLookup.getInt((Object)from);
+        if (i != -1 && i == (j = this.stateLookup.getInt((Object)to))) {
             FluidState lv2;
-            FluidState lv = arg.getFluidState();
-            return lv != (lv2 = arg2.getFluidState());
+            FluidState lv = from.getFluidState();
+            return lv != (lv2 = to.getFluidState());
         }
         return true;
     }
@@ -117,8 +117,8 @@ implements AutoCloseable {
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.prepare(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
     }
 }
 

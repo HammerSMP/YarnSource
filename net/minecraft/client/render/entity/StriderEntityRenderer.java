@@ -52,8 +52,8 @@ extends MobEntityRenderer<StriderEntity, StriderEntityModel<StriderEntity>> {
     }
 
     @Override
-    protected /* synthetic */ boolean isShaking(LivingEntity arg) {
-        return this.isShaking((StriderEntity)arg);
+    protected /* synthetic */ boolean isShaking(LivingEntity entity) {
+        return this.isShaking((StriderEntity)entity);
     }
 }
 

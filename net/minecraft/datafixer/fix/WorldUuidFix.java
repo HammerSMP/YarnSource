@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.AbstractUuidFix;
 
 public class WorldUuidFix
 extends AbstractUuidFix {
-    public WorldUuidFix(Schema schema) {
-        super(schema, TypeReferences.LEVEL);
+    public WorldUuidFix(Schema outputSchema) {
+        super(outputSchema, TypeReferences.LEVEL);
     }
 
     protected TypeRewriteRule makeRule() {

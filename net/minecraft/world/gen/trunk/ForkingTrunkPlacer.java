@@ -40,38 +40,38 @@ extends TrunkPlacer {
     }
 
     @Override
-    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld arg, Random random, int i, BlockPos arg2, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
-        ForkingTrunkPlacer.method_27400(arg, arg2.down());
+    public List<FoliagePlacer.TreeNode> generate(ModifiableTestableWorld world, Random random, int trunkHeight, BlockPos pos, Set<BlockPos> set, BlockBox arg3, TreeFeatureConfig arg4) {
+        ForkingTrunkPlacer.method_27400(world, pos.down());
         ArrayList list = Lists.newArrayList();
         Direction lv = Direction.Type.HORIZONTAL.random(random);
-        int j = i - random.nextInt(4) - 1;
+        int j = trunkHeight - random.nextInt(4) - 1;
         int k = 3 - random.nextInt(3);
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
-        int l = arg2.getX();
-        int m = arg2.getZ();
+        int l = pos.getX();
+        int m = pos.getZ();
         int n = 0;
-        for (int o = 0; o < i; ++o) {
-            int p = arg2.getY() + o;
+        for (int o = 0; o < trunkHeight; ++o) {
+            int p = pos.getY() + o;
             if (o >= j && k > 0) {
                 l += lv.getOffsetX();
                 m += lv.getOffsetZ();
                 --k;
             }
-            if (!ForkingTrunkPlacer.method_27402(arg, random, lv2.set(l, p, m), set, arg3, arg4)) continue;
+            if (!ForkingTrunkPlacer.method_27402(world, random, lv2.set(l, p, m), set, arg3, arg4)) continue;
             n = p + 1;
         }
         list.add(new FoliagePlacer.TreeNode(new BlockPos(l, n, m), 1, false));
-        l = arg2.getX();
-        m = arg2.getZ();
+        l = pos.getX();
+        m = pos.getZ();
         Direction lv3 = Direction.Type.HORIZONTAL.random(random);
         if (lv3 != lv) {
             int q = j - random.nextInt(2) - 1;
             int r = 1 + random.nextInt(3);
             n = 0;
-            for (int s = q; s < i && r > 0; ++s, --r) {
+            for (int s = q; s < trunkHeight && r > 0; ++s, --r) {
                 if (s < 1) continue;
-                int t = arg2.getY() + s;
-                if (!ForkingTrunkPlacer.method_27402(arg, random, lv2.set(l += lv3.getOffsetX(), t, m += lv3.getOffsetZ()), set, arg3, arg4)) continue;
+                int t = pos.getY() + s;
+                if (!ForkingTrunkPlacer.method_27402(world, random, lv2.set(l += lv3.getOffsetX(), t, m += lv3.getOffsetZ()), set, arg3, arg4)) continue;
                 n = t + 1;
             }
             if (n > 1) {

@@ -34,15 +34,15 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void trigger(ServerPlayerEntity arg, ZombieEntity arg2, VillagerEntity arg32) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg2);
-        LootContext lv2 = EntityPredicate.createAdvancementEntityLootContext(arg, arg32);
-        this.test(arg, arg3 -> arg3.matches(lv, lv2));
+    public void trigger(ServerPlayerEntity player, ZombieEntity zombie, VillagerEntity villager) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, zombie);
+        LootContext lv2 = EntityPredicate.createAdvancementEntityLootContext(player, villager);
+        this.test(player, arg3 -> arg3.matches(lv, lv2));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -50,28 +50,28 @@ extends AbstractCriterion<Conditions> {
         private final EntityPredicate.Extended zombie;
         private final EntityPredicate.Extended villager;
 
-        public Conditions(EntityPredicate.Extended arg, EntityPredicate.Extended arg2, EntityPredicate.Extended arg3) {
-            super(ID, arg);
-            this.zombie = arg2;
-            this.villager = arg3;
+        public Conditions(EntityPredicate.Extended player, EntityPredicate.Extended zombie, EntityPredicate.Extended villager) {
+            super(ID, player);
+            this.zombie = zombie;
+            this.villager = villager;
         }
 
         public static Conditions any() {
             return new Conditions(EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY);
         }
 
-        public boolean matches(LootContext arg, LootContext arg2) {
-            if (!this.zombie.test(arg)) {
+        public boolean matches(LootContext zombieContext, LootContext villagerContext) {
+            if (!this.zombie.test(zombieContext)) {
                 return false;
             }
-            return this.villager.test(arg2);
+            return this.villager.test(villagerContext);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
-            jsonObject.add("zombie", this.zombie.toJson(arg));
-            jsonObject.add("villager", this.villager.toJson(arg));
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
+            jsonObject.add("zombie", this.zombie.toJson(predicateSerializer));
+            jsonObject.add("villager", this.villager.toJson(predicateSerializer));
             return jsonObject;
         }
     }

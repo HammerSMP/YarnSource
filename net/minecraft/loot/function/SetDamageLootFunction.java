@@ -30,9 +30,9 @@ extends ConditionalLootFunction {
     private static final Logger LOGGER = LogManager.getLogger();
     private final UniformLootTableRange durabilityRange;
 
-    private SetDamageLootFunction(LootCondition[] args, UniformLootTableRange arg) {
-        super(args);
-        this.durabilityRange = arg;
+    private SetDamageLootFunction(LootCondition[] contents, UniformLootTableRange durabilityRange) {
+        super(contents);
+        this.durabilityRange = durabilityRange;
     }
 
     @Override
@@ -41,18 +41,18 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        if (arg.isDamageable()) {
-            float f = 1.0f - this.durabilityRange.nextFloat(arg2.getRandom());
-            arg.setDamage(MathHelper.floor(f * (float)arg.getMaxDamage()));
+    public ItemStack process(ItemStack stack, LootContext context) {
+        if (stack.isDamageable()) {
+            float f = 1.0f - this.durabilityRange.nextFloat(context.getRandom());
+            stack.setDamage(MathHelper.floor(f * (float)stack.getMaxDamage()));
         } else {
-            LOGGER.warn("Couldn't set damage of loot item {}", (Object)arg);
+            LOGGER.warn("Couldn't set damage of loot item {}", (Object)stack);
         }
-        return arg;
+        return stack;
     }
 
-    public static ConditionalLootFunction.Builder<?> builder(UniformLootTableRange arg) {
-        return SetDamageLootFunction.builder((LootCondition[] args) -> new SetDamageLootFunction((LootCondition[])args, arg));
+    public static ConditionalLootFunction.Builder<?> builder(UniformLootTableRange durabilityRange) {
+        return SetDamageLootFunction.builder((LootCondition[] conditions) -> new SetDamageLootFunction((LootCondition[])conditions, durabilityRange));
     }
 
     public static class Serializer
@@ -69,8 +69,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

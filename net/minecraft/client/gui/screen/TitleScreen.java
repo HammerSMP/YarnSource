@@ -81,9 +81,9 @@ extends Screen {
         this(false);
     }
 
-    public TitleScreen(boolean bl) {
+    public TitleScreen(boolean doBackgroundFade) {
         super(new TranslatableText("narrator.screen.title"));
-        this.doBackgroundFade = bl;
+        this.doBackgroundFade = doBackgroundFade;
         this.isMinceraft = (double)new Random().nextFloat() < 1.0E-4;
     }
 
@@ -141,21 +141,21 @@ extends Screen {
         }
     }
 
-    private void initWidgetsNormal(int i2, int j2) {
-        this.addButton(new ButtonWidget(this.width / 2 - 100, i2, 200, 20, new TranslatableText("menu.singleplayer"), arg -> this.client.openScreen(new SelectWorldScreen(this))));
+    private void initWidgetsNormal(int y, int spacingY) {
+        this.addButton(new ButtonWidget(this.width / 2 - 100, y, 200, 20, new TranslatableText("menu.singleplayer"), arg -> this.client.openScreen(new SelectWorldScreen(this))));
         boolean bl = this.client.isMultiplayerEnabled();
         ButtonWidget.TooltipSupplier lv = bl ? ButtonWidget.EMPTY : (arg, arg2, i, j) -> {
             if (!arg.active) {
                 this.renderTooltip(arg2, this.client.textRenderer.wrapLines(new TranslatableText("title.multiplayer.disabled"), Math.max(this.width / 2 - 43, 170)), i, j);
             }
         };
-        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(i2 + j2 * 1), (int)200, (int)20, (Text)new TranslatableText((String)"menu.multiplayer"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19860(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.TooltipSupplier)lv)).active = bl;
-        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(i2 + j2 * 2), (int)200, (int)20, (Text)new TranslatableText((String)"menu.online"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19859(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.TooltipSupplier)lv)).active = bl;
+        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(y + spacingY * 1), (int)200, (int)20, (Text)new TranslatableText((String)"menu.multiplayer"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19860(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.TooltipSupplier)lv)).active = bl;
+        this.addButton(new ButtonWidget((int)(this.width / 2 - 100), (int)(y + spacingY * 2), (int)200, (int)20, (Text)new TranslatableText((String)"menu.online"), (ButtonWidget.PressAction)(ButtonWidget.PressAction)LambdaMetafactory.metafactory(null, null, null, (Lnet/minecraft/client/gui/widget/ButtonWidget;)V, method_19859(net.minecraft.client.gui.widget.ButtonWidget ), (Lnet/minecraft/client/gui/widget/ButtonWidget;)V)((TitleScreen)this), (ButtonWidget.TooltipSupplier)lv)).active = bl;
     }
 
-    private void initWidgetsDemo(int i, int j) {
-        this.addButton(new ButtonWidget(this.width / 2 - 100, i, 200, 20, new TranslatableText("menu.playdemo"), arg -> this.client.method_29607("Demo_World", MinecraftServer.DEMO_LEVEL_INFO, class_5455.method_30528(), GeneratorOptions.DEMO_CONFIG)));
-        this.buttonResetDemo = this.addButton(new ButtonWidget(this.width / 2 - 100, i + j * 1, 200, 20, new TranslatableText("menu.resetdemo"), arg -> {
+    private void initWidgetsDemo(int y, int spacingY) {
+        this.addButton(new ButtonWidget(this.width / 2 - 100, y, 200, 20, new TranslatableText("menu.playdemo"), arg -> this.client.method_29607("Demo_World", MinecraftServer.DEMO_LEVEL_INFO, class_5455.method_30528(), GeneratorOptions.DEMO_CONFIG)));
+        this.buttonResetDemo = this.addButton(new ButtonWidget(this.width / 2 - 100, y + spacingY * 1, 200, 20, new TranslatableText("menu.resetdemo"), arg -> {
             LevelStorage lv = this.client.getLevelStorage();
             try (LevelStorage.Session lv2 = lv.createSession("Demo_World");){
                 LevelSummary lv3 = lv2.method_29584();
@@ -186,13 +186,13 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.backgroundFadeStart == 0L && this.doBackgroundFade) {
             this.backgroundFadeStart = Util.getMeasuringTimeMs();
         }
         float g = this.doBackgroundFade ? (float)(Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0f : 1.0f;
-        TitleScreen.fill(arg, 0, 0, this.width, this.height, -1);
-        this.backgroundRenderer.render(f, MathHelper.clamp(g, 0.0f, 1.0f));
+        TitleScreen.fill(matrices, 0, 0, this.width, this.height, -1);
+        this.backgroundRenderer.render(delta, MathHelper.clamp(g, 0.0f, 1.0f));
         int k = 274;
         int l = this.width / 2 - 137;
         int m = 30;
@@ -200,7 +200,7 @@ extends Screen {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, this.doBackgroundFade ? (float)MathHelper.ceil(MathHelper.clamp(g, 0.0f, 1.0f)) : 1.0f);
-        TitleScreen.drawTexture(arg, 0, 0, this.width, this.height, 0.0f, 0.0f, 16, 128, 16, 128);
+        TitleScreen.drawTexture(matrices, 0, 0, this.width, this.height, 0.0f, 0.0f, 16, 128, 16, 128);
         float h = this.doBackgroundFade ? MathHelper.clamp(g - 1.0f, 0.0f, 1.0f) : 1.0f;
         int n = MathHelper.ceil(h * 255.0f) << 24;
         if ((n & 0xFC000000) == 0) {
@@ -210,20 +210,20 @@ extends Screen {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, h);
         if (this.isMinceraft) {
             this.method_29343(l, 30, (integer, integer2) -> {
-                this.drawTexture(arg, integer + 0, (int)integer2, 0, 0, 99, 44);
-                this.drawTexture(arg, integer + 99, (int)integer2, 129, 0, 27, 44);
-                this.drawTexture(arg, integer + 99 + 26, (int)integer2, 126, 0, 3, 44);
-                this.drawTexture(arg, integer + 99 + 26 + 3, (int)integer2, 99, 0, 26, 44);
-                this.drawTexture(arg, integer + 155, (int)integer2, 0, 45, 155, 44);
+                this.drawTexture(matrices, integer + 0, (int)integer2, 0, 0, 99, 44);
+                this.drawTexture(matrices, integer + 99, (int)integer2, 129, 0, 27, 44);
+                this.drawTexture(matrices, integer + 99 + 26, (int)integer2, 126, 0, 3, 44);
+                this.drawTexture(matrices, integer + 99 + 26 + 3, (int)integer2, 99, 0, 26, 44);
+                this.drawTexture(matrices, integer + 155, (int)integer2, 0, 45, 155, 44);
             });
         } else {
             this.method_29343(l, 30, (integer, integer2) -> {
-                this.drawTexture(arg, integer + 0, (int)integer2, 0, 0, 155, 44);
-                this.drawTexture(arg, integer + 155, (int)integer2, 0, 45, 155, 44);
+                this.drawTexture(matrices, integer + 0, (int)integer2, 0, 0, 155, 44);
+                this.drawTexture(matrices, integer + 155, (int)integer2, 0, 45, 155, 44);
             });
         }
         this.client.getTextureManager().bindTexture(EDITION_TITLE_TEXTURE);
-        TitleScreen.drawTexture(arg, l + 88, 67, 0.0f, 0.0f, 98, 14, 128, 16);
+        TitleScreen.drawTexture(matrices, l + 88, 67, 0.0f, 0.0f, 98, 14, 128, 16);
         if (this.splashText != null) {
             RenderSystem.pushMatrix();
             RenderSystem.translatef(this.width / 2 + 90, 70.0f, 0.0f);
@@ -231,7 +231,7 @@ extends Screen {
             float o = 1.8f - MathHelper.abs(MathHelper.sin((float)(Util.getMeasuringTimeMs() % 1000L) / 1000.0f * ((float)Math.PI * 2)) * 0.1f);
             o = o * 100.0f / (float)(this.textRenderer.getWidth(this.splashText) + 32);
             RenderSystem.scalef(o, o, o);
-            this.drawCenteredString(arg, this.textRenderer, this.splashText, 0, -8, 0xFFFF00 | n);
+            this.drawCenteredString(matrices, this.textRenderer, this.splashText, 0, -8, 0xFFFF00 | n);
             RenderSystem.popMatrix();
         }
         String string = "Minecraft " + SharedConstants.getGameVersion().getName();
@@ -239,29 +239,29 @@ extends Screen {
         if (this.client.isModded()) {
             string = string + I18n.translate("menu.modded", new Object[0]);
         }
-        this.drawStringWithShadow(arg, this.textRenderer, string, 2, this.height - 10, 0xFFFFFF | n);
-        this.drawStringWithShadow(arg, this.textRenderer, "Copyright Mojang AB. Do not distribute!", this.copyrightTextX, this.height - 10, 0xFFFFFF | n);
-        if (i > this.copyrightTextX && i < this.copyrightTextX + this.copyrightTextWidth && j > this.height - 10 && j < this.height) {
-            TitleScreen.fill(arg, this.copyrightTextX, this.height - 1, this.copyrightTextX + this.copyrightTextWidth, this.height, 0xFFFFFF | n);
+        this.drawStringWithShadow(matrices, this.textRenderer, string, 2, this.height - 10, 0xFFFFFF | n);
+        this.drawStringWithShadow(matrices, this.textRenderer, "Copyright Mojang AB. Do not distribute!", this.copyrightTextX, this.height - 10, 0xFFFFFF | n);
+        if (mouseX > this.copyrightTextX && mouseX < this.copyrightTextX + this.copyrightTextWidth && mouseY > this.height - 10 && mouseY < this.height) {
+            TitleScreen.fill(matrices, this.copyrightTextX, this.height - 1, this.copyrightTextX + this.copyrightTextWidth, this.height, 0xFFFFFF | n);
         }
         for (AbstractButtonWidget lv : this.buttons) {
             lv.setAlpha(h);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.areRealmsNotificationsEnabled() && h >= 1.0f) {
-            this.realmsNotificationGui.render(arg, i, j, f);
+            this.realmsNotificationGui.render(matrices, mouseX, mouseY, delta);
         }
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (super.mouseClicked(d, e, i)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (super.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (this.areRealmsNotificationsEnabled() && this.realmsNotificationGui.mouseClicked(d, e, i)) {
+        if (this.areRealmsNotificationsEnabled() && this.realmsNotificationGui.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (d > (double)this.copyrightTextX && d < (double)(this.copyrightTextX + this.copyrightTextWidth) && e > (double)(this.height - 10) && e < (double)this.height) {
+        if (mouseX > (double)this.copyrightTextX && mouseX < (double)(this.copyrightTextX + this.copyrightTextWidth) && mouseY > (double)(this.height - 10) && mouseY < (double)this.height) {
             this.client.openScreen(new CreditsScreen(false, Runnables.doNothing()));
         }
         return false;
@@ -274,8 +274,8 @@ extends Screen {
         }
     }
 
-    private void onDemoDeletionConfirmed(boolean bl) {
-        if (bl) {
+    private void onDemoDeletionConfirmed(boolean delete) {
+        if (delete) {
             try (LevelStorage.Session lv = this.client.getLevelStorage().createSession("Demo_World");){
                 lv.deleteSessionLock();
             }

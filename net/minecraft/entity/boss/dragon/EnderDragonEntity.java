@@ -126,21 +126,21 @@ implements Monster {
         this.getDataTracker().startTracking(PHASE_TYPE, PhaseType.HOVER.getTypeId());
     }
 
-    public double[] getSegmentProperties(int i, float f) {
+    public double[] getSegmentProperties(int segmentNumber, float tickDelta) {
         if (this.isDead()) {
-            f = 0.0f;
+            tickDelta = 0.0f;
         }
-        f = 1.0f - f;
-        int j = this.latestSegment - i & 0x3F;
-        int k = this.latestSegment - i - 1 & 0x3F;
+        tickDelta = 1.0f - tickDelta;
+        int j = this.latestSegment - segmentNumber & 0x3F;
+        int k = this.latestSegment - segmentNumber - 1 & 0x3F;
         double[] ds = new double[3];
         double d = this.segmentCircularBuffer[j][0];
         double e = MathHelper.wrapDegrees(this.segmentCircularBuffer[k][0] - d);
-        ds[0] = d + e * (double)f;
+        ds[0] = d + e * (double)tickDelta;
         d = this.segmentCircularBuffer[j][1];
         e = this.segmentCircularBuffer[k][1] - d;
-        ds[1] = d + e * (double)f;
-        ds[2] = MathHelper.lerp((double)f, this.segmentCircularBuffer[j][2], this.segmentCircularBuffer[k][2]);
+        ds[1] = d + e * (double)tickDelta;
+        ds[2] = MathHelper.lerp((double)tickDelta, this.segmentCircularBuffer[j][2], this.segmentCircularBuffer[k][2]);
         return ds;
     }
 
@@ -302,8 +302,8 @@ implements Monster {
         }
     }
 
-    private void movePart(EnderDragonPart arg, double d, double e, double f) {
-        arg.updatePosition(this.getX() + d, this.getY() + e, this.getZ() + f);
+    private void movePart(EnderDragonPart arg, double dx, double dy, double dz) {
+        arg.updatePosition(this.getX() + dx, this.getY() + dy, this.getZ() + dz);
     }
 
     private float method_6820() {
@@ -337,10 +337,10 @@ implements Monster {
         }
     }
 
-    private void launchLivingEntities(List<Entity> list) {
+    private void launchLivingEntities(List<Entity> entities) {
         double d = (this.partBody.getBoundingBox().minX + this.partBody.getBoundingBox().maxX) / 2.0;
         double e = (this.partBody.getBoundingBox().minZ + this.partBody.getBoundingBox().maxZ) / 2.0;
-        for (Entity lv : list) {
+        for (Entity lv : entities) {
             if (!(lv instanceof LivingEntity)) continue;
             double f = lv.getX() - d;
             double g = lv.getZ() - e;
@@ -352,16 +352,16 @@ implements Monster {
         }
     }
 
-    private void damageLivingEntities(List<Entity> list) {
-        for (Entity lv : list) {
+    private void damageLivingEntities(List<Entity> entities) {
+        for (Entity lv : entities) {
             if (!(lv instanceof LivingEntity)) continue;
             lv.damage(DamageSource.mob(this), 10.0f);
             this.dealDamage(this, lv);
         }
     }
 
-    private float wrapYawChange(double d) {
-        return (float)MathHelper.wrapDegrees(d);
+    private float wrapYawChange(double yawDegrees) {
+        return (float)MathHelper.wrapDegrees(yawDegrees);
     }
 
     private boolean destroyBlocks(Box arg) {
@@ -395,20 +395,20 @@ implements Monster {
         return bl;
     }
 
-    public boolean damagePart(EnderDragonPart arg, DamageSource arg2, float f) {
+    public boolean damagePart(EnderDragonPart part, DamageSource source, float amount) {
         if (this.phaseManager.getCurrent().getType() == PhaseType.DYING) {
             return false;
         }
-        f = this.phaseManager.getCurrent().modifyDamageTaken(arg2, f);
-        if (arg != this.partHead) {
-            f = f / 4.0f + Math.min(f, 1.0f);
+        amount = this.phaseManager.getCurrent().modifyDamageTaken(source, amount);
+        if (part != this.partHead) {
+            amount = amount / 4.0f + Math.min(amount, 1.0f);
         }
-        if (f < 0.01f) {
+        if (amount < 0.01f) {
             return false;
         }
-        if (arg2.getAttacker() instanceof PlayerEntity || arg2.isExplosive()) {
+        if (source.getAttacker() instanceof PlayerEntity || source.isExplosive()) {
             float g = this.getHealth();
-            this.parentDamage(arg2, f);
+            this.parentDamage(source, amount);
             if (this.isDead() && !this.phaseManager.getCurrent().isSittingOrHovering()) {
                 this.setHealth(1.0f);
                 this.phaseManager.setPhase(PhaseType.DYING);
@@ -425,15 +425,15 @@ implements Monster {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (arg instanceof EntityDamageSource && ((EntityDamageSource)arg).isThorns()) {
-            this.damagePart(this.partBody, arg, f);
+    public boolean damage(DamageSource source, float amount) {
+        if (source instanceof EntityDamageSource && ((EntityDamageSource)source).isThorns()) {
+            this.damagePart(this.partBody, source, amount);
         }
         return false;
     }
 
-    protected boolean parentDamage(DamageSource arg, float f) {
-        return super.damage(arg, f);
+    protected boolean parentDamage(DamageSource source, float amount) {
+        return super.damage(source, amount);
     }
 
     @Override
@@ -484,10 +484,10 @@ implements Monster {
         }
     }
 
-    private void awardExperience(int i) {
-        while (i > 0) {
-            int j = ExperienceOrbEntity.roundToOrbSize(i);
-            i -= j;
+    private void awardExperience(int amount) {
+        while (amount > 0) {
+            int j = ExperienceOrbEntity.roundToOrbSize(amount);
+            amount -= j;
             this.world.spawnEntity(new ExperienceOrbEntity(this.world, this.getX(), this.getY(), this.getZ(), j));
         }
     }
@@ -541,10 +541,10 @@ implements Monster {
         return this.getNearestPathNodeIndex(this.getX(), this.getY(), this.getZ());
     }
 
-    public int getNearestPathNodeIndex(double d, double e, double f) {
+    public int getNearestPathNodeIndex(double x, double y, double z) {
         float g = 10000.0f;
         int i = 0;
-        PathNode lv = new PathNode(MathHelper.floor(d), MathHelper.floor(e), MathHelper.floor(f));
+        PathNode lv = new PathNode(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
         int j = 0;
         if (this.fight == null || this.fight.getAliveEndCrystals() == 0) {
             j = 12;
@@ -559,7 +559,7 @@ implements Monster {
     }
 
     @Nullable
-    public Path findPath(int i, int j, @Nullable PathNode arg) {
+    public Path findPath(int from, int to, @Nullable PathNode arg) {
         for (int k = 0; k < 24; ++k) {
             PathNode lv = this.pathNodes[k];
             lv.visited = false;
@@ -569,8 +569,8 @@ implements Monster {
             lv.previous = null;
             lv.heapIndex = -1;
         }
-        PathNode lv2 = this.pathNodes[i];
-        PathNode lv3 = this.pathNodes[j];
+        PathNode lv2 = this.pathNodes[from];
+        PathNode lv3 = this.pathNodes[to];
         lv2.penalizedPathLength = 0.0f;
         lv2.heapWeight = lv2.distanceToNearestTarget = lv2.getDistance(lv3);
         this.pathHeap.clear();
@@ -619,7 +619,7 @@ implements Monster {
         if (lv4 == lv2) {
             return null;
         }
-        LOGGER.debug("Failed to find path from {} to {}", (Object)i, (Object)j);
+        LOGGER.debug("Failed to find path from {} to {}", (Object)from, (Object)to);
         if (arg != null) {
             arg.previous = lv4;
             lv4 = arg;
@@ -627,28 +627,28 @@ implements Monster {
         return this.getPathOfAllPredecessors(lv2, lv4);
     }
 
-    private Path getPathOfAllPredecessors(PathNode arg, PathNode arg2) {
+    private Path getPathOfAllPredecessors(PathNode unused, PathNode node) {
         ArrayList list = Lists.newArrayList();
-        PathNode lv = arg2;
+        PathNode lv = node;
         list.add(0, lv);
         while (lv.previous != null) {
             lv = lv.previous;
             list.add(0, lv);
         }
-        return new Path(list, new BlockPos(arg2.x, arg2.y, arg2.z), true);
+        return new Path(list, new BlockPos(node.x, node.y, node.z), true);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("DragonPhase", this.phaseManager.getCurrent().getType().getTypeId());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("DragonPhase", this.phaseManager.getCurrent().getType().getTypeId());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("DragonPhase")) {
-            this.phaseManager.setPhase(PhaseType.getFromId(arg.getInt("DragonPhase")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("DragonPhase")) {
+            this.phaseManager.setPhase(PhaseType.getFromId(tag.getInt("DragonPhase")));
         }
     }
 
@@ -676,7 +676,7 @@ implements Monster {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ENDER_DRAGON_HURT;
     }
 
@@ -686,25 +686,25 @@ implements Monster {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float method_6823(int i, double[] ds, double[] es) {
+    public float method_6823(int segmentOffset, double[] segment1, double[] segment2) {
         double h;
         Phase lv = this.phaseManager.getCurrent();
         PhaseType<? extends Phase> lv2 = lv.getType();
         if (lv2 == PhaseType.LANDING || lv2 == PhaseType.TAKEOFF) {
             BlockPos lv3 = this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EndPortalFeature.ORIGIN);
             float f = Math.max(MathHelper.sqrt(lv3.getSquaredDistance(this.getPos(), true)) / 4.0f, 1.0f);
-            double d = (float)i / f;
+            double d = (float)segmentOffset / f;
         } else if (lv.isSittingOrHovering()) {
-            double e = i;
-        } else if (i == 6) {
+            double e = segmentOffset;
+        } else if (segmentOffset == 6) {
             double g = 0.0;
         } else {
-            h = es[1] - ds[1];
+            h = segment2[1] - segment1[1];
         }
         return (float)h;
     }
 
-    public Vec3d method_6834(float f) {
+    public Vec3d method_6834(float tickDelta) {
         Vec3d lv6;
         Phase lv = this.phaseManager.getCurrent();
         PhaseType<? extends Phase> lv2 = lv.getType();
@@ -715,39 +715,39 @@ implements Monster {
             float i = this.pitch;
             float j = 1.5f;
             this.pitch = -h * 1.5f * 5.0f;
-            Vec3d lv4 = this.getRotationVec(f);
+            Vec3d lv4 = this.getRotationVec(tickDelta);
             this.pitch = i;
         } else if (lv.isSittingOrHovering()) {
             float k = this.pitch;
             float l = 1.5f;
             this.pitch = -45.0f;
-            Vec3d lv5 = this.getRotationVec(f);
+            Vec3d lv5 = this.getRotationVec(tickDelta);
             this.pitch = k;
         } else {
-            lv6 = this.getRotationVec(f);
+            lv6 = this.getRotationVec(tickDelta);
         }
         return lv6;
     }
 
-    public void crystalDestroyed(EndCrystalEntity arg, BlockPos arg2, DamageSource arg3) {
+    public void crystalDestroyed(EndCrystalEntity crystal, BlockPos pos, DamageSource source) {
         PlayerEntity lv2;
-        if (arg3.getAttacker() instanceof PlayerEntity) {
-            PlayerEntity lv = (PlayerEntity)arg3.getAttacker();
+        if (source.getAttacker() instanceof PlayerEntity) {
+            PlayerEntity lv = (PlayerEntity)source.getAttacker();
         } else {
-            lv2 = this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, arg2.getX(), arg2.getY(), arg2.getZ());
+            lv2 = this.world.getClosestPlayer(CLOSE_PLAYER_PREDICATE, pos.getX(), pos.getY(), pos.getZ());
         }
-        if (arg == this.connectedCrystal) {
+        if (crystal == this.connectedCrystal) {
             this.damagePart(this.partHead, DamageSource.explosion(lv2), 10.0f);
         }
-        this.phaseManager.getCurrent().crystalDestroyed(arg, arg2, arg3, lv2);
+        this.phaseManager.getCurrent().crystalDestroyed(crystal, pos, source, lv2);
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (PHASE_TYPE.equals(arg) && this.world.isClient) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (PHASE_TYPE.equals(data) && this.world.isClient) {
             this.phaseManager.setPhase(PhaseType.getFromId(this.getDataTracker().get(PHASE_TYPE)));
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     public PhaseManager getPhaseManager() {
@@ -760,12 +760,12 @@ implements Monster {
     }
 
     @Override
-    public boolean addStatusEffect(StatusEffectInstance arg) {
+    public boolean addStatusEffect(StatusEffectInstance effect) {
         return false;
     }
 
     @Override
-    protected boolean canStartRiding(Entity arg) {
+    protected boolean canStartRiding(Entity entity) {
         return false;
     }
 

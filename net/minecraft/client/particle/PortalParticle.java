@@ -49,14 +49,14 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public void move(double d, double e, double f) {
-        this.setBoundingBox(this.getBoundingBox().offset(d, e, f));
+    public void move(double dx, double dy, double dz) {
+        this.setBoundingBox(this.getBoundingBox().offset(dx, dy, dz));
         this.repositionFromBoundingBox();
     }
 
     @Override
-    public float getSize(float f) {
-        float g = ((float)this.age + f) / (float)this.maxAge;
+    public float getSize(float tickDelta) {
+        float g = ((float)this.age + tickDelta) / (float)this.maxAge;
         g = 1.0f - g;
         g *= g;
         g = 1.0f - g;
@@ -64,8 +64,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public int getColorMultiplier(float f) {
-        int i = super.getColorMultiplier(f);
+    public int getColorMultiplier(float tint) {
+        int i = super.getColorMultiplier(tint);
         float g = (float)this.age / (float)this.maxAge;
         g *= g;
         g *= g;
@@ -100,8 +100,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

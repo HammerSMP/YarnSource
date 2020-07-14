@@ -37,18 +37,18 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        byte b = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        byte b = buf.readByte();
         this.invulnerable = (b & 1) != 0;
         this.flying = (b & 2) != 0;
         this.allowFlying = (b & 4) != 0;
         this.creativeMode = (b & 8) != 0;
-        this.flySpeed = arg.readFloat();
-        this.walkSpeed = arg.readFloat();
+        this.flySpeed = buf.readFloat();
+        this.walkSpeed = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
+    public void write(PacketByteBuf buf) throws IOException {
         byte b = 0;
         if (this.invulnerable) {
             b = (byte)(b | true ? 1 : 0);
@@ -62,9 +62,9 @@ implements Packet<ClientPlayPacketListener> {
         if (this.creativeMode) {
             b = (byte)(b | 8);
         }
-        arg.writeByte(b);
-        arg.writeFloat(this.flySpeed);
-        arg.writeFloat(this.walkSpeed);
+        buf.writeByte(b);
+        buf.writeFloat(this.flySpeed);
+        buf.writeFloat(this.walkSpeed);
     }
 
     @Override

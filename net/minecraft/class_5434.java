@@ -8,11 +8,11 @@ package net.minecraft;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.class_5455;
-import net.minecraft.class_5468;
+import net.minecraft.structure.MarginedStructureStart;
 import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.StructureManager;
-import net.minecraft.structure.VillageStructureStart;
 import net.minecraft.structure.pool.StructurePoolBasedGenerator;
+import net.minecraft.structure.pool.TemplatePools;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -39,7 +39,7 @@ extends StructureFeature<StructurePoolFeatureConfig> {
     }
 
     public static class class_5435
-    extends VillageStructureStart<StructurePoolFeatureConfig> {
+    extends MarginedStructureStart<StructurePoolFeatureConfig> {
         private final class_5434 field_25838;
 
         public class_5435(class_5434 arg, int i, int j, BlockBox arg2, int k, long l) {
@@ -50,7 +50,7 @@ extends StructureFeature<StructurePoolFeatureConfig> {
         @Override
         public void init(class_5455 arg, ChunkGenerator arg2, StructureManager arg3, int i, int j, Biome arg4, StructurePoolFeatureConfig arg5) {
             BlockPos lv = new BlockPos(i * 16, this.field_25838.field_25835, j * 16);
-            class_5468.method_30599();
+            TemplatePools.method_30599();
             StructurePoolBasedGenerator.method_30419(arg, arg5, PoolStructurePiece::new, arg2, arg3, lv, this.children, this.random, this.field_25838.field_25836, this.field_25838.field_25837);
             this.setBoundingBoxFromChildren();
         }

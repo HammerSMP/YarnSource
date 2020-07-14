@@ -26,24 +26,24 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public BookUpdateC2SPacket(ItemStack arg, boolean bl, Hand arg2) {
-        this.book = arg.copy();
-        this.signed = bl;
-        this.hand = arg2;
+    public BookUpdateC2SPacket(ItemStack book, boolean signed, Hand hand) {
+        this.book = book.copy();
+        this.signed = signed;
+        this.hand = hand;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.book = arg.readItemStack();
-        this.signed = arg.readBoolean();
-        this.hand = arg.readEnumConstant(Hand.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.book = buf.readItemStack();
+        this.signed = buf.readBoolean();
+        this.hand = buf.readEnumConstant(Hand.class);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeItemStack(this.book);
-        arg.writeBoolean(this.signed);
-        arg.writeEnumConstant(this.hand);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeItemStack(this.book);
+        buf.writeBoolean(this.signed);
+        buf.writeEnumConstant(this.hand);
     }
 
     @Override

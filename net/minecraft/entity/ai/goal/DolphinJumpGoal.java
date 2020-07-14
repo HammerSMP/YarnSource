@@ -21,9 +21,9 @@ extends DiveJumpingGoal {
     private final int chance;
     private boolean inWater;
 
-    public DolphinJumpGoal(DolphinEntity arg, int i) {
-        this.dolphin = arg;
-        this.chance = i;
+    public DolphinJumpGoal(DolphinEntity dolphin, int chance) {
+        this.dolphin = dolphin;
+        this.chance = chance;
     }
 
     @Override
@@ -42,13 +42,13 @@ extends DiveJumpingGoal {
         return true;
     }
 
-    private boolean isWater(BlockPos arg, int i, int j, int k) {
-        BlockPos lv = arg.add(i * k, 0, j * k);
+    private boolean isWater(BlockPos pos, int xOffset, int zOffset, int multiplier) {
+        BlockPos lv = pos.add(xOffset * multiplier, 0, zOffset * multiplier);
         return this.dolphin.world.getFluidState(lv).isIn(FluidTags.WATER) && !this.dolphin.world.getBlockState(lv).getMaterial().blocksMovement();
     }
 
-    private boolean isAirAbove(BlockPos arg, int i, int j, int k) {
-        return this.dolphin.world.getBlockState(arg.add(i * k, 1, j * k)).isAir() && this.dolphin.world.getBlockState(arg.add(i * k, 2, j * k)).isAir();
+    private boolean isAirAbove(BlockPos pos, int xOffset, int zOffset, int multiplier) {
+        return this.dolphin.world.getBlockState(pos.add(xOffset * multiplier, 1, zOffset * multiplier)).isAir() && this.dolphin.world.getBlockState(pos.add(xOffset * multiplier, 2, zOffset * multiplier)).isAir();
     }
 
     @Override

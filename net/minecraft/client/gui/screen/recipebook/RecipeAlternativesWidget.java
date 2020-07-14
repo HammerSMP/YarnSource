@@ -48,36 +48,36 @@ Element {
     private float time;
     private boolean furnace;
 
-    public void showAlternativesForResult(MinecraftClient arg, RecipeResultCollection arg2, int i, int j, int k, int l, float f) {
+    public void showAlternativesForResult(MinecraftClient client, RecipeResultCollection results, int buttonX, int buttonY, int areaCenterX, int areaCenterY, float delta) {
         float u;
         float t;
         float s;
         float r;
         float h;
-        this.client = arg;
-        this.resultCollection = arg2;
-        if (arg.player.currentScreenHandler instanceof AbstractFurnaceScreenHandler) {
+        this.client = client;
+        this.resultCollection = results;
+        if (client.player.currentScreenHandler instanceof AbstractFurnaceScreenHandler) {
             this.furnace = true;
         }
-        boolean bl = arg.player.getRecipeBook().isFilteringCraftable((AbstractRecipeScreenHandler)arg.player.currentScreenHandler);
-        List<Recipe<?>> list = arg2.getRecipes(true);
-        List list2 = bl ? Collections.emptyList() : arg2.getRecipes(false);
+        boolean bl = client.player.getRecipeBook().isFilteringCraftable((AbstractRecipeScreenHandler)client.player.currentScreenHandler);
+        List<Recipe<?>> list = results.getRecipes(true);
+        List list2 = bl ? Collections.emptyList() : results.getRecipes(false);
         int m = list.size();
         int n = m + list2.size();
         int o = n <= 16 ? 4 : 5;
         int p = (int)Math.ceil((float)n / (float)o);
-        this.buttonX = i;
-        this.buttonY = j;
+        this.buttonX = buttonX;
+        this.buttonY = buttonY;
         int q = 25;
         float g = this.buttonX + Math.min(n, o) * 25;
-        if (g > (h = (float)(k + 50))) {
-            this.buttonX = (int)((float)this.buttonX - f * (float)((int)((g - h) / f)));
+        if (g > (h = (float)(areaCenterX + 50))) {
+            this.buttonX = (int)((float)this.buttonX - delta * (float)((int)((g - h) / delta)));
         }
-        if ((r = (float)(this.buttonY + p * 25)) > (s = (float)(l + 50))) {
-            this.buttonY = (int)((float)this.buttonY - f * (float)MathHelper.ceil((r - s) / f));
+        if ((r = (float)(this.buttonY + p * 25)) > (s = (float)(areaCenterY + 50))) {
+            this.buttonY = (int)((float)this.buttonY - delta * (float)MathHelper.ceil((r - s) / delta));
         }
-        if ((t = (float)this.buttonY) < (u = (float)(l - 100))) {
-            this.buttonY = (int)((float)this.buttonY - f * (float)MathHelper.ceil((t - u) / f));
+        if ((t = (float)this.buttonY) < (u = (float)(areaCenterY - 100))) {
+            this.buttonY = (int)((float)this.buttonY - delta * (float)MathHelper.ceil((t - u) / delta));
         }
         this.visible = true;
         this.alternativeButtons.clear();
@@ -96,7 +96,7 @@ Element {
     }
 
     @Override
-    public boolean changeFocus(boolean bl) {
+    public boolean changeFocus(boolean lookForwards) {
         return false;
     }
 
@@ -109,12 +109,12 @@ Element {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (i != 0) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button != 0) {
             return false;
         }
         for (AlternativeButtonWidget lv : this.alternativeButtons) {
-            if (!lv.mouseClicked(d, e, i)) continue;
+            if (!lv.mouseClicked(mouseX, mouseY, button)) continue;
             this.lastClickedRecipe = lv.recipe;
             return true;
         }
@@ -122,16 +122,16 @@ Element {
     }
 
     @Override
-    public boolean isMouseOver(double d, double e) {
+    public boolean isMouseOver(double mouseX, double mouseY) {
         return false;
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (!this.visible) {
             return;
         }
-        this.time += f;
+        this.time += delta;
         RenderSystem.enableBlend();
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(BG_TEX);
@@ -144,10 +144,10 @@ Element {
         int o = 4;
         int p = 82;
         int q = 208;
-        this.renderGrid(arg, l, m, 24, 4, 82, 208);
+        this.renderGrid(matrices, l, m, 24, 4, 82, 208);
         RenderSystem.disableBlend();
         for (AlternativeButtonWidget lv : this.alternativeButtons) {
-            lv.render(arg, i, j, f);
+            lv.render(matrices, mouseX, mouseY, delta);
         }
         RenderSystem.popMatrix();
     }
@@ -178,8 +178,8 @@ Element {
         }
     }
 
-    public void setVisible(boolean bl) {
-        this.visible = bl;
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public boolean isVisible() {
@@ -194,14 +194,14 @@ Element {
         private final boolean craftable;
         protected final List<InputSlot> slots;
 
-        public AlternativeButtonWidget(int i, int j, Recipe<?> arg2, boolean bl) {
-            super(i, j, 200, 20, LiteralText.EMPTY);
+        public AlternativeButtonWidget(int x, int y, Recipe<?> recipe, boolean craftable) {
+            super(x, y, 200, 20, LiteralText.EMPTY);
             this.slots = Lists.newArrayList();
             this.width = 24;
             this.height = 24;
-            this.recipe = arg2;
-            this.craftable = bl;
-            this.alignRecipe(arg2);
+            this.recipe = recipe;
+            this.craftable = craftable;
+            this.alignRecipe(recipe);
         }
 
         protected void alignRecipe(Recipe<?> arg) {
@@ -209,15 +209,15 @@ Element {
         }
 
         @Override
-        public void acceptAlignedInput(Iterator<Ingredient> iterator, int i, int j, int k, int l) {
-            ItemStack[] lvs = iterator.next().getMatchingStacksClient();
+        public void acceptAlignedInput(Iterator<Ingredient> inputs, int slot, int amount, int gridX, int gridY) {
+            ItemStack[] lvs = inputs.next().getMatchingStacksClient();
             if (lvs.length != 0) {
-                this.slots.add(new InputSlot(3 + l * 7, 3 + k * 7, lvs));
+                this.slots.add(new InputSlot(3 + gridY * 7, 3 + gridX * 7, lvs));
             }
         }
 
         @Override
-        public void renderButton(MatrixStack arg, int i, int j, float f) {
+        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             int l;
             RenderSystem.enableAlphaTest();
             RecipeAlternativesWidget.this.client.getTextureManager().bindTexture(BG_TEX);
@@ -229,7 +229,7 @@ Element {
             if (this.isHovered()) {
                 l += 26;
             }
-            this.drawTexture(arg, this.x, this.y, k, l, this.width, this.height);
+            this.drawTexture(matrices, this.x, this.y, k, l, this.width, this.height);
             for (InputSlot lv : this.slots) {
                 RenderSystem.pushMatrix();
                 float g = 0.42f;
@@ -248,10 +248,10 @@ Element {
             public final int y;
             public final int x;
 
-            public InputSlot(int i, int j, ItemStack[] args) {
-                this.y = i;
-                this.x = j;
-                this.stacks = args;
+            public InputSlot(int y, int x, ItemStack[] stacks) {
+                this.y = y;
+                this.x = x;
+                this.stacks = stacks;
             }
         }
     }

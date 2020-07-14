@@ -11,10 +11,10 @@ extends DoorInteractGoal {
     private final boolean delayedClose;
     private int ticksLeft;
 
-    public LongDoorInteractGoal(MobEntity arg, boolean bl) {
-        super(arg);
-        this.mob = arg;
-        this.delayedClose = bl;
+    public LongDoorInteractGoal(MobEntity mob, boolean delayedClose) {
+        super(mob);
+        this.mob = mob;
+        this.delayedClose = delayedClose;
     }
 
     @Override

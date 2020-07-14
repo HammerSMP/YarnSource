@@ -100,13 +100,13 @@ extends BlockEntityRenderer<BannerBlockEntity> {
         BannerBlockEntityRenderer.renderCanvas(arg, arg2, i, j, arg3, arg4, bl, list, false);
     }
 
-    public static void renderCanvas(MatrixStack arg, VertexConsumerProvider arg2, int i, int j, ModelPart arg3, SpriteIdentifier arg4, boolean bl, List<Pair<BannerPattern, DyeColor>> list, boolean bl2) {
-        arg3.render(arg, arg4.method_30001(arg2, RenderLayer::getEntitySolid, bl2), i, j);
-        for (int k = 0; k < 17 && k < list.size(); ++k) {
-            Pair<BannerPattern, DyeColor> pair = list.get(k);
+    public static void renderCanvas(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, ModelPart canvas, SpriteIdentifier baseSprite, boolean isBanner, List<Pair<BannerPattern, DyeColor>> patterns, boolean bl2) {
+        canvas.render(matrices, baseSprite.method_30001(vertexConsumers, RenderLayer::getEntitySolid, bl2), light, overlay);
+        for (int k = 0; k < 17 && k < patterns.size(); ++k) {
+            Pair<BannerPattern, DyeColor> pair = patterns.get(k);
             float[] fs = ((DyeColor)pair.getSecond()).getColorComponents();
-            SpriteIdentifier lv = new SpriteIdentifier(bl ? TexturedRenderLayers.BANNER_PATTERNS_ATLAS_TEXTURE : TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, ((BannerPattern)((Object)pair.getFirst())).getSpriteId(bl));
-            arg3.render(arg, lv.getVertexConsumer(arg2, RenderLayer::getEntityNoOutline), i, j, fs[0], fs[1], fs[2], 1.0f);
+            SpriteIdentifier lv = new SpriteIdentifier(isBanner ? TexturedRenderLayers.BANNER_PATTERNS_ATLAS_TEXTURE : TexturedRenderLayers.SHIELD_PATTERNS_ATLAS_TEXTURE, ((BannerPattern)((Object)pair.getFirst())).getSpriteId(isBanner));
+            canvas.render(matrices, lv.getVertexConsumer(vertexConsumers, RenderLayer::getEntityNoOutline), light, overlay, fs[0], fs[1], fs[2], 1.0f);
         }
     }
 }

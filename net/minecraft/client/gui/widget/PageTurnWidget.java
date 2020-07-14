@@ -25,14 +25,14 @@ extends ButtonWidget {
     private final boolean isNextPageButton;
     private final boolean playPageTurnSound;
 
-    public PageTurnWidget(int i, int j, boolean bl, ButtonWidget.PressAction arg, boolean bl2) {
-        super(i, j, 23, 13, LiteralText.EMPTY, arg);
-        this.isNextPageButton = bl;
-        this.playPageTurnSound = bl2;
+    public PageTurnWidget(int x, int y, boolean isNextPageButton, ButtonWidget.PressAction action, boolean playPageTurnSound) {
+        super(x, y, 23, 13, LiteralText.EMPTY, action);
+        this.isNextPageButton = isNextPageButton;
+        this.playPageTurnSound = playPageTurnSound;
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         MinecraftClient.getInstance().getTextureManager().bindTexture(BookScreen.BOOK_TEXTURE);
         int k = 0;
@@ -43,13 +43,13 @@ extends ButtonWidget {
         if (!this.isNextPageButton) {
             l += 13;
         }
-        this.drawTexture(arg, this.x, this.y, k, l, 23, 13);
+        this.drawTexture(matrices, this.x, this.y, k, l, 23, 13);
     }
 
     @Override
-    public void playDownSound(SoundManager arg) {
+    public void playDownSound(SoundManager soundManager) {
         if (this.playPageTurnSound) {
-            arg.play(PositionedSoundInstance.master(SoundEvents.ITEM_BOOK_PAGE_TURN, 1.0f));
+            soundManager.play(PositionedSoundInstance.master(SoundEvents.ITEM_BOOK_PAGE_TURN, 1.0f));
         }
     }
 }

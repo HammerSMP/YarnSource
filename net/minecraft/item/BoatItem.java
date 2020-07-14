@@ -26,23 +26,23 @@ extends Item {
     private static final Predicate<Entity> RIDERS = EntityPredicates.EXCEPT_SPECTATOR.and(Entity::collides);
     private final BoatEntity.Type type;
 
-    public BoatItem(BoatEntity.Type arg, Item.Settings arg2) {
-        super(arg2);
-        this.type = arg;
+    public BoatItem(BoatEntity.Type type, Item.Settings settings) {
+        super(settings);
+        this.type = type;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        BlockHitResult lv2 = BoatItem.rayTrace(arg, arg2, RayTraceContext.FluidHandling.ANY);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        BlockHitResult lv2 = BoatItem.rayTrace(world, user, RayTraceContext.FluidHandling.ANY);
         if (((HitResult)lv2).getType() == HitResult.Type.MISS) {
             return TypedActionResult.pass(lv);
         }
-        Vec3d lv3 = arg2.getRotationVec(1.0f);
+        Vec3d lv3 = user.getRotationVec(1.0f);
         double d = 5.0;
-        List<Entity> list = arg.getEntities(arg2, arg2.getBoundingBox().stretch(lv3.multiply(5.0)).expand(1.0), RIDERS);
+        List<Entity> list = world.getEntities(user, user.getBoundingBox().stretch(lv3.multiply(5.0)).expand(1.0), RIDERS);
         if (!list.isEmpty()) {
-            Vec3d lv4 = arg2.getCameraPosVec(1.0f);
+            Vec3d lv4 = user.getCameraPosVec(1.0f);
             for (Entity lv5 : list) {
                 Box lv6 = lv5.getBoundingBox().expand(lv5.getTargetingMargin());
                 if (!lv6.contains(lv4)) continue;
@@ -50,20 +50,20 @@ extends Item {
             }
         }
         if (((HitResult)lv2).getType() == HitResult.Type.BLOCK) {
-            BoatEntity lv7 = new BoatEntity(arg, lv2.getPos().x, lv2.getPos().y, lv2.getPos().z);
+            BoatEntity lv7 = new BoatEntity(world, lv2.getPos().x, lv2.getPos().y, lv2.getPos().z);
             lv7.setBoatType(this.type);
-            lv7.yaw = arg2.yaw;
-            if (!arg.doesNotCollide(lv7, lv7.getBoundingBox().expand(-0.1))) {
+            lv7.yaw = user.yaw;
+            if (!world.doesNotCollide(lv7, lv7.getBoundingBox().expand(-0.1))) {
                 return TypedActionResult.fail(lv);
             }
-            if (!arg.isClient) {
-                arg.spawnEntity(lv7);
-                if (!arg2.abilities.creativeMode) {
+            if (!world.isClient) {
+                world.spawnEntity(lv7);
+                if (!user.abilities.creativeMode) {
                     lv.decrement(1);
                 }
             }
-            arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-            return TypedActionResult.method_29237(lv, arg.isClient());
+            user.incrementStat(Stats.USED.getOrCreateStat(this));
+            return TypedActionResult.method_29237(lv, world.isClient());
         }
         return TypedActionResult.pass(lv);
     }

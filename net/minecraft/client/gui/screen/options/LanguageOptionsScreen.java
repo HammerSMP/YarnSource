@@ -35,9 +35,9 @@ extends GameOptionsScreen {
     private OptionButtonWidget forceUnicodeButton;
     private ButtonWidget doneButton;
 
-    public LanguageOptionsScreen(Screen arg, GameOptions arg2, LanguageManager arg3) {
-        super(arg, arg2, new TranslatableText("options.language"));
-        this.languageManager = arg3;
+    public LanguageOptionsScreen(Screen parent, GameOptions options, LanguageManager languageManager) {
+        super(parent, options, new TranslatableText("options.language"));
+        this.languageManager = languageManager;
     }
 
     @Override
@@ -66,18 +66,18 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.languageSelectionList.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 16, 0xFFFFFF);
-        this.drawCenteredString(arg, this.textRenderer, "(" + I18n.translate("options.languageWarning", new Object[0]) + ")", this.width / 2, this.height - 56, 0x808080);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.languageSelectionList.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 16, 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, "(" + I18n.translate("options.languageWarning", new Object[0]) + ")", this.width / 2, this.height - 56, 0x808080);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Environment(value=EnvType.CLIENT)
     class LanguageSelectionListWidget
     extends AlwaysSelectedEntryListWidget<LanguageEntry> {
-        public LanguageSelectionListWidget(MinecraftClient arg2) {
-            super(arg2, LanguageOptionsScreen.this.width, LanguageOptionsScreen.this.height, 32, LanguageOptionsScreen.this.height - 65 + 4, 18);
+        public LanguageSelectionListWidget(MinecraftClient client) {
+            super(client, LanguageOptionsScreen.this.width, LanguageOptionsScreen.this.height, 32, LanguageOptionsScreen.this.height - 65 + 4, 18);
             for (LanguageDefinition lv : LanguageOptionsScreen.this.languageManager.getAllLanguages()) {
                 LanguageEntry lv2 = new LanguageEntry(lv);
                 this.addEntry(lv2);
@@ -108,8 +108,8 @@ extends GameOptionsScreen {
         }
 
         @Override
-        protected void renderBackground(MatrixStack arg) {
-            LanguageOptionsScreen.this.renderBackground(arg);
+        protected void renderBackground(MatrixStack matrices) {
+            LanguageOptionsScreen.this.renderBackground(matrices);
         }
 
         @Override
@@ -122,19 +122,19 @@ extends GameOptionsScreen {
         extends AlwaysSelectedEntryListWidget.Entry<LanguageEntry> {
             private final LanguageDefinition languageDefinition;
 
-            public LanguageEntry(LanguageDefinition arg2) {
-                this.languageDefinition = arg2;
+            public LanguageEntry(LanguageDefinition languageDefinition) {
+                this.languageDefinition = languageDefinition;
             }
 
             @Override
-            public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 String string = this.languageDefinition.toString();
-                LanguageOptionsScreen.this.textRenderer.drawWithShadow(arg, string, LanguageSelectionListWidget.this.width / 2 - LanguageOptionsScreen.this.textRenderer.getWidth(string) / 2, j + 1, 0xFFFFFF, true);
+                LanguageOptionsScreen.this.textRenderer.drawWithShadow(matrices, string, LanguageSelectionListWidget.this.width / 2 - LanguageOptionsScreen.this.textRenderer.getWidth(string) / 2, y + 1, 0xFFFFFF, true);
             }
 
             @Override
-            public boolean mouseClicked(double d, double e, int i) {
-                if (i == 0) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
                     this.onPressed();
                     return true;
                 }

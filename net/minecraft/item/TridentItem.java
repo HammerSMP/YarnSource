@@ -50,46 +50,46 @@ implements Vanishable {
     }
 
     @Override
-    public boolean canMine(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4) {
-        return !arg4.isCreative();
+    public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
+        return !miner.isCreative();
     }
 
     @Override
-    public UseAction getUseAction(ItemStack arg) {
+    public UseAction getUseAction(ItemStack stack) {
         return UseAction.SPEAR;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack arg) {
+    public int getMaxUseTime(ItemStack stack) {
         return 72000;
     }
 
     @Override
-    public void onStoppedUsing(ItemStack arg, World arg22, LivingEntity arg3, int i) {
-        if (!(arg3 instanceof PlayerEntity)) {
+    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+        if (!(user instanceof PlayerEntity)) {
             return;
         }
-        PlayerEntity lv = (PlayerEntity)arg3;
-        int j = this.getMaxUseTime(arg) - i;
+        PlayerEntity lv = (PlayerEntity)user;
+        int j = this.getMaxUseTime(stack) - remainingUseTicks;
         if (j < 10) {
             return;
         }
-        int k = EnchantmentHelper.getRiptide(arg);
+        int k = EnchantmentHelper.getRiptide(stack);
         if (k > 0 && !lv.isTouchingWaterOrRain()) {
             return;
         }
-        if (!arg22.isClient) {
-            arg.damage(1, lv, arg2 -> arg2.sendToolBreakStatus(arg3.getActiveHand()));
+        if (!world.isClient) {
+            stack.damage(1, lv, p -> p.sendToolBreakStatus(user.getActiveHand()));
             if (k == 0) {
-                TridentEntity lv2 = new TridentEntity(arg22, (LivingEntity)lv, arg);
+                TridentEntity lv2 = new TridentEntity(world, (LivingEntity)lv, stack);
                 lv2.setProperties(lv, lv.pitch, lv.yaw, 0.0f, 2.5f + (float)k * 0.5f, 1.0f);
                 if (lv.abilities.creativeMode) {
                     lv2.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
                 }
-                arg22.spawnEntity(lv2);
-                arg22.playSoundFromEntity(null, lv2, SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                world.spawnEntity(lv2);
+                world.playSoundFromEntity(null, lv2, SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
                 if (!lv.abilities.creativeMode) {
-                    lv.inventory.removeOne(arg);
+                    lv.inventory.removeOne(stack);
                 }
             }
         }
@@ -106,7 +106,7 @@ implements Vanishable {
             lv.addVelocity(h *= o / n, l *= o / n, m *= o / n);
             lv.setRiptideTicks(20);
             if (lv.isOnGround()) {
-                float p = 1.1999999f;
+                float p2 = 1.1999999f;
                 lv.move(MovementType.SELF, new Vec3d(0.0, 1.1999999284744263, 0.0));
             }
             if (k >= 3) {
@@ -116,43 +116,43 @@ implements Vanishable {
             } else {
                 lv5 = SoundEvents.ITEM_TRIDENT_RIPTIDE_1;
             }
-            arg22.playSoundFromEntity(null, lv, lv5, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            world.playSoundFromEntity(null, lv, lv5, SoundCategory.PLAYERS, 1.0f, 1.0f);
         }
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
         if (lv.getDamage() >= lv.getMaxDamage() - 1) {
             return TypedActionResult.fail(lv);
         }
-        if (EnchantmentHelper.getRiptide(lv) > 0 && !arg2.isTouchingWaterOrRain()) {
+        if (EnchantmentHelper.getRiptide(lv) > 0 && !user.isTouchingWaterOrRain()) {
             return TypedActionResult.fail(lv);
         }
-        arg2.setCurrentHand(arg3);
+        user.setCurrentHand(hand);
         return TypedActionResult.consume(lv);
     }
 
     @Override
-    public boolean postHit(ItemStack arg2, LivingEntity arg22, LivingEntity arg3) {
-        arg2.damage(1, arg3, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+    public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        stack.damage(1, attacker, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
         return true;
     }
 
     @Override
-    public boolean postMine(ItemStack arg2, World arg22, BlockState arg3, BlockPos arg4, LivingEntity arg5) {
-        if ((double)arg3.getHardness(arg22, arg4) != 0.0) {
-            arg2.damage(2, arg5, arg -> arg.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+    public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+        if ((double)state.getHardness(world, pos) != 0.0) {
+            stack.damage(2, miner, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
         }
         return true;
     }
 
     @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot arg) {
-        if (arg == EquipmentSlot.MAINHAND) {
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
+        if (slot == EquipmentSlot.MAINHAND) {
             return this.field_23746;
         }
-        return super.getAttributeModifiers(arg);
+        return super.getAttributeModifiers(slot);
     }
 
     @Override

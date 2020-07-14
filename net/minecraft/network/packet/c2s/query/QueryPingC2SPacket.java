@@ -22,18 +22,18 @@ implements Packet<ServerQueryPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public QueryPingC2SPacket(long l) {
-        this.startTime = l;
+    public QueryPingC2SPacket(long startTime) {
+        this.startTime = startTime;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.startTime = arg.readLong();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.startTime = buf.readLong();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeLong(this.startTime);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeLong(this.startTime);
     }
 
     @Override

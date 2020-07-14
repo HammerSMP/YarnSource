@@ -54,8 +54,8 @@ extends Sensor<HoglinEntity> {
         lv.remember(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, list.size());
     }
 
-    private Optional<BlockPos> findNearestWarpedFungus(ServerWorld arg, HoglinEntity arg22) {
-        return BlockPos.findClosest(arg22.getBlockPos(), 8, 4, arg2 -> arg.getBlockState((BlockPos)arg2).isIn(BlockTags.HOGLIN_REPELLENTS));
+    private Optional<BlockPos> findNearestWarpedFungus(ServerWorld world, HoglinEntity hoglin) {
+        return BlockPos.findClosest(hoglin.getBlockPos(), 8, 4, arg2 -> world.getBlockState((BlockPos)arg2).isIn(BlockTags.HOGLIN_REPELLENTS));
     }
 }
 

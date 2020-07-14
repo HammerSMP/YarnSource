@@ -54,21 +54,21 @@ public class VillagerData {
         return new VillagerData(this.type, arg, this.level);
     }
 
-    public VillagerData withLevel(int i) {
-        return new VillagerData(this.type, this.profession, i);
+    public VillagerData withLevel(int level) {
+        return new VillagerData(this.type, this.profession, level);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static int getLowerLevelExperience(int i) {
-        return VillagerData.canLevelUp(i) ? LEVEL_BASE_EXPERIENCE[i - 1] : 0;
+    public static int getLowerLevelExperience(int level) {
+        return VillagerData.canLevelUp(level) ? LEVEL_BASE_EXPERIENCE[level - 1] : 0;
     }
 
-    public static int getUpperLevelExperience(int i) {
-        return VillagerData.canLevelUp(i) ? LEVEL_BASE_EXPERIENCE[i] : 0;
+    public static int getUpperLevelExperience(int level) {
+        return VillagerData.canLevelUp(level) ? LEVEL_BASE_EXPERIENCE[level] : 0;
     }
 
-    public static boolean canLevelUp(int i) {
-        return i >= 1 && i < 5;
+    public static boolean canLevelUp(int level) {
+        return level >= 1 && level < 5;
     }
 }
 

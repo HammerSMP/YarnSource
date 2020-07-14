@@ -36,38 +36,38 @@ implements Packet<ClientPlayPacketListener> {
     public CommandSuggestionsS2CPacket() {
     }
 
-    public CommandSuggestionsS2CPacket(int i, Suggestions suggestions) {
-        this.completionId = i;
+    public CommandSuggestionsS2CPacket(int completionId, Suggestions suggestions) {
+        this.completionId = completionId;
         this.suggestions = suggestions;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.completionId = arg.readVarInt();
-        int i = arg.readVarInt();
-        int j = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.completionId = buf.readVarInt();
+        int i = buf.readVarInt();
+        int j = buf.readVarInt();
         StringRange stringRange = StringRange.between((int)i, (int)(i + j));
-        int k = arg.readVarInt();
+        int k = buf.readVarInt();
         ArrayList list = Lists.newArrayListWithCapacity((int)k);
         for (int l = 0; l < k; ++l) {
-            String string = arg.readString(32767);
-            Text lv = arg.readBoolean() ? arg.readText() : null;
+            String string = buf.readString(32767);
+            Text lv = buf.readBoolean() ? buf.readText() : null;
             list.add(new Suggestion(stringRange, string, (Message)lv));
         }
         this.suggestions = new Suggestions(stringRange, (List)list);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.completionId);
-        arg.writeVarInt(this.suggestions.getRange().getStart());
-        arg.writeVarInt(this.suggestions.getRange().getLength());
-        arg.writeVarInt(this.suggestions.getList().size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.completionId);
+        buf.writeVarInt(this.suggestions.getRange().getStart());
+        buf.writeVarInt(this.suggestions.getRange().getLength());
+        buf.writeVarInt(this.suggestions.getList().size());
         for (Suggestion suggestion : this.suggestions.getList()) {
-            arg.writeString(suggestion.getText());
-            arg.writeBoolean(suggestion.getTooltip() != null);
+            buf.writeString(suggestion.getText());
+            buf.writeBoolean(suggestion.getTooltip() != null);
             if (suggestion.getTooltip() == null) continue;
-            arg.writeText(Texts.toText(suggestion.getTooltip()));
+            buf.writeText(Texts.toText(suggestion.getTooltip()));
         }
     }
 

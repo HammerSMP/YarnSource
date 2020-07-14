@@ -46,10 +46,10 @@ extends Screen {
     private LockButtonWidget lockDifficultyButton;
     private Difficulty difficulty;
 
-    public OptionsScreen(Screen arg, GameOptions arg2) {
+    public OptionsScreen(Screen parent, GameOptions gameOptions) {
         super(new TranslatableText("options.title"));
-        this.parent = arg;
-        this.settings = arg2;
+        this.parent = parent;
+        this.settings = gameOptions;
     }
 
     @Override
@@ -112,13 +112,13 @@ extends Screen {
         }
     }
 
-    private Text getDifficultyButtonText(Difficulty arg) {
-        return new TranslatableText("options.difficulty").append(": ").append(arg.getTranslatableName());
+    private Text getDifficultyButtonText(Difficulty difficulty) {
+        return new TranslatableText("options.difficulty").append(": ").append(difficulty.getTranslatableName());
     }
 
-    private void lockDifficulty(boolean bl) {
+    private void lockDifficulty(boolean difficultyLocked) {
         this.client.openScreen(this);
-        if (bl && this.client.world != null) {
+        if (difficultyLocked && this.client.world != null) {
             this.client.getNetworkHandler().sendPacket(new UpdateDifficultyLockC2SPacket(true));
             this.lockDifficultyButton.setLocked(true);
             this.lockDifficultyButton.active = false;
@@ -132,10 +132,10 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

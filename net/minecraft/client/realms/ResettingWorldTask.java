@@ -28,16 +28,16 @@ extends LongRunningTask {
     private String title = I18n.translate("mco.reset.world.resetting.screen.title", new Object[0]);
     private final Runnable callback;
 
-    public ResettingWorldTask(@Nullable String string, @Nullable WorldTemplate arg, int i, boolean bl, long l, @Nullable String string2, Runnable runnable) {
-        this.seed = string;
-        this.worldTemplate = arg;
-        this.levelType = i;
-        this.generateStructures = bl;
-        this.serverId = l;
-        if (string2 != null) {
-            this.title = string2;
+    public ResettingWorldTask(@Nullable String seed, @Nullable WorldTemplate worldTemplate, int levelType, boolean generateStructures, long serverId, @Nullable String title, Runnable callback) {
+        this.seed = seed;
+        this.worldTemplate = worldTemplate;
+        this.levelType = levelType;
+        this.generateStructures = generateStructures;
+        this.serverId = serverId;
+        if (title != null) {
+            this.title = title;
         }
-        this.callback = runnable;
+        this.callback = callback;
     }
 
     @Override

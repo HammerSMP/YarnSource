@@ -202,43 +202,43 @@ implements ServerWorldAccess {
     private final StructureAccessor structureAccessor;
     private final boolean field_25143;
 
-    public ServerWorld(MinecraftServer minecraftServer, Executor executor, LevelStorage.Session arg2, ServerWorldProperties arg22, RegistryKey<World> arg3, RegistryKey<DimensionType> arg4, DimensionType arg5, WorldGenerationProgressListener arg6, ChunkGenerator arg7, boolean bl, long l, List<Spawner> list, boolean bl2) {
-        super(arg22, arg3, arg4, arg5, minecraftServer::getProfiler, false, bl, l);
+    public ServerWorld(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey<World> arg3, RegistryKey<DimensionType> arg4, DimensionType arg5, WorldGenerationProgressListener generationProgressListener, ChunkGenerator arg7, boolean bl, long l, List<Spawner> spawners, boolean bl2) {
+        super(properties, arg3, arg4, arg5, server::getProfiler, false, bl, l);
         this.field_25143 = bl2;
-        this.server = minecraftServer;
-        this.spawners = list;
-        this.worldProperties = arg22;
-        this.serverChunkManager = new ServerChunkManager(this, arg2, minecraftServer.getDataFixer(), minecraftServer.getStructureManager(), executor, arg7, minecraftServer.getPlayerManager().getViewDistance(), minecraftServer.syncChunkWrites(), arg6, () -> minecraftServer.getOverworld().getPersistentStateManager());
+        this.server = server;
+        this.spawners = spawners;
+        this.worldProperties = properties;
+        this.serverChunkManager = new ServerChunkManager(this, session, server.getDataFixer(), server.getStructureManager(), workerExecutor, arg7, server.getPlayerManager().getViewDistance(), server.syncChunkWrites(), generationProgressListener, () -> server.getOverworld().getPersistentStateManager());
         this.portalForcer = new PortalForcer(this);
         this.calculateAmbientDarkness();
         this.initWeatherGradients();
-        this.getWorldBorder().setMaxWorldBorderRadius(minecraftServer.getMaxWorldBorderRadius());
+        this.getWorldBorder().setMaxWorldBorderRadius(server.getMaxWorldBorderRadius());
         this.raidManager = this.getPersistentStateManager().getOrCreate(() -> new RaidManager(this), RaidManager.nameFor(this.getDimension()));
-        if (!minecraftServer.isSinglePlayer()) {
-            arg22.setGameMode(minecraftServer.getDefaultGameMode());
+        if (!server.isSinglePlayer()) {
+            properties.setGameMode(server.getDefaultGameMode());
         }
-        this.structureAccessor = new StructureAccessor(this, minecraftServer.getSaveProperties().getGeneratorOptions());
-        this.enderDragonFight = this.getDimension().hasEnderDragonFight() ? new EnderDragonFight(this, minecraftServer.getSaveProperties().getGeneratorOptions().getSeed(), minecraftServer.getSaveProperties().method_29036()) : null;
+        this.structureAccessor = new StructureAccessor(this, server.getSaveProperties().getGeneratorOptions());
+        this.enderDragonFight = this.getDimension().hasEnderDragonFight() ? new EnderDragonFight(this, server.getSaveProperties().getGeneratorOptions().getSeed(), server.getSaveProperties().method_29036()) : null;
     }
 
-    public void setWeather(int i, int j, boolean bl, boolean bl2) {
-        this.worldProperties.setClearWeatherTime(i);
-        this.worldProperties.setRainTime(j);
-        this.worldProperties.setThunderTime(j);
-        this.worldProperties.setRaining(bl);
-        this.worldProperties.setThundering(bl2);
+    public void setWeather(int clearDuration, int rainDuration, boolean raining, boolean thundering) {
+        this.worldProperties.setClearWeatherTime(clearDuration);
+        this.worldProperties.setRainTime(rainDuration);
+        this.worldProperties.setThunderTime(rainDuration);
+        this.worldProperties.setRaining(raining);
+        this.worldProperties.setThundering(thundering);
     }
 
     @Override
-    public Biome getGeneratorStoredBiome(int i, int j, int k) {
-        return this.getChunkManager().getChunkGenerator().getBiomeSource().getBiomeForNoiseGen(i, j, k);
+    public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ) {
+        return this.getChunkManager().getChunkGenerator().getBiomeSource().getBiomeForNoiseGen(biomeX, biomeY, biomeZ);
     }
 
     public StructureAccessor getStructureAccessor() {
         return this.structureAccessor;
     }
 
-    public void tick(BooleanSupplier booleanSupplier) {
+    public void tick(BooleanSupplier shouldKeepTicking) {
         boolean bl4;
         Profiler lv = this.getProfiler();
         this.inBlockTick = true;
@@ -303,7 +303,7 @@ implements ServerWorldAccess {
             this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED, this.rainGradient));
             this.server.getPlayerManager().sendToAll(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED, this.thunderGradient));
         }
-        if (this.allPlayersSleeping && this.players.stream().noneMatch(arg -> !arg.isSpectator() && !arg.isSleepingLongEnough())) {
+        if (this.allPlayersSleeping && this.players.stream().noneMatch(player -> !player.isSpectator() && !player.isSleepingLongEnough())) {
             this.allPlayersSleeping = false;
             if (this.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
                 long l = this.properties.getTimeOfDay() + 24000L;
@@ -317,7 +317,7 @@ implements ServerWorldAccess {
         this.calculateAmbientDarkness();
         this.tickTime();
         lv.swap("chunkSource");
-        this.getChunkManager().tick(booleanSupplier);
+        this.getChunkManager().tick(shouldKeepTicking);
         lv.swap("tickPending");
         if (!this.isDebugWorld()) {
             this.blockTickScheduler.tick();
@@ -393,23 +393,23 @@ implements ServerWorldAccess {
         }
     }
 
-    public void setTimeOfDay(long l) {
-        this.worldProperties.setTimeOfDay(l);
+    public void setTimeOfDay(long timeOfDay) {
+        this.worldProperties.setTimeOfDay(timeOfDay);
     }
 
-    public void tickSpawners(boolean bl, boolean bl2) {
+    public void tickSpawners(boolean spawnMonsters, boolean spawnAnimals) {
         for (Spawner lv : this.spawners) {
-            lv.spawn(this, bl, bl2);
+            lv.spawn(this, spawnMonsters, spawnAnimals);
         }
     }
 
     private void wakeSleepingPlayers() {
-        this.players.stream().filter(LivingEntity::isSleeping).collect(Collectors.toList()).forEach(arg -> arg.wakeUp(false, false));
+        this.players.stream().filter(LivingEntity::isSleeping).collect(Collectors.toList()).forEach(player -> player.wakeUp(false, false));
     }
 
-    public void tickChunk(WorldChunk arg, int i) {
+    public void tickChunk(WorldChunk chunk, int randomTickSpeed) {
         BlockPos lv3;
-        ChunkPos lv = arg.getPos();
+        ChunkPos lv = chunk.getPos();
         boolean bl = this.isRaining();
         int j = lv.getStartX();
         int k = lv.getStartZ();
@@ -447,11 +447,11 @@ implements ServerWorldAccess {
             }
         }
         lv2.swap("tickBlocks");
-        if (i > 0) {
-            for (ChunkSection lv10 : arg.getSectionArray()) {
+        if (randomTickSpeed > 0) {
+            for (ChunkSection lv10 : chunk.getSectionArray()) {
                 if (lv10 == WorldChunk.EMPTY_SECTION || !lv10.hasRandomTicks()) continue;
                 int l = lv10.getYOffset();
-                for (int m = 0; m < i; ++m) {
+                for (int m = 0; m < randomTickSpeed; ++m) {
                     FluidState lv13;
                     BlockPos lv11 = this.getRandomPosInChunk(j, l, k, 15);
                     lv2.push("randomTick");
@@ -469,10 +469,10 @@ implements ServerWorldAccess {
         lv2.pop();
     }
 
-    protected BlockPos getSurface(BlockPos arg2) {
-        BlockPos lv = this.getTopPosition(Heightmap.Type.MOTION_BLOCKING, arg2);
+    protected BlockPos getSurface(BlockPos pos) {
+        BlockPos lv = this.getTopPosition(Heightmap.Type.MOTION_BLOCKING, pos);
         Box lv2 = new Box(lv, new BlockPos(lv.getX(), this.getHeight(), lv.getZ())).expand(3.0);
-        List<LivingEntity> list = this.getEntities(LivingEntity.class, lv2, (? super T arg) -> arg != null && arg.isAlive() && this.isSkyVisible(arg.getBlockPos()));
+        List<LivingEntity> list = this.getEntities(LivingEntity.class, lv2, (? super T entity) -> entity != null && entity.isAlive() && this.isSkyVisible(entity.getBlockPos()));
         if (!list.isEmpty()) {
             return list.get(this.random.nextInt(list.size())).getBlockPos();
         }
@@ -519,113 +519,113 @@ implements ServerWorldAccess {
         this.idleTimeout = 0;
     }
 
-    private void tickFluid(ScheduledTick<Fluid> arg) {
-        FluidState lv = this.getFluidState(arg.pos);
-        if (lv.getFluid() == arg.getObject()) {
-            lv.onScheduledTick(this, arg.pos);
+    private void tickFluid(ScheduledTick<Fluid> tick) {
+        FluidState lv = this.getFluidState(tick.pos);
+        if (lv.getFluid() == tick.getObject()) {
+            lv.onScheduledTick(this, tick.pos);
         }
     }
 
-    private void tickBlock(ScheduledTick<Block> arg) {
-        BlockState lv = this.getBlockState(arg.pos);
-        if (lv.isOf(arg.getObject())) {
-            lv.scheduledTick(this, arg.pos, this.random);
+    private void tickBlock(ScheduledTick<Block> tick) {
+        BlockState lv = this.getBlockState(tick.pos);
+        if (lv.isOf(tick.getObject())) {
+            lv.scheduledTick(this, tick.pos, this.random);
         }
     }
 
-    public void tickEntity(Entity arg) {
-        if (!(arg instanceof PlayerEntity) && !this.getChunkManager().shouldTickEntity(arg)) {
-            this.checkChunk(arg);
+    public void tickEntity(Entity entity) {
+        if (!(entity instanceof PlayerEntity) && !this.getChunkManager().shouldTickEntity(entity)) {
+            this.checkEntityChunkPos(entity);
             return;
         }
-        arg.resetPosition(arg.getX(), arg.getY(), arg.getZ());
-        arg.prevYaw = arg.yaw;
-        arg.prevPitch = arg.pitch;
-        if (arg.updateNeeded) {
-            ++arg.age;
+        entity.resetPosition(entity.getX(), entity.getY(), entity.getZ());
+        entity.prevYaw = entity.yaw;
+        entity.prevPitch = entity.pitch;
+        if (entity.updateNeeded) {
+            ++entity.age;
             Profiler lv = this.getProfiler();
-            lv.push(() -> Registry.ENTITY_TYPE.getId(arg.getType()).toString());
+            lv.push(() -> Registry.ENTITY_TYPE.getId(entity.getType()).toString());
             lv.visit("tickNonPassenger");
-            arg.tick();
+            entity.tick();
             lv.pop();
         }
-        this.checkChunk(arg);
-        if (arg.updateNeeded) {
-            for (Entity lv2 : arg.getPassengerList()) {
-                this.tickPassenger(arg, lv2);
+        this.checkEntityChunkPos(entity);
+        if (entity.updateNeeded) {
+            for (Entity lv2 : entity.getPassengerList()) {
+                this.tickPassenger(entity, lv2);
             }
         }
     }
 
-    public void tickPassenger(Entity arg, Entity arg2) {
-        if (arg2.removed || arg2.getVehicle() != arg) {
-            arg2.stopRiding();
+    public void tickPassenger(Entity vehicle, Entity passenger) {
+        if (passenger.removed || passenger.getVehicle() != vehicle) {
+            passenger.stopRiding();
             return;
         }
-        if (!(arg2 instanceof PlayerEntity) && !this.getChunkManager().shouldTickEntity(arg2)) {
+        if (!(passenger instanceof PlayerEntity) && !this.getChunkManager().shouldTickEntity(passenger)) {
             return;
         }
-        arg2.resetPosition(arg2.getX(), arg2.getY(), arg2.getZ());
-        arg2.prevYaw = arg2.yaw;
-        arg2.prevPitch = arg2.pitch;
-        if (arg2.updateNeeded) {
-            ++arg2.age;
+        passenger.resetPosition(passenger.getX(), passenger.getY(), passenger.getZ());
+        passenger.prevYaw = passenger.yaw;
+        passenger.prevPitch = passenger.pitch;
+        if (passenger.updateNeeded) {
+            ++passenger.age;
             Profiler lv = this.getProfiler();
-            lv.push(() -> Registry.ENTITY_TYPE.getId(arg2.getType()).toString());
+            lv.push(() -> Registry.ENTITY_TYPE.getId(passenger.getType()).toString());
             lv.visit("tickPassenger");
-            arg2.tickRiding();
+            passenger.tickRiding();
             lv.pop();
         }
-        this.checkChunk(arg2);
-        if (arg2.updateNeeded) {
-            for (Entity lv2 : arg2.getPassengerList()) {
-                this.tickPassenger(arg2, lv2);
+        this.checkEntityChunkPos(passenger);
+        if (passenger.updateNeeded) {
+            for (Entity lv2 : passenger.getPassengerList()) {
+                this.tickPassenger(passenger, lv2);
             }
         }
     }
 
-    public void checkChunk(Entity arg) {
-        if (!arg.method_29240()) {
+    public void checkEntityChunkPos(Entity entity) {
+        if (!entity.isChunkPosUpdateRequested()) {
             return;
         }
         this.getProfiler().push("chunkCheck");
-        int i = MathHelper.floor(arg.getX() / 16.0);
-        int j = MathHelper.floor(arg.getY() / 16.0);
-        int k = MathHelper.floor(arg.getZ() / 16.0);
-        if (!arg.updateNeeded || arg.chunkX != i || arg.chunkY != j || arg.chunkZ != k) {
-            if (arg.updateNeeded && this.isChunkLoaded(arg.chunkX, arg.chunkZ)) {
-                this.getChunk(arg.chunkX, arg.chunkZ).remove(arg, arg.chunkY);
+        int i = MathHelper.floor(entity.getX() / 16.0);
+        int j = MathHelper.floor(entity.getY() / 16.0);
+        int k = MathHelper.floor(entity.getZ() / 16.0);
+        if (!entity.updateNeeded || entity.chunkX != i || entity.chunkY != j || entity.chunkZ != k) {
+            if (entity.updateNeeded && this.isChunkLoaded(entity.chunkX, entity.chunkZ)) {
+                this.getChunk(entity.chunkX, entity.chunkZ).remove(entity, entity.chunkY);
             }
-            if (arg.teleportRequested() || this.isChunkLoaded(i, k)) {
-                this.getChunk(i, k).addEntity(arg);
+            if (entity.teleportRequested() || this.isChunkLoaded(i, k)) {
+                this.getChunk(i, k).addEntity(entity);
             } else {
-                if (arg.updateNeeded) {
-                    LOGGER.warn("Entity {} left loaded chunk area", (Object)arg);
+                if (entity.updateNeeded) {
+                    LOGGER.warn("Entity {} left loaded chunk area", (Object)entity);
                 }
-                arg.updateNeeded = false;
+                entity.updateNeeded = false;
             }
         }
         this.getProfiler().pop();
     }
 
     @Override
-    public boolean canPlayerModifyAt(PlayerEntity arg, BlockPos arg2) {
-        return !this.server.isSpawnProtected(this, arg2, arg) && this.getWorldBorder().contains(arg2);
+    public boolean canPlayerModifyAt(PlayerEntity player, BlockPos pos) {
+        return !this.server.isSpawnProtected(this, pos, player) && this.getWorldBorder().contains(pos);
     }
 
-    public void save(@Nullable ProgressListener arg, boolean bl, boolean bl2) {
+    public void save(@Nullable ProgressListener progressListener, boolean flush, boolean bl2) {
         ServerChunkManager lv = this.getChunkManager();
         if (bl2) {
             return;
         }
-        if (arg != null) {
-            arg.method_15412(new TranslatableText("menu.savingLevel"));
+        if (progressListener != null) {
+            progressListener.method_15412(new TranslatableText("menu.savingLevel"));
         }
         this.saveLevel();
-        if (arg != null) {
-            arg.method_15414(new TranslatableText("menu.savingChunks"));
+        if (progressListener != null) {
+            progressListener.method_15414(new TranslatableText("menu.savingChunks"));
         }
-        lv.save(bl);
+        lv.save(flush);
     }
 
     private void saveLevel() {
@@ -673,93 +673,93 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public boolean spawnEntity(Entity arg) {
-        return this.addEntity(arg);
+    public boolean spawnEntity(Entity entity) {
+        return this.addEntity(entity);
     }
 
-    public boolean tryLoadEntity(Entity arg) {
-        return this.addEntity(arg);
+    public boolean tryLoadEntity(Entity entity) {
+        return this.addEntity(entity);
     }
 
-    public void onDimensionChanged(Entity arg) {
-        boolean bl = arg.teleporting;
-        arg.teleporting = true;
-        this.tryLoadEntity(arg);
-        arg.teleporting = bl;
-        this.checkChunk(arg);
+    public void onDimensionChanged(Entity entity) {
+        boolean bl = entity.teleporting;
+        entity.teleporting = true;
+        this.tryLoadEntity(entity);
+        entity.teleporting = bl;
+        this.checkEntityChunkPos(entity);
     }
 
-    public void onPlayerTeleport(ServerPlayerEntity arg) {
-        this.addPlayer(arg);
-        this.checkChunk(arg);
+    public void onPlayerTeleport(ServerPlayerEntity player) {
+        this.addPlayer(player);
+        this.checkEntityChunkPos(player);
     }
 
-    public void onPlayerChangeDimension(ServerPlayerEntity arg) {
-        this.addPlayer(arg);
-        this.checkChunk(arg);
+    public void onPlayerChangeDimension(ServerPlayerEntity player) {
+        this.addPlayer(player);
+        this.checkEntityChunkPos(player);
     }
 
-    public void onPlayerConnected(ServerPlayerEntity arg) {
-        this.addPlayer(arg);
+    public void onPlayerConnected(ServerPlayerEntity player) {
+        this.addPlayer(player);
     }
 
-    public void onPlayerRespawned(ServerPlayerEntity arg) {
-        this.addPlayer(arg);
+    public void onPlayerRespawned(ServerPlayerEntity player) {
+        this.addPlayer(player);
     }
 
-    private void addPlayer(ServerPlayerEntity arg) {
-        Entity lv = this.entitiesByUuid.get(arg.getUuid());
+    private void addPlayer(ServerPlayerEntity player) {
+        Entity lv = this.entitiesByUuid.get(player.getUuid());
         if (lv != null) {
-            LOGGER.warn("Force-added player with duplicate UUID {}", (Object)arg.getUuid().toString());
+            LOGGER.warn("Force-added player with duplicate UUID {}", (Object)player.getUuid().toString());
             lv.detach();
             this.removePlayer((ServerPlayerEntity)lv);
         }
-        this.players.add(arg);
+        this.players.add(player);
         this.updateSleepingPlayers();
-        Chunk lv2 = this.getChunk(MathHelper.floor(arg.getX() / 16.0), MathHelper.floor(arg.getZ() / 16.0), ChunkStatus.FULL, true);
+        Chunk lv2 = this.getChunk(MathHelper.floor(player.getX() / 16.0), MathHelper.floor(player.getZ() / 16.0), ChunkStatus.FULL, true);
         if (lv2 instanceof WorldChunk) {
-            lv2.addEntity(arg);
+            lv2.addEntity(player);
         }
-        this.loadEntityUnchecked(arg);
+        this.loadEntityUnchecked(player);
     }
 
-    private boolean addEntity(Entity arg) {
-        if (arg.removed) {
-            LOGGER.warn("Tried to add entity {} but it was marked as removed already", (Object)EntityType.getId(arg.getType()));
+    private boolean addEntity(Entity entity) {
+        if (entity.removed) {
+            LOGGER.warn("Tried to add entity {} but it was marked as removed already", (Object)EntityType.getId(entity.getType()));
             return false;
         }
-        if (this.checkUuid(arg)) {
+        if (this.checkUuid(entity)) {
             return false;
         }
-        Chunk lv = this.getChunk(MathHelper.floor(arg.getX() / 16.0), MathHelper.floor(arg.getZ() / 16.0), ChunkStatus.FULL, arg.teleporting);
+        Chunk lv = this.getChunk(MathHelper.floor(entity.getX() / 16.0), MathHelper.floor(entity.getZ() / 16.0), ChunkStatus.FULL, entity.teleporting);
         if (!(lv instanceof WorldChunk)) {
             return false;
         }
-        lv.addEntity(arg);
-        this.loadEntityUnchecked(arg);
+        lv.addEntity(entity);
+        this.loadEntityUnchecked(entity);
         return true;
     }
 
-    public boolean loadEntity(Entity arg) {
-        if (this.checkUuid(arg)) {
+    public boolean loadEntity(Entity entity) {
+        if (this.checkUuid(entity)) {
             return false;
         }
-        this.loadEntityUnchecked(arg);
+        this.loadEntityUnchecked(entity);
         return true;
     }
 
-    private boolean checkUuid(Entity arg) {
-        Entity lv = this.entitiesByUuid.get(arg.getUuid());
+    private boolean checkUuid(Entity entity) {
+        Entity lv = this.entitiesByUuid.get(entity.getUuid());
         if (lv == null) {
             return false;
         }
-        LOGGER.warn("Keeping entity {} that already exists with UUID {}", (Object)EntityType.getId(lv.getType()), (Object)arg.getUuid().toString());
+        LOGGER.warn("Keeping entity {} that already exists with UUID {}", (Object)EntityType.getId(lv.getType()), (Object)entity.getUuid().toString());
         return true;
     }
 
-    public void unloadEntities(WorldChunk arg) {
-        this.unloadedBlockEntities.addAll(arg.getBlockEntities().values());
-        for (TypeFilterableList<Entity> lv : arg.getEntitySectionArray()) {
+    public void unloadEntities(WorldChunk chunk) {
+        this.unloadedBlockEntities.addAll(chunk.getBlockEntities().values());
+        for (TypeFilterableList<Entity> lv : chunk.getEntitySectionArray()) {
             for (Entity lv2 : lv) {
                 if (lv2 instanceof ServerPlayerEntity) continue;
                 if (this.inEntityTick) {
@@ -771,112 +771,112 @@ implements ServerWorldAccess {
         }
     }
 
-    public void unloadEntity(Entity arg) {
-        if (arg instanceof EnderDragonEntity) {
-            for (EnderDragonPart lv : ((EnderDragonEntity)arg).getBodyParts()) {
+    public void unloadEntity(Entity entity) {
+        if (entity instanceof EnderDragonEntity) {
+            for (EnderDragonPart lv : ((EnderDragonEntity)entity).getBodyParts()) {
                 lv.remove();
             }
         }
-        this.entitiesByUuid.remove(arg.getUuid());
-        this.getChunkManager().unloadEntity(arg);
-        if (arg instanceof ServerPlayerEntity) {
-            ServerPlayerEntity lv2 = (ServerPlayerEntity)arg;
+        this.entitiesByUuid.remove(entity.getUuid());
+        this.getChunkManager().unloadEntity(entity);
+        if (entity instanceof ServerPlayerEntity) {
+            ServerPlayerEntity lv2 = (ServerPlayerEntity)entity;
             this.players.remove(lv2);
         }
-        this.getScoreboard().resetEntityScore(arg);
-        if (arg instanceof MobEntity) {
-            this.entityNavigations.remove(((MobEntity)arg).getNavigation());
+        this.getScoreboard().resetEntityScore(entity);
+        if (entity instanceof MobEntity) {
+            this.entityNavigations.remove(((MobEntity)entity).getNavigation());
         }
     }
 
-    private void loadEntityUnchecked(Entity arg) {
+    private void loadEntityUnchecked(Entity entity) {
         if (this.inEntityTick) {
-            this.entitiesToLoad.add(arg);
+            this.entitiesToLoad.add(entity);
         } else {
-            this.entitiesById.put(arg.getEntityId(), (Object)arg);
-            if (arg instanceof EnderDragonEntity) {
-                for (EnderDragonPart lv : ((EnderDragonEntity)arg).getBodyParts()) {
+            this.entitiesById.put(entity.getEntityId(), (Object)entity);
+            if (entity instanceof EnderDragonEntity) {
+                for (EnderDragonPart lv : ((EnderDragonEntity)entity).getBodyParts()) {
                     this.entitiesById.put(lv.getEntityId(), (Object)lv);
                 }
             }
-            this.entitiesByUuid.put(arg.getUuid(), arg);
-            this.getChunkManager().loadEntity(arg);
-            if (arg instanceof MobEntity) {
-                this.entityNavigations.add(((MobEntity)arg).getNavigation());
+            this.entitiesByUuid.put(entity.getUuid(), entity);
+            this.getChunkManager().loadEntity(entity);
+            if (entity instanceof MobEntity) {
+                this.entityNavigations.add(((MobEntity)entity).getNavigation());
             }
         }
     }
 
-    public void removeEntity(Entity arg) {
+    public void removeEntity(Entity entity) {
         if (this.inEntityTick) {
             throw Util.throwOrPause(new IllegalStateException("Removing entity while ticking!"));
         }
-        this.removeEntityFromChunk(arg);
-        this.entitiesById.remove(arg.getEntityId());
-        this.unloadEntity(arg);
+        this.removeEntityFromChunk(entity);
+        this.entitiesById.remove(entity.getEntityId());
+        this.unloadEntity(entity);
     }
 
-    private void removeEntityFromChunk(Entity arg) {
-        Chunk lv = this.getChunk(arg.chunkX, arg.chunkZ, ChunkStatus.FULL, false);
+    private void removeEntityFromChunk(Entity entity) {
+        Chunk lv = this.getChunk(entity.chunkX, entity.chunkZ, ChunkStatus.FULL, false);
         if (lv instanceof WorldChunk) {
-            ((WorldChunk)lv).remove(arg);
+            ((WorldChunk)lv).remove(entity);
         }
     }
 
-    public void removePlayer(ServerPlayerEntity arg) {
-        arg.remove();
-        this.removeEntity(arg);
+    public void removePlayer(ServerPlayerEntity player) {
+        player.remove();
+        this.removeEntity(player);
         this.updateSleepingPlayers();
     }
 
     @Override
-    public void setBlockBreakingInfo(int i, BlockPos arg, int j) {
+    public void setBlockBreakingInfo(int entityId, BlockPos pos, int progress) {
         for (ServerPlayerEntity lv : this.server.getPlayerManager().getPlayerList()) {
             double f;
             double e;
             double d;
-            if (lv == null || lv.world != this || lv.getEntityId() == i || !((d = (double)arg.getX() - lv.getX()) * d + (e = (double)arg.getY() - lv.getY()) * e + (f = (double)arg.getZ() - lv.getZ()) * f < 1024.0)) continue;
-            lv.networkHandler.sendPacket(new BlockBreakingProgressS2CPacket(i, arg, j));
+            if (lv == null || lv.world != this || lv.getEntityId() == entityId || !((d = (double)pos.getX() - lv.getX()) * d + (e = (double)pos.getY() - lv.getY()) * e + (f = (double)pos.getZ() - lv.getZ()) * f < 1024.0)) continue;
+            lv.networkHandler.sendPacket(new BlockBreakingProgressS2CPacket(entityId, pos, progress));
         }
     }
 
     @Override
-    public void playSound(@Nullable PlayerEntity arg, double d, double e, double f, SoundEvent arg2, SoundCategory arg3, float g, float h) {
-        this.server.getPlayerManager().sendToAround(arg, d, e, f, g > 1.0f ? (double)(16.0f * g) : 16.0, this.getRegistryKey(), new PlaySoundS2CPacket(arg2, arg3, d, e, f, g, h));
+    public void playSound(@Nullable PlayerEntity player, double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+        this.server.getPlayerManager().sendToAround(player, x, y, z, volume > 1.0f ? (double)(16.0f * volume) : 16.0, this.getRegistryKey(), new PlaySoundS2CPacket(sound, category, x, y, z, volume, pitch));
     }
 
     @Override
-    public void playSoundFromEntity(@Nullable PlayerEntity arg, Entity arg2, SoundEvent arg3, SoundCategory arg4, float f, float g) {
-        this.server.getPlayerManager().sendToAround(arg, arg2.getX(), arg2.getY(), arg2.getZ(), f > 1.0f ? (double)(16.0f * f) : 16.0, this.getRegistryKey(), new PlaySoundFromEntityS2CPacket(arg3, arg4, arg2, f, g));
+    public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+        this.server.getPlayerManager().sendToAround(player, entity.getX(), entity.getY(), entity.getZ(), volume > 1.0f ? (double)(16.0f * volume) : 16.0, this.getRegistryKey(), new PlaySoundFromEntityS2CPacket(sound, category, entity, volume, pitch));
     }
 
     @Override
-    public void syncGlobalEvent(int i, BlockPos arg, int j) {
-        this.server.getPlayerManager().sendToAll(new WorldEventS2CPacket(i, arg, j, true));
+    public void syncGlobalEvent(int eventId, BlockPos pos, int data) {
+        this.server.getPlayerManager().sendToAll(new WorldEventS2CPacket(eventId, pos, data, true));
     }
 
     @Override
-    public void syncWorldEvent(@Nullable PlayerEntity arg, int i, BlockPos arg2, int j) {
-        this.server.getPlayerManager().sendToAround(arg, arg2.getX(), arg2.getY(), arg2.getZ(), 64.0, this.getRegistryKey(), new WorldEventS2CPacket(i, arg2, j, false));
+    public void syncWorldEvent(@Nullable PlayerEntity player, int eventId, BlockPos pos, int data) {
+        this.server.getPlayerManager().sendToAround(player, pos.getX(), pos.getY(), pos.getZ(), 64.0, this.getRegistryKey(), new WorldEventS2CPacket(eventId, pos, data, false));
     }
 
     @Override
-    public void updateListeners(BlockPos arg, BlockState arg2, BlockState arg3, int i) {
-        this.getChunkManager().markForUpdate(arg);
-        VoxelShape lv = arg2.getCollisionShape(this, arg);
-        VoxelShape lv2 = arg3.getCollisionShape(this, arg);
+    public void updateListeners(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
+        this.getChunkManager().markForUpdate(pos);
+        VoxelShape lv = oldState.getCollisionShape(this, pos);
+        VoxelShape lv2 = newState.getCollisionShape(this, pos);
         if (!VoxelShapes.matchesAnywhere(lv, lv2, BooleanBiFunction.NOT_SAME)) {
             return;
         }
         for (EntityNavigation lv3 : this.entityNavigations) {
             if (lv3.shouldRecalculatePath()) continue;
-            lv3.onBlockChanged(arg);
+            lv3.onBlockChanged(pos);
         }
     }
 
     @Override
-    public void sendEntityStatus(Entity arg, byte b) {
-        this.getChunkManager().sendToNearbyPlayers(arg, new EntityStatusS2CPacket(arg, b));
+    public void sendEntityStatus(Entity entity, byte status) {
+        this.getChunkManager().sendToNearbyPlayers(entity, new EntityStatusS2CPacket(entity, status));
     }
 
     @Override
@@ -885,8 +885,8 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, @Nullable ExplosionBehavior arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
-        Explosion lv = new Explosion(this, arg, arg2, arg3, d, e, f, g, bl, arg4);
+    public Explosion createExplosion(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionBehavior arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
+        Explosion lv = new Explosion(this, entity, damageSource, arg3, d, e, f, g, bl, arg4);
         lv.collectBlocksAndDamageEntities();
         lv.affectWorld(false);
         if (arg4 == Explosion.DestructionType.NONE) {
@@ -900,8 +900,8 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public void addSyncedBlockEvent(BlockPos arg, Block arg2, int i, int j) {
-        this.syncedBlockEventQueue.add((Object)new BlockEvent(arg, arg2, i, j));
+    public void addSyncedBlockEvent(BlockPos pos, Block block, int type, int data) {
+        this.syncedBlockEventQueue.add((Object)new BlockEvent(pos, block, type, data));
     }
 
     private void processSyncedBlockEvents() {
@@ -912,10 +912,10 @@ implements ServerWorldAccess {
         }
     }
 
-    private boolean processBlockEvent(BlockEvent arg) {
-        BlockState lv = this.getBlockState(arg.getPos());
-        if (lv.isOf(arg.getBlock())) {
-            return lv.onSyncedBlockEvent(this, arg.getPos(), arg.getType(), arg.getData());
+    private boolean processBlockEvent(BlockEvent event) {
+        BlockState lv = this.getBlockState(event.getPos());
+        if (lv.isOf(event.getBlock())) {
+            return lv.onSyncedBlockEvent(this, event.getPos(), event.getType(), event.getData());
         }
         return false;
     }
@@ -942,29 +942,29 @@ implements ServerWorldAccess {
         return this.server.getStructureManager();
     }
 
-    public <T extends ParticleEffect> int spawnParticles(T arg, double d, double e, double f, int i, double g, double h, double j, double k) {
-        ParticleS2CPacket lv = new ParticleS2CPacket(arg, false, d, e, f, (float)g, (float)h, (float)j, (float)k, i);
+    public <T extends ParticleEffect> int spawnParticles(T particle, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed) {
+        ParticleS2CPacket lv = new ParticleS2CPacket(particle, false, x, y, z, (float)deltaX, (float)deltaY, (float)deltaZ, (float)speed, count);
         int l = 0;
         for (int m = 0; m < this.players.size(); ++m) {
             ServerPlayerEntity lv2 = this.players.get(m);
-            if (!this.sendToPlayerIfNearby(lv2, false, d, e, f, lv)) continue;
+            if (!this.sendToPlayerIfNearby(lv2, false, x, y, z, lv)) continue;
             ++l;
         }
         return l;
     }
 
-    public <T extends ParticleEffect> boolean spawnParticles(ServerPlayerEntity arg, T arg2, boolean bl, double d, double e, double f, int i, double g, double h, double j, double k) {
-        ParticleS2CPacket lv = new ParticleS2CPacket(arg2, bl, d, e, f, (float)g, (float)h, (float)j, (float)k, i);
-        return this.sendToPlayerIfNearby(arg, bl, d, e, f, lv);
+    public <T extends ParticleEffect> boolean spawnParticles(ServerPlayerEntity viewer, T particle, boolean force, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed) {
+        ParticleS2CPacket lv = new ParticleS2CPacket(particle, force, x, y, z, (float)deltaX, (float)deltaY, (float)deltaZ, (float)speed, count);
+        return this.sendToPlayerIfNearby(viewer, force, x, y, z, lv);
     }
 
-    private boolean sendToPlayerIfNearby(ServerPlayerEntity arg, boolean bl, double d, double e, double f, Packet<?> arg2) {
-        if (arg.getServerWorld() != this) {
+    private boolean sendToPlayerIfNearby(ServerPlayerEntity player, boolean force, double x, double y, double z, Packet<?> packet) {
+        if (player.getServerWorld() != this) {
             return false;
         }
-        BlockPos lv = arg.getBlockPos();
-        if (lv.isWithinDistance(new Vec3d(d, e, f), bl ? 512.0 : 32.0)) {
-            arg.networkHandler.sendPacket(arg2);
+        BlockPos lv = player.getBlockPos();
+        if (lv.isWithinDistance(new Vec3d(x, y, z), force ? 512.0 : 32.0)) {
+            player.networkHandler.sendPacket(packet);
             return true;
         }
         return false;
@@ -972,8 +972,8 @@ implements ServerWorldAccess {
 
     @Override
     @Nullable
-    public Entity getEntityById(int i) {
-        return (Entity)this.entitiesById.get(i);
+    public Entity getEntityById(int id) {
+        return (Entity)this.entitiesById.get(id);
     }
 
     @Nullable
@@ -982,16 +982,16 @@ implements ServerWorldAccess {
     }
 
     @Nullable
-    public BlockPos locateStructure(StructureFeature<?> arg, BlockPos arg2, int i, boolean bl) {
+    public BlockPos locateStructure(StructureFeature<?> feature, BlockPos pos, int radius, boolean skipExistingChunks) {
         if (!this.server.getSaveProperties().getGeneratorOptions().shouldGenerateStructures()) {
             return null;
         }
-        return this.getChunkManager().getChunkGenerator().locateStructure(this, arg, arg2, i, bl);
+        return this.getChunkManager().getChunkGenerator().locateStructure(this, feature, pos, radius, skipExistingChunks);
     }
 
     @Nullable
-    public BlockPos locateBiome(Biome arg, BlockPos arg2, int i, int j) {
-        return this.getChunkManager().getChunkGenerator().getBiomeSource().locateBiome(arg2.getX(), arg2.getY(), arg2.getZ(), i, j, (List<Biome>)ImmutableList.of((Object)arg), this.random, true);
+    public BlockPos locateBiome(Biome biome, BlockPos pos, int radius, int j) {
+        return this.getChunkManager().getChunkGenerator().getBiomeSource().locateBiome(pos.getX(), pos.getY(), pos.getZ(), radius, j, (List<Biome>)ImmutableList.of((Object)biome), this.random, true);
     }
 
     @Override
@@ -1020,13 +1020,13 @@ implements ServerWorldAccess {
 
     @Override
     @Nullable
-    public MapState getMapState(String string) {
-        return this.getServer().getOverworld().getPersistentStateManager().get(() -> new MapState(string), string);
+    public MapState getMapState(String id) {
+        return this.getServer().getOverworld().getPersistentStateManager().get(() -> new MapState(id), id);
     }
 
     @Override
-    public void putMapState(MapState arg) {
-        this.getServer().getOverworld().getPersistentStateManager().set(arg);
+    public void putMapState(MapState mapState) {
+        this.getServer().getOverworld().getPersistentStateManager().set(mapState);
     }
 
     @Override
@@ -1034,12 +1034,12 @@ implements ServerWorldAccess {
         return this.getServer().getOverworld().getPersistentStateManager().getOrCreate(IdCountsState::new, "idcounts").getNextMapId();
     }
 
-    public void setSpawnPos(BlockPos arg) {
+    public void setSpawnPos(BlockPos pos) {
         ChunkPos lv = new ChunkPos(new BlockPos(this.properties.getSpawnX(), 0, this.properties.getSpawnZ()));
-        this.properties.setSpawnPos(arg);
+        this.properties.setSpawnPos(pos);
         this.getChunkManager().removeTicket(ChunkTicketType.START, lv, 11, Unit.INSTANCE);
-        this.getChunkManager().addTicket(ChunkTicketType.START, new ChunkPos(arg), 11, Unit.INSTANCE);
-        this.getServer().getPlayerManager().sendToAll(new PlayerSpawnPositionS2CPacket(arg));
+        this.getChunkManager().addTicket(ChunkTicketType.START, new ChunkPos(pos), 11, Unit.INSTANCE);
+        this.getServer().getPlayerManager().sendToAll(new PlayerSpawnPositionS2CPacket(pos));
     }
 
     public BlockPos getSpawnPos() {
@@ -1055,22 +1055,22 @@ implements ServerWorldAccess {
         return lv != null ? LongSets.unmodifiable((LongSet)lv.getChunks()) : LongSets.EMPTY_SET;
     }
 
-    public boolean setChunkForced(int i, int j, boolean bl) {
+    public boolean setChunkForced(int x, int z, boolean forced) {
         boolean bl3;
         ForcedChunkState lv = this.getPersistentStateManager().getOrCreate(ForcedChunkState::new, "chunks");
-        ChunkPos lv2 = new ChunkPos(i, j);
+        ChunkPos lv2 = new ChunkPos(x, z);
         long l = lv2.toLong();
-        if (bl) {
+        if (forced) {
             boolean bl2 = lv.getChunks().add(l);
             if (bl2) {
-                this.getChunk(i, j);
+                this.getChunk(x, z);
             }
         } else {
             bl3 = lv.getChunks().remove(l);
         }
         lv.setDirty(bl3);
         if (bl3) {
-            this.getChunkManager().setChunkForced(lv2, bl);
+            this.getChunkManager().setChunkForced(lv2, forced);
         }
         return bl3;
     }
@@ -1080,13 +1080,13 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public void onBlockChanged(BlockPos arg, BlockState arg22, BlockState arg3) {
+    public void onBlockChanged(BlockPos pos, BlockState oldBlock, BlockState newBlock) {
         Optional<PointOfInterestType> optional2;
-        Optional<PointOfInterestType> optional = PointOfInterestType.from(arg22);
-        if (Objects.equals(optional, optional2 = PointOfInterestType.from(arg3))) {
+        Optional<PointOfInterestType> optional = PointOfInterestType.from(oldBlock);
+        if (Objects.equals(optional, optional2 = PointOfInterestType.from(newBlock))) {
             return;
         }
-        BlockPos lv = arg.toImmutable();
+        BlockPos lv = pos.toImmutable();
         optional.ifPresent(arg2 -> this.getServer().execute(() -> {
             this.getPointOfInterestStorage().remove(lv);
             DebugInfoSender.sendPoiRemoval(this, lv);
@@ -1101,23 +1101,23 @@ implements ServerWorldAccess {
         return this.getChunkManager().getPointOfInterestStorage();
     }
 
-    public boolean isNearOccupiedPointOfInterest(BlockPos arg) {
-        return this.isNearOccupiedPointOfInterest(arg, 1);
+    public boolean isNearOccupiedPointOfInterest(BlockPos pos) {
+        return this.isNearOccupiedPointOfInterest(pos, 1);
     }
 
-    public boolean isNearOccupiedPointOfInterest(ChunkSectionPos arg) {
-        return this.isNearOccupiedPointOfInterest(arg.getCenterPos());
+    public boolean isNearOccupiedPointOfInterest(ChunkSectionPos sectionPos) {
+        return this.isNearOccupiedPointOfInterest(sectionPos.getCenterPos());
     }
 
-    public boolean isNearOccupiedPointOfInterest(BlockPos arg, int i) {
-        if (i > 6) {
+    public boolean isNearOccupiedPointOfInterest(BlockPos pos, int maxDistance) {
+        if (maxDistance > 6) {
             return false;
         }
-        return this.getOccupiedPointOfInterestDistance(ChunkSectionPos.from(arg)) <= i;
+        return this.getOccupiedPointOfInterestDistance(ChunkSectionPos.from(pos)) <= maxDistance;
     }
 
-    public int getOccupiedPointOfInterestDistance(ChunkSectionPos arg) {
-        return this.getPointOfInterestStorage().getDistanceFromNearestOccupied(arg);
+    public int getOccupiedPointOfInterestDistance(ChunkSectionPos pos) {
+        return this.getPointOfInterestStorage().getDistanceFromNearestOccupied(pos);
     }
 
     public RaidManager getRaidManager() {
@@ -1125,16 +1125,16 @@ implements ServerWorldAccess {
     }
 
     @Nullable
-    public Raid getRaidAt(BlockPos arg) {
-        return this.raidManager.getRaidAt(arg, 9216);
+    public Raid getRaidAt(BlockPos pos) {
+        return this.raidManager.getRaidAt(pos, 9216);
     }
 
-    public boolean hasRaidAt(BlockPos arg) {
-        return this.getRaidAt(arg) != null;
+    public boolean hasRaidAt(BlockPos pos) {
+        return this.getRaidAt(pos) != null;
     }
 
-    public void handleInteraction(EntityInteraction arg, Entity arg2, InteractionObserver arg3) {
-        arg3.onInteractionWith(arg, arg2);
+    public void handleInteraction(EntityInteraction interaction, Entity entity, InteractionObserver observer) {
+        observer.onInteractionWith(interaction, entity);
     }
 
     public void dump(Path path) throws IOException {
@@ -1235,9 +1235,9 @@ implements ServerWorldAccess {
         }
     }
 
-    private static void dumpEntities(Writer writer, Iterable<Entity> iterable) throws IOException {
+    private static void dumpEntities(Writer writer, Iterable<Entity> entities) throws IOException {
         CsvWriter lv = CsvWriter.makeHeader().addColumn("x").addColumn("y").addColumn("z").addColumn("uuid").addColumn("type").addColumn("alive").addColumn("display_name").addColumn("custom_name").startBody(writer);
-        for (Entity lv2 : iterable) {
+        for (Entity lv2 : entities) {
             Text lv3 = lv2.getCustomName();
             Text lv4 = lv2.getDisplayName();
             lv.printRow(lv2.getX(), lv2.getY(), lv2.getZ(), lv2.getUuid(), Registry.ENTITY_TYPE.getId(lv2.getType()), lv2.isAlive(), lv4.getString(), lv3 != null ? lv3.getString() : null);
@@ -1253,20 +1253,20 @@ implements ServerWorldAccess {
     }
 
     @VisibleForTesting
-    public void clearUpdatesInArea(BlockBox arg) {
-        this.syncedBlockEventQueue.removeIf(arg2 -> arg.contains(arg2.getPos()));
+    public void clearUpdatesInArea(BlockBox box) {
+        this.syncedBlockEventQueue.removeIf(arg2 -> box.contains(arg2.getPos()));
     }
 
     @Override
-    public void updateNeighbors(BlockPos arg, Block arg2) {
+    public void updateNeighbors(BlockPos pos, Block block) {
         if (!this.isDebugWorld()) {
-            this.updateNeighborsAlways(arg, arg2);
+            this.updateNeighborsAlways(pos, block);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public float getBrightness(Direction arg, boolean bl) {
+    public float getBrightness(Direction direction, boolean shaded) {
         return 1.0f;
     }
 
@@ -1302,13 +1302,13 @@ implements ServerWorldAccess {
         return this;
     }
 
-    public static void createEndSpawnPlatform(ServerWorld arg) {
+    public static void createEndSpawnPlatform(ServerWorld world) {
         BlockPos lv = END_SPAWN_POS;
         int i = lv.getX();
         int j = lv.getY() - 2;
         int k = lv.getZ();
-        BlockPos.iterate(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach(arg2 -> arg.setBlockState((BlockPos)arg2, Blocks.AIR.getDefaultState()));
-        BlockPos.iterate(i - 2, j, k - 2, i + 2, j, k + 2).forEach(arg2 -> arg.setBlockState((BlockPos)arg2, Blocks.OBSIDIAN.getDefaultState()));
+        BlockPos.iterate(i - 2, j + 1, k - 2, i + 2, j + 3, k + 2).forEach(arg2 -> world.setBlockState((BlockPos)arg2, Blocks.AIR.getDefaultState()));
+        BlockPos.iterate(i - 2, j, k - 2, i + 2, j, k + 2).forEach(arg2 -> world.setBlockState((BlockPos)arg2, Blocks.OBSIDIAN.getDefaultState()));
     }
 
     @Override

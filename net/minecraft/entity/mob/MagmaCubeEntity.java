@@ -37,19 +37,19 @@ extends SlimeEntity {
         return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2f);
     }
 
-    public static boolean canMagmaCubeSpawn(EntityType<MagmaCubeEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getDifficulty() != Difficulty.PEACEFUL;
+    public static boolean canMagmaCubeSpawn(EntityType<MagmaCubeEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return world.getDifficulty() != Difficulty.PEACEFUL;
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return arg.intersectsEntities(this) && !arg.containsFluid(this.getBoundingBox());
+    public boolean canSpawn(WorldView world) {
+        return world.intersectsEntities(this) && !world.containsFluid(this.getBoundingBox());
     }
 
     @Override
-    protected void setSize(int i, boolean bl) {
-        super.setSize(i, bl);
-        this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).setBaseValue(i * 3);
+    protected void setSize(int size, boolean heal) {
+        super.setSize(size, heal);
+        this.getAttributeInstance(EntityAttributes.GENERIC_ARMOR).setBaseValue(size * 3);
     }
 
     @Override
@@ -90,18 +90,18 @@ extends SlimeEntity {
     }
 
     @Override
-    protected void swimUpward(Tag<Fluid> arg) {
-        if (arg == FluidTags.LAVA) {
+    protected void swimUpward(Tag<Fluid> fluid) {
+        if (fluid == FluidTags.LAVA) {
             Vec3d lv = this.getVelocity();
             this.setVelocity(lv.x, 0.22f + (float)this.getSize() * 0.05f, lv.z);
             this.velocityDirty = true;
         } else {
-            super.swimUpward(arg);
+            super.swimUpward(fluid);
         }
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
@@ -116,7 +116,7 @@ extends SlimeEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         if (this.isSmall()) {
             return SoundEvents.ENTITY_MAGMA_CUBE_HURT_SMALL;
         }

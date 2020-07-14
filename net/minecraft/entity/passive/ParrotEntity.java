@@ -149,12 +149,12 @@ implements Flutterer {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.setVariant(this.random.nextInt(5));
-        if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData(false);
+        if (entityData == null) {
+            entityData = new PassiveEntity.PassiveData(false);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -179,8 +179,8 @@ implements Flutterer {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        BirdNavigation lv = new BirdNavigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        BirdNavigation lv = new BirdNavigation(this, world);
         lv.setCanPathThroughDoors(false);
         lv.setCanSwim(true);
         lv.setCanEnterOpenDoors(true);
@@ -188,8 +188,8 @@ implements Flutterer {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * 0.6f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * 0.6f;
     }
 
     @Override
@@ -207,9 +207,9 @@ implements Flutterer {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void setNearbySongPlaying(BlockPos arg, boolean bl) {
-        this.songSource = arg;
-        this.songPlaying = bl;
+    public void setNearbySongPlaying(BlockPos songPosition, boolean playing) {
+        this.songSource = songPosition;
+        this.songPlaying = playing;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -233,25 +233,25 @@ implements Flutterer {
         this.flapProgress += this.flapSpeed * 2.0f;
     }
 
-    public static boolean imitateNearbyMob(World arg, Entity arg2) {
+    public static boolean imitateNearbyMob(World world, Entity parrot) {
         MobEntity lv;
-        if (!arg2.isAlive() || arg2.isSilent() || arg.random.nextInt(2) != 0) {
+        if (!parrot.isAlive() || parrot.isSilent() || world.random.nextInt(2) != 0) {
             return false;
         }
-        List<MobEntity> list = arg.getEntities(MobEntity.class, arg2.getBoundingBox().expand(20.0), CAN_IMITATE);
-        if (!list.isEmpty() && !(lv = list.get(arg.random.nextInt(list.size()))).isSilent()) {
+        List<MobEntity> list = world.getEntities(MobEntity.class, parrot.getBoundingBox().expand(20.0), CAN_IMITATE);
+        if (!list.isEmpty() && !(lv = list.get(world.random.nextInt(list.size()))).isSilent()) {
             SoundEvent lv2 = ParrotEntity.getSound(lv.getType());
-            arg.playSound(null, arg2.getX(), arg2.getY(), arg2.getZ(), lv2, arg2.getSoundCategory(), 0.7f, ParrotEntity.getSoundPitch(arg.random));
+            world.playSound(null, parrot.getX(), parrot.getY(), parrot.getZ(), lv2, parrot.getSoundCategory(), 0.7f, ParrotEntity.getSoundPitch(world.random));
             return true;
         }
         return false;
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (!this.isTamed() && TAMING_INGREDIENTS.contains(lv.getItem())) {
-            if (!arg.abilities.creativeMode) {
+            if (!player.abilities.creativeMode) {
                 lv.decrement(1);
             }
             if (!this.isSilent()) {
@@ -259,7 +259,7 @@ implements Flutterer {
             }
             if (!this.world.isClient) {
                 if (this.random.nextInt(10) == 0) {
-                    this.setOwner(arg);
+                    this.setOwner(player);
                     this.world.sendEntityStatus(this, (byte)7);
                 } else {
                     this.world.sendEntityStatus(this, (byte)6);
@@ -268,45 +268,45 @@ implements Flutterer {
             return ActionResult.success(this.world.isClient);
         }
         if (lv.getItem() == COOKIE) {
-            if (!arg.abilities.creativeMode) {
+            if (!player.abilities.creativeMode) {
                 lv.decrement(1);
             }
             this.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 900));
-            if (arg.isCreative() || !this.isInvulnerable()) {
-                this.damage(DamageSource.player(arg), Float.MAX_VALUE);
+            if (player.isCreative() || !this.isInvulnerable()) {
+                this.damage(DamageSource.player(player), Float.MAX_VALUE);
             }
             return ActionResult.success(this.world.isClient);
         }
-        if (!this.isInAir() && this.isTamed() && this.isOwner(arg)) {
+        if (!this.isInAir() && this.isTamed() && this.isOwner(player)) {
             if (!this.world.isClient) {
                 this.setSitting(!this.isSitting());
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
+    public boolean isBreedingItem(ItemStack stack) {
         return false;
     }
 
-    public static boolean canSpawn(EntityType<ParrotEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        BlockState lv = arg2.getBlockState(arg4.down());
-        return (lv.isIn(BlockTags.LEAVES) || lv.isOf(Blocks.GRASS_BLOCK) || lv.isIn(BlockTags.LOGS) || lv.isOf(Blocks.AIR)) && arg2.getBaseLightLevel(arg4, 0) > 8;
+    public static boolean canSpawn(EntityType<ParrotEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        BlockState lv = world.getBlockState(pos.down());
+        return (lv.isIn(BlockTags.LEAVES) || lv.isOf(Blocks.GRASS_BLOCK) || lv.isIn(BlockTags.LOGS) || lv.isOf(Blocks.AIR)) && world.getBaseLightLevel(pos, 0) > 8;
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
     @Override
-    protected void fall(double d, boolean bl, BlockState arg, BlockPos arg2) {
+    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
     }
 
     @Override
-    public boolean canBreedWith(AnimalEntity arg) {
+    public boolean canBreedWith(AnimalEntity other) {
         return false;
     }
 
@@ -317,8 +317,8 @@ implements Flutterer {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        return arg.damage(DamageSource.mob(this), 3.0f);
+    public boolean tryAttack(Entity target) {
+        return target.damage(DamageSource.mob(this), 3.0f);
     }
 
     @Override
@@ -327,20 +327,20 @@ implements Flutterer {
         return ParrotEntity.getRandomSound(this.world, this.world.random);
     }
 
-    public static SoundEvent getRandomSound(World arg, Random random) {
-        if (arg.getDifficulty() != Difficulty.PEACEFUL && random.nextInt(1000) == 0) {
+    public static SoundEvent getRandomSound(World world, Random random) {
+        if (world.getDifficulty() != Difficulty.PEACEFUL && random.nextInt(1000) == 0) {
             ArrayList list = Lists.newArrayList(MOB_SOUNDS.keySet());
             return ParrotEntity.getSound((EntityType)list.get(random.nextInt(list.size())));
         }
         return SoundEvents.ENTITY_PARROT_AMBIENT;
     }
 
-    private static SoundEvent getSound(EntityType<?> arg) {
-        return MOB_SOUNDS.getOrDefault(arg, SoundEvents.ENTITY_PARROT_AMBIENT);
+    private static SoundEvent getSound(EntityType<?> imitate) {
+        return MOB_SOUNDS.getOrDefault(imitate, SoundEvents.ENTITY_PARROT_AMBIENT);
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PARROT_HURT;
     }
 
@@ -350,14 +350,14 @@ implements Flutterer {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_PARROT_STEP, 0.15f, 1.0f);
     }
 
     @Override
-    protected float playFlySound(float f) {
+    protected float playFlySound(float distance) {
         this.playSound(SoundEvents.ENTITY_PARROT_FLY, 0.15f, 1.0f);
-        return f + this.maxWingDeviation / 2.0f;
+        return distance + this.maxWingDeviation / 2.0f;
     }
 
     @Override
@@ -385,28 +385,28 @@ implements Flutterer {
     }
 
     @Override
-    protected void pushAway(Entity arg) {
-        if (arg instanceof PlayerEntity) {
+    protected void pushAway(Entity entity) {
+        if (entity instanceof PlayerEntity) {
             return;
         }
-        super.pushAway(arg);
+        super.pushAway(entity);
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         this.setSitting(false);
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     public int getVariant() {
         return MathHelper.clamp(this.dataTracker.get(ATTR_VARIANT), 0, 4);
     }
 
-    public void setVariant(int i) {
-        this.dataTracker.set(ATTR_VARIANT, i);
+    public void setVariant(int variant) {
+        this.dataTracker.set(ATTR_VARIANT, variant);
     }
 
     @Override
@@ -416,15 +416,15 @@ implements Flutterer {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Variant", this.getVariant());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Variant", this.getVariant());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setVariant(arg.getInt("Variant"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setVariant(tag.getInt("Variant"));
     }
 
     public boolean isInAir() {

@@ -87,8 +87,8 @@ extends Screen {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
-        this.selectionManager.insert(c);
+    public boolean charTyped(char chr, int keyCode) {
+        this.selectionManager.insert(chr);
         return true;
     }
 
@@ -98,58 +98,58 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 265) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 265) {
             this.currentRow = this.currentRow - 1 & 3;
             this.selectionManager.moveCaretToEnd();
             return true;
         }
-        if (i == 264 || i == 257 || i == 335) {
+        if (keyCode == 264 || keyCode == 257 || keyCode == 335) {
             this.currentRow = this.currentRow + 1 & 3;
             this.selectionManager.moveCaretToEnd();
             return true;
         }
-        if (this.selectionManager.handleSpecialKey(i)) {
+        if (this.selectionManager.handleSpecialKey(keyCode)) {
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         DiffuseLighting.disableGuiDepthLighting();
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
-        arg.push();
-        arg.translate(this.width / 2, 0.0, 50.0);
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+        matrices.push();
+        matrices.translate(this.width / 2, 0.0, 50.0);
         float g = 93.75f;
-        arg.scale(93.75f, -93.75f, 93.75f);
-        arg.translate(0.0, -1.3125, 0.0);
+        matrices.scale(93.75f, -93.75f, 93.75f);
+        matrices.translate(0.0, -1.3125, 0.0);
         BlockState lv = this.sign.getCachedState();
         boolean bl = lv.getBlock() instanceof SignBlock;
         if (!bl) {
-            arg.translate(0.0, -0.3125, 0.0);
+            matrices.translate(0.0, -0.3125, 0.0);
         }
         boolean bl2 = this.ticksSinceOpened / 6 % 2 == 0;
         float h = 0.6666667f;
-        arg.push();
-        arg.scale(0.6666667f, -0.6666667f, -0.6666667f);
+        matrices.push();
+        matrices.scale(0.6666667f, -0.6666667f, -0.6666667f);
         VertexConsumerProvider.Immediate lv2 = this.client.getBufferBuilders().getEntityVertexConsumers();
         SpriteIdentifier lv3 = SignBlockEntityRenderer.getModelTexture(lv.getBlock());
         VertexConsumer lv4 = lv3.getVertexConsumer(lv2, this.field_21525::getLayer);
-        this.field_21525.field.render(arg, lv4, 0xF000F0, OverlayTexture.DEFAULT_UV);
+        this.field_21525.field.render(matrices, lv4, 0xF000F0, OverlayTexture.DEFAULT_UV);
         if (bl) {
-            this.field_21525.foot.render(arg, lv4, 0xF000F0, OverlayTexture.DEFAULT_UV);
+            this.field_21525.foot.render(matrices, lv4, 0xF000F0, OverlayTexture.DEFAULT_UV);
         }
-        arg.pop();
+        matrices.pop();
         float k = 0.010416667f;
-        arg.translate(0.0, 0.3333333432674408, 0.046666666865348816);
-        arg.scale(0.010416667f, -0.010416667f, 0.010416667f);
+        matrices.translate(0.0, 0.3333333432674408, 0.046666666865348816);
+        matrices.scale(0.010416667f, -0.010416667f, 0.010416667f);
         int l = this.sign.getTextColor().getSignColor();
         int m = this.selectionManager.getSelectionStart();
         int n = this.selectionManager.getSelectionEnd();
         int o = this.currentRow * 10 - this.field_24285.length * 5;
-        Matrix4f lv5 = arg.peek().getModel();
+        Matrix4f lv5 = matrices.peek().getModel();
         for (int p = 0; p < this.field_24285.length; ++p) {
             String string = this.field_24285[p];
             if (string == null) continue;
@@ -172,7 +172,7 @@ extends Screen {
             int v = u - this.client.textRenderer.getWidth(string2) / 2;
             if (bl2 && m < string2.length()) {
                 this.client.textRenderer.getClass();
-                SignEditScreen.fill(arg, v, o - 1, v + 1, o + 9, 0xFF000000 | l);
+                SignEditScreen.fill(matrices, v, o - 1, v + 1, o + 9, 0xFF000000 | l);
             }
             if (n == m) continue;
             int w = Math.min(m, n);
@@ -198,9 +198,9 @@ extends Screen {
             RenderSystem.disableColorLogicOp();
             RenderSystem.enableTexture();
         }
-        arg.pop();
+        matrices.pop();
         DiffuseLighting.enableGuiDepthLighting();
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

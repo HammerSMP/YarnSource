@@ -35,28 +35,28 @@ extends Task<LivingEntity> {
     private int tries;
     private long expiryTimeLimit;
 
-    public WalkHomeTask(float f) {
+    public WalkHomeTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.HOME, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        if (arg.getTime() - this.expiryTimeLimit < 20L) {
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        if (world.getTime() - this.expiryTimeLimit < 20L) {
             return false;
         }
-        PathAwareEntity lv = (PathAwareEntity)arg2;
-        PointOfInterestStorage lv2 = arg.getPointOfInterestStorage();
-        Optional<BlockPos> optional = lv2.getNearestPosition(PointOfInterestType.HOME.getCompletionCondition(), arg2.getBlockPos(), 48, PointOfInterestStorage.OccupationStatus.ANY);
+        PathAwareEntity lv = (PathAwareEntity)entity;
+        PointOfInterestStorage lv2 = world.getPointOfInterestStorage();
+        Optional<BlockPos> optional = lv2.getNearestPosition(PointOfInterestType.HOME.getCompletionCondition(), entity.getBlockPos(), 48, PointOfInterestStorage.OccupationStatus.ANY);
         return optional.isPresent() && !(optional.get().getSquaredDistance(lv.getBlockPos()) <= 4.0);
     }
 
     @Override
-    protected void run(ServerWorld arg2, LivingEntity arg22, long l) {
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
         this.tries = 0;
-        this.expiryTimeLimit = arg2.getTime() + (long)arg2.getRandom().nextInt(20);
-        PathAwareEntity lv = (PathAwareEntity)arg22;
-        PointOfInterestStorage lv2 = arg2.getPointOfInterestStorage();
+        this.expiryTimeLimit = world.getTime() + (long)world.getRandom().nextInt(20);
+        PathAwareEntity lv = (PathAwareEntity)entity;
+        PointOfInterestStorage lv2 = world.getPointOfInterestStorage();
         Predicate<BlockPos> predicate = arg -> {
             long l = arg.asLong();
             if (this.positionToExpiry.containsKey(l)) {
@@ -68,14 +68,14 @@ extends Task<LivingEntity> {
             this.positionToExpiry.put(l, this.expiryTimeLimit + 40L);
             return true;
         };
-        Stream<BlockPos> stream = lv2.getPositions(PointOfInterestType.HOME.getCompletionCondition(), predicate, arg22.getBlockPos(), 48, PointOfInterestStorage.OccupationStatus.ANY);
+        Stream<BlockPos> stream = lv2.getPositions(PointOfInterestType.HOME.getCompletionCondition(), predicate, entity.getBlockPos(), 48, PointOfInterestStorage.OccupationStatus.ANY);
         Path lv3 = lv.getNavigation().findPathToAny(stream, PointOfInterestType.HOME.getSearchDistance());
         if (lv3 != null && lv3.reachesTarget()) {
             BlockPos lv4 = lv3.getTarget();
             Optional<PointOfInterestType> optional = lv2.getType(lv4);
             if (optional.isPresent()) {
-                arg22.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv4, this.speed, 1));
-                DebugInfoSender.sendPointOfInterest(arg2, lv4);
+                entity.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv4, this.speed, 1));
+                DebugInfoSender.sendPointOfInterest(world, lv4);
             }
         } else if (this.tries < 5) {
             this.positionToExpiry.long2LongEntrySet().removeIf(entry -> entry.getLongValue() < this.expiryTimeLimit);

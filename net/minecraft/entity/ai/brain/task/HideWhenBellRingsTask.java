@@ -24,9 +24,9 @@ extends Task<LivingEntity> {
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        Brain<?> lv = arg2.getBrain();
-        Raid lv2 = arg.getRaidAt(arg2.getBlockPos());
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        Brain<?> lv = entity.getBrain();
+        Raid lv2 = world.getRaidAt(entity.getBlockPos());
         if (lv2 == null) {
             lv.doExclusively(Activity.HIDE);
         }

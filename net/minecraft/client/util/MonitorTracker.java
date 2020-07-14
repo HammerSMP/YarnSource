@@ -31,25 +31,25 @@ public class MonitorTracker {
     private final Long2ObjectMap<Monitor> pointerToMonitorMap = new Long2ObjectOpenHashMap();
     private final MonitorFactory monitorFactory;
 
-    public MonitorTracker(MonitorFactory arg) {
+    public MonitorTracker(MonitorFactory monitorFactory) {
         RenderSystem.assertThread(RenderSystem::isInInitPhase);
-        this.monitorFactory = arg;
+        this.monitorFactory = monitorFactory;
         GLFW.glfwSetMonitorCallback((arg_0, arg_1) -> this.handleMonitorEvent(arg_0, arg_1));
         PointerBuffer pointerBuffer = GLFW.glfwGetMonitors();
         if (pointerBuffer != null) {
             for (int i = 0; i < pointerBuffer.limit(); ++i) {
                 long l = pointerBuffer.get(i);
-                this.pointerToMonitorMap.put(l, (Object)arg.createMonitor(l));
+                this.pointerToMonitorMap.put(l, (Object)monitorFactory.createMonitor(l));
             }
         }
     }
 
-    private void handleMonitorEvent(long l, int i) {
+    private void handleMonitorEvent(long monitor, int event) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        if (i == 262145) {
-            this.pointerToMonitorMap.put(l, (Object)this.monitorFactory.createMonitor(l));
-        } else if (i == 262146) {
-            this.pointerToMonitorMap.remove(l);
+        if (event == 262145) {
+            this.pointerToMonitorMap.put(monitor, (Object)this.monitorFactory.createMonitor(monitor));
+        } else if (event == 262146) {
+            this.pointerToMonitorMap.remove(monitor);
         }
     }
 
@@ -90,14 +90,14 @@ public class MonitorTracker {
         return lv;
     }
 
-    public static int clamp(int i, int j, int k) {
-        if (i < j) {
-            return j;
+    public static int clamp(int value, int min, int max) {
+        if (value < min) {
+            return min;
         }
-        if (i > k) {
-            return k;
+        if (value > max) {
+            return max;
         }
-        return i;
+        return value;
     }
 
     public void stop() {

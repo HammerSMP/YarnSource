@@ -21,24 +21,24 @@ extends AbstractFireBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (this.canPlaceAt(arg, arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (this.canPlaceAt(state, world, pos)) {
             return this.getDefaultState();
         }
         return Blocks.AIR.getDefaultState();
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return SoulFireBlock.isSoulBase(arg2.getBlockState(arg3.down()).getBlock());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return SoulFireBlock.isSoulBase(world.getBlockState(pos.down()).getBlock());
     }
 
-    public static boolean isSoulBase(Block arg) {
-        return arg.isIn(BlockTags.SOUL_FIRE_BASE_BLOCKS);
+    public static boolean isSoulBase(Block block) {
+        return block.isIn(BlockTags.SOUL_FIRE_BASE_BLOCKS);
     }
 
     @Override
-    protected boolean isFlammable(BlockState arg) {
+    protected boolean isFlammable(BlockState state) {
         return true;
     }
 }

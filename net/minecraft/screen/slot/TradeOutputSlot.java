@@ -18,54 +18,54 @@ extends Slot {
     private int amount;
     private final Trader trader;
 
-    public TradeOutputSlot(PlayerEntity arg, Trader arg2, TraderInventory arg3, int i, int j, int k) {
-        super(arg3, i, j, k);
-        this.player = arg;
-        this.trader = arg2;
-        this.traderInventory = arg3;
+    public TradeOutputSlot(PlayerEntity player, Trader trader, TraderInventory traderInventory, int index, int x, int y) {
+        super(traderInventory, index, x, y);
+        this.player = player;
+        this.trader = trader;
+        this.traderInventory = traderInventory;
     }
 
     @Override
-    public boolean canInsert(ItemStack arg) {
+    public boolean canInsert(ItemStack stack) {
         return false;
     }
 
     @Override
-    public ItemStack takeStack(int i) {
+    public ItemStack takeStack(int amount) {
         if (this.hasStack()) {
-            this.amount += Math.min(i, this.getStack().getCount());
+            this.amount += Math.min(amount, this.getStack().getCount());
         }
-        return super.takeStack(i);
+        return super.takeStack(amount);
     }
 
     @Override
-    protected void onCrafted(ItemStack arg, int i) {
-        this.amount += i;
-        this.onCrafted(arg);
+    protected void onCrafted(ItemStack stack, int amount) {
+        this.amount += amount;
+        this.onCrafted(stack);
     }
 
     @Override
-    protected void onCrafted(ItemStack arg) {
-        arg.onCraft(this.player.world, this.player, this.amount);
+    protected void onCrafted(ItemStack stack) {
+        stack.onCraft(this.player.world, this.player, this.amount);
         this.amount = 0;
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
-        this.onCrafted(arg2);
+    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+        this.onCrafted(stack);
         TradeOffer lv = this.traderInventory.getTradeOffer();
         if (lv != null) {
             ItemStack lv3;
             ItemStack lv2 = this.traderInventory.getStack(0);
             if (lv.depleteBuyItems(lv2, lv3 = this.traderInventory.getStack(1)) || lv.depleteBuyItems(lv3, lv2)) {
                 this.trader.trade(lv);
-                arg.incrementStat(Stats.TRADED_WITH_VILLAGER);
+                player.incrementStat(Stats.TRADED_WITH_VILLAGER);
                 this.traderInventory.setStack(0, lv2);
                 this.traderInventory.setStack(1, lv3);
             }
             this.trader.setExperienceFromServer(this.trader.getExperience() + lv.getTraderExperience());
         }
-        return arg2;
+        return stack;
     }
 }
 

@@ -25,7 +25,7 @@ extends Item {
     }
 
     @Nullable
-    public Packet<?> createSyncPacket(ItemStack arg, World arg2, PlayerEntity arg3) {
+    public Packet<?> createSyncPacket(ItemStack stack, World world, PlayerEntity player) {
         return null;
     }
 }

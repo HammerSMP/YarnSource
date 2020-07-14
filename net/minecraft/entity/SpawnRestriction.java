@@ -49,26 +49,26 @@ import net.minecraft.world.Heightmap;
 public class SpawnRestriction {
     private static final Map<EntityType<?>, Entry> RESTRICTIONS = Maps.newHashMap();
 
-    private static <T extends MobEntity> void register(EntityType<T> arg, Location arg2, Heightmap.Type arg3, SpawnPredicate<T> arg4) {
-        Entry lv = RESTRICTIONS.put(arg, new Entry(arg3, arg2, arg4));
+    private static <T extends MobEntity> void register(EntityType<T> type, Location location, Heightmap.Type heightmapType, SpawnPredicate<T> predicate) {
+        Entry lv = RESTRICTIONS.put(type, new Entry(heightmapType, location, predicate));
         if (lv != null) {
-            throw new IllegalStateException("Duplicate registration for type " + Registry.ENTITY_TYPE.getId(arg));
+            throw new IllegalStateException("Duplicate registration for type " + Registry.ENTITY_TYPE.getId(type));
         }
     }
 
-    public static Location getLocation(EntityType<?> arg) {
-        Entry lv = RESTRICTIONS.get(arg);
+    public static Location getLocation(EntityType<?> type) {
+        Entry lv = RESTRICTIONS.get(type);
         return lv == null ? Location.NO_RESTRICTIONS : lv.location;
     }
 
-    public static Heightmap.Type getHeightmapType(@Nullable EntityType<?> arg) {
-        Entry lv = RESTRICTIONS.get(arg);
+    public static Heightmap.Type getHeightmapType(@Nullable EntityType<?> type) {
+        Entry lv = RESTRICTIONS.get(type);
         return lv == null ? Heightmap.Type.MOTION_BLOCKING_NO_LEAVES : lv.heightmapType;
     }
 
-    public static <T extends Entity> boolean canSpawn(EntityType<T> arg, class_5425 arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        Entry lv = RESTRICTIONS.get(arg);
-        return lv == null || lv.predicate.test(arg, arg2, arg3, arg4, random);
+    public static <T extends Entity> boolean canSpawn(EntityType<T> type, class_5425 arg2, SpawnReason spawnReason, BlockPos pos, Random random) {
+        Entry lv = RESTRICTIONS.get(type);
+        return lv == null || lv.predicate.test(type, arg2, spawnReason, pos, random);
     }
 
     static {
@@ -154,10 +154,10 @@ public class SpawnRestriction {
         private final Location location;
         private final SpawnPredicate<?> predicate;
 
-        public Entry(Heightmap.Type arg, Location arg2, SpawnPredicate<?> arg3) {
-            this.heightmapType = arg;
-            this.location = arg2;
-            this.predicate = arg3;
+        public Entry(Heightmap.Type heightmapType, Location location, SpawnPredicate<?> predicate) {
+            this.heightmapType = heightmapType;
+            this.location = location;
+            this.predicate = predicate;
         }
     }
 

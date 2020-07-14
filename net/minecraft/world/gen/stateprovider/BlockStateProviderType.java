@@ -23,8 +23,8 @@ public class BlockStateProviderType<P extends BlockStateProvider> {
     public static final BlockStateProviderType<PillarBlockStateProvider> ROTATED_BLOCK_PROVIDER = BlockStateProviderType.register("rotated_block_provider", PillarBlockStateProvider.CODEC);
     private final Codec<P> codec;
 
-    private static <P extends BlockStateProvider> BlockStateProviderType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.BLOCK_STATE_PROVIDER_TYPE, string, new BlockStateProviderType<P>(codec));
+    private static <P extends BlockStateProvider> BlockStateProviderType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.BLOCK_STATE_PROVIDER_TYPE, id, new BlockStateProviderType<P>(codec));
     }
 
     private BlockStateProviderType(Codec<P> codec) {

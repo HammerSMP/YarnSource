@@ -12,22 +12,22 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.class_5437;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.NetherrackReplaceBlobsFeatureConfig;
 
 public class NetherrackReplaceBlobsFeature
-extends Feature<class_5437> {
-    public NetherrackReplaceBlobsFeature(Codec<class_5437> codec) {
+extends Feature<NetherrackReplaceBlobsFeatureConfig> {
+    public NetherrackReplaceBlobsFeature(Codec<NetherrackReplaceBlobsFeatureConfig> codec) {
         super(codec);
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, class_5437 arg4) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, NetherrackReplaceBlobsFeatureConfig arg4) {
         Block lv = arg4.field_25849.getBlock();
         BlockPos lv2 = NetherrackReplaceBlobsFeature.method_27107(arg, arg3.mutableCopy().method_27158(Direction.Axis.Y, 1, arg.getHeight() - 1), lv);
         if (lv2 == null) {

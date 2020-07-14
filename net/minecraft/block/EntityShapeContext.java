@@ -21,8 +21,8 @@ implements ShapeContext {
     protected static final ShapeContext ABSENT = new EntityShapeContext(false, -1.7976931348623157E308, Items.AIR, arg -> false){
 
         @Override
-        public boolean isAbove(VoxelShape arg, BlockPos arg2, boolean bl) {
-            return bl;
+        public boolean isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue) {
+            return defaultValue;
         }
     };
     private final boolean descending;
@@ -30,21 +30,21 @@ implements ShapeContext {
     private final Item heldItem;
     private final Predicate<Fluid> field_24425;
 
-    protected EntityShapeContext(boolean bl, double d, Item arg, Predicate<Fluid> predicate) {
-        this.descending = bl;
-        this.minY = d;
-        this.heldItem = arg;
+    protected EntityShapeContext(boolean descending, double minY, Item heldItem, Predicate<Fluid> predicate) {
+        this.descending = descending;
+        this.minY = minY;
+        this.heldItem = heldItem;
         this.field_24425 = predicate;
     }
 
     @Deprecated
-    protected EntityShapeContext(Entity arg2) {
-        this(arg2.isDescending(), arg2.getY(), arg2 instanceof LivingEntity ? ((LivingEntity)arg2).getMainHandStack().getItem() : Items.AIR, arg2 instanceof LivingEntity ? ((LivingEntity)arg2)::canWalkOnFluid : arg -> false);
+    protected EntityShapeContext(Entity entity) {
+        this(entity.isDescending(), entity.getY(), entity instanceof LivingEntity ? ((LivingEntity)entity).getMainHandStack().getItem() : Items.AIR, entity instanceof LivingEntity ? ((LivingEntity)entity)::canWalkOnFluid : arg -> false);
     }
 
     @Override
-    public boolean isHolding(Item arg) {
-        return this.heldItem == arg;
+    public boolean isHolding(Item item) {
+        return this.heldItem == item;
     }
 
     @Override
@@ -58,8 +58,8 @@ implements ShapeContext {
     }
 
     @Override
-    public boolean isAbove(VoxelShape arg, BlockPos arg2, boolean bl) {
-        return this.minY > (double)arg2.getY() + arg.getMax(Direction.Axis.Y) - (double)1.0E-5f;
+    public boolean isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue) {
+        return this.minY > (double)pos.getY() + shape.getMax(Direction.Axis.Y) - (double)1.0E-5f;
     }
 }
 

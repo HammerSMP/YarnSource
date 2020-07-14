@@ -35,24 +35,24 @@ extends FoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
         BlockPos lv = arg3.getCenter().up(l);
         boolean bl = arg3.isGiantTrunk();
         if (bl) {
-            this.generate(arg, random, arg2, lv, k + 2, set, -1, bl, arg4);
-            this.generate(arg, random, arg2, lv, k + 3, set, 0, bl, arg4);
-            this.generate(arg, random, arg2, lv, k + 2, set, 1, bl, arg4);
+            this.generate(world, random, config, lv, radius + 2, leaves, -1, bl, arg4);
+            this.generate(world, random, config, lv, radius + 3, leaves, 0, bl, arg4);
+            this.generate(world, random, config, lv, radius + 2, leaves, 1, bl, arg4);
             if (random.nextBoolean()) {
-                this.generate(arg, random, arg2, lv, k, set, 2, bl, arg4);
+                this.generate(world, random, config, lv, radius, leaves, 2, bl, arg4);
             }
         } else {
-            this.generate(arg, random, arg2, lv, k + 2, set, -1, bl, arg4);
-            this.generate(arg, random, arg2, lv, k + 1, set, 0, bl, arg4);
+            this.generate(world, random, config, lv, radius + 2, leaves, -1, bl, arg4);
+            this.generate(world, random, config, lv, radius + 1, leaves, 0, bl, arg4);
         }
     }
 
     @Override
-    public int getHeight(Random random, int i, TreeFeatureConfig arg) {
+    public int getHeight(Random random, int trunkHeight, TreeFeatureConfig config) {
         return 4;
     }
 
@@ -65,12 +65,12 @@ extends FoliagePlacer {
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        if (j == -1 && !bl) {
-            return i == l && k == l;
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        if (dx == -1 && !bl) {
+            return baseHeight == dz && dy == dz;
         }
-        if (j == 1) {
-            return i + k > l * 2 - 2;
+        if (dx == 1) {
+            return baseHeight + dy > dz * 2 - 2;
         }
         return false;
     }

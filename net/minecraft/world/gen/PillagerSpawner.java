@@ -22,59 +22,59 @@ implements Spawner {
     private int ticksUntilNextSpawn;
 
     @Override
-    public int spawn(ServerWorld arg, boolean bl, boolean bl2) {
-        if (!bl) {
+    public int spawn(ServerWorld world, boolean spawnMonsters, boolean spawnAnimals) {
+        if (!spawnMonsters) {
             return 0;
         }
-        if (!arg.getGameRules().getBoolean(GameRules.DO_PATROL_SPAWNING)) {
+        if (!world.getGameRules().getBoolean(GameRules.DO_PATROL_SPAWNING)) {
             return 0;
         }
-        Random random = arg.random;
+        Random random = world.random;
         --this.ticksUntilNextSpawn;
         if (this.ticksUntilNextSpawn > 0) {
             return 0;
         }
         this.ticksUntilNextSpawn += 12000 + random.nextInt(1200);
-        long l = arg.getTimeOfDay() / 24000L;
-        if (l < 5L || !arg.isDay()) {
+        long l = world.getTimeOfDay() / 24000L;
+        if (l < 5L || !world.isDay()) {
             return 0;
         }
         if (random.nextInt(5) != 0) {
             return 0;
         }
-        int i = arg.getPlayers().size();
+        int i = world.getPlayers().size();
         if (i < 1) {
             return 0;
         }
-        PlayerEntity lv = arg.getPlayers().get(random.nextInt(i));
+        PlayerEntity lv = world.getPlayers().get(random.nextInt(i));
         if (lv.isSpectator()) {
             return 0;
         }
-        if (arg.isNearOccupiedPointOfInterest(lv.getBlockPos(), 2)) {
+        if (world.isNearOccupiedPointOfInterest(lv.getBlockPos(), 2)) {
             return 0;
         }
         int j = (24 + random.nextInt(24)) * (random.nextBoolean() ? -1 : 1);
         int k = (24 + random.nextInt(24)) * (random.nextBoolean() ? -1 : 1);
         BlockPos.Mutable lv2 = lv.getBlockPos().mutableCopy().move(j, 0, k);
-        if (!arg.isRegionLoaded(lv2.getX() - 10, lv2.getY() - 10, lv2.getZ() - 10, lv2.getX() + 10, lv2.getY() + 10, lv2.getZ() + 10)) {
+        if (!world.isRegionLoaded(lv2.getX() - 10, lv2.getY() - 10, lv2.getZ() - 10, lv2.getX() + 10, lv2.getY() + 10, lv2.getZ() + 10)) {
             return 0;
         }
-        Biome lv3 = arg.getBiome(lv2);
+        Biome lv3 = world.getBiome(lv2);
         Biome.Category lv4 = lv3.getCategory();
         if (lv4 == Biome.Category.MUSHROOM) {
             return 0;
         }
         int m = 0;
-        int n = (int)Math.ceil(arg.getLocalDifficulty(lv2).getLocalDifficulty()) + 1;
+        int n = (int)Math.ceil(world.getLocalDifficulty(lv2).getLocalDifficulty()) + 1;
         for (int o = 0; o < n; ++o) {
             ++m;
-            lv2.setY(arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv2).getY());
+            lv2.setY(world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv2).getY());
             if (o == 0) {
-                if (!this.spawnPillager(arg, lv2, random, true)) {
+                if (!this.spawnPillager(world, lv2, random, true)) {
                     break;
                 }
             } else {
-                this.spawnPillager(arg, lv2, random, false);
+                this.spawnPillager(world, lv2, random, false);
             }
             lv2.setX(lv2.getX() + random.nextInt(5) - random.nextInt(5));
             lv2.setZ(lv2.getZ() + random.nextInt(5) - random.nextInt(5));
@@ -82,23 +82,23 @@ implements Spawner {
         return m;
     }
 
-    private boolean spawnPillager(ServerWorld arg, BlockPos arg2, Random random, boolean bl) {
-        BlockState lv = arg.getBlockState(arg2);
-        if (!SpawnHelper.isClearForSpawn(arg, arg2, lv, lv.getFluidState(), EntityType.PILLAGER)) {
+    private boolean spawnPillager(ServerWorld world, BlockPos pos, Random random, boolean captain) {
+        BlockState lv = world.getBlockState(pos);
+        if (!SpawnHelper.isClearForSpawn(world, pos, lv, lv.getFluidState(), EntityType.PILLAGER)) {
             return false;
         }
-        if (!PatrolEntity.canSpawn(EntityType.PILLAGER, arg, SpawnReason.PATROL, arg2, random)) {
+        if (!PatrolEntity.canSpawn(EntityType.PILLAGER, world, SpawnReason.PATROL, pos, random)) {
             return false;
         }
-        PatrolEntity lv2 = EntityType.PILLAGER.create(arg);
+        PatrolEntity lv2 = EntityType.PILLAGER.create(world);
         if (lv2 != null) {
-            if (bl) {
+            if (captain) {
                 lv2.setPatrolLeader(true);
                 lv2.setRandomPatrolTarget();
             }
-            lv2.updatePosition(arg2.getX(), arg2.getY(), arg2.getZ());
-            lv2.initialize(arg, arg.getLocalDifficulty(arg2), SpawnReason.PATROL, null, null);
-            arg.spawnEntity(lv2);
+            lv2.updatePosition(pos.getX(), pos.getY(), pos.getZ());
+            lv2.initialize(world, world.getLocalDifficulty(pos), SpawnReason.PATROL, null, null);
+            world.spawnEntity(lv2);
             return true;
         }
         return false;

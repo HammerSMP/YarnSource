@@ -175,12 +175,12 @@ public abstract class Biomes {
     public static final Biome WARPED_FOREST;
     public static final Biome BASALT_DELTAS;
 
-    private static Biome register(int i, String string, Biome arg) {
-        BuiltinRegistries.set(BuiltinRegistries.BIOME, i, string, arg);
-        if (arg.hasParent()) {
-            field_25821.set(arg, BuiltinRegistries.BIOME.getRawId(BuiltinRegistries.BIOME.get(new Identifier(arg.parent))));
+    private static Biome register(int rawId, String id, Biome biome) {
+        BuiltinRegistries.set(BuiltinRegistries.BIOME, rawId, id, biome);
+        if (biome.hasParent()) {
+            field_25821.set(biome, BuiltinRegistries.BIOME.getRawId(BuiltinRegistries.BIOME.get(new Identifier(biome.parent))));
         }
-        return arg;
+        return biome;
     }
 
     @Nullable

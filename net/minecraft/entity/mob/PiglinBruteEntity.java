@@ -59,14 +59,14 @@ extends AbstractPiglinEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         PiglinBruteBrain.method_30250(this);
-        this.initEquipment(arg2);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        this.initEquipment(difficulty);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.GOLDEN_AXE));
     }
 
@@ -89,9 +89,9 @@ extends AbstractPiglinEntity {
     }
 
     @Override
-    public boolean canGather(ItemStack arg) {
-        if (arg.getItem() == Items.GOLDEN_AXE) {
-            return super.canGather(arg);
+    public boolean canGather(ItemStack stack) {
+        if (stack.getItem() == Items.GOLDEN_AXE) {
+            return super.canGather(stack);
         }
         return false;
     }
@@ -116,13 +116,13 @@ extends AbstractPiglinEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        boolean bl = super.damage(arg, f);
+    public boolean damage(DamageSource source, float amount) {
+        boolean bl = super.damage(source, amount);
         if (this.world.isClient) {
             return false;
         }
-        if (bl && arg.getAttacker() instanceof LivingEntity) {
-            PiglinBruteBrain.method_30251(this, (LivingEntity)arg.getAttacker());
+        if (bl && source.getAttacker() instanceof LivingEntity) {
+            PiglinBruteBrain.method_30251(this, (LivingEntity)source.getAttacker());
         }
         return bl;
     }
@@ -133,7 +133,7 @@ extends AbstractPiglinEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PIGLIN_BRUTE_HURT;
     }
 
@@ -143,7 +143,7 @@ extends AbstractPiglinEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_PIGLIN_BRUTE_STEP, 0.15f, 1.0f);
     }
 

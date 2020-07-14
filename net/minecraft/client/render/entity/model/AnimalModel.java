@@ -28,22 +28,22 @@ extends EntityModel<E> {
     private final float invertedChildBodyScale;
     private final float childBodyYOffset;
 
-    protected AnimalModel(boolean bl, float f, float g) {
-        this(bl, f, g, 2.0f, 2.0f, 24.0f);
+    protected AnimalModel(boolean headScaled, float childHeadYOffset, float childHeadZOffset) {
+        this(headScaled, childHeadYOffset, childHeadZOffset, 2.0f, 2.0f, 24.0f);
     }
 
-    protected AnimalModel(boolean bl, float f, float g, float h, float i, float j) {
-        this(RenderLayer::getEntityCutoutNoCull, bl, f, g, h, i, j);
+    protected AnimalModel(boolean headScaled, float childHeadYOffset, float childHeadZOffset, float invertedChildHeadScale, float invertedChildBodyScale, float childBodyYOffset) {
+        this(RenderLayer::getEntityCutoutNoCull, headScaled, childHeadYOffset, childHeadZOffset, invertedChildHeadScale, invertedChildBodyScale, childBodyYOffset);
     }
 
-    protected AnimalModel(Function<Identifier, RenderLayer> function, boolean bl, float f, float g, float h, float i, float j) {
+    protected AnimalModel(Function<Identifier, RenderLayer> function, boolean headScaled, float childHeadYOffset, float childHeadZOffset, float invertedChildHeadScale, float invertedChildBodyScale, float childBodyYOffset) {
         super(function);
-        this.headScaled = bl;
-        this.childHeadYOffset = f;
-        this.childHeadZOffset = g;
-        this.invertedChildHeadScale = h;
-        this.invertedChildBodyScale = i;
-        this.childBodyYOffset = j;
+        this.headScaled = headScaled;
+        this.childHeadYOffset = childHeadYOffset;
+        this.childHeadZOffset = childHeadZOffset;
+        this.invertedChildHeadScale = invertedChildHeadScale;
+        this.invertedChildBodyScale = invertedChildBodyScale;
+        this.childBodyYOffset = childBodyYOffset;
     }
 
     protected AnimalModel() {
@@ -51,25 +51,25 @@ extends EntityModel<E> {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
         if (this.child) {
-            arg.push();
+            matrices.push();
             if (this.headScaled) {
                 float l = 1.5f / this.invertedChildHeadScale;
-                arg.scale(l, l, l);
+                matrices.scale(l, l, l);
             }
-            arg.translate(0.0, this.childHeadYOffset / 16.0f, this.childHeadZOffset / 16.0f);
-            this.getHeadParts().forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
-            arg.pop();
-            arg.push();
+            matrices.translate(0.0, this.childHeadYOffset / 16.0f, this.childHeadZOffset / 16.0f);
+            this.getHeadParts().forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
+            matrices.pop();
+            matrices.push();
             float m = 1.0f / this.invertedChildBodyScale;
-            arg.scale(m, m, m);
-            arg.translate(0.0, this.childBodyYOffset / 16.0f, 0.0);
-            this.getBodyParts().forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
-            arg.pop();
+            matrices.scale(m, m, m);
+            matrices.translate(0.0, this.childBodyYOffset / 16.0f, 0.0);
+            this.getBodyParts().forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
+            matrices.pop();
         } else {
-            this.getHeadParts().forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
-            this.getBodyParts().forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
+            this.getHeadParts().forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
+            this.getBodyParts().forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
         }
     }
 

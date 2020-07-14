@@ -16,8 +16,8 @@ public class ServerTagManagerHolder {
         return tagManager;
     }
 
-    public static void setTagManager(TagManager arg) {
-        tagManager = arg;
+    public static void setTagManager(TagManager tagManager) {
+        ServerTagManagerHolder.tagManager = tagManager;
     }
 }
 

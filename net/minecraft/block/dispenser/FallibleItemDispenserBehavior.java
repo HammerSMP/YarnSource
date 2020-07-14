@@ -14,13 +14,13 @@ extends ItemDispenserBehavior {
         return this.success;
     }
 
-    public void setSuccess(boolean bl) {
-        this.success = bl;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     @Override
-    protected void playSound(BlockPointer arg) {
-        arg.getWorld().syncWorldEvent(this.isSuccess() ? 1000 : 1001, arg.getBlockPos(), 0);
+    protected void playSound(BlockPointer pointer) {
+        pointer.getWorld().syncWorldEvent(this.isSuccess() ? 1000 : 1001, pointer.getBlockPos(), 0);
     }
 }
 

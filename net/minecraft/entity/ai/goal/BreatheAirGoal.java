@@ -20,8 +20,8 @@ public class BreatheAirGoal
 extends Goal {
     private final PathAwareEntity mob;
 
-    public BreatheAirGoal(PathAwareEntity arg) {
-        this.mob = arg;
+    public BreatheAirGoal(PathAwareEntity mob) {
+        this.mob = mob;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }
 
@@ -66,9 +66,9 @@ extends Goal {
         this.mob.move(MovementType.SELF, this.mob.getVelocity());
     }
 
-    private boolean isAirPos(WorldView arg, BlockPos arg2) {
-        BlockState lv = arg.getBlockState(arg2);
-        return (arg.getFluidState(arg2).isEmpty() || lv.isOf(Blocks.BUBBLE_COLUMN)) && lv.canPathfindThrough(arg, arg2, NavigationType.LAND);
+    private boolean isAirPos(WorldView world, BlockPos pos) {
+        BlockState lv = world.getBlockState(pos);
+        return (world.getFluidState(pos).isEmpty() || lv.isOf(Blocks.BUBBLE_COLUMN)) && lv.canPathfindThrough(world, pos, NavigationType.LAND);
     }
 }
 

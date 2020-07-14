@@ -28,24 +28,24 @@ public class ChunkStreamVersion {
     private final Wrapper<InputStream> inputStreamWrapper;
     private final Wrapper<OutputStream> outputStreamWrapper;
 
-    private ChunkStreamVersion(int i, Wrapper<InputStream> arg, Wrapper<OutputStream> arg2) {
-        this.id = i;
-        this.inputStreamWrapper = arg;
-        this.outputStreamWrapper = arg2;
+    private ChunkStreamVersion(int id, Wrapper<InputStream> inputStreamWrapper, Wrapper<OutputStream> outputStreamWrapper) {
+        this.id = id;
+        this.inputStreamWrapper = inputStreamWrapper;
+        this.outputStreamWrapper = outputStreamWrapper;
     }
 
-    private static ChunkStreamVersion add(ChunkStreamVersion arg) {
-        VERSIONS.put(arg.id, (Object)arg);
-        return arg;
+    private static ChunkStreamVersion add(ChunkStreamVersion version) {
+        VERSIONS.put(version.id, (Object)version);
+        return version;
     }
 
     @Nullable
-    public static ChunkStreamVersion get(int i) {
-        return (ChunkStreamVersion)VERSIONS.get(i);
+    public static ChunkStreamVersion get(int id) {
+        return (ChunkStreamVersion)VERSIONS.get(id);
     }
 
-    public static boolean exists(int i) {
-        return VERSIONS.containsKey(i);
+    public static boolean exists(int id) {
+        return VERSIONS.containsKey(id);
     }
 
     public int getId() {

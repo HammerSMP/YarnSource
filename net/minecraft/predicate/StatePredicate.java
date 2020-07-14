@@ -36,54 +36,54 @@ public class StatePredicate {
     public static final StatePredicate ANY = new StatePredicate((List<Condition>)ImmutableList.of());
     private final List<Condition> conditions;
 
-    private static Condition createPredicate(String string, JsonElement jsonElement) {
-        if (jsonElement.isJsonPrimitive()) {
-            String string2 = jsonElement.getAsString();
-            return new ExactValueCondition(string, string2);
+    private static Condition createPredicate(String key, JsonElement json) {
+        if (json.isJsonPrimitive()) {
+            String string2 = json.getAsString();
+            return new ExactValueCondition(key, string2);
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "value");
+        JsonObject jsonObject = JsonHelper.asObject(json, "value");
         String string3 = jsonObject.has("min") ? StatePredicate.asNullableString(jsonObject.get("min")) : null;
         String string4 = jsonObject.has("max") ? StatePredicate.asNullableString(jsonObject.get("max")) : null;
-        return string3 != null && string3.equals(string4) ? new ExactValueCondition(string, string3) : new RangedValueCondition(string, string3, string4);
+        return string3 != null && string3.equals(string4) ? new ExactValueCondition(key, string3) : new RangedValueCondition(key, string3, string4);
     }
 
     @Nullable
-    private static String asNullableString(JsonElement jsonElement) {
-        if (jsonElement.isJsonNull()) {
+    private static String asNullableString(JsonElement json) {
+        if (json.isJsonNull()) {
             return null;
         }
-        return jsonElement.getAsString();
+        return json.getAsString();
     }
 
-    private StatePredicate(List<Condition> list) {
-        this.conditions = ImmutableList.copyOf(list);
+    private StatePredicate(List<Condition> testers) {
+        this.conditions = ImmutableList.copyOf(testers);
     }
 
-    public <S extends State<?, S>> boolean test(StateManager<?, S> arg, S arg2) {
+    public <S extends State<?, S>> boolean test(StateManager<?, S> stateManager, S container) {
         for (Condition lv : this.conditions) {
-            if (lv.test(arg, arg2)) continue;
+            if (lv.test(stateManager, container)) continue;
             return false;
         }
         return true;
     }
 
-    public boolean test(BlockState arg) {
-        return this.test(arg.getBlock().getStateManager(), arg);
+    public boolean test(BlockState state) {
+        return this.test(state.getBlock().getStateManager(), state);
     }
 
-    public boolean test(FluidState arg) {
-        return this.test(arg.getFluid().getStateManager(), arg);
+    public boolean test(FluidState state) {
+        return this.test(state.getFluid().getStateManager(), state);
     }
 
-    public void check(StateManager<?, ?> arg, Consumer<String> consumer) {
-        this.conditions.forEach(arg2 -> arg2.reportMissing(arg, consumer));
+    public void check(StateManager<?, ?> factory, Consumer<String> reporter) {
+        this.conditions.forEach(arg2 -> arg2.reportMissing(factory, reporter));
     }
 
-    public static StatePredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static StatePredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "properties");
+        JsonObject jsonObject = JsonHelper.asObject(json, "properties");
         ArrayList list = Lists.newArrayList();
         for (Map.Entry entry : jsonObject.entrySet()) {
             list.add(StatePredicate.createPredicate((String)entry.getKey(), (JsonElement)entry.getValue()));
@@ -112,21 +112,21 @@ public class StatePredicate {
             return new Builder();
         }
 
-        public Builder exactMatch(Property<?> arg, String string) {
-            this.conditions.add(new ExactValueCondition(arg.getName(), string));
+        public Builder exactMatch(Property<?> property, String valueName) {
+            this.conditions.add(new ExactValueCondition(property.getName(), valueName));
             return this;
         }
 
-        public Builder exactMatch(Property<Integer> arg, int i) {
-            return this.exactMatch((Property)arg, (Comparable<T> & StringIdentifiable)Integer.toString(i));
+        public Builder exactMatch(Property<Integer> property, int value) {
+            return this.exactMatch((Property)property, (Comparable<T> & StringIdentifiable)Integer.toString(value));
         }
 
-        public Builder exactMatch(Property<Boolean> arg, boolean bl) {
-            return this.exactMatch((Property)arg, (Comparable<T> & StringIdentifiable)Boolean.toString(bl));
+        public Builder exactMatch(Property<Boolean> property, boolean value) {
+            return this.exactMatch((Property)property, (Comparable<T> & StringIdentifiable)Boolean.toString(value));
         }
 
-        public <T extends Comparable<T> & StringIdentifiable> Builder exactMatch(Property<T> arg, T comparable) {
-            return this.exactMatch(arg, (T)((StringIdentifiable)comparable).asString());
+        public <T extends Comparable<T> & StringIdentifiable> Builder exactMatch(Property<T> property, T value) {
+            return this.exactMatch(property, (T)((StringIdentifiable)value).asString());
         }
 
         public StatePredicate build() {
@@ -141,21 +141,21 @@ public class StatePredicate {
         @Nullable
         private final String max;
 
-        public RangedValueCondition(String string, @Nullable String string2, @Nullable String string3) {
-            super(string);
-            this.min = string2;
-            this.max = string3;
+        public RangedValueCondition(String key, @Nullable String min, @Nullable String max) {
+            super(key);
+            this.min = min;
+            this.max = max;
         }
 
         @Override
-        protected <T extends Comparable<T>> boolean test(State<?, ?> arg, Property<T> arg2) {
+        protected <T extends Comparable<T>> boolean test(State<?, ?> state, Property<T> property) {
             Optional<T> optional2;
             Optional<T> optional;
-            T comparable = arg.get(arg2);
-            if (!(this.min == null || (optional = arg2.parse(this.min)).isPresent() && comparable.compareTo(optional.get()) >= 0)) {
+            T comparable = state.get(property);
+            if (!(this.min == null || (optional = property.parse(this.min)).isPresent() && comparable.compareTo(optional.get()) >= 0)) {
                 return false;
             }
-            return this.max == null || (optional2 = arg2.parse(this.max)).isPresent() && comparable.compareTo(optional2.get()) <= 0;
+            return this.max == null || (optional2 = property.parse(this.max)).isPresent() && comparable.compareTo(optional2.get()) <= 0;
         }
 
         @Override
@@ -175,15 +175,15 @@ public class StatePredicate {
     extends Condition {
         private final String value;
 
-        public ExactValueCondition(String string, String string2) {
-            super(string);
-            this.value = string2;
+        public ExactValueCondition(String key, String value) {
+            super(key);
+            this.value = value;
         }
 
         @Override
-        protected <T extends Comparable<T>> boolean test(State<?, ?> arg, Property<T> arg2) {
-            T comparable = arg.get(arg2);
-            Optional<T> optional = arg2.parse(this.value);
+        protected <T extends Comparable<T>> boolean test(State<?, ?> state, Property<T> property) {
+            T comparable = state.get(property);
+            Optional<T> optional = property.parse(this.value);
             return optional.isPresent() && comparable.compareTo(optional.get()) == 0;
         }
 
@@ -196,16 +196,16 @@ public class StatePredicate {
     static abstract class Condition {
         private final String key;
 
-        public Condition(String string) {
-            this.key = string;
+        public Condition(String key) {
+            this.key = key;
         }
 
-        public <S extends State<?, S>> boolean test(StateManager<?, S> arg, S arg2) {
-            Property<?> lv = arg.getProperty(this.key);
+        public <S extends State<?, S>> boolean test(StateManager<?, S> stateManager, S state) {
+            Property<?> lv = stateManager.getProperty(this.key);
             if (lv == null) {
                 return false;
             }
-            return this.test(arg2, lv);
+            return this.test(state, lv);
         }
 
         protected abstract <T extends Comparable<T>> boolean test(State<?, ?> var1, Property<T> var2);
@@ -216,10 +216,10 @@ public class StatePredicate {
             return this.key;
         }
 
-        public void reportMissing(StateManager<?, ?> arg, Consumer<String> consumer) {
-            Property<?> lv = arg.getProperty(this.key);
+        public void reportMissing(StateManager<?, ?> factory, Consumer<String> reporter) {
+            Property<?> lv = factory.getProperty(this.key);
             if (lv == null) {
-                consumer.accept(this.key);
+                reporter.accept(this.key);
             }
         }
     }

@@ -21,10 +21,10 @@ public class CachedBlockPosition {
     private BlockEntity blockEntity;
     private boolean cachedEntity;
 
-    public CachedBlockPosition(WorldView arg, BlockPos arg2, boolean bl) {
-        this.world = arg;
-        this.pos = arg2.toImmutable();
-        this.forceLoad = bl;
+    public CachedBlockPosition(WorldView world, BlockPos pos, boolean forceLoad) {
+        this.world = world;
+        this.pos = pos.toImmutable();
+        this.forceLoad = forceLoad;
     }
 
     public BlockState getBlockState() {
@@ -51,8 +51,8 @@ public class CachedBlockPosition {
         return this.pos;
     }
 
-    public static Predicate<CachedBlockPosition> matchesBlockState(Predicate<BlockState> predicate) {
-        return arg -> arg != null && predicate.test(arg.getBlockState());
+    public static Predicate<CachedBlockPosition> matchesBlockState(Predicate<BlockState> state) {
+        return arg -> arg != null && state.test(arg.getBlockState());
     }
 }
 

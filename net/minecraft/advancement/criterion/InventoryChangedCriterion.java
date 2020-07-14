@@ -48,12 +48,12 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2, lv3, lvs);
     }
 
-    public void trigger(ServerPlayerEntity arg, PlayerInventory arg2, ItemStack arg3) {
+    public void trigger(ServerPlayerEntity player, PlayerInventory inventory, ItemStack stack) {
         int i = 0;
         int j = 0;
         int k = 0;
-        for (int l = 0; l < arg2.size(); ++l) {
-            ItemStack lv = arg2.getStack(l);
+        for (int l = 0; l < inventory.size(); ++l) {
+            ItemStack lv = inventory.getStack(l);
             if (lv.isEmpty()) {
                 ++j;
                 continue;
@@ -62,16 +62,16 @@ extends AbstractCriterion<Conditions> {
             if (lv.getCount() < lv.getMaxCount()) continue;
             ++i;
         }
-        this.trigger(arg, arg2, arg3, i, j, k);
+        this.trigger(player, inventory, stack, i, j, k);
     }
 
-    private void trigger(ServerPlayerEntity arg, PlayerInventory arg2, ItemStack arg32, int i, int j, int k) {
-        this.test(arg, arg3 -> arg3.matches(arg2, arg32, i, j, k));
+    private void trigger(ServerPlayerEntity player, PlayerInventory inventory, ItemStack stack, int full, int empty, int occupied) {
+        this.test(player, arg3 -> arg3.matches(inventory, stack, full, empty, occupied));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -81,29 +81,29 @@ extends AbstractCriterion<Conditions> {
         private final NumberRange.IntRange empty;
         private final ItemPredicate[] items;
 
-        public Conditions(EntityPredicate.Extended arg, NumberRange.IntRange arg2, NumberRange.IntRange arg3, NumberRange.IntRange arg4, ItemPredicate[] args) {
-            super(ID, arg);
-            this.occupied = arg2;
-            this.full = arg3;
-            this.empty = arg4;
-            this.items = args;
+        public Conditions(EntityPredicate.Extended player, NumberRange.IntRange occupied, NumberRange.IntRange full, NumberRange.IntRange empty, ItemPredicate[] items) {
+            super(ID, player);
+            this.occupied = occupied;
+            this.full = full;
+            this.empty = empty;
+            this.items = items;
         }
 
-        public static Conditions items(ItemPredicate ... args) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, NumberRange.IntRange.ANY, NumberRange.IntRange.ANY, NumberRange.IntRange.ANY, args);
+        public static Conditions items(ItemPredicate ... items) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, NumberRange.IntRange.ANY, NumberRange.IntRange.ANY, NumberRange.IntRange.ANY, items);
         }
 
-        public static Conditions items(ItemConvertible ... args) {
-            ItemPredicate[] lvs = new ItemPredicate[args.length];
-            for (int i = 0; i < args.length; ++i) {
-                lvs[i] = new ItemPredicate(null, args[i].asItem(), NumberRange.IntRange.ANY, NumberRange.IntRange.ANY, EnchantmentPredicate.ARRAY_OF_ANY, EnchantmentPredicate.ARRAY_OF_ANY, null, NbtPredicate.ANY);
+        public static Conditions items(ItemConvertible ... items) {
+            ItemPredicate[] lvs = new ItemPredicate[items.length];
+            for (int i = 0; i < items.length; ++i) {
+                lvs[i] = new ItemPredicate(null, items[i].asItem(), NumberRange.IntRange.ANY, NumberRange.IntRange.ANY, EnchantmentPredicate.ARRAY_OF_ANY, EnchantmentPredicate.ARRAY_OF_ANY, null, NbtPredicate.ANY);
             }
             return Conditions.items(lvs);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             if (!(this.occupied.isDummy() && this.full.isDummy() && this.empty.isDummy())) {
                 JsonObject jsonObject2 = new JsonObject();
                 jsonObject2.add("occupied", this.occupied.toJson());
@@ -121,14 +121,14 @@ extends AbstractCriterion<Conditions> {
             return jsonObject;
         }
 
-        public boolean matches(PlayerInventory arg, ItemStack arg22, int i, int j, int k) {
-            if (!this.full.test(i)) {
+        public boolean matches(PlayerInventory inventory, ItemStack stack, int full, int empty, int occupied) {
+            if (!this.full.test(full)) {
                 return false;
             }
-            if (!this.empty.test(j)) {
+            if (!this.empty.test(empty)) {
                 return false;
             }
-            if (!this.occupied.test(k)) {
+            if (!this.occupied.test(occupied)) {
                 return false;
             }
             int l = this.items.length;
@@ -136,15 +136,15 @@ extends AbstractCriterion<Conditions> {
                 return true;
             }
             if (l == 1) {
-                return !arg22.isEmpty() && this.items[0].test(arg22);
+                return !stack.isEmpty() && this.items[0].test(stack);
             }
             ObjectArrayList list = new ObjectArrayList((Object[])this.items);
-            int m = arg.size();
+            int m = inventory.size();
             for (int n = 0; n < m; ++n) {
                 if (list.isEmpty()) {
                     return true;
                 }
-                ItemStack lv = arg.getStack(n);
+                ItemStack lv = inventory.getStack(n);
                 if (lv.isEmpty()) continue;
                 list.removeIf(arg2 -> arg2.test(lv));
             }

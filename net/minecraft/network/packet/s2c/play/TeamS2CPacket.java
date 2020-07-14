@@ -42,81 +42,81 @@ implements Packet<ClientPlayPacketListener> {
         this.playerList = Lists.newArrayList();
     }
 
-    public TeamS2CPacket(Team arg, int i) {
+    public TeamS2CPacket(Team team, int mode) {
         this.nameTagVisibilityRule = AbstractTeam.VisibilityRule.ALWAYS.name;
         this.collisionRule = AbstractTeam.CollisionRule.ALWAYS.name;
         this.color = Formatting.RESET;
         this.playerList = Lists.newArrayList();
-        this.teamName = arg.getName();
-        this.mode = i;
-        if (i == 0 || i == 2) {
-            this.displayName = arg.getDisplayName();
-            this.flags = arg.getFriendlyFlagsBitwise();
-            this.nameTagVisibilityRule = arg.getNameTagVisibilityRule().name;
-            this.collisionRule = arg.getCollisionRule().name;
-            this.color = arg.getColor();
-            this.prefix = arg.getPrefix();
-            this.suffix = arg.getSuffix();
+        this.teamName = team.getName();
+        this.mode = mode;
+        if (mode == 0 || mode == 2) {
+            this.displayName = team.getDisplayName();
+            this.flags = team.getFriendlyFlagsBitwise();
+            this.nameTagVisibilityRule = team.getNameTagVisibilityRule().name;
+            this.collisionRule = team.getCollisionRule().name;
+            this.color = team.getColor();
+            this.prefix = team.getPrefix();
+            this.suffix = team.getSuffix();
         }
-        if (i == 0) {
-            this.playerList.addAll(arg.getPlayerList());
+        if (mode == 0) {
+            this.playerList.addAll(team.getPlayerList());
         }
     }
 
-    public TeamS2CPacket(Team arg, Collection<String> collection, int i) {
+    public TeamS2CPacket(Team team, Collection<String> playerList, int mode) {
         this.nameTagVisibilityRule = AbstractTeam.VisibilityRule.ALWAYS.name;
         this.collisionRule = AbstractTeam.CollisionRule.ALWAYS.name;
         this.color = Formatting.RESET;
         this.playerList = Lists.newArrayList();
-        if (i != 3 && i != 4) {
+        if (mode != 3 && mode != 4) {
             throw new IllegalArgumentException("Method must be join or leave for player constructor");
         }
-        if (collection == null || collection.isEmpty()) {
+        if (playerList == null || playerList.isEmpty()) {
             throw new IllegalArgumentException("Players cannot be null/empty");
         }
-        this.mode = i;
-        this.teamName = arg.getName();
-        this.playerList.addAll(collection);
+        this.mode = mode;
+        this.teamName = team.getName();
+        this.playerList.addAll(playerList);
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.teamName = arg.readString(16);
-        this.mode = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.teamName = buf.readString(16);
+        this.mode = buf.readByte();
         if (this.mode == 0 || this.mode == 2) {
-            this.displayName = arg.readText();
-            this.flags = arg.readByte();
-            this.nameTagVisibilityRule = arg.readString(40);
-            this.collisionRule = arg.readString(40);
-            this.color = arg.readEnumConstant(Formatting.class);
-            this.prefix = arg.readText();
-            this.suffix = arg.readText();
+            this.displayName = buf.readText();
+            this.flags = buf.readByte();
+            this.nameTagVisibilityRule = buf.readString(40);
+            this.collisionRule = buf.readString(40);
+            this.color = buf.readEnumConstant(Formatting.class);
+            this.prefix = buf.readText();
+            this.suffix = buf.readText();
         }
         if (this.mode == 0 || this.mode == 3 || this.mode == 4) {
-            int i = arg.readVarInt();
+            int i = buf.readVarInt();
             for (int j = 0; j < i; ++j) {
-                this.playerList.add(arg.readString(40));
+                this.playerList.add(buf.readString(40));
             }
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.teamName);
-        arg.writeByte(this.mode);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.teamName);
+        buf.writeByte(this.mode);
         if (this.mode == 0 || this.mode == 2) {
-            arg.writeText(this.displayName);
-            arg.writeByte(this.flags);
-            arg.writeString(this.nameTagVisibilityRule);
-            arg.writeString(this.collisionRule);
-            arg.writeEnumConstant(this.color);
-            arg.writeText(this.prefix);
-            arg.writeText(this.suffix);
+            buf.writeText(this.displayName);
+            buf.writeByte(this.flags);
+            buf.writeString(this.nameTagVisibilityRule);
+            buf.writeString(this.collisionRule);
+            buf.writeEnumConstant(this.color);
+            buf.writeText(this.prefix);
+            buf.writeText(this.suffix);
         }
         if (this.mode == 0 || this.mode == 3 || this.mode == 4) {
-            arg.writeVarInt(this.playerList.size());
+            buf.writeVarInt(this.playerList.size());
             for (String string : this.playerList) {
-                arg.writeString(string);
+                buf.writeString(string);
             }
         }
     }

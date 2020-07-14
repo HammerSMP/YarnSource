@@ -25,10 +25,10 @@ import net.minecraft.state.property.Property;
 public abstract class BlockStateVariantMap {
     private final Map<PropertiesMap, List<BlockStateVariant>> variants = Maps.newHashMap();
 
-    protected void register(PropertiesMap arg, List<BlockStateVariant> list) {
-        List<BlockStateVariant> list2 = this.variants.put(arg, list);
+    protected void register(PropertiesMap condition, List<BlockStateVariant> possibleVariants) {
+        List<BlockStateVariant> list2 = this.variants.put(condition, possibleVariants);
         if (list2 != null) {
-            throw new IllegalStateException("Value " + arg + " is already defined");
+            throw new IllegalStateException("Value " + condition + " is already defined");
         }
     }
 
@@ -196,13 +196,13 @@ public abstract class BlockStateVariantMap {
             return this.register(comparable, comparable2, Collections.singletonList(arg));
         }
 
-        public BlockStateVariantMap register(BiFunction<T1, T2, BlockStateVariant> biFunction) {
-            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (BlockStateVariant)biFunction.apply(comparable, comparable2))));
+        public BlockStateVariantMap register(BiFunction<T1, T2, BlockStateVariant> variantFactory) {
+            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (BlockStateVariant)variantFactory.apply(comparable, comparable2))));
             return this;
         }
 
-        public BlockStateVariantMap registerVariants(BiFunction<T1, T2, List<BlockStateVariant>> biFunction) {
-            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (List)biFunction.apply(comparable, comparable2))));
+        public BlockStateVariantMap registerVariants(BiFunction<T1, T2, List<BlockStateVariant>> variantsFactory) {
+            this.first.getValues().forEach(comparable -> this.second.getValues().forEach(comparable2 -> this.register(comparable, comparable2, (List)variantsFactory.apply(comparable, comparable2))));
             return this;
         }
     }
@@ -220,18 +220,18 @@ public abstract class BlockStateVariantMap {
             return ImmutableList.of(this.property);
         }
 
-        public SingleProperty<T1> register(T1 comparable, List<BlockStateVariant> list) {
-            PropertiesMap lv = PropertiesMap.method_25821(this.property.method_30042(comparable));
-            this.register(lv, list);
+        public SingleProperty<T1> register(T1 value, List<BlockStateVariant> variants) {
+            PropertiesMap lv = PropertiesMap.method_25821(this.property.method_30042(value));
+            this.register(lv, variants);
             return this;
         }
 
-        public SingleProperty<T1> register(T1 comparable, BlockStateVariant arg) {
-            return this.register(comparable, Collections.singletonList(arg));
+        public SingleProperty<T1> register(T1 value, BlockStateVariant variant) {
+            return this.register(value, Collections.singletonList(variant));
         }
 
-        public BlockStateVariantMap register(Function<T1, BlockStateVariant> function) {
-            this.property.getValues().forEach(comparable -> this.register(comparable, (BlockStateVariant)function.apply(comparable)));
+        public BlockStateVariantMap register(Function<T1, BlockStateVariant> variantFactory) {
+            this.property.getValues().forEach(comparable -> this.register(comparable, (BlockStateVariant)variantFactory.apply(comparable)));
             return this;
         }
     }

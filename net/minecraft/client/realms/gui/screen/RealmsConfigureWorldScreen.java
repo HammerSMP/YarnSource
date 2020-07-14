@@ -74,9 +74,9 @@ extends RealmsScreenWithCallback {
     private int animTick;
     private int clicks;
 
-    public RealmsConfigureWorldScreen(RealmsMainScreen arg, long l) {
-        this.parent = arg;
-        this.serverId = l;
+    public RealmsConfigureWorldScreen(RealmsMainScreen parent, long serverId) {
+        this.parent = parent;
+        this.serverId = serverId;
     }
 
     @Override
@@ -119,12 +119,12 @@ extends RealmsScreenWithCallback {
         }
     }
 
-    private void addSlotButton(int i) {
-        int j = this.frame(i);
+    private void addSlotButton(int slotIndex) {
+        int j = this.frame(slotIndex);
         int k = RealmsConfigureWorldScreen.row(5) + 5;
         RealmsWorldSlotButton lv = new RealmsWorldSlotButton(j, k, 80, 80, () -> this.server, arg -> {
             this.toolTip = arg;
-        }, i, arg -> {
+        }, slotIndex, arg -> {
             RealmsWorldSlotButton.State lv = ((RealmsWorldSlotButton)arg).getState();
             if (lv != null) {
                 switch (lv.action) {
@@ -141,10 +141,10 @@ extends RealmsScreenWithCallback {
                             break;
                         }
                         if (lv.empty) {
-                            this.switchToEmptySlot(i, this.server);
+                            this.switchToEmptySlot(slotIndex, this.server);
                             break;
                         }
-                        this.switchToFullSlot(i, this.server);
+                        this.switchToFullSlot(slotIndex, this.server);
                         break;
                     }
                     default: {
@@ -160,8 +160,8 @@ extends RealmsScreenWithCallback {
         return this.left_x + i * 95;
     }
 
-    private int buttonCenter(int i, int j) {
-        return this.width / 2 - (j * 105 - 5) / 2 + i * 105;
+    private int buttonCenter(int i, int total) {
+        return this.width / 2 - (total * 105 - 5) / 2 + i * 105;
     }
 
     @Override
@@ -175,33 +175,33 @@ extends RealmsScreenWithCallback {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.toolTip = null;
-        this.renderBackground(arg);
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("mco.configure.worlds.title", new Object[0]), this.width / 2, RealmsConfigureWorldScreen.row(4), 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.renderBackground(matrices);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("mco.configure.worlds.title", new Object[0]), this.width / 2, RealmsConfigureWorldScreen.row(4), 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.server == null) {
-            this.drawCenteredString(arg, this.textRenderer, I18n.translate("mco.configure.world.title", new Object[0]), this.width / 2, 17, 0xFFFFFF);
+            this.drawCenteredString(matrices, this.textRenderer, I18n.translate("mco.configure.world.title", new Object[0]), this.width / 2, 17, 0xFFFFFF);
             return;
         }
         String string = this.server.getName();
         int k = this.textRenderer.getWidth(string);
         int l = this.server.state == RealmsServer.State.CLOSED ? 0xA0A0A0 : 0x7FFF7F;
         int m = this.textRenderer.getWidth(I18n.translate("mco.configure.world.title", new Object[0]));
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("mco.configure.world.title", new Object[0]), this.width / 2, 12, 0xFFFFFF);
-        this.drawCenteredString(arg, this.textRenderer, string, this.width / 2, 24, l);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("mco.configure.world.title", new Object[0]), this.width / 2, 12, 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, string, this.width / 2, 24, l);
         int n = Math.min(this.buttonCenter(2, 3) + 80 - 11, this.width / 2 + k / 2 + m / 2 + 10);
-        this.drawServerStatus(arg, n, 7, i, j);
+        this.drawServerStatus(matrices, n, 7, mouseX, mouseY);
         if (this.isMinigame()) {
-            this.textRenderer.draw(arg, I18n.translate("mco.configure.current.minigame", new Object[0]) + ": " + this.server.getMinigameName(), (float)(this.left_x + 80 + 20 + 10), (float)RealmsConfigureWorldScreen.row(13), 0xFFFFFF);
+            this.textRenderer.draw(matrices, I18n.translate("mco.configure.current.minigame", new Object[0]) + ": " + this.server.getMinigameName(), (float)(this.left_x + 80 + 20 + 10), (float)RealmsConfigureWorldScreen.row(13), 0xFFFFFF);
         }
         if (this.toolTip != null) {
-            this.renderMousehoverTooltip(arg, this.toolTip, i, j);
+            this.renderMousehoverTooltip(matrices, this.toolTip, mouseX, mouseY);
         }
     }
 
-    private int frame(int i) {
-        return this.left_x + (i - 1) * 98;
+    private int frame(int ordinal) {
+        return this.left_x + (ordinal - 1) * 98;
     }
 
     @Override
@@ -210,12 +210,12 @@ extends RealmsScreenWithCallback {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.backButtonClicked();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void backButtonClicked() {
@@ -225,11 +225,11 @@ extends RealmsScreenWithCallback {
         this.client.openScreen(this.parent);
     }
 
-    private void fetchServerData(long l) {
+    private void fetchServerData(long worldId) {
         new Thread(() -> {
             RealmsClient lv = RealmsClient.createRealmsClient();
             try {
-                this.server = lv.getOwnWorld(l);
+                this.server = lv.getOwnWorld(worldId);
                 this.disableButtons();
                 if (this.isMinigame()) {
                     this.addButton(this.switchMinigameButton);
@@ -255,9 +255,9 @@ extends RealmsScreenWithCallback {
         this.resetWorldButton.active = !this.server.expired;
     }
 
-    private void joinRealm(RealmsServer arg) {
+    private void joinRealm(RealmsServer serverData) {
         if (this.server.state == RealmsServer.State.OPEN) {
-            this.parent.play(arg, new RealmsConfigureWorldScreen(this.parent.newScreen(), this.serverId));
+            this.parent.play(serverData, new RealmsConfigureWorldScreen(this.parent.newScreen(), this.serverId));
         } else {
             this.openTheWorld(true, new RealmsConfigureWorldScreen(this.parent.newScreen(), this.serverId));
         }
@@ -270,25 +270,25 @@ extends RealmsScreenWithCallback {
         this.client.openScreen(lv);
     }
 
-    private void switchToFullSlot(int i, RealmsServer arg) {
+    private void switchToFullSlot(int selectedSlot, RealmsServer serverData) {
         TranslatableText lv = new TranslatableText("mco.configure.world.slot.switch.question.line1");
         TranslatableText lv2 = new TranslatableText("mco.configure.world.slot.switch.question.line2");
         this.client.openScreen(new RealmsLongConfirmationScreen(bl -> {
             if (bl) {
-                this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new SwitchSlotTask(arg.id, i, () -> this.client.openScreen(this.getNewScreen()))));
+                this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new SwitchSlotTask(arg.id, selectedSlot, () -> this.client.openScreen(this.getNewScreen()))));
             } else {
                 this.client.openScreen(this);
             }
         }, RealmsLongConfirmationScreen.Type.Info, lv, lv2, true));
     }
 
-    private void switchToEmptySlot(int i, RealmsServer arg) {
+    private void switchToEmptySlot(int selectedSlot, RealmsServer serverData) {
         TranslatableText lv = new TranslatableText("mco.configure.world.slot.switch.question.line1");
         TranslatableText lv2 = new TranslatableText("mco.configure.world.slot.switch.question.line2");
         this.client.openScreen(new RealmsLongConfirmationScreen(bl -> {
             if (bl) {
-                RealmsResetWorldScreen lv = new RealmsResetWorldScreen(this, arg, new TranslatableText("mco.configure.world.switch.slot"), new TranslatableText("mco.configure.world.switch.slot.subtitle"), 0xA0A0A0, ScreenTexts.CANCEL, () -> this.client.openScreen(this.getNewScreen()), () -> this.client.openScreen(this.getNewScreen()));
-                lv.setSlot(i);
+                RealmsResetWorldScreen lv = new RealmsResetWorldScreen(this, serverData, new TranslatableText("mco.configure.world.switch.slot"), new TranslatableText("mco.configure.world.switch.slot.subtitle"), 0xA0A0A0, ScreenTexts.CANCEL, () -> this.client.openScreen(this.getNewScreen()), () -> this.client.openScreen(this.getNewScreen()));
+                lv.setSlot(selectedSlot);
                 lv.setResetTitle(I18n.translate("mco.create.world.reset.title", new Object[0]));
                 this.client.openScreen(lv);
             } else {
@@ -372,29 +372,29 @@ extends RealmsScreenWithCallback {
         this.removeButton(this.resetWorldButton);
     }
 
-    private void removeButton(ButtonWidget arg) {
-        arg.visible = false;
-        this.children.remove(arg);
-        this.buttons.remove(arg);
+    private void removeButton(ButtonWidget button) {
+        button.visible = false;
+        this.children.remove(button);
+        this.buttons.remove(button);
     }
 
-    private void addButton(ButtonWidget arg) {
-        arg.visible = true;
-        this.addButton(arg);
+    private void addButton(ButtonWidget button) {
+        button.visible = true;
+        this.addButton(button);
     }
 
     private void hideMinigameButtons() {
         this.removeButton(this.switchMinigameButton);
     }
 
-    public void saveSlotSettings(RealmsWorldOptions arg) {
+    public void saveSlotSettings(RealmsWorldOptions options) {
         RealmsWorldOptions lv = this.server.slots.get(this.server.activeSlot);
-        arg.templateId = lv.templateId;
-        arg.templateImage = lv.templateImage;
+        options.templateId = lv.templateId;
+        options.templateImage = lv.templateImage;
         RealmsClient lv2 = RealmsClient.createRealmsClient();
         try {
-            lv2.updateSlot(this.server.id, this.server.activeSlot, arg);
-            this.server.slots.put(this.server.activeSlot, arg);
+            lv2.updateSlot(this.server.id, this.server.activeSlot, options);
+            this.server.slots.put(this.server.activeSlot, options);
         }
         catch (RealmsServiceException lv3) {
             LOGGER.error("Couldn't save slot settings");
@@ -404,12 +404,12 @@ extends RealmsScreenWithCallback {
         this.client.openScreen(this);
     }
 
-    public void saveSettings(String string, String string2) {
-        String string3 = string2.trim().isEmpty() ? null : string2;
+    public void saveSettings(String name, String desc) {
+        String string3 = desc.trim().isEmpty() ? null : desc;
         RealmsClient lv = RealmsClient.createRealmsClient();
         try {
-            lv.update(this.server.id, string, string3);
-            this.server.setName(string);
+            lv.update(this.server.id, name, string3);
+            this.server.setName(name);
             this.server.setDescription(string3);
         }
         catch (RealmsServiceException lv2) {
@@ -420,12 +420,12 @@ extends RealmsScreenWithCallback {
         this.client.openScreen(this);
     }
 
-    public void openTheWorld(boolean bl, Screen arg) {
-        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(arg, new OpenServerTask(this.server, this, this.parent, bl)));
+    public void openTheWorld(boolean join, Screen screen) {
+        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(screen, new OpenServerTask(this.server, this, this.parent, join)));
     }
 
-    public void closeTheWorld(Screen arg) {
-        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(arg, new CloseServerTask(this.server, this)));
+    public void closeTheWorld(Screen screen) {
+        this.client.openScreen(new RealmsLongRunningMcoTaskScreen(screen, new CloseServerTask(this.server, this)));
     }
 
     public void stateChanged() {
@@ -433,12 +433,12 @@ extends RealmsScreenWithCallback {
     }
 
     @Override
-    protected void callback(@Nullable WorldTemplate arg) {
-        if (arg == null) {
+    protected void callback(@Nullable WorldTemplate template) {
+        if (template == null) {
             return;
         }
-        if (WorldTemplate.WorldTemplateType.MINIGAME == arg.type) {
-            this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new SwitchMinigameTask(this.server.id, arg, this.getNewScreen())));
+        if (WorldTemplate.WorldTemplateType.MINIGAME == template.type) {
+            this.client.openScreen(new RealmsLongRunningMcoTaskScreen(this.parent, new SwitchMinigameTask(this.server.id, template, this.getNewScreen())));
         }
     }
 

@@ -22,12 +22,12 @@ public class RayTraceContext {
     private final FluidHandling fluid;
     private final ShapeContext entityPosition;
 
-    public RayTraceContext(Vec3d arg, Vec3d arg2, ShapeType arg3, FluidHandling arg4, Entity arg5) {
-        this.start = arg;
-        this.end = arg2;
-        this.shapeType = arg3;
-        this.fluid = arg4;
-        this.entityPosition = ShapeContext.of(arg5);
+    public RayTraceContext(Vec3d start, Vec3d end, ShapeType shapeType, FluidHandling fluidHandling, Entity entity) {
+        this.start = start;
+        this.end = end;
+        this.shapeType = shapeType;
+        this.fluid = fluidHandling;
+        this.entityPosition = ShapeContext.of(entity);
     }
 
     public Vec3d getEnd() {
@@ -38,12 +38,12 @@ public class RayTraceContext {
         return this.start;
     }
 
-    public VoxelShape getBlockShape(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return this.shapeType.get(arg, arg2, arg3, this.entityPosition);
+    public VoxelShape getBlockShape(BlockState state, BlockView world, BlockPos pos) {
+        return this.shapeType.get(state, world, pos, this.entityPosition);
     }
 
-    public VoxelShape getFluidShape(FluidState arg, BlockView arg2, BlockPos arg3) {
-        return this.fluid.handled(arg) ? arg.getShape(arg2, arg3) : VoxelShapes.empty();
+    public VoxelShape getFluidShape(FluidState state, BlockView world, BlockPos pos) {
+        return this.fluid.handled(state) ? state.getShape(world, pos) : VoxelShapes.empty();
     }
 
     public static enum FluidHandling {
@@ -57,8 +57,8 @@ public class RayTraceContext {
             this.predicate = predicate;
         }
 
-        public boolean handled(FluidState arg) {
-            return this.predicate.test(arg);
+        public boolean handled(FluidState state) {
+            return this.predicate.test(state);
         }
     }
 
@@ -74,8 +74,8 @@ public class RayTraceContext {
 
         private final ShapeProvider provider;
 
-        private ShapeType(ShapeProvider arg) {
-            this.provider = arg;
+        private ShapeType(ShapeProvider provider) {
+            this.provider = provider;
         }
 
         @Override

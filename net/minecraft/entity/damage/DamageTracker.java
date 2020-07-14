@@ -34,8 +34,8 @@ public class DamageTracker {
     private boolean hasDamage;
     private String fallDeathSuffix;
 
-    public DamageTracker(LivingEntity arg) {
-        this.entity = arg;
+    public DamageTracker(LivingEntity entity) {
+        this.entity = entity;
     }
 
     public void setFallDeathSuffix() {
@@ -49,10 +49,10 @@ public class DamageTracker {
         }
     }
 
-    public void onDamage(DamageSource arg, float f, float g) {
+    public void onDamage(DamageSource damageSource, float originalHealth, float g) {
         this.update();
         this.setFallDeathSuffix();
-        DamageRecord lv = new DamageRecord(arg, this.entity.age, f, g, this.fallDeathSuffix, this.entity.fallDistance);
+        DamageRecord lv = new DamageRecord(damageSource, this.entity.age, originalHealth, g, this.fallDeathSuffix, this.entity.fallDistance);
         this.recentDamage.add(lv);
         this.ageOnLastDamage = this.entity.age;
         this.hasDamage = true;

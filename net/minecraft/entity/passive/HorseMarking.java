@@ -16,16 +16,16 @@ public enum HorseMarking {
     private static final HorseMarking[] VALUES;
     private final int index;
 
-    private HorseMarking(int j) {
-        this.index = j;
+    private HorseMarking(int index) {
+        this.index = index;
     }
 
     public int getIndex() {
         return this.index;
     }
 
-    public static HorseMarking byIndex(int i) {
-        return VALUES[i % VALUES.length];
+    public static HorseMarking byIndex(int index) {
+        return VALUES[index % VALUES.length];
     }
 
     static {

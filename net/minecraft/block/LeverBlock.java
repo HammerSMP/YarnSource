@@ -51,10 +51,10 @@ extends WallMountedBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        switch ((WallMountLocation)arg.get(FACE)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        switch ((WallMountLocation)state.get(FACE)) {
             case FLOOR: {
-                switch (arg.get(FACING).getAxis()) {
+                switch (state.get(FACING).getAxis()) {
                     case X: {
                         return FLOOR_X_AXIS_SHAPE;
                     }
@@ -62,7 +62,7 @@ extends WallMountedBlock {
                 return FLOOR_Z_AXIS_SHAPE;
             }
             case WALL: {
-                switch (arg.get(FACING)) {
+                switch (state.get(FACING)) {
                     case EAST: {
                         return EAST_WALL_SHAPE;
                     }
@@ -76,7 +76,7 @@ extends WallMountedBlock {
                 return NORTH_WALL_SHAPE;
             }
         }
-        switch (arg.get(FACING).getAxis()) {
+        switch (state.get(FACING).getAxis()) {
             case X: {
                 return CEILING_X_AXIS_SHAPE;
             }
@@ -85,17 +85,17 @@ extends WallMountedBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
-            BlockState lv = (BlockState)arg.cycle(POWERED);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            BlockState lv = (BlockState)state.cycle(POWERED);
             if (lv.get(POWERED).booleanValue()) {
-                LeverBlock.spawnParticles(lv, arg2, arg3, 1.0f);
+                LeverBlock.spawnParticles(lv, world, pos, 1.0f);
             }
             return ActionResult.SUCCESS;
         }
-        BlockState lv2 = this.method_21846(arg, arg2, arg3);
+        BlockState lv2 = this.method_21846(state, world, pos);
         float f = lv2.get(POWERED) != false ? 0.6f : 0.5f;
-        arg2.playSound(null, arg3, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3f, f);
+        world.playSound(null, pos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3f, f);
         return ActionResult.CONSUME;
     }
 
@@ -106,60 +106,60 @@ extends WallMountedBlock {
         return arg;
     }
 
-    private static void spawnParticles(BlockState arg, WorldAccess arg2, BlockPos arg3, float f) {
-        Direction lv = arg.get(FACING).getOpposite();
-        Direction lv2 = LeverBlock.getDirection(arg).getOpposite();
-        double d = (double)arg3.getX() + 0.5 + 0.1 * (double)lv.getOffsetX() + 0.2 * (double)lv2.getOffsetX();
-        double e = (double)arg3.getY() + 0.5 + 0.1 * (double)lv.getOffsetY() + 0.2 * (double)lv2.getOffsetY();
-        double g = (double)arg3.getZ() + 0.5 + 0.1 * (double)lv.getOffsetZ() + 0.2 * (double)lv2.getOffsetZ();
-        arg2.addParticle(new DustParticleEffect(1.0f, 0.0f, 0.0f, f), d, e, g, 0.0, 0.0, 0.0);
+    private static void spawnParticles(BlockState state, WorldAccess world, BlockPos pos, float alpha) {
+        Direction lv = state.get(FACING).getOpposite();
+        Direction lv2 = LeverBlock.getDirection(state).getOpposite();
+        double d = (double)pos.getX() + 0.5 + 0.1 * (double)lv.getOffsetX() + 0.2 * (double)lv2.getOffsetX();
+        double e = (double)pos.getY() + 0.5 + 0.1 * (double)lv.getOffsetY() + 0.2 * (double)lv2.getOffsetY();
+        double g = (double)pos.getZ() + 0.5 + 0.1 * (double)lv.getOffsetZ() + 0.2 * (double)lv2.getOffsetZ();
+        world.addParticle(new DustParticleEffect(1.0f, 0.0f, 0.0f, alpha), d, e, g, 0.0, 0.0, 0.0);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        if (arg.get(POWERED).booleanValue() && random.nextFloat() < 0.25f) {
-            LeverBlock.spawnParticles(arg, arg2, arg3, 0.5f);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (state.get(POWERED).booleanValue() && random.nextFloat() < 0.25f) {
+            LeverBlock.spawnParticles(state, world, pos, 0.5f);
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (bl || arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (moved || state.isOf(newState.getBlock())) {
             return;
         }
-        if (arg.get(POWERED).booleanValue()) {
-            this.updateNeighbors(arg, arg2, arg3);
+        if (state.get(POWERED).booleanValue()) {
+            this.updateNeighbors(state, world, pos);
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return arg.get(POWERED) != false ? 15 : 0;
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return state.get(POWERED) != false ? 15 : 0;
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        if (arg.get(POWERED).booleanValue() && LeverBlock.getDirection(arg) == arg4) {
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (state.get(POWERED).booleanValue() && LeverBlock.getDirection(state) == direction) {
             return 15;
         }
         return 0;
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
-    private void updateNeighbors(BlockState arg, World arg2, BlockPos arg3) {
-        arg2.updateNeighborsAlways(arg3, this);
-        arg2.updateNeighborsAlways(arg3.offset(LeverBlock.getDirection(arg).getOpposite()), this);
+    private void updateNeighbors(BlockState state, World world, BlockPos pos) {
+        world.updateNeighborsAlways(pos, this);
+        world.updateNeighborsAlways(pos.offset(LeverBlock.getDirection(state).getOpposite()), this);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACE, FACING, POWERED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACE, FACING, POWERED);
     }
 }
 

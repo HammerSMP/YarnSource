@@ -45,8 +45,8 @@ extends StructureFeature<DefaultFeatureConfig> {
         return Start::new;
     }
 
-    private static int getGenerationHeight(int i, int j, ChunkGenerator arg) {
-        Random random = new Random(i + j * 10387313);
+    private static int getGenerationHeight(int chunkX, int chunkZ, ChunkGenerator chunkGenerator) {
+        Random random = new Random(chunkX + chunkZ * 10387313);
         BlockRotation lv = BlockRotation.random(random);
         int k = 5;
         int l = 5;
@@ -58,12 +58,12 @@ extends StructureFeature<DefaultFeatureConfig> {
         } else if (lv == BlockRotation.COUNTERCLOCKWISE_90) {
             l = -5;
         }
-        int m = (i << 4) + 7;
-        int n = (j << 4) + 7;
-        int o = arg.getHeightInGround(m, n, Heightmap.Type.WORLD_SURFACE_WG);
-        int p = arg.getHeightInGround(m, n + l, Heightmap.Type.WORLD_SURFACE_WG);
-        int q = arg.getHeightInGround(m + k, n, Heightmap.Type.WORLD_SURFACE_WG);
-        int r = arg.getHeightInGround(m + k, n + l, Heightmap.Type.WORLD_SURFACE_WG);
+        int m = (chunkX << 4) + 7;
+        int n = (chunkZ << 4) + 7;
+        int o = chunkGenerator.getHeightInGround(m, n, Heightmap.Type.WORLD_SURFACE_WG);
+        int p = chunkGenerator.getHeightInGround(m, n + l, Heightmap.Type.WORLD_SURFACE_WG);
+        int q = chunkGenerator.getHeightInGround(m + k, n, Heightmap.Type.WORLD_SURFACE_WG);
+        int r = chunkGenerator.getHeightInGround(m + k, n + l, Heightmap.Type.WORLD_SURFACE_WG);
         return Math.min(Math.min(o, p), Math.min(q, r));
     }
 

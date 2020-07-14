@@ -90,9 +90,9 @@ public class RealmsClient {
         currentEnvironment = Environment.LOCAL;
     }
 
-    public RealmsClient(String string, String string2, Proxy proxy) {
-        this.sessionId = string;
-        this.username = string2;
+    public RealmsClient(String sessionId, String username, Proxy proxy) {
+        this.sessionId = sessionId;
+        this.username = username;
         RealmsClientConfig.setProxy(proxy);
     }
 
@@ -102,8 +102,8 @@ public class RealmsClient {
         return RealmsServerList.parse(string2);
     }
 
-    public RealmsServer getOwnWorld(long l) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$ID".replace("$ID", String.valueOf(l)));
+    public RealmsServer getOwnWorld(long worldId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$ID".replace("$ID", String.valueOf(worldId)));
         String string2 = this.execute(Request.get(string));
         return RealmsServer.parse(string2);
     }
@@ -114,15 +114,15 @@ public class RealmsClient {
         return RealmsServerPlayerLists.parse(string2);
     }
 
-    public RealmsServerAddress join(long l) throws RealmsServiceException {
-        String string = this.url("worlds" + "/v1/$ID/join/pc".replace("$ID", "" + l));
+    public RealmsServerAddress join(long worldId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/v1/$ID/join/pc".replace("$ID", "" + worldId));
         String string2 = this.execute(Request.get(string, 5000, 30000));
         return RealmsServerAddress.parse(string2);
     }
 
-    public void initializeWorld(long l, String string, String string2) throws RealmsServiceException {
-        RealmsDescriptionDto lv = new RealmsDescriptionDto(string, string2);
-        String string3 = this.url("worlds" + "/$WORLD_ID/initialize".replace("$WORLD_ID", String.valueOf(l)));
+    public void initializeWorld(long worldId, String name, String motd) throws RealmsServiceException {
+        RealmsDescriptionDto lv = new RealmsDescriptionDto(name, motd);
+        String string3 = this.url("worlds" + "/$WORLD_ID/initialize".replace("$WORLD_ID", String.valueOf(worldId)));
         String string4 = JSON.toJson(lv);
         this.execute(Request.post(string3, string4, 5000, 10000));
     }
@@ -155,105 +155,105 @@ public class RealmsClient {
         return lv2;
     }
 
-    public void uninvite(long l, String string) throws RealmsServiceException {
-        String string2 = this.url("invites" + "/$WORLD_ID/invite/$UUID".replace("$WORLD_ID", String.valueOf(l)).replace("$UUID", string));
+    public void uninvite(long worldId, String profileUuid) throws RealmsServiceException {
+        String string2 = this.url("invites" + "/$WORLD_ID/invite/$UUID".replace("$WORLD_ID", String.valueOf(worldId)).replace("$UUID", profileUuid));
         this.execute(Request.delete(string2));
     }
 
-    public void uninviteMyselfFrom(long l) throws RealmsServiceException {
-        String string = this.url("invites" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(l)));
+    public void uninviteMyselfFrom(long worldId) throws RealmsServiceException {
+        String string = this.url("invites" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(worldId)));
         this.execute(Request.delete(string));
     }
 
-    public RealmsServer invite(long l, String string) throws RealmsServiceException {
+    public RealmsServer invite(long worldId, String profileName) throws RealmsServiceException {
         PlayerInfo lv = new PlayerInfo();
-        lv.setName(string);
-        String string2 = this.url("invites" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(l)));
+        lv.setName(profileName);
+        String string2 = this.url("invites" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(worldId)));
         String string3 = this.execute(Request.post(string2, JSON.toJson(lv)));
         return RealmsServer.parse(string3);
     }
 
-    public BackupList backupsFor(long l) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID/backups".replace("$WORLD_ID", String.valueOf(l)));
+    public BackupList backupsFor(long worldId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID/backups".replace("$WORLD_ID", String.valueOf(worldId)));
         String string2 = this.execute(Request.get(string));
         return BackupList.parse(string2);
     }
 
-    public void update(long l, String string, String string2) throws RealmsServiceException {
-        RealmsDescriptionDto lv = new RealmsDescriptionDto(string, string2);
-        String string3 = this.url("worlds" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(l)));
+    public void update(long worldId, String name, String motd) throws RealmsServiceException {
+        RealmsDescriptionDto lv = new RealmsDescriptionDto(name, motd);
+        String string3 = this.url("worlds" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(worldId)));
         this.execute(Request.post(string3, JSON.toJson(lv)));
     }
 
-    public void updateSlot(long l, int i, RealmsWorldOptions arg) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID/slot/$SLOT_ID".replace("$WORLD_ID", String.valueOf(l)).replace("$SLOT_ID", String.valueOf(i)));
-        String string2 = arg.toJson();
+    public void updateSlot(long worldId, int slot, RealmsWorldOptions options) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID/slot/$SLOT_ID".replace("$WORLD_ID", String.valueOf(worldId)).replace("$SLOT_ID", String.valueOf(slot)));
+        String string2 = options.toJson();
         this.execute(Request.post(string, string2));
     }
 
-    public boolean switchSlot(long l, int i) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID/slot/$SLOT_ID".replace("$WORLD_ID", String.valueOf(l)).replace("$SLOT_ID", String.valueOf(i)));
+    public boolean switchSlot(long worldId, int slot) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID/slot/$SLOT_ID".replace("$WORLD_ID", String.valueOf(worldId)).replace("$SLOT_ID", String.valueOf(slot)));
         String string2 = this.execute(Request.put(string, ""));
         return Boolean.valueOf(string2);
     }
 
-    public void restoreWorld(long l, String string) throws RealmsServiceException {
-        String string2 = this.url("worlds" + "/$WORLD_ID/backups".replace("$WORLD_ID", String.valueOf(l)), "backupId=" + string);
+    public void restoreWorld(long worldId, String backupId) throws RealmsServiceException {
+        String string2 = this.url("worlds" + "/$WORLD_ID/backups".replace("$WORLD_ID", String.valueOf(worldId)), "backupId=" + backupId);
         this.execute(Request.put(string2, "", 40000, 600000));
     }
 
-    public WorldTemplatePaginatedList fetchWorldTemplates(int i, int j, RealmsServer.WorldType arg) throws RealmsServiceException {
-        String string = this.url("worlds" + "/templates/$WORLD_TYPE".replace("$WORLD_TYPE", arg.toString()), String.format("page=%d&pageSize=%d", i, j));
+    public WorldTemplatePaginatedList fetchWorldTemplates(int page, int pageSize, RealmsServer.WorldType type) throws RealmsServiceException {
+        String string = this.url("worlds" + "/templates/$WORLD_TYPE".replace("$WORLD_TYPE", type.toString()), String.format("page=%d&pageSize=%d", page, pageSize));
         String string2 = this.execute(Request.get(string));
         return WorldTemplatePaginatedList.parse(string2);
     }
 
-    public Boolean putIntoMinigameMode(long l, String string) throws RealmsServiceException {
-        String string2 = "/minigames/$MINIGAME_ID/$WORLD_ID".replace("$MINIGAME_ID", string).replace("$WORLD_ID", String.valueOf(l));
+    public Boolean putIntoMinigameMode(long worldId, String minigameId) throws RealmsServiceException {
+        String string2 = "/minigames/$MINIGAME_ID/$WORLD_ID".replace("$MINIGAME_ID", minigameId).replace("$WORLD_ID", String.valueOf(worldId));
         String string3 = this.url("worlds" + string2);
         return Boolean.valueOf(this.execute(Request.put(string3, "")));
     }
 
-    public Ops op(long l, String string) throws RealmsServiceException {
-        String string2 = "/$WORLD_ID/$PROFILE_UUID".replace("$WORLD_ID", String.valueOf(l)).replace("$PROFILE_UUID", string);
+    public Ops op(long worldId, String profileUuid) throws RealmsServiceException {
+        String string2 = "/$WORLD_ID/$PROFILE_UUID".replace("$WORLD_ID", String.valueOf(worldId)).replace("$PROFILE_UUID", profileUuid);
         String string3 = this.url("ops" + string2);
         return Ops.parse(this.execute(Request.post(string3, "")));
     }
 
-    public Ops deop(long l, String string) throws RealmsServiceException {
-        String string2 = "/$WORLD_ID/$PROFILE_UUID".replace("$WORLD_ID", String.valueOf(l)).replace("$PROFILE_UUID", string);
+    public Ops deop(long worldId, String profileUuid) throws RealmsServiceException {
+        String string2 = "/$WORLD_ID/$PROFILE_UUID".replace("$WORLD_ID", String.valueOf(worldId)).replace("$PROFILE_UUID", profileUuid);
         String string3 = this.url("ops" + string2);
         return Ops.parse(this.execute(Request.delete(string3)));
     }
 
-    public Boolean open(long l) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID/open".replace("$WORLD_ID", String.valueOf(l)));
+    public Boolean open(long worldId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID/open".replace("$WORLD_ID", String.valueOf(worldId)));
         String string2 = this.execute(Request.put(string, ""));
         return Boolean.valueOf(string2);
     }
 
-    public Boolean close(long l) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID/close".replace("$WORLD_ID", String.valueOf(l)));
+    public Boolean close(long worldId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID/close".replace("$WORLD_ID", String.valueOf(worldId)));
         String string2 = this.execute(Request.put(string, ""));
         return Boolean.valueOf(string2);
     }
 
-    public Boolean resetWorldWithSeed(long l, String string, Integer integer, boolean bl) throws RealmsServiceException {
-        RealmsWorldResetDto lv = new RealmsWorldResetDto(string, -1L, integer, bl);
-        String string2 = this.url("worlds" + "/$WORLD_ID/reset".replace("$WORLD_ID", String.valueOf(l)));
+    public Boolean resetWorldWithSeed(long worldId, String seed, Integer levelType, boolean generateStructures) throws RealmsServiceException {
+        RealmsWorldResetDto lv = new RealmsWorldResetDto(seed, -1L, levelType, generateStructures);
+        String string2 = this.url("worlds" + "/$WORLD_ID/reset".replace("$WORLD_ID", String.valueOf(worldId)));
         String string3 = this.execute(Request.post(string2, JSON.toJson(lv), 30000, 80000));
         return Boolean.valueOf(string3);
     }
 
-    public Boolean resetWorldWithTemplate(long l, String string) throws RealmsServiceException {
-        RealmsWorldResetDto lv = new RealmsWorldResetDto(null, Long.valueOf(string), -1, false);
-        String string2 = this.url("worlds" + "/$WORLD_ID/reset".replace("$WORLD_ID", String.valueOf(l)));
+    public Boolean resetWorldWithTemplate(long worldId, String worldTemplateId) throws RealmsServiceException {
+        RealmsWorldResetDto lv = new RealmsWorldResetDto(null, Long.valueOf(worldTemplateId), -1, false);
+        String string2 = this.url("worlds" + "/$WORLD_ID/reset".replace("$WORLD_ID", String.valueOf(worldId)));
         String string3 = this.execute(Request.post(string2, JSON.toJson(lv), 30000, 80000));
         return Boolean.valueOf(string3);
     }
 
-    public Subscription subscriptionFor(long l) throws RealmsServiceException {
-        String string = this.url("subscriptions" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(l)));
+    public Subscription subscriptionFor(long worldId) throws RealmsServiceException {
+        String string = this.url("subscriptions" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(worldId)));
         String string2 = this.execute(Request.get(string));
         return Subscription.parse(string2);
     }
@@ -270,22 +270,22 @@ public class RealmsClient {
         return PendingInvitesList.parse(string2);
     }
 
-    public void acceptInvitation(String string) throws RealmsServiceException {
-        String string2 = this.url("invites" + "/accept/$INVITATION_ID".replace("$INVITATION_ID", string));
+    public void acceptInvitation(String invitationId) throws RealmsServiceException {
+        String string2 = this.url("invites" + "/accept/$INVITATION_ID".replace("$INVITATION_ID", invitationId));
         this.execute(Request.put(string2, ""));
     }
 
-    public WorldDownload download(long l, int i) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID/slot/$SLOT_ID/download".replace("$WORLD_ID", String.valueOf(l)).replace("$SLOT_ID", String.valueOf(i)));
+    public WorldDownload download(long worldId, int slotId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID/slot/$SLOT_ID/download".replace("$WORLD_ID", String.valueOf(worldId)).replace("$SLOT_ID", String.valueOf(slotId)));
         String string2 = this.execute(Request.get(string));
         return WorldDownload.parse(string2);
     }
 
-    public UploadInfo upload(long l, String string) throws RealmsServiceException {
-        String string2 = this.url("worlds" + "/$WORLD_ID/backups/upload".replace("$WORLD_ID", String.valueOf(l)));
+    public UploadInfo upload(long worldId, String uploadToken) throws RealmsServiceException {
+        String string2 = this.url("worlds" + "/$WORLD_ID/backups/upload".replace("$WORLD_ID", String.valueOf(worldId)));
         UploadInfo lv = new UploadInfo();
-        if (string != null) {
-            lv.setToken(string);
+        if (uploadToken != null) {
+            lv.setToken(uploadToken);
         }
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.excludeFieldsWithoutExposeAnnotation();
@@ -294,8 +294,8 @@ public class RealmsClient {
         return UploadInfo.parse(this.execute(Request.put(string2, string3)));
     }
 
-    public void rejectInvitation(String string) throws RealmsServiceException {
-        String string2 = this.url("invites" + "/reject/$INVITATION_ID".replace("$INVITATION_ID", string));
+    public void rejectInvitation(String invitationId) throws RealmsServiceException {
+        String string2 = this.url("invites" + "/reject/$INVITATION_ID".replace("$INVITATION_ID", invitationId));
         this.execute(Request.put(string2, ""));
     }
 
@@ -310,9 +310,9 @@ public class RealmsClient {
         return RealmsNews.parse(string2);
     }
 
-    public void sendPingResults(PingResult arg) throws RealmsServiceException {
+    public void sendPingResults(PingResult pingResult) throws RealmsServiceException {
         String string = this.url("regions/ping/stat");
-        this.execute(Request.post(string, JSON.toJson(arg)));
+        this.execute(Request.post(string, JSON.toJson(pingResult)));
     }
 
     public Boolean trialAvailable() throws RealmsServiceException {
@@ -321,20 +321,20 @@ public class RealmsClient {
         return Boolean.valueOf(string2);
     }
 
-    public void deleteWorld(long l) throws RealmsServiceException {
-        String string = this.url("worlds" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(l)));
+    public void deleteWorld(long worldId) throws RealmsServiceException {
+        String string = this.url("worlds" + "/$WORLD_ID".replace("$WORLD_ID", String.valueOf(worldId)));
         this.execute(Request.delete(string));
     }
 
     @Nullable
-    private String url(String string) {
-        return this.url(string, null);
+    private String url(String path) {
+        return this.url(path, null);
     }
 
     @Nullable
-    private String url(String string, @Nullable String string2) {
+    private String url(String path, @Nullable String queryString) {
         try {
-            return new URI(RealmsClient.currentEnvironment.protocol, RealmsClient.currentEnvironment.baseUrl, "/" + string, string2, null).toASCIIString();
+            return new URI(RealmsClient.currentEnvironment.protocol, RealmsClient.currentEnvironment.baseUrl, "/" + path, queryString, null).toASCIIString();
         }
         catch (URISyntaxException uRISyntaxException) {
             uRISyntaxException.printStackTrace();
@@ -342,20 +342,20 @@ public class RealmsClient {
         }
     }
 
-    private String execute(Request<?> arg) throws RealmsServiceException {
-        arg.cookie("sid", this.sessionId);
-        arg.cookie("user", this.username);
-        arg.cookie("version", SharedConstants.getGameVersion().getName());
+    private String execute(Request<?> r) throws RealmsServiceException {
+        r.cookie("sid", this.sessionId);
+        r.cookie("user", this.username);
+        r.cookie("version", SharedConstants.getGameVersion().getName());
         try {
-            int i = arg.responseCode();
+            int i = r.responseCode();
             if (i == 503) {
-                int j = arg.getRetryAfterHeader();
+                int j = r.getRetryAfterHeader();
                 throw new RetryCallException(j);
             }
-            String string = arg.text();
+            String string = r.text();
             if (i < 200 || i >= 300) {
                 if (i == 401) {
-                    String string2 = arg.getHeader("WWW-Authenticate");
+                    String string2 = r.getHeader("WWW-Authenticate");
                     LOGGER.info("Could not authorize you against Realms server: " + string2);
                     throw new RealmsServiceException(i, string2, -1, string2);
                 }
@@ -396,9 +396,9 @@ public class RealmsClient {
         public String baseUrl;
         public String protocol;
 
-        private Environment(String string2, String string3) {
-            this.baseUrl = string2;
-            this.protocol = string3;
+        private Environment(String baseUrl, String protocol) {
+            this.baseUrl = baseUrl;
+            this.protocol = protocol;
         }
     }
 }

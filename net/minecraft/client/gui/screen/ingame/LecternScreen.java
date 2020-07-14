@@ -30,25 +30,25 @@ implements ScreenHandlerProvider<LecternScreenHandler> {
     private final ScreenHandlerListener listener = new ScreenHandlerListener(){
 
         @Override
-        public void onHandlerRegistered(ScreenHandler arg, DefaultedList<ItemStack> arg2) {
+        public void onHandlerRegistered(ScreenHandler handler, DefaultedList<ItemStack> stacks) {
             LecternScreen.this.updatePageProvider();
         }
 
         @Override
-        public void onSlotUpdate(ScreenHandler arg, int i, ItemStack arg2) {
+        public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
             LecternScreen.this.updatePageProvider();
         }
 
         @Override
-        public void onPropertyUpdate(ScreenHandler arg, int i, int j) {
-            if (i == 0) {
+        public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
+            if (property == 0) {
                 LecternScreen.this.updatePage();
             }
         }
     };
 
-    public LecternScreen(LecternScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        this.container = arg;
+    public LecternScreen(LecternScreenHandler container, PlayerInventory inventory, Text title) {
+        this.container = container;
     }
 
     @Override
@@ -95,16 +95,16 @@ implements ScreenHandlerProvider<LecternScreenHandler> {
     }
 
     @Override
-    protected boolean jumpToPage(int i) {
-        if (i != this.container.getPage()) {
-            this.sendButtonPressPacket(100 + i);
+    protected boolean jumpToPage(int page) {
+        if (page != this.container.getPage()) {
+            this.sendButtonPressPacket(100 + page);
             return true;
         }
         return false;
     }
 
-    private void sendButtonPressPacket(int i) {
-        this.client.interactionManager.clickButton(this.container.syncId, i);
+    private void sendButtonPressPacket(int id) {
+        this.client.interactionManager.clickButton(this.container.syncId, id);
     }
 
     @Override

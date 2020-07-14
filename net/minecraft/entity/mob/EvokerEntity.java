@@ -83,8 +83,8 @@ extends SpellcastingIllagerEntity {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
     }
 
     @Override
@@ -93,8 +93,8 @@ extends SpellcastingIllagerEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
     }
 
     @Override
@@ -103,21 +103,21 @@ extends SpellcastingIllagerEntity {
     }
 
     @Override
-    public boolean isTeammate(Entity arg) {
-        if (arg == null) {
+    public boolean isTeammate(Entity other) {
+        if (other == null) {
             return false;
         }
-        if (arg == this) {
+        if (other == this) {
             return true;
         }
-        if (super.isTeammate(arg)) {
+        if (super.isTeammate(other)) {
             return true;
         }
-        if (arg instanceof VexEntity) {
-            return this.isTeammate(((VexEntity)arg).getOwner());
+        if (other instanceof VexEntity) {
+            return this.isTeammate(((VexEntity)other).getOwner());
         }
-        if (arg instanceof LivingEntity && ((LivingEntity)arg).getGroup() == EntityGroup.ILLAGER) {
-            return this.getScoreboardTeam() == null && arg.getScoreboardTeam() == null;
+        if (other instanceof LivingEntity && ((LivingEntity)other).getGroup() == EntityGroup.ILLAGER) {
+            return this.getScoreboardTeam() == null && other.getScoreboardTeam() == null;
         }
         return false;
     }
@@ -133,12 +133,12 @@ extends SpellcastingIllagerEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_EVOKER_HURT;
     }
 
-    private void setWololoTarget(@Nullable SheepEntity arg) {
-        this.wololoTarget = arg;
+    private void setWololoTarget(@Nullable SheepEntity sheep) {
+        this.wololoTarget = sheep;
     }
 
     @Nullable
@@ -152,7 +152,7 @@ extends SpellcastingIllagerEntity {
     }
 
     @Override
-    public void addBonusForWave(int i, boolean bl) {
+    public void addBonusForWave(int wave, boolean unused) {
     }
 
     public class WololoGoal
@@ -324,8 +324,8 @@ extends SpellcastingIllagerEntity {
             }
         }
 
-        private void conjureFangs(double d, double e, double f, double g, float h, int i) {
-            BlockPos lv = new BlockPos(d, g, e);
+        private void conjureFangs(double x, double z, double maxY, double y, float yaw, int warmup) {
+            BlockPos lv = new BlockPos(x, y, z);
             boolean bl = false;
             double j = 0.0;
             do {
@@ -339,9 +339,9 @@ extends SpellcastingIllagerEntity {
                 }
                 bl = true;
                 break;
-            } while ((lv = lv.down()).getY() >= MathHelper.floor(f) - 1);
+            } while ((lv = lv.down()).getY() >= MathHelper.floor(maxY) - 1);
             if (bl) {
-                EvokerEntity.this.world.spawnEntity(new EvokerFangsEntity(EvokerEntity.this.world, d, (double)lv.getY() + j, e, h, i, EvokerEntity.this));
+                EvokerEntity.this.world.spawnEntity(new EvokerFangsEntity(EvokerEntity.this.world, x, (double)lv.getY() + j, z, yaw, warmup, EvokerEntity.this));
             }
         }
 

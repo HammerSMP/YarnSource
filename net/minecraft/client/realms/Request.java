@@ -27,13 +27,13 @@ public abstract class Request<T extends Request<T>> {
     private boolean connected;
     protected String url;
 
-    public Request(String string, int i, int j) {
+    public Request(String url, int connectTimeout, int readTimeout) {
         try {
-            this.url = string;
+            this.url = url;
             Proxy proxy = RealmsClientConfig.getProxy();
-            this.connection = proxy != null ? (HttpURLConnection)new URL(string).openConnection(proxy) : (HttpURLConnection)new URL(string).openConnection();
-            this.connection.setConnectTimeout(i);
-            this.connection.setReadTimeout(j);
+            this.connection = proxy != null ? (HttpURLConnection)new URL(url).openConnection(proxy) : (HttpURLConnection)new URL(url).openConnection();
+            this.connection.setConnectTimeout(connectTimeout);
+            this.connection.setReadTimeout(readTimeout);
         }
         catch (MalformedURLException malformedURLException) {
             throw new RealmsHttpException(malformedURLException.getMessage(), malformedURLException);
@@ -43,16 +43,16 @@ public abstract class Request<T extends Request<T>> {
         }
     }
 
-    public void cookie(String string, String string2) {
-        Request.cookie(this.connection, string, string2);
+    public void cookie(String key, String value) {
+        Request.cookie(this.connection, key, value);
     }
 
-    public static void cookie(HttpURLConnection httpURLConnection, String string, String string2) {
-        String string3 = httpURLConnection.getRequestProperty("Cookie");
+    public static void cookie(HttpURLConnection connection, String key, String value) {
+        String string3 = connection.getRequestProperty("Cookie");
         if (string3 == null) {
-            httpURLConnection.setRequestProperty("Cookie", string + "=" + string2);
+            connection.setRequestProperty("Cookie", key + "=" + value);
         } else {
-            httpURLConnection.setRequestProperty("Cookie", string3 + ";" + string + "=" + string2);
+            connection.setRequestProperty("Cookie", string3 + ";" + key + "=" + value);
         }
     }
 
@@ -60,8 +60,8 @@ public abstract class Request<T extends Request<T>> {
         return Request.getRetryAfterHeader(this.connection);
     }
 
-    public static int getRetryAfterHeader(HttpURLConnection httpURLConnection) {
-        String string = httpURLConnection.getHeaderField("Retry-After");
+    public static int getRetryAfterHeader(HttpURLConnection connection) {
+        String string = connection.getHeaderField("Retry-After");
         try {
             return Integer.valueOf(string);
         }
@@ -93,11 +93,11 @@ public abstract class Request<T extends Request<T>> {
         }
     }
 
-    private String read(InputStream inputStream) throws IOException {
-        if (inputStream == null) {
+    private String read(InputStream in) throws IOException {
+        if (in == null) {
             return "";
         }
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+        InputStreamReader inputStreamReader = new InputStreamReader(in, "UTF-8");
         StringBuilder stringBuilder = new StringBuilder();
         int i = inputStreamReader.read();
         while (i != -1) {
@@ -152,41 +152,41 @@ public abstract class Request<T extends Request<T>> {
 
     protected abstract T doConnect();
 
-    public static Request<?> get(String string) {
-        return new Get(string, 5000, 60000);
+    public static Request<?> get(String url) {
+        return new Get(url, 5000, 60000);
     }
 
-    public static Request<?> get(String string, int i, int j) {
-        return new Get(string, i, j);
+    public static Request<?> get(String url, int connectTimeoutMillis, int readTimeoutMillis) {
+        return new Get(url, connectTimeoutMillis, readTimeoutMillis);
     }
 
-    public static Request<?> post(String string, String string2) {
-        return new Post(string, string2, 5000, 60000);
+    public static Request<?> post(String uri, String content) {
+        return new Post(uri, content, 5000, 60000);
     }
 
-    public static Request<?> post(String string, String string2, int i, int j) {
-        return new Post(string, string2, i, j);
+    public static Request<?> post(String uri, String content, int connectTimeoutMillis, int readTimeoutMillis) {
+        return new Post(uri, content, connectTimeoutMillis, readTimeoutMillis);
     }
 
-    public static Request<?> delete(String string) {
-        return new Delete(string, 5000, 60000);
+    public static Request<?> delete(String url) {
+        return new Delete(url, 5000, 60000);
     }
 
-    public static Request<?> put(String string, String string2) {
-        return new Put(string, string2, 5000, 60000);
+    public static Request<?> put(String url, String content) {
+        return new Put(url, content, 5000, 60000);
     }
 
-    public static Request<?> put(String string, String string2, int i, int j) {
-        return new Put(string, string2, i, j);
+    public static Request<?> put(String url, String content, int connectTimeoutMillis, int readTimeoutMillis) {
+        return new Put(url, content, connectTimeoutMillis, readTimeoutMillis);
     }
 
-    public String getHeader(String string) {
-        return Request.getHeader(this.connection, string);
+    public String getHeader(String header) {
+        return Request.getHeader(this.connection, header);
     }
 
-    public static String getHeader(HttpURLConnection httpURLConnection, String string) {
+    public static String getHeader(HttpURLConnection connection, String header) {
         try {
-            return httpURLConnection.getHeaderField(string);
+            return connection.getHeaderField(header);
         }
         catch (Exception exception) {
             return "";
@@ -198,9 +198,9 @@ public abstract class Request<T extends Request<T>> {
     extends Request<Post> {
         private final String content;
 
-        public Post(String string, String string2, int i, int j) {
-            super(string, i, j);
-            this.content = string2;
+        public Post(String uri, String content, int connectTimeout, int readTimeout) {
+            super(uri, connectTimeout, readTimeout);
+            this.content = content;
         }
 
         @Override
@@ -236,9 +236,9 @@ public abstract class Request<T extends Request<T>> {
     extends Request<Put> {
         private final String content;
 
-        public Put(String string, String string2, int i, int j) {
-            super(string, i, j);
-            this.content = string2;
+        public Put(String uri, String content, int connectTimeout, int readTimeout) {
+            super(uri, connectTimeout, readTimeout);
+            this.content = content;
         }
 
         @Override

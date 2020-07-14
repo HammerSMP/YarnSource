@@ -295,12 +295,12 @@ extends DataFix {
         hashMap.put("minecraft:structure_block", 255);
     });
 
-    public EntityBlockStateFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public EntityBlockStateFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
-    public static int getNumericalBlockId(String string) {
-        Integer integer = BLOCK_NAME_TO_ID.get(string);
+    public static int getNumericalBlockId(String blockId) {
+        Integer integer = BLOCK_NAME_TO_ID.get(blockId);
         return integer == null ? 0 : integer;
     }
 
@@ -349,21 +349,21 @@ extends DataFix {
         }).set(DSL.remainderFinder(), (Object)dynamic.remove("Data").remove("TileID").remove("Tile"));
     }
 
-    private Typed<?> mergeIdAndData(Typed<?> typed, String string, String string2, String string3) {
-        Tag.TagType type = DSL.field((String)string, (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), IdentifierNormalizingSchema.getIdentifierType())));
-        Tag.TagType type2 = DSL.field((String)string3, (Type)DSL.named((String)TypeReferences.BLOCK_STATE.typeName(), (Type)DSL.remainderType()));
+    private Typed<?> mergeIdAndData(Typed<?> typed, String oldIdKey, String oldDataKey, String newStateKey) {
+        Tag.TagType type = DSL.field((String)oldIdKey, (Type)DSL.named((String)TypeReferences.BLOCK_NAME.typeName(), (Type)DSL.or((Type)DSL.intType(), IdentifierNormalizingSchema.getIdentifierType())));
+        Tag.TagType type2 = DSL.field((String)newStateKey, (Type)DSL.named((String)TypeReferences.BLOCK_STATE.typeName(), (Type)DSL.remainderType()));
         Dynamic dynamic = (Dynamic)typed.getOrCreate(DSL.remainderFinder());
         return typed.update(type.finder(), (Type)type2, pair -> {
             int i = (Integer)((Either)pair.getSecond()).map(integer -> integer, EntityBlockStateFix::getNumericalBlockId);
-            int j = dynamic.get(string2).asInt(0) & 0xF;
+            int j = dynamic.get(oldDataKey).asInt(0) & 0xF;
             return Pair.of((Object)TypeReferences.BLOCK_STATE.typeName(), BlockStateFlattening.lookupState(i << 4 | j));
-        }).set(DSL.remainderFinder(), (Object)dynamic.remove(string2));
+        }).set(DSL.remainderFinder(), (Object)dynamic.remove(oldDataKey));
     }
 
-    private Typed<?> useFunction(Typed<?> typed, String string, Function<Typed<?>, Typed<?>> function) {
-        Type type = this.getInputSchema().getChoiceType(TypeReferences.ENTITY, string);
-        Type type2 = this.getOutputSchema().getChoiceType(TypeReferences.ENTITY, string);
-        return typed.updateTyped(DSL.namedChoice((String)string, (Type)type), type2, function);
+    private Typed<?> useFunction(Typed<?> typed, String entityId, Function<Typed<?>, Typed<?>> function) {
+        Type type = this.getInputSchema().getChoiceType(TypeReferences.ENTITY, entityId);
+        Type type2 = this.getOutputSchema().getChoiceType(TypeReferences.ENTITY, entityId);
+        return typed.updateTyped(DSL.namedChoice((String)entityId, (Type)type), type2, function);
     }
 }
 

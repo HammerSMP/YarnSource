@@ -50,7 +50,7 @@ extends JComponent {
     private final Collection<Runnable> stopTasks = Lists.newArrayList();
     private final AtomicBoolean stopped = new AtomicBoolean();
 
-    public static DedicatedServerGui create(final MinecraftDedicatedServer arg) {
+    public static DedicatedServerGui create(final MinecraftDedicatedServer server) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
@@ -58,7 +58,7 @@ extends JComponent {
             // empty catch block
         }
         final JFrame jFrame = new JFrame("Minecraft server");
-        final DedicatedServerGui lv = new DedicatedServerGui(arg);
+        final DedicatedServerGui lv = new DedicatedServerGui(server);
         jFrame.setDefaultCloseOperation(2);
         jFrame.add(lv);
         jFrame.pack();
@@ -70,7 +70,7 @@ extends JComponent {
             public void windowClosing(WindowEvent windowEvent) {
                 if (!lv.stopped.getAndSet(true)) {
                     jFrame.setTitle("Minecraft server - shutting down!");
-                    arg.stop(true);
+                    server.stop(true);
                     lv.runStopTasks();
                 }
             }
@@ -80,8 +80,8 @@ extends JComponent {
         return lv;
     }
 
-    private DedicatedServerGui(MinecraftDedicatedServer arg) {
-        this.server = arg;
+    private DedicatedServerGui(MinecraftDedicatedServer server) {
+        this.server = server;
         this.setPreferredSize(new Dimension(854, 480));
         this.setLayout(new BorderLayout());
         try {
@@ -93,8 +93,8 @@ extends JComponent {
         }
     }
 
-    public void addStopTask(Runnable runnable) {
-        this.stopTasks.add(runnable);
+    public void addStopTask(Runnable task) {
+        this.stopTasks.add(task);
     }
 
     private JComponent createStatsPanel() {
@@ -162,15 +162,15 @@ extends JComponent {
         this.stopTasks.forEach(Runnable::run);
     }
 
-    public void appendToConsole(JTextArea jTextArea, JScrollPane jScrollPane, String string) {
+    public void appendToConsole(JTextArea textArea, JScrollPane scrollPane, String string) {
         if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(() -> this.appendToConsole(jTextArea, jScrollPane, string));
+            SwingUtilities.invokeLater(() -> this.appendToConsole(textArea, scrollPane, string));
             return;
         }
-        Document document = jTextArea.getDocument();
-        JScrollBar jScrollBar = jScrollPane.getVerticalScrollBar();
+        Document document = textArea.getDocument();
+        JScrollBar jScrollBar = scrollPane.getVerticalScrollBar();
         boolean bl = false;
-        if (jScrollPane.getViewport().getView() == jTextArea) {
+        if (scrollPane.getViewport().getView() == textArea) {
             bl = (double)jScrollBar.getValue() + jScrollBar.getSize().getHeight() + (double)(FONT_MONOSPACE.getSize() * 4) > (double)jScrollBar.getMaximum();
         }
         try {

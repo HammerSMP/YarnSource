@@ -85,40 +85,40 @@ implements VillagerDataContainer {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        VillagerData.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> arg.put("VillagerData", (Tag)arg2));
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        VillagerData.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getVillagerData()).resultOrPartial(((Logger)LOGGER)::error).ifPresent(arg2 -> tag.put("VillagerData", (Tag)arg2));
         if (this.offerData != null) {
-            arg.put("Offers", this.offerData);
+            tag.put("Offers", this.offerData);
         }
         if (this.gossipData != null) {
-            arg.put("Gossips", this.gossipData);
+            tag.put("Gossips", this.gossipData);
         }
-        arg.putInt("ConversionTime", this.isConverting() ? this.conversionTimer : -1);
+        tag.putInt("ConversionTime", this.isConverting() ? this.conversionTimer : -1);
         if (this.converter != null) {
-            arg.putUuid("ConversionPlayer", this.converter);
+            tag.putUuid("ConversionPlayer", this.converter);
         }
-        arg.putInt("Xp", this.xp);
+        tag.putInt("Xp", this.xp);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("VillagerData", 10)) {
-            DataResult dataResult = VillagerData.CODEC.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)arg.get("VillagerData")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("VillagerData", 10)) {
+            DataResult dataResult = VillagerData.CODEC.parse(new Dynamic((DynamicOps)NbtOps.INSTANCE, (Object)tag.get("VillagerData")));
             dataResult.resultOrPartial(((Logger)LOGGER)::error).ifPresent(this::setVillagerData);
         }
-        if (arg.contains("Offers", 10)) {
-            this.offerData = arg.getCompound("Offers");
+        if (tag.contains("Offers", 10)) {
+            this.offerData = tag.getCompound("Offers");
         }
-        if (arg.contains("Gossips", 10)) {
-            this.gossipData = arg.getList("Gossips", 10);
+        if (tag.contains("Gossips", 10)) {
+            this.gossipData = tag.getList("Gossips", 10);
         }
-        if (arg.contains("ConversionTime", 99) && arg.getInt("ConversionTime") > -1) {
-            this.setConverting(arg.containsUuid("ConversionPlayer") ? arg.getUuid("ConversionPlayer") : null, arg.getInt("ConversionTime"));
+        if (tag.contains("ConversionTime", 99) && tag.getInt("ConversionTime") > -1) {
+            this.setConverting(tag.containsUuid("ConversionPlayer") ? tag.getUuid("ConversionPlayer") : null, tag.getInt("ConversionTime"));
         }
-        if (arg.contains("Xp", 3)) {
-            this.xp = arg.getInt("Xp");
+        if (tag.contains("Xp", 3)) {
+            this.xp = tag.getInt("Xp");
         }
     }
 
@@ -135,21 +135,21 @@ implements VillagerDataContainer {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.GOLDEN_APPLE) {
             if (this.hasStatusEffect(StatusEffects.WEAKNESS)) {
-                if (!arg.abilities.creativeMode) {
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                 }
                 if (!this.world.isClient) {
-                    this.setConverting(arg.getUuid(), this.random.nextInt(2401) + 3600);
+                    this.setConverting(player.getUuid(), this.random.nextInt(2401) + 3600);
                 }
                 return ActionResult.SUCCESS;
             }
             return ActionResult.CONSUME;
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
     @Override
@@ -158,7 +158,7 @@ implements VillagerDataContainer {
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return !this.isConverting() && this.xp == 0;
     }
 
@@ -166,30 +166,30 @@ implements VillagerDataContainer {
         return this.getDataTracker().get(CONVERTING);
     }
 
-    private void setConverting(@Nullable UUID uUID, int i) {
-        this.converter = uUID;
-        this.conversionTimer = i;
+    private void setConverting(@Nullable UUID uuid, int delay) {
+        this.converter = uuid;
+        this.conversionTimer = delay;
         this.getDataTracker().set(CONVERTING, true);
         this.removeStatusEffect(StatusEffects.WEAKNESS);
-        this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, i, Math.min(this.world.getDifficulty().getId() - 1, 0)));
+        this.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, delay, Math.min(this.world.getDifficulty().getId() - 1, 0)));
         this.world.sendEntityStatus(this, (byte)16);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 16) {
+    public void handleStatus(byte status) {
+        if (status == 16) {
             if (!this.isSilent()) {
                 this.world.playSound(this.getX(), this.getEyeY(), this.getZ(), SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE, this.getSoundCategory(), 1.0f + this.random.nextFloat(), this.random.nextFloat() * 0.7f + 0.3f, false);
             }
             return;
         }
-        super.handleStatus(b);
+        super.handleStatus(status);
     }
 
-    private void finishConversion(ServerWorld arg) {
+    private void finishConversion(ServerWorld world) {
         PlayerEntity lv4;
-        VillagerEntity lv = EntityType.VILLAGER.create(arg);
+        VillagerEntity lv = EntityType.VILLAGER.create(world);
         for (EquipmentSlot lv2 : EquipmentSlot.values()) {
             ItemStack lv3 = this.getEquippedStack(lv2);
             if (lv3.isEmpty()) continue;
@@ -210,7 +210,7 @@ implements VillagerDataContainer {
             lv.setOffers(new TraderOfferList(this.offerData));
         }
         lv.setExperience(this.xp);
-        lv.initialize(arg, arg.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, null, null);
+        lv.initialize(world, world.getLocalDifficulty(lv.getBlockPos()), SpawnReason.CONVERSION, null, null);
         if (this.isBaby()) {
             lv.setBreedingAge(-24000);
         }
@@ -224,14 +224,14 @@ implements VillagerDataContainer {
             lv.setPersistent();
         }
         lv.setInvulnerable(this.isInvulnerable());
-        arg.spawnEntity(lv);
-        if (this.converter != null && (lv4 = arg.getPlayerByUuid(this.converter)) instanceof ServerPlayerEntity) {
+        world.spawnEntity(lv);
+        if (this.converter != null && (lv4 = world.getPlayerByUuid(this.converter)) instanceof ServerPlayerEntity) {
             Criteria.CURED_ZOMBIE_VILLAGER.trigger((ServerPlayerEntity)lv4, this, lv);
-            arg.handleInteraction(EntityInteraction.ZOMBIE_VILLAGER_CURED, lv4, lv);
+            world.handleInteraction(EntityInteraction.ZOMBIE_VILLAGER_CURED, lv4, lv);
         }
         lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
         if (!this.isSilent()) {
-            arg.syncWorldEvent(null, 1027, this.getBlockPos(), 0);
+            world.syncWorldEvent(null, 1027, this.getBlockPos(), 0);
         }
     }
 
@@ -270,7 +270,7 @@ implements VillagerDataContainer {
     }
 
     @Override
-    public SoundEvent getHurtSound(DamageSource arg) {
+    public SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ZOMBIE_VILLAGER_HURT;
     }
 
@@ -289,27 +289,27 @@ implements VillagerDataContainer {
         return ItemStack.EMPTY;
     }
 
-    public void setOfferData(CompoundTag arg) {
-        this.offerData = arg;
+    public void setOfferData(CompoundTag offerTag) {
+        this.offerData = offerTag;
     }
 
-    public void setGossipData(Tag arg) {
-        this.gossipData = arg;
+    public void setGossipData(Tag gossipTag) {
+        this.gossipData = gossipTag;
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.setVillagerData(this.getVillagerData().withType(VillagerType.forBiome(arg.getBiome(this.getBlockPos()))));
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
-    public void setVillagerData(VillagerData arg) {
+    public void setVillagerData(VillagerData data) {
         VillagerData lv = this.getVillagerData();
-        if (lv.getProfession() != arg.getProfession()) {
+        if (lv.getProfession() != data.getProfession()) {
             this.offerData = null;
         }
-        this.dataTracker.set(VILLAGER_DATA, arg);
+        this.dataTracker.set(VILLAGER_DATA, data);
     }
 
     @Override
@@ -317,8 +317,8 @@ implements VillagerDataContainer {
         return this.dataTracker.get(VILLAGER_DATA);
     }
 
-    public void setXp(int i) {
-        this.xp = i;
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 }
 

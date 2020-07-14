@@ -31,18 +31,18 @@ public class HeightmapDebugRenderer
 implements DebugRenderer.Renderer {
     private final MinecraftClient client;
 
-    public HeightmapDebugRenderer(MinecraftClient arg) {
-        this.client = arg;
+    public HeightmapDebugRenderer(MinecraftClient client) {
+        this.client = client;
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         ClientWorld lv = this.client.world;
         RenderSystem.pushMatrix();
         RenderSystem.disableBlend();
         RenderSystem.disableTexture();
         RenderSystem.enableDepthTest();
-        BlockPos lv2 = new BlockPos(d, 0.0, f);
+        BlockPos lv2 = new BlockPos(cameraX, 0.0, cameraZ);
         Tessellator lv3 = Tessellator.getInstance();
         BufferBuilder lv4 = lv3.getBuffer();
         lv4.begin(5, VertexFormats.POSITION_COLOR);
@@ -57,8 +57,8 @@ implements DebugRenderer.Renderer {
                         for (int l = 0; l < 16; ++l) {
                             int m = lv7.x * 16 + k;
                             int n = lv7.z * 16 + l;
-                            float g = (float)((double)((float)lv.getTopY(lv6, m, n) + (float)lv6.ordinal() * 0.09375f) - e);
-                            WorldRenderer.drawBox(lv4, (double)((float)m + 0.25f) - d, g, (double)((float)n + 0.25f) - f, (double)((float)m + 0.75f) - d, g + 0.09375f, (double)((float)n + 0.75f) - f, lv8.getX(), lv8.getY(), lv8.getZ(), 1.0f);
+                            float g = (float)((double)((float)lv.getTopY(lv6, m, n) + (float)lv6.ordinal() * 0.09375f) - cameraY);
+                            WorldRenderer.drawBox(lv4, (double)((float)m + 0.25f) - cameraX, g, (double)((float)n + 0.25f) - cameraZ, (double)((float)m + 0.75f) - cameraX, g + 0.09375f, (double)((float)n + 0.75f) - cameraZ, lv8.getX(), lv8.getY(), lv8.getZ(), 1.0f);
                         }
                     }
                 }

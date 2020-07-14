@@ -31,30 +31,30 @@ extends Clearable {
 
     public boolean canPlayerUse(PlayerEntity var1);
 
-    default public void onOpen(PlayerEntity arg) {
+    default public void onOpen(PlayerEntity player) {
     }
 
-    default public void onClose(PlayerEntity arg) {
+    default public void onClose(PlayerEntity player) {
     }
 
-    default public boolean isValid(int i, ItemStack arg) {
+    default public boolean isValid(int slot, ItemStack stack) {
         return true;
     }
 
-    default public int count(Item arg) {
+    default public int count(Item item) {
         int i = 0;
         for (int j = 0; j < this.size(); ++j) {
             ItemStack lv = this.getStack(j);
-            if (!lv.getItem().equals(arg)) continue;
+            if (!lv.getItem().equals(item)) continue;
             i += lv.getCount();
         }
         return i;
     }
 
-    default public boolean containsAny(Set<Item> set) {
+    default public boolean containsAny(Set<Item> items) {
         for (int i = 0; i < this.size(); ++i) {
             ItemStack lv = this.getStack(i);
-            if (!set.contains(lv.getItem()) || lv.getCount() <= 0) continue;
+            if (!items.contains(lv.getItem()) || lv.getCount() <= 0) continue;
             return true;
         }
         return false;

@@ -33,8 +33,8 @@ extends AbstractUuidFix {
     private static final Set<String> OTHER_LIVINGS = Sets.newHashSet();
     private static final Set<String> PROJECTILES = Sets.newHashSet();
 
-    public EntityUuidFix(Schema schema) {
-        super(schema, TypeReferences.ENTITY);
+    public EntityUuidFix(Schema outputSchema) {
+        super(outputSchema, TypeReferences.ENTITY);
     }
 
     protected TypeRewriteRule makeRule() {

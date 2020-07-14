@@ -61,7 +61,7 @@ public class VillagerGossips {
         return this.entityReputation.entrySet().stream().flatMap(entry -> ((Reputation)entry.getValue()).entriesFor((UUID)entry.getKey()));
     }
 
-    private Collection<GossipEntry> pickGossips(Random random, int i) {
+    private Collection<GossipEntry> pickGossips(Random random, int count) {
         List list = this.entries().collect(Collectors.toList());
         if (list.isEmpty()) {
             return Collections.emptyList();
@@ -73,7 +73,7 @@ public class VillagerGossips {
             is[k] = (j += Math.abs(lv.getValue())) - 1;
         }
         Set set = Sets.newIdentityHashSet();
-        for (int l = 0; l < i; ++l) {
+        for (int l = 0; l < count; ++l) {
             int m = random.nextInt(j);
             int n = Arrays.binarySearch(is, m);
             set.add(list.get(n < 0 ? -n - 1 : n));
@@ -81,12 +81,12 @@ public class VillagerGossips {
         return set;
     }
 
-    private Reputation getReputationFor(UUID uUID2) {
-        return this.entityReputation.computeIfAbsent(uUID2, uUID -> new Reputation());
+    private Reputation getReputationFor(UUID target) {
+        return this.entityReputation.computeIfAbsent(target, uUID -> new Reputation());
     }
 
-    public void shareGossipFrom(VillagerGossips arg2, Random random, int i) {
-        Collection<GossipEntry> collection = arg2.pickGossips(random, i);
+    public void shareGossipFrom(VillagerGossips from, Random random, int count) {
+        Collection<GossipEntry> collection = from.pickGossips(random, count);
         collection.forEach(arg -> {
             int i = arg.value - arg.type.shareDecrement;
             if (i >= 2) {
@@ -95,17 +95,17 @@ public class VillagerGossips {
         });
     }
 
-    public int getReputationFor(UUID uUID, Predicate<VillageGossipType> predicate) {
-        Reputation lv = this.entityReputation.get(uUID);
-        return lv != null ? lv.getValueFor(predicate) : 0;
+    public int getReputationFor(UUID target, Predicate<VillageGossipType> gossipTypeFilter) {
+        Reputation lv = this.entityReputation.get(target);
+        return lv != null ? lv.getValueFor(gossipTypeFilter) : 0;
     }
 
-    public void startGossip(UUID uUID, VillageGossipType arg, int i) {
-        Reputation lv = this.getReputationFor(uUID);
-        lv.associatedGossip.mergeInt((Object)arg, i, (integer, integer2) -> this.mergeReputation(arg, (int)integer, (int)integer2));
-        lv.clamp(arg);
+    public void startGossip(UUID target, VillageGossipType type, int value) {
+        Reputation lv = this.getReputationFor(target);
+        lv.associatedGossip.mergeInt((Object)type, value, (integer, integer2) -> this.mergeReputation(type, (int)integer, (int)integer2));
+        lv.clamp(type);
         if (lv.isObsolete()) {
-            this.entityReputation.remove(uUID);
+            this.entityReputation.remove(target);
         }
     }
 
@@ -117,13 +117,13 @@ public class VillagerGossips {
         dynamic.asStream().map(GossipEntry::deserialize).flatMap(dataResult -> Util.stream(dataResult.result())).forEach(arg -> this.getReputationFor(arg.target).associatedGossip.put((Object)arg.type, arg.value));
     }
 
-    private static int max(int i, int j) {
-        return Math.max(i, j);
+    private static int max(int left, int right) {
+        return Math.max(left, right);
     }
 
-    private int mergeReputation(VillageGossipType arg, int i, int j) {
-        int k = i + j;
-        return k > arg.maxValue ? Math.max(arg.maxValue, i) : k;
+    private int mergeReputation(VillageGossipType type, int left, int right) {
+        int k = left + right;
+        return k > type.maxValue ? Math.max(type.maxValue, left) : k;
     }
 
     static class Reputation {
@@ -132,12 +132,12 @@ public class VillagerGossips {
         private Reputation() {
         }
 
-        public int getValueFor(Predicate<VillageGossipType> predicate) {
-            return this.associatedGossip.object2IntEntrySet().stream().filter(entry -> predicate.test((VillageGossipType)((Object)entry.getKey()))).mapToInt(entry -> entry.getIntValue() * ((VillageGossipType)entry.getKey()).multiplier).sum();
+        public int getValueFor(Predicate<VillageGossipType> gossipTypeFilter) {
+            return this.associatedGossip.object2IntEntrySet().stream().filter(entry -> gossipTypeFilter.test((VillageGossipType)((Object)entry.getKey()))).mapToInt(entry -> entry.getIntValue() * ((VillageGossipType)entry.getKey()).multiplier).sum();
         }
 
-        public Stream<GossipEntry> entriesFor(UUID uUID) {
-            return this.associatedGossip.object2IntEntrySet().stream().map(entry -> new GossipEntry(uUID, (VillageGossipType)((Object)((Object)entry.getKey())), entry.getIntValue()));
+        public Stream<GossipEntry> entriesFor(UUID target) {
+            return this.associatedGossip.object2IntEntrySet().stream().map(entry -> new GossipEntry(target, (VillageGossipType)((Object)((Object)entry.getKey())), entry.getIntValue()));
         }
 
         public void decay() {
@@ -157,18 +157,18 @@ public class VillagerGossips {
             return this.associatedGossip.isEmpty();
         }
 
-        public void clamp(VillageGossipType arg) {
-            int i = this.associatedGossip.getInt((Object)arg);
-            if (i > arg.maxValue) {
-                this.associatedGossip.put((Object)arg, arg.maxValue);
+        public void clamp(VillageGossipType gossipType) {
+            int i = this.associatedGossip.getInt((Object)gossipType);
+            if (i > gossipType.maxValue) {
+                this.associatedGossip.put((Object)gossipType, gossipType.maxValue);
             }
             if (i < 2) {
-                this.remove(arg);
+                this.remove(gossipType);
             }
         }
 
-        public void remove(VillageGossipType arg) {
-            this.associatedGossip.removeInt((Object)arg);
+        public void remove(VillageGossipType gossipType) {
+            this.associatedGossip.removeInt((Object)gossipType);
         }
     }
 

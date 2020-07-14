@@ -41,65 +41,65 @@ extends AbstractRedstoneGateBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (!arg4.abilities.allowModifyWorld) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!player.abilities.allowModifyWorld) {
             return ActionResult.PASS;
         }
-        arg2.setBlockState(arg3, (BlockState)arg.cycle(DELAY), 3);
-        return ActionResult.success(arg2.isClient);
+        world.setBlockState(pos, (BlockState)state.cycle(DELAY), 3);
+        return ActionResult.success(world.isClient);
     }
 
     @Override
-    protected int getUpdateDelayInternal(BlockState arg) {
-        return arg.get(DELAY) * 2;
+    protected int getUpdateDelayInternal(BlockState state) {
+        return state.get(DELAY) * 2;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        BlockState lv = super.getPlacementState(arg);
-        return (BlockState)lv.with(LOCKED, this.isLocked(arg.getWorld(), arg.getBlockPos(), lv));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        BlockState lv = super.getPlacementState(ctx);
+        return (BlockState)lv.with(LOCKED, this.isLocked(ctx.getWorld(), ctx.getBlockPos(), lv));
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg4.isClient() && arg2.getAxis() != arg.get(FACING).getAxis()) {
-            return (BlockState)arg.with(LOCKED, this.isLocked(arg4, arg5, arg));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!world.isClient() && direction.getAxis() != state.get(FACING).getAxis()) {
+            return (BlockState)state.with(LOCKED, this.isLocked(world, pos, state));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean isLocked(WorldView arg, BlockPos arg2, BlockState arg3) {
-        return this.getMaxInputLevelSides(arg, arg2, arg3) > 0;
+    public boolean isLocked(WorldView arg, BlockPos pos, BlockState state) {
+        return this.getMaxInputLevelSides(arg, pos, state) > 0;
     }
 
     @Override
-    protected boolean isValidInput(BlockState arg) {
-        return RepeaterBlock.isRedstoneGate(arg);
+    protected boolean isValidInput(BlockState state) {
+        return RepeaterBlock.isRedstoneGate(state);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        if (!arg.get(POWERED).booleanValue()) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (!state.get(POWERED).booleanValue()) {
             return;
         }
-        Direction lv = arg.get(FACING);
-        double d = (double)arg3.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
-        double e = (double)arg3.getY() + 0.4 + (random.nextDouble() - 0.5) * 0.2;
-        double f = (double)arg3.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
+        Direction lv = state.get(FACING);
+        double d = (double)pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
+        double e = (double)pos.getY() + 0.4 + (random.nextDouble() - 0.5) * 0.2;
+        double f = (double)pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
         float g = -5.0f;
         if (random.nextBoolean()) {
-            g = arg.get(DELAY) * 2 - 1;
+            g = state.get(DELAY) * 2 - 1;
         }
         double h = (g /= 16.0f) * (float)lv.getOffsetX();
         double i = g * (float)lv.getOffsetZ();
-        arg2.addParticle(DustParticleEffect.RED, d + h, e, f + i, 0.0, 0.0, 0.0);
+        world.addParticle(DustParticleEffect.RED, d + h, e, f + i, 0.0, 0.0, 0.0);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, DELAY, LOCKED, POWERED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, DELAY, LOCKED, POWERED);
     }
 }
 

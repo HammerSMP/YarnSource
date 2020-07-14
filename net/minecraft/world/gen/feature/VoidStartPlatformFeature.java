@@ -25,8 +25,8 @@ extends Feature<DefaultFeatureConfig> {
         super(codec);
     }
 
-    private static int getDistance(int i, int j, int k, int l) {
-        return Math.max(Math.abs(i - k), Math.abs(j - l));
+    private static int getDistance(int x1, int z1, int x2, int z2) {
+        return Math.max(Math.abs(x1 - x2), Math.abs(z1 - z2));
     }
 
     @Override

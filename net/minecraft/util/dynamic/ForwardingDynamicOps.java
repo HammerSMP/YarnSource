@@ -29,8 +29,8 @@ public abstract class ForwardingDynamicOps<T>
 implements DynamicOps<T> {
     protected final DynamicOps<T> delegate;
 
-    protected ForwardingDynamicOps(DynamicOps<T> dynamicOps) {
-        this.delegate = dynamicOps;
+    protected ForwardingDynamicOps(DynamicOps<T> delegate) {
+        this.delegate = delegate;
     }
 
     public T empty() {

@@ -21,18 +21,18 @@ implements Packet<ClientPlayPacketListener> {
     public ChunkLoadDistanceS2CPacket() {
     }
 
-    public ChunkLoadDistanceS2CPacket(int i) {
-        this.distance = i;
+    public ChunkLoadDistanceS2CPacket(int distance) {
+        this.distance = distance;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.distance = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.distance = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.distance);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.distance);
     }
 
     @Override

@@ -15,21 +15,21 @@ implements Packet<ServerPlayPacketListener> {
     public ChatMessageC2SPacket() {
     }
 
-    public ChatMessageC2SPacket(String string) {
-        if (string.length() > 256) {
-            string = string.substring(0, 256);
+    public ChatMessageC2SPacket(String chatMessage) {
+        if (chatMessage.length() > 256) {
+            chatMessage = chatMessage.substring(0, 256);
         }
-        this.chatMessage = string;
+        this.chatMessage = chatMessage;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.chatMessage = arg.readString(256);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.chatMessage = buf.readString(256);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.chatMessage);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.chatMessage);
     }
 
     @Override

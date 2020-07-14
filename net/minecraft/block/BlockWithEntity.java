@@ -25,24 +25,24 @@ implements BlockEntityProvider {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.INVISIBLE;
     }
 
     @Override
-    public boolean onSyncedBlockEvent(BlockState arg, World arg2, BlockPos arg3, int i, int j) {
-        super.onSyncedBlockEvent(arg, arg2, arg3, i, j);
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+    public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
+        super.onSyncedBlockEvent(state, world, pos, type, data);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv == null) {
             return false;
         }
-        return lv.onSyncedBlockEvent(i, j);
+        return lv.onSyncedBlockEvent(type, data);
     }
 
     @Override
     @Nullable
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg3) {
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        BlockEntity lv = world.getBlockEntity(pos);
         return lv instanceof NamedScreenHandlerFactory ? (NamedScreenHandlerFactory)((Object)lv) : null;
     }
 }

@@ -42,15 +42,15 @@ public class BucketItem
 extends Item {
     private final Fluid fluid;
 
-    public BucketItem(Fluid arg, Item.Settings arg2) {
-        super(arg2);
-        this.fluid = arg;
+    public BucketItem(Fluid fluid, Item.Settings settings) {
+        super(settings);
+        this.fluid = fluid;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        BlockHitResult lv2 = BucketItem.rayTrace(arg, arg2, this.fluid == Fluids.EMPTY ? RayTraceContext.FluidHandling.SOURCE_ONLY : RayTraceContext.FluidHandling.NONE);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        BlockHitResult lv2 = BucketItem.rayTrace(world, user, this.fluid == Fluids.EMPTY ? RayTraceContext.FluidHandling.SOURCE_ONLY : RayTraceContext.FluidHandling.NONE);
         if (((HitResult)lv2).getType() == HitResult.Type.MISS) {
             return TypedActionResult.pass(lv);
         }
@@ -60,89 +60,89 @@ extends Item {
             BlockPos lv4 = lv3.getBlockPos();
             Direction lv5 = lv3.getSide();
             BlockPos lv6 = lv4.offset(lv5);
-            if (!arg.canPlayerModifyAt(arg2, lv4) || !arg2.canPlaceOn(lv6, lv5, lv)) {
+            if (!world.canPlayerModifyAt(user, lv4) || !user.canPlaceOn(lv6, lv5, lv)) {
                 return TypedActionResult.fail(lv);
             }
             if (this.fluid == Fluids.EMPTY) {
                 Fluid lv8;
-                BlockState lv7 = arg.getBlockState(lv4);
-                if (lv7.getBlock() instanceof FluidDrainable && (lv8 = ((FluidDrainable)((Object)lv7.getBlock())).tryDrainFluid(arg, lv4, lv7)) != Fluids.EMPTY) {
-                    arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-                    arg2.playSound(lv8.isIn(FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_FILL_LAVA : SoundEvents.ITEM_BUCKET_FILL, 1.0f, 1.0f);
-                    ItemStack lv9 = ItemUsage.method_30012(lv, arg2, new ItemStack(lv8.getBucketItem()));
-                    if (!arg.isClient) {
-                        Criteria.FILLED_BUCKET.trigger((ServerPlayerEntity)arg2, new ItemStack(lv8.getBucketItem()));
+                BlockState lv7 = world.getBlockState(lv4);
+                if (lv7.getBlock() instanceof FluidDrainable && (lv8 = ((FluidDrainable)((Object)lv7.getBlock())).tryDrainFluid(world, lv4, lv7)) != Fluids.EMPTY) {
+                    user.incrementStat(Stats.USED.getOrCreateStat(this));
+                    user.playSound(lv8.isIn(FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_FILL_LAVA : SoundEvents.ITEM_BUCKET_FILL, 1.0f, 1.0f);
+                    ItemStack lv9 = ItemUsage.method_30012(lv, user, new ItemStack(lv8.getBucketItem()));
+                    if (!world.isClient) {
+                        Criteria.FILLED_BUCKET.trigger((ServerPlayerEntity)user, new ItemStack(lv8.getBucketItem()));
                     }
-                    return TypedActionResult.method_29237(lv9, arg.isClient());
+                    return TypedActionResult.method_29237(lv9, world.isClient());
                 }
                 return TypedActionResult.fail(lv);
             }
-            BlockState lv10 = arg.getBlockState(lv4);
+            BlockState lv10 = world.getBlockState(lv4);
             BlockPos blockPos = lv11 = lv10.getBlock() instanceof FluidFillable && this.fluid == Fluids.WATER ? lv4 : lv6;
-            if (this.placeFluid(arg2, arg, lv11, lv3)) {
-                this.onEmptied(arg, lv, lv11);
-                if (arg2 instanceof ServerPlayerEntity) {
-                    Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)arg2, lv11, lv);
+            if (this.placeFluid(user, world, lv11, lv3)) {
+                this.onEmptied(world, lv, lv11);
+                if (user instanceof ServerPlayerEntity) {
+                    Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity)user, lv11, lv);
                 }
-                arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-                return TypedActionResult.method_29237(this.getEmptiedStack(lv, arg2), arg.isClient());
+                user.incrementStat(Stats.USED.getOrCreateStat(this));
+                return TypedActionResult.method_29237(this.getEmptiedStack(lv, user), world.isClient());
             }
             return TypedActionResult.fail(lv);
         }
         return TypedActionResult.pass(lv);
     }
 
-    protected ItemStack getEmptiedStack(ItemStack arg, PlayerEntity arg2) {
-        if (!arg2.abilities.creativeMode) {
+    protected ItemStack getEmptiedStack(ItemStack stack, PlayerEntity player) {
+        if (!player.abilities.creativeMode) {
             return new ItemStack(Items.BUCKET);
         }
-        return arg;
+        return stack;
     }
 
-    public void onEmptied(World arg, ItemStack arg2, BlockPos arg3) {
+    public void onEmptied(World world, ItemStack stack, BlockPos pos) {
     }
 
-    public boolean placeFluid(@Nullable PlayerEntity arg, World arg2, BlockPos arg3, @Nullable BlockHitResult arg4) {
+    public boolean placeFluid(@Nullable PlayerEntity player, World world, BlockPos pos, @Nullable BlockHitResult arg4) {
         boolean bl2;
         if (!(this.fluid instanceof FlowableFluid)) {
             return false;
         }
-        BlockState lv = arg2.getBlockState(arg3);
+        BlockState lv = world.getBlockState(pos);
         Block lv2 = lv.getBlock();
         Material lv3 = lv.getMaterial();
         boolean bl = lv.canBucketPlace(this.fluid);
-        boolean bl3 = bl2 = lv.isAir() || bl || lv2 instanceof FluidFillable && ((FluidFillable)((Object)lv2)).canFillWithFluid(arg2, arg3, lv, this.fluid);
+        boolean bl3 = bl2 = lv.isAir() || bl || lv2 instanceof FluidFillable && ((FluidFillable)((Object)lv2)).canFillWithFluid(world, pos, lv, this.fluid);
         if (!bl2) {
-            return arg4 != null && this.placeFluid(arg, arg2, arg4.getBlockPos().offset(arg4.getSide()), null);
+            return arg4 != null && this.placeFluid(player, world, arg4.getBlockPos().offset(arg4.getSide()), null);
         }
-        if (arg2.getDimension().isUltrawarm() && this.fluid.isIn(FluidTags.WATER)) {
-            int i = arg3.getX();
-            int j = arg3.getY();
-            int k = arg3.getZ();
-            arg2.playSound(arg, arg3, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (arg2.random.nextFloat() - arg2.random.nextFloat()) * 0.8f);
+        if (world.getDimension().isUltrawarm() && this.fluid.isIn(FluidTags.WATER)) {
+            int i = pos.getX();
+            int j = pos.getY();
+            int k = pos.getZ();
+            world.playSound(player, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5f, 2.6f + (world.random.nextFloat() - world.random.nextFloat()) * 0.8f);
             for (int l = 0; l < 8; ++l) {
-                arg2.addParticle(ParticleTypes.LARGE_SMOKE, (double)i + Math.random(), (double)j + Math.random(), (double)k + Math.random(), 0.0, 0.0, 0.0);
+                world.addParticle(ParticleTypes.LARGE_SMOKE, (double)i + Math.random(), (double)j + Math.random(), (double)k + Math.random(), 0.0, 0.0, 0.0);
             }
             return true;
         }
         if (lv2 instanceof FluidFillable && this.fluid == Fluids.WATER) {
-            ((FluidFillable)((Object)lv2)).tryFillWithFluid(arg2, arg3, lv, ((FlowableFluid)this.fluid).getStill(false));
-            this.playEmptyingSound(arg, arg2, arg3);
+            ((FluidFillable)((Object)lv2)).tryFillWithFluid(world, pos, lv, ((FlowableFluid)this.fluid).getStill(false));
+            this.playEmptyingSound(player, world, pos);
             return true;
         }
-        if (!arg2.isClient && bl && !lv3.isLiquid()) {
-            arg2.breakBlock(arg3, true);
+        if (!world.isClient && bl && !lv3.isLiquid()) {
+            world.breakBlock(pos, true);
         }
-        if (arg2.setBlockState(arg3, this.fluid.getDefaultState().getBlockState(), 11) || lv.getFluidState().isStill()) {
-            this.playEmptyingSound(arg, arg2, arg3);
+        if (world.setBlockState(pos, this.fluid.getDefaultState().getBlockState(), 11) || lv.getFluidState().isStill()) {
+            this.playEmptyingSound(player, world, pos);
             return true;
         }
         return false;
     }
 
-    protected void playEmptyingSound(@Nullable PlayerEntity arg, WorldAccess arg2, BlockPos arg3) {
+    protected void playEmptyingSound(@Nullable PlayerEntity player, WorldAccess world, BlockPos pos) {
         SoundEvent lv = this.fluid.isIn(FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_EMPTY_LAVA : SoundEvents.ITEM_BUCKET_EMPTY;
-        arg2.playSound(arg, arg3, lv, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        world.playSound(player, pos, lv, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 }
 

@@ -39,26 +39,26 @@ public class TeamMsgCommand {
     private static final Style STYLE = Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableText("chat.type.team.hover"))).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/teammsg "));
     private static final SimpleCommandExceptionType NO_TEAM_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.teammsg.failed.noteam"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        LiteralCommandNode literalCommandNode = commandDispatcher.register((LiteralArgumentBuilder)CommandManager.literal("teammsg").then(CommandManager.argument("message", MessageArgumentType.message()).executes(commandContext -> TeamMsgCommand.execute((ServerCommandSource)commandContext.getSource(), MessageArgumentType.getMessage((CommandContext<ServerCommandSource>)commandContext, "message")))));
-        commandDispatcher.register((LiteralArgumentBuilder)CommandManager.literal("tm").redirect((CommandNode)literalCommandNode));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        LiteralCommandNode literalCommandNode = dispatcher.register((LiteralArgumentBuilder)CommandManager.literal("teammsg").then(CommandManager.argument("message", MessageArgumentType.message()).executes(commandContext -> TeamMsgCommand.execute((ServerCommandSource)commandContext.getSource(), MessageArgumentType.getMessage((CommandContext<ServerCommandSource>)commandContext, "message")))));
+        dispatcher.register((LiteralArgumentBuilder)CommandManager.literal("tm").redirect((CommandNode)literalCommandNode));
     }
 
-    private static int execute(ServerCommandSource arg, Text arg2) throws CommandSyntaxException {
-        Entity lv = arg.getEntityOrThrow();
+    private static int execute(ServerCommandSource source, Text message) throws CommandSyntaxException {
+        Entity lv = source.getEntityOrThrow();
         Team lv2 = (Team)lv.getScoreboardTeam();
         if (lv2 == null) {
             throw NO_TEAM_EXCEPTION.create();
         }
         MutableText lv3 = lv2.getFormattedName().fillStyle(STYLE);
-        List<ServerPlayerEntity> list = arg.getMinecraftServer().getPlayerManager().getPlayerList();
+        List<ServerPlayerEntity> list = source.getMinecraftServer().getPlayerManager().getPlayerList();
         for (ServerPlayerEntity lv4 : list) {
             if (lv4 == lv) {
-                lv4.sendSystemMessage(new TranslatableText("chat.type.team.sent", lv3, arg.getDisplayName(), arg2), lv.getUuid());
+                lv4.sendSystemMessage(new TranslatableText("chat.type.team.sent", lv3, source.getDisplayName(), message), lv.getUuid());
                 continue;
             }
             if (lv4.getScoreboardTeam() != lv2) continue;
-            lv4.sendSystemMessage(new TranslatableText("chat.type.team.text", lv3, arg.getDisplayName(), arg2), lv.getUuid());
+            lv4.sendSystemMessage(new TranslatableText("chat.type.team.text", lv3, source.getDisplayName(), message), lv.getUuid());
         }
         return list.size();
     }

@@ -85,8 +85,8 @@ public interface StructurePieceType {
 
     public StructurePiece load(StructureManager var1, CompoundTag var2);
 
-    public static StructurePieceType register(StructurePieceType arg, String string) {
-        return Registry.register(Registry.STRUCTURE_PIECE, string.toLowerCase(Locale.ROOT), arg);
+    public static StructurePieceType register(StructurePieceType pieceType, String id) {
+        return Registry.register(Registry.STRUCTURE_PIECE, id.toLowerCase(Locale.ROOT), pieceType);
     }
 }
 

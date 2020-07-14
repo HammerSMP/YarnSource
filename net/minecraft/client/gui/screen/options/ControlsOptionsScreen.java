@@ -31,8 +31,8 @@ extends GameOptionsScreen {
     private ControlsListWidget keyBindingListWidget;
     private ButtonWidget resetButton;
 
-    public ControlsOptionsScreen(Screen arg, GameOptions arg2) {
-        super(arg, arg2, new TranslatableText("controls.title"));
+    public ControlsOptionsScreen(Screen parent, GameOptions options) {
+        super(parent, options, new TranslatableText("controls.title"));
     }
 
     @Override
@@ -51,37 +51,37 @@ extends GameOptionsScreen {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.focusedBinding != null) {
-            this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.Type.MOUSE.createFromCode(i));
+            this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.Type.MOUSE.createFromCode(button));
             this.focusedBinding = null;
             KeyBinding.updateKeysByCode();
             return true;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.focusedBinding != null) {
-            if (i == 256) {
+            if (keyCode == 256) {
                 this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.UNKNOWN_KEY);
             } else {
-                this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.fromKeyCode(i, j));
+                this.gameOptions.setKeyCode(this.focusedBinding, InputUtil.fromKeyCode(keyCode, scanCode));
             }
             this.focusedBinding = null;
             this.time = Util.getMeasuringTimeMs();
             KeyBinding.updateKeysByCode();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.keyBindingListWidget.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.keyBindingListWidget.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
         boolean bl = false;
         for (KeyBinding lv : this.gameOptions.keysAll) {
             if (lv.isDefault()) continue;
@@ -89,7 +89,7 @@ extends GameOptionsScreen {
             break;
         }
         this.resetButton.active = bl;
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

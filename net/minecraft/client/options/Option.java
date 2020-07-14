@@ -197,20 +197,20 @@ public abstract class Option {
     private static final Text FAST_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fast.tooltip");
     private static final Text FABULOUS_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fabulous.tooltip", new TranslatableText("options.graphics.fabulous").formatted(Formatting.ITALIC));
     private static final Text FANCY_GRAPHICS_TOOLTIP = new TranslatableText("options.graphics.fancy.tooltip");
-    public static final CyclingOption GRAPHICS = new CyclingOption("options.graphics", (arg, integer) -> {
+    public static final CyclingOption GRAPHICS = new CyclingOption("options.graphics", (options, count) -> {
         MinecraftClient lv = MinecraftClient.getInstance();
         VideoWarningManager lv2 = lv.getVideoWarningManager();
-        if (arg.graphicsMode == GraphicsMode.FANCY && lv2.canWarn()) {
+        if (options.graphicsMode == GraphicsMode.FANCY && lv2.canWarn()) {
             lv2.scheduleWarning();
             return;
         }
-        arg.graphicsMode = arg.graphicsMode.next();
-        if (arg.graphicsMode == GraphicsMode.FABULOUS && (!GlStateManager.supportsGl30() || lv2.hasCancelledAfterWarning())) {
-            arg.graphicsMode = GraphicsMode.FAST;
+        options.graphicsMode = options.graphicsMode.next();
+        if (options.graphicsMode == GraphicsMode.FABULOUS && (!GlStateManager.supportsGl30() || lv2.hasCancelledAfterWarning())) {
+            options.graphicsMode = GraphicsMode.FAST;
         }
         lv.worldRenderer.reload();
-    }, (arg, arg2) -> {
-        switch (arg.graphicsMode) {
+    }, (options, arg2) -> {
+        switch (options.graphicsMode) {
             case FAST: {
                 arg2.setTooltip(MinecraftClient.getInstance().textRenderer.wrapLines(FAST_GRAPHICS_TOOLTIP, 200));
                 break;
@@ -223,8 +223,8 @@ public abstract class Option {
                 arg2.setTooltip(MinecraftClient.getInstance().textRenderer.wrapLines(FABULOUS_GRAPHICS_TOOLTIP, 200));
             }
         }
-        TranslatableText lv = new TranslatableText(arg.graphicsMode.getTranslationKey());
-        if (arg.graphicsMode == GraphicsMode.FABULOUS) {
+        TranslatableText lv = new TranslatableText(options.graphicsMode.getTranslationKey());
+        if (options.graphicsMode == GraphicsMode.FABULOUS) {
             return arg2.method_30501(lv.formatted(Formatting.ITALIC));
         }
         return arg2.method_30501(lv);
@@ -339,8 +339,8 @@ public abstract class Option {
     private final Text key;
     private Optional<List<StringRenderable>> tooltip;
 
-    public Option(String string) {
-        this.key = new TranslatableText(string);
+    public Option(String key) {
+        this.key = new TranslatableText(key);
         this.tooltip = Optional.empty();
     }
 
@@ -350,8 +350,8 @@ public abstract class Option {
         return this.key;
     }
 
-    public void setTooltip(List<StringRenderable> list) {
-        this.tooltip = Optional.of(list);
+    public void setTooltip(List<StringRenderable> tooltip) {
+        this.tooltip = Optional.of(tooltip);
     }
 
     public Optional<List<StringRenderable>> getTooltip() {

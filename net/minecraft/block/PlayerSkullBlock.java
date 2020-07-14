@@ -30,14 +30,14 @@ extends SkullBlock {
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
-        super.onPlaced(arg, arg2, arg3, arg4, arg5);
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof SkullBlockEntity) {
             SkullBlockEntity lv2 = (SkullBlockEntity)lv;
             GameProfile gameProfile = null;
-            if (arg5.hasTag()) {
-                CompoundTag lv3 = arg5.getTag();
+            if (itemStack.hasTag()) {
+                CompoundTag lv3 = itemStack.getTag();
                 if (lv3.contains("SkullOwner", 10)) {
                     gameProfile = NbtHelper.toGameProfile(lv3.getCompound("SkullOwner"));
                 } else if (lv3.contains("SkullOwner", 8) && !StringUtils.isBlank((CharSequence)lv3.getString("SkullOwner"))) {

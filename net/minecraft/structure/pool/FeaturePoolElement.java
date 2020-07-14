@@ -68,20 +68,20 @@ extends StructurePoolElement {
     }
 
     @Override
-    public List<Structure.StructureBlockInfo> getStructureBlockInfos(StructureManager arg, BlockPos arg2, BlockRotation arg3, Random random) {
+    public List<Structure.StructureBlockInfo> getStructureBlockInfos(StructureManager structureManager, BlockPos pos, BlockRotation rotation, Random random) {
         ArrayList list = Lists.newArrayList();
-        list.add(new Structure.StructureBlockInfo(arg2, (BlockState)Blocks.JIGSAW.getDefaultState().with(JigsawBlock.ORIENTATION, JigsawOrientation.byDirections(Direction.DOWN, Direction.SOUTH)), this.tag));
+        list.add(new Structure.StructureBlockInfo(pos, (BlockState)Blocks.JIGSAW.getDefaultState().with(JigsawBlock.ORIENTATION, JigsawOrientation.byDirections(Direction.DOWN, Direction.SOUTH)), this.tag));
         return list;
     }
 
     @Override
-    public BlockBox getBoundingBox(StructureManager arg, BlockPos arg2, BlockRotation arg3) {
-        BlockPos lv = this.getStart(arg, arg3);
-        return new BlockBox(arg2.getX(), arg2.getY(), arg2.getZ(), arg2.getX() + lv.getX(), arg2.getY() + lv.getY(), arg2.getZ() + lv.getZ());
+    public BlockBox getBoundingBox(StructureManager structureManager, BlockPos pos, BlockRotation rotation) {
+        BlockPos lv = this.getStart(structureManager, rotation);
+        return new BlockBox(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + lv.getX(), pos.getY() + lv.getY(), pos.getZ() + lv.getZ());
     }
 
     @Override
-    public boolean generate(StructureManager arg, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
+    public boolean generate(StructureManager structureManager, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean keepJigsaws) {
         return this.feature.get().generate(arg2, arg4, random, arg5);
     }
 

@@ -13,10 +13,10 @@ extends MoveControl {
     private final int maxPitchChange;
     private final boolean noGravity;
 
-    public FlightMoveControl(MobEntity arg, int i, boolean bl) {
-        super(arg);
-        this.maxPitchChange = i;
-        this.noGravity = bl;
+    public FlightMoveControl(MobEntity entity, int maxPitchChange, boolean noGravity) {
+        super(entity);
+        this.maxPitchChange = maxPitchChange;
+        this.noGravity = noGravity;
     }
 
     @Override

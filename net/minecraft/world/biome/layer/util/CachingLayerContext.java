@@ -23,12 +23,12 @@ implements LayerSampleContext<CachingLayerSampler> {
     private final long worldSeed;
     private long localSeed;
 
-    public CachingLayerContext(int i, long l, long m) {
-        this.worldSeed = CachingLayerContext.addSalt(l, m);
-        this.noiseSampler = new PerlinNoiseSampler(new Random(l));
+    public CachingLayerContext(int cacheCapacity, long seed, long salt) {
+        this.worldSeed = CachingLayerContext.addSalt(seed, salt);
+        this.noiseSampler = new PerlinNoiseSampler(new Random(seed));
         this.cache = new Long2IntLinkedOpenHashMap(16, 0.25f);
         this.cache.defaultReturnValue(Integer.MIN_VALUE);
-        this.cacheCapacity = i;
+        this.cacheCapacity = cacheCapacity;
     }
 
     @Override
@@ -47,17 +47,17 @@ implements LayerSampleContext<CachingLayerSampler> {
     }
 
     @Override
-    public void initSeed(long l, long m) {
+    public void initSeed(long x, long y) {
         long n = this.worldSeed;
-        n = SeedMixer.mixSeed(n, l);
-        n = SeedMixer.mixSeed(n, m);
-        n = SeedMixer.mixSeed(n, l);
-        this.localSeed = n = SeedMixer.mixSeed(n, m);
+        n = SeedMixer.mixSeed(n, x);
+        n = SeedMixer.mixSeed(n, y);
+        n = SeedMixer.mixSeed(n, x);
+        this.localSeed = n = SeedMixer.mixSeed(n, y);
     }
 
     @Override
-    public int nextInt(int i) {
-        int j = (int)Math.floorMod(this.localSeed >> 24, (long)i);
+    public int nextInt(int bound) {
+        int j = (int)Math.floorMod(this.localSeed >> 24, (long)bound);
         this.localSeed = SeedMixer.mixSeed(this.localSeed, this.worldSeed);
         return j;
     }
@@ -67,12 +67,12 @@ implements LayerSampleContext<CachingLayerSampler> {
         return this.noiseSampler;
     }
 
-    private static long addSalt(long l, long m) {
-        long n = m;
-        n = SeedMixer.mixSeed(n, m);
-        n = SeedMixer.mixSeed(n, m);
-        n = SeedMixer.mixSeed(n, m);
-        long o = l;
+    private static long addSalt(long seed, long salt) {
+        long n = salt;
+        n = SeedMixer.mixSeed(n, salt);
+        n = SeedMixer.mixSeed(n, salt);
+        n = SeedMixer.mixSeed(n, salt);
+        long o = seed;
         o = SeedMixer.mixSeed(o, n);
         o = SeedMixer.mixSeed(o, n);
         o = SeedMixer.mixSeed(o, n);
@@ -80,8 +80,8 @@ implements LayerSampleContext<CachingLayerSampler> {
     }
 
     @Override
-    public /* synthetic */ LayerSampler createSampler(LayerOperator arg) {
-        return this.createSampler(arg);
+    public /* synthetic */ LayerSampler createSampler(LayerOperator operator) {
+        return this.createSampler(operator);
     }
 }
 

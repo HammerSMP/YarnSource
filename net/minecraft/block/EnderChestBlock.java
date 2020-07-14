@@ -66,102 +66,102 @@ implements Waterloggable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public DoubleBlockProperties.PropertySource<? extends ChestBlockEntity> getBlockEntitySource(BlockState arg, World arg2, BlockPos arg3, boolean bl) {
+    public DoubleBlockProperties.PropertySource<? extends ChestBlockEntity> getBlockEntitySource(BlockState state, World world, BlockPos pos, boolean ignoreBlocked) {
         return DoubleBlockProperties.PropertyRetriever::getFallback;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         FluidState lv;
-        return (BlockState)((BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite())).with(WATERLOGGED, (lv = arg.getWorld().getFluidState(arg.getBlockPos())).getFluid() == Fluids.WATER);
+        return (BlockState)((BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite())).with(WATERLOGGED, (lv = ctx.getWorld().getFluidState(ctx.getBlockPos())).getFluid() == Fluids.WATER);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg22, BlockPos arg32, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        EnderChestInventory lv = arg4.getEnderChestInventory();
-        BlockEntity lv2 = arg22.getBlockEntity(arg32);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        EnderChestInventory lv = player.getEnderChestInventory();
+        BlockEntity lv2 = world.getBlockEntity(pos);
         if (lv == null || !(lv2 instanceof EnderChestBlockEntity)) {
-            return ActionResult.success(arg22.isClient);
+            return ActionResult.success(world.isClient);
         }
-        BlockPos lv3 = arg32.up();
-        if (arg22.getBlockState(lv3).isSolidBlock(arg22, lv3)) {
-            return ActionResult.success(arg22.isClient);
+        BlockPos lv3 = pos.up();
+        if (world.getBlockState(lv3).isSolidBlock(world, lv3)) {
+            return ActionResult.success(world.isClient);
         }
-        if (arg22.isClient) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
         EnderChestBlockEntity lv4 = (EnderChestBlockEntity)lv2;
         lv.setActiveBlockEntity(lv4);
-        arg4.openHandledScreen(new SimpleNamedScreenHandlerFactory((i, arg2, arg3) -> GenericContainerScreenHandler.createGeneric9x3(i, arg2, lv), CONTAINER_NAME));
-        arg4.incrementStat(Stats.OPEN_ENDERCHEST);
-        PiglinBrain.onGuardedBlockBroken(arg4, true);
+        player.openHandledScreen(new SimpleNamedScreenHandlerFactory((i, arg2, arg3) -> GenericContainerScreenHandler.createGeneric9x3(i, arg2, lv), CONTAINER_NAME));
+        player.incrementStat(Stats.OPEN_ENDERCHEST);
+        PiglinBrain.onGuardedBlockBroken(player, true);
         return ActionResult.CONSUME;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new EnderChestBlockEntity();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         for (int i = 0; i < 3; ++i) {
             int j = random.nextInt(2) * 2 - 1;
             int k = random.nextInt(2) * 2 - 1;
-            double d = (double)arg3.getX() + 0.5 + 0.25 * (double)j;
-            double e = (float)arg3.getY() + random.nextFloat();
-            double f = (double)arg3.getZ() + 0.5 + 0.25 * (double)k;
+            double d = (double)pos.getX() + 0.5 + 0.25 * (double)j;
+            double e = (float)pos.getY() + random.nextFloat();
+            double f = (double)pos.getZ() + 0.5 + 0.25 * (double)k;
             double g = random.nextFloat() * (float)j;
             double h = ((double)random.nextFloat() - 0.5) * 0.125;
             double l = random.nextFloat() * (float)k;
-            arg2.addParticle(ParticleTypes.PORTAL, d, e, f, g, h, l);
+            world.addParticle(ParticleTypes.PORTAL, d, e, f, g, h, l);
         }
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, WATERLOGGED);
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

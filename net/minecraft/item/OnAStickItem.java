@@ -20,22 +20,22 @@ extends Item {
     private final EntityType<T> target;
     private final int damagePerUse;
 
-    public OnAStickItem(Item.Settings arg, EntityType<T> arg2, int i) {
-        super(arg);
-        this.target = arg2;
-        this.damagePerUse = i;
+    public OnAStickItem(Item.Settings settings, EntityType<T> target, int damagePerUse) {
+        super(settings);
+        this.target = target;
+        this.damagePerUse = damagePerUse;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg22, Hand arg3) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemSteerable lv3;
-        ItemStack lv = arg22.getStackInHand(arg3);
-        if (arg.isClient) {
+        ItemStack lv = user.getStackInHand(hand);
+        if (world.isClient) {
             return TypedActionResult.pass(lv);
         }
-        Entity lv2 = arg22.getVehicle();
-        if (arg22.hasVehicle() && lv2 instanceof ItemSteerable && lv2.getType() == this.target && (lv3 = (ItemSteerable)((Object)lv2)).consumeOnAStickItem()) {
-            lv.damage(this.damagePerUse, arg22, arg2 -> arg2.sendToolBreakStatus(arg3));
+        Entity lv2 = user.getVehicle();
+        if (user.hasVehicle() && lv2 instanceof ItemSteerable && lv2.getType() == this.target && (lv3 = (ItemSteerable)((Object)lv2)).consumeOnAStickItem()) {
+            lv.damage(this.damagePerUse, user, p -> p.sendToolBreakStatus(hand));
             if (lv.isEmpty()) {
                 ItemStack lv4 = new ItemStack(Items.FISHING_ROD);
                 lv4.setTag(lv.getTag());
@@ -43,7 +43,7 @@ extends Item {
             }
             return TypedActionResult.success(lv);
         }
-        arg22.incrementStat(Stats.USED.getOrCreateStat(this));
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
         return TypedActionResult.pass(lv);
     }
 }

@@ -44,11 +44,11 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
     public final boolean onServer;
     private final PlayerEntity owner;
 
-    public PlayerScreenHandler(PlayerInventory arg, boolean bl, PlayerEntity arg2) {
+    public PlayerScreenHandler(PlayerInventory inventory, boolean onServer, PlayerEntity owner) {
         super(null, 0);
-        this.onServer = bl;
-        this.owner = arg2;
-        this.addSlot(new CraftingResultSlot(arg.player, this.craftingInput, this.craftingResult, 0, 154, 28));
+        this.onServer = onServer;
+        this.owner = owner;
+        this.addSlot(new CraftingResultSlot(inventory.player, this.craftingInput, this.craftingResult, 0, 154, 28));
         for (int i = 0; i < 2; ++i) {
             for (int j = 0; j < 2; ++j) {
                 this.addSlot(new Slot(this.craftingInput, j + i * 2, 98 + j * 18, 18 + i * 18));
@@ -56,7 +56,7 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
         }
         for (int k = 0; k < 4; ++k) {
             final EquipmentSlot lv = EQUIPMENT_SLOT_ORDER[k];
-            this.addSlot(new Slot(arg, 39 - k, 8, 8 + k * 18){
+            this.addSlot(new Slot(inventory, 39 - k, 8, 8 + k * 18){
 
                 @Override
                 public int getMaxStackAmount() {
@@ -64,17 +64,17 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
                 }
 
                 @Override
-                public boolean canInsert(ItemStack arg) {
-                    return lv == MobEntity.getPreferredEquipmentSlot(arg);
+                public boolean canInsert(ItemStack stack) {
+                    return lv == MobEntity.getPreferredEquipmentSlot(stack);
                 }
 
                 @Override
-                public boolean canTakeItems(PlayerEntity arg) {
+                public boolean canTakeItems(PlayerEntity playerEntity) {
                     ItemStack lv2 = this.getStack();
-                    if (!lv2.isEmpty() && !arg.isCreative() && EnchantmentHelper.hasBindingCurse(lv2)) {
+                    if (!lv2.isEmpty() && !playerEntity.isCreative() && EnchantmentHelper.hasBindingCurse(lv2)) {
                         return false;
                     }
-                    return super.canTakeItems(arg);
+                    return super.canTakeItems(playerEntity);
                 }
 
                 @Override
@@ -86,13 +86,13 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
         }
         for (int l = 0; l < 3; ++l) {
             for (int m = 0; m < 9; ++m) {
-                this.addSlot(new Slot(arg, m + (l + 1) * 9, 8 + m * 18, 84 + l * 18));
+                this.addSlot(new Slot(inventory, m + (l + 1) * 9, 8 + m * 18, 84 + l * 18));
             }
         }
         for (int n = 0; n < 9; ++n) {
-            this.addSlot(new Slot(arg, n, 8 + n * 18, 142));
+            this.addSlot(new Slot(inventory, n, 8 + n * 18, 142));
         }
-        this.addSlot(new Slot(arg, 40, 77, 62){
+        this.addSlot(new Slot(inventory, 40, 77, 62){
 
             @Override
             @Environment(value=EnvType.CLIENT)
@@ -103,8 +103,8 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
     }
 
     @Override
-    public void populateRecipeFinder(RecipeFinder arg) {
-        this.craftingInput.provideRecipeInputs(arg);
+    public void populateRecipeFinder(RecipeFinder finder) {
+        this.craftingInput.provideRecipeInputs(finder);
     }
 
     @Override
@@ -114,45 +114,45 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
     }
 
     @Override
-    public boolean matches(Recipe<? super CraftingInventory> arg) {
-        return arg.matches(this.craftingInput, this.owner.world);
+    public boolean matches(Recipe<? super CraftingInventory> recipe) {
+        return recipe.matches(this.craftingInput, this.owner.world);
     }
 
     @Override
-    public void onContentChanged(Inventory arg) {
+    public void onContentChanged(Inventory inventory) {
         CraftingScreenHandler.updateResult(this.syncId, this.owner.world, this.owner, this.craftingInput, this.craftingResult);
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
+    public void close(PlayerEntity player) {
+        super.close(player);
         this.craftingResult.clear();
-        if (arg.world.isClient) {
+        if (player.world.isClient) {
             return;
         }
-        this.dropInventory(arg, arg.world, this.craftingInput);
+        this.dropInventory(player, player.world, this.craftingInput);
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
+    public boolean canUse(PlayerEntity player) {
         return true;
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             int j;
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
             EquipmentSlot lv4 = MobEntity.getPreferredEquipmentSlot(lv);
-            if (i == 0) {
+            if (index == 0) {
                 if (!this.insertItem(lv3, 9, 45, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i >= 1 && i < 5 ? !this.insertItem(lv3, 9, 45, false) : (i >= 5 && i < 9 ? !this.insertItem(lv3, 9, 45, false) : (lv4.getType() == EquipmentSlot.Type.ARMOR && !((Slot)this.slots.get(8 - lv4.getEntitySlotId())).hasStack() ? !this.insertItem(lv3, j = 8 - lv4.getEntitySlotId(), j + 1, false) : (lv4 == EquipmentSlot.OFFHAND && !((Slot)this.slots.get(45)).hasStack() ? !this.insertItem(lv3, 45, 46, false) : (i >= 9 && i < 36 ? !this.insertItem(lv3, 36, 45, false) : (i >= 36 && i < 45 ? !this.insertItem(lv3, 9, 36, false) : !this.insertItem(lv3, 9, 45, false))))))) {
+            } else if (index >= 1 && index < 5 ? !this.insertItem(lv3, 9, 45, false) : (index >= 5 && index < 9 ? !this.insertItem(lv3, 9, 45, false) : (lv4.getType() == EquipmentSlot.Type.ARMOR && !((Slot)this.slots.get(8 - lv4.getEntitySlotId())).hasStack() ? !this.insertItem(lv3, j = 8 - lv4.getEntitySlotId(), j + 1, false) : (lv4 == EquipmentSlot.OFFHAND && !((Slot)this.slots.get(45)).hasStack() ? !this.insertItem(lv3, 45, 46, false) : (index >= 9 && index < 36 ? !this.insertItem(lv3, 36, 45, false) : (index >= 36 && index < 45 ? !this.insertItem(lv3, 9, 36, false) : !this.insertItem(lv3, 9, 45, false))))))) {
                 return ItemStack.EMPTY;
             }
             if (lv3.isEmpty()) {
@@ -163,17 +163,17 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            ItemStack lv5 = lv2.onTakeItem(arg, lv3);
-            if (i == 0) {
-                arg.dropItem(lv5, false);
+            ItemStack lv5 = lv2.onTakeItem(player, lv3);
+            if (index == 0) {
+                player.dropItem(lv5, false);
             }
         }
         return lv;
     }
 
     @Override
-    public boolean canInsertIntoSlot(ItemStack arg, Slot arg2) {
-        return arg2.inventory != this.craftingResult && super.canInsertIntoSlot(arg, arg2);
+    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+        return slot.inventory != this.craftingResult && super.canInsertIntoSlot(stack, slot);
     }
 
     @Override

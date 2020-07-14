@@ -25,24 +25,24 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public RecipeCategoryOptionsC2SPacket(RecipeBookCategory arg, boolean bl, boolean bl2) {
-        this.category = arg;
-        this.guiOpen = bl;
-        this.filteringCraftable = bl2;
+    public RecipeCategoryOptionsC2SPacket(RecipeBookCategory category, boolean guiOpen, boolean filteringCraftable) {
+        this.category = category;
+        this.guiOpen = guiOpen;
+        this.filteringCraftable = filteringCraftable;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.category = arg.readEnumConstant(RecipeBookCategory.class);
-        this.guiOpen = arg.readBoolean();
-        this.filteringCraftable = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.category = buf.readEnumConstant(RecipeBookCategory.class);
+        this.guiOpen = buf.readBoolean();
+        this.filteringCraftable = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.category);
-        arg.writeBoolean(this.guiOpen);
-        arg.writeBoolean(this.filteringCraftable);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.category);
+        buf.writeBoolean(this.guiOpen);
+        buf.writeBoolean(this.filteringCraftable);
     }
 
     @Override

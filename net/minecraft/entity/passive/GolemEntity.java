@@ -20,7 +20,7 @@ extends PathAwareEntity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
@@ -32,7 +32,7 @@ extends PathAwareEntity {
 
     @Override
     @Nullable
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return null;
     }
 
@@ -48,7 +48,7 @@ extends PathAwareEntity {
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return false;
     }
 }

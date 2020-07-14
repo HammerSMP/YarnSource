@@ -39,11 +39,11 @@ extends LongRunningTask {
     private final RealmsMainScreen mainScreen;
     private final ReentrantLock connectLock;
 
-    public RealmsGetServerDetailsTask(RealmsMainScreen arg, Screen arg2, RealmsServer arg3, ReentrantLock reentrantLock) {
-        this.lastScreen = arg2;
-        this.mainScreen = arg;
-        this.server = arg3;
-        this.connectLock = reentrantLock;
+    public RealmsGetServerDetailsTask(RealmsMainScreen mainScreen, Screen lastScreen, RealmsServer server, ReentrantLock connectLock) {
+        this.lastScreen = lastScreen;
+        this.mainScreen = mainScreen;
+        this.server = server;
+        this.connectLock = connectLock;
     }
 
     @Override
@@ -135,9 +135,9 @@ extends LongRunningTask {
         }
     }
 
-    private void sleep(int i) {
+    private void sleep(int sleepTimeSeconds) {
         try {
-            Thread.sleep(i * 1000);
+            Thread.sleep(sleepTimeSeconds * 1000);
         }
         catch (InterruptedException interruptedException) {
             LOGGER.warn(interruptedException.getLocalizedMessage());

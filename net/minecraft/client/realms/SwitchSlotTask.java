@@ -21,10 +21,10 @@ extends LongRunningTask {
     private final int slot;
     private final Runnable callback;
 
-    public SwitchSlotTask(long l, int i, Runnable runnable) {
-        this.worldId = l;
-        this.slot = i;
-        this.callback = runnable;
+    public SwitchSlotTask(long worldId, int slot, Runnable callback) {
+        this.worldId = worldId;
+        this.slot = slot;
+        this.callback = callback;
     }
 
     @Override

@@ -40,7 +40,7 @@ implements Trader {
     }
 
     @Override
-    public void setCurrentCustomer(@Nullable PlayerEntity arg) {
+    public void setCurrentCustomer(@Nullable PlayerEntity customer) {
     }
 
     @Override
@@ -50,17 +50,17 @@ implements Trader {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void setOffersFromServer(@Nullable TraderOfferList arg) {
-        this.recipeList = arg;
+    public void setOffersFromServer(@Nullable TraderOfferList offers) {
+        this.recipeList = offers;
     }
 
     @Override
-    public void trade(TradeOffer arg) {
-        arg.use();
+    public void trade(TradeOffer offer) {
+        offer.use();
     }
 
     @Override
-    public void onSellingItem(ItemStack arg) {
+    public void onSellingItem(ItemStack stack) {
     }
 
     @Override
@@ -74,8 +74,8 @@ implements Trader {
     }
 
     @Override
-    public void setExperienceFromServer(int i) {
-        this.experience = i;
+    public void setExperienceFromServer(int experience) {
+        this.experience = experience;
     }
 
     @Override

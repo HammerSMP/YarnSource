@@ -32,35 +32,35 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg, DamageSource arg2, float f, float g, boolean bl) {
-        this.test(arg, arg3 -> arg3.matches(arg, arg2, f, g, bl));
+    public void trigger(ServerPlayerEntity player, DamageSource source, float dealt, float taken, boolean blocked) {
+        this.test(player, arg3 -> arg3.matches(player, source, dealt, taken, blocked));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final DamagePredicate damage;
 
-        public Conditions(EntityPredicate.Extended arg, DamagePredicate arg2) {
-            super(ID, arg);
-            this.damage = arg2;
+        public Conditions(EntityPredicate.Extended player, DamagePredicate damage) {
+            super(ID, player);
+            this.damage = damage;
         }
 
-        public static Conditions create(DamagePredicate.Builder arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg.build());
+        public static Conditions create(DamagePredicate.Builder damageBuilder) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, damageBuilder.build());
         }
 
-        public boolean matches(ServerPlayerEntity arg, DamageSource arg2, float f, float g, boolean bl) {
-            return this.damage.test(arg, arg2, f, g, bl);
+        public boolean matches(ServerPlayerEntity player, DamageSource source, float dealt, float taken, boolean blocked) {
+            return this.damage.test(player, source, dealt, taken, blocked);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("damage", this.damage.toJson());
             return jsonObject;
         }

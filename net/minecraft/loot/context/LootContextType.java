@@ -22,9 +22,9 @@ public class LootContextType {
     private final Set<LootContextParameter<?>> required;
     private final Set<LootContextParameter<?>> allowed;
 
-    private LootContextType(Set<LootContextParameter<?>> set, Set<LootContextParameter<?>> set2) {
-        this.required = ImmutableSet.copyOf(set);
-        this.allowed = ImmutableSet.copyOf((Collection)Sets.union(set, set2));
+    private LootContextType(Set<LootContextParameter<?>> required, Set<LootContextParameter<?>> allowed) {
+        this.required = ImmutableSet.copyOf(required);
+        this.allowed = ImmutableSet.copyOf((Collection)Sets.union(required, allowed));
     }
 
     public Set<LootContextParameter<?>> getRequired() {
@@ -36,14 +36,14 @@ public class LootContextType {
     }
 
     public String toString() {
-        return "[" + Joiner.on((String)", ").join(this.allowed.stream().map(arg -> (this.required.contains(arg) ? "!" : "") + arg.getIdentifier()).iterator()) + "]";
+        return "[" + Joiner.on((String)", ").join(this.allowed.stream().map(parameter -> (this.required.contains(parameter) ? "!" : "") + parameter.getIdentifier()).iterator()) + "]";
     }
 
-    public void validate(LootTableReporter arg, LootContextAware arg2) {
-        Set<LootContextParameter<?>> set = arg2.getRequiredParameters();
+    public void validate(LootTableReporter reporter, LootContextAware parameterConsumer) {
+        Set<LootContextParameter<?>> set = parameterConsumer.getRequiredParameters();
         Sets.SetView set2 = Sets.difference(set, this.allowed);
         if (!set2.isEmpty()) {
-            arg.report("Parameters " + (Object)set2 + " are not provided in this context");
+            reporter.report("Parameters " + (Object)set2 + " are not provided in this context");
         }
     }
 
@@ -51,19 +51,19 @@ public class LootContextType {
         private final Set<LootContextParameter<?>> required = Sets.newIdentityHashSet();
         private final Set<LootContextParameter<?>> allowed = Sets.newIdentityHashSet();
 
-        public Builder require(LootContextParameter<?> arg) {
-            if (this.allowed.contains(arg)) {
-                throw new IllegalArgumentException("Parameter " + arg.getIdentifier() + " is already optional");
+        public Builder require(LootContextParameter<?> parameter) {
+            if (this.allowed.contains(parameter)) {
+                throw new IllegalArgumentException("Parameter " + parameter.getIdentifier() + " is already optional");
             }
-            this.required.add(arg);
+            this.required.add(parameter);
             return this;
         }
 
-        public Builder allow(LootContextParameter<?> arg) {
-            if (this.required.contains(arg)) {
-                throw new IllegalArgumentException("Parameter " + arg.getIdentifier() + " is already required");
+        public Builder allow(LootContextParameter<?> parameter) {
+            if (this.required.contains(parameter)) {
+                throw new IllegalArgumentException("Parameter " + parameter.getIdentifier() + " is already required");
             }
-            this.allowed.add(arg);
+            this.allowed.add(parameter);
             return this;
         }
 

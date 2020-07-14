@@ -24,37 +24,37 @@ extends Item {
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack arg, World arg2, LivingEntity arg3) {
-        if (arg3 instanceof ServerPlayerEntity) {
-            ServerPlayerEntity lv = (ServerPlayerEntity)arg3;
-            Criteria.CONSUME_ITEM.trigger(lv, arg);
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        if (user instanceof ServerPlayerEntity) {
+            ServerPlayerEntity lv = (ServerPlayerEntity)user;
+            Criteria.CONSUME_ITEM.trigger(lv, stack);
             lv.incrementStat(Stats.USED.getOrCreateStat(this));
         }
-        if (arg3 instanceof PlayerEntity && !((PlayerEntity)arg3).abilities.creativeMode) {
-            arg.decrement(1);
+        if (user instanceof PlayerEntity && !((PlayerEntity)user).abilities.creativeMode) {
+            stack.decrement(1);
         }
-        if (!arg2.isClient) {
-            arg3.clearStatusEffects();
+        if (!world.isClient) {
+            user.clearStatusEffects();
         }
-        if (arg.isEmpty()) {
+        if (stack.isEmpty()) {
             return new ItemStack(Items.BUCKET);
         }
-        return arg;
+        return stack;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack arg) {
+    public int getMaxUseTime(ItemStack stack) {
         return 32;
     }
 
     @Override
-    public UseAction getUseAction(ItemStack arg) {
+    public UseAction getUseAction(ItemStack stack) {
         return UseAction.DRINK;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        return ItemUsage.consumeHeldItem(arg, arg2, arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        return ItemUsage.consumeHeldItem(world, user, hand);
     }
 }
 

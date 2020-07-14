@@ -27,35 +27,35 @@ implements Packet<ClientPlayPacketListener> {
     public EntityVelocityUpdateS2CPacket() {
     }
 
-    public EntityVelocityUpdateS2CPacket(Entity arg) {
-        this(arg.getEntityId(), arg.getVelocity());
+    public EntityVelocityUpdateS2CPacket(Entity entity) {
+        this(entity.getEntityId(), entity.getVelocity());
     }
 
-    public EntityVelocityUpdateS2CPacket(int i, Vec3d arg) {
-        this.id = i;
+    public EntityVelocityUpdateS2CPacket(int id, Vec3d velocity) {
+        this.id = id;
         double d = 3.9;
-        double e = MathHelper.clamp(arg.x, -3.9, 3.9);
-        double f = MathHelper.clamp(arg.y, -3.9, 3.9);
-        double g = MathHelper.clamp(arg.z, -3.9, 3.9);
+        double e = MathHelper.clamp(velocity.x, -3.9, 3.9);
+        double f = MathHelper.clamp(velocity.y, -3.9, 3.9);
+        double g = MathHelper.clamp(velocity.z, -3.9, 3.9);
         this.velocityX = (int)(e * 8000.0);
         this.velocityY = (int)(f * 8000.0);
         this.velocityZ = (int)(g * 8000.0);
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.velocityX = arg.readShort();
-        this.velocityY = arg.readShort();
-        this.velocityZ = arg.readShort();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.velocityX = buf.readShort();
+        this.velocityY = buf.readShort();
+        this.velocityZ = buf.readShort();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeShort(this.velocityX);
-        arg.writeShort(this.velocityY);
-        arg.writeShort(this.velocityZ);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeShort(this.velocityX);
+        buf.writeShort(this.velocityY);
+        buf.writeShort(this.velocityZ);
     }
 
     @Override

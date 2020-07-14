@@ -23,8 +23,8 @@ public final class LevelInfo {
     private final GameRules gameRules;
     private final DataPackSettings field_25403;
 
-    public LevelInfo(String string, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, DataPackSettings arg4) {
-        this.name = string;
+    public LevelInfo(String name, GameMode arg, boolean bl, Difficulty arg2, boolean bl2, GameRules arg3, DataPackSettings arg4) {
+        this.name = name;
         this.gameMode = arg;
         this.structures = bl;
         this.difficulty = arg2;

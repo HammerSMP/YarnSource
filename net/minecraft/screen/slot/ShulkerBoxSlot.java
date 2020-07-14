@@ -16,8 +16,8 @@ extends Slot {
     }
 
     @Override
-    public boolean canInsert(ItemStack arg) {
-        return !(Block.getBlockFromItem(arg.getItem()) instanceof ShulkerBoxBlock);
+    public boolean canInsert(ItemStack stack) {
+        return !(Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock);
     }
 }
 

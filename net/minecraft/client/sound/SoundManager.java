@@ -139,16 +139,16 @@ extends SinglePreparationResourceReloadListener<SoundList> {
         return this.sounds.keySet();
     }
 
-    public void playNextTick(TickableSoundInstance arg) {
-        this.soundSystem.playNextTick(arg);
+    public void playNextTick(TickableSoundInstance sound) {
+        this.soundSystem.playNextTick(sound);
     }
 
-    public void play(SoundInstance arg) {
-        this.soundSystem.play(arg);
+    public void play(SoundInstance sound) {
+        this.soundSystem.play(sound);
     }
 
-    public void play(SoundInstance arg, int i) {
-        this.soundSystem.play(arg, i);
+    public void play(SoundInstance sound, int delay) {
+        this.soundSystem.play(sound, delay);
     }
 
     public void updateListenerPosition(Camera arg) {
@@ -175,11 +175,11 @@ extends SinglePreparationResourceReloadListener<SoundList> {
         this.soundSystem.resumeAll();
     }
 
-    public void updateSoundVolume(SoundCategory arg, float f) {
-        if (arg == SoundCategory.MASTER && f <= 0.0f) {
+    public void updateSoundVolume(SoundCategory category, float volume) {
+        if (category == SoundCategory.MASTER && volume <= 0.0f) {
             this.stopAll();
         }
-        this.soundSystem.updateSoundVolume(arg, f);
+        this.soundSystem.updateSoundVolume(category, volume);
     }
 
     public void stop(SoundInstance arg) {
@@ -207,8 +207,8 @@ extends SinglePreparationResourceReloadListener<SoundList> {
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.prepare(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -221,23 +221,23 @@ extends SinglePreparationResourceReloadListener<SoundList> {
         /*
          * WARNING - void declaration
          */
-        private void register(Identifier arg, SoundEntry arg2, ResourceManager arg3) {
+        private void register(Identifier id, SoundEntry entry, ResourceManager resourceManager) {
             boolean bl;
-            WeightedSoundSet lv = this.loadedSounds.get(arg);
+            WeightedSoundSet lv = this.loadedSounds.get(id);
             boolean bl2 = bl = lv == null;
-            if (bl || arg2.canReplace()) {
+            if (bl || entry.canReplace()) {
                 if (!bl) {
-                    LOGGER.debug("Replaced sound event location {}", (Object)arg);
+                    LOGGER.debug("Replaced sound event location {}", (Object)id);
                 }
-                lv = new WeightedSoundSet(arg, arg2.getSubtitle());
-                this.loadedSounds.put(arg, lv);
+                lv = new WeightedSoundSet(id, entry.getSubtitle());
+                this.loadedSounds.put(id, lv);
             }
-            block4: for (final Sound lv2 : arg2.getSounds()) {
+            block4: for (final Sound lv2 : entry.getSounds()) {
                 void lv6;
                 final Identifier lv3 = lv2.getIdentifier();
                 switch (lv2.getRegistrationType()) {
                     case FILE: {
-                        if (!SoundManager.isSoundResourcePresent(lv2, arg, arg3)) continue block4;
+                        if (!SoundManager.isSoundResourcePresent(lv2, id, resourceManager)) continue block4;
                         Sound lv4 = lv2;
                         break;
                     }
@@ -261,12 +261,12 @@ extends SinglePreparationResourceReloadListener<SoundList> {
                             }
 
                             @Override
-                            public void preload(SoundSystem arg) {
+                            public void preload(SoundSystem soundSystem) {
                                 WeightedSoundSet lv = (WeightedSoundSet)loadedSounds.get(lv3);
                                 if (lv == null) {
                                     return;
                                 }
-                                lv.preload(arg);
+                                lv.preload(soundSystem);
                             }
 
                             @Override

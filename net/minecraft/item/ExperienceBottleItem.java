@@ -21,25 +21,25 @@ extends Item {
     }
 
     @Override
-    public boolean hasGlint(ItemStack arg) {
+    public boolean hasGlint(ItemStack stack) {
         return true;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        arg.playSound(null, arg2.getX(), arg2.getY(), arg2.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.NEUTRAL, 0.5f, 0.4f / (RANDOM.nextFloat() * 0.4f + 0.8f));
-        if (!arg.isClient) {
-            ExperienceBottleEntity lv2 = new ExperienceBottleEntity(arg, arg2);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_EXPERIENCE_BOTTLE_THROW, SoundCategory.NEUTRAL, 0.5f, 0.4f / (RANDOM.nextFloat() * 0.4f + 0.8f));
+        if (!world.isClient) {
+            ExperienceBottleEntity lv2 = new ExperienceBottleEntity(world, user);
             lv2.setItem(lv);
-            lv2.setProperties(arg2, arg2.pitch, arg2.yaw, -20.0f, 0.7f, 1.0f);
-            arg.spawnEntity(lv2);
+            lv2.setProperties(user, user.pitch, user.yaw, -20.0f, 0.7f, 1.0f);
+            world.spawnEntity(lv2);
         }
-        arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        if (!arg2.abilities.creativeMode) {
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
+        if (!user.abilities.creativeMode) {
             lv.decrement(1);
         }
-        return TypedActionResult.method_29237(lv, arg.isClient());
+        return TypedActionResult.method_29237(lv, world.isClient());
     }
 }
 

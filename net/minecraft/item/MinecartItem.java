@@ -30,15 +30,15 @@ extends Item {
          * WARNING - void declaration
          */
         @Override
-        public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
+        public ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
             void k;
             RailShape lv5;
-            Direction lv = arg.getBlockState().get(DispenserBlock.FACING);
-            ServerWorld lv2 = arg.getWorld();
-            double d = arg.getX() + (double)lv.getOffsetX() * 1.125;
-            double e = Math.floor(arg.getY()) + (double)lv.getOffsetY();
-            double f = arg.getZ() + (double)lv.getOffsetZ() * 1.125;
-            BlockPos lv3 = arg.getBlockPos().offset(lv);
+            Direction lv = pointer.getBlockState().get(DispenserBlock.FACING);
+            ServerWorld lv2 = pointer.getWorld();
+            double d = pointer.getX() + (double)lv.getOffsetX() * 1.125;
+            double e = Math.floor(pointer.getY()) + (double)lv.getOffsetY();
+            double f = pointer.getZ() + (double)lv.getOffsetZ() * 1.125;
+            BlockPos lv3 = pointer.getBlockPos().offset(lv);
             BlockState lv4 = lv2.getBlockState(lv3);
             RailShape railShape = lv5 = lv4.getBlock() instanceof AbstractRailBlock ? lv4.get(((AbstractRailBlock)lv4.getBlock()).getShapeProperty()) : RailShape.NORTH_SOUTH;
             if (lv4.isIn(BlockTags.RAILS)) {
@@ -57,39 +57,39 @@ extends Item {
                     double j = -0.4;
                 }
             } else {
-                return this.defaultBehavior.dispense(arg, arg2);
+                return this.defaultBehavior.dispense(pointer, stack);
             }
-            AbstractMinecartEntity lv8 = AbstractMinecartEntity.create(lv2, d, e + k, f, ((MinecartItem)arg2.getItem()).type);
-            if (arg2.hasCustomName()) {
-                lv8.setCustomName(arg2.getName());
+            AbstractMinecartEntity lv8 = AbstractMinecartEntity.create(lv2, d, e + k, f, ((MinecartItem)stack.getItem()).type);
+            if (stack.hasCustomName()) {
+                lv8.setCustomName(stack.getName());
             }
             lv2.spawnEntity(lv8);
-            arg2.decrement(1);
-            return arg2;
+            stack.decrement(1);
+            return stack;
         }
 
         @Override
-        protected void playSound(BlockPointer arg) {
-            arg.getWorld().syncWorldEvent(1000, arg.getBlockPos(), 0);
+        protected void playSound(BlockPointer pointer) {
+            pointer.getWorld().syncWorldEvent(1000, pointer.getBlockPos(), 0);
         }
     };
     private final AbstractMinecartEntity.Type type;
 
-    public MinecartItem(AbstractMinecartEntity.Type arg, Item.Settings arg2) {
-        super(arg2);
-        this.type = arg;
+    public MinecartItem(AbstractMinecartEntity.Type type, Item.Settings settings) {
+        super(settings);
+        this.type = type;
         DispenserBlock.registerBehavior(this, DISPENSER_BEHAVIOR);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos lv2;
-        World lv = arg.getWorld();
-        BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
+        World lv = context.getWorld();
+        BlockState lv3 = lv.getBlockState(lv2 = context.getBlockPos());
         if (!lv3.isIn(BlockTags.RAILS)) {
             return ActionResult.FAIL;
         }
-        ItemStack lv4 = arg.getStack();
+        ItemStack lv4 = context.getStack();
         if (!lv.isClient) {
             RailShape lv5 = lv3.getBlock() instanceof AbstractRailBlock ? lv3.get(((AbstractRailBlock)lv3.getBlock()).getShapeProperty()) : RailShape.NORTH_SOUTH;
             double d = 0.0;

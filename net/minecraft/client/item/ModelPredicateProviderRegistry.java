@@ -49,34 +49,34 @@ public class ModelPredicateProviderRegistry {
     private static final ModelPredicateProvider DAMAGE_PROVIDER = (arg, arg2, arg3) -> MathHelper.clamp((float)arg.getDamage() / (float)arg.getMaxDamage(), 0.0f, 1.0f);
     private static final Map<Item, Map<Identifier, ModelPredicateProvider>> ITEM_SPECIFIC = Maps.newHashMap();
 
-    private static ModelPredicateProvider register(Identifier arg, ModelPredicateProvider arg2) {
-        GLOBAL.put(arg, arg2);
-        return arg2;
+    private static ModelPredicateProvider register(Identifier id, ModelPredicateProvider provider) {
+        GLOBAL.put(id, provider);
+        return provider;
     }
 
-    private static void register(Item arg2, Identifier arg22, ModelPredicateProvider arg3) {
-        ITEM_SPECIFIC.computeIfAbsent(arg2, arg -> Maps.newHashMap()).put(arg22, arg3);
+    private static void register(Item item, Identifier id, ModelPredicateProvider provider) {
+        ITEM_SPECIFIC.computeIfAbsent(item, arg -> Maps.newHashMap()).put(id, provider);
     }
 
     @Nullable
-    public static ModelPredicateProvider get(Item arg, Identifier arg2) {
+    public static ModelPredicateProvider get(Item item, Identifier id) {
         ModelPredicateProvider lv;
-        if (arg.getMaxDamage() > 0) {
-            if (DAMAGE_ID.equals(arg2)) {
+        if (item.getMaxDamage() > 0) {
+            if (DAMAGE_ID.equals(id)) {
                 return DAMAGE_PROVIDER;
             }
-            if (DAMAGED_ID.equals(arg2)) {
+            if (DAMAGED_ID.equals(id)) {
                 return DAMAGED_PROVIDER;
             }
         }
-        if ((lv = GLOBAL.get(arg2)) != null) {
+        if ((lv = GLOBAL.get(id)) != null) {
             return lv;
         }
-        Map<Identifier, ModelPredicateProvider> map = ITEM_SPECIFIC.get(arg);
+        Map<Identifier, ModelPredicateProvider> map = ITEM_SPECIFIC.get(item);
         if (map == null) {
             return null;
         }
-        return map.get(arg2);
+        return map.get(id);
     }
 
     static {
@@ -121,10 +121,10 @@ public class ModelPredicateProviderRegistry {
                 return (float)e;
             }
 
-            private double getTime(World arg, double d) {
-                if (arg.getTime() != this.lastTick) {
-                    this.lastTick = arg.getTime();
-                    double e = d - this.time;
+            private double getTime(World world, double skyAngle) {
+                if (world.getTime() != this.lastTick) {
+                    this.lastTick = world.getTime();
+                    double e = skyAngle - this.time;
                     e = MathHelper.floorMod(e + 0.5, 1.0) - 0.5;
                     this.step += e * 0.1;
                     this.step *= 0.9;
@@ -182,29 +182,29 @@ public class ModelPredicateProviderRegistry {
             }
 
             @Nullable
-            private BlockPos getSpawnPos(ClientWorld arg) {
-                return arg.getDimension().isNatural() ? arg.getSpawnPos() : null;
+            private BlockPos getSpawnPos(ClientWorld world) {
+                return world.getDimension().isNatural() ? world.getSpawnPos() : null;
             }
 
             @Nullable
-            private BlockPos getLodestonePos(World arg, CompoundTag arg2) {
+            private BlockPos getLodestonePos(World world, CompoundTag tag) {
                 Optional<RegistryKey<World>> optional;
-                boolean bl = arg2.contains("LodestonePos");
-                boolean bl2 = arg2.contains("LodestoneDimension");
-                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(arg2)).isPresent() && arg.getRegistryKey() == optional.get()) {
-                    return NbtHelper.toBlockPos(arg2.getCompound("LodestonePos"));
+                boolean bl = tag.contains("LodestonePos");
+                boolean bl2 = tag.contains("LodestoneDimension");
+                if (bl && bl2 && (optional = CompassItem.getLodestoneDimension(tag)).isPresent() && world.getRegistryKey() == optional.get()) {
+                    return NbtHelper.toBlockPos(tag.getCompound("LodestonePos"));
                 }
                 return null;
             }
 
-            private double getItemFrameAngleOffset(ItemFrameEntity arg) {
-                Direction lv = arg.getHorizontalFacing();
+            private double getItemFrameAngleOffset(ItemFrameEntity itemFrame) {
+                Direction lv = itemFrame.getHorizontalFacing();
                 int i = lv.getAxis().isVertical() ? 90 * lv.getDirection().offset() : 0;
-                return MathHelper.wrapDegrees(180 + lv.getHorizontal() * 90 + arg.getRotation() * 45 + i);
+                return MathHelper.wrapDegrees(180 + lv.getHorizontal() * 90 + itemFrame.getRotation() * 45 + i);
             }
 
-            private double getAngleToPos(Vec3d arg, Entity arg2) {
-                return Math.atan2(arg.getZ() - arg2.getZ(), arg.getX() - arg2.getX());
+            private double getAngleToPos(Vec3d pos, Entity entity) {
+                return Math.atan2(pos.getZ() - entity.getZ(), pos.getX() - entity.getX());
             }
         });
         ModelPredicateProviderRegistry.register(Items.CROSSBOW, new Identifier("pull"), (arg, arg2, arg3) -> {
@@ -245,12 +245,12 @@ public class ModelPredicateProviderRegistry {
         private AngleRandomizer() {
         }
 
-        private boolean shouldUpdate(long l) {
-            return this.lastUpdateTime != l;
+        private boolean shouldUpdate(long time) {
+            return this.lastUpdateTime != time;
         }
 
-        private void update(long l, double d) {
-            this.lastUpdateTime = l;
+        private void update(long time, double d) {
+            this.lastUpdateTime = time;
             double e = d - this.value;
             e = MathHelper.floorMod(e + 0.5, 1.0) - 0.5;
             this.speed += e * 0.1;

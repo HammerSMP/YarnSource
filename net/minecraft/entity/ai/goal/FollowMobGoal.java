@@ -26,15 +26,15 @@ extends Goal {
     private float oldWaterPathFindingPenalty;
     private final float maxDistance;
 
-    public FollowMobGoal(MobEntity arg, double d, float f, float g) {
-        this.mob = arg;
-        this.targetPredicate = arg2 -> arg2 != null && arg.getClass() != arg2.getClass();
-        this.speed = d;
-        this.navigation = arg.getNavigation();
-        this.minDistance = f;
-        this.maxDistance = g;
+    public FollowMobGoal(MobEntity mob, double speed, float minDistance, float maxDistance) {
+        this.mob = mob;
+        this.targetPredicate = arg2 -> arg2 != null && mob.getClass() != arg2.getClass();
+        this.speed = speed;
+        this.navigation = mob.getNavigation();
+        this.minDistance = minDistance;
+        this.maxDistance = maxDistance;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
-        if (!(arg.getNavigation() instanceof MobNavigation) && !(arg.getNavigation() instanceof BirdNavigation)) {
+        if (!(mob.getNavigation() instanceof MobNavigation) && !(mob.getNavigation() instanceof BirdNavigation)) {
             throw new IllegalArgumentException("Unsupported mob type for FollowMobGoal");
         }
     }

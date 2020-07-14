@@ -63,12 +63,12 @@ implements ResourceMetadataReader<AnimationResourceMetadata> {
         return new AnimationResourceMetadata(list, k, l, i, bl);
     }
 
-    private AnimationFrameResourceMetadata readFrameMetadata(int i, JsonElement jsonElement) {
-        if (jsonElement.isJsonPrimitive()) {
-            return new AnimationFrameResourceMetadata(JsonHelper.asInt(jsonElement, "frames[" + i + "]"));
+    private AnimationFrameResourceMetadata readFrameMetadata(int frame, JsonElement json) {
+        if (json.isJsonPrimitive()) {
+            return new AnimationFrameResourceMetadata(JsonHelper.asInt(json, "frames[" + frame + "]"));
         }
-        if (jsonElement.isJsonObject()) {
-            JsonObject jsonObject = JsonHelper.asObject(jsonElement, "frames[" + i + "]");
+        if (json.isJsonObject()) {
+            JsonObject jsonObject = JsonHelper.asObject(json, "frames[" + frame + "]");
             int j = JsonHelper.getInt(jsonObject, "time", -1);
             if (jsonObject.has("time")) {
                 Validate.inclusiveBetween((long)1L, (long)Integer.MAX_VALUE, (long)j, (String)"Invalid frame time");
@@ -86,8 +86,8 @@ implements ResourceMetadataReader<AnimationResourceMetadata> {
     }
 
     @Override
-    public /* synthetic */ Object fromJson(JsonObject jsonObject) {
-        return this.fromJson(jsonObject);
+    public /* synthetic */ Object fromJson(JsonObject json) {
+        return this.fromJson(json);
     }
 }
 

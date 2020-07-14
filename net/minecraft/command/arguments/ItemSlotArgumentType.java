@@ -70,8 +70,8 @@ implements ArgumentType<Integer> {
         return new ItemSlotArgumentType();
     }
 
-    public static int getItemSlot(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (Integer)commandContext.getArgument(string, Integer.class);
+    public static int getItemSlot(CommandContext<ServerCommandSource> context, String name) {
+        return (Integer)context.getArgument(name, Integer.class);
     }
 
     public Integer parse(StringReader stringReader) throws CommandSyntaxException {
@@ -82,8 +82,8 @@ implements ArgumentType<Integer> {
         return slotNamesToSlotCommandId.get(string);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestMatching(slotNamesToSlotCommandId.keySet(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestMatching(slotNamesToSlotCommandId.keySet(), builder);
     }
 
     public Collection<String> getExamples() {

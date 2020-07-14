@@ -66,8 +66,8 @@ extends HorseBaseEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
-        super.getHurtSound(arg);
+    protected SoundEvent getHurtSound(DamageSource source) {
+        super.getHurtSound(source);
         return SoundEvents.ENTITY_SKELETON_HORSE_HURT;
     }
 
@@ -90,11 +90,11 @@ extends HorseBaseEntity {
     }
 
     @Override
-    protected void playSwimSound(float f) {
+    protected void playSwimSound(float volume) {
         if (this.onGround) {
             super.playSwimSound(0.3f);
         } else {
-            super.playSwimSound(Math.min(0.1f, f * 25.0f));
+            super.playSwimSound(Math.min(0.1f, volume * 25.0f));
         }
     }
 
@@ -126,17 +126,17 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("SkeletonTrap", this.isTrapped());
-        arg.putInt("SkeletonTrapTime", this.trapTime);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("SkeletonTrap", this.isTrapped());
+        tag.putInt("SkeletonTrapTime", this.trapTime);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setTrapped(arg.getBoolean("SkeletonTrap"));
-        this.trapTime = arg.getInt("SkeletonTrapTime");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setTrapped(tag.getBoolean("SkeletonTrap"));
+        this.trapTime = tag.getInt("SkeletonTrapTime");
     }
 
     @Override
@@ -153,12 +153,12 @@ extends HorseBaseEntity {
         return this.trapped;
     }
 
-    public void setTrapped(boolean bl) {
-        if (bl == this.trapped) {
+    public void setTrapped(boolean trapped) {
+        if (trapped == this.trapped) {
             return;
         }
-        this.trapped = bl;
-        if (bl) {
+        this.trapped = trapped;
+        if (trapped) {
             this.goalSelector.add(1, this.trapTriggerGoal);
         } else {
             this.goalSelector.remove(this.trapTriggerGoal);
@@ -172,32 +172,32 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (!this.isTame()) {
             return ActionResult.PASS;
         }
         if (this.isBaby()) {
-            return super.interactMob(arg, arg2);
+            return super.interactMob(player, hand);
         }
-        if (arg.shouldCancelInteraction()) {
-            this.openInventory(arg);
+        if (player.shouldCancelInteraction()) {
+            this.openInventory(player);
             return ActionResult.success(this.world.isClient);
         }
         if (this.hasPassengers()) {
-            return super.interactMob(arg, arg2);
+            return super.interactMob(player, hand);
         }
         if (!lv.isEmpty()) {
             if (lv.getItem() == Items.SADDLE && !this.isSaddled()) {
-                this.openInventory(arg);
+                this.openInventory(player);
                 return ActionResult.success(this.world.isClient);
             }
-            ActionResult lv2 = lv.useOnEntity(arg, this, arg2);
+            ActionResult lv2 = lv.useOnEntity(player, this, hand);
             if (lv2.isAccepted()) {
                 return lv2;
             }
         }
-        this.putPlayerOnBack(arg);
+        this.putPlayerOnBack(player);
         return ActionResult.success(this.world.isClient);
     }
 }

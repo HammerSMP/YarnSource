@@ -28,8 +28,8 @@ import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class BedItemColorFix
 extends DataFix {
-    public BedItemColorFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public BedItemColorFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     public TypeRewriteRule makeRule() {

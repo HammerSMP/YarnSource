@@ -19,9 +19,9 @@ extends Feature<DefaultFeatureConfig> {
     public static final BlockPos ORIGIN = BlockPos.ORIGIN;
     private final boolean open;
 
-    public EndPortalFeature(boolean bl) {
+    public EndPortalFeature(boolean open) {
         super(DefaultFeatureConfig.CODEC);
-        this.open = bl;
+        this.open = open;
     }
 
     @Override

@@ -70,20 +70,20 @@ implements DataProvider {
     }
 
     @Override
-    public void run(DataCache arg) throws IOException {
+    public void run(DataCache cache) throws IOException {
         Path path = this.root.getOutput();
         HashSet set = Sets.newHashSet();
         RecipesProvider.generate(arg2 -> {
             if (!set.add(arg2.getRecipeId())) {
                 throw new IllegalStateException("Duplicate recipe " + arg2.getRecipeId());
             }
-            RecipesProvider.saveRecipe(arg, arg2.toJson(), path.resolve("data/" + arg2.getRecipeId().getNamespace() + "/recipes/" + arg2.getRecipeId().getPath() + ".json"));
+            RecipesProvider.saveRecipe(cache, arg2.toJson(), path.resolve("data/" + arg2.getRecipeId().getNamespace() + "/recipes/" + arg2.getRecipeId().getPath() + ".json"));
             JsonObject jsonObject = arg2.toAdvancementJson();
             if (jsonObject != null) {
-                RecipesProvider.saveRecipeAdvancement(arg, jsonObject, path.resolve("data/" + arg2.getRecipeId().getNamespace() + "/advancements/" + arg2.getAdvancementId().getPath() + ".json"));
+                RecipesProvider.saveRecipeAdvancement(cache, jsonObject, path.resolve("data/" + arg2.getRecipeId().getNamespace() + "/advancements/" + arg2.getAdvancementId().getPath() + ".json"));
             }
         });
-        RecipesProvider.saveRecipeAdvancement(arg, Advancement.Task.create().criterion("impossible", new ImpossibleCriterion.Conditions()).toJson(), path.resolve("data/minecraft/advancements/recipes/root.json"));
+        RecipesProvider.saveRecipeAdvancement(cache, Advancement.Task.create().criterion("impossible", new ImpossibleCriterion.Conditions()).toJson(), path.resolve("data/minecraft/advancements/recipes/root.json"));
     }
 
     private static void saveRecipe(DataCache arg, JsonObject jsonObject, Path path) {

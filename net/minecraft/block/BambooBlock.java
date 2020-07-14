@@ -51,8 +51,8 @@ implements Fertilizable {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE, LEAVES, STAGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE, LEAVES, STAGE);
     }
 
     @Override
@@ -61,36 +61,36 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
         return true;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        VoxelShape lv = arg.get(LEAVES) == BambooLeaves.LARGE ? LARGE_LEAVES_SHAPE : SMALL_LEAVES_SHAPE;
-        Vec3d lv2 = arg.getModelOffset(arg2, arg3);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        VoxelShape lv = state.get(LEAVES) == BambooLeaves.LARGE ? LARGE_LEAVES_SHAPE : SMALL_LEAVES_SHAPE;
+        Vec3d lv2 = state.getModelOffset(world, pos);
         return lv.offset(lv2.x, lv2.y, lv2.z);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        Vec3d lv = arg.getModelOffset(arg2, arg3);
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        Vec3d lv = state.getModelOffset(world, pos);
         return NO_LEAVES_SHAPE.offset(lv.x, lv.y, lv.z);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        FluidState lv = arg.getWorld().getFluidState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        FluidState lv = ctx.getWorld().getFluidState(ctx.getBlockPos());
         if (!lv.isEmpty()) {
             return null;
         }
-        BlockState lv2 = arg.getWorld().getBlockState(arg.getBlockPos().down());
+        BlockState lv2 = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
         if (lv2.isIn(BlockTags.BAMBOO_PLANTABLE_ON)) {
             if (lv2.isOf(Blocks.BAMBOO_SAPLING)) {
                 return (BlockState)this.getDefaultState().with(AGE, 0);
@@ -99,7 +99,7 @@ implements Fertilizable {
                 int i = lv2.get(AGE) > 0 ? 1 : 0;
                 return (BlockState)this.getDefaultState().with(AGE, i);
             }
-            BlockState lv3 = arg.getWorld().getBlockState(arg.getBlockPos().up());
+            BlockState lv3 = ctx.getWorld().getBlockState(ctx.getBlockPos().up());
             if (lv3.isOf(Blocks.BAMBOO) || lv3.isOf(Blocks.BAMBOO_SAPLING)) {
                 return (BlockState)this.getDefaultState().with(AGE, lv3.get(AGE));
             }
@@ -109,113 +109,113 @@ implements Fertilizable {
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.breakBlock(arg3, true);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.breakBlock(pos, true);
         }
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return arg.get(STAGE) == 0;
+    public boolean hasRandomTicks(BlockState state) {
+        return state.get(STAGE) == 0;
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         int i;
-        if (arg.get(STAGE) != 0) {
+        if (state.get(STAGE) != 0) {
             return;
         }
-        if (random.nextInt(3) == 0 && arg2.isAir(arg3.up()) && arg2.getBaseLightLevel(arg3.up(), 0) >= 9 && (i = this.countBambooBelow(arg2, arg3) + 1) < 16) {
-            this.updateLeaves(arg, arg2, arg3, random, i);
+        if (random.nextInt(3) == 0 && world.isAir(pos.up()) && world.getBaseLightLevel(pos.up(), 0) >= 9 && (i = this.countBambooBelow(world, pos) + 1) < 16) {
+            this.updateLeaves(state, world, pos, random, i);
         }
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return arg2.getBlockState(arg3.down()).isIn(BlockTags.BAMBOO_PLANTABLE_ON);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).isIn(BlockTags.BAMBOO_PLANTABLE_ON);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
-        if (arg2 == Direction.UP && arg3.isOf(Blocks.BAMBOO) && arg3.get(AGE) > arg.get(AGE)) {
-            arg4.setBlockState(arg5, (BlockState)arg.cycle(AGE), 2);
+        if (direction == Direction.UP && newState.isOf(Blocks.BAMBOO) && newState.get(AGE) > state.get(AGE)) {
+            world.setBlockState(pos, (BlockState)state.cycle(AGE), 2);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
         int j;
-        int i = this.countBambooAbove(arg, arg2);
-        return i + (j = this.countBambooBelow(arg, arg2)) + 1 < 16 && arg.getBlockState(arg2.up(i)).get(STAGE) != 1;
+        int i = this.countBambooAbove(world, pos);
+        return i + (j = this.countBambooBelow(world, pos)) + 1 < 16 && world.getBlockState(pos.up(i)).get(STAGE) != 1;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        int i = this.countBambooAbove(arg, arg2);
-        int j = this.countBambooBelow(arg, arg2);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        int i = this.countBambooAbove(world, pos);
+        int j = this.countBambooBelow(world, pos);
         int k = i + j + 1;
         int l = 1 + random.nextInt(2);
         for (int m = 0; m < l; ++m) {
-            BlockPos lv = arg2.up(i);
-            BlockState lv2 = arg.getBlockState(lv);
-            if (k >= 16 || lv2.get(STAGE) == 1 || !arg.isAir(lv.up())) {
+            BlockPos lv = pos.up(i);
+            BlockState lv2 = world.getBlockState(lv);
+            if (k >= 16 || lv2.get(STAGE) == 1 || !world.isAir(lv.up())) {
                 return;
             }
-            this.updateLeaves(lv2, arg, lv, random, k);
+            this.updateLeaves(lv2, world, lv, random, k);
             ++i;
             ++k;
         }
     }
 
     @Override
-    public float calcBlockBreakingDelta(BlockState arg, PlayerEntity arg2, BlockView arg3, BlockPos arg4) {
-        if (arg2.getMainHandStack().getItem() instanceof SwordItem) {
+    public float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
+        if (player.getMainHandStack().getItem() instanceof SwordItem) {
             return 1.0f;
         }
-        return super.calcBlockBreakingDelta(arg, arg2, arg3, arg4);
+        return super.calcBlockBreakingDelta(state, player, world, pos);
     }
 
-    protected void updateLeaves(BlockState arg, World arg2, BlockPos arg3, Random random, int i) {
-        BlockState lv = arg2.getBlockState(arg3.down());
-        BlockPos lv2 = arg3.down(2);
-        BlockState lv3 = arg2.getBlockState(lv2);
+    protected void updateLeaves(BlockState state, World world, BlockPos pos, Random random, int height) {
+        BlockState lv = world.getBlockState(pos.down());
+        BlockPos lv2 = pos.down(2);
+        BlockState lv3 = world.getBlockState(lv2);
         BambooLeaves lv4 = BambooLeaves.NONE;
-        if (i >= 1) {
+        if (height >= 1) {
             if (!lv.isOf(Blocks.BAMBOO) || lv.get(LEAVES) == BambooLeaves.NONE) {
                 lv4 = BambooLeaves.SMALL;
             } else if (lv.isOf(Blocks.BAMBOO) && lv.get(LEAVES) != BambooLeaves.NONE) {
                 lv4 = BambooLeaves.LARGE;
                 if (lv3.isOf(Blocks.BAMBOO)) {
-                    arg2.setBlockState(arg3.down(), (BlockState)lv.with(LEAVES, BambooLeaves.SMALL), 3);
-                    arg2.setBlockState(lv2, (BlockState)lv3.with(LEAVES, BambooLeaves.NONE), 3);
+                    world.setBlockState(pos.down(), (BlockState)lv.with(LEAVES, BambooLeaves.SMALL), 3);
+                    world.setBlockState(lv2, (BlockState)lv3.with(LEAVES, BambooLeaves.NONE), 3);
                 }
             }
         }
-        int j = arg.get(AGE) == 1 || lv3.isOf(Blocks.BAMBOO) ? 1 : 0;
-        int k = i >= 11 && random.nextFloat() < 0.25f || i == 15 ? 1 : 0;
-        arg2.setBlockState(arg3.up(), (BlockState)((BlockState)((BlockState)this.getDefaultState().with(AGE, j)).with(LEAVES, lv4)).with(STAGE, k), 3);
+        int j = state.get(AGE) == 1 || lv3.isOf(Blocks.BAMBOO) ? 1 : 0;
+        int k = height >= 11 && random.nextFloat() < 0.25f || height == 15 ? 1 : 0;
+        world.setBlockState(pos.up(), (BlockState)((BlockState)((BlockState)this.getDefaultState().with(AGE, j)).with(LEAVES, lv4)).with(STAGE, k), 3);
     }
 
-    protected int countBambooAbove(BlockView arg, BlockPos arg2) {
+    protected int countBambooAbove(BlockView world, BlockPos pos) {
         int i;
-        for (i = 0; i < 16 && arg.getBlockState(arg2.up(i + 1)).isOf(Blocks.BAMBOO); ++i) {
+        for (i = 0; i < 16 && world.getBlockState(pos.up(i + 1)).isOf(Blocks.BAMBOO); ++i) {
         }
         return i;
     }
 
-    protected int countBambooBelow(BlockView arg, BlockPos arg2) {
+    protected int countBambooBelow(BlockView world, BlockPos pos) {
         int i;
-        for (i = 0; i < 16 && arg.getBlockState(arg2.down(i + 1)).isOf(Blocks.BAMBOO); ++i) {
+        for (i = 0; i < 16 && world.getBlockState(pos.down(i + 1)).isOf(Blocks.BAMBOO); ++i) {
         }
         return i;
     }

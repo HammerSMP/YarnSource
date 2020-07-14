@@ -17,8 +17,8 @@ import net.minecraft.datafixer.TypeReferences;
 
 public class Schema100
 extends Schema {
-    public Schema100(int i, Schema schema) {
-        super(i, schema);
+    public Schema100(int versionKey, Schema parent) {
+        super(versionKey, parent);
     }
 
     protected static TypeTemplate targetItems(Schema schema) {
@@ -70,8 +70,8 @@ extends Schema {
         return map;
     }
 
-    public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> map, Map<String, Supplier<TypeTemplate>> map2) {
-        super.registerTypes(schema, map, map2);
+    public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, Map<String, Supplier<TypeTemplate>> blockEntityTypes) {
+        super.registerTypes(schema, entityTypes, blockEntityTypes);
         schema.registerType(false, TypeReferences.STRUCTURE, () -> DSL.optionalFields((String)"entities", (TypeTemplate)DSL.list((TypeTemplate)DSL.optionalFields((String)"nbt", (TypeTemplate)TypeReferences.ENTITY_TREE.in(schema))), (String)"blocks", (TypeTemplate)DSL.list((TypeTemplate)DSL.optionalFields((String)"nbt", (TypeTemplate)TypeReferences.BLOCK_ENTITY.in(schema))), (String)"palette", (TypeTemplate)DSL.list((TypeTemplate)TypeReferences.BLOCK_STATE.in(schema))));
         schema.registerType(false, TypeReferences.BLOCK_STATE, DSL::remainder);
     }

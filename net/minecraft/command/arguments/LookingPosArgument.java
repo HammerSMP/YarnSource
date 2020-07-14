@@ -26,16 +26,16 @@ implements PosArgument {
     private final double y;
     private final double z;
 
-    public LookingPosArgument(double d, double e, double f) {
-        this.x = d;
-        this.y = e;
-        this.z = f;
+    public LookingPosArgument(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
-    public Vec3d toAbsolutePos(ServerCommandSource arg) {
-        Vec2f lv = arg.getRotation();
-        Vec3d lv2 = arg.getEntityAnchor().positionAt(arg);
+    public Vec3d toAbsolutePos(ServerCommandSource source) {
+        Vec2f lv = source.getRotation();
+        Vec3d lv2 = source.getEntityAnchor().positionAt(source);
         float f = MathHelper.cos((lv.y + 90.0f) * ((float)Math.PI / 180));
         float g = MathHelper.sin((lv.y + 90.0f) * ((float)Math.PI / 180));
         float h = MathHelper.cos(-lv.x * ((float)Math.PI / 180));
@@ -52,7 +52,7 @@ implements PosArgument {
     }
 
     @Override
-    public Vec2f toAbsoluteRotation(ServerCommandSource arg) {
+    public Vec2f toAbsoluteRotation(ServerCommandSource source) {
         return Vec2f.ZERO;
     }
 
@@ -71,44 +71,44 @@ implements PosArgument {
         return true;
     }
 
-    public static LookingPosArgument parse(StringReader stringReader) throws CommandSyntaxException {
-        int i = stringReader.getCursor();
-        double d = LookingPosArgument.readCoordinate(stringReader, i);
-        if (!stringReader.canRead() || stringReader.peek() != ' ') {
-            stringReader.setCursor(i);
-            throw Vec3ArgumentType.INCOMPLETE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+    public static LookingPosArgument parse(StringReader reader) throws CommandSyntaxException {
+        int i = reader.getCursor();
+        double d = LookingPosArgument.readCoordinate(reader, i);
+        if (!reader.canRead() || reader.peek() != ' ') {
+            reader.setCursor(i);
+            throw Vec3ArgumentType.INCOMPLETE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
-        stringReader.skip();
-        double e = LookingPosArgument.readCoordinate(stringReader, i);
-        if (!stringReader.canRead() || stringReader.peek() != ' ') {
-            stringReader.setCursor(i);
-            throw Vec3ArgumentType.INCOMPLETE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+        reader.skip();
+        double e = LookingPosArgument.readCoordinate(reader, i);
+        if (!reader.canRead() || reader.peek() != ' ') {
+            reader.setCursor(i);
+            throw Vec3ArgumentType.INCOMPLETE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
-        stringReader.skip();
-        double f = LookingPosArgument.readCoordinate(stringReader, i);
+        reader.skip();
+        double f = LookingPosArgument.readCoordinate(reader, i);
         return new LookingPosArgument(d, e, f);
     }
 
-    private static double readCoordinate(StringReader stringReader, int i) throws CommandSyntaxException {
-        if (!stringReader.canRead()) {
-            throw CoordinateArgument.MISSING_COORDINATE.createWithContext((ImmutableStringReader)stringReader);
+    private static double readCoordinate(StringReader reader, int startingCursorPos) throws CommandSyntaxException {
+        if (!reader.canRead()) {
+            throw CoordinateArgument.MISSING_COORDINATE.createWithContext((ImmutableStringReader)reader);
         }
-        if (stringReader.peek() != '^') {
-            stringReader.setCursor(i);
-            throw Vec3ArgumentType.MIXED_COORDINATE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+        if (reader.peek() != '^') {
+            reader.setCursor(startingCursorPos);
+            throw Vec3ArgumentType.MIXED_COORDINATE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
-        stringReader.skip();
-        return stringReader.canRead() && stringReader.peek() != ' ' ? stringReader.readDouble() : 0.0;
+        reader.skip();
+        return reader.canRead() && reader.peek() != ' ' ? reader.readDouble() : 0.0;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(object instanceof LookingPosArgument)) {
+        if (!(o instanceof LookingPosArgument)) {
             return false;
         }
-        LookingPosArgument lv = (LookingPosArgument)object;
+        LookingPosArgument lv = (LookingPosArgument)o;
         return this.x == lv.x && this.y == lv.y && this.z == lv.z;
     }
 

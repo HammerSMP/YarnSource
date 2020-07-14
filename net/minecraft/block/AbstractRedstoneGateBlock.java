@@ -37,107 +37,107 @@ extends HorizontalFacingBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return AbstractRedstoneGateBlock.hasTopRim(arg2, arg3.down());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return AbstractRedstoneGateBlock.hasTopRim(world, pos.down());
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (this.isLocked(arg2, arg3, arg)) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (this.isLocked(world, pos, state)) {
             return;
         }
-        boolean bl = arg.get(POWERED);
-        boolean bl2 = this.hasPower(arg2, arg3, arg);
+        boolean bl = state.get(POWERED);
+        boolean bl2 = this.hasPower(world, pos, state);
         if (bl && !bl2) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWERED, false), 2);
+            world.setBlockState(pos, (BlockState)state.with(POWERED, false), 2);
         } else if (!bl) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWERED, true), 2);
+            world.setBlockState(pos, (BlockState)state.with(POWERED, true), 2);
             if (!bl2) {
-                ((ServerTickScheduler)arg2.getBlockTickScheduler()).schedule(arg3, this, this.getUpdateDelayInternal(arg), TickPriority.VERY_HIGH);
+                ((ServerTickScheduler)world.getBlockTickScheduler()).schedule(pos, this, this.getUpdateDelayInternal(state), TickPriority.VERY_HIGH);
             }
         }
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return arg.getWeakRedstonePower(arg2, arg3, arg4);
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return state.getWeakRedstonePower(world, pos, direction);
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        if (!arg.get(POWERED).booleanValue()) {
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (!state.get(POWERED).booleanValue()) {
             return 0;
         }
-        if (arg.get(FACING) == arg4) {
-            return this.getOutputLevel(arg2, arg3, arg);
+        if (state.get(FACING) == direction) {
+            return this.getOutputLevel(world, pos, state);
         }
         return 0;
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (arg.canPlaceAt(arg2, arg3)) {
-            this.updatePowered(arg2, arg3, arg);
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (state.canPlaceAt(world, pos)) {
+            this.updatePowered(world, pos, state);
             return;
         }
-        BlockEntity lv = this.hasBlockEntity() ? arg2.getBlockEntity(arg3) : null;
-        AbstractRedstoneGateBlock.dropStacks(arg, arg2, arg3, lv);
-        arg2.removeBlock(arg3, false);
+        BlockEntity lv = this.hasBlockEntity() ? world.getBlockEntity(pos) : null;
+        AbstractRedstoneGateBlock.dropStacks(state, world, pos, lv);
+        world.removeBlock(pos, false);
         for (Direction lv2 : Direction.values()) {
-            arg2.updateNeighborsAlways(arg3.offset(lv2), this);
+            world.updateNeighborsAlways(pos.offset(lv2), this);
         }
     }
 
-    protected void updatePowered(World arg, BlockPos arg2, BlockState arg3) {
+    protected void updatePowered(World world, BlockPos pos, BlockState state) {
         boolean bl2;
-        if (this.isLocked(arg, arg2, arg3)) {
+        if (this.isLocked(world, pos, state)) {
             return;
         }
-        boolean bl = arg3.get(POWERED);
-        if (bl != (bl2 = this.hasPower(arg, arg2, arg3)) && !arg.getBlockTickScheduler().isTicking(arg2, this)) {
+        boolean bl = state.get(POWERED);
+        if (bl != (bl2 = this.hasPower(world, pos, state)) && !world.getBlockTickScheduler().isTicking(pos, this)) {
             TickPriority lv = TickPriority.HIGH;
-            if (this.isTargetNotAligned(arg, arg2, arg3)) {
+            if (this.isTargetNotAligned(world, pos, state)) {
                 lv = TickPriority.EXTREMELY_HIGH;
             } else if (bl) {
                 lv = TickPriority.VERY_HIGH;
             }
-            arg.getBlockTickScheduler().schedule(arg2, this, this.getUpdateDelayInternal(arg3), lv);
+            world.getBlockTickScheduler().schedule(pos, this, this.getUpdateDelayInternal(state), lv);
         }
     }
 
-    public boolean isLocked(WorldView arg, BlockPos arg2, BlockState arg3) {
+    public boolean isLocked(WorldView arg, BlockPos pos, BlockState state) {
         return false;
     }
 
-    protected boolean hasPower(World arg, BlockPos arg2, BlockState arg3) {
-        return this.getPower(arg, arg2, arg3) > 0;
+    protected boolean hasPower(World world, BlockPos pos, BlockState state) {
+        return this.getPower(world, pos, state) > 0;
     }
 
-    protected int getPower(World arg, BlockPos arg2, BlockState arg3) {
-        Direction lv = arg3.get(FACING);
-        BlockPos lv2 = arg2.offset(lv);
-        int i = arg.getEmittedRedstonePower(lv2, lv);
+    protected int getPower(World world, BlockPos pos, BlockState state) {
+        Direction lv = state.get(FACING);
+        BlockPos lv2 = pos.offset(lv);
+        int i = world.getEmittedRedstonePower(lv2, lv);
         if (i >= 15) {
             return i;
         }
-        BlockState lv3 = arg.getBlockState(lv2);
+        BlockState lv3 = world.getBlockState(lv2);
         return Math.max(i, lv3.isOf(Blocks.REDSTONE_WIRE) ? lv3.get(RedstoneWireBlock.POWER) : 0);
     }
 
-    protected int getMaxInputLevelSides(WorldView arg, BlockPos arg2, BlockState arg3) {
-        Direction lv = arg3.get(FACING);
+    protected int getMaxInputLevelSides(WorldView world, BlockPos pos, BlockState state) {
+        Direction lv = state.get(FACING);
         Direction lv2 = lv.rotateYClockwise();
         Direction lv3 = lv.rotateYCounterclockwise();
-        return Math.max(this.getInputLevel(arg, arg2.offset(lv2), lv2), this.getInputLevel(arg, arg2.offset(lv3), lv3));
+        return Math.max(this.getInputLevel(world, pos.offset(lv2), lv2), this.getInputLevel(world, pos.offset(lv3), lv3));
     }
 
-    protected int getInputLevel(WorldView arg, BlockPos arg2, Direction arg3) {
-        BlockState lv = arg.getBlockState(arg2);
+    protected int getInputLevel(WorldView world, BlockPos pos, Direction dir) {
+        BlockState lv = world.getBlockState(pos);
         if (this.isValidInput(lv)) {
             if (lv.isOf(Blocks.REDSTONE_BLOCK)) {
                 return 15;
@@ -145,64 +145,64 @@ extends HorizontalFacingBlock {
             if (lv.isOf(Blocks.REDSTONE_WIRE)) {
                 return lv.get(RedstoneWireBlock.POWER);
             }
-            return arg.getStrongRedstonePower(arg2, arg3);
+            return world.getStrongRedstonePower(pos, dir);
         }
         return 0;
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite());
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
-        if (this.hasPower(arg, arg2, arg3)) {
-            arg.getBlockTickScheduler().schedule(arg2, this, 1);
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+        if (this.hasPower(world, pos, state)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        this.updateTarget(arg2, arg3, arg);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        this.updateTarget(world, pos, state);
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (bl || arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (moved || state.isOf(newState.getBlock())) {
             return;
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
-        this.updateTarget(arg2, arg3, arg);
+        super.onStateReplaced(state, world, pos, newState, moved);
+        this.updateTarget(world, pos, state);
     }
 
-    protected void updateTarget(World arg, BlockPos arg2, BlockState arg3) {
-        Direction lv = arg3.get(FACING);
-        BlockPos lv2 = arg2.offset(lv.getOpposite());
-        arg.updateNeighbor(lv2, this, arg2);
-        arg.updateNeighborsExcept(lv2, this, lv);
+    protected void updateTarget(World world, BlockPos pos, BlockState state) {
+        Direction lv = state.get(FACING);
+        BlockPos lv2 = pos.offset(lv.getOpposite());
+        world.updateNeighbor(lv2, this, pos);
+        world.updateNeighborsExcept(lv2, this, lv);
     }
 
-    protected boolean isValidInput(BlockState arg) {
-        return arg.emitsRedstonePower();
+    protected boolean isValidInput(BlockState state) {
+        return state.emitsRedstonePower();
     }
 
-    protected int getOutputLevel(BlockView arg, BlockPos arg2, BlockState arg3) {
+    protected int getOutputLevel(BlockView world, BlockPos pos, BlockState state) {
         return 15;
     }
 
-    public static boolean isRedstoneGate(BlockState arg) {
-        return arg.getBlock() instanceof AbstractRedstoneGateBlock;
+    public static boolean isRedstoneGate(BlockState state) {
+        return state.getBlock() instanceof AbstractRedstoneGateBlock;
     }
 
-    public boolean isTargetNotAligned(BlockView arg, BlockPos arg2, BlockState arg3) {
-        Direction lv = arg3.get(FACING).getOpposite();
-        BlockState lv2 = arg.getBlockState(arg2.offset(lv));
+    public boolean isTargetNotAligned(BlockView world, BlockPos pos, BlockState state) {
+        Direction lv = state.get(FACING).getOpposite();
+        BlockState lv2 = world.getBlockState(pos.offset(lv));
         return AbstractRedstoneGateBlock.isRedstoneGate(lv2) && lv2.get(FACING) != lv;
     }
 

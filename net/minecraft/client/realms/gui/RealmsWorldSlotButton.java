@@ -47,11 +47,11 @@ implements TickableElement {
     @Nullable
     private State state;
 
-    public RealmsWorldSlotButton(int i, int j, int k, int l, Supplier<RealmsServer> supplier, Consumer<Text> consumer, int m, ButtonWidget.PressAction arg) {
-        super(i, j, k, l, LiteralText.EMPTY, arg);
-        this.serverDataProvider = supplier;
-        this.slotIndex = m;
-        this.toolTipSetter = consumer;
+    public RealmsWorldSlotButton(int x, int y, int width, int height, Supplier<RealmsServer> serverDataProvider, Consumer<Text> toolTipSetter, int id, ButtonWidget.PressAction action) {
+        super(x, y, width, height, LiteralText.EMPTY, action);
+        this.serverDataProvider = serverDataProvider;
+        this.slotIndex = id;
+        this.toolTipSetter = toolTipSetter;
     }
 
     @Nullable
@@ -133,17 +133,17 @@ implements TickableElement {
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.state == null) {
             return;
         }
-        this.drawSlotFrame(arg, this.x, this.y, i, j, this.state.isCurrentlyActiveSlot, this.state.slotName, this.slotIndex, this.state.imageId, this.state.image, this.state.empty, this.state.minigame, this.state.action, this.state.actionPrompt);
+        this.drawSlotFrame(matrices, this.x, this.y, mouseX, mouseY, this.state.isCurrentlyActiveSlot, this.state.slotName, this.slotIndex, this.state.imageId, this.state.image, this.state.empty, this.state.minigame, this.state.action, this.state.actionPrompt);
     }
 
-    private void drawSlotFrame(MatrixStack arg, int i, int j, int k, int l, boolean bl, String string, int m, long n, @Nullable String string2, boolean bl2, boolean bl3, Action arg2, @Nullable Text arg3) {
+    private void drawSlotFrame(MatrixStack matrices, int x, int y, int mouseX, int mouseY, boolean bl, String text, int m, long n, @Nullable String string2, boolean bl2, boolean bl3, Action arg2, @Nullable Text arg3) {
         boolean bl5;
         boolean bl4 = this.isHovered();
-        if (this.isMouseOver(k, l) && arg3 != null) {
+        if (this.isMouseOver(mouseX, mouseY) && arg3 != null) {
             this.toolTipSetter.accept(arg3);
         }
         MinecraftClient lv = MinecraftClient.getInstance();
@@ -167,7 +167,7 @@ implements TickableElement {
         } else {
             RenderSystem.color4f(0.56f, 0.56f, 0.56f, 1.0f);
         }
-        RealmsWorldSlotButton.drawTexture(arg, i + 3, j + 3, 0.0f, 0.0f, 74, 74, 74, 74);
+        RealmsWorldSlotButton.drawTexture(matrices, x + 3, y + 3, 0.0f, 0.0f, 74, 74, 74, 74);
         lv2.bindTexture(SLOT_FRAME);
         boolean bl6 = bl5 = bl4 && arg2 != Action.NOTHING;
         if (bl5) {
@@ -177,8 +177,8 @@ implements TickableElement {
         } else {
             RenderSystem.color4f(0.56f, 0.56f, 0.56f, 1.0f);
         }
-        RealmsWorldSlotButton.drawTexture(arg, i, j, 0.0f, 0.0f, 80, 80, 80, 80);
-        this.drawCenteredString(arg, lv.textRenderer, string, i + 40, j + 66, 0xFFFFFF);
+        RealmsWorldSlotButton.drawTexture(matrices, x, y, 0.0f, 0.0f, 80, 80, 80, 80);
+        this.drawCenteredString(matrices, lv.textRenderer, text, x + 40, y + 66, 0xFFFFFF);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -193,15 +193,15 @@ implements TickableElement {
         @Nullable
         private final Text actionPrompt;
 
-        State(boolean bl, String string, long l, @Nullable String string2, boolean bl2, boolean bl3, Action arg, @Nullable Text arg2) {
-            this.isCurrentlyActiveSlot = bl;
-            this.slotName = string;
-            this.imageId = l;
-            this.image = string2;
-            this.empty = bl2;
-            this.minigame = bl3;
-            this.action = arg;
-            this.actionPrompt = arg2;
+        State(boolean isCurrentlyActiveSlot, String slotName, long imageId, @Nullable String image, boolean empty, boolean minigame, Action action, @Nullable Text actionPrompt) {
+            this.isCurrentlyActiveSlot = isCurrentlyActiveSlot;
+            this.slotName = slotName;
+            this.imageId = imageId;
+            this.image = image;
+            this.empty = empty;
+            this.minigame = minigame;
+            this.action = action;
+            this.actionPrompt = actionPrompt;
         }
     }
 

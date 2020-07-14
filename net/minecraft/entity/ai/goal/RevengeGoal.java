@@ -24,9 +24,9 @@ extends TrackTargetGoal {
     private final Class<?>[] noRevengeTypes;
     private Class<?>[] noHelpTypes;
 
-    public RevengeGoal(PathAwareEntity arg, Class<?> ... classs) {
-        super(arg, true);
-        this.noRevengeTypes = classs;
+    public RevengeGoal(PathAwareEntity mob, Class<?> ... noRevengeTypes) {
+        super(mob, true);
+        this.noRevengeTypes = noRevengeTypes;
         this.setControls(EnumSet.of(Goal.Control.TARGET));
     }
 
@@ -47,9 +47,9 @@ extends TrackTargetGoal {
         return this.canTrack(lv, VALID_AVOIDABLES_PREDICATE);
     }
 
-    public RevengeGoal setGroupRevenge(Class<?> ... classs) {
+    public RevengeGoal setGroupRevenge(Class<?> ... noHelpTypes) {
         this.groupRevenge = true;
-        this.noHelpTypes = classs;
+        this.noHelpTypes = noHelpTypes;
         return this;
     }
 
@@ -84,8 +84,8 @@ extends TrackTargetGoal {
         }
     }
 
-    protected void setMobEntityTarget(MobEntity arg, LivingEntity arg2) {
-        arg.setTarget(arg2);
+    protected void setMobEntityTarget(MobEntity mob, LivingEntity target) {
+        mob.setTarget(target);
     }
 }
 

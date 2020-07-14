@@ -52,25 +52,25 @@ extends CropBlock {
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (random.nextInt(3) != 0) {
-            super.randomTick(arg, arg2, arg3, random);
+            super.randomTick(state, world, pos, random);
         }
     }
 
     @Override
-    protected int getGrowthAmount(World arg) {
-        return super.getGrowthAmount(arg) / 3;
+    protected int getGrowthAmount(World world) {
+        return super.getGrowthAmount(world) / 3;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return AGE_TO_SHAPE[arg.get(this.getAgeProperty())];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return AGE_TO_SHAPE[state.get(this.getAgeProperty())];
     }
 }
 

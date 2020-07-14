@@ -66,20 +66,20 @@ public class CommandFunctionManager {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public int execute(CommandFunction arg, ServerCommandSource arg2) {
+    public int execute(CommandFunction function, ServerCommandSource source) {
         int i = this.getMaxCommandChainLength();
         if (this.executing) {
             if (this.chain.size() + this.pending.size() < i) {
-                this.pending.add(new Entry(this, arg2, new CommandFunction.FunctionElement(arg)));
+                this.pending.add(new Entry(this, source, new CommandFunction.FunctionElement(function)));
             }
             return 0;
         }
         try {
             this.executing = true;
             int j = 0;
-            CommandFunction.Element[] lvs = arg.getElements();
+            CommandFunction.Element[] lvs = function.getElements();
             for (int k = lvs.length - 1; k >= 0; --k) {
-                this.chain.push(new Entry(this, arg2, lvs[k]));
+                this.chain.push(new Entry(this, source, lvs[k]));
             }
             while (!this.chain.isEmpty()) {
                 try {
@@ -123,8 +123,8 @@ public class CommandFunctionManager {
         return this.server.getCommandSource().withLevel(2).withSilent();
     }
 
-    public Optional<CommandFunction> getFunction(Identifier arg) {
-        return this.field_25333.get(arg);
+    public Optional<CommandFunction> getFunction(Identifier id) {
+        return this.field_25333.get(id);
     }
 
     public Tag<CommandFunction> method_29462(Identifier arg) {
@@ -144,15 +144,15 @@ public class CommandFunctionManager {
         private final ServerCommandSource source;
         private final CommandFunction.Element element;
 
-        public Entry(CommandFunctionManager arg, ServerCommandSource arg2, CommandFunction.Element arg3) {
-            this.manager = arg;
-            this.source = arg2;
-            this.element = arg3;
+        public Entry(CommandFunctionManager manager, ServerCommandSource source, CommandFunction.Element element) {
+            this.manager = manager;
+            this.source = source;
+            this.element = element;
         }
 
-        public void execute(ArrayDeque<Entry> arrayDeque, int i) {
+        public void execute(ArrayDeque<Entry> stack, int maxChainLength) {
             try {
-                this.element.execute(this.manager, this.source, arrayDeque, i);
+                this.element.execute(this.manager, this.source, stack, maxChainLength);
             }
             catch (Throwable throwable) {
                 // empty catch block

@@ -31,8 +31,8 @@ extends RealmsScreen {
     private Text[] field_24205 = new Text[]{new TranslatableText("generator.default"), new TranslatableText("generator.flat"), new TranslatableText("generator.large_biomes"), new TranslatableText("generator.amplified")};
     private Text field_24206;
 
-    public RealmsResetNormalWorldScreen(RealmsResetWorldScreen arg, Text arg2) {
-        this.parent = arg;
+    public RealmsResetNormalWorldScreen(RealmsResetWorldScreen parent, Text arg2) {
+        this.parent = parent;
         this.field_24206 = arg2;
     }
 
@@ -70,21 +70,21 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.titleLabel.render(this, arg);
-        this.textRenderer.draw(arg, I18n.translate("mco.reset.world.seed", new Object[0]), (float)(this.width / 2 - 100), (float)RealmsResetNormalWorldScreen.row(1), 0xA0A0A0);
-        this.seedEdit.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.titleLabel.render(this, matrices);
+        this.textRenderer.draw(matrices, I18n.translate("mco.reset.world.seed", new Object[0]), (float)(this.width / 2 - 100), (float)RealmsResetNormalWorldScreen.row(1), 0xA0A0A0);
+        this.seedEdit.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     private Text method_27458() {

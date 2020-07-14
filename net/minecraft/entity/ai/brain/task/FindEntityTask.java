@@ -31,24 +31,24 @@ extends Task<E> {
     private final Predicate<E> shouldRunPredicate;
     private final MemoryModuleType<T> targetModule;
 
-    public FindEntityTask(EntityType<? extends T> arg, int i, Predicate<E> predicate, Predicate<T> predicate2, MemoryModuleType<T> arg2, float f, int j) {
+    public FindEntityTask(EntityType<? extends T> entityType, int maxDistance, Predicate<E> shouldRunPredicate, Predicate<T> predicate, MemoryModuleType<T> targetModule, float speed, int completionRange) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.VISIBLE_MOBS, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.entityType = arg;
-        this.speed = f;
-        this.maxSquaredDistance = i * i;
-        this.completionRange = j;
-        this.predicate = predicate2;
-        this.shouldRunPredicate = predicate;
-        this.targetModule = arg2;
+        this.entityType = entityType;
+        this.speed = speed;
+        this.maxSquaredDistance = maxDistance * maxDistance;
+        this.completionRange = completionRange;
+        this.predicate = predicate;
+        this.shouldRunPredicate = shouldRunPredicate;
+        this.targetModule = targetModule;
     }
 
-    public static <T extends LivingEntity> FindEntityTask<LivingEntity, T> create(EntityType<? extends T> arg2, int i, MemoryModuleType<T> arg22, float f, int j) {
-        return new FindEntityTask<LivingEntity, LivingEntity>(arg2, i, arg -> true, arg -> true, arg22, f, j);
+    public static <T extends LivingEntity> FindEntityTask<LivingEntity, T> create(EntityType<? extends T> entityType, int maxDistance, MemoryModuleType<T> targetModule, float speed, int completionRange) {
+        return new FindEntityTask<LivingEntity, LivingEntity>(entityType, maxDistance, arg -> true, arg -> true, targetModule, speed, completionRange);
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
-        return this.shouldRunPredicate.test(arg2) && this.method_24582(arg2);
+    protected boolean shouldRun(ServerWorld world, E entity) {
+        return this.shouldRunPredicate.test(entity) && this.method_24582(entity);
     }
 
     private boolean method_24582(E arg) {
@@ -61,9 +61,9 @@ extends Task<E> {
     }
 
     @Override
-    protected void run(ServerWorld arg, E arg2, long l) {
-        Brain<?> lv = ((LivingEntity)arg2).getBrain();
-        lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).ifPresent(list -> list.stream().filter(arg -> this.entityType.equals(arg.getType())).map(arg -> arg).filter(arg2 -> arg2.squaredDistanceTo((Entity)arg2) <= (double)this.maxSquaredDistance).filter(this.predicate).findFirst().ifPresent(arg2 -> {
+    protected void run(ServerWorld world, E entity, long time) {
+        Brain<?> lv = ((LivingEntity)entity).getBrain();
+        lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).ifPresent(list -> list.stream().filter(arg -> this.entityType.equals(arg.getType())).map(arg -> arg).filter(arg2 -> arg2.squaredDistanceTo((Entity)entity) <= (double)this.maxSquaredDistance).filter(this.predicate).findFirst().ifPresent(arg2 -> {
             lv.remember(this.targetModule, arg2);
             lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget((Entity)arg2, true));
             lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget((Entity)arg2, false), this.speed, this.completionRange));

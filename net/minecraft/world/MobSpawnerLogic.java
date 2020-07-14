@@ -68,8 +68,8 @@ public abstract class MobSpawnerLogic {
         }
     }
 
-    public void setEntityId(EntityType<?> arg) {
-        this.spawnEntry.getEntityTag().putString("id", Registry.ENTITY_TYPE.getId(arg).toString());
+    public void setEntityId(EntityType<?> type) {
+        this.spawnEntry.getEntityTag().putString("id", Registry.ENTITY_TYPE.getId(type).toString());
     }
 
     private boolean isPlayerInRange() {
@@ -171,50 +171,50 @@ public abstract class MobSpawnerLogic {
         this.sendStatus(1);
     }
 
-    public void fromTag(CompoundTag arg) {
-        this.spawnDelay = arg.getShort("Delay");
+    public void fromTag(CompoundTag tag) {
+        this.spawnDelay = tag.getShort("Delay");
         this.spawnPotentials.clear();
-        if (arg.contains("SpawnPotentials", 9)) {
-            ListTag lv = arg.getList("SpawnPotentials", 10);
+        if (tag.contains("SpawnPotentials", 9)) {
+            ListTag lv = tag.getList("SpawnPotentials", 10);
             for (int i = 0; i < lv.size(); ++i) {
                 this.spawnPotentials.add(new MobSpawnerEntry(lv.getCompound(i)));
             }
         }
-        if (arg.contains("SpawnData", 10)) {
-            this.setSpawnEntry(new MobSpawnerEntry(1, arg.getCompound("SpawnData")));
+        if (tag.contains("SpawnData", 10)) {
+            this.setSpawnEntry(new MobSpawnerEntry(1, tag.getCompound("SpawnData")));
         } else if (!this.spawnPotentials.isEmpty()) {
             this.setSpawnEntry(WeightedPicker.getRandom(this.getWorld().random, this.spawnPotentials));
         }
-        if (arg.contains("MinSpawnDelay", 99)) {
-            this.minSpawnDelay = arg.getShort("MinSpawnDelay");
-            this.maxSpawnDelay = arg.getShort("MaxSpawnDelay");
-            this.spawnCount = arg.getShort("SpawnCount");
+        if (tag.contains("MinSpawnDelay", 99)) {
+            this.minSpawnDelay = tag.getShort("MinSpawnDelay");
+            this.maxSpawnDelay = tag.getShort("MaxSpawnDelay");
+            this.spawnCount = tag.getShort("SpawnCount");
         }
-        if (arg.contains("MaxNearbyEntities", 99)) {
-            this.maxNearbyEntities = arg.getShort("MaxNearbyEntities");
-            this.requiredPlayerRange = arg.getShort("RequiredPlayerRange");
+        if (tag.contains("MaxNearbyEntities", 99)) {
+            this.maxNearbyEntities = tag.getShort("MaxNearbyEntities");
+            this.requiredPlayerRange = tag.getShort("RequiredPlayerRange");
         }
-        if (arg.contains("SpawnRange", 99)) {
-            this.spawnRange = arg.getShort("SpawnRange");
+        if (tag.contains("SpawnRange", 99)) {
+            this.spawnRange = tag.getShort("SpawnRange");
         }
         if (this.getWorld() != null) {
             this.renderedEntity = null;
         }
     }
 
-    public CompoundTag toTag(CompoundTag arg) {
+    public CompoundTag toTag(CompoundTag tag) {
         Identifier lv = this.getEntityId();
         if (lv == null) {
-            return arg;
+            return tag;
         }
-        arg.putShort("Delay", (short)this.spawnDelay);
-        arg.putShort("MinSpawnDelay", (short)this.minSpawnDelay);
-        arg.putShort("MaxSpawnDelay", (short)this.maxSpawnDelay);
-        arg.putShort("SpawnCount", (short)this.spawnCount);
-        arg.putShort("MaxNearbyEntities", (short)this.maxNearbyEntities);
-        arg.putShort("RequiredPlayerRange", (short)this.requiredPlayerRange);
-        arg.putShort("SpawnRange", (short)this.spawnRange);
-        arg.put("SpawnData", this.spawnEntry.getEntityTag().copy());
+        tag.putShort("Delay", (short)this.spawnDelay);
+        tag.putShort("MinSpawnDelay", (short)this.minSpawnDelay);
+        tag.putShort("MaxSpawnDelay", (short)this.maxSpawnDelay);
+        tag.putShort("SpawnCount", (short)this.spawnCount);
+        tag.putShort("MaxNearbyEntities", (short)this.maxNearbyEntities);
+        tag.putShort("RequiredPlayerRange", (short)this.requiredPlayerRange);
+        tag.putShort("SpawnRange", (short)this.spawnRange);
+        tag.put("SpawnData", this.spawnEntry.getEntityTag().copy());
         ListTag lv2 = new ListTag();
         if (this.spawnPotentials.isEmpty()) {
             lv2.add(this.spawnEntry.serialize());
@@ -223,8 +223,8 @@ public abstract class MobSpawnerLogic {
                 lv2.add(lv3.serialize());
             }
         }
-        arg.put("SpawnPotentials", lv2);
-        return arg;
+        tag.put("SpawnPotentials", lv2);
+        return tag;
     }
 
     @Nullable
@@ -247,8 +247,8 @@ public abstract class MobSpawnerLogic {
         return false;
     }
 
-    public void setSpawnEntry(MobSpawnerEntry arg) {
-        this.spawnEntry = arg;
+    public void setSpawnEntry(MobSpawnerEntry spawnEntry) {
+        this.spawnEntry = spawnEntry;
     }
 
     public abstract void sendStatus(int var1);

@@ -32,12 +32,12 @@ public class RequiredTagList<T> {
     private final List<TagWrapper<T>> tags = Lists.newArrayList();
     private final Function<TagManager, TagGroup<T>> groupGetter;
 
-    public RequiredTagList(Function<TagManager, TagGroup<T>> function) {
-        this.groupGetter = function;
+    public RequiredTagList(Function<TagManager, TagGroup<T>> managerGetter) {
+        this.groupGetter = managerGetter;
     }
 
-    public Tag.Identified<T> add(String string) {
-        TagWrapper lv = new TagWrapper(new Identifier(string));
+    public Tag.Identified<T> add(String id) {
+        TagWrapper lv = new TagWrapper(new Identifier(id));
         this.tags.add(lv);
         return lv;
     }
@@ -46,13 +46,13 @@ public class RequiredTagList<T> {
     public void clearAllTags() {
         this.group = TagGroup.createEmpty();
         SetTag lv = SetTag.empty();
-        this.tags.forEach(arg22 -> arg22.updateDelegate(arg2 -> lv));
+        this.tags.forEach(tag -> tag.updateDelegate(id -> lv));
     }
 
-    public void updateTagManager(TagManager arg) {
-        TagGroup lv = this.groupGetter.apply(arg);
+    public void updateTagManager(TagManager manager) {
+        TagGroup lv = this.groupGetter.apply(manager);
         this.group = lv;
-        this.tags.forEach(arg2 -> arg2.updateDelegate(lv::getTag));
+        this.tags.forEach(tag -> tag.updateDelegate(lv::getTag));
     }
 
     public TagGroup<T> getGroup() {
@@ -63,8 +63,8 @@ public class RequiredTagList<T> {
         return this.tags;
     }
 
-    public Set<Identifier> getMissingTags(TagManager arg) {
-        TagGroup<T> lv = this.groupGetter.apply(arg);
+    public Set<Identifier> getMissingTags(TagManager manager) {
+        TagGroup<T> lv = this.groupGetter.apply(manager);
         Set set = this.tags.stream().map(TagWrapper::getId).collect(Collectors.toSet());
         ImmutableSet immutableSet = ImmutableSet.copyOf(lv.getTagIds());
         return Sets.difference(set, (Set)immutableSet);
@@ -76,8 +76,8 @@ public class RequiredTagList<T> {
         private Tag<T> delegate;
         protected final Identifier id;
 
-        private TagWrapper(Identifier arg) {
-            this.id = arg;
+        private TagWrapper(Identifier id) {
+            this.id = id;
         }
 
         @Override
@@ -92,13 +92,13 @@ public class RequiredTagList<T> {
             return this.delegate;
         }
 
-        void updateDelegate(Function<Identifier, Tag<T>> function) {
-            this.delegate = function.apply(this.id);
+        void updateDelegate(Function<Identifier, Tag<T>> tagFactory) {
+            this.delegate = tagFactory.apply(this.id);
         }
 
         @Override
-        public boolean contains(T object) {
-            return this.get().contains(object);
+        public boolean contains(T entry) {
+            return this.get().contains(entry);
         }
 
         @Override

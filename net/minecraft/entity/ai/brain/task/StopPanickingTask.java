@@ -32,8 +32,8 @@ extends Task<VillagerEntity> {
         }
     }
 
-    private static boolean wasHurtByNearbyEntity(VillagerEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.HURT_BY_ENTITY).filter(arg2 -> arg2.squaredDistanceTo(arg) <= 36.0).isPresent();
+    private static boolean wasHurtByNearbyEntity(VillagerEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.HURT_BY_ENTITY).filter(arg2 -> arg2.squaredDistanceTo(entity) <= 36.0).isPresent();
     }
 }
 

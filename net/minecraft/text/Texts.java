@@ -30,29 +30,29 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class Texts {
-    public static MutableText setStyleIfAbsent(MutableText arg, Style arg2) {
-        if (arg2.isEmpty()) {
-            return arg;
+    public static MutableText setStyleIfAbsent(MutableText text, Style style) {
+        if (style.isEmpty()) {
+            return text;
         }
-        Style lv = arg.getStyle();
+        Style lv = text.getStyle();
         if (lv.isEmpty()) {
-            return arg.setStyle(arg2);
+            return text.setStyle(style);
         }
-        if (lv.equals(arg2)) {
-            return arg;
+        if (lv.equals(style)) {
+            return text;
         }
-        return arg.setStyle(lv.withParent(arg2));
+        return text.setStyle(lv.withParent(style));
     }
 
-    public static MutableText parse(@Nullable ServerCommandSource arg, Text arg2, @Nullable Entity arg3, int i) throws CommandSyntaxException {
-        if (i > 100) {
-            return arg2.shallowCopy();
+    public static MutableText parse(@Nullable ServerCommandSource source, Text text, @Nullable Entity sender, int depth) throws CommandSyntaxException {
+        if (depth > 100) {
+            return text.shallowCopy();
         }
-        MutableText lv = arg2 instanceof ParsableText ? ((ParsableText)((Object)arg2)).parse(arg, arg3, i + 1) : arg2.copy();
-        for (Text lv2 : arg2.getSiblings()) {
-            lv.append(Texts.parse(arg, lv2, arg3, i + 1));
+        MutableText lv = text instanceof ParsableText ? ((ParsableText)((Object)text)).parse(source, sender, depth + 1) : text.copy();
+        for (Text lv2 : text.getSiblings()) {
+            lv.append(Texts.parse(source, lv2, sender, depth + 1));
         }
-        return lv.fillStyle(Texts.method_27663(arg, arg2.getStyle(), arg3, i));
+        return lv.fillStyle(Texts.method_27663(source, text.getStyle(), sender, depth));
     }
 
     private static Style method_27663(@Nullable ServerCommandSource arg, Style arg2, @Nullable Entity arg3, int i) throws CommandSyntaxException {
@@ -65,53 +65,53 @@ public class Texts {
         return arg2;
     }
 
-    public static Text toText(GameProfile gameProfile) {
-        if (gameProfile.getName() != null) {
-            return new LiteralText(gameProfile.getName());
+    public static Text toText(GameProfile profile) {
+        if (profile.getName() != null) {
+            return new LiteralText(profile.getName());
         }
-        if (gameProfile.getId() != null) {
-            return new LiteralText(gameProfile.getId().toString());
+        if (profile.getId() != null) {
+            return new LiteralText(profile.getId().toString());
         }
         return new LiteralText("(unknown)");
     }
 
-    public static Text joinOrdered(Collection<String> collection) {
-        return Texts.joinOrdered(collection, string -> new LiteralText((String)string).formatted(Formatting.GREEN));
+    public static Text joinOrdered(Collection<String> strings) {
+        return Texts.joinOrdered(strings, string -> new LiteralText((String)string).formatted(Formatting.GREEN));
     }
 
-    public static <T extends Comparable<T>> Text joinOrdered(Collection<T> collection, Function<T, Text> function) {
-        if (collection.isEmpty()) {
+    public static <T extends Comparable<T>> Text joinOrdered(Collection<T> elements, Function<T, Text> transformer) {
+        if (elements.isEmpty()) {
             return LiteralText.EMPTY;
         }
-        if (collection.size() == 1) {
-            return function.apply(collection.iterator().next());
+        if (elements.size() == 1) {
+            return transformer.apply(elements.iterator().next());
         }
-        ArrayList list = Lists.newArrayList(collection);
+        ArrayList list = Lists.newArrayList(elements);
         list.sort(Comparable::compareTo);
-        return Texts.join(list, function);
+        return Texts.join(list, transformer);
     }
 
-    public static <T> MutableText join(Collection<T> collection, Function<T, Text> function) {
-        if (collection.isEmpty()) {
+    public static <T> MutableText join(Collection<T> elements, Function<T, Text> transformer) {
+        if (elements.isEmpty()) {
             return new LiteralText("");
         }
-        if (collection.size() == 1) {
-            return function.apply(collection.iterator().next()).shallowCopy();
+        if (elements.size() == 1) {
+            return transformer.apply(elements.iterator().next()).shallowCopy();
         }
         LiteralText lv = new LiteralText("");
         boolean bl = true;
-        for (T object : collection) {
+        for (T object : elements) {
             if (!bl) {
                 lv.append(new LiteralText(", ").formatted(Formatting.GRAY));
             }
-            lv.append(function.apply(object));
+            lv.append(transformer.apply(object));
             bl = false;
         }
         return lv;
     }
 
-    public static MutableText bracketed(Text arg) {
-        return new TranslatableText("chat.square_brackets", arg);
+    public static MutableText bracketed(Text text) {
+        return new TranslatableText("chat.square_brackets", text);
     }
 
     public static Text toText(Message message) {

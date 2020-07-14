@@ -32,32 +32,32 @@ extends AbstractFurnaceBlock {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new SmokerBlockEntity();
     }
 
     @Override
-    protected void openScreen(World arg, BlockPos arg2, PlayerEntity arg3) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    protected void openScreen(World world, BlockPos pos, PlayerEntity player) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof SmokerBlockEntity) {
-            arg3.openHandledScreen((NamedScreenHandlerFactory)((Object)lv));
-            arg3.incrementStat(Stats.INTERACT_WITH_SMOKER);
+            player.openHandledScreen((NamedScreenHandlerFactory)((Object)lv));
+            player.incrementStat(Stats.INTERACT_WITH_SMOKER);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        if (!arg.get(LIT).booleanValue()) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (!state.get(LIT).booleanValue()) {
             return;
         }
-        double d = (double)arg3.getX() + 0.5;
-        double e = arg3.getY();
-        double f = (double)arg3.getZ() + 0.5;
+        double d = (double)pos.getX() + 0.5;
+        double e = pos.getY();
+        double f = (double)pos.getZ() + 0.5;
         if (random.nextDouble() < 0.1) {
-            arg2.playSound(d, e, f, SoundEvents.BLOCK_SMOKER_SMOKE, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
+            world.playSound(d, e, f, SoundEvents.BLOCK_SMOKER_SMOKE, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
         }
-        arg2.addParticle(ParticleTypes.SMOKE, d, e + 1.1, f, 0.0, 0.0, 0.0);
+        world.addParticle(ParticleTypes.SMOKE, d, e + 1.1, f, 0.0, 0.0, 0.0);
     }
 }
 

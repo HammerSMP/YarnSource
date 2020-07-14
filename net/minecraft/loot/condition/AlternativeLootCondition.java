@@ -28,9 +28,9 @@ implements LootCondition {
     private final LootCondition[] terms;
     private final Predicate<LootContext> predicate;
 
-    private AlternativeLootCondition(LootCondition[] args) {
-        this.terms = args;
-        this.predicate = LootConditionTypes.joinOr(args);
+    private AlternativeLootCondition(LootCondition[] terms) {
+        this.terms = terms;
+        this.predicate = LootConditionTypes.joinOr(terms);
     }
 
     @Override
@@ -44,20 +44,20 @@ implements LootCondition {
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        LootCondition.super.validate(arg);
+    public void validate(LootTableReporter reporter) {
+        LootCondition.super.validate(reporter);
         for (int i = 0; i < this.terms.length; ++i) {
-            this.terms[i].validate(arg.makeChild(".term[" + i + "]"));
+            this.terms[i].validate(reporter.makeChild(".term[" + i + "]"));
         }
     }
 
-    public static Builder builder(LootCondition.Builder ... args) {
-        return new Builder(args);
+    public static Builder builder(LootCondition.Builder ... terms) {
+        return new Builder(terms);
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -74,8 +74,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 
@@ -83,15 +83,15 @@ implements LootCondition {
     implements LootCondition.Builder {
         private final List<LootCondition> terms = Lists.newArrayList();
 
-        public Builder(LootCondition.Builder ... args) {
-            for (LootCondition.Builder lv : args) {
+        public Builder(LootCondition.Builder ... terms) {
+            for (LootCondition.Builder lv : terms) {
                 this.terms.add(lv.build());
             }
         }
 
         @Override
-        public Builder or(LootCondition.Builder arg) {
-            this.terms.add(arg.build());
+        public Builder or(LootCondition.Builder condition) {
+            this.terms.add(condition.build());
             return this;
         }
 

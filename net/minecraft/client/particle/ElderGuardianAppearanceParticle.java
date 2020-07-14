@@ -33,8 +33,8 @@ extends Particle {
     private final Model model = new GuardianEntityModel();
     private final RenderLayer LAYER = RenderLayer.getEntityTranslucent(ElderGuardianEntityRenderer.TEXTURE);
 
-    private ElderGuardianAppearanceParticle(ClientWorld arg, double d, double e, double f) {
-        super(arg, d, e, f);
+    private ElderGuardianAppearanceParticle(ClientWorld world, double x, double y, double z) {
+        super(world, x, y, z);
         this.gravityStrength = 0.0f;
         this.maxAge = 30;
     }
@@ -45,11 +45,11 @@ extends Particle {
     }
 
     @Override
-    public void buildGeometry(VertexConsumer arg, Camera arg2, float f) {
-        float g = ((float)this.age + f) / (float)this.maxAge;
+    public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float tickDelta) {
+        float g = ((float)this.age + tickDelta) / (float)this.maxAge;
         float h = 0.05f + 0.5f * MathHelper.sin(g * (float)Math.PI);
         MatrixStack lv = new MatrixStack();
-        lv.multiply(arg2.getRotation());
+        lv.multiply(camera.getRotation());
         lv.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(150.0f * g - 60.0f));
         lv.scale(-1.0f, -1.0f, 1.0f);
         lv.translate(0.0, -1.101f, 1.5);

@@ -16,8 +16,8 @@ import net.minecraft.datafixer.fix.AbstractUuidFix;
 
 public class PersistentStateUuidFix
 extends AbstractUuidFix {
-    public PersistentStateUuidFix(Schema schema) {
-        super(schema, TypeReferences.SAVED_DATA);
+    public PersistentStateUuidFix(Schema outputSchema) {
+        super(outputSchema, TypeReferences.SAVED_DATA);
     }
 
     protected TypeRewriteRule makeRule() {

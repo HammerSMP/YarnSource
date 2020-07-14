@@ -53,9 +53,9 @@ public class StateManager<O, S extends State<O, S>> {
     private final ImmutableSortedMap<String, Property<?>> properties;
     private final ImmutableList<S> states;
 
-    protected StateManager(Function<O, S> function, O object, Factory<O, S> arg, Map<String, Property<?>> map) {
+    protected StateManager(Function<O, S> function, O object, Factory<O, S> factory, Map<String, Property<?>> propertiesMap) {
         this.owner = object;
-        this.properties = ImmutableSortedMap.copyOf(map);
+        this.properties = ImmutableSortedMap.copyOf(propertiesMap);
         Supplier<State> supplier = () -> (State)function.apply(object);
         MapCodec<State> mapCodec = MapCodec.of((MapEncoder)Encoder.empty(), (MapDecoder)Decoder.unit(supplier));
         for (Map.Entry entry : this.properties.entrySet()) {
@@ -74,7 +74,7 @@ public class StateManager<O, S extends State<O, S>> {
         }
         stream.forEach(list2 -> {
             ImmutableMap immutableMap = (ImmutableMap)list2.stream().collect(ImmutableMap.toImmutableMap(Pair::getFirst, Pair::getSecond));
-            State lv = (State)arg.create(object, immutableMap, mapCodec2);
+            State lv = (State)factory.create(object, immutableMap, mapCodec2);
             map2.put(immutableMap, lv);
             list3.add(lv);
         });
@@ -109,37 +109,37 @@ public class StateManager<O, S extends State<O, S>> {
     }
 
     @Nullable
-    public Property<?> getProperty(String string) {
-        return (Property)this.properties.get((Object)string);
+    public Property<?> getProperty(String name) {
+        return (Property)this.properties.get((Object)name);
     }
 
     public static class Builder<O, S extends State<O, S>> {
         private final O owner;
         private final Map<String, Property<?>> namedProperties = Maps.newHashMap();
 
-        public Builder(O object) {
-            this.owner = object;
+        public Builder(O owner) {
+            this.owner = owner;
         }
 
-        public Builder<O, S> add(Property<?> ... args) {
-            for (Property<?> lv : args) {
+        public Builder<O, S> add(Property<?> ... properties) {
+            for (Property<?> lv : properties) {
                 this.validate(lv);
                 this.namedProperties.put(lv.getName(), lv);
             }
             return this;
         }
 
-        private <T extends Comparable<T>> void validate(Property<T> arg) {
-            String string = arg.getName();
+        private <T extends Comparable<T>> void validate(Property<T> property) {
+            String string = property.getName();
             if (!VALID_NAME_PATTERN.matcher(string).matches()) {
                 throw new IllegalArgumentException(this.owner + " has invalidly named property: " + string);
             }
-            Collection<T> collection = arg.getValues();
+            Collection<T> collection = property.getValues();
             if (collection.size() <= 1) {
                 throw new IllegalArgumentException(this.owner + " attempted use property " + string + " with <= 1 possible values");
             }
             for (Comparable comparable : collection) {
-                String string2 = arg.name(comparable);
+                String string2 = property.name(comparable);
                 if (VALID_NAME_PATTERN.matcher(string2).matches()) continue;
                 throw new IllegalArgumentException(this.owner + " has property: " + string + " with invalidly named value: " + string2);
             }
@@ -148,8 +148,8 @@ public class StateManager<O, S extends State<O, S>> {
             }
         }
 
-        public StateManager<O, S> build(Function<O, S> function, Factory<O, S> arg) {
-            return new StateManager<O, S>(function, this.owner, arg, this.namedProperties);
+        public StateManager<O, S> build(Function<O, S> ownerToStateFunction, Factory<O, S> factory) {
+            return new StateManager<O, S>(ownerToStateFunction, this.owner, factory, this.namedProperties);
         }
     }
 

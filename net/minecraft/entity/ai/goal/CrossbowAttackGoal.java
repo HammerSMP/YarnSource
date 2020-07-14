@@ -28,10 +28,10 @@ extends Goal {
     private int chargedTicksLeft;
     private int field_25697;
 
-    public CrossbowAttackGoal(T arg, double d, float f) {
-        this.actor = arg;
-        this.speed = d;
-        this.squaredRange = f * f;
+    public CrossbowAttackGoal(T actor, double speed, float range) {
+        this.actor = actor;
+        this.speed = speed;
+        this.squaredRange = range * range;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }
 

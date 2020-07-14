@@ -17,39 +17,39 @@ public interface ItemSteerable {
 
     public float getSaddledSpeed();
 
-    default public boolean travel(MobEntity arg, SaddledComponent arg2, Vec3d arg3) {
+    default public boolean travel(MobEntity entity, SaddledComponent saddledEntity, Vec3d movementInput) {
         Entity lv;
-        if (!arg.isAlive()) {
+        if (!entity.isAlive()) {
             return false;
         }
-        Entity entity = lv = arg.getPassengerList().isEmpty() ? null : arg.getPassengerList().get(0);
-        if (!(arg.hasPassengers() && arg.canBeControlledByRider() && lv instanceof PlayerEntity)) {
-            arg.stepHeight = 0.5f;
-            arg.flyingSpeed = 0.02f;
-            this.setMovementInput(arg3);
+        Entity entity2 = lv = entity.getPassengerList().isEmpty() ? null : entity.getPassengerList().get(0);
+        if (!(entity.hasPassengers() && entity.canBeControlledByRider() && lv instanceof PlayerEntity)) {
+            entity.stepHeight = 0.5f;
+            entity.flyingSpeed = 0.02f;
+            this.setMovementInput(movementInput);
             return false;
         }
-        arg.prevYaw = arg.yaw = lv.yaw;
-        arg.pitch = lv.pitch * 0.5f;
-        arg.setRotation(arg.yaw, arg.pitch);
-        arg.bodyYaw = arg.yaw;
-        arg.headYaw = arg.yaw;
-        arg.stepHeight = 1.0f;
-        arg.flyingSpeed = arg.getMovementSpeed() * 0.1f;
-        if (arg2.boosted && arg2.field_23216++ > arg2.currentBoostTime) {
-            arg2.boosted = false;
+        entity.prevYaw = entity.yaw = lv.yaw;
+        entity.pitch = lv.pitch * 0.5f;
+        entity.setRotation(entity.yaw, entity.pitch);
+        entity.bodyYaw = entity.yaw;
+        entity.headYaw = entity.yaw;
+        entity.stepHeight = 1.0f;
+        entity.flyingSpeed = entity.getMovementSpeed() * 0.1f;
+        if (saddledEntity.boosted && saddledEntity.field_23216++ > saddledEntity.currentBoostTime) {
+            saddledEntity.boosted = false;
         }
-        if (arg.isLogicalSideForUpdatingMovement()) {
+        if (entity.isLogicalSideForUpdatingMovement()) {
             float f = this.getSaddledSpeed();
-            if (arg2.boosted) {
-                f += f * 1.15f * MathHelper.sin((float)arg2.field_23216 / (float)arg2.currentBoostTime * (float)Math.PI);
+            if (saddledEntity.boosted) {
+                f += f * 1.15f * MathHelper.sin((float)saddledEntity.field_23216 / (float)saddledEntity.currentBoostTime * (float)Math.PI);
             }
-            arg.setMovementSpeed(f);
+            entity.setMovementSpeed(f);
             this.setMovementInput(new Vec3d(0.0, 0.0, 1.0));
-            arg.bodyTrackingIncrements = 0;
+            entity.bodyTrackingIncrements = 0;
         } else {
-            arg.method_29242(arg, false);
-            arg.setVelocity(Vec3d.ZERO);
+            entity.method_29242(entity, false);
+            entity.setVelocity(Vec3d.ZERO);
         }
         return true;
     }

@@ -34,9 +34,9 @@ public class FillPlayerHeadLootFunction
 extends ConditionalLootFunction {
     private final LootContext.EntityTarget entity;
 
-    public FillPlayerHeadLootFunction(LootCondition[] args, LootContext.EntityTarget arg) {
-        super(args);
-        this.entity = arg;
+    public FillPlayerHeadLootFunction(LootCondition[] conditions, LootContext.EntityTarget entity) {
+        super(conditions);
+        this.entity = entity;
     }
 
     @Override
@@ -50,13 +50,13 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
+    public ItemStack process(ItemStack stack, LootContext context) {
         Entity lv;
-        if (arg.getItem() == Items.PLAYER_HEAD && (lv = arg2.get(this.entity.getParameter())) instanceof PlayerEntity) {
+        if (stack.getItem() == Items.PLAYER_HEAD && (lv = context.get(this.entity.getParameter())) instanceof PlayerEntity) {
             GameProfile gameProfile = ((PlayerEntity)lv).getGameProfile();
-            arg.getOrCreateTag().put("SkullOwner", NbtHelper.fromGameProfile(new CompoundTag(), gameProfile));
+            stack.getOrCreateTag().put("SkullOwner", NbtHelper.fromGameProfile(new CompoundTag(), gameProfile));
         }
-        return arg;
+        return stack;
     }
 
     public static class Serializer
@@ -74,8 +74,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

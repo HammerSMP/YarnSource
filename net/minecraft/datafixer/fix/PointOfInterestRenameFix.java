@@ -25,8 +25,8 @@ import net.minecraft.datafixer.TypeReferences;
 
 public abstract class PointOfInterestRenameFix
 extends DataFix {
-    public PointOfInterestRenameFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public PointOfInterestRenameFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     protected TypeRewriteRule makeRule() {

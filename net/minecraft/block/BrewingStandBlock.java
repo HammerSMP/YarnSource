@@ -50,79 +50,79 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new BrewingStandBlockEntity();
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof BrewingStandBlockEntity) {
-            arg4.openHandledScreen((BrewingStandBlockEntity)lv);
-            arg4.incrementStat(Stats.INTERACT_WITH_BREWINGSTAND);
+            player.openHandledScreen((BrewingStandBlockEntity)lv);
+            player.incrementStat(Stats.INTERACT_WITH_BREWINGSTAND);
         }
         return ActionResult.CONSUME;
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof BrewingStandBlockEntity) {
-            ((BrewingStandBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof BrewingStandBlockEntity) {
+            ((BrewingStandBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        double d = (double)arg3.getX() + 0.4 + (double)random.nextFloat() * 0.2;
-        double e = (double)arg3.getY() + 0.7 + (double)random.nextFloat() * 0.3;
-        double f = (double)arg3.getZ() + 0.4 + (double)random.nextFloat() * 0.2;
-        arg2.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        double d = (double)pos.getX() + 0.4 + (double)random.nextFloat() * 0.2;
+        double e = (double)pos.getY() + 0.7 + (double)random.nextFloat() * 0.3;
+        double f = (double)pos.getZ() + 0.4 + (double)random.nextFloat() * 0.2;
+        world.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof BrewingStandBlockEntity) {
-            ItemScatterer.spawn(arg2, arg3, (Inventory)((BrewingStandBlockEntity)lv));
+            ItemScatterer.spawn(world, pos, (Inventory)((BrewingStandBlockEntity)lv));
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return ScreenHandler.calculateComparatorOutput(arg2.getBlockEntity(arg3));
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(BOTTLE_PROPERTIES[0], BOTTLE_PROPERTIES[1], BOTTLE_PROPERTIES[2]);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(BOTTLE_PROPERTIES[0], BOTTLE_PROPERTIES[1], BOTTLE_PROPERTIES[2]);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

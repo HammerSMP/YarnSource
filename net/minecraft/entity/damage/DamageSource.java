@@ -55,64 +55,64 @@ public class DamageSource {
     private boolean explosive;
     public final String name;
 
-    public static DamageSource sting(LivingEntity arg) {
-        return new EntityDamageSource("sting", arg);
+    public static DamageSource sting(LivingEntity attacker) {
+        return new EntityDamageSource("sting", attacker);
     }
 
-    public static DamageSource mob(LivingEntity arg) {
-        return new EntityDamageSource("mob", arg);
+    public static DamageSource mob(LivingEntity attacker) {
+        return new EntityDamageSource("mob", attacker);
     }
 
-    public static DamageSource mobProjectile(Entity arg, LivingEntity arg2) {
-        return new ProjectileDamageSource("mob", arg, arg2);
+    public static DamageSource mobProjectile(Entity projectile, LivingEntity attacker) {
+        return new ProjectileDamageSource("mob", projectile, attacker);
     }
 
-    public static DamageSource player(PlayerEntity arg) {
-        return new EntityDamageSource("player", arg);
+    public static DamageSource player(PlayerEntity attacker) {
+        return new EntityDamageSource("player", attacker);
     }
 
-    public static DamageSource arrow(PersistentProjectileEntity arg, @Nullable Entity arg2) {
-        return new ProjectileDamageSource("arrow", arg, arg2).setProjectile();
+    public static DamageSource arrow(PersistentProjectileEntity projectile, @Nullable Entity attacker) {
+        return new ProjectileDamageSource("arrow", projectile, attacker).setProjectile();
     }
 
-    public static DamageSource trident(Entity arg, @Nullable Entity arg2) {
-        return new ProjectileDamageSource("trident", arg, arg2).setProjectile();
+    public static DamageSource trident(Entity trident, @Nullable Entity attacker) {
+        return new ProjectileDamageSource("trident", trident, attacker).setProjectile();
     }
 
-    public static DamageSource firework(FireworkRocketEntity arg, @Nullable Entity arg2) {
-        return new ProjectileDamageSource("fireworks", arg, arg2).setExplosive();
+    public static DamageSource firework(FireworkRocketEntity firework, @Nullable Entity attacker) {
+        return new ProjectileDamageSource("fireworks", firework, attacker).setExplosive();
     }
 
-    public static DamageSource fireball(AbstractFireballEntity arg, @Nullable Entity arg2) {
-        if (arg2 == null) {
-            return new ProjectileDamageSource("onFire", arg, arg).setFire().setProjectile();
+    public static DamageSource fireball(AbstractFireballEntity fireball, @Nullable Entity attacker) {
+        if (attacker == null) {
+            return new ProjectileDamageSource("onFire", fireball, fireball).setFire().setProjectile();
         }
-        return new ProjectileDamageSource("fireball", arg, arg2).setFire().setProjectile();
+        return new ProjectileDamageSource("fireball", fireball, attacker).setFire().setProjectile();
     }
 
-    public static DamageSource witherSkull(WitherSkullEntity arg, Entity arg2) {
-        return new ProjectileDamageSource("witherSkull", arg, arg2).setProjectile();
+    public static DamageSource witherSkull(WitherSkullEntity witherSkull, Entity attacker) {
+        return new ProjectileDamageSource("witherSkull", witherSkull, attacker).setProjectile();
     }
 
-    public static DamageSource thrownProjectile(Entity arg, @Nullable Entity arg2) {
-        return new ProjectileDamageSource("thrown", arg, arg2).setProjectile();
+    public static DamageSource thrownProjectile(Entity projectile, @Nullable Entity attacker) {
+        return new ProjectileDamageSource("thrown", projectile, attacker).setProjectile();
     }
 
-    public static DamageSource magic(Entity arg, @Nullable Entity arg2) {
-        return new ProjectileDamageSource("indirectMagic", arg, arg2).setBypassesArmor().setUsesMagic();
+    public static DamageSource magic(Entity magic, @Nullable Entity attacker) {
+        return new ProjectileDamageSource("indirectMagic", magic, attacker).setBypassesArmor().setUsesMagic();
     }
 
-    public static DamageSource thorns(Entity arg) {
-        return new EntityDamageSource("thorns", arg).setThorns().setUsesMagic();
+    public static DamageSource thorns(Entity attacker) {
+        return new EntityDamageSource("thorns", attacker).setThorns().setUsesMagic();
     }
 
-    public static DamageSource explosion(@Nullable Explosion arg) {
-        return DamageSource.explosion(arg != null ? arg.getCausingEntity() : null);
+    public static DamageSource explosion(@Nullable Explosion explosion) {
+        return DamageSource.explosion(explosion != null ? explosion.getCausingEntity() : null);
     }
 
-    public static DamageSource explosion(@Nullable LivingEntity arg) {
-        if (arg != null) {
-            return new EntityDamageSource("explosion.player", arg).setScaledWithDifficulty().setExplosive();
+    public static DamageSource explosion(@Nullable LivingEntity attacker) {
+        if (attacker != null) {
+            return new EntityDamageSource("explosion.player", attacker).setScaledWithDifficulty().setExplosive();
         }
         return new DamageSource("explosion").setScaledWithDifficulty().setExplosive();
     }
@@ -159,8 +159,8 @@ public class DamageSource {
         return this.unblockable;
     }
 
-    protected DamageSource(String string) {
-        this.name = string;
+    protected DamageSource(String name) {
+        this.name = name;
     }
 
     @Nullable
@@ -195,14 +195,14 @@ public class DamageSource {
         return this;
     }
 
-    public Text getDeathMessage(LivingEntity arg) {
-        LivingEntity lv = arg.getPrimeAdversary();
+    public Text getDeathMessage(LivingEntity entity) {
+        LivingEntity lv = entity.getPrimeAdversary();
         String string = "death.attack." + this.name;
         String string2 = string + ".player";
         if (lv != null) {
-            return new TranslatableText(string2, arg.getDisplayName(), lv.getDisplayName());
+            return new TranslatableText(string2, entity.getDisplayName(), lv.getDisplayName());
         }
-        return new TranslatableText(string, arg.getDisplayName());
+        return new TranslatableText(string, entity.getDisplayName());
     }
 
     public boolean isFire() {

@@ -40,91 +40,91 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getSidesShape(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
         return VoxelShapes.empty();
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return arg.get(DISTANCE) == 7 && arg.get(PERSISTENT) == false;
+    public boolean hasRandomTicks(BlockState state) {
+        return state.get(DISTANCE) == 7 && state.get(PERSISTENT) == false;
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.get(PERSISTENT).booleanValue() && arg.get(DISTANCE) == 7) {
-            LeavesBlock.dropStacks(arg, arg2, arg3);
-            arg2.removeBlock(arg3, false);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!state.get(PERSISTENT).booleanValue() && state.get(DISTANCE) == 7) {
+            LeavesBlock.dropStacks(state, world, pos);
+            world.removeBlock(pos, false);
         }
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        arg2.setBlockState(arg3, LeavesBlock.updateDistanceFromLogs(arg, arg2, arg3), 3);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        world.setBlockState(pos, LeavesBlock.updateDistanceFromLogs(state, world, pos), 3);
     }
 
     @Override
-    public int getOpacity(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public int getOpacity(BlockState state, BlockView world, BlockPos pos) {
         return 1;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        int i = LeavesBlock.getDistanceFromLog(arg3) + 1;
-        if (i != 1 || arg.get(DISTANCE) != i) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        int i = LeavesBlock.getDistanceFromLog(newState) + 1;
+        if (i != 1 || state.get(DISTANCE) != i) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
-        return arg;
+        return state;
     }
 
-    private static BlockState updateDistanceFromLogs(BlockState arg, WorldAccess arg2, BlockPos arg3) {
+    private static BlockState updateDistanceFromLogs(BlockState state, WorldAccess world, BlockPos pos) {
         int i = 7;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Direction lv2 : Direction.values()) {
-            lv.set(arg3, lv2);
-            i = Math.min(i, LeavesBlock.getDistanceFromLog(arg2.getBlockState(lv)) + 1);
+            lv.set(pos, lv2);
+            i = Math.min(i, LeavesBlock.getDistanceFromLog(world.getBlockState(lv)) + 1);
             if (i == 1) break;
         }
-        return (BlockState)arg.with(DISTANCE, i);
+        return (BlockState)state.with(DISTANCE, i);
     }
 
-    private static int getDistanceFromLog(BlockState arg) {
-        if (BlockTags.LOGS.contains(arg.getBlock())) {
+    private static int getDistanceFromLog(BlockState state) {
+        if (BlockTags.LOGS.contains(state.getBlock())) {
             return 0;
         }
-        if (arg.getBlock() instanceof LeavesBlock) {
-            return arg.get(DISTANCE);
+        if (state.getBlock() instanceof LeavesBlock) {
+            return state.get(DISTANCE);
         }
         return 7;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        if (!arg2.hasRain(arg3.up())) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (!world.hasRain(pos.up())) {
             return;
         }
         if (random.nextInt(15) != 1) {
             return;
         }
-        BlockPos lv = arg3.down();
-        BlockState lv2 = arg2.getBlockState(lv);
-        if (lv2.isOpaque() && lv2.isSideSolidFullSquare(arg2, lv, Direction.UP)) {
+        BlockPos lv = pos.down();
+        BlockState lv2 = world.getBlockState(lv);
+        if (lv2.isOpaque() && lv2.isSideSolidFullSquare(world, lv, Direction.UP)) {
             return;
         }
-        double d = (double)arg3.getX() + random.nextDouble();
-        double e = (double)arg3.getY() - 0.05;
-        double f = (double)arg3.getZ() + random.nextDouble();
-        arg2.addParticle(ParticleTypes.DRIPPING_WATER, d, e, f, 0.0, 0.0, 0.0);
+        double d = (double)pos.getX() + random.nextDouble();
+        double e = (double)pos.getY() - 0.05;
+        double f = (double)pos.getZ() + random.nextDouble();
+        world.addParticle(ParticleTypes.DRIPPING_WATER, d, e, f, 0.0, 0.0, 0.0);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(DISTANCE, PERSISTENT);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(DISTANCE, PERSISTENT);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return LeavesBlock.updateDistanceFromLogs((BlockState)this.getDefaultState().with(PERSISTENT, true), arg.getWorld(), arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return LeavesBlock.updateDistanceFromLogs((BlockState)this.getDefaultState().with(PERSISTENT, true), ctx.getWorld(), ctx.getBlockPos());
     }
 }
 

@@ -41,19 +41,19 @@ Tickable {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         if (this.hasCustomName()) {
-            arg.putString("CustomName", Text.Serializer.toJson(this.customName));
+            tag.putString("CustomName", Text.Serializer.toJson(this.customName));
         }
-        return arg;
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        if (arg2.contains("CustomName", 8)) {
-            this.customName = Text.Serializer.fromJson(arg2.getString("CustomName"));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        if (tag.contains("CustomName", 8)) {
+            this.customName = Text.Serializer.fromJson(tag.getString("CustomName"));
         }
     }
 
@@ -114,8 +114,8 @@ Tickable {
         return new TranslatableText("container.enchant");
     }
 
-    public void setCustomName(@Nullable Text arg) {
-        this.customName = arg;
+    public void setCustomName(@Nullable Text value) {
+        this.customName = value;
     }
 
     @Override

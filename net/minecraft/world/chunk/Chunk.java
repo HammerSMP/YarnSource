@@ -82,14 +82,14 @@ StructureHolder {
 
     public void setStructureStarts(Map<StructureFeature<?>, StructureStart<?>> var1);
 
-    default public boolean areSectionsEmptyBetween(int i, int j) {
-        if (i < 0) {
-            i = 0;
+    default public boolean areSectionsEmptyBetween(int lowerHeight, int upperHeight) {
+        if (lowerHeight < 0) {
+            lowerHeight = 0;
         }
-        if (j >= 256) {
-            j = 255;
+        if (upperHeight >= 256) {
+            upperHeight = 255;
         }
-        for (int k = i; k <= j; k += 16) {
+        for (int k = lowerHeight; k <= upperHeight; k += 16) {
             if (ChunkSection.isEmpty(this.getSectionArray()[k >> 4])) continue;
             return false;
         }
@@ -107,8 +107,8 @@ StructureHolder {
 
     public void removeBlockEntity(BlockPos var1);
 
-    default public void markBlockForPostProcessing(BlockPos arg) {
-        LogManager.getLogger().warn("Trying to mark a block for PostProcessing @ {}, but this operation is not supported.", (Object)arg);
+    default public void markBlockForPostProcessing(BlockPos pos) {
+        LogManager.getLogger().warn("Trying to mark a block for PostProcessing @ {}, but this operation is not supported.", (Object)pos);
     }
 
     public ShortList[] getPostProcessingLists();
@@ -117,7 +117,7 @@ StructureHolder {
         Chunk.getList(this.getPostProcessingLists(), i).add(s);
     }
 
-    default public void addPendingBlockEntityTag(CompoundTag arg) {
+    default public void addPendingBlockEntityTag(CompoundTag tag) {
         LogManager.getLogger().warn("Trying to set a BlockEntity, but this operation is not supported.");
     }
 
@@ -139,11 +139,11 @@ StructureHolder {
 
     public long getInhabitedTime();
 
-    public static ShortList getList(ShortList[] shortLists, int i) {
-        if (shortLists[i] == null) {
-            shortLists[i] = new ShortArrayList();
+    public static ShortList getList(ShortList[] lists, int index) {
+        if (lists[index] == null) {
+            lists[index] = new ShortArrayList();
         }
-        return shortLists[i];
+        return lists[index];
     }
 
     public boolean isLightOn();

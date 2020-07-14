@@ -38,13 +38,13 @@ implements BlockStateSupplier {
     private final Set<Property<?>> definedProperties = Sets.newHashSet();
     private final List<BlockStateVariantMap> variantMaps = Lists.newArrayList();
 
-    private VariantsBlockStateSupplier(Block arg, List<BlockStateVariant> list) {
-        this.block = arg;
-        this.variants = list;
+    private VariantsBlockStateSupplier(Block block, List<BlockStateVariant> variants) {
+        this.block = block;
+        this.variants = variants;
     }
 
-    public VariantsBlockStateSupplier coordinate(BlockStateVariantMap arg2) {
-        arg2.getProperties().forEach(arg -> {
+    public VariantsBlockStateSupplier coordinate(BlockStateVariantMap map) {
+        map.getProperties().forEach(arg -> {
             if (this.block.getStateManager().getProperty(arg.getName()) != arg) {
                 throw new IllegalStateException("Property " + arg + " is not defined for block " + this.block);
             }
@@ -52,7 +52,7 @@ implements BlockStateSupplier {
                 throw new IllegalStateException("Values of property " + arg + " already defined for block " + this.block);
             }
         });
-        this.variantMaps.add(arg2);
+        this.variantMaps.add(map);
         return this;
     }
 
@@ -85,16 +85,16 @@ implements BlockStateSupplier {
         return this.block;
     }
 
-    public static VariantsBlockStateSupplier create(Block arg) {
-        return new VariantsBlockStateSupplier(arg, (List<BlockStateVariant>)ImmutableList.of((Object)BlockStateVariant.create()));
+    public static VariantsBlockStateSupplier create(Block block) {
+        return new VariantsBlockStateSupplier(block, (List<BlockStateVariant>)ImmutableList.of((Object)BlockStateVariant.create()));
     }
 
-    public static VariantsBlockStateSupplier create(Block arg, BlockStateVariant arg2) {
-        return new VariantsBlockStateSupplier(arg, (List<BlockStateVariant>)ImmutableList.of((Object)arg2));
+    public static VariantsBlockStateSupplier create(Block block, BlockStateVariant variant) {
+        return new VariantsBlockStateSupplier(block, (List<BlockStateVariant>)ImmutableList.of((Object)variant));
     }
 
-    public static VariantsBlockStateSupplier create(Block arg, BlockStateVariant ... args) {
-        return new VariantsBlockStateSupplier(arg, (List<BlockStateVariant>)ImmutableList.copyOf((Object[])args));
+    public static VariantsBlockStateSupplier create(Block block, BlockStateVariant ... variants) {
+        return new VariantsBlockStateSupplier(block, (List<BlockStateVariant>)ImmutableList.copyOf((Object[])variants));
     }
 
     @Override

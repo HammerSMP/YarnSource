@@ -24,15 +24,15 @@ extends FeatureSize {
     private final int lowerSize;
     private final int upperSize;
 
-    public TwoLayersFeatureSize(int i, int j, int k) {
-        this(i, j, k, OptionalInt.empty());
+    public TwoLayersFeatureSize(int limit, int lowerSize, int upperSize) {
+        this(limit, lowerSize, upperSize, OptionalInt.empty());
     }
 
-    public TwoLayersFeatureSize(int i, int j, int k, OptionalInt optionalInt) {
-        super(optionalInt);
-        this.limit = i;
-        this.lowerSize = j;
-        this.upperSize = k;
+    public TwoLayersFeatureSize(int limit, int lowerSize, int upperSize, OptionalInt minClippedHeight) {
+        super(minClippedHeight);
+        this.limit = limit;
+        this.lowerSize = lowerSize;
+        this.upperSize = upperSize;
     }
 
     @Override

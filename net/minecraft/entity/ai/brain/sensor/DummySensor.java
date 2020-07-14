@@ -16,7 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 public class DummySensor
 extends Sensor<LivingEntity> {
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
+    protected void sense(ServerWorld world, LivingEntity entity) {
     }
 
     @Override

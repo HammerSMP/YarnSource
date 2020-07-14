@@ -22,17 +22,17 @@ extends CombinedEntry {
     }
 
     @Override
-    protected EntryCombiner combine(EntryCombiner[] args) {
-        switch (args.length) {
+    protected EntryCombiner combine(EntryCombiner[] children) {
+        switch (children.length) {
             case 0: {
                 return ALWAYS_TRUE;
             }
             case 1: {
-                return args[0];
+                return children[0];
             }
             case 2: {
-                EntryCombiner lv = args[0];
-                EntryCombiner lv2 = args[1];
+                EntryCombiner lv = children[0];
+                EntryCombiner lv2 = children[1];
                 return (arg3, consumer) -> {
                     lv.expand(arg3, consumer);
                     lv2.expand(arg3, consumer);
@@ -40,9 +40,9 @@ extends CombinedEntry {
                 };
             }
         }
-        return (arg, consumer) -> {
-            for (EntryCombiner lv : args) {
-                lv.expand(arg, consumer);
+        return (context, lootChoiceExpander) -> {
+            for (EntryCombiner lv : children) {
+                lv.expand(context, lootChoiceExpander);
             }
             return true;
         };

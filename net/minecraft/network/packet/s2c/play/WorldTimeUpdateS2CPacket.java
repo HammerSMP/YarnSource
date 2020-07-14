@@ -22,10 +22,10 @@ implements Packet<ClientPlayPacketListener> {
     public WorldTimeUpdateS2CPacket() {
     }
 
-    public WorldTimeUpdateS2CPacket(long l, long m, boolean bl) {
-        this.time = l;
-        this.timeOfDay = m;
-        if (!bl) {
+    public WorldTimeUpdateS2CPacket(long time, long timeOfDay, boolean doDaylightCycle) {
+        this.time = time;
+        this.timeOfDay = timeOfDay;
+        if (!doDaylightCycle) {
             this.timeOfDay = -this.timeOfDay;
             if (this.timeOfDay == 0L) {
                 this.timeOfDay = -1L;
@@ -34,15 +34,15 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.time = arg.readLong();
-        this.timeOfDay = arg.readLong();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.time = buf.readLong();
+        this.timeOfDay = buf.readLong();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeLong(this.time);
-        arg.writeLong(this.timeOfDay);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeLong(this.time);
+        buf.writeLong(this.timeOfDay);
     }
 
     @Override

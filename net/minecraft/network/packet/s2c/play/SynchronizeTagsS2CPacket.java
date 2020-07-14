@@ -27,13 +27,13 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.tagManager = TagManager.fromPacket(arg);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.tagManager = TagManager.fromPacket(buf);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        this.tagManager.toPacket(arg);
+    public void write(PacketByteBuf buf) throws IOException {
+        this.tagManager.toPacket(buf);
     }
 
     @Override

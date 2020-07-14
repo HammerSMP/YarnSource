@@ -26,8 +26,8 @@ public class MoveControl {
     protected float sidewaysMovement;
     protected State state = State.WAIT;
 
-    public MoveControl(MobEntity arg) {
-        this.entity = arg;
+    public MoveControl(MobEntity entity) {
+        this.entity = entity;
     }
 
     public boolean isMoving() {
@@ -38,20 +38,20 @@ public class MoveControl {
         return this.speed;
     }
 
-    public void moveTo(double d, double e, double f, double g) {
-        this.targetX = d;
-        this.targetY = e;
-        this.targetZ = f;
-        this.speed = g;
+    public void moveTo(double x, double y, double z, double speed) {
+        this.targetX = x;
+        this.targetY = y;
+        this.targetZ = z;
+        this.speed = speed;
         if (this.state != State.JUMPING) {
             this.state = State.MOVE_TO;
         }
     }
 
-    public void strafeTo(float f, float g) {
+    public void strafeTo(float forward, float sideways) {
         this.state = State.STRAFE;
-        this.forwardMovement = f;
-        this.sidewaysMovement = g;
+        this.forwardMovement = forward;
+        this.sidewaysMovement = sideways;
         this.speed = 0.25;
     }
 
@@ -115,16 +115,16 @@ public class MoveControl {
         return lv == null || (lv2 = lv.getNodeMaker()) == null || lv2.getDefaultNodeType(this.entity.world, MathHelper.floor(this.entity.getX() + (double)f), MathHelper.floor(this.entity.getY()), MathHelper.floor(this.entity.getZ() + (double)g)) == PathNodeType.WALKABLE;
     }
 
-    protected float changeAngle(float f, float g, float h) {
+    protected float changeAngle(float from, float to, float max) {
         float j;
-        float i = MathHelper.wrapDegrees(g - f);
-        if (i > h) {
-            i = h;
+        float i = MathHelper.wrapDegrees(to - from);
+        if (i > max) {
+            i = max;
         }
-        if (i < -h) {
-            i = -h;
+        if (i < -max) {
+            i = -max;
         }
-        if ((j = f + i) < 0.0f) {
+        if ((j = from + i) < 0.0f) {
             j += 360.0f;
         } else if (j > 360.0f) {
             j -= 360.0f;

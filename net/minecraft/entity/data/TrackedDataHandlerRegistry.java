@@ -483,17 +483,17 @@ public class TrackedDataHandlerRegistry {
         }
     };
 
-    public static void register(TrackedDataHandler<?> arg) {
-        field_13328.add(arg);
+    public static void register(TrackedDataHandler<?> handler) {
+        field_13328.add(handler);
     }
 
     @Nullable
-    public static TrackedDataHandler<?> get(int i) {
-        return field_13328.get(i);
+    public static TrackedDataHandler<?> get(int id) {
+        return field_13328.get(id);
     }
 
-    public static int getId(TrackedDataHandler<?> arg) {
-        return field_13328.getRawId(arg);
+    public static int getId(TrackedDataHandler<?> handler) {
+        return field_13328.getRawId(handler);
     }
 
     static {

@@ -28,11 +28,11 @@ extends ValueObject {
     public int daysLeft;
     public SubscriptionType type = SubscriptionType.NORMAL;
 
-    public static Subscription parse(String string) {
+    public static Subscription parse(String json) {
         Subscription lv = new Subscription();
         try {
             JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(string).getAsJsonObject();
+            JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
             lv.startDate = JsonUtils.getLongOr("startDate", jsonObject, 0L);
             lv.daysLeft = JsonUtils.getIntOr("daysLeft", jsonObject, 0);
             lv.type = Subscription.typeFrom(JsonUtils.getStringOr("subscriptionType", jsonObject, SubscriptionType.NORMAL.name()));
@@ -43,9 +43,9 @@ extends ValueObject {
         return lv;
     }
 
-    private static SubscriptionType typeFrom(String string) {
+    private static SubscriptionType typeFrom(String subscriptionType) {
         try {
-            return SubscriptionType.valueOf(string);
+            return SubscriptionType.valueOf(subscriptionType);
         }
         catch (Exception exception) {
             return SubscriptionType.NORMAL;

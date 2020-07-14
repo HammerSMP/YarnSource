@@ -30,13 +30,13 @@ extends LandPathNodeMaker {
     private float oldWaterBorderPenalty;
 
     @Override
-    public void init(ChunkCache arg, MobEntity arg2) {
-        super.init(arg, arg2);
-        arg2.setPathfindingPenalty(PathNodeType.WATER, 0.0f);
-        this.oldWalkablePenalty = arg2.getPathfindingPenalty(PathNodeType.WALKABLE);
-        arg2.setPathfindingPenalty(PathNodeType.WALKABLE, 6.0f);
-        this.oldWaterBorderPenalty = arg2.getPathfindingPenalty(PathNodeType.WATER_BORDER);
-        arg2.setPathfindingPenalty(PathNodeType.WATER_BORDER, 4.0f);
+    public void init(ChunkCache cachedWorld, MobEntity entity) {
+        super.init(cachedWorld, entity);
+        entity.setPathfindingPenalty(PathNodeType.WATER, 0.0f);
+        this.oldWalkablePenalty = entity.getPathfindingPenalty(PathNodeType.WALKABLE);
+        entity.setPathfindingPenalty(PathNodeType.WALKABLE, 6.0f);
+        this.oldWaterBorderPenalty = entity.getPathfindingPenalty(PathNodeType.WATER_BORDER);
+        entity.setPathfindingPenalty(PathNodeType.WATER_BORDER, 4.0f);
     }
 
     @Override
@@ -52,12 +52,12 @@ extends LandPathNodeMaker {
     }
 
     @Override
-    public TargetPathNode getNode(double d, double e, double f) {
-        return new TargetPathNode(this.getNode(MathHelper.floor(d), MathHelper.floor(e + 0.5), MathHelper.floor(f)));
+    public TargetPathNode getNode(double x, double y, double z) {
+        return new TargetPathNode(this.getNode(MathHelper.floor(x), MathHelper.floor(y + 0.5), MathHelper.floor(z)));
     }
 
     @Override
-    public int getSuccessors(PathNode[] args, PathNode arg) {
+    public int getSuccessors(PathNode[] successors, PathNode node) {
         PathNode lv11;
         PathNode lv10;
         PathNode lv9;
@@ -65,113 +65,113 @@ extends LandPathNodeMaker {
         boolean bl4;
         int i = 0;
         boolean j = true;
-        BlockPos lv = new BlockPos(arg.x, arg.y, arg.z);
+        BlockPos lv = new BlockPos(node.x, node.y, node.z);
         double d = this.getFeetY(lv);
-        PathNode lv2 = this.getPathNode(arg.x, arg.y, arg.z + 1, 1, d);
-        PathNode lv3 = this.getPathNode(arg.x - 1, arg.y, arg.z, 1, d);
-        PathNode lv4 = this.getPathNode(arg.x + 1, arg.y, arg.z, 1, d);
-        PathNode lv5 = this.getPathNode(arg.x, arg.y, arg.z - 1, 1, d);
-        PathNode lv6 = this.getPathNode(arg.x, arg.y + 1, arg.z, 0, d);
-        PathNode lv7 = this.getPathNode(arg.x, arg.y - 1, arg.z, 1, d);
+        PathNode lv2 = this.getPathNode(node.x, node.y, node.z + 1, 1, d);
+        PathNode lv3 = this.getPathNode(node.x - 1, node.y, node.z, 1, d);
+        PathNode lv4 = this.getPathNode(node.x + 1, node.y, node.z, 1, d);
+        PathNode lv5 = this.getPathNode(node.x, node.y, node.z - 1, 1, d);
+        PathNode lv6 = this.getPathNode(node.x, node.y + 1, node.z, 0, d);
+        PathNode lv7 = this.getPathNode(node.x, node.y - 1, node.z, 1, d);
         if (lv2 != null && !lv2.visited) {
-            args[i++] = lv2;
+            successors[i++] = lv2;
         }
         if (lv3 != null && !lv3.visited) {
-            args[i++] = lv3;
+            successors[i++] = lv3;
         }
         if (lv4 != null && !lv4.visited) {
-            args[i++] = lv4;
+            successors[i++] = lv4;
         }
         if (lv5 != null && !lv5.visited) {
-            args[i++] = lv5;
+            successors[i++] = lv5;
         }
         if (lv6 != null && !lv6.visited) {
-            args[i++] = lv6;
+            successors[i++] = lv6;
         }
         if (lv7 != null && !lv7.visited) {
-            args[i++] = lv7;
+            successors[i++] = lv7;
         }
         boolean bl = lv5 == null || lv5.type == PathNodeType.OPEN || lv5.penalty != 0.0f;
         boolean bl2 = lv2 == null || lv2.type == PathNodeType.OPEN || lv2.penalty != 0.0f;
         boolean bl3 = lv4 == null || lv4.type == PathNodeType.OPEN || lv4.penalty != 0.0f;
         boolean bl5 = bl4 = lv3 == null || lv3.type == PathNodeType.OPEN || lv3.penalty != 0.0f;
-        if (bl && bl4 && (lv8 = this.getPathNode(arg.x - 1, arg.y, arg.z - 1, 1, d)) != null && !lv8.visited) {
-            args[i++] = lv8;
+        if (bl && bl4 && (lv8 = this.getPathNode(node.x - 1, node.y, node.z - 1, 1, d)) != null && !lv8.visited) {
+            successors[i++] = lv8;
         }
-        if (bl && bl3 && (lv9 = this.getPathNode(arg.x + 1, arg.y, arg.z - 1, 1, d)) != null && !lv9.visited) {
-            args[i++] = lv9;
+        if (bl && bl3 && (lv9 = this.getPathNode(node.x + 1, node.y, node.z - 1, 1, d)) != null && !lv9.visited) {
+            successors[i++] = lv9;
         }
-        if (bl2 && bl4 && (lv10 = this.getPathNode(arg.x - 1, arg.y, arg.z + 1, 1, d)) != null && !lv10.visited) {
-            args[i++] = lv10;
+        if (bl2 && bl4 && (lv10 = this.getPathNode(node.x - 1, node.y, node.z + 1, 1, d)) != null && !lv10.visited) {
+            successors[i++] = lv10;
         }
-        if (bl2 && bl3 && (lv11 = this.getPathNode(arg.x + 1, arg.y, arg.z + 1, 1, d)) != null && !lv11.visited) {
-            args[i++] = lv11;
+        if (bl2 && bl3 && (lv11 = this.getPathNode(node.x + 1, node.y, node.z + 1, 1, d)) != null && !lv11.visited) {
+            successors[i++] = lv11;
         }
         return i;
     }
 
-    private double getFeetY(BlockPos arg) {
+    private double getFeetY(BlockPos pos) {
         if (!this.entity.isTouchingWater()) {
             VoxelShape lv2;
             BlockPos lv;
-            return (double)lv.getY() + ((lv2 = this.cachedWorld.getBlockState(lv = arg.down()).getCollisionShape(this.cachedWorld, lv)).isEmpty() ? 0.0 : lv2.getMax(Direction.Axis.Y));
+            return (double)lv.getY() + ((lv2 = this.cachedWorld.getBlockState(lv = pos.down()).getCollisionShape(this.cachedWorld, lv)).isEmpty() ? 0.0 : lv2.getMax(Direction.Axis.Y));
         }
-        return (double)arg.getY() + 0.5;
+        return (double)pos.getY() + 0.5;
     }
 
     @Nullable
-    private PathNode getPathNode(int i, int j, int k, int l, double d) {
+    private PathNode getPathNode(int x, int y, int z, int maxYStep, double prevFeetY) {
         PathNode lv = null;
-        BlockPos lv2 = new BlockPos(i, j, k);
+        BlockPos lv2 = new BlockPos(x, y, z);
         double e = this.getFeetY(lv2);
-        if (e - d > 1.125) {
+        if (e - prevFeetY > 1.125) {
             return null;
         }
-        PathNodeType lv3 = this.getNodeType(this.cachedWorld, i, j, k, this.entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, false, false);
+        PathNodeType lv3 = this.getNodeType(this.cachedWorld, x, y, z, this.entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, false, false);
         float f = this.entity.getPathfindingPenalty(lv3);
         double g = (double)this.entity.getWidth() / 2.0;
         if (f >= 0.0f) {
-            lv = this.getNode(i, j, k);
+            lv = this.getNode(x, y, z);
             lv.type = lv3;
             lv.penalty = Math.max(lv.penalty, f);
         }
         if (lv3 == PathNodeType.WATER || lv3 == PathNodeType.WALKABLE) {
-            if (j < this.entity.world.getSeaLevel() - 10 && lv != null) {
+            if (y < this.entity.world.getSeaLevel() - 10 && lv != null) {
                 lv.penalty += 1.0f;
             }
             return lv;
         }
-        if (lv == null && l > 0 && lv3 != PathNodeType.FENCE && lv3 != PathNodeType.UNPASSABLE_RAIL && lv3 != PathNodeType.TRAPDOOR) {
-            lv = this.getPathNode(i, j + 1, k, l - 1, d);
+        if (lv == null && maxYStep > 0 && lv3 != PathNodeType.FENCE && lv3 != PathNodeType.UNPASSABLE_RAIL && lv3 != PathNodeType.TRAPDOOR) {
+            lv = this.getPathNode(x, y + 1, z, maxYStep - 1, prevFeetY);
         }
         if (lv3 == PathNodeType.OPEN) {
-            Box lv4 = new Box((double)i - g + 0.5, (double)j + 0.001, (double)k - g + 0.5, (double)i + g + 0.5, (float)j + this.entity.getHeight(), (double)k + g + 0.5);
+            Box lv4 = new Box((double)x - g + 0.5, (double)y + 0.001, (double)z - g + 0.5, (double)x + g + 0.5, (float)y + this.entity.getHeight(), (double)z + g + 0.5);
             if (!this.entity.world.doesNotCollide(this.entity, lv4)) {
                 return null;
             }
-            PathNodeType lv5 = this.getNodeType(this.cachedWorld, i, j - 1, k, this.entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, false, false);
+            PathNodeType lv5 = this.getNodeType(this.cachedWorld, x, y - 1, z, this.entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, false, false);
             if (lv5 == PathNodeType.BLOCKED) {
-                lv = this.getNode(i, j, k);
+                lv = this.getNode(x, y, z);
                 lv.type = PathNodeType.WALKABLE;
                 lv.penalty = Math.max(lv.penalty, f);
                 return lv;
             }
             if (lv5 == PathNodeType.WATER) {
-                lv = this.getNode(i, j, k);
+                lv = this.getNode(x, y, z);
                 lv.type = PathNodeType.WATER;
                 lv.penalty = Math.max(lv.penalty, f);
                 return lv;
             }
             int m = 0;
-            while (j > 0 && lv3 == PathNodeType.OPEN) {
-                --j;
+            while (y > 0 && lv3 == PathNodeType.OPEN) {
+                --y;
                 if (m++ >= this.entity.getSafeFallDistance()) {
                     return null;
                 }
-                lv3 = this.getNodeType(this.cachedWorld, i, j, k, this.entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, false, false);
+                lv3 = this.getNodeType(this.cachedWorld, x, y, z, this.entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, false, false);
                 f = this.entity.getPathfindingPenalty(lv3);
                 if (lv3 != PathNodeType.OPEN && f >= 0.0f) {
-                    lv = this.getNode(i, j, k);
+                    lv = this.getNode(x, y, z);
                     lv.type = lv3;
                     lv.penalty = Math.max(lv.penalty, f);
                     break;
@@ -184,34 +184,34 @@ extends LandPathNodeMaker {
     }
 
     @Override
-    protected PathNodeType adjustNodeType(BlockView arg, boolean bl, boolean bl2, BlockPos arg2, PathNodeType arg3) {
-        if (arg3 == PathNodeType.RAIL && !(arg.getBlockState(arg2).getBlock() instanceof AbstractRailBlock) && !(arg.getBlockState(arg2.down()).getBlock() instanceof AbstractRailBlock)) {
-            arg3 = PathNodeType.UNPASSABLE_RAIL;
+    protected PathNodeType adjustNodeType(BlockView world, boolean canOpenDoors, boolean canEnterOpenDoors, BlockPos pos, PathNodeType type) {
+        if (type == PathNodeType.RAIL && !(world.getBlockState(pos).getBlock() instanceof AbstractRailBlock) && !(world.getBlockState(pos.down()).getBlock() instanceof AbstractRailBlock)) {
+            type = PathNodeType.UNPASSABLE_RAIL;
         }
-        if (arg3 == PathNodeType.DOOR_OPEN || arg3 == PathNodeType.DOOR_WOOD_CLOSED || arg3 == PathNodeType.DOOR_IRON_CLOSED) {
-            arg3 = PathNodeType.BLOCKED;
+        if (type == PathNodeType.DOOR_OPEN || type == PathNodeType.DOOR_WOOD_CLOSED || type == PathNodeType.DOOR_IRON_CLOSED) {
+            type = PathNodeType.BLOCKED;
         }
-        if (arg3 == PathNodeType.LEAVES) {
-            arg3 = PathNodeType.BLOCKED;
+        if (type == PathNodeType.LEAVES) {
+            type = PathNodeType.BLOCKED;
         }
-        return arg3;
+        return type;
     }
 
     @Override
-    public PathNodeType getDefaultNodeType(BlockView arg, int i, int j, int k) {
+    public PathNodeType getDefaultNodeType(BlockView world, int x, int y, int z) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        PathNodeType lv2 = AmphibiousPathNodeMaker.getCommonNodeType(arg, lv.set(i, j, k));
+        PathNodeType lv2 = AmphibiousPathNodeMaker.getCommonNodeType(world, lv.set(x, y, z));
         if (lv2 == PathNodeType.WATER) {
             for (Direction lv3 : Direction.values()) {
-                PathNodeType lv4 = AmphibiousPathNodeMaker.getCommonNodeType(arg, lv.set(i, j, k).move(lv3));
+                PathNodeType lv4 = AmphibiousPathNodeMaker.getCommonNodeType(world, lv.set(x, y, z).move(lv3));
                 if (lv4 != PathNodeType.BLOCKED) continue;
                 return PathNodeType.WATER_BORDER;
             }
             return PathNodeType.WATER;
         }
-        if (lv2 == PathNodeType.OPEN && j >= 1) {
-            BlockState lv5 = arg.getBlockState(new BlockPos(i, j - 1, k));
-            PathNodeType lv6 = AmphibiousPathNodeMaker.getCommonNodeType(arg, lv.set(i, j - 1, k));
+        if (lv2 == PathNodeType.OPEN && y >= 1) {
+            BlockState lv5 = world.getBlockState(new BlockPos(x, y - 1, z));
+            PathNodeType lv6 = AmphibiousPathNodeMaker.getCommonNodeType(world, lv.set(x, y - 1, z));
             lv2 = lv6 == PathNodeType.WALKABLE || lv6 == PathNodeType.OPEN || lv6 == PathNodeType.LAVA ? PathNodeType.OPEN : PathNodeType.WALKABLE;
             if (lv6 == PathNodeType.DAMAGE_FIRE || lv5.isOf(Blocks.MAGMA_BLOCK) || lv5.isIn(BlockTags.CAMPFIRES)) {
                 lv2 = PathNodeType.DAMAGE_FIRE;
@@ -224,7 +224,7 @@ extends LandPathNodeMaker {
             }
         }
         if (lv2 == PathNodeType.WALKABLE) {
-            lv2 = AmphibiousPathNodeMaker.getNodeTypeFromNeighbors(arg, lv.set(i, j, k), lv2);
+            lv2 = AmphibiousPathNodeMaker.getNodeTypeFromNeighbors(world, lv.set(x, y, z), lv2);
         }
         return lv2;
     }

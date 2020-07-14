@@ -31,16 +31,16 @@ import net.minecraft.util.registry.Registry;
 public class ItemColors {
     private final IdList<ItemColorProvider> providers = new IdList(32);
 
-    public static ItemColors create(BlockColors arg3) {
+    public static ItemColors create(BlockColors blockColors) {
         ItemColors lv = new ItemColors();
-        lv.register((arg, i) -> i > 0 ? -1 : ((DyeableItem)((Object)arg.getItem())).getColor(arg), Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS, Items.LEATHER_HORSE_ARMOR);
-        lv.register((arg, i) -> GrassColors.getColor(0.5, 1.0), Blocks.TALL_GRASS, Blocks.LARGE_FERN);
-        lv.register((arg, i) -> {
+        lv.register((stack, tintIndex) -> tintIndex > 0 ? -1 : ((DyeableItem)((Object)stack.getItem())).getColor(stack), Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS, Items.LEATHER_HORSE_ARMOR);
+        lv.register((stack, tintIndex) -> GrassColors.getColor(0.5, 1.0), Blocks.TALL_GRASS, Blocks.LARGE_FERN);
+        lv.register((stack, tintIndex) -> {
             int[] is;
-            if (i != 1) {
+            if (tintIndex != 1) {
                 return -1;
             }
-            CompoundTag lv = arg.getSubTag("Explosion");
+            CompoundTag lv = stack.getSubTag("Explosion");
             int[] arrn = is = lv != null && lv.contains("Colors", 11) ? lv.getIntArray("Colors") : null;
             if (is == null || is.length == 0) {
                 return 0x8A8A8A;
@@ -58,27 +58,27 @@ public class ItemColors {
             }
             return (j /= is.length) << 16 | (k /= is.length) << 8 | (l /= is.length);
         }, Items.FIREWORK_STAR);
-        lv.register((arg, i) -> i > 0 ? -1 : PotionUtil.getColor(arg), Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
+        lv.register((stack, tintIndex) -> tintIndex > 0 ? -1 : PotionUtil.getColor(stack), Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
         for (SpawnEggItem lv2 : SpawnEggItem.getAll()) {
-            lv.register((arg2, i) -> lv2.getColor(i), lv2);
+            lv.register((stack, tintIndex) -> lv2.getColor(tintIndex), lv2);
         }
-        lv.register((arg2, i) -> {
-            BlockState lv = ((BlockItem)arg2.getItem()).getBlock().getDefaultState();
-            return arg3.getColor(lv, null, null, i);
+        lv.register((stack, tintIndex) -> {
+            BlockState lv = ((BlockItem)stack.getItem()).getBlock().getDefaultState();
+            return blockColors.getColor(lv, null, null, tintIndex);
         }, Blocks.GRASS_BLOCK, Blocks.GRASS, Blocks.FERN, Blocks.VINE, Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.BIRCH_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES, Blocks.LILY_PAD);
-        lv.register((arg, i) -> i == 0 ? PotionUtil.getColor(arg) : -1, Items.TIPPED_ARROW);
-        lv.register((arg, i) -> i == 0 ? -1 : FilledMapItem.getMapColor(arg), Items.FILLED_MAP);
+        lv.register((stack, tintIndex) -> tintIndex == 0 ? PotionUtil.getColor(stack) : -1, Items.TIPPED_ARROW);
+        lv.register((stack, tintIndex) -> tintIndex == 0 ? -1 : FilledMapItem.getMapColor(stack), Items.FILLED_MAP);
         return lv;
     }
 
-    public int getColorMultiplier(ItemStack arg, int i) {
-        ItemColorProvider lv = this.providers.get(Registry.ITEM.getRawId(arg.getItem()));
-        return lv == null ? -1 : lv.getColor(arg, i);
+    public int getColorMultiplier(ItemStack item, int tintIndex) {
+        ItemColorProvider lv = this.providers.get(Registry.ITEM.getRawId(item.getItem()));
+        return lv == null ? -1 : lv.getColor(item, tintIndex);
     }
 
-    public void register(ItemColorProvider arg, ItemConvertible ... args) {
-        for (ItemConvertible lv : args) {
-            this.providers.set(arg, Item.getRawId(lv.asItem()));
+    public void register(ItemColorProvider mapper, ItemConvertible ... items) {
+        for (ItemConvertible lv : items) {
+            this.providers.set(mapper, Item.getRawId(lv.asItem()));
         }
     }
 }

@@ -51,24 +51,24 @@ extends AbstractSignBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return FACING_TO_SHAPE.get(arg.get(FACING));
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return FACING_TO_SHAPE.get(state.get(FACING));
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return arg2.getBlockState(arg3.offset(arg.get(FACING).getOpposite())).getMaterial().isSolid();
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.offset(state.get(FACING).getOpposite())).getMaterial().isSolid();
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction[] lvs;
         BlockState lv = this.getDefaultState();
-        FluidState lv2 = arg.getWorld().getFluidState(arg.getBlockPos());
-        World lv3 = arg.getWorld();
-        BlockPos lv4 = arg.getBlockPos();
-        for (Direction lv5 : lvs = arg.getPlacementDirections()) {
+        FluidState lv2 = ctx.getWorld().getFluidState(ctx.getBlockPos());
+        World lv3 = ctx.getWorld();
+        BlockPos lv4 = ctx.getBlockPos();
+        for (Direction lv5 : lvs = ctx.getPlacementDirections()) {
             Direction lv6;
             if (!lv5.getAxis().isHorizontal() || !(lv = (BlockState)lv.with(FACING, lv6 = lv5.getOpposite())).canPlaceAt(lv3, lv4)) continue;
             return (BlockState)lv.with(WATERLOGGED, lv2.getFluid() == Fluids.WATER);
@@ -77,26 +77,26 @@ extends AbstractSignBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2.getOpposite() == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction.getOpposite() == state.get(FACING) && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, WATERLOGGED);
     }
 }
 

@@ -61,7 +61,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setClearWeatherTime(int i) {
+    public void setClearWeatherTime(int clearWeatherTime) {
     }
 
     @Override
@@ -90,47 +90,47 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setSpawnX(int i) {
+    public void setSpawnX(int spawnX) {
     }
 
     @Override
-    public void setSpawnY(int i) {
+    public void setSpawnY(int spawnY) {
     }
 
     @Override
-    public void setSpawnZ(int i) {
+    public void setSpawnZ(int spawnZ) {
     }
 
     @Override
-    public void setTime(long l) {
+    public void setTime(long time) {
     }
 
     @Override
-    public void setTimeOfDay(long l) {
+    public void setTimeOfDay(long time) {
     }
 
     @Override
-    public void setSpawnPos(BlockPos arg) {
+    public void setSpawnPos(BlockPos pos) {
     }
 
     @Override
-    public void setThundering(boolean bl) {
+    public void setThundering(boolean thundering) {
     }
 
     @Override
-    public void setThunderTime(int i) {
+    public void setThunderTime(int thunderTime) {
     }
 
     @Override
-    public void setRaining(boolean bl) {
+    public void setRaining(boolean raining) {
     }
 
     @Override
-    public void setRainTime(int i) {
+    public void setRainTime(int rainTime) {
     }
 
     @Override
-    public void setGameMode(GameMode arg) {
+    public void setGameMode(GameMode gameMode) {
     }
 
     @Override
@@ -149,7 +149,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setInitialized(boolean bl) {
+    public void setInitialized(boolean initialized) {
     }
 
     @Override
@@ -163,7 +163,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setWorldBorder(WorldBorder.Properties arg) {
+    public void setWorldBorder(WorldBorder.Properties properties) {
     }
 
     @Override
@@ -187,7 +187,7 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setWanderingTraderSpawnDelay(int i) {
+    public void setWanderingTraderSpawnDelay(int wanderingTraderSpawnDelay) {
     }
 
     @Override
@@ -196,17 +196,17 @@ implements ServerWorldProperties {
     }
 
     @Override
-    public void setWanderingTraderSpawnChance(int i) {
+    public void setWanderingTraderSpawnChance(int wanderingTraderSpawnChance) {
     }
 
     @Override
-    public void setWanderingTraderId(UUID uUID) {
+    public void setWanderingTraderId(UUID uuid) {
     }
 
     @Override
-    public void populateCrashReport(CrashReportSection arg) {
-        arg.add("Derived", true);
-        this.properties.populateCrashReport(arg);
+    public void populateCrashReport(CrashReportSection reportSection) {
+        reportSection.add("Derived", true);
+        this.properties.populateCrashReport(reportSection);
     }
 }
 

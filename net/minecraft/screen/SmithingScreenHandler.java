@@ -28,32 +28,32 @@ extends ForgingScreenHandler {
     private SmithingRecipe field_25386;
     private final List<SmithingRecipe> field_25668;
 
-    public SmithingScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, ScreenHandlerContext.EMPTY);
+    public SmithingScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
     }
 
-    public SmithingScreenHandler(int i, PlayerInventory arg, ScreenHandlerContext arg2) {
-        super(ScreenHandlerType.SMITHING, i, arg, arg2);
-        this.field_25385 = arg.player.world;
+    public SmithingScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(ScreenHandlerType.SMITHING, syncId, playerInventory, context);
+        this.field_25385 = playerInventory.player.world;
         this.field_25668 = this.field_25385.getRecipeManager().listAllOfType(RecipeType.SMITHING);
     }
 
     @Override
-    protected boolean canUse(BlockState arg) {
-        return arg.isOf(Blocks.SMITHING_TABLE);
+    protected boolean canUse(BlockState state) {
+        return state.isOf(Blocks.SMITHING_TABLE);
     }
 
     @Override
-    protected boolean canTakeOutput(PlayerEntity arg, boolean bl) {
+    protected boolean canTakeOutput(PlayerEntity player, boolean present) {
         return this.field_25386 != null && this.field_25386.matches(this.input, this.field_25385);
     }
 
     @Override
-    protected ItemStack onTakeOutput(PlayerEntity arg3, ItemStack arg22) {
+    protected ItemStack onTakeOutput(PlayerEntity player, ItemStack stack) {
         this.method_29539(0);
         this.method_29539(1);
         this.context.run((arg, arg2) -> arg.syncWorldEvent(1044, (BlockPos)arg2, 0));
-        return arg22;
+        return stack;
     }
 
     private void method_29539(int i) {

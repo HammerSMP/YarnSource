@@ -87,7 +87,7 @@ public class Main {
     /*
      * WARNING - void declaration
      */
-    public static void main(String[] strings) {
+    public static void main(String[] args) {
         OptionParser optionParser = new OptionParser();
         OptionSpecBuilder optionSpec = optionParser.accepts("nogui");
         OptionSpecBuilder optionSpec2 = optionParser.accepts("initSettings", "Initializes 'server.properties' and 'eula.txt', then quits");
@@ -105,7 +105,7 @@ public class Main {
         NonOptionArgumentSpec optionSpec14 = optionParser.nonOptions();
         try {
             void lv10;
-            OptionSet optionSet = optionParser.parse(strings);
+            OptionSet optionSet = optionParser.parse(args);
             if (optionSet.has((OptionSpec)optionSpec8)) {
                 optionParser.printHelpOn((OutputStream)System.err);
                 return;
@@ -190,9 +190,9 @@ public class Main {
         }
     }
 
-    private static void forceUpgradeWorld(LevelStorage.Session arg, DataFixer dataFixer, boolean bl, BooleanSupplier booleanSupplier, ImmutableSet<RegistryKey<World>> immutableSet) {
+    private static void forceUpgradeWorld(LevelStorage.Session session, DataFixer dataFixer, boolean eraseCache, BooleanSupplier booleanSupplier, ImmutableSet<RegistryKey<World>> worlds) {
         LOGGER.info("Forcing world upgrade!");
-        WorldUpdater lv = new WorldUpdater(arg, dataFixer, immutableSet, bl);
+        WorldUpdater lv = new WorldUpdater(session, dataFixer, worlds, eraseCache);
         Text lv2 = null;
         while (!lv.isDone()) {
             int i;
@@ -216,14 +216,14 @@ public class Main {
         }
     }
 
-    private static /* synthetic */ MinecraftDedicatedServer method_29734(class_5455.class_5457 arg, LevelStorage.Session arg2, ResourcePackManager arg3, ServerResourceManager arg4, SaveProperties arg5, ServerPropertiesLoader arg6, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, UserCache arg7, OptionSet optionSet, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, Thread thread) {
+    private static /* synthetic */ MinecraftDedicatedServer method_29734(class_5455.class_5457 registryTracker, LevelStorage.Session session, ResourcePackManager resourcePackManager, ServerResourceManager serverResourceManager, SaveProperties saveProperties, ServerPropertiesLoader propertiesLoader, MinecraftSessionService sessionService, GameProfileRepository profileRepository, UserCache userCache, OptionSet optionSet, OptionSpec serverName, OptionSpec serverPort, OptionSpec demo, OptionSpec serverId, OptionSpec noGui, OptionSpec nonOptions, Thread serverThread) {
         boolean bl;
-        MinecraftDedicatedServer lv = new MinecraftDedicatedServer(thread, arg, arg2, arg3, arg4, arg5, arg6, Schemas.getFixer(), minecraftSessionService, gameProfileRepository, arg7, WorldGenerationProgressLogger::new);
-        lv.setServerName((String)optionSet.valueOf(optionSpec));
-        lv.setServerPort((Integer)optionSet.valueOf(optionSpec2));
-        lv.setDemo(optionSet.has(optionSpec3));
-        lv.setServerId((String)optionSet.valueOf(optionSpec4));
-        boolean bl2 = bl = !optionSet.has(optionSpec5) && !optionSet.valuesOf(optionSpec6).contains("nogui");
+        MinecraftDedicatedServer lv = new MinecraftDedicatedServer(serverThread, registryTracker, session, resourcePackManager, serverResourceManager, saveProperties, propertiesLoader, Schemas.getFixer(), sessionService, profileRepository, userCache, WorldGenerationProgressLogger::new);
+        lv.setServerName((String)optionSet.valueOf(serverName));
+        lv.setServerPort((Integer)optionSet.valueOf(serverPort));
+        lv.setDemo(optionSet.has(demo));
+        lv.setServerId((String)optionSet.valueOf(serverId));
+        boolean bl2 = bl = !optionSet.has(noGui) && !optionSet.valuesOf(nonOptions).contains("nogui");
         if (bl && !GraphicsEnvironment.isHeadless()) {
             lv.createGui();
         }

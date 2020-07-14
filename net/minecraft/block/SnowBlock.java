@@ -39,10 +39,10 @@ extends Block {
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
-        switch (arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+        switch (type) {
             case LAND: {
-                return arg.get(LAYERS) < 5;
+                return state.get(LAYERS) < 5;
             }
             case WATER: {
                 return false;
@@ -55,64 +55,64 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return LAYERS_TO_SHAPE[arg.get(LAYERS)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return LAYERS_TO_SHAPE[state.get(LAYERS)];
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return LAYERS_TO_SHAPE[arg.get(LAYERS) - 1];
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return LAYERS_TO_SHAPE[state.get(LAYERS) - 1];
     }
 
     @Override
-    public VoxelShape getSidesShape(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return LAYERS_TO_SHAPE[arg.get(LAYERS)];
+    public VoxelShape getSidesShape(BlockState state, BlockView world, BlockPos pos) {
+        return LAYERS_TO_SHAPE[state.get(LAYERS)];
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return LAYERS_TO_SHAPE[arg.get(LAYERS)];
+    public VoxelShape getVisualShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return LAYERS_TO_SHAPE[state.get(LAYERS)];
     }
 
     @Override
-    public boolean hasSidedTransparency(BlockState arg) {
+    public boolean hasSidedTransparency(BlockState state) {
         return true;
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockState lv = arg2.getBlockState(arg3.down());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockState lv = world.getBlockState(pos.down());
         if (lv.isOf(Blocks.ICE) || lv.isOf(Blocks.PACKED_ICE) || lv.isOf(Blocks.BARRIER)) {
             return false;
         }
         if (lv.isOf(Blocks.HONEY_BLOCK) || lv.isOf(Blocks.SOUL_SAND)) {
             return true;
         }
-        return Block.isFaceFullSquare(lv.getCollisionShape(arg2, arg3.down()), Direction.UP) || lv.getBlock() == this && lv.get(LAYERS) == 8;
+        return Block.isFaceFullSquare(lv.getCollisionShape(world, pos.down()), Direction.UP) || lv.getBlock() == this && lv.get(LAYERS) == 8;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.getLightLevel(LightType.BLOCK, arg3) > 11) {
-            SnowBlock.dropStacks(arg, arg2, arg3);
-            arg2.removeBlock(arg3, false);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.getLightLevel(LightType.BLOCK, pos) > 11) {
+            SnowBlock.dropStacks(state, world, pos);
+            world.removeBlock(pos, false);
         }
     }
 
     @Override
-    public boolean canReplace(BlockState arg, ItemPlacementContext arg2) {
-        int i = arg.get(LAYERS);
-        if (arg2.getStack().getItem() == this.asItem() && i < 8) {
-            if (arg2.canReplaceExisting()) {
-                return arg2.getSide() == Direction.UP;
+    public boolean canReplace(BlockState state, ItemPlacementContext context) {
+        int i = state.get(LAYERS);
+        if (context.getStack().getItem() == this.asItem() && i < 8) {
+            if (context.canReplaceExisting()) {
+                return context.getSide() == Direction.UP;
             }
             return true;
         }
@@ -121,18 +121,18 @@ extends Block {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        BlockState lv = arg.getWorld().getBlockState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        BlockState lv = ctx.getWorld().getBlockState(ctx.getBlockPos());
         if (lv.isOf(this)) {
             int i = lv.get(LAYERS);
             return (BlockState)lv.with(LAYERS, Math.min(8, i + 1));
         }
-        return super.getPlacementState(arg);
+        return super.getPlacementState(ctx);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(LAYERS);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(LAYERS);
     }
 }
 

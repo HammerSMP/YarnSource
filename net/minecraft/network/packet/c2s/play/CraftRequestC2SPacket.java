@@ -26,24 +26,24 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public CraftRequestC2SPacket(int i, Recipe<?> arg, boolean bl) {
-        this.syncId = i;
-        this.recipe = arg.getId();
-        this.craftAll = bl;
+    public CraftRequestC2SPacket(int syncId, Recipe<?> recipe, boolean craftAll) {
+        this.syncId = syncId;
+        this.recipe = recipe.getId();
+        this.craftAll = craftAll;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readByte();
-        this.recipe = arg.readIdentifier();
-        this.craftAll = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readByte();
+        this.recipe = buf.readIdentifier();
+        this.craftAll = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
-        arg.writeIdentifier(this.recipe);
-        arg.writeBoolean(this.craftAll);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
+        buf.writeIdentifier(this.recipe);
+        buf.writeBoolean(this.craftAll);
     }
 
     @Override

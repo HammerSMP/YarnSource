@@ -39,50 +39,50 @@ extends Block {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        for (Direction lv : arg.getPlacementDirections()) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        for (Direction lv : ctx.getPlacementDirections()) {
             BlockState lv2;
-            if (lv.getAxis() != Direction.Axis.Y || !(lv2 = (BlockState)this.getDefaultState().with(HANGING, lv == Direction.UP)).canPlaceAt(arg.getWorld(), arg.getBlockPos())) continue;
+            if (lv.getAxis() != Direction.Axis.Y || !(lv2 = (BlockState)this.getDefaultState().with(HANGING, lv == Direction.UP)).canPlaceAt(ctx.getWorld(), ctx.getBlockPos())) continue;
             return lv2;
         }
         return null;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return arg.get(HANGING) != false ? HANGING_SHAPE : STANDING_SHAPE;
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return state.get(HANGING) != false ? HANGING_SHAPE : STANDING_SHAPE;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(HANGING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(HANGING);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        Direction lv = LanternBlock.attachedDirection(arg).getOpposite();
-        return Block.sideCoversSmallSquare(arg2, arg3.offset(lv), lv.getOpposite());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        Direction lv = LanternBlock.attachedDirection(state).getOpposite();
+        return Block.sideCoversSmallSquare(world, pos.offset(lv), lv.getOpposite());
     }
 
-    protected static Direction attachedDirection(BlockState arg) {
-        return arg.get(HANGING) != false ? Direction.DOWN : Direction.UP;
+    protected static Direction attachedDirection(BlockState state) {
+        return state.get(HANGING) != false ? Direction.DOWN : Direction.UP;
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.DESTROY;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (LanternBlock.attachedDirection(arg).getOpposite() == arg2 && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (LanternBlock.attachedDirection(state).getOpposite() == direction && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

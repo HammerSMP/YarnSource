@@ -18,21 +18,21 @@ public class Potion {
     private final String baseName;
     private final ImmutableList<StatusEffectInstance> effects;
 
-    public static Potion byId(String string) {
-        return Registry.POTION.get(Identifier.tryParse(string));
+    public static Potion byId(String id) {
+        return Registry.POTION.get(Identifier.tryParse(id));
     }
 
-    public Potion(StatusEffectInstance ... args) {
-        this((String)null, args);
+    public Potion(StatusEffectInstance ... effects) {
+        this((String)null, effects);
     }
 
-    public Potion(@Nullable String string, StatusEffectInstance ... args) {
-        this.baseName = string;
-        this.effects = ImmutableList.copyOf((Object[])args);
+    public Potion(@Nullable String baseName, StatusEffectInstance ... effects) {
+        this.baseName = baseName;
+        this.effects = ImmutableList.copyOf((Object[])effects);
     }
 
-    public String finishTranslationKey(String string) {
-        return string + (this.baseName == null ? Registry.POTION.getId(this).getPath() : this.baseName);
+    public String finishTranslationKey(String prefix) {
+        return prefix + (this.baseName == null ? Registry.POTION.getId(this).getPath() : this.baseName);
     }
 
     public List<StatusEffectInstance> getEffects() {

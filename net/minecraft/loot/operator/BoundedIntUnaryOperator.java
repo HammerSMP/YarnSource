@@ -32,42 +32,42 @@ implements IntUnaryOperator {
     private final Integer max;
     private final IntUnaryOperator operator;
 
-    private BoundedIntUnaryOperator(@Nullable Integer integer, @Nullable Integer integer2) {
-        this.min = integer;
-        this.max = integer2;
-        if (integer == null) {
-            if (integer2 == null) {
+    private BoundedIntUnaryOperator(@Nullable Integer min, @Nullable Integer max) {
+        this.min = min;
+        this.max = max;
+        if (min == null) {
+            if (max == null) {
                 this.operator = i -> i;
             } else {
-                int i2 = integer2;
+                int i2 = max;
                 this.operator = j -> Math.min(i2, j);
             }
         } else {
-            int j2 = integer;
-            if (integer2 == null) {
+            int j2 = min;
+            if (max == null) {
                 this.operator = j -> Math.max(j2, j);
             } else {
-                int k2 = integer2;
+                int k2 = max;
                 this.operator = k -> MathHelper.clamp(k, j2, k2);
             }
         }
     }
 
-    public static BoundedIntUnaryOperator create(int i, int j) {
-        return new BoundedIntUnaryOperator(i, j);
+    public static BoundedIntUnaryOperator create(int min, int max) {
+        return new BoundedIntUnaryOperator(min, max);
     }
 
-    public static BoundedIntUnaryOperator createMin(int i) {
-        return new BoundedIntUnaryOperator(i, null);
+    public static BoundedIntUnaryOperator createMin(int min) {
+        return new BoundedIntUnaryOperator(min, null);
     }
 
-    public static BoundedIntUnaryOperator createMax(int i) {
-        return new BoundedIntUnaryOperator(null, i);
+    public static BoundedIntUnaryOperator createMax(int max) {
+        return new BoundedIntUnaryOperator(null, max);
     }
 
     @Override
-    public int applyAsInt(int i) {
-        return this.operator.applyAsInt(i);
+    public int applyAsInt(int value) {
+        return this.operator.applyAsInt(value);
     }
 
     public static class Serializer
@@ -91,12 +91,12 @@ implements IntUnaryOperator {
             return jsonObject;
         }
 
-        public /* synthetic */ JsonElement serialize(Object object, Type type, JsonSerializationContext jsonSerializationContext) {
-            return this.serialize((BoundedIntUnaryOperator)object, type, jsonSerializationContext);
+        public /* synthetic */ JsonElement serialize(Object op, Type type, JsonSerializationContext context) {
+            return this.serialize((BoundedIntUnaryOperator)op, type, context);
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
     }
 }

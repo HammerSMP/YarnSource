@@ -64,10 +64,10 @@ extends RealmsScreen {
     private final RealmsServer serverData;
     private RealmsLabel titleLabel;
 
-    public RealmsBackupScreen(RealmsConfigureWorldScreen arg, RealmsServer arg2, int i) {
-        this.parent = arg;
-        this.serverData = arg2;
-        this.slotId = i;
+    public RealmsBackupScreen(RealmsConfigureWorldScreen parent, RealmsServer serverData, int slotId) {
+        this.parent = parent;
+        this.serverData = serverData;
+        this.slotId = slotId;
     }
 
     @Override
@@ -132,13 +132,13 @@ extends RealmsScreen {
         }
     }
 
-    private void addToChangeList(Backup arg, String string) {
-        if (string.contains("Uploaded")) {
-            String string2 = DateFormat.getDateTimeInstance(3, 3).format(arg.lastModifiedDate);
-            arg.changeList.put(string, string2);
-            arg.setUploadedVersion(true);
+    private void addToChangeList(Backup backup, String key) {
+        if (key.contains("Uploaded")) {
+            String string2 = DateFormat.getDateTimeInstance(3, 3).format(backup.lastModifiedDate);
+            backup.changeList.put(key, string2);
+            backup.setUploadedVersion(true);
         } else {
-            arg.changeList.put(string, arg.metadata.get(string));
+            backup.changeList.put(key, backup.metadata.get(key));
         }
     }
 
@@ -162,18 +162,18 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    private void restoreClicked(int i) {
-        if (i >= 0 && i < this.backups.size() && !this.serverData.expired) {
-            this.selectedBackup = i;
-            Date date = this.backups.get((int)i).lastModifiedDate;
+    private void restoreClicked(int selectedBackup) {
+        if (selectedBackup >= 0 && selectedBackup < this.backups.size() && !this.serverData.expired) {
+            this.selectedBackup = selectedBackup;
+            Date date = this.backups.get((int)selectedBackup).lastModifiedDate;
             String string = DateFormat.getDateTimeInstance(3, 3).format(date);
             String string2 = RealmsUtil.method_25282(date);
             TranslatableText lv = new TranslatableText("mco.configure.world.restore.question.line1", string, string2);
@@ -212,19 +212,19 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.toolTip = null;
-        this.renderBackground(arg);
-        this.backupObjectSelectionList.render(arg, i, j, f);
-        this.titleLabel.render(this, arg);
-        this.textRenderer.draw(arg, I18n.translate("mco.configure.world.backup", new Object[0]), (float)((this.width - 150) / 2 - 90), 20.0f, 0xA0A0A0);
+        this.renderBackground(matrices);
+        this.backupObjectSelectionList.render(matrices, mouseX, mouseY, delta);
+        this.titleLabel.render(this, matrices);
+        this.textRenderer.draw(matrices, I18n.translate("mco.configure.world.backup", new Object[0]), (float)((this.width - 150) / 2 - 90), 20.0f, 0xA0A0A0);
         if (this.noBackups.booleanValue()) {
-            this.textRenderer.draw(arg, I18n.translate("mco.backup.nobackups", new Object[0]), 20.0f, (float)(this.height / 2 - 10), 0xFFFFFF);
+            this.textRenderer.draw(matrices, I18n.translate("mco.backup.nobackups", new Object[0]), 20.0f, (float)(this.height / 2 - 10), 0xFFFFFF);
         }
         this.downloadButton.active = this.noBackups == false;
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.toolTip != null) {
-            this.renderMousehoverTooltip(arg, this.toolTip, i, j);
+            this.renderMousehoverTooltip(matrices, this.toolTip, mouseX, mouseY);
         }
     }
 
@@ -244,13 +244,13 @@ extends RealmsScreen {
     extends AlwaysSelectedEntryListWidget.Entry<BackupObjectSelectionListEntry> {
         private final Backup mBackup;
 
-        public BackupObjectSelectionListEntry(Backup arg2) {
-            this.mBackup = arg2;
+        public BackupObjectSelectionListEntry(Backup backup) {
+            this.mBackup = backup;
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.renderBackupItem(arg, this.mBackup, k - 40, j, n, o);
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.renderBackupItem(matrices, this.mBackup, x - 40, y, mouseX, mouseY);
         }
 
         private void renderBackupItem(MatrixStack arg, Backup arg2, int i, int j, int k, int l) {
@@ -269,8 +269,8 @@ extends RealmsScreen {
             }
         }
 
-        private String getMediumDatePresentation(Date date) {
-            return DateFormat.getDateTimeInstance(3, 3).format(date);
+        private String getMediumDatePresentation(Date lastModifiedDate) {
+            return DateFormat.getDateTimeInstance(3, 3).format(lastModifiedDate);
         }
 
         private void drawRestore(MatrixStack arg, int i, int j, int k, int l) {
@@ -309,8 +309,8 @@ extends RealmsScreen {
             super(RealmsBackupScreen.this.width - 150, RealmsBackupScreen.this.height, 32, RealmsBackupScreen.this.height - 15, 36);
         }
 
-        public void addEntry(Backup arg) {
-            this.addEntry(new BackupObjectSelectionListEntry(arg));
+        public void addEntry(Backup backup) {
+            this.addEntry(new BackupObjectSelectionListEntry(backup));
         }
 
         @Override
@@ -329,23 +329,23 @@ extends RealmsScreen {
         }
 
         @Override
-        public void renderBackground(MatrixStack arg) {
-            RealmsBackupScreen.this.renderBackground(arg);
+        public void renderBackground(MatrixStack matrices) {
+            RealmsBackupScreen.this.renderBackground(matrices);
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            if (i != 0) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (button != 0) {
                 return false;
             }
-            if (d < (double)this.getScrollbarPositionX() && e >= (double)this.top && e <= (double)this.bottom) {
+            if (mouseX < (double)this.getScrollbarPositionX() && mouseY >= (double)this.top && mouseY <= (double)this.bottom) {
                 int j = this.width / 2 - 92;
                 int k = this.width;
-                int l = (int)Math.floor(e - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
+                int l = (int)Math.floor(mouseY - (double)this.top) - this.headerHeight + (int)this.getScrollAmount();
                 int m = l / this.itemHeight;
-                if (d >= (double)j && d <= (double)k && m >= 0 && l >= 0 && m < this.getItemCount()) {
+                if (mouseX >= (double)j && mouseX <= (double)k && m >= 0 && l >= 0 && m < this.getItemCount()) {
                     this.setSelected(m);
-                    this.itemClicked(l, m, d, e, this.width);
+                    this.itemClicked(l, m, mouseX, mouseY, this.width);
                 }
                 return true;
             }
@@ -358,34 +358,34 @@ extends RealmsScreen {
         }
 
         @Override
-        public void itemClicked(int i, int j, double d, double e, int k) {
+        public void itemClicked(int cursorY, int selectionIndex, double mouseX, double mouseY, int listWidth) {
             int l = this.width - 35;
-            int m = j * this.itemHeight + 36 - (int)this.getScrollAmount();
+            int m = selectionIndex * this.itemHeight + 36 - (int)this.getScrollAmount();
             int n = l + 10;
             int o = m - 3;
-            if (d >= (double)l && d <= (double)(l + 9) && e >= (double)m && e <= (double)(m + 9)) {
-                if (!((Backup)((RealmsBackupScreen)RealmsBackupScreen.this).backups.get((int)j)).changeList.isEmpty()) {
+            if (mouseX >= (double)l && mouseX <= (double)(l + 9) && mouseY >= (double)m && mouseY <= (double)(m + 9)) {
+                if (!((Backup)((RealmsBackupScreen)RealmsBackupScreen.this).backups.get((int)selectionIndex)).changeList.isEmpty()) {
                     RealmsBackupScreen.this.selectedBackup = -1;
                     lastScrollPosition = (int)this.getScrollAmount();
-                    this.client.openScreen(new RealmsBackupInfoScreen(RealmsBackupScreen.this, (Backup)RealmsBackupScreen.this.backups.get(j)));
+                    this.client.openScreen(new RealmsBackupInfoScreen(RealmsBackupScreen.this, (Backup)RealmsBackupScreen.this.backups.get(selectionIndex)));
                 }
-            } else if (d >= (double)n && d < (double)(n + 13) && e >= (double)o && e < (double)(o + 15)) {
+            } else if (mouseX >= (double)n && mouseX < (double)(n + 13) && mouseY >= (double)o && mouseY < (double)(o + 15)) {
                 lastScrollPosition = (int)this.getScrollAmount();
-                RealmsBackupScreen.this.restoreClicked(j);
+                RealmsBackupScreen.this.restoreClicked(selectionIndex);
             }
         }
 
         @Override
-        public void setSelected(int i) {
-            this.setSelectedItem(i);
-            if (i != -1) {
-                Realms.narrateNow(I18n.translate("narrator.select", ((Backup)((RealmsBackupScreen)RealmsBackupScreen.this).backups.get((int)i)).lastModifiedDate.toString()));
+        public void setSelected(int index) {
+            this.setSelectedItem(index);
+            if (index != -1) {
+                Realms.narrateNow(I18n.translate("narrator.select", ((Backup)((RealmsBackupScreen)RealmsBackupScreen.this).backups.get((int)index)).lastModifiedDate.toString()));
             }
-            this.selectInviteListItem(i);
+            this.selectInviteListItem(index);
         }
 
-        public void selectInviteListItem(int i) {
-            RealmsBackupScreen.this.selectedBackup = i;
+        public void selectInviteListItem(int item) {
+            RealmsBackupScreen.this.selectedBackup = item;
             RealmsBackupScreen.this.updateButtonStates();
         }
 

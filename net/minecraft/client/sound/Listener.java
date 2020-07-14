@@ -19,9 +19,9 @@ public class Listener {
     private float volume = 1.0f;
     private Vec3d field_24051 = Vec3d.ZERO;
 
-    public void setPosition(Vec3d arg) {
-        this.field_24051 = arg;
-        AL10.alListener3f((int)4100, (float)((float)arg.x), (float)((float)arg.y), (float)((float)arg.z));
+    public void setPosition(Vec3d position) {
+        this.field_24051 = position;
+        AL10.alListener3f((int)4100, (float)((float)position.x), (float)((float)position.y), (float)((float)position.z));
     }
 
     public Vec3d method_27268() {
@@ -32,9 +32,9 @@ public class Listener {
         AL10.alListenerfv((int)4111, (float[])new float[]{arg.getX(), arg.getY(), arg.getZ(), arg2.getX(), arg2.getY(), arg2.getZ()});
     }
 
-    public void setVolume(float f) {
-        AL10.alListenerf((int)4106, (float)f);
-        this.volume = f;
+    public void setVolume(float volume) {
+        AL10.alListenerf((int)4106, (float)volume);
+        this.volume = volume;
     }
 
     public float getVolume() {

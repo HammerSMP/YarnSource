@@ -45,17 +45,17 @@ implements Comparable<KeyBinding> {
     private boolean pressed;
     private int timesPressed;
 
-    public static void onKeyPressed(InputUtil.Key arg) {
-        KeyBinding lv = keyToBindings.get(arg);
+    public static void onKeyPressed(InputUtil.Key key) {
+        KeyBinding lv = keyToBindings.get(key);
         if (lv != null) {
             ++lv.timesPressed;
         }
     }
 
-    public static void setKeyPressed(InputUtil.Key arg, boolean bl) {
-        KeyBinding lv = keyToBindings.get(arg);
+    public static void setKeyPressed(InputUtil.Key key, boolean pressed) {
+        KeyBinding lv = keyToBindings.get(key);
         if (lv != null) {
-            lv.setPressed(bl);
+            lv.setPressed(pressed);
         }
     }
 
@@ -79,17 +79,17 @@ implements Comparable<KeyBinding> {
         }
     }
 
-    public KeyBinding(String string, int i, String string2) {
-        this(string, InputUtil.Type.KEYSYM, i, string2);
+    public KeyBinding(String translationKey, int code, String category) {
+        this(translationKey, InputUtil.Type.KEYSYM, code, category);
     }
 
-    public KeyBinding(String string, InputUtil.Type arg, int i, String string2) {
-        this.translationKey = string;
-        this.defaultKey = this.boundKey = arg.createFromCode(i);
-        this.category = string2;
-        keysById.put(string, this);
+    public KeyBinding(String translationKey, InputUtil.Type type, int code, String category) {
+        this.translationKey = translationKey;
+        this.defaultKey = this.boundKey = type.createFromCode(code);
+        this.category = category;
+        keysById.put(translationKey, this);
         keyToBindings.put(this.boundKey, this);
-        keyCategories.add(string2);
+        keyCategories.add(category);
     }
 
     public boolean isPressed() {
@@ -121,8 +121,8 @@ implements Comparable<KeyBinding> {
         return this.defaultKey;
     }
 
-    public void setBoundKey(InputUtil.Key arg) {
-        this.boundKey = arg;
+    public void setBoundKey(InputUtil.Key boundKey) {
+        this.boundKey = boundKey;
     }
 
     @Override
@@ -133,31 +133,31 @@ implements Comparable<KeyBinding> {
         return categoryOrderMap.get(this.category).compareTo(categoryOrderMap.get(arg.category));
     }
 
-    public static Supplier<Text> getLocalizedName(String string) {
-        KeyBinding lv = keysById.get(string);
+    public static Supplier<Text> getLocalizedName(String id) {
+        KeyBinding lv = keysById.get(id);
         if (lv == null) {
-            return () -> new TranslatableText(string);
+            return () -> new TranslatableText(id);
         }
         return lv::getBoundKeyLocalizedText;
     }
 
-    public boolean equals(KeyBinding arg) {
-        return this.boundKey.equals(arg.boundKey);
+    public boolean equals(KeyBinding other) {
+        return this.boundKey.equals(other.boundKey);
     }
 
     public boolean isUnbound() {
         return this.boundKey.equals(InputUtil.UNKNOWN_KEY);
     }
 
-    public boolean matchesKey(int i, int j) {
-        if (i == InputUtil.UNKNOWN_KEY.getCode()) {
-            return this.boundKey.getCategory() == InputUtil.Type.SCANCODE && this.boundKey.getCode() == j;
+    public boolean matchesKey(int keyCode, int scanCode) {
+        if (keyCode == InputUtil.UNKNOWN_KEY.getCode()) {
+            return this.boundKey.getCategory() == InputUtil.Type.SCANCODE && this.boundKey.getCode() == scanCode;
         }
-        return this.boundKey.getCategory() == InputUtil.Type.KEYSYM && this.boundKey.getCode() == i;
+        return this.boundKey.getCategory() == InputUtil.Type.KEYSYM && this.boundKey.getCode() == keyCode;
     }
 
-    public boolean matchesMouse(int i) {
-        return this.boundKey.getCategory() == InputUtil.Type.MOUSE && this.boundKey.getCode() == i;
+    public boolean matchesMouse(int code) {
+        return this.boundKey.getCategory() == InputUtil.Type.MOUSE && this.boundKey.getCode() == code;
     }
 
     public Text getBoundKeyLocalizedText() {
@@ -172,13 +172,13 @@ implements Comparable<KeyBinding> {
         return this.boundKey.getTranslationKey();
     }
 
-    public void setPressed(boolean bl) {
-        this.pressed = bl;
+    public void setPressed(boolean pressed) {
+        this.pressed = pressed;
     }
 
     @Override
-    public /* synthetic */ int compareTo(Object object) {
-        return this.compareTo((KeyBinding)object);
+    public /* synthetic */ int compareTo(Object other) {
+        return this.compareTo((KeyBinding)other);
     }
 }
 

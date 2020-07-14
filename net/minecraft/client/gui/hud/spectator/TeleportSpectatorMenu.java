@@ -41,8 +41,8 @@ SpectatorMenuCommand {
         this(ORDERING.sortedCopy(MinecraftClient.getInstance().getNetworkHandler().getPlayerList()));
     }
 
-    public TeleportSpectatorMenu(Collection<PlayerListEntry> collection) {
-        for (PlayerListEntry lv : ORDERING.sortedCopy(collection)) {
+    public TeleportSpectatorMenu(Collection<PlayerListEntry> entries) {
+        for (PlayerListEntry lv : ORDERING.sortedCopy(entries)) {
             if (lv.getGameMode() == GameMode.SPECTATOR) continue;
             this.elements.add(new TeleportToSpecificPlayerSpectatorCommand(lv.getProfile()));
         }
@@ -59,8 +59,8 @@ SpectatorMenuCommand {
     }
 
     @Override
-    public void use(SpectatorMenu arg) {
-        arg.selectElement(this);
+    public void use(SpectatorMenu menu) {
+        menu.selectElement(this);
     }
 
     @Override

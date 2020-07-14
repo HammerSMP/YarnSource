@@ -112,9 +112,9 @@ public class BlockEntityType<T extends BlockEntity> {
         return Registry.register(Registry.BLOCK_ENTITY_TYPE, string, arg.build(type));
     }
 
-    public BlockEntityType(Supplier<? extends T> supplier, Set<Block> set, Type<?> type) {
+    public BlockEntityType(Supplier<? extends T> supplier, Set<Block> blocks, Type<?> type) {
         this.supplier = supplier;
-        this.blocks = set;
+        this.blocks = blocks;
         this.type = type;
     }
 
@@ -123,13 +123,13 @@ public class BlockEntityType<T extends BlockEntity> {
         return (T)((BlockEntity)this.supplier.get());
     }
 
-    public boolean supports(Block arg) {
-        return this.blocks.contains(arg);
+    public boolean supports(Block block) {
+        return this.blocks.contains(block);
     }
 
     @Nullable
-    public T get(BlockView arg, BlockPos arg2) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    public T get(BlockView world, BlockPos pos) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv == null || lv.getType() != this) {
             return null;
         }
@@ -140,13 +140,13 @@ public class BlockEntityType<T extends BlockEntity> {
         private final Supplier<? extends T> supplier;
         private final Set<Block> blocks;
 
-        private Builder(Supplier<? extends T> supplier, Set<Block> set) {
+        private Builder(Supplier<? extends T> supplier, Set<Block> blocks) {
             this.supplier = supplier;
-            this.blocks = set;
+            this.blocks = blocks;
         }
 
-        public static <T extends BlockEntity> Builder<T> create(Supplier<? extends T> supplier, Block ... args) {
-            return new Builder<T>(supplier, (Set<Block>)ImmutableSet.copyOf((Object[])args));
+        public static <T extends BlockEntity> Builder<T> create(Supplier<? extends T> supplier, Block ... blocks) {
+            return new Builder<T>(supplier, (Set<Block>)ImmutableSet.copyOf((Object[])blocks));
         }
 
         public BlockEntityType<T> build(Type<?> type) {

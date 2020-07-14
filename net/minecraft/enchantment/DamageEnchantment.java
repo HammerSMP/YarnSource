@@ -22,19 +22,19 @@ extends Enchantment {
     private static final int[] field_9064 = new int[]{20, 20, 20};
     public final int typeIndex;
 
-    public DamageEnchantment(Enchantment.Rarity arg, int i, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.WEAPON, args);
-        this.typeIndex = i;
+    public DamageEnchantment(Enchantment.Rarity weight, int typeIndex, EquipmentSlot ... slots) {
+        super(weight, EnchantmentTarget.WEAPON, slots);
+        this.typeIndex = typeIndex;
     }
 
     @Override
-    public int getMinPower(int i) {
-        return field_9063[this.typeIndex] + (i - 1) * field_9066[this.typeIndex];
+    public int getMinPower(int level) {
+        return field_9063[this.typeIndex] + (level - 1) * field_9066[this.typeIndex];
     }
 
     @Override
-    public int getMaxPower(int i) {
-        return this.getMinPower(i) + field_9064[this.typeIndex];
+    public int getMaxPower(int level) {
+        return this.getMinPower(level) + field_9064[this.typeIndex];
     }
 
     @Override
@@ -43,38 +43,38 @@ extends Enchantment {
     }
 
     @Override
-    public float getAttackDamage(int i, EntityGroup arg) {
+    public float getAttackDamage(int level, EntityGroup group) {
         if (this.typeIndex == 0) {
-            return 1.0f + (float)Math.max(0, i - 1) * 0.5f;
+            return 1.0f + (float)Math.max(0, level - 1) * 0.5f;
         }
-        if (this.typeIndex == 1 && arg == EntityGroup.UNDEAD) {
-            return (float)i * 2.5f;
+        if (this.typeIndex == 1 && group == EntityGroup.UNDEAD) {
+            return (float)level * 2.5f;
         }
-        if (this.typeIndex == 2 && arg == EntityGroup.ARTHROPOD) {
-            return (float)i * 2.5f;
+        if (this.typeIndex == 2 && group == EntityGroup.ARTHROPOD) {
+            return (float)level * 2.5f;
         }
         return 0.0f;
     }
 
     @Override
-    public boolean canAccept(Enchantment arg) {
-        return !(arg instanceof DamageEnchantment);
+    public boolean canAccept(Enchantment other) {
+        return !(other instanceof DamageEnchantment);
     }
 
     @Override
-    public boolean isAcceptableItem(ItemStack arg) {
-        if (arg.getItem() instanceof AxeItem) {
+    public boolean isAcceptableItem(ItemStack stack) {
+        if (stack.getItem() instanceof AxeItem) {
             return true;
         }
-        return super.isAcceptableItem(arg);
+        return super.isAcceptableItem(stack);
     }
 
     @Override
-    public void onTargetDamaged(LivingEntity arg, Entity arg2, int i) {
-        if (arg2 instanceof LivingEntity) {
-            LivingEntity lv = (LivingEntity)arg2;
+    public void onTargetDamaged(LivingEntity user, Entity target, int level) {
+        if (target instanceof LivingEntity) {
+            LivingEntity lv = (LivingEntity)target;
             if (this.typeIndex == 2 && lv.getGroup() == EntityGroup.ARTHROPOD) {
-                int j = 20 + arg.getRandom().nextInt(10 * i);
+                int j = 20 + user.getRandom().nextInt(10 * level);
                 lv.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, j, 3));
             }
         }

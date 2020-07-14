@@ -60,11 +60,11 @@ extends RealmsScreen {
     private RealmsLabel titleLabel;
     private RealmsLabel toastMessage;
 
-    public RealmsSlotOptionsScreen(RealmsConfigureWorldScreen arg, RealmsWorldOptions arg2, RealmsServer.WorldType arg3, int i) {
-        this.parent = arg;
-        this.options = arg2;
-        this.worldType = arg3;
-        this.activeSlot = i;
+    public RealmsSlotOptionsScreen(RealmsConfigureWorldScreen parent, RealmsWorldOptions options, RealmsServer.WorldType worldType, int activeSlot) {
+        this.parent = parent;
+        this.options = options;
+        this.worldType = worldType;
+        this.activeSlot = activeSlot;
     }
 
     @Override
@@ -78,12 +78,12 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
@@ -217,21 +217,21 @@ extends RealmsScreen {
         return new TranslatableText("mco.configure.world.forceGameMode").append(": ").append(RealmsSlotOptionsScreen.getWorldConfigureMessage(this.forceGameMode));
     }
 
-    private static Text getWorldConfigureMessage(boolean bl) {
-        return bl ? field_24207 : field_24208;
+    private static Text getWorldConfigureMessage(boolean enabled) {
+        return enabled ? field_24207 : field_24208;
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         String string = I18n.translate("mco.configure.world.edit.slot.name", new Object[0]);
-        this.textRenderer.draw(arg, string, (float)(this.column1_x + this.column_width / 2 - this.textRenderer.getWidth(string) / 2), (float)(RealmsSlotOptionsScreen.row(0) - 5), 0xFFFFFF);
-        this.titleLabel.render(this, arg);
+        this.textRenderer.draw(matrices, string, (float)(this.column1_x + this.column_width / 2 - this.textRenderer.getWidth(string) / 2), (float)(RealmsSlotOptionsScreen.row(0) - 5), 0xFFFFFF);
+        this.titleLabel.render(this, matrices);
         if (this.toastMessage != null) {
-            this.toastMessage.render(this, arg);
+            this.toastMessage.render(this, matrices);
         }
-        this.nameEdit.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+        this.nameEdit.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     private String getSlotName() {
@@ -255,11 +255,11 @@ extends RealmsScreen {
         private final double min;
         private final double max;
 
-        public SettingsSlider(int i, int j, int k, int l, float f, float g) {
-            super(i, j, k, 20, LiteralText.EMPTY, 0.0);
-            this.min = f;
-            this.max = g;
-            this.value = (MathHelper.clamp((float)l, f, g) - f) / (g - f);
+        public SettingsSlider(int id, int x, int y, int width, float min, float max) {
+            super(id, x, y, 20, LiteralText.EMPTY, 0.0);
+            this.min = min;
+            this.max = max;
+            this.value = (MathHelper.clamp((float)width, min, max) - min) / (max - min);
             this.updateMessage();
         }
 
@@ -277,11 +277,11 @@ extends RealmsScreen {
         }
 
         @Override
-        public void onClick(double d, double e) {
+        public void onClick(double mouseX, double mouseY) {
         }
 
         @Override
-        public void onRelease(double d, double e) {
+        public void onRelease(double mouseX, double mouseY) {
         }
     }
 }

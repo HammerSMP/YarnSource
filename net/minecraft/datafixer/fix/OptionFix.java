@@ -25,11 +25,11 @@ extends DataFix {
     private final String oldName;
     private final String newName;
 
-    public OptionFix(Schema schema, boolean bl, String string, String string2, String string3) {
-        super(schema, bl);
-        this.name = string;
-        this.oldName = string2;
-        this.newName = string3;
+    public OptionFix(Schema outputSchema, boolean changesType, String name, String oldName, String newName) {
+        super(outputSchema, changesType);
+        this.name = name;
+        this.oldName = oldName;
+        this.newName = newName;
     }
 
     public TypeRewriteRule makeRule() {

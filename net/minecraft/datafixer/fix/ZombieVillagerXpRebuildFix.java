@@ -18,13 +18,13 @@ import net.minecraft.datafixer.fix.VillagerXpRebuildFix;
 
 public class ZombieVillagerXpRebuildFix
 extends ChoiceFix {
-    public ZombieVillagerXpRebuildFix(Schema schema, boolean bl) {
-        super(schema, bl, "Zombie Villager XP rebuild", TypeReferences.ENTITY, "minecraft:zombie_villager");
+    public ZombieVillagerXpRebuildFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "Zombie Villager XP rebuild", TypeReferences.ENTITY, "minecraft:zombie_villager");
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), dynamic -> {
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), dynamic -> {
             Optional optional = dynamic.get("Xp").asNumber().result();
             if (!optional.isPresent()) {
                 int i = dynamic.get("VillagerData").get("level").asInt(1);

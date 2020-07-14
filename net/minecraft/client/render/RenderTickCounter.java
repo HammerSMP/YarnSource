@@ -17,14 +17,14 @@ public class RenderTickCounter {
     private long prevTimeMillis;
     private final float tickTime;
 
-    public RenderTickCounter(float f, long l) {
-        this.tickTime = 1000.0f / f;
-        this.prevTimeMillis = l;
+    public RenderTickCounter(float tps, long timeMillis) {
+        this.tickTime = 1000.0f / tps;
+        this.prevTimeMillis = timeMillis;
     }
 
-    public int beginRenderTick(long l) {
-        this.lastFrameDuration = (float)(l - this.prevTimeMillis) / this.tickTime;
-        this.prevTimeMillis = l;
+    public int beginRenderTick(long timeMillis) {
+        this.lastFrameDuration = (float)(timeMillis - this.prevTimeMillis) / this.tickTime;
+        this.prevTimeMillis = timeMillis;
         this.tickDelta += this.lastFrameDuration;
         int i = (int)this.tickDelta;
         this.tickDelta -= (float)i;

@@ -25,9 +25,9 @@ implements FeatureConfig {
     private final class_5428 field_25843;
     private final class_5428 field_25844;
 
-    public DeltaFeatureConfig(BlockState arg, BlockState arg2, class_5428 arg3, class_5428 arg4) {
-        this.contents = arg;
-        this.rim = arg2;
+    public DeltaFeatureConfig(BlockState contents, BlockState rim, class_5428 arg3, class_5428 arg4) {
+        this.contents = contents;
+        this.rim = rim;
         this.field_25843 = arg3;
         this.field_25844 = arg4;
     }

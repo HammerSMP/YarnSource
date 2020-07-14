@@ -24,8 +24,8 @@ extends ScreenHandler {
         super(arg, i);
     }
 
-    public void fillInputSlots(boolean bl, Recipe<?> arg, ServerPlayerEntity arg2) {
-        new InputSlotFiller(this).fillInputSlots(arg2, arg, bl);
+    public void fillInputSlots(boolean craftAll, Recipe<?> recipe, ServerPlayerEntity player) {
+        new InputSlotFiller(this).fillInputSlots(player, recipe, craftAll);
     }
 
     public abstract void populateRecipeFinder(RecipeFinder var1);

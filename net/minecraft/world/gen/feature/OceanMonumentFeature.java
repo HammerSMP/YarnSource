@@ -80,9 +80,9 @@ extends StructureFeature<DefaultFeatureConfig> {
             this.method_16588(i, j);
         }
 
-        private void method_16588(int i, int j) {
-            int k = i * 16 - 29;
-            int l = j * 16 - 29;
+        private void method_16588(int chunkX, int chunkZ) {
+            int k = chunkX * 16 - 29;
+            int l = chunkZ * 16 - 29;
             Direction lv = Direction.Type.HORIZONTAL.random(this.random);
             this.children.add(new OceanMonumentGenerator.Base(this.random, k, l, lv));
             this.setBoundingBoxFromChildren();

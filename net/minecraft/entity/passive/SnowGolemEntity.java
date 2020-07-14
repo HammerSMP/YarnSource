@@ -80,16 +80,16 @@ RangedAttackMob {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("Pumpkin", this.hasPumpkin());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("Pumpkin", this.hasPumpkin());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("Pumpkin")) {
-            this.setHasPumpkin(arg.getBoolean("Pumpkin"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("Pumpkin")) {
+            this.setHasPumpkin(tag.getBoolean("Pumpkin"));
         }
     }
 
@@ -124,12 +124,12 @@ RangedAttackMob {
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
+    public void attack(LivingEntity target, float pullProgress) {
         SnowballEntity lv = new SnowballEntity(this.world, this);
-        double d = arg.getEyeY() - (double)1.1f;
-        double e = arg.getX() - this.getX();
+        double d = target.getEyeY() - (double)1.1f;
+        double e = target.getX() - this.getX();
         double g = d - lv.getY();
-        double h = arg.getZ() - this.getZ();
+        double h = target.getZ() - this.getZ();
         float i = MathHelper.sqrt(e * e + h * h) * 0.2f;
         lv.setVelocity(e, g + (double)i, h, 1.6f, 12.0f);
         this.playSound(SoundEvents.ENTITY_SNOW_GOLEM_SHOOT, 1.0f, 0.4f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
@@ -137,17 +137,17 @@ RangedAttackMob {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 1.7f;
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity arg, Hand arg22) {
-        ItemStack lv = arg.getStackInHand(arg22);
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.SHEARS && this.isShearable()) {
             this.sheared(SoundCategory.PLAYERS);
             if (!this.world.isClient) {
-                lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
+                lv.damage(1, player, arg2 -> arg2.sendToolBreakStatus(hand));
             }
             return ActionResult.success(this.world.isClient);
         }
@@ -155,8 +155,8 @@ RangedAttackMob {
     }
 
     @Override
-    public void sheared(SoundCategory arg) {
-        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SNOW_GOLEM_SHEAR, arg, 1.0f, 1.0f);
+    public void sheared(SoundCategory shearedSoundCategory) {
+        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SNOW_GOLEM_SHEAR, shearedSoundCategory, 1.0f, 1.0f);
         if (!this.world.isClient()) {
             this.setHasPumpkin(false);
             this.dropStack(new ItemStack(Items.CARVED_PUMPKIN), 1.7f);
@@ -172,9 +172,9 @@ RangedAttackMob {
         return (this.dataTracker.get(SNOW_GOLEM_FLAGS) & 0x10) != 0;
     }
 
-    public void setHasPumpkin(boolean bl) {
+    public void setHasPumpkin(boolean hasPumpkin) {
         byte b = this.dataTracker.get(SNOW_GOLEM_FLAGS);
-        if (bl) {
+        if (hasPumpkin) {
             this.dataTracker.set(SNOW_GOLEM_FLAGS, (byte)(b | 0x10));
         } else {
             this.dataTracker.set(SNOW_GOLEM_FLAGS, (byte)(b & 0xFFFFFFEF));
@@ -189,7 +189,7 @@ RangedAttackMob {
 
     @Override
     @Nullable
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_SNOW_GOLEM_HURT;
     }
 

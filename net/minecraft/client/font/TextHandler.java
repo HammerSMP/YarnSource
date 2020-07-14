@@ -31,64 +31,64 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class TextHandler {
     private final WidthRetriever widthRetriever;
 
-    public TextHandler(WidthRetriever arg) {
-        this.widthRetriever = arg;
+    public TextHandler(WidthRetriever widthRetriever) {
+        this.widthRetriever = widthRetriever;
     }
 
-    public float getWidth(@Nullable String string) {
-        if (string == null) {
+    public float getWidth(@Nullable String text) {
+        if (text == null) {
             return 0.0f;
         }
         MutableFloat mutableFloat = new MutableFloat();
-        TextVisitFactory.visitFormatted(string, Style.EMPTY, (i, arg, j) -> {
+        TextVisitFactory.visitFormatted(text, Style.EMPTY, (i, arg, j) -> {
             mutableFloat.add(this.widthRetriever.getWidth(j, arg));
             return true;
         });
         return mutableFloat.floatValue();
     }
 
-    public float getWidth(StringRenderable arg2) {
+    public float getWidth(StringRenderable text) {
         MutableFloat mutableFloat = new MutableFloat();
-        TextVisitFactory.visitFormatted(arg2, Style.EMPTY, (i, arg, j) -> {
+        TextVisitFactory.visitFormatted(text, Style.EMPTY, (i, arg, j) -> {
             mutableFloat.add(this.widthRetriever.getWidth(j, arg));
             return true;
         });
         return mutableFloat.floatValue();
     }
 
-    public int getTrimmedLength(String string, int i, Style arg) {
-        WidthLimitingVisitor lv = new WidthLimitingVisitor(i);
-        TextVisitFactory.visitForwards(string, arg, lv);
+    public int getTrimmedLength(String text, int maxWidth, Style style) {
+        WidthLimitingVisitor lv = new WidthLimitingVisitor(maxWidth);
+        TextVisitFactory.visitForwards(text, style, lv);
         return lv.getLength();
     }
 
-    public String trimToWidth(String string, int i, Style arg) {
-        return string.substring(0, this.getTrimmedLength(string, i, arg));
+    public String trimToWidth(String text, int maxWidth, Style style) {
+        return text.substring(0, this.getTrimmedLength(text, maxWidth, style));
     }
 
-    public String trimToWidthBackwards(String string, int i, Style arg2) {
+    public String trimToWidthBackwards(String text, int maxWidth, Style style) {
         MutableFloat mutableFloat = new MutableFloat();
-        MutableInt mutableInt = new MutableInt(string.length());
-        TextVisitFactory.visitBackwards(string, arg2, (j, arg, k) -> {
+        MutableInt mutableInt = new MutableInt(text.length());
+        TextVisitFactory.visitBackwards(text, style, (j, arg, k) -> {
             float f = mutableFloat.addAndGet(this.widthRetriever.getWidth(k, arg));
-            if (f > (float)i) {
+            if (f > (float)maxWidth) {
                 return false;
             }
             mutableInt.setValue(j);
             return true;
         });
-        return string.substring(mutableInt.intValue());
+        return text.substring(mutableInt.intValue());
     }
 
     @Nullable
-    public Style trimToWidth(StringRenderable arg, int i) {
-        WidthLimitingVisitor lv = new WidthLimitingVisitor(i);
-        return arg.visit((arg2, string) -> TextVisitFactory.visitFormatted(string, arg2, (TextVisitFactory.CharacterVisitor)lv) ? Optional.empty() : Optional.of(arg2), Style.EMPTY).orElse(null);
+    public Style trimToWidth(StringRenderable text, int maxWidth) {
+        WidthLimitingVisitor lv = new WidthLimitingVisitor(maxWidth);
+        return text.visit((arg2, string) -> TextVisitFactory.visitFormatted(string, arg2, (TextVisitFactory.CharacterVisitor)lv) ? Optional.empty() : Optional.of(arg2), Style.EMPTY).orElse(null);
     }
 
-    public StringRenderable trimToWidth(StringRenderable arg, int i, Style arg2) {
-        final WidthLimitingVisitor lv = new WidthLimitingVisitor(i);
-        return arg.visit(new StringRenderable.StyledVisitor<StringRenderable>(){
+    public StringRenderable trimToWidth(StringRenderable text, int width, Style style) {
+        final WidthLimitingVisitor lv = new WidthLimitingVisitor(width);
+        return text.visit(new StringRenderable.StyledVisitor<StringRenderable>(){
             private final TextCollector collector = new TextCollector();
 
             @Override
@@ -106,66 +106,66 @@ public class TextHandler {
                 }
                 return Optional.empty();
             }
-        }, arg2).orElse(arg);
+        }, style).orElse(text);
     }
 
-    public static int moveCursorByWords(String string, int i, int j, boolean bl) {
-        int k = j;
-        boolean bl2 = i < 0;
-        int l = Math.abs(i);
+    public static int moveCursorByWords(String text, int offset, int cursor, boolean consumeSpaceOrBreak) {
+        int k = cursor;
+        boolean bl2 = offset < 0;
+        int l = Math.abs(offset);
         for (int m = 0; m < l; ++m) {
             if (bl2) {
-                while (bl && k > 0 && (string.charAt(k - 1) == ' ' || string.charAt(k - 1) == '\n')) {
+                while (consumeSpaceOrBreak && k > 0 && (text.charAt(k - 1) == ' ' || text.charAt(k - 1) == '\n')) {
                     --k;
                 }
-                while (k > 0 && string.charAt(k - 1) != ' ' && string.charAt(k - 1) != '\n') {
+                while (k > 0 && text.charAt(k - 1) != ' ' && text.charAt(k - 1) != '\n') {
                     --k;
                 }
                 continue;
             }
-            int n = string.length();
-            int o = string.indexOf(32, k);
-            int p = string.indexOf(10, k);
+            int n = text.length();
+            int o = text.indexOf(32, k);
+            int p = text.indexOf(10, k);
             k = o == -1 && p == -1 ? -1 : (o != -1 && p != -1 ? Math.min(o, p) : (o != -1 ? o : p));
             if (k == -1) {
                 k = n;
                 continue;
             }
-            while (bl && k < n && (string.charAt(k) == ' ' || string.charAt(k) == '\n')) {
+            while (consumeSpaceOrBreak && k < n && (text.charAt(k) == ' ' || text.charAt(k) == '\n')) {
                 ++k;
             }
         }
         return k;
     }
 
-    public void wrapLines(String string, int i, Style arg, boolean bl, LineWrappingConsumer arg2) {
+    public void wrapLines(String text, int maxWidth, Style style, boolean retainTrailingWordSplit, LineWrappingConsumer consumer) {
         int j = 0;
-        int k = string.length();
-        Style lv = arg;
+        int k = text.length();
+        Style lv = style;
         while (j < k) {
-            LineBreakingVisitor lv2 = new LineBreakingVisitor(i);
-            boolean bl2 = TextVisitFactory.visitFormatted(string, j, lv, arg, lv2);
+            LineBreakingVisitor lv2 = new LineBreakingVisitor(maxWidth);
+            boolean bl2 = TextVisitFactory.visitFormatted(text, j, lv, style, lv2);
             if (bl2) {
-                arg2.accept(lv, j, k);
+                consumer.accept(lv, j, k);
                 break;
             }
             int l = lv2.getEndingIndex();
-            char c = string.charAt(l);
+            char c = text.charAt(l);
             int m = c == '\n' || c == ' ' ? l + 1 : l;
-            arg2.accept(lv, j, bl ? m : l);
+            consumer.accept(lv, j, retainTrailingWordSplit ? m : l);
             j = m;
             lv = lv2.getEndingStyle();
         }
     }
 
-    public List<StringRenderable> wrapLines(String string, int i2, Style arg2) {
+    public List<StringRenderable> wrapLines(String text, int maxWidth, Style style) {
         ArrayList list = Lists.newArrayList();
-        this.wrapLines(string, i2, arg2, false, (arg, i, j) -> list.add(StringRenderable.styled(string.substring(i, j), arg)));
+        this.wrapLines(text, maxWidth, style, false, (arg, i, j) -> list.add(StringRenderable.styled(text.substring(i, j), arg)));
         return list;
     }
 
-    public List<StringRenderable> wrapLines(StringRenderable arg, int i, Style arg2) {
-        return this.method_29971(arg, i, arg2, null);
+    public List<StringRenderable> wrapLines(StringRenderable arg, int maxWidth, Style arg2) {
+        return this.method_29971(arg, maxWidth, arg2, null);
     }
 
     public List<StringRenderable> method_29971(StringRenderable arg2, int i, Style arg22, @Nullable StringRenderable arg3) {
@@ -223,19 +223,19 @@ public class TextHandler {
         private final List<StyledString> parts;
         private String joined;
 
-        public LineWrappingCollector(List<StyledString> list) {
-            this.parts = list;
-            this.joined = list.stream().map(arg -> ((StyledString)arg).literal).collect(Collectors.joining());
+        public LineWrappingCollector(List<StyledString> parts) {
+            this.parts = parts;
+            this.joined = parts.stream().map(arg -> ((StyledString)arg).literal).collect(Collectors.joining());
         }
 
-        public char charAt(int i) {
-            return this.joined.charAt(i);
+        public char charAt(int index) {
+            return this.joined.charAt(index);
         }
 
-        public StringRenderable collectLine(int i, int j, Style arg) {
+        public StringRenderable collectLine(int lineLength, int skippedLength, Style style) {
             TextCollector lv = new TextCollector();
             ListIterator<StyledString> listIterator = this.parts.listIterator();
-            int k = i;
+            int k = lineLength;
             boolean bl = false;
             while (listIterator.hasNext()) {
                 StyledString lv2 = listIterator.next();
@@ -251,7 +251,7 @@ public class TextHandler {
                         if (!string2.isEmpty()) {
                             lv.add(StringRenderable.styled(string2, lv2.style));
                         }
-                        k += j;
+                        k += skippedLength;
                         bl = true;
                     }
                 }
@@ -266,10 +266,10 @@ public class TextHandler {
                     listIterator.remove();
                     break;
                 }
-                listIterator.set(new StyledString(string3, arg));
+                listIterator.set(new StyledString(string3, style));
                 break;
             }
-            this.joined = this.joined.substring(i + j);
+            this.joined = this.joined.substring(lineLength + skippedLength);
             return lv.getCombined();
         }
 
@@ -288,19 +288,19 @@ public class TextHandler {
         private final String literal;
         private final Style style;
 
-        public StyledString(String string, Style arg) {
-            this.literal = string;
-            this.style = arg;
+        public StyledString(String literal, Style style) {
+            this.literal = literal;
+            this.style = style;
         }
 
         @Override
-        public <T> Optional<T> visit(StringRenderable.Visitor<T> arg) {
-            return arg.accept(this.literal);
+        public <T> Optional<T> visit(StringRenderable.Visitor<T> visitor) {
+            return visitor.accept(this.literal);
         }
 
         @Override
-        public <T> Optional<T> visit(StringRenderable.StyledVisitor<T> arg, Style arg2) {
-            return arg.accept(this.style.withParent(arg2), this.literal);
+        public <T> Optional<T> visit(StringRenderable.StyledVisitor<T> styledVisitor, Style style) {
+            return styledVisitor.accept(this.style.withParent(style), this.literal);
         }
     }
 
@@ -323,8 +323,8 @@ public class TextHandler {
         private int count;
         private int startOffset;
 
-        public LineBreakingVisitor(float f) {
-            this.maxWidth = Math.max(f, 1.0f);
+        public LineBreakingVisitor(float maxWidth) {
+            this.maxWidth = Math.max(maxWidth, 1.0f);
         }
 
         @Override
@@ -352,9 +352,9 @@ public class TextHandler {
             return true;
         }
 
-        private boolean breakLine(int i, Style arg) {
-            this.endIndex = i;
-            this.endStyle = arg;
+        private boolean breakLine(int finishIndex, Style finishStyle) {
+            this.endIndex = finishIndex;
+            this.endStyle = finishStyle;
             return false;
         }
 
@@ -370,8 +370,8 @@ public class TextHandler {
             return this.endStyle;
         }
 
-        public void offset(int i) {
-            this.startOffset += i;
+        public void offset(int extraOffset) {
+            this.startOffset += extraOffset;
         }
     }
 
@@ -381,8 +381,8 @@ public class TextHandler {
         private float widthLeft;
         private int length;
 
-        public WidthLimitingVisitor(float f) {
-            this.widthLeft = f;
+        public WidthLimitingVisitor(float maxWidth) {
+            this.widthLeft = maxWidth;
         }
 
         @Override

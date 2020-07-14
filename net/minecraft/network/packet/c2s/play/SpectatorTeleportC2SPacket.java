@@ -22,18 +22,18 @@ implements Packet<ServerPlayPacketListener> {
     public SpectatorTeleportC2SPacket() {
     }
 
-    public SpectatorTeleportC2SPacket(UUID uUID) {
-        this.targetUuid = uUID;
+    public SpectatorTeleportC2SPacket(UUID targetUuid) {
+        this.targetUuid = targetUuid;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.targetUuid = arg.readUuid();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.targetUuid = buf.readUuid();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeUuid(this.targetUuid);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeUuid(this.targetUuid);
     }
 
     @Override
@@ -42,8 +42,8 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Nullable
-    public Entity getTarget(ServerWorld arg) {
-        return arg.getEntity(this.targetUuid);
+    public Entity getTarget(ServerWorld world) {
+        return world.getEntity(this.targetUuid);
     }
 }
 

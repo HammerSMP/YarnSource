@@ -50,31 +50,31 @@ extends StructurePiece {
         this.pos = new BlockPos(arg2.getInt("TPX"), arg2.getInt("TPY"), arg2.getInt("TPZ"));
     }
 
-    protected void setStructureData(Structure arg, BlockPos arg2, StructurePlacementData arg3) {
-        this.structure = arg;
+    protected void setStructureData(Structure structure, BlockPos pos, StructurePlacementData placementData) {
+        this.structure = structure;
         this.setOrientation(Direction.NORTH);
-        this.pos = arg2;
-        this.placementData = arg3;
-        this.boundingBox = arg.calculateBoundingBox(arg3, arg2);
+        this.pos = pos;
+        this.placementData = placementData;
+        this.boundingBox = structure.calculateBoundingBox(placementData, pos);
     }
 
     @Override
-    protected void toNbt(CompoundTag arg) {
-        arg.putInt("TPX", this.pos.getX());
-        arg.putInt("TPY", this.pos.getY());
-        arg.putInt("TPZ", this.pos.getZ());
+    protected void toNbt(CompoundTag tag) {
+        tag.putInt("TPX", this.pos.getX());
+        tag.putInt("TPY", this.pos.getY());
+        tag.putInt("TPZ", this.pos.getZ());
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
-        this.placementData.setBoundingBox(arg4);
+    public boolean generate(ServerWorldAccess arg, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox boundingBox, ChunkPos arg5, BlockPos arg6) {
+        this.placementData.setBoundingBox(boundingBox);
         this.boundingBox = this.structure.calculateBoundingBox(this.placementData, this.pos);
         if (this.structure.place(arg, this.pos, arg6, this.placementData, random, 2)) {
             List<Structure.StructureBlockInfo> list = this.structure.getInfosForBlock(this.pos, this.placementData, Blocks.STRUCTURE_BLOCK);
             for (Structure.StructureBlockInfo lv : list) {
                 StructureBlockMode lv2;
                 if (lv.tag == null || (lv2 = StructureBlockMode.valueOf(lv.tag.getString("mode"))) != StructureBlockMode.DATA) continue;
-                this.handleMetadata(lv.tag.getString("metadata"), lv.pos, arg, random, arg4);
+                this.handleMetadata(lv.tag.getString("metadata"), lv.pos, arg, random, boundingBox);
             }
             List<Structure.StructureBlockInfo> list2 = this.structure.getInfosForBlock(this.pos, this.placementData, Blocks.JIGSAW);
             for (Structure.StructureBlockInfo lv3 : list2) {
@@ -103,9 +103,9 @@ extends StructurePiece {
     protected abstract void handleMetadata(String var1, BlockPos var2, class_5425 var3, Random var4, BlockBox var5);
 
     @Override
-    public void translate(int i, int j, int k) {
-        super.translate(i, j, k);
-        this.pos = this.pos.add(i, j, k);
+    public void translate(int x, int y, int z) {
+        super.translate(x, y, z);
+        this.pos = this.pos.add(x, y, z);
     }
 
     @Override

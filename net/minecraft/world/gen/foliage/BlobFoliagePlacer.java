@@ -47,21 +47,21 @@ extends FoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
-        for (int m = l; m >= l - j; --m) {
-            int n = Math.max(k + arg3.getFoliageRadius() - 1 - m / 2, 0);
-            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk(), arg4);
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
+        for (int m = l; m >= l - foliageHeight; --m) {
+            int n = Math.max(radius + arg3.getFoliageRadius() - 1 - m / 2, 0);
+            this.generate(world, random, config, arg3.getCenter(), n, leaves, m, arg3.isGiantTrunk(), arg4);
         }
     }
 
     @Override
-    public int getHeight(Random random, int i, TreeFeatureConfig arg) {
+    public int getHeight(Random random, int trunkHeight, TreeFeatureConfig config) {
         return this.height;
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        return i == l && k == l && (random.nextInt(2) == 0 || j == 0);
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        return baseHeight == dz && dy == dz && (random.nextInt(2) == 0 || dx == 0);
     }
 }
 

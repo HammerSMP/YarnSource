@@ -122,13 +122,13 @@ implements Font {
         private final float advance;
         private final int glyphIndex;
 
-        private TtfGlyph(int i, int j, int k, int l, float f, float g, int m) {
-            this.width = j - i;
-            this.height = k - l;
-            this.advance = f / TrueTypeFont.this.oversample;
-            this.bearingX = (g + (float)i + TrueTypeFont.this.shiftX) / TrueTypeFont.this.oversample;
-            this.ascent = (TrueTypeFont.this.ascent - (float)k + TrueTypeFont.this.shiftY) / TrueTypeFont.this.oversample;
-            this.glyphIndex = m;
+        private TtfGlyph(int xMin, int xMax, int yMax, int yMin, float advance, float bearing, int index) {
+            this.width = xMax - xMin;
+            this.height = yMax - yMin;
+            this.advance = advance / TrueTypeFont.this.oversample;
+            this.bearingX = (bearing + (float)xMin + TrueTypeFont.this.shiftX) / TrueTypeFont.this.oversample;
+            this.ascent = (TrueTypeFont.this.ascent - (float)yMax + TrueTypeFont.this.shiftY) / TrueTypeFont.this.oversample;
+            this.glyphIndex = index;
         }
 
         @Override
@@ -162,10 +162,10 @@ implements Font {
         }
 
         @Override
-        public void upload(int i, int j) {
+        public void upload(int x, int y) {
             NativeImage lv = new NativeImage(NativeImage.Format.LUMINANCE, this.width, this.height, false);
             lv.makeGlyphBitmapSubpixel(TrueTypeFont.this.info, this.glyphIndex, this.width, this.height, TrueTypeFont.this.scaleFactor, TrueTypeFont.this.scaleFactor, TrueTypeFont.this.shiftX, TrueTypeFont.this.shiftY, 0, 0);
-            lv.upload(0, i, j, 0, 0, this.width, this.height, false, true);
+            lv.upload(0, x, y, 0, 0, this.width, this.height, false, true);
         }
 
         @Override

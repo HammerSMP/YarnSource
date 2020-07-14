@@ -23,17 +23,17 @@ public class SkinProcessor {
     private int height;
 
     @Nullable
-    public BufferedImage process(BufferedImage bufferedImage) {
+    public BufferedImage process(BufferedImage image) {
         boolean bl;
-        if (bufferedImage == null) {
+        if (image == null) {
             return null;
         }
         this.width = 64;
         this.height = 64;
         BufferedImage bufferedImage2 = new BufferedImage(this.width, this.height, 2);
         Graphics graphics = bufferedImage2.getGraphics();
-        graphics.drawImage(bufferedImage, 0, 0, null);
-        boolean bl2 = bl = bufferedImage.getHeight() == 32;
+        graphics.drawImage(image, 0, 0, null);
+        boolean bl2 = bl = image.getHeight() == 32;
         if (bl) {
             graphics.setColor(new Color(0, 0, 0, 0));
             graphics.fillRect(0, 32, 64, 32);
@@ -61,25 +61,25 @@ public class SkinProcessor {
         return bufferedImage2;
     }
 
-    private void doNotchTransparencyHack(int i, int j, int k, int l) {
-        for (int m = i; m < k; ++m) {
-            for (int n = j; n < l; ++n) {
+    private void doNotchTransparencyHack(int x0, int y0, int x1, int y1) {
+        for (int m = x0; m < x1; ++m) {
+            for (int n = y0; n < y1; ++n) {
                 int o = this.pixels[m + n * this.width];
                 if ((o >> 24 & 0xFF) >= 128) continue;
                 return;
             }
         }
-        for (int p = i; p < k; ++p) {
-            for (int q = j; q < l; ++q) {
+        for (int p = x0; p < x1; ++p) {
+            for (int q = y0; q < y1; ++q) {
                 int n = p + q * this.width;
                 this.pixels[n] = this.pixels[n] & 0xFFFFFF;
             }
         }
     }
 
-    private void setNoAlpha(int i, int j, int k, int l) {
-        for (int m = i; m < k; ++m) {
-            for (int n = j; n < l; ++n) {
+    private void setNoAlpha(int x0, int y0, int x1, int y1) {
+        for (int m = x0; m < x1; ++m) {
+            for (int n = y0; n < y1; ++n) {
                 int n2 = m + n * this.width;
                 this.pixels[n2] = this.pixels[n2] | 0xFF000000;
             }

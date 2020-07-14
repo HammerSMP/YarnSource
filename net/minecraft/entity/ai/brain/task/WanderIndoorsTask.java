@@ -24,9 +24,9 @@ public class WanderIndoorsTask
 extends Task<PathAwareEntity> {
     private final float speed;
 
-    public WanderIndoorsTask(float f) {
+    public WanderIndoorsTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override

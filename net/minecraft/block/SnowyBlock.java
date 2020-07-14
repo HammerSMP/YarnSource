@@ -25,22 +25,22 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.UP) {
-            return (BlockState)arg.with(SNOWY, arg3.isOf(Blocks.SNOW_BLOCK) || arg3.isOf(Blocks.SNOW));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.UP) {
+            return (BlockState)state.with(SNOWY, newState.isOf(Blocks.SNOW_BLOCK) || newState.isOf(Blocks.SNOW));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState lv;
-        return (BlockState)this.getDefaultState().with(SNOWY, (lv = arg.getWorld().getBlockState(arg.getBlockPos().up())).isOf(Blocks.SNOW_BLOCK) || lv.isOf(Blocks.SNOW));
+        return (BlockState)this.getDefaultState().with(SNOWY, (lv = ctx.getWorld().getBlockState(ctx.getBlockPos().up())).isOf(Blocks.SNOW_BLOCK) || lv.isOf(Blocks.SNOW));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(SNOWY);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(SNOWY);
     }
 }
 

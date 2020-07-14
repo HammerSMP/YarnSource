@@ -28,9 +28,9 @@ implements FeatureConfig {
     public final int size;
     public final BlockState state;
 
-    public OreFeatureConfig(RuleTest arg, BlockState arg2, int i) {
-        this.size = i;
-        this.state = arg2;
+    public OreFeatureConfig(RuleTest arg, BlockState state, int size) {
+        this.size = size;
+        this.state = state;
         this.target = arg;
     }
 

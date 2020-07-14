@@ -33,9 +33,9 @@ public enum Instrument implements StringIdentifiable
     private final String name;
     private final SoundEvent sound;
 
-    private Instrument(String string2, SoundEvent arg) {
-        this.name = string2;
-        this.sound = arg;
+    private Instrument(String name, SoundEvent sound) {
+        this.name = name;
+        this.sound = sound;
     }
 
     @Override
@@ -47,41 +47,41 @@ public enum Instrument implements StringIdentifiable
         return this.sound;
     }
 
-    public static Instrument fromBlockState(BlockState arg) {
-        if (arg.isOf(Blocks.CLAY)) {
+    public static Instrument fromBlockState(BlockState state) {
+        if (state.isOf(Blocks.CLAY)) {
             return FLUTE;
         }
-        if (arg.isOf(Blocks.GOLD_BLOCK)) {
+        if (state.isOf(Blocks.GOLD_BLOCK)) {
             return BELL;
         }
-        if (arg.isIn(BlockTags.WOOL)) {
+        if (state.isIn(BlockTags.WOOL)) {
             return GUITAR;
         }
-        if (arg.isOf(Blocks.PACKED_ICE)) {
+        if (state.isOf(Blocks.PACKED_ICE)) {
             return CHIME;
         }
-        if (arg.isOf(Blocks.BONE_BLOCK)) {
+        if (state.isOf(Blocks.BONE_BLOCK)) {
             return XYLOPHONE;
         }
-        if (arg.isOf(Blocks.IRON_BLOCK)) {
+        if (state.isOf(Blocks.IRON_BLOCK)) {
             return IRON_XYLOPHONE;
         }
-        if (arg.isOf(Blocks.SOUL_SAND)) {
+        if (state.isOf(Blocks.SOUL_SAND)) {
             return COW_BELL;
         }
-        if (arg.isOf(Blocks.PUMPKIN)) {
+        if (state.isOf(Blocks.PUMPKIN)) {
             return DIDGERIDOO;
         }
-        if (arg.isOf(Blocks.EMERALD_BLOCK)) {
+        if (state.isOf(Blocks.EMERALD_BLOCK)) {
             return BIT;
         }
-        if (arg.isOf(Blocks.HAY_BLOCK)) {
+        if (state.isOf(Blocks.HAY_BLOCK)) {
             return BANJO;
         }
-        if (arg.isOf(Blocks.GLOWSTONE)) {
+        if (state.isOf(Blocks.GLOWSTONE)) {
             return PLING;
         }
-        Material lv = arg.getMaterial();
+        Material lv = state.getMaterial();
         if (lv == Material.STONE) {
             return BASEDRUM;
         }

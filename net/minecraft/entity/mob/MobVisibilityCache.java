@@ -16,8 +16,8 @@ public class MobVisibilityCache {
     private final List<Entity> visibleEntities = Lists.newArrayList();
     private final List<Entity> invisibleEntities = Lists.newArrayList();
 
-    public MobVisibilityCache(MobEntity arg) {
-        this.owner = arg;
+    public MobVisibilityCache(MobEntity owner) {
+        this.owner = owner;
     }
 
     public void clear() {
@@ -25,20 +25,20 @@ public class MobVisibilityCache {
         this.invisibleEntities.clear();
     }
 
-    public boolean canSee(Entity arg) {
-        if (this.visibleEntities.contains(arg)) {
+    public boolean canSee(Entity entity) {
+        if (this.visibleEntities.contains(entity)) {
             return true;
         }
-        if (this.invisibleEntities.contains(arg)) {
+        if (this.invisibleEntities.contains(entity)) {
             return false;
         }
         this.owner.world.getProfiler().push("canSee");
-        boolean bl = this.owner.canSee(arg);
+        boolean bl = this.owner.canSee(entity);
         this.owner.world.getProfiler().pop();
         if (bl) {
-            this.visibleEntities.add(arg);
+            this.visibleEntities.add(entity);
         } else {
-            this.invisibleEntities.add(arg);
+            this.invisibleEntities.add(entity);
         }
         return bl;
     }

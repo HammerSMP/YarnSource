@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class CatTypeFix
 extends ChoiceFix {
-    public CatTypeFix(Schema schema, boolean bl) {
-        super(schema, bl, "CatTypeFix", TypeReferences.ENTITY, "minecraft:cat");
+    public CatTypeFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "CatTypeFix", TypeReferences.ENTITY, "minecraft:cat");
     }
 
     public Dynamic<?> fixCatTypeData(Dynamic<?> dynamic) {
@@ -30,8 +30,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixCatTypeData);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixCatTypeData);
     }
 }
 

@@ -57,8 +57,8 @@ extends HorseBaseEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
-        super.getHurtSound(arg);
+    protected SoundEvent getHurtSound(DamageSource source) {
+        super.getHurtSound(source);
         return SoundEvents.ENTITY_ZOMBIE_HORSE_HURT;
     }
 
@@ -69,32 +69,32 @@ extends HorseBaseEntity {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (!this.isTame()) {
             return ActionResult.PASS;
         }
         if (this.isBaby()) {
-            return super.interactMob(arg, arg2);
+            return super.interactMob(player, hand);
         }
-        if (arg.shouldCancelInteraction()) {
-            this.openInventory(arg);
+        if (player.shouldCancelInteraction()) {
+            this.openInventory(player);
             return ActionResult.success(this.world.isClient);
         }
         if (this.hasPassengers()) {
-            return super.interactMob(arg, arg2);
+            return super.interactMob(player, hand);
         }
         if (!lv.isEmpty()) {
             if (lv.getItem() == Items.SADDLE && !this.isSaddled()) {
-                this.openInventory(arg);
+                this.openInventory(player);
                 return ActionResult.success(this.world.isClient);
             }
-            ActionResult lv2 = lv.useOnEntity(arg, this, arg2);
+            ActionResult lv2 = lv.useOnEntity(player, this, hand);
             if (lv2.isAccepted()) {
                 return lv2;
             }
         }
-        this.putPlayerOnBack(arg);
+        this.putPlayerOnBack(player);
         return ActionResult.success(this.world.isClient);
     }
 

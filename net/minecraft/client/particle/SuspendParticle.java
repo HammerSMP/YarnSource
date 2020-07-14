@@ -20,8 +20,8 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class SuspendParticle
 extends SpriteBillboardParticle {
-    private SuspendParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i) {
-        super(arg, d, e, f, g, h, i);
+    private SuspendParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ);
         float j;
         this.colorRed = j = this.random.nextFloat() * 0.1f + 0.2f;
         this.colorGreen = j;
@@ -40,8 +40,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public void move(double d, double e, double f) {
-        this.setBoundingBox(this.getBoundingBox().offset(d, e, f));
+    public void move(double dx, double dy, double dz) {
+        this.setBoundingBox(this.getBoundingBox().offset(dx, dy, dz));
         this.repositionFromBoundingBox();
     }
 
@@ -65,8 +65,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public DolphinFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public DolphinFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -85,8 +85,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -104,8 +104,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public HappyVillagerFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public HappyVillagerFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -122,8 +122,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public MyceliumFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public MyceliumFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

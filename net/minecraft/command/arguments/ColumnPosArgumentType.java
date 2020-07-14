@@ -47,8 +47,8 @@ implements ArgumentType<PosArgument> {
         return new ColumnPosArgumentType();
     }
 
-    public static ColumnPos getColumnPos(CommandContext<ServerCommandSource> commandContext, String string) {
-        BlockPos lv = ((PosArgument)commandContext.getArgument(string, PosArgument.class)).toAbsoluteBlockPos((ServerCommandSource)commandContext.getSource());
+    public static ColumnPos getColumnPos(CommandContext<ServerCommandSource> context, String name) {
+        BlockPos lv = ((PosArgument)context.getArgument(name, PosArgument.class)).toAbsoluteBlockPos((ServerCommandSource)context.getSource());
         return new ColumnPos(lv.getX(), lv.getZ());
     }
 
@@ -67,16 +67,16 @@ implements ArgumentType<PosArgument> {
         return new DefaultPosArgument(lv, new CoordinateArgument(true, 0.0), lv2);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        if (commandContext.getSource() instanceof CommandSource) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
             Collection<CommandSource.RelativePosition> collection2;
-            String string = suggestionsBuilder.getRemaining();
+            String string = builder.getRemaining();
             if (!string.isEmpty() && string.charAt(0) == '^') {
                 Set<CommandSource.RelativePosition> collection = Collections.singleton(CommandSource.RelativePosition.ZERO_LOCAL);
             } else {
-                collection2 = ((CommandSource)commandContext.getSource()).getBlockPositionSuggestions();
+                collection2 = ((CommandSource)context.getSource()).getBlockPositionSuggestions();
             }
-            return CommandSource.suggestColumnPositions(string, collection2, suggestionsBuilder, CommandManager.getCommandValidator(this::parse));
+            return CommandSource.suggestColumnPositions(string, collection2, builder, CommandManager.getCommandValidator(this::parse));
         }
         return Suggestions.empty();
     }

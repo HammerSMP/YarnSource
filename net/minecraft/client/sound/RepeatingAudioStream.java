@@ -24,11 +24,11 @@ implements AudioStream {
     private AudioStream delegate;
     private final BufferedInputStream inputStream;
 
-    public RepeatingAudioStream(DelegateFactory arg, InputStream inputStream) throws IOException {
-        this.delegateFactory = arg;
+    public RepeatingAudioStream(DelegateFactory delegateFactory, InputStream inputStream) throws IOException {
+        this.delegateFactory = delegateFactory;
         this.inputStream = new BufferedInputStream(inputStream);
         this.inputStream.mark(Integer.MAX_VALUE);
-        this.delegate = arg.create(new ReusableInputStream(this.inputStream));
+        this.delegate = delegateFactory.create(new ReusableInputStream(this.inputStream));
     }
 
     @Override
@@ -37,13 +37,13 @@ implements AudioStream {
     }
 
     @Override
-    public ByteBuffer getBuffer(int i) throws IOException {
-        ByteBuffer byteBuffer = this.delegate.getBuffer(i);
+    public ByteBuffer getBuffer(int size) throws IOException {
+        ByteBuffer byteBuffer = this.delegate.getBuffer(size);
         if (!byteBuffer.hasRemaining()) {
             this.delegate.close();
             this.inputStream.reset();
             this.delegate = this.delegateFactory.create(new ReusableInputStream(this.inputStream));
-            byteBuffer = this.delegate.getBuffer(i);
+            byteBuffer = this.delegate.getBuffer(size);
         }
         return byteBuffer;
     }

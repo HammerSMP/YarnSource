@@ -21,9 +21,9 @@ implements DecoratorConfig {
     public final int count;
     public final int spread;
 
-    public CountDepthDecoratorConfig(int i, int j) {
-        this.count = i;
-        this.spread = j;
+    public CountDepthDecoratorConfig(int count, int baseline) {
+        this.count = count;
+        this.spread = baseline;
     }
 }
 

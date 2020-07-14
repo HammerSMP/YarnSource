@@ -18,16 +18,16 @@ public enum HorseColor {
     private static final HorseColor[] VALUES;
     private final int index;
 
-    private HorseColor(int j) {
-        this.index = j;
+    private HorseColor(int index) {
+        this.index = index;
     }
 
     public int getIndex() {
         return this.index;
     }
 
-    public static HorseColor byIndex(int i) {
-        return VALUES[i % VALUES.length];
+    public static HorseColor byIndex(int index) {
+        return VALUES[index % VALUES.length];
     }
 
     static {

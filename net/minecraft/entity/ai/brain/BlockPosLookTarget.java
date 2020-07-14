@@ -13,9 +13,9 @@ implements LookTarget {
     private final BlockPos blockPos;
     private final Vec3d pos;
 
-    public BlockPosLookTarget(BlockPos arg) {
-        this.blockPos = arg;
-        this.pos = Vec3d.ofCenter(arg);
+    public BlockPosLookTarget(BlockPos blockPos) {
+        this.blockPos = blockPos;
+        this.pos = Vec3d.ofCenter(blockPos);
     }
 
     @Override
@@ -29,7 +29,7 @@ implements LookTarget {
     }
 
     @Override
-    public boolean isSeenBy(LivingEntity arg) {
+    public boolean isSeenBy(LivingEntity entity) {
         return true;
     }
 

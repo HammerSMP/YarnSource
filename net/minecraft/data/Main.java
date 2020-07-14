@@ -67,15 +67,15 @@ public class Main {
         lv.run();
     }
 
-    public static DataGenerator create(Path path, Collection<Path> collection, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
-        DataGenerator lv = new DataGenerator(path, collection);
-        if (bl || bl2) {
+    public static DataGenerator create(Path output, Collection<Path> inputs, boolean includeClient, boolean includeServer, boolean includeDev, boolean includeReports, boolean validate) {
+        DataGenerator lv = new DataGenerator(output, inputs);
+        if (includeClient || includeServer) {
             lv.install(new SnbtProvider(lv).addWriter(new StructureValidatorProvider()));
         }
-        if (bl) {
+        if (includeClient) {
             lv.install(new BlockStateDefinitionProvider(lv));
         }
-        if (bl2) {
+        if (includeServer) {
             lv.install(new FluidTagsProvider(lv));
             BlockTagsProvider lv2 = new BlockTagsProvider(lv);
             lv.install(lv2);
@@ -85,10 +85,10 @@ public class Main {
             lv.install(new AdvancementsProvider(lv));
             lv.install(new LootTablesProvider(lv));
         }
-        if (bl3) {
+        if (includeDev) {
             lv.install(new NbtProvider(lv));
         }
-        if (bl4) {
+        if (includeReports) {
             lv.install(new BlockListProvider(lv));
             lv.install(new ItemListProvider(lv));
             lv.install(new CommandSyntaxProvider(lv));

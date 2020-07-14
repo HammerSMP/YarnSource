@@ -23,10 +23,10 @@ extends LongRunningTask {
     private final WorldTemplate worldTemplate;
     private final RealmsConfigureWorldScreen lastScreen;
 
-    public SwitchMinigameTask(long l, WorldTemplate arg, RealmsConfigureWorldScreen arg2) {
-        this.worldId = l;
-        this.worldTemplate = arg;
-        this.lastScreen = arg2;
+    public SwitchMinigameTask(long worldId, WorldTemplate worldTemplate, RealmsConfigureWorldScreen lastScreen) {
+        this.worldId = worldId;
+        this.worldTemplate = worldTemplate;
+        this.lastScreen = lastScreen;
     }
 
     @Override

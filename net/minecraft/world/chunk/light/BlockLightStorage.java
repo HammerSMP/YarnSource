@@ -17,18 +17,18 @@ import net.minecraft.world.chunk.light.LightStorage;
 
 public class BlockLightStorage
 extends LightStorage<Data> {
-    protected BlockLightStorage(ChunkProvider arg) {
-        super(LightType.BLOCK, arg, new Data((Long2ObjectOpenHashMap<ChunkNibbleArray>)new Long2ObjectOpenHashMap()));
+    protected BlockLightStorage(ChunkProvider chunkProvider) {
+        super(LightType.BLOCK, chunkProvider, new Data((Long2ObjectOpenHashMap<ChunkNibbleArray>)new Long2ObjectOpenHashMap()));
     }
 
     @Override
-    protected int getLight(long l) {
-        long m = ChunkSectionPos.fromGlobalPos(l);
-        ChunkNibbleArray lv = this.getLightArray(m, false);
+    protected int getLight(long blockPos) {
+        long m = ChunkSectionPos.fromBlockPos(blockPos);
+        ChunkNibbleArray lv = this.getLightSection(m, false);
         if (lv == null) {
             return 0;
         }
-        return lv.get(ChunkSectionPos.getLocalCoord(BlockPos.unpackLongX(l)), ChunkSectionPos.getLocalCoord(BlockPos.unpackLongY(l)), ChunkSectionPos.getLocalCoord(BlockPos.unpackLongZ(l)));
+        return lv.get(ChunkSectionPos.getLocalCoord(BlockPos.unpackLongX(blockPos)), ChunkSectionPos.getLocalCoord(BlockPos.unpackLongY(blockPos)), ChunkSectionPos.getLocalCoord(BlockPos.unpackLongZ(blockPos)));
     }
 
     public static final class Data

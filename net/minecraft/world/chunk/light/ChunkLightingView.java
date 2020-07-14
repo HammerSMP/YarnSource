@@ -15,7 +15,7 @@ import net.minecraft.world.chunk.light.LightingView;
 public interface ChunkLightingView
 extends LightingView {
     @Nullable
-    public ChunkNibbleArray getLightArray(ChunkSectionPos var1);
+    public ChunkNibbleArray getLightSection(ChunkSectionPos var1);
 
     public int getLightLevel(BlockPos var1);
 
@@ -26,7 +26,7 @@ extends LightingView {
 
         @Override
         @Nullable
-        public ChunkNibbleArray getLightArray(ChunkSectionPos arg) {
+        public ChunkNibbleArray getLightSection(ChunkSectionPos pos) {
             return null;
         }
 
@@ -36,7 +36,7 @@ extends LightingView {
         }
 
         @Override
-        public void updateSectionStatus(ChunkSectionPos arg, boolean bl) {
+        public void setSectionStatus(ChunkSectionPos pos, boolean notReady) {
         }
     }
 }

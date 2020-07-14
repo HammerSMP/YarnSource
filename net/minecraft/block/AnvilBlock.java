@@ -61,29 +61,29 @@ extends FallingBlock {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerFacing().rotateYClockwise());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerFacing().rotateYClockwise());
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
-        arg4.incrementStat(Stats.INTERACT_WITH_ANVIL);
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        player.incrementStat(Stats.INTERACT_WITH_ANVIL);
         return ActionResult.CONSUME;
     }
 
     @Override
     @Nullable
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg32) {
-        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new AnvilScreenHandler(i, arg3, ScreenHandlerContext.create(arg2, arg32)), TITLE);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new AnvilScreenHandler(i, arg3, ScreenHandlerContext.create(world, pos)), TITLE);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        Direction lv = arg.get(FACING);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        Direction lv = state.get(FACING);
         if (lv.getAxis() == Direction.Axis.X) {
             return X_AXIS_SHAPE;
         }
@@ -91,54 +91,54 @@ extends FallingBlock {
     }
 
     @Override
-    protected void configureFallingBlockEntity(FallingBlockEntity arg) {
-        arg.setHurtEntities(true);
+    protected void configureFallingBlockEntity(FallingBlockEntity entity) {
+        entity.setHurtEntities(true);
     }
 
     @Override
-    public void onLanding(World arg, BlockPos arg2, BlockState arg3, BlockState arg4, FallingBlockEntity arg5) {
-        if (!arg5.isSilent()) {
-            arg.syncWorldEvent(1031, arg2, 0);
+    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
+        if (!fallingBlockEntity.isSilent()) {
+            world.syncWorldEvent(1031, pos, 0);
         }
     }
 
     @Override
-    public void onDestroyedOnLanding(World arg, BlockPos arg2, FallingBlockEntity arg3) {
-        if (!arg3.isSilent()) {
-            arg.syncWorldEvent(1029, arg2, 0);
+    public void onDestroyedOnLanding(World world, BlockPos pos, FallingBlockEntity fallingBlockEntity) {
+        if (!fallingBlockEntity.isSilent()) {
+            world.syncWorldEvent(1029, pos, 0);
         }
     }
 
     @Nullable
-    public static BlockState getLandingState(BlockState arg) {
-        if (arg.isOf(Blocks.ANVIL)) {
-            return (BlockState)Blocks.CHIPPED_ANVIL.getDefaultState().with(FACING, arg.get(FACING));
+    public static BlockState getLandingState(BlockState fallingState) {
+        if (fallingState.isOf(Blocks.ANVIL)) {
+            return (BlockState)Blocks.CHIPPED_ANVIL.getDefaultState().with(FACING, fallingState.get(FACING));
         }
-        if (arg.isOf(Blocks.CHIPPED_ANVIL)) {
-            return (BlockState)Blocks.DAMAGED_ANVIL.getDefaultState().with(FACING, arg.get(FACING));
+        if (fallingState.isOf(Blocks.CHIPPED_ANVIL)) {
+            return (BlockState)Blocks.DAMAGED_ANVIL.getDefaultState().with(FACING, fallingState.get(FACING));
         }
         return null;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public int getColor(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.getTopMaterialColor((BlockView)arg2, (BlockPos)arg3).color;
+    public int getColor(BlockState state, BlockView world, BlockPos pos) {
+        return state.getTopMaterialColor((BlockView)world, (BlockPos)pos).color;
     }
 }
 

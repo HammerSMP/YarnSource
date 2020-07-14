@@ -30,22 +30,22 @@ extends GourdBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg22, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        ItemStack lv = arg4.getStackInHand(arg5);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.SHEARS) {
-            if (!arg22.isClient) {
-                Direction lv2 = arg6.getSide();
-                Direction lv3 = lv2.getAxis() == Direction.Axis.Y ? arg4.getHorizontalFacing().getOpposite() : lv2;
-                arg22.playSound(null, arg3, SoundEvents.BLOCK_PUMPKIN_CARVE, SoundCategory.BLOCKS, 1.0f, 1.0f);
-                arg22.setBlockState(arg3, (BlockState)Blocks.CARVED_PUMPKIN.getDefaultState().with(CarvedPumpkinBlock.FACING, lv3), 11);
-                ItemEntity lv4 = new ItemEntity(arg22, (double)arg3.getX() + 0.5 + (double)lv3.getOffsetX() * 0.65, (double)arg3.getY() + 0.1, (double)arg3.getZ() + 0.5 + (double)lv3.getOffsetZ() * 0.65, new ItemStack(Items.PUMPKIN_SEEDS, 4));
-                lv4.setVelocity(0.05 * (double)lv3.getOffsetX() + arg22.random.nextDouble() * 0.02, 0.05, 0.05 * (double)lv3.getOffsetZ() + arg22.random.nextDouble() * 0.02);
-                arg22.spawnEntity(lv4);
-                lv.damage(1, arg4, arg2 -> arg2.sendToolBreakStatus(arg5));
+            if (!world.isClient) {
+                Direction lv2 = hit.getSide();
+                Direction lv3 = lv2.getAxis() == Direction.Axis.Y ? player.getHorizontalFacing().getOpposite() : lv2;
+                world.playSound(null, pos, SoundEvents.BLOCK_PUMPKIN_CARVE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                world.setBlockState(pos, (BlockState)Blocks.CARVED_PUMPKIN.getDefaultState().with(CarvedPumpkinBlock.FACING, lv3), 11);
+                ItemEntity lv4 = new ItemEntity(world, (double)pos.getX() + 0.5 + (double)lv3.getOffsetX() * 0.65, (double)pos.getY() + 0.1, (double)pos.getZ() + 0.5 + (double)lv3.getOffsetZ() * 0.65, new ItemStack(Items.PUMPKIN_SEEDS, 4));
+                lv4.setVelocity(0.05 * (double)lv3.getOffsetX() + world.random.nextDouble() * 0.02, 0.05, 0.05 * (double)lv3.getOffsetZ() + world.random.nextDouble() * 0.02);
+                world.spawnEntity(lv4);
+                lv.damage(1, player, arg2 -> arg2.sendToolBreakStatus(hand));
             }
-            return ActionResult.success(arg22.isClient);
+            return ActionResult.success(world.isClient);
         }
-        return super.onUse(arg, arg22, arg3, arg4, arg5, arg6);
+        return super.onUse(state, world, pos, player, hand, hit);
     }
 
     @Override

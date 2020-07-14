@@ -24,74 +24,74 @@ public class CoordinateArgument {
     private final boolean relative;
     private final double value;
 
-    public CoordinateArgument(boolean bl, double d) {
-        this.relative = bl;
-        this.value = d;
+    public CoordinateArgument(boolean relative, double value) {
+        this.relative = relative;
+        this.value = value;
     }
 
-    public double toAbsoluteCoordinate(double d) {
+    public double toAbsoluteCoordinate(double offset) {
         if (this.relative) {
-            return this.value + d;
+            return this.value + offset;
         }
         return this.value;
     }
 
-    public static CoordinateArgument parse(StringReader stringReader, boolean bl) throws CommandSyntaxException {
-        if (stringReader.canRead() && stringReader.peek() == '^') {
-            throw Vec3ArgumentType.MIXED_COORDINATE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+    public static CoordinateArgument parse(StringReader reader, boolean centerIntegers) throws CommandSyntaxException {
+        if (reader.canRead() && reader.peek() == '^') {
+            throw Vec3ArgumentType.MIXED_COORDINATE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
-        if (!stringReader.canRead()) {
-            throw MISSING_COORDINATE.createWithContext((ImmutableStringReader)stringReader);
+        if (!reader.canRead()) {
+            throw MISSING_COORDINATE.createWithContext((ImmutableStringReader)reader);
         }
-        boolean bl2 = CoordinateArgument.isRelative(stringReader);
-        int i = stringReader.getCursor();
-        double d = stringReader.canRead() && stringReader.peek() != ' ' ? stringReader.readDouble() : 0.0;
-        String string = stringReader.getString().substring(i, stringReader.getCursor());
+        boolean bl2 = CoordinateArgument.isRelative(reader);
+        int i = reader.getCursor();
+        double d = reader.canRead() && reader.peek() != ' ' ? reader.readDouble() : 0.0;
+        String string = reader.getString().substring(i, reader.getCursor());
         if (bl2 && string.isEmpty()) {
             return new CoordinateArgument(true, 0.0);
         }
-        if (!string.contains(".") && !bl2 && bl) {
+        if (!string.contains(".") && !bl2 && centerIntegers) {
             d += 0.5;
         }
         return new CoordinateArgument(bl2, d);
     }
 
-    public static CoordinateArgument parse(StringReader stringReader) throws CommandSyntaxException {
+    public static CoordinateArgument parse(StringReader reader) throws CommandSyntaxException {
         double e;
-        if (stringReader.canRead() && stringReader.peek() == '^') {
-            throw Vec3ArgumentType.MIXED_COORDINATE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+        if (reader.canRead() && reader.peek() == '^') {
+            throw Vec3ArgumentType.MIXED_COORDINATE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
-        if (!stringReader.canRead()) {
-            throw MISSING_BLOCK_POSITION.createWithContext((ImmutableStringReader)stringReader);
+        if (!reader.canRead()) {
+            throw MISSING_BLOCK_POSITION.createWithContext((ImmutableStringReader)reader);
         }
-        boolean bl = CoordinateArgument.isRelative(stringReader);
-        if (stringReader.canRead() && stringReader.peek() != ' ') {
-            double d = bl ? stringReader.readDouble() : (double)stringReader.readInt();
+        boolean bl = CoordinateArgument.isRelative(reader);
+        if (reader.canRead() && reader.peek() != ' ') {
+            double d = bl ? reader.readDouble() : (double)reader.readInt();
         } else {
             e = 0.0;
         }
         return new CoordinateArgument(bl, e);
     }
 
-    private static boolean isRelative(StringReader stringReader) {
+    private static boolean isRelative(StringReader reader) {
         boolean bl2;
-        if (stringReader.peek() == '~') {
+        if (reader.peek() == '~') {
             boolean bl = true;
-            stringReader.skip();
+            reader.skip();
         } else {
             bl2 = false;
         }
         return bl2;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(object instanceof CoordinateArgument)) {
+        if (!(o instanceof CoordinateArgument)) {
             return false;
         }
-        CoordinateArgument lv = (CoordinateArgument)object;
+        CoordinateArgument lv = (CoordinateArgument)o;
         if (this.relative != lv.relative) {
             return false;
         }

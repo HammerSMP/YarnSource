@@ -23,8 +23,8 @@ public class BipedEntityRenderer<T extends MobEntity, M extends BipedEntityModel
 extends MobEntityRenderer<T, M> {
     private static final Identifier TEXTURE = new Identifier("textures/entity/steve.png");
 
-    public BipedEntityRenderer(EntityRenderDispatcher arg, M arg2, float f) {
-        this(arg, arg2, f, 1.0f, 1.0f, 1.0f);
+    public BipedEntityRenderer(EntityRenderDispatcher dispatcher, M model, float f) {
+        this(dispatcher, model, f, 1.0f, 1.0f, 1.0f);
     }
 
     public BipedEntityRenderer(EntityRenderDispatcher arg, M arg2, float f, float g, float h, float i) {

@@ -29,8 +29,8 @@ implements FeatureConfig {
     @Nullable
     private final BlockPos crystalBeamTarget;
 
-    public EndSpikeFeatureConfig(boolean bl, List<EndSpikeFeature.Spike> list, @Nullable BlockPos arg) {
-        this(bl, list, Optional.ofNullable(arg));
+    public EndSpikeFeatureConfig(boolean crystalInvulnerable, List<EndSpikeFeature.Spike> spikes, @Nullable BlockPos crystalBeamTarget) {
+        this(crystalInvulnerable, spikes, Optional.ofNullable(crystalBeamTarget));
     }
 
     private EndSpikeFeatureConfig(boolean bl, List<EndSpikeFeature.Spike> list, Optional<BlockPos> optional) {

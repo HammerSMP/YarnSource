@@ -32,84 +32,84 @@ public class BrewingRecipeRegistry {
         return false;
     };
 
-    public static boolean isValidIngredient(ItemStack arg) {
-        return BrewingRecipeRegistry.isItemRecipeIngredient(arg) || BrewingRecipeRegistry.isPotionRecipeIngredient(arg);
+    public static boolean isValidIngredient(ItemStack stack) {
+        return BrewingRecipeRegistry.isItemRecipeIngredient(stack) || BrewingRecipeRegistry.isPotionRecipeIngredient(stack);
     }
 
-    protected static boolean isItemRecipeIngredient(ItemStack arg) {
+    protected static boolean isItemRecipeIngredient(ItemStack stack) {
         int j = ITEM_RECIPES.size();
         for (int i = 0; i < j; ++i) {
-            if (!((Recipe)ITEM_RECIPES.get(i)).ingredient.test(arg)) continue;
+            if (!((Recipe)ITEM_RECIPES.get(i)).ingredient.test(stack)) continue;
             return true;
         }
         return false;
     }
 
-    protected static boolean isPotionRecipeIngredient(ItemStack arg) {
+    protected static boolean isPotionRecipeIngredient(ItemStack stack) {
         int j = POTION_RECIPES.size();
         for (int i = 0; i < j; ++i) {
-            if (!((Recipe)POTION_RECIPES.get(i)).ingredient.test(arg)) continue;
+            if (!((Recipe)POTION_RECIPES.get(i)).ingredient.test(stack)) continue;
             return true;
         }
         return false;
     }
 
-    public static boolean isBrewable(Potion arg) {
+    public static boolean isBrewable(Potion potion) {
         int j = POTION_RECIPES.size();
         for (int i = 0; i < j; ++i) {
-            if (((Recipe)POTION_RECIPES.get(i)).output != arg) continue;
+            if (((Recipe)POTION_RECIPES.get(i)).output != potion) continue;
             return true;
         }
         return false;
     }
 
-    public static boolean hasRecipe(ItemStack arg, ItemStack arg2) {
-        if (!POTION_TYPE_PREDICATE.test(arg)) {
+    public static boolean hasRecipe(ItemStack input, ItemStack ingredient) {
+        if (!POTION_TYPE_PREDICATE.test(input)) {
             return false;
         }
-        return BrewingRecipeRegistry.hasItemRecipe(arg, arg2) || BrewingRecipeRegistry.hasPotionRecipe(arg, arg2);
+        return BrewingRecipeRegistry.hasItemRecipe(input, ingredient) || BrewingRecipeRegistry.hasPotionRecipe(input, ingredient);
     }
 
-    protected static boolean hasItemRecipe(ItemStack arg, ItemStack arg2) {
-        Item lv = arg.getItem();
+    protected static boolean hasItemRecipe(ItemStack input, ItemStack ingredient) {
+        Item lv = input.getItem();
         int j = ITEM_RECIPES.size();
         for (int i = 0; i < j; ++i) {
             Recipe<Item> lv2 = ITEM_RECIPES.get(i);
-            if (((Recipe)lv2).input != lv || !((Recipe)lv2).ingredient.test(arg2)) continue;
+            if (((Recipe)lv2).input != lv || !((Recipe)lv2).ingredient.test(ingredient)) continue;
             return true;
         }
         return false;
     }
 
-    protected static boolean hasPotionRecipe(ItemStack arg, ItemStack arg2) {
-        Potion lv = PotionUtil.getPotion(arg);
+    protected static boolean hasPotionRecipe(ItemStack input, ItemStack ingredient) {
+        Potion lv = PotionUtil.getPotion(input);
         int j = POTION_RECIPES.size();
         for (int i = 0; i < j; ++i) {
             Recipe<Potion> lv2 = POTION_RECIPES.get(i);
-            if (((Recipe)lv2).input != lv || !((Recipe)lv2).ingredient.test(arg2)) continue;
+            if (((Recipe)lv2).input != lv || !((Recipe)lv2).ingredient.test(ingredient)) continue;
             return true;
         }
         return false;
     }
 
-    public static ItemStack craft(ItemStack arg, ItemStack arg2) {
-        if (!arg2.isEmpty()) {
-            Potion lv = PotionUtil.getPotion(arg2);
-            Item lv2 = arg2.getItem();
+    public static ItemStack craft(ItemStack input, ItemStack ingredient) {
+        if (!ingredient.isEmpty()) {
+            Potion lv = PotionUtil.getPotion(ingredient);
+            Item lv2 = ingredient.getItem();
             int j = ITEM_RECIPES.size();
             for (int i = 0; i < j; ++i) {
                 Recipe<Item> lv3 = ITEM_RECIPES.get(i);
-                if (((Recipe)lv3).input != lv2 || !((Recipe)lv3).ingredient.test(arg)) continue;
+                if (((Recipe)lv3).input != lv2 || !((Recipe)lv3).ingredient.test(input)) continue;
                 return PotionUtil.setPotion(new ItemStack((ItemConvertible)((Recipe)lv3).output), lv);
             }
             int l = POTION_RECIPES.size();
             for (int k = 0; k < l; ++k) {
                 Recipe<Potion> lv4 = POTION_RECIPES.get(k);
-                if (((Recipe)lv4).input != lv || !((Recipe)lv4).ingredient.test(arg)) continue;
+                if (((Recipe)lv4).input != lv || !((Recipe)lv4).ingredient.test(input)) continue;
                 return PotionUtil.setPotion(new ItemStack(lv2), (Potion)((Recipe)lv4).output);
             }
         }
-        return arg2;
+        return ingredient;
     }
 
     public static void registerDefaults() {
@@ -175,25 +175,25 @@ public class BrewingRecipeRegistry {
         BrewingRecipeRegistry.registerPotionRecipe(Potions.SLOW_FALLING, Items.REDSTONE, Potions.LONG_SLOW_FALLING);
     }
 
-    private static void registerItemRecipe(Item arg, Item arg2, Item arg3) {
-        if (!(arg instanceof PotionItem)) {
-            throw new IllegalArgumentException("Expected a potion, got: " + Registry.ITEM.getId(arg));
+    private static void registerItemRecipe(Item input, Item ingredient, Item output) {
+        if (!(input instanceof PotionItem)) {
+            throw new IllegalArgumentException("Expected a potion, got: " + Registry.ITEM.getId(input));
         }
-        if (!(arg3 instanceof PotionItem)) {
-            throw new IllegalArgumentException("Expected a potion, got: " + Registry.ITEM.getId(arg3));
+        if (!(output instanceof PotionItem)) {
+            throw new IllegalArgumentException("Expected a potion, got: " + Registry.ITEM.getId(output));
         }
-        ITEM_RECIPES.add(new Recipe<Item>(arg, Ingredient.ofItems(arg2), arg3));
+        ITEM_RECIPES.add(new Recipe<Item>(input, Ingredient.ofItems(ingredient), output));
     }
 
-    private static void registerPotionType(Item arg) {
-        if (!(arg instanceof PotionItem)) {
-            throw new IllegalArgumentException("Expected a potion, got: " + Registry.ITEM.getId(arg));
+    private static void registerPotionType(Item item) {
+        if (!(item instanceof PotionItem)) {
+            throw new IllegalArgumentException("Expected a potion, got: " + Registry.ITEM.getId(item));
         }
-        POTION_TYPES.add(Ingredient.ofItems(arg));
+        POTION_TYPES.add(Ingredient.ofItems(item));
     }
 
-    private static void registerPotionRecipe(Potion arg, Item arg2, Potion arg3) {
-        POTION_RECIPES.add(new Recipe<Potion>(arg, Ingredient.ofItems(arg2), arg3));
+    private static void registerPotionRecipe(Potion input, Item arg2, Potion output) {
+        POTION_RECIPES.add(new Recipe<Potion>(input, Ingredient.ofItems(arg2), output));
     }
 
     static class Recipe<T> {

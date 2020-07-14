@@ -33,8 +33,8 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        Brain<?> lv = arg2.getBrain();
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        Brain<?> lv = entity.getBrain();
         Optional<Object> optional = Optional.empty();
         ArrayList list = Lists.newArrayList();
         List<LivingEntity> list2 = lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).orElse((List<LivingEntity>)ImmutableList.of());

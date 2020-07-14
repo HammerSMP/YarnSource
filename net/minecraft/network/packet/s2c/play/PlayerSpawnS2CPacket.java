@@ -29,36 +29,36 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerSpawnS2CPacket() {
     }
 
-    public PlayerSpawnS2CPacket(PlayerEntity arg) {
-        this.id = arg.getEntityId();
-        this.uuid = arg.getGameProfile().getId();
-        this.x = arg.getX();
-        this.y = arg.getY();
-        this.z = arg.getZ();
-        this.yaw = (byte)(arg.yaw * 256.0f / 360.0f);
-        this.pitch = (byte)(arg.pitch * 256.0f / 360.0f);
+    public PlayerSpawnS2CPacket(PlayerEntity player) {
+        this.id = player.getEntityId();
+        this.uuid = player.getGameProfile().getId();
+        this.x = player.getX();
+        this.y = player.getY();
+        this.z = player.getZ();
+        this.yaw = (byte)(player.yaw * 256.0f / 360.0f);
+        this.pitch = (byte)(player.pitch * 256.0f / 360.0f);
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.uuid = arg.readUuid();
-        this.x = arg.readDouble();
-        this.y = arg.readDouble();
-        this.z = arg.readDouble();
-        this.yaw = arg.readByte();
-        this.pitch = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.uuid = buf.readUuid();
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.yaw = buf.readByte();
+        this.pitch = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeUuid(this.uuid);
-        arg.writeDouble(this.x);
-        arg.writeDouble(this.y);
-        arg.writeDouble(this.z);
-        arg.writeByte(this.yaw);
-        arg.writeByte(this.pitch);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeUuid(this.uuid);
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeByte(this.yaw);
+        buf.writeByte(this.pitch);
     }
 
     @Override

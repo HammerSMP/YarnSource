@@ -59,22 +59,22 @@ extends BiomeSource {
     private final long seed;
     private final Optional<Preset> field_24721;
 
-    private MultiNoiseBiomeSource(long l, List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> list) {
-        this(l, list, Optional.empty());
+    private MultiNoiseBiomeSource(long seed, List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> biomePoints) {
+        this(seed, biomePoints, Optional.empty());
     }
 
-    public MultiNoiseBiomeSource(long l, List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> list, Optional<Preset> optional) {
+    public MultiNoiseBiomeSource(long seed, List<Pair<Biome.MixedNoisePoint, Supplier<Biome>>> list, Optional<Preset> optional) {
         super(list.stream().map(Pair::getSecond).map(Supplier::get).collect(Collectors.toList()));
-        this.seed = l;
+        this.seed = seed;
         this.field_24721 = optional;
         IntStream intStream = IntStream.rangeClosed(-7, -6);
         IntStream intStream2 = IntStream.rangeClosed(-7, -6);
         IntStream intStream3 = IntStream.rangeClosed(-7, -6);
         IntStream intStream4 = IntStream.rangeClosed(-7, -6);
-        this.temperatureNoise = new DoublePerlinNoiseSampler(new ChunkRandom(l), intStream);
-        this.humidityNoise = new DoublePerlinNoiseSampler(new ChunkRandom(l + 1L), intStream2);
-        this.altitudeNoise = new DoublePerlinNoiseSampler(new ChunkRandom(l + 2L), intStream3);
-        this.weirdnessNoise = new DoublePerlinNoiseSampler(new ChunkRandom(l + 3L), intStream4);
+        this.temperatureNoise = new DoublePerlinNoiseSampler(new ChunkRandom(seed), intStream);
+        this.humidityNoise = new DoublePerlinNoiseSampler(new ChunkRandom(seed + 1L), intStream2);
+        this.altitudeNoise = new DoublePerlinNoiseSampler(new ChunkRandom(seed + 2L), intStream3);
+        this.weirdnessNoise = new DoublePerlinNoiseSampler(new ChunkRandom(seed + 3L), intStream4);
         this.biomePoints = list;
         this.threeDimensionalSampling = false;
     }
@@ -90,14 +90,14 @@ extends BiomeSource {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource withSeed(long l) {
-        return new MultiNoiseBiomeSource(l, this.biomePoints, this.field_24721);
+    public BiomeSource withSeed(long seed) {
+        return new MultiNoiseBiomeSource(seed, this.biomePoints, this.field_24721);
     }
 
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        int l = this.threeDimensionalSampling ? j : 0;
-        Biome.MixedNoisePoint lv = new Biome.MixedNoisePoint((float)this.temperatureNoise.sample(i, l, k), (float)this.humidityNoise.sample(i, l, k), (float)this.altitudeNoise.sample(i, l, k), (float)this.weirdnessNoise.sample(i, l, k), 0.0f);
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        int l = this.threeDimensionalSampling ? biomeY : 0;
+        Biome.MixedNoisePoint lv = new Biome.MixedNoisePoint((float)this.temperatureNoise.sample(biomeX, l, biomeZ), (float)this.humidityNoise.sample(biomeX, l, biomeZ), (float)this.altitudeNoise.sample(biomeX, l, biomeZ), (float)this.weirdnessNoise.sample(biomeX, l, biomeZ), 0.0f);
         return this.biomePoints.stream().min(Comparator.comparing(pair -> Float.valueOf(((Biome.MixedNoisePoint)pair.getFirst()).calculateDistanceTo(lv)))).map(Pair::getSecond).map(Supplier::get).orElse(Biomes.THE_VOID);
     }
 
@@ -108,18 +108,18 @@ extends BiomeSource {
     public static class Preset {
         private static final Map<Identifier, Preset> field_24724 = Maps.newHashMap();
         public static final MapCodec<Pair<Preset, Long>> CODEC = Codec.mapPair((MapCodec)Identifier.CODEC.flatXmap(arg -> Optional.ofNullable(field_24724.get(arg)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown preset: " + arg))), arg -> DataResult.success((Object)arg.id)).fieldOf("preset"), (MapCodec)Codec.LONG.fieldOf("seed")).stable();
-        public static final Preset NETHER = new Preset(new Identifier("nether"), l -> MultiNoiseBiomeSource.method_28465(l));
+        public static final Preset NETHER = new Preset(new Identifier("nether"), seed -> MultiNoiseBiomeSource.method_28465(seed));
         private final Identifier id;
         private final LongFunction<MultiNoiseBiomeSource> biomeSourceFunction;
 
-        public Preset(Identifier arg, LongFunction<MultiNoiseBiomeSource> longFunction) {
-            this.id = arg;
+        public Preset(Identifier id, LongFunction<MultiNoiseBiomeSource> longFunction) {
+            this.id = id;
             this.biomeSourceFunction = longFunction;
-            field_24724.put(arg, this);
+            field_24724.put(id, this);
         }
 
-        public MultiNoiseBiomeSource getBiomeSource(long l) {
-            return this.biomeSourceFunction.apply(l);
+        public MultiNoiseBiomeSource getBiomeSource(long seed) {
+            return this.biomeSourceFunction.apply(seed);
         }
     }
 }

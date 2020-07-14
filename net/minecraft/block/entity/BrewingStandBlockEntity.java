@@ -47,8 +47,8 @@ Tickable {
     protected final PropertyDelegate propertyDelegate = new PropertyDelegate(){
 
         @Override
-        public int get(int i) {
-            switch (i) {
+        public int get(int index) {
+            switch (index) {
                 case 0: {
                     return BrewingStandBlockEntity.this.brewTime;
                 }
@@ -60,14 +60,14 @@ Tickable {
         }
 
         @Override
-        public void set(int i, int j) {
-            switch (i) {
+        public void set(int index, int value) {
+            switch (index) {
                 case 0: {
-                    BrewingStandBlockEntity.this.brewTime = j;
+                    BrewingStandBlockEntity.this.brewTime = value;
                     break;
                 }
                 case 1: {
-                    BrewingStandBlockEntity.this.fuel = j;
+                    BrewingStandBlockEntity.this.fuel = value;
                 }
             }
         }
@@ -191,88 +191,88 @@ Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        Inventories.fromTag(arg2, this.inventory);
-        this.brewTime = arg2.getShort("BrewTime");
-        this.fuel = arg2.getByte("Fuel");
+        Inventories.fromTag(tag, this.inventory);
+        this.brewTime = tag.getShort("BrewTime");
+        this.fuel = tag.getByte("Fuel");
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.putShort("BrewTime", (short)this.brewTime);
-        Inventories.toTag(arg, this.inventory);
-        arg.putByte("Fuel", (byte)this.fuel);
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putShort("BrewTime", (short)this.brewTime);
+        Inventories.toTag(tag, this.inventory);
+        tag.putByte("Fuel", (byte)this.fuel);
+        return tag;
     }
 
     @Override
-    public ItemStack getStack(int i) {
-        if (i >= 0 && i < this.inventory.size()) {
-            return this.inventory.get(i);
+    public ItemStack getStack(int slot) {
+        if (slot >= 0 && slot < this.inventory.size()) {
+            return this.inventory.get(slot);
         }
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
-        return Inventories.splitStack(this.inventory, i, j);
+    public ItemStack removeStack(int slot, int amount) {
+        return Inventories.splitStack(this.inventory, slot, amount);
     }
 
     @Override
-    public ItemStack removeStack(int i) {
-        return Inventories.removeStack(this.inventory, i);
+    public ItemStack removeStack(int slot) {
+        return Inventories.removeStack(this.inventory, slot);
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        if (i >= 0 && i < this.inventory.size()) {
-            this.inventory.set(i, arg);
+    public void setStack(int slot, ItemStack stack) {
+        if (slot >= 0 && slot < this.inventory.size()) {
+            this.inventory.set(slot, stack);
         }
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
+    public boolean canPlayerUse(PlayerEntity player) {
         if (this.world.getBlockEntity(this.pos) != this) {
             return false;
         }
-        return !(arg.squaredDistanceTo((double)this.pos.getX() + 0.5, (double)this.pos.getY() + 0.5, (double)this.pos.getZ() + 0.5) > 64.0);
+        return !(player.squaredDistanceTo((double)this.pos.getX() + 0.5, (double)this.pos.getY() + 0.5, (double)this.pos.getZ() + 0.5) > 64.0);
     }
 
     @Override
-    public boolean isValid(int i, ItemStack arg) {
-        if (i == 3) {
-            return BrewingRecipeRegistry.isValidIngredient(arg);
+    public boolean isValid(int slot, ItemStack stack) {
+        if (slot == 3) {
+            return BrewingRecipeRegistry.isValidIngredient(stack);
         }
-        Item lv = arg.getItem();
-        if (i == 4) {
+        Item lv = stack.getItem();
+        if (slot == 4) {
             return lv == Items.BLAZE_POWDER;
         }
-        return (lv == Items.POTION || lv == Items.SPLASH_POTION || lv == Items.LINGERING_POTION || lv == Items.GLASS_BOTTLE) && this.getStack(i).isEmpty();
+        return (lv == Items.POTION || lv == Items.SPLASH_POTION || lv == Items.LINGERING_POTION || lv == Items.GLASS_BOTTLE) && this.getStack(slot).isEmpty();
     }
 
     @Override
-    public int[] getAvailableSlots(Direction arg) {
-        if (arg == Direction.UP) {
+    public int[] getAvailableSlots(Direction side) {
+        if (side == Direction.UP) {
             return TOP_SLOTS;
         }
-        if (arg == Direction.DOWN) {
+        if (side == Direction.DOWN) {
             return BOTTOM_SLOTS;
         }
         return SIDE_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int i, ItemStack arg, @Nullable Direction arg2) {
-        return this.isValid(i, arg);
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return this.isValid(slot, stack);
     }
 
     @Override
-    public boolean canExtract(int i, ItemStack arg, Direction arg2) {
-        if (i == 3) {
-            return arg.getItem() == Items.GLASS_BOTTLE;
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        if (slot == 3) {
+            return stack.getItem() == Items.GLASS_BOTTLE;
         }
         return true;
     }
@@ -283,8 +283,8 @@ Tickable {
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return new BrewingStandScreenHandler(i, arg, this, this.propertyDelegate);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new BrewingStandScreenHandler(syncId, playerInventory, this, this.propertyDelegate);
     }
 }
 

@@ -29,8 +29,8 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerMoveC2SPacket(boolean bl) {
-        this.onGround = bl;
+    public PlayerMoveC2SPacket(boolean onGround) {
+        this.onGround = onGround;
     }
 
     @Override
@@ -39,33 +39,33 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.onGround = arg.readUnsignedByte() != 0;
+    public void read(PacketByteBuf buf) throws IOException {
+        this.onGround = buf.readUnsignedByte() != 0;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.onGround ? 1 : 0);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.onGround ? 1 : 0);
     }
 
-    public double getX(double d) {
-        return this.changePosition ? this.x : d;
+    public double getX(double currentX) {
+        return this.changePosition ? this.x : currentX;
     }
 
-    public double getY(double d) {
-        return this.changePosition ? this.y : d;
+    public double getY(double currentY) {
+        return this.changePosition ? this.y : currentY;
     }
 
-    public double getZ(double d) {
-        return this.changePosition ? this.z : d;
+    public double getZ(double currentZ) {
+        return this.changePosition ? this.z : currentZ;
     }
 
-    public float getYaw(float f) {
-        return this.changeLook ? this.yaw : f;
+    public float getYaw(float currentYaw) {
+        return this.changeLook ? this.yaw : currentYaw;
     }
 
-    public float getPitch(float f) {
-        return this.changeLook ? this.pitch : f;
+    public float getPitch(float currentPitch) {
+        return this.changeLook ? this.pitch : currentPitch;
     }
 
     public boolean isOnGround() {
@@ -79,25 +79,25 @@ implements Packet<ServerPlayPacketListener> {
         }
 
         @Environment(value=EnvType.CLIENT)
-        public LookOnly(float f, float g, boolean bl) {
-            this.yaw = f;
-            this.pitch = g;
-            this.onGround = bl;
+        public LookOnly(float yaw, float pitch, boolean onGround) {
+            this.yaw = yaw;
+            this.pitch = pitch;
+            this.onGround = onGround;
             this.changeLook = true;
         }
 
         @Override
-        public void read(PacketByteBuf arg) throws IOException {
-            this.yaw = arg.readFloat();
-            this.pitch = arg.readFloat();
-            super.read(arg);
+        public void read(PacketByteBuf buf) throws IOException {
+            this.yaw = buf.readFloat();
+            this.pitch = buf.readFloat();
+            super.read(buf);
         }
 
         @Override
-        public void write(PacketByteBuf arg) throws IOException {
-            arg.writeFloat(this.yaw);
-            arg.writeFloat(this.pitch);
-            super.write(arg);
+        public void write(PacketByteBuf buf) throws IOException {
+            buf.writeFloat(this.yaw);
+            buf.writeFloat(this.pitch);
+            super.write(buf);
         }
     }
 
@@ -108,28 +108,28 @@ implements Packet<ServerPlayPacketListener> {
         }
 
         @Environment(value=EnvType.CLIENT)
-        public PositionOnly(double d, double e, double f, boolean bl) {
-            this.x = d;
-            this.y = e;
-            this.z = f;
-            this.onGround = bl;
+        public PositionOnly(double x, double y, double z, boolean onGround) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.onGround = onGround;
             this.changePosition = true;
         }
 
         @Override
-        public void read(PacketByteBuf arg) throws IOException {
-            this.x = arg.readDouble();
-            this.y = arg.readDouble();
-            this.z = arg.readDouble();
-            super.read(arg);
+        public void read(PacketByteBuf buf) throws IOException {
+            this.x = buf.readDouble();
+            this.y = buf.readDouble();
+            this.z = buf.readDouble();
+            super.read(buf);
         }
 
         @Override
-        public void write(PacketByteBuf arg) throws IOException {
-            arg.writeDouble(this.x);
-            arg.writeDouble(this.y);
-            arg.writeDouble(this.z);
-            super.write(arg);
+        public void write(PacketByteBuf buf) throws IOException {
+            buf.writeDouble(this.x);
+            buf.writeDouble(this.y);
+            buf.writeDouble(this.z);
+            super.write(buf);
         }
     }
 
@@ -141,35 +141,35 @@ implements Packet<ServerPlayPacketListener> {
         }
 
         @Environment(value=EnvType.CLIENT)
-        public Both(double d, double e, double f, float g, float h, boolean bl) {
-            this.x = d;
-            this.y = e;
-            this.z = f;
-            this.yaw = g;
-            this.pitch = h;
-            this.onGround = bl;
+        public Both(double x, double y, double z, float yaw, float pitch, boolean onGround) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.yaw = yaw;
+            this.pitch = pitch;
+            this.onGround = onGround;
             this.changeLook = true;
             this.changePosition = true;
         }
 
         @Override
-        public void read(PacketByteBuf arg) throws IOException {
-            this.x = arg.readDouble();
-            this.y = arg.readDouble();
-            this.z = arg.readDouble();
-            this.yaw = arg.readFloat();
-            this.pitch = arg.readFloat();
-            super.read(arg);
+        public void read(PacketByteBuf buf) throws IOException {
+            this.x = buf.readDouble();
+            this.y = buf.readDouble();
+            this.z = buf.readDouble();
+            this.yaw = buf.readFloat();
+            this.pitch = buf.readFloat();
+            super.read(buf);
         }
 
         @Override
-        public void write(PacketByteBuf arg) throws IOException {
-            arg.writeDouble(this.x);
-            arg.writeDouble(this.y);
-            arg.writeDouble(this.z);
-            arg.writeFloat(this.yaw);
-            arg.writeFloat(this.pitch);
-            super.write(arg);
+        public void write(PacketByteBuf buf) throws IOException {
+            buf.writeDouble(this.x);
+            buf.writeDouble(this.y);
+            buf.writeDouble(this.z);
+            buf.writeFloat(this.yaw);
+            buf.writeFloat(this.pitch);
+            super.write(buf);
         }
     }
 }

@@ -29,36 +29,36 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerPositionLookS2CPacket() {
     }
 
-    public PlayerPositionLookS2CPacket(double d, double e, double f, float g, float h, Set<Flag> set, int i) {
-        this.x = d;
-        this.y = e;
-        this.z = f;
-        this.yaw = g;
-        this.pitch = h;
-        this.flags = set;
-        this.teleportId = i;
+    public PlayerPositionLookS2CPacket(double x, double y, double z, float yaw, float pitch, Set<Flag> flags, int teleportId) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.flags = flags;
+        this.teleportId = teleportId;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.x = arg.readDouble();
-        this.y = arg.readDouble();
-        this.z = arg.readDouble();
-        this.yaw = arg.readFloat();
-        this.pitch = arg.readFloat();
-        this.flags = Flag.getFlags(arg.readUnsignedByte());
-        this.teleportId = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.yaw = buf.readFloat();
+        this.pitch = buf.readFloat();
+        this.flags = Flag.getFlags(buf.readUnsignedByte());
+        this.teleportId = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeDouble(this.x);
-        arg.writeDouble(this.y);
-        arg.writeDouble(this.z);
-        arg.writeFloat(this.yaw);
-        arg.writeFloat(this.pitch);
-        arg.writeByte(Flag.getBitfield(this.flags));
-        arg.writeVarInt(this.teleportId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeFloat(this.yaw);
+        buf.writeFloat(this.pitch);
+        buf.writeByte(Flag.getBitfield(this.flags));
+        buf.writeVarInt(this.teleportId);
     }
 
     @Override
@@ -110,8 +110,8 @@ implements Packet<ClientPlayPacketListener> {
 
         private final int shift;
 
-        private Flag(int j) {
-            this.shift = j;
+        private Flag(int shift) {
+            this.shift = shift;
         }
 
         private int getMask() {

@@ -37,22 +37,22 @@ implements Spawner {
     private int spawnDelay;
     private int spawnChance;
 
-    public WanderingTraderManager(ServerWorldProperties arg) {
-        this.properties = arg;
+    public WanderingTraderManager(ServerWorldProperties properties) {
+        this.properties = properties;
         this.spawnTimer = 1200;
-        this.spawnDelay = arg.getWanderingTraderSpawnDelay();
-        this.spawnChance = arg.getWanderingTraderSpawnChance();
+        this.spawnDelay = properties.getWanderingTraderSpawnDelay();
+        this.spawnChance = properties.getWanderingTraderSpawnChance();
         if (this.spawnDelay == 0 && this.spawnChance == 0) {
             this.spawnDelay = 24000;
-            arg.setWanderingTraderSpawnDelay(this.spawnDelay);
+            properties.setWanderingTraderSpawnDelay(this.spawnDelay);
             this.spawnChance = 25;
-            arg.setWanderingTraderSpawnChance(this.spawnChance);
+            properties.setWanderingTraderSpawnChance(this.spawnChance);
         }
     }
 
     @Override
-    public int spawn(ServerWorld arg, boolean bl, boolean bl2) {
-        if (!arg.getGameRules().getBoolean(GameRules.DO_TRADER_SPAWNING)) {
+    public int spawn(ServerWorld world, boolean spawnMonsters, boolean spawnAnimals) {
+        if (!world.getGameRules().getBoolean(GameRules.DO_TRADER_SPAWNING)) {
             return 0;
         }
         if (--this.spawnTimer > 0) {
@@ -65,7 +65,7 @@ implements Spawner {
             return 0;
         }
         this.spawnDelay = 24000;
-        if (!arg.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
+        if (!world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
             return 0;
         }
         int i = this.spawnChance;
@@ -74,7 +74,7 @@ implements Spawner {
         if (this.random.nextInt(100) > i) {
             return 0;
         }
-        if (this.method_18018(arg)) {
+        if (this.method_18018(world)) {
             this.spawnChance = 25;
             return 1;
         }

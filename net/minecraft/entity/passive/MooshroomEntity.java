@@ -63,15 +63,15 @@ implements Shearable {
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (arg2.getBlockState(arg.down()).isOf(Blocks.MYCELIUM)) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (world.getBlockState(pos.down()).isOf(Blocks.MYCELIUM)) {
             return 10.0f;
         }
-        return arg2.getBrightness(arg) - 0.5f;
+        return world.getBrightness(pos) - 0.5f;
     }
 
-    public static boolean canSpawn(EntityType<MooshroomEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getBlockState(arg4.down()).isOf(Blocks.MYCELIUM) && arg2.getBaseLightLevel(arg4, 0) > 8;
+    public static boolean canSpawn(EntityType<MooshroomEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return world.getBlockState(pos.down()).isOf(Blocks.MYCELIUM) && world.getBaseLightLevel(pos, 0) > 8;
     }
 
     @Override
@@ -91,8 +91,8 @@ implements Shearable {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg22) {
-        ItemStack lv = arg.getStackInHand(arg22);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.BOWL && !this.isBaby()) {
             SoundEvent lv6;
             ItemStack lv3;
@@ -106,8 +106,8 @@ implements Shearable {
             } else {
                 lv3 = new ItemStack(Items.MUSHROOM_STEW);
             }
-            ItemStack lv4 = ItemUsage.method_30270(lv, arg, lv3, false);
-            arg.setStackInHand(arg22, lv4);
+            ItemStack lv4 = ItemUsage.method_30270(lv, player, lv3, false);
+            player.setStackInHand(hand, lv4);
             if (bl) {
                 SoundEvent lv5 = SoundEvents.ENTITY_MOOSHROOM_SUSPICIOUS_MILK;
             } else {
@@ -119,7 +119,7 @@ implements Shearable {
         if (lv.getItem() == Items.SHEARS && this.isShearable()) {
             this.sheared(SoundCategory.PLAYERS);
             if (!this.world.isClient) {
-                lv.damage(1, arg, arg2 -> arg2.sendToolBreakStatus(arg22));
+                lv.damage(1, player, arg2 -> arg2.sendToolBreakStatus(hand));
             }
             return ActionResult.success(this.world.isClient);
         }
@@ -134,7 +134,7 @@ implements Shearable {
                     return ActionResult.PASS;
                 }
                 Pair<StatusEffect, Integer> pair = optional.get();
-                if (!arg.abilities.creativeMode) {
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                 }
                 for (int j = 0; j < 4; ++j) {
@@ -146,12 +146,12 @@ implements Shearable {
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg22);
+        return super.interactMob(player, hand);
     }
 
     @Override
-    public void sheared(SoundCategory arg) {
-        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_MOOSHROOM_SHEAR, arg, 1.0f, 1.0f);
+    public void sheared(SoundCategory shearedSoundCategory) {
+        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_MOOSHROOM_SHEAR, shearedSoundCategory, 1.0f, 1.0f);
         if (!this.world.isClient()) {
             ((ServerWorld)this.world).spawnParticles(ParticleTypes.EXPLOSION, this.getX(), this.getBodyY(0.5), this.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
             this.remove();
@@ -180,30 +180,30 @@ implements Shearable {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putString("Type", this.getMooshroomType().name);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putString("Type", this.getMooshroomType().name);
         if (this.stewEffect != null) {
-            arg.putByte("EffectId", (byte)StatusEffect.getRawId(this.stewEffect));
-            arg.putInt("EffectDuration", this.stewEffectDuration);
+            tag.putByte("EffectId", (byte)StatusEffect.getRawId(this.stewEffect));
+            tag.putInt("EffectDuration", this.stewEffectDuration);
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setType(Type.fromName(arg.getString("Type")));
-        if (arg.contains("EffectId", 1)) {
-            this.stewEffect = StatusEffect.byRawId(arg.getByte("EffectId"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setType(Type.fromName(tag.getString("Type")));
+        if (tag.contains("EffectId", 1)) {
+            this.stewEffect = StatusEffect.byRawId(tag.getByte("EffectId"));
         }
-        if (arg.contains("EffectDuration", 3)) {
-            this.stewEffectDuration = arg.getInt("EffectDuration");
+        if (tag.contains("EffectDuration", 3)) {
+            this.stewEffectDuration = tag.getInt("EffectDuration");
         }
     }
 
-    private Optional<Pair<StatusEffect, Integer>> getStewEffectFrom(ItemStack arg) {
+    private Optional<Pair<StatusEffect, Integer>> getStewEffectFrom(ItemStack flower) {
         Block lv2;
-        Item lv = arg.getItem();
+        Item lv = flower.getItem();
         if (lv instanceof BlockItem && (lv2 = ((BlockItem)lv).getBlock()) instanceof FlowerBlock) {
             FlowerBlock lv3 = (FlowerBlock)lv2;
             return Optional.of(Pair.of((Object)lv3.getEffectInStew(), (Object)lv3.getEffectInStewDuration()));
@@ -211,8 +211,8 @@ implements Shearable {
         return Optional.empty();
     }
 
-    private void setType(Type arg) {
-        this.dataTracker.set(TYPE, arg.name);
+    private void setType(Type type) {
+        this.dataTracker.set(TYPE, type.name);
     }
 
     public Type getMooshroomType() {
@@ -226,11 +226,11 @@ implements Shearable {
         return lv;
     }
 
-    private Type chooseBabyType(MooshroomEntity arg) {
+    private Type chooseBabyType(MooshroomEntity mooshroom) {
         Type lv4;
         Type lv2;
         Type lv = this.getMooshroomType();
-        if (lv == (lv2 = arg.getMooshroomType()) && this.random.nextInt(1024) == 0) {
+        if (lv == (lv2 = mooshroom.getMooshroomType()) && this.random.nextInt(1024) == 0) {
             Type lv3 = lv == Type.BROWN ? Type.RED : Type.BROWN;
         } else {
             lv4 = this.random.nextBoolean() ? lv : lv2;
@@ -255,9 +255,9 @@ implements Shearable {
         private final String name;
         private final BlockState mushroom;
 
-        private Type(String string2, BlockState arg) {
-            this.name = string2;
-            this.mushroom = arg;
+        private Type(String name, BlockState mushroom) {
+            this.name = name;
+            this.mushroom = mushroom;
         }
 
         @Environment(value=EnvType.CLIENT)
@@ -265,9 +265,9 @@ implements Shearable {
             return this.mushroom;
         }
 
-        private static Type fromName(String string) {
+        private static Type fromName(String name) {
             for (Type lv : Type.values()) {
-                if (!lv.name.equals(string)) continue;
+                if (!lv.name.equals(name)) continue;
                 return lv;
             }
             return RED;

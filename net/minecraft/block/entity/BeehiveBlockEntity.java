@@ -72,15 +72,15 @@ implements Tickable {
         return this.bees.size() == 3;
     }
 
-    public void angerBees(@Nullable PlayerEntity arg, BlockState arg2, BeeState arg3) {
-        List<Entity> list = this.tryReleaseBee(arg2, arg3);
-        if (arg != null) {
+    public void angerBees(@Nullable PlayerEntity player, BlockState state, BeeState arg3) {
+        List<Entity> list = this.tryReleaseBee(state, arg3);
+        if (player != null) {
             for (Entity lv : list) {
                 if (!(lv instanceof BeeEntity)) continue;
                 BeeEntity lv2 = (BeeEntity)lv;
-                if (!(arg.getPos().squaredDistanceTo(lv.getPos()) <= 16.0)) continue;
+                if (!(player.getPos().squaredDistanceTo(lv.getPos()) <= 16.0)) continue;
                 if (!this.isSmoked()) {
-                    lv2.setTarget(arg);
+                    lv2.setTarget(player);
                     continue;
                 }
                 lv2.setCannotEnterHiveTicks(400);
@@ -88,22 +88,22 @@ implements Tickable {
         }
     }
 
-    private List<Entity> tryReleaseBee(BlockState arg, BeeState arg2) {
+    private List<Entity> tryReleaseBee(BlockState state, BeeState arg2) {
         ArrayList list = Lists.newArrayList();
-        this.bees.removeIf(arg3 -> this.releaseBee(arg, (Bee)arg3, list, arg2));
+        this.bees.removeIf(bee -> this.releaseBee(state, (Bee)bee, list, arg2));
         return list;
     }
 
-    public void tryEnterHive(Entity arg, boolean bl) {
-        this.tryEnterHive(arg, bl, 0);
+    public void tryEnterHive(Entity entity, boolean hasNectar) {
+        this.tryEnterHive(entity, hasNectar, 0);
     }
 
     public int getBeeCount() {
         return this.bees.size();
     }
 
-    public static int getHoneyLevel(BlockState arg) {
-        return arg.get(BeehiveBlock.HONEY_LEVEL);
+    public static int getHoneyLevel(BlockState state) {
+        return state.get(BeehiveBlock.HONEY_LEVEL);
     }
 
     public boolean isSmoked() {
@@ -114,40 +114,40 @@ implements Tickable {
         DebugInfoSender.sendBeehiveDebugData(this);
     }
 
-    public void tryEnterHive(Entity arg, boolean bl, int i) {
+    public void tryEnterHive(Entity entity, boolean hasNectar, int ticksInHive) {
         if (this.bees.size() >= 3) {
             return;
         }
-        arg.stopRiding();
-        arg.removeAllPassengers();
+        entity.stopRiding();
+        entity.removeAllPassengers();
         CompoundTag lv = new CompoundTag();
-        arg.saveToTag(lv);
-        this.bees.add(new Bee(lv, i, bl ? 2400 : 600));
+        entity.saveToTag(lv);
+        this.bees.add(new Bee(lv, ticksInHive, hasNectar ? 2400 : 600));
         if (this.world != null) {
             BeeEntity lv2;
-            if (arg instanceof BeeEntity && (lv2 = (BeeEntity)arg).hasFlower() && (!this.hasFlowerPos() || this.world.random.nextBoolean())) {
+            if (entity instanceof BeeEntity && (lv2 = (BeeEntity)entity).hasFlower() && (!this.hasFlowerPos() || this.world.random.nextBoolean())) {
                 this.flowerPos = lv2.getFlowerPos();
             }
             BlockPos lv3 = this.getPos();
             this.world.playSound(null, (double)lv3.getX(), (double)lv3.getY(), lv3.getZ(), SoundEvents.BLOCK_BEEHIVE_ENTER, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
-        arg.remove();
+        entity.remove();
     }
 
-    private boolean releaseBee(BlockState arg2, Bee arg22, @Nullable List<Entity> list, BeeState arg3) {
+    private boolean releaseBee(BlockState state, Bee bee, @Nullable List<Entity> list, BeeState beeState) {
         boolean bl;
-        if ((this.world.isNight() || this.world.isRaining()) && arg3 != BeeState.EMERGENCY) {
+        if ((this.world.isNight() || this.world.isRaining()) && beeState != BeeState.EMERGENCY) {
             return false;
         }
         BlockPos lv = this.getPos();
-        CompoundTag lv2 = arg22.entityData;
+        CompoundTag lv2 = bee.entityData;
         lv2.remove("Passengers");
         lv2.remove("Leash");
         lv2.remove("UUID");
-        Direction lv3 = arg2.get(BeehiveBlock.FACING);
+        Direction lv3 = state.get(BeehiveBlock.FACING);
         BlockPos lv4 = lv.offset(lv3);
         boolean bl2 = bl = !this.world.getBlockState(lv4).getCollisionShape(this.world, lv4).isEmpty();
-        if (bl && arg3 != BeeState.EMERGENCY) {
+        if (bl && beeState != BeeState.EMERGENCY) {
             return false;
         }
         Entity lv5 = EntityType.loadEntityWithPassengers(lv2, this.world, arg -> arg);
@@ -160,19 +160,19 @@ implements Tickable {
                 if (this.hasFlowerPos() && !lv6.hasFlower() && this.world.random.nextFloat() < 0.9f) {
                     lv6.setFlowerPos(this.flowerPos);
                 }
-                if (arg3 == BeeState.HONEY_DELIVERED) {
+                if (beeState == BeeState.HONEY_DELIVERED) {
                     int i;
                     lv6.onHoneyDelivered();
-                    if (arg2.getBlock().isIn(BlockTags.BEEHIVES) && (i = BeehiveBlockEntity.getHoneyLevel(arg2)) < 5) {
+                    if (state.getBlock().isIn(BlockTags.BEEHIVES) && (i = BeehiveBlockEntity.getHoneyLevel(state)) < 5) {
                         int j;
                         int n = j = this.world.random.nextInt(100) == 0 ? 2 : 1;
                         if (i + j > 5) {
                             --j;
                         }
-                        this.world.setBlockState(this.getPos(), (BlockState)arg2.with(BeehiveBlock.HONEY_LEVEL, i + j));
+                        this.world.setBlockState(this.getPos(), (BlockState)state.with(BeehiveBlock.HONEY_LEVEL, i + j));
                     }
                 }
-                this.ageBee(arg22.ticksInHive, lv6);
+                this.ageBee(bee.ticksInHive, lv6);
                 if (list != null) {
                     list.add(lv6);
                 }
@@ -189,15 +189,15 @@ implements Tickable {
         return false;
     }
 
-    private void ageBee(int i, BeeEntity arg) {
-        int j = arg.getBreedingAge();
+    private void ageBee(int ticks, BeeEntity bee) {
+        int j = bee.getBreedingAge();
         if (j < 0) {
-            arg.setBreedingAge(Math.min(0, j + i));
+            bee.setBreedingAge(Math.min(0, j + ticks));
         } else if (j > 0) {
-            arg.setBreedingAge(Math.max(0, j - i));
+            bee.setBreedingAge(Math.max(0, j - ticks));
         }
-        arg.setLoveTicks(Math.max(0, arg.getLoveTicks() - i));
-        arg.resetPollinationTicks();
+        bee.setLoveTicks(Math.max(0, bee.getLoveTicks() - ticks));
+        bee.resetPollinationTicks();
     }
 
     private boolean hasFlowerPos() {
@@ -237,29 +237,29 @@ implements Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.bees.clear();
-        ListTag lv = arg2.getList("Bees", 10);
+        ListTag lv = tag.getList("Bees", 10);
         for (int i = 0; i < lv.size(); ++i) {
             CompoundTag lv2 = lv.getCompound(i);
             Bee lv3 = new Bee(lv2.getCompound("EntityData"), lv2.getInt("TicksInHive"), lv2.getInt("MinOccupationTicks"));
             this.bees.add(lv3);
         }
         this.flowerPos = null;
-        if (arg2.contains("FlowerPos")) {
-            this.flowerPos = NbtHelper.toBlockPos(arg2.getCompound("FlowerPos"));
+        if (tag.contains("FlowerPos")) {
+            this.flowerPos = NbtHelper.toBlockPos(tag.getCompound("FlowerPos"));
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.put("Bees", this.getBees());
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.put("Bees", this.getBees());
         if (this.hasFlowerPos()) {
-            arg.put("FlowerPos", NbtHelper.fromBlockPos(this.flowerPos));
+            tag.put("FlowerPos", NbtHelper.fromBlockPos(this.flowerPos));
         }
-        return arg;
+        return tag;
     }
 
     public ListTag getBees() {
@@ -280,11 +280,11 @@ implements Tickable {
         private int ticksInHive;
         private final int minOccupationTicks;
 
-        private Bee(CompoundTag arg, int i, int j) {
-            arg.remove("UUID");
-            this.entityData = arg;
-            this.ticksInHive = i;
-            this.minOccupationTicks = j;
+        private Bee(CompoundTag entityData, int ticksInHive, int minOccupationTicks) {
+            entityData.remove("UUID");
+            this.entityData = entityData;
+            this.ticksInHive = ticksInHive;
+            this.minOccupationTicks = minOccupationTicks;
         }
     }
 

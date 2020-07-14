@@ -25,9 +25,9 @@ implements Spawner {
     private int ticksUntilNextSpawn;
 
     @Override
-    public int spawn(ServerWorld arg, boolean bl, boolean bl2) {
+    public int spawn(ServerWorld world, boolean spawnMonsters, boolean spawnAnimals) {
         Random random;
-        if (!bl2 || !arg.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
+        if (!spawnAnimals || !world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING)) {
             return 0;
         }
         --this.ticksUntilNextSpawn;
@@ -35,52 +35,52 @@ implements Spawner {
             return 0;
         }
         this.ticksUntilNextSpawn = 1200;
-        ServerPlayerEntity lv = arg.getRandomAlivePlayer();
+        ServerPlayerEntity lv = world.getRandomAlivePlayer();
         if (lv == null) {
             return 0;
         }
-        int i = (8 + random.nextInt(24)) * ((random = arg.random).nextBoolean() ? -1 : 1);
+        int i = (8 + random.nextInt(24)) * ((random = world.random).nextBoolean() ? -1 : 1);
         int j = (8 + random.nextInt(24)) * (random.nextBoolean() ? -1 : 1);
         BlockPos lv2 = lv.getBlockPos().add(i, 0, j);
-        if (!arg.isRegionLoaded(lv2.getX() - 10, lv2.getY() - 10, lv2.getZ() - 10, lv2.getX() + 10, lv2.getY() + 10, lv2.getZ() + 10)) {
+        if (!world.isRegionLoaded(lv2.getX() - 10, lv2.getY() - 10, lv2.getZ() - 10, lv2.getX() + 10, lv2.getY() + 10, lv2.getZ() + 10)) {
             return 0;
         }
-        if (SpawnHelper.canSpawn(SpawnRestriction.Location.ON_GROUND, arg, lv2, EntityType.CAT)) {
-            if (arg.isNearOccupiedPointOfInterest(lv2, 2)) {
-                return this.spawnInHouse(arg, lv2);
+        if (SpawnHelper.canSpawn(SpawnRestriction.Location.ON_GROUND, world, lv2, EntityType.CAT)) {
+            if (world.isNearOccupiedPointOfInterest(lv2, 2)) {
+                return this.spawnInHouse(world, lv2);
             }
-            if (arg.getStructureAccessor().method_28388(lv2, true, StructureFeature.SWAMP_HUT).hasChildren()) {
-                return this.spawnInSwampHut(arg, lv2);
+            if (world.getStructureAccessor().method_28388(lv2, true, StructureFeature.SWAMP_HUT).hasChildren()) {
+                return this.spawnInSwampHut(world, lv2);
             }
         }
         return 0;
     }
 
-    private int spawnInHouse(ServerWorld arg, BlockPos arg2) {
+    private int spawnInHouse(ServerWorld world, BlockPos pos) {
         List<CatEntity> list;
         int i = 48;
-        if (arg.getPointOfInterestStorage().count(PointOfInterestType.HOME.getCompletionCondition(), arg2, 48, PointOfInterestStorage.OccupationStatus.IS_OCCUPIED) > 4L && (list = arg.getNonSpectatingEntities(CatEntity.class, new Box(arg2).expand(48.0, 8.0, 48.0))).size() < 5) {
-            return this.spawn(arg2, arg);
+        if (world.getPointOfInterestStorage().count(PointOfInterestType.HOME.getCompletionCondition(), pos, 48, PointOfInterestStorage.OccupationStatus.IS_OCCUPIED) > 4L && (list = world.getNonSpectatingEntities(CatEntity.class, new Box(pos).expand(48.0, 8.0, 48.0))).size() < 5) {
+            return this.spawn(pos, world);
         }
         return 0;
     }
 
-    private int spawnInSwampHut(ServerWorld arg, BlockPos arg2) {
+    private int spawnInSwampHut(ServerWorld arg, BlockPos pos) {
         int i = 16;
-        List<CatEntity> list = arg.getNonSpectatingEntities(CatEntity.class, new Box(arg2).expand(16.0, 8.0, 16.0));
+        List<CatEntity> list = arg.getNonSpectatingEntities(CatEntity.class, new Box(pos).expand(16.0, 8.0, 16.0));
         if (list.size() < 1) {
-            return this.spawn(arg2, arg);
+            return this.spawn(pos, arg);
         }
         return 0;
     }
 
-    private int spawn(BlockPos arg, ServerWorld arg2) {
+    private int spawn(BlockPos pos, ServerWorld arg2) {
         CatEntity lv = EntityType.CAT.create(arg2);
         if (lv == null) {
             return 0;
         }
-        lv.initialize(arg2, arg2.getLocalDifficulty(arg), SpawnReason.NATURAL, null, null);
-        lv.refreshPositionAndAngles(arg, 0.0f, 0.0f);
+        lv.initialize(arg2, arg2.getLocalDifficulty(pos), SpawnReason.NATURAL, null, null);
+        lv.refreshPositionAndAngles(pos, 0.0f, 0.0f);
         arg2.spawnEntity(lv);
         return 1;
     }

@@ -16,12 +16,12 @@ import net.minecraft.server.world.ServerWorld;
 
 public class WaitTask
 extends Task<LivingEntity> {
-    public WaitTask(int i, int j) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(), i, j);
+    public WaitTask(int minRunTime, int maxRunTime) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(), minRunTime, maxRunTime);
     }
 
     @Override
-    protected boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
+    protected boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
         return true;
     }
 }

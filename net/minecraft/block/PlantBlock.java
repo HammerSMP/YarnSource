@@ -20,35 +20,35 @@ extends Block {
         super(arg);
     }
 
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.isOf(Blocks.GRASS_BLOCK) || arg.isOf(Blocks.DIRT) || arg.isOf(Blocks.COARSE_DIRT) || arg.isOf(Blocks.PODZOL) || arg.isOf(Blocks.FARMLAND);
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return floor.isOf(Blocks.GRASS_BLOCK) || floor.isOf(Blocks.DIRT) || floor.isOf(Blocks.COARSE_DIRT) || floor.isOf(Blocks.PODZOL) || floor.isOf(Blocks.FARMLAND);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockPos lv = arg3.down();
-        return this.canPlantOnTop(arg2.getBlockState(lv), arg2, lv);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos lv = pos.down();
+        return this.canPlantOnTop(world.getBlockState(lv), world, lv);
     }
 
     @Override
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.getFluidState().isEmpty();
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+        return state.getFluidState().isEmpty();
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
-        if (arg4 == NavigationType.AIR && !this.collidable) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+        if (type == NavigationType.AIR && !this.collidable) {
             return true;
         }
-        return super.canPathfindThrough(arg, arg2, arg3, arg4);
+        return super.canPathfindThrough(state, world, pos, type);
     }
 }
 

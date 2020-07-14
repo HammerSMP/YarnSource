@@ -48,9 +48,9 @@ implements CommandSource {
     private int completionId = -1;
     private CompletableFuture<Suggestions> pendingCompletion;
 
-    public ClientCommandSource(ClientPlayNetworkHandler arg, MinecraftClient arg2) {
-        this.networkHandler = arg;
-        this.client = arg2;
+    public ClientCommandSource(ClientPlayNetworkHandler networkHandler, MinecraftClient client) {
+        this.networkHandler = networkHandler;
+        this.client = client;
     }
 
     @Override
@@ -86,19 +86,19 @@ implements CommandSource {
     }
 
     @Override
-    public boolean hasPermissionLevel(int i) {
+    public boolean hasPermissionLevel(int level) {
         ClientPlayerEntity lv = this.client.player;
-        return lv != null ? lv.hasPermissionLevel(i) : i == 0;
+        return lv != null ? lv.hasPermissionLevel(level) : level == 0;
     }
 
     @Override
-    public CompletableFuture<Suggestions> getCompletions(CommandContext<CommandSource> commandContext, SuggestionsBuilder suggestionsBuilder) {
+    public CompletableFuture<Suggestions> getCompletions(CommandContext<CommandSource> context, SuggestionsBuilder builder) {
         if (this.pendingCompletion != null) {
             this.pendingCompletion.cancel(false);
         }
         this.pendingCompletion = new CompletableFuture();
         int i = ++this.completionId;
-        this.networkHandler.sendPacket(new RequestCommandCompletionsC2SPacket(i, commandContext.getInput()));
+        this.networkHandler.sendPacket(new RequestCommandCompletionsC2SPacket(i, context.getInput()));
         return this.pendingCompletion;
     }
 
@@ -140,8 +140,8 @@ implements CommandSource {
         return this.networkHandler.getRegistryTracker();
     }
 
-    public void onCommandSuggestions(int i, Suggestions suggestions) {
-        if (i == this.completionId) {
+    public void onCommandSuggestions(int completionId, Suggestions suggestions) {
+        if (completionId == this.completionId) {
             this.pendingCompletion.complete(suggestions);
             this.pendingCompletion = null;
             this.completionId = -1;

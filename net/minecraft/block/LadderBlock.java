@@ -47,8 +47,8 @@ implements Waterloggable {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        switch (arg.get(FACING)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        switch (state.get(FACING)) {
             case NORTH: {
                 return NORTH_SHAPE;
             }
@@ -62,40 +62,40 @@ implements Waterloggable {
         return EAST_SHAPE;
     }
 
-    private boolean canPlaceOn(BlockView arg, BlockPos arg2, Direction arg3) {
-        BlockState lv = arg.getBlockState(arg2);
-        return lv.isSideSolidFullSquare(arg, arg2, arg3);
+    private boolean canPlaceOn(BlockView world, BlockPos pos, Direction side) {
+        BlockState lv = world.getBlockState(pos);
+        return lv.isSideSolidFullSquare(world, pos, side);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        Direction lv = arg.get(FACING);
-        return this.canPlaceOn(arg2, arg3.offset(lv.getOpposite()), lv);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        Direction lv = state.get(FACING);
+        return this.canPlaceOn(world, pos.offset(lv.getOpposite()), lv);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2.getOpposite() == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction.getOpposite() == state.get(FACING) && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState lv;
-        if (!arg.canReplaceExisting() && (lv = arg.getWorld().getBlockState(arg.getBlockPos().offset(arg.getSide().getOpposite()))).isOf(this) && lv.get(FACING) == arg.getSide()) {
+        if (!ctx.canReplaceExisting() && (lv = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(ctx.getSide().getOpposite()))).isOf(this) && lv.get(FACING) == ctx.getSide()) {
             return null;
         }
         BlockState lv2 = this.getDefaultState();
-        World lv3 = arg.getWorld();
-        BlockPos lv4 = arg.getBlockPos();
-        FluidState lv5 = arg.getWorld().getFluidState(arg.getBlockPos());
-        for (Direction lv6 : arg.getPlacementDirections()) {
+        World lv3 = ctx.getWorld();
+        BlockPos lv4 = ctx.getBlockPos();
+        FluidState lv5 = ctx.getWorld().getFluidState(ctx.getBlockPos());
+        for (Direction lv6 : ctx.getPlacementDirections()) {
             if (!lv6.getAxis().isHorizontal() || !(lv2 = (BlockState)lv2.with(FACING, lv6.getOpposite())).canPlaceAt(lv3, lv4)) continue;
             return (BlockState)lv2.with(WATERLOGGED, lv5.getFluid() == Fluids.WATER);
         }
@@ -103,26 +103,26 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, WATERLOGGED);
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 }
 

@@ -17,24 +17,24 @@ extends BlockEntity {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.putInt("OutputSignal", this.outputSignal);
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putInt("OutputSignal", this.outputSignal);
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.outputSignal = arg2.getInt("OutputSignal");
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.outputSignal = tag.getInt("OutputSignal");
     }
 
     public int getOutputSignal() {
         return this.outputSignal;
     }
 
-    public void setOutputSignal(int i) {
-        this.outputSignal = i;
+    public void setOutputSignal(int outputSignal) {
+        this.outputSignal = outputSignal;
     }
 }
 

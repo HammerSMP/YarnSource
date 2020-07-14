@@ -53,10 +53,10 @@ public abstract class EntityNavigation {
     private float rangeMultiplier = 1.0f;
     private final PathNodeNavigator pathNodeNavigator;
 
-    public EntityNavigation(MobEntity arg, World arg2) {
-        this.entity = arg;
-        this.world = arg2;
-        int i = MathHelper.floor(arg.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE) * 16.0);
+    public EntityNavigation(MobEntity mob, World world) {
+        this.entity = mob;
+        this.world = world;
+        int i = MathHelper.floor(mob.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE) * 16.0);
         this.pathNodeNavigator = this.createPathNodeNavigator(i);
     }
 
@@ -64,8 +64,8 @@ public abstract class EntityNavigation {
         this.rangeMultiplier = 1.0f;
     }
 
-    public void setRangeMultiplier(float f) {
-        this.rangeMultiplier = f;
+    public void setRangeMultiplier(float rangeMultiplier) {
+        this.rangeMultiplier = rangeMultiplier;
     }
 
     public BlockPos getTargetPos() {
@@ -74,8 +74,8 @@ public abstract class EntityNavigation {
 
     protected abstract PathNodeNavigator createPathNodeNavigator(int var1);
 
-    public void setSpeed(double d) {
-        this.speed = d;
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     public boolean shouldRecalculatePath() {
@@ -96,13 +96,13 @@ public abstract class EntityNavigation {
     }
 
     @Nullable
-    public final Path findPathTo(double d, double e, double f, int i) {
-        return this.findPathTo(new BlockPos(d, e, f), i);
+    public final Path findPathTo(double x, double y, double z, int distance) {
+        return this.findPathTo(new BlockPos(x, y, z), distance);
     }
 
     @Nullable
-    public Path findPathToAny(Stream<BlockPos> stream, int i) {
-        return this.findPathToAny(stream.collect(Collectors.toSet()), 8, false, i);
+    public Path findPathToAny(Stream<BlockPos> positions, int distance) {
+        return this.findPathToAny(positions.collect(Collectors.toSet()), 8, false, distance);
     }
 
     @Nullable
@@ -111,18 +111,18 @@ public abstract class EntityNavigation {
     }
 
     @Nullable
-    public Path findPathTo(BlockPos arg, int i) {
-        return this.findPathToAny((Set<BlockPos>)ImmutableSet.of((Object)arg), 8, false, i);
+    public Path findPathTo(BlockPos target, int distance) {
+        return this.findPathToAny((Set<BlockPos>)ImmutableSet.of((Object)target), 8, false, distance);
     }
 
     @Nullable
-    public Path findPathTo(Entity arg, int i) {
-        return this.findPathToAny((Set<BlockPos>)ImmutableSet.of((Object)arg.getBlockPos()), 16, true, i);
+    public Path findPathTo(Entity entity, int distance) {
+        return this.findPathToAny((Set<BlockPos>)ImmutableSet.of((Object)entity.getBlockPos()), 16, true, distance);
     }
 
     @Nullable
-    protected Path findPathToAny(Set<BlockPos> set, int i, boolean bl, int j) {
-        if (set.isEmpty()) {
+    protected Path findPathToAny(Set<BlockPos> positions, int range, boolean bl, int distance) {
+        if (positions.isEmpty()) {
             return null;
         }
         if (this.entity.getY() < 0.0) {
@@ -131,40 +131,40 @@ public abstract class EntityNavigation {
         if (!this.isAtValidPosition()) {
             return null;
         }
-        if (this.currentPath != null && !this.currentPath.isFinished() && set.contains(this.currentTarget)) {
+        if (this.currentPath != null && !this.currentPath.isFinished() && positions.contains(this.currentTarget)) {
             return this.currentPath;
         }
         this.world.getProfiler().push("pathfind");
         float f = (float)this.entity.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
         BlockPos lv = bl ? this.entity.getBlockPos().up() : this.entity.getBlockPos();
-        int k = (int)(f + (float)i);
+        int k = (int)(f + (float)range);
         ChunkCache lv2 = new ChunkCache(this.world, lv.add(-k, -k, -k), lv.add(k, k, k));
-        Path lv3 = this.pathNodeNavigator.findPathToAny(lv2, this.entity, set, f, j, this.rangeMultiplier);
+        Path lv3 = this.pathNodeNavigator.findPathToAny(lv2, this.entity, positions, f, distance, this.rangeMultiplier);
         this.world.getProfiler().pop();
         if (lv3 != null && lv3.getTarget() != null) {
             this.currentTarget = lv3.getTarget();
-            this.currentDistance = j;
+            this.currentDistance = distance;
             this.method_26085();
         }
         return lv3;
     }
 
-    public boolean startMovingTo(double d, double e, double f, double g) {
-        return this.startMovingAlong(this.findPathTo(d, e, f, 1), g);
+    public boolean startMovingTo(double x, double y, double z, double speed) {
+        return this.startMovingAlong(this.findPathTo(x, y, z, 1), speed);
     }
 
-    public boolean startMovingTo(Entity arg, double d) {
-        Path lv = this.findPathTo(arg, 1);
-        return lv != null && this.startMovingAlong(lv, d);
+    public boolean startMovingTo(Entity entity, double speed) {
+        Path lv = this.findPathTo(entity, 1);
+        return lv != null && this.startMovingAlong(lv, speed);
     }
 
-    public boolean startMovingAlong(@Nullable Path arg, double d) {
-        if (arg == null) {
+    public boolean startMovingAlong(@Nullable Path path, double speed) {
+        if (path == null) {
             this.currentPath = null;
             return false;
         }
-        if (!arg.equalsPath(this.currentPath)) {
-            this.currentPath = arg;
+        if (!path.equalsPath(this.currentPath)) {
+            this.currentPath = path;
         }
         if (this.isIdle()) {
             return false;
@@ -173,7 +173,7 @@ public abstract class EntityNavigation {
         if (this.currentPath.getLength() <= 0) {
             return false;
         }
-        this.speed = d;
+        this.speed = speed;
         Vec3d lv = this.getPos();
         this.pathStartTime = this.tickCount;
         this.pathStartPos = lv;
@@ -240,13 +240,13 @@ public abstract class EntityNavigation {
         return lv3.dotProduct(lv4 = arg.subtract(lv)) > 0.0;
     }
 
-    protected void checkTimeouts(Vec3d arg) {
+    protected void checkTimeouts(Vec3d currentPos) {
         if (this.tickCount - this.pathStartTime > 100) {
-            if (arg.squaredDistanceTo(this.pathStartPos) < 2.25) {
+            if (currentPos.squaredDistanceTo(this.pathStartPos) < 2.25) {
                 this.stop();
             }
             this.pathStartTime = this.tickCount;
-            this.pathStartPos = arg;
+            this.pathStartPos = currentPos;
         }
         if (this.currentPath != null && !this.currentPath.isFinished()) {
             Vec3i lv = this.currentPath.getCurrentPosition();
@@ -254,7 +254,7 @@ public abstract class EntityNavigation {
                 this.currentNodeMs += Util.getMeasuringTimeMs() - this.lastActiveTickMs;
             } else {
                 this.lastNodePosition = lv;
-                double d = arg.distanceTo(Vec3d.ofBottomCenter(this.lastNodePosition));
+                double d = currentPos.distanceTo(Vec3d.ofBottomCenter(this.lastNodePosition));
                 double d2 = this.currentNodeTimeout = this.entity.getMovementSpeed() > 0.0f ? d / (double)this.entity.getMovementSpeed() * 1000.0 : 0.0;
             }
             if (this.currentNodeTimeout > 0.0 && (double)this.currentNodeMs > this.currentNodeTimeout * 3.0) {
@@ -308,8 +308,8 @@ public abstract class EntityNavigation {
 
     protected abstract boolean canPathDirectlyThrough(Vec3d var1, Vec3d var2, int var3, int var4, int var5);
 
-    public boolean isValidPosition(BlockPos arg) {
-        BlockPos lv = arg.down();
+    public boolean isValidPosition(BlockPos pos) {
+        BlockPos lv = pos.down();
         return this.world.getBlockState(lv).isOpaqueFullCube(this.world, lv);
     }
 
@@ -317,21 +317,21 @@ public abstract class EntityNavigation {
         return this.nodeMaker;
     }
 
-    public void setCanSwim(boolean bl) {
-        this.nodeMaker.setCanSwim(bl);
+    public void setCanSwim(boolean canSwim) {
+        this.nodeMaker.setCanSwim(canSwim);
     }
 
     public boolean canSwim() {
         return this.nodeMaker.canSwim();
     }
 
-    public void onBlockChanged(BlockPos arg) {
+    public void onBlockChanged(BlockPos pos) {
         if (this.currentPath == null || this.currentPath.isFinished() || this.currentPath.getLength() == 0) {
             return;
         }
         PathNode lv = this.currentPath.getEnd();
         Vec3d lv2 = new Vec3d(((double)lv.x + this.entity.getX()) / 2.0, ((double)lv.y + this.entity.getY()) / 2.0, ((double)lv.z + this.entity.getZ()) / 2.0);
-        if (arg.isWithinDistance(lv2, (double)(this.currentPath.getLength() - this.currentPath.getCurrentNodeIndex()))) {
+        if (pos.isWithinDistance(lv2, (double)(this.currentPath.getLength() - this.currentPath.getCurrentNodeIndex()))) {
             this.recalculatePath();
         }
     }

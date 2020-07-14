@@ -17,9 +17,9 @@ extends Goal {
     private double z;
     private final double speed;
 
-    public GoToWalkTargetGoal(PathAwareEntity arg, double d) {
-        this.mob = arg;
-        this.speed = d;
+    public GoToWalkTargetGoal(PathAwareEntity mob, double speed) {
+        this.mob = mob;
+        this.speed = speed;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 

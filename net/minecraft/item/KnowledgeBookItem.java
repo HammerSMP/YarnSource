@@ -35,20 +35,20 @@ extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
         CompoundTag lv2 = lv.getTag();
-        if (!arg2.abilities.creativeMode) {
-            arg2.setStackInHand(arg3, ItemStack.EMPTY);
+        if (!user.abilities.creativeMode) {
+            user.setStackInHand(hand, ItemStack.EMPTY);
         }
         if (lv2 == null || !lv2.contains("Recipes", 9)) {
             LOGGER.error("Tag not valid: {}", (Object)lv2);
             return TypedActionResult.fail(lv);
         }
-        if (!arg.isClient) {
+        if (!world.isClient) {
             ListTag lv3 = lv2.getList("Recipes", 8);
             ArrayList list = Lists.newArrayList();
-            RecipeManager lv4 = arg.getServer().getRecipeManager();
+            RecipeManager lv4 = world.getServer().getRecipeManager();
             for (int i = 0; i < lv3.size(); ++i) {
                 String string = lv3.getString(i);
                 Optional<Recipe<?>> optional = lv4.get(new Identifier(string));
@@ -58,10 +58,10 @@ extends Item {
                 }
                 list.add(optional.get());
             }
-            arg2.unlockRecipes(list);
-            arg2.incrementStat(Stats.USED.getOrCreateStat(this));
+            user.unlockRecipes(list);
+            user.incrementStat(Stats.USED.getOrCreateStat(this));
         }
-        return TypedActionResult.method_29237(lv, arg.isClient());
+        return TypedActionResult.method_29237(lv, world.isClient());
     }
 }
 

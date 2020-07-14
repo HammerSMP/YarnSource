@@ -57,23 +57,23 @@ AutoCloseable {
     private final Map<String, Integer> dynamicIdCounters = Maps.newHashMap();
     private final ResourceManager resourceContainer;
 
-    public TextureManager(ResourceManager arg) {
-        this.resourceContainer = arg;
+    public TextureManager(ResourceManager resourceManager) {
+        this.resourceContainer = resourceManager;
     }
 
-    public void bindTexture(Identifier arg) {
+    public void bindTexture(Identifier id) {
         if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(() -> this.bindTextureInner(arg));
+            RenderSystem.recordRenderCall(() -> this.bindTextureInner(id));
         } else {
-            this.bindTextureInner(arg);
+            this.bindTextureInner(id);
         }
     }
 
-    private void bindTextureInner(Identifier arg) {
-        AbstractTexture lv = this.textures.get(arg);
+    private void bindTextureInner(Identifier id) {
+        AbstractTexture lv = this.textures.get(id);
         if (lv == null) {
-            lv = new ResourceTexture(arg);
-            this.registerTexture(arg, lv);
+            lv = new ResourceTexture(id);
+            this.registerTexture(id, lv);
         }
         lv.bindTexture();
     }
@@ -124,29 +124,29 @@ AutoCloseable {
     }
 
     @Nullable
-    public AbstractTexture getTexture(Identifier arg) {
-        return this.textures.get(arg);
+    public AbstractTexture getTexture(Identifier id) {
+        return this.textures.get(id);
     }
 
-    public Identifier registerDynamicTexture(String string, NativeImageBackedTexture arg) {
-        Integer integer = this.dynamicIdCounters.get(string);
+    public Identifier registerDynamicTexture(String prefix, NativeImageBackedTexture texture) {
+        Integer integer = this.dynamicIdCounters.get(prefix);
         if (integer == null) {
             integer = 1;
         } else {
             Integer n = integer;
             Integer n2 = integer = Integer.valueOf(integer + 1);
         }
-        this.dynamicIdCounters.put(string, integer);
-        Identifier lv = new Identifier(String.format("dynamic/%s_%d", string, integer));
-        this.registerTexture(lv, arg);
+        this.dynamicIdCounters.put(prefix, integer);
+        Identifier lv = new Identifier(String.format("dynamic/%s_%d", prefix, integer));
+        this.registerTexture(lv, texture);
         return lv;
     }
 
-    public CompletableFuture<Void> loadTextureAsync(Identifier arg, Executor executor) {
-        if (!this.textures.containsKey(arg)) {
-            AsyncTexture lv = new AsyncTexture(this.resourceContainer, arg, executor);
-            this.textures.put(arg, lv);
-            return lv.getLoadCompleteFuture().thenRunAsync(() -> this.registerTexture(arg, lv), TextureManager::runOnRenderThread);
+    public CompletableFuture<Void> loadTextureAsync(Identifier id, Executor executor) {
+        if (!this.textures.containsKey(id)) {
+            AsyncTexture lv = new AsyncTexture(this.resourceContainer, id, executor);
+            this.textures.put(id, lv);
+            return lv.getLoadCompleteFuture().thenRunAsync(() -> this.registerTexture(id, lv), TextureManager::runOnRenderThread);
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -162,8 +162,8 @@ AutoCloseable {
         }
     }
 
-    public void destroyTexture(Identifier arg) {
-        AbstractTexture lv = this.getTexture(arg);
+    public void destroyTexture(Identifier id) {
+        AbstractTexture lv = this.getTexture(id);
         if (lv != null) {
             TextureUtil.deleteId(lv.getGlId());
         }
@@ -178,8 +178,8 @@ AutoCloseable {
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        return ((CompletableFuture)CompletableFuture.allOf(TitleScreen.loadTexturesAsync(this, executor), this.loadTextureAsync(AbstractButtonWidget.WIDGETS_LOCATION, executor)).thenCompose(arg::whenPrepared)).thenAcceptAsync(void_ -> {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+        return ((CompletableFuture)CompletableFuture.allOf(TitleScreen.loadTexturesAsync(this, prepareExecutor), this.loadTextureAsync(AbstractButtonWidget.WIDGETS_LOCATION, prepareExecutor)).thenCompose(synchronizer::whenPrepared)).thenAcceptAsync(void_ -> {
             MissingSprite.getMissingSpriteTexture();
             RealmsMainScreen.method_23765(this.resourceContainer);
             Iterator<Map.Entry<Identifier, AbstractTexture>> iterator = this.textures.entrySet().iterator();
@@ -191,7 +191,7 @@ AutoCloseable {
                     iterator.remove();
                     continue;
                 }
-                lv2.registerTexture(this, arg2, lv, executor2);
+                lv2.registerTexture(this, manager, lv, applyExecutor);
             }
         }, runnable -> RenderSystem.recordRenderCall(runnable::run));
     }

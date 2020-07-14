@@ -23,15 +23,15 @@ implements Element {
     private final int y;
     private final int color;
 
-    public RealmsLabel(Text arg, int i, int j, int k) {
+    public RealmsLabel(Text arg, int x, int y, int color) {
         this.text = arg;
-        this.x = i;
-        this.y = j;
-        this.color = k;
+        this.x = x;
+        this.y = y;
+        this.color = color;
     }
 
-    public void render(Screen arg, MatrixStack arg2) {
-        arg.drawCenteredText(arg2, MinecraftClient.getInstance().textRenderer, this.text, this.x, this.y, this.color);
+    public void render(Screen screen, MatrixStack arg2) {
+        screen.drawCenteredText(arg2, MinecraftClient.getInstance().textRenderer, this.text, this.x, this.y, this.color);
     }
 
     public String getText() {

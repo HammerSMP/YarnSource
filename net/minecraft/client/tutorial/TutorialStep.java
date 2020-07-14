@@ -31,22 +31,22 @@ public enum TutorialStep {
     private final String name;
     private final Function<TutorialManager, ? extends TutorialStepHandler> handlerFactory;
 
-    private <T extends TutorialStepHandler> TutorialStep(String string2, Function<TutorialManager, T> function) {
-        this.name = string2;
-        this.handlerFactory = function;
+    private <T extends TutorialStepHandler> TutorialStep(String name, Function<TutorialManager, T> factory) {
+        this.name = name;
+        this.handlerFactory = factory;
     }
 
-    public TutorialStepHandler createHandler(TutorialManager arg) {
-        return this.handlerFactory.apply(arg);
+    public TutorialStepHandler createHandler(TutorialManager manager) {
+        return this.handlerFactory.apply(manager);
     }
 
     public String getName() {
         return this.name;
     }
 
-    public static TutorialStep byName(String string) {
+    public static TutorialStep byName(String name) {
         for (TutorialStep lv : TutorialStep.values()) {
-            if (!lv.name.equals(string)) continue;
+            if (!lv.name.equals(name)) continue;
             return lv;
         }
         return NONE;

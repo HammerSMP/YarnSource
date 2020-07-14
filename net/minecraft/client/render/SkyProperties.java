@@ -38,12 +38,12 @@ public abstract class SkyProperties {
     private final boolean shouldRenderSky;
     private final boolean darkened;
 
-    public SkyProperties(float f, boolean bl, SkyType arg, boolean bl2, boolean bl3) {
-        this.cloudsHeight = f;
-        this.alternateSkyColor = bl;
-        this.skyType = arg;
-        this.shouldRenderSky = bl2;
-        this.darkened = bl3;
+    public SkyProperties(float cloudsHeight, boolean alternateSkyColor, SkyType skyType, boolean shouldRenderSky, boolean darkened) {
+        this.cloudsHeight = cloudsHeight;
+        this.alternateSkyColor = alternateSkyColor;
+        this.skyType = skyType;
+        this.shouldRenderSky = shouldRenderSky;
+        this.darkened = darkened;
     }
 
     public static SkyProperties byDimensionType(Optional<RegistryKey<DimensionType>> optional) {
@@ -51,9 +51,9 @@ public abstract class SkyProperties {
     }
 
     @Nullable
-    public float[] getSkyColor(float f, float g) {
+    public float[] getSkyColor(float skyAngle, float tickDelta) {
         float h = 0.4f;
-        float i = MathHelper.cos(f * ((float)Math.PI * 2)) - 0.0f;
+        float i = MathHelper.cos(skyAngle * ((float)Math.PI * 2)) - 0.0f;
         float j = -0.0f;
         if (i >= -0.4f && i <= 0.4f) {
             float k = (i - -0.0f) / 0.4f * 0.5f + 0.5f;
@@ -100,18 +100,18 @@ public abstract class SkyProperties {
         }
 
         @Override
-        public Vec3d adjustSkyColor(Vec3d arg, float f) {
-            return arg.multiply(0.15f);
+        public Vec3d adjustSkyColor(Vec3d color, float sunHeight) {
+            return color.multiply(0.15f);
         }
 
         @Override
-        public boolean useThickFog(int i, int j) {
+        public boolean useThickFog(int camX, int camY) {
             return false;
         }
 
         @Override
         @Nullable
-        public float[] getSkyColor(float f, float g) {
+        public float[] getSkyColor(float skyAngle, float tickDelta) {
             return null;
         }
     }
@@ -124,12 +124,12 @@ public abstract class SkyProperties {
         }
 
         @Override
-        public Vec3d adjustSkyColor(Vec3d arg, float f) {
-            return arg.multiply(f * 0.94f + 0.06f, f * 0.94f + 0.06f, f * 0.91f + 0.09f);
+        public Vec3d adjustSkyColor(Vec3d color, float sunHeight) {
+            return color.multiply(sunHeight * 0.94f + 0.06f, sunHeight * 0.94f + 0.06f, sunHeight * 0.91f + 0.09f);
         }
 
         @Override
-        public boolean useThickFog(int i, int j) {
+        public boolean useThickFog(int camX, int camY) {
             return false;
         }
     }
@@ -142,12 +142,12 @@ public abstract class SkyProperties {
         }
 
         @Override
-        public Vec3d adjustSkyColor(Vec3d arg, float f) {
-            return arg;
+        public Vec3d adjustSkyColor(Vec3d color, float sunHeight) {
+            return color;
         }
 
         @Override
-        public boolean useThickFog(int i, int j) {
+        public boolean useThickFog(int camX, int camY) {
             return true;
         }
     }

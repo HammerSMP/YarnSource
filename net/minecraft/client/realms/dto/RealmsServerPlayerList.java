@@ -36,12 +36,12 @@ extends ValueObject {
     public long serverId;
     public List<String> players;
 
-    public static RealmsServerPlayerList parse(JsonObject jsonObject) {
+    public static RealmsServerPlayerList parse(JsonObject node) {
         RealmsServerPlayerList lv = new RealmsServerPlayerList();
         try {
             JsonElement jsonElement;
-            lv.serverId = JsonUtils.getLongOr("serverId", jsonObject, -1L);
-            String string = JsonUtils.getStringOr("playerList", jsonObject, null);
+            lv.serverId = JsonUtils.getLongOr("serverId", node, -1L);
+            String string = JsonUtils.getStringOr("playerList", node, null);
             lv.players = string != null ? ((jsonElement = jsonParser.parse(string)).isJsonArray() ? RealmsServerPlayerList.parsePlayers(jsonElement.getAsJsonArray()) : Lists.newArrayList()) : Lists.newArrayList();
         }
         catch (Exception exception) {

@@ -26,11 +26,11 @@ extends LongRunningTask {
     private final boolean join;
     private final RealmsMainScreen mainScreen;
 
-    public OpenServerTask(RealmsServer arg, Screen arg2, RealmsMainScreen arg3, boolean bl) {
-        this.serverData = arg;
-        this.returnScreen = arg2;
-        this.join = bl;
-        this.mainScreen = arg3;
+    public OpenServerTask(RealmsServer realmsServer, Screen returnScreen, RealmsMainScreen mainScreen, boolean join) {
+        this.serverData = realmsServer;
+        this.returnScreen = returnScreen;
+        this.join = join;
+        this.mainScreen = mainScreen;
     }
 
     @Override

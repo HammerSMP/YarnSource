@@ -53,14 +53,14 @@ public class RealmsUtil {
         }
     });
 
-    public static String uuidToName(String string) throws Exception {
-        GameProfile gameProfile = (GameProfile)gameProfileCache.get((Object)string);
+    public static String uuidToName(String uuid) throws Exception {
+        GameProfile gameProfile = (GameProfile)gameProfileCache.get((Object)uuid);
         return gameProfile.getName();
     }
 
-    public static Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> getTextures(String string) {
+    public static Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> getTextures(String uuid) {
         try {
-            GameProfile gameProfile = (GameProfile)gameProfileCache.get((Object)string);
+            GameProfile gameProfile = (GameProfile)gameProfileCache.get((Object)uuid);
             return sessionService.getTextures(gameProfile, false);
         }
         catch (Exception exception) {

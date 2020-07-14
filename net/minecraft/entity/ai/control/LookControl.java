@@ -18,28 +18,28 @@ public class LookControl {
     protected double lookY;
     protected double lookZ;
 
-    public LookControl(MobEntity arg) {
-        this.entity = arg;
+    public LookControl(MobEntity entity) {
+        this.entity = entity;
     }
 
-    public void lookAt(Vec3d arg) {
-        this.lookAt(arg.x, arg.y, arg.z);
+    public void lookAt(Vec3d direction) {
+        this.lookAt(direction.x, direction.y, direction.z);
     }
 
-    public void lookAt(Entity arg, float f, float g) {
-        this.lookAt(arg.getX(), LookControl.getLookingHeightFor(arg), arg.getZ(), f, g);
+    public void lookAt(Entity entity, float yawSpeed, float pitchSpeed) {
+        this.lookAt(entity.getX(), LookControl.getLookingHeightFor(entity), entity.getZ(), yawSpeed, pitchSpeed);
     }
 
-    public void lookAt(double d, double e, double f) {
-        this.lookAt(d, e, f, this.entity.getLookYawSpeed(), this.entity.getLookPitchSpeed());
+    public void lookAt(double x, double y, double z) {
+        this.lookAt(x, y, z, this.entity.getLookYawSpeed(), this.entity.getLookPitchSpeed());
     }
 
-    public void lookAt(double d, double e, double f, float g, float h) {
-        this.lookX = d;
-        this.lookY = e;
-        this.lookZ = f;
-        this.yawSpeed = g;
-        this.pitchSpeed = h;
+    public void lookAt(double x, double y, double z, float yawSpeed, float pitchSpeed) {
+        this.lookX = x;
+        this.lookY = y;
+        this.lookZ = z;
+        this.yawSpeed = yawSpeed;
+        this.pitchSpeed = pitchSpeed;
         this.active = true;
     }
 
@@ -93,17 +93,17 @@ public class LookControl {
         return (float)(MathHelper.atan2(e, d) * 57.2957763671875) - 90.0f;
     }
 
-    protected float changeAngle(float f, float g, float h) {
-        float i = MathHelper.subtractAngles(f, g);
-        float j = MathHelper.clamp(i, -h, h);
-        return f + j;
+    protected float changeAngle(float from, float to, float max) {
+        float i = MathHelper.subtractAngles(from, to);
+        float j = MathHelper.clamp(i, -max, max);
+        return from + j;
     }
 
-    private static double getLookingHeightFor(Entity arg) {
-        if (arg instanceof LivingEntity) {
-            return arg.getEyeY();
+    private static double getLookingHeightFor(Entity entity) {
+        if (entity instanceof LivingEntity) {
+            return entity.getEyeY();
         }
-        return (arg.getBoundingBox().minY + arg.getBoundingBox().maxY) / 2.0;
+        return (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) / 2.0;
     }
 }
 

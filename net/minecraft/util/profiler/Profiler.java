@@ -54,15 +54,15 @@ public interface Profiler {
             }
 
             @Override
-            public void push(String string) {
-                arg.push(string);
-                arg2.push(string);
+            public void push(String location) {
+                arg.push(location);
+                arg2.push(location);
             }
 
             @Override
-            public void push(Supplier<String> supplier) {
-                arg.push(supplier);
-                arg2.push(supplier);
+            public void push(Supplier<String> locationGetter) {
+                arg.push(locationGetter);
+                arg2.push(locationGetter);
             }
 
             @Override
@@ -72,28 +72,28 @@ public interface Profiler {
             }
 
             @Override
-            public void swap(String string) {
-                arg.swap(string);
-                arg2.swap(string);
+            public void swap(String location) {
+                arg.swap(location);
+                arg2.swap(location);
             }
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            public void swap(Supplier<String> supplier) {
-                arg.swap(supplier);
-                arg2.swap(supplier);
+            public void swap(Supplier<String> locationGetter) {
+                arg.swap(locationGetter);
+                arg2.swap(locationGetter);
             }
 
             @Override
-            public void visit(String string) {
-                arg.visit(string);
-                arg2.visit(string);
+            public void visit(String marker) {
+                arg.visit(marker);
+                arg2.visit(marker);
             }
 
             @Override
-            public void visit(Supplier<String> supplier) {
-                arg.visit(supplier);
-                arg2.visit(supplier);
+            public void visit(Supplier<String> markerGetter) {
+                arg.visit(markerGetter);
+                arg2.visit(markerGetter);
             }
         };
     }

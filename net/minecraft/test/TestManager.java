@@ -14,8 +14,8 @@ public class TestManager {
     public static final TestManager INSTANCE = new TestManager();
     private final Collection<GameTest> tests = Lists.newCopyOnWriteArrayList();
 
-    public void start(GameTest arg) {
-        this.tests.add(arg);
+    public void start(GameTest test) {
+        this.tests.add(test);
     }
 
     public void clear() {

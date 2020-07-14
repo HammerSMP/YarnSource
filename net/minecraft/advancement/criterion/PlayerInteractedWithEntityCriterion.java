@@ -35,14 +35,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void test(ServerPlayerEntity arg, ItemStack arg2, Entity arg32) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg32);
-        this.test(arg, arg3 -> arg3.test(arg2, lv));
+    public void test(ServerPlayerEntity player, ItemStack stack, Entity entity) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, entity);
+        this.test(player, arg3 -> arg3.test(stack, lv));
     }
 
     @Override
-    protected /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    protected /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -50,28 +50,28 @@ extends AbstractCriterion<Conditions> {
         private final ItemPredicate item;
         private final EntityPredicate.Extended entity;
 
-        public Conditions(EntityPredicate.Extended arg, ItemPredicate arg2, EntityPredicate.Extended arg3) {
-            super(ID, arg);
-            this.item = arg2;
-            this.entity = arg3;
+        public Conditions(EntityPredicate.Extended player, ItemPredicate item, EntityPredicate.Extended entity) {
+            super(ID, player);
+            this.item = item;
+            this.entity = entity;
         }
 
-        public static Conditions create(EntityPredicate.Extended arg, ItemPredicate.Builder arg2, EntityPredicate.Extended arg3) {
-            return new Conditions(arg, arg2.build(), arg3);
+        public static Conditions create(EntityPredicate.Extended player, ItemPredicate.Builder itemBuilder, EntityPredicate.Extended entity) {
+            return new Conditions(player, itemBuilder.build(), entity);
         }
 
-        public boolean test(ItemStack arg, LootContext arg2) {
-            if (!this.item.test(arg)) {
+        public boolean test(ItemStack stack, LootContext context) {
+            if (!this.item.test(stack)) {
                 return false;
             }
-            return this.entity.test(arg2);
+            return this.entity.test(context);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("item", this.item.toJson());
-            jsonObject.add("entity", this.entity.toJson(arg));
+            jsonObject.add("entity", this.entity.toJson(predicateSerializer));
             return jsonObject;
         }
     }

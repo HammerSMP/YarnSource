@@ -32,13 +32,13 @@ public abstract class ValueObject {
         return stringBuilder.toString();
     }
 
-    private static String getName(Field field) {
-        SerializedName serializedName = field.getAnnotation(SerializedName.class);
-        return serializedName != null ? serializedName.value() : field.getName();
+    private static String getName(Field f) {
+        SerializedName serializedName = f.getAnnotation(SerializedName.class);
+        return serializedName != null ? serializedName.value() : f.getName();
     }
 
-    private static boolean isStatic(Field field) {
-        return Modifier.isStatic(field.getModifiers());
+    private static boolean isStatic(Field f) {
+        return Modifier.isStatic(f.getModifiers());
     }
 }
 

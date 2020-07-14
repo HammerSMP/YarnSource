@@ -57,65 +57,65 @@ implements ResourcePack {
     public static final Identifier IRON_GOLEM_TEXTURE = new Identifier("textures/entity/iron_golem.png");
     private final ResourcePack parent;
 
-    public Format4ResourcePack(ResourcePack arg) {
-        this.parent = arg;
+    public Format4ResourcePack(ResourcePack parent) {
+        this.parent = parent;
     }
 
     @Override
-    public InputStream openRoot(String string) throws IOException {
-        return this.parent.openRoot(string);
+    public InputStream openRoot(String fileName) throws IOException {
+        return this.parent.openRoot(fileName);
     }
 
     @Override
-    public boolean contains(ResourceType arg, Identifier arg2) {
-        if (!"minecraft".equals(arg2.getNamespace())) {
-            return this.parent.contains(arg, arg2);
+    public boolean contains(ResourceType type, Identifier id) {
+        if (!"minecraft".equals(id.getNamespace())) {
+            return this.parent.contains(type, id);
         }
-        String string = arg2.getPath();
+        String string = id.getPath();
         if ("textures/misc/enchanted_item_glint.png".equals(string)) {
             return false;
         }
         if ("textures/entity/iron_golem/iron_golem.png".equals(string)) {
-            return this.parent.contains(arg, IRON_GOLEM_TEXTURE);
+            return this.parent.contains(type, IRON_GOLEM_TEXTURE);
         }
         if ("textures/entity/conduit/wind.png".equals(string) || "textures/entity/conduit/wind_vertical.png".equals(string)) {
             return false;
         }
         if (SHIELD_PATTERN_TEXTURES.contains(string)) {
-            return this.parent.contains(arg, OLD_SHIELD_BASE_TEXTURE) && this.parent.contains(arg, arg2);
+            return this.parent.contains(type, OLD_SHIELD_BASE_TEXTURE) && this.parent.contains(type, id);
         }
         if (BANNER_PATTERN_TEXTURES.contains(string)) {
-            return this.parent.contains(arg, OLD_BANNER_BASE_TEXTURE) && this.parent.contains(arg, arg2);
+            return this.parent.contains(type, OLD_BANNER_BASE_TEXTURE) && this.parent.contains(type, id);
         }
         Pair<ChestType, Identifier> pair = NEW_TO_OLD_CHEST_TEXTURES.get(string);
-        if (pair != null && this.parent.contains(arg, (Identifier)pair.getSecond())) {
+        if (pair != null && this.parent.contains(type, (Identifier)pair.getSecond())) {
             return true;
         }
-        return this.parent.contains(arg, arg2);
+        return this.parent.contains(type, id);
     }
 
     @Override
-    public InputStream open(ResourceType arg, Identifier arg2) throws IOException {
-        if (!"minecraft".equals(arg2.getNamespace())) {
-            return this.parent.open(arg, arg2);
+    public InputStream open(ResourceType type, Identifier id) throws IOException {
+        if (!"minecraft".equals(id.getNamespace())) {
+            return this.parent.open(type, id);
         }
-        String string = arg2.getPath();
+        String string = id.getPath();
         if ("textures/entity/iron_golem/iron_golem.png".equals(string)) {
-            return this.parent.open(arg, IRON_GOLEM_TEXTURE);
+            return this.parent.open(type, IRON_GOLEM_TEXTURE);
         }
         if (SHIELD_PATTERN_TEXTURES.contains(string)) {
-            InputStream inputStream = Format4ResourcePack.openCroppedStream(this.parent.open(arg, OLD_SHIELD_BASE_TEXTURE), this.parent.open(arg, arg2), 64, 2, 2, 12, 22);
+            InputStream inputStream = Format4ResourcePack.openCroppedStream(this.parent.open(type, OLD_SHIELD_BASE_TEXTURE), this.parent.open(type, id), 64, 2, 2, 12, 22);
             if (inputStream != null) {
                 return inputStream;
             }
         } else if (BANNER_PATTERN_TEXTURES.contains(string)) {
-            InputStream inputStream2 = Format4ResourcePack.openCroppedStream(this.parent.open(arg, OLD_BANNER_BASE_TEXTURE), this.parent.open(arg, arg2), 64, 0, 0, 42, 41);
+            InputStream inputStream2 = Format4ResourcePack.openCroppedStream(this.parent.open(type, OLD_BANNER_BASE_TEXTURE), this.parent.open(type, id), 64, 0, 0, 42, 41);
             if (inputStream2 != null) {
                 return inputStream2;
             }
         } else {
             if ("textures/entity/enderdragon/dragon.png".equals(string) || "textures/entity/enderdragon/dragon_exploding.png".equals(string)) {
-                try (NativeImage lv = NativeImage.read(this.parent.open(arg, arg2));){
+                try (NativeImage lv = NativeImage.read(this.parent.open(type, id));){
                     int i = lv.getWidth() / 256;
                     for (int j = 88 * i; j < 200 * i; ++j) {
                         for (int k = 56 * i; k < 112 * i; ++k) {
@@ -127,12 +127,12 @@ implements ResourcePack {
                 }
             }
             if ("textures/entity/conduit/closed_eye.png".equals(string) || "textures/entity/conduit/open_eye.png".equals(string)) {
-                return Format4ResourcePack.method_24199(this.parent.open(arg, arg2));
+                return Format4ResourcePack.method_24199(this.parent.open(type, id));
             }
             Pair<ChestType, Identifier> pair = NEW_TO_OLD_CHEST_TEXTURES.get(string);
             if (pair != null) {
                 ChestType lv2 = (ChestType)pair.getFirst();
-                InputStream inputStream3 = this.parent.open(arg, (Identifier)pair.getSecond());
+                InputStream inputStream3 = this.parent.open(type, (Identifier)pair.getSecond());
                 if (lv2 == ChestType.SINGLE) {
                     return Format4ResourcePack.cropSingleChestTexture(inputStream3);
                 }
@@ -144,7 +144,7 @@ implements ResourcePack {
                 }
             }
         }
-        return this.parent.open(arg, arg2);
+        return this.parent.open(type, id);
     }
 
     /*
@@ -288,19 +288,19 @@ implements ResourcePack {
     }
 
     @Override
-    public Collection<Identifier> findResources(ResourceType arg, String string, String string2, int i, Predicate<String> predicate) {
-        return this.parent.findResources(arg, string, string2, i, predicate);
+    public Collection<Identifier> findResources(ResourceType type, String namespace, String prefix, int maxDepth, Predicate<String> pathFilter) {
+        return this.parent.findResources(type, namespace, prefix, maxDepth, pathFilter);
     }
 
     @Override
-    public Set<String> getNamespaces(ResourceType arg) {
-        return this.parent.getNamespaces(arg);
+    public Set<String> getNamespaces(ResourceType type) {
+        return this.parent.getNamespaces(type);
     }
 
     @Override
     @Nullable
-    public <T> T parseMetadata(ResourceMetadataReader<T> arg) throws IOException {
-        return this.parent.parseMetadata(arg);
+    public <T> T parseMetadata(ResourceMetadataReader<T> metaReader) throws IOException {
+        return this.parent.parseMetadata(metaReader);
     }
 
     @Override
@@ -313,7 +313,7 @@ implements ResourcePack {
         this.parent.close();
     }
 
-    private static void loadBytes(NativeImage arg, NativeImage arg2, int i, int j, int k, int l, int m, int n, int o, boolean bl, boolean bl2) {
+    private static void loadBytes(NativeImage source, NativeImage target, int i, int j, int k, int l, int m, int n, int o, boolean bl, boolean bl2) {
         m *= o;
         k *= o;
         l *= o;
@@ -321,7 +321,7 @@ implements ResourcePack {
         j *= o;
         for (int p = 0; p < (n *= o); ++p) {
             for (int q = 0; q < m; ++q) {
-                arg2.setPixelColor(k + q, l + p, arg.getPixelColor(i + (bl ? m - 1 - q : q), j + (bl2 ? n - 1 - p : p)));
+                target.setPixelColor(k + q, l + p, source.getPixelColor(i + (bl ? m - 1 - q : q), j + (bl2 ? n - 1 - p : p)));
             }
         }
     }

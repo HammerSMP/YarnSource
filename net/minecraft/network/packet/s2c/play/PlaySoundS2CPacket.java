@@ -32,37 +32,37 @@ implements Packet<ClientPlayPacketListener> {
     public PlaySoundS2CPacket() {
     }
 
-    public PlaySoundS2CPacket(SoundEvent arg, SoundCategory arg2, double d, double e, double f, float g, float h) {
-        Validate.notNull((Object)arg, (String)"sound", (Object[])new Object[0]);
-        this.sound = arg;
-        this.category = arg2;
-        this.fixedX = (int)(d * 8.0);
-        this.fixedY = (int)(e * 8.0);
-        this.fixedZ = (int)(f * 8.0);
-        this.volume = g;
-        this.pitch = h;
+    public PlaySoundS2CPacket(SoundEvent sound, SoundCategory category, double x, double y, double z, float volume, float pitch) {
+        Validate.notNull((Object)sound, (String)"sound", (Object[])new Object[0]);
+        this.sound = sound;
+        this.category = category;
+        this.fixedX = (int)(x * 8.0);
+        this.fixedY = (int)(y * 8.0);
+        this.fixedZ = (int)(z * 8.0);
+        this.volume = volume;
+        this.pitch = pitch;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.sound = (SoundEvent)Registry.SOUND_EVENT.get(arg.readVarInt());
-        this.category = arg.readEnumConstant(SoundCategory.class);
-        this.fixedX = arg.readInt();
-        this.fixedY = arg.readInt();
-        this.fixedZ = arg.readInt();
-        this.volume = arg.readFloat();
-        this.pitch = arg.readFloat();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.sound = (SoundEvent)Registry.SOUND_EVENT.get(buf.readVarInt());
+        this.category = buf.readEnumConstant(SoundCategory.class);
+        this.fixedX = buf.readInt();
+        this.fixedY = buf.readInt();
+        this.fixedZ = buf.readInt();
+        this.volume = buf.readFloat();
+        this.pitch = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(Registry.SOUND_EVENT.getRawId(this.sound));
-        arg.writeEnumConstant(this.category);
-        arg.writeInt(this.fixedX);
-        arg.writeInt(this.fixedY);
-        arg.writeInt(this.fixedZ);
-        arg.writeFloat(this.volume);
-        arg.writeFloat(this.pitch);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(Registry.SOUND_EVENT.getRawId(this.sound));
+        buf.writeEnumConstant(this.category);
+        buf.writeInt(this.fixedX);
+        buf.writeInt(this.fixedY);
+        buf.writeInt(this.fixedZ);
+        buf.writeFloat(this.volume);
+        buf.writeFloat(this.pitch);
     }
 
     @Environment(value=EnvType.CLIENT)

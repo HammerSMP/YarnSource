@@ -39,8 +39,8 @@ implements ArgumentType<Formatting> {
         return new ColorArgumentType();
     }
 
-    public static Formatting getColor(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (Formatting)((Object)commandContext.getArgument(string, Formatting.class));
+    public static Formatting getColor(CommandContext<ServerCommandSource> context, String name) {
+        return (Formatting)((Object)context.getArgument(name, Formatting.class));
     }
 
     public Formatting parse(StringReader stringReader) throws CommandSyntaxException {
@@ -52,8 +52,8 @@ implements ArgumentType<Formatting> {
         return lv;
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestMatching(Formatting.getNames(true, false), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestMatching(Formatting.getNames(true, false), builder);
     }
 
     public Collection<String> getExamples() {

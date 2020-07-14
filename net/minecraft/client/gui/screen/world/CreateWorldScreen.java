@@ -122,8 +122,8 @@ extends Screen {
         this.field_25477 = path;
     }
 
-    public CreateWorldScreen(@Nullable Screen arg) {
-        this(arg, DataPackSettings.SAFE_MODE, new MoreOptionsDialog(class_5455.method_30528(), GeneratorOptions.getDefaultOptions(), Optional.of(GeneratorType.DEFAULT), OptionalLong.empty()));
+    public CreateWorldScreen(@Nullable Screen parent) {
+        this(parent, DataPackSettings.SAFE_MODE, new MoreOptionsDialog(class_5455.method_30528(), GeneratorOptions.getDefaultOptions(), Optional.of(GeneratorType.DEFAULT), OptionalLong.empty()));
     }
 
     private CreateWorldScreen(@Nullable Screen arg, DataPackSettings arg2, MoreOptionsDialog arg3) {
@@ -306,10 +306,10 @@ extends Screen {
         this.setMoreOptionsOpen(this.moreOptionsOpen);
     }
 
-    private void setMoreOptionsOpen(boolean bl) {
-        this.moreOptionsOpen = bl;
+    private void setMoreOptionsOpen(boolean moreOptionsOpen) {
+        this.moreOptionsOpen = moreOptionsOpen;
         this.gameModeSwitchButton.visible = !this.moreOptionsOpen;
-        boolean bl2 = this.field_24286.visible = !this.moreOptionsOpen;
+        boolean bl = this.field_24286.visible = !this.moreOptionsOpen;
         if (this.moreOptionsDialog.isDebugWorld()) {
             this.field_25478.visible = false;
             this.gameModeSwitchButton.active = false;
@@ -337,11 +337,11 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (i == 257 || i == 335) {
+        if (keyCode == 257 || keyCode == 335) {
             this.createLevel();
             return true;
         }
@@ -370,34 +370,34 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, -1);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, -1);
         if (this.moreOptionsOpen) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
-            this.moreOptionsDialog.render(arg, i, j, f);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.enterSeed", new Object[0]), this.width / 2 - 100, 47, -6250336);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.seedInfo", new Object[0]), this.width / 2 - 100, 85, -6250336);
+            this.moreOptionsDialog.render(matrices, mouseX, mouseY, delta);
         } else {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirectoryName, this.width / 2 - 100, 85, -6250336);
-            this.levelNameField.render(arg, i, j, f);
-            this.drawTextWithShadow(arg, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 150, 122, -6250336);
-            this.drawTextWithShadow(arg, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 150, 134, -6250336);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, -6250336);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.resultFolder", new Object[0]) + " " + this.saveDirectoryName, this.width / 2 - 100, 85, -6250336);
+            this.levelNameField.render(matrices, mouseX, mouseY, delta);
+            this.drawTextWithShadow(matrices, this.textRenderer, this.firstGameModeDescriptionLine, this.width / 2 - 150, 122, -6250336);
+            this.drawTextWithShadow(matrices, this.textRenderer, this.secondGameModeDescriptionLine, this.width / 2 - 150, 134, -6250336);
             if (this.enableCheatsButton.visible) {
-                this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
+                this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.allowCommands.info", new Object[0]), this.width / 2 - 150, 172, -6250336);
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
-    protected <T extends Element> T addChild(T arg) {
-        return super.addChild(arg);
+    protected <T extends Element> T addChild(T child) {
+        return super.addChild(child);
     }
 
     @Override
-    protected <T extends AbstractButtonWidget> T addButton(T arg) {
-        return super.addButton(arg);
+    protected <T extends AbstractButtonWidget> T addButton(T button) {
+        return super.addButton(button);
     }
 
     @Nullable
@@ -565,9 +565,9 @@ extends Screen {
         private final String translationSuffix;
         private final GameMode defaultGameMode;
 
-        private Mode(String string2, GameMode arg) {
-            this.translationSuffix = string2;
-            this.defaultGameMode = arg;
+        private Mode(String translationSuffix, GameMode defaultGameMode) {
+            this.translationSuffix = translationSuffix;
+            this.defaultGameMode = defaultGameMode;
         }
     }
 }

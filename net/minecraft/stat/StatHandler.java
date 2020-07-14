@@ -26,22 +26,22 @@ public class StatHandler {
         this.statMap.defaultReturnValue(0);
     }
 
-    public void increaseStat(PlayerEntity arg, Stat<?> arg2, int i) {
-        int j = (int)Math.min((long)this.getStat(arg2) + (long)i, Integer.MAX_VALUE);
-        this.setStat(arg, arg2, j);
+    public void increaseStat(PlayerEntity player, Stat<?> stat, int value) {
+        int j = (int)Math.min((long)this.getStat(stat) + (long)value, Integer.MAX_VALUE);
+        this.setStat(player, stat, j);
     }
 
-    public void setStat(PlayerEntity arg, Stat<?> arg2, int i) {
-        this.statMap.put(arg2, i);
+    public void setStat(PlayerEntity player, Stat<?> stat, int value) {
+        this.statMap.put(stat, value);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public <T> int getStat(StatType<T> arg, T object) {
-        return arg.hasStat(object) ? this.getStat(arg.getOrCreateStat(object)) : 0;
+    public <T> int getStat(StatType<T> type, T stat) {
+        return type.hasStat(stat) ? this.getStat(type.getOrCreateStat(stat)) : 0;
     }
 
-    public int getStat(Stat<?> arg) {
-        return this.statMap.getInt(arg);
+    public int getStat(Stat<?> stat) {
+        return this.statMap.getInt(stat);
     }
 }
 

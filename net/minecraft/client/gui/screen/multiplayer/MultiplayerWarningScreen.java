@@ -35,9 +35,9 @@ extends Screen {
     private CheckboxWidget checkbox;
     private final List<StringRenderable> lines = Lists.newArrayList();
 
-    public MultiplayerWarningScreen(Screen arg) {
+    public MultiplayerWarningScreen(Screen parent) {
         super(NarratorManager.EMPTY);
-        this.parent = arg;
+        this.parent = parent;
     }
 
     @Override
@@ -65,16 +65,16 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
-        this.drawCenteredText(arg, this.textRenderer, header, this.width / 2, 30, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, header, this.width / 2, 30, 0xFFFFFF);
         int k = 70;
         for (StringRenderable lv : this.lines) {
-            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

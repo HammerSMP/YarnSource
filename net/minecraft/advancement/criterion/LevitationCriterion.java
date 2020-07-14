@@ -34,13 +34,13 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void trigger(ServerPlayerEntity arg, Vec3d arg2, int i) {
-        this.test(arg, arg3 -> arg3.matches(arg, arg2, i));
+    public void trigger(ServerPlayerEntity player, Vec3d startPos, int duration) {
+        this.test(player, arg3 -> arg3.matches(player, startPos, duration));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -48,26 +48,26 @@ extends AbstractCriterion<Conditions> {
         private final DistancePredicate distance;
         private final NumberRange.IntRange duration;
 
-        public Conditions(EntityPredicate.Extended arg, DistancePredicate arg2, NumberRange.IntRange arg3) {
-            super(ID, arg);
-            this.distance = arg2;
-            this.duration = arg3;
+        public Conditions(EntityPredicate.Extended player, DistancePredicate distance, NumberRange.IntRange duration) {
+            super(ID, player);
+            this.distance = distance;
+            this.duration = duration;
         }
 
-        public static Conditions create(DistancePredicate arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, NumberRange.IntRange.ANY);
+        public static Conditions create(DistancePredicate distance) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, distance, NumberRange.IntRange.ANY);
         }
 
-        public boolean matches(ServerPlayerEntity arg, Vec3d arg2, int i) {
-            if (!this.distance.test(arg2.x, arg2.y, arg2.z, arg.getX(), arg.getY(), arg.getZ())) {
+        public boolean matches(ServerPlayerEntity player, Vec3d startPos, int duration) {
+            if (!this.distance.test(startPos.x, startPos.y, startPos.z, player.getX(), player.getY(), player.getZ())) {
                 return false;
             }
-            return this.duration.test(i);
+            return this.duration.test(duration);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("distance", this.distance.toJson());
             jsonObject.add("duration", this.duration.toJson());
             return jsonObject;

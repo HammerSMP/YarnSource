@@ -28,19 +28,19 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg);
     }
 
-    public void trigger(ServerPlayerEntity arg2) {
-        this.test(arg2, arg -> true);
+    public void trigger(ServerPlayerEntity player) {
+        this.test(player, arg -> true);
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
-        public Conditions(EntityPredicate.Extended arg) {
-            super(ID, arg);
+        public Conditions(EntityPredicate.Extended player) {
+            super(ID, player);
         }
     }
 }

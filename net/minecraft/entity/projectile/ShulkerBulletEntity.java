@@ -60,21 +60,21 @@ extends ProjectileEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ShulkerBulletEntity(World arg, double d, double e, double f, double g, double h, double i) {
-        this((EntityType<? extends ShulkerBulletEntity>)EntityType.SHULKER_BULLET, arg);
-        this.refreshPositionAndAngles(d, e, f, this.yaw, this.pitch);
-        this.setVelocity(g, h, i);
+    public ShulkerBulletEntity(World world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        this((EntityType<? extends ShulkerBulletEntity>)EntityType.SHULKER_BULLET, world);
+        this.refreshPositionAndAngles(x, y, z, this.yaw, this.pitch);
+        this.setVelocity(velocityX, velocityY, velocityZ);
     }
 
-    public ShulkerBulletEntity(World arg, LivingEntity arg2, Entity arg3, Direction.Axis arg4) {
-        this((EntityType<? extends ShulkerBulletEntity>)EntityType.SHULKER_BULLET, arg);
-        this.setOwner(arg2);
-        BlockPos lv = arg2.getBlockPos();
+    public ShulkerBulletEntity(World world, LivingEntity owner, Entity target, Direction.Axis arg4) {
+        this((EntityType<? extends ShulkerBulletEntity>)EntityType.SHULKER_BULLET, world);
+        this.setOwner(owner);
+        BlockPos lv = owner.getBlockPos();
         double d = (double)lv.getX() + 0.5;
         double e = (double)lv.getY() + 0.5;
         double f = (double)lv.getZ() + 0.5;
         this.refreshPositionAndAngles(d, e, f, this.yaw, this.pitch);
-        this.target = arg3;
+        this.target = target;
         this.direction = Direction.UP;
         this.method_7486(arg4);
     }
@@ -85,32 +85,32 @@ extends ProjectileEntity {
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.target != null) {
-            arg.putUuid("Target", this.target.getUuid());
+            tag.putUuid("Target", this.target.getUuid());
         }
         if (this.direction != null) {
-            arg.putInt("Dir", this.direction.getId());
+            tag.putInt("Dir", this.direction.getId());
         }
-        arg.putInt("Steps", this.stepCount);
-        arg.putDouble("TXD", this.targetX);
-        arg.putDouble("TYD", this.targetY);
-        arg.putDouble("TZD", this.targetZ);
+        tag.putInt("Steps", this.stepCount);
+        tag.putDouble("TXD", this.targetX);
+        tag.putDouble("TYD", this.targetY);
+        tag.putDouble("TZD", this.targetZ);
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.stepCount = arg.getInt("Steps");
-        this.targetX = arg.getDouble("TXD");
-        this.targetY = arg.getDouble("TYD");
-        this.targetZ = arg.getDouble("TZD");
-        if (arg.contains("Dir", 99)) {
-            this.direction = Direction.byId(arg.getInt("Dir"));
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.stepCount = tag.getInt("Steps");
+        this.targetX = tag.getDouble("TXD");
+        this.targetY = tag.getDouble("TYD");
+        this.targetZ = tag.getDouble("TZD");
+        if (tag.contains("Dir", 99)) {
+            this.direction = Direction.byId(tag.getInt("Dir"));
         }
-        if (arg.containsUuid("Target")) {
-            this.targetUuid = arg.getUuid("Target");
+        if (tag.containsUuid("Target")) {
+            this.targetUuid = tag.getUuid("Target");
         }
     }
 
@@ -259,8 +259,8 @@ extends ProjectileEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
-        return d < 16384.0;
+    public boolean shouldRender(double distance) {
+        return distance < 16384.0;
     }
 
     @Override
@@ -269,9 +269,9 @@ extends ProjectileEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
-        Entity lv = arg.getEntity();
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
+        Entity lv = entityHitResult.getEntity();
         Entity lv2 = this.getOwner();
         LivingEntity lv3 = lv2 instanceof LivingEntity ? (LivingEntity)lv2 : null;
         boolean bl = lv.damage(DamageSource.mobProjectile(this, lv3).setProjectile(), 4.0f);
@@ -284,15 +284,15 @@ extends ProjectileEntity {
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult arg) {
-        super.onBlockHit(arg);
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
         ((ServerWorld)this.world).spawnParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 2, 0.2, 0.2, 0.2, 0.0);
         this.playSound(SoundEvents.ENTITY_SHULKER_BULLET_HIT, 1.0f, 1.0f);
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         this.remove();
     }
 
@@ -302,7 +302,7 @@ extends ProjectileEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         if (!this.world.isClient) {
             this.playSound(SoundEvents.ENTITY_SHULKER_BULLET_HURT, 1.0f, 1.0f);
             ((ServerWorld)this.world).spawnParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 15, 0.2, 0.2, 0.2, 0.0);

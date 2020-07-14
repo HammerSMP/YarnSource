@@ -80,7 +80,7 @@ extends MinecraftServer {
     }
 
     @Override
-    public void tick(BooleanSupplier booleanSupplier) {
+    public void tick(BooleanSupplier shouldKeepTicking) {
         boolean bl = this.paused;
         this.paused = MinecraftClient.getInstance().getNetworkHandler() != null && MinecraftClient.getInstance().isPaused();
         Profiler lv = this.getProfiler();
@@ -94,7 +94,7 @@ extends MinecraftServer {
         if (this.paused) {
             return;
         }
-        super.tick(booleanSupplier);
+        super.tick(shouldKeepTicking);
         int i = Math.max(2, this.client.options.viewDistance + -1);
         if (i != this.getPlayerManager().getViewDistance()) {
             LOGGER.info("Changing view distance to {}, from {}", (Object)i, (Object)this.getPlayerManager().getViewDistance());
@@ -133,16 +133,16 @@ extends MinecraftServer {
     }
 
     @Override
-    public void setCrashReport(CrashReport arg) {
-        this.client.setCrashReport(arg);
+    public void setCrashReport(CrashReport report) {
+        this.client.setCrashReport(report);
     }
 
     @Override
-    public CrashReport populateCrashReport(CrashReport arg) {
-        arg = super.populateCrashReport(arg);
-        arg.getSystemDetailsSection().add("Type", "Integrated Server (map_client.txt)");
-        arg.getSystemDetailsSection().add("Is Modded", () -> this.getModdedStatusMessage().orElse("Probably not. Jar signature remains and both client + server brands are untouched."));
-        return arg;
+    public CrashReport populateCrashReport(CrashReport report) {
+        report = super.populateCrashReport(report);
+        report.getSystemDetailsSection().add("Type", "Integrated Server (map_client.txt)");
+        report.getSystemDetailsSection().add("Is Modded", () -> this.getModdedStatusMessage().orElse("Probably not. Jar signature remains and both client + server brands are untouched."));
+        return report;
     }
 
     @Override
@@ -162,21 +162,21 @@ extends MinecraftServer {
     }
 
     @Override
-    public void addSnooperInfo(Snooper arg) {
-        super.addSnooperInfo(arg);
-        arg.addInfo("snooper_partner", this.client.getSnooper().getToken());
+    public void addSnooperInfo(Snooper snooper) {
+        super.addSnooperInfo(snooper);
+        snooper.addInfo("snooper_partner", this.client.getSnooper().getToken());
     }
 
     @Override
-    public boolean openToLan(GameMode arg, boolean bl, int i) {
+    public boolean openToLan(GameMode gameMode, boolean cheatsAllowed, int port) {
         try {
-            this.getNetworkIo().bind(null, i);
-            LOGGER.info("Started serving on {}", (Object)i);
-            this.lanPort = i;
-            this.lanPinger = new LanServerPinger(this.getServerMotd(), i + "");
+            this.getNetworkIo().bind(null, port);
+            LOGGER.info("Started serving on {}", (Object)port);
+            this.lanPort = port;
+            this.lanPinger = new LanServerPinger(this.getServerMotd(), port + "");
             this.lanPinger.start();
-            this.getPlayerManager().setGameMode(arg);
-            this.getPlayerManager().setCheatsAllowed(bl);
+            this.getPlayerManager().setGameMode(gameMode);
+            this.getPlayerManager().setCheatsAllowed(cheatsAllowed);
             int j = this.getPermissionLevel(this.client.player.getGameProfile());
             this.client.player.setClientPermissionLevel(j);
             for (ServerPlayerEntity lv : this.getPlayerManager().getPlayerList()) {
@@ -225,9 +225,9 @@ extends MinecraftServer {
     }
 
     @Override
-    public void setDefaultGameMode(GameMode arg) {
-        super.setDefaultGameMode(arg);
-        this.getPlayerManager().setGameMode(arg);
+    public void setDefaultGameMode(GameMode gameMode) {
+        super.setDefaultGameMode(gameMode);
+        this.getPlayerManager().setGameMode(gameMode);
     }
 
     @Override
@@ -245,18 +245,18 @@ extends MinecraftServer {
         return 2;
     }
 
-    public void setLocalPlayerUuid(UUID uUID) {
-        this.localPlayerUuid = uUID;
+    public void setLocalPlayerUuid(UUID localPlayerUuid) {
+        this.localPlayerUuid = localPlayerUuid;
     }
 
     @Override
-    public boolean isHost(GameProfile gameProfile) {
-        return gameProfile.getName().equalsIgnoreCase(this.getUserName());
+    public boolean isHost(GameProfile profile) {
+        return profile.getName().equalsIgnoreCase(this.getUserName());
     }
 
     @Override
-    public int adjustTrackingDistance(int i) {
-        return (int)(this.client.options.entityDistanceScaling * (float)i);
+    public int adjustTrackingDistance(int initialDistance) {
+        return (int)(this.client.options.entityDistanceScaling * (float)initialDistance);
     }
 
     @Override

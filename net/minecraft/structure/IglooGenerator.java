@@ -42,15 +42,15 @@ public class IglooGenerator {
     private static final Map<Identifier, BlockPos> field_14408 = ImmutableMap.of((Object)TOP_TEMPLATE, (Object)new BlockPos(3, 5, 5), (Object)MIDDLE_TEMPLATE, (Object)new BlockPos(1, 3, 1), (Object)BOTTOM_TEMPLATE, (Object)new BlockPos(3, 6, 7));
     private static final Map<Identifier, BlockPos> field_14406 = ImmutableMap.of((Object)TOP_TEMPLATE, (Object)BlockPos.ORIGIN, (Object)MIDDLE_TEMPLATE, (Object)new BlockPos(2, -3, 4), (Object)BOTTOM_TEMPLATE, (Object)new BlockPos(0, -3, -2));
 
-    public static void addPieces(StructureManager arg, BlockPos arg2, BlockRotation arg3, List<StructurePiece> list, Random random) {
+    public static void addPieces(StructureManager manager, BlockPos pos, BlockRotation rotation, List<StructurePiece> pieces, Random random) {
         if (random.nextDouble() < 0.5) {
             int i = random.nextInt(8) + 4;
-            list.add(new Piece(arg, BOTTOM_TEMPLATE, arg2, arg3, i * 3));
+            pieces.add(new Piece(manager, BOTTOM_TEMPLATE, pos, rotation, i * 3));
             for (int j = 0; j < i - 1; ++j) {
-                list.add(new Piece(arg, MIDDLE_TEMPLATE, arg2, arg3, j * 3));
+                pieces.add(new Piece(manager, MIDDLE_TEMPLATE, pos, rotation, j * 3));
             }
         }
-        list.add(new Piece(arg, TOP_TEMPLATE, arg2, arg3, 0));
+        pieces.add(new Piece(manager, TOP_TEMPLATE, pos, rotation, 0));
     }
 
     public static class Piece
@@ -58,49 +58,49 @@ public class IglooGenerator {
         private final Identifier template;
         private final BlockRotation rotation;
 
-        public Piece(StructureManager arg, Identifier arg2, BlockPos arg3, BlockRotation arg4, int i) {
+        public Piece(StructureManager manager, Identifier identifier, BlockPos pos, BlockRotation rotation, int yOffset) {
             super(StructurePieceType.IGLOO, 0);
-            this.template = arg2;
-            BlockPos lv = (BlockPos)field_14406.get(arg2);
-            this.pos = arg3.add(lv.getX(), lv.getY() - i, lv.getZ());
-            this.rotation = arg4;
-            this.initializeStructureData(arg);
+            this.template = identifier;
+            BlockPos lv = (BlockPos)field_14406.get(identifier);
+            this.pos = pos.add(lv.getX(), lv.getY() - yOffset, lv.getZ());
+            this.rotation = rotation;
+            this.initializeStructureData(manager);
         }
 
-        public Piece(StructureManager arg, CompoundTag arg2) {
-            super(StructurePieceType.IGLOO, arg2);
-            this.template = new Identifier(arg2.getString("Template"));
-            this.rotation = BlockRotation.valueOf(arg2.getString("Rot"));
-            this.initializeStructureData(arg);
+        public Piece(StructureManager manager, CompoundTag tag) {
+            super(StructurePieceType.IGLOO, tag);
+            this.template = new Identifier(tag.getString("Template"));
+            this.rotation = BlockRotation.valueOf(tag.getString("Rot"));
+            this.initializeStructureData(manager);
         }
 
-        private void initializeStructureData(StructureManager arg) {
-            Structure lv = arg.getStructureOrBlank(this.template);
+        private void initializeStructureData(StructureManager manager) {
+            Structure lv = manager.getStructureOrBlank(this.template);
             StructurePlacementData lv2 = new StructurePlacementData().setRotation(this.rotation).setMirror(BlockMirror.NONE).setPosition((BlockPos)field_14408.get(this.template)).addProcessor(BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS);
             this.setStructureData(lv, this.pos, lv2);
         }
 
         @Override
-        protected void toNbt(CompoundTag arg) {
-            super.toNbt(arg);
-            arg.putString("Template", this.template.toString());
-            arg.putString("Rot", this.rotation.name());
+        protected void toNbt(CompoundTag tag) {
+            super.toNbt(tag);
+            tag.putString("Template", this.template.toString());
+            tag.putString("Rot", this.rotation.name());
         }
 
         @Override
-        protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
-            if (!"chest".equals(string)) {
+        protected void handleMetadata(String metadata, BlockPos pos, class_5425 arg2, Random random, BlockBox boundingBox) {
+            if (!"chest".equals(metadata)) {
                 return;
             }
-            arg2.setBlockState(arg, Blocks.AIR.getDefaultState(), 3);
-            BlockEntity lv = arg2.getBlockEntity(arg.down());
+            arg2.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+            BlockEntity lv = arg2.getBlockEntity(pos.down());
             if (lv instanceof ChestBlockEntity) {
                 ((ChestBlockEntity)lv).setLootTable(LootTables.IGLOO_CHEST_CHEST, random.nextLong());
             }
         }
 
         @Override
-        public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+        public boolean generate(ServerWorldAccess arg, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox boundingBox, ChunkPos arg5, BlockPos arg6) {
             BlockPos lv5;
             BlockState lv6;
             StructurePlacementData lv = new StructurePlacementData().setRotation(this.rotation).setMirror(BlockMirror.NONE).setPosition((BlockPos)field_14408.get(this.template)).addProcessor(BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS);
@@ -109,7 +109,7 @@ public class IglooGenerator {
             int i = arg.getTopY(Heightmap.Type.WORLD_SURFACE_WG, lv3.getX(), lv3.getZ());
             BlockPos lv4 = this.pos;
             this.pos = this.pos.add(0, i - 90 - 1, 0);
-            boolean bl = super.generate(arg, arg2, arg3, random, arg4, arg5, arg6);
+            boolean bl = super.generate(arg, structureAccessor, chunkGenerator, random, boundingBox, arg5, arg6);
             if (this.template.equals(TOP_TEMPLATE) && !(lv6 = arg.getBlockState((lv5 = this.pos.add(Structure.transform(lv, new BlockPos(3, 0, 5)))).down())).isAir() && !lv6.isOf(Blocks.LADDER)) {
                 arg.setBlockState(lv5, Blocks.SNOW_BLOCK.getDefaultState(), 3);
             }

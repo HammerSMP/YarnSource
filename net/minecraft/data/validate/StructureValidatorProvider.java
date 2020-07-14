@@ -21,18 +21,18 @@ implements SnbtProvider.Tweaker {
     private static final Logger field_24617 = LogManager.getLogger();
 
     @Override
-    public CompoundTag write(String string, CompoundTag arg) {
-        if (string.startsWith("data/minecraft/structures/")) {
-            return StructureValidatorProvider.update(string, StructureValidatorProvider.addDataVersion(arg));
+    public CompoundTag write(String name, CompoundTag nbt) {
+        if (name.startsWith("data/minecraft/structures/")) {
+            return StructureValidatorProvider.update(name, StructureValidatorProvider.addDataVersion(nbt));
         }
-        return arg;
+        return nbt;
     }
 
-    private static CompoundTag addDataVersion(CompoundTag arg) {
-        if (!arg.contains("DataVersion", 99)) {
-            arg.putInt("DataVersion", 500);
+    private static CompoundTag addDataVersion(CompoundTag nbt) {
+        if (!nbt.contains("DataVersion", 99)) {
+            nbt.putInt("DataVersion", 500);
         }
-        return arg;
+        return nbt;
     }
 
     private static CompoundTag update(String string, CompoundTag arg) {

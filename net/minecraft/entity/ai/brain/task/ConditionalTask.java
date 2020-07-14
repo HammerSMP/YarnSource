@@ -24,52 +24,52 @@ extends Task<E> {
     private final Task<? super E> delegate;
     private final boolean allowsContinuation;
 
-    public ConditionalTask(Map<MemoryModuleType<?>, MemoryModuleState> map, Predicate<E> predicate, Task<? super E> arg, boolean bl) {
-        super(ConditionalTask.merge(map, arg.requiredMemoryStates));
-        this.condition = predicate;
-        this.delegate = arg;
-        this.allowsContinuation = bl;
+    public ConditionalTask(Map<MemoryModuleType<?>, MemoryModuleState> requiredMemoryStates, Predicate<E> condition, Task<? super E> delegate, boolean allowsContinuation) {
+        super(ConditionalTask.merge(requiredMemoryStates, delegate.requiredMemoryStates));
+        this.condition = condition;
+        this.delegate = delegate;
+        this.allowsContinuation = allowsContinuation;
     }
 
-    private static Map<MemoryModuleType<?>, MemoryModuleState> merge(Map<MemoryModuleType<?>, MemoryModuleState> map, Map<MemoryModuleType<?>, MemoryModuleState> map2) {
+    private static Map<MemoryModuleType<?>, MemoryModuleState> merge(Map<MemoryModuleType<?>, MemoryModuleState> first, Map<MemoryModuleType<?>, MemoryModuleState> second) {
         HashMap map3 = Maps.newHashMap();
-        map3.putAll(map);
-        map3.putAll(map2);
+        map3.putAll(first);
+        map3.putAll(second);
         return map3;
     }
 
-    public ConditionalTask(Predicate<E> predicate, Task<? super E> arg) {
-        this((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(), (Predicate<? super E>)predicate, arg, false);
+    public ConditionalTask(Predicate<E> condition, Task<? super E> delegate) {
+        this((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(), (Predicate<? super E>)condition, delegate, false);
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
-        return this.condition.test(arg2) && this.delegate.shouldRun(arg, arg2);
+    protected boolean shouldRun(ServerWorld world, E entity) {
+        return this.condition.test(entity) && this.delegate.shouldRun(world, entity);
     }
 
     @Override
-    protected boolean shouldKeepRunning(ServerWorld arg, E arg2, long l) {
-        return this.allowsContinuation && this.condition.test(arg2) && this.delegate.shouldKeepRunning(arg, arg2, l);
+    protected boolean shouldKeepRunning(ServerWorld world, E entity, long time) {
+        return this.allowsContinuation && this.condition.test(entity) && this.delegate.shouldKeepRunning(world, entity, time);
     }
 
     @Override
-    protected boolean isTimeLimitExceeded(long l) {
+    protected boolean isTimeLimitExceeded(long time) {
         return false;
     }
 
     @Override
-    protected void run(ServerWorld arg, E arg2, long l) {
-        this.delegate.run(arg, arg2, l);
+    protected void run(ServerWorld world, E entity, long time) {
+        this.delegate.run(world, entity, time);
     }
 
     @Override
-    protected void keepRunning(ServerWorld arg, E arg2, long l) {
-        this.delegate.keepRunning(arg, arg2, l);
+    protected void keepRunning(ServerWorld world, E entity, long time) {
+        this.delegate.keepRunning(world, entity, time);
     }
 
     @Override
-    protected void finishRunning(ServerWorld arg, E arg2, long l) {
-        this.delegate.finishRunning(arg, arg2, l);
+    protected void finishRunning(ServerWorld world, E entity, long time) {
+        this.delegate.finishRunning(world, entity, time);
     }
 
     @Override

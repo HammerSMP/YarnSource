@@ -137,8 +137,8 @@ extends RecipeBook {
         return this.field_25778;
     }
 
-    public List<RecipeResultCollection> getResultsForGroup(RecipeBookGroup arg) {
-        return this.resultsByGroup.getOrDefault((Object)arg, Collections.emptyList());
+    public List<RecipeResultCollection> getResultsForGroup(RecipeBookGroup category) {
+        return this.resultsByGroup.getOrDefault((Object)category, Collections.emptyList());
     }
 }
 

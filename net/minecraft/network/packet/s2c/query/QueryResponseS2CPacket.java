@@ -33,18 +33,18 @@ implements Packet<ClientQueryPacketListener> {
     public QueryResponseS2CPacket() {
     }
 
-    public QueryResponseS2CPacket(ServerMetadata arg) {
-        this.metadata = arg;
+    public QueryResponseS2CPacket(ServerMetadata metadata) {
+        this.metadata = metadata;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.metadata = JsonHelper.deserialize(GSON, arg.readString(32767), ServerMetadata.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.metadata = JsonHelper.deserialize(GSON, buf.readString(32767), ServerMetadata.class);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(GSON.toJson((Object)this.metadata));
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(GSON.toJson((Object)this.metadata));
     }
 
     @Override

@@ -24,15 +24,15 @@ extends Task<PathAwareEntity> {
     private final int horizontalRadius;
     private final int verticalRadius;
 
-    public StrollTask(float f) {
-        this(f, 10, 7);
+    public StrollTask(float speed) {
+        this(speed, 10, 7);
     }
 
-    public StrollTask(float f, int i, int j) {
+    public StrollTask(float speed, int horizontalRadius, int verticalRadius) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.speed = f;
-        this.horizontalRadius = i;
-        this.verticalRadius = j;
+        this.speed = speed;
+        this.horizontalRadius = horizontalRadius;
+        this.verticalRadius = verticalRadius;
     }
 
     @Override

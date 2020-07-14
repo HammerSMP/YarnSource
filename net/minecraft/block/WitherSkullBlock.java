@@ -45,55 +45,55 @@ extends SkullBlock {
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
-        super.onPlaced(arg, arg2, arg3, arg4, arg5);
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof SkullBlockEntity) {
-            WitherSkullBlock.onPlaced(arg, arg2, (SkullBlockEntity)lv);
+            WitherSkullBlock.onPlaced(world, pos, (SkullBlockEntity)lv);
         }
     }
 
-    public static void onPlaced(World arg, BlockPos arg2, SkullBlockEntity arg3) {
+    public static void onPlaced(World world, BlockPos pos, SkullBlockEntity blockEntity) {
         boolean bl;
-        if (arg.isClient) {
+        if (world.isClient) {
             return;
         }
-        BlockState lv = arg3.getCachedState();
+        BlockState lv = blockEntity.getCachedState();
         boolean bl2 = bl = lv.isOf(Blocks.WITHER_SKELETON_SKULL) || lv.isOf(Blocks.WITHER_SKELETON_WALL_SKULL);
-        if (!bl || arg2.getY() < 0 || arg.getDifficulty() == Difficulty.PEACEFUL) {
+        if (!bl || pos.getY() < 0 || world.getDifficulty() == Difficulty.PEACEFUL) {
             return;
         }
         BlockPattern lv2 = WitherSkullBlock.getWitherBossPattern();
-        BlockPattern.Result lv3 = lv2.searchAround(arg, arg2);
+        BlockPattern.Result lv3 = lv2.searchAround(world, pos);
         if (lv3 == null) {
             return;
         }
         for (int i = 0; i < lv2.getWidth(); ++i) {
             for (int j = 0; j < lv2.getHeight(); ++j) {
                 CachedBlockPosition lv4 = lv3.translate(i, j, 0);
-                arg.setBlockState(lv4.getBlockPos(), Blocks.AIR.getDefaultState(), 2);
-                arg.syncWorldEvent(2001, lv4.getBlockPos(), Block.getRawIdFromState(lv4.getBlockState()));
+                world.setBlockState(lv4.getBlockPos(), Blocks.AIR.getDefaultState(), 2);
+                world.syncWorldEvent(2001, lv4.getBlockPos(), Block.getRawIdFromState(lv4.getBlockState()));
             }
         }
-        WitherEntity lv5 = EntityType.WITHER.create(arg);
+        WitherEntity lv5 = EntityType.WITHER.create(world);
         BlockPos lv6 = lv3.translate(1, 2, 0).getBlockPos();
         lv5.refreshPositionAndAngles((double)lv6.getX() + 0.5, (double)lv6.getY() + 0.55, (double)lv6.getZ() + 0.5, lv3.getForwards().getAxis() == Direction.Axis.X ? 0.0f : 90.0f, 0.0f);
         lv5.bodyYaw = lv3.getForwards().getAxis() == Direction.Axis.X ? 0.0f : 90.0f;
         lv5.method_6885();
-        for (ServerPlayerEntity lv7 : arg.getNonSpectatingEntities(ServerPlayerEntity.class, lv5.getBoundingBox().expand(50.0))) {
+        for (ServerPlayerEntity lv7 : world.getNonSpectatingEntities(ServerPlayerEntity.class, lv5.getBoundingBox().expand(50.0))) {
             Criteria.SUMMONED_ENTITY.trigger(lv7, lv5);
         }
-        arg.spawnEntity(lv5);
+        world.spawnEntity(lv5);
         for (int k = 0; k < lv2.getWidth(); ++k) {
             for (int l = 0; l < lv2.getHeight(); ++l) {
-                arg.updateNeighbors(lv3.translate(k, l, 0).getBlockPos(), Blocks.AIR);
+                world.updateNeighbors(lv3.translate(k, l, 0).getBlockPos(), Blocks.AIR);
             }
         }
     }
 
-    public static boolean canDispense(World arg, BlockPos arg2, ItemStack arg3) {
-        if (arg3.getItem() == Items.WITHER_SKELETON_SKULL && arg2.getY() >= 2 && arg.getDifficulty() != Difficulty.PEACEFUL && !arg.isClient) {
-            return WitherSkullBlock.getWitherDispenserPattern().searchAround(arg, arg2) != null;
+    public static boolean canDispense(World world, BlockPos pos, ItemStack stack) {
+        if (stack.getItem() == Items.WITHER_SKELETON_SKULL && pos.getY() >= 2 && world.getDifficulty() != Difficulty.PEACEFUL && !world.isClient) {
+            return WitherSkullBlock.getWitherDispenserPattern().searchAround(world, pos) != null;
         }
         return false;
     }

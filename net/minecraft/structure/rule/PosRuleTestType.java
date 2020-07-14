@@ -20,8 +20,8 @@ public interface PosRuleTestType<P extends PosRuleTest> {
 
     public Codec<P> codec();
 
-    public static <P extends PosRuleTest> PosRuleTestType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.POS_RULE_TEST, string, () -> codec);
+    public static <P extends PosRuleTest> PosRuleTestType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.POS_RULE_TEST, id, () -> codec);
     }
 }
 

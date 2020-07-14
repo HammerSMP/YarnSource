@@ -28,30 +28,30 @@ extends VillagerWorkTask {
     private static final List<Item> COMPOSTABLES = ImmutableList.of((Object)Items.WHEAT_SEEDS, (Object)Items.BEETROOT_SEEDS);
 
     @Override
-    protected void performAdditionalWork(ServerWorld arg, VillagerEntity arg2) {
-        Optional<GlobalPos> optional = arg2.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE);
+    protected void performAdditionalWork(ServerWorld world, VillagerEntity entity) {
+        Optional<GlobalPos> optional = entity.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE);
         if (!optional.isPresent()) {
             return;
         }
         GlobalPos lv = optional.get();
-        BlockState lv2 = arg.getBlockState(lv.getPos());
+        BlockState lv2 = world.getBlockState(lv.getPos());
         if (lv2.isOf(Blocks.COMPOSTER)) {
-            this.craftAndDropBread(arg2);
-            this.compostSeeds(arg, arg2, lv, lv2);
+            this.craftAndDropBread(entity);
+            this.compostSeeds(world, entity, lv, lv2);
         }
     }
 
-    private void compostSeeds(ServerWorld arg, VillagerEntity arg2, GlobalPos arg3, BlockState arg4) {
-        BlockPos lv = arg3.getPos();
-        if (arg4.get(ComposterBlock.LEVEL) == 8) {
-            arg4 = ComposterBlock.emptyFullComposter(arg4, arg, lv);
+    private void compostSeeds(ServerWorld world, VillagerEntity entity, GlobalPos pos, BlockState composterState) {
+        BlockPos lv = pos.getPos();
+        if (composterState.get(ComposterBlock.LEVEL) == 8) {
+            composterState = ComposterBlock.emptyFullComposter(composterState, world, lv);
         }
         int i = 20;
         int j = 10;
         int[] is = new int[COMPOSTABLES.size()];
-        SimpleInventory lv2 = arg2.getInventory();
+        SimpleInventory lv2 = entity.getInventory();
         int k = lv2.size();
-        BlockState lv3 = arg4;
+        BlockState lv3 = composterState;
         for (int l = k - 1; l >= 0 && i > 0; --l) {
             int o;
             ItemStack lv4 = lv2.getStack(l);
@@ -63,20 +63,20 @@ extends VillagerWorkTask {
             if (p <= 0) continue;
             i -= p;
             for (int q = 0; q < p; ++q) {
-                if ((lv3 = ComposterBlock.compost(lv3, arg, lv4, lv)).get(ComposterBlock.LEVEL) != 7) continue;
-                this.method_30232(arg, arg4, lv, lv3);
+                if ((lv3 = ComposterBlock.compost(lv3, world, lv4, lv)).get(ComposterBlock.LEVEL) != 7) continue;
+                this.method_30232(world, composterState, lv, lv3);
                 return;
             }
         }
-        this.method_30232(arg, arg4, lv, lv3);
+        this.method_30232(world, composterState, lv, lv3);
     }
 
     private void method_30232(ServerWorld arg, BlockState arg2, BlockPos arg3, BlockState arg4) {
         arg.syncWorldEvent(1500, arg3, arg4 != arg2 ? 1 : 0);
     }
 
-    private void craftAndDropBread(VillagerEntity arg) {
-        SimpleInventory lv = arg.getInventory();
+    private void craftAndDropBread(VillagerEntity entity) {
+        SimpleInventory lv = entity.getInventory();
         if (lv.count(Items.BREAD) > 36) {
             return;
         }
@@ -91,7 +91,7 @@ extends VillagerWorkTask {
         lv.removeItem(Items.WHEAT, m);
         ItemStack lv2 = lv.addStack(new ItemStack(Items.BREAD, l));
         if (!lv2.isEmpty()) {
-            arg.dropStack(lv2, 0.5f);
+            entity.dropStack(lv2, 0.5f);
         }
     }
 }

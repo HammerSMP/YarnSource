@@ -54,8 +54,8 @@ extends StructureFeature<OceanRuinFeatureConfig> {
         }
 
         @Nullable
-        public static BiomeType byName(String string) {
-            return nameMap.get(string);
+        public static BiomeType byName(String name) {
+            return nameMap.get(name);
         }
 
         @Override

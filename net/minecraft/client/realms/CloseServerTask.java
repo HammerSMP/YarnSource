@@ -22,9 +22,9 @@ extends LongRunningTask {
     private final RealmsServer serverData;
     private final RealmsConfigureWorldScreen configureScreen;
 
-    public CloseServerTask(RealmsServer arg, RealmsConfigureWorldScreen arg2) {
-        this.serverData = arg;
-        this.configureScreen = arg2;
+    public CloseServerTask(RealmsServer realmsServer, RealmsConfigureWorldScreen configureWorldScreen) {
+        this.serverData = realmsServer;
+        this.configureScreen = configureWorldScreen;
     }
 
     @Override

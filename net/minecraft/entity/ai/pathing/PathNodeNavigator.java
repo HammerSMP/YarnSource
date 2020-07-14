@@ -36,51 +36,51 @@ public class PathNodeNavigator {
     private final PathNodeMaker pathNodeMaker;
     private final PathMinHeap minHeap = new PathMinHeap();
 
-    public PathNodeNavigator(PathNodeMaker arg, int i) {
-        this.pathNodeMaker = arg;
-        this.range = i;
+    public PathNodeNavigator(PathNodeMaker pathNodeMaker, int range) {
+        this.pathNodeMaker = pathNodeMaker;
+        this.range = range;
     }
 
     @Nullable
-    public Path findPathToAny(ChunkCache arg2, MobEntity arg22, Set<BlockPos> set, float f, int i, float g) {
+    public Path findPathToAny(ChunkCache world, MobEntity mob, Set<BlockPos> positions, float followRange, int distance, float rangeMultiplier) {
         this.minHeap.clear();
-        this.pathNodeMaker.init(arg2, arg22);
+        this.pathNodeMaker.init(world, mob);
         PathNode lv = this.pathNodeMaker.getStart();
-        Map<TargetPathNode, BlockPos> map = set.stream().collect(Collectors.toMap(arg -> this.pathNodeMaker.getNode((double)arg.getX(), (double)arg.getY(), (double)arg.getZ()), Function.identity()));
-        Path lv2 = this.findPathToAny(lv, map, f, i, g);
+        Map<TargetPathNode, BlockPos> map = positions.stream().collect(Collectors.toMap(arg -> this.pathNodeMaker.getNode((double)arg.getX(), (double)arg.getY(), (double)arg.getZ()), Function.identity()));
+        Path lv2 = this.findPathToAny(lv, map, followRange, distance, rangeMultiplier);
         this.pathNodeMaker.clear();
         return lv2;
     }
 
     @Nullable
-    private Path findPathToAny(PathNode arg2, Map<TargetPathNode, BlockPos> map, float f, int i, float g) {
+    private Path findPathToAny(PathNode startNode, Map<TargetPathNode, BlockPos> positions, float followRange, int distance, float rangeMultiplier) {
         Optional<Path> optional;
-        Set<TargetPathNode> set = map.keySet();
-        arg2.penalizedPathLength = 0.0f;
-        arg2.heapWeight = arg2.distanceToNearestTarget = this.calculateDistances(arg2, set);
+        Set<TargetPathNode> set = positions.keySet();
+        startNode.penalizedPathLength = 0.0f;
+        startNode.heapWeight = startNode.distanceToNearestTarget = this.calculateDistances(startNode, set);
         this.minHeap.clear();
-        this.minHeap.push(arg2);
+        this.minHeap.push(startNode);
         ImmutableSet set2 = ImmutableSet.of();
         int j = 0;
         HashSet set3 = Sets.newHashSetWithExpectedSize((int)set.size());
-        int k = (int)((float)this.range * g);
+        int k = (int)((float)this.range * rangeMultiplier);
         while (!this.minHeap.isEmpty() && ++j < k) {
             PathNode lv = this.minHeap.pop();
             lv.visited = true;
             for (TargetPathNode lv2 : set) {
-                if (!(lv.getManhattanDistance(lv2) <= (float)i)) continue;
+                if (!(lv.getManhattanDistance(lv2) <= (float)distance)) continue;
                 lv2.markReached();
                 set3.add(lv2);
             }
             if (!set3.isEmpty()) break;
-            if (lv.getDistance(arg2) >= f) continue;
+            if (lv.getDistance(startNode) >= followRange) continue;
             int l = this.pathNodeMaker.getSuccessors(this.successors, lv);
             for (int m = 0; m < l; ++m) {
                 PathNode lv3 = this.successors[m];
                 float h = lv.getDistance(lv3);
                 lv3.pathLength = lv.pathLength + h;
                 float n = lv.penalizedPathLength + h + lv3.penalty;
-                if (!(lv3.pathLength < f) || lv3.isInHeap() && !(n < lv3.penalizedPathLength)) continue;
+                if (!(lv3.pathLength < followRange) || lv3.isInHeap() && !(n < lv3.penalizedPathLength)) continue;
                 lv3.previous = lv;
                 lv3.penalizedPathLength = n;
                 lv3.distanceToNearestTarget = this.calculateDistances(lv3, set) * 1.5f;
@@ -92,7 +92,7 @@ public class PathNodeNavigator {
                 this.minHeap.push(lv3);
             }
         }
-        Optional<Path> optional2 = optional = !set3.isEmpty() ? set3.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)map.get(arg), true)).min(Comparator.comparingInt(Path::getLength)) : set.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)map.get(arg), false)).min(Comparator.comparingDouble(Path::getManhattanDistanceFromTarget).thenComparingInt(Path::getLength));
+        Optional<Path> optional2 = optional = !set3.isEmpty() ? set3.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)positions.get(arg), true)).min(Comparator.comparingInt(Path::getLength)) : set.stream().map(arg -> this.createPath(arg.getNearestNode(), (BlockPos)positions.get(arg), false)).min(Comparator.comparingDouble(Path::getManhattanDistanceFromTarget).thenComparingInt(Path::getLength));
         if (!optional.isPresent()) {
             return null;
         }
@@ -100,25 +100,25 @@ public class PathNodeNavigator {
         return lv4;
     }
 
-    private float calculateDistances(PathNode arg, Set<TargetPathNode> set) {
+    private float calculateDistances(PathNode node, Set<TargetPathNode> targets) {
         float f = Float.MAX_VALUE;
-        for (TargetPathNode lv : set) {
-            float g = arg.getDistance(lv);
-            lv.updateNearestNode(g, arg);
+        for (TargetPathNode lv : targets) {
+            float g = node.getDistance(lv);
+            lv.updateNearestNode(g, node);
             f = Math.min(g, f);
         }
         return f;
     }
 
-    private Path createPath(PathNode arg, BlockPos arg2, boolean bl) {
+    private Path createPath(PathNode endNode, BlockPos target, boolean reachesTarget) {
         ArrayList list = Lists.newArrayList();
-        PathNode lv = arg;
+        PathNode lv = endNode;
         list.add(0, lv);
         while (lv.previous != null) {
             lv = lv.previous;
             list.add(0, lv);
         }
-        return new Path(list, arg2, bl);
+        return new Path(list, target, reachesTarget);
     }
 }
 

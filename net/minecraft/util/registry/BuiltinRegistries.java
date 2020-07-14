@@ -15,13 +15,9 @@ import com.google.common.collect.Maps;
 import com.mojang.serialization.Lifecycle;
 import java.util.Map;
 import java.util.function.Supplier;
-import net.minecraft.class_5463;
-import net.minecraft.class_5464;
-import net.minecraft.class_5468;
-import net.minecraft.class_5469;
-import net.minecraft.class_5470;
-import net.minecraft.class_5471;
 import net.minecraft.structure.pool.StructurePool;
+import net.minecraft.structure.pool.TemplatePools;
+import net.minecraft.structure.processor.ProcessorLists;
 import net.minecraft.structure.processor.StructureProcessor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.MutableRegistry;
@@ -31,9 +27,13 @@ import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
+import net.minecraft.world.gen.carver.ConfiguredCarvers;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.ConfiguredFeatures;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeatures;
 import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilder;
+import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,39 +42,39 @@ public class BuiltinRegistries {
     private static final Map<Identifier, Supplier<?>> DEFAULT_VALUE_SUPPLIERS = Maps.newLinkedHashMap();
     private static final MutableRegistry<MutableRegistry<?>> ROOT = new SimpleRegistry(RegistryKey.ofRegistry(new Identifier("root")), Lifecycle.experimental());
     public static final Registry<? extends Registry<?>> REGISTRIES = ROOT;
-    public static final Registry<ConfiguredSurfaceBuilder<?>> CONGINURED_SURFACE_BUILDER = BuiltinRegistries.addRegistry(Registry.CONFIGURED_SURFACE_BUILDER_WORLDGEN, () -> class_5471.NOPE);
-    public static final Registry<ConfiguredCarver<?>> CONFIGURED_CARVER = BuiltinRegistries.addRegistry(Registry.CONFIGURED_CARVER_WORLDGEN, () -> class_5463.CAVE);
-    public static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE = BuiltinRegistries.addRegistry(Registry.CONFIGURED_FEATURE_WORLDGEN, () -> class_5464.NOPE);
-    public static final Registry<ConfiguredStructureFeature<?, ?>> CONFIGURED_STRUCTURE_FEATURE = BuiltinRegistries.addRegistry(Registry.CONFIGURED_STRUCTURE_FEATURE_WORLDGEN, () -> class_5470.MINESHAFT);
-    public static final Registry<ImmutableList<StructureProcessor>> STRUCTURE_PROCESSORS = BuiltinRegistries.addRegistry(Registry.PROCESSOR_LIST_WORLDGEN, () -> class_5469.ZOMBIE_PLAINS);
-    public static final Registry<StructurePool> STRUCTURE_POOL = BuiltinRegistries.addRegistry(Registry.TEMPLATE_POOL_WORLDGEN, () -> class_5468.field_26254);
+    public static final Registry<ConfiguredSurfaceBuilder<?>> CONFIGURED_SURFACE_BUILDER = BuiltinRegistries.addRegistry(Registry.CONFIGURED_SURFACE_BUILDER_WORLDGEN, () -> ConfiguredSurfaceBuilders.NOPE);
+    public static final Registry<ConfiguredCarver<?>> CONFIGURED_CARVER = BuiltinRegistries.addRegistry(Registry.CONFIGURED_CARVER_WORLDGEN, () -> ConfiguredCarvers.CAVE);
+    public static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE = BuiltinRegistries.addRegistry(Registry.CONFIGURED_FEATURE_WORLDGEN, () -> ConfiguredFeatures.NOPE);
+    public static final Registry<ConfiguredStructureFeature<?, ?>> CONFIGURED_STRUCTURE_FEATURE = BuiltinRegistries.addRegistry(Registry.CONFIGURED_STRUCTURE_FEATURE_WORLDGEN, () -> ConfiguredStructureFeatures.MINESHAFT);
+    public static final Registry<ImmutableList<StructureProcessor>> PROCESSOR_LIST = BuiltinRegistries.addRegistry(Registry.PROCESSOR_LIST_WORLDGEN, () -> ProcessorLists.ZOMBIE_PLAINS);
+    public static final Registry<StructurePool> TEMPLATE_POOL = BuiltinRegistries.addRegistry(Registry.TEMPLATE_POOL_WORLDGEN, () -> TemplatePools.EMPTY);
     public static final Registry<Biome> BIOME = BuiltinRegistries.addRegistry(Registry.BIOME_KEY, () -> Biomes.DEFAULT);
 
-    private static <T> Registry<T> addRegistry(RegistryKey<? extends Registry<T>> arg, Supplier<T> supplier) {
-        return BuiltinRegistries.addRegistry(arg, Lifecycle.experimental(), supplier);
+    private static <T> Registry<T> addRegistry(RegistryKey<? extends Registry<T>> registryRef, Supplier<T> defaultValueSupplier) {
+        return BuiltinRegistries.addRegistry(registryRef, Lifecycle.experimental(), defaultValueSupplier);
     }
 
-    private static <T> Registry<T> addRegistry(RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle, Supplier<T> supplier) {
-        return BuiltinRegistries.addRegistry(arg, new SimpleRegistry(arg, lifecycle), supplier);
+    private static <T> Registry<T> addRegistry(RegistryKey<? extends Registry<T>> registryRef, Lifecycle lifecycle, Supplier<T> defaultValueSupplier) {
+        return BuiltinRegistries.addRegistry(registryRef, new SimpleRegistry(registryRef, lifecycle), defaultValueSupplier);
     }
 
-    private static <T, R extends MutableRegistry<T>> R addRegistry(RegistryKey<? extends Registry<T>> arg, R arg2, Supplier<T> supplier) {
-        Identifier lv = arg.getValue();
-        DEFAULT_VALUE_SUPPLIERS.put(lv, supplier);
+    private static <T, R extends MutableRegistry<T>> R addRegistry(RegistryKey<? extends Registry<T>> registryRef, R registry, Supplier<T> defaultValueSupplier) {
+        Identifier lv = registryRef.getValue();
+        DEFAULT_VALUE_SUPPLIERS.put(lv, defaultValueSupplier);
         MutableRegistry<MutableRegistry<?>> lv2 = ROOT;
-        return lv2.add(arg, arg2);
+        return lv2.add(registryRef, registry);
     }
 
-    public static <T> T add(Registry<? super T> arg, String string, T object) {
-        return BuiltinRegistries.add(arg, new Identifier(string), object);
+    public static <T> T add(Registry<? super T> registry, String id, T object) {
+        return BuiltinRegistries.add(registry, new Identifier(id), object);
     }
 
-    public static <V, T extends V> T add(Registry<V> arg, Identifier arg2, T object) {
-        return ((MutableRegistry)arg).add(RegistryKey.of(arg.getKey(), arg2), object);
+    public static <V, T extends V> T add(Registry<V> registry, Identifier id, T object) {
+        return ((MutableRegistry)registry).add(RegistryKey.of(registry.getKey(), id), object);
     }
 
-    public static <V, T extends V> T set(Registry<V> arg, int i, String string, T object) {
-        return ((MutableRegistry)arg).set(i, RegistryKey.of(arg.getKey(), new Identifier(string)), object);
+    public static <V, T extends V> T set(Registry<V> registry, int rawId, String id, T object) {
+        return ((MutableRegistry)registry).set(rawId, RegistryKey.of(registry.getKey(), new Identifier(id)), object);
     }
 
     public static void init() {

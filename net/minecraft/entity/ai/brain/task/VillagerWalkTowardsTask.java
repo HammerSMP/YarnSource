@@ -29,20 +29,20 @@ extends Task<VillagerEntity> {
     private final int maxRange;
     private final int maxRunTime;
 
-    public VillagerWalkTowardsTask(MemoryModuleType<GlobalPos> arg, float f, int i, int j, int k) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.destination = arg;
-        this.speed = f;
-        this.completionRange = i;
-        this.maxRange = j;
-        this.maxRunTime = k;
+    public VillagerWalkTowardsTask(MemoryModuleType<GlobalPos> destination, float speed, int completionRange, int maxRange, int maxRunTime) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), destination, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.destination = destination;
+        this.speed = speed;
+        this.completionRange = completionRange;
+        this.maxRange = maxRange;
+        this.maxRunTime = maxRunTime;
     }
 
-    private void giveUp(VillagerEntity arg, long l) {
-        Brain<VillagerEntity> lv = arg.getBrain();
-        arg.releaseTicketFor(this.destination);
+    private void giveUp(VillagerEntity villager, long time) {
+        Brain<VillagerEntity> lv = villager.getBrain();
+        villager.releaseTicketFor(this.destination);
         lv.forget(this.destination);
-        lv.remember(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, l);
+        lv.remember(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, time);
     }
 
     @Override
@@ -69,20 +69,20 @@ extends Task<VillagerEntity> {
         });
     }
 
-    private boolean shouldGiveUp(ServerWorld arg, VillagerEntity arg2) {
-        Optional<Long> optional = arg2.getBrain().getOptionalMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+    private boolean shouldGiveUp(ServerWorld world, VillagerEntity villager) {
+        Optional<Long> optional = villager.getBrain().getOptionalMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
         if (optional.isPresent()) {
-            return arg.getTime() - optional.get() > (long)this.maxRunTime;
+            return world.getTime() - optional.get() > (long)this.maxRunTime;
         }
         return false;
     }
 
-    private boolean exceedsMaxRange(ServerWorld arg, VillagerEntity arg2, GlobalPos arg3) {
-        return arg3.getDimension() != arg.getRegistryKey() || arg3.getPos().getManhattanDistance(arg2.getBlockPos()) > this.maxRange;
+    private boolean exceedsMaxRange(ServerWorld world, VillagerEntity villager, GlobalPos pos) {
+        return pos.getDimension() != world.getRegistryKey() || pos.getPos().getManhattanDistance(villager.getBlockPos()) > this.maxRange;
     }
 
-    private boolean reachedDestination(ServerWorld arg, VillagerEntity arg2, GlobalPos arg3) {
-        return arg3.getDimension() == arg.getRegistryKey() && arg3.getPos().getManhattanDistance(arg2.getBlockPos()) <= this.completionRange;
+    private boolean reachedDestination(ServerWorld world, VillagerEntity villager, GlobalPos pos) {
+        return pos.getDimension() == world.getRegistryKey() && pos.getPos().getManhattanDistance(villager.getBlockPos()) <= this.completionRange;
     }
 }
 

@@ -30,94 +30,94 @@ implements Packet<ClientPlayPacketListener> {
     public WorldBorderS2CPacket() {
     }
 
-    public WorldBorderS2CPacket(WorldBorder arg, Type arg2) {
-        this.type = arg2;
-        this.centerX = arg.getCenterX();
-        this.centerZ = arg.getCenterZ();
-        this.oldSize = arg.getSize();
-        this.size = arg.getTargetSize();
-        this.interpolationDuration = arg.getTargetRemainingTime();
-        this.portalTeleportPosLimit = arg.getMaxWorldBorderRadius();
-        this.warningBlocks = arg.getWarningBlocks();
-        this.warningTime = arg.getWarningTime();
+    public WorldBorderS2CPacket(WorldBorder border, Type type) {
+        this.type = type;
+        this.centerX = border.getCenterX();
+        this.centerZ = border.getCenterZ();
+        this.oldSize = border.getSize();
+        this.size = border.getTargetSize();
+        this.interpolationDuration = border.getTargetRemainingTime();
+        this.portalTeleportPosLimit = border.getMaxWorldBorderRadius();
+        this.warningBlocks = border.getWarningBlocks();
+        this.warningTime = border.getWarningTime();
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.type = arg.readEnumConstant(Type.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.type = buf.readEnumConstant(Type.class);
         switch (this.type) {
             case SET_SIZE: {
-                this.size = arg.readDouble();
+                this.size = buf.readDouble();
                 break;
             }
             case LERP_SIZE: {
-                this.oldSize = arg.readDouble();
-                this.size = arg.readDouble();
-                this.interpolationDuration = arg.readVarLong();
+                this.oldSize = buf.readDouble();
+                this.size = buf.readDouble();
+                this.interpolationDuration = buf.readVarLong();
                 break;
             }
             case SET_CENTER: {
-                this.centerX = arg.readDouble();
-                this.centerZ = arg.readDouble();
+                this.centerX = buf.readDouble();
+                this.centerZ = buf.readDouble();
                 break;
             }
             case SET_WARNING_BLOCKS: {
-                this.warningBlocks = arg.readVarInt();
+                this.warningBlocks = buf.readVarInt();
                 break;
             }
             case SET_WARNING_TIME: {
-                this.warningTime = arg.readVarInt();
+                this.warningTime = buf.readVarInt();
                 break;
             }
             case INITIALIZE: {
-                this.centerX = arg.readDouble();
-                this.centerZ = arg.readDouble();
-                this.oldSize = arg.readDouble();
-                this.size = arg.readDouble();
-                this.interpolationDuration = arg.readVarLong();
-                this.portalTeleportPosLimit = arg.readVarInt();
-                this.warningBlocks = arg.readVarInt();
-                this.warningTime = arg.readVarInt();
+                this.centerX = buf.readDouble();
+                this.centerZ = buf.readDouble();
+                this.oldSize = buf.readDouble();
+                this.size = buf.readDouble();
+                this.interpolationDuration = buf.readVarLong();
+                this.portalTeleportPosLimit = buf.readVarInt();
+                this.warningBlocks = buf.readVarInt();
+                this.warningTime = buf.readVarInt();
             }
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.type);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.type);
         switch (this.type) {
             case SET_SIZE: {
-                arg.writeDouble(this.size);
+                buf.writeDouble(this.size);
                 break;
             }
             case LERP_SIZE: {
-                arg.writeDouble(this.oldSize);
-                arg.writeDouble(this.size);
-                arg.writeVarLong(this.interpolationDuration);
+                buf.writeDouble(this.oldSize);
+                buf.writeDouble(this.size);
+                buf.writeVarLong(this.interpolationDuration);
                 break;
             }
             case SET_CENTER: {
-                arg.writeDouble(this.centerX);
-                arg.writeDouble(this.centerZ);
+                buf.writeDouble(this.centerX);
+                buf.writeDouble(this.centerZ);
                 break;
             }
             case SET_WARNING_TIME: {
-                arg.writeVarInt(this.warningTime);
+                buf.writeVarInt(this.warningTime);
                 break;
             }
             case SET_WARNING_BLOCKS: {
-                arg.writeVarInt(this.warningBlocks);
+                buf.writeVarInt(this.warningBlocks);
                 break;
             }
             case INITIALIZE: {
-                arg.writeDouble(this.centerX);
-                arg.writeDouble(this.centerZ);
-                arg.writeDouble(this.oldSize);
-                arg.writeDouble(this.size);
-                arg.writeVarLong(this.interpolationDuration);
-                arg.writeVarInt(this.portalTeleportPosLimit);
-                arg.writeVarInt(this.warningBlocks);
-                arg.writeVarInt(this.warningTime);
+                buf.writeDouble(this.centerX);
+                buf.writeDouble(this.centerZ);
+                buf.writeDouble(this.oldSize);
+                buf.writeDouble(this.size);
+                buf.writeVarLong(this.interpolationDuration);
+                buf.writeVarInt(this.portalTeleportPosLimit);
+                buf.writeVarInt(this.warningBlocks);
+                buf.writeVarInt(this.warningTime);
             }
         }
     }
@@ -129,38 +129,38 @@ implements Packet<ClientPlayPacketListener> {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void apply(WorldBorder arg) {
+    public void apply(WorldBorder border) {
         switch (this.type) {
             case SET_SIZE: {
-                arg.setSize(this.size);
+                border.setSize(this.size);
                 break;
             }
             case LERP_SIZE: {
-                arg.interpolateSize(this.oldSize, this.size, this.interpolationDuration);
+                border.interpolateSize(this.oldSize, this.size, this.interpolationDuration);
                 break;
             }
             case SET_CENTER: {
-                arg.setCenter(this.centerX, this.centerZ);
+                border.setCenter(this.centerX, this.centerZ);
                 break;
             }
             case INITIALIZE: {
-                arg.setCenter(this.centerX, this.centerZ);
+                border.setCenter(this.centerX, this.centerZ);
                 if (this.interpolationDuration > 0L) {
-                    arg.interpolateSize(this.oldSize, this.size, this.interpolationDuration);
+                    border.interpolateSize(this.oldSize, this.size, this.interpolationDuration);
                 } else {
-                    arg.setSize(this.size);
+                    border.setSize(this.size);
                 }
-                arg.setMaxWorldBorderRadius(this.portalTeleportPosLimit);
-                arg.setWarningBlocks(this.warningBlocks);
-                arg.setWarningTime(this.warningTime);
+                border.setMaxWorldBorderRadius(this.portalTeleportPosLimit);
+                border.setWarningBlocks(this.warningBlocks);
+                border.setWarningTime(this.warningTime);
                 break;
             }
             case SET_WARNING_TIME: {
-                arg.setWarningTime(this.warningTime);
+                border.setWarningTime(this.warningTime);
                 break;
             }
             case SET_WARNING_BLOCKS: {
-                arg.setWarningBlocks(this.warningBlocks);
+                border.setWarningBlocks(this.warningBlocks);
             }
         }
     }

@@ -16,13 +16,13 @@ import net.minecraft.datafixer.fix.EntitySimpleTransformFix;
 
 public class EntityCatSplitFix
 extends EntitySimpleTransformFix {
-    public EntityCatSplitFix(Schema schema, boolean bl) {
-        super("EntityCatSplitFix", schema, bl);
+    public EntityCatSplitFix(Schema outputSchema, boolean changesType) {
+        super("EntityCatSplitFix", outputSchema, changesType);
     }
 
     @Override
-    protected Pair<String, Dynamic<?>> transform(String string, Dynamic<?> dynamic) {
-        if (Objects.equals("minecraft:ocelot", string)) {
+    protected Pair<String, Dynamic<?>> transform(String choice, Dynamic<?> dynamic) {
+        if (Objects.equals("minecraft:ocelot", choice)) {
             int i = dynamic.get("CatType").asInt(0);
             if (i == 0) {
                 String string2 = dynamic.get("Owner").asString("");
@@ -36,7 +36,7 @@ extends EntitySimpleTransformFix {
                 return Pair.of((Object)"minecraft:cat", (Object)dynamic);
             }
         }
-        return Pair.of((Object)string, dynamic);
+        return Pair.of((Object)choice, dynamic);
     }
 }
 

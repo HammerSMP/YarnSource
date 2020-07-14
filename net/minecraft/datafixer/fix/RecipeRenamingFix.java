@@ -16,8 +16,8 @@ public class RecipeRenamingFix
 extends RecipeRenameFix {
     private static final Map<String, String> recipes = ImmutableMap.builder().put((Object)"minecraft:acacia_bark", (Object)"minecraft:acacia_wood").put((Object)"minecraft:birch_bark", (Object)"minecraft:birch_wood").put((Object)"minecraft:dark_oak_bark", (Object)"minecraft:dark_oak_wood").put((Object)"minecraft:jungle_bark", (Object)"minecraft:jungle_wood").put((Object)"minecraft:oak_bark", (Object)"minecraft:oak_wood").put((Object)"minecraft:spruce_bark", (Object)"minecraft:spruce_wood").build();
 
-    public RecipeRenamingFix(Schema schema, boolean bl) {
-        super(schema, bl, "Recipes renamening fix", string -> recipes.getOrDefault(string, (String)string));
+    public RecipeRenamingFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "Recipes renamening fix", string -> recipes.getOrDefault(string, (String)string));
     }
 }
 

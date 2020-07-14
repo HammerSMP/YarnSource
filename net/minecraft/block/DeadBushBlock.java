@@ -22,13 +22,13 @@ extends PlantBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        Block lv = arg.getBlock();
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        Block lv = floor.getBlock();
         return lv == Blocks.SAND || lv == Blocks.RED_SAND || lv == Blocks.TERRACOTTA || lv == Blocks.WHITE_TERRACOTTA || lv == Blocks.ORANGE_TERRACOTTA || lv == Blocks.MAGENTA_TERRACOTTA || lv == Blocks.LIGHT_BLUE_TERRACOTTA || lv == Blocks.YELLOW_TERRACOTTA || lv == Blocks.LIME_TERRACOTTA || lv == Blocks.PINK_TERRACOTTA || lv == Blocks.GRAY_TERRACOTTA || lv == Blocks.LIGHT_GRAY_TERRACOTTA || lv == Blocks.CYAN_TERRACOTTA || lv == Blocks.PURPLE_TERRACOTTA || lv == Blocks.BLUE_TERRACOTTA || lv == Blocks.BROWN_TERRACOTTA || lv == Blocks.GREEN_TERRACOTTA || lv == Blocks.RED_TERRACOTTA || lv == Blocks.BLACK_TERRACOTTA || lv == Blocks.DIRT || lv == Blocks.COARSE_DIRT || lv == Blocks.PODZOL;
     }
 }

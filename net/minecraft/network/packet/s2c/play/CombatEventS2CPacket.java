@@ -23,50 +23,50 @@ implements Packet<ClientPlayPacketListener> {
     public CombatEventS2CPacket() {
     }
 
-    public CombatEventS2CPacket(DamageTracker arg, Type arg2) {
-        this(arg, arg2, LiteralText.EMPTY);
+    public CombatEventS2CPacket(DamageTracker damageTracker, Type type) {
+        this(damageTracker, type, LiteralText.EMPTY);
     }
 
-    public CombatEventS2CPacket(DamageTracker arg, Type arg2, Text arg3) {
-        this.type = arg2;
-        LivingEntity lv = arg.getBiggestAttacker();
-        switch (arg2) {
+    public CombatEventS2CPacket(DamageTracker damageTracker, Type type, Text deathMessage) {
+        this.type = type;
+        LivingEntity lv = damageTracker.getBiggestAttacker();
+        switch (type) {
             case END_COMBAT: {
-                this.timeSinceLastAttack = arg.getTimeSinceLastAttack();
+                this.timeSinceLastAttack = damageTracker.getTimeSinceLastAttack();
                 this.attackerEntityId = lv == null ? -1 : lv.getEntityId();
                 break;
             }
             case ENTITY_DIED: {
-                this.entityId = arg.getEntity().getEntityId();
+                this.entityId = damageTracker.getEntity().getEntityId();
                 this.attackerEntityId = lv == null ? -1 : lv.getEntityId();
-                this.deathMessage = arg3;
+                this.deathMessage = deathMessage;
             }
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.type = arg.readEnumConstant(Type.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.type = buf.readEnumConstant(Type.class);
         if (this.type == Type.END_COMBAT) {
-            this.timeSinceLastAttack = arg.readVarInt();
-            this.attackerEntityId = arg.readInt();
+            this.timeSinceLastAttack = buf.readVarInt();
+            this.attackerEntityId = buf.readInt();
         } else if (this.type == Type.ENTITY_DIED) {
-            this.entityId = arg.readVarInt();
-            this.attackerEntityId = arg.readInt();
-            this.deathMessage = arg.readText();
+            this.entityId = buf.readVarInt();
+            this.attackerEntityId = buf.readInt();
+            this.deathMessage = buf.readText();
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.type);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.type);
         if (this.type == Type.END_COMBAT) {
-            arg.writeVarInt(this.timeSinceLastAttack);
-            arg.writeInt(this.attackerEntityId);
+            buf.writeVarInt(this.timeSinceLastAttack);
+            buf.writeInt(this.attackerEntityId);
         } else if (this.type == Type.ENTITY_DIED) {
-            arg.writeVarInt(this.entityId);
-            arg.writeInt(this.attackerEntityId);
-            arg.writeText(this.deathMessage);
+            buf.writeVarInt(this.entityId);
+            buf.writeInt(this.attackerEntityId);
+            buf.writeText(this.deathMessage);
         }
     }
 

@@ -68,15 +68,15 @@ implements SynchronousResourceReloadListener {
     }
 
     @Override
-    public void apply(ResourceManager arg) {
-        this.languageDefs = LanguageManager.method_29393(arg.streamResourcePacks());
+    public void apply(ResourceManager manager) {
+        this.languageDefs = LanguageManager.method_29393(manager.streamResourcePacks());
         LanguageDefinition lv = this.languageDefs.getOrDefault("en_us", field_25291);
         this.field_25292 = this.languageDefs.getOrDefault(this.currentLanguageCode, lv);
         ArrayList list = Lists.newArrayList((Object[])new LanguageDefinition[]{lv});
         if (this.field_25292 != lv) {
             list.add(this.field_25292);
         }
-        TranslationStorage lv2 = TranslationStorage.load(arg, list);
+        TranslationStorage lv2 = TranslationStorage.load(manager, list);
         I18n.method_29391(lv2);
         Language.setInstance(lv2);
     }
@@ -94,8 +94,8 @@ implements SynchronousResourceReloadListener {
         return Sets.newTreeSet(this.languageDefs.values());
     }
 
-    public LanguageDefinition getLanguage(String string) {
-        return this.languageDefs.get(string);
+    public LanguageDefinition getLanguage(String code) {
+        return this.languageDefs.get(code);
     }
 }
 

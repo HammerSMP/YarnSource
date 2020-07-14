@@ -56,33 +56,33 @@ public class StructurePlacementData {
         return lv;
     }
 
-    public StructurePlacementData setMirror(BlockMirror arg) {
-        this.mirror = arg;
+    public StructurePlacementData setMirror(BlockMirror mirror) {
+        this.mirror = mirror;
         return this;
     }
 
-    public StructurePlacementData setRotation(BlockRotation arg) {
-        this.rotation = arg;
+    public StructurePlacementData setRotation(BlockRotation rotation) {
+        this.rotation = rotation;
         return this;
     }
 
-    public StructurePlacementData setPosition(BlockPos arg) {
-        this.position = arg;
+    public StructurePlacementData setPosition(BlockPos position) {
+        this.position = position;
         return this;
     }
 
-    public StructurePlacementData setIgnoreEntities(boolean bl) {
-        this.ignoreEntities = bl;
+    public StructurePlacementData setIgnoreEntities(boolean ignoreEntities) {
+        this.ignoreEntities = ignoreEntities;
         return this;
     }
 
-    public StructurePlacementData setChunkPosition(ChunkPos arg) {
-        this.chunkPosition = arg;
+    public StructurePlacementData setChunkPosition(ChunkPos chunkPosition) {
+        this.chunkPosition = chunkPosition;
         return this;
     }
 
-    public StructurePlacementData setBoundingBox(BlockBox arg) {
-        this.boundingBox = arg;
+    public StructurePlacementData setBoundingBox(BlockBox boundingBox) {
+        this.boundingBox = boundingBox;
         return this;
     }
 
@@ -91,8 +91,8 @@ public class StructurePlacementData {
         return this;
     }
 
-    public StructurePlacementData setUpdateNeighbors(boolean bl) {
-        this.updateNeighbors = bl;
+    public StructurePlacementData setUpdateNeighbors(boolean updateNeighbors) {
+        this.updateNeighbors = updateNeighbors;
         return this;
     }
 
@@ -101,13 +101,13 @@ public class StructurePlacementData {
         return this;
     }
 
-    public StructurePlacementData addProcessor(StructureProcessor arg) {
-        this.processors.add(arg);
+    public StructurePlacementData addProcessor(StructureProcessor processor) {
+        this.processors.add(processor);
         return this;
     }
 
-    public StructurePlacementData removeProcessor(StructureProcessor arg) {
-        this.processors.remove(arg);
+    public StructurePlacementData removeProcessor(StructureProcessor processor) {
+        this.processors.remove(processor);
         return this;
     }
 
@@ -123,14 +123,14 @@ public class StructurePlacementData {
         return this.position;
     }
 
-    public Random getRandom(@Nullable BlockPos arg) {
+    public Random getRandom(@Nullable BlockPos pos) {
         if (this.random != null) {
             return this.random;
         }
-        if (arg == null) {
+        if (pos == null) {
             return new Random(Util.getMeasuringTimeMs());
         }
-        return new Random(MathHelper.hashCode(arg));
+        return new Random(MathHelper.hashCode(pos));
     }
 
     public boolean shouldIgnoreEntities() {
@@ -163,21 +163,21 @@ public class StructurePlacementData {
         return this.placeFluids;
     }
 
-    public Structure.PalettedBlockInfoList getRandomBlockInfos(List<Structure.PalettedBlockInfoList> list, @Nullable BlockPos arg) {
+    public Structure.PalettedBlockInfoList getRandomBlockInfos(List<Structure.PalettedBlockInfoList> list, @Nullable BlockPos pos) {
         int i = list.size();
         if (i == 0) {
             throw new IllegalStateException("No palettes");
         }
-        return list.get(this.getRandom(arg).nextInt(i));
+        return list.get(this.getRandom(pos).nextInt(i));
     }
 
     @Nullable
-    private BlockBox getChunkBlockBox(@Nullable ChunkPos arg) {
-        if (arg == null) {
+    private BlockBox getChunkBlockBox(@Nullable ChunkPos pos) {
+        if (pos == null) {
             return this.boundingBox;
         }
-        int i = arg.x * 16;
-        int j = arg.z * 16;
+        int i = pos.x * 16;
+        int j = pos.z * 16;
         return new BlockBox(i, 0, j, i + 16 - 1, 255, j + 16 - 1);
     }
 

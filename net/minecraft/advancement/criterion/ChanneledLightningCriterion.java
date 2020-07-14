@@ -36,33 +36,33 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lvs);
     }
 
-    public void trigger(ServerPlayerEntity arg3, Collection<? extends Entity> collection) {
-        List list = collection.stream().map(arg2 -> EntityPredicate.createAdvancementEntityLootContext(arg3, arg2)).collect(Collectors.toList());
-        this.test(arg3, arg -> arg.matches(list));
+    public void trigger(ServerPlayerEntity player, Collection<? extends Entity> victims) {
+        List list = victims.stream().map(arg2 -> EntityPredicate.createAdvancementEntityLootContext(player, arg2)).collect(Collectors.toList());
+        this.test(player, arg -> arg.matches(list));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final EntityPredicate.Extended[] victims;
 
-        public Conditions(EntityPredicate.Extended arg, EntityPredicate.Extended[] args) {
-            super(ID, arg);
-            this.victims = args;
+        public Conditions(EntityPredicate.Extended player, EntityPredicate.Extended[] victims) {
+            super(ID, player);
+            this.victims = victims;
         }
 
-        public static Conditions create(EntityPredicate ... args) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, (EntityPredicate.Extended[])Stream.of(args).map(EntityPredicate.Extended::ofLegacy).toArray(EntityPredicate.Extended[]::new));
+        public static Conditions create(EntityPredicate ... victims) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, (EntityPredicate.Extended[])Stream.of(victims).map(EntityPredicate.Extended::ofLegacy).toArray(EntityPredicate.Extended[]::new));
         }
 
-        public boolean matches(Collection<? extends LootContext> collection) {
+        public boolean matches(Collection<? extends LootContext> victims) {
             for (EntityPredicate.Extended lv : this.victims) {
                 boolean bl = false;
-                for (LootContext lootContext : collection) {
+                for (LootContext lootContext : victims) {
                     if (!lv.test(lootContext)) continue;
                     bl = true;
                     break;
@@ -74,9 +74,9 @@ extends AbstractCriterion<Conditions> {
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
-            jsonObject.add("victims", EntityPredicate.Extended.toPredicatesJsonArray(this.victims, arg));
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
+            jsonObject.add("victims", EntityPredicate.Extended.toPredicatesJsonArray(this.victims, predicateSerializer));
             return jsonObject;
         }
     }

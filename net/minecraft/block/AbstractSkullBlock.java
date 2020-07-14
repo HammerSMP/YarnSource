@@ -25,13 +25,13 @@ extends BlockWithEntity
 implements Wearable {
     private final SkullBlock.SkullType type;
 
-    public AbstractSkullBlock(SkullBlock.SkullType arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.type = arg;
+    public AbstractSkullBlock(SkullBlock.SkullType type, AbstractBlock.Settings settings) {
+        super(settings);
+        this.type = type;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new SkullBlockEntity();
     }
 
@@ -41,7 +41,7 @@ implements Wearable {
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

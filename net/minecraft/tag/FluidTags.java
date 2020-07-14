@@ -17,8 +17,8 @@ public final class FluidTags {
     public static final Tag.Identified<Fluid> WATER = FluidTags.register("water");
     public static final Tag.Identified<Fluid> LAVA = FluidTags.register("lava");
 
-    private static Tag.Identified<Fluid> register(String string) {
-        return REQUIRED_TAGS.add(string);
+    private static Tag.Identified<Fluid> register(String id) {
+        return REQUIRED_TAGS.add(id);
     }
 
     public static TagGroup<Fluid> getTagGroup() {

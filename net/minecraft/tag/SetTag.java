@@ -22,23 +22,23 @@ implements Tag<T> {
     @VisibleForTesting
     protected final Class<?> type;
 
-    protected SetTag(Set<T> set, Class<?> class_) {
-        this.type = class_;
-        this.valueSet = set;
-        this.valueList = ImmutableList.copyOf(set);
+    protected SetTag(Set<T> values, Class<?> type) {
+        this.type = type;
+        this.valueSet = values;
+        this.valueList = ImmutableList.copyOf(values);
     }
 
     public static <T> SetTag<T> empty() {
         return new SetTag<T>(ImmutableSet.of(), Void.class);
     }
 
-    public static <T> SetTag<T> of(Set<T> set) {
-        return new SetTag<T>(set, SetTag.getCommonType(set));
+    public static <T> SetTag<T> of(Set<T> values) {
+        return new SetTag<T>(values, SetTag.getCommonType(values));
     }
 
     @Override
-    public boolean contains(T object) {
-        return this.type.isInstance(object) && this.valueSet.contains(object);
+    public boolean contains(T entry) {
+        return this.type.isInstance(entry) && this.valueSet.contains(entry);
     }
 
     @Override
@@ -46,12 +46,12 @@ implements Tag<T> {
         return this.valueList;
     }
 
-    private static <T> Class<?> getCommonType(Set<T> set) {
-        if (set.isEmpty()) {
+    private static <T> Class<?> getCommonType(Set<T> values) {
+        if (values.isEmpty()) {
             return Void.class;
         }
         Class<?> class_ = null;
-        for (T object : set) {
+        for (T object : values) {
             if (class_ == null) {
                 class_ = object.getClass();
                 continue;
@@ -61,11 +61,11 @@ implements Tag<T> {
         return class_;
     }
 
-    private static Class<?> getCommonType(Class<?> class_, Class<?> class2) {
-        while (!class_.isAssignableFrom(class2)) {
-            class_ = class_.getSuperclass();
+    private static Class<?> getCommonType(Class<?> first, Class<?> second) {
+        while (!first.isAssignableFrom(second)) {
+            first = first.getSuperclass();
         }
-        return class_;
+        return first;
     }
 }
 

@@ -27,17 +27,17 @@ public class ConfiguredCarver<WC extends CarverConfig> {
     private final Carver<WC> carver;
     private final WC config;
 
-    public ConfiguredCarver(Carver<WC> arg, WC arg2) {
-        this.carver = arg;
-        this.config = arg2;
+    public ConfiguredCarver(Carver<WC> carver, WC config) {
+        this.carver = carver;
+        this.config = config;
     }
 
     public WC method_30378() {
         return this.config;
     }
 
-    public boolean shouldCarve(Random random, int i, int j) {
-        return this.carver.shouldCarve(random, i, j, this.config);
+    public boolean shouldCarve(Random random, int chunkX, int chunkZ) {
+        return this.carver.shouldCarve(random, chunkX, chunkZ, this.config);
     }
 
     public boolean carve(Chunk arg, Function<BlockPos, Biome> function, Random random, int i, int j, int k, int l, int m, BitSet bitSet) {

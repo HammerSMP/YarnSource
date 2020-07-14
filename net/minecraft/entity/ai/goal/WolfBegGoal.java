@@ -22,11 +22,11 @@ extends Goal {
     private int timer;
     private final TargetPredicate validPlayerPredicate;
 
-    public WolfBegGoal(WolfEntity arg, float f) {
-        this.wolf = arg;
-        this.world = arg.world;
-        this.begDistance = f;
-        this.validPlayerPredicate = new TargetPredicate().setBaseMaxDistance(f).includeInvulnerable().includeTeammates().ignoreEntityTargetRules();
+    public WolfBegGoal(WolfEntity wolf, float begDistance) {
+        this.wolf = wolf;
+        this.world = wolf.world;
+        this.begDistance = begDistance;
+        this.validPlayerPredicate = new TargetPredicate().setBaseMaxDistance(begDistance).includeInvulnerable().includeTeammates().ignoreEntityTargetRules();
         this.setControls(EnumSet.of(Goal.Control.LOOK));
     }
 
@@ -68,9 +68,9 @@ extends Goal {
         --this.timer;
     }
 
-    private boolean isAttractive(PlayerEntity arg) {
+    private boolean isAttractive(PlayerEntity player) {
         for (Hand lv : Hand.values()) {
-            ItemStack lv2 = arg.getStackInHand(lv);
+            ItemStack lv2 = player.getStackInHand(lv);
             if (this.wolf.isTamed() && lv2.getItem() == Items.BONE) {
                 return true;
             }

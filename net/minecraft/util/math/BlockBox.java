@@ -23,14 +23,14 @@ public class BlockBox {
     public BlockBox() {
     }
 
-    public BlockBox(int[] is) {
-        if (is.length == 6) {
-            this.minX = is[0];
-            this.minY = is[1];
-            this.minZ = is[2];
-            this.maxX = is[3];
-            this.maxY = is[4];
-            this.maxZ = is[5];
+    public BlockBox(int[] data) {
+        if (data.length == 6) {
+            this.minX = data[0];
+            this.minY = data[1];
+            this.minZ = data[2];
+            this.maxX = data[3];
+            this.maxY = data[4];
+            this.maxZ = data[5];
         }
     }
 
@@ -42,101 +42,101 @@ public class BlockBox {
         return new BlockBox(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
-    public static BlockBox rotated(int i, int j, int k, int l, int m, int n, int o, int p, int q, Direction arg) {
-        switch (arg) {
+    public static BlockBox rotated(int x, int y, int z, int offsetX, int offsetY, int offsetZ, int sizeX, int sizeY, int sizeZ, Direction facing) {
+        switch (facing) {
             default: {
-                return new BlockBox(i + l, j + m, k + n, i + o - 1 + l, j + p - 1 + m, k + q - 1 + n);
+                return new BlockBox(x + offsetX, y + offsetY, z + offsetZ, x + sizeX - 1 + offsetX, y + sizeY - 1 + offsetY, z + sizeZ - 1 + offsetZ);
             }
             case NORTH: {
-                return new BlockBox(i + l, j + m, k - q + 1 + n, i + o - 1 + l, j + p - 1 + m, k + n);
+                return new BlockBox(x + offsetX, y + offsetY, z - sizeZ + 1 + offsetZ, x + sizeX - 1 + offsetX, y + sizeY - 1 + offsetY, z + offsetZ);
             }
             case SOUTH: {
-                return new BlockBox(i + l, j + m, k + n, i + o - 1 + l, j + p - 1 + m, k + q - 1 + n);
+                return new BlockBox(x + offsetX, y + offsetY, z + offsetZ, x + sizeX - 1 + offsetX, y + sizeY - 1 + offsetY, z + sizeZ - 1 + offsetZ);
             }
             case WEST: {
-                return new BlockBox(i - q + 1 + n, j + m, k + l, i + n, j + p - 1 + m, k + o - 1 + l);
+                return new BlockBox(x - sizeZ + 1 + offsetZ, y + offsetY, z + offsetX, x + offsetZ, y + sizeY - 1 + offsetY, z + sizeX - 1 + offsetX);
             }
             case EAST: 
         }
-        return new BlockBox(i + n, j + m, k + l, i + q - 1 + n, j + p - 1 + m, k + o - 1 + l);
+        return new BlockBox(x + offsetZ, y + offsetY, z + offsetX, x + sizeZ - 1 + offsetZ, y + sizeY - 1 + offsetY, z + sizeX - 1 + offsetX);
     }
 
-    public static BlockBox create(int i, int j, int k, int l, int m, int n) {
-        return new BlockBox(Math.min(i, l), Math.min(j, m), Math.min(k, n), Math.max(i, l), Math.max(j, m), Math.max(k, n));
+    public static BlockBox create(int x1, int y1, int z1, int x2, int y2, int z2) {
+        return new BlockBox(Math.min(x1, x2), Math.min(y1, y2), Math.min(z1, z2), Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2));
     }
 
-    public BlockBox(BlockBox arg) {
-        this.minX = arg.minX;
-        this.minY = arg.minY;
-        this.minZ = arg.minZ;
-        this.maxX = arg.maxX;
-        this.maxY = arg.maxY;
-        this.maxZ = arg.maxZ;
+    public BlockBox(BlockBox source) {
+        this.minX = source.minX;
+        this.minY = source.minY;
+        this.minZ = source.minZ;
+        this.maxX = source.maxX;
+        this.maxY = source.maxY;
+        this.maxZ = source.maxZ;
     }
 
-    public BlockBox(int i, int j, int k, int l, int m, int n) {
-        this.minX = i;
-        this.minY = j;
-        this.minZ = k;
-        this.maxX = l;
-        this.maxY = m;
-        this.maxZ = n;
+    public BlockBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
     }
 
-    public BlockBox(Vec3i arg, Vec3i arg2) {
-        this.minX = Math.min(arg.getX(), arg2.getX());
-        this.minY = Math.min(arg.getY(), arg2.getY());
-        this.minZ = Math.min(arg.getZ(), arg2.getZ());
-        this.maxX = Math.max(arg.getX(), arg2.getX());
-        this.maxY = Math.max(arg.getY(), arg2.getY());
-        this.maxZ = Math.max(arg.getZ(), arg2.getZ());
+    public BlockBox(Vec3i v1, Vec3i v2) {
+        this.minX = Math.min(v1.getX(), v2.getX());
+        this.minY = Math.min(v1.getY(), v2.getY());
+        this.minZ = Math.min(v1.getZ(), v2.getZ());
+        this.maxX = Math.max(v1.getX(), v2.getX());
+        this.maxY = Math.max(v1.getY(), v2.getY());
+        this.maxZ = Math.max(v1.getZ(), v2.getZ());
     }
 
-    public BlockBox(int i, int j, int k, int l) {
-        this.minX = i;
-        this.minZ = j;
-        this.maxX = k;
-        this.maxZ = l;
+    public BlockBox(int minX, int minZ, int maxX, int maxZ) {
+        this.minX = minX;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxZ = maxZ;
         this.minY = 1;
         this.maxY = 512;
     }
 
-    public boolean intersects(BlockBox arg) {
-        return this.maxX >= arg.minX && this.minX <= arg.maxX && this.maxZ >= arg.minZ && this.minZ <= arg.maxZ && this.maxY >= arg.minY && this.minY <= arg.maxY;
+    public boolean intersects(BlockBox other) {
+        return this.maxX >= other.minX && this.minX <= other.maxX && this.maxZ >= other.minZ && this.minZ <= other.maxZ && this.maxY >= other.minY && this.minY <= other.maxY;
     }
 
-    public boolean intersectsXZ(int i, int j, int k, int l) {
-        return this.maxX >= i && this.minX <= k && this.maxZ >= j && this.minZ <= l;
+    public boolean intersectsXZ(int minX, int minZ, int maxX, int maxZ) {
+        return this.maxX >= minX && this.minX <= maxX && this.maxZ >= minZ && this.minZ <= maxZ;
     }
 
-    public void encompass(BlockBox arg) {
-        this.minX = Math.min(this.minX, arg.minX);
-        this.minY = Math.min(this.minY, arg.minY);
-        this.minZ = Math.min(this.minZ, arg.minZ);
-        this.maxX = Math.max(this.maxX, arg.maxX);
-        this.maxY = Math.max(this.maxY, arg.maxY);
-        this.maxZ = Math.max(this.maxZ, arg.maxZ);
+    public void encompass(BlockBox region) {
+        this.minX = Math.min(this.minX, region.minX);
+        this.minY = Math.min(this.minY, region.minY);
+        this.minZ = Math.min(this.minZ, region.minZ);
+        this.maxX = Math.max(this.maxX, region.maxX);
+        this.maxY = Math.max(this.maxY, region.maxY);
+        this.maxZ = Math.max(this.maxZ, region.maxZ);
     }
 
-    public void offset(int i, int j, int k) {
-        this.minX += i;
-        this.minY += j;
-        this.minZ += k;
-        this.maxX += i;
-        this.maxY += j;
-        this.maxZ += k;
+    public void offset(int dx, int dy, int dz) {
+        this.minX += dx;
+        this.minY += dy;
+        this.minZ += dz;
+        this.maxX += dx;
+        this.maxY += dy;
+        this.maxZ += dz;
     }
 
-    public BlockBox translated(int i, int j, int k) {
-        return new BlockBox(this.minX + i, this.minY + j, this.minZ + k, this.maxX + i, this.maxY + j, this.maxZ + k);
+    public BlockBox translated(int x, int y, int z) {
+        return new BlockBox(this.minX + x, this.minY + y, this.minZ + z, this.maxX + x, this.maxY + y, this.maxZ + z);
     }
 
     public void method_29299(Vec3i arg) {
         this.offset(arg.getX(), arg.getY(), arg.getZ());
     }
 
-    public boolean contains(Vec3i arg) {
-        return arg.getX() >= this.minX && arg.getX() <= this.maxX && arg.getZ() >= this.minZ && arg.getZ() <= this.maxZ && arg.getY() >= this.minY && arg.getY() <= this.maxY;
+    public boolean contains(Vec3i vec) {
+        return vec.getX() >= this.minX && vec.getX() <= this.maxX && vec.getZ() >= this.minZ && vec.getZ() <= this.maxZ && vec.getY() >= this.minY && vec.getY() <= this.maxY;
     }
 
     public Vec3i getDimensions() {

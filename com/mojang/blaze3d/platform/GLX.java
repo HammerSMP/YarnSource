@@ -67,9 +67,9 @@ public class GLX {
         return GlStateManager.getString(7937) + " GL version " + GlStateManager.getString(7938) + ", " + GlStateManager.getString(7936);
     }
 
-    public static int _getRefreshRate(Window arg) {
+    public static int _getRefreshRate(Window window) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        long l = GLFW.glfwGetWindowMonitor((long)arg.getHandle());
+        long l = GLFW.glfwGetWindowMonitor((long)window.getHandle());
         if (l == 0L) {
             l = GLFW.glfwGetPrimaryMonitor();
         }
@@ -105,16 +105,16 @@ public class GLX {
         return longSupplier2;
     }
 
-    public static void _setGlfwErrorCallback(GLFWErrorCallbackI gLFWErrorCallbackI) {
+    public static void _setGlfwErrorCallback(GLFWErrorCallbackI callback) {
         RenderSystem.assertThread(RenderSystem::isInInitPhase);
-        GLFWErrorCallback gLFWErrorCallback = GLFW.glfwSetErrorCallback((GLFWErrorCallbackI)gLFWErrorCallbackI);
+        GLFWErrorCallback gLFWErrorCallback = GLFW.glfwSetErrorCallback((GLFWErrorCallbackI)callback);
         if (gLFWErrorCallback != null) {
             gLFWErrorCallback.free();
         }
     }
 
-    public static boolean _shouldClose(Window arg) {
-        return GLFW.glfwWindowShouldClose((long)arg.getHandle());
+    public static boolean _shouldClose(Window window) {
+        return GLFW.glfwWindowShouldClose((long)window.getHandle());
     }
 
     public static void _setupNvFogDistance() {
@@ -124,7 +124,7 @@ public class GLX {
         }
     }
 
-    public static void _init(int i, boolean bl) {
+    public static void _init(int debugVerbosity, boolean debugSync) {
         RenderSystem.assertThread(RenderSystem::isInInitPhase);
         GLCapabilities gLCapabilities = GL.getCapabilities();
         capsString = "Using framebuffer using " + GlStateManager.initFramebufferSupport(gLCapabilities);
@@ -135,7 +135,7 @@ public class GLX {
         catch (Throwable throwable) {
             // empty catch block
         }
-        GlDebug.enableDebug(i, bl);
+        GlDebug.enableDebug(debugVerbosity, debugSync);
     }
 
     public static String _getCapsString() {
@@ -146,7 +146,7 @@ public class GLX {
         return cpuInfo == null ? "<unknown>" : cpuInfo;
     }
 
-    public static void _renderCrosshair(int i, boolean bl, boolean bl2, boolean bl3) {
+    public static void _renderCrosshair(int size, boolean drawX, boolean drawY, boolean drawZ) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
         GlStateManager.disableTexture();
         GlStateManager.depthMask(false);
@@ -154,32 +154,32 @@ public class GLX {
         BufferBuilder lv2 = lv.getBuffer();
         GL11.glLineWidth((float)4.0f);
         lv2.begin(1, VertexFormats.POSITION_COLOR);
-        if (bl) {
+        if (drawX) {
             lv2.vertex(0.0, 0.0, 0.0).color(0, 0, 0, 255).next();
-            lv2.vertex(i, 0.0, 0.0).color(0, 0, 0, 255).next();
+            lv2.vertex(size, 0.0, 0.0).color(0, 0, 0, 255).next();
         }
-        if (bl2) {
+        if (drawY) {
             lv2.vertex(0.0, 0.0, 0.0).color(0, 0, 0, 255).next();
-            lv2.vertex(0.0, i, 0.0).color(0, 0, 0, 255).next();
+            lv2.vertex(0.0, size, 0.0).color(0, 0, 0, 255).next();
         }
-        if (bl3) {
+        if (drawZ) {
             lv2.vertex(0.0, 0.0, 0.0).color(0, 0, 0, 255).next();
-            lv2.vertex(0.0, 0.0, i).color(0, 0, 0, 255).next();
+            lv2.vertex(0.0, 0.0, size).color(0, 0, 0, 255).next();
         }
         lv.draw();
         GL11.glLineWidth((float)2.0f);
         lv2.begin(1, VertexFormats.POSITION_COLOR);
-        if (bl) {
+        if (drawX) {
             lv2.vertex(0.0, 0.0, 0.0).color(255, 0, 0, 255).next();
-            lv2.vertex(i, 0.0, 0.0).color(255, 0, 0, 255).next();
+            lv2.vertex(size, 0.0, 0.0).color(255, 0, 0, 255).next();
         }
-        if (bl2) {
+        if (drawY) {
             lv2.vertex(0.0, 0.0, 0.0).color(0, 255, 0, 255).next();
-            lv2.vertex(0.0, i, 0.0).color(0, 255, 0, 255).next();
+            lv2.vertex(0.0, size, 0.0).color(0, 255, 0, 255).next();
         }
-        if (bl3) {
+        if (drawZ) {
             lv2.vertex(0.0, 0.0, 0.0).color(127, 127, 255, 255).next();
-            lv2.vertex(0.0, 0.0, i).color(127, 127, 255, 255).next();
+            lv2.vertex(0.0, 0.0, size).color(127, 127, 255, 255).next();
         }
         lv.draw();
         GL11.glLineWidth((float)1.0f);
@@ -187,16 +187,16 @@ public class GLX {
         GlStateManager.enableTexture();
     }
 
-    public static String getErrorString(int i) {
-        return LOOKUP_MAP.get(i);
+    public static String getErrorString(int code) {
+        return LOOKUP_MAP.get(code);
     }
 
-    public static <T> T make(Supplier<T> supplier) {
-        return supplier.get();
+    public static <T> T make(Supplier<T> factory) {
+        return factory.get();
     }
 
-    public static <T> T make(T object, Consumer<T> consumer) {
-        consumer.accept(object);
+    public static <T> T make(T object, Consumer<T> initializer) {
+        initializer.accept(object);
         return object;
     }
 

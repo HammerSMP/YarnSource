@@ -105,11 +105,11 @@ public class Util {
         return arg.name((Comparable)object);
     }
 
-    public static String createTranslationKey(String string, @Nullable Identifier arg) {
-        if (arg == null) {
-            return string + ".unregistered_sadface";
+    public static String createTranslationKey(String type, @Nullable Identifier id) {
+        if (id == null) {
+            return type + ".unregistered_sadface";
         }
-        return string + '.' + arg.getNamespace() + '.' + arg.getPath().replace('/', '.');
+        return type + '.' + id.getNamespace() + '.' + id.getPath().replace('/', '.');
     }
 
     public static long getMeasuringTimeMs() {
@@ -303,12 +303,12 @@ public class Util {
         return object2;
     }
 
-    public static <T> T make(Supplier<T> supplier) {
-        return supplier.get();
+    public static <T> T make(Supplier<T> factory) {
+        return factory.get();
     }
 
-    public static <T> T make(T object, Consumer<T> consumer) {
-        consumer.accept(object);
+    public static <T> T make(T object, Consumer<T> initializer) {
+        initializer.accept(object);
         return object;
     }
 
@@ -316,11 +316,11 @@ public class Util {
         return IdentityHashStrategy.INSTANCE;
     }
 
-    public static <V> CompletableFuture<List<V>> combine(List<? extends CompletableFuture<? extends V>> list) {
-        ArrayList list2 = Lists.newArrayListWithCapacity((int)list.size());
-        CompletableFuture[] completableFutures = new CompletableFuture[list.size()];
+    public static <V> CompletableFuture<List<V>> combine(List<? extends CompletableFuture<? extends V>> futures) {
+        ArrayList list2 = Lists.newArrayListWithCapacity((int)futures.size());
+        CompletableFuture[] completableFutures = new CompletableFuture[futures.size()];
         CompletableFuture completableFuture = new CompletableFuture();
-        list.forEach(completableFuture2 -> {
+        futures.forEach(completableFuture2 -> {
             int i = list2.size();
             list2.add(null);
             completableFutures[i] = completableFuture2.whenComplete((object, throwable) -> {
@@ -347,13 +347,13 @@ public class Util {
         return optional;
     }
 
-    public static Runnable debugRunnable(Runnable runnable, Supplier<String> supplier) {
+    public static Runnable debugRunnable(Runnable runnable, Supplier<String> messageSupplier) {
         return runnable;
     }
 
-    public static <T extends Throwable> T throwOrPause(T throwable) {
+    public static <T extends Throwable> T throwOrPause(T t) {
         if (SharedConstants.isDevelopment) {
-            LOGGER.error("Trying to throw a fatal exception, pausing in IDE", throwable);
+            LOGGER.error("Trying to throw a fatal exception, pausing in IDE", t);
             try {
                 do {
                     Thread.sleep(1000L);
@@ -361,28 +361,28 @@ public class Util {
                 } while (true);
             }
             catch (InterruptedException interruptedException) {
-                return throwable;
+                return t;
             }
         }
-        return throwable;
+        return t;
     }
 
-    public static String getInnermostMessage(Throwable throwable) {
-        if (throwable.getCause() != null) {
-            return Util.getInnermostMessage(throwable.getCause());
+    public static String getInnermostMessage(Throwable t) {
+        if (t.getCause() != null) {
+            return Util.getInnermostMessage(t.getCause());
         }
-        if (throwable.getMessage() != null) {
-            return throwable.getMessage();
+        if (t.getMessage() != null) {
+            return t.getMessage();
         }
-        return throwable.toString();
+        return t.toString();
     }
 
-    public static <T> T getRandom(T[] objects, Random random) {
-        return objects[random.nextInt(objects.length)];
+    public static <T> T getRandom(T[] array, Random random) {
+        return array[random.nextInt(array.length)];
     }
 
-    public static int getRandom(int[] is, Random random) {
-        return is[random.nextInt(is.length)];
+    public static int getRandom(int[] array, Random random) {
+        return array[random.nextInt(array.length)];
     }
 
     private static BooleanSupplier method_30625(final Path path, final Path path2) {
@@ -495,32 +495,32 @@ public class Util {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static int moveCursor(String string, int i, int j) {
+    public static int moveCursor(String string, int cursor, int delta) {
         int k = string.length();
-        if (j >= 0) {
-            for (int l = 0; i < k && l < j; ++l) {
-                if (!Character.isHighSurrogate(string.charAt(i++)) || i >= k || !Character.isLowSurrogate(string.charAt(i))) continue;
-                ++i;
+        if (delta >= 0) {
+            for (int l = 0; cursor < k && l < delta; ++l) {
+                if (!Character.isHighSurrogate(string.charAt(cursor++)) || cursor >= k || !Character.isLowSurrogate(string.charAt(cursor))) continue;
+                ++cursor;
             }
         } else {
-            for (int m = j; i > 0 && m < 0; ++m) {
-                if (!Character.isLowSurrogate(string.charAt(--i)) || i <= 0 || !Character.isHighSurrogate(string.charAt(i - 1))) continue;
-                --i;
+            for (int m = delta; cursor > 0 && m < 0; ++m) {
+                if (!Character.isLowSurrogate(string.charAt(--cursor)) || cursor <= 0 || !Character.isHighSurrogate(string.charAt(cursor - 1))) continue;
+                --cursor;
             }
         }
-        return i;
+        return cursor;
     }
 
     public static Consumer<String> method_29188(String string, Consumer<String> consumer) {
         return string2 -> consumer.accept(string + string2);
     }
 
-    public static DataResult<int[]> toIntArray(IntStream intStream, int i) {
-        int[] is = intStream.limit(i + 1).toArray();
-        if (is.length != i) {
-            String string = "Input is not a list of " + i + " ints";
-            if (is.length >= i) {
-                return DataResult.error((String)string, (Object)Arrays.copyOf(is, i));
+    public static DataResult<int[]> toIntArray(IntStream intStream, int length) {
+        int[] is = intStream.limit(length + 1).toArray();
+        if (is.length != length) {
+            String string = "Input is not a list of " + length + " ints";
+            if (is.length >= length) {
+                return DataResult.error((String)string, (Object)Arrays.copyOf(is, length));
             }
             return DataResult.error((String)string);
         }
@@ -581,8 +581,8 @@ public class Util {
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            protected String[] getURLOpenCommand(URL uRL) {
-                return new String[]{"rundll32", "url.dll,FileProtocolHandler", uRL.toString()};
+            protected String[] getURLOpenCommand(URL url) {
+                return new String[]{"rundll32", "url.dll,FileProtocolHandler", url.toString()};
             }
         }
         ,
@@ -590,8 +590,8 @@ public class Util {
 
             @Override
             @Environment(value=EnvType.CLIENT)
-            protected String[] getURLOpenCommand(URL uRL) {
-                return new String[]{"open", uRL.toString()};
+            protected String[] getURLOpenCommand(URL url) {
+                return new String[]{"open", url.toString()};
             }
         }
         ,
@@ -599,9 +599,9 @@ public class Util {
 
 
         @Environment(value=EnvType.CLIENT)
-        public void open(URL uRL) {
+        public void open(URL url) {
             try {
-                Process process = AccessController.doPrivileged(() -> Runtime.getRuntime().exec(this.getURLOpenCommand(uRL)));
+                Process process = AccessController.doPrivileged(() -> Runtime.getRuntime().exec(this.getURLOpenCommand(url)));
                 for (String string : IOUtils.readLines((InputStream)process.getErrorStream())) {
                     LOGGER.error(string);
                 }
@@ -610,7 +610,7 @@ public class Util {
                 process.getOutputStream().close();
             }
             catch (IOException | PrivilegedActionException exception) {
-                LOGGER.error("Couldn't open url '{}'", (Object)uRL, (Object)exception);
+                LOGGER.error("Couldn't open url '{}'", (Object)url, (Object)exception);
             }
         }
 
@@ -635,9 +635,9 @@ public class Util {
         }
 
         @Environment(value=EnvType.CLIENT)
-        protected String[] getURLOpenCommand(URL uRL) {
-            String string = uRL.toString();
-            if ("file".equals(uRL.getProtocol())) {
+        protected String[] getURLOpenCommand(URL url) {
+            String string = url.toString();
+            if ("file".equals(url.getProtocol())) {
                 string = string.replace("file:", "file://");
             }
             return new String[]{"xdg-open", string};

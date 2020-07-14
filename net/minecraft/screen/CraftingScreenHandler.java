@@ -38,15 +38,15 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
     private final ScreenHandlerContext context;
     private final PlayerEntity player;
 
-    public CraftingScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, ScreenHandlerContext.EMPTY);
+    public CraftingScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
     }
 
-    public CraftingScreenHandler(int i, PlayerInventory arg, ScreenHandlerContext arg2) {
-        super(ScreenHandlerType.CRAFTING, i);
-        this.context = arg2;
-        this.player = arg.player;
-        this.addSlot(new CraftingResultSlot(arg.player, this.input, this.result, 0, 124, 35));
+    public CraftingScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(ScreenHandlerType.CRAFTING, syncId);
+        this.context = context;
+        this.player = playerInventory.player;
+        this.addSlot(new CraftingResultSlot(playerInventory.player, this.input, this.result, 0, 124, 35));
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 3; ++k) {
                 this.addSlot(new Slot(this.input, k + j * 3, 30 + k * 18, 17 + j * 18));
@@ -54,37 +54,37 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
         }
         for (int l = 0; l < 3; ++l) {
             for (int m = 0; m < 9; ++m) {
-                this.addSlot(new Slot(arg, m + l * 9 + 9, 8 + m * 18, 84 + l * 18));
+                this.addSlot(new Slot(playerInventory, m + l * 9 + 9, 8 + m * 18, 84 + l * 18));
             }
         }
         for (int n = 0; n < 9; ++n) {
-            this.addSlot(new Slot(arg, n, 8 + n * 18, 142));
+            this.addSlot(new Slot(playerInventory, n, 8 + n * 18, 142));
         }
     }
 
-    protected static void updateResult(int i, World arg, PlayerEntity arg2, CraftingInventory arg3, CraftingResultInventory arg4) {
+    protected static void updateResult(int syncId, World world, PlayerEntity player, CraftingInventory craftingInventory, CraftingResultInventory resultInventory) {
         CraftingRecipe lv3;
-        if (arg.isClient) {
+        if (world.isClient) {
             return;
         }
-        ServerPlayerEntity lv = (ServerPlayerEntity)arg2;
+        ServerPlayerEntity lv = (ServerPlayerEntity)player;
         ItemStack lv2 = ItemStack.EMPTY;
-        Optional<CraftingRecipe> optional = arg.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, arg3, arg);
-        if (optional.isPresent() && arg4.shouldCraftRecipe(arg, lv, lv3 = optional.get())) {
-            lv2 = lv3.craft(arg3);
+        Optional<CraftingRecipe> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        if (optional.isPresent() && resultInventory.shouldCraftRecipe(world, lv, lv3 = optional.get())) {
+            lv2 = lv3.craft(craftingInventory);
         }
-        arg4.setStack(0, lv2);
-        lv.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(i, 0, lv2));
+        resultInventory.setStack(0, lv2);
+        lv.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, 0, lv2));
     }
 
     @Override
-    public void onContentChanged(Inventory arg3) {
+    public void onContentChanged(Inventory inventory) {
         this.context.run((arg, arg2) -> CraftingScreenHandler.updateResult(this.syncId, arg, this.player, this.input, this.result));
     }
 
     @Override
-    public void populateRecipeFinder(RecipeFinder arg) {
-        this.input.provideRecipeInputs(arg);
+    public void populateRecipeFinder(RecipeFinder finder) {
+        this.input.provideRecipeInputs(finder);
     }
 
     @Override
@@ -94,35 +94,35 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
     }
 
     @Override
-    public boolean matches(Recipe<? super CraftingInventory> arg) {
-        return arg.matches(this.input, this.player.world);
+    public boolean matches(Recipe<? super CraftingInventory> recipe) {
+        return recipe.matches(this.input, this.player.world);
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
-        this.context.run((arg2, arg3) -> this.dropInventory(arg, (World)arg2, this.input));
+    public void close(PlayerEntity player) {
+        super.close(player);
+        this.context.run((arg2, arg3) -> this.dropInventory(player, (World)arg2, this.input));
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return CraftingScreenHandler.canUse(this.context, arg, Blocks.CRAFTING_TABLE);
+    public boolean canUse(PlayerEntity player) {
+        return CraftingScreenHandler.canUse(this.context, player, Blocks.CRAFTING_TABLE);
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i == 0) {
-                this.context.run((arg3, arg4) -> lv3.getItem().onCraft(lv3, (World)arg3, arg));
+            if (index == 0) {
+                this.context.run((arg3, arg4) -> lv3.getItem().onCraft(lv3, (World)arg3, player));
                 if (!this.insertItem(lv3, 10, 46, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i >= 10 && i < 46 ? !this.insertItem(lv3, 1, 10, false) && (i < 37 ? !this.insertItem(lv3, 37, 46, false) : !this.insertItem(lv3, 10, 37, false)) : !this.insertItem(lv3, 10, 46, false)) {
+            } else if (index >= 10 && index < 46 ? !this.insertItem(lv3, 1, 10, false) && (index < 37 ? !this.insertItem(lv3, 37, 46, false) : !this.insertItem(lv3, 10, 37, false)) : !this.insertItem(lv3, 10, 46, false)) {
                 return ItemStack.EMPTY;
             }
             if (lv3.isEmpty()) {
@@ -133,17 +133,17 @@ extends AbstractRecipeScreenHandler<CraftingInventory> {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            ItemStack lv4 = lv2.onTakeItem(arg, lv3);
-            if (i == 0) {
-                arg.dropItem(lv4, false);
+            ItemStack lv4 = lv2.onTakeItem(player, lv3);
+            if (index == 0) {
+                player.dropItem(lv4, false);
             }
         }
         return lv;
     }
 
     @Override
-    public boolean canInsertIntoSlot(ItemStack arg, Slot arg2) {
-        return arg2.inventory != this.result && super.canInsertIntoSlot(arg, arg2);
+    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+        return slot.inventory != this.result && super.canInsertIntoSlot(stack, slot);
     }
 
     @Override

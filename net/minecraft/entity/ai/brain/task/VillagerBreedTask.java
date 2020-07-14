@@ -70,18 +70,18 @@ extends Task<VillagerEntity> {
         }
     }
 
-    private void goHome(ServerWorld arg, VillagerEntity arg2, VillagerEntity arg3) {
-        Optional<BlockPos> optional = this.getReachableHome(arg, arg2);
+    private void goHome(ServerWorld world, VillagerEntity first, VillagerEntity second) {
+        Optional<BlockPos> optional = this.getReachableHome(world, first);
         if (!optional.isPresent()) {
-            arg.sendEntityStatus(arg3, (byte)13);
-            arg.sendEntityStatus(arg2, (byte)13);
+            world.sendEntityStatus(second, (byte)13);
+            world.sendEntityStatus(first, (byte)13);
         } else {
-            Optional<VillagerEntity> optional2 = this.createChild(arg, arg2, arg3);
+            Optional<VillagerEntity> optional2 = this.createChild(world, first, second);
             if (optional2.isPresent()) {
-                this.setChildHome(arg, optional2.get(), optional.get());
+                this.setChildHome(world, optional2.get(), optional.get());
             } else {
-                arg.getPointOfInterestStorage().releaseTicket(optional.get());
-                DebugInfoSender.sendPointOfInterest(arg, optional.get());
+                world.getPointOfInterestStorage().releaseTicket(optional.get());
+                DebugInfoSender.sendPointOfInterest(world, optional.get());
             }
         }
     }
@@ -91,21 +91,21 @@ extends Task<VillagerEntity> {
         arg2.getBrain().forget(MemoryModuleType.BREED_TARGET);
     }
 
-    private boolean isReadyToBreed(VillagerEntity arg2) {
-        Brain<VillagerEntity> lv = arg2.getBrain();
+    private boolean isReadyToBreed(VillagerEntity villager) {
+        Brain<VillagerEntity> lv = villager.getBrain();
         Optional<PassiveEntity> optional = lv.getOptionalMemory(MemoryModuleType.BREED_TARGET).filter(arg -> arg.getType() == EntityType.VILLAGER);
         if (!optional.isPresent()) {
             return false;
         }
-        return LookTargetUtil.canSee(lv, MemoryModuleType.BREED_TARGET, EntityType.VILLAGER) && arg2.isReadyToBreed() && optional.get().isReadyToBreed();
+        return LookTargetUtil.canSee(lv, MemoryModuleType.BREED_TARGET, EntityType.VILLAGER) && villager.isReadyToBreed() && optional.get().isReadyToBreed();
     }
 
-    private Optional<BlockPos> getReachableHome(ServerWorld arg, VillagerEntity arg22) {
-        return arg.getPointOfInterestStorage().getPosition(PointOfInterestType.HOME.getCompletionCondition(), arg2 -> this.canReachHome(arg22, (BlockPos)arg2), arg22.getBlockPos(), 48);
+    private Optional<BlockPos> getReachableHome(ServerWorld world, VillagerEntity villager) {
+        return world.getPointOfInterestStorage().getPosition(PointOfInterestType.HOME.getCompletionCondition(), arg2 -> this.canReachHome(villager, (BlockPos)arg2), villager.getBlockPos(), 48);
     }
 
-    private boolean canReachHome(VillagerEntity arg, BlockPos arg2) {
-        Path lv = arg.getNavigation().findPathTo(arg2, PointOfInterestType.HOME.getSearchDistance());
+    private boolean canReachHome(VillagerEntity villager, BlockPos pos) {
+        Path lv = villager.getNavigation().findPathTo(pos, PointOfInterestType.HOME.getSearchDistance());
         return lv != null && lv.reachesTarget();
     }
 
@@ -123,29 +123,29 @@ extends Task<VillagerEntity> {
         return Optional.of(lv);
     }
 
-    private void setChildHome(ServerWorld arg, VillagerEntity arg2, BlockPos arg3) {
-        GlobalPos lv = GlobalPos.create(arg.getRegistryKey(), arg3);
-        arg2.getBrain().remember(MemoryModuleType.HOME, lv);
+    private void setChildHome(ServerWorld world, VillagerEntity child, BlockPos pos) {
+        GlobalPos lv = GlobalPos.create(world.getRegistryKey(), pos);
+        child.getBrain().remember(MemoryModuleType.HOME, lv);
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void finishRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.finishRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void finishRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.finishRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void run(ServerWorld arg, LivingEntity arg2, long l) {
-        this.run(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void run(ServerWorld world, LivingEntity entity, long time) {
+        this.run(world, (VillagerEntity)entity, time);
     }
 }
 

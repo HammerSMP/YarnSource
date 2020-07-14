@@ -57,85 +57,85 @@ extends Vec3i {
         super(d, e, f);
     }
 
-    public BlockPos(Vec3d arg) {
-        this(arg.x, arg.y, arg.z);
+    public BlockPos(Vec3d pos) {
+        this(pos.x, pos.y, pos.z);
     }
 
-    public BlockPos(Position arg) {
-        this(arg.getX(), arg.getY(), arg.getZ());
+    public BlockPos(Position pos) {
+        this(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public BlockPos(Vec3i arg) {
-        this(arg.getX(), arg.getY(), arg.getZ());
+    public BlockPos(Vec3i pos) {
+        this(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static long offset(long l, Direction arg) {
-        return BlockPos.add(l, arg.getOffsetX(), arg.getOffsetY(), arg.getOffsetZ());
+    public static long offset(long value, Direction direction) {
+        return BlockPos.add(value, direction.getOffsetX(), direction.getOffsetY(), direction.getOffsetZ());
     }
 
-    public static long add(long l, int i, int j, int k) {
-        return BlockPos.asLong(BlockPos.unpackLongX(l) + i, BlockPos.unpackLongY(l) + j, BlockPos.unpackLongZ(l) + k);
+    public static long add(long value, int x, int y, int z) {
+        return BlockPos.asLong(BlockPos.unpackLongX(value) + x, BlockPos.unpackLongY(value) + y, BlockPos.unpackLongZ(value) + z);
     }
 
-    public static int unpackLongX(long l) {
-        return (int)(l << 64 - BIT_SHIFT_X - SIZE_BITS_X >> 64 - SIZE_BITS_X);
+    public static int unpackLongX(long x) {
+        return (int)(x << 64 - BIT_SHIFT_X - SIZE_BITS_X >> 64 - SIZE_BITS_X);
     }
 
-    public static int unpackLongY(long l) {
-        return (int)(l << 64 - SIZE_BITS_Y >> 64 - SIZE_BITS_Y);
+    public static int unpackLongY(long y) {
+        return (int)(y << 64 - SIZE_BITS_Y >> 64 - SIZE_BITS_Y);
     }
 
-    public static int unpackLongZ(long l) {
-        return (int)(l << 64 - BIT_SHIFT_Z - SIZE_BITS_Z >> 64 - SIZE_BITS_Z);
+    public static int unpackLongZ(long z) {
+        return (int)(z << 64 - BIT_SHIFT_Z - SIZE_BITS_Z >> 64 - SIZE_BITS_Z);
     }
 
-    public static BlockPos fromLong(long l) {
-        return new BlockPos(BlockPos.unpackLongX(l), BlockPos.unpackLongY(l), BlockPos.unpackLongZ(l));
+    public static BlockPos fromLong(long value) {
+        return new BlockPos(BlockPos.unpackLongX(value), BlockPos.unpackLongY(value), BlockPos.unpackLongZ(value));
     }
 
     public long asLong() {
         return BlockPos.asLong(this.getX(), this.getY(), this.getZ());
     }
 
-    public static long asLong(int i, int j, int k) {
+    public static long asLong(int x, int y, int z) {
         long l = 0L;
-        l |= ((long)i & BITS_X) << BIT_SHIFT_X;
-        l |= ((long)j & BITS_Y) << 0;
-        return l |= ((long)k & BITS_Z) << BIT_SHIFT_Z;
+        l |= ((long)x & BITS_X) << BIT_SHIFT_X;
+        l |= ((long)y & BITS_Y) << 0;
+        return l |= ((long)z & BITS_Z) << BIT_SHIFT_Z;
     }
 
-    public static long removeChunkSectionLocalY(long l) {
-        return l & 0xFFFFFFFFFFFFFFF0L;
+    public static long removeChunkSectionLocalY(long y) {
+        return y & 0xFFFFFFFFFFFFFFF0L;
     }
 
-    public BlockPos add(double d, double e, double f) {
-        if (d == 0.0 && e == 0.0 && f == 0.0) {
+    public BlockPos add(double x, double y, double z) {
+        if (x == 0.0 && y == 0.0 && z == 0.0) {
             return this;
         }
-        return new BlockPos((double)this.getX() + d, (double)this.getY() + e, (double)this.getZ() + f);
+        return new BlockPos((double)this.getX() + x, (double)this.getY() + y, (double)this.getZ() + z);
     }
 
-    public BlockPos add(int i, int j, int k) {
-        if (i == 0 && j == 0 && k == 0) {
+    public BlockPos add(int x, int y, int z) {
+        if (x == 0 && y == 0 && z == 0) {
             return this;
         }
-        return new BlockPos(this.getX() + i, this.getY() + j, this.getZ() + k);
+        return new BlockPos(this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
-    public BlockPos add(Vec3i arg) {
-        return this.add(arg.getX(), arg.getY(), arg.getZ());
+    public BlockPos add(Vec3i pos) {
+        return this.add(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public BlockPos subtract(Vec3i arg) {
-        return this.add(-arg.getX(), -arg.getY(), -arg.getZ());
+    public BlockPos subtract(Vec3i pos) {
+        return this.add(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
     public BlockPos up() {
         return this.offset(Direction.UP);
     }
 
-    public BlockPos up(int i) {
-        return this.offset(Direction.UP, i);
+    public BlockPos up(int distance) {
+        return this.offset(Direction.UP, distance);
     }
 
     @Override
@@ -152,36 +152,36 @@ extends Vec3i {
         return this.offset(Direction.NORTH);
     }
 
-    public BlockPos north(int i) {
-        return this.offset(Direction.NORTH, i);
+    public BlockPos north(int distance) {
+        return this.offset(Direction.NORTH, distance);
     }
 
     public BlockPos south() {
         return this.offset(Direction.SOUTH);
     }
 
-    public BlockPos south(int i) {
-        return this.offset(Direction.SOUTH, i);
+    public BlockPos south(int distance) {
+        return this.offset(Direction.SOUTH, distance);
     }
 
     public BlockPos west() {
         return this.offset(Direction.WEST);
     }
 
-    public BlockPos west(int i) {
-        return this.offset(Direction.WEST, i);
+    public BlockPos west(int distance) {
+        return this.offset(Direction.WEST, distance);
     }
 
     public BlockPos east() {
         return this.offset(Direction.EAST);
     }
 
-    public BlockPos east(int i) {
-        return this.offset(Direction.EAST, i);
+    public BlockPos east(int distance) {
+        return this.offset(Direction.EAST, distance);
     }
 
-    public BlockPos offset(Direction arg) {
-        return new BlockPos(this.getX() + arg.getOffsetX(), this.getY() + arg.getOffsetY(), this.getZ() + arg.getOffsetZ());
+    public BlockPos offset(Direction direction) {
+        return new BlockPos(this.getX() + direction.getOffsetX(), this.getY() + direction.getOffsetY(), this.getZ() + direction.getOffsetZ());
     }
 
     @Override
@@ -202,8 +202,8 @@ extends Vec3i {
         return new BlockPos(this.getX() + j, this.getY() + k, this.getZ() + l);
     }
 
-    public BlockPos rotate(BlockRotation arg) {
-        switch (arg) {
+    public BlockPos rotate(BlockRotation rotation) {
+        switch (rotation) {
             default: {
                 return this;
             }
@@ -219,8 +219,8 @@ extends Vec3i {
     }
 
     @Override
-    public BlockPos crossProduct(Vec3i arg) {
-        return new BlockPos(this.getY() * arg.getZ() - this.getZ() * arg.getY(), this.getZ() * arg.getX() - this.getX() * arg.getZ(), this.getX() * arg.getY() - this.getY() * arg.getX());
+    public BlockPos crossProduct(Vec3i pos) {
+        return new BlockPos(this.getY() * pos.getZ() - this.getZ() * pos.getY(), this.getZ() * pos.getX() - this.getX() * pos.getZ(), this.getX() * pos.getY() - this.getY() * pos.getX());
     }
 
     public BlockPos toImmutable() {
@@ -254,11 +254,11 @@ extends Vec3i {
         };
     }
 
-    public static Iterable<BlockPos> iterateOutwards(BlockPos arg, final int i, final int j, final int k) {
-        final int l = i + j + k;
-        final int m = arg.getX();
-        final int n = arg.getY();
-        final int o = arg.getZ();
+    public static Iterable<BlockPos> iterateOutwards(BlockPos center, final int xRange, final int yRange, final int zRange) {
+        final int l = xRange + yRange + zRange;
+        final int m = center.getX();
+        final int n = center.getY();
+        final int o = center.getZ();
         return () -> new AbstractIterator<BlockPos>(){
             private final Mutable field_23378 = new Mutable();
             private int manhattanDistance;
@@ -283,18 +283,18 @@ extends Vec3i {
                             if (this.manhattanDistance > l) {
                                 return (BlockPos)this.endOfData();
                             }
-                            this.limitX = Math.min(i, this.manhattanDistance);
+                            this.limitX = Math.min(xRange, this.manhattanDistance);
                             this.dx = -this.limitX;
                         }
-                        this.limitY = Math.min(j, this.manhattanDistance - Math.abs(this.dx));
+                        this.limitY = Math.min(yRange, this.manhattanDistance - Math.abs(this.dx));
                         this.dy = -this.limitY;
                     }
-                    int i2 = this.dx;
-                    int j2 = this.dy;
-                    int k2 = this.manhattanDistance - Math.abs(i2) - Math.abs(j2);
-                    if (k2 <= k) {
-                        this.field_23379 = k2 != 0;
-                        lv = this.field_23378.set(m + i2, n + j2, o + k2);
+                    int i = this.dx;
+                    int j = this.dy;
+                    int k = this.manhattanDistance - Math.abs(i) - Math.abs(j);
+                    if (k <= zRange) {
+                        this.field_23379 = k != 0;
+                        lv = this.field_23378.set(m + i, n + j, o + k);
                     }
                     ++this.dy;
                 }
@@ -307,38 +307,38 @@ extends Vec3i {
         };
     }
 
-    public static Optional<BlockPos> findClosest(BlockPos arg, int i, int j, Predicate<BlockPos> predicate) {
-        return BlockPos.streamOutwards(arg, i, j, i).filter(predicate).findFirst();
+    public static Optional<BlockPos> findClosest(BlockPos pos, int horizontalRange, int verticalRange, Predicate<BlockPos> condition) {
+        return BlockPos.streamOutwards(pos, horizontalRange, verticalRange, horizontalRange).filter(condition).findFirst();
     }
 
-    public static Stream<BlockPos> streamOutwards(BlockPos arg, int i, int j, int k) {
-        return StreamSupport.stream(BlockPos.iterateOutwards(arg, i, j, k).spliterator(), false);
+    public static Stream<BlockPos> streamOutwards(BlockPos center, int maxX, int maxY, int maxZ) {
+        return StreamSupport.stream(BlockPos.iterateOutwards(center, maxX, maxY, maxZ).spliterator(), false);
     }
 
-    public static Iterable<BlockPos> iterate(BlockPos arg, BlockPos arg2) {
-        return BlockPos.iterate(Math.min(arg.getX(), arg2.getX()), Math.min(arg.getY(), arg2.getY()), Math.min(arg.getZ(), arg2.getZ()), Math.max(arg.getX(), arg2.getX()), Math.max(arg.getY(), arg2.getY()), Math.max(arg.getZ(), arg2.getZ()));
+    public static Iterable<BlockPos> iterate(BlockPos start, BlockPos end) {
+        return BlockPos.iterate(Math.min(start.getX(), end.getX()), Math.min(start.getY(), end.getY()), Math.min(start.getZ(), end.getZ()), Math.max(start.getX(), end.getX()), Math.max(start.getY(), end.getY()), Math.max(start.getZ(), end.getZ()));
     }
 
-    public static Stream<BlockPos> stream(BlockPos arg, BlockPos arg2) {
-        return StreamSupport.stream(BlockPos.iterate(arg, arg2).spliterator(), false);
+    public static Stream<BlockPos> stream(BlockPos start, BlockPos end) {
+        return StreamSupport.stream(BlockPos.iterate(start, end).spliterator(), false);
     }
 
-    public static Stream<BlockPos> stream(BlockBox arg) {
-        return BlockPos.stream(Math.min(arg.minX, arg.maxX), Math.min(arg.minY, arg.maxY), Math.min(arg.minZ, arg.maxZ), Math.max(arg.minX, arg.maxX), Math.max(arg.minY, arg.maxY), Math.max(arg.minZ, arg.maxZ));
+    public static Stream<BlockPos> stream(BlockBox box) {
+        return BlockPos.stream(Math.min(box.minX, box.maxX), Math.min(box.minY, box.maxY), Math.min(box.minZ, box.maxZ), Math.max(box.minX, box.maxX), Math.max(box.minY, box.maxY), Math.max(box.minZ, box.maxZ));
     }
 
     public static Stream<BlockPos> method_29715(Box arg) {
         return BlockPos.stream(MathHelper.floor(arg.minX), MathHelper.floor(arg.minY), MathHelper.floor(arg.minZ), MathHelper.floor(arg.maxX), MathHelper.floor(arg.maxY), MathHelper.floor(arg.maxZ));
     }
 
-    public static Stream<BlockPos> stream(int i, int j, int k, int l, int m, int n) {
-        return StreamSupport.stream(BlockPos.iterate(i, j, k, l, m, n).spliterator(), false);
+    public static Stream<BlockPos> stream(int startX, int startY, int startZ, int endX, int endY, int endZ) {
+        return StreamSupport.stream(BlockPos.iterate(startX, startY, startZ, endX, endY, endZ).spliterator(), false);
     }
 
-    public static Iterable<BlockPos> iterate(final int i, final int j, final int k, int l, int m, int n) {
-        final int o = l - i + 1;
-        final int p = m - j + 1;
-        int q = n - k + 1;
+    public static Iterable<BlockPos> iterate(final int startX, final int startY, final int startZ, int endX, int endY, int endZ) {
+        final int o = endX - startX + 1;
+        final int p = endY - startY + 1;
+        int q = endZ - startZ + 1;
         final int r = o * p * q;
         return () -> new AbstractIterator<BlockPos>(){
             private final Mutable field_23380 = new Mutable();
@@ -348,12 +348,12 @@ extends Vec3i {
                 if (this.index == r) {
                     return (BlockPos)this.endOfData();
                 }
-                int i2 = this.index % o;
-                int j2 = this.index / o;
-                int k2 = j2 % p;
-                int l = j2 / p;
+                int i = this.index % o;
+                int j = this.index / o;
+                int k = j % p;
+                int l = j / p;
                 ++this.index;
-                return this.field_23380.set(i + i2, j + k2, k + l);
+                return this.field_23380.set(startX + i, startY + k, startZ + l);
             }
 
             protected /* synthetic */ Object computeNext() {
@@ -408,13 +408,13 @@ extends Vec3i {
     }
 
     @Override
-    public /* synthetic */ Vec3i crossProduct(Vec3i arg) {
-        return this.crossProduct(arg);
+    public /* synthetic */ Vec3i crossProduct(Vec3i vec) {
+        return this.crossProduct(vec);
     }
 
     @Override
-    public /* synthetic */ Vec3i offset(Direction arg, int i) {
-        return this.offset(arg, i);
+    public /* synthetic */ Vec3i offset(Direction direction, int distance) {
+        return this.offset(direction, distance);
     }
 
     @Override
@@ -452,13 +452,13 @@ extends Vec3i {
         }
 
         @Override
-        public BlockPos add(double d, double e, double f) {
-            return super.add(d, e, f).toImmutable();
+        public BlockPos add(double x, double y, double z) {
+            return super.add(x, y, z).toImmutable();
         }
 
         @Override
-        public BlockPos add(int i, int j, int k) {
-            return super.add(i, j, k).toImmutable();
+        public BlockPos add(int x, int y, int z) {
+            return super.add(x, y, z).toImmutable();
         }
 
         @Override
@@ -472,51 +472,51 @@ extends Vec3i {
         }
 
         @Override
-        public BlockPos rotate(BlockRotation arg) {
-            return super.rotate(arg).toImmutable();
+        public BlockPos rotate(BlockRotation rotation) {
+            return super.rotate(rotation).toImmutable();
         }
 
-        public Mutable set(int i, int j, int k) {
-            this.setX(i);
-            this.setY(j);
-            this.setZ(k);
+        public Mutable set(int x, int y, int z) {
+            this.setX(x);
+            this.setY(y);
+            this.setZ(z);
             return this;
         }
 
-        public Mutable set(double d, double e, double f) {
-            return this.set(MathHelper.floor(d), MathHelper.floor(e), MathHelper.floor(f));
+        public Mutable set(double x, double y, double z) {
+            return this.set(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
         }
 
-        public Mutable set(Vec3i arg) {
-            return this.set(arg.getX(), arg.getY(), arg.getZ());
+        public Mutable set(Vec3i pos) {
+            return this.set(pos.getX(), pos.getY(), pos.getZ());
         }
 
-        public Mutable set(long l) {
-            return this.set(Mutable.unpackLongX(l), Mutable.unpackLongY(l), Mutable.unpackLongZ(l));
+        public Mutable set(long pos) {
+            return this.set(Mutable.unpackLongX(pos), Mutable.unpackLongY(pos), Mutable.unpackLongZ(pos));
         }
 
-        public Mutable set(AxisCycleDirection arg, int i, int j, int k) {
-            return this.set(arg.choose(i, j, k, Direction.Axis.X), arg.choose(i, j, k, Direction.Axis.Y), arg.choose(i, j, k, Direction.Axis.Z));
+        public Mutable set(AxisCycleDirection axis, int x, int y, int z) {
+            return this.set(axis.choose(x, y, z, Direction.Axis.X), axis.choose(x, y, z, Direction.Axis.Y), axis.choose(x, y, z, Direction.Axis.Z));
         }
 
-        public Mutable set(Vec3i arg, Direction arg2) {
-            return this.set(arg.getX() + arg2.getOffsetX(), arg.getY() + arg2.getOffsetY(), arg.getZ() + arg2.getOffsetZ());
+        public Mutable set(Vec3i pos, Direction direction) {
+            return this.set(pos.getX() + direction.getOffsetX(), pos.getY() + direction.getOffsetY(), pos.getZ() + direction.getOffsetZ());
         }
 
-        public Mutable set(Vec3i arg, int i, int j, int k) {
-            return this.set(arg.getX() + i, arg.getY() + j, arg.getZ() + k);
+        public Mutable set(Vec3i pos, int x, int y, int z) {
+            return this.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
         }
 
-        public Mutable move(Direction arg) {
-            return this.move(arg, 1);
+        public Mutable move(Direction direction) {
+            return this.move(direction, 1);
         }
 
-        public Mutable move(Direction arg, int i) {
-            return this.set(this.getX() + arg.getOffsetX() * i, this.getY() + arg.getOffsetY() * i, this.getZ() + arg.getOffsetZ() * i);
+        public Mutable move(Direction direction, int distance) {
+            return this.set(this.getX() + direction.getOffsetX() * distance, this.getY() + direction.getOffsetY() * distance, this.getZ() + direction.getOffsetZ() * distance);
         }
 
-        public Mutable move(int i, int j, int k) {
-            return this.set(this.getX() + i, this.getY() + j, this.getZ() + k);
+        public Mutable move(int dx, int dy, int dz) {
+            return this.set(this.getX() + dx, this.getY() + dy, this.getZ() + dz);
         }
 
         public Mutable method_27158(Direction.Axis arg, int i, int j) {
@@ -535,18 +535,18 @@ extends Vec3i {
         }
 
         @Override
-        public void setX(int i) {
-            super.setX(i);
+        public void setX(int x) {
+            super.setX(x);
         }
 
         @Override
-        public void setY(int i) {
-            super.setY(i);
+        public void setY(int y) {
+            super.setY(y);
         }
 
         @Override
-        public void setZ(int i) {
-            super.setZ(i);
+        public void setZ(int z) {
+            super.setZ(z);
         }
 
         @Override
@@ -555,13 +555,13 @@ extends Vec3i {
         }
 
         @Override
-        public /* synthetic */ Vec3i crossProduct(Vec3i arg) {
-            return super.crossProduct(arg);
+        public /* synthetic */ Vec3i crossProduct(Vec3i vec) {
+            return super.crossProduct(vec);
         }
 
         @Override
-        public /* synthetic */ Vec3i offset(Direction arg, int i) {
-            return this.offset(arg, i);
+        public /* synthetic */ Vec3i offset(Direction direction, int distance) {
+            return this.offset(direction, distance);
         }
 
         @Override

@@ -25,24 +25,24 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public JigsawGeneratingC2SPacket(BlockPos arg, int i, boolean bl) {
-        this.pos = arg;
-        this.maxDepth = i;
-        this.keepJigsaws = bl;
+    public JigsawGeneratingC2SPacket(BlockPos pos, int maxDepth, boolean keepJigsaws) {
+        this.pos = pos;
+        this.maxDepth = maxDepth;
+        this.keepJigsaws = keepJigsaws;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.maxDepth = arg.readVarInt();
-        this.keepJigsaws = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.maxDepth = buf.readVarInt();
+        this.keepJigsaws = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeVarInt(this.maxDepth);
-        arg.writeBoolean(this.keepJigsaws);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeVarInt(this.maxDepth);
+        buf.writeBoolean(this.keepJigsaws);
     }
 
     @Override

@@ -21,7 +21,7 @@ extends RuleTest {
     }
 
     @Override
-    public boolean test(BlockState arg, Random random) {
+    public boolean test(BlockState state, Random random) {
         return true;
     }
 

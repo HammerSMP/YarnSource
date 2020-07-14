@@ -26,10 +26,10 @@ extends RealmsScreen {
     private final Text title2;
     private int delayTicker;
 
-    public RealmsConfirmScreen(BooleanConsumer booleanConsumer, Text arg, Text arg2) {
+    public RealmsConfirmScreen(BooleanConsumer booleanConsumer, Text title1, Text title2) {
         this.field_22692 = booleanConsumer;
-        this.title1 = arg;
-        this.title2 = arg2;
+        this.title1 = title1;
+        this.title2 = title2;
     }
 
     @Override
@@ -39,11 +39,11 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title1, this.width / 2, RealmsConfirmScreen.row(3), 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, this.title2, this.width / 2, RealmsConfirmScreen.row(5), 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title1, this.width / 2, RealmsConfirmScreen.row(3), 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.title2, this.width / 2, RealmsConfirmScreen.row(5), 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override

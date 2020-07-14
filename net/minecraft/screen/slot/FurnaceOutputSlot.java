@@ -14,40 +14,40 @@ extends Slot {
     private final PlayerEntity player;
     private int amount;
 
-    public FurnaceOutputSlot(PlayerEntity arg, Inventory arg2, int i, int j, int k) {
-        super(arg2, i, j, k);
-        this.player = arg;
+    public FurnaceOutputSlot(PlayerEntity player, Inventory inventory, int index, int x, int y) {
+        super(inventory, index, x, y);
+        this.player = player;
     }
 
     @Override
-    public boolean canInsert(ItemStack arg) {
+    public boolean canInsert(ItemStack stack) {
         return false;
     }
 
     @Override
-    public ItemStack takeStack(int i) {
+    public ItemStack takeStack(int amount) {
         if (this.hasStack()) {
-            this.amount += Math.min(i, this.getStack().getCount());
+            this.amount += Math.min(amount, this.getStack().getCount());
         }
-        return super.takeStack(i);
+        return super.takeStack(amount);
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
-        this.onCrafted(arg2);
-        super.onTakeItem(arg, arg2);
-        return arg2;
+    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+        this.onCrafted(stack);
+        super.onTakeItem(player, stack);
+        return stack;
     }
 
     @Override
-    protected void onCrafted(ItemStack arg, int i) {
-        this.amount += i;
-        this.onCrafted(arg);
+    protected void onCrafted(ItemStack stack, int amount) {
+        this.amount += amount;
+        this.onCrafted(stack);
     }
 
     @Override
-    protected void onCrafted(ItemStack arg) {
-        arg.onCraft(this.player.world, this.player, this.amount);
+    protected void onCrafted(ItemStack stack) {
+        stack.onCraft(this.player.world, this.player, this.amount);
         if (!this.player.world.isClient && this.inventory instanceof AbstractFurnaceBlockEntity) {
             ((AbstractFurnaceBlockEntity)this.inventory).dropExperience(this.player);
         }

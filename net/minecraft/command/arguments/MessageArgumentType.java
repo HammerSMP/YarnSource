@@ -34,8 +34,8 @@ implements ArgumentType<MessageFormat> {
         return new MessageArgumentType();
     }
 
-    public static Text getMessage(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ((MessageFormat)commandContext.getArgument(string, MessageFormat.class)).format((ServerCommandSource)commandContext.getSource(), ((ServerCommandSource)commandContext.getSource()).hasPermissionLevel(2));
+    public static Text getMessage(CommandContext<ServerCommandSource> command, String name) throws CommandSyntaxException {
+        return ((MessageFormat)command.getArgument(name, MessageFormat.class)).format((ServerCommandSource)command.getSource(), ((ServerCommandSource)command.getSource()).hasPermissionLevel(2));
     }
 
     public MessageFormat parse(StringReader stringReader) throws CommandSyntaxException {

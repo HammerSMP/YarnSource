@@ -22,8 +22,8 @@ public interface TooltipContext {
 
         private final boolean advanced;
 
-        private Default(boolean bl) {
-            this.advanced = bl;
+        private Default(boolean advanced) {
+            this.advanced = advanced;
         }
 
         @Override

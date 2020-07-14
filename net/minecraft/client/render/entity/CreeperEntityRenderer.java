@@ -56,8 +56,8 @@ extends MobEntityRenderer<CreeperEntity, CreeperEntityModel<CreeperEntity>> {
     }
 
     @Override
-    protected /* synthetic */ float getAnimationCounter(LivingEntity arg, float f) {
-        return this.getAnimationCounter((CreeperEntity)arg, f);
+    protected /* synthetic */ float getAnimationCounter(LivingEntity entity, float tickDelta) {
+        return this.getAnimationCounter((CreeperEntity)entity, tickDelta);
     }
 }
 

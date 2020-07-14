@@ -22,11 +22,11 @@ public class SoulParticle
 extends AbstractSlowingParticle {
     private final SpriteProvider spriteProvider;
 
-    private SoulParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, g, h, i);
-        this.spriteProvider = arg2;
+    private SoulParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ);
+        this.spriteProvider = spriteProvider;
         this.scale(1.5f);
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -47,8 +47,8 @@ extends AbstractSlowingParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

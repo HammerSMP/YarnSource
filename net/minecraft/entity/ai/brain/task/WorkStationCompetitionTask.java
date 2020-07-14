@@ -22,9 +22,9 @@ public class WorkStationCompetitionTask
 extends Task<VillagerEntity> {
     final VillagerProfession profession;
 
-    public WorkStationCompetitionTask(VillagerProfession arg) {
+    public WorkStationCompetitionTask(VillagerProfession profession) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.JOB_SITE, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.MOBS, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.profession = arg;
+        this.profession = profession;
     }
 
     @Override
@@ -33,30 +33,30 @@ extends Task<VillagerEntity> {
         arg.getPointOfInterestStorage().getType(lv.getPos()).ifPresent(arg32 -> LookTargetUtil.streamSeenVillagers(arg2, arg3 -> this.isUsingWorkStationAt(lv, (PointOfInterestType)arg32, (VillagerEntity)arg3)).reduce(arg2, WorkStationCompetitionTask::keepJobSiteForMoreExperiencedVillager));
     }
 
-    private static VillagerEntity keepJobSiteForMoreExperiencedVillager(VillagerEntity arg, VillagerEntity arg2) {
+    private static VillagerEntity keepJobSiteForMoreExperiencedVillager(VillagerEntity first, VillagerEntity second) {
         VillagerEntity lv4;
         VillagerEntity lv3;
-        if (arg.getExperience() > arg2.getExperience()) {
-            VillagerEntity lv = arg;
-            VillagerEntity lv2 = arg2;
+        if (first.getExperience() > second.getExperience()) {
+            VillagerEntity lv = first;
+            VillagerEntity lv2 = second;
         } else {
-            lv3 = arg2;
-            lv4 = arg;
+            lv3 = second;
+            lv4 = first;
         }
         lv4.getBrain().forget(MemoryModuleType.JOB_SITE);
         return lv3;
     }
 
-    private boolean isUsingWorkStationAt(GlobalPos arg, PointOfInterestType arg2, VillagerEntity arg3) {
-        return this.hasJobSite(arg3) && arg.equals(arg3.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).get()) && this.isCompletedWorkStation(arg2, arg3.getVillagerData().getProfession());
+    private boolean isUsingWorkStationAt(GlobalPos pos, PointOfInterestType poiType, VillagerEntity villager) {
+        return this.hasJobSite(villager) && pos.equals(villager.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).get()) && this.isCompletedWorkStation(poiType, villager.getVillagerData().getProfession());
     }
 
-    private boolean isCompletedWorkStation(PointOfInterestType arg, VillagerProfession arg2) {
-        return arg2.getWorkStation().getCompletionCondition().test(arg);
+    private boolean isCompletedWorkStation(PointOfInterestType poiType, VillagerProfession profession) {
+        return profession.getWorkStation().getCompletionCondition().test(poiType);
     }
 
-    private boolean hasJobSite(VillagerEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).isPresent();
+    private boolean hasJobSite(VillagerEntity villager) {
+        return villager.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE).isPresent();
     }
 }
 

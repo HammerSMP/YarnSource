@@ -83,8 +83,8 @@ implements ItemConvertible {
             return !VoxelShapes.matchesAnywhere(VoxelShapes.fullCube(), arg, BooleanBiFunction.NOT_SAME);
         }
 
-        public /* synthetic */ Object load(Object object) throws Exception {
-            return this.load((VoxelShape)object);
+        public /* synthetic */ Object load(Object shape) throws Exception {
+            return this.load((VoxelShape)shape);
         }
     });
     protected final StateManager<Block, BlockState> stateManager;
@@ -103,70 +103,70 @@ implements ItemConvertible {
         return object2ByteLinkedOpenHashMap;
     });
 
-    public static int getRawIdFromState(@Nullable BlockState arg) {
-        if (arg == null) {
+    public static int getRawIdFromState(@Nullable BlockState state) {
+        if (state == null) {
             return 0;
         }
-        int i = STATE_IDS.getRawId(arg);
+        int i = STATE_IDS.getRawId(state);
         return i == -1 ? 0 : i;
     }
 
-    public static BlockState getStateFromRawId(int i) {
-        BlockState lv = STATE_IDS.get(i);
+    public static BlockState getStateFromRawId(int stateId) {
+        BlockState lv = STATE_IDS.get(stateId);
         return lv == null ? Blocks.AIR.getDefaultState() : lv;
     }
 
-    public static Block getBlockFromItem(@Nullable Item arg) {
-        if (arg instanceof BlockItem) {
-            return ((BlockItem)arg).getBlock();
+    public static Block getBlockFromItem(@Nullable Item item) {
+        if (item instanceof BlockItem) {
+            return ((BlockItem)item).getBlock();
         }
         return Blocks.AIR;
     }
 
-    public static BlockState pushEntitiesUpBeforeBlockChange(BlockState arg, BlockState arg2, World arg3, BlockPos arg4) {
-        VoxelShape lv = VoxelShapes.combine(arg.getCollisionShape(arg3, arg4), arg2.getCollisionShape(arg3, arg4), BooleanBiFunction.ONLY_SECOND).offset(arg4.getX(), arg4.getY(), arg4.getZ());
-        List<Entity> list = arg3.getEntities(null, lv.getBoundingBox());
+    public static BlockState pushEntitiesUpBeforeBlockChange(BlockState from, BlockState to, World world, BlockPos pos) {
+        VoxelShape lv = VoxelShapes.combine(from.getCollisionShape(world, pos), to.getCollisionShape(world, pos), BooleanBiFunction.ONLY_SECOND).offset(pos.getX(), pos.getY(), pos.getZ());
+        List<Entity> list = world.getEntities(null, lv.getBoundingBox());
         for (Entity lv2 : list) {
             double d = VoxelShapes.calculateMaxOffset(Direction.Axis.Y, lv2.getBoundingBox().offset(0.0, 1.0, 0.0), Stream.of(lv), -1.0);
             lv2.requestTeleport(lv2.getX(), lv2.getY() + 1.0 + d, lv2.getZ());
         }
-        return arg2;
+        return to;
     }
 
-    public static VoxelShape createCuboidShape(double d, double e, double f, double g, double h, double i) {
-        return VoxelShapes.cuboid(d / 16.0, e / 16.0, f / 16.0, g / 16.0, h / 16.0, i / 16.0);
+    public static VoxelShape createCuboidShape(double xMin, double yMin, double zMin, double xMax, double yMax, double zMax) {
+        return VoxelShapes.cuboid(xMin / 16.0, yMin / 16.0, zMin / 16.0, xMax / 16.0, yMax / 16.0, zMax / 16.0);
     }
 
-    public boolean isIn(Tag<Block> arg) {
-        return arg.contains(this);
+    public boolean isIn(Tag<Block> tag) {
+        return tag.contains(this);
     }
 
-    public boolean is(Block arg) {
-        return this == arg;
+    public boolean is(Block block) {
+        return this == block;
     }
 
-    public static BlockState postProcessState(BlockState arg, WorldAccess arg2, BlockPos arg3) {
-        BlockState lv = arg;
+    public static BlockState postProcessState(BlockState state, WorldAccess world, BlockPos pos) {
+        BlockState lv = state;
         BlockPos.Mutable lv2 = new BlockPos.Mutable();
         for (Direction lv3 : FACINGS) {
-            lv2.set(arg3, lv3);
-            lv = lv.getStateForNeighborUpdate(lv3, arg2.getBlockState(lv2), arg2, arg3, lv2);
+            lv2.set(pos, lv3);
+            lv = lv.getStateForNeighborUpdate(lv3, world.getBlockState(lv2), world, pos, lv2);
         }
         return lv;
     }
 
-    public static void replace(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i) {
-        Block.replace(arg, arg2, arg3, arg4, i, 512);
+    public static void replace(BlockState state, BlockState newState, WorldAccess world, BlockPos pos, int flags) {
+        Block.replace(state, newState, world, pos, flags, 512);
     }
 
-    public static void replace(BlockState arg, BlockState arg2, WorldAccess arg3, BlockPos arg4, int i, int j) {
-        if (arg2 != arg) {
-            if (arg2.isAir()) {
-                if (!arg3.isClient()) {
-                    arg3.breakBlock(arg4, (i & 0x20) == 0, null, j);
+    public static void replace(BlockState state, BlockState newState, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth) {
+        if (newState != state) {
+            if (newState.isAir()) {
+                if (!world.isClient()) {
+                    world.breakBlock(pos, (flags & 0x20) == 0, null, maxUpdateDepth);
                 }
             } else {
-                arg3.setBlockState(arg4, arg2, i & 0xFFFFFFDF, j);
+                world.setBlockState(pos, newState, flags & 0xFFFFFFDF, maxUpdateDepth);
             }
         }
     }
@@ -179,30 +179,30 @@ implements ItemConvertible {
         this.setDefaultState(this.stateManager.getDefaultState());
     }
 
-    public static boolean cannotConnect(Block arg) {
-        return arg instanceof LeavesBlock || arg == Blocks.BARRIER || arg == Blocks.CARVED_PUMPKIN || arg == Blocks.JACK_O_LANTERN || arg == Blocks.MELON || arg == Blocks.PUMPKIN || arg.isIn(BlockTags.SHULKER_BOXES);
+    public static boolean cannotConnect(Block block) {
+        return block instanceof LeavesBlock || block == Blocks.BARRIER || block == Blocks.CARVED_PUMPKIN || block == Blocks.JACK_O_LANTERN || block == Blocks.MELON || block == Blocks.PUMPKIN || block.isIn(BlockTags.SHULKER_BOXES);
     }
 
-    public boolean hasRandomTicks(BlockState arg) {
+    public boolean hasRandomTicks(BlockState state) {
         return this.randomTicks;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static boolean shouldDrawSide(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        BlockPos lv = arg3.offset(arg4);
-        BlockState lv2 = arg2.getBlockState(lv);
-        if (arg.isSideInvisible(lv2, arg4)) {
+    public static boolean shouldDrawSide(BlockState state, BlockView world, BlockPos pos, Direction facing) {
+        BlockPos lv = pos.offset(facing);
+        BlockState lv2 = world.getBlockState(lv);
+        if (state.isSideInvisible(lv2, facing)) {
             return false;
         }
         if (lv2.isOpaque()) {
-            NeighborGroup lv3 = new NeighborGroup(arg, lv2, arg4);
+            NeighborGroup lv3 = new NeighborGroup(state, lv2, facing);
             Object2ByteLinkedOpenHashMap<NeighborGroup> object2ByteLinkedOpenHashMap = FACE_CULL_MAP.get();
             byte b = object2ByteLinkedOpenHashMap.getAndMoveToFirst((Object)lv3);
             if (b != 127) {
                 return b != 0;
             }
-            VoxelShape lv4 = arg.getCullingFace(arg2, arg3, arg4);
-            VoxelShape lv5 = lv2.getCullingFace(arg2, lv, arg4.getOpposite());
+            VoxelShape lv4 = state.getCullingFace(world, pos, facing);
+            VoxelShape lv5 = lv2.getCullingFace(world, lv, facing.getOpposite());
             boolean bl = VoxelShapes.matchesAnywhere(lv4, lv5, BooleanBiFunction.ONLY_FIRST);
             if (object2ByteLinkedOpenHashMap.size() == 2048) {
                 object2ByteLinkedOpenHashMap.removeLastByte();
@@ -213,88 +213,88 @@ implements ItemConvertible {
         return true;
     }
 
-    public static boolean hasTopRim(BlockView arg, BlockPos arg2) {
-        return arg.getBlockState(arg2).isSideSolid(arg, arg2, Direction.UP, SideShapeType.RIGID);
+    public static boolean hasTopRim(BlockView world, BlockPos pos) {
+        return world.getBlockState(pos).isSideSolid(world, pos, Direction.UP, SideShapeType.RIGID);
     }
 
-    public static boolean sideCoversSmallSquare(WorldView arg, BlockPos arg2, Direction arg3) {
-        BlockState lv = arg.getBlockState(arg2);
-        if (arg3 == Direction.DOWN && lv.isIn(BlockTags.UNSTABLE_BOTTOM_CENTER)) {
+    public static boolean sideCoversSmallSquare(WorldView world, BlockPos pos, Direction side) {
+        BlockState lv = world.getBlockState(pos);
+        if (side == Direction.DOWN && lv.isIn(BlockTags.UNSTABLE_BOTTOM_CENTER)) {
             return false;
         }
-        return lv.isSideSolid(arg, arg2, arg3, SideShapeType.CENTER);
+        return lv.isSideSolid(world, pos, side, SideShapeType.CENTER);
     }
 
-    public static boolean isFaceFullSquare(VoxelShape arg, Direction arg2) {
-        VoxelShape lv = arg.getFace(arg2);
+    public static boolean isFaceFullSquare(VoxelShape shape, Direction side) {
+        VoxelShape lv = shape.getFace(side);
         return Block.isShapeFullCube(lv);
     }
 
-    public static boolean isShapeFullCube(VoxelShape arg) {
-        return (Boolean)FULL_CUBE_SHAPE_CACHE.getUnchecked((Object)arg);
+    public static boolean isShapeFullCube(VoxelShape shape) {
+        return (Boolean)FULL_CUBE_SHAPE_CACHE.getUnchecked((Object)shape);
     }
 
-    public boolean isTranslucent(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return !Block.isShapeFullCube(arg.getOutlineShape(arg2, arg3)) && arg.getFluidState().isEmpty();
+    public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+        return !Block.isShapeFullCube(state.getOutlineShape(world, pos)) && state.getFluidState().isEmpty();
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
     }
 
-    public void onBroken(WorldAccess arg, BlockPos arg2, BlockState arg3) {
+    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
     }
 
-    public static List<ItemStack> getDroppedStacks(BlockState arg, ServerWorld arg2, BlockPos arg3, @Nullable BlockEntity arg4) {
-        LootContext.Builder lv = new LootContext.Builder(arg2).random(arg2.random).parameter(LootContextParameters.POSITION, arg3).parameter(LootContextParameters.TOOL, ItemStack.EMPTY).optionalParameter(LootContextParameters.BLOCK_ENTITY, arg4);
-        return arg.getDroppedStacks(lv);
+    public static List<ItemStack> getDroppedStacks(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity) {
+        LootContext.Builder lv = new LootContext.Builder(world).random(world.random).parameter(LootContextParameters.POSITION, pos).parameter(LootContextParameters.TOOL, ItemStack.EMPTY).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
+        return state.getDroppedStacks(lv);
     }
 
-    public static List<ItemStack> getDroppedStacks(BlockState arg, ServerWorld arg2, BlockPos arg3, @Nullable BlockEntity arg4, @Nullable Entity arg5, ItemStack arg6) {
-        LootContext.Builder lv = new LootContext.Builder(arg2).random(arg2.random).parameter(LootContextParameters.POSITION, arg3).parameter(LootContextParameters.TOOL, arg6).optionalParameter(LootContextParameters.THIS_ENTITY, arg5).optionalParameter(LootContextParameters.BLOCK_ENTITY, arg4);
-        return arg.getDroppedStacks(lv);
+    public static List<ItemStack> getDroppedStacks(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Entity entity, ItemStack stack) {
+        LootContext.Builder lv = new LootContext.Builder(world).random(world.random).parameter(LootContextParameters.POSITION, pos).parameter(LootContextParameters.TOOL, stack).optionalParameter(LootContextParameters.THIS_ENTITY, entity).optionalParameter(LootContextParameters.BLOCK_ENTITY, blockEntity);
+        return state.getDroppedStacks(lv);
     }
 
-    public static void dropStacks(BlockState arg, World arg2, BlockPos arg32) {
-        if (arg2 instanceof ServerWorld) {
-            Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, null).forEach(arg3 -> Block.dropStack(arg2, arg32, arg3));
-            arg.onStacksDropped((ServerWorld)arg2, arg32, ItemStack.EMPTY);
+    public static void dropStacks(BlockState state, World world, BlockPos pos) {
+        if (world instanceof ServerWorld) {
+            Block.getDroppedStacks(state, (ServerWorld)world, pos, null).forEach(stack -> Block.dropStack(world, pos, stack));
+            state.onStacksDropped((ServerWorld)world, pos, ItemStack.EMPTY);
         }
     }
 
-    public static void dropStacks(BlockState arg, WorldAccess arg2, BlockPos arg32, @Nullable BlockEntity arg4) {
+    public static void dropStacks(BlockState state, WorldAccess arg2, BlockPos pos, @Nullable BlockEntity blockEntity) {
         if (arg2 instanceof ServerWorld) {
-            Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, arg4).forEach(arg3 -> Block.dropStack((ServerWorld)arg2, arg32, arg3));
-            arg.onStacksDropped((ServerWorld)arg2, arg32, ItemStack.EMPTY);
+            Block.getDroppedStacks(state, (ServerWorld)arg2, pos, blockEntity).forEach(stack -> Block.dropStack((ServerWorld)arg2, pos, stack));
+            state.onStacksDropped((ServerWorld)arg2, pos, ItemStack.EMPTY);
         }
     }
 
-    public static void dropStacks(BlockState arg, World arg2, BlockPos arg32, @Nullable BlockEntity arg4, Entity arg5, ItemStack arg6) {
-        if (arg2 instanceof ServerWorld) {
-            Block.getDroppedStacks(arg, (ServerWorld)arg2, arg32, arg4, arg5, arg6).forEach(arg3 -> Block.dropStack(arg2, arg32, arg3));
-            arg.onStacksDropped((ServerWorld)arg2, arg32, arg6);
+    public static void dropStacks(BlockState state, World world, BlockPos pos, @Nullable BlockEntity blockEntity, Entity entity, ItemStack stack) {
+        if (world instanceof ServerWorld) {
+            Block.getDroppedStacks(state, (ServerWorld)world, pos, blockEntity, entity, stack).forEach(arg3 -> Block.dropStack(world, pos, arg3));
+            state.onStacksDropped((ServerWorld)world, pos, stack);
         }
     }
 
-    public static void dropStack(World arg, BlockPos arg2, ItemStack arg3) {
-        if (arg.isClient || arg3.isEmpty() || !arg.getGameRules().getBoolean(GameRules.DO_TILE_DROPS)) {
+    public static void dropStack(World world, BlockPos pos, ItemStack stack) {
+        if (world.isClient || stack.isEmpty() || !world.getGameRules().getBoolean(GameRules.DO_TILE_DROPS)) {
             return;
         }
         float f = 0.5f;
-        double d = (double)(arg.random.nextFloat() * 0.5f) + 0.25;
-        double e = (double)(arg.random.nextFloat() * 0.5f) + 0.25;
-        double g = (double)(arg.random.nextFloat() * 0.5f) + 0.25;
-        ItemEntity lv = new ItemEntity(arg, (double)arg2.getX() + d, (double)arg2.getY() + e, (double)arg2.getZ() + g, arg3);
+        double d = (double)(world.random.nextFloat() * 0.5f) + 0.25;
+        double e = (double)(world.random.nextFloat() * 0.5f) + 0.25;
+        double g = (double)(world.random.nextFloat() * 0.5f) + 0.25;
+        ItemEntity lv = new ItemEntity(world, (double)pos.getX() + d, (double)pos.getY() + e, (double)pos.getZ() + g, stack);
         lv.setToDefaultPickupDelay();
-        arg.spawnEntity(lv);
+        world.spawnEntity(lv);
     }
 
-    protected void dropExperience(ServerWorld arg, BlockPos arg2, int i) {
+    protected void dropExperience(ServerWorld arg, BlockPos pos, int size) {
         if (arg.getGameRules().getBoolean(GameRules.DO_TILE_DROPS)) {
-            while (i > 0) {
-                int j = ExperienceOrbEntity.roundToOrbSize(i);
-                i -= j;
-                arg.spawnEntity(new ExperienceOrbEntity(arg, (double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5, j));
+            while (size > 0) {
+                int j = ExperienceOrbEntity.roundToOrbSize(size);
+                size -= j;
+                arg.spawnEntity(new ExperienceOrbEntity(arg, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, j));
             }
         }
     }
@@ -303,24 +303,24 @@ implements ItemConvertible {
         return this.resistance;
     }
 
-    public void onDestroyedByExplosion(World arg, BlockPos arg2, Explosion arg3) {
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
     }
 
-    public void onSteppedOn(World arg, BlockPos arg2, Entity arg3) {
+    public void onSteppedOn(World world, BlockPos pos, Entity entity) {
     }
 
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState();
     }
 
-    public void afterBreak(World arg, PlayerEntity arg2, BlockPos arg3, BlockState arg4, @Nullable BlockEntity arg5, ItemStack arg6) {
-        arg2.incrementStat(Stats.MINED.getOrCreateStat(this));
-        arg2.addExhaustion(0.005f);
-        Block.dropStacks(arg4, arg, arg3, arg5, arg2, arg6);
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
+        player.incrementStat(Stats.MINED.getOrCreateStat(this));
+        player.addExhaustion(0.005f);
+        Block.dropStacks(state, world, pos, blockEntity, player, stack);
     }
 
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, @Nullable LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
     }
 
     public boolean canMobSpawnInside() {
@@ -339,21 +339,21 @@ implements ItemConvertible {
         return this.translationKey;
     }
 
-    public void onLandedUpon(World arg, BlockPos arg2, Entity arg3, float f) {
-        arg3.handleFallDamage(f, 1.0f);
+    public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
+        entity.handleFallDamage(distance, 1.0f);
     }
 
-    public void onEntityLand(BlockView arg, Entity arg2) {
-        arg2.setVelocity(arg2.getVelocity().multiply(1.0, 0.0, 1.0));
+    public void onEntityLand(BlockView world, Entity entity) {
+        entity.setVelocity(entity.getVelocity().multiply(1.0, 0.0, 1.0));
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(this);
     }
 
-    public void addStacksForDisplay(ItemGroup arg, DefaultedList<ItemStack> arg2) {
-        arg2.add(new ItemStack(this));
+    public void addStacksForDisplay(ItemGroup group, DefaultedList<ItemStack> list) {
+        list.add(new ItemStack(this));
     }
 
     public float getSlipperiness() {
@@ -368,36 +368,36 @@ implements ItemConvertible {
         return this.jumpVelocityMultiplier;
     }
 
-    public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        arg.syncWorldEvent(arg4, 2001, arg2, Block.getRawIdFromState(arg3));
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        world.syncWorldEvent(player, 2001, pos, Block.getRawIdFromState(state));
         if (this.isIn(BlockTags.GUARDED_BY_PIGLINS)) {
-            PiglinBrain.onGuardedBlockBroken(arg4, false);
+            PiglinBrain.onGuardedBlockBroken(player, false);
         }
     }
 
-    public void rainTick(World arg, BlockPos arg2) {
+    public void rainTick(World world, BlockPos pos) {
     }
 
-    public boolean shouldDropItemsOnExplosion(Explosion arg) {
+    public boolean shouldDropItemsOnExplosion(Explosion explosion) {
         return true;
     }
 
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
     }
 
     public StateManager<Block, BlockState> getStateManager() {
         return this.stateManager;
     }
 
-    protected final void setDefaultState(BlockState arg) {
-        this.defaultState = arg;
+    protected final void setDefaultState(BlockState state) {
+        this.defaultState = state;
     }
 
     public final BlockState getDefaultState() {
         return this.defaultState;
     }
 
-    public BlockSoundGroup getSoundGroup(BlockState arg) {
+    public BlockSoundGroup getSoundGroup(BlockState state) {
         return this.soundGroup;
     }
 
@@ -418,7 +418,7 @@ implements ItemConvertible {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable BlockView arg2, List<Text> list, TooltipContext arg3) {
+    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
     }
 
     @Override
@@ -431,20 +431,20 @@ implements ItemConvertible {
         private final BlockState other;
         private final Direction facing;
 
-        public NeighborGroup(BlockState arg, BlockState arg2, Direction arg3) {
-            this.self = arg;
-            this.other = arg2;
-            this.facing = arg3;
+        public NeighborGroup(BlockState self, BlockState other, Direction facing) {
+            this.self = self;
+            this.other = other;
+            this.facing = facing;
         }
 
-        public boolean equals(Object object) {
-            if (this == object) {
+        public boolean equals(Object o) {
+            if (this == o) {
                 return true;
             }
-            if (!(object instanceof NeighborGroup)) {
+            if (!(o instanceof NeighborGroup)) {
                 return false;
             }
-            NeighborGroup lv = (NeighborGroup)object;
+            NeighborGroup lv = (NeighborGroup)o;
             return this.self == lv.self && this.other == lv.other && this.facing == lv.facing;
         }
 

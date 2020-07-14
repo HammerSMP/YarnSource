@@ -20,8 +20,8 @@ import net.minecraft.util.registry.Registry;
 @Environment(value=EnvType.CLIENT)
 public class StatusEffectSpriteManager
 extends SpriteAtlasHolder {
-    public StatusEffectSpriteManager(TextureManager arg) {
-        super(arg, new Identifier("textures/atlas/mob_effects.png"), "mob_effect");
+    public StatusEffectSpriteManager(TextureManager textureManager) {
+        super(textureManager, new Identifier("textures/atlas/mob_effects.png"), "mob_effect");
     }
 
     @Override
@@ -29,8 +29,8 @@ extends SpriteAtlasHolder {
         return Registry.STATUS_EFFECT.getIds().stream();
     }
 
-    public Sprite getSprite(StatusEffect arg) {
-        return this.getSprite(Registry.STATUS_EFFECT.getId(arg));
+    public Sprite getSprite(StatusEffect effect) {
+        return this.getSprite(Registry.STATUS_EFFECT.getId(effect));
     }
 }
 

@@ -16,8 +16,8 @@ public interface ShapeContext {
         return EntityShapeContext.ABSENT;
     }
 
-    public static ShapeContext of(Entity arg) {
-        return new EntityShapeContext(arg);
+    public static ShapeContext of(Entity entity) {
+        return new EntityShapeContext(entity);
     }
 
     public boolean isDescending();

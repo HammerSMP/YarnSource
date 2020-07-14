@@ -46,15 +46,15 @@ public class TriggerCommand {
     private static final SimpleCommandExceptionType FAILED_UNPRIMED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.trigger.failed.unprimed"));
     private static final SimpleCommandExceptionType FAILED_INVALID_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.trigger.failed.invalid"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)CommandManager.literal("trigger").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("objective", ObjectiveArgumentType.objective()).suggests((commandContext, suggestionsBuilder) -> TriggerCommand.suggestObjectives((ServerCommandSource)commandContext.getSource(), suggestionsBuilder)).executes(commandContext -> TriggerCommand.executeSimple((ServerCommandSource)commandContext.getSource(), TriggerCommand.getScore(((ServerCommandSource)commandContext.getSource()).getPlayer(), ObjectiveArgumentType.getObjective((CommandContext<ServerCommandSource>)commandContext, "objective"))))).then(CommandManager.literal("add").then(CommandManager.argument("value", IntegerArgumentType.integer()).executes(commandContext -> TriggerCommand.executeAdd((ServerCommandSource)commandContext.getSource(), TriggerCommand.getScore(((ServerCommandSource)commandContext.getSource()).getPlayer(), ObjectiveArgumentType.getObjective((CommandContext<ServerCommandSource>)commandContext, "objective")), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"value")))))).then(CommandManager.literal("set").then(CommandManager.argument("value", IntegerArgumentType.integer()).executes(commandContext -> TriggerCommand.executeSet((ServerCommandSource)commandContext.getSource(), TriggerCommand.getScore(((ServerCommandSource)commandContext.getSource()).getPlayer(), ObjectiveArgumentType.getObjective((CommandContext<ServerCommandSource>)commandContext, "objective")), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"value")))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)CommandManager.literal("trigger").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("objective", ObjectiveArgumentType.objective()).suggests((commandContext, suggestionsBuilder) -> TriggerCommand.suggestObjectives((ServerCommandSource)commandContext.getSource(), suggestionsBuilder)).executes(commandContext -> TriggerCommand.executeSimple((ServerCommandSource)commandContext.getSource(), TriggerCommand.getScore(((ServerCommandSource)commandContext.getSource()).getPlayer(), ObjectiveArgumentType.getObjective((CommandContext<ServerCommandSource>)commandContext, "objective"))))).then(CommandManager.literal("add").then(CommandManager.argument("value", IntegerArgumentType.integer()).executes(commandContext -> TriggerCommand.executeAdd((ServerCommandSource)commandContext.getSource(), TriggerCommand.getScore(((ServerCommandSource)commandContext.getSource()).getPlayer(), ObjectiveArgumentType.getObjective((CommandContext<ServerCommandSource>)commandContext, "objective")), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"value")))))).then(CommandManager.literal("set").then(CommandManager.argument("value", IntegerArgumentType.integer()).executes(commandContext -> TriggerCommand.executeSet((ServerCommandSource)commandContext.getSource(), TriggerCommand.getScore(((ServerCommandSource)commandContext.getSource()).getPlayer(), ObjectiveArgumentType.getObjective((CommandContext<ServerCommandSource>)commandContext, "objective")), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"value")))))));
     }
 
-    public static CompletableFuture<Suggestions> suggestObjectives(ServerCommandSource arg, SuggestionsBuilder suggestionsBuilder) {
-        Entity lv = arg.getEntity();
+    public static CompletableFuture<Suggestions> suggestObjectives(ServerCommandSource source, SuggestionsBuilder builder) {
+        Entity lv = source.getEntity();
         ArrayList list = Lists.newArrayList();
         if (lv != null) {
-            ServerScoreboard lv2 = arg.getMinecraftServer().getScoreboard();
+            ServerScoreboard lv2 = source.getMinecraftServer().getScoreboard();
             String string = lv.getEntityName();
             for (ScoreboardObjective lv3 : lv2.getObjectives()) {
                 ScoreboardPlayerScore lv4;
@@ -62,37 +62,37 @@ public class TriggerCommand {
                 list.add(lv3.getName());
             }
         }
-        return CommandSource.suggestMatching(list, suggestionsBuilder);
+        return CommandSource.suggestMatching(list, builder);
     }
 
-    private static int executeAdd(ServerCommandSource arg, ScoreboardPlayerScore arg2, int i) {
-        arg2.incrementScore(i);
-        arg.sendFeedback(new TranslatableText("commands.trigger.add.success", arg2.getObjective().toHoverableText(), i), true);
-        return arg2.getScore();
+    private static int executeAdd(ServerCommandSource source, ScoreboardPlayerScore score, int value) {
+        score.incrementScore(value);
+        source.sendFeedback(new TranslatableText("commands.trigger.add.success", score.getObjective().toHoverableText(), value), true);
+        return score.getScore();
     }
 
-    private static int executeSet(ServerCommandSource arg, ScoreboardPlayerScore arg2, int i) {
-        arg2.setScore(i);
-        arg.sendFeedback(new TranslatableText("commands.trigger.set.success", arg2.getObjective().toHoverableText(), i), true);
-        return i;
+    private static int executeSet(ServerCommandSource source, ScoreboardPlayerScore score, int value) {
+        score.setScore(value);
+        source.sendFeedback(new TranslatableText("commands.trigger.set.success", score.getObjective().toHoverableText(), value), true);
+        return value;
     }
 
-    private static int executeSimple(ServerCommandSource arg, ScoreboardPlayerScore arg2) {
-        arg2.incrementScore(1);
-        arg.sendFeedback(new TranslatableText("commands.trigger.simple.success", arg2.getObjective().toHoverableText()), true);
-        return arg2.getScore();
+    private static int executeSimple(ServerCommandSource source, ScoreboardPlayerScore score) {
+        score.incrementScore(1);
+        source.sendFeedback(new TranslatableText("commands.trigger.simple.success", score.getObjective().toHoverableText()), true);
+        return score.getScore();
     }
 
-    private static ScoreboardPlayerScore getScore(ServerPlayerEntity arg, ScoreboardObjective arg2) throws CommandSyntaxException {
+    private static ScoreboardPlayerScore getScore(ServerPlayerEntity player, ScoreboardObjective objective) throws CommandSyntaxException {
         String string;
-        if (arg2.getCriterion() != ScoreboardCriterion.TRIGGER) {
+        if (objective.getCriterion() != ScoreboardCriterion.TRIGGER) {
             throw FAILED_INVALID_EXCEPTION.create();
         }
-        Scoreboard lv = arg.getScoreboard();
-        if (!lv.playerHasObjective(string = arg.getEntityName(), arg2)) {
+        Scoreboard lv = player.getScoreboard();
+        if (!lv.playerHasObjective(string = player.getEntityName(), objective)) {
             throw FAILED_UNPRIMED_EXCEPTION.create();
         }
-        ScoreboardPlayerScore lv2 = lv.getPlayerScore(string, arg2);
+        ScoreboardPlayerScore lv2 = lv.getPlayerScore(string, objective);
         if (lv2.isLocked()) {
             throw FAILED_UNPRIMED_EXCEPTION.create();
         }

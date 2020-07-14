@@ -23,13 +23,13 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class MemoryExpiryDataFix
 extends ChoiceFix {
-    public MemoryExpiryDataFix(Schema schema, String string) {
-        super(schema, false, "Memory expiry data fix (" + string + ")", TypeReferences.ENTITY, string);
+    public MemoryExpiryDataFix(Schema outputSchema, String choiceName) {
+        super(outputSchema, false, "Memory expiry data fix (" + choiceName + ")", TypeReferences.ENTITY, choiceName);
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::updateBrain);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::updateBrain);
     }
 
     public Dynamic<?> updateBrain(Dynamic<?> dynamic) {

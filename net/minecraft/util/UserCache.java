@@ -73,9 +73,9 @@ public class UserCache {
     private final File cacheFile;
     private final AtomicLong field_25724 = new AtomicLong();
 
-    public UserCache(GameProfileRepository gameProfileRepository, File file) {
-        this.profileRepository = gameProfileRepository;
-        this.cacheFile = file;
+    public UserCache(GameProfileRepository profileRepository, File cacheFile) {
+        this.profileRepository = profileRepository;
+        this.cacheFile = cacheFile;
         Lists.reverse(this.load()).forEach(this::method_30164);
     }
 
@@ -93,29 +93,29 @@ public class UserCache {
     }
 
     @Nullable
-    private static GameProfile findProfileByName(GameProfileRepository gameProfileRepository, String string) {
+    private static GameProfile findProfileByName(GameProfileRepository repository, String name) {
         final AtomicReference atomicReference = new AtomicReference();
         ProfileLookupCallback profileLookupCallback = new ProfileLookupCallback(){
 
-            public void onProfileLookupSucceeded(GameProfile gameProfile) {
-                atomicReference.set(gameProfile);
+            public void onProfileLookupSucceeded(GameProfile profile) {
+                atomicReference.set(profile);
             }
 
-            public void onProfileLookupFailed(GameProfile gameProfile, Exception exception) {
+            public void onProfileLookupFailed(GameProfile profile, Exception exception) {
                 atomicReference.set(null);
             }
         };
-        gameProfileRepository.findProfilesByNames(new String[]{string}, Agent.MINECRAFT, profileLookupCallback);
+        repository.findProfilesByNames(new String[]{name}, Agent.MINECRAFT, profileLookupCallback);
         GameProfile gameProfile = (GameProfile)atomicReference.get();
         if (!UserCache.shouldUseRemote() && gameProfile == null) {
-            UUID uUID = PlayerEntity.getUuidFromProfile(new GameProfile(null, string));
-            gameProfile = new GameProfile(uUID, string);
+            UUID uUID = PlayerEntity.getUuidFromProfile(new GameProfile(null, name));
+            gameProfile = new GameProfile(uUID, name);
         }
         return gameProfile;
     }
 
-    public static void setUseRemote(boolean bl) {
-        useRemote = bl;
+    public static void setUseRemote(boolean value) {
+        useRemote = value;
     }
 
     private static boolean shouldUseRemote() {

@@ -33,19 +33,19 @@ implements EntryCombiner {
     protected final LootCondition[] conditions;
     private final Predicate<LootContext> conditionPredicate;
 
-    protected LootPoolEntry(LootCondition[] args) {
-        this.conditions = args;
-        this.conditionPredicate = LootConditionTypes.joinAnd(args);
+    protected LootPoolEntry(LootCondition[] conditions) {
+        this.conditions = conditions;
+        this.conditionPredicate = LootConditionTypes.joinAnd(conditions);
     }
 
-    public void validate(LootTableReporter arg) {
+    public void validate(LootTableReporter reporter) {
         for (int i = 0; i < this.conditions.length; ++i) {
-            this.conditions[i].validate(arg.makeChild(".condition[" + i + "]"));
+            this.conditions[i].validate(reporter.makeChild(".condition[" + i + "]"));
         }
     }
 
-    protected final boolean test(LootContext arg) {
-        return this.conditionPredicate.test(arg);
+    protected final boolean test(LootContext context) {
+        return this.conditionPredicate.test(context);
     }
 
     public abstract LootPoolEntryType getType();
@@ -71,13 +71,13 @@ implements EntryCombiner {
         public abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, LootCondition[] var3);
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
 
         @Override
-        public /* synthetic */ void toJson(JsonObject jsonObject, Object object, JsonSerializationContext jsonSerializationContext) {
-            this.toJson(jsonObject, (T)((LootPoolEntry)object), jsonSerializationContext);
+        public /* synthetic */ void toJson(JsonObject json, Object object, JsonSerializationContext context) {
+            this.toJson(json, (T)((LootPoolEntry)object), context);
         }
     }
 
@@ -102,8 +102,8 @@ implements EntryCombiner {
             return this.conditions.toArray(new LootCondition[0]);
         }
 
-        public AlternativeEntry.Builder alternatively(Builder<?> arg) {
-            return new AlternativeEntry.Builder(this, arg);
+        public AlternativeEntry.Builder alternatively(Builder<?> builder) {
+            return new AlternativeEntry.Builder(this, builder);
         }
 
         public abstract LootPoolEntry build();
@@ -114,8 +114,8 @@ implements EntryCombiner {
         }
 
         @Override
-        public /* synthetic */ Object conditionally(LootCondition.Builder arg) {
-            return this.conditionally(arg);
+        public /* synthetic */ Object conditionally(LootCondition.Builder condition) {
+            return this.conditionally(condition);
         }
     }
 }

@@ -16,8 +16,8 @@ implements Packet<ServerPlayPacketListener> {
     public UpdateDifficultyC2SPacket() {
     }
 
-    public UpdateDifficultyC2SPacket(Difficulty arg) {
-        this.difficulty = arg;
+    public UpdateDifficultyC2SPacket(Difficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     @Override
@@ -26,13 +26,13 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.difficulty = Difficulty.byOrdinal(arg.readUnsignedByte());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.difficulty = Difficulty.byOrdinal(buf.readUnsignedByte());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.difficulty.getId());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.difficulty.getId());
     }
 
     public Difficulty getDifficulty() {

@@ -69,17 +69,17 @@ public class EntityTrackerEntry {
     private boolean hadVehicle;
     private boolean lastOnGround;
 
-    public EntityTrackerEntry(ServerWorld arg, Entity arg2, int i, boolean bl, Consumer<Packet<?>> consumer) {
-        this.world = arg;
-        this.receiver = consumer;
-        this.entity = arg2;
-        this.tickInterval = i;
-        this.alwaysUpdateVelocity = bl;
+    public EntityTrackerEntry(ServerWorld world, Entity entity, int tickInterval, boolean alwaysUpdateVelocity, Consumer<Packet<?>> receiver) {
+        this.world = world;
+        this.receiver = receiver;
+        this.entity = entity;
+        this.tickInterval = tickInterval;
+        this.alwaysUpdateVelocity = alwaysUpdateVelocity;
         this.storeEncodedCoordinates();
-        this.lastYaw = MathHelper.floor(arg2.yaw * 256.0f / 360.0f);
-        this.lastPitch = MathHelper.floor(arg2.pitch * 256.0f / 360.0f);
-        this.lastHeadPitch = MathHelper.floor(arg2.getHeadYaw() * 256.0f / 360.0f);
-        this.lastOnGround = arg2.isOnGround();
+        this.lastYaw = MathHelper.floor(entity.yaw * 256.0f / 360.0f);
+        this.lastPitch = MathHelper.floor(entity.pitch * 256.0f / 360.0f);
+        this.lastHeadPitch = MathHelper.floor(entity.getHeadYaw() * 256.0f / 360.0f);
+        this.lastOnGround = entity.isOnGround();
     }
 
     public void tick() {
@@ -177,33 +177,33 @@ public class EntityTrackerEntry {
         }
     }
 
-    public void stopTracking(ServerPlayerEntity arg) {
-        this.entity.onStoppedTrackingBy(arg);
-        arg.onStoppedTracking(this.entity);
+    public void stopTracking(ServerPlayerEntity player) {
+        this.entity.onStoppedTrackingBy(player);
+        player.onStoppedTracking(this.entity);
     }
 
-    public void startTracking(ServerPlayerEntity arg) {
-        this.sendPackets(arg.networkHandler::sendPacket);
-        this.entity.onStartedTrackingBy(arg);
-        arg.onStartedTracking(this.entity);
+    public void startTracking(ServerPlayerEntity player) {
+        this.sendPackets(player.networkHandler::sendPacket);
+        this.entity.onStartedTrackingBy(player);
+        player.onStartedTracking(this.entity);
     }
 
-    public void sendPackets(Consumer<Packet<?>> consumer) {
+    public void sendPackets(Consumer<Packet<?>> sender) {
         MobEntity lv6;
         if (this.entity.removed) {
             LOGGER.warn("Fetching packet for removed entity " + this.entity);
         }
         Packet<?> lv = this.entity.createSpawnPacket();
         this.lastHeadPitch = MathHelper.floor(this.entity.getHeadYaw() * 256.0f / 360.0f);
-        consumer.accept(lv);
+        sender.accept(lv);
         if (!this.entity.getDataTracker().isEmpty()) {
-            consumer.accept(new EntityTrackerUpdateS2CPacket(this.entity.getEntityId(), this.entity.getDataTracker(), true));
+            sender.accept(new EntityTrackerUpdateS2CPacket(this.entity.getEntityId(), this.entity.getDataTracker(), true));
         }
         boolean bl = this.alwaysUpdateVelocity;
         if (this.entity instanceof LivingEntity) {
             Collection<EntityAttributeInstance> collection = ((LivingEntity)this.entity).getAttributes().getAttributesToSend();
             if (!collection.isEmpty()) {
-                consumer.accept(new EntityAttributesS2CPacket(this.entity.getEntityId(), collection));
+                sender.accept(new EntityAttributesS2CPacket(this.entity.getEntityId(), collection));
             }
             if (((LivingEntity)this.entity).isFallFlying()) {
                 bl = true;
@@ -211,7 +211,7 @@ public class EntityTrackerEntry {
         }
         this.velocity = this.entity.getVelocity();
         if (bl && !(lv instanceof MobSpawnS2CPacket)) {
-            consumer.accept(new EntityVelocityUpdateS2CPacket(this.entity.getEntityId(), this.velocity));
+            sender.accept(new EntityVelocityUpdateS2CPacket(this.entity.getEntityId(), this.velocity));
         }
         if (this.entity instanceof LivingEntity) {
             ArrayList list = Lists.newArrayList();
@@ -221,23 +221,23 @@ public class EntityTrackerEntry {
                 list.add(Pair.of((Object)((Object)lv2), (Object)lv3.copy()));
             }
             if (!list.isEmpty()) {
-                consumer.accept(new EntityEquipmentUpdateS2CPacket(this.entity.getEntityId(), list));
+                sender.accept(new EntityEquipmentUpdateS2CPacket(this.entity.getEntityId(), list));
             }
         }
         if (this.entity instanceof LivingEntity) {
             LivingEntity lv4 = (LivingEntity)this.entity;
             for (StatusEffectInstance lv5 : lv4.getStatusEffects()) {
-                consumer.accept(new EntityStatusEffectS2CPacket(this.entity.getEntityId(), lv5));
+                sender.accept(new EntityStatusEffectS2CPacket(this.entity.getEntityId(), lv5));
             }
         }
         if (!this.entity.getPassengerList().isEmpty()) {
-            consumer.accept(new EntityPassengersSetS2CPacket(this.entity));
+            sender.accept(new EntityPassengersSetS2CPacket(this.entity));
         }
         if (this.entity.hasVehicle()) {
-            consumer.accept(new EntityPassengersSetS2CPacket(this.entity.getVehicle()));
+            sender.accept(new EntityPassengersSetS2CPacket(this.entity.getVehicle()));
         }
         if (this.entity instanceof MobEntity && (lv6 = (MobEntity)this.entity).isLeashed()) {
-            consumer.accept(new EntityAttachS2CPacket(lv6, lv6.getHoldingEntity()));
+            sender.accept(new EntityAttachS2CPacket(lv6, lv6.getHoldingEntity()));
         }
     }
 
@@ -265,10 +265,10 @@ public class EntityTrackerEntry {
         return EntityS2CPacket.decodePacketCoordinates(this.lastX, this.lastY, this.lastZ);
     }
 
-    private void sendSyncPacket(Packet<?> arg) {
-        this.receiver.accept(arg);
+    private void sendSyncPacket(Packet<?> packet) {
+        this.receiver.accept(packet);
         if (this.entity instanceof ServerPlayerEntity) {
-            ((ServerPlayerEntity)this.entity).networkHandler.sendPacket(arg);
+            ((ServerPlayerEntity)this.entity).networkHandler.sendPacket(packet);
         }
     }
 }

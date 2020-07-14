@@ -44,24 +44,24 @@ extends HandledScreen<BeaconScreenHandler> {
     private StatusEffect primaryEffect;
     private StatusEffect secondaryEffect;
 
-    public BeaconScreen(final BeaconScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
+    public BeaconScreen(final BeaconScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
         this.backgroundWidth = 230;
         this.backgroundHeight = 219;
-        arg.addListener(new ScreenHandlerListener(){
+        handler.addListener(new ScreenHandlerListener(){
 
             @Override
-            public void onHandlerRegistered(ScreenHandler arg3, DefaultedList<ItemStack> arg2) {
+            public void onHandlerRegistered(ScreenHandler handler2, DefaultedList<ItemStack> stacks) {
             }
 
             @Override
-            public void onSlotUpdate(ScreenHandler arg3, int i, ItemStack arg2) {
+            public void onSlotUpdate(ScreenHandler handler2, int slotId, ItemStack stack) {
             }
 
             @Override
-            public void onPropertyUpdate(ScreenHandler arg2, int i, int j) {
-                BeaconScreen.this.primaryEffect = arg.getPrimaryEffect();
-                BeaconScreen.this.secondaryEffect = arg.getSecondaryEffect();
+            public void onPropertyUpdate(ScreenHandler handler2, int property, int value) {
+                BeaconScreen.this.primaryEffect = handler.getPrimaryEffect();
+                BeaconScreen.this.secondaryEffect = handler.getSecondaryEffect();
                 BeaconScreen.this.consumeGem = true;
             }
         });
@@ -125,23 +125,23 @@ extends HandledScreen<BeaconScreenHandler> {
     }
 
     @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("block.minecraft.beacon.primary", new Object[0]), 62, 10, 0xE0E0E0);
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("block.minecraft.beacon.secondary", new Object[0]), 169, 10, 0xE0E0E0);
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("block.minecraft.beacon.primary", new Object[0]), 62, 10, 0xE0E0E0);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("block.minecraft.beacon.secondary", new Object[0]), 169, 10, 0xE0E0E0);
         for (AbstractButtonWidget lv : this.buttons) {
             if (!lv.isHovered()) continue;
-            lv.renderToolTip(arg, i - this.x, j - this.y);
+            lv.renderToolTip(matrices, mouseX - this.x, mouseY - this.y);
             break;
         }
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = (this.width - this.backgroundWidth) / 2;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
         this.itemRenderer.zOffset = 100.0f;
         this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.NETHERITE_INGOT), k + 20, l + 109);
         this.itemRenderer.renderInGuiWithOverrides(new ItemStack(Items.EMERALD), k + 41, l + 109);
@@ -152,17 +152,17 @@ extends HandledScreen<BeaconScreenHandler> {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
     @Environment(value=EnvType.CLIENT)
     class CancelButtonWidget
     extends IconButtonWidget {
-        public CancelButtonWidget(int i, int j) {
-            super(i, j, 112, 220);
+        public CancelButtonWidget(int x, int y) {
+            super(x, y, 112, 220);
         }
 
         @Override
@@ -172,16 +172,16 @@ extends HandledScreen<BeaconScreenHandler> {
         }
 
         @Override
-        public void renderToolTip(MatrixStack arg, int i, int j) {
-            BeaconScreen.this.renderTooltip(arg, ScreenTexts.CANCEL, i, j);
+        public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+            BeaconScreen.this.renderTooltip(matrices, ScreenTexts.CANCEL, mouseX, mouseY);
         }
     }
 
     @Environment(value=EnvType.CLIENT)
     class DoneButtonWidget
     extends IconButtonWidget {
-        public DoneButtonWidget(int i, int j) {
-            super(i, j, 90, 220);
+        public DoneButtonWidget(int x, int y) {
+            super(x, y, 90, 220);
         }
 
         @Override
@@ -192,8 +192,8 @@ extends HandledScreen<BeaconScreenHandler> {
         }
 
         @Override
-        public void renderToolTip(MatrixStack arg, int i, int j) {
-            BeaconScreen.this.renderTooltip(arg, ScreenTexts.DONE, i, j);
+        public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+            BeaconScreen.this.renderTooltip(matrices, ScreenTexts.DONE, mouseX, mouseY);
         }
     }
 
@@ -203,10 +203,10 @@ extends HandledScreen<BeaconScreenHandler> {
         private final int u;
         private final int v;
 
-        protected IconButtonWidget(int i, int j, int k, int l) {
-            super(i, j);
-            this.u = k;
-            this.v = l;
+        protected IconButtonWidget(int x, int y, int u, int v) {
+            super(x, y);
+            this.u = u;
+            this.v = v;
         }
 
         @Override
@@ -222,11 +222,11 @@ extends HandledScreen<BeaconScreenHandler> {
         private final Sprite sprite;
         private final boolean primary;
 
-        public EffectButtonWidget(int i, int j, StatusEffect arg2, boolean bl) {
-            super(i, j);
-            this.effect = arg2;
-            this.sprite = MinecraftClient.getInstance().getStatusEffectSpriteManager().getSprite(arg2);
-            this.primary = bl;
+        public EffectButtonWidget(int x, int y, StatusEffect statusEffect, boolean primary) {
+            super(x, y);
+            this.effect = statusEffect;
+            this.sprite = MinecraftClient.getInstance().getStatusEffectSpriteManager().getSprite(statusEffect);
+            this.primary = primary;
         }
 
         @Override
@@ -246,12 +246,12 @@ extends HandledScreen<BeaconScreenHandler> {
         }
 
         @Override
-        public void renderToolTip(MatrixStack arg, int i, int j) {
+        public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
             TranslatableText lv = new TranslatableText(this.effect.getTranslationKey());
             if (!this.primary && this.effect != StatusEffects.REGENERATION) {
                 lv.append(" II");
             }
-            BeaconScreen.this.renderTooltip(arg, lv, i, j);
+            BeaconScreen.this.renderTooltip(matrices, lv, mouseX, mouseY);
         }
 
         @Override
@@ -266,12 +266,12 @@ extends HandledScreen<BeaconScreenHandler> {
     extends AbstractPressableButtonWidget {
         private boolean disabled;
 
-        protected BaseButtonWidget(int i, int j) {
-            super(i, j, 22, 22, LiteralText.EMPTY);
+        protected BaseButtonWidget(int x, int y) {
+            super(x, y, 22, 22, LiteralText.EMPTY);
         }
 
         @Override
-        public void renderButton(MatrixStack arg, int i, int j, float f) {
+        public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
             MinecraftClient.getInstance().getTextureManager().bindTexture(TEXTURE);
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             int k = 219;
@@ -283,8 +283,8 @@ extends HandledScreen<BeaconScreenHandler> {
             } else if (this.isHovered()) {
                 l += this.width * 3;
             }
-            this.drawTexture(arg, this.x, this.y, l, 219, this.width, this.height);
-            this.renderExtra(arg);
+            this.drawTexture(matrices, this.x, this.y, l, 219, this.width, this.height);
+            this.renderExtra(matrices);
         }
 
         protected abstract void renderExtra(MatrixStack var1);
@@ -293,8 +293,8 @@ extends HandledScreen<BeaconScreenHandler> {
             return this.disabled;
         }
 
-        public void setDisabled(boolean bl) {
-            this.disabled = bl;
+        public void setDisabled(boolean disabled) {
+            this.disabled = disabled;
         }
     }
 }

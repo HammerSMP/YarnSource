@@ -14,8 +14,8 @@ public abstract class ServerConfigEntry<T> {
     @Nullable
     private final T key;
 
-    public ServerConfigEntry(@Nullable T object) {
-        this.key = object;
+    public ServerConfigEntry(@Nullable T key) {
+        this.key = key;
     }
 
     @Nullable

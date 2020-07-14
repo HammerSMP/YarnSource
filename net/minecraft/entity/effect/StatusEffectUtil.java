@@ -17,32 +17,32 @@ import net.minecraft.util.math.MathHelper;
 
 public final class StatusEffectUtil {
     @Environment(value=EnvType.CLIENT)
-    public static String durationToString(StatusEffectInstance arg, float f) {
-        if (arg.isPermanent()) {
+    public static String durationToString(StatusEffectInstance effect, float multiplier) {
+        if (effect.isPermanent()) {
             return "**:**";
         }
-        int i = MathHelper.floor((float)arg.getDuration() * f);
+        int i = MathHelper.floor((float)effect.getDuration() * multiplier);
         return ChatUtil.ticksToString(i);
     }
 
-    public static boolean hasHaste(LivingEntity arg) {
-        return arg.hasStatusEffect(StatusEffects.HASTE) || arg.hasStatusEffect(StatusEffects.CONDUIT_POWER);
+    public static boolean hasHaste(LivingEntity entity) {
+        return entity.hasStatusEffect(StatusEffects.HASTE) || entity.hasStatusEffect(StatusEffects.CONDUIT_POWER);
     }
 
-    public static int getHasteAmplifier(LivingEntity arg) {
+    public static int getHasteAmplifier(LivingEntity entity) {
         int i = 0;
         int j = 0;
-        if (arg.hasStatusEffect(StatusEffects.HASTE)) {
-            i = arg.getStatusEffect(StatusEffects.HASTE).getAmplifier();
+        if (entity.hasStatusEffect(StatusEffects.HASTE)) {
+            i = entity.getStatusEffect(StatusEffects.HASTE).getAmplifier();
         }
-        if (arg.hasStatusEffect(StatusEffects.CONDUIT_POWER)) {
-            j = arg.getStatusEffect(StatusEffects.CONDUIT_POWER).getAmplifier();
+        if (entity.hasStatusEffect(StatusEffects.CONDUIT_POWER)) {
+            j = entity.getStatusEffect(StatusEffects.CONDUIT_POWER).getAmplifier();
         }
         return Math.max(i, j);
     }
 
-    public static boolean hasWaterBreathing(LivingEntity arg) {
-        return arg.hasStatusEffect(StatusEffects.WATER_BREATHING) || arg.hasStatusEffect(StatusEffects.CONDUIT_POWER);
+    public static boolean hasWaterBreathing(LivingEntity entity) {
+        return entity.hasStatusEffect(StatusEffects.WATER_BREATHING) || entity.hasStatusEffect(StatusEffects.CONDUIT_POWER);
     }
 }
 

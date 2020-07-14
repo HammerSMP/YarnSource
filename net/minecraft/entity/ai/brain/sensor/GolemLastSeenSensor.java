@@ -27,8 +27,8 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg2) {
-        GolemLastSeenSensor.senseIronGolem(arg2);
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        GolemLastSeenSensor.senseIronGolem(entity);
     }
 
     @Override

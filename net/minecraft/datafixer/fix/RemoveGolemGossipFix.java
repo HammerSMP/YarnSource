@@ -18,17 +18,17 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class RemoveGolemGossipFix
 extends ChoiceFix {
-    public RemoveGolemGossipFix(Schema schema, boolean bl) {
-        super(schema, bl, "Remove Golem Gossip Fix", TypeReferences.ENTITY, "minecraft:villager");
+    public RemoveGolemGossipFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "Remove Golem Gossip Fix", TypeReferences.ENTITY, "minecraft:villager");
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), RemoveGolemGossipFix::updateGossipsList);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), RemoveGolemGossipFix::updateGossipsList);
     }
 
-    private static Dynamic<?> updateGossipsList(Dynamic<?> dynamic) {
-        return dynamic.update("Gossips", dynamic22 -> dynamic.createList(dynamic22.asStream().filter(dynamic -> !dynamic.get("Type").asString("").equals("golem"))));
+    private static Dynamic<?> updateGossipsList(Dynamic<?> villagerData) {
+        return villagerData.update("Gossips", dynamic22 -> villagerData.createList(dynamic22.asStream().filter(dynamic -> !dynamic.get("Type").asString("").equals("golem"))));
     }
 }
 

@@ -40,19 +40,19 @@ extends ValueObject {
     public WorldTemplatePaginatedList() {
     }
 
-    public WorldTemplatePaginatedList(int i) {
+    public WorldTemplatePaginatedList(int size) {
         this.templates = Collections.emptyList();
         this.page = 0;
-        this.size = i;
+        this.size = size;
         this.total = -1;
     }
 
-    public static WorldTemplatePaginatedList parse(String string) {
+    public static WorldTemplatePaginatedList parse(String json) {
         WorldTemplatePaginatedList lv = new WorldTemplatePaginatedList();
         lv.templates = Lists.newArrayList();
         try {
             JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(string).getAsJsonObject();
+            JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
             if (jsonObject.get("templates").isJsonArray()) {
                 Iterator iterator = jsonObject.get("templates").getAsJsonArray().iterator();
                 while (iterator.hasNext()) {

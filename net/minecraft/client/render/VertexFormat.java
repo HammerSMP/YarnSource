@@ -51,14 +51,14 @@ public class VertexFormat {
         return this.elements;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        VertexFormat lv = (VertexFormat)object;
+        VertexFormat lv = (VertexFormat)o;
         if (this.size != lv.size) {
             return false;
         }
@@ -69,15 +69,15 @@ public class VertexFormat {
         return this.elements.hashCode();
     }
 
-    public void startDrawing(long l) {
+    public void startDrawing(long pointer) {
         if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(() -> this.startDrawing(l));
+            RenderSystem.recordRenderCall(() -> this.startDrawing(pointer));
             return;
         }
         int i = this.getVertexSize();
         ImmutableList<VertexFormatElement> list = this.getElements();
         for (int j = 0; j < list.size(); ++j) {
-            ((VertexFormatElement)list.get(j)).startDrawing(l + (long)this.offsets.getInt(j), i);
+            ((VertexFormatElement)list.get(j)).startDrawing(pointer + (long)this.offsets.getInt(j), i);
         }
     }
 

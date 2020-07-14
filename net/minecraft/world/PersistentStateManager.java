@@ -30,60 +30,60 @@ public class PersistentStateManager {
     private final DataFixer dataFixer;
     private final File directory;
 
-    public PersistentStateManager(File file, DataFixer dataFixer) {
+    public PersistentStateManager(File directory, DataFixer dataFixer) {
         this.dataFixer = dataFixer;
-        this.directory = file;
+        this.directory = directory;
     }
 
-    private File getFile(String string) {
-        return new File(this.directory, string + ".dat");
+    private File getFile(String id) {
+        return new File(this.directory, id + ".dat");
     }
 
-    public <T extends PersistentState> T getOrCreate(Supplier<T> supplier, String string) {
-        T lv = this.get(supplier, string);
+    public <T extends PersistentState> T getOrCreate(Supplier<T> factory, String id) {
+        T lv = this.get(factory, id);
         if (lv != null) {
             return lv;
         }
-        PersistentState lv2 = (PersistentState)supplier.get();
+        PersistentState lv2 = (PersistentState)factory.get();
         this.set(lv2);
         return (T)lv2;
     }
 
     @Nullable
-    public <T extends PersistentState> T get(Supplier<T> supplier, String string) {
-        PersistentState lv = this.loadedStates.get(string);
-        if (lv == null && !this.loadedStates.containsKey(string)) {
-            lv = this.readFromFile(supplier, string);
-            this.loadedStates.put(string, lv);
+    public <T extends PersistentState> T get(Supplier<T> factory, String id) {
+        PersistentState lv = this.loadedStates.get(id);
+        if (lv == null && !this.loadedStates.containsKey(id)) {
+            lv = this.readFromFile(factory, id);
+            this.loadedStates.put(id, lv);
         }
         return (T)lv;
     }
 
     @Nullable
-    private <T extends PersistentState> T readFromFile(Supplier<T> supplier, String string) {
+    private <T extends PersistentState> T readFromFile(Supplier<T> factory, String id) {
         try {
-            File file = this.getFile(string);
+            File file = this.getFile(id);
             if (file.exists()) {
-                PersistentState lv = (PersistentState)supplier.get();
-                CompoundTag lv2 = this.readTag(string, SharedConstants.getGameVersion().getWorldVersion());
+                PersistentState lv = (PersistentState)factory.get();
+                CompoundTag lv2 = this.readTag(id, SharedConstants.getGameVersion().getWorldVersion());
                 lv.fromTag(lv2.getCompound("data"));
                 return (T)lv;
             }
         }
         catch (Exception exception) {
-            LOGGER.error("Error loading saved data: {}", (Object)string, (Object)exception);
+            LOGGER.error("Error loading saved data: {}", (Object)id, (Object)exception);
         }
         return null;
     }
 
-    public void set(PersistentState arg) {
-        this.loadedStates.put(arg.getId(), arg);
+    public void set(PersistentState state) {
+        this.loadedStates.put(state.getId(), state);
     }
 
     /*
      * Exception decompiling
      */
-    public CompoundTag readTag(String string, int i) throws IOException {
+    public CompoundTag readTag(String id, int dataVersion) throws IOException {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [0[TRYBLOCK]], but top level block is 8[TRYBLOCK]

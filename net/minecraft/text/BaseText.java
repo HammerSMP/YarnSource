@@ -19,8 +19,8 @@ implements MutableText {
     private Style style = Style.EMPTY;
 
     @Override
-    public MutableText append(Text arg) {
-        this.siblings.add(arg);
+    public MutableText append(Text text) {
+        this.siblings.add(text);
         return this;
     }
 
@@ -35,8 +35,8 @@ implements MutableText {
     }
 
     @Override
-    public MutableText setStyle(Style arg) {
-        this.style = arg;
+    public MutableText setStyle(Style style) {
+        this.style = style;
         return this;
     }
 
@@ -56,12 +56,12 @@ implements MutableText {
         return lv;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (object instanceof BaseText) {
-            BaseText lv = (BaseText)object;
+        if (obj instanceof BaseText) {
+            BaseText lv = (BaseText)obj;
             return this.siblings.equals(lv.siblings) && Objects.equals(this.getStyle(), lv.getStyle());
         }
         return false;

@@ -24,12 +24,12 @@ public class ChunkBorderDebugRenderer
 implements DebugRenderer.Renderer {
     private final MinecraftClient client;
 
-    public ChunkBorderDebugRenderer(MinecraftClient arg) {
-        this.client = arg;
+    public ChunkBorderDebugRenderer(MinecraftClient client) {
+        this.client = client;
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         RenderSystem.enableDepthTest();
         RenderSystem.shadeModel(7425);
         RenderSystem.enableAlphaTest();
@@ -37,12 +37,12 @@ implements DebugRenderer.Renderer {
         Entity lv = this.client.gameRenderer.getCamera().getFocusedEntity();
         Tessellator lv2 = Tessellator.getInstance();
         BufferBuilder lv3 = lv2.getBuffer();
-        double g = 0.0 - e;
-        double h = 256.0 - e;
+        double g = 0.0 - cameraY;
+        double h = 256.0 - cameraY;
         RenderSystem.disableTexture();
         RenderSystem.disableBlend();
-        double i = (double)(lv.chunkX << 4) - d;
-        double j = (double)(lv.chunkZ << 4) - f;
+        double i = (double)(lv.chunkX << 4) - cameraX;
+        double j = (double)(lv.chunkZ << 4) - cameraZ;
         RenderSystem.lineWidth(1.0f);
         lv3.begin(3, VertexFormats.POSITION_COLOR);
         for (int k = -16; k <= 32; k += 16) {
@@ -74,7 +74,7 @@ implements DebugRenderer.Renderer {
             lv3.vertex(i + 16.0, h, j + (double)n).color(1.0f, 1.0f, 0.0f, 0.0f).next();
         }
         for (int o = 0; o <= 256; o += 2) {
-            double p = (double)o - e;
+            double p = (double)o - cameraY;
             lv3.vertex(i, p, j).color(1.0f, 1.0f, 0.0f, 0.0f).next();
             lv3.vertex(i, p, j).color(1.0f, 1.0f, 0.0f, 1.0f).next();
             lv3.vertex(i, p, j + 16.0).color(1.0f, 1.0f, 0.0f, 1.0f).next();
@@ -95,7 +95,7 @@ implements DebugRenderer.Renderer {
             }
         }
         for (int s = 0; s <= 256; s += 16) {
-            double t = (double)s - e;
+            double t = (double)s - cameraY;
             lv3.vertex(i, t, j).color(0.25f, 0.25f, 1.0f, 0.0f).next();
             lv3.vertex(i, t, j).color(0.25f, 0.25f, 1.0f, 1.0f).next();
             lv3.vertex(i, t, j + 16.0).color(0.25f, 0.25f, 1.0f, 1.0f).next();

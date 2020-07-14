@@ -49,15 +49,15 @@ public final class ChunkGeneratorType {
     private final boolean field_24786;
     private final Optional<Preset> field_24787;
 
-    private ChunkGeneratorType(StructuresConfig arg, NoiseConfig arg2, BlockState arg3, BlockState arg4, int i, int j, int k, boolean bl) {
-        this(arg, arg2, arg3, arg4, i, j, k, bl, Optional.empty());
+    private ChunkGeneratorType(StructuresConfig config, NoiseConfig arg2, BlockState defaultBlock, BlockState defaultFluid, int i, int j, int k, boolean bl) {
+        this(config, arg2, defaultBlock, defaultFluid, i, j, k, bl, Optional.empty());
     }
 
-    private ChunkGeneratorType(StructuresConfig arg, NoiseConfig arg2, BlockState arg3, BlockState arg4, int i, int j, int k, boolean bl, Optional<Preset> optional) {
-        this.config = arg;
+    private ChunkGeneratorType(StructuresConfig config, NoiseConfig arg2, BlockState defaultBlock, BlockState defaultFluid, int i, int j, int k, boolean bl, Optional<Preset> optional) {
+        this.config = config;
         this.field_24782 = arg2;
-        this.defaultBlock = arg3;
-        this.defaultFluid = arg4;
+        this.defaultBlock = defaultBlock;
+        this.defaultFluid = defaultFluid;
         this.bedrockCeilingY = i;
         this.bedrockFloorY = j;
         this.field_24785 = k;
@@ -115,10 +115,10 @@ public final class ChunkGeneratorType {
         private final Identifier id;
         private final ChunkGeneratorType chunkGeneratorType;
 
-        public Preset(String string, Function<Preset, ChunkGeneratorType> function) {
-            this.id = new Identifier(string);
-            this.text = new TranslatableText("generator.noise." + string);
-            this.chunkGeneratorType = function.apply(this);
+        public Preset(String id, Function<Preset, ChunkGeneratorType> generatorTypeGetter) {
+            this.id = new Identifier(id);
+            this.text = new TranslatableText("generator.noise." + id);
+            this.chunkGeneratorType = generatorTypeGetter.apply(this);
             BY_ID.put(this.id, this);
         }
 
@@ -126,14 +126,14 @@ public final class ChunkGeneratorType {
             return this.chunkGeneratorType;
         }
 
-        private static ChunkGeneratorType createIslandsType(StructuresConfig arg, BlockState arg2, BlockState arg3, Preset arg4, boolean bl, boolean bl2) {
-            return new ChunkGeneratorType(arg, new NoiseConfig(128, new NoiseSamplingConfig(2.0, 1.0, 80.0, 160.0), new SlideConfig(-3000, 64, -46), new SlideConfig(-30, 7, 1), 2, 1, 0.0, 0.0, true, false, bl2, false), arg2, arg3, -10, -10, 0, bl, Optional.of(arg4));
+        private static ChunkGeneratorType createIslandsType(StructuresConfig config, BlockState defaultBlock, BlockState defaultFluid, Preset arg4, boolean bl, boolean bl2) {
+            return new ChunkGeneratorType(config, new NoiseConfig(128, new NoiseSamplingConfig(2.0, 1.0, 80.0, 160.0), new SlideConfig(-3000, 64, -46), new SlideConfig(-30, 7, 1), 2, 1, 0.0, 0.0, true, false, bl2, false), defaultBlock, defaultFluid, -10, -10, 0, bl, Optional.of(arg4));
         }
 
-        private static ChunkGeneratorType createCavesType(StructuresConfig arg, BlockState arg2, BlockState arg3, Preset arg4) {
+        private static ChunkGeneratorType createCavesType(StructuresConfig config, BlockState defaultBlock, BlockState defaultFluid, Preset arg4) {
             HashMap map = Maps.newHashMap(StructuresConfig.DEFAULT_STRUCTURES);
             map.put(StructureFeature.RUINED_PORTAL, new StructureConfig(25, 10, 34222645));
-            return new ChunkGeneratorType(new StructuresConfig(Optional.ofNullable(arg.getStronghold()), map), new NoiseConfig(128, new NoiseSamplingConfig(1.0, 3.0, 80.0, 60.0), new SlideConfig(120, 3, 0), new SlideConfig(320, 4, -1), 1, 2, 0.0, 0.019921875, false, false, false, false), arg2, arg3, 0, 0, 32, false, Optional.of(arg4));
+            return new ChunkGeneratorType(new StructuresConfig(Optional.ofNullable(config.getStronghold()), map), new NoiseConfig(128, new NoiseSamplingConfig(1.0, 3.0, 80.0, 60.0), new SlideConfig(120, 3, 0), new SlideConfig(320, 4, -1), 1, 2, 0.0, 0.019921875, false, false, false, false), defaultBlock, defaultFluid, 0, 0, 32, false, Optional.of(arg4));
         }
 
         private static ChunkGeneratorType createOverworldType(StructuresConfig arg, boolean bl, Preset arg2) {

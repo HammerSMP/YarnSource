@@ -15,10 +15,10 @@ extends StatusEffect {
     }
 
     @Override
-    public void onRemoved(LivingEntity arg, AttributeContainer arg2, int i) {
-        super.onRemoved(arg, arg2, i);
-        if (arg.getHealth() > arg.getMaxHealth()) {
-            arg.setHealth(arg.getMaxHealth());
+    public void onRemoved(LivingEntity entity, AttributeContainer attributes, int amplifier) {
+        super.onRemoved(entity, attributes, amplifier);
+        if (entity.getHealth() > entity.getMaxHealth()) {
+            entity.setHealth(entity.getMaxHealth());
         }
     }
 }

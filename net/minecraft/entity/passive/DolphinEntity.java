@@ -93,10 +93,10 @@ extends WaterCreatureEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         this.setAir(this.getMaxAir());
         this.pitch = 0.0f;
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -105,11 +105,11 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected void tickWaterBreathingAir(int i) {
+    protected void tickWaterBreathingAir(int air) {
     }
 
-    public void setTreasurePos(BlockPos arg) {
-        this.dataTracker.set(TREASURE_POS, arg);
+    public void setTreasurePos(BlockPos treasurePos) {
+        this.dataTracker.set(TREASURE_POS, treasurePos);
     }
 
     public BlockPos getTreasurePos() {
@@ -120,16 +120,16 @@ extends WaterCreatureEntity {
         return this.dataTracker.get(HAS_FISH);
     }
 
-    public void setHasFish(boolean bl) {
-        this.dataTracker.set(HAS_FISH, bl);
+    public void setHasFish(boolean hasFish) {
+        this.dataTracker.set(HAS_FISH, hasFish);
     }
 
     public int getMoistness() {
         return this.dataTracker.get(MOISTNESS);
     }
 
-    public void setMoistness(int i) {
-        this.dataTracker.set(MOISTNESS, i);
+    public void setMoistness(int moistness) {
+        this.dataTracker.set(MOISTNESS, moistness);
     }
 
     @Override
@@ -141,24 +141,24 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("TreasurePosX", this.getTreasurePos().getX());
-        arg.putInt("TreasurePosY", this.getTreasurePos().getY());
-        arg.putInt("TreasurePosZ", this.getTreasurePos().getZ());
-        arg.putBoolean("GotFish", this.hasFish());
-        arg.putInt("Moistness", this.getMoistness());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("TreasurePosX", this.getTreasurePos().getX());
+        tag.putInt("TreasurePosY", this.getTreasurePos().getY());
+        tag.putInt("TreasurePosZ", this.getTreasurePos().getZ());
+        tag.putBoolean("GotFish", this.hasFish());
+        tag.putInt("Moistness", this.getMoistness());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        int i = arg.getInt("TreasurePosX");
-        int j = arg.getInt("TreasurePosY");
-        int k = arg.getInt("TreasurePosZ");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        int i = tag.getInt("TreasurePosX");
+        int j = tag.getInt("TreasurePosY");
+        int k = tag.getInt("TreasurePosZ");
         this.setTreasurePos(new BlockPos(i, j, k));
-        super.readCustomDataFromTag(arg);
-        this.setHasFish(arg.getBoolean("GotFish"));
-        this.setMoistness(arg.getInt("Moistness"));
+        super.readCustomDataFromTag(tag);
+        this.setHasFish(tag.getBoolean("GotFish"));
+        this.setMoistness(tag.getInt("Moistness"));
     }
 
     @Override
@@ -183,15 +183,15 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        return new SwimNavigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new SwimNavigation(this, world);
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        boolean bl = arg.damage(DamageSource.mob(this), (int)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE));
+    public boolean tryAttack(Entity target) {
+        boolean bl = target.damage(DamageSource.mob(this), (int)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE));
         if (bl) {
-            this.dealDamage(this, arg);
+            this.dealDamage(this, target);
             this.playSound(SoundEvents.ENTITY_DOLPHIN_ATTACK, 1.0f, 1.0f);
         }
         return bl;
@@ -203,12 +203,12 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected int getNextAirOnLand(int i) {
+    protected int getNextAirOnLand(int air) {
         return this.getMaxAir();
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 0.3f;
     }
 
@@ -223,28 +223,28 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    protected boolean canStartRiding(Entity arg) {
+    protected boolean canStartRiding(Entity entity) {
         return true;
     }
 
     @Override
-    public boolean canPickUp(ItemStack arg) {
-        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
+    public boolean canPickUp(ItemStack stack) {
+        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(stack);
         if (!this.getEquippedStack(lv).isEmpty()) {
             return false;
         }
-        return lv == EquipmentSlot.MAINHAND && super.canPickUp(arg);
+        return lv == EquipmentSlot.MAINHAND && super.canPickUp(stack);
     }
 
     @Override
-    protected void loot(ItemEntity arg) {
+    protected void loot(ItemEntity item) {
         ItemStack lv;
-        if (this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty() && this.canPickupItem(lv = arg.getStack())) {
-            this.method_29499(arg);
+        if (this.getEquippedStack(EquipmentSlot.MAINHAND).isEmpty() && this.canPickupItem(lv = item.getStack())) {
+            this.method_29499(item);
             this.equipStack(EquipmentSlot.MAINHAND, lv);
             this.handDropChances[EquipmentSlot.MAINHAND.getEntitySlotId()] = 2.0f;
-            this.sendPickup(arg, lv.getCount());
-            arg.remove();
+            this.sendPickup(item, lv.getCount());
+            item.remove();
         }
     }
 
@@ -283,46 +283,46 @@ extends WaterCreatureEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 38) {
+    public void handleStatus(byte status) {
+        if (status == 38) {
             this.spawnParticlesAround(ParticleTypes.HAPPY_VILLAGER);
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    private void spawnParticlesAround(ParticleEffect arg) {
+    private void spawnParticlesAround(ParticleEffect parameters) {
         for (int i = 0; i < 7; ++i) {
             double d = this.random.nextGaussian() * 0.01;
             double e = this.random.nextGaussian() * 0.01;
             double f = this.random.nextGaussian() * 0.01;
-            this.world.addParticle(arg, this.getParticleX(1.0), this.getRandomBodyY() + 0.2, this.getParticleZ(1.0), d, e, f);
+            this.world.addParticle(parameters, this.getParticleX(1.0), this.getRandomBodyY() + 0.2, this.getParticleZ(1.0), d, e, f);
         }
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (!lv.isEmpty() && lv.getItem().isIn(ItemTags.FISHES)) {
             if (!this.world.isClient) {
                 this.playSound(SoundEvents.ENTITY_DOLPHIN_EAT, 1.0f, 1.0f);
             }
             this.setHasFish(true);
-            if (!arg.abilities.creativeMode) {
+            if (!player.abilities.creativeMode) {
                 lv.decrement(1);
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
-    public static boolean canSpawn(EntityType<DolphinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg4.getY() > 45 && arg4.getY() < arg2.getSeaLevel() && (arg2.getBiome(arg4) != Biomes.OCEAN || arg2.getBiome(arg4) != Biomes.DEEP_OCEAN) && arg2.getFluidState(arg4).isIn(FluidTags.WATER);
+    public static boolean canSpawn(EntityType<DolphinEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return pos.getY() > 45 && pos.getY() < world.getSeaLevel() && (world.getBiome(pos) != Biomes.OCEAN || world.getBiome(pos) != Biomes.DEEP_OCEAN) && world.getFluidState(pos).isIn(FluidTags.WATER);
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_DOLPHIN_HURT;
     }
 
@@ -357,21 +357,21 @@ extends WaterCreatureEntity {
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() && this.isTouchingWater()) {
-            this.updateVelocity(this.getMovementSpeed(), arg);
+            this.updateVelocity(this.getMovementSpeed(), movementInput);
             this.move(MovementType.SELF, this.getVelocity());
             this.setVelocity(this.getVelocity().multiply(0.9));
             if (this.getTarget() == null) {
                 this.setVelocity(this.getVelocity().add(0.0, -0.005, 0.0));
             }
         } else {
-            super.travel(arg);
+            super.travel(movementInput);
         }
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return true;
     }
 
@@ -380,8 +380,8 @@ extends WaterCreatureEntity {
         private final DolphinEntity dolphin;
         private boolean noPathToStructure;
 
-        LeadToNearbyTreasureGoal(DolphinEntity arg) {
-            this.dolphin = arg;
+        LeadToNearbyTreasureGoal(DolphinEntity dolphin) {
+            this.dolphin = dolphin;
             this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
         }
 
@@ -469,9 +469,9 @@ extends WaterCreatureEntity {
         private final double speed;
         private PlayerEntity closestPlayer;
 
-        SwimWithPlayerGoal(DolphinEntity arg, double d) {
-            this.dolphin = arg;
-            this.speed = d;
+        SwimWithPlayerGoal(DolphinEntity dolphin, double speed) {
+            this.dolphin = dolphin;
+            this.speed = speed;
             this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
         }
 
@@ -562,12 +562,12 @@ extends WaterCreatureEntity {
             }
         }
 
-        private void spitOutItem(ItemStack arg) {
-            if (arg.isEmpty()) {
+        private void spitOutItem(ItemStack stack) {
+            if (stack.isEmpty()) {
                 return;
             }
             double d = DolphinEntity.this.getEyeY() - (double)0.3f;
-            ItemEntity lv = new ItemEntity(DolphinEntity.this.world, DolphinEntity.this.getX(), d, DolphinEntity.this.getZ(), arg);
+            ItemEntity lv = new ItemEntity(DolphinEntity.this.world, DolphinEntity.this.getX(), d, DolphinEntity.this.getZ(), stack);
             lv.setPickupDelay(40);
             lv.setThrower(DolphinEntity.this.getUuid());
             float f = 0.3f;
@@ -582,9 +582,9 @@ extends WaterCreatureEntity {
     extends MoveControl {
         private final DolphinEntity dolphin;
 
-        public DolphinMoveControl(DolphinEntity arg) {
-            super(arg);
-            this.dolphin = arg;
+        public DolphinMoveControl(DolphinEntity dolphin) {
+            super(dolphin);
+            this.dolphin = dolphin;
         }
 
         @Override

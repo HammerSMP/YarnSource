@@ -33,8 +33,8 @@ implements ResourceMetadataReader<PackResourceMetadata> {
     }
 
     @Override
-    public /* synthetic */ Object fromJson(JsonObject jsonObject) {
-        return this.fromJson(jsonObject);
+    public /* synthetic */ Object fromJson(JsonObject json) {
+        return this.fromJson(json);
     }
 }
 

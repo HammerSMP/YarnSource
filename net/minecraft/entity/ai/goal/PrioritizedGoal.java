@@ -16,13 +16,13 @@ extends Goal {
     private final int priority;
     private boolean running;
 
-    public PrioritizedGoal(int i, Goal arg) {
-        this.priority = i;
-        this.goal = arg;
+    public PrioritizedGoal(int priority, Goal goal) {
+        this.priority = priority;
+        this.goal = goal;
     }
 
-    public boolean canBeReplacedBy(PrioritizedGoal arg) {
-        return this.canStop() && arg.getPriority() < this.getPriority();
+    public boolean canBeReplacedBy(PrioritizedGoal goal) {
+        return this.canStop() && goal.getPriority() < this.getPriority();
     }
 
     @Override
@@ -64,8 +64,8 @@ extends Goal {
     }
 
     @Override
-    public void setControls(EnumSet<Goal.Control> enumSet) {
-        this.goal.setControls(enumSet);
+    public void setControls(EnumSet<Goal.Control> controls) {
+        this.goal.setControls(controls);
     }
 
     @Override

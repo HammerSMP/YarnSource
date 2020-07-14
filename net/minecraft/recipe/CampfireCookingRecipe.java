@@ -19,8 +19,8 @@ import net.minecraft.util.Identifier;
 
 public class CampfireCookingRecipe
 extends AbstractCookingRecipe {
-    public CampfireCookingRecipe(Identifier arg, String string, Ingredient arg2, ItemStack arg3, float f, int i) {
-        super(RecipeType.CAMPFIRE_COOKING, arg, string, arg2, arg3, f, i);
+    public CampfireCookingRecipe(Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookTime) {
+        super(RecipeType.CAMPFIRE_COOKING, id, group, input, output, experience, cookTime);
     }
 
     @Override

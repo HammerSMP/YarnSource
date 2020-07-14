@@ -22,8 +22,8 @@ public abstract class ZombieBaseEntityRenderer<T extends ZombieEntity, M extends
 extends BipedEntityRenderer<T, M> {
     private static final Identifier TEXTURE = new Identifier("textures/entity/zombie/zombie.png");
 
-    protected ZombieBaseEntityRenderer(EntityRenderDispatcher arg, M arg2, M arg3, M arg4) {
-        super(arg, arg2, 0.5f);
+    protected ZombieBaseEntityRenderer(EntityRenderDispatcher dispatcher, M arg2, M arg3, M arg4) {
+        super(dispatcher, arg2, 0.5f);
         this.addFeature(new ArmorFeatureRenderer(this, arg3, arg4));
     }
 
@@ -38,8 +38,8 @@ extends BipedEntityRenderer<T, M> {
     }
 
     @Override
-    protected /* synthetic */ boolean isShaking(LivingEntity arg) {
-        return this.isShaking((T)((ZombieEntity)arg));
+    protected /* synthetic */ boolean isShaking(LivingEntity entity) {
+        return this.isShaking((T)((ZombieEntity)entity));
     }
 }
 

@@ -17,9 +17,9 @@ implements CriterionConditions {
     private final Identifier id;
     private final EntityPredicate.Extended playerPredicate;
 
-    public AbstractCriterionConditions(Identifier arg, EntityPredicate.Extended arg2) {
-        this.id = arg;
-        this.playerPredicate = arg2;
+    public AbstractCriterionConditions(Identifier id, EntityPredicate.Extended playerPredicate) {
+        this.id = id;
+        this.playerPredicate = playerPredicate;
     }
 
     @Override
@@ -32,9 +32,9 @@ implements CriterionConditions {
     }
 
     @Override
-    public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
+    public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("player", this.playerPredicate.toJson(arg));
+        jsonObject.add("player", this.playerPredicate.toJson(predicateSerializer));
         return jsonObject;
     }
 

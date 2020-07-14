@@ -33,10 +33,10 @@ extends RealmsScreen {
     private final Screen parent;
     private int textHeight;
 
-    public DisconnectedRealmsScreen(Screen arg, String string, Text arg2) {
-        this.parent = arg;
-        this.title = I18n.translate(string, new Object[0]);
-        this.reason = arg2;
+    public DisconnectedRealmsScreen(Screen parent, String titleTranslationKey, Text reason) {
+        this.parent = parent;
+        this.title = I18n.translate(titleTranslationKey, new Object[0]);
+        this.reason = reason;
     }
 
     @Override
@@ -53,28 +53,28 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             MinecraftClient.getInstance().openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         this.textRenderer.getClass();
-        this.drawCenteredString(arg, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.textHeight / 2 - 9 * 2, 0xAAAAAA);
+        this.drawCenteredString(matrices, this.textRenderer, this.title, this.width / 2, this.height / 2 - this.textHeight / 2 - 9 * 2, 0xAAAAAA);
         int k = this.height / 2 - this.textHeight / 2;
         if (this.lines != null) {
             for (StringRenderable lv : this.lines) {
-                this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+                this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
                 this.textRenderer.getClass();
                 k += 9;
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

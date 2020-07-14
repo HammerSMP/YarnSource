@@ -27,11 +27,11 @@ implements RealmsSerializable {
     @SerializedName(value="generateStructures")
     private final boolean generateStructures;
 
-    public RealmsWorldResetDto(String string, long l, int i, boolean bl) {
-        this.seed = string;
-        this.worldTemplateId = l;
-        this.levelType = i;
-        this.generateStructures = bl;
+    public RealmsWorldResetDto(String seed, long worldTemplateId, int levelType, boolean generateStructures) {
+        this.seed = seed;
+        this.worldTemplateId = worldTemplateId;
+        this.levelType = levelType;
+        this.generateStructures = generateStructures;
     }
 }
 

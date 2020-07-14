@@ -39,8 +39,8 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
     private boolean checkEntity;
     private final BiPredicate<BlockState, BlockPos> field_25669;
 
-    public BlockCollisionSpliterator(CollisionView arg3, @Nullable Entity arg22, Box arg32) {
-        this(arg3, arg22, arg32, (arg, arg2) -> true);
+    public BlockCollisionSpliterator(CollisionView world, @Nullable Entity entity, Box box) {
+        this(world, entity, box, (arg, arg2) -> true);
     }
 
     public BlockCollisionSpliterator(CollisionView arg, @Nullable Entity arg2, Box arg3, BiPredicate<BlockState, BlockPos> biPredicate) {
@@ -93,9 +93,9 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
     }
 
     @Nullable
-    private BlockView getChunk(int i, int j) {
-        int k = i >> 4;
-        int l = j >> 4;
+    private BlockView getChunk(int x, int z) {
+        int k = x >> 4;
+        int l = z >> 4;
         return this.world.getExistingChunk(k, l);
     }
 
@@ -120,12 +120,12 @@ extends Spliterators.AbstractSpliterator<VoxelShape> {
         return VoxelShapes.matchesAnywhere(arg, VoxelShapes.cuboid(arg2.contract(1.0E-7)), BooleanBiFunction.AND);
     }
 
-    public static boolean isInWorldBorder(WorldBorder arg, Box arg2) {
-        double d = MathHelper.floor(arg.getBoundWest());
-        double e = MathHelper.floor(arg.getBoundNorth());
-        double f = MathHelper.ceil(arg.getBoundEast());
-        double g = MathHelper.ceil(arg.getBoundSouth());
-        return arg2.minX > d && arg2.minX < f && arg2.minZ > e && arg2.minZ < g && arg2.maxX > d && arg2.maxX < f && arg2.maxZ > e && arg2.maxZ < g;
+    public static boolean isInWorldBorder(WorldBorder border, Box box) {
+        double d = MathHelper.floor(border.getBoundWest());
+        double e = MathHelper.floor(border.getBoundNorth());
+        double f = MathHelper.ceil(border.getBoundEast());
+        double g = MathHelper.ceil(border.getBoundSouth());
+        return box.minX > d && box.minX < f && box.minZ > e && box.minZ < g && box.maxX > d && box.maxX < f && box.maxZ > e && box.maxZ < g;
     }
 }
 

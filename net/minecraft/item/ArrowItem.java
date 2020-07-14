@@ -16,9 +16,9 @@ extends Item {
         super(arg);
     }
 
-    public PersistentProjectileEntity createArrow(World arg, ItemStack arg2, LivingEntity arg3) {
-        ArrowEntity lv = new ArrowEntity(arg, arg3);
-        lv.initFromStack(arg2);
+    public PersistentProjectileEntity createArrow(World world, ItemStack stack, LivingEntity shooter) {
+        ArrowEntity lv = new ArrowEntity(world, shooter);
+        lv.initFromStack(stack);
         return lv;
     }
 }

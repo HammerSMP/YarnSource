@@ -56,69 +56,69 @@ extends BlockWithEntity {
 
     @Override
     @Nullable
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return null;
     }
 
-    public static BlockEntity createBlockEntityPiston(BlockState arg, Direction arg2, boolean bl, boolean bl2) {
-        return new PistonBlockEntity(arg, arg2, bl, bl2);
+    public static BlockEntity createBlockEntityPiston(BlockState pushedBlock, Direction dir, boolean extending, boolean bl2) {
+        return new PistonBlockEntity(pushedBlock, dir, extending, bl2);
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof PistonBlockEntity) {
             ((PistonBlockEntity)lv).finish();
         }
     }
 
     @Override
-    public void onBroken(WorldAccess arg, BlockPos arg2, BlockState arg3) {
-        BlockPos lv = arg2.offset(arg3.get(FACING).getOpposite());
-        BlockState lv2 = arg.getBlockState(lv);
+    public void onBroken(WorldAccess world, BlockPos pos, BlockState state) {
+        BlockPos lv = pos.offset(state.get(FACING).getOpposite());
+        BlockState lv2 = world.getBlockState(lv);
         if (lv2.getBlock() instanceof PistonBlock && lv2.get(PistonBlock.EXTENDED).booleanValue()) {
-            arg.removeBlock(lv, false);
+            world.removeBlock(lv, false);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (!arg2.isClient && arg2.getBlockEntity(arg3) == null) {
-            arg2.removeBlock(arg3, false);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!world.isClient && world.getBlockEntity(pos) == null) {
+            world.removeBlock(pos, false);
             return ActionResult.CONSUME;
         }
         return ActionResult.PASS;
     }
 
     @Override
-    public List<ItemStack> getDroppedStacks(BlockState arg, LootContext.Builder arg2) {
-        PistonBlockEntity lv = this.getPistonBlockEntity(arg2.getWorld(), arg2.get(LootContextParameters.POSITION));
+    public List<ItemStack> getDroppedStacks(BlockState state, LootContext.Builder builder) {
+        PistonBlockEntity lv = this.getPistonBlockEntity(builder.getWorld(), builder.get(LootContextParameters.POSITION));
         if (lv == null) {
             return Collections.emptyList();
         }
-        return lv.getPushedBlock().getDroppedStacks(arg2);
+        return lv.getPushedBlock().getDroppedStacks(builder);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return VoxelShapes.empty();
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        PistonBlockEntity lv = this.getPistonBlockEntity(arg2, arg3);
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        PistonBlockEntity lv = this.getPistonBlockEntity(world, pos);
         if (lv != null) {
-            return lv.getCollisionShape(arg2, arg3);
+            return lv.getCollisionShape(world, pos);
         }
         return VoxelShapes.empty();
     }
 
     @Nullable
-    private PistonBlockEntity getPistonBlockEntity(BlockView arg, BlockPos arg2) {
-        BlockEntity lv = arg.getBlockEntity(arg2);
+    private PistonBlockEntity getPistonBlockEntity(BlockView world, BlockPos pos) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof PistonBlockEntity) {
             return (PistonBlockEntity)lv;
         }
@@ -127,27 +127,27 @@ extends BlockWithEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, TYPE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, TYPE);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

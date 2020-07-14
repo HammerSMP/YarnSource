@@ -89,27 +89,27 @@ public class DimensionType {
         return OVERWORLD_CAVES;
     }
 
-    protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, boolean bl7, boolean bl8, boolean bl9, int i, Identifier arg, float f) {
-        this(optionalLong, bl, bl2, bl3, bl4, bl5, false, bl6, bl7, bl8, bl9, i, VoronoiBiomeAccessType.INSTANCE, arg, f);
+    protected DimensionType(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultrawarm, boolean natural, boolean shrunk, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int logicalHeight, Identifier infiniburn, float ambientLight) {
+        this(fixedTime, hasSkylight, hasCeiling, ultrawarm, natural, shrunk, false, piglinSafe, bedWorks, respawnAnchorWorks, hasRaids, logicalHeight, VoronoiBiomeAccessType.INSTANCE, infiniburn, ambientLight);
     }
 
-    protected DimensionType(OptionalLong optionalLong, boolean bl, boolean bl2, boolean bl3, boolean bl4, boolean bl5, boolean bl6, boolean bl7, boolean bl8, boolean bl9, boolean bl10, int i, BiomeAccessType arg, Identifier arg2, float f) {
-        this.fixedTime = optionalLong;
-        this.hasSkyLight = bl;
-        this.hasCeiling = bl2;
-        this.ultrawarm = bl3;
-        this.natural = bl4;
-        this.shrunk = bl5;
-        this.hasEnderDragonFight = bl6;
-        this.piglinSafe = bl7;
-        this.bedWorks = bl8;
-        this.respawnAnchorWorks = bl9;
-        this.hasRaids = bl10;
-        this.logicalHeight = i;
-        this.biomeAccessType = arg;
-        this.infiniburn = arg2;
-        this.ambientLight = f;
-        this.field_24767 = DimensionType.method_28515(f);
+    protected DimensionType(OptionalLong fixedTime, boolean hasSkylight, boolean hasCeiling, boolean ultrawarm, boolean natural, boolean shrunk, boolean hasEnderDragonFight, boolean piglinSafe, boolean bedWorks, boolean respawnAnchorWorks, boolean hasRaids, int logicalHeight, BiomeAccessType biomeAccessType, Identifier infiniburn, float ambientLight) {
+        this.fixedTime = fixedTime;
+        this.hasSkyLight = hasSkylight;
+        this.hasCeiling = hasCeiling;
+        this.ultrawarm = ultrawarm;
+        this.natural = natural;
+        this.shrunk = shrunk;
+        this.hasEnderDragonFight = hasEnderDragonFight;
+        this.piglinSafe = piglinSafe;
+        this.bedWorks = bedWorks;
+        this.respawnAnchorWorks = respawnAnchorWorks;
+        this.hasRaids = hasRaids;
+        this.logicalHeight = logicalHeight;
+        this.biomeAccessType = biomeAccessType;
+        this.infiniburn = infiniburn;
+        this.ambientLight = ambientLight;
+        this.field_24767 = DimensionType.method_28515(ambientLight);
     }
 
     private static float[] method_28515(float f) {
@@ -140,27 +140,27 @@ public class DimensionType {
         return World.CODEC.parse(dynamic);
     }
 
-    public static class_5455.class_5457 addRegistryDefaults(class_5455.class_5457 arg) {
-        MutableRegistry<DimensionType> lv = arg.method_30530(Registry.DIMENSION_TYPE_KEY);
+    public static class_5455.class_5457 addRegistryDefaults(class_5455.class_5457 registryTracker) {
+        MutableRegistry<DimensionType> lv = registryTracker.method_30530(Registry.DIMENSION_TYPE_KEY);
         lv.add(OVERWORLD_REGISTRY_KEY, OVERWORLD);
         lv.add(OVERWORLD_CAVES_REGISTRY_KEY, OVERWORLD_CAVES);
         lv.add(THE_NETHER_REGISTRY_KEY, THE_NETHER);
         lv.add(THE_END_REGISTRY_KEY, THE_END);
-        return arg;
+        return registryTracker;
     }
 
-    private static ChunkGenerator createEndGenerator(long l) {
-        return new SurfaceChunkGenerator(new TheEndBiomeSource(l), l, ChunkGeneratorType.Preset.END.getChunkGeneratorType());
+    private static ChunkGenerator createEndGenerator(long seed) {
+        return new SurfaceChunkGenerator(new TheEndBiomeSource(seed), seed, ChunkGeneratorType.Preset.END.getChunkGeneratorType());
     }
 
-    private static ChunkGenerator createNetherGenerator(long l) {
-        return new SurfaceChunkGenerator(MultiNoiseBiomeSource.Preset.NETHER.getBiomeSource(l), l, ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType());
+    private static ChunkGenerator createNetherGenerator(long seed) {
+        return new SurfaceChunkGenerator(MultiNoiseBiomeSource.Preset.NETHER.getBiomeSource(seed), seed, ChunkGeneratorType.Preset.NETHER.getChunkGeneratorType());
     }
 
-    public static SimpleRegistry<DimensionOptions> method_28517(long l) {
+    public static SimpleRegistry<DimensionOptions> method_28517(long seed) {
         SimpleRegistry<DimensionOptions> lv = new SimpleRegistry<DimensionOptions>(Registry.DIMENSION_OPTIONS, Lifecycle.experimental());
-        lv.add(DimensionOptions.NETHER, new DimensionOptions(() -> THE_NETHER, DimensionType.createNetherGenerator(l)));
-        lv.add(DimensionOptions.END, new DimensionOptions(() -> THE_END, DimensionType.createEndGenerator(l)));
+        lv.add(DimensionOptions.NETHER, new DimensionOptions(() -> THE_NETHER, DimensionType.createNetherGenerator(seed)));
+        lv.add(DimensionOptions.END, new DimensionOptions(() -> THE_END, DimensionType.createEndGenerator(seed)));
         lv.markLoaded(DimensionOptions.NETHER);
         lv.markLoaded(DimensionOptions.END);
         return lv;
@@ -174,17 +174,17 @@ public class DimensionType {
         return "";
     }
 
-    public static File getSaveDirectory(RegistryKey<World> arg, File file) {
-        if (arg == World.OVERWORLD) {
-            return file;
+    public static File getSaveDirectory(RegistryKey<World> worldRef, File root) {
+        if (worldRef == World.OVERWORLD) {
+            return root;
         }
-        if (arg == World.END) {
-            return new File(file, "DIM1");
+        if (worldRef == World.END) {
+            return new File(root, "DIM1");
         }
-        if (arg == World.NETHER) {
-            return new File(file, "DIM-1");
+        if (worldRef == World.NETHER) {
+            return new File(root, "DIM-1");
         }
-        return new File(file, "dimensions/" + arg.getValue().getNamespace() + "/" + arg.getValue().getPath());
+        return new File(root, "dimensions/" + worldRef.getValue().getNamespace() + "/" + worldRef.getValue().getPath());
     }
 
     public boolean hasSkyLight() {

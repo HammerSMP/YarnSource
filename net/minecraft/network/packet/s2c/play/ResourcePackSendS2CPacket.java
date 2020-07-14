@@ -22,24 +22,24 @@ implements Packet<ClientPlayPacketListener> {
     public ResourcePackSendS2CPacket() {
     }
 
-    public ResourcePackSendS2CPacket(String string, String string2) {
-        this.url = string;
-        this.hash = string2;
-        if (string2.length() > 40) {
-            throw new IllegalArgumentException("Hash is too long (max 40, was " + string2.length() + ")");
+    public ResourcePackSendS2CPacket(String url, String hash) {
+        this.url = url;
+        this.hash = hash;
+        if (hash.length() > 40) {
+            throw new IllegalArgumentException("Hash is too long (max 40, was " + hash.length() + ")");
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.url = arg.readString(32767);
-        this.hash = arg.readString(40);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.url = buf.readString(32767);
+        this.hash = buf.readString(40);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeString(this.url);
-        arg.writeString(this.hash);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeString(this.url);
+        buf.writeString(this.hash);
     }
 
     @Override

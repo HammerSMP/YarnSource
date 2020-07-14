@@ -30,9 +30,9 @@ public class GameMenuScreen
 extends Screen {
     private final boolean showMenu;
 
-    public GameMenuScreen(boolean bl) {
-        super(bl ? new TranslatableText("menu.game") : new TranslatableText("menu.paused"));
-        this.showMenu = bl;
+    public GameMenuScreen(boolean showMenu) {
+        super(showMenu ? new TranslatableText("menu.game") : new TranslatableText("menu.paused"));
+        this.showMenu = showMenu;
     }
 
     @Override
@@ -97,14 +97,14 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.showMenu) {
-            this.renderBackground(arg);
-            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
+            this.renderBackground(matrices);
+            this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 40, 0xFFFFFF);
         } else {
-            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 10, 0xFFFFFF);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

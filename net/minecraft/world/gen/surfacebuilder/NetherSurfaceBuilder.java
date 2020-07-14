@@ -87,11 +87,11 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
     }
 
     @Override
-    public void initSeed(long l) {
-        if (this.seed != l || this.noise == null) {
-            this.noise = new OctavePerlinNoiseSampler(new ChunkRandom(l), IntStream.rangeClosed(-3, 0));
+    public void initSeed(long seed) {
+        if (this.seed != seed || this.noise == null) {
+            this.noise = new OctavePerlinNoiseSampler(new ChunkRandom(seed), IntStream.rangeClosed(-3, 0));
         }
-        this.seed = l;
+        this.seed = seed;
     }
 }
 

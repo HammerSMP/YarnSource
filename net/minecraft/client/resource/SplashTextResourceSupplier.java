@@ -91,8 +91,8 @@ extends SinglePreparationResourceReloadListener<List<String>> {
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.prepare(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
     }
 
     private static /* synthetic */ boolean method_18664(String string) {

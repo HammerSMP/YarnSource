@@ -40,9 +40,9 @@ extends Model {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
-        this.field_3550.render(arg, arg2, i, j, f, g, h, k);
-        this.field_3551.render(arg, arg2, i, j, f, g, h, k);
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+        this.field_3550.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+        this.field_3551.render(matrices, vertices, light, overlay, red, green, blue, alpha);
     }
 }
 

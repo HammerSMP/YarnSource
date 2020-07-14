@@ -26,8 +26,8 @@ implements TutorialStepHandler {
     private TutorialToast toast;
     private int ticks;
 
-    public OpenInventoryTutorialStepHandler(TutorialManager arg) {
-        this.manager = arg;
+    public OpenInventoryTutorialStepHandler(TutorialManager manager) {
+        this.manager = manager;
     }
 
     @Override

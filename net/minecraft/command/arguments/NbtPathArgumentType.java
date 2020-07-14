@@ -57,8 +57,8 @@ implements ArgumentType<NbtPath> {
         return new NbtPathArgumentType();
     }
 
-    public static NbtPath getNbtPath(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (NbtPath)commandContext.getArgument(string, NbtPath.class);
+    public static NbtPath getNbtPath(CommandContext<ServerCommandSource> context, String name) {
+        return (NbtPath)context.getArgument(name, NbtPath.class);
     }
 
     public NbtPath parse(StringReader stringReader) throws CommandSyntaxException {
@@ -78,57 +78,57 @@ implements ArgumentType<NbtPath> {
         return new NbtPath(stringReader.getString().substring(i, stringReader.getCursor()), list.toArray(new PathNode[0]), (Object2IntMap<PathNode>)object2IntMap);
     }
 
-    private static PathNode parseNode(StringReader stringReader, boolean bl) throws CommandSyntaxException {
-        switch (stringReader.peek()) {
+    private static PathNode parseNode(StringReader reader, boolean root) throws CommandSyntaxException {
+        switch (reader.peek()) {
             case '{': {
-                if (!bl) {
-                    throw INVALID_PATH_NODE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+                if (!root) {
+                    throw INVALID_PATH_NODE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
                 }
-                CompoundTag lv = new StringNbtReader(stringReader).parseCompoundTag();
+                CompoundTag lv = new StringNbtReader(reader).parseCompoundTag();
                 return new FilteredRootNode(lv);
             }
             case '[': {
-                stringReader.skip();
-                char i = stringReader.peek();
+                reader.skip();
+                char i = reader.peek();
                 if (i == '{') {
-                    CompoundTag lv2 = new StringNbtReader(stringReader).parseCompoundTag();
-                    stringReader.expect(']');
+                    CompoundTag lv2 = new StringNbtReader(reader).parseCompoundTag();
+                    reader.expect(']');
                     return new FilteredListElementNode(lv2);
                 }
                 if (i == ']') {
-                    stringReader.skip();
+                    reader.skip();
                     return AllListElementNode.INSTANCE;
                 }
-                int j = stringReader.readInt();
-                stringReader.expect(']');
+                int j = reader.readInt();
+                reader.expect(']');
                 return new IndexedListElementNode(j);
             }
             case '\"': {
-                String string = stringReader.readString();
-                return NbtPathArgumentType.readCompoundChildNode(stringReader, string);
+                String string = reader.readString();
+                return NbtPathArgumentType.readCompoundChildNode(reader, string);
             }
         }
-        String string2 = NbtPathArgumentType.readName(stringReader);
-        return NbtPathArgumentType.readCompoundChildNode(stringReader, string2);
+        String string2 = NbtPathArgumentType.readName(reader);
+        return NbtPathArgumentType.readCompoundChildNode(reader, string2);
     }
 
-    private static PathNode readCompoundChildNode(StringReader stringReader, String string) throws CommandSyntaxException {
-        if (stringReader.canRead() && stringReader.peek() == '{') {
-            CompoundTag lv = new StringNbtReader(stringReader).parseCompoundTag();
-            return new FilteredNamedNode(string, lv);
+    private static PathNode readCompoundChildNode(StringReader reader, String name) throws CommandSyntaxException {
+        if (reader.canRead() && reader.peek() == '{') {
+            CompoundTag lv = new StringNbtReader(reader).parseCompoundTag();
+            return new FilteredNamedNode(name, lv);
         }
-        return new NamedNode(string);
+        return new NamedNode(name);
     }
 
-    private static String readName(StringReader stringReader) throws CommandSyntaxException {
-        int i = stringReader.getCursor();
-        while (stringReader.canRead() && NbtPathArgumentType.isNameCharacter(stringReader.peek())) {
-            stringReader.skip();
+    private static String readName(StringReader reader) throws CommandSyntaxException {
+        int i = reader.getCursor();
+        while (reader.canRead() && NbtPathArgumentType.isNameCharacter(reader.peek())) {
+            reader.skip();
         }
-        if (stringReader.getCursor() == i) {
-            throw INVALID_PATH_NODE_EXCEPTION.createWithContext((ImmutableStringReader)stringReader);
+        if (reader.getCursor() == i) {
+            throw INVALID_PATH_NODE_EXCEPTION.createWithContext((ImmutableStringReader)reader);
         }
-        return stringReader.getString().substring(i, stringReader.getCursor());
+        return reader.getString().substring(i, reader.getCursor());
     }
 
     public Collection<String> getExamples() {
@@ -139,32 +139,32 @@ implements ArgumentType<NbtPath> {
         return c != ' ' && c != '\"' && c != '[' && c != ']' && c != '.' && c != '{' && c != '}';
     }
 
-    private static Predicate<Tag> getPredicate(CompoundTag arg) {
-        return arg2 -> NbtHelper.matches(arg, arg2, true);
+    private static Predicate<Tag> getPredicate(CompoundTag filter) {
+        return arg2 -> NbtHelper.matches(filter, arg2, true);
     }
 
-    public /* synthetic */ Object parse(StringReader stringReader) throws CommandSyntaxException {
-        return this.parse(stringReader);
+    public /* synthetic */ Object parse(StringReader reader) throws CommandSyntaxException {
+        return this.parse(reader);
     }
 
     static class FilteredRootNode
     implements PathNode {
         private final Predicate<Tag> matcher;
 
-        public FilteredRootNode(CompoundTag arg) {
-            this.matcher = NbtPathArgumentType.getPredicate(arg);
+        public FilteredRootNode(CompoundTag filter) {
+            this.matcher = NbtPathArgumentType.getPredicate(filter);
         }
 
         @Override
-        public void get(Tag arg, List<Tag> list) {
-            if (arg instanceof CompoundTag && this.matcher.test(arg)) {
-                list.add(arg);
+        public void get(Tag current, List<Tag> results) {
+            if (current instanceof CompoundTag && this.matcher.test(current)) {
+                results.add(current);
             }
         }
 
         @Override
-        public void getOrInit(Tag arg, Supplier<Tag> supplier, List<Tag> list) {
-            this.get(arg, list);
+        public void getOrInit(Tag current, Supplier<Tag> source, List<Tag> results) {
+            this.get(current, results);
         }
 
         @Override
@@ -173,12 +173,12 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int set(Tag arg, Supplier<Tag> supplier) {
+        public int set(Tag current, Supplier<Tag> source) {
             return 0;
         }
 
         @Override
-        public int clear(Tag arg) {
+        public int clear(Tag current) {
             return 0;
         }
     }
@@ -189,31 +189,31 @@ implements ArgumentType<NbtPath> {
         private final CompoundTag filter;
         private final Predicate<Tag> predicate;
 
-        public FilteredNamedNode(String string, CompoundTag arg) {
-            this.name = string;
-            this.filter = arg;
-            this.predicate = NbtPathArgumentType.getPredicate(arg);
+        public FilteredNamedNode(String name, CompoundTag filter) {
+            this.name = name;
+            this.filter = filter;
+            this.predicate = NbtPathArgumentType.getPredicate(filter);
         }
 
         @Override
-        public void get(Tag arg, List<Tag> list) {
+        public void get(Tag current, List<Tag> results) {
             Tag lv;
-            if (arg instanceof CompoundTag && this.predicate.test(lv = ((CompoundTag)arg).get(this.name))) {
-                list.add(lv);
+            if (current instanceof CompoundTag && this.predicate.test(lv = ((CompoundTag)current).get(this.name))) {
+                results.add(lv);
             }
         }
 
         @Override
-        public void getOrInit(Tag arg, Supplier<Tag> supplier, List<Tag> list) {
-            if (arg instanceof CompoundTag) {
-                CompoundTag lv = (CompoundTag)arg;
+        public void getOrInit(Tag current, Supplier<Tag> source, List<Tag> results) {
+            if (current instanceof CompoundTag) {
+                CompoundTag lv = (CompoundTag)current;
                 Tag lv2 = lv.get(this.name);
                 if (lv2 == null) {
                     lv2 = this.filter.copy();
                     lv.put(this.name, lv2);
-                    list.add(lv2);
+                    results.add(lv2);
                 } else if (this.predicate.test(lv2)) {
-                    list.add(lv2);
+                    results.add(lv2);
                 }
             }
         }
@@ -224,11 +224,11 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int set(Tag arg, Supplier<Tag> supplier) {
+        public int set(Tag current, Supplier<Tag> source) {
             Tag lv3;
             CompoundTag lv;
             Tag lv2;
-            if (arg instanceof CompoundTag && this.predicate.test(lv2 = (lv = (CompoundTag)arg).get(this.name)) && !(lv3 = supplier.get()).equals(lv2)) {
+            if (current instanceof CompoundTag && this.predicate.test(lv2 = (lv = (CompoundTag)current).get(this.name)) && !(lv3 = source.get()).equals(lv2)) {
                 lv.put(this.name, lv3);
                 return 1;
             }
@@ -236,10 +236,10 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int clear(Tag arg) {
+        public int clear(Tag current) {
             CompoundTag lv;
             Tag lv2;
-            if (arg instanceof CompoundTag && this.predicate.test(lv2 = (lv = (CompoundTag)arg).get(this.name))) {
+            if (current instanceof CompoundTag && this.predicate.test(lv2 = (lv = (CompoundTag)current).get(this.name))) {
                 lv.remove(this.name);
                 return 1;
             }
@@ -255,23 +255,23 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public void get(Tag arg, List<Tag> list) {
-            if (arg instanceof AbstractListTag) {
-                list.addAll((AbstractListTag)arg);
+        public void get(Tag current, List<Tag> results) {
+            if (current instanceof AbstractListTag) {
+                results.addAll((AbstractListTag)current);
             }
         }
 
         @Override
-        public void getOrInit(Tag arg, Supplier<Tag> supplier, List<Tag> list) {
-            if (arg instanceof AbstractListTag) {
-                AbstractListTag lv = (AbstractListTag)arg;
+        public void getOrInit(Tag current, Supplier<Tag> source, List<Tag> results) {
+            if (current instanceof AbstractListTag) {
+                AbstractListTag lv = (AbstractListTag)current;
                 if (lv.isEmpty()) {
-                    Tag lv2 = supplier.get();
+                    Tag lv2 = source.get();
                     if (lv.addTag(0, lv2)) {
-                        list.add(lv2);
+                        results.add(lv2);
                     }
                 } else {
-                    list.addAll(lv);
+                    results.addAll(lv);
                 }
             }
         }
@@ -282,15 +282,15 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int set(Tag arg, Supplier<Tag> supplier) {
-            if (arg instanceof AbstractListTag) {
-                AbstractListTag lv = (AbstractListTag)arg;
+        public int set(Tag current, Supplier<Tag> source) {
+            if (current instanceof AbstractListTag) {
+                AbstractListTag lv = (AbstractListTag)current;
                 int i = lv.size();
                 if (i == 0) {
-                    lv.addTag(0, supplier.get());
+                    lv.addTag(0, source.get());
                     return 1;
                 }
-                Tag lv2 = supplier.get();
+                Tag lv2 = source.get();
                 int j = i - (int)lv.stream().filter(lv2::equals).count();
                 if (j == 0) {
                     return 0;
@@ -300,7 +300,7 @@ implements ArgumentType<NbtPath> {
                     return 0;
                 }
                 for (int k = 1; k < i; ++k) {
-                    lv.addTag(k, supplier.get());
+                    lv.addTag(k, source.get());
                 }
                 return j;
             }
@@ -308,10 +308,10 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int clear(Tag arg) {
+        public int clear(Tag current) {
             AbstractListTag lv;
             int i;
-            if (arg instanceof AbstractListTag && (i = (lv = (AbstractListTag)arg).size()) > 0) {
+            if (current instanceof AbstractListTag && (i = (lv = (AbstractListTag)current).size()) > 0) {
                 lv.clear();
                 return i;
             }
@@ -324,32 +324,32 @@ implements ArgumentType<NbtPath> {
         private final CompoundTag filter;
         private final Predicate<Tag> predicate;
 
-        public FilteredListElementNode(CompoundTag arg) {
-            this.filter = arg;
-            this.predicate = NbtPathArgumentType.getPredicate(arg);
+        public FilteredListElementNode(CompoundTag filter) {
+            this.filter = filter;
+            this.predicate = NbtPathArgumentType.getPredicate(filter);
         }
 
         @Override
-        public void get(Tag arg, List<Tag> list) {
-            if (arg instanceof ListTag) {
-                ListTag lv = (ListTag)arg;
-                lv.stream().filter(this.predicate).forEach(list::add);
+        public void get(Tag current, List<Tag> results) {
+            if (current instanceof ListTag) {
+                ListTag lv = (ListTag)current;
+                lv.stream().filter(this.predicate).forEach(results::add);
             }
         }
 
         @Override
-        public void getOrInit(Tag arg2, Supplier<Tag> supplier, List<Tag> list) {
+        public void getOrInit(Tag current, Supplier<Tag> source, List<Tag> results) {
             MutableBoolean mutableBoolean = new MutableBoolean();
-            if (arg2 instanceof ListTag) {
-                ListTag lv = (ListTag)arg2;
+            if (current instanceof ListTag) {
+                ListTag lv = (ListTag)current;
                 lv.stream().filter(this.predicate).forEach(arg -> {
-                    list.add((Tag)arg);
+                    results.add((Tag)arg);
                     mutableBoolean.setTrue();
                 });
                 if (mutableBoolean.isFalse()) {
                     CompoundTag lv2 = this.filter.copy();
                     lv.add(lv2);
-                    list.add(lv2);
+                    results.add(lv2);
                 }
             }
         }
@@ -360,19 +360,19 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int set(Tag arg, Supplier<Tag> supplier) {
+        public int set(Tag current, Supplier<Tag> source) {
             int i = 0;
-            if (arg instanceof ListTag) {
-                ListTag lv = (ListTag)arg;
+            if (current instanceof ListTag) {
+                ListTag lv = (ListTag)current;
                 int j = lv.size();
                 if (j == 0) {
-                    lv.add(supplier.get());
+                    lv.add(source.get());
                     ++i;
                 } else {
                     for (int k = 0; k < j; ++k) {
                         Tag lv3;
                         Tag lv2 = lv.get(k);
-                        if (!this.predicate.test(lv2) || (lv3 = supplier.get()).equals(lv2) || !lv.setTag(k, lv3)) continue;
+                        if (!this.predicate.test(lv2) || (lv3 = source.get()).equals(lv2) || !lv.setTag(k, lv3)) continue;
                         ++i;
                     }
                 }
@@ -381,10 +381,10 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int clear(Tag arg) {
+        public int clear(Tag current) {
             int i = 0;
-            if (arg instanceof ListTag) {
-                ListTag lv = (ListTag)arg;
+            if (current instanceof ListTag) {
+                ListTag lv = (ListTag)current;
                 for (int j = lv.size() - 1; j >= 0; --j) {
                     if (!this.predicate.test(lv.get(j))) continue;
                     lv.remove(j);
@@ -399,26 +399,26 @@ implements ArgumentType<NbtPath> {
     implements PathNode {
         private final int index;
 
-        public IndexedListElementNode(int i) {
-            this.index = i;
+        public IndexedListElementNode(int index) {
+            this.index = index;
         }
 
         @Override
-        public void get(Tag arg, List<Tag> list) {
-            if (arg instanceof AbstractListTag) {
+        public void get(Tag current, List<Tag> results) {
+            if (current instanceof AbstractListTag) {
                 int j;
-                AbstractListTag lv = (AbstractListTag)arg;
+                AbstractListTag lv = (AbstractListTag)current;
                 int i = lv.size();
                 int n = j = this.index < 0 ? i + this.index : this.index;
                 if (0 <= j && j < i) {
-                    list.add((Tag)lv.get(j));
+                    results.add((Tag)lv.get(j));
                 }
             }
         }
 
         @Override
-        public void getOrInit(Tag arg, Supplier<Tag> supplier, List<Tag> list) {
-            this.get(arg, list);
+        public void getOrInit(Tag current, Supplier<Tag> source, List<Tag> results) {
+            this.get(current, results);
         }
 
         @Override
@@ -427,15 +427,15 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int set(Tag arg, Supplier<Tag> supplier) {
-            if (arg instanceof AbstractListTag) {
+        public int set(Tag current, Supplier<Tag> source) {
+            if (current instanceof AbstractListTag) {
                 int j;
-                AbstractListTag lv = (AbstractListTag)arg;
+                AbstractListTag lv = (AbstractListTag)current;
                 int i = lv.size();
                 int n = j = this.index < 0 ? i + this.index : this.index;
                 if (0 <= j && j < i) {
                     Tag lv2 = (Tag)lv.get(j);
-                    Tag lv3 = supplier.get();
+                    Tag lv3 = source.get();
                     if (!lv3.equals(lv2) && lv.setTag(j, lv3)) {
                         return 1;
                     }
@@ -445,10 +445,10 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int clear(Tag arg) {
-            if (arg instanceof AbstractListTag) {
+        public int clear(Tag current) {
+            if (current instanceof AbstractListTag) {
                 int j;
-                AbstractListTag lv = (AbstractListTag)arg;
+                AbstractListTag lv = (AbstractListTag)current;
                 int i = lv.size();
                 int n = j = this.index < 0 ? i + this.index : this.index;
                 if (0 <= j && j < i) {
@@ -464,30 +464,30 @@ implements ArgumentType<NbtPath> {
     implements PathNode {
         private final String name;
 
-        public NamedNode(String string) {
-            this.name = string;
+        public NamedNode(String name) {
+            this.name = name;
         }
 
         @Override
-        public void get(Tag arg, List<Tag> list) {
+        public void get(Tag current, List<Tag> results) {
             Tag lv;
-            if (arg instanceof CompoundTag && (lv = ((CompoundTag)arg).get(this.name)) != null) {
-                list.add(lv);
+            if (current instanceof CompoundTag && (lv = ((CompoundTag)current).get(this.name)) != null) {
+                results.add(lv);
             }
         }
 
         @Override
-        public void getOrInit(Tag arg, Supplier<Tag> supplier, List<Tag> list) {
-            if (arg instanceof CompoundTag) {
+        public void getOrInit(Tag current, Supplier<Tag> source, List<Tag> results) {
+            if (current instanceof CompoundTag) {
                 Tag lv3;
-                CompoundTag lv = (CompoundTag)arg;
+                CompoundTag lv = (CompoundTag)current;
                 if (lv.contains(this.name)) {
                     Tag lv2 = lv.get(this.name);
                 } else {
-                    lv3 = supplier.get();
+                    lv3 = source.get();
                     lv.put(this.name, lv3);
                 }
-                list.add(lv3);
+                results.add(lv3);
             }
         }
 
@@ -497,11 +497,11 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int set(Tag arg, Supplier<Tag> supplier) {
-            if (arg instanceof CompoundTag) {
+        public int set(Tag current, Supplier<Tag> source) {
+            if (current instanceof CompoundTag) {
                 Tag lv3;
-                CompoundTag lv = (CompoundTag)arg;
-                Tag lv2 = supplier.get();
+                CompoundTag lv = (CompoundTag)current;
+                Tag lv2 = source.get();
                 if (!lv2.equals(lv3 = lv.put(this.name, lv2))) {
                     return 1;
                 }
@@ -510,9 +510,9 @@ implements ArgumentType<NbtPath> {
         }
 
         @Override
-        public int clear(Tag arg) {
+        public int clear(Tag current) {
             CompoundTag lv;
-            if (arg instanceof CompoundTag && (lv = (CompoundTag)arg).contains(this.name)) {
+            if (current instanceof CompoundTag && (lv = (CompoundTag)current).contains(this.name)) {
                 lv.remove(this.name);
                 return 1;
             }
@@ -531,18 +531,18 @@ implements ArgumentType<NbtPath> {
 
         public int clear(Tag var1);
 
-        default public List<Tag> get(List<Tag> list) {
-            return this.process(list, (arg_0, arg_1) -> this.get(arg_0, arg_1));
+        default public List<Tag> get(List<Tag> tags) {
+            return this.process(tags, (arg_0, arg_1) -> this.get(arg_0, arg_1));
         }
 
-        default public List<Tag> getOrInit(List<Tag> list2, Supplier<Tag> supplier) {
-            return this.process(list2, (arg, list) -> this.getOrInit((Tag)arg, supplier, (List<Tag>)list));
+        default public List<Tag> getOrInit(List<Tag> tags, Supplier<Tag> supplier) {
+            return this.process(tags, (current, results) -> this.getOrInit((Tag)current, supplier, (List<Tag>)results));
         }
 
-        default public List<Tag> process(List<Tag> list, BiConsumer<Tag, List<Tag>> biConsumer) {
+        default public List<Tag> process(List<Tag> tags, BiConsumer<Tag, List<Tag>> action) {
             ArrayList list2 = Lists.newArrayList();
-            for (Tag lv : list) {
-                biConsumer.accept(lv, list2);
+            for (Tag lv : tags) {
+                action.accept(lv, list2);
             }
             return list2;
         }
@@ -553,14 +553,14 @@ implements ArgumentType<NbtPath> {
         private final Object2IntMap<PathNode> nodeEndIndices;
         private final PathNode[] nodes;
 
-        public NbtPath(String string, PathNode[] args, Object2IntMap<PathNode> object2IntMap) {
+        public NbtPath(String string, PathNode[] nodes, Object2IntMap<PathNode> nodeEndIndices) {
             this.string = string;
-            this.nodes = args;
-            this.nodeEndIndices = object2IntMap;
+            this.nodes = nodes;
+            this.nodeEndIndices = nodeEndIndices;
         }
 
-        public List<Tag> get(Tag arg) throws CommandSyntaxException {
-            List<Tag> list = Collections.singletonList(arg);
+        public List<Tag> get(Tag tag) throws CommandSyntaxException {
+            List<Tag> list = Collections.singletonList(tag);
             for (PathNode lv : this.nodes) {
                 if (!(list = lv.get(list)).isEmpty()) continue;
                 throw this.createNothingFoundException(lv);
@@ -568,8 +568,8 @@ implements ArgumentType<NbtPath> {
             return list;
         }
 
-        public int count(Tag arg) {
-            List<Tag> list = Collections.singletonList(arg);
+        public int count(Tag tag) {
+            List<Tag> list = Collections.singletonList(tag);
             for (PathNode lv : this.nodes) {
                 if (!(list = lv.get(list)).isEmpty()) continue;
                 return 0;
@@ -577,8 +577,8 @@ implements ArgumentType<NbtPath> {
             return list.size();
         }
 
-        private List<Tag> getTerminals(Tag arg) throws CommandSyntaxException {
-            List<Tag> list = Collections.singletonList(arg);
+        private List<Tag> getTerminals(Tag start) throws CommandSyntaxException {
+            List<Tag> list = Collections.singletonList(start);
             for (int i = 0; i < this.nodes.length - 1; ++i) {
                 PathNode lv = this.nodes[i];
                 int j = i + 1;
@@ -588,24 +588,24 @@ implements ArgumentType<NbtPath> {
             return list;
         }
 
-        public List<Tag> getOrInit(Tag arg, Supplier<Tag> supplier) throws CommandSyntaxException {
-            List<Tag> list = this.getTerminals(arg);
+        public List<Tag> getOrInit(Tag tag, Supplier<Tag> source) throws CommandSyntaxException {
+            List<Tag> list = this.getTerminals(tag);
             PathNode lv = this.nodes[this.nodes.length - 1];
-            return lv.getOrInit(list, supplier);
+            return lv.getOrInit(list, source);
         }
 
-        private static int forEach(List<Tag> list, Function<Tag, Integer> function) {
-            return list.stream().map(function).reduce(0, (integer, integer2) -> integer + integer2);
+        private static int forEach(List<Tag> tags, Function<Tag, Integer> operation) {
+            return tags.stream().map(operation).reduce(0, (integer, integer2) -> integer + integer2);
         }
 
-        public int put(Tag arg, Supplier<Tag> supplier) throws CommandSyntaxException {
-            List<Tag> list = this.getTerminals(arg);
+        public int put(Tag tag, Supplier<Tag> source) throws CommandSyntaxException {
+            List<Tag> list = this.getTerminals(tag);
             PathNode lv = this.nodes[this.nodes.length - 1];
-            return NbtPath.forEach(list, arg2 -> lv.set((Tag)arg2, supplier));
+            return NbtPath.forEach(list, arg2 -> lv.set((Tag)arg2, source));
         }
 
-        public int remove(Tag arg) {
-            List<Tag> list = Collections.singletonList(arg);
+        public int remove(Tag tag) {
+            List<Tag> list = Collections.singletonList(tag);
             for (int i = 0; i < this.nodes.length - 1; ++i) {
                 list = this.nodes[i].get(list);
             }
@@ -613,8 +613,8 @@ implements ArgumentType<NbtPath> {
             return NbtPath.forEach(list, lv::clear);
         }
 
-        private CommandSyntaxException createNothingFoundException(PathNode arg) {
-            int i = this.nodeEndIndices.getInt((Object)arg);
+        private CommandSyntaxException createNothingFoundException(PathNode node) {
+            int i = this.nodeEndIndices.getInt((Object)node);
             return NOTHING_FOUND_EXCEPTION.create((Object)this.string.substring(0, i));
         }
 

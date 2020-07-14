@@ -40,15 +40,15 @@ implements DynamicMBean {
     private final MBeanInfo beanInfo;
     private final Map<String, Entry> entries = Stream.of(new Entry("tickTimes", this::getTickTimes, "Historical tick times (ms)", long[].class), new Entry("averageTickTime", this::getAverageTickTime, "Current average tick time (ms)", Long.TYPE)).collect(Collectors.toMap(arg -> Entry.method_27186(arg), Function.identity()));
 
-    private ServerMBean(MinecraftServer minecraftServer) {
-        this.server = minecraftServer;
+    private ServerMBean(MinecraftServer server) {
+        this.server = server;
         MBeanAttributeInfo[] mBeanAttributeInfos = (MBeanAttributeInfo[])this.entries.values().stream().map(object -> ((Entry)object).createInfo()).toArray(MBeanAttributeInfo[]::new);
         this.beanInfo = new MBeanInfo(ServerMBean.class.getSimpleName(), "metrics for dedicated server", mBeanAttributeInfos, null, null, new MBeanNotificationInfo[0]);
     }
 
-    public static void register(MinecraftServer minecraftServer) {
+    public static void register(MinecraftServer server) {
         try {
-            ManagementFactory.getPlatformMBeanServer().registerMBean(new ServerMBean(minecraftServer), new ObjectName("net.minecraft.server:type=Server"));
+            ManagementFactory.getPlatformMBeanServer().registerMBean(new ServerMBean(server), new ObjectName("net.minecraft.server:type=Server"));
         }
         catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException jMException) {
             LOGGER.warn("Failed to initialise server as JMX bean", (Throwable)jMException);
@@ -65,8 +65,8 @@ implements DynamicMBean {
 
     @Override
     @Nullable
-    public Object getAttribute(String string) {
-        Entry lv = this.entries.get(string);
+    public Object getAttribute(String attribute) {
+        Entry lv = this.entries.get(attribute);
         return lv == null ? null : lv.getter.get();
     }
 
@@ -75,19 +75,19 @@ implements DynamicMBean {
     }
 
     @Override
-    public AttributeList getAttributes(String[] strings) {
-        List<Attribute> list = Arrays.stream(strings).map(this.entries::get).filter(Objects::nonNull).map(arg -> new Attribute(((Entry)arg).name, ((Entry)arg).getter.get())).collect(Collectors.toList());
+    public AttributeList getAttributes(String[] attributes) {
+        List<Attribute> list = Arrays.stream(attributes).map(this.entries::get).filter(Objects::nonNull).map(arg -> new Attribute(((Entry)arg).name, ((Entry)arg).getter.get())).collect(Collectors.toList());
         return new AttributeList(list);
     }
 
     @Override
-    public AttributeList setAttributes(AttributeList attributeList) {
+    public AttributeList setAttributes(AttributeList attributes) {
         return new AttributeList();
     }
 
     @Override
     @Nullable
-    public Object invoke(String string, Object[] objects, String[] strings) {
+    public Object invoke(String actionName, Object[] params, String[] signature) {
         return null;
     }
 
@@ -102,11 +102,11 @@ implements DynamicMBean {
         private final String description;
         private final Class<?> type;
 
-        private Entry(String string, Supplier<Object> supplier, String string2, Class<?> class_) {
-            this.name = string;
-            this.getter = supplier;
-            this.description = string2;
-            this.type = class_;
+        private Entry(String name, Supplier<Object> getter, String description, Class<?> type) {
+            this.name = name;
+            this.getter = getter;
+            this.description = description;
+            this.type = type;
         }
 
         private MBeanAttributeInfo createInfo() {

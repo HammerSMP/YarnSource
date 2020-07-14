@@ -23,21 +23,21 @@ extends AbstractFireballEntity {
         super((EntityType<? extends AbstractFireballEntity>)arg, arg2);
     }
 
-    public SmallFireballEntity(World arg, LivingEntity arg2, double d, double e, double f) {
-        super((EntityType<? extends AbstractFireballEntity>)EntityType.SMALL_FIREBALL, arg2, d, e, f, arg);
+    public SmallFireballEntity(World world, LivingEntity owner, double velocityX, double velocityY, double velocityZ) {
+        super((EntityType<? extends AbstractFireballEntity>)EntityType.SMALL_FIREBALL, owner, velocityX, velocityY, velocityZ, world);
     }
 
-    public SmallFireballEntity(World arg, double d, double e, double f, double g, double h, double i) {
-        super((EntityType<? extends AbstractFireballEntity>)EntityType.SMALL_FIREBALL, d, e, f, g, h, i, arg);
+    public SmallFireballEntity(World world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        super((EntityType<? extends AbstractFireballEntity>)EntityType.SMALL_FIREBALL, x, y, z, velocityX, velocityY, velocityZ, world);
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
         if (this.world.isClient) {
             return;
         }
-        Entity lv = arg.getEntity();
+        Entity lv = entityHitResult.getEntity();
         if (!lv.isFireImmune()) {
             Entity lv2 = this.getOwner();
             int i = lv.getFireTicks();
@@ -52,22 +52,22 @@ extends AbstractFireballEntity {
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult arg) {
+    protected void onBlockHit(BlockHitResult blockHitResult) {
         BlockHitResult lv2;
         BlockPos lv3;
-        super.onBlockHit(arg);
+        super.onBlockHit(blockHitResult);
         if (this.world.isClient) {
             return;
         }
         Entity lv = this.getOwner();
-        if ((lv == null || !(lv instanceof MobEntity) || this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) && this.world.isAir(lv3 = (lv2 = arg).getBlockPos().offset(lv2.getSide()))) {
+        if ((lv == null || !(lv instanceof MobEntity) || this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) && this.world.isAir(lv3 = (lv2 = blockHitResult).getBlockPos().offset(lv2.getSide()))) {
             this.world.setBlockState(lv3, AbstractFireBlock.getState(this.world, lv3));
         }
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         if (!this.world.isClient) {
             this.remove();
         }
@@ -79,7 +79,7 @@ extends AbstractFireballEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         return false;
     }
 }

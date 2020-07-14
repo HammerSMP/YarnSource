@@ -25,9 +25,9 @@ extends ClientConnection {
     private static final Text RATE_LIMIT_EXCEEDED_MESSAGE = new TranslatableText("disconnect.exceeded_packet_rate");
     private final int rateLimit;
 
-    public RateLimitedConnection(int i) {
+    public RateLimitedConnection(int rateLimit) {
         super(NetworkSide.SERVERBOUND);
-        this.rateLimit = i;
+        this.rateLimit = rateLimit;
     }
 
     @Override

@@ -21,8 +21,8 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class WaterSuspendParticle
 extends SpriteBillboardParticle {
-    private WaterSuspendParticle(ClientWorld arg, double d, double e, double f) {
-        super(arg, d, e - 0.125, f);
+    private WaterSuspendParticle(ClientWorld world, double x, double y, double z) {
+        super(world, x, y - 0.125, z);
         this.colorRed = 0.4f;
         this.colorGreen = 0.4f;
         this.colorBlue = 0.7f;
@@ -32,8 +32,8 @@ extends SpriteBillboardParticle {
         this.collidesWithWorld = false;
     }
 
-    private WaterSuspendParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i) {
-        super(arg, d, e - 0.125, f, g, h, i);
+    private WaterSuspendParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        super(world, x, y - 0.125, z, velocityX, velocityY, velocityZ);
         this.setBoundingBoxSpacing(0.01f, 0.01f);
         this.scale *= this.random.nextFloat() * 0.6f + 0.6f;
         this.maxAge = (int)(16.0 / (Math.random() * 0.8 + 0.2));
@@ -62,8 +62,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public WarpedSporeFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public WarpedSporeFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -82,8 +82,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public CrimsonSporeFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public CrimsonSporeFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -104,8 +104,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public UnderwaterFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public UnderwaterFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

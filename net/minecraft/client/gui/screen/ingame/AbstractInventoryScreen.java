@@ -52,10 +52,10 @@ extends HandledScreen<T> {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.drawStatusEffects) {
-            this.drawStatusEffects(arg);
+            this.drawStatusEffects(matrices);
         }
     }
 

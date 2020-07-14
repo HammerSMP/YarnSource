@@ -50,20 +50,20 @@ extends RecipeBookWidget {
     protected abstract Text getToggleCraftableButtonText();
 
     @Override
-    public void slotClicked(@Nullable Slot arg) {
-        super.slotClicked(arg);
-        if (arg != null && arg.id < this.craftingScreenHandler.getCraftingSlotCount()) {
+    public void slotClicked(@Nullable Slot slot) {
+        super.slotClicked(slot);
+        if (slot != null && slot.id < this.craftingScreenHandler.getCraftingSlotCount()) {
             this.outputSlot = null;
         }
     }
 
     @Override
-    public void showGhostRecipe(Recipe<?> arg, List<Slot> list) {
-        ItemStack lv = arg.getOutput();
-        this.ghostSlots.setRecipe(arg);
-        this.ghostSlots.addSlot(Ingredient.ofStacks(lv), list.get((int)2).x, list.get((int)2).y);
-        DefaultedList<Ingredient> lv2 = arg.getPreviewInputs();
-        this.outputSlot = list.get(1);
+    public void showGhostRecipe(Recipe<?> recipe, List<Slot> slots) {
+        ItemStack lv = recipe.getOutput();
+        this.ghostSlots.setRecipe(recipe);
+        this.ghostSlots.addSlot(Ingredient.ofStacks(lv), slots.get((int)2).x, slots.get((int)2).y);
+        DefaultedList<Ingredient> lv2 = recipe.getPreviewInputs();
+        this.outputSlot = slots.get(1);
         if (this.fuels == null) {
             this.fuels = this.getAllowedFuels();
         }
@@ -76,7 +76,7 @@ extends RecipeBookWidget {
             }
             Ingredient lv3 = (Ingredient)iterator.next();
             if (lv3.isEmpty()) continue;
-            Slot lv4 = list.get(i);
+            Slot lv4 = slots.get(i);
             this.ghostSlots.addSlot(lv3, lv4.x, lv4.y);
         }
     }

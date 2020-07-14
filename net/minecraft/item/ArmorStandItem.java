@@ -30,27 +30,27 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg2) {
-        Direction lv = arg2.getSide();
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        Direction lv = context.getSide();
         if (lv == Direction.DOWN) {
             return ActionResult.FAIL;
         }
-        World lv2 = arg2.getWorld();
-        ItemPlacementContext lv3 = new ItemPlacementContext(arg2);
+        World lv2 = context.getWorld();
+        ItemPlacementContext lv3 = new ItemPlacementContext(context);
         BlockPos lv4 = lv3.getBlockPos();
-        ItemStack lv5 = arg2.getStack();
+        ItemStack lv5 = context.getStack();
         Vec3d lv6 = Vec3d.ofBottomCenter(lv4);
         Box lv7 = EntityType.ARMOR_STAND.getDimensions().method_30231(lv6.getX(), lv6.getY(), lv6.getZ());
         if (!lv2.doesNotCollide(null, lv7, arg -> true) || !lv2.getEntities(null, lv7).isEmpty()) {
             return ActionResult.FAIL;
         }
         if (lv2 instanceof ServerWorld) {
-            ArmorStandEntity lv8 = EntityType.ARMOR_STAND.create((ServerWorld)lv2, lv5.getTag(), null, arg2.getPlayer(), lv4, SpawnReason.SPAWN_EGG, true, true);
+            ArmorStandEntity lv8 = EntityType.ARMOR_STAND.create((ServerWorld)lv2, lv5.getTag(), null, context.getPlayer(), lv4, SpawnReason.SPAWN_EGG, true, true);
             if (lv8 == null) {
                 return ActionResult.FAIL;
             }
             lv2.spawnEntity(lv8);
-            float f = (float)MathHelper.floor((MathHelper.wrapDegrees(arg2.getPlayerYaw() - 180.0f) + 22.5f) / 45.0f) * 45.0f;
+            float f = (float)MathHelper.floor((MathHelper.wrapDegrees(context.getPlayerYaw() - 180.0f) + 22.5f) / 45.0f) * 45.0f;
             lv8.refreshPositionAndAngles(lv8.getX(), lv8.getY(), lv8.getZ(), f, 0.0f);
             this.setRotations(lv8, lv2.random);
             lv2.spawnEntity(lv8);
@@ -60,16 +60,16 @@ extends Item {
         return ActionResult.success(lv2.isClient);
     }
 
-    private void setRotations(ArmorStandEntity arg, Random random) {
-        EulerAngle lv = arg.getHeadRotation();
+    private void setRotations(ArmorStandEntity stand, Random random) {
+        EulerAngle lv = stand.getHeadRotation();
         float f = random.nextFloat() * 5.0f;
         float g = random.nextFloat() * 20.0f - 10.0f;
         EulerAngle lv2 = new EulerAngle(lv.getPitch() + f, lv.getYaw() + g, lv.getRoll());
-        arg.setHeadRotation(lv2);
-        lv = arg.getBodyRotation();
+        stand.setHeadRotation(lv2);
+        lv = stand.getBodyRotation();
         f = random.nextFloat() * 10.0f - 5.0f;
         lv2 = new EulerAngle(lv.getPitch(), lv.getYaw() + f, lv.getRoll());
-        arg.setBodyRotation(lv2);
+        stand.setBodyRotation(lv2);
     }
 }
 

@@ -34,12 +34,12 @@ extends ValueObject {
     private static final Logger LOGGER = LogManager.getLogger();
     public List<RealmsServerPlayerList> servers;
 
-    public static RealmsServerPlayerLists parse(String string) {
+    public static RealmsServerPlayerLists parse(String json) {
         RealmsServerPlayerLists lv = new RealmsServerPlayerLists();
         lv.servers = Lists.newArrayList();
         try {
             JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(string).getAsJsonObject();
+            JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
             if (jsonObject.get("lists").isJsonArray()) {
                 JsonArray jsonArray = jsonObject.get("lists").getAsJsonArray();
                 Iterator iterator = jsonArray.iterator();

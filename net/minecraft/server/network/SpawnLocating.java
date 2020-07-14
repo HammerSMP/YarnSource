@@ -18,27 +18,27 @@ import net.minecraft.world.chunk.WorldChunk;
 
 public class SpawnLocating {
     @Nullable
-    protected static BlockPos findOverworldSpawn(ServerWorld arg, int i, int j, boolean bl) {
+    protected static BlockPos findOverworldSpawn(ServerWorld world, int x, int z, boolean validSpawnNeeded) {
         int k;
-        BlockPos.Mutable lv = new BlockPos.Mutable(i, 0, j);
-        Biome lv2 = arg.getBiome(lv);
-        boolean bl2 = arg.getDimension().hasCeiling();
+        BlockPos.Mutable lv = new BlockPos.Mutable(x, 0, z);
+        Biome lv2 = world.getBiome(lv);
+        boolean bl2 = world.getDimension().hasCeiling();
         BlockState lv3 = lv2.getSurfaceConfig().getTopMaterial();
-        if (bl && !lv3.getBlock().isIn(BlockTags.VALID_SPAWN)) {
+        if (validSpawnNeeded && !lv3.getBlock().isIn(BlockTags.VALID_SPAWN)) {
             return null;
         }
-        WorldChunk lv4 = arg.getChunk(i >> 4, j >> 4);
-        int n = k = bl2 ? arg.getChunkManager().getChunkGenerator().getSpawnHeight() : lv4.sampleHeightmap(Heightmap.Type.MOTION_BLOCKING, i & 0xF, j & 0xF);
+        WorldChunk lv4 = world.getChunk(x >> 4, z >> 4);
+        int n = k = bl2 ? world.getChunkManager().getChunkGenerator().getSpawnHeight() : lv4.sampleHeightmap(Heightmap.Type.MOTION_BLOCKING, x & 0xF, z & 0xF);
         if (k < 0) {
             return null;
         }
-        int l = lv4.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, i & 0xF, j & 0xF);
-        if (l <= k && l > lv4.sampleHeightmap(Heightmap.Type.OCEAN_FLOOR, i & 0xF, j & 0xF)) {
+        int l = lv4.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, x & 0xF, z & 0xF);
+        if (l <= k && l > lv4.sampleHeightmap(Heightmap.Type.OCEAN_FLOOR, x & 0xF, z & 0xF)) {
             return null;
         }
         for (int m = k + 1; m >= 0; --m) {
-            lv.set(i, m, j);
-            BlockState lv5 = arg.getBlockState(lv);
+            lv.set(x, m, z);
+            BlockState lv5 = world.getBlockState(lv);
             if (!lv5.getFluidState().isEmpty()) break;
             if (!lv5.equals(lv3)) continue;
             return lv.up().toImmutable();
@@ -47,10 +47,10 @@ public class SpawnLocating {
     }
 
     @Nullable
-    public static BlockPos findServerSpawnPoint(ServerWorld arg, ChunkPos arg2, boolean bl) {
-        for (int i = arg2.getStartX(); i <= arg2.getEndX(); ++i) {
-            for (int j = arg2.getStartZ(); j <= arg2.getEndZ(); ++j) {
-                BlockPos lv = SpawnLocating.findOverworldSpawn(arg, i, j, bl);
+    public static BlockPos findServerSpawnPoint(ServerWorld world, ChunkPos chunkPos, boolean validSpawnNeeded) {
+        for (int i = chunkPos.getStartX(); i <= chunkPos.getEndX(); ++i) {
+            for (int j = chunkPos.getStartZ(); j <= chunkPos.getEndZ(); ++j) {
+                BlockPos lv = SpawnLocating.findOverworldSpawn(world, i, j, validSpawnNeeded);
                 if (lv == null) continue;
                 return lv;
             }

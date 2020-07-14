@@ -16,9 +16,9 @@ public class GoToOwnerAndPurrGoal
 extends MoveToTargetPosGoal {
     private final CatEntity cat;
 
-    public GoToOwnerAndPurrGoal(CatEntity arg, double d, int i) {
-        super(arg, d, i, 6);
-        this.cat = arg;
+    public GoToOwnerAndPurrGoal(CatEntity cat, double speed, int range) {
+        super(cat, speed, range, 6);
+        this.cat = cat;
         this.lowestY = -2;
         this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
     }
@@ -35,7 +35,7 @@ extends MoveToTargetPosGoal {
     }
 
     @Override
-    protected int getInterval(PathAwareEntity arg) {
+    protected int getInterval(PathAwareEntity mob) {
         return 40;
     }
 
@@ -57,8 +57,8 @@ extends MoveToTargetPosGoal {
     }
 
     @Override
-    protected boolean isTargetPos(WorldView arg, BlockPos arg2) {
-        return arg.isAir(arg2.up()) && arg.getBlockState(arg2).getBlock().isIn(BlockTags.BEDS);
+    protected boolean isTargetPos(WorldView world, BlockPos pos) {
+        return world.isAir(pos.up()) && world.getBlockState(pos).getBlock().isIn(BlockTags.BEDS);
     }
 }
 

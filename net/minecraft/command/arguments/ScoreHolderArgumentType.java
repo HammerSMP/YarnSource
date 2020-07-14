@@ -58,24 +58,24 @@ implements ArgumentType<ScoreHolder> {
     private static final SimpleCommandExceptionType EMPTY_SCORE_HOLDER_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("argument.scoreHolder.empty"));
     private final boolean multiple;
 
-    public ScoreHolderArgumentType(boolean bl) {
-        this.multiple = bl;
+    public ScoreHolderArgumentType(boolean multiple) {
+        this.multiple = multiple;
     }
 
-    public static String getScoreHolder(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ScoreHolderArgumentType.getScoreHolders(commandContext, string).iterator().next();
+    public static String getScoreHolder(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        return ScoreHolderArgumentType.getScoreHolders(context, name).iterator().next();
     }
 
-    public static Collection<String> getScoreHolders(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ScoreHolderArgumentType.getScoreHolders(commandContext, string, Collections::emptyList);
+    public static Collection<String> getScoreHolders(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        return ScoreHolderArgumentType.getScoreHolders(context, name, Collections::emptyList);
     }
 
-    public static Collection<String> getScoreboardScoreHolders(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ScoreHolderArgumentType.getScoreHolders(commandContext, string, ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getScoreboard()::getKnownPlayers);
+    public static Collection<String> getScoreboardScoreHolders(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        return ScoreHolderArgumentType.getScoreHolders(context, name, ((ServerCommandSource)context.getSource()).getMinecraftServer().getScoreboard()::getKnownPlayers);
     }
 
-    public static Collection<String> getScoreHolders(CommandContext<ServerCommandSource> commandContext, String string, Supplier<Collection<String>> supplier) throws CommandSyntaxException {
-        Collection<String> collection = ((ScoreHolder)commandContext.getArgument(string, ScoreHolder.class)).getNames((ServerCommandSource)commandContext.getSource(), supplier);
+    public static Collection<String> getScoreHolders(CommandContext<ServerCommandSource> context, String name, Supplier<Collection<String>> players) throws CommandSyntaxException {
+        Collection<String> collection = ((ScoreHolder)context.getArgument(name, ScoreHolder.class)).getNames((ServerCommandSource)context.getSource(), players);
         if (collection.isEmpty()) {
             throw EntityArgumentType.ENTITY_NOT_FOUND_EXCEPTION.create();
         }

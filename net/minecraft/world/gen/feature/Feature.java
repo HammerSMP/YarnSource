@@ -12,13 +12,12 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5433;
-import net.minecraft.class_5437;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ModifiableWorld;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.TestableWorld;
+import net.minecraft.world.gen.CountConfig;
 import net.minecraft.world.gen.ProbabilityConfig;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.AbstractPileFeature;
@@ -71,6 +70,7 @@ import net.minecraft.world.gen.feature.KelpFeature;
 import net.minecraft.world.gen.feature.LakeFeature;
 import net.minecraft.world.gen.feature.NetherForestVegetationFeature;
 import net.minecraft.world.gen.feature.NetherrackReplaceBlobsFeature;
+import net.minecraft.world.gen.feature.NetherrackReplaceBlobsFeatureConfig;
 import net.minecraft.world.gen.feature.NoOpFeature;
 import net.minecraft.world.gen.feature.NoSurfaceOreFeature;
 import net.minecraft.world.gen.feature.OreFeature;
@@ -82,7 +82,6 @@ import net.minecraft.world.gen.feature.RandomFeatureConfig;
 import net.minecraft.world.gen.feature.RandomPatchFeature;
 import net.minecraft.world.gen.feature.RandomPatchFeatureConfig;
 import net.minecraft.world.gen.feature.SeaPickleFeature;
-import net.minecraft.world.gen.feature.SeaPickleFeatureConfig;
 import net.minecraft.world.gen.feature.SeagrassFeature;
 import net.minecraft.world.gen.feature.SimpleBlockFeature;
 import net.minecraft.world.gen.feature.SimpleBlockFeatureConfig;
@@ -94,6 +93,7 @@ import net.minecraft.world.gen.feature.SpringFeatureConfig;
 import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraft.world.gen.feature.TreeFeatureConfig;
 import net.minecraft.world.gen.feature.TwistingVinesFeature;
+import net.minecraft.world.gen.feature.UnderwaterDiskFeature;
 import net.minecraft.world.gen.feature.VinesFeature;
 import net.minecraft.world.gen.feature.VoidStartPlatformFeature;
 import net.minecraft.world.gen.feature.WeepingVinesFeature;
@@ -120,19 +120,19 @@ public abstract class Feature<FC extends FeatureConfig> {
     public static final Feature<DefaultFeatureConfig> BLUE_ICE = Feature.register("blue_ice", new BlueIceFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<SingleStateFeatureConfig> ICEBERG = Feature.register("iceberg", new IcebergFeature(SingleStateFeatureConfig.CODEC));
     public static final Feature<SingleStateFeatureConfig> FOREST_ROCK = Feature.register("forest_rock", new ForestRockFeature(SingleStateFeatureConfig.CODEC));
-    public static final Feature<DiskFeatureConfig> DISK = Feature.register("disk", new class_5433(DiskFeatureConfig.CODEC));
+    public static final Feature<DiskFeatureConfig> DISK = Feature.register("disk", new UnderwaterDiskFeature(DiskFeatureConfig.CODEC));
     public static final Feature<DiskFeatureConfig> ICE_PATCH = Feature.register("ice_patch", new IcePatchFeature(DiskFeatureConfig.CODEC));
     public static final Feature<SingleStateFeatureConfig> LAKE = Feature.register("lake", new LakeFeature(SingleStateFeatureConfig.CODEC));
     public static final Feature<OreFeatureConfig> ORE = Feature.register("ore", new OreFeature(OreFeatureConfig.CODEC));
     public static final Feature<EndSpikeFeatureConfig> END_SPIKE = Feature.register("end_spike", new EndSpikeFeature(EndSpikeFeatureConfig.CODEC));
     public static final Feature<DefaultFeatureConfig> END_ISLAND = Feature.register("end_island", new EndIslandFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<EndGatewayFeatureConfig> END_GATEWAY = Feature.register("end_gateway", new EndGatewayFeature(EndGatewayFeatureConfig.CODEC));
-    public static final SeagrassFeature field_13567 = Feature.register("seagrass", new SeagrassFeature(ProbabilityConfig.CODEC));
+    public static final SeagrassFeature SEAGRASS = Feature.register("seagrass", new SeagrassFeature(ProbabilityConfig.CODEC));
     public static final Feature<DefaultFeatureConfig> KELP = Feature.register("kelp", new KelpFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<DefaultFeatureConfig> CORAL_TREE = Feature.register("coral_tree", new CoralTreeFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<DefaultFeatureConfig> CORAL_MUSHROOM = Feature.register("coral_mushroom", new CoralMushroomFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<DefaultFeatureConfig> CORAL_CLAW = Feature.register("coral_claw", new CoralClawFeature(DefaultFeatureConfig.CODEC));
-    public static final Feature<SeaPickleFeatureConfig> SEA_PICKLE = Feature.register("sea_pickle", new SeaPickleFeature(SeaPickleFeatureConfig.CODEC));
+    public static final Feature<CountConfig> SEA_PICKLE = Feature.register("sea_pickle", new SeaPickleFeature(CountConfig.CODEC));
     public static final Feature<SimpleBlockFeatureConfig> SIMPLE_BLOCK = Feature.register("simple_block", new SimpleBlockFeature(SimpleBlockFeatureConfig.CODEC));
     public static final Feature<ProbabilityConfig> BAMBOO = Feature.register("bamboo", new BambooFeature(ProbabilityConfig.CODEC));
     public static final Feature<HugeFungusFeatureConfig> HUGE_FUNGUS = Feature.register("huge_fungus", new HugeFungusFeature(HugeFungusFeatureConfig.CODEC));
@@ -141,7 +141,7 @@ public abstract class Feature<FC extends FeatureConfig> {
     public static final Feature<DefaultFeatureConfig> TWISTING_VINES = Feature.register("twisting_vines", new TwistingVinesFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<BasaltColumnsFeatureConfig> BASALT_COLUMNS = Feature.register("basalt_columns", new BasaltColumnsFeature(BasaltColumnsFeatureConfig.CODEC));
     public static final Feature<DeltaFeatureConfig> DELTA_FEATURE = Feature.register("delta_feature", new DeltaFeature(DeltaFeatureConfig.CODEC));
-    public static final Feature<class_5437> NETHERRACK_REPLACE_BLOBS = Feature.register("netherrack_replace_blobs", new NetherrackReplaceBlobsFeature(class_5437.field_25848));
+    public static final Feature<NetherrackReplaceBlobsFeatureConfig> NETHERRACK_REPLACE_BLOBS = Feature.register("netherrack_replace_blobs", new NetherrackReplaceBlobsFeature(NetherrackReplaceBlobsFeatureConfig.field_25848));
     public static final Feature<FillLayerFeatureConfig> FILL_LAYER = Feature.register("fill_layer", new FillLayerFeature(FillLayerFeatureConfig.CODEC));
     public static final BonusChestFeature BONUS_CHEST = Feature.register("bonus_chest", new BonusChestFeature(DefaultFeatureConfig.CODEC));
     public static final Feature<DefaultFeatureConfig> BASALT_PILLAR = Feature.register("basalt_pillar", new BasaltPillarFeature(DefaultFeatureConfig.CODEC));
@@ -153,42 +153,42 @@ public abstract class Feature<FC extends FeatureConfig> {
     public static final Feature<DecoratedFeatureConfig> DECORATED_FLOWER = Feature.register("decorated_flower", new DecoratedFlowerFeature(DecoratedFeatureConfig.CODEC));
     private final Codec<ConfiguredFeature<FC, Feature<FC>>> codec;
 
-    private static <C extends FeatureConfig, F extends Feature<C>> F register(String string, F arg) {
-        return (F)Registry.register(Registry.FEATURE, string, arg);
+    private static <C extends FeatureConfig, F extends Feature<C>> F register(String name, F feature) {
+        return (F)Registry.register(Registry.FEATURE, name, feature);
     }
 
-    public Feature(Codec<FC> codec) {
-        this.codec = codec.fieldOf("config").xmap(arg -> new ConfiguredFeature<FeatureConfig, Feature>(this, (FeatureConfig)arg), arg -> arg.config).codec();
+    public Feature(Codec<FC> configCodec) {
+        this.codec = configCodec.fieldOf("config").xmap(arg -> new ConfiguredFeature<FeatureConfig, Feature>(this, (FeatureConfig)arg), arg -> arg.config).codec();
     }
 
     public Codec<ConfiguredFeature<FC, Feature<FC>>> getCodec() {
         return this.codec;
     }
 
-    public ConfiguredFeature<FC, ?> configure(FC arg) {
-        return new ConfiguredFeature<FC, Feature>(this, arg);
+    public ConfiguredFeature<FC, ?> configure(FC config) {
+        return new ConfiguredFeature<FC, Feature>(this, config);
     }
 
-    protected void setBlockState(ModifiableWorld arg, BlockPos arg2, BlockState arg3) {
-        arg.setBlockState(arg2, arg3, 3);
+    protected void setBlockState(ModifiableWorld world, BlockPos pos, BlockState state) {
+        world.setBlockState(pos, state, 3);
     }
 
     public abstract boolean generate(ServerWorldAccess var1, ChunkGenerator var2, Random var3, BlockPos var4, FC var5);
 
-    protected static boolean isStone(Block arg) {
-        return arg == Blocks.STONE || arg == Blocks.GRANITE || arg == Blocks.DIORITE || arg == Blocks.ANDESITE;
+    protected static boolean isStone(Block block) {
+        return block == Blocks.STONE || block == Blocks.GRANITE || block == Blocks.DIORITE || block == Blocks.ANDESITE;
     }
 
-    public static boolean isSoil(Block arg) {
-        return arg == Blocks.DIRT || arg == Blocks.GRASS_BLOCK || arg == Blocks.PODZOL || arg == Blocks.COARSE_DIRT || arg == Blocks.MYCELIUM;
+    public static boolean isSoil(Block block) {
+        return block == Blocks.DIRT || block == Blocks.GRASS_BLOCK || block == Blocks.PODZOL || block == Blocks.COARSE_DIRT || block == Blocks.MYCELIUM;
     }
 
-    public static boolean isSoil(TestableWorld arg2, BlockPos arg22) {
-        return arg2.testBlockState(arg22, arg -> Feature.isSoil(arg.getBlock()));
+    public static boolean isSoil(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, state -> Feature.isSoil(state.getBlock()));
     }
 
-    public static boolean isAir(TestableWorld arg, BlockPos arg2) {
-        return arg.testBlockState(arg2, AbstractBlock.AbstractBlockState::isAir);
+    public static boolean isAir(TestableWorld world, BlockPos pos) {
+        return world.testBlockState(pos, AbstractBlock.AbstractBlockState::isAir);
     }
 }
 

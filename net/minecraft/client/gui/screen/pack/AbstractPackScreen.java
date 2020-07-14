@@ -136,9 +136,9 @@ extends Screen {
         this.doneButton.active = !this.selectedPackList.children().isEmpty();
     }
 
-    private void updatePackList(PackListWidget arg, Stream<ResourcePackOrganizer.Pack> stream) {
-        arg.children().clear();
-        stream.forEach(arg2 -> arg.children().add(new PackListWidget.ResourcePackEntry(this.client, arg, this, (ResourcePackOrganizer.Pack)arg2)));
+    private void updatePackList(PackListWidget widget, Stream<ResourcePackOrganizer.Pack> packs) {
+        widget.children().clear();
+        packs.forEach(arg2 -> widget.children().add(new PackListWidget.ResourcePackEntry(this.client, widget, this, (ResourcePackOrganizer.Pack)arg2)));
     }
 
     private void method_29680() {
@@ -149,13 +149,13 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
-        this.availablePackList.render(arg, i, j, f);
-        this.selectedPackList.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, DROP_INFO, this.width / 2, 20, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.availablePackList.render(matrices, mouseX, mouseY, delta);
+        this.selectedPackList.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, DROP_INFO, this.width / 2, 20, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     protected static void method_29669(MinecraftClient arg, List<Path> list, Path path) {
@@ -183,11 +183,11 @@ extends Screen {
     }
 
     @Override
-    public void filesDragged(List<Path> list) {
-        String string = list.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
+    public void filesDragged(List<Path> paths) {
+        String string = paths.stream().map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
         this.client.openScreen(new ConfirmScreen(bl -> {
             if (bl) {
-                AbstractPackScreen.method_29669(this.client, list, this.field_25474.toPath());
+                AbstractPackScreen.method_29669(this.client, paths, this.field_25474.toPath());
                 this.method_29680();
             }
             this.client.openScreen(this);

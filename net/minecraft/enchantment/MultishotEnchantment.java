@@ -10,17 +10,17 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class MultishotEnchantment
 extends Enchantment {
-    public MultishotEnchantment(Enchantment.Rarity arg, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.CROSSBOW, args);
+    public MultishotEnchantment(Enchantment.Rarity weight, EquipmentSlot ... slotTypes) {
+        super(weight, EnchantmentTarget.CROSSBOW, slotTypes);
     }
 
     @Override
-    public int getMinPower(int i) {
+    public int getMinPower(int level) {
         return 20;
     }
 
     @Override
-    public int getMaxPower(int i) {
+    public int getMaxPower(int level) {
         return 50;
     }
 
@@ -30,8 +30,8 @@ extends Enchantment {
     }
 
     @Override
-    public boolean canAccept(Enchantment arg) {
-        return super.canAccept(arg) && arg != Enchantments.PIERCING;
+    public boolean canAccept(Enchantment other) {
+        return super.canAccept(other) && other != Enchantments.PIERCING;
     }
 }
 

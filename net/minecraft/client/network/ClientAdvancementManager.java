@@ -39,18 +39,18 @@ public class ClientAdvancementManager {
     @Nullable
     private Advancement selectedTab;
 
-    public ClientAdvancementManager(MinecraftClient arg) {
-        this.client = arg;
+    public ClientAdvancementManager(MinecraftClient client) {
+        this.client = client;
     }
 
-    public void onAdvancements(AdvancementUpdateS2CPacket arg) {
-        if (arg.shouldClearCurrent()) {
+    public void onAdvancements(AdvancementUpdateS2CPacket packet) {
+        if (packet.shouldClearCurrent()) {
             this.manager.clear();
             this.advancementProgresses.clear();
         }
-        this.manager.removeAll(arg.getAdvancementIdsToRemove());
-        this.manager.load(arg.getAdvancementsToEarn());
-        for (Map.Entry<Identifier, AdvancementProgress> entry : arg.getAdvancementsToProgress().entrySet()) {
+        this.manager.removeAll(packet.getAdvancementIdsToRemove());
+        this.manager.load(packet.getAdvancementsToEarn());
+        for (Map.Entry<Identifier, AdvancementProgress> entry : packet.getAdvancementsToProgress().entrySet()) {
             Advancement lv = this.manager.get(entry.getKey());
             if (lv != null) {
                 AdvancementProgress lv2 = entry.getValue();
@@ -59,7 +59,7 @@ public class ClientAdvancementManager {
                 if (this.listener != null) {
                     this.listener.setProgress(lv, lv2);
                 }
-                if (arg.shouldClearCurrent() || !lv2.isDone() || lv.getDisplay() == null || !lv.getDisplay().shouldShowToast()) continue;
+                if (packet.shouldClearCurrent() || !lv2.isDone() || lv.getDisplay() == null || !lv.getDisplay().shouldShowToast()) continue;
                 this.client.getToastManager().add(new AdvancementToast(lv));
                 continue;
             }
@@ -71,27 +71,27 @@ public class ClientAdvancementManager {
         return this.manager;
     }
 
-    public void selectTab(@Nullable Advancement arg, boolean bl) {
+    public void selectTab(@Nullable Advancement tab, boolean local) {
         ClientPlayNetworkHandler lv = this.client.getNetworkHandler();
-        if (lv != null && arg != null && bl) {
-            lv.sendPacket(AdvancementTabC2SPacket.open(arg));
+        if (lv != null && tab != null && local) {
+            lv.sendPacket(AdvancementTabC2SPacket.open(tab));
         }
-        if (this.selectedTab != arg) {
-            this.selectedTab = arg;
+        if (this.selectedTab != tab) {
+            this.selectedTab = tab;
             if (this.listener != null) {
-                this.listener.selectTab(arg);
+                this.listener.selectTab(tab);
             }
         }
     }
 
-    public void setListener(@Nullable Listener arg) {
-        this.listener = arg;
-        this.manager.setListener(arg);
-        if (arg != null) {
+    public void setListener(@Nullable Listener listener) {
+        this.listener = listener;
+        this.manager.setListener(listener);
+        if (listener != null) {
             for (Map.Entry<Advancement, AdvancementProgress> entry : this.advancementProgresses.entrySet()) {
-                arg.setProgress(entry.getKey(), entry.getValue());
+                listener.setProgress(entry.getKey(), entry.getValue());
             }
-            arg.selectTab(this.selectedTab);
+            listener.selectTab(this.selectedTab);
         }
     }
 

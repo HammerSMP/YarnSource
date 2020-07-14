@@ -44,67 +44,67 @@ implements Packet<ClientPlayPacketListener> {
     public GameJoinS2CPacket() {
     }
 
-    public GameJoinS2CPacket(int i, GameMode arg, GameMode arg2, long l, boolean bl, Set<RegistryKey<World>> set, class_5455.class_5457 arg3, RegistryKey<DimensionType> arg4, RegistryKey<World> arg5, int j, int k, boolean bl2, boolean bl3, boolean bl4, boolean bl5) {
-        this.playerEntityId = i;
+    public GameJoinS2CPacket(int playerEntityId, GameMode gameMode, GameMode arg2, long sha256Seed, boolean hardcore, Set<RegistryKey<World>> set, class_5455.class_5457 arg3, RegistryKey<DimensionType> arg4, RegistryKey<World> arg5, int maxPlayers, int chunkLoadDistance, boolean reducedDebugInfo, boolean showDeathScreen, boolean debugWorld, boolean flatWorld) {
+        this.playerEntityId = playerEntityId;
         this.field_25320 = set;
         this.dimensionTracker = arg3;
         this.field_25321 = arg4;
         this.dimensionId = arg5;
-        this.sha256Seed = l;
-        this.gameMode = arg;
+        this.sha256Seed = sha256Seed;
+        this.gameMode = gameMode;
         this.field_25713 = arg2;
-        this.maxPlayers = j;
-        this.hardcore = bl;
-        this.chunkLoadDistance = k;
-        this.reducedDebugInfo = bl2;
-        this.showDeathScreen = bl3;
-        this.debugWorld = bl4;
-        this.flatWorld = bl5;
+        this.maxPlayers = maxPlayers;
+        this.hardcore = hardcore;
+        this.chunkLoadDistance = chunkLoadDistance;
+        this.reducedDebugInfo = reducedDebugInfo;
+        this.showDeathScreen = showDeathScreen;
+        this.debugWorld = debugWorld;
+        this.flatWorld = flatWorld;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.playerEntityId = arg.readInt();
-        this.hardcore = arg.readBoolean();
-        this.gameMode = GameMode.byId(arg.readByte());
-        this.field_25713 = GameMode.byId(arg.readByte());
-        int i = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.playerEntityId = buf.readInt();
+        this.hardcore = buf.readBoolean();
+        this.gameMode = GameMode.byId(buf.readByte());
+        this.field_25713 = GameMode.byId(buf.readByte());
+        int i = buf.readVarInt();
         this.field_25320 = Sets.newHashSet();
         for (int j = 0; j < i; ++j) {
-            this.field_25320.add(RegistryKey.of(Registry.DIMENSION, arg.readIdentifier()));
+            this.field_25320.add(RegistryKey.of(Registry.DIMENSION, buf.readIdentifier()));
         }
-        this.dimensionTracker = arg.decode(class_5455.class_5457.field_25923);
-        this.field_25321 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, arg.readIdentifier());
-        this.dimensionId = RegistryKey.of(Registry.DIMENSION, arg.readIdentifier());
-        this.sha256Seed = arg.readLong();
-        this.maxPlayers = arg.readVarInt();
-        this.chunkLoadDistance = arg.readVarInt();
-        this.reducedDebugInfo = arg.readBoolean();
-        this.showDeathScreen = arg.readBoolean();
-        this.debugWorld = arg.readBoolean();
-        this.flatWorld = arg.readBoolean();
+        this.dimensionTracker = buf.decode(class_5455.class_5457.field_25923);
+        this.field_25321 = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, buf.readIdentifier());
+        this.dimensionId = RegistryKey.of(Registry.DIMENSION, buf.readIdentifier());
+        this.sha256Seed = buf.readLong();
+        this.maxPlayers = buf.readVarInt();
+        this.chunkLoadDistance = buf.readVarInt();
+        this.reducedDebugInfo = buf.readBoolean();
+        this.showDeathScreen = buf.readBoolean();
+        this.debugWorld = buf.readBoolean();
+        this.flatWorld = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.playerEntityId);
-        arg.writeBoolean(this.hardcore);
-        arg.writeByte(this.gameMode.getId());
-        arg.writeByte(this.field_25713.getId());
-        arg.writeVarInt(this.field_25320.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeInt(this.playerEntityId);
+        buf.writeBoolean(this.hardcore);
+        buf.writeByte(this.gameMode.getId());
+        buf.writeByte(this.field_25713.getId());
+        buf.writeVarInt(this.field_25320.size());
         for (RegistryKey<World> lv : this.field_25320) {
-            arg.writeIdentifier(lv.getValue());
+            buf.writeIdentifier(lv.getValue());
         }
-        arg.encode(class_5455.class_5457.field_25923, this.dimensionTracker);
-        arg.writeIdentifier(this.field_25321.getValue());
-        arg.writeIdentifier(this.dimensionId.getValue());
-        arg.writeLong(this.sha256Seed);
-        arg.writeVarInt(this.maxPlayers);
-        arg.writeVarInt(this.chunkLoadDistance);
-        arg.writeBoolean(this.reducedDebugInfo);
-        arg.writeBoolean(this.showDeathScreen);
-        arg.writeBoolean(this.debugWorld);
-        arg.writeBoolean(this.flatWorld);
+        buf.encode(class_5455.class_5457.field_25923, this.dimensionTracker);
+        buf.writeIdentifier(this.field_25321.getValue());
+        buf.writeIdentifier(this.dimensionId.getValue());
+        buf.writeLong(this.sha256Seed);
+        buf.writeVarInt(this.maxPlayers);
+        buf.writeVarInt(this.chunkLoadDistance);
+        buf.writeBoolean(this.reducedDebugInfo);
+        buf.writeBoolean(this.showDeathScreen);
+        buf.writeBoolean(this.debugWorld);
+        buf.writeBoolean(this.flatWorld);
     }
 
     @Override

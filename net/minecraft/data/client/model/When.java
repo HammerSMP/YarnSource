@@ -30,37 +30,37 @@ extends Supplier<JsonElement> {
         return new PropertyCondition();
     }
 
-    public static When anyOf(When ... args) {
-        return new LogicalCondition(LogicalOperator.OR, Arrays.asList(args));
+    public static When anyOf(When ... conditions) {
+        return new LogicalCondition(LogicalOperator.OR, Arrays.asList(conditions));
     }
 
     public static class PropertyCondition
     implements When {
         private final Map<Property<?>, String> properties = Maps.newHashMap();
 
-        private static <T extends Comparable<T>> String name(Property<T> arg, Stream<T> stream) {
-            return stream.map(arg::name).collect(Collectors.joining("|"));
+        private static <T extends Comparable<T>> String name(Property<T> property, Stream<T> valueStream) {
+            return valueStream.map(property::name).collect(Collectors.joining("|"));
         }
 
-        private static <T extends Comparable<T>> String name(Property<T> arg, T comparable, T[] comparables) {
-            return PropertyCondition.name(arg, Stream.concat(Stream.of(comparable), Stream.of(comparables)));
+        private static <T extends Comparable<T>> String name(Property<T> property, T value, T[] otherValues) {
+            return PropertyCondition.name(property, Stream.concat(Stream.of(value), Stream.of(otherValues)));
         }
 
-        private <T extends Comparable<T>> void set(Property<T> arg, String string) {
-            String string2 = this.properties.put(arg, string);
+        private <T extends Comparable<T>> void set(Property<T> property, String value) {
+            String string2 = this.properties.put(property, value);
             if (string2 != null) {
-                throw new IllegalStateException("Tried to replace " + arg + " value from " + string2 + " to " + string);
+                throw new IllegalStateException("Tried to replace " + property + " value from " + string2 + " to " + value);
             }
         }
 
-        public final <T extends Comparable<T>> PropertyCondition set(Property<T> arg, T comparable) {
-            this.set(arg, arg.name(comparable));
+        public final <T extends Comparable<T>> PropertyCondition set(Property<T> property, T value) {
+            this.set(property, property.name(value));
             return this;
         }
 
         @SafeVarargs
-        public final <T extends Comparable<T>> PropertyCondition set(Property<T> arg, T comparable, T ... comparables) {
-            this.set(arg, PropertyCondition.name(arg, comparable, comparables));
+        public final <T extends Comparable<T>> PropertyCondition set(Property<T> property, T value, T ... otherValues) {
+            this.set(property, PropertyCondition.name(property, value, otherValues));
             return this;
         }
 
@@ -72,10 +72,10 @@ extends Supplier<JsonElement> {
         }
 
         @Override
-        public void validate(StateManager<?, ?> arg) {
-            List list = this.properties.keySet().stream().filter(arg2 -> arg.getProperty(arg2.getName()) != arg2).collect(Collectors.toList());
+        public void validate(StateManager<?, ?> stateManager) {
+            List list = this.properties.keySet().stream().filter(arg2 -> stateManager.getProperty(arg2.getName()) != arg2).collect(Collectors.toList());
             if (!list.isEmpty()) {
-                throw new IllegalStateException("Properties " + list + " are missing from " + arg);
+                throw new IllegalStateException("Properties " + list + " are missing from " + stateManager);
             }
         }
 
@@ -90,14 +90,14 @@ extends Supplier<JsonElement> {
         private final LogicalOperator operator;
         private final List<When> components;
 
-        private LogicalCondition(LogicalOperator arg, List<When> list) {
-            this.operator = arg;
-            this.components = list;
+        private LogicalCondition(LogicalOperator operator, List<When> components) {
+            this.operator = operator;
+            this.components = components;
         }
 
         @Override
-        public void validate(StateManager<?, ?> arg) {
-            this.components.forEach(arg2 -> arg2.validate(arg));
+        public void validate(StateManager<?, ?> stateManager) {
+            this.components.forEach(arg2 -> arg2.validate(stateManager));
         }
 
         @Override
@@ -121,8 +121,8 @@ extends Supplier<JsonElement> {
 
         private final String name;
 
-        private LogicalOperator(String string2) {
-            this.name = string2;
+        private LogicalOperator(String name) {
+            this.name = name;
         }
     }
 }

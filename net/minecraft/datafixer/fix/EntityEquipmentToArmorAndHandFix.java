@@ -34,8 +34,8 @@ import net.minecraft.datafixer.TypeReferences;
 
 public class EntityEquipmentToArmorAndHandFix
 extends DataFix {
-    public EntityEquipmentToArmorAndHandFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public EntityEquipmentToArmorAndHandFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     public TypeRewriteRule makeRule() {

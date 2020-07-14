@@ -39,16 +39,16 @@ public class TradeOffer {
         this.demandBonus = arg.getInt("demand");
     }
 
-    public TradeOffer(ItemStack arg, ItemStack arg2, int i, int j, float f) {
-        this(arg, ItemStack.EMPTY, arg2, i, j, f);
+    public TradeOffer(ItemStack buyItem, ItemStack sellItem, int maxUses, int rewardedExp, float priceMultiplier) {
+        this(buyItem, ItemStack.EMPTY, sellItem, maxUses, rewardedExp, priceMultiplier);
     }
 
-    public TradeOffer(ItemStack arg, ItemStack arg2, ItemStack arg3, int i, int j, float f) {
-        this(arg, arg2, arg3, 0, i, j, f);
+    public TradeOffer(ItemStack firstBuyItem, ItemStack secondBuyItem, ItemStack sellItem, int maxUses, int rewardedExp, float priceMultiplier) {
+        this(firstBuyItem, secondBuyItem, sellItem, 0, maxUses, rewardedExp, priceMultiplier);
     }
 
-    public TradeOffer(ItemStack arg, ItemStack arg2, ItemStack arg3, int i, int j, int k, float f) {
-        this(arg, arg2, arg3, i, j, k, f, 0);
+    public TradeOffer(ItemStack firstBuyItem, ItemStack secondBuyItem, ItemStack sellItem, int uses, int maxUses, int rewardedExp, float priceMultiplier) {
+        this(firstBuyItem, secondBuyItem, sellItem, uses, maxUses, rewardedExp, priceMultiplier, 0);
     }
 
     public TradeOffer(ItemStack arg, ItemStack arg2, ItemStack arg3, int i, int j, int k, float f, int l) {
@@ -165,19 +165,19 @@ public class TradeOffer {
         return lv;
     }
 
-    public boolean matchesBuyItems(ItemStack arg, ItemStack arg2) {
-        return this.acceptsBuy(arg, this.getAdjustedFirstBuyItem()) && arg.getCount() >= this.getAdjustedFirstBuyItem().getCount() && this.acceptsBuy(arg2, this.secondBuyItem) && arg2.getCount() >= this.secondBuyItem.getCount();
+    public boolean matchesBuyItems(ItemStack first, ItemStack second) {
+        return this.acceptsBuy(first, this.getAdjustedFirstBuyItem()) && first.getCount() >= this.getAdjustedFirstBuyItem().getCount() && this.acceptsBuy(second, this.secondBuyItem) && second.getCount() >= this.secondBuyItem.getCount();
     }
 
-    private boolean acceptsBuy(ItemStack arg, ItemStack arg2) {
-        if (arg2.isEmpty() && arg.isEmpty()) {
+    private boolean acceptsBuy(ItemStack given, ItemStack sample) {
+        if (sample.isEmpty() && given.isEmpty()) {
             return true;
         }
-        ItemStack lv = arg.copy();
+        ItemStack lv = given.copy();
         if (lv.getItem().isDamageable()) {
             lv.setDamage(lv.getDamage());
         }
-        return ItemStack.areItemsEqualIgnoreDamage(lv, arg2) && (!arg2.hasTag() || lv.hasTag() && NbtHelper.matches(arg2.getTag(), lv.getTag(), false));
+        return ItemStack.areItemsEqualIgnoreDamage(lv, sample) && (!sample.hasTag() || lv.hasTag() && NbtHelper.matches(sample.getTag(), lv.getTag(), false));
     }
 
     public boolean depleteBuyItems(ItemStack arg, ItemStack arg2) {

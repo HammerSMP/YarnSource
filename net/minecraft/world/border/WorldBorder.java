@@ -39,31 +39,31 @@ public class WorldBorder {
     private Area area = new StaticArea(6.0E7);
     public static final Properties DEFAULT_BORDER = new Properties(0.0, 0.0, 0.2, 5.0, 5, 15, 6.0E7, 0L, 0.0);
 
-    public boolean contains(BlockPos arg) {
-        return (double)(arg.getX() + 1) > this.getBoundWest() && (double)arg.getX() < this.getBoundEast() && (double)(arg.getZ() + 1) > this.getBoundNorth() && (double)arg.getZ() < this.getBoundSouth();
+    public boolean contains(BlockPos pos) {
+        return (double)(pos.getX() + 1) > this.getBoundWest() && (double)pos.getX() < this.getBoundEast() && (double)(pos.getZ() + 1) > this.getBoundNorth() && (double)pos.getZ() < this.getBoundSouth();
     }
 
-    public boolean contains(ChunkPos arg) {
-        return (double)arg.getEndX() > this.getBoundWest() && (double)arg.getStartX() < this.getBoundEast() && (double)arg.getEndZ() > this.getBoundNorth() && (double)arg.getStartZ() < this.getBoundSouth();
+    public boolean contains(ChunkPos pos) {
+        return (double)pos.getEndX() > this.getBoundWest() && (double)pos.getStartX() < this.getBoundEast() && (double)pos.getEndZ() > this.getBoundNorth() && (double)pos.getStartZ() < this.getBoundSouth();
     }
 
-    public boolean contains(Box arg) {
-        return arg.maxX > this.getBoundWest() && arg.minX < this.getBoundEast() && arg.maxZ > this.getBoundNorth() && arg.minZ < this.getBoundSouth();
+    public boolean contains(Box box) {
+        return box.maxX > this.getBoundWest() && box.minX < this.getBoundEast() && box.maxZ > this.getBoundNorth() && box.minZ < this.getBoundSouth();
     }
 
-    public double getDistanceInsideBorder(Entity arg) {
-        return this.getDistanceInsideBorder(arg.getX(), arg.getZ());
+    public double getDistanceInsideBorder(Entity entity) {
+        return this.getDistanceInsideBorder(entity.getX(), entity.getZ());
     }
 
     public VoxelShape asVoxelShape() {
         return this.area.asVoxelShape();
     }
 
-    public double getDistanceInsideBorder(double d, double e) {
-        double f = e - this.getBoundNorth();
-        double g = this.getBoundSouth() - e;
-        double h = d - this.getBoundWest();
-        double i = this.getBoundEast() - d;
+    public double getDistanceInsideBorder(double x, double z) {
+        double f = z - this.getBoundNorth();
+        double g = this.getBoundSouth() - z;
+        double h = x - this.getBoundWest();
+        double i = this.getBoundEast() - x;
         double j = Math.min(h, i);
         j = Math.min(j, f);
         return Math.min(j, g);
@@ -98,12 +98,12 @@ public class WorldBorder {
         return this.centerZ;
     }
 
-    public void setCenter(double d, double e) {
-        this.centerX = d;
-        this.centerZ = e;
+    public void setCenter(double x, double z) {
+        this.centerX = x;
+        this.centerZ = z;
         this.area.onCenterChanged();
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onCenterChanged(this, d, e);
+            lv.onCenterChanged(this, x, z);
         }
     }
 
@@ -119,17 +119,17 @@ public class WorldBorder {
         return this.area.getTargetSize();
     }
 
-    public void setSize(double d) {
-        this.area = new StaticArea(d);
+    public void setSize(double size) {
+        this.area = new StaticArea(size);
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onSizeChange(this, d);
+            lv.onSizeChange(this, size);
         }
     }
 
-    public void interpolateSize(double d, double e, long l) {
-        this.area = d == e ? new StaticArea(e) : new MovingArea(d, e, l);
+    public void interpolateSize(double fromSize, double toSize, long time) {
+        this.area = fromSize == toSize ? new StaticArea(toSize) : new MovingArea(fromSize, toSize, time);
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onInterpolateSize(this, d, e, l);
+            lv.onInterpolateSize(this, fromSize, toSize, time);
         }
     }
 
@@ -137,12 +137,12 @@ public class WorldBorder {
         return Lists.newArrayList(this.listeners);
     }
 
-    public void addListener(WorldBorderListener arg) {
-        this.listeners.add(arg);
+    public void addListener(WorldBorderListener listener) {
+        this.listeners.add(listener);
     }
 
-    public void setMaxWorldBorderRadius(int i) {
-        this.maxWorldBorderRadius = i;
+    public void setMaxWorldBorderRadius(int radius) {
+        this.maxWorldBorderRadius = radius;
         this.area.onMaxWorldBorderRadiusChanged();
     }
 
@@ -154,10 +154,10 @@ public class WorldBorder {
         return this.buffer;
     }
 
-    public void setBuffer(double d) {
-        this.buffer = d;
+    public void setBuffer(double buffer) {
+        this.buffer = buffer;
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onSafeZoneChanged(this, d);
+            lv.onSafeZoneChanged(this, buffer);
         }
     }
 
@@ -165,10 +165,10 @@ public class WorldBorder {
         return this.damagePerBlock;
     }
 
-    public void setDamagePerBlock(double d) {
-        this.damagePerBlock = d;
+    public void setDamagePerBlock(double damagePerBlock) {
+        this.damagePerBlock = damagePerBlock;
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onDamagePerBlockChanged(this, d);
+            lv.onDamagePerBlockChanged(this, damagePerBlock);
         }
     }
 
@@ -181,10 +181,10 @@ public class WorldBorder {
         return this.warningTime;
     }
 
-    public void setWarningTime(int i) {
-        this.warningTime = i;
+    public void setWarningTime(int warningTime) {
+        this.warningTime = warningTime;
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onWarningTimeChanged(this, i);
+            lv.onWarningTimeChanged(this, warningTime);
         }
     }
 
@@ -192,10 +192,10 @@ public class WorldBorder {
         return this.warningBlocks;
     }
 
-    public void setWarningBlocks(int i) {
-        this.warningBlocks = i;
+    public void setWarningBlocks(int warningBlocks) {
+        this.warningBlocks = warningBlocks;
         for (WorldBorderListener lv : this.getListeners()) {
-            lv.onWarningBlocksChanged(this, i);
+            lv.onWarningBlocksChanged(this, warningBlocks);
         }
     }
 
@@ -207,16 +207,16 @@ public class WorldBorder {
         return new Properties(this);
     }
 
-    public void load(Properties arg) {
-        this.setCenter(arg.getCenterX(), arg.getCenterZ());
-        this.setDamagePerBlock(arg.getDamagePerBlock());
-        this.setBuffer(arg.getBuffer());
-        this.setWarningBlocks(arg.getWarningBlocks());
-        this.setWarningTime(arg.getWarningTime());
-        if (arg.getTargetRemainingTime() > 0L) {
-            this.interpolateSize(arg.getSize(), arg.getTargetSize(), arg.getTargetRemainingTime());
+    public void load(Properties properties) {
+        this.setCenter(properties.getCenterX(), properties.getCenterZ());
+        this.setDamagePerBlock(properties.getDamagePerBlock());
+        this.setBuffer(properties.getBuffer());
+        this.setWarningBlocks(properties.getWarningBlocks());
+        this.setWarningTime(properties.getWarningTime());
+        if (properties.getTargetRemainingTime() > 0L) {
+            this.interpolateSize(properties.getSize(), properties.getTargetSize(), properties.getTargetRemainingTime());
         } else {
-            this.setSize(arg.getSize());
+            this.setSize(properties.getSize());
         }
     }
 
@@ -231,28 +231,28 @@ public class WorldBorder {
         private final long targetRemainingTime;
         private final double targetSize;
 
-        private Properties(double d, double e, double f, double g, int i, int j, double h, long l, double k) {
-            this.centerX = d;
-            this.centerZ = e;
-            this.damagePerBlock = f;
-            this.buffer = g;
-            this.warningBlocks = i;
-            this.warningTime = j;
-            this.size = h;
-            this.targetRemainingTime = l;
-            this.targetSize = k;
+        private Properties(double centerX, double centerZ, double damagePerBlock, double buffer, int warningBlocks, int warningTime, double size, long targetRemainingTime, double targetSize) {
+            this.centerX = centerX;
+            this.centerZ = centerZ;
+            this.damagePerBlock = damagePerBlock;
+            this.buffer = buffer;
+            this.warningBlocks = warningBlocks;
+            this.warningTime = warningTime;
+            this.size = size;
+            this.targetRemainingTime = targetRemainingTime;
+            this.targetSize = targetSize;
         }
 
-        private Properties(WorldBorder arg) {
-            this.centerX = arg.getCenterX();
-            this.centerZ = arg.getCenterZ();
-            this.damagePerBlock = arg.getDamagePerBlock();
-            this.buffer = arg.getBuffer();
-            this.warningBlocks = arg.getWarningBlocks();
-            this.warningTime = arg.getWarningTime();
-            this.size = arg.getSize();
-            this.targetRemainingTime = arg.getTargetRemainingTime();
-            this.targetSize = arg.getTargetSize();
+        private Properties(WorldBorder worldBorder) {
+            this.centerX = worldBorder.getCenterX();
+            this.centerZ = worldBorder.getCenterZ();
+            this.damagePerBlock = worldBorder.getDamagePerBlock();
+            this.buffer = worldBorder.getBuffer();
+            this.warningBlocks = worldBorder.getWarningBlocks();
+            this.warningTime = worldBorder.getWarningTime();
+            this.size = worldBorder.getSize();
+            this.targetRemainingTime = worldBorder.getTargetRemainingTime();
+            this.targetSize = worldBorder.getTargetSize();
         }
 
         public double getCenterX() {
@@ -304,16 +304,16 @@ public class WorldBorder {
             return new Properties(d, e, i, h, j, k, f, l, g);
         }
 
-        public void toTag(CompoundTag arg) {
-            arg.putDouble("BorderCenterX", this.centerX);
-            arg.putDouble("BorderCenterZ", this.centerZ);
-            arg.putDouble("BorderSize", this.size);
-            arg.putLong("BorderSizeLerpTime", this.targetRemainingTime);
-            arg.putDouble("BorderSafeZone", this.buffer);
-            arg.putDouble("BorderDamagePerBlock", this.damagePerBlock);
-            arg.putDouble("BorderSizeLerpTarget", this.targetSize);
-            arg.putDouble("BorderWarningBlocks", this.warningBlocks);
-            arg.putDouble("BorderWarningTime", this.warningTime);
+        public void toTag(CompoundTag tag) {
+            tag.putDouble("BorderCenterX", this.centerX);
+            tag.putDouble("BorderCenterZ", this.centerZ);
+            tag.putDouble("BorderSize", this.size);
+            tag.putLong("BorderSizeLerpTime", this.targetRemainingTime);
+            tag.putDouble("BorderSafeZone", this.buffer);
+            tag.putDouble("BorderDamagePerBlock", this.damagePerBlock);
+            tag.putDouble("BorderSizeLerpTarget", this.targetSize);
+            tag.putDouble("BorderWarningBlocks", this.warningBlocks);
+            tag.putDouble("BorderWarningTime", this.warningTime);
         }
     }
 
@@ -415,12 +415,12 @@ public class WorldBorder {
         private final long timeStart;
         private final double timeDuration;
 
-        private MovingArea(double d, double e, long l) {
-            this.oldSize = d;
-            this.newSize = e;
-            this.timeDuration = l;
+        private MovingArea(double oldSize, double newSize, long duration) {
+            this.oldSize = oldSize;
+            this.newSize = newSize;
+            this.timeDuration = duration;
             this.timeStart = Util.getMeasuringTimeMs();
-            this.timeEnd = this.timeStart + l;
+            this.timeEnd = this.timeStart + duration;
         }
 
         @Override

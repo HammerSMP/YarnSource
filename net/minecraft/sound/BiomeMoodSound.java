@@ -28,11 +28,11 @@ public class BiomeMoodSound {
     private int spawnRange;
     private double extraDistance;
 
-    public BiomeMoodSound(SoundEvent arg, int i, int j, double d) {
-        this.event = arg;
-        this.cultivationTicks = i;
-        this.spawnRange = j;
-        this.extraDistance = d;
+    public BiomeMoodSound(SoundEvent event, int cultivationTicks, int spawnRange, double extraDistance) {
+        this.event = event;
+        this.cultivationTicks = cultivationTicks;
+        this.spawnRange = spawnRange;
+        this.extraDistance = extraDistance;
     }
 
     @Environment(value=EnvType.CLIENT)

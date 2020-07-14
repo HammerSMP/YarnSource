@@ -37,69 +37,69 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return BITES_TO_SHAPE[arg.get(BITES)];
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return BITES_TO_SHAPE[state.get(BITES)];
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
-            ItemStack lv = arg4.getStackInHand(arg5);
-            if (this.tryEat(arg2, arg3, arg, arg4).isAccepted()) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            ItemStack lv = player.getStackInHand(hand);
+            if (this.tryEat(world, pos, state, player).isAccepted()) {
                 return ActionResult.SUCCESS;
             }
             if (lv.isEmpty()) {
                 return ActionResult.CONSUME;
             }
         }
-        return this.tryEat(arg2, arg3, arg, arg4);
+        return this.tryEat(world, pos, state, player);
     }
 
-    private ActionResult tryEat(WorldAccess arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        if (!arg4.canConsume(false)) {
+    private ActionResult tryEat(WorldAccess world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!player.canConsume(false)) {
             return ActionResult.PASS;
         }
-        arg4.incrementStat(Stats.EAT_CAKE_SLICE);
-        arg4.getHungerManager().add(2, 0.1f);
-        int i = arg3.get(BITES);
+        player.incrementStat(Stats.EAT_CAKE_SLICE);
+        player.getHungerManager().add(2, 0.1f);
+        int i = state.get(BITES);
         if (i < 6) {
-            arg.setBlockState(arg2, (BlockState)arg3.with(BITES, i + 1), 3);
+            world.setBlockState(pos, (BlockState)state.with(BITES, i + 1), 3);
         } else {
-            arg.removeBlock(arg2, false);
+            world.removeBlock(pos, false);
         }
         return ActionResult.SUCCESS;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return arg2.getBlockState(arg3.down()).getMaterial().isSolid();
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).getMaterial().isSolid();
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(BITES);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(BITES);
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return (7 - arg.get(BITES)) * 2;
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return (7 - state.get(BITES)) * 2;
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

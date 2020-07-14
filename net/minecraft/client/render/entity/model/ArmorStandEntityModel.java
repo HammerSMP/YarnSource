@@ -102,11 +102,11 @@ extends ArmorStandArmorEntityModel {
     }
 
     @Override
-    public void setArmAngle(Arm arg, MatrixStack arg2) {
-        ModelPart lv = this.getArm(arg);
+    public void setArmAngle(Arm arm, MatrixStack matrices) {
+        ModelPart lv = this.getArm(arm);
         boolean bl = lv.visible;
         lv.visible = true;
-        super.setArmAngle(arg, arg2);
+        super.setArmAngle(arm, matrices);
         lv.visible = bl;
     }
 }

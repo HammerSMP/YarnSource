@@ -54,13 +54,13 @@ extends BiomeSource {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource withSeed(long l) {
-        return new VanillaLayeredBiomeSource(l, this.field_24498, this.field_24729);
+    public BiomeSource withSeed(long seed) {
+        return new VanillaLayeredBiomeSource(seed, this.field_24498, this.field_24729);
     }
 
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        return this.biomeSampler.sample(i, k);
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        return this.biomeSampler.sample(biomeX, biomeZ);
     }
 }
 

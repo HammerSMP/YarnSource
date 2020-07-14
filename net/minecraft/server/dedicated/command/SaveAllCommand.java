@@ -23,19 +23,19 @@ import net.minecraft.text.TranslatableText;
 public class SaveAllCommand {
     private static final SimpleCommandExceptionType FAILED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.save.failed"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("save-all").requires(arg -> arg.hasPermissionLevel(4))).executes(commandContext -> SaveAllCommand.saveAll((ServerCommandSource)commandContext.getSource(), false))).then(CommandManager.literal("flush").executes(commandContext -> SaveAllCommand.saveAll((ServerCommandSource)commandContext.getSource(), true))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("save-all").requires(arg -> arg.hasPermissionLevel(4))).executes(commandContext -> SaveAllCommand.saveAll((ServerCommandSource)commandContext.getSource(), false))).then(CommandManager.literal("flush").executes(commandContext -> SaveAllCommand.saveAll((ServerCommandSource)commandContext.getSource(), true))));
     }
 
-    private static int saveAll(ServerCommandSource arg, boolean bl) throws CommandSyntaxException {
-        arg.sendFeedback(new TranslatableText("commands.save.saving"), false);
-        MinecraftServer minecraftServer = arg.getMinecraftServer();
+    private static int saveAll(ServerCommandSource source, boolean flush) throws CommandSyntaxException {
+        source.sendFeedback(new TranslatableText("commands.save.saving"), false);
+        MinecraftServer minecraftServer = source.getMinecraftServer();
         minecraftServer.getPlayerManager().saveAllPlayerData();
-        boolean bl2 = minecraftServer.save(true, bl, true);
+        boolean bl2 = minecraftServer.save(true, flush, true);
         if (!bl2) {
             throw FAILED_EXCEPTION.create();
         }
-        arg.sendFeedback(new TranslatableText("commands.save.success"), true);
+        source.sendFeedback(new TranslatableText("commands.save.success"), true);
         return 1;
     }
 }

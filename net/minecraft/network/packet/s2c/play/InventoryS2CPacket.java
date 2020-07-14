@@ -25,30 +25,30 @@ implements Packet<ClientPlayPacketListener> {
     public InventoryS2CPacket() {
     }
 
-    public InventoryS2CPacket(int i, DefaultedList<ItemStack> arg) {
-        this.syncId = i;
-        this.contents = DefaultedList.ofSize(arg.size(), ItemStack.EMPTY);
+    public InventoryS2CPacket(int syncId, DefaultedList<ItemStack> contents) {
+        this.syncId = syncId;
+        this.contents = DefaultedList.ofSize(contents.size(), ItemStack.EMPTY);
         for (int j = 0; j < this.contents.size(); ++j) {
-            this.contents.set(j, arg.get(j).copy());
+            this.contents.set(j, contents.get(j).copy());
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readUnsignedByte();
-        int i = arg.readShort();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readUnsignedByte();
+        int i = buf.readShort();
         this.contents = DefaultedList.ofSize(i, ItemStack.EMPTY);
         for (int j = 0; j < i; ++j) {
-            this.contents.set(j, arg.readItemStack());
+            this.contents.set(j, buf.readItemStack());
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
-        arg.writeShort(this.contents.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
+        buf.writeShort(this.contents.size());
         for (ItemStack lv : this.contents) {
-            arg.writeItemStack(lv);
+            buf.writeItemStack(lv);
         }
     }
 

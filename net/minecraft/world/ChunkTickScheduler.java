@@ -24,15 +24,15 @@ implements TickScheduler<T> {
     private final ChunkPos pos;
     private final ShortList[] scheduledPositions = new ShortList[16];
 
-    public ChunkTickScheduler(Predicate<T> predicate, ChunkPos arg) {
-        this(predicate, arg, new ListTag());
+    public ChunkTickScheduler(Predicate<T> shouldExclude, ChunkPos pos) {
+        this(shouldExclude, pos, new ListTag());
     }
 
-    public ChunkTickScheduler(Predicate<T> predicate, ChunkPos arg, ListTag arg2) {
-        this.shouldExclude = predicate;
-        this.pos = arg;
-        for (int i = 0; i < arg2.size(); ++i) {
-            ListTag lv = arg2.getList(i);
+    public ChunkTickScheduler(Predicate<T> shouldExclude, ChunkPos pos, ListTag tag) {
+        this.shouldExclude = shouldExclude;
+        this.pos = pos;
+        for (int i = 0; i < tag.size(); ++i) {
+            ListTag lv = tag.getList(i);
             for (int j = 0; j < lv.size(); ++j) {
                 Chunk.getList(this.scheduledPositions, i).add(lv.getShort(j));
             }
@@ -43,29 +43,29 @@ implements TickScheduler<T> {
         return ChunkSerializer.toNbt(this.scheduledPositions);
     }
 
-    public void tick(TickScheduler<T> arg, Function<BlockPos, T> function) {
+    public void tick(TickScheduler<T> scheduler, Function<BlockPos, T> dataMapper) {
         for (int i = 0; i < this.scheduledPositions.length; ++i) {
             if (this.scheduledPositions[i] == null) continue;
             for (Short short_ : this.scheduledPositions[i]) {
                 BlockPos lv = ProtoChunk.joinBlockPos(short_, i, this.pos);
-                arg.schedule(lv, function.apply(lv), 0);
+                scheduler.schedule(lv, dataMapper.apply(lv), 0);
             }
             this.scheduledPositions[i].clear();
         }
     }
 
     @Override
-    public boolean isScheduled(BlockPos arg, T object) {
+    public boolean isScheduled(BlockPos pos, T object) {
         return false;
     }
 
     @Override
-    public void schedule(BlockPos arg, T object, int i, TickPriority arg2) {
-        Chunk.getList(this.scheduledPositions, arg.getY() >> 4).add(ProtoChunk.getPackedSectionRelative(arg));
+    public void schedule(BlockPos pos, T object, int delay, TickPriority priority) {
+        Chunk.getList(this.scheduledPositions, pos.getY() >> 4).add(ProtoChunk.getPackedSectionRelative(pos));
     }
 
     @Override
-    public boolean isTicking(BlockPos arg, T object) {
+    public boolean isTicking(BlockPos pos, T object) {
         return false;
     }
 }

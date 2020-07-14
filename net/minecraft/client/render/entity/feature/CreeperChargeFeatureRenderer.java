@@ -27,8 +27,8 @@ extends EnergySwirlOverlayFeatureRenderer<CreeperEntity, CreeperEntityModel<Cree
     }
 
     @Override
-    protected float getEnergySwirlX(float f) {
-        return f * 0.01f;
+    protected float getEnergySwirlX(float partialAge) {
+        return partialAge * 0.01f;
     }
 
     @Override

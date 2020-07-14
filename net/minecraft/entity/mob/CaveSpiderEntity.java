@@ -36,9 +36,9 @@ extends SpiderEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        if (super.tryAttack(arg)) {
-            if (arg instanceof LivingEntity) {
+    public boolean tryAttack(Entity target) {
+        if (super.tryAttack(target)) {
+            if (target instanceof LivingEntity) {
                 int i = 0;
                 if (this.world.getDifficulty() == Difficulty.NORMAL) {
                     i = 7;
@@ -46,7 +46,7 @@ extends SpiderEntity {
                     i = 15;
                 }
                 if (i > 0) {
-                    ((LivingEntity)arg).addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, i * 20, 0));
+                    ((LivingEntity)target).addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, i * 20, 0));
                 }
             }
             return true;
@@ -56,12 +56,12 @@ extends SpiderEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        return arg4;
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        return entityData;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 0.45f;
     }
 }

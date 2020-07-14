@@ -130,8 +130,8 @@ public class StructurePool {
             return this.id;
         }
 
-        public static Projection getById(String string) {
-            return PROJECTIONS_BY_ID.get(string);
+        public static Projection getById(String id) {
+            return PROJECTIONS_BY_ID.get(id);
         }
 
         public ImmutableList<StructureProcessor> getProcessors() {

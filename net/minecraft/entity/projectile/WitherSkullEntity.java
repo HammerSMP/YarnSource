@@ -39,13 +39,13 @@ extends ExplosiveProjectileEntity {
         super((EntityType<? extends ExplosiveProjectileEntity>)arg, arg2);
     }
 
-    public WitherSkullEntity(World arg, LivingEntity arg2, double d, double e, double f) {
-        super(EntityType.WITHER_SKULL, arg2, d, e, f, arg);
+    public WitherSkullEntity(World world, LivingEntity owner, double directionX, double directionY, double directionZ) {
+        super(EntityType.WITHER_SKULL, owner, directionX, directionY, directionZ, world);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public WitherSkullEntity(World arg, double d, double e, double f, double g, double h, double i) {
-        super(EntityType.WITHER_SKULL, d, e, f, g, h, i, arg);
+    public WitherSkullEntity(World world, double x, double y, double z, double directionX, double directionY, double directionZ) {
+        super(EntityType.WITHER_SKULL, x, y, z, directionX, directionY, directionZ, world);
     }
 
     @Override
@@ -59,21 +59,21 @@ extends ExplosiveProjectileEntity {
     }
 
     @Override
-    public float getEffectiveExplosionResistance(Explosion arg, BlockView arg2, BlockPos arg3, BlockState arg4, FluidState arg5, float f) {
-        if (this.isCharged() && WitherEntity.canDestroy(arg4)) {
-            return Math.min(0.8f, f);
+    public float getEffectiveExplosionResistance(Explosion explosion, BlockView world, BlockPos pos, BlockState blockState, FluidState fluidState, float max) {
+        if (this.isCharged() && WitherEntity.canDestroy(blockState)) {
+            return Math.min(0.8f, max);
         }
-        return f;
+        return max;
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
+    protected void onEntityHit(EntityHitResult entityHitResult) {
         boolean bl2;
-        super.onEntityHit(arg);
+        super.onEntityHit(entityHitResult);
         if (this.world.isClient) {
             return;
         }
-        Entity lv = arg.getEntity();
+        Entity lv = entityHitResult.getEntity();
         Entity lv2 = this.getOwner();
         if (lv2 instanceof LivingEntity) {
             LivingEntity lv3 = (LivingEntity)lv2;
@@ -102,8 +102,8 @@ extends ExplosiveProjectileEntity {
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         if (!this.world.isClient) {
             Explosion.DestructionType lv = this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE;
             this.world.createExplosion(this, this.getX(), this.getY(), this.getZ(), 1.0f, false, lv);
@@ -117,7 +117,7 @@ extends ExplosiveProjectileEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         return false;
     }
 
@@ -130,8 +130,8 @@ extends ExplosiveProjectileEntity {
         return this.dataTracker.get(CHARGED);
     }
 
-    public void setCharged(boolean bl) {
-        this.dataTracker.set(CHARGED, bl);
+    public void setCharged(boolean charged) {
+        this.dataTracker.set(CHARGED, charged);
     }
 
     @Override

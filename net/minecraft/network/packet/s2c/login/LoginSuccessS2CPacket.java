@@ -25,27 +25,27 @@ implements Packet<ClientLoginPacketListener> {
     public LoginSuccessS2CPacket() {
     }
 
-    public LoginSuccessS2CPacket(GameProfile gameProfile) {
-        this.profile = gameProfile;
+    public LoginSuccessS2CPacket(GameProfile profile) {
+        this.profile = profile;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
+    public void read(PacketByteBuf buf) throws IOException {
         int[] is = new int[4];
         for (int i = 0; i < is.length; ++i) {
-            is[i] = arg.readInt();
+            is[i] = buf.readInt();
         }
         UUID uUID = DynamicSerializableUuid.toUuid(is);
-        String string = arg.readString(16);
+        String string = buf.readString(16);
         this.profile = new GameProfile(uUID, string);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
+    public void write(PacketByteBuf buf) throws IOException {
         for (int i : DynamicSerializableUuid.toIntArray(this.profile.getId())) {
-            arg.writeInt(i);
+            buf.writeInt(i);
         }
-        arg.writeString(this.profile.getName());
+        buf.writeString(this.profile.getName());
     }
 
     @Override

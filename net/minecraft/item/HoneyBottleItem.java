@@ -27,36 +27,36 @@ extends Item {
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack arg, World arg2, LivingEntity arg3) {
-        super.finishUsing(arg, arg2, arg3);
-        if (arg3 instanceof ServerPlayerEntity) {
-            ServerPlayerEntity lv = (ServerPlayerEntity)arg3;
-            Criteria.CONSUME_ITEM.trigger(lv, arg);
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        super.finishUsing(stack, world, user);
+        if (user instanceof ServerPlayerEntity) {
+            ServerPlayerEntity lv = (ServerPlayerEntity)user;
+            Criteria.CONSUME_ITEM.trigger(lv, stack);
             lv.incrementStat(Stats.USED.getOrCreateStat(this));
         }
-        if (!arg2.isClient) {
-            arg3.removeStatusEffect(StatusEffects.POISON);
+        if (!world.isClient) {
+            user.removeStatusEffect(StatusEffects.POISON);
         }
-        if (arg.isEmpty()) {
+        if (stack.isEmpty()) {
             return new ItemStack(Items.GLASS_BOTTLE);
         }
-        if (arg3 instanceof PlayerEntity && !((PlayerEntity)arg3).abilities.creativeMode) {
+        if (user instanceof PlayerEntity && !((PlayerEntity)user).abilities.creativeMode) {
             ItemStack lv2 = new ItemStack(Items.GLASS_BOTTLE);
-            PlayerEntity lv3 = (PlayerEntity)arg3;
+            PlayerEntity lv3 = (PlayerEntity)user;
             if (!lv3.inventory.insertStack(lv2)) {
                 lv3.dropItem(lv2, false);
             }
         }
-        return arg;
+        return stack;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack arg) {
+    public int getMaxUseTime(ItemStack stack) {
         return 40;
     }
 
     @Override
-    public UseAction getUseAction(ItemStack arg) {
+    public UseAction getUseAction(ItemStack stack) {
         return UseAction.DRINK;
     }
 
@@ -71,8 +71,8 @@ extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        return ItemUsage.consumeHeldItem(arg, arg2, arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        return ItemUsage.consumeHeldItem(world, user, hand);
     }
 }
 

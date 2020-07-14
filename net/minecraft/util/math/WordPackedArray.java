@@ -15,42 +15,42 @@ public class WordPackedArray {
     private final long maxValue;
     private final int length;
 
-    public WordPackedArray(int i, int j) {
-        this(i, j, new long[MathHelper.roundUpToMultiple(j * i, 64) / 64]);
+    public WordPackedArray(int unitSize, int length) {
+        this(unitSize, length, new long[MathHelper.roundUpToMultiple(length * unitSize, 64) / 64]);
     }
 
-    public WordPackedArray(int i, int j, long[] ls) {
-        Validate.inclusiveBetween((long)1L, (long)32L, (long)i);
-        this.length = j;
-        this.unitSize = i;
-        this.array = ls;
-        this.maxValue = (1L << i) - 1L;
-        int k = MathHelper.roundUpToMultiple(j * i, 64) / 64;
-        if (ls.length != k) {
-            throw new IllegalArgumentException("Invalid length given for storage, got: " + ls.length + " but expected: " + k);
+    public WordPackedArray(int unitSize, int length, long[] array) {
+        Validate.inclusiveBetween((long)1L, (long)32L, (long)unitSize);
+        this.length = length;
+        this.unitSize = unitSize;
+        this.array = array;
+        this.maxValue = (1L << unitSize) - 1L;
+        int k = MathHelper.roundUpToMultiple(length * unitSize, 64) / 64;
+        if (array.length != k) {
+            throw new IllegalArgumentException("Invalid length given for storage, got: " + array.length + " but expected: " + k);
         }
     }
 
-    public void set(int i, int j) {
-        Validate.inclusiveBetween((long)0L, (long)(this.length - 1), (long)i);
-        Validate.inclusiveBetween((long)0L, (long)this.maxValue, (long)j);
-        int k = i * this.unitSize;
+    public void set(int index, int value) {
+        Validate.inclusiveBetween((long)0L, (long)(this.length - 1), (long)index);
+        Validate.inclusiveBetween((long)0L, (long)this.maxValue, (long)value);
+        int k = index * this.unitSize;
         int l = k >> 6;
-        int m = (i + 1) * this.unitSize - 1 >> 6;
+        int m = (index + 1) * this.unitSize - 1 >> 6;
         int n = k ^ l << 6;
-        this.array[l] = this.array[l] & (this.maxValue << n ^ 0xFFFFFFFFFFFFFFFFL) | ((long)j & this.maxValue) << n;
+        this.array[l] = this.array[l] & (this.maxValue << n ^ 0xFFFFFFFFFFFFFFFFL) | ((long)value & this.maxValue) << n;
         if (l != m) {
             int o = 64 - n;
             int p = this.unitSize - o;
-            this.array[m] = this.array[m] >>> p << p | ((long)j & this.maxValue) >> o;
+            this.array[m] = this.array[m] >>> p << p | ((long)value & this.maxValue) >> o;
         }
     }
 
-    public int get(int i) {
-        Validate.inclusiveBetween((long)0L, (long)(this.length - 1), (long)i);
-        int j = i * this.unitSize;
+    public int get(int index) {
+        Validate.inclusiveBetween((long)0L, (long)(this.length - 1), (long)index);
+        int j = index * this.unitSize;
         int k = j >> 6;
-        int l = (i + 1) * this.unitSize - 1 >> 6;
+        int l = (index + 1) * this.unitSize - 1 >> 6;
         int m = j ^ k << 6;
         if (k == l) {
             return (int)(this.array[k] >>> m & this.maxValue);

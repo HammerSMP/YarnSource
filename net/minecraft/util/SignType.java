@@ -26,13 +26,13 @@ public class SignType {
     public static final SignType WARPED = SignType.register(new SignType("warped"));
     private final String name;
 
-    protected SignType(String string) {
-        this.name = string;
+    protected SignType(String name) {
+        this.name = name;
     }
 
-    private static SignType register(SignType arg) {
-        VALUES.add(arg);
-        return arg;
+    private static SignType register(SignType type) {
+        VALUES.add(type);
+        return type;
     }
 
     @Environment(value=EnvType.CLIENT)

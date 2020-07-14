@@ -41,59 +41,59 @@ extends StructurePieceWithDimensions {
     }
 
     @Override
-    protected void toNbt(CompoundTag arg) {
-        super.toNbt(arg);
-        arg.putBoolean("Witch", this.hasWitch);
-        arg.putBoolean("Cat", this.hasCat);
+    protected void toNbt(CompoundTag tag) {
+        super.toNbt(tag);
+        tag.putBoolean("Witch", this.hasWitch);
+        tag.putBoolean("Cat", this.hasCat);
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, StructureAccessor arg2, ChunkGenerator arg3, Random random, BlockBox arg4, ChunkPos arg5, BlockPos arg6) {
+    public boolean generate(ServerWorldAccess arg, StructureAccessor structureAccessor, ChunkGenerator chunkGenerator, Random random, BlockBox boundingBox, ChunkPos arg5, BlockPos arg6) {
         int m;
         int l;
         int k;
-        if (!this.method_14839(arg, arg4, 0)) {
+        if (!this.method_14839(arg, boundingBox, 0)) {
             return false;
         }
-        this.fillWithOutline(arg, arg4, 1, 1, 1, 5, 1, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 1, 4, 2, 5, 4, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 2, 1, 0, 4, 1, 0, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 2, 2, 2, 3, 3, 2, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 1, 2, 3, 1, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 5, 2, 3, 5, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 2, 2, 7, 4, 3, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 1, 0, 2, 1, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 5, 0, 2, 5, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 1, 0, 7, 1, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.fillWithOutline(arg, arg4, 5, 0, 7, 5, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
-        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 2, 3, 2, arg4);
-        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 3, 3, 7, arg4);
-        this.addBlock(arg, Blocks.AIR.getDefaultState(), 1, 3, 4, arg4);
-        this.addBlock(arg, Blocks.AIR.getDefaultState(), 5, 3, 4, arg4);
-        this.addBlock(arg, Blocks.AIR.getDefaultState(), 5, 3, 5, arg4);
-        this.addBlock(arg, Blocks.POTTED_RED_MUSHROOM.getDefaultState(), 1, 3, 5, arg4);
-        this.addBlock(arg, Blocks.CRAFTING_TABLE.getDefaultState(), 3, 2, 6, arg4);
-        this.addBlock(arg, Blocks.CAULDRON.getDefaultState(), 4, 2, 6, arg4);
-        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 1, 2, 1, arg4);
-        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 5, 2, 1, arg4);
+        this.fillWithOutline(arg, boundingBox, 1, 1, 1, 5, 1, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 1, 4, 2, 5, 4, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 2, 1, 0, 4, 1, 0, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 2, 2, 2, 3, 3, 2, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 1, 2, 3, 1, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 5, 2, 3, 5, 3, 6, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 2, 2, 7, 4, 3, 7, Blocks.SPRUCE_PLANKS.getDefaultState(), Blocks.SPRUCE_PLANKS.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 1, 0, 2, 1, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 5, 0, 2, 5, 3, 2, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 1, 0, 7, 1, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.fillWithOutline(arg, boundingBox, 5, 0, 7, 5, 3, 7, Blocks.OAK_LOG.getDefaultState(), Blocks.OAK_LOG.getDefaultState(), false);
+        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 2, 3, 2, boundingBox);
+        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 3, 3, 7, boundingBox);
+        this.addBlock(arg, Blocks.AIR.getDefaultState(), 1, 3, 4, boundingBox);
+        this.addBlock(arg, Blocks.AIR.getDefaultState(), 5, 3, 4, boundingBox);
+        this.addBlock(arg, Blocks.AIR.getDefaultState(), 5, 3, 5, boundingBox);
+        this.addBlock(arg, Blocks.POTTED_RED_MUSHROOM.getDefaultState(), 1, 3, 5, boundingBox);
+        this.addBlock(arg, Blocks.CRAFTING_TABLE.getDefaultState(), 3, 2, 6, boundingBox);
+        this.addBlock(arg, Blocks.CAULDRON.getDefaultState(), 4, 2, 6, boundingBox);
+        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 1, 2, 1, boundingBox);
+        this.addBlock(arg, Blocks.OAK_FENCE.getDefaultState(), 5, 2, 1, boundingBox);
         BlockState lv = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.NORTH);
         BlockState lv2 = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
         BlockState lv3 = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST);
         BlockState lv4 = (BlockState)Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH);
-        this.fillWithOutline(arg, arg4, 0, 4, 1, 6, 4, 1, lv, lv, false);
-        this.fillWithOutline(arg, arg4, 0, 4, 2, 0, 4, 7, lv2, lv2, false);
-        this.fillWithOutline(arg, arg4, 6, 4, 2, 6, 4, 7, lv3, lv3, false);
-        this.fillWithOutline(arg, arg4, 0, 4, 8, 6, 4, 8, lv4, lv4, false);
-        this.addBlock(arg, (BlockState)lv.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT), 0, 4, 1, arg4);
-        this.addBlock(arg, (BlockState)lv.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT), 6, 4, 1, arg4);
-        this.addBlock(arg, (BlockState)lv4.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT), 0, 4, 8, arg4);
-        this.addBlock(arg, (BlockState)lv4.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT), 6, 4, 8, arg4);
+        this.fillWithOutline(arg, boundingBox, 0, 4, 1, 6, 4, 1, lv, lv, false);
+        this.fillWithOutline(arg, boundingBox, 0, 4, 2, 0, 4, 7, lv2, lv2, false);
+        this.fillWithOutline(arg, boundingBox, 6, 4, 2, 6, 4, 7, lv3, lv3, false);
+        this.fillWithOutline(arg, boundingBox, 0, 4, 8, 6, 4, 8, lv4, lv4, false);
+        this.addBlock(arg, (BlockState)lv.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT), 0, 4, 1, boundingBox);
+        this.addBlock(arg, (BlockState)lv.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT), 6, 4, 1, boundingBox);
+        this.addBlock(arg, (BlockState)lv4.with(StairsBlock.SHAPE, StairShape.OUTER_LEFT), 0, 4, 8, boundingBox);
+        this.addBlock(arg, (BlockState)lv4.with(StairsBlock.SHAPE, StairShape.OUTER_RIGHT), 6, 4, 8, boundingBox);
         for (int i = 2; i <= 7; i += 5) {
             for (int j = 1; j <= 5; j += 4) {
-                this.method_14936(arg, Blocks.OAK_LOG.getDefaultState(), j, -1, i, arg4);
+                this.method_14936(arg, Blocks.OAK_LOG.getDefaultState(), j, -1, i, boundingBox);
             }
         }
-        if (!this.hasWitch && arg4.contains(new BlockPos(k = this.applyXTransform(2, 5), l = this.applyYTransform(2), m = this.applyZTransform(2, 5)))) {
+        if (!this.hasWitch && boundingBox.contains(new BlockPos(k = this.applyXTransform(2, 5), l = this.applyYTransform(2), m = this.applyZTransform(2, 5)))) {
             this.hasWitch = true;
             WitchEntity lv5 = EntityType.WITCH.create(arg.getWorld());
             lv5.setPersistent();
@@ -101,7 +101,7 @@ extends StructurePieceWithDimensions {
             lv5.initialize(arg, arg.getLocalDifficulty(new BlockPos(k, l, m)), SpawnReason.STRUCTURE, null, null);
             arg.spawnEntity(lv5);
         }
-        this.method_16181(arg, arg4);
+        this.method_16181(arg, boundingBox);
         return true;
     }
 

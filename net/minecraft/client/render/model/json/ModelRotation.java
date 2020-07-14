@@ -19,11 +19,11 @@ public class ModelRotation {
     public final float angle;
     public final boolean rescale;
 
-    public ModelRotation(Vector3f arg, Direction.Axis arg2, float f, boolean bl) {
-        this.origin = arg;
-        this.axis = arg2;
-        this.angle = f;
-        this.rescale = bl;
+    public ModelRotation(Vector3f origin, Direction.Axis axis, float angle, boolean rescale) {
+        this.origin = origin;
+        this.axis = axis;
+        this.angle = angle;
+        this.rescale = rescale;
     }
 }
 

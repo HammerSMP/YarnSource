@@ -38,20 +38,20 @@ public class Heightmap {
     private final Predicate<BlockState> blockPredicate;
     private final Chunk chunk;
 
-    public Heightmap(Chunk arg, Type arg2) {
-        this.blockPredicate = arg2.getBlockPredicate();
+    public Heightmap(Chunk arg, Type type) {
+        this.blockPredicate = type.getBlockPredicate();
         this.chunk = arg;
     }
 
-    public static void populateHeightmaps(Chunk arg, Set<Type> set) {
-        int i = set.size();
+    public static void populateHeightmaps(Chunk arg, Set<Type> types) {
+        int i = types.size();
         ObjectArrayList objectList = new ObjectArrayList(i);
         ObjectListIterator objectListIterator = objectList.iterator();
         int j = arg.getHighestNonEmptySectionYOffset() + 16;
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (int k = 0; k < 16; ++k) {
             block1: for (int l = 0; l < 16; ++l) {
-                for (Type lv2 : set) {
+                for (Type lv2 : types) {
                     objectList.add((Object)arg.getHeightmap(lv2));
                 }
                 for (int m = j - 1; m >= 0; --m) {
@@ -71,52 +71,52 @@ public class Heightmap {
         }
     }
 
-    public boolean trackUpdate(int i, int j, int k, BlockState arg) {
-        int l = this.get(i, k);
-        if (j <= l - 2) {
+    public boolean trackUpdate(int x, int y, int z, BlockState state) {
+        int l = this.get(x, z);
+        if (y <= l - 2) {
             return false;
         }
-        if (this.blockPredicate.test(arg)) {
-            if (j >= l) {
-                this.set(i, k, j + 1);
+        if (this.blockPredicate.test(state)) {
+            if (y >= l) {
+                this.set(x, z, y + 1);
                 return true;
             }
-        } else if (l - 1 == j) {
+        } else if (l - 1 == y) {
             BlockPos.Mutable lv = new BlockPos.Mutable();
-            for (int m = j - 1; m >= 0; --m) {
-                lv.set(i, m, k);
+            for (int m = y - 1; m >= 0; --m) {
+                lv.set(x, m, z);
                 if (!this.blockPredicate.test(this.chunk.getBlockState(lv))) continue;
-                this.set(i, k, m + 1);
+                this.set(x, z, m + 1);
                 return true;
             }
-            this.set(i, k, 0);
+            this.set(x, z, 0);
             return true;
         }
         return false;
     }
 
-    public int get(int i, int j) {
-        return this.get(Heightmap.toIndex(i, j));
+    public int get(int x, int z) {
+        return this.get(Heightmap.toIndex(x, z));
     }
 
-    private int get(int i) {
-        return this.storage.get(i);
+    private int get(int index) {
+        return this.storage.get(index);
     }
 
-    private void set(int i, int j, int k) {
-        this.storage.set(Heightmap.toIndex(i, j), k);
+    private void set(int x, int z, int height) {
+        this.storage.set(Heightmap.toIndex(x, z), height);
     }
 
-    public void setTo(long[] ls) {
-        System.arraycopy(ls, 0, this.storage.getStorage(), 0, ls.length);
+    public void setTo(long[] heightmap) {
+        System.arraycopy(heightmap, 0, this.storage.getStorage(), 0, heightmap.length);
     }
 
     public long[] asLongArray() {
         return this.storage.getStorage();
     }
 
-    private static int toIndex(int i, int j) {
-        return i + j * 16;
+    private static int toIndex(int x, int z) {
+        return x + z * 16;
     }
 
     static /* synthetic */ Predicate method_16683() {
@@ -142,10 +142,10 @@ public class Heightmap {
         private final Predicate<BlockState> blockPredicate;
         private static final Map<String, Type> BY_NAME;
 
-        private Type(String string2, Purpose arg, Predicate<BlockState> predicate) {
-            this.name = string2;
-            this.purpose = arg;
-            this.blockPredicate = predicate;
+        private Type(String name, Purpose purpose, Predicate<BlockState> blockPredicate) {
+            this.name = name;
+            this.purpose = purpose;
+            this.blockPredicate = blockPredicate;
         }
 
         public String getName() {
@@ -162,8 +162,8 @@ public class Heightmap {
         }
 
         @Nullable
-        public static Type byName(String string) {
-            return BY_NAME.get(string);
+        public static Type byName(String name) {
+            return BY_NAME.get(name);
         }
 
         public Predicate<BlockState> getBlockPredicate() {

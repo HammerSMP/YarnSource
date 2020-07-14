@@ -34,48 +34,48 @@ implements Packet<ClientPlayPacketListener> {
     public ExplosionS2CPacket() {
     }
 
-    public ExplosionS2CPacket(double d, double e, double f, float g, List<BlockPos> list, Vec3d arg) {
-        this.x = d;
-        this.y = e;
-        this.z = f;
-        this.radius = g;
-        this.affectedBlocks = Lists.newArrayList(list);
-        if (arg != null) {
-            this.playerVelocityX = (float)arg.x;
-            this.playerVelocityY = (float)arg.y;
-            this.playerVelocityZ = (float)arg.z;
+    public ExplosionS2CPacket(double x, double y, double z, float radius, List<BlockPos> affectedBlocks, Vec3d playerVelocity) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.radius = radius;
+        this.affectedBlocks = Lists.newArrayList(affectedBlocks);
+        if (playerVelocity != null) {
+            this.playerVelocityX = (float)playerVelocity.x;
+            this.playerVelocityY = (float)playerVelocity.y;
+            this.playerVelocityZ = (float)playerVelocity.z;
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.x = arg.readFloat();
-        this.y = arg.readFloat();
-        this.z = arg.readFloat();
-        this.radius = arg.readFloat();
-        int i = arg.readInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.x = buf.readFloat();
+        this.y = buf.readFloat();
+        this.z = buf.readFloat();
+        this.radius = buf.readFloat();
+        int i = buf.readInt();
         this.affectedBlocks = Lists.newArrayListWithCapacity((int)i);
         int j = MathHelper.floor(this.x);
         int k = MathHelper.floor(this.y);
         int l = MathHelper.floor(this.z);
         for (int m = 0; m < i; ++m) {
-            int n = arg.readByte() + j;
-            int o = arg.readByte() + k;
-            int p = arg.readByte() + l;
+            int n = buf.readByte() + j;
+            int o = buf.readByte() + k;
+            int p = buf.readByte() + l;
             this.affectedBlocks.add(new BlockPos(n, o, p));
         }
-        this.playerVelocityX = arg.readFloat();
-        this.playerVelocityY = arg.readFloat();
-        this.playerVelocityZ = arg.readFloat();
+        this.playerVelocityX = buf.readFloat();
+        this.playerVelocityY = buf.readFloat();
+        this.playerVelocityZ = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeFloat((float)this.x);
-        arg.writeFloat((float)this.y);
-        arg.writeFloat((float)this.z);
-        arg.writeFloat(this.radius);
-        arg.writeInt(this.affectedBlocks.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeFloat((float)this.x);
+        buf.writeFloat((float)this.y);
+        buf.writeFloat((float)this.z);
+        buf.writeFloat(this.radius);
+        buf.writeInt(this.affectedBlocks.size());
         int i = MathHelper.floor(this.x);
         int j = MathHelper.floor(this.y);
         int k = MathHelper.floor(this.z);
@@ -83,13 +83,13 @@ implements Packet<ClientPlayPacketListener> {
             int l = lv.getX() - i;
             int m = lv.getY() - j;
             int n = lv.getZ() - k;
-            arg.writeByte(l);
-            arg.writeByte(m);
-            arg.writeByte(n);
+            buf.writeByte(l);
+            buf.writeByte(m);
+            buf.writeByte(n);
         }
-        arg.writeFloat(this.playerVelocityX);
-        arg.writeFloat(this.playerVelocityY);
-        arg.writeFloat(this.playerVelocityZ);
+        buf.writeFloat(this.playerVelocityX);
+        buf.writeFloat(this.playerVelocityY);
+        buf.writeFloat(this.playerVelocityZ);
     }
 
     @Override

@@ -33,8 +33,8 @@ import net.minecraft.util.JsonSerializableType;
 import net.minecraft.util.registry.Registry;
 
 public class JsonSerializing {
-    public static <E, T extends JsonSerializableType<E>> TypeHandler<E, T> createTypeHandler(Registry<T> arg, String string, String string2, Function<E, T> function) {
-        return new TypeHandler(arg, string, string2, function);
+    public static <E, T extends JsonSerializableType<E>> TypeHandler<E, T> createTypeHandler(Registry<T> registry, String rootFieldName, String idFieldName, Function<E, T> typeIdentification) {
+        return new TypeHandler(registry, rootFieldName, idFieldName, typeIdentification);
     }
 
     public static interface CustomSerializer<T> {
@@ -53,11 +53,11 @@ public class JsonSerializing {
         @Nullable
         private final Pair<T, CustomSerializer<? extends E>> elementSerializer;
 
-        private GsonSerializer(Registry<T> arg, String string, String string2, Function<E, T> function, @Nullable Pair<T, CustomSerializer<? extends E>> pair) {
+        private GsonSerializer(Registry<T> arg, String rootFieldName, String idFieldName, Function<E, T> typeIdentification, @Nullable Pair<T, CustomSerializer<? extends E>> pair) {
             this.registry = arg;
-            this.rootFieldName = string;
-            this.idFieldName = string2;
-            this.typeIdentification = function;
+            this.rootFieldName = rootFieldName;
+            this.idFieldName = idFieldName;
+            this.typeIdentification = typeIdentification;
             this.elementSerializer = pair;
         }
 
@@ -100,11 +100,11 @@ public class JsonSerializing {
         @Nullable
         private Pair<T, CustomSerializer<? extends E>> customSerializer;
 
-        private TypeHandler(Registry<T> arg, String string, String string2, Function<E, T> function) {
-            this.registry = arg;
-            this.rootFieldName = string;
-            this.idFieldName = string2;
-            this.typeIdentification = function;
+        private TypeHandler(Registry<T> registry, String rootFieldName, String idFieldName, Function<E, T> typeIdentification) {
+            this.registry = registry;
+            this.rootFieldName = rootFieldName;
+            this.idFieldName = idFieldName;
+            this.typeIdentification = typeIdentification;
         }
 
         public Object createGsonSerializer() {

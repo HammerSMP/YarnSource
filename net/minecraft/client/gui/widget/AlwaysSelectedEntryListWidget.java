@@ -22,11 +22,11 @@ extends EntryListWidget<E> {
     }
 
     @Override
-    public boolean changeFocus(boolean bl) {
+    public boolean changeFocus(boolean lookForwards) {
         if (!this.inFocus && this.getItemCount() == 0) {
             return false;
         }
-        boolean bl2 = this.inFocus = !this.inFocus;
+        boolean bl = this.inFocus = !this.inFocus;
         if (this.inFocus && this.getSelected() == null && this.getItemCount() > 0) {
             this.moveSelection(EntryListWidget.MoveDirection.DOWN);
         } else if (this.inFocus && this.getSelected() != null) {
@@ -39,7 +39,7 @@ extends EntryListWidget<E> {
     public static abstract class Entry<E extends Entry<E>>
     extends EntryListWidget.Entry<E> {
         @Override
-        public boolean changeFocus(boolean bl) {
+        public boolean changeFocus(boolean lookForwards) {
             return false;
         }
     }

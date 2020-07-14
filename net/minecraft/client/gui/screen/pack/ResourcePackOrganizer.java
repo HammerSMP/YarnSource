@@ -36,8 +36,8 @@ public class ResourcePackOrganizer {
     private final Runnable updateCallback;
     private final Consumer<ResourcePackManager> applier;
 
-    public ResourcePackOrganizer(Runnable runnable, Function<ResourcePackProfile, Identifier> function, ResourcePackManager arg, Consumer<ResourcePackManager> consumer) {
-        this.updateCallback = runnable;
+    public ResourcePackOrganizer(Runnable updateCallback, Function<ResourcePackProfile, Identifier> function, ResourcePackManager arg, Consumer<ResourcePackManager> consumer) {
+        this.updateCallback = updateCallback;
         this.field_25785 = function;
         this.field_25626 = arg;
         this.enabledPacks = Lists.newArrayList(arg.getEnabledProfiles());
@@ -139,8 +139,8 @@ public class ResourcePackOrganizer {
     implements Pack {
         private final ResourcePackProfile profile;
 
-        public AbstractPack(ResourcePackProfile arg2) {
-            this.profile = arg2;
+        public AbstractPack(ResourcePackProfile profile) {
+            this.profile = profile;
         }
 
         protected abstract List<ResourcePackProfile> getCurrentList();
@@ -188,11 +188,11 @@ public class ResourcePackOrganizer {
             ResourcePackOrganizer.this.updateCallback.run();
         }
 
-        protected void move(int i) {
+        protected void move(int offset) {
             List<ResourcePackProfile> list = this.getCurrentList();
             int j = list.indexOf(this.profile);
             list.remove(j);
-            list.add(j + i, this.profile);
+            list.add(j + offset, this.profile);
             ResourcePackOrganizer.this.updateCallback.run();
         }
 

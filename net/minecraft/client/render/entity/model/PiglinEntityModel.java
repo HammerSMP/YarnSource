@@ -30,24 +30,24 @@ extends PlayerEntityModel<T> {
     private final ModelPart field_25632;
     private final ModelPart field_25633;
 
-    public PiglinEntityModel(float f, int i, int j) {
-        super(f, false);
-        this.textureWidth = i;
-        this.textureHeight = j;
+    public PiglinEntityModel(float scale, int textureWidth, int textureHeight) {
+        super(scale, false);
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
         this.torso = new ModelPart(this, 16, 16);
-        this.torso.addCuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, f);
+        this.torso.addCuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, scale);
         this.head = new ModelPart(this);
-        this.head.setTextureOffset(0, 0).addCuboid(-5.0f, -8.0f, -4.0f, 10.0f, 8.0f, 8.0f, f);
-        this.head.setTextureOffset(31, 1).addCuboid(-2.0f, -4.0f, -5.0f, 4.0f, 4.0f, 1.0f, f);
-        this.head.setTextureOffset(2, 4).addCuboid(2.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, f);
-        this.head.setTextureOffset(2, 0).addCuboid(-3.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, f);
+        this.head.setTextureOffset(0, 0).addCuboid(-5.0f, -8.0f, -4.0f, 10.0f, 8.0f, 8.0f, scale);
+        this.head.setTextureOffset(31, 1).addCuboid(-2.0f, -4.0f, -5.0f, 4.0f, 4.0f, 1.0f, scale);
+        this.head.setTextureOffset(2, 4).addCuboid(2.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, scale);
+        this.head.setTextureOffset(2, 0).addCuboid(-3.0f, -2.0f, -5.0f, 1.0f, 2.0f, 1.0f, scale);
         this.rightEar = new ModelPart(this);
         this.rightEar.setPivot(4.5f, -6.0f, 0.0f);
-        this.rightEar.setTextureOffset(51, 6).addCuboid(0.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, f);
+        this.rightEar.setTextureOffset(51, 6).addCuboid(0.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, scale);
         this.head.addChild(this.rightEar);
         this.leftEar = new ModelPart(this);
         this.leftEar.setPivot(-4.5f, -6.0f, 0.0f);
-        this.leftEar.setTextureOffset(39, 6).addCuboid(-1.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, f);
+        this.leftEar.setTextureOffset(39, 6).addCuboid(-1.0f, 0.0f, -2.0f, 1.0f, 5.0f, 4.0f, scale);
         this.head.addChild(this.leftEar);
         this.helmet = new ModelPart(this);
         this.field_25634 = this.torso.method_29991();

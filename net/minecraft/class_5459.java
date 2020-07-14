@@ -25,16 +25,16 @@ public class class_5459 {
         int k = class_5459.method_30575(predicate, lv.set(arg), lv2, i);
         int l = class_5459.method_30575(predicate, lv.set(arg), lv3, i);
         int m = k;
-        class_5461[] lvs = new class_5461[m + 1 + l];
-        lvs[m] = new class_5461(class_5459.method_30575(predicate, lv.set(arg), lv4, j), class_5459.method_30575(predicate, lv.set(arg), lv5, j));
-        int n = lvs[m].field_25939;
+        IntBounds[] lvs = new IntBounds[m + 1 + l];
+        lvs[m] = new IntBounds(class_5459.method_30575(predicate, lv.set(arg), lv4, j), class_5459.method_30575(predicate, lv.set(arg), lv5, j));
+        int n = lvs[m].min;
         for (int o = 1; o <= k; ++o) {
-            class_5461 lv6 = lvs[m - (o - 1)];
-            lvs[m - o] = new class_5461(class_5459.method_30575(predicate, lv.set(arg).move(lv2, o), lv4, lv6.field_25939), class_5459.method_30575(predicate, lv.set(arg).move(lv2, o), lv5, lv6.field_25940));
+            IntBounds lv6 = lvs[m - (o - 1)];
+            lvs[m - o] = new IntBounds(class_5459.method_30575(predicate, lv.set(arg).move(lv2, o), lv4, lv6.min), class_5459.method_30575(predicate, lv.set(arg).move(lv2, o), lv5, lv6.max));
         }
         for (int p = 1; p <= l; ++p) {
-            class_5461 lv7 = lvs[m + p - 1];
-            lvs[m + p] = new class_5461(class_5459.method_30575(predicate, lv.set(arg).move(lv3, p), lv4, lv7.field_25939), class_5459.method_30575(predicate, lv.set(arg).move(lv3, p), lv5, lv7.field_25940));
+            IntBounds lv7 = lvs[m + p - 1];
+            lvs[m + p] = new IntBounds(class_5459.method_30575(predicate, lv.set(arg).move(lv3, p), lv4, lv7.min), class_5459.method_30575(predicate, lv.set(arg).move(lv3, p), lv5, lv7.max));
         }
         int q = 0;
         int r = 0;
@@ -43,17 +43,17 @@ public class class_5459 {
         int[] is = new int[lvs.length];
         for (int u = n; u >= 0; --u) {
             for (int v = 0; v < lvs.length; ++v) {
-                class_5461 lv8 = lvs[v];
-                int w = n - lv8.field_25939;
-                int x = n + lv8.field_25940;
+                IntBounds lv8 = lvs[v];
+                int w = n - lv8.min;
+                int x = n + lv8.max;
                 is[v] = u >= w && u <= x ? x + 1 - u : 0;
             }
-            Pair<class_5461, Integer> pair = class_5459.method_30576(is);
-            class_5461 lv9 = (class_5461)pair.getFirst();
-            int y = 1 + lv9.field_25940 - lv9.field_25939;
+            Pair<IntBounds, Integer> pair = class_5459.method_30576(is);
+            IntBounds lv9 = (IntBounds)pair.getFirst();
+            int y = 1 + lv9.max - lv9.min;
             int z = (Integer)pair.getSecond();
             if (y * z <= s * t) continue;
-            q = lv9.field_25939;
+            q = lv9.min;
             r = u;
             s = y;
             t = z;
@@ -69,7 +69,7 @@ public class class_5459 {
     }
 
     @VisibleForTesting
-    static Pair<class_5461, Integer> method_30576(int[] is) {
+    static Pair<IntBounds, Integer> method_30576(int[] is) {
         int i = 0;
         int j = 0;
         int k = 0;
@@ -94,7 +94,7 @@ public class class_5459 {
             if (!intStack.isEmpty()) continue;
             intStack.push(l);
         }
-        return new Pair((Object)new class_5461(i, j - 1), (Object)k);
+        return new Pair((Object)new IntBounds(i, j - 1), (Object)k);
     }
 
     public static class class_5460 {
@@ -109,17 +109,17 @@ public class class_5459 {
         }
     }
 
-    public static class class_5461 {
-        public final int field_25939;
-        public final int field_25940;
+    public static class IntBounds {
+        public final int min;
+        public final int max;
 
-        public class_5461(int i, int j) {
-            this.field_25939 = i;
-            this.field_25940 = j;
+        public IntBounds(int min, int max) {
+            this.min = min;
+            this.max = max;
         }
 
         public String toString() {
-            return "IntBounds{min=" + this.field_25939 + ", max=" + this.field_25940 + '}';
+            return "IntBounds{min=" + this.min + ", max=" + this.max + '}';
         }
     }
 }

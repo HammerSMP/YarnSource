@@ -39,8 +39,8 @@ implements ArgumentType<ParticleEffect> {
         return new ParticleArgumentType();
     }
 
-    public static ParticleEffect getParticle(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (ParticleEffect)commandContext.getArgument(string, ParticleEffect.class);
+    public static ParticleEffect getParticle(CommandContext<ServerCommandSource> context, String name) {
+        return (ParticleEffect)context.getArgument(name, ParticleEffect.class);
     }
 
     public ParticleEffect parse(StringReader stringReader) throws CommandSyntaxException {
@@ -51,18 +51,18 @@ implements ArgumentType<ParticleEffect> {
         return EXAMPLES;
     }
 
-    public static ParticleEffect readParameters(StringReader stringReader) throws CommandSyntaxException {
-        Identifier lv = Identifier.fromCommandInput(stringReader);
+    public static ParticleEffect readParameters(StringReader reader) throws CommandSyntaxException {
+        Identifier lv = Identifier.fromCommandInput(reader);
         ParticleType<?> lv2 = Registry.PARTICLE_TYPE.getOrEmpty(lv).orElseThrow(() -> UNKNOWN_PARTICLE_EXCEPTION.create((Object)lv));
-        return ParticleArgumentType.readParameters(stringReader, lv2);
+        return ParticleArgumentType.readParameters(reader, lv2);
     }
 
-    private static <T extends ParticleEffect> T readParameters(StringReader stringReader, ParticleType<T> arg) throws CommandSyntaxException {
-        return arg.getParametersFactory().read(arg, stringReader);
+    private static <T extends ParticleEffect> T readParameters(StringReader reader, ParticleType<T> type) throws CommandSyntaxException {
+        return type.getParametersFactory().read(type, reader);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestIdentifiers(Registry.PARTICLE_TYPE.getIds(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestIdentifiers(Registry.PARTICLE_TYPE.getIds(), builder);
     }
 
     public /* synthetic */ Object parse(StringReader stringReader) throws CommandSyntaxException {

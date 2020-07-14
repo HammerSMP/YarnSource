@@ -33,50 +33,50 @@ extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
     private final Slot ingredientSlot;
 
-    public BrewingStandScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, new SimpleInventory(5), new ArrayPropertyDelegate(2));
+    public BrewingStandScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, new SimpleInventory(5), new ArrayPropertyDelegate(2));
     }
 
-    public BrewingStandScreenHandler(int i, PlayerInventory arg, Inventory arg2, PropertyDelegate arg3) {
-        super(ScreenHandlerType.BREWING_STAND, i);
-        BrewingStandScreenHandler.checkSize(arg2, 5);
-        BrewingStandScreenHandler.checkDataCount(arg3, 2);
-        this.inventory = arg2;
-        this.propertyDelegate = arg3;
-        this.addSlot(new PotionSlot(arg2, 0, 56, 51));
-        this.addSlot(new PotionSlot(arg2, 1, 79, 58));
-        this.addSlot(new PotionSlot(arg2, 2, 102, 51));
-        this.ingredientSlot = this.addSlot(new IngredientSlot(arg2, 3, 79, 17));
-        this.addSlot(new FuelSlot(arg2, 4, 17, 17));
-        this.addProperties(arg3);
+    public BrewingStandScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
+        super(ScreenHandlerType.BREWING_STAND, syncId);
+        BrewingStandScreenHandler.checkSize(inventory, 5);
+        BrewingStandScreenHandler.checkDataCount(propertyDelegate, 2);
+        this.inventory = inventory;
+        this.propertyDelegate = propertyDelegate;
+        this.addSlot(new PotionSlot(inventory, 0, 56, 51));
+        this.addSlot(new PotionSlot(inventory, 1, 79, 58));
+        this.addSlot(new PotionSlot(inventory, 2, 102, 51));
+        this.ingredientSlot = this.addSlot(new IngredientSlot(inventory, 3, 79, 17));
+        this.addSlot(new FuelSlot(inventory, 4, 17, 17));
+        this.addProperties(propertyDelegate);
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 9; ++k) {
-                this.addSlot(new Slot(arg, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
             }
         }
         for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(arg, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return this.inventory.canPlayerUse(arg);
+    public boolean canUse(PlayerEntity player) {
+        return this.inventory.canPlayerUse(player);
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i >= 0 && i <= 2 || i == 3 || i == 4) {
+            if (index >= 0 && index <= 2 || index == 3 || index == 4) {
                 if (!this.insertItem(lv3, 5, 41, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (FuelSlot.matches(lv) ? this.insertItem(lv3, 4, 5, false) || this.ingredientSlot.canInsert(lv3) && !this.insertItem(lv3, 3, 4, false) : (this.ingredientSlot.canInsert(lv3) ? !this.insertItem(lv3, 3, 4, false) : (PotionSlot.matches(lv) && lv.getCount() == 1 ? !this.insertItem(lv3, 0, 3, false) : (i >= 5 && i < 32 ? !this.insertItem(lv3, 32, 41, false) : (i >= 32 && i < 41 ? !this.insertItem(lv3, 5, 32, false) : !this.insertItem(lv3, 5, 41, false)))))) {
+            } else if (FuelSlot.matches(lv) ? this.insertItem(lv3, 4, 5, false) || this.ingredientSlot.canInsert(lv3) && !this.insertItem(lv3, 3, 4, false) : (this.ingredientSlot.canInsert(lv3) ? !this.insertItem(lv3, 3, 4, false) : (PotionSlot.matches(lv) && lv.getCount() == 1 ? !this.insertItem(lv3, 0, 3, false) : (index >= 5 && index < 32 ? !this.insertItem(lv3, 32, 41, false) : (index >= 32 && index < 41 ? !this.insertItem(lv3, 5, 32, false) : !this.insertItem(lv3, 5, 41, false)))))) {
                 return ItemStack.EMPTY;
             }
             if (lv3.isEmpty()) {
@@ -87,7 +87,7 @@ extends ScreenHandler {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
         }
         return lv;
     }
@@ -109,12 +109,12 @@ extends ScreenHandler {
         }
 
         @Override
-        public boolean canInsert(ItemStack arg) {
-            return FuelSlot.matches(arg);
+        public boolean canInsert(ItemStack stack) {
+            return FuelSlot.matches(stack);
         }
 
-        public static boolean matches(ItemStack arg) {
-            return arg.getItem() == Items.BLAZE_POWDER;
+        public static boolean matches(ItemStack stack) {
+            return stack.getItem() == Items.BLAZE_POWDER;
         }
 
         @Override
@@ -130,8 +130,8 @@ extends ScreenHandler {
         }
 
         @Override
-        public boolean canInsert(ItemStack arg) {
-            return BrewingRecipeRegistry.isValidIngredient(arg);
+        public boolean canInsert(ItemStack stack) {
+            return BrewingRecipeRegistry.isValidIngredient(stack);
         }
 
         @Override
@@ -147,8 +147,8 @@ extends ScreenHandler {
         }
 
         @Override
-        public boolean canInsert(ItemStack arg) {
-            return PotionSlot.matches(arg);
+        public boolean canInsert(ItemStack stack) {
+            return PotionSlot.matches(stack);
         }
 
         @Override
@@ -157,17 +157,17 @@ extends ScreenHandler {
         }
 
         @Override
-        public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
-            Potion lv = PotionUtil.getPotion(arg2);
-            if (arg instanceof ServerPlayerEntity) {
-                Criteria.BREWED_POTION.trigger((ServerPlayerEntity)arg, lv);
+        public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+            Potion lv = PotionUtil.getPotion(stack);
+            if (player instanceof ServerPlayerEntity) {
+                Criteria.BREWED_POTION.trigger((ServerPlayerEntity)player, lv);
             }
-            super.onTakeItem(arg, arg2);
-            return arg2;
+            super.onTakeItem(player, stack);
+            return stack;
         }
 
-        public static boolean matches(ItemStack arg) {
-            Item lv = arg.getItem();
+        public static boolean matches(ItemStack stack) {
+            Item lv = stack.getItem();
             return lv == Items.POTION || lv == Items.SPLASH_POTION || lv == Items.LINGERING_POTION || lv == Items.GLASS_BOTTLE;
         }
     }

@@ -24,12 +24,12 @@ extends Goal {
     protected boolean ignoringChance;
     private boolean field_24463;
 
-    public WanderAroundGoal(PathAwareEntity arg, double d) {
-        this(arg, d, 120);
+    public WanderAroundGoal(PathAwareEntity mob, double speed) {
+        this(mob, speed, 120);
     }
 
-    public WanderAroundGoal(PathAwareEntity arg, double d, int i) {
-        this(arg, d, i, true);
+    public WanderAroundGoal(PathAwareEntity mob, double speed, int chance) {
+        this(mob, speed, chance, true);
     }
 
     public WanderAroundGoal(PathAwareEntity arg, double d, int i, boolean bl) {
@@ -89,8 +89,8 @@ extends Goal {
         this.ignoringChance = true;
     }
 
-    public void setChance(int i) {
-        this.chance = i;
+    public void setChance(int chance) {
+        this.chance = chance;
     }
 }
 

@@ -87,9 +87,9 @@ extends StructurePoolElement {
         return (Structure)this.field_24015.map(arg::getStructureOrBlank, Function.identity());
     }
 
-    public List<Structure.StructureBlockInfo> getDataStructureBlocks(StructureManager arg, BlockPos arg2, BlockRotation arg3, boolean bl) {
+    public List<Structure.StructureBlockInfo> getDataStructureBlocks(StructureManager arg, BlockPos arg2, BlockRotation arg3, boolean mirroredAndRotated) {
         Structure lv = this.method_27233(arg);
-        List<Structure.StructureBlockInfo> list = lv.getInfosForBlock(arg2, new StructurePlacementData().setRotation(arg3), Blocks.STRUCTURE_BLOCK, bl);
+        List<Structure.StructureBlockInfo> list = lv.getInfosForBlock(arg2, new StructurePlacementData().setRotation(arg3), Blocks.STRUCTURE_BLOCK, mirroredAndRotated);
         ArrayList list2 = Lists.newArrayList();
         for (Structure.StructureBlockInfo lv2 : list) {
             StructureBlockMode lv3;
@@ -100,25 +100,25 @@ extends StructurePoolElement {
     }
 
     @Override
-    public List<Structure.StructureBlockInfo> getStructureBlockInfos(StructureManager arg, BlockPos arg2, BlockRotation arg3, Random random) {
-        Structure lv = this.method_27233(arg);
-        List<Structure.StructureBlockInfo> list = lv.getInfosForBlock(arg2, new StructurePlacementData().setRotation(arg3), Blocks.JIGSAW, true);
+    public List<Structure.StructureBlockInfo> getStructureBlockInfos(StructureManager structureManager, BlockPos pos, BlockRotation rotation, Random random) {
+        Structure lv = this.method_27233(structureManager);
+        List<Structure.StructureBlockInfo> list = lv.getInfosForBlock(pos, new StructurePlacementData().setRotation(rotation), Blocks.JIGSAW, true);
         Collections.shuffle(list, random);
         return list;
     }
 
     @Override
-    public BlockBox getBoundingBox(StructureManager arg, BlockPos arg2, BlockRotation arg3) {
-        Structure lv = this.method_27233(arg);
-        return lv.calculateBoundingBox(new StructurePlacementData().setRotation(arg3), arg2);
+    public BlockBox getBoundingBox(StructureManager structureManager, BlockPos pos, BlockRotation rotation) {
+        Structure lv = this.method_27233(structureManager);
+        return lv.calculateBoundingBox(new StructurePlacementData().setRotation(rotation), pos);
     }
 
     @Override
-    public boolean generate(StructureManager arg, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean bl) {
+    public boolean generate(StructureManager structureManager, ServerWorldAccess arg2, StructureAccessor arg3, ChunkGenerator arg4, BlockPos arg5, BlockPos arg6, BlockRotation arg7, BlockBox arg8, Random random, boolean keepJigsaws) {
         StructurePlacementData lv2;
-        Structure lv = this.method_27233(arg);
-        if (lv.place(arg2, arg5, arg6, lv2 = this.createPlacementData(arg7, arg8, bl), random, 18)) {
-            List<Structure.StructureBlockInfo> list = Structure.process(arg2, arg5, arg6, lv2, this.getDataStructureBlocks(arg, arg5, arg7, false));
+        Structure lv = this.method_27233(structureManager);
+        if (lv.place(arg2, arg5, arg6, lv2 = this.createPlacementData(arg7, arg8, keepJigsaws), random, 18)) {
+            List<Structure.StructureBlockInfo> list = Structure.process(arg2, arg5, arg6, lv2, this.getDataStructureBlocks(structureManager, arg5, arg7, false));
             for (Structure.StructureBlockInfo lv3 : list) {
                 this.method_16756(arg2, lv3, arg5, arg7, random, arg8);
             }
@@ -127,7 +127,7 @@ extends StructurePoolElement {
         return false;
     }
 
-    protected StructurePlacementData createPlacementData(BlockRotation arg, BlockBox arg2, boolean bl) {
+    protected StructurePlacementData createPlacementData(BlockRotation arg, BlockBox arg2, boolean keepJigsaws) {
         StructurePlacementData lv = new StructurePlacementData();
         lv.setBoundingBox(arg2);
         lv.setRotation(arg);
@@ -135,7 +135,7 @@ extends StructurePoolElement {
         lv.setIgnoreEntities(false);
         lv.addProcessor(BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS);
         lv.method_27264(true);
-        if (!bl) {
+        if (!keepJigsaws) {
             lv.addProcessor(JigsawReplacementStructureProcessor.INSTANCE);
         }
         this.processors.get().forEach(lv::addProcessor);

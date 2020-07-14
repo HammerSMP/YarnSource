@@ -37,9 +37,9 @@ import net.minecraft.util.registry.Registry;
 public class RecipeFinder {
     public final Int2IntMap idToAmountMap = new Int2IntOpenHashMap();
 
-    public void addNormalItem(ItemStack arg) {
-        if (!(arg.isDamaged() || arg.hasEnchantments() || arg.hasCustomName())) {
-            this.addItem(arg);
+    public void addNormalItem(ItemStack stack) {
+        if (!(stack.isDamaged() || stack.hasEnchantments() || stack.hasCustomName())) {
+            this.addItem(stack);
         }
     }
 
@@ -63,33 +63,33 @@ public class RecipeFinder {
         return this.idToAmountMap.get(i) > 0;
     }
 
-    private int take(int i, int j) {
-        int k = this.idToAmountMap.get(i);
-        if (k >= j) {
-            this.idToAmountMap.put(i, k - j);
-            return i;
+    private int take(int id, int amount) {
+        int k = this.idToAmountMap.get(id);
+        if (k >= amount) {
+            this.idToAmountMap.put(id, k - amount);
+            return id;
         }
         return 0;
     }
 
-    private void addItem(int i, int j) {
-        this.idToAmountMap.put(i, this.idToAmountMap.get(i) + j);
+    private void addItem(int id, int amount) {
+        this.idToAmountMap.put(id, this.idToAmountMap.get(id) + amount);
     }
 
-    public boolean findRecipe(Recipe<?> arg, @Nullable IntList intList) {
-        return this.findRecipe(arg, intList, 1);
+    public boolean findRecipe(Recipe<?> arg, @Nullable IntList outMatchingInputIds) {
+        return this.findRecipe(arg, outMatchingInputIds, 1);
     }
 
-    public boolean findRecipe(Recipe<?> arg, @Nullable IntList intList, int i) {
-        return new Filter(arg).find(i, intList);
+    public boolean findRecipe(Recipe<?> arg, @Nullable IntList outMatchingInputIds, int amount) {
+        return new Filter(arg).find(amount, outMatchingInputIds);
     }
 
-    public int countRecipeCrafts(Recipe<?> arg, @Nullable IntList intList) {
-        return this.countRecipeCrafts(arg, Integer.MAX_VALUE, intList);
+    public int countRecipeCrafts(Recipe<?> arg, @Nullable IntList outMatchingInputIds) {
+        return this.countRecipeCrafts(arg, Integer.MAX_VALUE, outMatchingInputIds);
     }
 
-    public int countRecipeCrafts(Recipe<?> arg, int i, @Nullable IntList intList) {
-        return new Filter(arg).countCrafts(i, intList);
+    public int countRecipeCrafts(Recipe<?> arg, int limit, @Nullable IntList outMatchingInputIds) {
+        return new Filter(arg).countCrafts(limit, outMatchingInputIds);
     }
 
     public static ItemStack getStackFromId(int i) {
@@ -129,14 +129,14 @@ public class RecipeFinder {
             }
         }
 
-        public boolean find(int i, @Nullable IntList intList) {
+        public boolean find(int amount, @Nullable IntList outMatchingInputIds) {
             boolean bl2;
-            if (i <= 0) {
+            if (amount <= 0) {
                 return true;
             }
             int j = 0;
-            while (this.method_7423(i)) {
-                RecipeFinder.this.take(this.field_7551[this.field_7557.getInt(0)], i);
+            while (this.method_7423(amount)) {
+                RecipeFinder.this.take(this.field_7551[this.field_7557.getInt(0)], amount);
                 int k = this.field_7557.size() - 1;
                 this.method_7421(this.field_7557.getInt(k));
                 for (int l = 0; l < k; ++l) {
@@ -147,24 +147,24 @@ public class RecipeFinder {
                 ++j;
             }
             boolean bl = j == this.ingredientCount;
-            boolean bl3 = bl2 = bl && intList != null;
+            boolean bl3 = bl2 = bl && outMatchingInputIds != null;
             if (bl2) {
-                intList.clear();
+                outMatchingInputIds.clear();
             }
             this.field_7558.clear(0, this.ingredientCount + this.field_7553 + this.ingredientCount);
             int m = 0;
             DefaultedList<Ingredient> list = this.recipe.getPreviewInputs();
             for (int n = 0; n < list.size(); ++n) {
                 if (bl2 && ((Ingredient)list.get(n)).isEmpty()) {
-                    intList.add(0);
+                    outMatchingInputIds.add(0);
                     continue;
                 }
                 for (int o = 0; o < this.field_7553; ++o) {
                     if (!this.method_7425(false, m, o)) continue;
                     this.method_7414(true, o, m);
-                    RecipeFinder.this.addItem(this.field_7551[o], i);
+                    RecipeFinder.this.addItem(this.field_7551[o], amount);
                     if (!bl2) continue;
-                    intList.add(this.field_7551[o]);
+                    outMatchingInputIds.add(this.field_7551[o]);
                 }
                 ++m;
             }
@@ -252,10 +252,10 @@ public class RecipeFinder {
             return (bl ? 0 : this.ingredientCount) + i;
         }
 
-        public int countCrafts(int i, @Nullable IntList intList) {
+        public int countCrafts(int limit, @Nullable IntList outMatchingInputIds) {
             int l;
             int j = 0;
-            int k = Math.min(i, this.method_7415()) + 1;
+            int k = Math.min(limit, this.method_7415()) + 1;
             do {
                 if (this.find(l = (j + k) / 2, null)) {
                     if (k - j <= 1) break;
@@ -265,7 +265,7 @@ public class RecipeFinder {
                 k = l;
             } while (true);
             if (l > 0) {
-                this.find(l, intList);
+                this.find(l, outMatchingInputIds);
             }
             return l;
         }

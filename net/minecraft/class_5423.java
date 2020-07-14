@@ -23,18 +23,18 @@ extends EntityView,
 WorldView,
 ModifiableTestableWorld {
     @Override
-    default public Stream<VoxelShape> getEntityCollisions(@Nullable Entity arg, Box arg2, Predicate<Entity> predicate) {
-        return EntityView.super.getEntityCollisions(arg, arg2, predicate);
+    default public Stream<VoxelShape> getEntityCollisions(@Nullable Entity entity, Box box, Predicate<Entity> predicate) {
+        return EntityView.super.getEntityCollisions(entity, box, predicate);
     }
 
     @Override
-    default public boolean intersectsEntities(@Nullable Entity arg, VoxelShape arg2) {
-        return EntityView.super.intersectsEntities(arg, arg2);
+    default public boolean intersectsEntities(@Nullable Entity entity, VoxelShape shape) {
+        return EntityView.super.intersectsEntities(entity, shape);
     }
 
     @Override
-    default public BlockPos getTopPosition(Heightmap.Type arg, BlockPos arg2) {
-        return WorldView.super.getTopPosition(arg, arg2);
+    default public BlockPos getTopPosition(Heightmap.Type heightmap, BlockPos pos) {
+        return WorldView.super.getTopPosition(heightmap, pos);
     }
 }
 

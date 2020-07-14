@@ -28,40 +28,40 @@ extends Task<LivingEntity> {
     private final MemoryModuleType<GlobalPos> memoryModule;
     private final Predicate<PointOfInterestType> condition;
 
-    public ForgetCompletedPointOfInterestTask(PointOfInterestType arg, MemoryModuleType<GlobalPos> arg2) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(arg2, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.condition = arg.getCompletionCondition();
-        this.memoryModule = arg2;
+    public ForgetCompletedPointOfInterestTask(PointOfInterestType poiType, MemoryModuleType<GlobalPos> memoryModule) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(memoryModule, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.condition = poiType.getCompletionCondition();
+        this.memoryModule = memoryModule;
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        GlobalPos lv = arg2.getBrain().getOptionalMemory(this.memoryModule).get();
-        return arg.getRegistryKey() == lv.getDimension() && lv.getPos().isWithinDistance(arg2.getPos(), 16.0);
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        GlobalPos lv = entity.getBrain().getOptionalMemory(this.memoryModule).get();
+        return world.getRegistryKey() == lv.getDimension() && lv.getPos().isWithinDistance(entity.getPos(), 16.0);
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        Brain<?> lv = arg2.getBrain();
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        Brain<?> lv = entity.getBrain();
         GlobalPos lv2 = lv.getOptionalMemory(this.memoryModule).get();
         BlockPos lv3 = lv2.getPos();
-        ServerWorld lv4 = arg.getServer().getWorld(lv2.getDimension());
+        ServerWorld lv4 = world.getServer().getWorld(lv2.getDimension());
         if (lv4 == null || this.hasCompletedPointOfInterest(lv4, lv3)) {
             lv.forget(this.memoryModule);
-        } else if (this.isBedOccupiedByOthers(lv4, lv3, arg2)) {
+        } else if (this.isBedOccupiedByOthers(lv4, lv3, entity)) {
             lv.forget(this.memoryModule);
-            arg.getPointOfInterestStorage().releaseTicket(lv3);
-            DebugInfoSender.sendPointOfInterest(arg, lv3);
+            world.getPointOfInterestStorage().releaseTicket(lv3);
+            DebugInfoSender.sendPointOfInterest(world, lv3);
         }
     }
 
-    private boolean isBedOccupiedByOthers(ServerWorld arg, BlockPos arg2, LivingEntity arg3) {
-        BlockState lv = arg.getBlockState(arg2);
-        return lv.getBlock().isIn(BlockTags.BEDS) && lv.get(BedBlock.OCCUPIED) != false && !arg3.isSleeping();
+    private boolean isBedOccupiedByOthers(ServerWorld world, BlockPos pos, LivingEntity entity) {
+        BlockState lv = world.getBlockState(pos);
+        return lv.getBlock().isIn(BlockTags.BEDS) && lv.get(BedBlock.OCCUPIED) != false && !entity.isSleeping();
     }
 
-    private boolean hasCompletedPointOfInterest(ServerWorld arg, BlockPos arg2) {
-        return !arg.getPointOfInterestStorage().test(arg2, this.condition);
+    private boolean hasCompletedPointOfInterest(ServerWorld world, BlockPos pos) {
+        return !world.getPointOfInterestStorage().test(pos, this.condition);
     }
 }
 

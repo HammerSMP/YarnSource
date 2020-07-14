@@ -13,10 +13,10 @@ implements Comparable<ChunkTicket<?>> {
     private final T argument;
     private long tickCreated;
 
-    protected ChunkTicket(ChunkTicketType<T> arg, int i, T object) {
-        this.type = arg;
-        this.level = i;
-        this.argument = object;
+    protected ChunkTicket(ChunkTicketType<T> type, int level, T argument) {
+        this.type = type;
+        this.level = level;
+        this.argument = argument;
     }
 
     @Override
@@ -32,14 +32,14 @@ implements Comparable<ChunkTicket<?>> {
         return this.type.getArgumentComparator().compare(this.argument, arg.argument);
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(object instanceof ChunkTicket)) {
+        if (!(obj instanceof ChunkTicket)) {
             return false;
         }
-        ChunkTicket lv = (ChunkTicket)object;
+        ChunkTicket lv = (ChunkTicket)obj;
         return this.level == lv.level && Objects.equals(this.type, lv.type) && Objects.equals(this.argument, lv.argument);
     }
 
@@ -59,18 +59,18 @@ implements Comparable<ChunkTicket<?>> {
         return this.level;
     }
 
-    protected void setTickCreated(long l) {
-        this.tickCreated = l;
+    protected void setTickCreated(long tickCreated) {
+        this.tickCreated = tickCreated;
     }
 
-    protected boolean isExpired(long l) {
+    protected boolean isExpired(long currentTick) {
         long m = this.type.getExpiryTicks();
-        return m != 0L && l - this.tickCreated > m;
+        return m != 0L && currentTick - this.tickCreated > m;
     }
 
     @Override
-    public /* synthetic */ int compareTo(Object object) {
-        return this.compareTo((ChunkTicket)object);
+    public /* synthetic */ int compareTo(Object that) {
+        return this.compareTo((ChunkTicket)that);
     }
 }
 

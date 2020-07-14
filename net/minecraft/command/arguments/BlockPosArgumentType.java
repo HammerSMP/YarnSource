@@ -46,20 +46,20 @@ implements ArgumentType<PosArgument> {
         return new BlockPosArgumentType();
     }
 
-    public static BlockPos getLoadedBlockPos(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        BlockPos lv = ((PosArgument)commandContext.getArgument(string, PosArgument.class)).toAbsoluteBlockPos((ServerCommandSource)commandContext.getSource());
-        if (!((ServerCommandSource)commandContext.getSource()).getWorld().isChunkLoaded(lv)) {
+    public static BlockPos getLoadedBlockPos(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        BlockPos lv = ((PosArgument)context.getArgument(name, PosArgument.class)).toAbsoluteBlockPos((ServerCommandSource)context.getSource());
+        if (!((ServerCommandSource)context.getSource()).getWorld().isChunkLoaded(lv)) {
             throw UNLOADED_EXCEPTION.create();
         }
-        ((ServerCommandSource)commandContext.getSource()).getWorld();
+        ((ServerCommandSource)context.getSource()).getWorld();
         if (!ServerWorld.method_24794(lv)) {
             throw OUT_OF_WORLD_EXCEPTION.create();
         }
         return lv;
     }
 
-    public static BlockPos getBlockPos(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ((PosArgument)commandContext.getArgument(string, PosArgument.class)).toAbsoluteBlockPos((ServerCommandSource)commandContext.getSource());
+    public static BlockPos getBlockPos(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        return ((PosArgument)context.getArgument(name, PosArgument.class)).toAbsoluteBlockPos((ServerCommandSource)context.getSource());
     }
 
     public PosArgument parse(StringReader stringReader) throws CommandSyntaxException {
@@ -69,16 +69,16 @@ implements ArgumentType<PosArgument> {
         return DefaultPosArgument.parse(stringReader);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        if (commandContext.getSource() instanceof CommandSource) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
             Collection<CommandSource.RelativePosition> collection2;
-            String string = suggestionsBuilder.getRemaining();
+            String string = builder.getRemaining();
             if (!string.isEmpty() && string.charAt(0) == '^') {
                 Set<CommandSource.RelativePosition> collection = Collections.singleton(CommandSource.RelativePosition.ZERO_LOCAL);
             } else {
-                collection2 = ((CommandSource)commandContext.getSource()).getBlockPositionSuggestions();
+                collection2 = ((CommandSource)context.getSource()).getBlockPositionSuggestions();
             }
-            return CommandSource.suggestPositions(string, collection2, suggestionsBuilder, CommandManager.getCommandValidator(this::parse));
+            return CommandSource.suggestPositions(string, collection2, builder, CommandManager.getCommandValidator(this::parse));
         }
         return Suggestions.empty();
     }

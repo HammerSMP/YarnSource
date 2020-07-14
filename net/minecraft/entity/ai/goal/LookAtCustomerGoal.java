@@ -11,9 +11,9 @@ public class LookAtCustomerGoal
 extends LookAtEntityGoal {
     private final AbstractTraderEntity trader;
 
-    public LookAtCustomerGoal(AbstractTraderEntity arg) {
-        super(arg, PlayerEntity.class, 8.0f);
-        this.trader = arg;
+    public LookAtCustomerGoal(AbstractTraderEntity trader) {
+        super(trader, PlayerEntity.class, 8.0f);
+        this.trader = trader;
     }
 
     @Override

@@ -46,29 +46,29 @@ extends BiomeSource {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource withSeed(long l) {
+    public BiomeSource withSeed(long seed) {
         return this;
     }
 
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
         return this.biome.get();
     }
 
     @Override
     @Nullable
-    public BlockPos locateBiome(int i, int j, int k, int l, int m, List<Biome> list, Random random, boolean bl) {
-        if (list.contains(this.biome.get())) {
+    public BlockPos locateBiome(int x, int y, int z, int radius, int m, List<Biome> biomes, Random random, boolean bl) {
+        if (biomes.contains(this.biome.get())) {
             if (bl) {
-                return new BlockPos(i, j, k);
+                return new BlockPos(x, y, z);
             }
-            return new BlockPos(i - l + random.nextInt(l * 2 + 1), j, k - l + random.nextInt(l * 2 + 1));
+            return new BlockPos(x - radius + random.nextInt(radius * 2 + 1), y, z - radius + random.nextInt(radius * 2 + 1));
         }
         return null;
     }
 
     @Override
-    public Set<Biome> getBiomesInArea(int i, int j, int k, int l) {
+    public Set<Biome> getBiomesInArea(int x, int y, int z, int radius) {
         return Sets.newHashSet((Object[])new Biome[]{this.biome.get()});
     }
 }

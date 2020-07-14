@@ -29,9 +29,9 @@ public class SetNbtLootFunction
 extends ConditionalLootFunction {
     private final CompoundTag tag;
 
-    private SetNbtLootFunction(LootCondition[] args, CompoundTag arg) {
-        super(args);
-        this.tag = arg;
+    private SetNbtLootFunction(LootCondition[] conditions, CompoundTag tag) {
+        super(conditions);
+        this.tag = tag;
     }
 
     @Override
@@ -40,13 +40,13 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        arg.getOrCreateTag().copyFrom(this.tag);
-        return arg;
+    public ItemStack process(ItemStack stack, LootContext context) {
+        stack.getOrCreateTag().copyFrom(this.tag);
+        return stack;
     }
 
-    public static ConditionalLootFunction.Builder<?> builder(CompoundTag arg) {
-        return SetNbtLootFunction.builder((LootCondition[] args) -> new SetNbtLootFunction((LootCondition[])args, arg));
+    public static ConditionalLootFunction.Builder<?> builder(CompoundTag tag) {
+        return SetNbtLootFunction.builder((LootCondition[] conditions) -> new SetNbtLootFunction((LootCondition[])conditions, tag));
     }
 
     public static class Serializer
@@ -69,8 +69,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 }

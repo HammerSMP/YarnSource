@@ -36,7 +36,7 @@ extends ThreadExecutor<Runnable> {
     }
 
     @Override
-    protected boolean canExecute(Runnable runnable) {
+    protected boolean canExecute(Runnable task) {
         return !this.stopped;
     }
 

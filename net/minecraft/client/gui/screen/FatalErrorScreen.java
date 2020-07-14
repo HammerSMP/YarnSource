@@ -20,8 +20,8 @@ public class FatalErrorScreen
 extends Screen {
     private final Text message;
 
-    public FatalErrorScreen(Text arg, Text arg2) {
-        super(arg);
+    public FatalErrorScreen(Text title, Text arg2) {
+        super(title);
         this.message = arg2;
     }
 
@@ -32,11 +32,11 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.fillGradient(arg, 0, 0, this.width, this.height, -12574688, -11530224);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 90, 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, this.message, this.width / 2, 110, 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.fillGradient(matrices, 0, 0, this.width, this.height, -12574688, -11530224);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 90, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.message, this.width / 2, 110, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override

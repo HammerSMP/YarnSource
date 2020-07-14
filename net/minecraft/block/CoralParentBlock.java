@@ -38,18 +38,18 @@ implements Waterloggable {
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(WATERLOGGED, true));
     }
 
-    protected void checkLivingConditions(BlockState arg, WorldAccess arg2, BlockPos arg3) {
-        if (!CoralParentBlock.isInWater(arg, arg2, arg3)) {
-            arg2.getBlockTickScheduler().schedule(arg3, this, 60 + arg2.getRandom().nextInt(40));
+    protected void checkLivingConditions(BlockState state, WorldAccess world, BlockPos pos) {
+        if (!CoralParentBlock.isInWater(state, world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 60 + world.getRandom().nextInt(40));
         }
     }
 
-    protected static boolean isInWater(BlockState arg, BlockView arg2, BlockPos arg3) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    protected static boolean isInWater(BlockState state, BlockView world, BlockPos pos) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return true;
         }
         for (Direction lv : Direction.values()) {
-            if (!arg2.getFluidState(arg3.offset(lv)).isIn(FluidTags.WATER)) continue;
+            if (!world.getFluidState(pos.offset(lv)).isIn(FluidTags.WATER)) continue;
             return true;
         }
         return false;
@@ -57,44 +57,44 @@ implements Waterloggable {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         FluidState lv;
-        return (BlockState)this.getDefaultState().with(WATERLOGGED, (lv = arg.getWorld().getFluidState(arg.getBlockPos())).isIn(FluidTags.WATER) && lv.getLevel() == 8);
+        return (BlockState)this.getDefaultState().with(WATERLOGGED, (lv = ctx.getWorld().getFluidState(ctx.getBlockPos())).isIn(FluidTags.WATER) && lv.getLevel() == 8);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg2 == Direction.DOWN && !this.canPlaceAt(arg, arg4, arg5)) {
+        if (direction == Direction.DOWN && !this.canPlaceAt(state, world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockPos lv = arg3.down();
-        return arg2.getBlockState(lv).isSideSolidFullSquare(arg2, lv, Direction.UP);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos lv = pos.down();
+        return world.getBlockState(lv).isSideSolidFullSquare(world, lv, Direction.UP);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(WATERLOGGED);
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 }
 

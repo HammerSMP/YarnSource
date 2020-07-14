@@ -24,8 +24,8 @@ extends EntryListWidget<E> {
     }
 
     @Override
-    public boolean changeFocus(boolean bl) {
-        boolean bl2 = super.changeFocus(bl);
+    public boolean changeFocus(boolean lookForwards) {
+        boolean bl2 = super.changeFocus(lookForwards);
         if (bl2) {
             this.ensureVisible(this.getFocused());
         }
@@ -33,7 +33,7 @@ extends EntryListWidget<E> {
     }
 
     @Override
-    protected boolean isSelectedItem(int i) {
+    protected boolean isSelectedItem(int index) {
         return false;
     }
 
@@ -51,13 +51,13 @@ extends EntryListWidget<E> {
         }
 
         @Override
-        public void setDragging(boolean bl) {
-            this.dragging = bl;
+        public void setDragging(boolean dragging) {
+            this.dragging = dragging;
         }
 
         @Override
-        public void setFocused(@Nullable Element arg) {
-            this.focused = arg;
+        public void setFocused(@Nullable Element focused) {
+            this.focused = focused;
         }
 
         @Override

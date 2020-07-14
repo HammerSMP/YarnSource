@@ -49,23 +49,23 @@ extends HostileEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.patrolTarget != null) {
-            arg.put("PatrolTarget", NbtHelper.fromBlockPos(this.patrolTarget));
+            tag.put("PatrolTarget", NbtHelper.fromBlockPos(this.patrolTarget));
         }
-        arg.putBoolean("PatrolLeader", this.patrolLeader);
-        arg.putBoolean("Patrolling", this.patrolling);
+        tag.putBoolean("PatrolLeader", this.patrolLeader);
+        tag.putBoolean("Patrolling", this.patrolling);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("PatrolTarget")) {
-            this.patrolTarget = NbtHelper.toBlockPos(arg.getCompound("PatrolTarget"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("PatrolTarget")) {
+            this.patrolTarget = NbtHelper.toBlockPos(tag.getCompound("PatrolTarget"));
         }
-        this.patrolLeader = arg.getBoolean("PatrolLeader");
-        this.patrolling = arg.getBoolean("Patrolling");
+        this.patrolLeader = tag.getBoolean("PatrolLeader");
+        this.patrolling = tag.getBoolean("Patrolling");
     }
 
     @Override
@@ -79,34 +79,34 @@ extends HostileEntity {
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 != SpawnReason.PATROL && arg3 != SpawnReason.EVENT && arg3 != SpawnReason.STRUCTURE && this.random.nextFloat() < 0.06f && this.canLead()) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (spawnReason != SpawnReason.PATROL && spawnReason != SpawnReason.EVENT && spawnReason != SpawnReason.STRUCTURE && this.random.nextFloat() < 0.06f && this.canLead()) {
             this.patrolLeader = true;
         }
         if (this.isPatrolLeader()) {
             this.equipStack(EquipmentSlot.HEAD, Raid.getOminousBanner());
             this.setEquipmentDropChance(EquipmentSlot.HEAD, 2.0f);
         }
-        if (arg3 == SpawnReason.PATROL) {
+        if (spawnReason == SpawnReason.PATROL) {
             this.patrolling = true;
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
-    public static boolean canSpawn(EntityType<? extends PatrolEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        if (arg2.getLightLevel(LightType.BLOCK, arg4) > 8) {
+    public static boolean canSpawn(EntityType<? extends PatrolEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        if (world.getLightLevel(LightType.BLOCK, pos) > 8) {
             return false;
         }
-        return PatrolEntity.canSpawnIgnoreLightLevel(arg, arg2, arg3, arg4, random);
+        return PatrolEntity.canSpawnIgnoreLightLevel(type, world, spawnReason, pos, random);
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
-        return !this.patrolling || d > 16384.0;
+    public boolean canImmediatelyDespawn(double distanceSquared) {
+        return !this.patrolling || distanceSquared > 16384.0;
     }
 
-    public void setPatrolTarget(BlockPos arg) {
-        this.patrolTarget = arg;
+    public void setPatrolTarget(BlockPos targetPos) {
+        this.patrolTarget = targetPos;
         this.patrolling = true;
     }
 
@@ -118,8 +118,8 @@ extends HostileEntity {
         return this.patrolTarget != null;
     }
 
-    public void setPatrolLeader(boolean bl) {
-        this.patrolLeader = bl;
+    public void setPatrolLeader(boolean patrolLeader) {
+        this.patrolLeader = patrolLeader;
         this.patrolling = true;
     }
 
@@ -140,8 +140,8 @@ extends HostileEntity {
         return this.patrolling;
     }
 
-    protected void setPatrolling(boolean bl) {
-        this.patrolling = bl;
+    protected void setPatrolling(boolean patrolling) {
+        this.patrolling = patrolling;
     }
 
     public static class PatrolGoal<T extends PatrolEntity>
@@ -151,10 +151,10 @@ extends HostileEntity {
         private final double followSpeed;
         private long nextPatrolSearchTime;
 
-        public PatrolGoal(T arg, double d, double e) {
-            this.entity = arg;
-            this.leaderSpeed = d;
-            this.followSpeed = e;
+        public PatrolGoal(T entity, double leaderSpeed, double followSpeed) {
+            this.entity = entity;
+            this.leaderSpeed = leaderSpeed;
+            this.followSpeed = followSpeed;
             this.nextPatrolSearchTime = -1L;
             this.setControls(EnumSet.of(Goal.Control.MOVE));
         }

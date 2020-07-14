@@ -29,8 +29,8 @@ extends AbstractCommandBlockScreen {
     private boolean conditional;
     private boolean autoActivate;
 
-    public CommandBlockScreen(CommandBlockBlockEntity arg) {
-        this.blockEntity = arg;
+    public CommandBlockScreen(CommandBlockBlockEntity blockEntity) {
+        this.blockEntity = blockEntity;
     }
 
     @Override
@@ -84,8 +84,8 @@ extends AbstractCommandBlockScreen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
-        super.resize(arg, i, j);
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
         this.updateTrackedOutput();
         this.updateMode();
         this.updateConditionalMode();
@@ -98,8 +98,8 @@ extends AbstractCommandBlockScreen {
     }
 
     @Override
-    protected void syncSettingsToServer(CommandBlockExecutor arg) {
-        this.client.getNetworkHandler().sendPacket(new UpdateCommandBlockC2SPacket(new BlockPos(arg.getPos()), this.consoleCommandTextField.getText(), this.mode, arg.isTrackingOutput(), this.conditional, this.autoActivate));
+    protected void syncSettingsToServer(CommandBlockExecutor commandExecutor) {
+        this.client.getNetworkHandler().sendPacket(new UpdateCommandBlockC2SPacket(new BlockPos(commandExecutor.getPos()), this.consoleCommandTextField.getText(), this.mode, commandExecutor.isTrackingOutput(), this.conditional, this.autoActivate));
     }
 
     private void updateMode() {

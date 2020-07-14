@@ -60,172 +60,172 @@ public class TeamCommand {
     private static final SimpleCommandExceptionType OPTION_DEATH_MESSAGE_VISIBILITY_UNCHANGED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.team.option.deathMessageVisibility.unchanged"));
     private static final SimpleCommandExceptionType OPTION_COLLISION_RULE_UNCHANGED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.team.option.collisionRule.unchanged"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("team").requires(arg -> arg.hasPermissionLevel(2))).then(((LiteralArgumentBuilder)CommandManager.literal("list").executes(commandContext -> TeamCommand.executeListTeams((ServerCommandSource)commandContext.getSource()))).then(CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeListMembers((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team")))))).then(CommandManager.literal("add").then(((RequiredArgumentBuilder)CommandManager.argument("team", StringArgumentType.word()).executes(commandContext -> TeamCommand.executeAdd((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"team")))).then(CommandManager.argument("displayName", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeAdd((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "displayName"))))))).then(CommandManager.literal("remove").then(CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeRemove((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team")))))).then(CommandManager.literal("empty").then(CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeEmpty((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team")))))).then(CommandManager.literal("join").then(((RequiredArgumentBuilder)CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeJoin((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), Collections.singleton(((ServerCommandSource)commandContext.getSource()).getEntityOrThrow().getEntityName())))).then(CommandManager.argument("members", ScoreHolderArgumentType.scoreHolders()).suggests(ScoreHolderArgumentType.SUGGESTION_PROVIDER).executes(commandContext -> TeamCommand.executeJoin((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), ScoreHolderArgumentType.getScoreboardScoreHolders((CommandContext<ServerCommandSource>)commandContext, "members"))))))).then(CommandManager.literal("leave").then(CommandManager.argument("members", ScoreHolderArgumentType.scoreHolders()).suggests(ScoreHolderArgumentType.SUGGESTION_PROVIDER).executes(commandContext -> TeamCommand.executeLeave((ServerCommandSource)commandContext.getSource(), ScoreHolderArgumentType.getScoreboardScoreHolders((CommandContext<ServerCommandSource>)commandContext, "members")))))).then(CommandManager.literal("modify").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("team", TeamArgumentType.team()).then(CommandManager.literal("displayName").then(CommandManager.argument("displayName", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeModifyDisplayName((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "displayName")))))).then(CommandManager.literal("color").then(CommandManager.argument("value", ColorArgumentType.color()).executes(commandContext -> TeamCommand.executeModifyColor((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), ColorArgumentType.getColor((CommandContext<ServerCommandSource>)commandContext, "value")))))).then(CommandManager.literal("friendlyFire").then(CommandManager.argument("allowed", BoolArgumentType.bool()).executes(commandContext -> TeamCommand.executeModifyFriendlyFire((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), BoolArgumentType.getBool((CommandContext)commandContext, (String)"allowed")))))).then(CommandManager.literal("seeFriendlyInvisibles").then(CommandManager.argument("allowed", BoolArgumentType.bool()).executes(commandContext -> TeamCommand.executeModifySeeFriendlyInvisibles((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), BoolArgumentType.getBool((CommandContext)commandContext, (String)"allowed")))))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("nametagVisibility").then(CommandManager.literal("never").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.NEVER)))).then(CommandManager.literal("hideForOtherTeams").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS)))).then(CommandManager.literal("hideForOwnTeam").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM)))).then(CommandManager.literal("always").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.ALWAYS))))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("deathMessageVisibility").then(CommandManager.literal("never").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.NEVER)))).then(CommandManager.literal("hideForOtherTeams").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS)))).then(CommandManager.literal("hideForOwnTeam").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM)))).then(CommandManager.literal("always").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.ALWAYS))))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("collisionRule").then(CommandManager.literal("never").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.NEVER)))).then(CommandManager.literal("pushOwnTeam").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.PUSH_OWN_TEAM)))).then(CommandManager.literal("pushOtherTeams").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.PUSH_OTHER_TEAMS)))).then(CommandManager.literal("always").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.ALWAYS))))).then(CommandManager.literal("prefix").then(CommandManager.argument("prefix", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeModifyPrefix((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "prefix")))))).then(CommandManager.literal("suffix").then(CommandManager.argument("suffix", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeModifySuffix((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "suffix"))))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("team").requires(arg -> arg.hasPermissionLevel(2))).then(((LiteralArgumentBuilder)CommandManager.literal("list").executes(commandContext -> TeamCommand.executeListTeams((ServerCommandSource)commandContext.getSource()))).then(CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeListMembers((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team")))))).then(CommandManager.literal("add").then(((RequiredArgumentBuilder)CommandManager.argument("team", StringArgumentType.word()).executes(commandContext -> TeamCommand.executeAdd((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"team")))).then(CommandManager.argument("displayName", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeAdd((ServerCommandSource)commandContext.getSource(), StringArgumentType.getString((CommandContext)commandContext, (String)"team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "displayName"))))))).then(CommandManager.literal("remove").then(CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeRemove((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team")))))).then(CommandManager.literal("empty").then(CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeEmpty((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team")))))).then(CommandManager.literal("join").then(((RequiredArgumentBuilder)CommandManager.argument("team", TeamArgumentType.team()).executes(commandContext -> TeamCommand.executeJoin((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), Collections.singleton(((ServerCommandSource)commandContext.getSource()).getEntityOrThrow().getEntityName())))).then(CommandManager.argument("members", ScoreHolderArgumentType.scoreHolders()).suggests(ScoreHolderArgumentType.SUGGESTION_PROVIDER).executes(commandContext -> TeamCommand.executeJoin((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), ScoreHolderArgumentType.getScoreboardScoreHolders((CommandContext<ServerCommandSource>)commandContext, "members"))))))).then(CommandManager.literal("leave").then(CommandManager.argument("members", ScoreHolderArgumentType.scoreHolders()).suggests(ScoreHolderArgumentType.SUGGESTION_PROVIDER).executes(commandContext -> TeamCommand.executeLeave((ServerCommandSource)commandContext.getSource(), ScoreHolderArgumentType.getScoreboardScoreHolders((CommandContext<ServerCommandSource>)commandContext, "members")))))).then(CommandManager.literal("modify").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("team", TeamArgumentType.team()).then(CommandManager.literal("displayName").then(CommandManager.argument("displayName", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeModifyDisplayName((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "displayName")))))).then(CommandManager.literal("color").then(CommandManager.argument("value", ColorArgumentType.color()).executes(commandContext -> TeamCommand.executeModifyColor((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), ColorArgumentType.getColor((CommandContext<ServerCommandSource>)commandContext, "value")))))).then(CommandManager.literal("friendlyFire").then(CommandManager.argument("allowed", BoolArgumentType.bool()).executes(commandContext -> TeamCommand.executeModifyFriendlyFire((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), BoolArgumentType.getBool((CommandContext)commandContext, (String)"allowed")))))).then(CommandManager.literal("seeFriendlyInvisibles").then(CommandManager.argument("allowed", BoolArgumentType.bool()).executes(commandContext -> TeamCommand.executeModifySeeFriendlyInvisibles((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), BoolArgumentType.getBool((CommandContext)commandContext, (String)"allowed")))))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("nametagVisibility").then(CommandManager.literal("never").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.NEVER)))).then(CommandManager.literal("hideForOtherTeams").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS)))).then(CommandManager.literal("hideForOwnTeam").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM)))).then(CommandManager.literal("always").executes(commandContext -> TeamCommand.executeModifyNametagVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.ALWAYS))))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("deathMessageVisibility").then(CommandManager.literal("never").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.NEVER)))).then(CommandManager.literal("hideForOtherTeams").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS)))).then(CommandManager.literal("hideForOwnTeam").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM)))).then(CommandManager.literal("always").executes(commandContext -> TeamCommand.executeModifyDeathMessageVisibility((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.VisibilityRule.ALWAYS))))).then(((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("collisionRule").then(CommandManager.literal("never").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.NEVER)))).then(CommandManager.literal("pushOwnTeam").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.PUSH_OWN_TEAM)))).then(CommandManager.literal("pushOtherTeams").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.PUSH_OTHER_TEAMS)))).then(CommandManager.literal("always").executes(commandContext -> TeamCommand.executeModifyCollisionRule((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), AbstractTeam.CollisionRule.ALWAYS))))).then(CommandManager.literal("prefix").then(CommandManager.argument("prefix", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeModifyPrefix((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "prefix")))))).then(CommandManager.literal("suffix").then(CommandManager.argument("suffix", TextArgumentType.text()).executes(commandContext -> TeamCommand.executeModifySuffix((ServerCommandSource)commandContext.getSource(), TeamArgumentType.getTeam((CommandContext<ServerCommandSource>)commandContext, "team"), TextArgumentType.getTextArgument((CommandContext<ServerCommandSource>)commandContext, "suffix"))))))));
     }
 
-    private static int executeLeave(ServerCommandSource arg, Collection<String> collection) {
-        ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
-        for (String string : collection) {
+    private static int executeLeave(ServerCommandSource source, Collection<String> members) {
+        ServerScoreboard lv = source.getMinecraftServer().getScoreboard();
+        for (String string : members) {
             lv.clearPlayerTeam(string);
         }
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText("commands.team.leave.success.single", collection.iterator().next()), true);
+        if (members.size() == 1) {
+            source.sendFeedback(new TranslatableText("commands.team.leave.success.single", members.iterator().next()), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.team.leave.success.multiple", collection.size()), true);
+            source.sendFeedback(new TranslatableText("commands.team.leave.success.multiple", members.size()), true);
         }
-        return collection.size();
+        return members.size();
     }
 
-    private static int executeJoin(ServerCommandSource arg, Team arg2, Collection<String> collection) {
-        ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
-        for (String string : collection) {
-            ((Scoreboard)lv).addPlayerToTeam(string, arg2);
+    private static int executeJoin(ServerCommandSource source, Team team, Collection<String> members) {
+        ServerScoreboard lv = source.getMinecraftServer().getScoreboard();
+        for (String string : members) {
+            ((Scoreboard)lv).addPlayerToTeam(string, team);
         }
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText("commands.team.join.success.single", collection.iterator().next(), arg2.getFormattedName()), true);
+        if (members.size() == 1) {
+            source.sendFeedback(new TranslatableText("commands.team.join.success.single", members.iterator().next(), team.getFormattedName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.team.join.success.multiple", collection.size(), arg2.getFormattedName()), true);
+            source.sendFeedback(new TranslatableText("commands.team.join.success.multiple", members.size(), team.getFormattedName()), true);
         }
-        return collection.size();
+        return members.size();
     }
 
-    private static int executeModifyNametagVisibility(ServerCommandSource arg, Team arg2, AbstractTeam.VisibilityRule arg3) throws CommandSyntaxException {
-        if (arg2.getNameTagVisibilityRule() == arg3) {
+    private static int executeModifyNametagVisibility(ServerCommandSource source, Team team, AbstractTeam.VisibilityRule visibility) throws CommandSyntaxException {
+        if (team.getNameTagVisibilityRule() == visibility) {
             throw OPTION_NAMETAG_VISIBILITY_UNCHANGED_EXCEPTION.create();
         }
-        arg2.setNameTagVisibilityRule(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.nametagVisibility.success", arg2.getFormattedName(), arg3.getTranslationKey()), true);
+        team.setNameTagVisibilityRule(visibility);
+        source.sendFeedback(new TranslatableText("commands.team.option.nametagVisibility.success", team.getFormattedName(), visibility.getTranslationKey()), true);
         return 0;
     }
 
-    private static int executeModifyDeathMessageVisibility(ServerCommandSource arg, Team arg2, AbstractTeam.VisibilityRule arg3) throws CommandSyntaxException {
-        if (arg2.getDeathMessageVisibilityRule() == arg3) {
+    private static int executeModifyDeathMessageVisibility(ServerCommandSource source, Team team, AbstractTeam.VisibilityRule visibility) throws CommandSyntaxException {
+        if (team.getDeathMessageVisibilityRule() == visibility) {
             throw OPTION_DEATH_MESSAGE_VISIBILITY_UNCHANGED_EXCEPTION.create();
         }
-        arg2.setDeathMessageVisibilityRule(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.deathMessageVisibility.success", arg2.getFormattedName(), arg3.getTranslationKey()), true);
+        team.setDeathMessageVisibilityRule(visibility);
+        source.sendFeedback(new TranslatableText("commands.team.option.deathMessageVisibility.success", team.getFormattedName(), visibility.getTranslationKey()), true);
         return 0;
     }
 
-    private static int executeModifyCollisionRule(ServerCommandSource arg, Team arg2, AbstractTeam.CollisionRule arg3) throws CommandSyntaxException {
-        if (arg2.getCollisionRule() == arg3) {
+    private static int executeModifyCollisionRule(ServerCommandSource source, Team team, AbstractTeam.CollisionRule collisionRule) throws CommandSyntaxException {
+        if (team.getCollisionRule() == collisionRule) {
             throw OPTION_COLLISION_RULE_UNCHANGED_EXCEPTION.create();
         }
-        arg2.setCollisionRule(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.collisionRule.success", arg2.getFormattedName(), arg3.getTranslationKey()), true);
+        team.setCollisionRule(collisionRule);
+        source.sendFeedback(new TranslatableText("commands.team.option.collisionRule.success", team.getFormattedName(), collisionRule.getTranslationKey()), true);
         return 0;
     }
 
-    private static int executeModifySeeFriendlyInvisibles(ServerCommandSource arg, Team arg2, boolean bl) throws CommandSyntaxException {
-        if (arg2.shouldShowFriendlyInvisibles() == bl) {
-            if (bl) {
+    private static int executeModifySeeFriendlyInvisibles(ServerCommandSource source, Team team, boolean allowed) throws CommandSyntaxException {
+        if (team.shouldShowFriendlyInvisibles() == allowed) {
+            if (allowed) {
                 throw OPTION_SEE_FRIENDLY_INVISIBLES_ALREADY_ENABLED_EXCEPTION.create();
             }
             throw OPTION_SEE_FRIENDLY_INVISIBLES_ALREADY_DISABLED_EXCEPTION.create();
         }
-        arg2.setShowFriendlyInvisibles(bl);
-        arg.sendFeedback(new TranslatableText("commands.team.option.seeFriendlyInvisibles." + (bl ? "enabled" : "disabled"), arg2.getFormattedName()), true);
+        team.setShowFriendlyInvisibles(allowed);
+        source.sendFeedback(new TranslatableText("commands.team.option.seeFriendlyInvisibles." + (allowed ? "enabled" : "disabled"), team.getFormattedName()), true);
         return 0;
     }
 
-    private static int executeModifyFriendlyFire(ServerCommandSource arg, Team arg2, boolean bl) throws CommandSyntaxException {
-        if (arg2.isFriendlyFireAllowed() == bl) {
-            if (bl) {
+    private static int executeModifyFriendlyFire(ServerCommandSource source, Team team, boolean allowed) throws CommandSyntaxException {
+        if (team.isFriendlyFireAllowed() == allowed) {
+            if (allowed) {
                 throw OPTION_FRIENDLY_FIRE_ALREADY_ENABLED_EXCEPTION.create();
             }
             throw OPTION_FRIENDLY_FIRE_ALREADY_DISABLED_EXCEPTION.create();
         }
-        arg2.setFriendlyFireAllowed(bl);
-        arg.sendFeedback(new TranslatableText("commands.team.option.friendlyfire." + (bl ? "enabled" : "disabled"), arg2.getFormattedName()), true);
+        team.setFriendlyFireAllowed(allowed);
+        source.sendFeedback(new TranslatableText("commands.team.option.friendlyfire." + (allowed ? "enabled" : "disabled"), team.getFormattedName()), true);
         return 0;
     }
 
-    private static int executeModifyDisplayName(ServerCommandSource arg, Team arg2, Text arg3) throws CommandSyntaxException {
-        if (arg2.getDisplayName().equals(arg3)) {
+    private static int executeModifyDisplayName(ServerCommandSource source, Team team, Text displayName) throws CommandSyntaxException {
+        if (team.getDisplayName().equals(displayName)) {
             throw OPTION_NAME_UNCHANGED_EXCEPTION.create();
         }
-        arg2.setDisplayName(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.name.success", arg2.getFormattedName()), true);
+        team.setDisplayName(displayName);
+        source.sendFeedback(new TranslatableText("commands.team.option.name.success", team.getFormattedName()), true);
         return 0;
     }
 
-    private static int executeModifyColor(ServerCommandSource arg, Team arg2, Formatting arg3) throws CommandSyntaxException {
-        if (arg2.getColor() == arg3) {
+    private static int executeModifyColor(ServerCommandSource source, Team team, Formatting color) throws CommandSyntaxException {
+        if (team.getColor() == color) {
             throw OPTION_COLOR_UNCHANGED_EXCEPTION.create();
         }
-        arg2.setColor(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.color.success", arg2.getFormattedName(), arg3.getName()), true);
+        team.setColor(color);
+        source.sendFeedback(new TranslatableText("commands.team.option.color.success", team.getFormattedName(), color.getName()), true);
         return 0;
     }
 
-    private static int executeEmpty(ServerCommandSource arg, Team arg2) throws CommandSyntaxException {
-        ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
-        ArrayList collection = Lists.newArrayList(arg2.getPlayerList());
+    private static int executeEmpty(ServerCommandSource source, Team team) throws CommandSyntaxException {
+        ServerScoreboard lv = source.getMinecraftServer().getScoreboard();
+        ArrayList collection = Lists.newArrayList(team.getPlayerList());
         if (collection.isEmpty()) {
             throw EMPTY_UNCHANGED_EXCEPTION.create();
         }
         for (String string : collection) {
-            ((Scoreboard)lv).removePlayerFromTeam(string, arg2);
+            ((Scoreboard)lv).removePlayerFromTeam(string, team);
         }
-        arg.sendFeedback(new TranslatableText("commands.team.empty.success", collection.size(), arg2.getFormattedName()), true);
+        source.sendFeedback(new TranslatableText("commands.team.empty.success", collection.size(), team.getFormattedName()), true);
         return collection.size();
     }
 
-    private static int executeRemove(ServerCommandSource arg, Team arg2) {
-        ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
-        lv.removeTeam(arg2);
-        arg.sendFeedback(new TranslatableText("commands.team.remove.success", arg2.getFormattedName()), true);
+    private static int executeRemove(ServerCommandSource source, Team team) {
+        ServerScoreboard lv = source.getMinecraftServer().getScoreboard();
+        lv.removeTeam(team);
+        source.sendFeedback(new TranslatableText("commands.team.remove.success", team.getFormattedName()), true);
         return lv.getTeams().size();
     }
 
-    private static int executeAdd(ServerCommandSource arg, String string) throws CommandSyntaxException {
-        return TeamCommand.executeAdd(arg, string, new LiteralText(string));
+    private static int executeAdd(ServerCommandSource source, String team) throws CommandSyntaxException {
+        return TeamCommand.executeAdd(source, team, new LiteralText(team));
     }
 
-    private static int executeAdd(ServerCommandSource arg, String string, Text arg2) throws CommandSyntaxException {
-        ServerScoreboard lv = arg.getMinecraftServer().getScoreboard();
-        if (lv.getTeam(string) != null) {
+    private static int executeAdd(ServerCommandSource source, String team, Text displayName) throws CommandSyntaxException {
+        ServerScoreboard lv = source.getMinecraftServer().getScoreboard();
+        if (lv.getTeam(team) != null) {
             throw ADD_DUPLICATE_EXCEPTION.create();
         }
-        if (string.length() > 16) {
+        if (team.length() > 16) {
             throw ADD_LONG_NAME_EXCEPTION.create((Object)16);
         }
-        Team lv2 = lv.addTeam(string);
-        lv2.setDisplayName(arg2);
-        arg.sendFeedback(new TranslatableText("commands.team.add.success", lv2.getFormattedName()), true);
+        Team lv2 = lv.addTeam(team);
+        lv2.setDisplayName(displayName);
+        source.sendFeedback(new TranslatableText("commands.team.add.success", lv2.getFormattedName()), true);
         return lv.getTeams().size();
     }
 
-    private static int executeListMembers(ServerCommandSource arg, Team arg2) {
-        Collection<String> collection = arg2.getPlayerList();
+    private static int executeListMembers(ServerCommandSource source, Team team) {
+        Collection<String> collection = team.getPlayerList();
         if (collection.isEmpty()) {
-            arg.sendFeedback(new TranslatableText("commands.team.list.members.empty", arg2.getFormattedName()), false);
+            source.sendFeedback(new TranslatableText("commands.team.list.members.empty", team.getFormattedName()), false);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.team.list.members.success", arg2.getFormattedName(), collection.size(), Texts.joinOrdered(collection)), false);
+            source.sendFeedback(new TranslatableText("commands.team.list.members.success", team.getFormattedName(), collection.size(), Texts.joinOrdered(collection)), false);
         }
         return collection.size();
     }
 
-    private static int executeListTeams(ServerCommandSource arg) {
-        Collection<Team> collection = arg.getMinecraftServer().getScoreboard().getTeams();
+    private static int executeListTeams(ServerCommandSource source) {
+        Collection<Team> collection = source.getMinecraftServer().getScoreboard().getTeams();
         if (collection.isEmpty()) {
-            arg.sendFeedback(new TranslatableText("commands.team.list.teams.empty"), false);
+            source.sendFeedback(new TranslatableText("commands.team.list.teams.empty"), false);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.team.list.teams.success", collection.size(), Texts.join(collection, Team::getFormattedName)), false);
+            source.sendFeedback(new TranslatableText("commands.team.list.teams.success", collection.size(), Texts.join(collection, Team::getFormattedName)), false);
         }
         return collection.size();
     }
 
-    private static int executeModifyPrefix(ServerCommandSource arg, Team arg2, Text arg3) {
-        arg2.setPrefix(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.prefix.success", arg3), false);
+    private static int executeModifyPrefix(ServerCommandSource source, Team team, Text prefix) {
+        team.setPrefix(prefix);
+        source.sendFeedback(new TranslatableText("commands.team.option.prefix.success", prefix), false);
         return 1;
     }
 
-    private static int executeModifySuffix(ServerCommandSource arg, Team arg2, Text arg3) {
-        arg2.setSuffix(arg3);
-        arg.sendFeedback(new TranslatableText("commands.team.option.suffix.success", arg3), false);
+    private static int executeModifySuffix(ServerCommandSource source, Team team, Text suffix) {
+        team.setSuffix(suffix);
+        source.sendFeedback(new TranslatableText("commands.team.option.suffix.success", suffix), false);
         return 1;
     }
 }

@@ -49,19 +49,19 @@ extends BlockWithEntity {
     }
 
     @Override
-    public boolean hasSidedTransparency(BlockState arg) {
+    public boolean hasSidedTransparency(BlockState state) {
         return true;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        super.randomDisplayTick(arg, arg2, arg3, random);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        super.randomDisplayTick(state, world, pos, random);
         for (int i = -2; i <= 2; ++i) {
             block1: for (int j = -2; j <= 2; ++j) {
                 if (i > -2 && i < 2 && j == -1) {
@@ -69,55 +69,55 @@ extends BlockWithEntity {
                 }
                 if (random.nextInt(16) != 0) continue;
                 for (int k = 0; k <= 1; ++k) {
-                    BlockPos lv = arg3.add(i, k, j);
-                    if (!arg2.getBlockState(lv).isOf(Blocks.BOOKSHELF)) continue;
-                    if (!arg2.isAir(arg3.add(i / 2, 0, j / 2))) continue block1;
-                    arg2.addParticle(ParticleTypes.ENCHANT, (double)arg3.getX() + 0.5, (double)arg3.getY() + 2.0, (double)arg3.getZ() + 0.5, (double)((float)i + random.nextFloat()) - 0.5, (float)k - random.nextFloat() - 1.0f, (double)((float)j + random.nextFloat()) - 0.5);
+                    BlockPos lv = pos.add(i, k, j);
+                    if (!world.getBlockState(lv).isOf(Blocks.BOOKSHELF)) continue;
+                    if (!world.isAir(pos.add(i / 2, 0, j / 2))) continue block1;
+                    world.addParticle(ParticleTypes.ENCHANT, (double)pos.getX() + 0.5, (double)pos.getY() + 2.0, (double)pos.getZ() + 0.5, (double)((float)i + random.nextFloat()) - 0.5, (float)k - random.nextFloat() - 1.0f, (double)((float)j + random.nextFloat()) - 0.5);
                 }
             }
         }
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new EnchantingTableBlockEntity();
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
         return ActionResult.CONSUME;
     }
 
     @Override
     @Nullable
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg32) {
-        BlockEntity lv = arg2.getBlockEntity(arg32);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof EnchantingTableBlockEntity) {
             Text lv2 = ((Nameable)((Object)lv)).getDisplayName();
-            return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new EnchantmentScreenHandler(i, arg3, ScreenHandlerContext.create(arg2, arg32)), lv2);
+            return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new EnchantmentScreenHandler(i, arg3, ScreenHandlerContext.create(world, pos)), lv2);
         }
         return null;
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof EnchantingTableBlockEntity) {
-            ((EnchantingTableBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof EnchantingTableBlockEntity) {
+            ((EnchantingTableBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

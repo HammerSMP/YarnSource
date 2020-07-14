@@ -23,10 +23,10 @@ extends Task<E> {
     private final int distance;
     private final float forwardMovement;
 
-    public AttackTask(int i, float f) {
+    public AttackTask(int distance, float forwardMovement) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.VISIBLE_MOBS, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.distance = i;
-        this.forwardMovement = f;
+        this.distance = distance;
+        this.forwardMovement = forwardMovement;
     }
 
     @Override
@@ -41,16 +41,16 @@ extends Task<E> {
         ((MobEntity)arg2).yaw = MathHelper.stepAngleTowards(((MobEntity)arg2).yaw, ((MobEntity)arg2).headYaw, 0.0f);
     }
 
-    private boolean isAttackTargetVisible(E arg) {
-        return ((LivingEntity)arg).getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().contains(this.getAttackTarget(arg));
+    private boolean isAttackTargetVisible(E entity) {
+        return ((LivingEntity)entity).getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().contains(this.getAttackTarget(entity));
     }
 
-    private boolean isNearAttackTarget(E arg) {
-        return this.getAttackTarget(arg).isInRange((Entity)arg, this.distance);
+    private boolean isNearAttackTarget(E entity) {
+        return this.getAttackTarget(entity).isInRange((Entity)entity, this.distance);
     }
 
-    private LivingEntity getAttackTarget(E arg) {
-        return ((LivingEntity)arg).getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
+    private LivingEntity getAttackTarget(E entity) {
+        return ((LivingEntity)entity).getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET).get();
     }
 }
 

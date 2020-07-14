@@ -109,32 +109,32 @@ Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.itemsBeingCooked.clear();
-        Inventories.fromTag(arg2, this.itemsBeingCooked);
-        if (arg2.contains("CookingTimes", 11)) {
-            int[] is = arg2.getIntArray("CookingTimes");
+        Inventories.fromTag(tag, this.itemsBeingCooked);
+        if (tag.contains("CookingTimes", 11)) {
+            int[] is = tag.getIntArray("CookingTimes");
             System.arraycopy(is, 0, this.cookingTimes, 0, Math.min(this.cookingTotalTimes.length, is.length));
         }
-        if (arg2.contains("CookingTotalTimes", 11)) {
-            int[] js = arg2.getIntArray("CookingTotalTimes");
+        if (tag.contains("CookingTotalTimes", 11)) {
+            int[] js = tag.getIntArray("CookingTotalTimes");
             System.arraycopy(js, 0, this.cookingTotalTimes, 0, Math.min(this.cookingTotalTimes.length, js.length));
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        this.saveInitialChunkData(arg);
-        arg.putIntArray("CookingTimes", this.cookingTimes);
-        arg.putIntArray("CookingTotalTimes", this.cookingTotalTimes);
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        this.saveInitialChunkData(tag);
+        tag.putIntArray("CookingTimes", this.cookingTimes);
+        tag.putIntArray("CookingTotalTimes", this.cookingTotalTimes);
+        return tag;
     }
 
-    private CompoundTag saveInitialChunkData(CompoundTag arg) {
-        super.toTag(arg);
-        Inventories.toTag(arg, this.itemsBeingCooked, true);
-        return arg;
+    private CompoundTag saveInitialChunkData(CompoundTag tag) {
+        super.toTag(tag);
+        Inventories.toTag(tag, this.itemsBeingCooked, true);
+        return tag;
     }
 
     @Override
@@ -148,20 +148,20 @@ Tickable {
         return this.saveInitialChunkData(new CompoundTag());
     }
 
-    public Optional<CampfireCookingRecipe> getRecipeFor(ItemStack arg) {
+    public Optional<CampfireCookingRecipe> getRecipeFor(ItemStack item) {
         if (this.itemsBeingCooked.stream().noneMatch(ItemStack::isEmpty)) {
             return Optional.empty();
         }
-        return this.world.getRecipeManager().getFirstMatch(RecipeType.CAMPFIRE_COOKING, new SimpleInventory(arg), this.world);
+        return this.world.getRecipeManager().getFirstMatch(RecipeType.CAMPFIRE_COOKING, new SimpleInventory(item), this.world);
     }
 
-    public boolean addItem(ItemStack arg, int i) {
+    public boolean addItem(ItemStack item, int integer) {
         for (int j = 0; j < this.itemsBeingCooked.size(); ++j) {
             ItemStack lv = this.itemsBeingCooked.get(j);
             if (!lv.isEmpty()) continue;
-            this.cookingTotalTimes[j] = i;
+            this.cookingTotalTimes[j] = integer;
             this.cookingTimes[j] = 0;
-            this.itemsBeingCooked.set(j, arg.split(1));
+            this.itemsBeingCooked.set(j, item.split(1));
             this.updateListeners();
             return true;
         }

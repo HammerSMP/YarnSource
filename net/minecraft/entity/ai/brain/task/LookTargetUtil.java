@@ -29,64 +29,64 @@ import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3d;
 
 public class LookTargetUtil {
-    public static void lookAtAndWalkTowardsEachOther(LivingEntity arg, LivingEntity arg2, float f) {
-        LookTargetUtil.lookAtEachOther(arg, arg2);
-        LookTargetUtil.walkTowardsEachOther(arg, arg2, f);
+    public static void lookAtAndWalkTowardsEachOther(LivingEntity first, LivingEntity second, float speed) {
+        LookTargetUtil.lookAtEachOther(first, second);
+        LookTargetUtil.walkTowardsEachOther(first, second, speed);
     }
 
-    public static boolean canSee(Brain<?> arg, LivingEntity arg2) {
-        return arg.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).filter(list -> list.contains(arg2)).isPresent();
+    public static boolean canSee(Brain<?> brain, LivingEntity target) {
+        return brain.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).filter(list -> list.contains(target)).isPresent();
     }
 
-    public static boolean canSee(Brain<?> arg, MemoryModuleType<? extends LivingEntity> arg22, EntityType<?> arg3) {
-        return LookTargetUtil.canSee(arg, arg22, (LivingEntity arg2) -> arg2.getType() == arg3);
+    public static boolean canSee(Brain<?> brain, MemoryModuleType<? extends LivingEntity> memoryModuleType, EntityType<?> entityType) {
+        return LookTargetUtil.canSee(brain, memoryModuleType, (LivingEntity arg2) -> arg2.getType() == entityType);
     }
 
-    private static boolean canSee(Brain<?> arg, MemoryModuleType<? extends LivingEntity> arg22, Predicate<LivingEntity> predicate) {
-        return arg.getOptionalMemory(arg22).filter(predicate).filter(LivingEntity::isAlive).filter(arg2 -> LookTargetUtil.canSee(arg, arg2)).isPresent();
+    private static boolean canSee(Brain<?> brain, MemoryModuleType<? extends LivingEntity> memoryType, Predicate<LivingEntity> filter) {
+        return brain.getOptionalMemory(memoryType).filter(filter).filter(LivingEntity::isAlive).filter(arg2 -> LookTargetUtil.canSee(brain, arg2)).isPresent();
     }
 
-    private static void lookAtEachOther(LivingEntity arg, LivingEntity arg2) {
-        LookTargetUtil.lookAt(arg, arg2);
-        LookTargetUtil.lookAt(arg2, arg);
+    private static void lookAtEachOther(LivingEntity first, LivingEntity second) {
+        LookTargetUtil.lookAt(first, second);
+        LookTargetUtil.lookAt(second, first);
     }
 
-    public static void lookAt(LivingEntity arg, LivingEntity arg2) {
-        arg.getBrain().remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg2, true));
+    public static void lookAt(LivingEntity entity, LivingEntity target) {
+        entity.getBrain().remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(target, true));
     }
 
-    private static void walkTowardsEachOther(LivingEntity arg, LivingEntity arg2, float f) {
+    private static void walkTowardsEachOther(LivingEntity first, LivingEntity second, float speed) {
         int i = 2;
-        LookTargetUtil.walkTowards(arg, arg2, f, 2);
-        LookTargetUtil.walkTowards(arg2, arg, f, 2);
+        LookTargetUtil.walkTowards(first, second, speed, 2);
+        LookTargetUtil.walkTowards(second, first, speed, 2);
     }
 
-    public static void walkTowards(LivingEntity arg, Entity arg2, float f, int i) {
-        WalkTarget lv = new WalkTarget(new EntityLookTarget(arg2, false), f, i);
-        arg.getBrain().remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg2, true));
-        arg.getBrain().remember(MemoryModuleType.WALK_TARGET, lv);
+    public static void walkTowards(LivingEntity entity, Entity target, float speed, int completionRange) {
+        WalkTarget lv = new WalkTarget(new EntityLookTarget(target, false), speed, completionRange);
+        entity.getBrain().remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(target, true));
+        entity.getBrain().remember(MemoryModuleType.WALK_TARGET, lv);
     }
 
-    public static void walkTowards(LivingEntity arg, BlockPos arg2, float f, int i) {
-        WalkTarget lv = new WalkTarget(new BlockPosLookTarget(arg2), f, i);
-        arg.getBrain().remember(MemoryModuleType.LOOK_TARGET, new BlockPosLookTarget(arg2));
-        arg.getBrain().remember(MemoryModuleType.WALK_TARGET, lv);
+    public static void walkTowards(LivingEntity entity, BlockPos target, float speed, int completionRange) {
+        WalkTarget lv = new WalkTarget(new BlockPosLookTarget(target), speed, completionRange);
+        entity.getBrain().remember(MemoryModuleType.LOOK_TARGET, new BlockPosLookTarget(target));
+        entity.getBrain().remember(MemoryModuleType.WALK_TARGET, lv);
     }
 
-    public static void give(LivingEntity arg, ItemStack arg2, Vec3d arg3) {
-        double d = arg.getEyeY() - (double)0.3f;
-        ItemEntity lv = new ItemEntity(arg.world, arg.getX(), d, arg.getZ(), arg2);
+    public static void give(LivingEntity entity, ItemStack stack, Vec3d targetLocation) {
+        double d = entity.getEyeY() - (double)0.3f;
+        ItemEntity lv = new ItemEntity(entity.world, entity.getX(), d, entity.getZ(), stack);
         float f = 0.3f;
-        Vec3d lv2 = arg3.subtract(arg.getPos());
+        Vec3d lv2 = targetLocation.subtract(entity.getPos());
         lv2 = lv2.normalize().multiply(0.3f);
         lv.setVelocity(lv2);
         lv.setToDefaultPickupDelay();
-        arg.world.spawnEntity(lv);
+        entity.world.spawnEntity(lv);
     }
 
-    public static ChunkSectionPos getPosClosestToOccupiedPointOfInterest(ServerWorld arg, ChunkSectionPos arg22, int i) {
-        int j = arg.getOccupiedPointOfInterestDistance(arg22);
-        return ChunkSectionPos.stream(arg22, i).filter(arg2 -> arg.getOccupiedPointOfInterestDistance((ChunkSectionPos)arg2) < j).min(Comparator.comparingInt(arg::getOccupiedPointOfInterestDistance)).orElse(arg22);
+    public static ChunkSectionPos getPosClosestToOccupiedPointOfInterest(ServerWorld world, ChunkSectionPos center, int radius) {
+        int j = world.getOccupiedPointOfInterestDistance(center);
+        return ChunkSectionPos.stream(center, radius).filter(arg2 -> world.getOccupiedPointOfInterestDistance((ChunkSectionPos)arg2) < j).min(Comparator.comparingInt(world::getOccupiedPointOfInterestDistance)).orElse(center);
     }
 
     public static boolean method_25940(MobEntity arg, LivingEntity arg2, int i) {
@@ -104,44 +104,44 @@ public class LookTargetUtil {
         return d <= (e = (double)(arg.getWidth() * 2.0f * (arg.getWidth() * 2.0f) + arg2.getWidth()));
     }
 
-    public static boolean isNewTargetTooFar(LivingEntity arg, LivingEntity arg2, double d) {
-        Optional<LivingEntity> optional = arg.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET);
+    public static boolean isNewTargetTooFar(LivingEntity source, LivingEntity target, double extraDistance) {
+        Optional<LivingEntity> optional = source.getBrain().getOptionalMemory(MemoryModuleType.ATTACK_TARGET);
         if (!optional.isPresent()) {
             return false;
         }
-        double e = arg.squaredDistanceTo(optional.get().getPos());
-        double f = arg.squaredDistanceTo(arg2.getPos());
-        return f > e + d * d;
+        double e = source.squaredDistanceTo(optional.get().getPos());
+        double f = source.squaredDistanceTo(target.getPos());
+        return f > e + extraDistance * extraDistance;
     }
 
-    public static boolean isVisibleInMemory(LivingEntity arg, LivingEntity arg2) {
-        Brain<List<LivingEntity>> lv = arg.getBrain();
+    public static boolean isVisibleInMemory(LivingEntity source, LivingEntity target) {
+        Brain<List<LivingEntity>> lv = source.getBrain();
         if (!lv.hasMemoryModule(MemoryModuleType.VISIBLE_MOBS)) {
             return false;
         }
-        return lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().contains(arg2);
+        return lv.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).get().contains(target);
     }
 
-    public static LivingEntity getCloserEntity(LivingEntity arg, Optional<LivingEntity> optional, LivingEntity arg2) {
-        if (!optional.isPresent()) {
-            return arg2;
+    public static LivingEntity getCloserEntity(LivingEntity source, Optional<LivingEntity> first, LivingEntity second) {
+        if (!first.isPresent()) {
+            return second;
         }
-        return LookTargetUtil.getCloserEntity(arg, optional.get(), arg2);
+        return LookTargetUtil.getCloserEntity(source, first.get(), second);
     }
 
-    public static LivingEntity getCloserEntity(LivingEntity arg, LivingEntity arg2, LivingEntity arg3) {
-        Vec3d lv = arg2.getPos();
-        Vec3d lv2 = arg3.getPos();
-        return arg.squaredDistanceTo(lv) < arg.squaredDistanceTo(lv2) ? arg2 : arg3;
+    public static LivingEntity getCloserEntity(LivingEntity source, LivingEntity first, LivingEntity second) {
+        Vec3d lv = first.getPos();
+        Vec3d lv2 = second.getPos();
+        return source.squaredDistanceTo(lv) < source.squaredDistanceTo(lv2) ? first : second;
     }
 
-    public static Optional<LivingEntity> getEntity(LivingEntity arg, MemoryModuleType<UUID> arg2) {
-        Optional<UUID> optional = arg.getBrain().getOptionalMemory(arg2);
+    public static Optional<LivingEntity> getEntity(LivingEntity entity, MemoryModuleType<UUID> uuidMemoryModule) {
+        Optional<UUID> optional = entity.getBrain().getOptionalMemory(uuidMemoryModule);
         return optional.map(uUID -> (LivingEntity)((ServerWorld)arg.world).getEntity((UUID)uUID));
     }
 
-    public static Stream<VillagerEntity> streamSeenVillagers(VillagerEntity arg, Predicate<VillagerEntity> predicate) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.MOBS).map(list -> list.stream().filter(arg2 -> arg2 instanceof VillagerEntity && arg2 != arg).map(arg -> (VillagerEntity)arg).filter(LivingEntity::isAlive).filter(predicate)).orElseGet(Stream::empty);
+    public static Stream<VillagerEntity> streamSeenVillagers(VillagerEntity villager, Predicate<VillagerEntity> filter) {
+        return villager.getBrain().getOptionalMemory(MemoryModuleType.MOBS).map(list -> list.stream().filter(arg2 -> arg2 instanceof VillagerEntity && arg2 != villager).map(arg -> (VillagerEntity)arg).filter(LivingEntity::isAlive).filter(filter)).orElseGet(Stream::empty);
     }
 }
 

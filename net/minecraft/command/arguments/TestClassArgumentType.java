@@ -48,8 +48,8 @@ implements ArgumentType<String> {
         return new TestClassArgumentType();
     }
 
-    public static String getTestClass(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (String)commandContext.getArgument(string, String.class);
+    public static String getTestClass(CommandContext<ServerCommandSource> context, String name) {
+        return (String)context.getArgument(name, String.class);
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {

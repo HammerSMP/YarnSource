@@ -350,13 +350,13 @@ implements ClientPlayPacketListener {
     private Set<RegistryKey<World>> worldKeys;
     private class_5455 registryTracker = class_5455.method_30528();
 
-    public ClientPlayNetworkHandler(MinecraftClient arg, Screen arg2, ClientConnection arg3, GameProfile gameProfile) {
-        this.client = arg;
-        this.loginScreen = arg2;
-        this.connection = arg3;
-        this.profile = gameProfile;
-        this.advancementHandler = new ClientAdvancementManager(arg);
-        this.commandSource = new ClientCommandSource(this, arg);
+    public ClientPlayNetworkHandler(MinecraftClient client, Screen screen, ClientConnection connection, GameProfile profile) {
+        this.client = client;
+        this.loginScreen = screen;
+        this.connection = connection;
+        this.profile = profile;
+        this.advancementHandler = new ClientAdvancementManager(client);
+        this.commandSource = new ClientCommandSource(this, client);
     }
 
     public ClientCommandSource getCommandSource() {
@@ -372,25 +372,25 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onGameJoin(GameJoinS2CPacket arg) {
+    public void onGameJoin(GameJoinS2CPacket packet) {
         ClientWorld.Properties lv4;
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         this.client.interactionManager = new ClientPlayerInteractionManager(this.client, this);
         if (!this.connection.isLocal()) {
             RequiredTagListRegistry.clearAllTags();
         }
-        ArrayList arrayList = Lists.newArrayList(arg.method_29443());
+        ArrayList arrayList = Lists.newArrayList(packet.method_29443());
         Collections.shuffle(arrayList);
         this.worldKeys = Sets.newLinkedHashSet((Iterable)arrayList);
-        this.registryTracker = arg.getDimension();
-        RegistryKey<DimensionType> lv = arg.method_29444();
-        RegistryKey<World> lv2 = arg.getDimensionId();
+        this.registryTracker = packet.getDimension();
+        RegistryKey<DimensionType> lv = packet.method_29444();
+        RegistryKey<World> lv2 = packet.getDimensionId();
         DimensionType lv3 = this.registryTracker.method_30518().get(lv);
-        this.chunkLoadDistance = arg.getChunkLoadDistance();
-        boolean bl = arg.isDebugWorld();
-        boolean bl2 = arg.isFlatWorld();
-        this.worldProperties = lv4 = new ClientWorld.Properties(Difficulty.NORMAL, arg.isHardcore(), bl2);
-        this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
+        this.chunkLoadDistance = packet.getChunkLoadDistance();
+        boolean bl = packet.isDebugWorld();
+        boolean bl2 = packet.isFlatWorld();
+        this.worldProperties = lv4 = new ClientWorld.Properties(Difficulty.NORMAL, packet.isHardcore(), bl2);
+        this.world = new ClientWorld(this, lv4, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, packet.getSha256Seed());
         this.client.joinWorld(this.world);
         if (this.client.player == null) {
             this.client.player = this.client.interactionManager.createPlayer(this.world, new StatHandler(), new ClientRecipeBook());
@@ -401,30 +401,30 @@ implements ClientPlayPacketListener {
         }
         this.client.debugRenderer.reset();
         this.client.player.afterSpawn();
-        int i = arg.getEntityId();
+        int i = packet.getEntityId();
         this.world.addPlayer(i, this.client.player);
         this.client.player.input = new KeyboardInput(this.client.options);
         this.client.interactionManager.copyAbilities(this.client.player);
         this.client.cameraEntity = this.client.player;
         this.client.openScreen(new DownloadingTerrainScreen());
         this.client.player.setEntityId(i);
-        this.client.player.setReducedDebugInfo(arg.hasReducedDebugInfo());
-        this.client.player.setShowsDeathScreen(arg.showsDeathScreen());
-        this.client.interactionManager.setGameMode(arg.getGameMode());
-        this.client.interactionManager.method_30108(arg.method_30116());
+        this.client.player.setReducedDebugInfo(packet.hasReducedDebugInfo());
+        this.client.player.setShowsDeathScreen(packet.showsDeathScreen());
+        this.client.interactionManager.setGameMode(packet.getGameMode());
+        this.client.interactionManager.method_30108(packet.method_30116());
         this.client.options.onPlayerModelPartChange();
         this.connection.send(new CustomPayloadC2SPacket(CustomPayloadC2SPacket.BRAND, new PacketByteBuf(Unpooled.buffer()).writeString(ClientBrandRetriever.getClientModName())));
         this.client.getGame().onStartGameSession();
     }
 
     @Override
-    public void onEntitySpawn(EntitySpawnS2CPacket arg) {
+    public void onEntitySpawn(EntitySpawnS2CPacket packet) {
         Object lv42;
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        double d = arg.getX();
-        double e = arg.getY();
-        double f = arg.getZ();
-        EntityType<?> lv = arg.getEntityTypeId();
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        double d = packet.getX();
+        double e = packet.getY();
+        double f = packet.getZ();
+        EntityType<?> lv = packet.getEntityTypeId();
         if (lv == EntityType.CHEST_MINECART) {
             ChestMinecartEntity lv2 = new ChestMinecartEntity(this.world, d, e, f);
         } else if (lv == EntityType.FURNACE_MINECART) {
@@ -440,7 +440,7 @@ implements ClientPlayPacketListener {
         } else if (lv == EntityType.MINECART) {
             MinecartEntity lv8 = new MinecartEntity(this.world, d, e, f);
         } else if (lv == EntityType.FISHING_BOBBER) {
-            Entity lv9 = this.world.getEntityById(arg.getEntityData());
+            Entity lv9 = this.world.getEntityById(packet.getEntityData());
             if (lv9 instanceof PlayerEntity) {
                 FishingBobberEntity lv10 = new FishingBobberEntity(this.world, (PlayerEntity)lv9, d, e, f);
             } else {
@@ -448,28 +448,28 @@ implements ClientPlayPacketListener {
             }
         } else if (lv == EntityType.ARROW) {
             ArrowEntity lv12 = new ArrowEntity(this.world, d, e, f);
-            Entity lv13 = this.world.getEntityById(arg.getEntityData());
+            Entity lv13 = this.world.getEntityById(packet.getEntityData());
             if (lv13 != null) {
                 ((PersistentProjectileEntity)lv12).setOwner(lv13);
             }
         } else if (lv == EntityType.SPECTRAL_ARROW) {
             SpectralArrowEntity lv14 = new SpectralArrowEntity(this.world, d, e, f);
-            Entity lv15 = this.world.getEntityById(arg.getEntityData());
+            Entity lv15 = this.world.getEntityById(packet.getEntityData());
             if (lv15 != null) {
                 ((PersistentProjectileEntity)lv14).setOwner(lv15);
             }
         } else if (lv == EntityType.TRIDENT) {
             TridentEntity lv16 = new TridentEntity(this.world, d, e, f);
-            Entity lv17 = this.world.getEntityById(arg.getEntityData());
+            Entity lv17 = this.world.getEntityById(packet.getEntityData());
             if (lv17 != null) {
                 ((PersistentProjectileEntity)lv16).setOwner(lv17);
             }
         } else if (lv == EntityType.SNOWBALL) {
             SnowballEntity lv18 = new SnowballEntity(this.world, d, e, f);
         } else if (lv == EntityType.LLAMA_SPIT) {
-            LlamaSpitEntity lv19 = new LlamaSpitEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
+            LlamaSpitEntity lv19 = new LlamaSpitEntity(this.world, d, e, f, packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         } else if (lv == EntityType.ITEM_FRAME) {
-            ItemFrameEntity lv20 = new ItemFrameEntity(this.world, new BlockPos(d, e, f), Direction.byId(arg.getEntityData()));
+            ItemFrameEntity lv20 = new ItemFrameEntity(this.world, new BlockPos(d, e, f), Direction.byId(packet.getEntityData()));
         } else if (lv == EntityType.LEASH_KNOT) {
             LeashKnotEntity lv21 = new LeashKnotEntity(this.world, new BlockPos(d, e, f));
         } else if (lv == EntityType.ENDER_PEARL) {
@@ -479,15 +479,15 @@ implements ClientPlayPacketListener {
         } else if (lv == EntityType.FIREWORK_ROCKET) {
             FireworkRocketEntity lv24 = new FireworkRocketEntity(this.world, d, e, f, ItemStack.EMPTY);
         } else if (lv == EntityType.FIREBALL) {
-            FireballEntity lv25 = new FireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
+            FireballEntity lv25 = new FireballEntity(this.world, d, e, f, packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         } else if (lv == EntityType.DRAGON_FIREBALL) {
-            DragonFireballEntity lv26 = new DragonFireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
+            DragonFireballEntity lv26 = new DragonFireballEntity(this.world, d, e, f, packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         } else if (lv == EntityType.SMALL_FIREBALL) {
-            SmallFireballEntity lv27 = new SmallFireballEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
+            SmallFireballEntity lv27 = new SmallFireballEntity(this.world, d, e, f, packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         } else if (lv == EntityType.WITHER_SKULL) {
-            WitherSkullEntity lv28 = new WitherSkullEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
+            WitherSkullEntity lv28 = new WitherSkullEntity(this.world, d, e, f, packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         } else if (lv == EntityType.SHULKER_BULLET) {
-            ShulkerBulletEntity lv29 = new ShulkerBulletEntity(this.world, d, e, f, arg.getVelocityX(), arg.getVelocityY(), arg.getVelocityZ());
+            ShulkerBulletEntity lv29 = new ShulkerBulletEntity(this.world, d, e, f, packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         } else if (lv == EntityType.EGG) {
             EggEntity lv30 = new EggEntity(this.world, d, e, f);
         } else if (lv == EntityType.EVOKER_FANGS) {
@@ -507,7 +507,7 @@ implements ClientPlayPacketListener {
         } else if (lv == EntityType.ITEM) {
             ItemEntity lv38 = new ItemEntity(this.world, d, e, f);
         } else if (lv == EntityType.FALLING_BLOCK) {
-            FallingBlockEntity lv39 = new FallingBlockEntity(this.world, d, e, f, Block.getStateFromRawId(arg.getEntityData()));
+            FallingBlockEntity lv39 = new FallingBlockEntity(this.world, d, e, f, Block.getStateFromRawId(packet.getEntityData()));
         } else if (lv == EntityType.AREA_EFFECT_CLOUD) {
             AreaEffectCloudEntity lv40 = new AreaEffectCloudEntity(this.world, d, e, f);
         } else if (lv == EntityType.LIGHTNING_BOLT) {
@@ -516,13 +516,13 @@ implements ClientPlayPacketListener {
             lv42 = null;
         }
         if (lv42 != null) {
-            int i = arg.getId();
+            int i = packet.getId();
             lv42.updateTrackedPosition(d, e, f);
             lv42.refreshPositionAfterTeleport(d, e, f);
-            lv42.pitch = (float)(arg.getPitch() * 360) / 256.0f;
-            lv42.yaw = (float)(arg.getYaw() * 360) / 256.0f;
+            lv42.pitch = (float)(packet.getPitch() * 360) / 256.0f;
+            lv42.yaw = (float)(packet.getYaw() * 360) / 256.0f;
             lv42.setEntityId(i);
-            lv42.setUuid(arg.getUuid());
+            lv42.setUuid(packet.getUuid());
             this.world.addEntity(i, lv42);
             if (lv42 instanceof AbstractMinecartEntity) {
                 this.client.getSoundManager().play(new MovingMinecartSoundInstance(lv42));
@@ -531,57 +531,57 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onExperienceOrbSpawn(ExperienceOrbSpawnS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        double d = arg.getX();
-        double e = arg.getY();
-        double f = arg.getZ();
-        ExperienceOrbEntity lv = new ExperienceOrbEntity(this.world, d, e, f, arg.getExperience());
+    public void onExperienceOrbSpawn(ExperienceOrbSpawnS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        double d = packet.getX();
+        double e = packet.getY();
+        double f = packet.getZ();
+        ExperienceOrbEntity lv = new ExperienceOrbEntity(this.world, d, e, f, packet.getExperience());
         lv.updateTrackedPosition(d, e, f);
         lv.yaw = 0.0f;
         lv.pitch = 0.0f;
-        lv.setEntityId(arg.getId());
-        this.world.addEntity(arg.getId(), lv);
+        lv.setEntityId(packet.getId());
+        this.world.addEntity(packet.getId(), lv);
     }
 
     @Override
-    public void onPaintingSpawn(PaintingSpawnS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        PaintingEntity lv = new PaintingEntity(this.world, arg.getPos(), arg.getFacing(), arg.getMotive());
-        lv.setEntityId(arg.getId());
-        lv.setUuid(arg.getPaintingUuid());
-        this.world.addEntity(arg.getId(), lv);
+    public void onPaintingSpawn(PaintingSpawnS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        PaintingEntity lv = new PaintingEntity(this.world, packet.getPos(), packet.getFacing(), packet.getMotive());
+        lv.setEntityId(packet.getId());
+        lv.setUuid(packet.getPaintingUuid());
+        this.world.addEntity(packet.getId(), lv);
     }
 
     @Override
-    public void onVelocityUpdate(EntityVelocityUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getId());
+    public void onVelocityUpdate(EntityVelocityUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getId());
         if (lv == null) {
             return;
         }
-        lv.setVelocityClient((double)arg.getVelocityX() / 8000.0, (double)arg.getVelocityY() / 8000.0, (double)arg.getVelocityZ() / 8000.0);
+        lv.setVelocityClient((double)packet.getVelocityX() / 8000.0, (double)packet.getVelocityY() / 8000.0, (double)packet.getVelocityZ() / 8000.0);
     }
 
     @Override
-    public void onEntityTrackerUpdate(EntityTrackerUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.id());
-        if (lv != null && arg.getTrackedValues() != null) {
-            lv.getDataTracker().writeUpdatedEntries(arg.getTrackedValues());
+    public void onEntityTrackerUpdate(EntityTrackerUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.id());
+        if (lv != null && packet.getTrackedValues() != null) {
+            lv.getDataTracker().writeUpdatedEntries(packet.getTrackedValues());
         }
     }
 
     @Override
-    public void onPlayerSpawn(PlayerSpawnS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        double d = arg.getX();
-        double e = arg.getY();
-        double f = arg.getZ();
-        float g = (float)(arg.getYaw() * 360) / 256.0f;
-        float h = (float)(arg.getPitch() * 360) / 256.0f;
-        int i = arg.getId();
-        OtherClientPlayerEntity lv = new OtherClientPlayerEntity(this.client.world, this.getPlayerListEntry(arg.getPlayerUuid()).getProfile());
+    public void onPlayerSpawn(PlayerSpawnS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        double d = packet.getX();
+        double e = packet.getY();
+        double f = packet.getZ();
+        float g = (float)(packet.getYaw() * 360) / 256.0f;
+        float h = (float)(packet.getPitch() * 360) / 256.0f;
+        int i = packet.getId();
+        OtherClientPlayerEntity lv = new OtherClientPlayerEntity(this.client.world, this.getPlayerListEntry(packet.getPlayerUuid()).getProfile());
         lv.setEntityId(i);
         lv.resetPosition(d, e, f);
         lv.updateTrackedPosition(d, e, f);
@@ -590,112 +590,112 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onEntityPosition(EntityPositionS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getId());
+    public void onEntityPosition(EntityPositionS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getId());
         if (lv == null) {
             return;
         }
-        double d = arg.getX();
-        double e = arg.getY();
-        double f = arg.getZ();
+        double d = packet.getX();
+        double e = packet.getY();
+        double f = packet.getZ();
         lv.updateTrackedPosition(d, e, f);
         if (!lv.isLogicalSideForUpdatingMovement()) {
-            float g = (float)(arg.getYaw() * 360) / 256.0f;
-            float h = (float)(arg.getPitch() * 360) / 256.0f;
+            float g = (float)(packet.getYaw() * 360) / 256.0f;
+            float h = (float)(packet.getPitch() * 360) / 256.0f;
             lv.updateTrackedPositionAndAngles(d, e, f, g, h, 3, true);
-            lv.setOnGround(arg.isOnGround());
+            lv.setOnGround(packet.isOnGround());
         }
     }
 
     @Override
-    public void onHeldItemChange(HeldItemChangeS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        if (PlayerInventory.isValidHotbarIndex(arg.getSlot())) {
-            this.client.player.inventory.selectedSlot = arg.getSlot();
+    public void onHeldItemChange(HeldItemChangeS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        if (PlayerInventory.isValidHotbarIndex(packet.getSlot())) {
+            this.client.player.inventory.selectedSlot = packet.getSlot();
         }
     }
 
     @Override
-    public void onEntityUpdate(EntityS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = arg.getEntity(this.world);
+    public void onEntityUpdate(EntityS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = packet.getEntity(this.world);
         if (lv == null) {
             return;
         }
         if (!lv.isLogicalSideForUpdatingMovement()) {
-            if (arg.isPositionChanged()) {
-                Vec3d lv2 = arg.method_30302(lv.method_30227());
+            if (packet.isPositionChanged()) {
+                Vec3d lv2 = packet.method_30302(lv.method_30227());
                 lv.method_30228(lv2);
-                float f = arg.hasRotation() ? (float)(arg.getYaw() * 360) / 256.0f : lv.yaw;
-                float g = arg.hasRotation() ? (float)(arg.getPitch() * 360) / 256.0f : lv.pitch;
+                float f = packet.hasRotation() ? (float)(packet.getYaw() * 360) / 256.0f : lv.yaw;
+                float g = packet.hasRotation() ? (float)(packet.getPitch() * 360) / 256.0f : lv.pitch;
                 lv.updateTrackedPositionAndAngles(lv2.getX(), lv2.getY(), lv2.getZ(), f, g, 3, false);
-            } else if (arg.hasRotation()) {
-                float h = (float)(arg.getYaw() * 360) / 256.0f;
-                float i = (float)(arg.getPitch() * 360) / 256.0f;
+            } else if (packet.hasRotation()) {
+                float h = (float)(packet.getYaw() * 360) / 256.0f;
+                float i = (float)(packet.getPitch() * 360) / 256.0f;
                 lv.updateTrackedPositionAndAngles(lv.getX(), lv.getY(), lv.getZ(), h, i, 3, false);
             }
-            lv.setOnGround(arg.isOnGround());
+            lv.setOnGround(packet.isOnGround());
         }
     }
 
     @Override
-    public void onEntitySetHeadYaw(EntitySetHeadYawS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = arg.getEntity(this.world);
+    public void onEntitySetHeadYaw(EntitySetHeadYawS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = packet.getEntity(this.world);
         if (lv == null) {
             return;
         }
-        float f = (float)(arg.getHeadYaw() * 360) / 256.0f;
+        float f = (float)(packet.getHeadYaw() * 360) / 256.0f;
         lv.updateTrackedHeadRotation(f, 3);
     }
 
     @Override
-    public void onEntitiesDestroy(EntitiesDestroyS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        for (int i = 0; i < arg.getEntityIds().length; ++i) {
-            int j = arg.getEntityIds()[i];
+    public void onEntitiesDestroy(EntitiesDestroyS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        for (int i = 0; i < packet.getEntityIds().length; ++i) {
+            int j = packet.getEntityIds()[i];
             this.world.removeEntity(j);
         }
     }
 
     @Override
-    public void onPlayerPositionLook(PlayerPositionLookS2CPacket arg) {
+    public void onPlayerPositionLook(PlayerPositionLookS2CPacket packet) {
         double o;
         double n;
         double k;
         double j;
         double g;
         double f;
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientPlayerEntity lv = this.client.player;
         Vec3d lv2 = lv.getVelocity();
-        boolean bl = arg.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.X);
-        boolean bl2 = arg.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.Y);
-        boolean bl3 = arg.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.Z);
+        boolean bl = packet.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.X);
+        boolean bl2 = packet.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.Y);
+        boolean bl3 = packet.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.Z);
         if (bl) {
             double d = lv2.getX();
-            double e = lv.getX() + arg.getX();
-            lv.lastRenderX += arg.getX();
+            double e = lv.getX() + packet.getX();
+            lv.lastRenderX += packet.getX();
         } else {
             f = 0.0;
-            lv.lastRenderX = g = arg.getX();
+            lv.lastRenderX = g = packet.getX();
         }
         if (bl2) {
             double h = lv2.getY();
-            double i = lv.getY() + arg.getY();
-            lv.lastRenderY += arg.getY();
+            double i = lv.getY() + packet.getY();
+            lv.lastRenderY += packet.getY();
         } else {
             j = 0.0;
-            lv.lastRenderY = k = arg.getY();
+            lv.lastRenderY = k = packet.getY();
         }
         if (bl3) {
             double l = lv2.getZ();
-            double m = lv.getZ() + arg.getZ();
-            lv.lastRenderZ += arg.getZ();
+            double m = lv.getZ() + packet.getZ();
+            lv.lastRenderZ += packet.getZ();
         } else {
             n = 0.0;
-            lv.lastRenderZ = o = arg.getZ();
+            lv.lastRenderZ = o = packet.getZ();
         }
         if (lv.age > 0 && lv.getVehicle() != null) {
             ((PlayerEntity)lv).method_29239();
@@ -705,16 +705,16 @@ implements ClientPlayPacketListener {
         lv.prevY = k;
         lv.prevZ = o;
         lv.setVelocity(f, j, n);
-        float p = arg.getYaw();
-        float q = arg.getPitch();
-        if (arg.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.X_ROT)) {
+        float p = packet.getYaw();
+        float q = packet.getPitch();
+        if (packet.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.X_ROT)) {
             q += lv.pitch;
         }
-        if (arg.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.Y_ROT)) {
+        if (packet.getFlags().contains((Object)PlayerPositionLookS2CPacket.Flag.Y_ROT)) {
             p += lv.yaw;
         }
         lv.updatePositionAndAngles(g, k, o, p, q);
-        this.connection.send(new TeleportConfirmC2SPacket(arg.getTeleportId()));
+        this.connection.send(new TeleportConfirmC2SPacket(packet.getTeleportId()));
         this.connection.send(new PlayerMoveC2SPacket.Both(lv.getX(), lv.getY(), lv.getZ(), lv.yaw, lv.pitch, false));
         if (!this.positionLookSetup) {
             this.positionLookSetup = true;
@@ -723,93 +723,93 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onChunkDeltaUpdate(ChunkDeltaUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        arg.method_30621((arg_0, arg_1) -> this.world.setBlockStateWithoutNeighborUpdates(arg_0, arg_1));
+    public void onChunkDeltaUpdate(ChunkDeltaUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        packet.method_30621((arg_0, arg_1) -> this.world.setBlockStateWithoutNeighborUpdates(arg_0, arg_1));
     }
 
     @Override
-    public void onChunkData(ChunkDataS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        int i = arg.getX();
-        int j = arg.getZ();
-        BiomeArray lv = arg.getBiomeArray() == null ? null : new BiomeArray(this.registryTracker.method_30530(Registry.BIOME_KEY), arg.getBiomeArray());
-        WorldChunk lv2 = this.world.getChunkManager().loadChunkFromPacket(i, j, lv, arg.getReadBuffer(), arg.getHeightmaps(), arg.getVerticalStripBitmask(), arg.isFullChunk());
-        if (lv2 != null && arg.isFullChunk()) {
+    public void onChunkData(ChunkDataS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        int i = packet.getX();
+        int j = packet.getZ();
+        BiomeArray lv = packet.getBiomeArray() == null ? null : new BiomeArray(this.registryTracker.method_30530(Registry.BIOME_KEY), packet.getBiomeArray());
+        WorldChunk lv2 = this.world.getChunkManager().loadChunkFromPacket(i, j, lv, packet.getReadBuffer(), packet.getHeightmaps(), packet.getVerticalStripBitmask(), packet.isFullChunk());
+        if (lv2 != null && packet.isFullChunk()) {
             this.world.addEntitiesToChunk(lv2);
         }
         for (int k = 0; k < 16; ++k) {
             this.world.scheduleBlockRenders(i, k, j);
         }
-        for (CompoundTag lv3 : arg.getBlockEntityTagList()) {
+        for (CompoundTag lv3 : packet.getBlockEntityTagList()) {
             BlockPos lv4 = new BlockPos(lv3.getInt("x"), lv3.getInt("y"), lv3.getInt("z"));
             BlockEntity lv5 = this.world.getBlockEntity(lv4);
             if (lv5 == null) continue;
             lv5.fromTag(this.world.getBlockState(lv4), lv3);
         }
-        if (!arg.method_30144()) {
-            this.world.getLightingProvider().setLightEnabled(lv2.getPos(), false);
-            int l = arg.getVerticalStripBitmask();
+        if (!packet.method_30144()) {
+            this.world.getLightingProvider().setColumnEnabled(lv2.getPos(), false);
+            int l = packet.getVerticalStripBitmask();
             for (int m = 0; m < 16; ++m) {
                 if ((l & 1 << m) == 0) continue;
-                this.world.getLightingProvider().queueData(LightType.BLOCK, ChunkSectionPos.from(lv2.getPos(), m), new ChunkNibbleArray(), false);
-                this.world.getLightingProvider().queueData(LightType.SKY, ChunkSectionPos.from(lv2.getPos(), m), new ChunkNibbleArray(), false);
+                this.world.getLightingProvider().enqueueSectionData(LightType.BLOCK, ChunkSectionPos.from(lv2.getPos(), m), new ChunkNibbleArray(), false);
+                this.world.getLightingProvider().enqueueSectionData(LightType.SKY, ChunkSectionPos.from(lv2.getPos(), m), new ChunkNibbleArray(), false);
             }
             this.world.getLightingProvider().doLightUpdates(Integer.MAX_VALUE, true, true);
-            this.world.getLightingProvider().setLightEnabled(lv2.getPos(), true);
+            this.world.getLightingProvider().setColumnEnabled(lv2.getPos(), true);
             lv2.getLightSourcesStream().forEach(arg2 -> this.world.getLightingProvider().addLightSource((BlockPos)arg2, lv2.getLuminance((BlockPos)arg2)));
         }
     }
 
     @Override
-    public void onUnloadChunk(UnloadChunkS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        int i = arg.getX();
-        int j = arg.getZ();
+    public void onUnloadChunk(UnloadChunkS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        int i = packet.getX();
+        int j = packet.getZ();
         ClientChunkManager lv = this.world.getChunkManager();
         lv.unload(i, j);
         LightingProvider lv2 = lv.getLightingProvider();
         for (int k = 0; k < 16; ++k) {
             this.world.scheduleBlockRenders(i, k, j);
-            lv2.updateSectionStatus(ChunkSectionPos.from(i, k, j), true);
+            lv2.setSectionStatus(ChunkSectionPos.from(i, k, j), true);
         }
-        lv2.setLightEnabled(new ChunkPos(i, j), false);
+        lv2.setColumnEnabled(new ChunkPos(i, j), false);
     }
 
     @Override
-    public void onBlockUpdate(BlockUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.world.setBlockStateWithoutNeighborUpdates(arg.getPos(), arg.getState());
+    public void onBlockUpdate(BlockUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.world.setBlockStateWithoutNeighborUpdates(packet.getPos(), packet.getState());
     }
 
     @Override
-    public void onDisconnect(DisconnectS2CPacket arg) {
-        this.connection.disconnect(arg.getReason());
+    public void onDisconnect(DisconnectS2CPacket packet) {
+        this.connection.disconnect(packet.getReason());
     }
 
     @Override
-    public void onDisconnected(Text arg) {
+    public void onDisconnected(Text reason) {
         this.client.disconnect();
         if (this.loginScreen != null) {
             if (this.loginScreen instanceof RealmsScreen) {
-                this.client.openScreen(new DisconnectedRealmsScreen(this.loginScreen, "disconnect.lost", arg));
+                this.client.openScreen(new DisconnectedRealmsScreen(this.loginScreen, "disconnect.lost", reason));
             } else {
-                this.client.openScreen(new DisconnectedScreen(this.loginScreen, "disconnect.lost", arg));
+                this.client.openScreen(new DisconnectedScreen(this.loginScreen, "disconnect.lost", reason));
             }
         } else {
-            this.client.openScreen(new DisconnectedScreen(new MultiplayerScreen(new TitleScreen()), "disconnect.lost", arg));
+            this.client.openScreen(new DisconnectedScreen(new MultiplayerScreen(new TitleScreen()), "disconnect.lost", reason));
         }
     }
 
-    public void sendPacket(Packet<?> arg) {
-        this.connection.send(arg);
+    public void sendPacket(Packet<?> packet) {
+        this.connection.send(packet);
     }
 
     @Override
-    public void onItemPickupAnimation(ItemPickupAnimationS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getEntityId());
-        LivingEntity lv2 = (LivingEntity)this.world.getEntityById(arg.getCollectorEntityId());
+    public void onItemPickupAnimation(ItemPickupAnimationS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getEntityId());
+        LivingEntity lv2 = (LivingEntity)this.world.getEntityById(packet.getCollectorEntityId());
         if (lv2 == null) {
             lv2 = this.client.player;
         }
@@ -823,71 +823,71 @@ implements ClientPlayPacketListener {
             if (lv instanceof ItemEntity) {
                 ItemEntity lv3 = (ItemEntity)lv;
                 ItemStack lv4 = lv3.getStack();
-                lv4.decrement(arg.getStackAmount());
+                lv4.decrement(packet.getStackAmount());
                 if (lv4.isEmpty()) {
-                    this.world.removeEntity(arg.getEntityId());
+                    this.world.removeEntity(packet.getEntityId());
                 }
             } else {
-                this.world.removeEntity(arg.getEntityId());
+                this.world.removeEntity(packet.getEntityId());
             }
         }
     }
 
     @Override
-    public void onGameMessage(GameMessageS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.inGameHud.addChatMessage(arg.getLocation(), arg.getMessage(), arg.getSenderUuid());
+    public void onGameMessage(GameMessageS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.inGameHud.addChatMessage(packet.getLocation(), packet.getMessage(), packet.getSenderUuid());
     }
 
     @Override
-    public void onEntityAnimation(EntityAnimationS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getId());
+    public void onEntityAnimation(EntityAnimationS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getId());
         if (lv == null) {
             return;
         }
-        if (arg.getAnimationId() == 0) {
+        if (packet.getAnimationId() == 0) {
             LivingEntity lv2 = (LivingEntity)lv;
             lv2.swingHand(Hand.MAIN_HAND);
-        } else if (arg.getAnimationId() == 3) {
+        } else if (packet.getAnimationId() == 3) {
             LivingEntity lv3 = (LivingEntity)lv;
             lv3.swingHand(Hand.OFF_HAND);
-        } else if (arg.getAnimationId() == 1) {
+        } else if (packet.getAnimationId() == 1) {
             lv.animateDamage();
-        } else if (arg.getAnimationId() == 2) {
+        } else if (packet.getAnimationId() == 2) {
             PlayerEntity lv4 = (PlayerEntity)lv;
             lv4.wakeUp(false, false);
-        } else if (arg.getAnimationId() == 4) {
+        } else if (packet.getAnimationId() == 4) {
             this.client.particleManager.addEmitter(lv, ParticleTypes.CRIT);
-        } else if (arg.getAnimationId() == 5) {
+        } else if (packet.getAnimationId() == 5) {
             this.client.particleManager.addEmitter(lv, ParticleTypes.ENCHANTED_HIT);
         }
     }
 
     @Override
-    public void onMobSpawn(MobSpawnS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        double d = arg.getX();
-        double e = arg.getY();
-        double f = arg.getZ();
-        float g = (float)(arg.getYaw() * 360) / 256.0f;
-        float h = (float)(arg.getPitch() * 360) / 256.0f;
-        LivingEntity lv = (LivingEntity)EntityType.createInstanceFromId(arg.getEntityTypeId(), this.client.world);
+    public void onMobSpawn(MobSpawnS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        double d = packet.getX();
+        double e = packet.getY();
+        double f = packet.getZ();
+        float g = (float)(packet.getYaw() * 360) / 256.0f;
+        float h = (float)(packet.getPitch() * 360) / 256.0f;
+        LivingEntity lv = (LivingEntity)EntityType.createInstanceFromId(packet.getEntityTypeId(), this.client.world);
         if (lv != null) {
             lv.updateTrackedPosition(d, e, f);
-            lv.bodyYaw = (float)(arg.getHeadYaw() * 360) / 256.0f;
-            lv.headYaw = (float)(arg.getHeadYaw() * 360) / 256.0f;
+            lv.bodyYaw = (float)(packet.getHeadYaw() * 360) / 256.0f;
+            lv.headYaw = (float)(packet.getHeadYaw() * 360) / 256.0f;
             if (lv instanceof EnderDragonEntity) {
                 EnderDragonPart[] lvs = ((EnderDragonEntity)lv).getBodyParts();
                 for (int i = 0; i < lvs.length; ++i) {
-                    lvs[i].setEntityId(i + arg.getId());
+                    lvs[i].setEntityId(i + packet.getId());
                 }
             }
-            lv.setEntityId(arg.getId());
-            lv.setUuid(arg.getUuid());
+            lv.setEntityId(packet.getId());
+            lv.setUuid(packet.getUuid());
             lv.updatePositionAndAngles(d, e, f, g, h);
-            lv.setVelocity((float)arg.getVelocityX() / 8000.0f, (float)arg.getVelocityY() / 8000.0f, (float)arg.getVelocityZ() / 8000.0f);
-            this.world.addEntity(arg.getId(), lv);
+            lv.setVelocity((float)packet.getVelocityX() / 8000.0f, (float)packet.getVelocityY() / 8000.0f, (float)packet.getVelocityZ() / 8000.0f);
+            this.world.addEntity(packet.getId(), lv);
             if (lv instanceof BeeEntity) {
                 PassiveBeeSoundInstance lv3;
                 boolean bl = ((BeeEntity)lv).hasAngerTime();
@@ -899,34 +899,34 @@ implements ClientPlayPacketListener {
                 this.client.getSoundManager().playNextTick(lv3);
             }
         } else {
-            LOGGER.warn("Skipping Entity with id {}", (Object)arg.getEntityTypeId());
+            LOGGER.warn("Skipping Entity with id {}", (Object)packet.getEntityTypeId());
         }
     }
 
     @Override
-    public void onWorldTimeUpdate(WorldTimeUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.world.method_29089(arg.getTime());
-        this.client.world.setTimeOfDay(arg.getTimeOfDay());
+    public void onWorldTimeUpdate(WorldTimeUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.world.method_29089(packet.getTime());
+        this.client.world.setTimeOfDay(packet.getTimeOfDay());
     }
 
     @Override
-    public void onPlayerSpawnPosition(PlayerSpawnPositionS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.world.setSpawnPos(arg.getPos());
+    public void onPlayerSpawnPosition(PlayerSpawnPositionS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.world.setSpawnPos(packet.getPos());
     }
 
     @Override
-    public void onEntityPassengersSet(EntityPassengersSetS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getId());
+    public void onEntityPassengersSet(EntityPassengersSetS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getId());
         if (lv == null) {
             LOGGER.warn("Received passengers for unknown entity");
             return;
         }
         boolean bl = lv.hasPassengerDeep(this.client.player);
         lv.removeAllPassengers();
-        for (int i : arg.getPassengerIds()) {
+        for (int i : packet.getPassengerIds()) {
             Entity lv2 = this.world.getEntityById(i);
             if (lv2 == null) continue;
             lv2.startRiding(lv, true);
@@ -936,17 +936,17 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onEntityAttach(EntityAttachS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getAttachedEntityId());
+    public void onEntityAttach(EntityAttachS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getAttachedEntityId());
         if (lv instanceof MobEntity) {
-            ((MobEntity)lv).setHoldingEntityId(arg.getHoldingEntityId());
+            ((MobEntity)lv).setHoldingEntityId(packet.getHoldingEntityId());
         }
     }
 
-    private static ItemStack getActiveTotemOfUndying(PlayerEntity arg) {
+    private static ItemStack getActiveTotemOfUndying(PlayerEntity player) {
         for (Hand lv : Hand.values()) {
-            ItemStack lv2 = arg.getStackInHand(lv);
+            ItemStack lv2 = player.getStackInHand(lv);
             if (lv2.getItem() != Items.TOTEM_OF_UNDYING) continue;
             return lv2;
         }
@@ -954,13 +954,13 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onEntityStatus(EntityStatusS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = arg.getEntity(this.world);
+    public void onEntityStatus(EntityStatusS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = packet.getEntity(this.world);
         if (lv != null) {
-            if (arg.getStatus() == 21) {
+            if (packet.getStatus() == 21) {
                 this.client.getSoundManager().play(new GuardianAttackSoundInstance((GuardianEntity)lv));
-            } else if (arg.getStatus() == 35) {
+            } else if (packet.getStatus() == 35) {
                 int i = 40;
                 this.client.particleManager.addEmitter(lv, ParticleTypes.TOTEM_OF_UNDYING, 30);
                 this.world.playSound(lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ITEM_TOTEM_USE, lv.getSoundCategory(), 1.0f, 1.0f, false);
@@ -968,30 +968,30 @@ implements ClientPlayPacketListener {
                     this.client.gameRenderer.showFloatingItem(ClientPlayNetworkHandler.getActiveTotemOfUndying(this.client.player));
                 }
             } else {
-                lv.handleStatus(arg.getStatus());
+                lv.handleStatus(packet.getStatus());
             }
         }
     }
 
     @Override
-    public void onHealthUpdate(HealthUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.player.updateHealth(arg.getHealth());
-        this.client.player.getHungerManager().setFoodLevel(arg.getFood());
-        this.client.player.getHungerManager().setSaturationLevelClient(arg.getSaturation());
+    public void onHealthUpdate(HealthUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.player.updateHealth(packet.getHealth());
+        this.client.player.getHungerManager().setFoodLevel(packet.getFood());
+        this.client.player.getHungerManager().setSaturationLevelClient(packet.getSaturation());
     }
 
     @Override
-    public void onExperienceBarUpdate(ExperienceBarUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.player.setExperience(arg.getBarProgress(), arg.getExperienceLevel(), arg.getExperience());
+    public void onExperienceBarUpdate(ExperienceBarUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.player.setExperience(packet.getBarProgress(), packet.getExperienceLevel(), packet.getExperience());
     }
 
     @Override
-    public void onPlayerRespawn(PlayerRespawnS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        RegistryKey<DimensionType> lv = arg.method_29445();
-        RegistryKey<World> lv2 = arg.getDimension();
+    public void onPlayerRespawn(PlayerRespawnS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        RegistryKey<DimensionType> lv = packet.method_29445();
+        RegistryKey<World> lv2 = packet.getDimension();
         DimensionType lv3 = this.registryTracker.method_30518().get(lv);
         ClientPlayerEntity lv4 = this.client.player;
         int i = lv4.getEntityId();
@@ -999,10 +999,10 @@ implements ClientPlayPacketListener {
         if (lv2 != lv4.world.getRegistryKey()) {
             ClientWorld.Properties lv6;
             Scoreboard lv5 = this.world.getScoreboard();
-            boolean bl = arg.isDebugWorld();
-            boolean bl2 = arg.isFlatWorld();
+            boolean bl = packet.isDebugWorld();
+            boolean bl2 = packet.isFlatWorld();
             this.worldProperties = lv6 = new ClientWorld.Properties(this.worldProperties.getDifficulty(), this.worldProperties.isHardcore(), bl2);
-            this.world = new ClientWorld(this, lv6, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, arg.getSha256Seed());
+            this.world = new ClientWorld(this, lv6, lv2, lv, lv3, this.chunkLoadDistance, this.client::getProfiler, this.client.worldRenderer, bl, packet.getSha256Seed());
             this.world.setScoreboard(lv5);
             this.client.joinWorld(this.world);
             this.client.openScreen(new DownloadingTerrainScreen());
@@ -1018,7 +1018,7 @@ implements ClientPlayPacketListener {
         }
         this.client.cameraEntity = lv7;
         lv7.getDataTracker().writeUpdatedEntries(lv4.getDataTracker().getAllEntries());
-        if (arg.shouldKeepPlayerAttributes()) {
+        if (packet.shouldKeepPlayerAttributes()) {
             lv7.getAttributes().setFrom(lv4.getAttributes());
         }
         lv7.afterSpawn();
@@ -1032,50 +1032,50 @@ implements ClientPlayPacketListener {
         if (this.client.currentScreen instanceof DeathScreen) {
             this.client.openScreen(null);
         }
-        this.client.interactionManager.setGameMode(arg.getGameMode());
-        this.client.interactionManager.method_30108(arg.method_30117());
+        this.client.interactionManager.setGameMode(packet.getGameMode());
+        this.client.interactionManager.method_30108(packet.method_30117());
     }
 
     @Override
-    public void onExplosion(ExplosionS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Explosion lv = new Explosion(this.client.world, null, arg.getX(), arg.getY(), arg.getZ(), arg.getRadius(), arg.getAffectedBlocks());
+    public void onExplosion(ExplosionS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Explosion lv = new Explosion(this.client.world, null, packet.getX(), packet.getY(), packet.getZ(), packet.getRadius(), packet.getAffectedBlocks());
         lv.affectWorld(true);
-        this.client.player.setVelocity(this.client.player.getVelocity().add(arg.getPlayerVelocityX(), arg.getPlayerVelocityY(), arg.getPlayerVelocityZ()));
+        this.client.player.setVelocity(this.client.player.getVelocity().add(packet.getPlayerVelocityX(), packet.getPlayerVelocityY(), packet.getPlayerVelocityZ()));
     }
 
     @Override
-    public void onOpenHorseScreen(OpenHorseScreenS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getHorseId());
+    public void onOpenHorseScreen(OpenHorseScreenS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getHorseId());
         if (lv instanceof HorseBaseEntity) {
             ClientPlayerEntity lv2 = this.client.player;
             HorseBaseEntity lv3 = (HorseBaseEntity)lv;
-            SimpleInventory lv4 = new SimpleInventory(arg.getSlotCount());
-            HorseScreenHandler lv5 = new HorseScreenHandler(arg.getSyncId(), lv2.inventory, lv4, lv3);
+            SimpleInventory lv4 = new SimpleInventory(packet.getSlotCount());
+            HorseScreenHandler lv5 = new HorseScreenHandler(packet.getSyncId(), lv2.inventory, lv4, lv3);
             lv2.currentScreenHandler = lv5;
             this.client.openScreen(new HorseScreen(lv5, lv2.inventory, lv3));
         }
     }
 
     @Override
-    public void onOpenScreen(OpenScreenS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        HandledScreens.open(arg.getScreenHandlerType(), this.client, arg.getSyncId(), arg.getName());
+    public void onOpenScreen(OpenScreenS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        HandledScreens.open(packet.getScreenHandlerType(), this.client, packet.getSyncId(), packet.getName());
     }
 
     @Override
-    public void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onScreenHandlerSlotUpdate(ScreenHandlerSlotUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        ItemStack lv2 = arg.getItemStack();
-        int i = arg.getSlot();
+        ItemStack lv2 = packet.getItemStack();
+        int i = packet.getSlot();
         this.client.getTutorialManager().onSlotUpdate(lv2);
-        if (arg.getSyncId() == -1) {
+        if (packet.getSyncId() == -1) {
             if (!(this.client.currentScreen instanceof CreativeInventoryScreen)) {
                 lv.inventory.setCursorStack(lv2);
             }
-        } else if (arg.getSyncId() == -2) {
+        } else if (packet.getSyncId() == -2) {
             lv.inventory.setStack(i, lv2);
         } else {
             boolean bl = false;
@@ -1083,65 +1083,65 @@ implements ClientPlayPacketListener {
                 CreativeInventoryScreen lv3 = (CreativeInventoryScreen)this.client.currentScreen;
                 boolean bl2 = bl = lv3.getSelectedTab() != ItemGroup.INVENTORY.getIndex();
             }
-            if (arg.getSyncId() == 0 && arg.getSlot() >= 36 && i < 45) {
+            if (packet.getSyncId() == 0 && packet.getSlot() >= 36 && i < 45) {
                 ItemStack lv4;
                 if (!lv2.isEmpty() && ((lv4 = lv.playerScreenHandler.getSlot(i).getStack()).isEmpty() || lv4.getCount() < lv2.getCount())) {
                     lv2.setCooldown(5);
                 }
                 lv.playerScreenHandler.setStackInSlot(i, lv2);
-            } else if (!(arg.getSyncId() != lv.currentScreenHandler.syncId || arg.getSyncId() == 0 && bl)) {
+            } else if (!(packet.getSyncId() != lv.currentScreenHandler.syncId || packet.getSyncId() == 0 && bl)) {
                 lv.currentScreenHandler.setStackInSlot(i, lv2);
             }
         }
     }
 
     @Override
-    public void onGuiActionConfirm(ConfirmGuiActionS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onGuiActionConfirm(ConfirmGuiActionS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ScreenHandler lv = null;
         ClientPlayerEntity lv2 = this.client.player;
-        if (arg.getId() == 0) {
+        if (packet.getId() == 0) {
             lv = lv2.playerScreenHandler;
-        } else if (arg.getId() == lv2.currentScreenHandler.syncId) {
+        } else if (packet.getId() == lv2.currentScreenHandler.syncId) {
             lv = lv2.currentScreenHandler;
         }
-        if (lv != null && !arg.wasAccepted()) {
-            this.sendPacket(new ConfirmGuiActionC2SPacket(arg.getId(), arg.getActionId(), true));
+        if (lv != null && !packet.wasAccepted()) {
+            this.sendPacket(new ConfirmGuiActionC2SPacket(packet.getId(), packet.getActionId(), true));
         }
     }
 
     @Override
-    public void onInventory(InventoryS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onInventory(InventoryS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        if (arg.getSyncId() == 0) {
-            lv.playerScreenHandler.updateSlotStacks(arg.getContents());
-        } else if (arg.getSyncId() == lv.currentScreenHandler.syncId) {
-            lv.currentScreenHandler.updateSlotStacks(arg.getContents());
+        if (packet.getSyncId() == 0) {
+            lv.playerScreenHandler.updateSlotStacks(packet.getContents());
+        } else if (packet.getSyncId() == lv.currentScreenHandler.syncId) {
+            lv.currentScreenHandler.updateSlotStacks(packet.getContents());
         }
     }
 
     @Override
-    public void onSignEditorOpen(SignEditorOpenS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        BlockEntity lv = this.world.getBlockEntity(arg.getPos());
+    public void onSignEditorOpen(SignEditorOpenS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        BlockEntity lv = this.world.getBlockEntity(packet.getPos());
         if (!(lv instanceof SignBlockEntity)) {
             lv = new SignBlockEntity();
-            lv.setLocation(this.world, arg.getPos());
+            lv.setLocation(this.world, packet.getPos());
         }
         this.client.player.openEditSignScreen((SignBlockEntity)lv);
     }
 
     @Override
-    public void onBlockEntityUpdate(BlockEntityUpdateS2CPacket arg) {
+    public void onBlockEntityUpdate(BlockEntityUpdateS2CPacket packet) {
         boolean bl;
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        BlockPos lv = arg.getPos();
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        BlockPos lv = packet.getPos();
         BlockEntity lv2 = this.client.world.getBlockEntity(lv);
-        int i = arg.getBlockEntityType();
+        int i = packet.getBlockEntityType();
         boolean bl2 = bl = i == 2 && lv2 instanceof CommandBlockBlockEntity;
         if (i == 1 && lv2 instanceof MobSpawnerBlockEntity || bl || i == 3 && lv2 instanceof BeaconBlockEntity || i == 4 && lv2 instanceof SkullBlockEntity || i == 6 && lv2 instanceof BannerBlockEntity || i == 7 && lv2 instanceof StructureBlockBlockEntity || i == 8 && lv2 instanceof EndGatewayBlockEntity || i == 9 && lv2 instanceof SignBlockEntity || i == 11 && lv2 instanceof BedBlockEntity || i == 5 && lv2 instanceof ConduitBlockEntity || i == 12 && lv2 instanceof JigsawBlockEntity || i == 13 && lv2 instanceof CampfireBlockEntity || i == 14 && lv2 instanceof BeehiveBlockEntity) {
-            lv2.fromTag(this.client.world.getBlockState(lv), arg.getCompoundTag());
+            lv2.fromTag(this.client.world.getBlockState(lv), packet.getCompoundTag());
         }
         if (bl && this.client.currentScreen instanceof CommandBlockScreen) {
             ((CommandBlockScreen)this.client.currentScreen).updateCommandBlock();
@@ -1149,47 +1149,47 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onScreenHandlerPropertyUpdate(ScreenHandlerPropertyUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onScreenHandlerPropertyUpdate(ScreenHandlerPropertyUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        if (lv.currentScreenHandler != null && lv.currentScreenHandler.syncId == arg.getSyncId()) {
-            lv.currentScreenHandler.setProperty(arg.getPropertyId(), arg.getValue());
+        if (lv.currentScreenHandler != null && lv.currentScreenHandler.syncId == packet.getSyncId()) {
+            lv.currentScreenHandler.setProperty(packet.getPropertyId(), packet.getValue());
         }
     }
 
     @Override
-    public void onEquipmentUpdate(EntityEquipmentUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getId());
+    public void onEquipmentUpdate(EntityEquipmentUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getId());
         if (lv != null) {
-            arg.method_30145().forEach(pair -> lv.equipStack((EquipmentSlot)((Object)((Object)pair.getFirst())), (ItemStack)pair.getSecond()));
+            packet.method_30145().forEach(pair -> lv.equipStack((EquipmentSlot)((Object)((Object)pair.getFirst())), (ItemStack)pair.getSecond()));
         }
     }
 
     @Override
-    public void onCloseScreen(CloseScreenS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onCloseScreen(CloseScreenS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         this.client.player.closeScreen();
     }
 
     @Override
-    public void onBlockEvent(BlockEventS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.world.addSyncedBlockEvent(arg.getPos(), arg.getBlock(), arg.getType(), arg.getData());
+    public void onBlockEvent(BlockEventS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.world.addSyncedBlockEvent(packet.getPos(), packet.getBlock(), packet.getType(), packet.getData());
     }
 
     @Override
-    public void onBlockDestroyProgress(BlockBreakingProgressS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.world.setBlockBreakingInfo(arg.getEntityId(), arg.getPos(), arg.getProgress());
+    public void onBlockDestroyProgress(BlockBreakingProgressS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.world.setBlockBreakingInfo(packet.getEntityId(), packet.getPos(), packet.getProgress());
     }
 
     @Override
-    public void onGameStateChange(GameStateChangeS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onGameStateChange(GameStateChangeS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        GameStateChangeS2CPacket.Reason lv2 = arg.getReason();
-        float f = arg.getValue();
+        GameStateChangeS2CPacket.Reason lv2 = packet.getReason();
+        float f = packet.getValue();
         int i = MathHelper.floor(f + 0.5f);
         if (lv2 == GameStateChangeS2CPacket.NO_RESPAWN_BLOCK) {
             ((PlayerEntity)lv).sendMessage(new TranslatableText("block.minecraft.spawn.not_valid"), false);
@@ -1240,10 +1240,10 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onMapUpdate(MapUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onMapUpdate(MapUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         MapRenderer lv = this.client.gameRenderer.getMapRenderer();
-        String string = FilledMapItem.getMapName(arg.getId());
+        String string = FilledMapItem.getMapName(packet.getId());
         MapState lv2 = this.client.world.getMapState(string);
         if (lv2 == null) {
             MapState lv3;
@@ -1253,30 +1253,30 @@ implements ClientPlayPacketListener {
             }
             this.client.world.putMapState(lv2);
         }
-        arg.apply(lv2);
+        packet.apply(lv2);
         lv.updateTexture(lv2);
     }
 
     @Override
-    public void onWorldEvent(WorldEventS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        if (arg.isGlobal()) {
-            this.client.world.syncGlobalEvent(arg.getEventId(), arg.getPos(), arg.getData());
+    public void onWorldEvent(WorldEventS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        if (packet.isGlobal()) {
+            this.client.world.syncGlobalEvent(packet.getEventId(), packet.getPos(), packet.getData());
         } else {
-            this.client.world.syncWorldEvent(arg.getEventId(), arg.getPos(), arg.getData());
+            this.client.world.syncWorldEvent(packet.getEventId(), packet.getPos(), packet.getData());
         }
     }
 
     @Override
-    public void onAdvancements(AdvancementUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.advancementHandler.onAdvancements(arg);
+    public void onAdvancements(AdvancementUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.advancementHandler.onAdvancements(packet);
     }
 
     @Override
-    public void onSelectAdvancementTab(SelectAdvancementTabS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Identifier lv = arg.getTabId();
+    public void onSelectAdvancementTab(SelectAdvancementTabS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Identifier lv = packet.getTabId();
         if (lv == null) {
             this.advancementHandler.selectTab(null, false);
         } else {
@@ -1286,27 +1286,27 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onCommandTree(CommandTreeS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.commandDispatcher = new CommandDispatcher(arg.getCommandTree());
+    public void onCommandTree(CommandTreeS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.commandDispatcher = new CommandDispatcher(packet.getCommandTree());
     }
 
     @Override
-    public void onStopSound(StopSoundS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.getSoundManager().stopSounds(arg.getSoundId(), arg.getCategory());
+    public void onStopSound(StopSoundS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.getSoundManager().stopSounds(packet.getSoundId(), packet.getCategory());
     }
 
     @Override
-    public void onCommandSuggestions(CommandSuggestionsS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.commandSource.onCommandSuggestions(arg.getCompletionId(), arg.getSuggestions());
+    public void onCommandSuggestions(CommandSuggestionsS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.commandSource.onCommandSuggestions(packet.getCompletionId(), packet.getSuggestions());
     }
 
     @Override
-    public void onSynchronizeRecipes(SynchronizeRecipesS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.recipeManager.setRecipes(arg.getRecipes());
+    public void onSynchronizeRecipes(SynchronizeRecipesS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.recipeManager.setRecipes(packet.getRecipes());
         SearchableContainer<RecipeResultCollection> lv = this.client.getSearchableContainer(SearchManager.RECIPE_OUTPUT);
         lv.clear();
         ClientRecipeBook lv2 = this.client.player.getRecipeBook();
@@ -1316,26 +1316,26 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onLookAt(LookAtS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Vec3d lv = arg.getTargetPosition(this.world);
+    public void onLookAt(LookAtS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Vec3d lv = packet.getTargetPosition(this.world);
         if (lv != null) {
-            this.client.player.lookAt(arg.getSelfAnchor(), lv);
+            this.client.player.lookAt(packet.getSelfAnchor(), lv);
         }
     }
 
     @Override
-    public void onTagQuery(TagQueryResponseS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        if (!this.dataQueryHandler.handleQueryResponse(arg.getTransactionId(), arg.getTag())) {
-            LOGGER.debug("Got unhandled response to tag query {}", (Object)arg.getTransactionId());
+    public void onTagQuery(TagQueryResponseS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        if (!this.dataQueryHandler.handleQueryResponse(packet.getTransactionId(), packet.getTag())) {
+            LOGGER.debug("Got unhandled response to tag query {}", (Object)packet.getTransactionId());
         }
     }
 
     @Override
-    public void onStatistics(StatisticsS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        for (Map.Entry<Stat<?>, Integer> entry : arg.getStatMap().entrySet()) {
+    public void onStatistics(StatisticsS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        for (Map.Entry<Stat<?>, Integer> entry : packet.getStatMap().entrySet()) {
             Stat<?> lv = entry.getKey();
             int i = entry.getValue();
             this.client.player.getStatHandler().setStat(this.client.player, lv, i);
@@ -1346,29 +1346,29 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onUnlockRecipes(UnlockRecipesS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onUnlockRecipes(UnlockRecipesS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientRecipeBook lv = this.client.player.getRecipeBook();
-        lv.setOptions(arg.isFurnaceFilteringCraftable());
-        UnlockRecipesS2CPacket.Action lv2 = arg.getAction();
+        lv.setOptions(packet.isFurnaceFilteringCraftable());
+        UnlockRecipesS2CPacket.Action lv2 = packet.getAction();
         switch (lv2) {
             case REMOVE: {
-                for (Identifier lv3 : arg.getRecipeIdsToChange()) {
+                for (Identifier lv3 : packet.getRecipeIdsToChange()) {
                     this.recipeManager.get(lv3).ifPresent(lv::remove);
                 }
                 break;
             }
             case INIT: {
-                for (Identifier lv4 : arg.getRecipeIdsToChange()) {
+                for (Identifier lv4 : packet.getRecipeIdsToChange()) {
                     this.recipeManager.get(lv4).ifPresent(lv::add);
                 }
-                for (Identifier lv5 : arg.getRecipeIdsToInit()) {
+                for (Identifier lv5 : packet.getRecipeIdsToInit()) {
                     this.recipeManager.get(lv5).ifPresent(lv::display);
                 }
                 break;
             }
             case ADD: {
-                for (Identifier lv6 : arg.getRecipeIdsToChange()) {
+                for (Identifier lv6 : packet.getRecipeIdsToChange()) {
                     this.recipeManager.get(lv6).ifPresent(arg2 -> {
                         lv.add((Recipe<?>)arg2);
                         lv.display((Recipe<?>)arg2);
@@ -1385,25 +1385,25 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onEntityPotionEffect(EntityStatusEffectS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getEntityId());
+    public void onEntityPotionEffect(EntityStatusEffectS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getEntityId());
         if (!(lv instanceof LivingEntity)) {
             return;
         }
-        StatusEffect lv2 = StatusEffect.byRawId(arg.getEffectId());
+        StatusEffect lv2 = StatusEffect.byRawId(packet.getEffectId());
         if (lv2 == null) {
             return;
         }
-        StatusEffectInstance lv3 = new StatusEffectInstance(lv2, arg.getDuration(), arg.getAmplifier(), arg.isAmbient(), arg.shouldShowParticles(), arg.shouldShowIcon());
-        lv3.setPermanent(arg.isPermanent());
+        StatusEffectInstance lv3 = new StatusEffectInstance(lv2, packet.getDuration(), packet.getAmplifier(), packet.isAmbient(), packet.shouldShowParticles(), packet.shouldShowIcon());
+        lv3.setPermanent(packet.isPermanent());
         ((LivingEntity)lv).applyStatusEffect(lv3);
     }
 
     @Override
-    public void onSynchronizeTags(SynchronizeTagsS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        TagManager lv = arg.getTagManager();
+    public void onSynchronizeTags(SynchronizeTagsS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        TagManager lv = packet.getTagManager();
         Multimap<Identifier, Identifier> multimap = RequiredTagListRegistry.getMissingTags(lv);
         if (!multimap.isEmpty()) {
             LOGGER.warn("Incomplete server tags, disconnecting. Missing: {}", multimap);
@@ -1418,12 +1418,12 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onCombatEvent(CombatEventS2CPacket arg) {
+    public void onCombatEvent(CombatEventS2CPacket packet) {
         Entity lv;
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        if (arg.type == CombatEventS2CPacket.Type.ENTITY_DIED && (lv = this.world.getEntityById(arg.entityId)) == this.client.player) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        if (packet.type == CombatEventS2CPacket.Type.ENTITY_DIED && (lv = this.world.getEntityById(packet.entityId)) == this.client.player) {
             if (this.client.player.showsDeathScreen()) {
-                this.client.openScreen(new DeathScreen(arg.deathMessage, this.world.getLevelProperties().isHardcore()));
+                this.client.openScreen(new DeathScreen(packet.deathMessage, this.world.getLevelProperties().isHardcore()));
             } else {
                 this.client.player.requestRespawn();
             }
@@ -1431,34 +1431,34 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onDifficulty(DifficultyS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.worldProperties.setDifficulty(arg.getDifficulty());
-        this.worldProperties.setDifficultyLocked(arg.isDifficultyLocked());
+    public void onDifficulty(DifficultyS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.worldProperties.setDifficulty(packet.getDifficulty());
+        this.worldProperties.setDifficultyLocked(packet.isDifficultyLocked());
     }
 
     @Override
-    public void onSetCameraEntity(SetCameraEntityS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = arg.getEntity(this.world);
+    public void onSetCameraEntity(SetCameraEntityS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = packet.getEntity(this.world);
         if (lv != null) {
             this.client.setCameraEntity(lv);
         }
     }
 
     @Override
-    public void onWorldBorder(WorldBorderS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        arg.apply(this.world.getWorldBorder());
+    public void onWorldBorder(WorldBorderS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        packet.apply(this.world.getWorldBorder());
     }
 
     @Override
-    public void onTitle(TitleS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        TitleS2CPacket.Action lv = arg.getAction();
+    public void onTitle(TitleS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        TitleS2CPacket.Action lv = packet.getAction();
         Text lv2 = null;
         Text lv3 = null;
-        Text lv4 = arg.getText() != null ? arg.getText() : LiteralText.EMPTY;
+        Text lv4 = packet.getText() != null ? packet.getText() : LiteralText.EMPTY;
         switch (lv) {
             case TITLE: {
                 lv2 = lv4;
@@ -1478,39 +1478,39 @@ implements ClientPlayPacketListener {
                 return;
             }
         }
-        this.client.inGameHud.setTitles(lv2, lv3, arg.getFadeInTicks(), arg.getStayTicks(), arg.getFadeOutTicks());
+        this.client.inGameHud.setTitles(lv2, lv3, packet.getFadeInTicks(), packet.getStayTicks(), packet.getFadeOutTicks());
     }
 
     @Override
-    public void onPlayerListHeader(PlayerListHeaderS2CPacket arg) {
-        this.client.inGameHud.getPlayerListWidget().setHeader(arg.getHeader().getString().isEmpty() ? null : arg.getHeader());
-        this.client.inGameHud.getPlayerListWidget().setFooter(arg.getFooter().getString().isEmpty() ? null : arg.getFooter());
+    public void onPlayerListHeader(PlayerListHeaderS2CPacket packet) {
+        this.client.inGameHud.getPlayerListWidget().setHeader(packet.getHeader().getString().isEmpty() ? null : packet.getHeader());
+        this.client.inGameHud.getPlayerListWidget().setFooter(packet.getFooter().getString().isEmpty() ? null : packet.getFooter());
     }
 
     @Override
-    public void onRemoveEntityEffect(RemoveEntityStatusEffectS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = arg.getEntity(this.world);
+    public void onRemoveEntityEffect(RemoveEntityStatusEffectS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = packet.getEntity(this.world);
         if (lv instanceof LivingEntity) {
-            ((LivingEntity)lv).removeStatusEffectInternal(arg.getEffectType());
+            ((LivingEntity)lv).removeStatusEffectInternal(packet.getEffectType());
         }
     }
 
     @Override
-    public void onPlayerList(PlayerListS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        for (PlayerListS2CPacket.Entry lv : arg.getEntries()) {
-            if (arg.getAction() == PlayerListS2CPacket.Action.REMOVE_PLAYER) {
+    public void onPlayerList(PlayerListS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        for (PlayerListS2CPacket.Entry lv : packet.getEntries()) {
+            if (packet.getAction() == PlayerListS2CPacket.Action.REMOVE_PLAYER) {
                 this.playerListEntries.remove(lv.getProfile().getId());
                 continue;
             }
             PlayerListEntry lv2 = this.playerListEntries.get(lv.getProfile().getId());
-            if (arg.getAction() == PlayerListS2CPacket.Action.ADD_PLAYER) {
+            if (packet.getAction() == PlayerListS2CPacket.Action.ADD_PLAYER) {
                 lv2 = new PlayerListEntry(lv);
                 this.playerListEntries.put(lv2.getProfile().getId(), lv2);
             }
             if (lv2 == null) continue;
-            switch (arg.getAction()) {
+            switch (packet.getAction()) {
                 case ADD_PLAYER: {
                     lv2.setGameMode(lv.getGameMode());
                     lv2.setLatency(lv.getLatency());
@@ -1533,48 +1533,48 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onKeepAlive(KeepAliveS2CPacket arg) {
-        this.sendPacket(new KeepAliveC2SPacket(arg.getId()));
+    public void onKeepAlive(KeepAliveS2CPacket packet) {
+        this.sendPacket(new KeepAliveC2SPacket(packet.getId()));
     }
 
     @Override
-    public void onPlayerAbilities(PlayerAbilitiesS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onPlayerAbilities(PlayerAbilitiesS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ClientPlayerEntity lv = this.client.player;
-        lv.abilities.flying = arg.isFlying();
-        lv.abilities.creativeMode = arg.isCreativeMode();
-        lv.abilities.invulnerable = arg.isInvulnerable();
-        lv.abilities.allowFlying = arg.allowFlying();
-        lv.abilities.setFlySpeed(arg.getFlySpeed());
-        lv.abilities.setWalkSpeed(arg.getWalkSpeed());
+        lv.abilities.flying = packet.isFlying();
+        lv.abilities.creativeMode = packet.isCreativeMode();
+        lv.abilities.invulnerable = packet.isInvulnerable();
+        lv.abilities.allowFlying = packet.allowFlying();
+        lv.abilities.setFlySpeed(packet.getFlySpeed());
+        lv.abilities.setWalkSpeed(packet.getWalkSpeed());
     }
 
     @Override
-    public void onPlaySound(PlaySoundS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.world.playSound(this.client.player, arg.getX(), arg.getY(), arg.getZ(), arg.getSound(), arg.getCategory(), arg.getVolume(), arg.getPitch());
+    public void onPlaySound(PlaySoundS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.world.playSound(this.client.player, packet.getX(), packet.getY(), packet.getZ(), packet.getSound(), packet.getCategory(), packet.getVolume(), packet.getPitch());
     }
 
     @Override
-    public void onPlaySoundFromEntity(PlaySoundFromEntityS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getEntityId());
+    public void onPlaySoundFromEntity(PlaySoundFromEntityS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getEntityId());
         if (lv == null) {
             return;
         }
-        this.client.world.playSoundFromEntity(this.client.player, lv, arg.getSound(), arg.getCategory(), arg.getVolume(), arg.getPitch());
+        this.client.world.playSoundFromEntity(this.client.player, lv, packet.getSound(), packet.getCategory(), packet.getVolume(), packet.getPitch());
     }
 
     @Override
-    public void onPlaySoundId(PlaySoundIdS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.getSoundManager().play(new PositionedSoundInstance(arg.getSoundId(), arg.getCategory(), arg.getVolume(), arg.getPitch(), false, 0, SoundInstance.AttenuationType.LINEAR, arg.getX(), arg.getY(), arg.getZ(), false));
+    public void onPlaySoundId(PlaySoundIdS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.getSoundManager().play(new PositionedSoundInstance(packet.getSoundId(), packet.getCategory(), packet.getVolume(), packet.getPitch(), false, 0, SoundInstance.AttenuationType.LINEAR, packet.getX(), packet.getY(), packet.getZ(), false));
     }
 
     @Override
-    public void onResourcePackSend(ResourcePackSendS2CPacket arg) {
-        String string = arg.getURL();
-        String string2 = arg.getSHA1();
+    public void onResourcePackSend(ResourcePackSendS2CPacket packet) {
+        String string = packet.getURL();
+        String string2 = packet.getSHA1();
         if (!this.validateResourcePackUrl(string)) {
             return;
         }
@@ -1624,16 +1624,16 @@ implements ClientPlayPacketListener {
         }
     }
 
-    private boolean validateResourcePackUrl(String string) {
+    private boolean validateResourcePackUrl(String url) {
         try {
-            URI uRI = new URI(string);
+            URI uRI = new URI(url);
             String string2 = uRI.getScheme();
             boolean bl = "level".equals(string2);
             if (!("http".equals(string2) || "https".equals(string2) || bl)) {
-                throw new URISyntaxException(string, "Wrong protocol");
+                throw new URISyntaxException(url, "Wrong protocol");
             }
-            if (bl && (string.contains("..") || !string.endsWith("/resources.zip"))) {
-                throw new URISyntaxException(string, "Invalid levelstorage resourcepack path");
+            if (bl && (url.contains("..") || !url.endsWith("/resources.zip"))) {
+                throw new URISyntaxException(url, "Invalid levelstorage resourcepack path");
             }
         }
         catch (URISyntaxException uRISyntaxException) {
@@ -1643,47 +1643,47 @@ implements ClientPlayPacketListener {
         return true;
     }
 
-    private void feedbackAfterDownload(CompletableFuture<?> completableFuture) {
-        ((CompletableFuture)completableFuture.thenRun(() -> this.sendResourcePackStatus(ResourcePackStatusC2SPacket.Status.SUCCESSFULLY_LOADED))).exceptionally(throwable -> {
+    private void feedbackAfterDownload(CompletableFuture<?> downloadFuture) {
+        ((CompletableFuture)downloadFuture.thenRun(() -> this.sendResourcePackStatus(ResourcePackStatusC2SPacket.Status.SUCCESSFULLY_LOADED))).exceptionally(throwable -> {
             this.sendResourcePackStatus(ResourcePackStatusC2SPacket.Status.FAILED_DOWNLOAD);
             return null;
         });
     }
 
-    private void sendResourcePackStatus(ResourcePackStatusC2SPacket.Status arg) {
-        this.connection.send(new ResourcePackStatusC2SPacket(arg));
+    private void sendResourcePackStatus(ResourcePackStatusC2SPacket.Status packStatus) {
+        this.connection.send(new ResourcePackStatusC2SPacket(packStatus));
     }
 
     @Override
-    public void onBossBar(BossBarS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.inGameHud.getBossBarHud().handlePacket(arg);
+    public void onBossBar(BossBarS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.inGameHud.getBossBarHud().handlePacket(packet);
     }
 
     @Override
-    public void onCooldownUpdate(CooldownUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        if (arg.getCooldown() == 0) {
-            this.client.player.getItemCooldownManager().remove(arg.getItem());
+    public void onCooldownUpdate(CooldownUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        if (packet.getCooldown() == 0) {
+            this.client.player.getItemCooldownManager().remove(packet.getItem());
         } else {
-            this.client.player.getItemCooldownManager().set(arg.getItem(), arg.getCooldown());
+            this.client.player.getItemCooldownManager().set(packet.getItem(), packet.getCooldown());
         }
     }
 
     @Override
-    public void onVehicleMove(VehicleMoveS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onVehicleMove(VehicleMoveS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         Entity lv = this.client.player.getRootVehicle();
         if (lv != this.client.player && lv.isLogicalSideForUpdatingMovement()) {
-            lv.updatePositionAndAngles(arg.getX(), arg.getY(), arg.getZ(), arg.getYaw(), arg.getPitch());
+            lv.updatePositionAndAngles(packet.getX(), packet.getY(), packet.getZ(), packet.getYaw(), packet.getPitch());
             this.connection.send(new VehicleMoveC2SPacket(lv));
         }
     }
 
     @Override
-    public void onOpenWrittenBook(OpenWrittenBookS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        ItemStack lv = this.client.player.getStackInHand(arg.getHand());
+    public void onOpenWrittenBook(OpenWrittenBookS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        ItemStack lv = this.client.player.getStackInHand(packet.getHand());
         if (lv.getItem() == Items.WRITTEN_BOOK) {
             this.client.openScreen(new BookScreen(new BookScreen.WrittenBookContents(lv)));
         }
@@ -1693,12 +1693,12 @@ implements ClientPlayPacketListener {
      * WARNING - Removed try catching itself - possible behaviour change.
      */
     @Override
-    public void onCustomPayload(CustomPayloadS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Identifier lv = arg.getChannel();
+    public void onCustomPayload(CustomPayloadS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Identifier lv = packet.getChannel();
         PacketByteBuf lv2 = null;
         try {
-            lv2 = arg.getData();
+            lv2 = packet.getData();
             if (CustomPayloadS2CPacket.BRAND.equals(lv)) {
                 this.client.player.setServerBrand(lv2.readString(32767));
             } else if (CustomPayloadS2CPacket.DEBUG_PATH.equals(lv)) {
@@ -1890,117 +1890,117 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onScoreboardObjectiveUpdate(ScoreboardObjectiveUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onScoreboardObjectiveUpdate(ScoreboardObjectiveUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         Scoreboard lv = this.world.getScoreboard();
-        String string = arg.getName();
-        if (arg.getMode() == 0) {
-            lv.addObjective(string, ScoreboardCriterion.DUMMY, arg.getDisplayName(), arg.getType());
+        String string = packet.getName();
+        if (packet.getMode() == 0) {
+            lv.addObjective(string, ScoreboardCriterion.DUMMY, packet.getDisplayName(), packet.getType());
         } else if (lv.containsObjective(string)) {
             ScoreboardObjective lv2 = lv.getNullableObjective(string);
-            if (arg.getMode() == 1) {
+            if (packet.getMode() == 1) {
                 lv.removeObjective(lv2);
-            } else if (arg.getMode() == 2) {
-                lv2.setRenderType(arg.getType());
-                lv2.setDisplayName(arg.getDisplayName());
+            } else if (packet.getMode() == 2) {
+                lv2.setRenderType(packet.getType());
+                lv2.setDisplayName(packet.getDisplayName());
             }
         }
     }
 
     @Override
-    public void onScoreboardPlayerUpdate(ScoreboardPlayerUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onScoreboardPlayerUpdate(ScoreboardPlayerUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         Scoreboard lv = this.world.getScoreboard();
-        String string = arg.getObjectiveName();
-        switch (arg.getUpdateMode()) {
+        String string = packet.getObjectiveName();
+        switch (packet.getUpdateMode()) {
             case CHANGE: {
                 ScoreboardObjective lv2 = lv.getObjective(string);
-                ScoreboardPlayerScore lv3 = lv.getPlayerScore(arg.getPlayerName(), lv2);
-                lv3.setScore(arg.getScore());
+                ScoreboardPlayerScore lv3 = lv.getPlayerScore(packet.getPlayerName(), lv2);
+                lv3.setScore(packet.getScore());
                 break;
             }
             case REMOVE: {
-                lv.resetPlayerScore(arg.getPlayerName(), lv.getNullableObjective(string));
+                lv.resetPlayerScore(packet.getPlayerName(), lv.getNullableObjective(string));
             }
         }
     }
 
     @Override
-    public void onScoreboardDisplay(ScoreboardDisplayS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onScoreboardDisplay(ScoreboardDisplayS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         Scoreboard lv = this.world.getScoreboard();
-        String string = arg.getName();
+        String string = packet.getName();
         ScoreboardObjective lv2 = string == null ? null : lv.getObjective(string);
-        lv.setObjectiveSlot(arg.getSlot(), lv2);
+        lv.setObjectiveSlot(packet.getSlot(), lv2);
     }
 
     @Override
-    public void onTeam(TeamS2CPacket arg) {
+    public void onTeam(TeamS2CPacket packet) {
         Team lv3;
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         Scoreboard lv = this.world.getScoreboard();
-        if (arg.getMode() == 0) {
-            Team lv2 = lv.addTeam(arg.getTeamName());
+        if (packet.getMode() == 0) {
+            Team lv2 = lv.addTeam(packet.getTeamName());
         } else {
-            lv3 = lv.getTeam(arg.getTeamName());
+            lv3 = lv.getTeam(packet.getTeamName());
         }
-        if (arg.getMode() == 0 || arg.getMode() == 2) {
+        if (packet.getMode() == 0 || packet.getMode() == 2) {
             AbstractTeam.CollisionRule lv5;
-            lv3.setDisplayName(arg.getDisplayName());
-            lv3.setColor(arg.getPlayerPrefix());
-            lv3.setFriendlyFlagsBitwise(arg.getFlags());
-            AbstractTeam.VisibilityRule lv4 = AbstractTeam.VisibilityRule.getRule(arg.getNameTagVisibilityRule());
+            lv3.setDisplayName(packet.getDisplayName());
+            lv3.setColor(packet.getPlayerPrefix());
+            lv3.setFriendlyFlagsBitwise(packet.getFlags());
+            AbstractTeam.VisibilityRule lv4 = AbstractTeam.VisibilityRule.getRule(packet.getNameTagVisibilityRule());
             if (lv4 != null) {
                 lv3.setNameTagVisibilityRule(lv4);
             }
-            if ((lv5 = AbstractTeam.CollisionRule.getRule(arg.getCollisionRule())) != null) {
+            if ((lv5 = AbstractTeam.CollisionRule.getRule(packet.getCollisionRule())) != null) {
                 lv3.setCollisionRule(lv5);
             }
-            lv3.setPrefix(arg.getPrefix());
-            lv3.setSuffix(arg.getSuffix());
+            lv3.setPrefix(packet.getPrefix());
+            lv3.setSuffix(packet.getSuffix());
         }
-        if (arg.getMode() == 0 || arg.getMode() == 3) {
-            for (String string : arg.getPlayerList()) {
+        if (packet.getMode() == 0 || packet.getMode() == 3) {
+            for (String string : packet.getPlayerList()) {
                 lv.addPlayerToTeam(string, lv3);
             }
         }
-        if (arg.getMode() == 4) {
-            for (String string2 : arg.getPlayerList()) {
+        if (packet.getMode() == 4) {
+            for (String string2 : packet.getPlayerList()) {
                 lv.removePlayerFromTeam(string2, lv3);
             }
         }
-        if (arg.getMode() == 1) {
+        if (packet.getMode() == 1) {
             lv.removeTeam(lv3);
         }
     }
 
     @Override
-    public void onParticle(ParticleS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        if (arg.getCount() == 0) {
-            double d = arg.getSpeed() * arg.getOffsetX();
-            double e = arg.getSpeed() * arg.getOffsetY();
-            double f = arg.getSpeed() * arg.getOffsetZ();
+    public void onParticle(ParticleS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        if (packet.getCount() == 0) {
+            double d = packet.getSpeed() * packet.getOffsetX();
+            double e = packet.getSpeed() * packet.getOffsetY();
+            double f = packet.getSpeed() * packet.getOffsetZ();
             try {
-                this.world.addParticle(arg.getParameters(), arg.isLongDistance(), arg.getX(), arg.getY(), arg.getZ(), d, e, f);
+                this.world.addParticle(packet.getParameters(), packet.isLongDistance(), packet.getX(), packet.getY(), packet.getZ(), d, e, f);
             }
             catch (Throwable throwable) {
-                LOGGER.warn("Could not spawn particle effect {}", (Object)arg.getParameters());
+                LOGGER.warn("Could not spawn particle effect {}", (Object)packet.getParameters());
             }
         } else {
-            for (int i = 0; i < arg.getCount(); ++i) {
-                double g = this.random.nextGaussian() * (double)arg.getOffsetX();
-                double h = this.random.nextGaussian() * (double)arg.getOffsetY();
-                double j = this.random.nextGaussian() * (double)arg.getOffsetZ();
-                double k = this.random.nextGaussian() * (double)arg.getSpeed();
-                double l = this.random.nextGaussian() * (double)arg.getSpeed();
-                double m = this.random.nextGaussian() * (double)arg.getSpeed();
+            for (int i = 0; i < packet.getCount(); ++i) {
+                double g = this.random.nextGaussian() * (double)packet.getOffsetX();
+                double h = this.random.nextGaussian() * (double)packet.getOffsetY();
+                double j = this.random.nextGaussian() * (double)packet.getOffsetZ();
+                double k = this.random.nextGaussian() * (double)packet.getSpeed();
+                double l = this.random.nextGaussian() * (double)packet.getSpeed();
+                double m = this.random.nextGaussian() * (double)packet.getSpeed();
                 try {
-                    this.world.addParticle(arg.getParameters(), arg.isLongDistance(), arg.getX() + g, arg.getY() + h, arg.getZ() + j, k, l, m);
+                    this.world.addParticle(packet.getParameters(), packet.isLongDistance(), packet.getX() + g, packet.getY() + h, packet.getZ() + j, k, l, m);
                     continue;
                 }
                 catch (Throwable throwable2) {
-                    LOGGER.warn("Could not spawn particle effect {}", (Object)arg.getParameters());
+                    LOGGER.warn("Could not spawn particle effect {}", (Object)packet.getParameters());
                     return;
                 }
             }
@@ -2008,9 +2008,9 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onEntityAttributes(EntityAttributesS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        Entity lv = this.world.getEntityById(arg.getEntityId());
+    public void onEntityAttributes(EntityAttributesS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        Entity lv = this.world.getEntityById(packet.getEntityId());
         if (lv == null) {
             return;
         }
@@ -2018,7 +2018,7 @@ implements ClientPlayPacketListener {
             throw new IllegalStateException("Server tried to update attributes of a non-living entity (actually: " + lv + ")");
         }
         AttributeContainer lv2 = ((LivingEntity)lv).getAttributes();
-        for (EntityAttributesS2CPacket.Entry lv3 : arg.getEntries()) {
+        for (EntityAttributesS2CPacket.Entry lv3 : packet.getEntries()) {
             EntityAttributeInstance lv4 = lv2.getCustomInstance(lv3.getId());
             if (lv4 == null) {
                 LOGGER.warn("Entity {} does not have attribute {}", (Object)lv, (Object)Registry.ATTRIBUTE.getId(lv3.getId()));
@@ -2033,13 +2033,13 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onCraftFailedResponse(CraftFailedResponseS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onCraftFailedResponse(CraftFailedResponseS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ScreenHandler lv = this.client.player.currentScreenHandler;
-        if (lv.syncId != arg.getSyncId() || !lv.isNotRestricted(this.client.player)) {
+        if (lv.syncId != packet.getSyncId() || !lv.isNotRestricted(this.client.player)) {
             return;
         }
-        this.recipeManager.get(arg.getRecipeId()).ifPresent(arg2 -> {
+        this.recipeManager.get(packet.getRecipeId()).ifPresent(arg2 -> {
             if (this.client.currentScreen instanceof RecipeBookProvider) {
                 RecipeBookWidget lv = ((RecipeBookProvider)((Object)this.client.currentScreen)).getRecipeBookWidget();
                 lv.showGhostRecipe((Recipe<?>)arg2, arg.slots);
@@ -2048,62 +2048,62 @@ implements ClientPlayPacketListener {
     }
 
     @Override
-    public void onLightUpdate(LightUpdateS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        int i = arg.getChunkX();
-        int j = arg.getChunkZ();
+    public void onLightUpdate(LightUpdateS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        int i = packet.getChunkX();
+        int j = packet.getChunkZ();
         LightingProvider lv = this.world.getChunkManager().getLightingProvider();
-        int k = arg.getSkyLightMask();
-        int l = arg.getFilledSkyLightMask();
-        Iterator<byte[]> iterator = arg.getSkyLightUpdates().iterator();
-        this.updateLighting(i, j, lv, LightType.SKY, k, l, iterator, arg.method_30006());
-        int m = arg.getBlockLightMask();
-        int n = arg.getFilledBlockLightMask();
-        Iterator<byte[]> iterator2 = arg.getBlockLightUpdates().iterator();
-        this.updateLighting(i, j, lv, LightType.BLOCK, m, n, iterator2, arg.method_30006());
+        int k = packet.getSkyLightMask();
+        int l = packet.getFilledSkyLightMask();
+        Iterator<byte[]> iterator = packet.getSkyLightUpdates().iterator();
+        this.updateLighting(i, j, lv, LightType.SKY, k, l, iterator, packet.method_30006());
+        int m = packet.getBlockLightMask();
+        int n = packet.getFilledBlockLightMask();
+        Iterator<byte[]> iterator2 = packet.getBlockLightUpdates().iterator();
+        this.updateLighting(i, j, lv, LightType.BLOCK, m, n, iterator2, packet.method_30006());
     }
 
     @Override
-    public void onSetTradeOffers(SetTradeOffersS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
+    public void onSetTradeOffers(SetTradeOffersS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
         ScreenHandler lv = this.client.player.currentScreenHandler;
-        if (arg.getSyncId() == lv.syncId && lv instanceof MerchantScreenHandler) {
-            ((MerchantScreenHandler)lv).setOffers(new TraderOfferList(arg.getOffers().toTag()));
-            ((MerchantScreenHandler)lv).setExperienceFromServer(arg.getExperience());
-            ((MerchantScreenHandler)lv).setLevelProgress(arg.getLevelProgress());
-            ((MerchantScreenHandler)lv).setCanLevel(arg.isLeveled());
-            ((MerchantScreenHandler)lv).setRefreshTrades(arg.isRefreshable());
+        if (packet.getSyncId() == lv.syncId && lv instanceof MerchantScreenHandler) {
+            ((MerchantScreenHandler)lv).setOffers(new TraderOfferList(packet.getOffers().toTag()));
+            ((MerchantScreenHandler)lv).setExperienceFromServer(packet.getExperience());
+            ((MerchantScreenHandler)lv).setLevelProgress(packet.getLevelProgress());
+            ((MerchantScreenHandler)lv).setCanLevel(packet.isLeveled());
+            ((MerchantScreenHandler)lv).setRefreshTrades(packet.isRefreshable());
         }
     }
 
     @Override
-    public void onChunkLoadDistance(ChunkLoadDistanceS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.chunkLoadDistance = arg.getDistance();
-        this.world.getChunkManager().updateLoadDistance(arg.getDistance());
+    public void onChunkLoadDistance(ChunkLoadDistanceS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.chunkLoadDistance = packet.getDistance();
+        this.world.getChunkManager().updateLoadDistance(packet.getDistance());
     }
 
     @Override
-    public void onChunkRenderDistanceCenter(ChunkRenderDistanceCenterS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.world.getChunkManager().setChunkMapCenter(arg.getChunkX(), arg.getChunkZ());
+    public void onChunkRenderDistanceCenter(ChunkRenderDistanceCenterS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.world.getChunkManager().setChunkMapCenter(packet.getChunkX(), packet.getChunkZ());
     }
 
     @Override
-    public void onPlayerActionResponse(PlayerActionResponseS2CPacket arg) {
-        NetworkThreadUtils.forceMainThread(arg, this, this.client);
-        this.client.interactionManager.processPlayerActionResponse(this.world, arg.getBlockPos(), arg.getBlockState(), arg.getAction(), arg.isApproved());
+    public void onPlayerActionResponse(PlayerActionResponseS2CPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, this, this.client);
+        this.client.interactionManager.processPlayerActionResponse(this.world, packet.getBlockPos(), packet.getBlockState(), packet.getAction(), packet.isApproved());
     }
 
-    private void updateLighting(int i, int j, LightingProvider arg, LightType arg2, int k, int l, Iterator<byte[]> iterator, boolean bl) {
+    private void updateLighting(int chunkX, int chunkZ, LightingProvider provider, LightType type, int mask, int filledMask, Iterator<byte[]> updates, boolean bl) {
         for (int m = 0; m < 18; ++m) {
             boolean bl3;
             int n = -1 + m;
-            boolean bl2 = (k & 1 << m) != 0;
-            boolean bl4 = bl3 = (l & 1 << m) != 0;
+            boolean bl2 = (mask & 1 << m) != 0;
+            boolean bl4 = bl3 = (filledMask & 1 << m) != 0;
             if (!bl2 && !bl3) continue;
-            arg.queueData(arg2, ChunkSectionPos.from(i, n, j), bl2 ? new ChunkNibbleArray((byte[])iterator.next().clone()) : new ChunkNibbleArray(), bl);
-            this.world.scheduleBlockRenders(i, n, j);
+            provider.enqueueSectionData(type, ChunkSectionPos.from(chunkX, n, chunkZ), bl2 ? new ChunkNibbleArray((byte[])updates.next().clone()) : new ChunkNibbleArray(), bl);
+            this.world.scheduleBlockRenders(chunkX, n, chunkZ);
         }
     }
 
@@ -2117,14 +2117,14 @@ implements ClientPlayPacketListener {
     }
 
     @Nullable
-    public PlayerListEntry getPlayerListEntry(UUID uUID) {
-        return this.playerListEntries.get(uUID);
+    public PlayerListEntry getPlayerListEntry(UUID uuid) {
+        return this.playerListEntries.get(uuid);
     }
 
     @Nullable
-    public PlayerListEntry getPlayerListEntry(String string) {
+    public PlayerListEntry getPlayerListEntry(String profileName) {
         for (PlayerListEntry lv : this.playerListEntries.values()) {
-            if (!lv.getProfile().getName().equals(string)) continue;
+            if (!lv.getProfile().getName().equals(profileName)) continue;
             return lv;
         }
         return null;

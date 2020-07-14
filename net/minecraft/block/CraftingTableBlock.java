@@ -29,18 +29,18 @@ extends Block {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        arg4.openHandledScreen(arg.createScreenHandlerFactory(arg2, arg3));
-        arg4.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        player.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
         return ActionResult.CONSUME;
     }
 
     @Override
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState arg, World arg2, BlockPos arg32) {
-        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new CraftingScreenHandler(i, arg3, ScreenHandlerContext.create(arg2, arg32)), TITLE);
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory((i, arg3, arg4) -> new CraftingScreenHandler(i, arg3, ScreenHandlerContext.create(world, pos)), TITLE);
     }
 }
 

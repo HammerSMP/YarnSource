@@ -21,8 +21,8 @@ extends Task<LivingEntity> {
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        arg2.getBrain().refreshActivities(arg.getTimeOfDay(), arg.getTime());
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        entity.getBrain().refreshActivities(world.getTimeOfDay(), world.getTime());
     }
 }
 

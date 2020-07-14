@@ -29,13 +29,13 @@ public abstract class PathNodeMaker {
     protected boolean canOpenDoors;
     protected boolean canSwim;
 
-    public void init(ChunkCache arg, MobEntity arg2) {
-        this.cachedWorld = arg;
-        this.entity = arg2;
+    public void init(ChunkCache cachedWorld, MobEntity entity) {
+        this.cachedWorld = cachedWorld;
+        this.entity = entity;
         this.pathNodeCache.clear();
-        this.entityBlockXSize = MathHelper.floor(arg2.getWidth() + 1.0f);
-        this.entityBlockYSize = MathHelper.floor(arg2.getHeight() + 1.0f);
-        this.entityBlockZSize = MathHelper.floor(arg2.getWidth() + 1.0f);
+        this.entityBlockXSize = MathHelper.floor(entity.getWidth() + 1.0f);
+        this.entityBlockYSize = MathHelper.floor(entity.getHeight() + 1.0f);
+        this.entityBlockZSize = MathHelper.floor(entity.getWidth() + 1.0f);
     }
 
     public void clear() {
@@ -47,8 +47,8 @@ public abstract class PathNodeMaker {
         return this.getNode(arg.getX(), arg.getY(), arg.getZ());
     }
 
-    protected PathNode getNode(int i, int j, int k) {
-        return (PathNode)this.pathNodeCache.computeIfAbsent(PathNode.hash(i, j, k), l -> new PathNode(i, j, k));
+    protected PathNode getNode(int x, int y, int z) {
+        return (PathNode)this.pathNodeCache.computeIfAbsent(PathNode.hash(x, y, z), l -> new PathNode(x, y, z));
     }
 
     public abstract PathNode getStart();
@@ -61,16 +61,16 @@ public abstract class PathNodeMaker {
 
     public abstract PathNodeType getDefaultNodeType(BlockView var1, int var2, int var3, int var4);
 
-    public void setCanEnterOpenDoors(boolean bl) {
-        this.canEnterOpenDoors = bl;
+    public void setCanEnterOpenDoors(boolean canEnterOpenDoors) {
+        this.canEnterOpenDoors = canEnterOpenDoors;
     }
 
-    public void setCanOpenDoors(boolean bl) {
-        this.canOpenDoors = bl;
+    public void setCanOpenDoors(boolean canOpenDoors) {
+        this.canOpenDoors = canOpenDoors;
     }
 
-    public void setCanSwim(boolean bl) {
-        this.canSwim = bl;
+    public void setCanSwim(boolean canSwim) {
+        this.canSwim = canSwim;
     }
 
     public boolean canEnterOpenDoors() {

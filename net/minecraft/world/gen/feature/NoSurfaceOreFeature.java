@@ -34,22 +34,22 @@ extends Feature<OreFeatureConfig> {
         return true;
     }
 
-    private void getStartPos(BlockPos.Mutable arg, Random random, BlockPos arg2, int i) {
-        int j = this.randomCoord(random, i);
-        int k = this.randomCoord(random, i);
-        int l = this.randomCoord(random, i);
-        arg.set(arg2, j, k, l);
+    private void getStartPos(BlockPos.Mutable mutable, Random random, BlockPos pos, int size) {
+        int j = this.randomCoord(random, size);
+        int k = this.randomCoord(random, size);
+        int l = this.randomCoord(random, size);
+        mutable.set(pos, j, k, l);
     }
 
-    private int randomCoord(Random random, int i) {
-        return Math.round((random.nextFloat() - random.nextFloat()) * (float)i);
+    private int randomCoord(Random random, int size) {
+        return Math.round((random.nextFloat() - random.nextFloat()) * (float)size);
     }
 
-    private boolean checkAir(WorldAccess arg, BlockPos arg2) {
+    private boolean checkAir(WorldAccess world, BlockPos pos) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         for (Direction lv2 : Direction.values()) {
-            lv.set(arg2, lv2);
-            if (!arg.getBlockState(lv).isAir()) continue;
+            lv.set(pos, lv2);
+            if (!world.getBlockState(lv).isAir()) continue;
             return true;
         }
         return false;

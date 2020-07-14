@@ -36,16 +36,16 @@ extends BlobFoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
-        for (int m = l; m >= l - j; --m) {
-            int n = k + arg3.getFoliageRadius() - 1 - m;
-            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk(), arg4);
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
+        for (int m = l; m >= l - foliageHeight; --m) {
+            int n = radius + arg3.getFoliageRadius() - 1 - m;
+            this.generate(world, random, config, arg3.getCenter(), n, leaves, m, arg3.isGiantTrunk(), arg4);
         }
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        return i == l && k == l && random.nextInt(2) == 0;
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        return baseHeight == dz && dy == dz && random.nextInt(2) == 0;
     }
 }
 

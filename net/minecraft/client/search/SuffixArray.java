@@ -45,18 +45,18 @@ public class SuffixArray<T> {
     private IntList suffixSplits = new IntArrayList();
     private int maxTextLength;
 
-    public void add(T object, String string) {
-        this.maxTextLength = Math.max(this.maxTextLength, string.length());
+    public void add(T object, String text) {
+        this.maxTextLength = Math.max(this.maxTextLength, text.length());
         int i = this.objects.size();
         this.objects.add(object);
         this.suffixStarts.add(this.characters.size());
-        for (int j = 0; j < string.length(); ++j) {
+        for (int j = 0; j < text.length(); ++j) {
             this.suffixIndexToObjectIndex.add(i);
             this.suffixSplits.add(j);
-            this.characters.add((int)string.charAt(j));
+            this.characters.add((int)text.charAt(j));
         }
         this.suffixIndexToObjectIndex.add(i);
-        this.suffixSplits.add(string.length());
+        this.suffixSplits.add(text.length());
         this.characters.add(-1);
     }
 
@@ -130,9 +130,9 @@ public class SuffixArray<T> {
         LOGGER.debug("");
     }
 
-    private String getDebugString(int i) {
-        int j = this.suffixSplits.getInt(i);
-        int k = this.suffixStarts.getInt(this.suffixIndexToObjectIndex.getInt(i));
+    private String getDebugString(int suffixIndex) {
+        int j = this.suffixSplits.getInt(suffixIndex);
+        int k = this.suffixStarts.getInt(this.suffixIndexToObjectIndex.getInt(suffixIndex));
         StringBuilder stringBuilder = new StringBuilder();
         int l = 0;
         while (k + l < this.characters.size()) {
@@ -147,9 +147,9 @@ public class SuffixArray<T> {
         return stringBuilder.toString();
     }
 
-    private int compare(String string, int i) {
-        int j = this.suffixStarts.getInt(this.suffixIndexToObjectIndex.getInt(i));
-        int k = this.suffixSplits.getInt(i);
+    private int compare(String string, int suffixIndex) {
+        int j = this.suffixStarts.getInt(this.suffixIndexToObjectIndex.getInt(suffixIndex));
+        int k = this.suffixSplits.getInt(suffixIndex);
         for (int l = 0; l < string.length(); ++l) {
             char d;
             int m = this.characters.getInt(j + k + l);
@@ -166,15 +166,15 @@ public class SuffixArray<T> {
         return 0;
     }
 
-    public List<T> findAll(String string) {
+    public List<T> findAll(String text) {
         int i = this.suffixIndexToObjectIndex.size();
         int j = 0;
         int k = i;
         while (j < k) {
             int l = j + (k - j) / 2;
-            int m = this.compare(string, l);
+            int m = this.compare(text, l);
             if (PRINT_COMPARISONS) {
-                LOGGER.debug("comparing lower \"{}\" with {} \"{}\": {}", (Object)string, (Object)l, (Object)this.getDebugString(l), (Object)m);
+                LOGGER.debug("comparing lower \"{}\" with {} \"{}\": {}", (Object)text, (Object)l, (Object)this.getDebugString(l), (Object)m);
             }
             if (m > 0) {
                 j = l + 1;
@@ -189,9 +189,9 @@ public class SuffixArray<T> {
         k = i;
         while (j < k) {
             int o = j + (k - j) / 2;
-            int p = this.compare(string, o);
+            int p = this.compare(text, o);
             if (PRINT_COMPARISONS) {
-                LOGGER.debug("comparing upper \"{}\" with {} \"{}\": {}", (Object)string, (Object)o, (Object)this.getDebugString(o), (Object)p);
+                LOGGER.debug("comparing upper \"{}\" with {} \"{}\": {}", (Object)text, (Object)o, (Object)this.getDebugString(o), (Object)p);
             }
             if (p >= 0) {
                 j = o + 1;

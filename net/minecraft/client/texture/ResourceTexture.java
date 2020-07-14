@@ -32,15 +32,15 @@ extends AbstractTexture {
     private static final Logger LOGGER = LogManager.getLogger();
     protected final Identifier location;
 
-    public ResourceTexture(Identifier arg) {
-        this.location = arg;
+    public ResourceTexture(Identifier location) {
+        this.location = location;
     }
 
     @Override
-    public void load(ResourceManager arg) throws IOException {
+    public void load(ResourceManager manager) throws IOException {
         boolean bl4;
         boolean bl3;
-        TextureData lv = this.loadTextureData(arg);
+        TextureData lv = this.loadTextureData(manager);
         lv.checkException();
         TextureResourceMetadata lv2 = lv.getMetadata();
         if (lv2 != null) {
@@ -58,13 +58,13 @@ extends AbstractTexture {
         }
     }
 
-    private void upload(NativeImage arg, boolean bl, boolean bl2) {
+    private void upload(NativeImage arg, boolean blur, boolean clamp) {
         TextureUtil.allocate(this.getGlId(), 0, arg.getWidth(), arg.getHeight());
-        arg.upload(0, 0, 0, 0, 0, arg.getWidth(), arg.getHeight(), bl, bl2, false, true);
+        arg.upload(0, 0, 0, 0, 0, arg.getWidth(), arg.getHeight(), blur, clamp, false, true);
     }
 
-    protected TextureData loadTextureData(ResourceManager arg) {
-        return TextureData.load(arg, this.location);
+    protected TextureData loadTextureData(ResourceManager resourceManager) {
+        return TextureData.load(resourceManager, this.location);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -77,16 +77,16 @@ extends AbstractTexture {
         @Nullable
         private final IOException exception;
 
-        public TextureData(IOException iOException) {
-            this.exception = iOException;
+        public TextureData(IOException exception) {
+            this.exception = exception;
             this.metadata = null;
             this.image = null;
         }
 
-        public TextureData(@Nullable TextureResourceMetadata arg, NativeImage arg2) {
+        public TextureData(@Nullable TextureResourceMetadata metadata, NativeImage image) {
             this.exception = null;
-            this.metadata = arg;
-            this.image = arg2;
+            this.metadata = metadata;
+            this.image = image;
         }
 
         /*

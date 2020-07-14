@@ -50,17 +50,17 @@ extends Feature<OreFeatureConfig> {
         return false;
     }
 
-    protected boolean generateVeinPart(WorldAccess arg, Random random, OreFeatureConfig arg2, double d, double e, double f, double g, double h, double i, int j, int k, int l, int m, int n) {
+    protected boolean generateVeinPart(WorldAccess world, Random random, OreFeatureConfig config, double startX, double endX, double startZ, double endZ, double startY, double endY, int x, int y, int z, int size, int n) {
         int o = 0;
-        BitSet bitSet = new BitSet(m * n * m);
+        BitSet bitSet = new BitSet(size * n * size);
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        int p = arg2.size;
+        int p = config.size;
         double[] ds = new double[p * 4];
         for (int q = 0; q < p; ++q) {
             float r = (float)q / (float)p;
-            double s = MathHelper.lerp((double)r, d, e);
-            double t = MathHelper.lerp((double)r, h, i);
-            double u = MathHelper.lerp((double)r, f, g);
+            double s = MathHelper.lerp((double)r, startX, endX);
+            double t = MathHelper.lerp((double)r, startY, endY);
+            double u = MathHelper.lerp((double)r, startZ, endZ);
             double v = random.nextDouble() * (double)p / 16.0;
             double w = ((double)(MathHelper.sin((float)Math.PI * r) + 1.0f) * v + 1.0) / 2.0;
             ds[q * 4 + 0] = s;
@@ -68,19 +68,19 @@ extends Feature<OreFeatureConfig> {
             ds[q * 4 + 2] = u;
             ds[q * 4 + 3] = w;
         }
-        for (int x = 0; x < p - 1; ++x) {
-            if (ds[x * 4 + 3] <= 0.0) continue;
-            for (int y = x + 1; y < p; ++y) {
+        for (int x2 = 0; x2 < p - 1; ++x2) {
+            if (ds[x2 * 4 + 3] <= 0.0) continue;
+            for (int y2 = x2 + 1; y2 < p; ++y2) {
                 double ab;
                 double aa;
-                double z;
+                double z2;
                 double ac;
-                if (ds[y * 4 + 3] <= 0.0 || !((ac = ds[x * 4 + 3] - ds[y * 4 + 3]) * ac > (z = ds[x * 4 + 0] - ds[y * 4 + 0]) * z + (aa = ds[x * 4 + 1] - ds[y * 4 + 1]) * aa + (ab = ds[x * 4 + 2] - ds[y * 4 + 2]) * ab)) continue;
+                if (ds[y2 * 4 + 3] <= 0.0 || !((ac = ds[x2 * 4 + 3] - ds[y2 * 4 + 3]) * ac > (z2 = ds[x2 * 4 + 0] - ds[y2 * 4 + 0]) * z2 + (aa = ds[x2 * 4 + 1] - ds[y2 * 4 + 1]) * aa + (ab = ds[x2 * 4 + 2] - ds[y2 * 4 + 2]) * ab)) continue;
                 if (ac > 0.0) {
-                    ds[y * 4 + 3] = -1.0;
+                    ds[y2 * 4 + 3] = -1.0;
                     continue;
                 }
-                ds[x * 4 + 3] = -1.0;
+                ds[x2 * 4 + 3] = -1.0;
             }
         }
         for (int ad = 0; ad < p; ++ad) {
@@ -89,9 +89,9 @@ extends Feature<OreFeatureConfig> {
             double af = ds[ad * 4 + 0];
             double ag = ds[ad * 4 + 1];
             double ah = ds[ad * 4 + 2];
-            int ai = Math.max(MathHelper.floor(af - ae), j);
-            int aj = Math.max(MathHelper.floor(ag - ae), k);
-            int ak = Math.max(MathHelper.floor(ah - ae), l);
+            int ai = Math.max(MathHelper.floor(af - ae), x);
+            int aj = Math.max(MathHelper.floor(ag - ae), y);
+            int ak = Math.max(MathHelper.floor(ah - ae), z);
             int al = Math.max(MathHelper.floor(af + ae), ai);
             int am = Math.max(MathHelper.floor(ag + ae), aj);
             int an = Math.max(MathHelper.floor(ah + ae), ak);
@@ -104,11 +104,11 @@ extends Feature<OreFeatureConfig> {
                     for (int as = ak; as <= an; ++as) {
                         int au;
                         double at = ((double)as + 0.5 - ah) / ae;
-                        if (!(ap * ap + ar * ar + at * at < 1.0) || bitSet.get(au = ao - j + (aq - k) * m + (as - l) * m * n)) continue;
+                        if (!(ap * ap + ar * ar + at * at < 1.0) || bitSet.get(au = ao - x + (aq - y) * size + (as - z) * size * n)) continue;
                         bitSet.set(au);
                         lv.set(ao, aq, as);
-                        if (!arg2.target.test(arg.getBlockState(lv), random)) continue;
-                        arg.setBlockState(lv, arg2.state, 2);
+                        if (!config.target.test(world.getBlockState(lv), random)) continue;
+                        world.setBlockState(lv, config.state, 2);
                         ++o;
                     }
                 }

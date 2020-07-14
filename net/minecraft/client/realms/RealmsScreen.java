@@ -25,8 +25,8 @@ extends Screen {
         super(NarratorManager.EMPTY);
     }
 
-    protected static int row(int i) {
-        return 40 + i * 13;
+    protected static int row(int index) {
+        return 40 + index * 13;
     }
 
     @Override

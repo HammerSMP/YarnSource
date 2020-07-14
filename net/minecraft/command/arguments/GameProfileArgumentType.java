@@ -75,10 +75,10 @@ implements ArgumentType<GameProfileArgument> {
         };
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder2) {
-        if (commandContext.getSource() instanceof CommandSource) {
-            StringReader stringReader = new StringReader(suggestionsBuilder2.getInput());
-            stringReader.setCursor(suggestionsBuilder2.getStart());
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
+            StringReader stringReader = new StringReader(builder.getInput());
+            stringReader.setCursor(builder.getStart());
             EntitySelectorReader lv = new EntitySelectorReader(stringReader);
             try {
                 lv.read();
@@ -86,7 +86,7 @@ implements ArgumentType<GameProfileArgument> {
             catch (CommandSyntaxException commandSyntaxException) {
                 // empty catch block
             }
-            return lv.listSuggestions(suggestionsBuilder2, (SuggestionsBuilder suggestionsBuilder) -> CommandSource.suggestMatching(((CommandSource)commandContext.getSource()).getPlayerNames(), suggestionsBuilder));
+            return lv.listSuggestions(builder, (SuggestionsBuilder suggestionsBuilder) -> CommandSource.suggestMatching(((CommandSource)context.getSource()).getPlayerNames(), suggestionsBuilder));
         }
         return Suggestions.empty();
     }

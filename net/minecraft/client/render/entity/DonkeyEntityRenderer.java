@@ -27,8 +27,8 @@ public class DonkeyEntityRenderer<T extends AbstractDonkeyEntity>
 extends HorseBaseEntityRenderer<T, DonkeyEntityModel<T>> {
     private static final Map<EntityType<?>, Identifier> TEXTURES = Maps.newHashMap((Map)ImmutableMap.of(EntityType.DONKEY, (Object)new Identifier("textures/entity/horse/donkey.png"), EntityType.MULE, (Object)new Identifier("textures/entity/horse/mule.png")));
 
-    public DonkeyEntityRenderer(EntityRenderDispatcher arg, float f) {
-        super(arg, new DonkeyEntityModel(0.0f), f);
+    public DonkeyEntityRenderer(EntityRenderDispatcher dispatcher, float scale) {
+        super(dispatcher, new DonkeyEntityModel(0.0f), scale);
     }
 
     @Override

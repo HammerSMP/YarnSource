@@ -36,9 +36,9 @@ extends CompositeEntityModel<T> {
     }
 
     @Override
-    public void setAngles(T arg, float f, float g, float h, float i, float j) {
-        this.bullet.yaw = i * ((float)Math.PI / 180);
-        this.bullet.pitch = j * ((float)Math.PI / 180);
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        this.bullet.yaw = headYaw * ((float)Math.PI / 180);
+        this.bullet.pitch = headPitch * ((float)Math.PI / 180);
     }
 }
 

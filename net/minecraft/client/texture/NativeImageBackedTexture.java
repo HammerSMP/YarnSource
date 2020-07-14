@@ -28,8 +28,8 @@ extends AbstractTexture {
     @Nullable
     private NativeImage image;
 
-    public NativeImageBackedTexture(NativeImage arg) {
-        this.image = arg;
+    public NativeImageBackedTexture(NativeImage image) {
+        this.image = image;
         if (!RenderSystem.isOnRenderThread()) {
             RenderSystem.recordRenderCall(() -> {
                 TextureUtil.allocate(this.getGlId(), this.image.getWidth(), this.image.getHeight());
@@ -41,14 +41,14 @@ extends AbstractTexture {
         }
     }
 
-    public NativeImageBackedTexture(int i, int j, boolean bl) {
+    public NativeImageBackedTexture(int width, int height, boolean useStb) {
         RenderSystem.assertThread(RenderSystem::isOnGameThreadOrInit);
-        this.image = new NativeImage(i, j, bl);
+        this.image = new NativeImage(width, height, useStb);
         TextureUtil.allocate(this.getGlId(), this.image.getWidth(), this.image.getHeight());
     }
 
     @Override
-    public void load(ResourceManager arg) {
+    public void load(ResourceManager manager) {
     }
 
     public void upload() {
@@ -65,11 +65,11 @@ extends AbstractTexture {
         return this.image;
     }
 
-    public void setImage(NativeImage arg) {
+    public void setImage(NativeImage image) {
         if (this.image != null) {
             this.image.close();
         }
-        this.image = arg;
+        this.image = image;
     }
 
     @Override

@@ -43,8 +43,8 @@ extends AbstractCriterion<Conditions> {
         Block lv = PlacedBlockCriterion.getBlock(jsonObject);
         StatePredicate lv2 = StatePredicate.fromJson(jsonObject.get("state"));
         if (lv != null) {
-            lv2.check(lv.getStateManager(), string -> {
-                throw new JsonSyntaxException("Block " + lv + " has no property " + string + ":");
+            lv2.check(lv.getStateManager(), name -> {
+                throw new JsonSyntaxException("Block " + lv + " has no property " + name + ":");
             });
         }
         LocationPredicate lv3 = LocationPredicate.fromJson(jsonObject.get("location"));
@@ -53,22 +53,22 @@ extends AbstractCriterion<Conditions> {
     }
 
     @Nullable
-    private static Block getBlock(JsonObject jsonObject) {
-        if (jsonObject.has("block")) {
-            Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "block"));
+    private static Block getBlock(JsonObject obj) {
+        if (obj.has("block")) {
+            Identifier lv = new Identifier(JsonHelper.getString(obj, "block"));
             return Registry.BLOCK.getOrEmpty(lv).orElseThrow(() -> new JsonSyntaxException("Unknown block type '" + lv + "'"));
         }
         return null;
     }
 
-    public void trigger(ServerPlayerEntity arg, BlockPos arg2, ItemStack arg3) {
-        BlockState lv = arg.getServerWorld().getBlockState(arg2);
-        this.test(arg, arg5 -> arg5.matches(lv, arg2, arg.getServerWorld(), arg3));
+    public void trigger(ServerPlayerEntity player, BlockPos blockPos, ItemStack stack) {
+        BlockState lv = player.getServerWorld().getBlockState(blockPos);
+        this.test(player, arg5 -> arg5.matches(lv, blockPos, player.getServerWorld(), stack));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -78,34 +78,34 @@ extends AbstractCriterion<Conditions> {
         private final LocationPredicate location;
         private final ItemPredicate item;
 
-        public Conditions(EntityPredicate.Extended arg, @Nullable Block arg2, StatePredicate arg3, LocationPredicate arg4, ItemPredicate arg5) {
-            super(ID, arg);
-            this.block = arg2;
-            this.state = arg3;
-            this.location = arg4;
-            this.item = arg5;
+        public Conditions(EntityPredicate.Extended player, @Nullable Block block, StatePredicate state, LocationPredicate location, ItemPredicate item) {
+            super(ID, player);
+            this.block = block;
+            this.state = state;
+            this.location = location;
+            this.item = item;
         }
 
-        public static Conditions block(Block arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, StatePredicate.ANY, LocationPredicate.ANY, ItemPredicate.ANY);
+        public static Conditions block(Block block) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, block, StatePredicate.ANY, LocationPredicate.ANY, ItemPredicate.ANY);
         }
 
-        public boolean matches(BlockState arg, BlockPos arg2, ServerWorld arg3, ItemStack arg4) {
-            if (this.block != null && !arg.isOf(this.block)) {
+        public boolean matches(BlockState state, BlockPos pos, ServerWorld world, ItemStack stack) {
+            if (this.block != null && !state.isOf(this.block)) {
                 return false;
             }
-            if (!this.state.test(arg)) {
+            if (!this.state.test(state)) {
                 return false;
             }
-            if (!this.location.test(arg3, arg2.getX(), arg2.getY(), arg2.getZ())) {
+            if (!this.location.test(world, pos.getX(), pos.getY(), pos.getZ())) {
                 return false;
             }
-            return this.item.test(arg4);
+            return this.item.test(stack);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             if (this.block != null) {
                 jsonObject.addProperty("block", Registry.BLOCK.getId(this.block).toString());
             }

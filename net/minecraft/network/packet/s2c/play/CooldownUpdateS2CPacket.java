@@ -23,21 +23,21 @@ implements Packet<ClientPlayPacketListener> {
     public CooldownUpdateS2CPacket() {
     }
 
-    public CooldownUpdateS2CPacket(Item arg, int i) {
-        this.item = arg;
-        this.cooldown = i;
+    public CooldownUpdateS2CPacket(Item item, int cooldown) {
+        this.item = item;
+        this.cooldown = cooldown;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.item = Item.byRawId(arg.readVarInt());
-        this.cooldown = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.item = Item.byRawId(buf.readVarInt());
+        this.cooldown = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(Item.getRawId(this.item));
-        arg.writeVarInt(this.cooldown);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(Item.getRawId(this.item));
+        buf.writeVarInt(this.cooldown);
     }
 
     @Override

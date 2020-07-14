@@ -39,13 +39,13 @@ implements ParticleEffect {
         }
 
         @Override
-        public /* synthetic */ ParticleEffect read(ParticleType arg, PacketByteBuf arg2) {
-            return this.read(arg, arg2);
+        public /* synthetic */ ParticleEffect read(ParticleType type, PacketByteBuf buf) {
+            return this.read(type, buf);
         }
 
         @Override
-        public /* synthetic */ ParticleEffect read(ParticleType arg, StringReader stringReader) throws CommandSyntaxException {
-            return this.read(arg, stringReader);
+        public /* synthetic */ ParticleEffect read(ParticleType type, StringReader reader) throws CommandSyntaxException {
+            return this.read(type, reader);
         }
     };
     private final ParticleType<BlockStateParticleEffect> type;
@@ -55,14 +55,14 @@ implements ParticleEffect {
         return BlockState.CODEC.xmap(arg2 -> new BlockStateParticleEffect(arg3, (BlockState)arg2), arg -> arg.blockState);
     }
 
-    public BlockStateParticleEffect(ParticleType<BlockStateParticleEffect> arg, BlockState arg2) {
-        this.type = arg;
-        this.blockState = arg2;
+    public BlockStateParticleEffect(ParticleType<BlockStateParticleEffect> type, BlockState blockState) {
+        this.type = type;
+        this.blockState = blockState;
     }
 
     @Override
-    public void write(PacketByteBuf arg) {
-        arg.writeVarInt(Block.STATE_IDS.getRawId(this.blockState));
+    public void write(PacketByteBuf buf) {
+        buf.writeVarInt(Block.STATE_IDS.getRawId(this.blockState));
     }
 
     @Override

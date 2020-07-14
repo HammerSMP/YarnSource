@@ -83,36 +83,36 @@ public class MultiplayerServerListPinger {
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<ClientConnection> clientConnections = Collections.synchronizedList(Lists.newArrayList());
 
-    public void add(final ServerInfo arg, final Runnable runnable) throws UnknownHostException {
-        ServerAddress lv = ServerAddress.parse(arg.address);
+    public void add(final ServerInfo entry, final Runnable runnable) throws UnknownHostException {
+        ServerAddress lv = ServerAddress.parse(entry.address);
         final ClientConnection lv2 = ClientConnection.connect(InetAddress.getByName(lv.getAddress()), lv.getPort(), false);
         this.clientConnections.add(lv2);
-        arg.label = new TranslatableText("multiplayer.status.pinging");
-        arg.ping = -1L;
-        arg.playerListSummary = null;
+        entry.label = new TranslatableText("multiplayer.status.pinging");
+        entry.ping = -1L;
+        entry.playerListSummary = null;
         lv2.setPacketListener(new ClientQueryPacketListener(){
             private boolean sentQuery;
             private boolean received;
             private long startTime;
 
             @Override
-            public void onResponse(QueryResponseS2CPacket arg2) {
+            public void onResponse(QueryResponseS2CPacket packet) {
                 if (this.received) {
                     lv2.disconnect(new TranslatableText("multiplayer.status.unrequested"));
                     return;
                 }
                 this.received = true;
-                ServerMetadata lv = arg2.getServerMetadata();
-                arg.label = lv.getDescription() != null ? lv.getDescription() : LiteralText.EMPTY;
+                ServerMetadata lv = packet.getServerMetadata();
+                entry.label = lv.getDescription() != null ? lv.getDescription() : LiteralText.EMPTY;
                 if (lv.getVersion() != null) {
-                    arg.version = new LiteralText(lv.getVersion().getGameVersion());
-                    arg.protocolVersion = lv.getVersion().getProtocolVersion();
+                    entry.version = new LiteralText(lv.getVersion().getGameVersion());
+                    entry.protocolVersion = lv.getVersion().getProtocolVersion();
                 } else {
-                    arg.version = new TranslatableText("multiplayer.status.old");
-                    arg.protocolVersion = 0;
+                    entry.version = new TranslatableText("multiplayer.status.old");
+                    entry.protocolVersion = 0;
                 }
                 if (lv.getPlayers() != null) {
-                    arg.playerCountLabel = MultiplayerServerListPinger.method_27647(lv.getPlayers().getOnlinePlayerCount(), lv.getPlayers().getPlayerLimit());
+                    entry.playerCountLabel = MultiplayerServerListPinger.method_27647(lv.getPlayers().getOnlinePlayerCount(), lv.getPlayers().getPlayerLimit());
                     ArrayList list = Lists.newArrayList();
                     if (ArrayUtils.isNotEmpty((Object[])lv.getPlayers().getSample())) {
                         for (GameProfile gameProfile : lv.getPlayers().getSample()) {
@@ -121,10 +121,10 @@ public class MultiplayerServerListPinger {
                         if (lv.getPlayers().getSample().length < lv.getPlayers().getOnlinePlayerCount()) {
                             list.add(new TranslatableText("multiplayer.status.and_more", lv.getPlayers().getOnlinePlayerCount() - lv.getPlayers().getSample().length));
                         }
-                        arg.playerListSummary = list;
+                        entry.playerListSummary = list;
                     }
                 } else {
-                    arg.playerCountLabel = new TranslatableText("multiplayer.status.unknown").formatted(Formatting.DARK_GRAY);
+                    entry.playerCountLabel = new TranslatableText("multiplayer.status.unknown").formatted(Formatting.DARK_GRAY);
                 }
                 String string = null;
                 if (lv.getFavicon() != null) {
@@ -135,8 +135,8 @@ public class MultiplayerServerListPinger {
                         LOGGER.error("Invalid server icon (unknown format)");
                     }
                 }
-                if (!Objects.equals(string, arg.getIcon())) {
-                    arg.setIcon(string);
+                if (!Objects.equals(string, entry.getIcon())) {
+                    entry.setIcon(string);
                     runnable.run();
                 }
                 this.startTime = Util.getMeasuringTimeMs();
@@ -145,20 +145,20 @@ public class MultiplayerServerListPinger {
             }
 
             @Override
-            public void onPong(QueryPongS2CPacket arg2) {
+            public void onPong(QueryPongS2CPacket packet) {
                 long l = this.startTime;
                 long m = Util.getMeasuringTimeMs();
-                arg.ping = m - l;
+                entry.ping = m - l;
                 lv2.disconnect(new TranslatableText("multiplayer.status.finished"));
             }
 
             @Override
-            public void onDisconnected(Text arg2) {
+            public void onDisconnected(Text reason) {
                 if (!this.sentQuery) {
-                    LOGGER.error("Can't ping {}: {}", (Object)arg.address, (Object)arg2.getString());
-                    arg.label = new TranslatableText("multiplayer.status.cannot_connect").formatted(Formatting.DARK_RED);
-                    arg.playerCountLabel = LiteralText.EMPTY;
-                    MultiplayerServerListPinger.this.ping(arg);
+                    LOGGER.error("Can't ping {}: {}", (Object)entry.address, (Object)reason.getString());
+                    entry.label = new TranslatableText("multiplayer.status.cannot_connect").formatted(Formatting.DARK_RED);
+                    entry.playerCountLabel = LiteralText.EMPTY;
+                    MultiplayerServerListPinger.this.ping(entry);
                 }
             }
 

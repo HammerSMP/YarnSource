@@ -32,9 +32,9 @@ implements SoundContainer<Sound> {
     @Nullable
     private final Text subtitle;
 
-    public WeightedSoundSet(Identifier arg, @Nullable String string) {
-        this.id = arg;
-        this.subtitle = string == null ? null : new TranslatableText(string);
+    public WeightedSoundSet(Identifier id, @Nullable String subtitle) {
+        this.id = id;
+        this.subtitle = subtitle == null ? null : new TranslatableText(subtitle);
     }
 
     @Override
@@ -70,9 +70,9 @@ implements SoundContainer<Sound> {
     }
 
     @Override
-    public void preload(SoundSystem arg) {
+    public void preload(SoundSystem soundSystem) {
         for (SoundContainer<Sound> lv : this.sounds) {
-            lv.preload(arg);
+            lv.preload(soundSystem);
         }
     }
 

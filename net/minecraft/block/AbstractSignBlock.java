@@ -42,21 +42,21 @@ implements Waterloggable {
     protected static final VoxelShape SHAPE = Block.createCuboidShape(4.0, 0.0, 4.0, 12.0, 16.0, 12.0);
     private final SignType type;
 
-    protected AbstractSignBlock(AbstractBlock.Settings arg, SignType arg2) {
-        super(arg);
-        this.type = arg2;
+    protected AbstractSignBlock(AbstractBlock.Settings settings, SignType type) {
+        super(settings);
+        this.type = type;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
@@ -66,36 +66,36 @@ implements Waterloggable {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new SignBlockEntity();
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         boolean bl;
-        ItemStack lv = arg4.getStackInHand(arg5);
-        boolean bl2 = bl = lv.getItem() instanceof DyeItem && arg4.abilities.allowModifyWorld;
-        if (arg2.isClient) {
+        ItemStack lv = player.getStackInHand(hand);
+        boolean bl2 = bl = lv.getItem() instanceof DyeItem && player.abilities.allowModifyWorld;
+        if (world.isClient) {
             return bl ? ActionResult.SUCCESS : ActionResult.CONSUME;
         }
-        BlockEntity lv2 = arg2.getBlockEntity(arg3);
+        BlockEntity lv2 = world.getBlockEntity(pos);
         if (lv2 instanceof SignBlockEntity) {
             boolean bl22;
             SignBlockEntity lv3 = (SignBlockEntity)lv2;
-            if (bl && (bl22 = lv3.setTextColor(((DyeItem)lv.getItem()).getColor())) && !arg4.isCreative()) {
+            if (bl && (bl22 = lv3.setTextColor(((DyeItem)lv.getItem()).getColor())) && !player.isCreative()) {
                 lv.decrement(1);
             }
-            return lv3.onActivate(arg4) ? ActionResult.SUCCESS : ActionResult.PASS;
+            return lv3.onActivate(player) ? ActionResult.SUCCESS : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
+    public FluidState getFluidState(BlockState state) {
+        if (state.get(WATERLOGGED).booleanValue()) {
             return Fluids.WATER.getStill(false);
         }
-        return super.getFluidState(arg);
+        return super.getFluidState(state);
     }
 
     @Environment(value=EnvType.CLIENT)

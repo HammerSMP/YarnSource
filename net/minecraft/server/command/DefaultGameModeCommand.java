@@ -17,27 +17,27 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
 
 public class DefaultGameModeCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralArgumentBuilder literalArgumentBuilder = (LiteralArgumentBuilder)CommandManager.literal("defaultgamemode").requires(arg -> arg.hasPermissionLevel(2));
         for (GameMode lv : GameMode.values()) {
             if (lv == GameMode.NOT_SET) continue;
             literalArgumentBuilder.then(CommandManager.literal(lv.getName()).executes(commandContext -> DefaultGameModeCommand.execute((ServerCommandSource)commandContext.getSource(), lv)));
         }
-        commandDispatcher.register(literalArgumentBuilder);
+        dispatcher.register(literalArgumentBuilder);
     }
 
-    private static int execute(ServerCommandSource arg, GameMode arg2) {
+    private static int execute(ServerCommandSource source, GameMode defaultGameMode) {
         int i = 0;
-        MinecraftServer minecraftServer = arg.getMinecraftServer();
-        minecraftServer.setDefaultGameMode(arg2);
+        MinecraftServer minecraftServer = source.getMinecraftServer();
+        minecraftServer.setDefaultGameMode(defaultGameMode);
         if (minecraftServer.shouldForceGameMode()) {
             for (ServerPlayerEntity lv : minecraftServer.getPlayerManager().getPlayerList()) {
-                if (lv.interactionManager.getGameMode() == arg2) continue;
-                lv.setGameMode(arg2);
+                if (lv.interactionManager.getGameMode() == defaultGameMode) continue;
+                lv.setGameMode(defaultGameMode);
                 ++i;
             }
         }
-        arg.sendFeedback(new TranslatableText("commands.defaultgamemode.success", arg2.getTranslatableName()), true);
+        source.sendFeedback(new TranslatableText("commands.defaultgamemode.success", defaultGameMode.getTranslatableName()), true);
         return i;
     }
 }

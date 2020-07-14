@@ -21,29 +21,29 @@ import org.lwjgl.system.MemoryUtil;
 
 @Environment(value=EnvType.CLIENT)
 public class BufferRenderer {
-    public static void draw(BufferBuilder arg) {
+    public static void draw(BufferBuilder bufferBuilder) {
         if (!RenderSystem.isOnRenderThread()) {
             RenderSystem.recordRenderCall(() -> {
-                Pair<BufferBuilder.DrawArrayParameters, ByteBuffer> pair = arg.popData();
+                Pair<BufferBuilder.DrawArrayParameters, ByteBuffer> pair = bufferBuilder.popData();
                 BufferBuilder.DrawArrayParameters lv = (BufferBuilder.DrawArrayParameters)pair.getFirst();
                 BufferRenderer.draw((ByteBuffer)pair.getSecond(), lv.getMode(), lv.getVertexFormat(), lv.getCount());
             });
         } else {
-            Pair<BufferBuilder.DrawArrayParameters, ByteBuffer> pair = arg.popData();
+            Pair<BufferBuilder.DrawArrayParameters, ByteBuffer> pair = bufferBuilder.popData();
             BufferBuilder.DrawArrayParameters lv = (BufferBuilder.DrawArrayParameters)pair.getFirst();
             BufferRenderer.draw((ByteBuffer)pair.getSecond(), lv.getMode(), lv.getVertexFormat(), lv.getCount());
         }
     }
 
-    private static void draw(ByteBuffer byteBuffer, int i, VertexFormat arg, int j) {
+    private static void draw(ByteBuffer buffer, int mode, VertexFormat vertexFormat, int count) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        byteBuffer.clear();
-        if (j <= 0) {
+        buffer.clear();
+        if (count <= 0) {
             return;
         }
-        arg.startDrawing(MemoryUtil.memAddress((ByteBuffer)byteBuffer));
-        GlStateManager.drawArrays(i, 0, j);
-        arg.endDrawing();
+        vertexFormat.startDrawing(MemoryUtil.memAddress((ByteBuffer)buffer));
+        GlStateManager.drawArrays(mode, 0, count);
+        vertexFormat.endDrawing();
     }
 }
 

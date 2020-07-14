@@ -51,14 +51,14 @@ NamedScreenHandlerFactory {
         }
 
         @Override
-        public ItemStack getStack(int i) {
-            return i == 0 ? LecternBlockEntity.this.book : ItemStack.EMPTY;
+        public ItemStack getStack(int slot) {
+            return slot == 0 ? LecternBlockEntity.this.book : ItemStack.EMPTY;
         }
 
         @Override
-        public ItemStack removeStack(int i, int j) {
-            if (i == 0) {
-                ItemStack lv = LecternBlockEntity.this.book.split(j);
+        public ItemStack removeStack(int slot, int amount) {
+            if (slot == 0) {
+                ItemStack lv = LecternBlockEntity.this.book.split(amount);
                 if (LecternBlockEntity.this.book.isEmpty()) {
                     LecternBlockEntity.this.onBookRemoved();
                 }
@@ -68,8 +68,8 @@ NamedScreenHandlerFactory {
         }
 
         @Override
-        public ItemStack removeStack(int i) {
-            if (i == 0) {
+        public ItemStack removeStack(int slot) {
+            if (slot == 0) {
                 ItemStack lv = LecternBlockEntity.this.book;
                 LecternBlockEntity.this.book = ItemStack.EMPTY;
                 LecternBlockEntity.this.onBookRemoved();
@@ -79,7 +79,7 @@ NamedScreenHandlerFactory {
         }
 
         @Override
-        public void setStack(int i, ItemStack arg) {
+        public void setStack(int slot, ItemStack stack) {
         }
 
         @Override
@@ -93,18 +93,18 @@ NamedScreenHandlerFactory {
         }
 
         @Override
-        public boolean canPlayerUse(PlayerEntity arg) {
+        public boolean canPlayerUse(PlayerEntity player) {
             if (LecternBlockEntity.this.world.getBlockEntity(LecternBlockEntity.this.pos) != LecternBlockEntity.this) {
                 return false;
             }
-            if (arg.squaredDistanceTo((double)LecternBlockEntity.this.pos.getX() + 0.5, (double)LecternBlockEntity.this.pos.getY() + 0.5, (double)LecternBlockEntity.this.pos.getZ() + 0.5) > 64.0) {
+            if (player.squaredDistanceTo((double)LecternBlockEntity.this.pos.getX() + 0.5, (double)LecternBlockEntity.this.pos.getY() + 0.5, (double)LecternBlockEntity.this.pos.getZ() + 0.5) > 64.0) {
                 return false;
             }
             return LecternBlockEntity.this.hasBook();
         }
 
         @Override
-        public boolean isValid(int i, ItemStack arg) {
+        public boolean isValid(int slot, ItemStack stack) {
             return false;
         }
 
@@ -115,14 +115,14 @@ NamedScreenHandlerFactory {
     private final PropertyDelegate propertyDelegate = new PropertyDelegate(){
 
         @Override
-        public int get(int i) {
-            return i == 0 ? LecternBlockEntity.this.currentPage : 0;
+        public int get(int index) {
+            return index == 0 ? LecternBlockEntity.this.currentPage : 0;
         }
 
         @Override
-        public void set(int i, int j) {
-            if (i == 0) {
-                LecternBlockEntity.this.setCurrentPage(j);
+        public void set(int index, int value) {
+            if (index == 0) {
+                LecternBlockEntity.this.setCurrentPage(value);
             }
         }
 
@@ -148,8 +148,8 @@ NamedScreenHandlerFactory {
         return lv == Items.WRITABLE_BOOK || lv == Items.WRITTEN_BOOK;
     }
 
-    public void setBook(ItemStack arg) {
-        this.setBook(arg, null);
+    public void setBook(ItemStack book) {
+        this.setBook(book, null);
     }
 
     private void onBookRemoved() {
@@ -158,15 +158,15 @@ NamedScreenHandlerFactory {
         LecternBlock.setHasBook(this.getWorld(), this.getPos(), this.getCachedState(), false);
     }
 
-    public void setBook(ItemStack arg, @Nullable PlayerEntity arg2) {
-        this.book = this.resolveBook(arg, arg2);
+    public void setBook(ItemStack book, @Nullable PlayerEntity player) {
+        this.book = this.resolveBook(book, player);
         this.currentPage = 0;
         this.pageCount = WrittenBookItem.getPageCount(this.book);
         this.markDirty();
     }
 
-    private void setCurrentPage(int i) {
-        int j = MathHelper.clamp(i, 0, this.pageCount - 1);
+    private void setCurrentPage(int currentPage) {
+        int j = MathHelper.clamp(currentPage, 0, this.pageCount - 1);
         if (j != this.currentPage) {
             this.currentPage = j;
             this.markDirty();
@@ -183,25 +183,25 @@ NamedScreenHandlerFactory {
         return MathHelper.floor(f * 14.0f) + (this.hasBook() ? 1 : 0);
     }
 
-    private ItemStack resolveBook(ItemStack arg, @Nullable PlayerEntity arg2) {
-        if (this.world instanceof ServerWorld && arg.getItem() == Items.WRITTEN_BOOK) {
-            WrittenBookItem.resolve(arg, this.getCommandSource(arg2), arg2);
+    private ItemStack resolveBook(ItemStack book, @Nullable PlayerEntity player) {
+        if (this.world instanceof ServerWorld && book.getItem() == Items.WRITTEN_BOOK) {
+            WrittenBookItem.resolve(book, this.getCommandSource(player), player);
         }
-        return arg;
+        return book;
     }
 
-    private ServerCommandSource getCommandSource(@Nullable PlayerEntity arg) {
+    private ServerCommandSource getCommandSource(@Nullable PlayerEntity player) {
         Text lv2;
         String string2;
-        if (arg == null) {
+        if (player == null) {
             String string = "Lectern";
             LiteralText lv = new LiteralText("Lectern");
         } else {
-            string2 = arg.getName().getString();
-            lv2 = arg.getDisplayName();
+            string2 = player.getName().getString();
+            lv2 = player.getDisplayName();
         }
         Vec3d lv3 = Vec3d.ofCenter(this.pos);
-        return new ServerCommandSource(CommandOutput.DUMMY, lv3, Vec2f.ZERO, (ServerWorld)this.world, 2, string2, lv2, this.world.getServer(), arg);
+        return new ServerCommandSource(CommandOutput.DUMMY, lv3, Vec2f.ZERO, (ServerWorld)this.world, 2, string2, lv2, this.world.getServer(), player);
     }
 
     @Override
@@ -210,21 +210,21 @@ NamedScreenHandlerFactory {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.book = arg2.contains("Book", 10) ? this.resolveBook(ItemStack.fromTag(arg2.getCompound("Book")), null) : ItemStack.EMPTY;
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.book = tag.contains("Book", 10) ? this.resolveBook(ItemStack.fromTag(tag.getCompound("Book")), null) : ItemStack.EMPTY;
         this.pageCount = WrittenBookItem.getPageCount(this.book);
-        this.currentPage = MathHelper.clamp(arg2.getInt("Page"), 0, this.pageCount - 1);
+        this.currentPage = MathHelper.clamp(tag.getInt("Page"), 0, this.pageCount - 1);
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         if (!this.getBook().isEmpty()) {
-            arg.put("Book", this.getBook().toTag(new CompoundTag()));
-            arg.putInt("Page", this.currentPage);
+            tag.put("Book", this.getBook().toTag(new CompoundTag()));
+            tag.putInt("Page", this.currentPage);
         }
-        return arg;
+        return tag;
     }
 
     @Override

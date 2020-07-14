@@ -74,28 +74,28 @@ extends PassiveEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         this.loveTicks = 0;
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (arg2.getBlockState(arg.down()).isOf(Blocks.GRASS_BLOCK)) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (world.getBlockState(pos.down()).isOf(Blocks.GRASS_BLOCK)) {
             return 10.0f;
         }
-        return arg2.getBrightness(arg) - 0.5f;
+        return world.getBrightness(pos) - 0.5f;
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("InLove", this.loveTicks);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("InLove", this.loveTicks);
         if (this.lovingPlayer != null) {
-            arg.putUuid("LoveCause", this.lovingPlayer);
+            tag.putUuid("LoveCause", this.lovingPlayer);
         }
     }
 
@@ -105,14 +105,14 @@ extends PassiveEntity {
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.loveTicks = arg.getInt("InLove");
-        this.lovingPlayer = arg.containsUuid("LoveCause") ? arg.getUuid("LoveCause") : null;
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.loveTicks = tag.getInt("InLove");
+        this.lovingPlayer = tag.containsUuid("LoveCause") ? tag.getUuid("LoveCause") : null;
     }
 
-    public static boolean isValidNaturalSpawn(EntityType<? extends AnimalEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getBlockState(arg4.down()).isOf(Blocks.GRASS_BLOCK) && arg2.getBaseLightLevel(arg4, 0) > 8;
+    public static boolean isValidNaturalSpawn(EntityType<? extends AnimalEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return world.getBlockState(pos.down()).isOf(Blocks.GRASS_BLOCK) && world.getBaseLightLevel(pos, 0) > 8;
     }
 
     @Override
@@ -121,31 +121,31 @@ extends PassiveEntity {
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return false;
     }
 
     @Override
-    protected int getCurrentExperience(PlayerEntity arg) {
+    protected int getCurrentExperience(PlayerEntity player) {
         return 1 + this.world.random.nextInt(3);
     }
 
-    public boolean isBreedingItem(ItemStack arg) {
-        return arg.getItem() == Items.WHEAT;
+    public boolean isBreedingItem(ItemStack stack) {
+        return stack.getItem() == Items.WHEAT;
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (this.isBreedingItem(lv)) {
             int i = this.getBreedingAge();
             if (!this.world.isClient && i == 0 && this.canEat()) {
-                this.eat(arg, lv);
-                this.lovePlayer(arg);
+                this.eat(player, lv);
+                this.lovePlayer(player);
                 return ActionResult.SUCCESS;
             }
             if (this.isBaby()) {
-                this.eat(arg, lv);
+                this.eat(player, lv);
                 this.growUp((int)((float)(-i / 20) * 0.1f), true);
                 return ActionResult.success(this.world.isClient);
             }
@@ -153,12 +153,12 @@ extends PassiveEntity {
                 return ActionResult.CONSUME;
             }
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
-    protected void eat(PlayerEntity arg, ItemStack arg2) {
-        if (!arg.abilities.creativeMode) {
-            arg2.decrement(1);
+    protected void eat(PlayerEntity player, ItemStack stack) {
+        if (!player.abilities.creativeMode) {
+            stack.decrement(1);
         }
     }
 
@@ -166,16 +166,16 @@ extends PassiveEntity {
         return this.loveTicks <= 0;
     }
 
-    public void lovePlayer(@Nullable PlayerEntity arg) {
+    public void lovePlayer(@Nullable PlayerEntity player) {
         this.loveTicks = 600;
-        if (arg != null) {
-            this.lovingPlayer = arg.getUuid();
+        if (player != null) {
+            this.lovingPlayer = player.getUuid();
         }
         this.world.sendEntityStatus(this, (byte)18);
     }
 
-    public void setLoveTicks(int i) {
-        this.loveTicks = i;
+    public void setLoveTicks(int loveTicks) {
+        this.loveTicks = loveTicks;
     }
 
     public int getLoveTicks() {
@@ -202,33 +202,33 @@ extends PassiveEntity {
         this.loveTicks = 0;
     }
 
-    public boolean canBreedWith(AnimalEntity arg) {
-        if (arg == this) {
+    public boolean canBreedWith(AnimalEntity other) {
+        if (other == this) {
             return false;
         }
-        if (arg.getClass() != this.getClass()) {
+        if (other.getClass() != this.getClass()) {
             return false;
         }
-        return this.isInLove() && arg.isInLove();
+        return this.isInLove() && other.isInLove();
     }
 
-    public void breed(ServerWorld arg, AnimalEntity arg2) {
-        PassiveEntity lv = this.createChild(arg, arg2);
+    public void breed(ServerWorld arg, AnimalEntity other) {
+        PassiveEntity lv = this.createChild(arg, other);
         if (lv == null) {
             return;
         }
         ServerPlayerEntity lv2 = this.getLovingPlayer();
-        if (lv2 == null && arg2.getLovingPlayer() != null) {
-            lv2 = arg2.getLovingPlayer();
+        if (lv2 == null && other.getLovingPlayer() != null) {
+            lv2 = other.getLovingPlayer();
         }
         if (lv2 != null) {
             lv2.incrementStat(Stats.ANIMALS_BRED);
-            Criteria.BRED_ANIMALS.trigger(lv2, this, arg2, lv);
+            Criteria.BRED_ANIMALS.trigger(lv2, this, other, lv);
         }
         this.setBreedingAge(6000);
-        arg2.setBreedingAge(6000);
+        other.setBreedingAge(6000);
         this.resetLoveTicks();
-        arg2.resetLoveTicks();
+        other.resetLoveTicks();
         lv.setBaby(true);
         lv.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), 0.0f, 0.0f);
         arg.spawnEntity(lv);
@@ -240,8 +240,8 @@ extends PassiveEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 18) {
+    public void handleStatus(byte status) {
+        if (status == 18) {
             for (int i = 0; i < 7; ++i) {
                 double d = this.random.nextGaussian() * 0.02;
                 double e = this.random.nextGaussian() * 0.02;
@@ -249,7 +249,7 @@ extends PassiveEntity {
                 this.world.addParticle(ParticleTypes.HEART, this.getParticleX(1.0), this.getRandomBodyY() + 0.5, this.getParticleZ(1.0), d, e, f);
             }
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 }

@@ -36,9 +36,9 @@ public class SetContentsLootFunction
 extends ConditionalLootFunction {
     private final List<LootPoolEntry> entries;
 
-    private SetContentsLootFunction(LootCondition[] args, List<LootPoolEntry> list) {
-        super(args);
-        this.entries = ImmutableList.copyOf(list);
+    private SetContentsLootFunction(LootCondition[] conditions, List<LootPoolEntry> entries) {
+        super(conditions);
+        this.entries = ImmutableList.copyOf(entries);
     }
 
     @Override
@@ -47,24 +47,24 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
-        if (arg.isEmpty()) {
-            return arg;
+    public ItemStack process(ItemStack stack, LootContext context) {
+        if (stack.isEmpty()) {
+            return stack;
         }
         DefaultedList<ItemStack> lv = DefaultedList.of();
-        this.entries.forEach(arg32 -> arg32.expand(arg2, arg3 -> arg3.generateLoot(LootTable.processStacks(lv::add), arg2)));
+        this.entries.forEach(entry -> entry.expand(context, choice -> choice.generateLoot(LootTable.processStacks(lv::add), context)));
         CompoundTag lv2 = new CompoundTag();
         Inventories.toTag(lv2, lv);
-        CompoundTag lv3 = arg.getOrCreateTag();
+        CompoundTag lv3 = stack.getOrCreateTag();
         lv3.put("BlockEntityTag", lv2.copyFrom(lv3.getCompound("BlockEntityTag")));
-        return arg;
+        return stack;
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        super.validate(arg);
+    public void validate(LootTableReporter reporter) {
+        super.validate(reporter);
         for (int i = 0; i < this.entries.size(); ++i) {
-            this.entries.get(i).validate(arg.makeChild(".entry[" + i + "]"));
+            this.entries.get(i).validate(reporter.makeChild(".entry[" + i + "]"));
         }
     }
 
@@ -87,8 +87,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -101,8 +101,8 @@ extends ConditionalLootFunction {
             return this;
         }
 
-        public Builer withEntry(LootPoolEntry.Builder<?> arg) {
-            this.entries.add(arg.build());
+        public Builer withEntry(LootPoolEntry.Builder<?> entryBuilder) {
+            this.entries.add(entryBuilder.build());
             return this;
         }
 

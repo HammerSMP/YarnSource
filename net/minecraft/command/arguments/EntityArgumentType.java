@@ -53,25 +53,25 @@ implements ArgumentType<EntitySelector> {
     private final boolean singleTarget;
     private final boolean playersOnly;
 
-    protected EntityArgumentType(boolean bl, boolean bl2) {
-        this.singleTarget = bl;
-        this.playersOnly = bl2;
+    protected EntityArgumentType(boolean singleTarget, boolean playersOnly) {
+        this.singleTarget = singleTarget;
+        this.playersOnly = playersOnly;
     }
 
     public static EntityArgumentType entity() {
         return new EntityArgumentType(true, false);
     }
 
-    public static Entity getEntity(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ((EntitySelector)commandContext.getArgument(string, EntitySelector.class)).getEntity((ServerCommandSource)commandContext.getSource());
+    public static Entity getEntity(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        return ((EntitySelector)context.getArgument(name, EntitySelector.class)).getEntity((ServerCommandSource)context.getSource());
     }
 
     public static EntityArgumentType entities() {
         return new EntityArgumentType(false, false);
     }
 
-    public static Collection<? extends Entity> getEntities(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        Collection<? extends Entity> collection = EntityArgumentType.getOptionalEntities(commandContext, string);
+    public static Collection<? extends Entity> getEntities(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        Collection<? extends Entity> collection = EntityArgumentType.getOptionalEntities(context, name);
         if (collection.isEmpty()) {
             throw ENTITY_NOT_FOUND_EXCEPTION.create();
         }
@@ -125,11 +125,11 @@ implements ArgumentType<EntitySelector> {
         return lv2;
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder2) {
-        if (commandContext.getSource() instanceof CommandSource) {
-            StringReader stringReader = new StringReader(suggestionsBuilder2.getInput());
-            stringReader.setCursor(suggestionsBuilder2.getStart());
-            CommandSource lv = (CommandSource)commandContext.getSource();
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
+            StringReader stringReader = new StringReader(builder.getInput());
+            stringReader.setCursor(builder.getStart());
+            CommandSource lv = (CommandSource)context.getSource();
             EntitySelectorReader lv2 = new EntitySelectorReader(stringReader, lv.hasPermissionLevel(2));
             try {
                 lv2.read();
@@ -137,7 +137,7 @@ implements ArgumentType<EntitySelector> {
             catch (CommandSyntaxException commandSyntaxException) {
                 // empty catch block
             }
-            return lv2.listSuggestions(suggestionsBuilder2, (SuggestionsBuilder suggestionsBuilder) -> {
+            return lv2.listSuggestions(builder, (SuggestionsBuilder suggestionsBuilder) -> {
                 Collection<String> collection = lv.getPlayerNames();
                 Collection<String> iterable = this.playersOnly ? collection : Iterables.concat(collection, lv.getEntitySuggestions());
                 CommandSource.suggestMatching(iterable, suggestionsBuilder);

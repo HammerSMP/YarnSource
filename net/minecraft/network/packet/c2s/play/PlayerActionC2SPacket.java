@@ -26,24 +26,24 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerActionC2SPacket(Action arg, BlockPos arg2, Direction arg3) {
-        this.action = arg;
-        this.pos = arg2.toImmutable();
-        this.direction = arg3;
+    public PlayerActionC2SPacket(Action action, BlockPos pos, Direction direction) {
+        this.action = action;
+        this.pos = pos.toImmutable();
+        this.direction = direction;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.action = arg.readEnumConstant(Action.class);
-        this.pos = arg.readBlockPos();
-        this.direction = Direction.byId(arg.readUnsignedByte());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.action = buf.readEnumConstant(Action.class);
+        this.pos = buf.readBlockPos();
+        this.direction = Direction.byId(buf.readUnsignedByte());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.action);
-        arg.writeBlockPos(this.pos);
-        arg.writeByte(this.direction.getId());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.action);
+        buf.writeBlockPos(this.pos);
+        buf.writeByte(this.direction.getId());
     }
 
     @Override

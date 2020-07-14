@@ -31,8 +31,8 @@ public interface BlockView {
 
     public FluidState getFluidState(BlockPos var1);
 
-    default public int getLuminance(BlockPos arg) {
-        return this.getBlockState(arg).getLuminance();
+    default public int getLuminance(BlockPos pos) {
+        return this.getBlockState(pos).getLuminance();
     }
 
     default public int getMaxLightLevel() {
@@ -47,8 +47,8 @@ public interface BlockView {
         return BlockPos.method_29715(arg).map(this::getBlockState);
     }
 
-    default public BlockHitResult rayTrace(RayTraceContext arg3) {
-        return BlockView.rayTrace(arg3, (arg, arg2) -> {
+    default public BlockHitResult rayTrace(RayTraceContext context) {
+        return BlockView.rayTrace(context, (arg, arg2) -> {
             BlockState lv = this.getBlockState((BlockPos)arg2);
             FluidState lv2 = this.getFluidState((BlockPos)arg2);
             Vec3d lv3 = arg.getStart();
@@ -67,40 +67,40 @@ public interface BlockView {
     }
 
     @Nullable
-    default public BlockHitResult rayTraceBlock(Vec3d arg, Vec3d arg2, BlockPos arg3, VoxelShape arg4, BlockState arg5) {
+    default public BlockHitResult rayTraceBlock(Vec3d start, Vec3d end, BlockPos pos, VoxelShape shape, BlockState state) {
         BlockHitResult lv2;
-        BlockHitResult lv = arg4.rayTrace(arg, arg2, arg3);
-        if (lv != null && (lv2 = arg5.getRayTraceShape(this, arg3).rayTrace(arg, arg2, arg3)) != null && lv2.getPos().subtract(arg).lengthSquared() < lv.getPos().subtract(arg).lengthSquared()) {
+        BlockHitResult lv = shape.rayTrace(start, end, pos);
+        if (lv != null && (lv2 = state.getRayTraceShape(this, pos).rayTrace(start, end, pos)) != null && lv2.getPos().subtract(start).lengthSquared() < lv.getPos().subtract(start).lengthSquared()) {
             return lv.withSide(lv2.getSide());
         }
         return lv;
     }
 
-    default public double method_30346(VoxelShape arg, Supplier<VoxelShape> supplier) {
-        if (!arg.isEmpty()) {
-            return arg.getMax(Direction.Axis.Y);
+    default public double getDismountHeight(VoxelShape blockCollisionShape, Supplier<VoxelShape> belowBlockCollisionShapeGetter) {
+        if (!blockCollisionShape.isEmpty()) {
+            return blockCollisionShape.getMax(Direction.Axis.Y);
         }
-        double d = supplier.get().getMax(Direction.Axis.Y);
+        double d = belowBlockCollisionShapeGetter.get().getMax(Direction.Axis.Y);
         if (d >= 1.0) {
             return d - 1.0;
         }
         return Double.NEGATIVE_INFINITY;
     }
 
-    default public double method_30347(BlockPos arg) {
-        return this.method_30346(this.getBlockState(arg).getCollisionShape(this, arg), () -> {
-            BlockPos lv = arg.down();
+    default public double getDismountHeight(BlockPos pos) {
+        return this.getDismountHeight(this.getBlockState(pos).getCollisionShape(this, pos), () -> {
+            BlockPos lv = pos.down();
             return this.getBlockState(lv).getCollisionShape(this, lv);
         });
     }
 
-    public static <T> T rayTrace(RayTraceContext arg, BiFunction<RayTraceContext, BlockPos, T> biFunction, Function<RayTraceContext, T> function) {
+    public static <T> T rayTrace(RayTraceContext arg, BiFunction<RayTraceContext, BlockPos, T> context, Function<RayTraceContext, T> blockRayTracer) {
         int l;
         int k;
         Vec3d lv2;
         Vec3d lv = arg.getStart();
         if (lv.equals(lv2 = arg.getEnd())) {
-            return function.apply(arg);
+            return blockRayTracer.apply(arg);
         }
         double d = MathHelper.lerp(-1.0E-7, lv2.x, lv.x);
         double e = MathHelper.lerp(-1.0E-7, lv2.y, lv.y);
@@ -110,7 +110,7 @@ public interface BlockView {
         double i = MathHelper.lerp(-1.0E-7, lv.z, lv2.z);
         int j = MathHelper.floor(g);
         BlockPos.Mutable lv3 = new BlockPos.Mutable(j, k = MathHelper.floor(h), l = MathHelper.floor(i));
-        T object = biFunction.apply(arg, lv3);
+        T object = context.apply(arg, lv3);
         if (object != null) {
             return object;
         }
@@ -143,10 +143,10 @@ public interface BlockView {
                 l += r;
                 x += u;
             }
-            if ((object2 = biFunction.apply(arg, lv3.set(j, k, l))) == null) continue;
+            if ((object2 = context.apply(arg, lv3.set(j, k, l))) == null) continue;
             return object2;
         }
-        return function.apply(arg);
+        return blockRayTracer.apply(arg);
     }
 }
 

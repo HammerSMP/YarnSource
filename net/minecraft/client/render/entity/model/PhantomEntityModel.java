@@ -76,8 +76,8 @@ extends CompositeEntityModel<T> {
     }
 
     @Override
-    public void setAngles(T arg, float f, float g, float h, float i, float j) {
-        float k = ((float)(((Entity)arg).getEntityId() * 3) + h) * 0.13f;
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        float k = ((float)(((Entity)entity).getEntityId() * 3) + animationProgress) * 0.13f;
         float l = 16.0f;
         this.leftWing.roll = MathHelper.cos(k) * 16.0f * ((float)Math.PI / 180);
         this.leftWingTip.roll = MathHelper.cos(k) * 16.0f * ((float)Math.PI / 180);

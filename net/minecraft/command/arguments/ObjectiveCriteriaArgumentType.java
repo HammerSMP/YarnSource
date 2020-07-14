@@ -61,7 +61,7 @@ implements ArgumentType<ScoreboardCriterion> {
         });
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         ArrayList list = Lists.newArrayList(ScoreboardCriterion.OBJECTIVES.keySet());
         for (StatType statType : Registry.STAT_TYPE) {
             for (Object object : statType.getRegistry()) {
@@ -69,11 +69,11 @@ implements ArgumentType<ScoreboardCriterion> {
                 list.add(string);
             }
         }
-        return CommandSource.suggestMatching(list, suggestionsBuilder);
+        return CommandSource.suggestMatching(list, builder);
     }
 
-    public <T> String getStatName(StatType<T> arg, Object object) {
-        return Stat.getName(arg, object);
+    public <T> String getStatName(StatType<T> stat, Object value) {
+        return Stat.getName(stat, value);
     }
 
     public Collection<String> getExamples() {

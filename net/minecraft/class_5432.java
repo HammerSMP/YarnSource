@@ -4,12 +4,12 @@
 package net.minecraft;
 
 import net.minecraft.class_5428;
+import net.minecraft.world.gen.CountConfig;
 import net.minecraft.world.gen.decorator.ChanceDecoratorConfig;
 import net.minecraft.world.gen.decorator.ConfiguredDecorator;
 import net.minecraft.world.gen.decorator.Decorator;
 import net.minecraft.world.gen.decorator.NopeDecoratorConfig;
 import net.minecraft.world.gen.decorator.RangeDecoratorConfig;
-import net.minecraft.world.gen.feature.SeaPickleFeatureConfig;
 
 public interface class_5432<R> {
     public R method_30374(ConfiguredDecorator<?> var1);
@@ -19,7 +19,7 @@ public interface class_5432<R> {
     }
 
     default public R method_30373(class_5428 arg) {
-        return this.method_30374(Decorator.COUNT.configure(new SeaPickleFeatureConfig(arg)));
+        return this.method_30374(Decorator.COUNT.configure(new CountConfig(arg)));
     }
 
     default public R method_30375(int i) {
@@ -35,7 +35,7 @@ public interface class_5432<R> {
     }
 
     default public R method_30371() {
-        return this.method_30374(Decorator.SQUARE.configure(NopeDecoratorConfig.field_24892));
+        return this.method_30374(Decorator.SQUARE.configure(NopeDecoratorConfig.INSTANCE));
     }
 }
 

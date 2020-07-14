@@ -44,18 +44,18 @@ extends Feature<BlockPileFeatureConfig> {
         return true;
     }
 
-    private boolean canPlacePileBlock(WorldAccess arg, BlockPos arg2, Random random) {
-        BlockPos lv = arg2.down();
-        BlockState lv2 = arg.getBlockState(lv);
+    private boolean canPlacePileBlock(WorldAccess world, BlockPos pos, Random random) {
+        BlockPos lv = pos.down();
+        BlockState lv2 = world.getBlockState(lv);
         if (lv2.isOf(Blocks.GRASS_PATH)) {
             return random.nextBoolean();
         }
-        return lv2.isSideSolidFullSquare(arg, lv, Direction.UP);
+        return lv2.isSideSolidFullSquare(world, lv, Direction.UP);
     }
 
-    private void addPileBlock(WorldAccess arg, BlockPos arg2, Random random, BlockPileFeatureConfig arg3) {
-        if (arg.isAir(arg2) && this.canPlacePileBlock(arg, arg2, random)) {
-            arg.setBlockState(arg2, arg3.stateProvider.getBlockState(random, arg2), 4);
+    private void addPileBlock(WorldAccess world, BlockPos pos, Random random, BlockPileFeatureConfig config) {
+        if (world.isAir(pos) && this.canPlacePileBlock(world, pos, random)) {
+            world.setBlockState(pos, config.stateProvider.getBlockState(random, pos), 4);
         }
     }
 }

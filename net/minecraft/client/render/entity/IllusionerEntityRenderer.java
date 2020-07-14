@@ -68,8 +68,8 @@ extends IllagerEntityRenderer<IllusionerEntity> {
     }
 
     @Override
-    protected /* synthetic */ boolean isVisible(LivingEntity arg) {
-        return this.isVisible((IllusionerEntity)arg);
+    protected /* synthetic */ boolean isVisible(LivingEntity entity) {
+        return this.isVisible((IllusionerEntity)entity);
     }
 }
 

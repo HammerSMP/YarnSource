@@ -30,44 +30,44 @@ extends Block {
     }
 
     @Override
-    public boolean hasSidedTransparency(BlockState arg) {
+    public boolean hasSidedTransparency(BlockState state) {
         return true;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        if (!this.getDefaultState().canPlaceAt(arg.getWorld(), arg.getBlockPos())) {
-            return Block.pushEntitiesUpBeforeBlockChange(this.getDefaultState(), Blocks.DIRT.getDefaultState(), arg.getWorld(), arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        if (!this.getDefaultState().canPlaceAt(ctx.getWorld(), ctx.getBlockPos())) {
+            return Block.pushEntitiesUpBeforeBlockChange(this.getDefaultState(), Blocks.DIRT.getDefaultState(), ctx.getWorld(), ctx.getBlockPos());
         }
-        return super.getPlacementState(arg);
+        return super.getPlacementState(ctx);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.UP && !arg.canPlaceAt(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.UP && !state.canPlaceAt(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        FarmlandBlock.setToDirt(arg, arg2, arg3);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        FarmlandBlock.setToDirt(state, world, pos);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockState lv = arg2.getBlockState(arg3.up());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockState lv = world.getBlockState(pos.up());
         return !lv.getMaterial().isSolid() || lv.getBlock() instanceof FenceGateBlock;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

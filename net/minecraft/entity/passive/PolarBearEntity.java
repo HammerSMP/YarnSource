@@ -82,7 +82,7 @@ implements Angerable {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
+    public boolean isBreedingItem(ItemStack stack) {
         return false;
     }
 
@@ -107,24 +107,24 @@ implements Angerable {
         return MobEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 30.0).add(EntityAttributes.GENERIC_FOLLOW_RANGE, 20.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 6.0);
     }
 
-    public static boolean canSpawn(EntityType<PolarBearEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        Biome lv = arg2.getBiome(arg4);
+    public static boolean canSpawn(EntityType<PolarBearEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        Biome lv = world.getBiome(pos);
         if (lv == Biomes.FROZEN_OCEAN || lv == Biomes.DEEP_FROZEN_OCEAN) {
-            return arg2.getBaseLightLevel(arg4, 0) > 8 && arg2.getBlockState(arg4.down()).isOf(Blocks.ICE);
+            return world.getBaseLightLevel(pos, 0) > 8 && world.getBlockState(pos.down()).isOf(Blocks.ICE);
         }
-        return PolarBearEntity.isValidNaturalSpawn(arg, arg2, arg3, arg4, random);
+        return PolarBearEntity.isValidNaturalSpawn(type, world, spawnReason, pos, random);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.angerFromTag((ServerWorld)this.world, arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.angerFromTag((ServerWorld)this.world, tag);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        this.angerToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        this.angerToTag(tag);
     }
 
     @Override
@@ -133,8 +133,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngerTime(int i) {
-        this.angerTime = i;
+    public void setAngerTime(int ticks) {
+        this.angerTime = ticks;
     }
 
     @Override
@@ -143,8 +143,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngryAt(@Nullable UUID uUID) {
-        this.targetUuid = uUID;
+    public void setAngryAt(@Nullable UUID uuid) {
+        this.targetUuid = uuid;
     }
 
     @Override
@@ -161,7 +161,7 @@ implements Angerable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_POLAR_BEAR_HURT;
     }
 
@@ -171,7 +171,7 @@ implements Angerable {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_POLAR_BEAR_STEP, 0.15f, 1.0f);
     }
 
@@ -207,20 +207,20 @@ implements Angerable {
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose arg) {
+    public EntityDimensions getDimensions(EntityPose pose) {
         if (this.warningAnimationProgress > 0.0f) {
             float f = this.warningAnimationProgress / 6.0f;
             float g = 1.0f + f;
-            return super.getDimensions(arg).scaled(1.0f, g);
+            return super.getDimensions(pose).scaled(1.0f, g);
         }
-        return super.getDimensions(arg);
+        return super.getDimensions(pose);
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        boolean bl = arg.damage(DamageSource.mob(this), (int)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE));
+    public boolean tryAttack(Entity target) {
+        boolean bl = target.damage(DamageSource.mob(this), (int)this.getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE));
         if (bl) {
-            this.dealDamage(this, arg);
+            this.dealDamage(this, target);
         }
         return bl;
     }
@@ -229,13 +229,13 @@ implements Angerable {
         return this.dataTracker.get(WARNING);
     }
 
-    public void setWarning(boolean bl) {
-        this.dataTracker.set(WARNING, bl);
+    public void setWarning(boolean warning) {
+        this.dataTracker.set(WARNING, warning);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getWarningAnimationProgress(float f) {
-        return MathHelper.lerp(f, this.lastWarningAnimationProgress, this.warningAnimationProgress) / 6.0f;
+    public float getWarningAnimationProgress(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.lastWarningAnimationProgress, this.warningAnimationProgress) / 6.0f;
     }
 
     @Override
@@ -244,11 +244,11 @@ implements Angerable {
     }
 
     @Override
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg4 == null) {
-            arg4 = new PassiveEntity.PassiveData(1.0f);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (entityData == null) {
+            entityData = new PassiveEntity.PassiveData(1.0f);
         }
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     class PolarBearEscapeDangerGoal
@@ -273,13 +273,13 @@ implements Angerable {
         }
 
         @Override
-        protected void attack(LivingEntity arg, double d) {
-            double e = this.getSquaredMaxAttackDistance(arg);
-            if (d <= e && this.method_28347()) {
+        protected void attack(LivingEntity target, double squaredDistance) {
+            double e = this.getSquaredMaxAttackDistance(target);
+            if (squaredDistance <= e && this.method_28347()) {
                 this.method_28346();
-                this.mob.tryAttack(arg);
+                this.mob.tryAttack(target);
                 PolarBearEntity.this.setWarning(false);
-            } else if (d <= e * 2.0) {
+            } else if (squaredDistance <= e * 2.0) {
                 if (this.method_28347()) {
                     PolarBearEntity.this.setWarning(false);
                     this.method_28346();
@@ -301,8 +301,8 @@ implements Angerable {
         }
 
         @Override
-        protected double getSquaredMaxAttackDistance(LivingEntity arg) {
-            return 4.0f + arg.getWidth();
+        protected double getSquaredMaxAttackDistance(LivingEntity entity) {
+            return 4.0f + entity.getWidth();
         }
     }
 
@@ -349,9 +349,9 @@ implements Angerable {
         }
 
         @Override
-        protected void setMobEntityTarget(MobEntity arg, LivingEntity arg2) {
-            if (arg instanceof PolarBearEntity && !arg.isBaby()) {
-                super.setMobEntityTarget(arg, arg2);
+        protected void setMobEntityTarget(MobEntity mob, LivingEntity target) {
+            if (mob instanceof PolarBearEntity && !mob.isBaby()) {
+                super.setMobEntityTarget(mob, target);
             }
         }
     }

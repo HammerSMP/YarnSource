@@ -55,8 +55,8 @@ SpectatorMenuCommand {
     }
 
     @Override
-    public void use(SpectatorMenu arg) {
-        arg.selectElement(this);
+    public void use(SpectatorMenu menu) {
+        menu.selectElement(this);
     }
 
     @Override
@@ -104,8 +104,8 @@ SpectatorMenuCommand {
         }
 
         @Override
-        public void use(SpectatorMenu arg) {
-            arg.selectElement(new TeleportSpectatorMenu(this.scoreboardEntries));
+        public void use(SpectatorMenu menu) {
+            menu.selectElement(new TeleportSpectatorMenu(this.scoreboardEntries));
         }
 
         @Override

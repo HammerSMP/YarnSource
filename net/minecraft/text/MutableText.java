@@ -13,29 +13,29 @@ public interface MutableText
 extends Text {
     public MutableText setStyle(Style var1);
 
-    default public MutableText append(String string) {
-        return this.append(new LiteralText(string));
+    default public MutableText append(String text) {
+        return this.append(new LiteralText(text));
     }
 
     public MutableText append(Text var1);
 
-    default public MutableText styled(UnaryOperator<Style> unaryOperator) {
-        this.setStyle((Style)unaryOperator.apply(this.getStyle()));
+    default public MutableText styled(UnaryOperator<Style> styleUpdater) {
+        this.setStyle((Style)styleUpdater.apply(this.getStyle()));
         return this;
     }
 
-    default public MutableText fillStyle(Style arg) {
-        this.setStyle(arg.withParent(this.getStyle()));
+    default public MutableText fillStyle(Style styleOverride) {
+        this.setStyle(styleOverride.withParent(this.getStyle()));
         return this;
     }
 
-    default public MutableText formatted(Formatting ... args) {
-        this.setStyle(this.getStyle().withFormatting(args));
+    default public MutableText formatted(Formatting ... formattings) {
+        this.setStyle(this.getStyle().withFormatting(formattings));
         return this;
     }
 
-    default public MutableText formatted(Formatting arg) {
-        this.setStyle(this.getStyle().withFormatting(arg));
+    default public MutableText formatted(Formatting formatting) {
+        this.setStyle(this.getStyle().withFormatting(formatting));
         return this;
     }
 }

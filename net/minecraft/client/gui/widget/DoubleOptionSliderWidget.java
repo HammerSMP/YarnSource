@@ -18,9 +18,9 @@ public class DoubleOptionSliderWidget
 extends OptionSliderWidget {
     private final DoubleOption option;
 
-    public DoubleOptionSliderWidget(GameOptions arg, int i, int j, int k, int l, DoubleOption arg2) {
-        super(arg, i, j, k, l, (double)((float)arg2.getRatio(arg2.get(arg))));
-        this.option = arg2;
+    public DoubleOptionSliderWidget(GameOptions gameOptions, int x, int y, int width, int height, DoubleOption option) {
+        super(gameOptions, x, y, width, height, (double)((float)option.getRatio(option.get(gameOptions))));
+        this.option = option;
         this.updateMessage();
     }
 

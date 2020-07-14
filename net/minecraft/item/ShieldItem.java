@@ -35,43 +35,43 @@ extends Item {
     }
 
     @Override
-    public String getTranslationKey(ItemStack arg) {
-        if (arg.getSubTag("BlockEntityTag") != null) {
-            return this.getTranslationKey() + '.' + ShieldItem.getColor(arg).getName();
+    public String getTranslationKey(ItemStack stack) {
+        if (stack.getSubTag("BlockEntityTag") != null) {
+            return this.getTranslationKey() + '.' + ShieldItem.getColor(stack).getName();
         }
-        return super.getTranslationKey(arg);
+        return super.getTranslationKey(stack);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        BannerItem.appendBannerTooltip(arg, list);
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        BannerItem.appendBannerTooltip(stack, tooltip);
     }
 
     @Override
-    public UseAction getUseAction(ItemStack arg) {
+    public UseAction getUseAction(ItemStack stack) {
         return UseAction.BLOCK;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack arg) {
+    public int getMaxUseTime(ItemStack stack) {
         return 72000;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        arg2.setCurrentHand(arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        user.setCurrentHand(hand);
         return TypedActionResult.consume(lv);
     }
 
     @Override
-    public boolean canRepair(ItemStack arg, ItemStack arg2) {
-        return ItemTags.PLANKS.contains(arg2.getItem()) || super.canRepair(arg, arg2);
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return ItemTags.PLANKS.contains(ingredient.getItem()) || super.canRepair(stack, ingredient);
     }
 
-    public static DyeColor getColor(ItemStack arg) {
-        return DyeColor.byId(arg.getOrCreateSubTag("BlockEntityTag").getInt("Base"));
+    public static DyeColor getColor(ItemStack stack) {
+        return DyeColor.byId(stack.getOrCreateSubTag("BlockEntityTag").getInt("Base"));
     }
 }
 

@@ -42,84 +42,84 @@ extends Block {
     }
 
     @Override
-    public void onBlockBreakStart(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4) {
-        RedstoneOreBlock.light(arg, arg2, arg3);
-        super.onBlockBreakStart(arg, arg2, arg3, arg4);
+    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        RedstoneOreBlock.light(state, world, pos);
+        super.onBlockBreakStart(state, world, pos, player);
     }
 
     @Override
-    public void onSteppedOn(World arg, BlockPos arg2, Entity arg3) {
-        RedstoneOreBlock.light(arg.getBlockState(arg2), arg, arg2);
-        super.onSteppedOn(arg, arg2, arg3);
+    public void onSteppedOn(World world, BlockPos pos, Entity entity) {
+        RedstoneOreBlock.light(world.getBlockState(pos), world, pos);
+        super.onSteppedOn(world, pos, entity);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
-            RedstoneOreBlock.spawnParticles(arg2, arg3);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            RedstoneOreBlock.spawnParticles(world, pos);
         } else {
-            RedstoneOreBlock.light(arg, arg2, arg3);
+            RedstoneOreBlock.light(state, world, pos);
         }
-        ItemStack lv = arg4.getStackInHand(arg5);
-        if (lv.getItem() instanceof BlockItem && new ItemPlacementContext(arg4, arg5, lv, arg6).canPlace()) {
+        ItemStack lv = player.getStackInHand(hand);
+        if (lv.getItem() instanceof BlockItem && new ItemPlacementContext(player, hand, lv, hit).canPlace()) {
             return ActionResult.PASS;
         }
         return ActionResult.SUCCESS;
     }
 
-    private static void light(BlockState arg, World arg2, BlockPos arg3) {
-        RedstoneOreBlock.spawnParticles(arg2, arg3);
-        if (!arg.get(LIT).booleanValue()) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(LIT, true), 3);
+    private static void light(BlockState state, World world, BlockPos pos) {
+        RedstoneOreBlock.spawnParticles(world, pos);
+        if (!state.get(LIT).booleanValue()) {
+            world.setBlockState(pos, (BlockState)state.with(LIT, true), 3);
         }
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return arg.get(LIT);
+    public boolean hasRandomTicks(BlockState state) {
+        return state.get(LIT);
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg.get(LIT).booleanValue()) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(LIT, false), 3);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (state.get(LIT).booleanValue()) {
+            world.setBlockState(pos, (BlockState)state.with(LIT, false), 3);
         }
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
-        super.onStacksDropped(arg, arg2, arg3, arg4);
-        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg4) == 0) {
+    public void onStacksDropped(BlockState state, ServerWorld arg2, BlockPos pos, ItemStack stack) {
+        super.onStacksDropped(state, arg2, pos, stack);
+        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0) {
             int i = 1 + arg2.random.nextInt(5);
-            this.dropExperience(arg2, arg3, i);
+            this.dropExperience(arg2, pos, i);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        if (arg.get(LIT).booleanValue()) {
-            RedstoneOreBlock.spawnParticles(arg2, arg3);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (state.get(LIT).booleanValue()) {
+            RedstoneOreBlock.spawnParticles(world, pos);
         }
     }
 
-    private static void spawnParticles(World arg, BlockPos arg2) {
+    private static void spawnParticles(World world, BlockPos pos) {
         double d = 0.5625;
-        Random random = arg.random;
+        Random random = world.random;
         for (Direction lv : Direction.values()) {
-            BlockPos lv2 = arg2.offset(lv);
-            if (arg.getBlockState(lv2).isOpaqueFullCube(arg, lv2)) continue;
+            BlockPos lv2 = pos.offset(lv);
+            if (world.getBlockState(lv2).isOpaqueFullCube(world, lv2)) continue;
             Direction.Axis lv3 = lv.getAxis();
             double e = lv3 == Direction.Axis.X ? 0.5 + 0.5625 * (double)lv.getOffsetX() : (double)random.nextFloat();
             double f = lv3 == Direction.Axis.Y ? 0.5 + 0.5625 * (double)lv.getOffsetY() : (double)random.nextFloat();
             double g = lv3 == Direction.Axis.Z ? 0.5 + 0.5625 * (double)lv.getOffsetZ() : (double)random.nextFloat();
-            arg.addParticle(DustParticleEffect.RED, (double)arg2.getX() + e, (double)arg2.getY() + f, (double)arg2.getZ() + g, 0.0, 0.0, 0.0);
+            world.addParticle(DustParticleEffect.RED, (double)pos.getX() + e, (double)pos.getY() + f, (double)pos.getZ() + g, 0.0, 0.0, 0.0);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(LIT);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(LIT);
     }
 }
 

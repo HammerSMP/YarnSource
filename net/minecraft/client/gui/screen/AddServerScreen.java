@@ -52,11 +52,11 @@ extends Screen {
         }
     };
 
-    public AddServerScreen(Screen arg, BooleanConsumer booleanConsumer, ServerInfo arg2) {
+    public AddServerScreen(Screen parent, BooleanConsumer callback, ServerInfo server) {
         super(new TranslatableText("addServer.title"));
-        this.parent = arg;
-        this.callback = booleanConsumer;
-        this.server = arg2;
+        this.parent = parent;
+        this.callback = callback;
+        this.server = server;
     }
 
     @Override
@@ -93,15 +93,15 @@ extends Screen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.addressField.getText();
         String string2 = this.serverNameField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.addressField.setText(string);
         this.serverNameField.setText(string2);
     }
 
-    private void onClose(String string) {
+    private void onClose(String text) {
         this.updateButtonActiveState();
     }
 
@@ -129,14 +129,14 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 17, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("addServer.enterName", new Object[0]), this.width / 2 - 100, 53, 0xA0A0A0);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("addServer.enterIp", new Object[0]), this.width / 2 - 100, 94, 0xA0A0A0);
-        this.serverNameField.render(arg, i, j, f);
-        this.addressField.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 17, 0xFFFFFF);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("addServer.enterName", new Object[0]), this.width / 2 - 100, 53, 0xA0A0A0);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("addServer.enterIp", new Object[0]), this.width / 2 - 100, 94, 0xA0A0A0);
+        this.serverNameField.render(matrices, mouseX, mouseY, delta);
+        this.addressField.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

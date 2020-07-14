@@ -48,10 +48,10 @@ extends RealmsScreen {
     private String startDate;
     private Subscription.SubscriptionType type;
 
-    public RealmsSubscriptionInfoScreen(Screen arg, RealmsServer arg2, Screen arg3) {
-        this.parent = arg;
-        this.serverData = arg2;
-        this.mainScreen = arg3;
+    public RealmsSubscriptionInfoScreen(Screen parent, RealmsServer serverData, Screen mainScreen) {
+        this.parent = parent;
+        this.serverData = serverData;
+        this.mainScreen = mainScreen;
         this.subscriptionTitle = I18n.translate("mco.configure.world.subscription.title", new Object[0]);
         this.subscriptionStartLabelText = I18n.translate("mco.configure.world.subscription.start", new Object[0]);
         this.timeLeftLabelText = I18n.translate("mco.configure.world.subscription.timeleft", new Object[0]);
@@ -99,10 +99,10 @@ extends RealmsScreen {
         this.client.openScreen(this);
     }
 
-    private void getSubscription(long l) {
+    private void getSubscription(long worldId) {
         RealmsClient lv = RealmsClient.createRealmsClient();
         try {
-            Subscription lv2 = lv.subscriptionFor(l);
+            Subscription lv2 = lv.subscriptionFor(worldId);
             this.daysLeft = lv2.daysLeft;
             this.startDate = this.localPresentation(lv2.startDate);
             this.type = lv2.type;
@@ -113,9 +113,9 @@ extends RealmsScreen {
         }
     }
 
-    private String localPresentation(long l) {
+    private String localPresentation(long cetTime) {
         GregorianCalendar calendar = new GregorianCalendar(TimeZone.getDefault());
-        calendar.setTimeInMillis(l);
+        calendar.setTimeInMillis(cetTime);
         return DateFormat.getDateTimeInstance().format(calendar.getTime());
     }
 
@@ -125,39 +125,39 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         int k = this.width / 2 - 100;
-        this.drawCenteredString(arg, this.textRenderer, this.subscriptionTitle, this.width / 2, 17, 0xFFFFFF);
-        this.textRenderer.draw(arg, this.subscriptionStartLabelText, (float)k, (float)RealmsSubscriptionInfoScreen.row(0), 0xA0A0A0);
-        this.textRenderer.draw(arg, this.startDate, (float)k, (float)RealmsSubscriptionInfoScreen.row(1), 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, this.subscriptionTitle, this.width / 2, 17, 0xFFFFFF);
+        this.textRenderer.draw(matrices, this.subscriptionStartLabelText, (float)k, (float)RealmsSubscriptionInfoScreen.row(0), 0xA0A0A0);
+        this.textRenderer.draw(matrices, this.startDate, (float)k, (float)RealmsSubscriptionInfoScreen.row(1), 0xFFFFFF);
         if (this.type == Subscription.SubscriptionType.NORMAL) {
-            this.textRenderer.draw(arg, this.timeLeftLabelText, (float)k, (float)RealmsSubscriptionInfoScreen.row(3), 0xA0A0A0);
+            this.textRenderer.draw(matrices, this.timeLeftLabelText, (float)k, (float)RealmsSubscriptionInfoScreen.row(3), 0xA0A0A0);
         } else if (this.type == Subscription.SubscriptionType.RECURRING) {
-            this.textRenderer.draw(arg, this.daysLeftLabelText, (float)k, (float)RealmsSubscriptionInfoScreen.row(3), 0xA0A0A0);
+            this.textRenderer.draw(matrices, this.daysLeftLabelText, (float)k, (float)RealmsSubscriptionInfoScreen.row(3), 0xA0A0A0);
         }
-        this.textRenderer.draw(arg, this.daysLeftPresentation(this.daysLeft), (float)k, (float)RealmsSubscriptionInfoScreen.row(4), 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.textRenderer.draw(matrices, this.daysLeftPresentation(this.daysLeft), (float)k, (float)RealmsSubscriptionInfoScreen.row(4), 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private String daysLeftPresentation(int i) {
-        if (i == -1 && this.serverData.expired) {
+    private String daysLeftPresentation(int daysLeft) {
+        if (daysLeft == -1 && this.serverData.expired) {
             return I18n.translate("mco.configure.world.subscription.expired", new Object[0]);
         }
-        if (i <= 1) {
+        if (daysLeft <= 1) {
             return I18n.translate("mco.configure.world.subscription.less_than_a_day", new Object[0]);
         }
-        int j = i / 30;
-        int k = i % 30;
+        int j = daysLeft / 30;
+        int k = daysLeft % 30;
         StringBuilder stringBuilder = new StringBuilder();
         if (j > 0) {
             stringBuilder.append(j).append(" ");

@@ -11,11 +11,11 @@ public class TeleportTarget {
     public final float yaw;
     public final float pitch;
 
-    public TeleportTarget(Vec3d arg, Vec3d arg2, float f, float g) {
-        this.position = arg;
-        this.velocity = arg2;
-        this.yaw = f;
-        this.pitch = g;
+    public TeleportTarget(Vec3d position, Vec3d velocity, float yaw, float pitch) {
+        this.position = position;
+        this.velocity = velocity;
+        this.yaw = yaw;
+        this.pitch = pitch;
     }
 }
 

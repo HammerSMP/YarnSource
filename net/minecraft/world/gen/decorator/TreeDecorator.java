@@ -27,14 +27,14 @@ public abstract class TreeDecorator {
 
     public abstract void generate(ServerWorldAccess var1, Random var2, List<BlockPos> var3, List<BlockPos> var4, Set<BlockPos> var5, BlockBox var6);
 
-    protected void placeVine(ModifiableWorld arg, BlockPos arg2, BooleanProperty arg3, Set<BlockPos> set, BlockBox arg4) {
-        this.setBlockStateAndEncompassPosition(arg, arg2, (BlockState)Blocks.VINE.getDefaultState().with(arg3, true), set, arg4);
+    protected void placeVine(ModifiableWorld world, BlockPos pos, BooleanProperty directionProperty, Set<BlockPos> set, BlockBox box) {
+        this.setBlockStateAndEncompassPosition(world, pos, (BlockState)Blocks.VINE.getDefaultState().with(directionProperty, true), set, box);
     }
 
-    protected void setBlockStateAndEncompassPosition(ModifiableWorld arg, BlockPos arg2, BlockState arg3, Set<BlockPos> set, BlockBox arg4) {
-        arg.setBlockState(arg2, arg3, 19);
-        set.add(arg2);
-        arg4.encompass(new BlockBox(arg2, arg2));
+    protected void setBlockStateAndEncompassPosition(ModifiableWorld world, BlockPos pos, BlockState state, Set<BlockPos> set, BlockBox box) {
+        world.setBlockState(pos, state, 19);
+        set.add(pos);
+        box.encompass(new BlockBox(pos, pos));
     }
 }
 

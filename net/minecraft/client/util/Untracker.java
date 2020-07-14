@@ -41,12 +41,12 @@ public class Untracker {
         }
     });
 
-    public static void untrack(long l) {
+    public static void untrack(long address) {
         if (ALLOCATOR_UNTRACK == null) {
             return;
         }
         try {
-            ALLOCATOR_UNTRACK.invoke(l);
+            ALLOCATOR_UNTRACK.invoke(address);
         }
         catch (Throwable throwable) {
             throw new RuntimeException(throwable);

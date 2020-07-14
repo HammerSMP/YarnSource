@@ -26,24 +26,24 @@ implements Packet<ClientPlayPacketListener> {
     public GameMessageS2CPacket() {
     }
 
-    public GameMessageS2CPacket(Text arg, MessageType arg2, UUID uUID) {
-        this.message = arg;
-        this.location = arg2;
-        this.senderUuid = uUID;
+    public GameMessageS2CPacket(Text message, MessageType location, UUID senderUuid) {
+        this.message = message;
+        this.location = location;
+        this.senderUuid = senderUuid;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.message = arg.readText();
-        this.location = MessageType.byId(arg.readByte());
-        this.senderUuid = arg.readUuid();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.message = buf.readText();
+        this.location = MessageType.byId(buf.readByte());
+        this.senderUuid = buf.readUuid();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeText(this.message);
-        arg.writeByte(this.location.getId());
-        arg.writeUuid(this.senderUuid);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeText(this.message);
+        buf.writeByte(this.location.getId());
+        buf.writeUuid(this.senderUuid);
     }
 
     @Override

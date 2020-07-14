@@ -61,8 +61,8 @@ implements ArgumentType<EntityAnchor> {
         return lv;
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestMatching(EntityAnchor.anchors.keySet(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestMatching(EntityAnchor.anchors.keySet(), builder);
     }
 
     public Collection<String> getExamples() {
@@ -81,14 +81,14 @@ implements ArgumentType<EntityAnchor> {
         private final String id;
         private final BiFunction<Vec3d, Entity, Vec3d> offset;
 
-        private EntityAnchor(String string2, BiFunction<Vec3d, Entity, Vec3d> biFunction) {
-            this.id = string2;
-            this.offset = biFunction;
+        private EntityAnchor(String id, BiFunction<Vec3d, Entity, Vec3d> offset) {
+            this.id = id;
+            this.offset = offset;
         }
 
         @Nullable
-        public static EntityAnchor fromId(String string) {
-            return anchors.get(string);
+        public static EntityAnchor fromId(String id) {
+            return anchors.get(id);
         }
 
         public Vec3d positionAt(Entity arg) {

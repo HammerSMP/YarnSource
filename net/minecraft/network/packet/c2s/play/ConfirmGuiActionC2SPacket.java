@@ -24,10 +24,10 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ConfirmGuiActionC2SPacket(int i, short s, boolean bl) {
-        this.windowId = i;
-        this.actionId = s;
-        this.accepted = bl;
+    public ConfirmGuiActionC2SPacket(int windowId, short actionId, boolean accepted) {
+        this.windowId = windowId;
+        this.actionId = actionId;
+        this.accepted = accepted;
     }
 
     @Override
@@ -36,17 +36,17 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.windowId = arg.readByte();
-        this.actionId = arg.readShort();
-        this.accepted = arg.readByte() != 0;
+    public void read(PacketByteBuf buf) throws IOException {
+        this.windowId = buf.readByte();
+        this.actionId = buf.readShort();
+        this.accepted = buf.readByte() != 0;
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.windowId);
-        arg.writeShort(this.actionId);
-        arg.writeByte(this.accepted ? 1 : 0);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.windowId);
+        buf.writeShort(this.actionId);
+        buf.writeByte(this.accepted ? 1 : 0);
     }
 
     public int getWindowId() {

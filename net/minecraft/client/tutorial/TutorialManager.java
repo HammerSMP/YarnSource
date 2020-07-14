@@ -31,31 +31,31 @@ public class TutorialManager {
     @Nullable
     private TutorialStepHandler currentHandler;
 
-    public TutorialManager(MinecraftClient arg) {
-        this.client = arg;
+    public TutorialManager(MinecraftClient client) {
+        this.client = client;
     }
 
-    public void onMovement(Input arg) {
+    public void onMovement(Input input) {
         if (this.currentHandler != null) {
-            this.currentHandler.onMovement(arg);
+            this.currentHandler.onMovement(input);
         }
     }
 
-    public void onUpdateMouse(double d, double e) {
+    public void onUpdateMouse(double deltaX, double deltaY) {
         if (this.currentHandler != null) {
-            this.currentHandler.onMouseUpdate(d, e);
+            this.currentHandler.onMouseUpdate(deltaX, deltaY);
         }
     }
 
-    public void tick(@Nullable ClientWorld arg, @Nullable HitResult arg2) {
-        if (this.currentHandler != null && arg2 != null && arg != null) {
-            this.currentHandler.onTarget(arg, arg2);
+    public void tick(@Nullable ClientWorld world, @Nullable HitResult hitResult) {
+        if (this.currentHandler != null && hitResult != null && world != null) {
+            this.currentHandler.onTarget(world, hitResult);
         }
     }
 
-    public void onBlockAttacked(ClientWorld arg, BlockPos arg2, BlockState arg3, float f) {
+    public void onBlockAttacked(ClientWorld world, BlockPos pos, BlockState state, float f) {
         if (this.currentHandler != null) {
-            this.currentHandler.onBlockAttacked(arg, arg2, arg3, f);
+            this.currentHandler.onBlockAttacked(world, pos, state, f);
         }
     }
 
@@ -65,9 +65,9 @@ public class TutorialManager {
         }
     }
 
-    public void onSlotUpdate(ItemStack arg) {
+    public void onSlotUpdate(ItemStack stack) {
         if (this.currentHandler != null) {
-            this.currentHandler.onSlotUpdate(arg);
+            this.currentHandler.onSlotUpdate(stack);
         }
     }
 
@@ -98,12 +98,12 @@ public class TutorialManager {
         }
     }
 
-    public void setStep(TutorialStep arg) {
-        this.client.options.tutorialStep = arg;
+    public void setStep(TutorialStep step) {
+        this.client.options.tutorialStep = step;
         this.client.options.write();
         if (this.currentHandler != null) {
             this.currentHandler.destroy();
-            this.currentHandler = arg.createHandler(this);
+            this.currentHandler = step.createHandler(this);
         }
     }
 

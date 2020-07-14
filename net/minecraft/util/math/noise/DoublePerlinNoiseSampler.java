@@ -21,23 +21,23 @@ public class DoublePerlinNoiseSampler {
         this(arg, (List)intStream.boxed().collect(ImmutableList.toImmutableList()));
     }
 
-    public DoublePerlinNoiseSampler(ChunkRandom arg, List<Integer> list) {
-        this.firstSampler = new OctavePerlinNoiseSampler(arg, list);
-        this.secondSampler = new OctavePerlinNoiseSampler(arg, list);
-        int i = list.stream().min(Integer::compareTo).orElse(0);
-        int j = list.stream().max(Integer::compareTo).orElse(0);
+    public DoublePerlinNoiseSampler(ChunkRandom arg, List<Integer> octaves) {
+        this.firstSampler = new OctavePerlinNoiseSampler(arg, octaves);
+        this.secondSampler = new OctavePerlinNoiseSampler(arg, octaves);
+        int i = octaves.stream().min(Integer::compareTo).orElse(0);
+        int j = octaves.stream().max(Integer::compareTo).orElse(0);
         this.amplitude = 0.16666666666666666 / DoublePerlinNoiseSampler.createAmplitude(j - i);
     }
 
-    private static double createAmplitude(int i) {
-        return 0.1 * (1.0 + 1.0 / (double)(i + 1));
+    private static double createAmplitude(int octaves) {
+        return 0.1 * (1.0 + 1.0 / (double)(octaves + 1));
     }
 
-    public double sample(double d, double e, double f) {
-        double g = d * 1.0181268882175227;
-        double h = e * 1.0181268882175227;
-        double i = f * 1.0181268882175227;
-        return (this.firstSampler.sample(d, e, f) + this.secondSampler.sample(g, h, i)) * this.amplitude;
+    public double sample(double x, double y, double z) {
+        double g = x * 1.0181268882175227;
+        double h = y * 1.0181268882175227;
+        double i = z * 1.0181268882175227;
+        return (this.firstSampler.sample(x, y, z) + this.secondSampler.sample(g, h, i)) * this.amplitude;
     }
 }
 

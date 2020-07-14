@@ -24,21 +24,21 @@ implements Packet<ClientPlayPacketListener> {
     public EntityStatusS2CPacket() {
     }
 
-    public EntityStatusS2CPacket(Entity arg, byte b) {
-        this.id = arg.getEntityId();
-        this.status = b;
+    public EntityStatusS2CPacket(Entity entity, byte status) {
+        this.id = entity.getEntityId();
+        this.status = status;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readInt();
-        this.status = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readInt();
+        this.status = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.id);
-        arg.writeByte(this.status);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeInt(this.id);
+        buf.writeByte(this.status);
     }
 
     @Override
@@ -47,8 +47,8 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Entity getEntity(World arg) {
-        return arg.getEntityById(this.id);
+    public Entity getEntity(World world) {
+        return world.getEntityById(this.id);
     }
 
     @Environment(value=EnvType.CLIENT)

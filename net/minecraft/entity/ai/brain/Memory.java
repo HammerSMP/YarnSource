@@ -34,8 +34,8 @@ public class Memory<T> {
         return new Memory<T>(object, Long.MAX_VALUE);
     }
 
-    public static <T> Memory<T> timed(T object, long l) {
-        return new Memory<T>(object, l);
+    public static <T> Memory<T> timed(T value, long expiry) {
+        return new Memory<T>(value, expiry);
     }
 
     public T getValue() {

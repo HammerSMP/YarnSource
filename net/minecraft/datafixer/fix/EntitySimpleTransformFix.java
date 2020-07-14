@@ -24,8 +24,8 @@ extends EntityTransformFix {
     }
 
     @Override
-    protected Pair<String, Typed<?>> transform(String string, Typed<?> typed) {
-        Pair<String, Dynamic<?>> pair = this.transform(string, (Dynamic)typed.getOrCreate(DSL.remainderFinder()));
+    protected Pair<String, Typed<?>> transform(String choice, Typed<?> typed) {
+        Pair<String, Dynamic<?>> pair = this.transform(choice, (Dynamic)typed.getOrCreate(DSL.remainderFinder()));
         return Pair.of((Object)pair.getFirst(), (Object)typed.set(DSL.remainderFinder(), pair.getSecond()));
     }
 

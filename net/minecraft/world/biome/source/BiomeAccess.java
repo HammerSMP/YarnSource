@@ -22,43 +22,43 @@ public class BiomeAccess {
     private final long seed;
     private final BiomeAccessType type;
 
-    public BiomeAccess(Storage arg, long l, BiomeAccessType arg2) {
-        this.storage = arg;
-        this.seed = l;
-        this.type = arg2;
+    public BiomeAccess(Storage storage, long seed, BiomeAccessType type) {
+        this.storage = storage;
+        this.seed = seed;
+        this.type = type;
     }
 
-    public static long hashSeed(long l) {
-        return Hashing.sha256().hashLong(l).asLong();
+    public static long hashSeed(long seed) {
+        return Hashing.sha256().hashLong(seed).asLong();
     }
 
-    public BiomeAccess withSource(BiomeSource arg) {
-        return new BiomeAccess(arg, this.seed, this.type);
+    public BiomeAccess withSource(BiomeSource source) {
+        return new BiomeAccess(source, this.seed, this.type);
     }
 
-    public Biome getBiome(BlockPos arg) {
-        return this.type.getBiome(this.seed, arg.getX(), arg.getY(), arg.getZ(), this.storage);
+    public Biome getBiome(BlockPos pos) {
+        return this.type.getBiome(this.seed, pos.getX(), pos.getY(), pos.getZ(), this.storage);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Biome getBiome(double d, double e, double f) {
-        int i = MathHelper.floor(d) >> 2;
-        int j = MathHelper.floor(e) >> 2;
-        int k = MathHelper.floor(f) >> 2;
+    public Biome getBiome(double x, double y, double z) {
+        int i = MathHelper.floor(x) >> 2;
+        int j = MathHelper.floor(y) >> 2;
+        int k = MathHelper.floor(z) >> 2;
         return this.getBiomeForNoiseGen(i, j, k);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Biome method_27344(BlockPos arg) {
-        int i = arg.getX() >> 2;
-        int j = arg.getY() >> 2;
-        int k = arg.getZ() >> 2;
+    public Biome method_27344(BlockPos pos) {
+        int i = pos.getX() >> 2;
+        int j = pos.getY() >> 2;
+        int k = pos.getZ() >> 2;
         return this.getBiomeForNoiseGen(i, j, k);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        return this.storage.getBiomeForNoiseGen(i, j, k);
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        return this.storage.getBiomeForNoiseGen(biomeX, biomeY, biomeZ);
     }
 
     public static interface Storage {

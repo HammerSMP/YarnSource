@@ -18,25 +18,25 @@ public class ChunkOcclusionData {
     private static final int DIRECTION_COUNT = Direction.values().length;
     private final BitSet visibility = new BitSet(DIRECTION_COUNT * DIRECTION_COUNT);
 
-    public void addOpenEdgeFaces(Set<Direction> set) {
-        for (Direction lv : set) {
-            for (Direction lv2 : set) {
+    public void addOpenEdgeFaces(Set<Direction> faces) {
+        for (Direction lv : faces) {
+            for (Direction lv2 : faces) {
                 this.setVisibleThrough(lv, lv2, true);
             }
         }
     }
 
-    public void setVisibleThrough(Direction arg, Direction arg2, boolean bl) {
-        this.visibility.set(arg.ordinal() + arg2.ordinal() * DIRECTION_COUNT, bl);
-        this.visibility.set(arg2.ordinal() + arg.ordinal() * DIRECTION_COUNT, bl);
+    public void setVisibleThrough(Direction from, Direction to, boolean visible) {
+        this.visibility.set(from.ordinal() + to.ordinal() * DIRECTION_COUNT, visible);
+        this.visibility.set(to.ordinal() + from.ordinal() * DIRECTION_COUNT, visible);
     }
 
-    public void fill(boolean bl) {
-        this.visibility.set(0, this.visibility.size(), bl);
+    public void fill(boolean visible) {
+        this.visibility.set(0, this.visibility.size(), visible);
     }
 
-    public boolean isVisibleThrough(Direction arg, Direction arg2) {
-        return this.visibility.get(arg.ordinal() + arg2.ordinal() * DIRECTION_COUNT);
+    public boolean isVisibleThrough(Direction from, Direction to) {
+        return this.visibility.get(from.ordinal() + to.ordinal() * DIRECTION_COUNT);
     }
 
     public String toString() {

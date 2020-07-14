@@ -22,8 +22,8 @@ public class ServerAddress {
     private final String address;
     private final int port;
 
-    private ServerAddress(String string, int i) {
-        this.address = string;
+    private ServerAddress(String address, int i) {
+        this.address = address;
         this.port = i;
     }
 
@@ -40,16 +40,16 @@ public class ServerAddress {
         return this.port;
     }
 
-    public static ServerAddress parse(String string) {
+    public static ServerAddress parse(String address) {
         int j;
         int i;
-        if (string == null) {
+        if (address == null) {
             return null;
         }
-        String[] strings = string.split(":");
-        if (string.startsWith("[") && (i = string.indexOf("]")) > 0) {
-            String string2 = string.substring(1, i);
-            String string3 = string.substring(i + 1).trim();
+        String[] strings = address.split(":");
+        if (address.startsWith("[") && (i = address.indexOf("]")) > 0) {
+            String string2 = address.substring(1, i);
+            String string3 = address.substring(i + 1).trim();
             if (string3.startsWith(":") && !string3.isEmpty()) {
                 string3 = string3.substring(1);
                 strings = new String[]{string2, string3};
@@ -58,7 +58,7 @@ public class ServerAddress {
             }
         }
         if (strings.length > 2) {
-            strings = new String[]{string};
+            strings = new String[]{address};
         }
         String string4 = strings[0];
         int n = j = strings.length > 1 ? ServerAddress.portOrDefault(strings[1], 25565) : 25565;
@@ -70,7 +70,7 @@ public class ServerAddress {
         return new ServerAddress(string4, j);
     }
 
-    private static Pair<String, Integer> resolveServer(String string) {
+    private static Pair<String, Integer> resolveServer(String address) {
         try {
             String string2 = "com.sun.jndi.dns.DnsContextFactory";
             Class.forName("com.sun.jndi.dns.DnsContextFactory");
@@ -79,7 +79,7 @@ public class ServerAddress {
             hashtable.put("java.naming.provider.url", "dns:");
             hashtable.put("com.sun.jndi.dns.timeout.retries", "1");
             InitialDirContext dirContext = new InitialDirContext(hashtable);
-            Attributes attributes = dirContext.getAttributes("_minecraft._tcp." + string, new String[]{"SRV"});
+            Attributes attributes = dirContext.getAttributes("_minecraft._tcp." + address, new String[]{"SRV"});
             Attribute attribute = attributes.get("srv");
             if (attribute != null) {
                 String[] strings = attribute.get().toString().split(" ", 4);
@@ -89,15 +89,15 @@ public class ServerAddress {
         catch (Throwable throwable) {
             // empty catch block
         }
-        return Pair.of((Object)string, (Object)25565);
+        return Pair.of((Object)address, (Object)25565);
     }
 
-    private static int portOrDefault(String string, int i) {
+    private static int portOrDefault(String port, int def) {
         try {
-            return Integer.parseInt(string.trim());
+            return Integer.parseInt(port.trim());
         }
         catch (Exception exception) {
-            return i;
+            return def;
         }
     }
 }

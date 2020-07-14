@@ -116,23 +116,23 @@ RangedAttackMob {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Invul", this.getInvulnerableTimer());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Invul", this.getInvulnerableTimer());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setInvulTimer(arg.getInt("Invul"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setInvulTimer(tag.getInt("Invul"));
         if (this.hasCustomName()) {
             this.bossBar.setName(this.getDisplayName());
         }
     }
 
     @Override
-    public void setCustomName(@Nullable Text arg) {
-        super.setCustomName(arg);
+    public void setCustomName(@Nullable Text name) {
+        super.setCustomName(name);
         this.bossBar.setName(this.getDisplayName());
     }
 
@@ -142,7 +142,7 @@ RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_WITHER_HURT;
     }
 
@@ -317,8 +317,8 @@ RangedAttackMob {
         this.bossBar.setPercent(this.getHealth() / this.getMaxHealth());
     }
 
-    public static boolean canDestroy(BlockState arg) {
-        return !arg.isAir() && !BlockTags.WITHER_IMMUNE.contains(arg.getBlock());
+    public static boolean canDestroy(BlockState block) {
+        return !block.isAir() && !BlockTags.WITHER_IMMUNE.contains(block.getBlock());
     }
 
     public void method_6885() {
@@ -327,68 +327,68 @@ RangedAttackMob {
     }
 
     @Override
-    public void slowMovement(BlockState arg, Vec3d arg2) {
+    public void slowMovement(BlockState state, Vec3d multiplier) {
     }
 
     @Override
-    public void onStartedTrackingBy(ServerPlayerEntity arg) {
-        super.onStartedTrackingBy(arg);
-        this.bossBar.addPlayer(arg);
+    public void onStartedTrackingBy(ServerPlayerEntity player) {
+        super.onStartedTrackingBy(player);
+        this.bossBar.addPlayer(player);
     }
 
     @Override
-    public void onStoppedTrackingBy(ServerPlayerEntity arg) {
-        super.onStoppedTrackingBy(arg);
-        this.bossBar.removePlayer(arg);
+    public void onStoppedTrackingBy(ServerPlayerEntity player) {
+        super.onStoppedTrackingBy(player);
+        this.bossBar.removePlayer(player);
     }
 
-    private double getHeadX(int i) {
-        if (i <= 0) {
+    private double getHeadX(int headIndex) {
+        if (headIndex <= 0) {
             return this.getX();
         }
-        float f = (this.bodyYaw + (float)(180 * (i - 1))) * ((float)Math.PI / 180);
+        float f = (this.bodyYaw + (float)(180 * (headIndex - 1))) * ((float)Math.PI / 180);
         float g = MathHelper.cos(f);
         return this.getX() + (double)g * 1.3;
     }
 
-    private double getHeadY(int i) {
-        if (i <= 0) {
+    private double getHeadY(int headIndex) {
+        if (headIndex <= 0) {
             return this.getY() + 3.0;
         }
         return this.getY() + 2.2;
     }
 
-    private double getHeadZ(int i) {
-        if (i <= 0) {
+    private double getHeadZ(int headIndex) {
+        if (headIndex <= 0) {
             return this.getZ();
         }
-        float f = (this.bodyYaw + (float)(180 * (i - 1))) * ((float)Math.PI / 180);
+        float f = (this.bodyYaw + (float)(180 * (headIndex - 1))) * ((float)Math.PI / 180);
         float g = MathHelper.sin(f);
         return this.getZ() + (double)g * 1.3;
     }
 
-    private float getNextAngle(float f, float g, float h) {
-        float i = MathHelper.wrapDegrees(g - f);
-        if (i > h) {
-            i = h;
+    private float getNextAngle(float prevAngle, float desiredAngle, float maxDifference) {
+        float i = MathHelper.wrapDegrees(desiredAngle - prevAngle);
+        if (i > maxDifference) {
+            i = maxDifference;
         }
-        if (i < -h) {
-            i = -h;
+        if (i < -maxDifference) {
+            i = -maxDifference;
         }
-        return f + i;
+        return prevAngle + i;
     }
 
     private void method_6878(int i, LivingEntity arg) {
         this.method_6877(i, arg.getX(), arg.getY() + (double)arg.getStandingEyeHeight() * 0.5, arg.getZ(), i == 0 && this.random.nextFloat() < 0.001f);
     }
 
-    private void method_6877(int i, double d, double e, double f, boolean bl) {
+    private void method_6877(int headIndex, double d, double e, double f, boolean bl) {
         if (!this.isSilent()) {
             this.world.syncWorldEvent(null, 1024, this.getBlockPos(), 0);
         }
-        double g = this.getHeadX(i);
-        double h = this.getHeadY(i);
-        double j = this.getHeadZ(i);
+        double g = this.getHeadX(headIndex);
+        double h = this.getHeadY(headIndex);
+        double j = this.getHeadZ(headIndex);
         double k = d - g;
         double l = e - h;
         double m = f - j;
@@ -402,26 +402,26 @@ RangedAttackMob {
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
-        this.method_6878(0, arg);
+    public void attack(LivingEntity target, float pullProgress) {
+        this.method_6878(0, target);
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         Entity lv;
-        if (this.isInvulnerableTo(arg)) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        if (arg == DamageSource.DROWN || arg.getAttacker() instanceof WitherEntity) {
+        if (source == DamageSource.DROWN || source.getAttacker() instanceof WitherEntity) {
             return false;
         }
-        if (this.getInvulnerableTimer() > 0 && arg != DamageSource.OUT_OF_WORLD) {
+        if (this.getInvulnerableTimer() > 0 && source != DamageSource.OUT_OF_WORLD) {
             return false;
         }
-        if (this.shouldRenderOverlay() && (lv = arg.getSource()) instanceof PersistentProjectileEntity) {
+        if (this.shouldRenderOverlay() && (lv = source.getSource()) instanceof PersistentProjectileEntity) {
             return false;
         }
-        Entity lv2 = arg.getAttacker();
+        Entity lv2 = source.getAttacker();
         if (lv2 != null && !(lv2 instanceof PlayerEntity) && lv2 instanceof LivingEntity && ((LivingEntity)lv2).getGroup() == this.getGroup()) {
             return false;
         }
@@ -433,12 +433,12 @@ RangedAttackMob {
             int n = i++;
             this.field_7092[n] = this.field_7092[n] + 3;
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    protected void dropEquipment(DamageSource arg, int i, boolean bl) {
-        super.dropEquipment(arg, i, bl);
+    protected void dropEquipment(DamageSource source, int lootingMultiplier, boolean allowDrops) {
+        super.dropEquipment(source, lootingMultiplier, allowDrops);
         ItemEntity lv = this.dropItem(Items.NETHER_STAR);
         if (lv != null) {
             lv.setCovetedItem();
@@ -455,12 +455,12 @@ RangedAttackMob {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
     @Override
-    public boolean addStatusEffect(StatusEffectInstance arg) {
+    public boolean addStatusEffect(StatusEffectInstance effect) {
         return false;
     }
 
@@ -469,29 +469,29 @@ RangedAttackMob {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getHeadYaw(int i) {
-        return this.sideHeadYaws[i];
+    public float getHeadYaw(int headIndex) {
+        return this.sideHeadYaws[headIndex];
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getHeadPitch(int i) {
-        return this.sideHeadPitches[i];
+    public float getHeadPitch(int headIndex) {
+        return this.sideHeadPitches[headIndex];
     }
 
     public int getInvulnerableTimer() {
         return this.dataTracker.get(INVUL_TIMER);
     }
 
-    public void setInvulTimer(int i) {
-        this.dataTracker.set(INVUL_TIMER, i);
+    public void setInvulTimer(int ticks) {
+        this.dataTracker.set(INVUL_TIMER, ticks);
     }
 
-    public int getTrackedEntityId(int i) {
-        return this.dataTracker.get(TRACKED_ENTITY_IDS.get(i));
+    public int getTrackedEntityId(int headIndex) {
+        return this.dataTracker.get(TRACKED_ENTITY_IDS.get(headIndex));
     }
 
-    public void setTrackedEntityId(int i, int j) {
-        this.dataTracker.set(TRACKED_ENTITY_IDS.get(i), j);
+    public void setTrackedEntityId(int headIndex, int id) {
+        this.dataTracker.set(TRACKED_ENTITY_IDS.get(headIndex), id);
     }
 
     @Override
@@ -505,7 +505,7 @@ RangedAttackMob {
     }
 
     @Override
-    protected boolean canStartRiding(Entity arg) {
+    protected boolean canStartRiding(Entity entity) {
         return false;
     }
 
@@ -515,11 +515,11 @@ RangedAttackMob {
     }
 
     @Override
-    public boolean canHaveStatusEffect(StatusEffectInstance arg) {
-        if (arg.getEffectType() == StatusEffects.WITHER) {
+    public boolean canHaveStatusEffect(StatusEffectInstance effect) {
+        if (effect.getEffectType() == StatusEffects.WITHER) {
             return false;
         }
-        return super.canHaveStatusEffect(arg);
+        return super.canHaveStatusEffect(effect);
     }
 
     class DescendAtHalfHealthGoal

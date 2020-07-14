@@ -55,26 +55,26 @@ public class Timer<T> {
         });
     }
 
-    public Timer(TimerCallbackSerializer<T> arg) {
-        this.callback = arg;
+    public Timer(TimerCallbackSerializer<T> timerCallbackSerializer) {
+        this.callback = timerCallbackSerializer;
     }
 
-    public void processEvents(T object, long l) {
+    public void processEvents(T server, long time) {
         Event<T> lv;
-        while ((lv = this.events.peek()) != null && lv.triggerTime <= l) {
+        while ((lv = this.events.peek()) != null && lv.triggerTime <= time) {
             this.events.remove();
-            this.eventsByName.remove((Object)lv.name, (Object)l);
-            lv.callback.call(object, this, l);
+            this.eventsByName.remove((Object)lv.name, (Object)time);
+            lv.callback.call(server, this, time);
         }
     }
 
-    public void setEvent(String string, long l, TimerCallback<T> arg) {
-        if (this.eventsByName.contains((Object)string, (Object)l)) {
+    public void setEvent(String name, long triggerTime, TimerCallback<T> callback) {
+        if (this.eventsByName.contains((Object)name, (Object)triggerTime)) {
             return;
         }
         this.eventCounter = this.eventCounter.plus(UnsignedLong.ONE);
-        Event lv = new Event(l, this.eventCounter, string, arg);
-        this.eventsByName.put((Object)string, (Object)l, lv);
+        Event lv = new Event(triggerTime, this.eventCounter, name, callback);
+        this.eventsByName.put((Object)name, (Object)triggerTime, lv);
         this.events.add(lv);
     }
 
@@ -90,21 +90,21 @@ public class Timer<T> {
         return Collections.unmodifiableSet(this.eventsByName.rowKeySet());
     }
 
-    private void addEvent(CompoundTag arg) {
-        CompoundTag lv = arg.getCompound("Callback");
+    private void addEvent(CompoundTag tag) {
+        CompoundTag lv = tag.getCompound("Callback");
         TimerCallback<T> lv2 = this.callback.deserialize(lv);
         if (lv2 != null) {
-            String string = arg.getString("Name");
-            long l = arg.getLong("TriggerTime");
+            String string = tag.getString("Name");
+            long l = tag.getLong("TriggerTime");
             this.setEvent(string, l, lv2);
         }
     }
 
-    private CompoundTag serialize(Event<T> arg) {
+    private CompoundTag serialize(Event<T> event) {
         CompoundTag lv = new CompoundTag();
-        lv.putString("Name", arg.name);
-        lv.putLong("TriggerTime", arg.triggerTime);
-        lv.put("Callback", this.callback.serialize(arg.callback));
+        lv.putString("Name", event.name);
+        lv.putLong("TriggerTime", event.triggerTime);
+        lv.put("Callback", this.callback.serialize(event.callback));
         return lv;
     }
 
@@ -120,11 +120,11 @@ public class Timer<T> {
         public final String name;
         public final TimerCallback<T> callback;
 
-        private Event(long l, UnsignedLong unsignedLong, String string, TimerCallback<T> arg) {
-            this.triggerTime = l;
-            this.id = unsignedLong;
-            this.name = string;
-            this.callback = arg;
+        private Event(long triggerTime, UnsignedLong id, String name, TimerCallback<T> callback) {
+            this.triggerTime = triggerTime;
+            this.id = id;
+            this.name = name;
+            this.callback = callback;
         }
     }
 }

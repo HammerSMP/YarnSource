@@ -33,9 +33,9 @@ extends RealmsScreen {
     private ButtonWidget createButton;
     private RealmsLabel createRealmLabel;
 
-    public RealmsCreateRealmScreen(RealmsServer arg, RealmsMainScreen arg2) {
-        this.server = arg;
-        this.parent = arg2;
+    public RealmsCreateRealmScreen(RealmsServer server, RealmsMainScreen parent) {
+        this.server = server;
+        this.parent = parent;
     }
 
     @Override
@@ -70,19 +70,19 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
-        boolean bl = super.charTyped(c, i);
+    public boolean charTyped(char chr, int keyCode) {
+        boolean bl = super.charTyped(chr, keyCode);
         this.createButton.active = this.valid();
         return bl;
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        boolean bl = super.keyPressed(i, j, k);
+        boolean bl = super.keyPressed(keyCode, scanCode, modifiers);
         this.createButton.active = this.valid();
         return bl;
     }
@@ -100,18 +100,18 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.createRealmLabel.render(this, arg);
-        this.textRenderer.draw(arg, I18n.translate("mco.configure.world.name", new Object[0]), (float)(this.width / 2 - 100), 52.0f, 0xA0A0A0);
-        this.textRenderer.draw(arg, I18n.translate("mco.configure.world.description", new Object[0]), (float)(this.width / 2 - 100), 102.0f, 0xA0A0A0);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.createRealmLabel.render(this, matrices);
+        this.textRenderer.draw(matrices, I18n.translate("mco.configure.world.name", new Object[0]), (float)(this.width / 2 - 100), 52.0f, 0xA0A0A0);
+        this.textRenderer.draw(matrices, I18n.translate("mco.configure.world.description", new Object[0]), (float)(this.width / 2 - 100), 102.0f, 0xA0A0A0);
         if (this.nameBox != null) {
-            this.nameBox.render(arg, i, j, f);
+            this.nameBox.render(matrices, mouseX, mouseY, delta);
         }
         if (this.descriptionBox != null) {
-            this.descriptionBox.render(arg, i, j, f);
+            this.descriptionBox.render(matrices, mouseX, mouseY, delta);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

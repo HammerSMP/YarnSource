@@ -23,13 +23,13 @@ extends StorageMinecartEntity {
         super(arg, arg2);
     }
 
-    public ChestMinecartEntity(World arg, double d, double e, double f) {
-        super(EntityType.CHEST_MINECART, d, e, f, arg);
+    public ChestMinecartEntity(World world, double x, double y, double z) {
+        super(EntityType.CHEST_MINECART, x, y, z, world);
     }
 
     @Override
-    public void dropItems(DamageSource arg) {
-        super.dropItems(arg);
+    public void dropItems(DamageSource damageSource) {
+        super.dropItems(damageSource);
         if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             this.dropItem(Blocks.CHEST);
         }
@@ -56,8 +56,8 @@ extends StorageMinecartEntity {
     }
 
     @Override
-    public ScreenHandler getScreenHandler(int i, PlayerInventory arg) {
-        return GenericContainerScreenHandler.createGeneric9x3(i, arg, this);
+    public ScreenHandler getScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return GenericContainerScreenHandler.createGeneric9x3(syncId, playerInventory, this);
     }
 }
 

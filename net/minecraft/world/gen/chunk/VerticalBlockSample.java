@@ -18,19 +18,19 @@ public final class VerticalBlockSample
 implements BlockView {
     private final BlockState[] states;
 
-    public VerticalBlockSample(BlockState[] args) {
-        this.states = args;
+    public VerticalBlockSample(BlockState[] states) {
+        this.states = states;
     }
 
     @Override
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos arg) {
+    public BlockEntity getBlockEntity(BlockPos pos) {
         return null;
     }
 
     @Override
-    public BlockState getBlockState(BlockPos arg) {
-        int i = arg.getY();
+    public BlockState getBlockState(BlockPos pos) {
+        int i = pos.getY();
         if (i < 0 || i >= this.states.length) {
             return Blocks.AIR.getDefaultState();
         }
@@ -38,8 +38,8 @@ implements BlockView {
     }
 
     @Override
-    public FluidState getFluidState(BlockPos arg) {
-        return this.getBlockState(arg).getFluidState();
+    public FluidState getFluidState(BlockPos pos) {
+        return this.getBlockState(pos).getFluidState();
     }
 }
 

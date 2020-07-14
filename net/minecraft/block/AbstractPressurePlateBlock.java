@@ -32,8 +32,8 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.getRedstoneOutput(arg) > 0 ? PRESSED_SHAPE : DEFAULT_SHAPE;
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.getRedstoneOutput(state) > 0 ? PRESSED_SHAPE : DEFAULT_SHAPE;
     }
 
     protected int getTickRate() {
@@ -46,56 +46,56 @@ extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockPos lv = arg3.down();
-        return AbstractPressurePlateBlock.hasTopRim(arg2, lv) || AbstractPressurePlateBlock.sideCoversSmallSquare(arg2, lv, Direction.UP);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos lv = pos.down();
+        return AbstractPressurePlateBlock.hasTopRim(world, lv) || AbstractPressurePlateBlock.sideCoversSmallSquare(world, lv, Direction.UP);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        int i = this.getRedstoneOutput(arg);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        int i = this.getRedstoneOutput(state);
         if (i > 0) {
-            this.updatePlateState(arg2, arg3, arg, i);
+            this.updatePlateState(world, pos, state, i);
         }
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (arg2.isClient) {
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (world.isClient) {
             return;
         }
-        int i = this.getRedstoneOutput(arg);
+        int i = this.getRedstoneOutput(state);
         if (i == 0) {
-            this.updatePlateState(arg2, arg3, arg, i);
+            this.updatePlateState(world, pos, state, i);
         }
     }
 
-    protected void updatePlateState(World arg, BlockPos arg2, BlockState arg3, int i) {
+    protected void updatePlateState(World world, BlockPos pos, BlockState state, int rsOut) {
         boolean bl2;
-        int j = this.getRedstoneOutput(arg, arg2);
-        boolean bl = i > 0;
+        int j = this.getRedstoneOutput(world, pos);
+        boolean bl = rsOut > 0;
         boolean bl3 = bl2 = j > 0;
-        if (i != j) {
-            BlockState lv = this.setRedstoneOutput(arg3, j);
-            arg.setBlockState(arg2, lv, 2);
-            this.updateNeighbors(arg, arg2);
-            arg.scheduleBlockRerenderIfNeeded(arg2, arg3, lv);
+        if (rsOut != j) {
+            BlockState lv = this.setRedstoneOutput(state, j);
+            world.setBlockState(pos, lv, 2);
+            this.updateNeighbors(world, pos);
+            world.scheduleBlockRerenderIfNeeded(pos, state, lv);
         }
         if (!bl2 && bl) {
-            this.playDepressSound(arg, arg2);
+            this.playDepressSound(world, pos);
         } else if (bl2 && !bl) {
-            this.playPressSound(arg, arg2);
+            this.playPressSound(world, pos);
         }
         if (bl2) {
-            arg.getBlockTickScheduler().schedule(new BlockPos(arg2), this, this.getTickRate());
+            world.getBlockTickScheduler().schedule(new BlockPos(pos), this, this.getTickRate());
         }
     }
 
@@ -104,41 +104,41 @@ extends Block {
     protected abstract void playDepressSound(WorldAccess var1, BlockPos var2);
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (bl || arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (moved || state.isOf(newState.getBlock())) {
             return;
         }
-        if (this.getRedstoneOutput(arg) > 0) {
-            this.updateNeighbors(arg2, arg3);
+        if (this.getRedstoneOutput(state) > 0) {
+            this.updateNeighbors(world, pos);
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    protected void updateNeighbors(World arg, BlockPos arg2) {
-        arg.updateNeighborsAlways(arg2, this);
-        arg.updateNeighborsAlways(arg2.down(), this);
-    }
-
-    @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return this.getRedstoneOutput(arg);
+    protected void updateNeighbors(World world, BlockPos pos) {
+        world.updateNeighborsAlways(pos, this);
+        world.updateNeighborsAlways(pos.down(), this);
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        if (arg4 == Direction.UP) {
-            return this.getRedstoneOutput(arg);
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return this.getRedstoneOutput(state);
+    }
+
+    @Override
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (direction == Direction.UP) {
+            return this.getRedstoneOutput(state);
         }
         return 0;
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.DESTROY;
     }
 

@@ -46,32 +46,32 @@ implements Tickable {
         super(BlockEntityType.SKULL);
     }
 
-    public static void setUserCache(UserCache arg) {
-        userCache = arg;
+    public static void setUserCache(UserCache value) {
+        userCache = value;
     }
 
-    public static void setSessionService(MinecraftSessionService minecraftSessionService) {
-        sessionService = minecraftSessionService;
+    public static void setSessionService(MinecraftSessionService value) {
+        sessionService = value;
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         if (this.owner != null) {
             CompoundTag lv = new CompoundTag();
             NbtHelper.fromGameProfile(lv, this.owner);
-            arg.put("SkullOwner", lv);
+            tag.put("SkullOwner", lv);
         }
-        return arg;
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
+    public void fromTag(BlockState state, CompoundTag tag) {
         String string;
-        super.fromTag(arg, arg2);
-        if (arg2.contains("SkullOwner", 10)) {
-            this.setOwnerAndType(NbtHelper.toGameProfile(arg2.getCompound("SkullOwner")));
-        } else if (arg2.contains("ExtraType", 8) && !ChatUtil.isEmpty(string = arg2.getString("ExtraType"))) {
+        super.fromTag(state, tag);
+        if (tag.contains("SkullOwner", 10)) {
+            this.setOwnerAndType(NbtHelper.toGameProfile(tag.getCompound("SkullOwner")));
+        } else if (tag.contains("ExtraType", 8) && !ChatUtil.isEmpty(string = tag.getString("ExtraType"))) {
             this.setOwnerAndType(new GameProfile(null, string));
         }
     }
@@ -90,9 +90,9 @@ implements Tickable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getTicksPowered(float f) {
+    public float getTicksPowered(float tickDelta) {
         if (this.powered) {
-            return (float)this.ticksPowered + f;
+            return (float)this.ticksPowered + tickDelta;
         }
         return this.ticksPowered;
     }
@@ -125,19 +125,19 @@ implements Tickable {
     }
 
     @Nullable
-    public static GameProfile loadProperties(@Nullable GameProfile gameProfile) {
-        if (gameProfile == null || ChatUtil.isEmpty(gameProfile.getName())) {
-            return gameProfile;
+    public static GameProfile loadProperties(@Nullable GameProfile profile) {
+        if (profile == null || ChatUtil.isEmpty(profile.getName())) {
+            return profile;
         }
-        if (gameProfile.isComplete() && gameProfile.getProperties().containsKey((Object)"textures")) {
-            return gameProfile;
+        if (profile.isComplete() && profile.getProperties().containsKey((Object)"textures")) {
+            return profile;
         }
         if (userCache == null || sessionService == null) {
-            return gameProfile;
+            return profile;
         }
-        GameProfile gameProfile2 = userCache.findByName(gameProfile.getName());
+        GameProfile gameProfile2 = userCache.findByName(profile.getName());
         if (gameProfile2 == null) {
-            return gameProfile;
+            return profile;
         }
         Property property = (Property)Iterables.getFirst((Iterable)gameProfile2.getProperties().get((Object)"textures"), null);
         if (property == null) {

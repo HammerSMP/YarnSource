@@ -17,8 +17,8 @@ implements FeatureConfig {
     public static final Codec<SimpleRandomFeatureConfig> CODEC = ConfiguredFeature.CODEC.listOf().fieldOf("features").xmap(SimpleRandomFeatureConfig::new, arg -> arg.features).codec();
     public final List<Supplier<ConfiguredFeature<?, ?>>> features;
 
-    public SimpleRandomFeatureConfig(List<Supplier<ConfiguredFeature<?, ?>>> list) {
-        this.features = list;
+    public SimpleRandomFeatureConfig(List<Supplier<ConfiguredFeature<?, ?>>> features) {
+        this.features = features;
     }
 }
 

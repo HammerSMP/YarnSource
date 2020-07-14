@@ -22,12 +22,12 @@ public class JigsawJunction {
     private final int deltaY;
     private final StructurePool.Projection destProjection;
 
-    public JigsawJunction(int i, int j, int k, int l, StructurePool.Projection arg) {
-        this.sourceX = i;
-        this.sourceGroundY = j;
-        this.sourceZ = k;
-        this.deltaY = l;
-        this.destProjection = arg;
+    public JigsawJunction(int sourceX, int sourceGroundY, int sourceZ, int deltaY, StructurePool.Projection destProjection) {
+        this.sourceX = sourceX;
+        this.sourceGroundY = sourceGroundY;
+        this.sourceZ = sourceZ;
+        this.deltaY = deltaY;
+        this.destProjection = destProjection;
     }
 
     public int getSourceX() {
@@ -52,14 +52,14 @@ public class JigsawJunction {
         return new JigsawJunction(dynamic.get("source_x").asInt(0), dynamic.get("source_ground_y").asInt(0), dynamic.get("source_z").asInt(0), dynamic.get("delta_y").asInt(0), StructurePool.Projection.getById(dynamic.get("dest_proj").asString("")));
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        JigsawJunction lv = (JigsawJunction)object;
+        JigsawJunction lv = (JigsawJunction)o;
         if (this.sourceX != lv.sourceX) {
             return false;
         }

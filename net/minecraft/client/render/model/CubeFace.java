@@ -24,16 +24,16 @@ public enum CubeFace {
     private static final CubeFace[] DIRECTION_LOOKUP;
     private final Corner[] corners;
 
-    public static CubeFace getFace(Direction arg) {
-        return DIRECTION_LOOKUP[arg.getId()];
+    public static CubeFace getFace(Direction direction) {
+        return DIRECTION_LOOKUP[direction.getId()];
     }
 
-    private CubeFace(Corner ... args) {
-        this.corners = args;
+    private CubeFace(Corner ... corners) {
+        this.corners = corners;
     }
 
-    public Corner getCorner(int i) {
-        return this.corners[i];
+    public Corner getCorner(int corner) {
+        return this.corners[corner];
     }
 
     static {
@@ -53,10 +53,10 @@ public enum CubeFace {
         public final int ySide;
         public final int zSide;
 
-        private Corner(int i, int j, int k) {
-            this.xSide = i;
-            this.ySide = j;
-            this.zSide = k;
+        private Corner(int x, int y, int z) {
+            this.xSide = x;
+            this.ySide = y;
+            this.zSide = z;
         }
     }
 

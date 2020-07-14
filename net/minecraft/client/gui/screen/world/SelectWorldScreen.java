@@ -32,14 +32,14 @@ extends Screen {
     protected TextFieldWidget searchBox;
     private WorldListWidget levelList;
 
-    public SelectWorldScreen(Screen arg) {
+    public SelectWorldScreen(Screen parent) {
         super(new TranslatableText("selectWorld.title"));
-        this.parent = arg;
+        this.parent = parent;
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
-        return super.mouseScrolled(d, e, f);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
@@ -66,11 +66,11 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        return this.searchBox.keyPressed(i, j, k);
+        return this.searchBox.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
@@ -79,19 +79,19 @@ extends Screen {
     }
 
     @Override
-    public boolean charTyped(char c, int i) {
-        return this.searchBox.charTyped(c, i);
+    public boolean charTyped(char chr, int keyCode) {
+        return this.searchBox.charTyped(chr, keyCode);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.tooltipText = null;
-        this.levelList.render(arg, i, j, f);
-        this.searchBox.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        super.render(arg, i, j, f);
+        this.levelList.render(matrices, mouseX, mouseY, delta);
+        this.searchBox.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.tooltipText != null) {
-            this.renderTooltip(arg, this.tooltipText, i, j);
+            this.renderTooltip(matrices, this.tooltipText, mouseX, mouseY);
         }
     }
 
@@ -99,11 +99,11 @@ extends Screen {
         this.tooltipText = list;
     }
 
-    public void worldSelected(boolean bl) {
-        this.selectButton.active = bl;
-        this.deleteButton.active = bl;
-        this.editButton.active = bl;
-        this.recreateButton.active = bl;
+    public void worldSelected(boolean active) {
+        this.selectButton.active = active;
+        this.deleteButton.active = active;
+        this.editButton.active = active;
+        this.recreateButton.active = active;
     }
 
     @Override

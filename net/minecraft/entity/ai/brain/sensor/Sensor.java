@@ -14,19 +14,19 @@ public abstract class Sensor<E extends LivingEntity> {
     private final int senseInterval;
     private long lastSenseTime;
 
-    public Sensor(int i) {
-        this.senseInterval = i;
-        this.lastSenseTime = RANDOM.nextInt(i);
+    public Sensor(int senseInterval) {
+        this.senseInterval = senseInterval;
+        this.lastSenseTime = RANDOM.nextInt(senseInterval);
     }
 
     public Sensor() {
         this(20);
     }
 
-    public final void tick(ServerWorld arg, E arg2) {
+    public final void tick(ServerWorld arg, E entity) {
         if (--this.lastSenseTime <= 0L) {
             this.lastSenseTime = this.senseInterval;
-            this.sense(arg, arg2);
+            this.sense(arg, entity);
         }
     }
 

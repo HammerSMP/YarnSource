@@ -31,9 +31,9 @@ implements AutoCloseable {
     private final GameRenderer renderer;
     private final MinecraftClient client;
 
-    public LightmapTextureManager(GameRenderer arg, MinecraftClient arg2) {
-        this.renderer = arg;
-        this.client = arg2;
+    public LightmapTextureManager(GameRenderer renderer, MinecraftClient client) {
+        this.renderer = renderer;
+        this.client = client;
         this.texture = new NativeImageBackedTexture(16, 16, false);
         this.textureIdentifier = this.client.getTextureManager().registerDynamicTexture("light_map", this.texture);
         this.image = this.texture.getImage();
@@ -80,7 +80,7 @@ implements AutoCloseable {
         RenderSystem.activeTexture(33984);
     }
 
-    public void update(float f) {
+    public void update(float delta) {
         float m;
         float i;
         if (!this.dirty) {
@@ -100,7 +100,7 @@ implements AutoCloseable {
         }
         float j = this.client.player.getUnderwaterVisibility();
         if (this.client.player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
-            float k = GameRenderer.getNightVisionStrength(this.client.player, f);
+            float k = GameRenderer.getNightVisionStrength(this.client.player, delta);
         } else if (j > 0.0f && this.client.player.hasStatusEffect(StatusEffects.CONDUIT_POWER)) {
             float l = j;
         } else {
@@ -126,8 +126,8 @@ implements AutoCloseable {
                     lv4.scale(q);
                     lv3.add(lv4);
                     lv3.lerp(new Vector3f(0.75f, 0.75f, 0.75f), 0.04f);
-                    if (this.renderer.getSkyDarkness(f) > 0.0f) {
-                        float v = this.renderer.getSkyDarkness(f);
+                    if (this.renderer.getSkyDarkness(delta) > 0.0f) {
+                        float v = this.renderer.getSkyDarkness(delta);
                         Vector3f lv5 = lv3.copy();
                         lv5.multiplyComponentwise(0.7f, 0.6f, 0.6f);
                         lv3.lerp(lv5, v);
@@ -163,20 +163,20 @@ implements AutoCloseable {
         return 1.0f - g * g * g * g;
     }
 
-    private float getBrightness(World arg, int i) {
-        return arg.getDimension().method_28516(i);
+    private float getBrightness(World world, int i) {
+        return world.getDimension().method_28516(i);
     }
 
-    public static int pack(int i, int j) {
-        return i << 4 | j << 20;
+    public static int pack(int block, int sky) {
+        return block << 4 | sky << 20;
     }
 
-    public static int getBlockLightCoordinates(int i) {
-        return i >> 4 & 0xFFFF;
+    public static int getBlockLightCoordinates(int light) {
+        return light >> 4 & 0xFFFF;
     }
 
-    public static int getSkyLightCoordinates(int i) {
-        return i >> 20 & 0xFFFF;
+    public static int getSkyLightCoordinates(int light) {
+        return light >> 20 & 0xFFFF;
     }
 }
 

@@ -30,9 +30,9 @@ extends RealmsScreen {
     private final Backup backup;
     private BackupInfoList backupInfoList;
 
-    public RealmsBackupInfoScreen(Screen arg, Backup arg2) {
-        this.parent = arg;
-        this.backup = arg2;
+    public RealmsBackupInfoScreen(Screen parent, Backup backup) {
+        this.parent = parent;
+        this.backup = backup;
     }
 
     @Override
@@ -54,45 +54,45 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredString(arg, this.textRenderer, "Changes from last backup", this.width / 2, 10, 0xFFFFFF);
-        this.backupInfoList.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredString(matrices, this.textRenderer, "Changes from last backup", this.width / 2, 10, 0xFFFFFF);
+        this.backupInfoList.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private Text checkForSpecificMetadata(String string, String string2) {
-        String string3 = string.toLowerCase(Locale.ROOT);
+    private Text checkForSpecificMetadata(String key, String value) {
+        String string3 = key.toLowerCase(Locale.ROOT);
         if (string3.contains("game") && string3.contains("mode")) {
-            return this.gameModeMetadata(string2);
+            return this.gameModeMetadata(value);
         }
         if (string3.contains("game") && string3.contains("difficulty")) {
-            return this.gameDifficultyMetadata(string2);
+            return this.gameDifficultyMetadata(value);
         }
-        return new LiteralText(string2);
+        return new LiteralText(value);
     }
 
-    private Text gameDifficultyMetadata(String string) {
+    private Text gameDifficultyMetadata(String value) {
         try {
-            return RealmsSlotOptionsScreen.DIFFICULTIES[Integer.parseInt(string)];
+            return RealmsSlotOptionsScreen.DIFFICULTIES[Integer.parseInt(value)];
         }
         catch (Exception exception) {
             return new LiteralText("UNKNOWN");
         }
     }
 
-    private Text gameModeMetadata(String string) {
+    private Text gameModeMetadata(String value) {
         try {
-            return RealmsSlotOptionsScreen.GAME_MODES[Integer.parseInt(string)];
+            return RealmsSlotOptionsScreen.GAME_MODES[Integer.parseInt(value)];
         }
         catch (Exception exception) {
             return new LiteralText("UNKNOWN");
@@ -123,10 +123,10 @@ extends RealmsScreen {
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             TextRenderer lv = ((RealmsBackupInfoScreen)RealmsBackupInfoScreen.this).client.textRenderer;
-            RealmsBackupInfoScreen.this.drawStringWithShadow(arg, lv, this.field_25258, k, j, 0xA0A0A0);
-            RealmsBackupInfoScreen.this.drawTextWithShadow(arg, lv, RealmsBackupInfoScreen.this.checkForSpecificMetadata(this.field_25258, this.field_25259), k, j + 12, 0xFFFFFF);
+            RealmsBackupInfoScreen.this.drawStringWithShadow(matrices, lv, this.field_25258, x, y, 0xA0A0A0);
+            RealmsBackupInfoScreen.this.drawTextWithShadow(matrices, lv, RealmsBackupInfoScreen.this.checkForSpecificMetadata(this.field_25258, this.field_25259), x, y + 12, 0xFFFFFF);
         }
     }
 }

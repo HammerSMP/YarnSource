@@ -24,8 +24,8 @@ public class ZombieVillagerEntityRenderer
 extends BipedEntityRenderer<ZombieVillagerEntity, ZombieVillagerEntityModel<ZombieVillagerEntity>> {
     private static final Identifier TEXTURE = new Identifier("textures/entity/zombie_villager/zombie_villager.png");
 
-    public ZombieVillagerEntityRenderer(EntityRenderDispatcher arg, ReloadableResourceManager arg2) {
-        super(arg, new ZombieVillagerEntityModel(0.0f, false), 0.5f);
+    public ZombieVillagerEntityRenderer(EntityRenderDispatcher dispatcher, ReloadableResourceManager arg2) {
+        super(dispatcher, new ZombieVillagerEntityModel(0.0f, false), 0.5f);
         this.addFeature(new ArmorFeatureRenderer(this, new ZombieVillagerEntityModel(0.5f, true), new ZombieVillagerEntityModel(1.0f, true)));
         this.addFeature(new VillagerClothingFeatureRenderer<ZombieVillagerEntity, ZombieVillagerEntityModel<ZombieVillagerEntity>>(this, arg2, "zombie_villager"));
     }
@@ -41,8 +41,8 @@ extends BipedEntityRenderer<ZombieVillagerEntity, ZombieVillagerEntityModel<Zomb
     }
 
     @Override
-    protected /* synthetic */ boolean isShaking(LivingEntity arg) {
-        return this.isShaking((ZombieVillagerEntity)arg);
+    protected /* synthetic */ boolean isShaking(LivingEntity entity) {
+        return this.isShaking((ZombieVillagerEntity)entity);
     }
 }
 

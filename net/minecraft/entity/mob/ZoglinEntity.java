@@ -124,9 +124,9 @@ Hoglin {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        super.onTrackedDataSet(arg);
-        if (BABY.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        super.onTrackedDataSet(data);
+        if (BABY.equals(data)) {
             this.calculateDimensions();
         }
     }
@@ -140,38 +140,38 @@ Hoglin {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        if (!(arg instanceof LivingEntity)) {
+    public boolean tryAttack(Entity target) {
+        if (!(target instanceof LivingEntity)) {
             return false;
         }
         this.movementCooldownTicks = 10;
         this.world.sendEntityStatus(this, (byte)4);
         this.playSound(SoundEvents.ENTITY_ZOGLIN_ATTACK, 1.0f, this.getSoundPitch());
-        return Hoglin.tryAttack(this, (LivingEntity)arg);
+        return Hoglin.tryAttack(this, (LivingEntity)target);
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return !this.isLeashed();
     }
 
     @Override
-    protected void knockback(LivingEntity arg) {
+    protected void knockback(LivingEntity target) {
         if (!this.isBaby()) {
-            Hoglin.knockback(this, arg);
+            Hoglin.knockback(this, target);
         }
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        boolean bl = super.damage(arg, f);
+    public boolean damage(DamageSource source, float amount) {
+        boolean bl = super.damage(source, amount);
         if (this.world.isClient) {
             return false;
         }
-        if (!bl || !(arg.getAttacker() instanceof LivingEntity)) {
+        if (!bl || !(source.getAttacker() instanceof LivingEntity)) {
             return bl;
         }
-        LivingEntity lv = (LivingEntity)arg.getAttacker();
+        LivingEntity lv = (LivingEntity)source.getAttacker();
         if (EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL.test(lv) && !LookTargetUtil.isNewTargetTooFar(this, lv, 4.0)) {
             this.method_26938(lv);
         }
@@ -206,9 +206,9 @@ Hoglin {
     }
 
     @Override
-    public void setBaby(boolean bl) {
-        this.getDataTracker().set(BABY, bl);
-        if (!this.world.isClient && bl) {
+    public void setBaby(boolean baby) {
+        this.getDataTracker().set(BABY, baby);
+        if (!this.world.isClient && baby) {
             this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(0.5);
         }
     }
@@ -228,12 +228,12 @@ Hoglin {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 4) {
+    public void handleStatus(byte status) {
+        if (status == 4) {
             this.movementCooldownTicks = 10;
             this.playSound(SoundEvents.ENTITY_ZOGLIN_ATTACK, 1.0f, this.getSoundPitch());
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -255,7 +255,7 @@ Hoglin {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_ZOGLIN_HURT;
     }
 
@@ -265,7 +265,7 @@ Hoglin {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_ZOGLIN_STEP, 0.15f, 1.0f);
     }
 
@@ -285,17 +285,17 @@ Hoglin {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.isBaby()) {
-            arg.putBoolean("IsBaby", true);
+            tag.putBoolean("IsBaby", true);
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.getBoolean("IsBaby")) {
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.getBoolean("IsBaby")) {
             this.setBaby(true);
         }
     }

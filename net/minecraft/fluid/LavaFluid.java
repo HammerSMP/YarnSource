@@ -55,38 +55,38 @@ extends FlowableFluid {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(World arg, BlockPos arg2, FluidState arg3, Random random) {
-        BlockPos lv = arg2.up();
-        if (arg.getBlockState(lv).isAir() && !arg.getBlockState(lv).isOpaqueFullCube(arg, lv)) {
+    public void randomDisplayTick(World world, BlockPos pos, FluidState state, Random random) {
+        BlockPos lv = pos.up();
+        if (world.getBlockState(lv).isAir() && !world.getBlockState(lv).isOpaqueFullCube(world, lv)) {
             if (random.nextInt(100) == 0) {
-                double d = (double)arg2.getX() + random.nextDouble();
-                double e = (double)arg2.getY() + 1.0;
-                double f = (double)arg2.getZ() + random.nextDouble();
-                arg.addParticle(ParticleTypes.LAVA, d, e, f, 0.0, 0.0, 0.0);
-                arg.playSound(d, e, f, SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.2f + random.nextFloat() * 0.2f, 0.9f + random.nextFloat() * 0.15f, false);
+                double d = (double)pos.getX() + random.nextDouble();
+                double e = (double)pos.getY() + 1.0;
+                double f = (double)pos.getZ() + random.nextDouble();
+                world.addParticle(ParticleTypes.LAVA, d, e, f, 0.0, 0.0, 0.0);
+                world.playSound(d, e, f, SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS, 0.2f + random.nextFloat() * 0.2f, 0.9f + random.nextFloat() * 0.15f, false);
             }
             if (random.nextInt(200) == 0) {
-                arg.playSound(arg2.getX(), (double)arg2.getY(), (double)arg2.getZ(), SoundEvents.BLOCK_LAVA_AMBIENT, SoundCategory.BLOCKS, 0.2f + random.nextFloat() * 0.2f, 0.9f + random.nextFloat() * 0.15f, false);
+                world.playSound(pos.getX(), (double)pos.getY(), (double)pos.getZ(), SoundEvents.BLOCK_LAVA_AMBIENT, SoundCategory.BLOCKS, 0.2f + random.nextFloat() * 0.2f, 0.9f + random.nextFloat() * 0.15f, false);
             }
         }
     }
 
     @Override
-    public void onRandomTick(World arg, BlockPos arg2, FluidState arg3, Random random) {
-        if (!arg.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
+    public void onRandomTick(World world, BlockPos pos, FluidState state, Random random) {
+        if (!world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) {
             return;
         }
         int i = random.nextInt(3);
         if (i > 0) {
-            BlockPos lv = arg2;
+            BlockPos lv = pos;
             for (int j = 0; j < i; ++j) {
-                if (!arg.canSetBlock(lv = lv.add(random.nextInt(3) - 1, 1, random.nextInt(3) - 1))) {
+                if (!world.canSetBlock(lv = lv.add(random.nextInt(3) - 1, 1, random.nextInt(3) - 1))) {
                     return;
                 }
-                BlockState lv2 = arg.getBlockState(lv);
+                BlockState lv2 = world.getBlockState(lv);
                 if (lv2.isAir()) {
-                    if (!this.canLightFire(arg, lv)) continue;
-                    arg.setBlockState(lv, AbstractFireBlock.getState(arg, lv));
+                    if (!this.canLightFire(world, lv)) continue;
+                    world.setBlockState(lv, AbstractFireBlock.getState(world, lv));
                     return;
                 }
                 if (!lv2.getMaterial().blocksMovement()) continue;
@@ -94,29 +94,29 @@ extends FlowableFluid {
             }
         } else {
             for (int k = 0; k < 3; ++k) {
-                BlockPos lv3 = arg2.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
-                if (!arg.canSetBlock(lv3)) {
+                BlockPos lv3 = pos.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
+                if (!world.canSetBlock(lv3)) {
                     return;
                 }
-                if (!arg.isAir(lv3.up()) || !this.hasBurnableBlock(arg, lv3)) continue;
-                arg.setBlockState(lv3.up(), AbstractFireBlock.getState(arg, lv3));
+                if (!world.isAir(lv3.up()) || !this.hasBurnableBlock(world, lv3)) continue;
+                world.setBlockState(lv3.up(), AbstractFireBlock.getState(world, lv3));
             }
         }
     }
 
-    private boolean canLightFire(WorldView arg, BlockPos arg2) {
+    private boolean canLightFire(WorldView world, BlockPos pos) {
         for (Direction lv : Direction.values()) {
-            if (!this.hasBurnableBlock(arg, arg2.offset(lv))) continue;
+            if (!this.hasBurnableBlock(world, pos.offset(lv))) continue;
             return true;
         }
         return false;
     }
 
-    private boolean hasBurnableBlock(WorldView arg, BlockPos arg2) {
-        if (arg2.getY() >= 0 && arg2.getY() < 256 && !arg.isChunkLoaded(arg2)) {
+    private boolean hasBurnableBlock(WorldView world, BlockPos pos) {
+        if (pos.getY() >= 0 && pos.getY() < 256 && !world.isChunkLoaded(pos)) {
             return false;
         }
-        return arg.getBlockState(arg2).getMaterial().isBurnable();
+        return world.getBlockState(pos).getMaterial().isBurnable();
     }
 
     @Override
@@ -127,51 +127,51 @@ extends FlowableFluid {
     }
 
     @Override
-    protected void beforeBreakingBlock(WorldAccess arg, BlockPos arg2, BlockState arg3) {
-        this.playExtinguishEvent(arg, arg2);
+    protected void beforeBreakingBlock(WorldAccess world, BlockPos pos, BlockState state) {
+        this.playExtinguishEvent(world, pos);
     }
 
     @Override
-    public int getFlowSpeed(WorldView arg) {
-        return arg.getDimension().isUltrawarm() ? 4 : 2;
+    public int getFlowSpeed(WorldView world) {
+        return world.getDimension().isUltrawarm() ? 4 : 2;
     }
 
     @Override
-    public BlockState toBlockState(FluidState arg) {
-        return (BlockState)Blocks.LAVA.getDefaultState().with(FluidBlock.LEVEL, LavaFluid.method_15741(arg));
+    public BlockState toBlockState(FluidState state) {
+        return (BlockState)Blocks.LAVA.getDefaultState().with(FluidBlock.LEVEL, LavaFluid.method_15741(state));
     }
 
     @Override
-    public boolean matchesType(Fluid arg) {
-        return arg == Fluids.LAVA || arg == Fluids.FLOWING_LAVA;
+    public boolean matchesType(Fluid fluid) {
+        return fluid == Fluids.LAVA || fluid == Fluids.FLOWING_LAVA;
     }
 
     @Override
-    public int getLevelDecreasePerBlock(WorldView arg) {
-        return arg.getDimension().isUltrawarm() ? 1 : 2;
+    public int getLevelDecreasePerBlock(WorldView world) {
+        return world.getDimension().isUltrawarm() ? 1 : 2;
     }
 
     @Override
-    public boolean canBeReplacedWith(FluidState arg, BlockView arg2, BlockPos arg3, Fluid arg4, Direction arg5) {
-        return arg.getHeight(arg2, arg3) >= 0.44444445f && arg4.isIn(FluidTags.WATER);
+    public boolean canBeReplacedWith(FluidState state, BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
+        return state.getHeight(world, pos) >= 0.44444445f && fluid.isIn(FluidTags.WATER);
     }
 
     @Override
-    public int getTickRate(WorldView arg) {
-        return arg.getDimension().isUltrawarm() ? 10 : 30;
+    public int getTickRate(WorldView world) {
+        return world.getDimension().isUltrawarm() ? 10 : 30;
     }
 
     @Override
-    public int getNextTickDelay(World arg, BlockPos arg2, FluidState arg3, FluidState arg4) {
-        int i = this.getTickRate(arg);
-        if (!(arg3.isEmpty() || arg4.isEmpty() || arg3.get(FALLING).booleanValue() || arg4.get(FALLING).booleanValue() || !(arg4.getHeight(arg, arg2) > arg3.getHeight(arg, arg2)) || arg.getRandom().nextInt(4) == 0)) {
+    public int getNextTickDelay(World world, BlockPos pos, FluidState oldState, FluidState newState) {
+        int i = this.getTickRate(world);
+        if (!(oldState.isEmpty() || newState.isEmpty() || oldState.get(FALLING).booleanValue() || newState.get(FALLING).booleanValue() || !(newState.getHeight(world, pos) > oldState.getHeight(world, pos)) || world.getRandom().nextInt(4) == 0)) {
             i *= 4;
         }
         return i;
     }
 
-    private void playExtinguishEvent(WorldAccess arg, BlockPos arg2) {
-        arg.syncWorldEvent(1501, arg2, 0);
+    private void playExtinguishEvent(WorldAccess world, BlockPos pos) {
+        world.syncWorldEvent(1501, pos, 0);
     }
 
     @Override
@@ -180,18 +180,18 @@ extends FlowableFluid {
     }
 
     @Override
-    protected void flow(WorldAccess arg, BlockPos arg2, BlockState arg3, Direction arg4, FluidState arg5) {
-        if (arg4 == Direction.DOWN) {
-            FluidState lv = arg.getFluidState(arg2);
+    protected void flow(WorldAccess world, BlockPos pos, BlockState state, Direction direction, FluidState fluidState) {
+        if (direction == Direction.DOWN) {
+            FluidState lv = world.getFluidState(pos);
             if (this.isIn(FluidTags.LAVA) && lv.isIn(FluidTags.WATER)) {
-                if (arg3.getBlock() instanceof FluidBlock) {
-                    arg.setBlockState(arg2, Blocks.STONE.getDefaultState(), 3);
+                if (state.getBlock() instanceof FluidBlock) {
+                    world.setBlockState(pos, Blocks.STONE.getDefaultState(), 3);
                 }
-                this.playExtinguishEvent(arg, arg2);
+                this.playExtinguishEvent(world, pos);
                 return;
             }
         }
-        super.flow(arg, arg2, arg3, arg4, arg5);
+        super.flow(world, pos, state, direction, fluidState);
     }
 
     @Override
@@ -213,12 +213,12 @@ extends FlowableFluid {
         }
 
         @Override
-        public int getLevel(FluidState arg) {
-            return arg.get(LEVEL);
+        public int getLevel(FluidState state) {
+            return state.get(LEVEL);
         }
 
         @Override
-        public boolean isStill(FluidState arg) {
+        public boolean isStill(FluidState state) {
             return false;
         }
     }
@@ -226,12 +226,12 @@ extends FlowableFluid {
     public static class Still
     extends LavaFluid {
         @Override
-        public int getLevel(FluidState arg) {
+        public int getLevel(FluidState state) {
             return 8;
         }
 
         @Override
-        public boolean isStill(FluidState arg) {
+        public boolean isStill(FluidState state) {
             return true;
         }
     }

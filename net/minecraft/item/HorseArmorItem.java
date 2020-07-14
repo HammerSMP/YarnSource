@@ -17,10 +17,10 @@ extends Item {
     private final int bonus;
     private final String entityTexture;
 
-    public HorseArmorItem(int i, String string, Item.Settings arg) {
-        super(arg);
-        this.bonus = i;
-        this.entityTexture = "textures/entity/horse/armor/horse_armor_" + string + ".png";
+    public HorseArmorItem(int bonus, String name, Item.Settings settings) {
+        super(settings);
+        this.bonus = bonus;
+        this.entityTexture = "textures/entity/horse/armor/horse_armor_" + name + ".png";
     }
 
     @Environment(value=EnvType.CLIENT)

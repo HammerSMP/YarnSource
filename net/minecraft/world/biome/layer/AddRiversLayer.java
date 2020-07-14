@@ -23,9 +23,9 @@ IdentityCoordinateTransformer
     private static final int RIVER_ID;
 
     @Override
-    public int sample(LayerRandomnessSource arg, LayerSampler arg2, LayerSampler arg3, int i, int j) {
-        int k = arg2.sample(this.transformX(i), this.transformZ(j));
-        int l = arg3.sample(this.transformX(i), this.transformZ(j));
+    public int sample(LayerRandomnessSource context, LayerSampler sampler1, LayerSampler sampler2, int x, int z) {
+        int k = sampler1.sample(this.transformX(x), this.transformZ(z));
+        int l = sampler2.sample(this.transformX(x), this.transformZ(z));
         if (BiomeLayers.isOcean(k)) {
             return k;
         }

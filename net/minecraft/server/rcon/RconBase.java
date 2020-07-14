@@ -20,8 +20,8 @@ implements Runnable {
     protected final String description;
     protected Thread thread;
 
-    protected RconBase(String string) {
-        this.description = string;
+    protected RconBase(String description) {
+        this.description = description;
     }
 
     public synchronized void start() {

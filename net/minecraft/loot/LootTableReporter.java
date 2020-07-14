@@ -34,18 +34,18 @@ public class LootTableReporter {
     private final Set<Identifier> tables;
     private String name;
 
-    public LootTableReporter(LootContextType arg, Function<Identifier, LootCondition> function, Function<Identifier, LootTable> function2) {
-        this((Multimap<String, String>)HashMultimap.create(), () -> "", arg, function, (Set<Identifier>)ImmutableSet.of(), function2, (Set<Identifier>)ImmutableSet.of());
+    public LootTableReporter(LootContextType contextType, Function<Identifier, LootCondition> conditionGetter, Function<Identifier, LootTable> tableFactory) {
+        this((Multimap<String, String>)HashMultimap.create(), () -> "", contextType, conditionGetter, (Set<Identifier>)ImmutableSet.of(), tableFactory, (Set<Identifier>)ImmutableSet.of());
     }
 
-    public LootTableReporter(Multimap<String, String> multimap, Supplier<String> supplier, LootContextType arg, Function<Identifier, LootCondition> function, Set<Identifier> set, Function<Identifier, LootTable> function2, Set<Identifier> set2) {
-        this.messages = multimap;
-        this.nameFactory = supplier;
-        this.contextType = arg;
-        this.conditionGetter = function;
-        this.conditions = set;
-        this.tableGetter = function2;
-        this.tables = set2;
+    public LootTableReporter(Multimap<String, String> messages, Supplier<String> nameFactory, LootContextType contextType, Function<Identifier, LootCondition> conditionGetter, Set<Identifier> conditions, Function<Identifier, LootTable> tableGetter, Set<Identifier> tables) {
+        this.messages = messages;
+        this.nameFactory = nameFactory;
+        this.contextType = contextType;
+        this.conditionGetter = conditionGetter;
+        this.conditions = conditions;
+        this.tableGetter = tableGetter;
+        this.tables = tables;
     }
 
     private String getName() {
@@ -55,52 +55,52 @@ public class LootTableReporter {
         return this.name;
     }
 
-    public void report(String string) {
-        this.messages.put((Object)this.getName(), (Object)string);
+    public void report(String message) {
+        this.messages.put((Object)this.getName(), (Object)message);
     }
 
-    public LootTableReporter makeChild(String string) {
-        return new LootTableReporter(this.messages, () -> this.getName() + string, this.contextType, this.conditionGetter, this.conditions, this.tableGetter, this.tables);
+    public LootTableReporter makeChild(String name) {
+        return new LootTableReporter(this.messages, () -> this.getName() + name, this.contextType, this.conditionGetter, this.conditions, this.tableGetter, this.tables);
     }
 
-    public LootTableReporter withTable(String string, Identifier arg) {
-        ImmutableSet immutableSet = ImmutableSet.builder().addAll(this.tables).add((Object)arg).build();
-        return new LootTableReporter(this.messages, () -> this.getName() + string, this.contextType, this.conditionGetter, this.conditions, this.tableGetter, (Set<Identifier>)immutableSet);
+    public LootTableReporter withTable(String name, Identifier id) {
+        ImmutableSet immutableSet = ImmutableSet.builder().addAll(this.tables).add((Object)id).build();
+        return new LootTableReporter(this.messages, () -> this.getName() + name, this.contextType, this.conditionGetter, this.conditions, this.tableGetter, (Set<Identifier>)immutableSet);
     }
 
-    public LootTableReporter withCondition(String string, Identifier arg) {
-        ImmutableSet immutableSet = ImmutableSet.builder().addAll(this.conditions).add((Object)arg).build();
-        return new LootTableReporter(this.messages, () -> this.getName() + string, this.contextType, this.conditionGetter, (Set<Identifier>)immutableSet, this.tableGetter, this.tables);
+    public LootTableReporter withCondition(String name, Identifier id) {
+        ImmutableSet immutableSet = ImmutableSet.builder().addAll(this.conditions).add((Object)id).build();
+        return new LootTableReporter(this.messages, () -> this.getName() + name, this.contextType, this.conditionGetter, (Set<Identifier>)immutableSet, this.tableGetter, this.tables);
     }
 
-    public boolean hasTable(Identifier arg) {
-        return this.tables.contains(arg);
+    public boolean hasTable(Identifier id) {
+        return this.tables.contains(id);
     }
 
-    public boolean hasCondition(Identifier arg) {
-        return this.conditions.contains(arg);
+    public boolean hasCondition(Identifier id) {
+        return this.conditions.contains(id);
     }
 
     public Multimap<String, String> getMessages() {
         return ImmutableMultimap.copyOf(this.messages);
     }
 
-    public void validateContext(LootContextAware arg) {
-        this.contextType.validate(this, arg);
+    public void validateContext(LootContextAware contextAware) {
+        this.contextType.validate(this, contextAware);
     }
 
     @Nullable
-    public LootTable getTable(Identifier arg) {
-        return this.tableGetter.apply(arg);
+    public LootTable getTable(Identifier id) {
+        return this.tableGetter.apply(id);
     }
 
     @Nullable
-    public LootCondition getCondition(Identifier arg) {
-        return this.conditionGetter.apply(arg);
+    public LootCondition getCondition(Identifier id) {
+        return this.conditionGetter.apply(id);
     }
 
-    public LootTableReporter withContextType(LootContextType arg) {
-        return new LootTableReporter(this.messages, this.nameFactory, arg, this.conditionGetter, this.conditions, this.tableGetter, this.tables);
+    public LootTableReporter withContextType(LootContextType contextType) {
+        return new LootTableReporter(this.messages, this.nameFactory, contextType, this.conditionGetter, this.conditions, this.tableGetter, this.tables);
     }
 }
 

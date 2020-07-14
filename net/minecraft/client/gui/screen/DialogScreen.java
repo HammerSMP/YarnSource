@@ -28,10 +28,10 @@ extends Screen {
     private int linesY;
     private int buttonWidth;
 
-    protected DialogScreen(Text arg, List<StringRenderable> list, ImmutableList<ChoiceButton> immutableList) {
-        super(arg);
-        this.message = StringRenderable.concat(list);
-        this.choiceButtons = immutableList;
+    protected DialogScreen(Text title, List<StringRenderable> messageParts, ImmutableList<ChoiceButton> choiceButtons) {
+        super(title);
+        this.message = StringRenderable.concat(messageParts);
+        this.choiceButtons = choiceButtons;
     }
 
     @Override
@@ -40,8 +40,8 @@ extends Screen {
     }
 
     @Override
-    public void init(MinecraftClient arg, int i, int j) {
-        super.init(arg, i, j);
+    public void init(MinecraftClient client, int width, int height) {
+        super.init(client, width, height);
         for (ChoiceButton lv : this.choiceButtons) {
             this.buttonWidth = Math.max(this.buttonWidth, 20 + this.textRenderer.getWidth(lv.message) + 20);
         }
@@ -50,10 +50,10 @@ extends Screen {
         this.lines = this.textRenderer.wrapLines(this.message, l);
         this.textRenderer.getClass();
         int m = this.lines.size() * 9;
-        this.linesY = (int)((double)j / 2.0 - (double)m / 2.0);
+        this.linesY = (int)((double)height / 2.0 - (double)m / 2.0);
         this.textRenderer.getClass();
         int n = this.linesY + m + 9 * 2;
-        int o = (int)((double)i / 2.0 - (double)l / 2.0);
+        int o = (int)((double)width / 2.0 - (double)l / 2.0);
         for (ChoiceButton lv2 : this.choiceButtons) {
             this.addButton(new ButtonWidget(o, n, this.buttonWidth, 20, lv2.message, lv2.pressAction));
             o += k;
@@ -61,17 +61,17 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
         this.textRenderer.getClass();
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, this.linesY - 9 * 2, -1);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, this.linesY - 9 * 2, -1);
         int k = this.linesY;
         for (StringRenderable lv : this.lines) {
-            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, -1);
+            this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, -1);
             this.textRenderer.getClass();
             k += 9;
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
@@ -84,9 +84,9 @@ extends Screen {
         private final Text message;
         private final ButtonWidget.PressAction pressAction;
 
-        public ChoiceButton(Text arg, ButtonWidget.PressAction arg2) {
-            this.message = arg;
-            this.pressAction = arg2;
+        public ChoiceButton(Text message, ButtonWidget.PressAction pressAction) {
+            this.message = message;
+            this.pressAction = pressAction;
         }
     }
 }

@@ -33,23 +33,23 @@ public class EmptyChunk
 extends WorldChunk {
     private static final Biome[] BIOMES = Util.make(new Biome[BiomeArray.DEFAULT_LENGTH], args -> Arrays.fill(args, Biomes.PLAINS));
 
-    public EmptyChunk(World arg, ChunkPos arg2) {
-        super(arg, arg2, new BiomeArray(arg.method_30349().method_30530(Registry.BIOME_KEY), BIOMES));
+    public EmptyChunk(World world, ChunkPos pos) {
+        super(world, pos, new BiomeArray(world.method_30349().method_30530(Registry.BIOME_KEY), BIOMES));
     }
 
     @Override
-    public BlockState getBlockState(BlockPos arg) {
+    public BlockState getBlockState(BlockPos pos) {
         return Blocks.VOID_AIR.getDefaultState();
     }
 
     @Override
     @Nullable
-    public BlockState setBlockState(BlockPos arg, BlockState arg2, boolean bl) {
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean moved) {
         return null;
     }
 
     @Override
-    public FluidState getFluidState(BlockPos arg) {
+    public FluidState getFluidState(BlockPos pos) {
         return Fluids.EMPTY.getDefaultState();
     }
 
@@ -60,38 +60,38 @@ extends WorldChunk {
     }
 
     @Override
-    public int getLuminance(BlockPos arg) {
+    public int getLuminance(BlockPos pos) {
         return 0;
     }
 
     @Override
-    public void addEntity(Entity arg) {
+    public void addEntity(Entity entity) {
     }
 
     @Override
-    public void remove(Entity arg) {
+    public void remove(Entity entity) {
     }
 
     @Override
-    public void remove(Entity arg, int i) {
+    public void remove(Entity entity, int section) {
     }
 
     @Override
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos arg, WorldChunk.CreationType arg2) {
+    public BlockEntity getBlockEntity(BlockPos pos, WorldChunk.CreationType creationType) {
         return null;
     }
 
     @Override
-    public void addBlockEntity(BlockEntity arg) {
+    public void addBlockEntity(BlockEntity blockEntity) {
     }
 
     @Override
-    public void setBlockEntity(BlockPos arg, BlockEntity arg2) {
+    public void setBlockEntity(BlockPos pos, BlockEntity blockEntity) {
     }
 
     @Override
-    public void removeBlockEntity(BlockPos arg) {
+    public void removeBlockEntity(BlockPos pos) {
     }
 
     @Override
@@ -99,11 +99,11 @@ extends WorldChunk {
     }
 
     @Override
-    public void getEntities(@Nullable Entity arg, Box arg2, List<Entity> list, Predicate<? super Entity> predicate) {
+    public void getEntities(@Nullable Entity except, Box box, List<Entity> entityList, Predicate<? super Entity> predicate) {
     }
 
     @Override
-    public <T extends Entity> void getEntities(Class<? extends T> class_, Box arg, List<T> list, Predicate<? super T> predicate) {
+    public <T extends Entity> void getEntities(Class<? extends T> entityClass, Box box, List<T> entityList, Predicate<? super T> predicate) {
     }
 
     @Override
@@ -112,7 +112,7 @@ extends WorldChunk {
     }
 
     @Override
-    public boolean areSectionsEmptyBetween(int i, int j) {
+    public boolean areSectionsEmptyBetween(int lowerHeight, int upperHeight) {
         return true;
     }
 

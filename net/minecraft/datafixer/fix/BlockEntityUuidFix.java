@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.AbstractUuidFix;
 
 public class BlockEntityUuidFix
 extends AbstractUuidFix {
-    public BlockEntityUuidFix(Schema schema) {
-        super(schema, TypeReferences.BLOCK_ENTITY);
+    public BlockEntityUuidFix(Schema outputSchema) {
+        super(outputSchema, TypeReferences.BLOCK_ENTITY);
     }
 
     protected TypeRewriteRule makeRule() {

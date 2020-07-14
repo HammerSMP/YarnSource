@@ -20,15 +20,15 @@ public class ItemCooldownManager {
     private final Map<Item, Entry> entries = Maps.newHashMap();
     private int tick;
 
-    public boolean isCoolingDown(Item arg) {
-        return this.getCooldownProgress(arg, 0.0f) > 0.0f;
+    public boolean isCoolingDown(Item item) {
+        return this.getCooldownProgress(item, 0.0f) > 0.0f;
     }
 
-    public float getCooldownProgress(Item arg, float f) {
-        Entry lv = this.entries.get(arg);
+    public float getCooldownProgress(Item item, float partialTicks) {
+        Entry lv = this.entries.get(item);
         if (lv != null) {
             float g = lv.endTick - lv.startTick;
-            float h = (float)lv.endTick - ((float)this.tick + f);
+            float h = (float)lv.endTick - ((float)this.tick + partialTicks);
             return MathHelper.clamp(h / g, 0.0f, 1.0f);
         }
         return 0.0f;
@@ -47,30 +47,30 @@ public class ItemCooldownManager {
         }
     }
 
-    public void set(Item arg, int i) {
-        this.entries.put(arg, new Entry(this.tick, this.tick + i));
-        this.onCooldownUpdate(arg, i);
+    public void set(Item item, int duration) {
+        this.entries.put(item, new Entry(this.tick, this.tick + duration));
+        this.onCooldownUpdate(item, duration);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void remove(Item arg) {
-        this.entries.remove(arg);
-        this.onCooldownUpdate(arg);
+    public void remove(Item item) {
+        this.entries.remove(item);
+        this.onCooldownUpdate(item);
     }
 
-    protected void onCooldownUpdate(Item arg, int i) {
+    protected void onCooldownUpdate(Item item, int duration) {
     }
 
-    protected void onCooldownUpdate(Item arg) {
+    protected void onCooldownUpdate(Item item) {
     }
 
     class Entry {
         private final int startTick;
         private final int endTick;
 
-        private Entry(int i, int j) {
-            this.startTick = i;
-            this.endTick = j;
+        private Entry(int startTick, int endTick) {
+            this.startTick = startTick;
+            this.endTick = endTick;
         }
     }
 }

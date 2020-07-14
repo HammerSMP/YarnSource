@@ -75,9 +75,9 @@ extends CompositeEntityModel<T> {
     }
 
     @Override
-    public void setAngles(T arg, float f, float g, float h, float i, float j) {
-        this.head.yaw = i * ((float)Math.PI / 180);
-        this.head.pitch = j * ((float)Math.PI / 180);
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        this.head.yaw = headYaw * ((float)Math.PI / 180);
+        this.head.pitch = headPitch * ((float)Math.PI / 180);
         float k = 0.7853982f;
         this.rightBackLeg.roll = -0.7853982f;
         this.leftBackLeg.roll = 0.7853982f;
@@ -97,14 +97,14 @@ extends CompositeEntityModel<T> {
         this.leftFrontMiddleLeg.yaw = 0.3926991f;
         this.rightFrontLeg.yaw = -0.7853982f;
         this.leftFrontLeg.yaw = 0.7853982f;
-        float n = -(MathHelper.cos(f * 0.6662f * 2.0f + 0.0f) * 0.4f) * g;
-        float o = -(MathHelper.cos(f * 0.6662f * 2.0f + (float)Math.PI) * 0.4f) * g;
-        float p = -(MathHelper.cos(f * 0.6662f * 2.0f + 1.5707964f) * 0.4f) * g;
-        float q = -(MathHelper.cos(f * 0.6662f * 2.0f + 4.712389f) * 0.4f) * g;
-        float r = Math.abs(MathHelper.sin(f * 0.6662f + 0.0f) * 0.4f) * g;
-        float s = Math.abs(MathHelper.sin(f * 0.6662f + (float)Math.PI) * 0.4f) * g;
-        float t = Math.abs(MathHelper.sin(f * 0.6662f + 1.5707964f) * 0.4f) * g;
-        float u = Math.abs(MathHelper.sin(f * 0.6662f + 4.712389f) * 0.4f) * g;
+        float n = -(MathHelper.cos(limbAngle * 0.6662f * 2.0f + 0.0f) * 0.4f) * limbDistance;
+        float o = -(MathHelper.cos(limbAngle * 0.6662f * 2.0f + (float)Math.PI) * 0.4f) * limbDistance;
+        float p = -(MathHelper.cos(limbAngle * 0.6662f * 2.0f + 1.5707964f) * 0.4f) * limbDistance;
+        float q = -(MathHelper.cos(limbAngle * 0.6662f * 2.0f + 4.712389f) * 0.4f) * limbDistance;
+        float r = Math.abs(MathHelper.sin(limbAngle * 0.6662f + 0.0f) * 0.4f) * limbDistance;
+        float s = Math.abs(MathHelper.sin(limbAngle * 0.6662f + (float)Math.PI) * 0.4f) * limbDistance;
+        float t = Math.abs(MathHelper.sin(limbAngle * 0.6662f + 1.5707964f) * 0.4f) * limbDistance;
+        float u = Math.abs(MathHelper.sin(limbAngle * 0.6662f + 4.712389f) * 0.4f) * limbDistance;
         this.rightBackLeg.yaw += n;
         this.leftBackLeg.yaw += -n;
         this.rightBackMiddleLeg.yaw += o;

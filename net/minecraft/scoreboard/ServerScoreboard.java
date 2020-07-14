@@ -33,60 +33,60 @@ extends Scoreboard {
     private final Set<ScoreboardObjective> objectives = Sets.newHashSet();
     private Runnable[] updateListeners = new Runnable[0];
 
-    public ServerScoreboard(MinecraftServer minecraftServer) {
-        this.server = minecraftServer;
+    public ServerScoreboard(MinecraftServer server) {
+        this.server = server;
     }
 
     @Override
-    public void updateScore(ScoreboardPlayerScore arg) {
-        super.updateScore(arg);
-        if (this.objectives.contains(arg.getObjective())) {
-            this.server.getPlayerManager().sendToAll(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.CHANGE, arg.getObjective().getName(), arg.getPlayerName(), arg.getScore()));
+    public void updateScore(ScoreboardPlayerScore score) {
+        super.updateScore(score);
+        if (this.objectives.contains(score.getObjective())) {
+            this.server.getPlayerManager().sendToAll(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.CHANGE, score.getObjective().getName(), score.getPlayerName(), score.getScore()));
         }
         this.runUpdateListeners();
     }
 
     @Override
-    public void updatePlayerScore(String string) {
-        super.updatePlayerScore(string);
-        this.server.getPlayerManager().sendToAll(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.REMOVE, null, string, 0));
+    public void updatePlayerScore(String playerName) {
+        super.updatePlayerScore(playerName);
+        this.server.getPlayerManager().sendToAll(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.REMOVE, null, playerName, 0));
         this.runUpdateListeners();
     }
 
     @Override
-    public void updatePlayerScore(String string, ScoreboardObjective arg) {
-        super.updatePlayerScore(string, arg);
-        if (this.objectives.contains(arg)) {
-            this.server.getPlayerManager().sendToAll(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.REMOVE, arg.getName(), string, 0));
+    public void updatePlayerScore(String playerName, ScoreboardObjective objective) {
+        super.updatePlayerScore(playerName, objective);
+        if (this.objectives.contains(objective)) {
+            this.server.getPlayerManager().sendToAll(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.REMOVE, objective.getName(), playerName, 0));
         }
         this.runUpdateListeners();
     }
 
     @Override
-    public void setObjectiveSlot(int i, @Nullable ScoreboardObjective arg) {
-        ScoreboardObjective lv = this.getObjectiveForSlot(i);
-        super.setObjectiveSlot(i, arg);
-        if (lv != arg && lv != null) {
+    public void setObjectiveSlot(int slot, @Nullable ScoreboardObjective objective) {
+        ScoreboardObjective lv = this.getObjectiveForSlot(slot);
+        super.setObjectiveSlot(slot, objective);
+        if (lv != objective && lv != null) {
             if (this.getSlot(lv) > 0) {
-                this.server.getPlayerManager().sendToAll(new ScoreboardDisplayS2CPacket(i, arg));
+                this.server.getPlayerManager().sendToAll(new ScoreboardDisplayS2CPacket(slot, objective));
             } else {
                 this.removeScoreboardObjective(lv);
             }
         }
-        if (arg != null) {
-            if (this.objectives.contains(arg)) {
-                this.server.getPlayerManager().sendToAll(new ScoreboardDisplayS2CPacket(i, arg));
+        if (objective != null) {
+            if (this.objectives.contains(objective)) {
+                this.server.getPlayerManager().sendToAll(new ScoreboardDisplayS2CPacket(slot, objective));
             } else {
-                this.addScoreboardObjective(arg);
+                this.addScoreboardObjective(objective);
             }
         }
         this.runUpdateListeners();
     }
 
     @Override
-    public boolean addPlayerToTeam(String string, Team arg) {
-        if (super.addPlayerToTeam(string, arg)) {
-            this.server.getPlayerManager().sendToAll(new TeamS2CPacket(arg, Arrays.asList(string), 3));
+    public boolean addPlayerToTeam(String playerName, Team arg) {
+        if (super.addPlayerToTeam(playerName, arg)) {
+            this.server.getPlayerManager().sendToAll(new TeamS2CPacket(arg, Arrays.asList(playerName), 3));
             this.runUpdateListeners();
             return true;
         }
@@ -94,32 +94,32 @@ extends Scoreboard {
     }
 
     @Override
-    public void removePlayerFromTeam(String string, Team arg) {
-        super.removePlayerFromTeam(string, arg);
-        this.server.getPlayerManager().sendToAll(new TeamS2CPacket(arg, Arrays.asList(string), 4));
+    public void removePlayerFromTeam(String playerName, Team arg) {
+        super.removePlayerFromTeam(playerName, arg);
+        this.server.getPlayerManager().sendToAll(new TeamS2CPacket(arg, Arrays.asList(playerName), 4));
         this.runUpdateListeners();
     }
 
     @Override
-    public void updateObjective(ScoreboardObjective arg) {
-        super.updateObjective(arg);
+    public void updateObjective(ScoreboardObjective objective) {
+        super.updateObjective(objective);
         this.runUpdateListeners();
     }
 
     @Override
-    public void updateExistingObjective(ScoreboardObjective arg) {
-        super.updateExistingObjective(arg);
-        if (this.objectives.contains(arg)) {
-            this.server.getPlayerManager().sendToAll(new ScoreboardObjectiveUpdateS2CPacket(arg, 2));
+    public void updateExistingObjective(ScoreboardObjective objective) {
+        super.updateExistingObjective(objective);
+        if (this.objectives.contains(objective)) {
+            this.server.getPlayerManager().sendToAll(new ScoreboardObjectiveUpdateS2CPacket(objective, 2));
         }
         this.runUpdateListeners();
     }
 
     @Override
-    public void updateRemovedObjective(ScoreboardObjective arg) {
-        super.updateRemovedObjective(arg);
-        if (this.objectives.contains(arg)) {
-            this.removeScoreboardObjective(arg);
+    public void updateRemovedObjective(ScoreboardObjective objective) {
+        super.updateRemovedObjective(objective);
+        if (this.objectives.contains(objective)) {
+            this.removeScoreboardObjective(objective);
         }
         this.runUpdateListeners();
     }
@@ -145,9 +145,9 @@ extends Scoreboard {
         this.runUpdateListeners();
     }
 
-    public void addUpdateListener(Runnable runnable) {
+    public void addUpdateListener(Runnable listener) {
         this.updateListeners = Arrays.copyOf(this.updateListeners, this.updateListeners.length + 1);
-        this.updateListeners[this.updateListeners.length - 1] = runnable;
+        this.updateListeners[this.updateListeners.length - 1] = listener;
     }
 
     protected void runUpdateListeners() {
@@ -156,53 +156,53 @@ extends Scoreboard {
         }
     }
 
-    public List<Packet<?>> createChangePackets(ScoreboardObjective arg) {
+    public List<Packet<?>> createChangePackets(ScoreboardObjective objective) {
         ArrayList list = Lists.newArrayList();
-        list.add(new ScoreboardObjectiveUpdateS2CPacket(arg, 0));
+        list.add(new ScoreboardObjectiveUpdateS2CPacket(objective, 0));
         for (int i = 0; i < 19; ++i) {
-            if (this.getObjectiveForSlot(i) != arg) continue;
-            list.add(new ScoreboardDisplayS2CPacket(i, arg));
+            if (this.getObjectiveForSlot(i) != objective) continue;
+            list.add(new ScoreboardDisplayS2CPacket(i, objective));
         }
-        for (ScoreboardPlayerScore lv : this.getAllPlayerScores(arg)) {
+        for (ScoreboardPlayerScore lv : this.getAllPlayerScores(objective)) {
             list.add(new ScoreboardPlayerUpdateS2CPacket(UpdateMode.CHANGE, lv.getObjective().getName(), lv.getPlayerName(), lv.getScore()));
         }
         return list;
     }
 
-    public void addScoreboardObjective(ScoreboardObjective arg) {
-        List<Packet<?>> list = this.createChangePackets(arg);
+    public void addScoreboardObjective(ScoreboardObjective objective) {
+        List<Packet<?>> list = this.createChangePackets(objective);
         for (ServerPlayerEntity lv : this.server.getPlayerManager().getPlayerList()) {
             for (Packet<?> lv2 : list) {
                 lv.networkHandler.sendPacket(lv2);
             }
         }
-        this.objectives.add(arg);
+        this.objectives.add(objective);
     }
 
-    public List<Packet<?>> createRemovePackets(ScoreboardObjective arg) {
+    public List<Packet<?>> createRemovePackets(ScoreboardObjective objective) {
         ArrayList list = Lists.newArrayList();
-        list.add(new ScoreboardObjectiveUpdateS2CPacket(arg, 1));
+        list.add(new ScoreboardObjectiveUpdateS2CPacket(objective, 1));
         for (int i = 0; i < 19; ++i) {
-            if (this.getObjectiveForSlot(i) != arg) continue;
-            list.add(new ScoreboardDisplayS2CPacket(i, arg));
+            if (this.getObjectiveForSlot(i) != objective) continue;
+            list.add(new ScoreboardDisplayS2CPacket(i, objective));
         }
         return list;
     }
 
-    public void removeScoreboardObjective(ScoreboardObjective arg) {
-        List<Packet<?>> list = this.createRemovePackets(arg);
+    public void removeScoreboardObjective(ScoreboardObjective objective) {
+        List<Packet<?>> list = this.createRemovePackets(objective);
         for (ServerPlayerEntity lv : this.server.getPlayerManager().getPlayerList()) {
             for (Packet<?> lv2 : list) {
                 lv.networkHandler.sendPacket(lv2);
             }
         }
-        this.objectives.remove(arg);
+        this.objectives.remove(objective);
     }
 
-    public int getSlot(ScoreboardObjective arg) {
+    public int getSlot(ScoreboardObjective objective) {
         int i = 0;
         for (int j = 0; j < 19; ++j) {
-            if (this.getObjectiveForSlot(j) != arg) continue;
+            if (this.getObjectiveForSlot(j) != objective) continue;
             ++i;
         }
         return i;

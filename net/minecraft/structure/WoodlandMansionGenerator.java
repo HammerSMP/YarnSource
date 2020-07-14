@@ -38,10 +38,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 public class WoodlandMansionGenerator {
-    public static void addPieces(StructureManager arg, BlockPos arg2, BlockRotation arg3, List<Piece> list, Random random) {
+    public static void addPieces(StructureManager manager, BlockPos pos, BlockRotation rotation, List<Piece> pieces, Random random) {
         MansionParameters lv = new MansionParameters(random);
-        LayoutGenerator lv2 = new LayoutGenerator(arg, random);
-        lv2.generate(arg2, arg3, list, lv);
+        LayoutGenerator lv2 = new LayoutGenerator(manager, random);
+        lv2.generate(pos, rotation, pieces, lv);
     }
 
     static class ThirdFloorRoomPool
@@ -66,16 +66,16 @@ public class WoodlandMansionGenerator {
         }
 
         @Override
-        public String getMediumFunctionalRoom(Random random, boolean bl) {
-            if (bl) {
+        public String getMediumFunctionalRoom(Random random, boolean staircase) {
+            if (staircase) {
                 return "1x2_c_stairs";
             }
             return "1x2_c" + (random.nextInt(4) + 1);
         }
 
         @Override
-        public String getMediumGenericRoom(Random random, boolean bl) {
-            if (bl) {
+        public String getMediumGenericRoom(Random random, boolean staircase) {
+            if (staircase) {
                 return "1x2_d_stairs";
             }
             return "1x2_d" + (random.nextInt(5) + 1);
@@ -113,12 +113,12 @@ public class WoodlandMansionGenerator {
         }
 
         @Override
-        public String getMediumFunctionalRoom(Random random, boolean bl) {
+        public String getMediumFunctionalRoom(Random random, boolean staircase) {
             return "1x2_a" + (random.nextInt(9) + 1);
         }
 
         @Override
-        public String getMediumGenericRoom(Random random, boolean bl) {
+        public String getMediumGenericRoom(Random random, boolean staircase) {
             return "1x2_b" + (random.nextInt(5) + 1);
         }
 
@@ -163,23 +163,23 @@ public class WoodlandMansionGenerator {
         private final int m;
         private final int fallback;
 
-        public FlagMatrix(int i, int j, int k) {
-            this.n = i;
-            this.m = j;
-            this.fallback = k;
-            this.array = new int[i][j];
+        public FlagMatrix(int n, int m, int fallback) {
+            this.n = n;
+            this.m = m;
+            this.fallback = fallback;
+            this.array = new int[n][m];
         }
 
-        public void set(int i, int j, int k) {
+        public void set(int i, int j, int value) {
             if (i >= 0 && i < this.n && j >= 0 && j < this.m) {
-                this.array[i][j] = k;
+                this.array[i][j] = value;
             }
         }
 
-        public void fill(int i, int j, int k, int l, int m) {
-            for (int n = j; n <= l; ++n) {
-                for (int o = i; o <= k; ++o) {
-                    this.set(o, n, m);
+        public void fill(int i0, int j0, int i1, int j1, int value) {
+            for (int n = j0; n <= j1; ++n) {
+                for (int o = i0; o <= i1; ++o) {
+                    this.set(o, n, value);
                 }
             }
         }
@@ -191,14 +191,14 @@ public class WoodlandMansionGenerator {
             return this.fallback;
         }
 
-        public void update(int i, int j, int k, int l) {
-            if (this.get(i, j) == k) {
-                this.set(i, j, l);
+        public void update(int i, int j, int expected, int newValue) {
+            if (this.get(i, j) == expected) {
+                this.set(i, j, newValue);
             }
         }
 
-        public boolean anyMatchAround(int i, int j, int k) {
-            return this.get(i - 1, j) == k || this.get(i + 1, j) == k || this.get(i, j + 1) == k || this.get(i, j - 1) == k;
+        public boolean anyMatchAround(int i, int j, int value) {
+            return this.get(i - 1, j) == value || this.get(i + 1, j) == value || this.get(i, j + 1) == value || this.get(i, j - 1) == value;
         }
     }
 
@@ -450,22 +450,22 @@ public class WoodlandMansionGenerator {
         private int field_15446;
         private int field_15445;
 
-        public LayoutGenerator(StructureManager arg, Random random) {
-            this.manager = arg;
+        public LayoutGenerator(StructureManager manager, Random random) {
+            this.manager = manager;
             this.random = random;
         }
 
-        public void generate(BlockPos arg, BlockRotation arg2, List<Piece> list, MansionParameters arg3) {
+        public void generate(BlockPos pos, BlockRotation rotation, List<Piece> pieces, MansionParameters arg3) {
             GenerationPiece lv = new GenerationPiece();
-            lv.position = arg;
-            lv.rotation = arg2;
+            lv.position = pos;
+            lv.rotation = rotation;
             lv.template = "wall_flat";
             GenerationPiece lv2 = new GenerationPiece();
-            this.addEntrance(list, lv);
+            this.addEntrance(pieces, lv);
             lv2.position = lv.position.up(8);
             lv2.rotation = lv.rotation;
             lv2.template = "wall_window";
-            if (!list.isEmpty()) {
+            if (!pieces.isEmpty()) {
                 // empty if block
             }
             FlagMatrix lv3 = arg3.field_15440;
@@ -474,8 +474,8 @@ public class WoodlandMansionGenerator {
             this.field_15445 = arg3.field_15441 + 1;
             int i = arg3.field_15442 + 1;
             int j = arg3.field_15441;
-            this.addRoof(list, lv, lv3, Direction.SOUTH, this.field_15446, this.field_15445, i, j);
-            this.addRoof(list, lv2, lv3, Direction.SOUTH, this.field_15446, this.field_15445, i, j);
+            this.addRoof(pieces, lv, lv3, Direction.SOUTH, this.field_15446, this.field_15445, i, j);
+            this.addRoof(pieces, lv2, lv3, Direction.SOUTH, this.field_15446, this.field_15445, i, j);
             GenerationPiece lv5 = new GenerationPiece();
             lv5.position = lv.position.up(19);
             lv5.rotation = lv.rotation;
@@ -484,21 +484,21 @@ public class WoodlandMansionGenerator {
             for (int k = 0; k < lv4.m && !bl; ++k) {
                 for (int l = lv4.n - 1; l >= 0 && !bl; --l) {
                     if (!MansionParameters.method_15047(lv4, l, k)) continue;
-                    lv5.position = lv5.position.offset(arg2.rotate(Direction.SOUTH), 8 + (k - this.field_15445) * 8);
-                    lv5.position = lv5.position.offset(arg2.rotate(Direction.EAST), (l - this.field_15446) * 8);
-                    this.method_15052(list, lv5);
-                    this.addRoof(list, lv5, lv4, Direction.SOUTH, l, k, l, k);
+                    lv5.position = lv5.position.offset(rotation.rotate(Direction.SOUTH), 8 + (k - this.field_15445) * 8);
+                    lv5.position = lv5.position.offset(rotation.rotate(Direction.EAST), (l - this.field_15446) * 8);
+                    this.method_15052(pieces, lv5);
+                    this.addRoof(pieces, lv5, lv4, Direction.SOUTH, l, k, l, k);
                     bl = true;
                 }
             }
-            this.method_15055(list, arg.up(16), arg2, lv3, lv4);
-            this.method_15055(list, arg.up(27), arg2, lv4, null);
-            if (!list.isEmpty()) {
+            this.method_15055(pieces, pos.up(16), rotation, lv3, lv4);
+            this.method_15055(pieces, pos.up(27), rotation, lv4, null);
+            if (!pieces.isEmpty()) {
                 // empty if block
             }
             RoomPool[] lvs = new RoomPool[]{new FirstFloorRoomPool(), new SecondFloorRoomPool(), new ThirdFloorRoomPool()};
             for (int m = 0; m < 3; ++m) {
-                BlockPos lv6 = arg.up(8 * m + (m == 2 ? 3 : 0));
+                BlockPos lv6 = pos.up(8 * m + (m == 2 ? 3 : 0));
                 FlagMatrix lv7 = arg3.field_15443[m];
                 FlagMatrix lv8 = m == 2 ? lv4 : lv3;
                 String string = m == 0 ? "carpet_south_1" : "carpet_south_2";
@@ -506,20 +506,20 @@ public class WoodlandMansionGenerator {
                 for (int n = 0; n < lv8.m; ++n) {
                     for (int o = 0; o < lv8.n; ++o) {
                         if (lv8.get(o, n) != 1) continue;
-                        BlockPos lv9 = lv6.offset(arg2.rotate(Direction.SOUTH), 8 + (n - this.field_15445) * 8);
-                        lv9 = lv9.offset(arg2.rotate(Direction.EAST), (o - this.field_15446) * 8);
-                        list.add(new Piece(this.manager, "corridor_floor", lv9, arg2));
+                        BlockPos lv9 = lv6.offset(rotation.rotate(Direction.SOUTH), 8 + (n - this.field_15445) * 8);
+                        lv9 = lv9.offset(rotation.rotate(Direction.EAST), (o - this.field_15446) * 8);
+                        pieces.add(new Piece(this.manager, "corridor_floor", lv9, rotation));
                         if (lv8.get(o, n - 1) == 1 || (lv7.get(o, n - 1) & 0x800000) == 0x800000) {
-                            list.add(new Piece(this.manager, "carpet_north", lv9.offset(arg2.rotate(Direction.EAST), 1).up(), arg2));
+                            pieces.add(new Piece(this.manager, "carpet_north", lv9.offset(rotation.rotate(Direction.EAST), 1).up(), rotation));
                         }
                         if (lv8.get(o + 1, n) == 1 || (lv7.get(o + 1, n) & 0x800000) == 0x800000) {
-                            list.add(new Piece(this.manager, "carpet_east", lv9.offset(arg2.rotate(Direction.SOUTH), 1).offset(arg2.rotate(Direction.EAST), 5).up(), arg2));
+                            pieces.add(new Piece(this.manager, "carpet_east", lv9.offset(rotation.rotate(Direction.SOUTH), 1).offset(rotation.rotate(Direction.EAST), 5).up(), rotation));
                         }
                         if (lv8.get(o, n + 1) == 1 || (lv7.get(o, n + 1) & 0x800000) == 0x800000) {
-                            list.add(new Piece(this.manager, string, lv9.offset(arg2.rotate(Direction.SOUTH), 5).offset(arg2.rotate(Direction.WEST), 1), arg2));
+                            pieces.add(new Piece(this.manager, string, lv9.offset(rotation.rotate(Direction.SOUTH), 5).offset(rotation.rotate(Direction.WEST), 1), rotation));
                         }
                         if (lv8.get(o - 1, n) != 1 && (lv7.get(o - 1, n) & 0x800000) != 0x800000) continue;
-                        list.add(new Piece(this.manager, string2, lv9.offset(arg2.rotate(Direction.WEST), 1).offset(arg2.rotate(Direction.NORTH), 1), arg2));
+                        pieces.add(new Piece(this.manager, string2, lv9.offset(rotation.rotate(Direction.WEST), 1).offset(rotation.rotate(Direction.NORTH), 1), rotation));
                     }
                 }
                 String string3 = m == 0 ? "indoors_wall_1" : "indoors_wall_2";
@@ -547,33 +547,33 @@ public class WoodlandMansionGenerator {
                         } else if ((r & 0x100000) == 0x100000) {
                             lv11 = Direction.UP;
                         }
-                        BlockPos lv12 = lv6.offset(arg2.rotate(Direction.SOUTH), 8 + (p - this.field_15445) * 8);
-                        lv12 = lv12.offset(arg2.rotate(Direction.EAST), -1 + (q - this.field_15446) * 8);
+                        BlockPos lv12 = lv6.offset(rotation.rotate(Direction.SOUTH), 8 + (p - this.field_15445) * 8);
+                        lv12 = lv12.offset(rotation.rotate(Direction.EAST), -1 + (q - this.field_15446) * 8);
                         if (MansionParameters.method_15047(lv8, q - 1, p) && !arg3.method_15039(lv8, q - 1, p, m, t)) {
-                            list.add(new Piece(this.manager, lv11 == Direction.WEST ? string4 : string3, lv12, arg2));
+                            pieces.add(new Piece(this.manager, lv11 == Direction.WEST ? string4 : string3, lv12, rotation));
                         }
                         if (lv8.get(q + 1, p) == 1 && !bl2) {
-                            BlockPos lv13 = lv12.offset(arg2.rotate(Direction.EAST), 8);
-                            list.add(new Piece(this.manager, lv11 == Direction.EAST ? string4 : string3, lv13, arg2));
+                            BlockPos lv13 = lv12.offset(rotation.rotate(Direction.EAST), 8);
+                            pieces.add(new Piece(this.manager, lv11 == Direction.EAST ? string4 : string3, lv13, rotation));
                         }
                         if (MansionParameters.method_15047(lv8, q, p + 1) && !arg3.method_15039(lv8, q, p + 1, m, t)) {
-                            BlockPos lv14 = lv12.offset(arg2.rotate(Direction.SOUTH), 7);
-                            lv14 = lv14.offset(arg2.rotate(Direction.EAST), 7);
-                            list.add(new Piece(this.manager, lv11 == Direction.SOUTH ? string4 : string3, lv14, arg2.rotate(BlockRotation.CLOCKWISE_90)));
+                            BlockPos lv14 = lv12.offset(rotation.rotate(Direction.SOUTH), 7);
+                            lv14 = lv14.offset(rotation.rotate(Direction.EAST), 7);
+                            pieces.add(new Piece(this.manager, lv11 == Direction.SOUTH ? string4 : string3, lv14, rotation.rotate(BlockRotation.CLOCKWISE_90)));
                         }
                         if (lv8.get(q, p - 1) == 1 && !bl2) {
-                            BlockPos lv15 = lv12.offset(arg2.rotate(Direction.NORTH), 1);
-                            lv15 = lv15.offset(arg2.rotate(Direction.EAST), 7);
-                            list.add(new Piece(this.manager, lv11 == Direction.NORTH ? string4 : string3, lv15, arg2.rotate(BlockRotation.CLOCKWISE_90)));
+                            BlockPos lv15 = lv12.offset(rotation.rotate(Direction.NORTH), 1);
+                            lv15 = lv15.offset(rotation.rotate(Direction.EAST), 7);
+                            pieces.add(new Piece(this.manager, lv11 == Direction.NORTH ? string4 : string3, lv15, rotation.rotate(BlockRotation.CLOCKWISE_90)));
                         }
                         if (s == 65536) {
-                            this.addSmallRoom(list, lv12, arg2, lv11, lvs[m]);
+                            this.addSmallRoom(pieces, lv12, rotation, lv11, lvs[m]);
                             continue;
                         }
                         if (s == 131072 && lv11 != null) {
                             Direction lv16 = arg3.method_15040(lv8, q, p, m, t);
                             boolean bl32 = (r & 0x400000) == 0x400000;
-                            this.addMediumRoom(list, lv12, arg2, lv16, lv11, lvs[m], bl32);
+                            this.addMediumRoom(pieces, lv12, rotation, lv16, lv11, lvs[m], bl32);
                             continue;
                         }
                         if (s == 262144 && lv11 != null && lv11 != Direction.UP) {
@@ -581,11 +581,11 @@ public class WoodlandMansionGenerator {
                             if (!arg3.method_15039(lv8, q + lv17.getOffsetX(), p + lv17.getOffsetZ(), m, t)) {
                                 lv17 = lv17.getOpposite();
                             }
-                            this.addBigRoom(list, lv12, arg2, lv17, lv11, lvs[m]);
+                            this.addBigRoom(pieces, lv12, rotation, lv17, lv11, lvs[m]);
                             continue;
                         }
                         if (s != 262144 || lv11 != Direction.UP) continue;
-                        this.addBigSecretRoom(list, lv12, arg2, lvs[m]);
+                        this.addBigSecretRoom(pieces, lv12, rotation, lvs[m]);
                     }
                 }
             }
@@ -789,50 +789,50 @@ public class WoodlandMansionGenerator {
             list.add(new Piece(this.manager, string, lv3, lv));
         }
 
-        private void addMediumRoom(List<Piece> list, BlockPos arg, BlockRotation arg2, Direction arg3, Direction arg4, RoomPool arg5, boolean bl) {
+        private void addMediumRoom(List<Piece> list, BlockPos arg, BlockRotation arg2, Direction arg3, Direction arg4, RoomPool arg5, boolean staircase) {
             if (arg4 == Direction.EAST && arg3 == Direction.SOUTH) {
                 BlockPos lv = arg.offset(arg2.rotate(Direction.EAST), 1);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv, arg2));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv, arg2));
             } else if (arg4 == Direction.EAST && arg3 == Direction.NORTH) {
                 BlockPos lv2 = arg.offset(arg2.rotate(Direction.EAST), 1);
                 lv2 = lv2.offset(arg2.rotate(Direction.SOUTH), 6);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv2, arg2, BlockMirror.LEFT_RIGHT));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv2, arg2, BlockMirror.LEFT_RIGHT));
             } else if (arg4 == Direction.WEST && arg3 == Direction.NORTH) {
                 BlockPos lv3 = arg.offset(arg2.rotate(Direction.EAST), 7);
                 lv3 = lv3.offset(arg2.rotate(Direction.SOUTH), 6);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv3, arg2.rotate(BlockRotation.CLOCKWISE_180)));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv3, arg2.rotate(BlockRotation.CLOCKWISE_180)));
             } else if (arg4 == Direction.WEST && arg3 == Direction.SOUTH) {
                 BlockPos lv4 = arg.offset(arg2.rotate(Direction.EAST), 7);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv4, arg2, BlockMirror.FRONT_BACK));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv4, arg2, BlockMirror.FRONT_BACK));
             } else if (arg4 == Direction.SOUTH && arg3 == Direction.EAST) {
                 BlockPos lv5 = arg.offset(arg2.rotate(Direction.EAST), 1);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv5, arg2.rotate(BlockRotation.CLOCKWISE_90), BlockMirror.LEFT_RIGHT));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv5, arg2.rotate(BlockRotation.CLOCKWISE_90), BlockMirror.LEFT_RIGHT));
             } else if (arg4 == Direction.SOUTH && arg3 == Direction.WEST) {
                 BlockPos lv6 = arg.offset(arg2.rotate(Direction.EAST), 7);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv6, arg2.rotate(BlockRotation.CLOCKWISE_90)));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv6, arg2.rotate(BlockRotation.CLOCKWISE_90)));
             } else if (arg4 == Direction.NORTH && arg3 == Direction.WEST) {
                 BlockPos lv7 = arg.offset(arg2.rotate(Direction.EAST), 7);
                 lv7 = lv7.offset(arg2.rotate(Direction.SOUTH), 6);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv7, arg2.rotate(BlockRotation.CLOCKWISE_90), BlockMirror.FRONT_BACK));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv7, arg2.rotate(BlockRotation.CLOCKWISE_90), BlockMirror.FRONT_BACK));
             } else if (arg4 == Direction.NORTH && arg3 == Direction.EAST) {
                 BlockPos lv8 = arg.offset(arg2.rotate(Direction.EAST), 1);
                 lv8 = lv8.offset(arg2.rotate(Direction.SOUTH), 6);
-                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, bl), lv8, arg2.rotate(BlockRotation.COUNTERCLOCKWISE_90)));
+                list.add(new Piece(this.manager, arg5.getMediumFunctionalRoom(this.random, staircase), lv8, arg2.rotate(BlockRotation.COUNTERCLOCKWISE_90)));
             } else if (arg4 == Direction.SOUTH && arg3 == Direction.NORTH) {
                 BlockPos lv9 = arg.offset(arg2.rotate(Direction.EAST), 1);
                 lv9 = lv9.offset(arg2.rotate(Direction.NORTH), 8);
-                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, bl), lv9, arg2));
+                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, staircase), lv9, arg2));
             } else if (arg4 == Direction.NORTH && arg3 == Direction.SOUTH) {
                 BlockPos lv10 = arg.offset(arg2.rotate(Direction.EAST), 7);
                 lv10 = lv10.offset(arg2.rotate(Direction.SOUTH), 14);
-                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, bl), lv10, arg2.rotate(BlockRotation.CLOCKWISE_180)));
+                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, staircase), lv10, arg2.rotate(BlockRotation.CLOCKWISE_180)));
             } else if (arg4 == Direction.WEST && arg3 == Direction.EAST) {
                 BlockPos lv11 = arg.offset(arg2.rotate(Direction.EAST), 15);
-                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, bl), lv11, arg2.rotate(BlockRotation.CLOCKWISE_90)));
+                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, staircase), lv11, arg2.rotate(BlockRotation.CLOCKWISE_90)));
             } else if (arg4 == Direction.EAST && arg3 == Direction.WEST) {
                 BlockPos lv12 = arg.offset(arg2.rotate(Direction.WEST), 7);
                 lv12 = lv12.offset(arg2.rotate(Direction.SOUTH), 6);
-                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, bl), lv12, arg2.rotate(BlockRotation.COUNTERCLOCKWISE_90)));
+                list.add(new Piece(this.manager, arg5.getMediumGenericRoom(this.random, staircase), lv12, arg2.rotate(BlockRotation.COUNTERCLOCKWISE_90)));
             } else if (arg4 == Direction.UP && arg3 == Direction.EAST) {
                 BlockPos lv13 = arg.offset(arg2.rotate(Direction.EAST), 15);
                 list.add(new Piece(this.manager, arg5.getMediumSecretRoom(this.random), lv13, arg2.rotate(BlockRotation.CLOCKWISE_90)));
@@ -934,34 +934,34 @@ public class WoodlandMansionGenerator {
         }
 
         @Override
-        protected void toNbt(CompoundTag arg) {
-            super.toNbt(arg);
-            arg.putString("Template", this.template);
-            arg.putString("Rot", this.placementData.getRotation().name());
-            arg.putString("Mi", this.placementData.getMirror().name());
+        protected void toNbt(CompoundTag tag) {
+            super.toNbt(tag);
+            tag.putString("Template", this.template);
+            tag.putString("Rot", this.placementData.getRotation().name());
+            tag.putString("Mi", this.placementData.getMirror().name());
         }
 
         /*
          * WARNING - void declaration
          */
         @Override
-        protected void handleMetadata(String string, BlockPos arg, class_5425 arg2, Random random, BlockBox arg3) {
-            if (string.startsWith("Chest")) {
+        protected void handleMetadata(String metadata, BlockPos pos, class_5425 arg2, Random random, BlockBox boundingBox) {
+            if (metadata.startsWith("Chest")) {
                 BlockRotation lv = this.placementData.getRotation();
                 BlockState lv2 = Blocks.CHEST.getDefaultState();
-                if ("ChestWest".equals(string)) {
+                if ("ChestWest".equals(metadata)) {
                     lv2 = (BlockState)lv2.with(ChestBlock.FACING, lv.rotate(Direction.WEST));
-                } else if ("ChestEast".equals(string)) {
+                } else if ("ChestEast".equals(metadata)) {
                     lv2 = (BlockState)lv2.with(ChestBlock.FACING, lv.rotate(Direction.EAST));
-                } else if ("ChestSouth".equals(string)) {
+                } else if ("ChestSouth".equals(metadata)) {
                     lv2 = (BlockState)lv2.with(ChestBlock.FACING, lv.rotate(Direction.SOUTH));
-                } else if ("ChestNorth".equals(string)) {
+                } else if ("ChestNorth".equals(metadata)) {
                     lv2 = (BlockState)lv2.with(ChestBlock.FACING, lv.rotate(Direction.NORTH));
                 }
-                this.addChest(arg2, arg3, random, arg, LootTables.WOODLAND_MANSION_CHEST, lv2);
+                this.addChest(arg2, boundingBox, random, pos, LootTables.WOODLAND_MANSION_CHEST, lv2);
             } else {
                 void lv5;
-                switch (string) {
+                switch (metadata) {
                     case "Mage": {
                         IllagerEntity lv3 = EntityType.EVOKER.create(arg2.getWorld());
                         break;
@@ -975,10 +975,10 @@ public class WoodlandMansionGenerator {
                     }
                 }
                 lv5.setPersistent();
-                lv5.refreshPositionAndAngles(arg, 0.0f, 0.0f);
+                lv5.refreshPositionAndAngles(pos, 0.0f, 0.0f);
                 lv5.initialize(arg2, arg2.getLocalDifficulty(lv5.getBlockPos()), SpawnReason.STRUCTURE, null, null);
                 arg2.spawnEntity((Entity)lv5);
-                arg2.setBlockState(arg, Blocks.AIR.getDefaultState(), 2);
+                arg2.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
             }
         }
     }

@@ -25,8 +25,8 @@ implements AutoCloseable {
     private final VertexFormat format;
     private int vertexCount;
 
-    public VertexBuffer(VertexFormat arg) {
-        this.format = arg;
+    public VertexBuffer(VertexFormat format) {
+        this.format = format;
         RenderSystem.glGenBuffers(integer -> {
             this.id = integer;
         });
@@ -36,24 +36,24 @@ implements AutoCloseable {
         RenderSystem.glBindBuffer(34962, () -> this.id);
     }
 
-    public void upload(BufferBuilder arg) {
+    public void upload(BufferBuilder buffer) {
         if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(() -> this.uploadInternal(arg));
+            RenderSystem.recordRenderCall(() -> this.uploadInternal(buffer));
         } else {
-            this.uploadInternal(arg);
+            this.uploadInternal(buffer);
         }
     }
 
-    public CompletableFuture<Void> submitUpload(BufferBuilder arg) {
+    public CompletableFuture<Void> submitUpload(BufferBuilder buffer) {
         if (!RenderSystem.isOnRenderThread()) {
-            return CompletableFuture.runAsync(() -> this.uploadInternal(arg), runnable -> RenderSystem.recordRenderCall(runnable::run));
+            return CompletableFuture.runAsync(() -> this.uploadInternal(buffer), runnable -> RenderSystem.recordRenderCall(runnable::run));
         }
-        this.uploadInternal(arg);
+        this.uploadInternal(buffer);
         return CompletableFuture.completedFuture(null);
     }
 
-    private void uploadInternal(BufferBuilder arg) {
-        Pair<BufferBuilder.DrawArrayParameters, ByteBuffer> pair = arg.popData();
+    private void uploadInternal(BufferBuilder buffer) {
+        Pair<BufferBuilder.DrawArrayParameters, ByteBuffer> pair = buffer.popData();
         if (this.id == -1) {
             return;
         }
@@ -64,11 +64,11 @@ implements AutoCloseable {
         VertexBuffer.unbind();
     }
 
-    public void draw(Matrix4f arg, int i) {
+    public void draw(Matrix4f matrix, int mode) {
         RenderSystem.pushMatrix();
         RenderSystem.loadIdentity();
-        RenderSystem.multMatrix(arg);
-        RenderSystem.drawArrays(i, 0, this.vertexCount);
+        RenderSystem.multMatrix(matrix);
+        RenderSystem.drawArrays(mode, 0, this.vertexCount);
         RenderSystem.popMatrix();
     }
 

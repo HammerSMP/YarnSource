@@ -54,16 +54,16 @@ extends Entity {
         this.hoverHeight = (float)(Math.random() * Math.PI * 2.0);
     }
 
-    public ItemEntity(World arg, double d, double e, double f) {
-        this((EntityType<? extends ItemEntity>)EntityType.ITEM, arg);
-        this.updatePosition(d, e, f);
+    public ItemEntity(World world, double x, double y, double z) {
+        this((EntityType<? extends ItemEntity>)EntityType.ITEM, world);
+        this.updatePosition(x, y, z);
         this.yaw = this.random.nextFloat() * 360.0f;
         this.setVelocity(this.random.nextDouble() * 0.2 - 0.1, 0.2, this.random.nextDouble() * 0.2 - 0.1);
     }
 
-    public ItemEntity(World arg, double d, double e, double f, ItemStack arg2) {
-        this(arg, d, e, f);
-        this.setStack(arg2);
+    public ItemEntity(World world, double x, double y, double z, ItemStack stack) {
+        this(world, x, y, z);
+        this.setStack(stack);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -181,51 +181,51 @@ extends Entity {
         return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < 6000 && lv.getCount() < lv.getMaxCount();
     }
 
-    private void tryMerge(ItemEntity arg) {
+    private void tryMerge(ItemEntity other) {
         ItemStack lv = this.getStack();
-        ItemStack lv2 = arg.getStack();
-        if (!Objects.equals(this.getOwner(), arg.getOwner()) || !ItemEntity.canMerge(lv, lv2)) {
+        ItemStack lv2 = other.getStack();
+        if (!Objects.equals(this.getOwner(), other.getOwner()) || !ItemEntity.canMerge(lv, lv2)) {
             return;
         }
         if (lv2.getCount() < lv.getCount()) {
-            ItemEntity.merge(this, lv, arg, lv2);
+            ItemEntity.merge(this, lv, other, lv2);
         } else {
-            ItemEntity.merge(arg, lv2, this, lv);
+            ItemEntity.merge(other, lv2, this, lv);
         }
     }
 
-    public static boolean canMerge(ItemStack arg, ItemStack arg2) {
-        if (arg2.getItem() != arg.getItem()) {
+    public static boolean canMerge(ItemStack stack1, ItemStack stack2) {
+        if (stack2.getItem() != stack1.getItem()) {
             return false;
         }
-        if (arg2.getCount() + arg.getCount() > arg2.getMaxCount()) {
+        if (stack2.getCount() + stack1.getCount() > stack2.getMaxCount()) {
             return false;
         }
-        if (arg2.hasTag() ^ arg.hasTag()) {
+        if (stack2.hasTag() ^ stack1.hasTag()) {
             return false;
         }
-        return !arg2.hasTag() || arg2.getTag().equals(arg.getTag());
+        return !stack2.hasTag() || stack2.getTag().equals(stack1.getTag());
     }
 
-    public static ItemStack merge(ItemStack arg, ItemStack arg2, int i) {
-        int j = Math.min(Math.min(arg.getMaxCount(), i) - arg.getCount(), arg2.getCount());
-        ItemStack lv = arg.copy();
+    public static ItemStack merge(ItemStack stack1, ItemStack stack2, int maxCount) {
+        int j = Math.min(Math.min(stack1.getMaxCount(), maxCount) - stack1.getCount(), stack2.getCount());
+        ItemStack lv = stack1.copy();
         lv.increment(j);
-        arg2.decrement(j);
+        stack2.decrement(j);
         return lv;
     }
 
-    private static void merge(ItemEntity arg, ItemStack arg2, ItemStack arg3) {
-        ItemStack lv = ItemEntity.merge(arg2, arg3, 64);
-        arg.setStack(lv);
+    private static void merge(ItemEntity targetEntity, ItemStack stack1, ItemStack stack2) {
+        ItemStack lv = ItemEntity.merge(stack1, stack2, 64);
+        targetEntity.setStack(lv);
     }
 
-    private static void merge(ItemEntity arg, ItemStack arg2, ItemEntity arg3, ItemStack arg4) {
-        ItemEntity.merge(arg, arg2, arg4);
-        arg.pickupDelay = Math.max(arg.pickupDelay, arg3.pickupDelay);
-        arg.age = Math.min(arg.age, arg3.age);
-        if (arg4.isEmpty()) {
-            arg3.remove();
+    private static void merge(ItemEntity targetEntity, ItemStack targetStack, ItemEntity sourceEntity, ItemStack sourceStack) {
+        ItemEntity.merge(targetEntity, targetStack, sourceStack);
+        targetEntity.pickupDelay = Math.max(targetEntity.pickupDelay, sourceEntity.pickupDelay);
+        targetEntity.age = Math.min(targetEntity.age, sourceEntity.age);
+        if (sourceStack.isEmpty()) {
+            sourceEntity.remove();
         }
     }
 
@@ -235,18 +235,18 @@ extends Entity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        if (!this.getStack().isEmpty() && this.getStack().getItem() == Items.NETHER_STAR && arg.isExplosive()) {
+        if (!this.getStack().isEmpty() && this.getStack().getItem() == Items.NETHER_STAR && source.isExplosive()) {
             return false;
         }
-        if (!this.getStack().getItem().damage(arg)) {
+        if (!this.getStack().getItem().damage(source)) {
             return false;
         }
         this.scheduleVelocityUpdate();
-        this.health = (int)((float)this.health - f);
+        this.health = (int)((float)this.health - amount);
         if (this.health <= 0) {
             this.remove();
         }
@@ -254,35 +254,35 @@ extends Entity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        arg.putShort("Health", (short)this.health);
-        arg.putShort("Age", (short)this.age);
-        arg.putShort("PickupDelay", (short)this.pickupDelay);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        tag.putShort("Health", (short)this.health);
+        tag.putShort("Age", (short)this.age);
+        tag.putShort("PickupDelay", (short)this.pickupDelay);
         if (this.getThrower() != null) {
-            arg.putUuid("Thrower", this.getThrower());
+            tag.putUuid("Thrower", this.getThrower());
         }
         if (this.getOwner() != null) {
-            arg.putUuid("Owner", this.getOwner());
+            tag.putUuid("Owner", this.getOwner());
         }
         if (!this.getStack().isEmpty()) {
-            arg.put("Item", this.getStack().toTag(new CompoundTag()));
+            tag.put("Item", this.getStack().toTag(new CompoundTag()));
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        this.health = arg.getShort("Health");
-        this.age = arg.getShort("Age");
-        if (arg.contains("PickupDelay")) {
-            this.pickupDelay = arg.getShort("PickupDelay");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        this.health = tag.getShort("Health");
+        this.age = tag.getShort("Age");
+        if (tag.contains("PickupDelay")) {
+            this.pickupDelay = tag.getShort("PickupDelay");
         }
-        if (arg.containsUuid("Owner")) {
-            this.owner = arg.getUuid("Owner");
+        if (tag.containsUuid("Owner")) {
+            this.owner = tag.getUuid("Owner");
         }
-        if (arg.containsUuid("Thrower")) {
-            this.thrower = arg.getUuid("Thrower");
+        if (tag.containsUuid("Thrower")) {
+            this.thrower = tag.getUuid("Thrower");
         }
-        CompoundTag lv = arg.getCompound("Item");
+        CompoundTag lv = tag.getCompound("Item");
         this.setStack(ItemStack.fromTag(lv));
         if (this.getStack().isEmpty()) {
             this.remove();
@@ -290,21 +290,21 @@ extends Entity {
     }
 
     @Override
-    public void onPlayerCollision(PlayerEntity arg) {
+    public void onPlayerCollision(PlayerEntity player) {
         if (this.world.isClient) {
             return;
         }
         ItemStack lv = this.getStack();
         Item lv2 = lv.getItem();
         int i = lv.getCount();
-        if (this.pickupDelay == 0 && (this.owner == null || this.owner.equals(arg.getUuid())) && arg.inventory.insertStack(lv)) {
-            arg.sendPickup(this, i);
+        if (this.pickupDelay == 0 && (this.owner == null || this.owner.equals(player.getUuid())) && player.inventory.insertStack(lv)) {
+            player.sendPickup(this, i);
             if (lv.isEmpty()) {
                 this.remove();
                 lv.setCount(i);
             }
-            arg.increaseStat(Stats.PICKED_UP.getOrCreateStat(lv2), i);
-            arg.method_29499(this);
+            player.increaseStat(Stats.PICKED_UP.getOrCreateStat(lv2), i);
+            player.method_29499(this);
         }
     }
 
@@ -324,8 +324,8 @@ extends Entity {
 
     @Override
     @Nullable
-    public Entity moveToWorld(ServerWorld arg) {
-        Entity lv = super.moveToWorld(arg);
+    public Entity moveToWorld(ServerWorld destination) {
+        Entity lv = super.moveToWorld(destination);
         if (!this.world.isClient && lv instanceof ItemEntity) {
             ((ItemEntity)lv).tryMerge();
         }
@@ -336,14 +336,14 @@ extends Entity {
         return this.getDataTracker().get(STACK);
     }
 
-    public void setStack(ItemStack arg) {
-        this.getDataTracker().set(STACK, arg);
+    public void setStack(ItemStack stack) {
+        this.getDataTracker().set(STACK, stack);
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        super.onTrackedDataSet(arg);
-        if (STACK.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        super.onTrackedDataSet(data);
+        if (STACK.equals(data)) {
             this.getStack().setHolder(this);
         }
     }
@@ -353,8 +353,8 @@ extends Entity {
         return this.owner;
     }
 
-    public void setOwner(@Nullable UUID uUID) {
-        this.owner = uUID;
+    public void setOwner(@Nullable UUID uuid) {
+        this.owner = uuid;
     }
 
     @Nullable
@@ -362,8 +362,8 @@ extends Entity {
         return this.thrower;
     }
 
-    public void setThrower(@Nullable UUID uUID) {
-        this.thrower = uUID;
+    public void setThrower(@Nullable UUID uuid) {
+        this.thrower = uuid;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -383,8 +383,8 @@ extends Entity {
         this.pickupDelay = 32767;
     }
 
-    public void setPickupDelay(int i) {
-        this.pickupDelay = i;
+    public void setPickupDelay(int pickupDelay) {
+        this.pickupDelay = pickupDelay;
     }
 
     public boolean cannotPickup() {

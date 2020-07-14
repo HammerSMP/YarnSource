@@ -22,18 +22,18 @@ implements Packet<ClientPlayPacketListener> {
     public PlayerSpawnPositionS2CPacket() {
     }
 
-    public PlayerSpawnPositionS2CPacket(BlockPos arg) {
-        this.pos = arg;
+    public PlayerSpawnPositionS2CPacket(BlockPos pos) {
+        this.pos = pos;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
     }
 
     @Override

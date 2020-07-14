@@ -20,9 +20,9 @@ extends WanderAroundGoal {
         this(arg, d, 0.001f);
     }
 
-    public WanderAroundFarGoal(PathAwareEntity arg, double d, float f) {
-        super(arg, d);
-        this.probability = f;
+    public WanderAroundFarGoal(PathAwareEntity mob, double speed, float probability) {
+        super(mob, speed);
+        this.probability = probability;
     }
 
     @Override

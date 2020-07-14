@@ -97,16 +97,16 @@ public class LevelStorage {
     private final Path backupsDirectory;
     private final DataFixer dataFixer;
 
-    public LevelStorage(Path path, Path path2, DataFixer dataFixer) {
+    public LevelStorage(Path savesDirectory, Path backupsDirectory, DataFixer dataFixer) {
         this.dataFixer = dataFixer;
         try {
-            Files.createDirectories(Files.exists(path, new LinkOption[0]) ? path.toRealPath(new LinkOption[0]) : path, new FileAttribute[0]);
+            Files.createDirectories(Files.exists(savesDirectory, new LinkOption[0]) ? savesDirectory.toRealPath(new LinkOption[0]) : savesDirectory, new FileAttribute[0]);
         }
         catch (IOException iOException) {
             throw new RuntimeException(iOException);
         }
-        this.savesDirectory = path;
-        this.backupsDirectory = path2;
+        this.savesDirectory = savesDirectory;
+        this.backupsDirectory = backupsDirectory;
     }
 
     public static LevelStorage create(Path path) {
@@ -241,9 +241,9 @@ public class LevelStorage {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isLevelNameValid(String string) {
+    public boolean isLevelNameValid(String name) {
         try {
-            Path path = this.savesDirectory.resolve(string);
+            Path path = this.savesDirectory.resolve(name);
             Files.createDirectory(path, new FileAttribute[0]);
             Files.deleteIfExists(path);
             return true;
@@ -254,8 +254,8 @@ public class LevelStorage {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean levelExists(String string) {
-        return Files.isDirectory(this.savesDirectory.resolve(string), new LinkOption[0]);
+    public boolean levelExists(String name) {
+        return Files.isDirectory(this.savesDirectory.resolve(name), new LinkOption[0]);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -268,8 +268,8 @@ public class LevelStorage {
         return this.backupsDirectory;
     }
 
-    public Session createSession(String string) throws IOException {
-        return new Session(string);
+    public Session createSession(String directoryName) throws IOException {
+        return new Session(directoryName);
     }
 
     public class Session
@@ -279,9 +279,9 @@ public class LevelStorage {
         private final String directoryName;
         private final Map<WorldSavePath, Path> paths = Maps.newHashMap();
 
-        public Session(String string) throws IOException {
-            this.directoryName = string;
-            this.directory = LevelStorage.this.savesDirectory.resolve(string);
+        public Session(String directoryName) throws IOException {
+            this.directoryName = directoryName;
+            this.directory = LevelStorage.this.savesDirectory.resolve(directoryName);
             this.lock = SessionLock.create(this.directory);
         }
 
@@ -289,12 +289,12 @@ public class LevelStorage {
             return this.directoryName;
         }
 
-        public Path getDirectory(WorldSavePath arg2) {
-            return this.paths.computeIfAbsent(arg2, arg -> this.directory.resolve(arg.getRelativePath()));
+        public Path getDirectory(WorldSavePath savePath) {
+            return this.paths.computeIfAbsent(savePath, path -> this.directory.resolve(path.getRelativePath()));
         }
 
-        public File getWorldDirectory(RegistryKey<World> arg) {
-            return DimensionType.getSaveDirectory(arg, this.directory.toFile());
+        public File getWorldDirectory(RegistryKey<World> key) {
+            return DimensionType.getSaveDirectory(key, this.directory.toFile());
         }
 
         private void checkValid() {
@@ -313,9 +313,9 @@ public class LevelStorage {
             return lv != null && lv.method_29586().getLevelFormatVersion() != LevelStorage.this.getCurrentVersion();
         }
 
-        public boolean convert(ProgressListener arg) {
+        public boolean convert(ProgressListener progressListener) {
             this.checkValid();
-            return AnvilLevelStorage.convertLevel(this, arg);
+            return AnvilLevelStorage.convertLevel(this, progressListener);
         }
 
         @Nullable
@@ -420,7 +420,7 @@ public class LevelStorage {
         }
 
         @Environment(value=EnvType.CLIENT)
-        public void save(String string) throws IOException {
+        public void save(String name) throws IOException {
             this.checkValid();
             File file = new File(LevelStorage.this.savesDirectory.toFile(), this.directoryName);
             if (!file.exists()) {
@@ -430,7 +430,7 @@ public class LevelStorage {
             if (file2.exists()) {
                 CompoundTag lv = NbtIo.method_30613(file2);
                 CompoundTag lv2 = lv.getCompound("Data");
-                lv2.putString("LevelName", string);
+                lv2.putString("LevelName", name);
                 NbtIo.method_30614(lv, file2);
             }
         }

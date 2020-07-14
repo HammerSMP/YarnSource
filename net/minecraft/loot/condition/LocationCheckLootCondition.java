@@ -26,9 +26,9 @@ implements LootCondition {
     private final LocationPredicate predicate;
     private final BlockPos offset;
 
-    private LocationCheckLootCondition(LocationPredicate arg, BlockPos arg2) {
-        this.predicate = arg;
-        this.offset = arg2;
+    private LocationCheckLootCondition(LocationPredicate predicate, BlockPos offset) {
+        this.predicate = predicate;
+        this.offset = offset;
     }
 
     @Override
@@ -42,8 +42,8 @@ implements LootCondition {
         return lv != null && this.predicate.test(arg.getWorld(), lv.getX() + this.offset.getX(), lv.getY() + this.offset.getY(), lv.getZ() + this.offset.getZ());
     }
 
-    public static LootCondition.Builder builder(LocationPredicate.Builder arg) {
-        return () -> new LocationCheckLootCondition(arg.build(), BlockPos.ORIGIN);
+    public static LootCondition.Builder builder(LocationPredicate.Builder predicateBuilder) {
+        return () -> new LocationCheckLootCondition(predicateBuilder.build(), BlockPos.ORIGIN);
     }
 
     public static LootCondition.Builder method_30151(LocationPredicate.Builder arg, BlockPos arg2) {
@@ -51,8 +51,8 @@ implements LootCondition {
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -81,8 +81,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

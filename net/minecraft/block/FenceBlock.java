@@ -41,48 +41,48 @@ extends HorizontalConnectingBlock {
     }
 
     @Override
-    public VoxelShape getCullingShape(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return this.cullingShapes[this.getShapeIndex(arg)];
+    public VoxelShape getCullingShape(BlockState state, BlockView world, BlockPos pos) {
+        return this.cullingShapes[this.getShapeIndex(state)];
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return this.getOutlineShape(arg, arg2, arg3, arg4);
+    public VoxelShape getVisualShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return this.getOutlineShape(state, world, pos, context);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 
-    public boolean canConnect(BlockState arg, boolean bl, Direction arg2) {
-        Block lv = arg.getBlock();
+    public boolean canConnect(BlockState state, boolean neighborIsFullSquare, Direction dir) {
+        Block lv = state.getBlock();
         boolean bl2 = this.isFence(lv);
-        boolean bl3 = lv instanceof FenceGateBlock && FenceGateBlock.canWallConnect(arg, arg2);
-        return !FenceBlock.cannotConnect(lv) && bl || bl2 || bl3;
+        boolean bl3 = lv instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, dir);
+        return !FenceBlock.cannotConnect(lv) && neighborIsFullSquare || bl2 || bl3;
     }
 
-    private boolean isFence(Block arg) {
-        return arg.isIn(BlockTags.FENCES) && arg.isIn(BlockTags.WOODEN_FENCES) == this.getDefaultState().isIn(BlockTags.WOODEN_FENCES);
+    private boolean isFence(Block block) {
+        return block.isIn(BlockTags.FENCES) && block.isIn(BlockTags.WOODEN_FENCES) == this.getDefaultState().isIn(BlockTags.WOODEN_FENCES);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
-            ItemStack lv = arg4.getStackInHand(arg5);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            ItemStack lv = player.getStackInHand(hand);
             if (lv.getItem() == Items.LEAD) {
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
         }
-        return LeadItem.attachHeldMobsToBlock(arg4, arg2, arg3);
+        return LeadItem.attachHeldMobsToBlock(player, world, pos);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        World lv = arg.getWorld();
-        BlockPos lv2 = arg.getBlockPos();
-        FluidState lv3 = arg.getWorld().getFluidState(arg.getBlockPos());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        World lv = ctx.getWorld();
+        BlockPos lv2 = ctx.getBlockPos();
+        FluidState lv3 = ctx.getWorld().getFluidState(ctx.getBlockPos());
         BlockPos lv4 = lv2.north();
         BlockPos lv5 = lv2.east();
         BlockPos lv6 = lv2.south();
@@ -91,23 +91,23 @@ extends HorizontalConnectingBlock {
         BlockState lv9 = lv.getBlockState(lv5);
         BlockState lv10 = lv.getBlockState(lv6);
         BlockState lv11 = lv.getBlockState(lv7);
-        return (BlockState)((BlockState)((BlockState)((BlockState)((BlockState)super.getPlacementState(arg).with(NORTH, this.canConnect(lv8, lv8.isSideSolidFullSquare(lv, lv4, Direction.SOUTH), Direction.SOUTH))).with(EAST, this.canConnect(lv9, lv9.isSideSolidFullSquare(lv, lv5, Direction.WEST), Direction.WEST))).with(SOUTH, this.canConnect(lv10, lv10.isSideSolidFullSquare(lv, lv6, Direction.NORTH), Direction.NORTH))).with(WEST, this.canConnect(lv11, lv11.isSideSolidFullSquare(lv, lv7, Direction.EAST), Direction.EAST))).with(WATERLOGGED, lv3.getFluid() == Fluids.WATER);
+        return (BlockState)((BlockState)((BlockState)((BlockState)((BlockState)super.getPlacementState(ctx).with(NORTH, this.canConnect(lv8, lv8.isSideSolidFullSquare(lv, lv4, Direction.SOUTH), Direction.SOUTH))).with(EAST, this.canConnect(lv9, lv9.isSideSolidFullSquare(lv, lv5, Direction.WEST), Direction.WEST))).with(SOUTH, this.canConnect(lv10, lv10.isSideSolidFullSquare(lv, lv6, Direction.NORTH), Direction.NORTH))).with(WEST, this.canConnect(lv11, lv11.isSideSolidFullSquare(lv, lv7, Direction.EAST), Direction.EAST))).with(WATERLOGGED, lv3.getFluid() == Fluids.WATER);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(WATERLOGGED).booleanValue()) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(WATERLOGGED).booleanValue()) {
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        if (arg2.getAxis().getType() == Direction.Type.HORIZONTAL) {
-            return (BlockState)arg.with((Property)FACING_PROPERTIES.get(arg2), this.canConnect(arg3, arg3.isSideSolidFullSquare(arg4, arg6, arg2.getOpposite()), arg2.getOpposite()));
+        if (direction.getAxis().getType() == Direction.Type.HORIZONTAL) {
+            return (BlockState)state.with((Property)FACING_PROPERTIES.get(direction), this.canConnect(newState, newState.isSideSolidFullSquare(world, posFrom, direction.getOpposite()), direction.getOpposite()));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
     }
 }
 

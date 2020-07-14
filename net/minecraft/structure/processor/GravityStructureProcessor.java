@@ -30,14 +30,14 @@ extends StructureProcessor {
     private final Heightmap.Type heightmap;
     private final int offset;
 
-    public GravityStructureProcessor(Heightmap.Type arg, int i) {
-        this.heightmap = arg;
-        this.offset = i;
+    public GravityStructureProcessor(Heightmap.Type heightmap, int offset) {
+        this.heightmap = heightmap;
+        this.offset = offset;
     }
 
     @Override
     @Nullable
-    public Structure.StructureBlockInfo process(WorldView arg, BlockPos arg2, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
+    public Structure.StructureBlockInfo process(WorldView arg, BlockPos pos, BlockPos arg3, Structure.StructureBlockInfo arg4, Structure.StructureBlockInfo arg5, StructurePlacementData arg6) {
         Heightmap.Type lv4;
         if (arg instanceof ServerWorld) {
             if (this.heightmap == Heightmap.Type.WORLD_SURFACE_WG) {

@@ -56,12 +56,12 @@ implements AutoCloseable {
     private final Int2ObjectMap<IntList> charactersByWidth = new Int2ObjectOpenHashMap();
     private final List<GlyphAtlasTexture> glyphAtlases = Lists.newArrayList();
 
-    public FontStorage(TextureManager arg, Identifier arg2) {
-        this.textureManager = arg;
-        this.id = arg2;
+    public FontStorage(TextureManager textureManager, Identifier id) {
+        this.textureManager = textureManager;
+        this.id = id;
     }
 
-    public void setFonts(List<Font> list) {
+    public void setFonts(List<Font> fonts) {
         this.method_24290();
         this.closeGlyphAtlases();
         this.glyphRendererCache.clear();
@@ -70,12 +70,12 @@ implements AutoCloseable {
         this.blankGlyphRenderer = this.getGlyphRenderer(BlankGlyph.INSTANCE);
         this.whiteRectangleGlyphRenderer = this.getGlyphRenderer(WhiteRectangleGlyph.INSTANCE);
         IntOpenHashSet intSet = new IntOpenHashSet();
-        for (Font lv : list) {
+        for (Font lv : fonts) {
             intSet.addAll((IntCollection)lv.method_27442());
         }
         HashSet set = Sets.newHashSet();
         intSet.forEach(i2 -> {
-            for (Font lv : list) {
+            for (Font lv : fonts) {
                 Glyph lv2 = i2 == 32 ? SPACE : lv.getGlyph(i2);
                 if (lv2 == null) continue;
                 set.add(lv);
@@ -84,7 +84,7 @@ implements AutoCloseable {
                 break;
             }
         });
-        list.stream().filter(set::contains).forEach(this.fonts::add);
+        fonts.stream().filter(set::contains).forEach(this.fonts::add);
     }
 
     @Override
@@ -124,21 +124,21 @@ implements AutoCloseable {
         return (GlyphRenderer)this.glyphRendererCache.computeIfAbsent(i2, i -> i == 32 ? EMPTY_GLYPH_RENDERER : this.getGlyphRenderer(this.getRenderableGlyph(i)));
     }
 
-    private GlyphRenderer getGlyphRenderer(RenderableGlyph arg) {
+    private GlyphRenderer getGlyphRenderer(RenderableGlyph c) {
         for (GlyphAtlasTexture lv : this.glyphAtlases) {
-            GlyphRenderer lv2 = lv.getGlyphRenderer(arg);
+            GlyphRenderer lv2 = lv.getGlyphRenderer(c);
             if (lv2 == null) continue;
             return lv2;
         }
-        GlyphAtlasTexture lv3 = new GlyphAtlasTexture(new Identifier(this.id.getNamespace(), this.id.getPath() + "/" + this.glyphAtlases.size()), arg.hasColor());
+        GlyphAtlasTexture lv3 = new GlyphAtlasTexture(new Identifier(this.id.getNamespace(), this.id.getPath() + "/" + this.glyphAtlases.size()), c.hasColor());
         this.glyphAtlases.add(lv3);
         this.textureManager.registerTexture(lv3.getId(), lv3);
-        GlyphRenderer lv4 = lv3.getGlyphRenderer(arg);
+        GlyphRenderer lv4 = lv3.getGlyphRenderer(c);
         return lv4 == null ? this.blankGlyphRenderer : lv4;
     }
 
-    public GlyphRenderer getObfuscatedGlyphRenderer(Glyph arg) {
-        IntList intList = (IntList)this.charactersByWidth.get(MathHelper.ceil(arg.getAdvance(false)));
+    public GlyphRenderer getObfuscatedGlyphRenderer(Glyph glyph) {
+        IntList intList = (IntList)this.charactersByWidth.get(MathHelper.ceil(glyph.getAdvance(false)));
         if (intList != null && !intList.isEmpty()) {
             return this.getGlyphRenderer(intList.getInt(RANDOM.nextInt(intList.size())));
         }

@@ -56,8 +56,8 @@ extends EntityRenderer<DragonFireballEntity> {
         super.render(arg, f, g, arg2, arg3, i);
     }
 
-    private static void produceVertex(VertexConsumer arg, Matrix4f arg2, Matrix3f arg3, int i, float f, int j, int k, int l) {
-        arg.vertex(arg2, f - 0.5f, (float)j - 0.25f, 0.0f).color(255, 255, 255, 255).texture(k, l).overlay(OverlayTexture.DEFAULT_UV).light(i).normal(arg3, 0.0f, 1.0f, 0.0f).next();
+    private static void produceVertex(VertexConsumer vertexConsumer, Matrix4f modelMatrix, Matrix3f normalMatrix, int light, float x, int y, int textureU, int textureV) {
+        vertexConsumer.vertex(modelMatrix, x - 0.5f, (float)y - 0.25f, 0.0f).color(255, 255, 255, 255).texture(textureU, textureV).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
     }
 
     @Override

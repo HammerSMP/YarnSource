@@ -22,9 +22,9 @@ public class WantNewItemTask<E extends PiglinEntity>
 extends Task<E> {
     private final int range;
 
-    public WantNewItemTask(int i) {
+    public WantNewItemTask(int range) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ADMIRING_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.range = i;
+        this.range = range;
     }
 
     @Override

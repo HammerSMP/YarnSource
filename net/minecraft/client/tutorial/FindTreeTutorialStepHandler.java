@@ -39,8 +39,8 @@ implements TutorialStepHandler {
     private TutorialToast toast;
     private int ticks;
 
-    public FindTreeTutorialStepHandler(TutorialManager arg) {
-        this.manager = arg;
+    public FindTreeTutorialStepHandler(TutorialManager manager) {
+        this.manager = manager;
     }
 
     @Override
@@ -77,25 +77,25 @@ implements TutorialStepHandler {
     }
 
     @Override
-    public void onTarget(ClientWorld arg, HitResult arg2) {
+    public void onTarget(ClientWorld world, HitResult hitResult) {
         BlockState lv;
-        if (arg2.getType() == HitResult.Type.BLOCK && TREE_BLOCKS.contains((lv = arg.getBlockState(((BlockHitResult)arg2).getBlockPos())).getBlock())) {
+        if (hitResult.getType() == HitResult.Type.BLOCK && TREE_BLOCKS.contains((lv = world.getBlockState(((BlockHitResult)hitResult).getBlockPos())).getBlock())) {
             this.manager.setStep(TutorialStep.PUNCH_TREE);
         }
     }
 
     @Override
-    public void onSlotUpdate(ItemStack arg) {
+    public void onSlotUpdate(ItemStack stack) {
         for (Block lv : TREE_BLOCKS) {
-            if (arg.getItem() != lv.asItem()) continue;
+            if (stack.getItem() != lv.asItem()) continue;
             this.manager.setStep(TutorialStep.CRAFT_PLANKS);
             return;
         }
     }
 
-    public static boolean hasBrokenTreeBlocks(ClientPlayerEntity arg) {
+    public static boolean hasBrokenTreeBlocks(ClientPlayerEntity player) {
         for (Block lv : TREE_BLOCKS) {
-            if (arg.getStatHandler().getStat(Stats.MINED.getOrCreateStat(lv)) <= 0) continue;
+            if (player.getStatHandler().getStat(Stats.MINED.getOrCreateStat(lv)) <= 0) continue;
             return true;
         }
         return false;

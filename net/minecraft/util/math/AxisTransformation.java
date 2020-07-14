@@ -19,20 +19,20 @@ public enum AxisTransformation {
     private final Matrix3f matrix;
     private static final AxisTransformation[][] COMBINATIONS;
 
-    private AxisTransformation(int j, int k, int l) {
-        this.mappings = new int[]{j, k, l};
+    private AxisTransformation(int xMapping, int yMapping, int zMapping) {
+        this.mappings = new int[]{xMapping, yMapping, zMapping};
         this.matrix = new Matrix3f();
         this.matrix.set(0, this.map(0), 1.0f);
         this.matrix.set(1, this.map(1), 1.0f);
         this.matrix.set(2, this.map(2), 1.0f);
     }
 
-    public AxisTransformation prepend(AxisTransformation arg) {
-        return COMBINATIONS[this.ordinal()][arg.ordinal()];
+    public AxisTransformation prepend(AxisTransformation transformation) {
+        return COMBINATIONS[this.ordinal()][transformation.ordinal()];
     }
 
-    public int map(int i) {
-        return this.mappings[i];
+    public int map(int oldAxis) {
+        return this.mappings[oldAxis];
     }
 
     public Matrix3f getMatrix() {

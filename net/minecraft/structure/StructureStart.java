@@ -44,14 +44,14 @@ public abstract class StructureStart<C extends FeatureConfig> {
     private int references;
     protected final ChunkRandom random;
 
-    public StructureStart(StructureFeature<C> arg, int i, int j, BlockBox arg2, int k, long l) {
-        this.feature = arg;
-        this.chunkX = i;
-        this.chunkZ = j;
-        this.references = k;
+    public StructureStart(StructureFeature<C> feature, int chunkX, int chunkZ, BlockBox box, int references, long seed) {
+        this.feature = feature;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+        this.references = references;
         this.random = new ChunkRandom();
-        this.random.setCarverSeed(l, i, j);
-        this.boundingBox = arg2;
+        this.random.setCarverSeed(seed, chunkX, chunkZ);
+        this.boundingBox = box;
     }
 
     public abstract void init(class_5455 var1, ChunkGenerator var2, StructureManager var3, int var4, int var5, Biome var6, C var7);
@@ -96,15 +96,15 @@ public abstract class StructureStart<C extends FeatureConfig> {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public CompoundTag toTag(int i, int j) {
+    public CompoundTag toTag(int chunkX, int chunkZ) {
         CompoundTag lv = new CompoundTag();
         if (!this.hasChildren()) {
             lv.putString("id", "INVALID");
             return lv;
         }
         lv.putString("id", Registry.STRUCTURE_FEATURE.getId(this.getFeature()).toString());
-        lv.putInt("ChunkX", i);
-        lv.putInt("ChunkZ", j);
+        lv.putInt("ChunkX", chunkX);
+        lv.putInt("ChunkZ", chunkZ);
         lv.putInt("references", this.references);
         lv.put("BB", this.boundingBox.toNbt());
         ListTag lv2 = new ListTag();

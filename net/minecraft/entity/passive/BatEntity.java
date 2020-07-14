@@ -71,7 +71,7 @@ extends AmbientEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_BAT_HURT;
     }
 
@@ -86,7 +86,7 @@ extends AmbientEntity {
     }
 
     @Override
-    protected void pushAway(Entity arg) {
+    protected void pushAway(Entity entity) {
     }
 
     @Override
@@ -101,9 +101,9 @@ extends AmbientEntity {
         return (this.dataTracker.get(BAT_FLAGS) & 1) != 0;
     }
 
-    public void setRoosting(boolean bl) {
+    public void setRoosting(boolean roosting) {
         byte b = this.dataTracker.get(BAT_FLAGS);
-        if (bl) {
+        if (roosting) {
             this.dataTracker.set(BAT_FLAGS, (byte)(b | 1));
         } else {
             this.dataTracker.set(BAT_FLAGS, (byte)(b & 0xFFFFFFFE));
@@ -173,12 +173,12 @@ extends AmbientEntity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
     @Override
-    protected void fall(double d, boolean bl, BlockState arg, BlockPos arg2) {
+    protected void fall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPosition) {
     }
 
     @Override
@@ -187,33 +187,33 @@ extends AmbientEntity {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
         if (!this.world.isClient && this.isRoosting()) {
             this.setRoosting(false);
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.dataTracker.set(BAT_FLAGS, arg.getByte("BatFlags"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.dataTracker.set(BAT_FLAGS, tag.getByte("BatFlags"));
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putByte("BatFlags", this.dataTracker.get(BAT_FLAGS));
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putByte("BatFlags", this.dataTracker.get(BAT_FLAGS));
     }
 
-    public static boolean canSpawn(EntityType<BatEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        if (arg4.getY() >= arg2.getSeaLevel()) {
+    public static boolean canSpawn(EntityType<BatEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        if (pos.getY() >= world.getSeaLevel()) {
             return false;
         }
-        int i = arg2.getLightLevel(arg4);
+        int i = world.getLightLevel(pos);
         int j = 4;
         if (BatEntity.isTodayAroundHalloween()) {
             j = 7;
@@ -223,7 +223,7 @@ extends AmbientEntity {
         if (i > random.nextInt(j)) {
             return false;
         }
-        return BatEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+        return BatEntity.canMobSpawn(type, world, spawnReason, pos, random);
     }
 
     private static boolean isTodayAroundHalloween() {
@@ -234,8 +234,8 @@ extends AmbientEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height / 2.0f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height / 2.0f;
     }
 }
 

@@ -19,20 +19,20 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class EndRodParticle
 extends AnimatedParticle {
-    private EndRodParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, arg2, -5.0E-4f);
-        this.velocityX = g;
-        this.velocityY = h;
-        this.velocityZ = i;
+    private EndRodParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z, spriteProvider, -5.0E-4f);
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
         this.scale *= 0.75f;
         this.maxAge = 60 + this.random.nextInt(12);
         this.setTargetColor(15916745);
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
-    public void move(double d, double e, double f) {
-        this.setBoundingBox(this.getBoundingBox().offset(d, e, f));
+    public void move(double dx, double dy, double dz) {
+        this.setBoundingBox(this.getBoundingBox().offset(dx, dy, dz));
         this.repositionFromBoundingBox();
     }
 
@@ -41,8 +41,8 @@ extends AnimatedParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

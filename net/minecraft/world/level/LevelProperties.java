@@ -97,29 +97,29 @@ SaveProperties {
     private boolean modded;
     private final Timer<MinecraftServer> scheduledEvents;
 
-    private LevelProperties(@Nullable DataFixer dataFixer, int i, @Nullable CompoundTag arg, boolean bl, int j, int k, int l, long m, long n, int o, int p, int q, boolean bl2, int r, boolean bl3, boolean bl4, boolean bl5, WorldBorder.Properties arg2, int s, int t, @Nullable UUID uUID, LinkedHashSet<String> linkedHashSet, Timer<MinecraftServer> arg3, @Nullable CompoundTag arg4, CompoundTag arg5, LevelInfo arg6, GeneratorOptions arg7, Lifecycle lifecycle) {
+    private LevelProperties(@Nullable DataFixer dataFixer, int dataVersion, @Nullable CompoundTag playerData, boolean modded, int spawnX, int spawnY, int spawnZ, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, WorldBorder.Properties worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, @Nullable UUID wanderingTraderId, LinkedHashSet<String> serverBrands, Timer<MinecraftServer> arg3, @Nullable CompoundTag arg4, CompoundTag arg5, LevelInfo arg6, GeneratorOptions arg7, Lifecycle lifecycle) {
         this.dataFixer = dataFixer;
-        this.modded = bl;
-        this.spawnX = j;
-        this.spawnY = k;
-        this.spawnZ = l;
-        this.time = m;
-        this.timeOfDay = n;
-        this.version = o;
-        this.clearWeatherTime = p;
-        this.rainTime = q;
-        this.raining = bl2;
-        this.thunderTime = r;
-        this.thundering = bl3;
-        this.initialized = bl4;
-        this.difficultyLocked = bl5;
-        this.worldBorder = arg2;
-        this.wanderingTraderSpawnDelay = s;
-        this.wanderingTraderSpawnChance = t;
-        this.wanderingTraderId = uUID;
-        this.serverBrands = linkedHashSet;
-        this.playerData = arg;
-        this.dataVersion = i;
+        this.modded = modded;
+        this.spawnX = spawnX;
+        this.spawnY = spawnY;
+        this.spawnZ = spawnZ;
+        this.time = time;
+        this.timeOfDay = timeOfDay;
+        this.version = version;
+        this.clearWeatherTime = clearWeatherTime;
+        this.rainTime = rainTime;
+        this.raining = raining;
+        this.thunderTime = thunderTime;
+        this.thundering = thundering;
+        this.initialized = initialized;
+        this.difficultyLocked = difficultyLocked;
+        this.worldBorder = worldBorder;
+        this.wanderingTraderSpawnDelay = wanderingTraderSpawnDelay;
+        this.wanderingTraderSpawnChance = wanderingTraderSpawnChance;
+        this.wanderingTraderId = wanderingTraderId;
+        this.serverBrands = serverBrands;
+        this.playerData = playerData;
+        this.dataVersion = dataVersion;
         this.scheduledEvents = arg3;
         this.customBossEvents = arg4;
         this.field_25031 = arg5;
@@ -244,35 +244,35 @@ SaveProperties {
     }
 
     @Override
-    public void setSpawnX(int i) {
-        this.spawnX = i;
+    public void setSpawnX(int spawnX) {
+        this.spawnX = spawnX;
     }
 
     @Override
-    public void setSpawnY(int i) {
-        this.spawnY = i;
+    public void setSpawnY(int spawnY) {
+        this.spawnY = spawnY;
     }
 
     @Override
-    public void setSpawnZ(int i) {
-        this.spawnZ = i;
+    public void setSpawnZ(int spawnZ) {
+        this.spawnZ = spawnZ;
     }
 
     @Override
-    public void setTime(long l) {
-        this.time = l;
+    public void setTime(long time) {
+        this.time = time;
     }
 
     @Override
-    public void setTimeOfDay(long l) {
-        this.timeOfDay = l;
+    public void setTimeOfDay(long time) {
+        this.timeOfDay = time;
     }
 
     @Override
-    public void setSpawnPos(BlockPos arg) {
-        this.spawnX = arg.getX();
-        this.spawnY = arg.getY();
-        this.spawnZ = arg.getZ();
+    public void setSpawnPos(BlockPos pos) {
+        this.spawnX = pos.getX();
+        this.spawnY = pos.getY();
+        this.spawnZ = pos.getZ();
     }
 
     @Override
@@ -291,8 +291,8 @@ SaveProperties {
     }
 
     @Override
-    public void setClearWeatherTime(int i) {
-        this.clearWeatherTime = i;
+    public void setClearWeatherTime(int clearWeatherTime) {
+        this.clearWeatherTime = clearWeatherTime;
     }
 
     @Override
@@ -301,8 +301,8 @@ SaveProperties {
     }
 
     @Override
-    public void setThundering(boolean bl) {
-        this.thundering = bl;
+    public void setThundering(boolean thundering) {
+        this.thundering = thundering;
     }
 
     @Override
@@ -311,8 +311,8 @@ SaveProperties {
     }
 
     @Override
-    public void setThunderTime(int i) {
-        this.thunderTime = i;
+    public void setThunderTime(int thunderTime) {
+        this.thunderTime = thunderTime;
     }
 
     @Override
@@ -321,8 +321,8 @@ SaveProperties {
     }
 
     @Override
-    public void setRaining(boolean bl) {
-        this.raining = bl;
+    public void setRaining(boolean raining) {
+        this.raining = raining;
     }
 
     @Override
@@ -331,8 +331,8 @@ SaveProperties {
     }
 
     @Override
-    public void setRainTime(int i) {
-        this.rainTime = i;
+    public void setRainTime(int rainTime) {
+        this.rainTime = rainTime;
     }
 
     @Override
@@ -341,8 +341,8 @@ SaveProperties {
     }
 
     @Override
-    public void setGameMode(GameMode arg) {
-        this.field_25030 = this.field_25030.method_28382(arg);
+    public void setGameMode(GameMode gameMode) {
+        this.field_25030 = this.field_25030.method_28382(gameMode);
     }
 
     @Override
@@ -361,8 +361,8 @@ SaveProperties {
     }
 
     @Override
-    public void setInitialized(boolean bl) {
-        this.initialized = bl;
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
     }
 
     @Override
@@ -376,8 +376,8 @@ SaveProperties {
     }
 
     @Override
-    public void setWorldBorder(WorldBorder.Properties arg) {
-        this.worldBorder = arg;
+    public void setWorldBorder(WorldBorder.Properties properties) {
+        this.worldBorder = properties;
     }
 
     @Override
@@ -386,8 +386,8 @@ SaveProperties {
     }
 
     @Override
-    public void setDifficulty(Difficulty arg) {
-        this.field_25030 = this.field_25030.method_28381(arg);
+    public void setDifficulty(Difficulty difficulty) {
+        this.field_25030 = this.field_25030.method_28381(difficulty);
     }
 
     @Override
@@ -396,8 +396,8 @@ SaveProperties {
     }
 
     @Override
-    public void setDifficultyLocked(boolean bl) {
-        this.difficultyLocked = bl;
+    public void setDifficultyLocked(boolean locked) {
+        this.difficultyLocked = locked;
     }
 
     @Override
@@ -406,9 +406,9 @@ SaveProperties {
     }
 
     @Override
-    public void populateCrashReport(CrashReportSection arg) {
-        ServerWorldProperties.super.populateCrashReport(arg);
-        SaveProperties.super.populateCrashReport(arg);
+    public void populateCrashReport(CrashReportSection reportSection) {
+        ServerWorldProperties.super.populateCrashReport(reportSection);
+        SaveProperties.super.populateCrashReport(reportSection);
     }
 
     @Override
@@ -449,8 +449,8 @@ SaveProperties {
     }
 
     @Override
-    public void setCustomBossEvents(@Nullable CompoundTag arg) {
-        this.customBossEvents = arg;
+    public void setCustomBossEvents(@Nullable CompoundTag tag) {
+        this.customBossEvents = tag;
     }
 
     @Override
@@ -459,8 +459,8 @@ SaveProperties {
     }
 
     @Override
-    public void setWanderingTraderSpawnDelay(int i) {
-        this.wanderingTraderSpawnDelay = i;
+    public void setWanderingTraderSpawnDelay(int wanderingTraderSpawnDelay) {
+        this.wanderingTraderSpawnDelay = wanderingTraderSpawnDelay;
     }
 
     @Override
@@ -469,19 +469,19 @@ SaveProperties {
     }
 
     @Override
-    public void setWanderingTraderSpawnChance(int i) {
-        this.wanderingTraderSpawnChance = i;
+    public void setWanderingTraderSpawnChance(int wanderingTraderSpawnChance) {
+        this.wanderingTraderSpawnChance = wanderingTraderSpawnChance;
     }
 
     @Override
-    public void setWanderingTraderId(UUID uUID) {
-        this.wanderingTraderId = uUID;
+    public void setWanderingTraderId(UUID uuid) {
+        this.wanderingTraderId = uuid;
     }
 
     @Override
-    public void addServerBrand(String string, boolean bl) {
-        this.serverBrands.add(string);
-        this.modded |= bl;
+    public void addServerBrand(String brand, boolean modded) {
+        this.serverBrands.add(brand);
+        this.modded |= modded;
     }
 
     @Override

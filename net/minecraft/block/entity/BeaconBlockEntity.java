@@ -72,8 +72,8 @@ Tickable {
     private final PropertyDelegate propertyDelegate = new PropertyDelegate(){
 
         @Override
-        public int get(int i) {
-            switch (i) {
+        public int get(int index) {
+            switch (index) {
                 case 0: {
                     return BeaconBlockEntity.this.level;
                 }
@@ -88,21 +88,21 @@ Tickable {
         }
 
         @Override
-        public void set(int i, int j) {
-            switch (i) {
+        public void set(int index, int value) {
+            switch (index) {
                 case 0: {
-                    BeaconBlockEntity.this.level = j;
+                    BeaconBlockEntity.this.level = value;
                     break;
                 }
                 case 1: {
                     if (!BeaconBlockEntity.this.world.isClient && !BeaconBlockEntity.this.beamSegments.isEmpty()) {
                         BeaconBlockEntity.this.playSound(SoundEvents.BLOCK_BEACON_POWER_SELECT);
                     }
-                    BeaconBlockEntity.this.primary = BeaconBlockEntity.getPotionEffectById(j);
+                    BeaconBlockEntity.this.primary = BeaconBlockEntity.getPotionEffectById(value);
                     break;
                 }
                 case 2: {
-                    BeaconBlockEntity.this.secondary = BeaconBlockEntity.getPotionEffectById(j);
+                    BeaconBlockEntity.this.secondary = BeaconBlockEntity.getPotionEffectById(value);
                 }
             }
         }
@@ -197,14 +197,14 @@ Tickable {
         }
     }
 
-    private void updateLevel(int i, int j, int k) {
+    private void updateLevel(int x, int y, int z) {
         int m;
         this.level = 0;
         int l = 1;
-        while (l <= 4 && (m = j - l) >= 0) {
+        while (l <= 4 && (m = y - l) >= 0) {
             boolean bl = true;
-            block1: for (int n = i - l; n <= i + l && bl; ++n) {
-                for (int o = k - l; o <= k + l; ++o) {
+            block1: for (int n = x - l; n <= x + l && bl; ++n) {
+                for (int o = z - l; o <= z + l; ++o) {
                     if (this.world.getBlockState(new BlockPos(n, m, o)).isIn(BlockTags.BEACON_BASE_BLOCKS)) continue;
                     bl = false;
                     continue block1;
@@ -274,33 +274,33 @@ Tickable {
     }
 
     @Nullable
-    private static StatusEffect getPotionEffectById(int i) {
-        StatusEffect lv = StatusEffect.byRawId(i);
+    private static StatusEffect getPotionEffectById(int id) {
+        StatusEffect lv = StatusEffect.byRawId(id);
         return EFFECTS.contains(lv) ? lv : null;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.primary = BeaconBlockEntity.getPotionEffectById(arg2.getInt("Primary"));
-        this.secondary = BeaconBlockEntity.getPotionEffectById(arg2.getInt("Secondary"));
-        if (arg2.contains("CustomName", 8)) {
-            this.customName = Text.Serializer.fromJson(arg2.getString("CustomName"));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.primary = BeaconBlockEntity.getPotionEffectById(tag.getInt("Primary"));
+        this.secondary = BeaconBlockEntity.getPotionEffectById(tag.getInt("Secondary"));
+        if (tag.contains("CustomName", 8)) {
+            this.customName = Text.Serializer.fromJson(tag.getString("CustomName"));
         }
-        this.lock = ContainerLock.fromTag(arg2);
+        this.lock = ContainerLock.fromTag(tag);
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.putInt("Primary", StatusEffect.getRawId(this.primary));
-        arg.putInt("Secondary", StatusEffect.getRawId(this.secondary));
-        arg.putInt("Levels", this.level);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putInt("Primary", StatusEffect.getRawId(this.primary));
+        tag.putInt("Secondary", StatusEffect.getRawId(this.secondary));
+        tag.putInt("Levels", this.level);
         if (this.customName != null) {
-            arg.putString("CustomName", Text.Serializer.toJson(this.customName));
+            tag.putString("CustomName", Text.Serializer.toJson(this.customName));
         }
-        this.lock.toTag(arg);
-        return arg;
+        this.lock.toTag(tag);
+        return tag;
     }
 
     public void setCustomName(@Nullable Text arg) {
@@ -325,8 +325,8 @@ Tickable {
         private final float[] color;
         private int height;
 
-        public BeamSegment(float[] fs) {
-            this.color = fs;
+        public BeamSegment(float[] color) {
+            this.color = color;
             this.height = 1;
         }
 

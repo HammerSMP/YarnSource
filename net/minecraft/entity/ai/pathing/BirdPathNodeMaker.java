@@ -28,9 +28,9 @@ import net.minecraft.world.chunk.ChunkCache;
 public class BirdPathNodeMaker
 extends LandPathNodeMaker {
     @Override
-    public void init(ChunkCache arg, MobEntity arg2) {
-        super.init(arg, arg2);
-        this.waterPathNodeTypeWeight = arg2.getPathfindingPenalty(PathNodeType.WATER);
+    public void init(ChunkCache cachedWorld, MobEntity entity) {
+        super.init(cachedWorld, entity);
+        this.waterPathNodeTypeWeight = entity.getPathfindingPenalty(PathNodeType.WATER);
     }
 
     @Override
@@ -71,12 +71,12 @@ extends LandPathNodeMaker {
     }
 
     @Override
-    public TargetPathNode getNode(double d, double e, double f) {
-        return new TargetPathNode(super.getNode(MathHelper.floor(d), MathHelper.floor(e), MathHelper.floor(f)));
+    public TargetPathNode getNode(double x, double y, double z) {
+        return new TargetPathNode(super.getNode(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z)));
     }
 
     @Override
-    public int getSuccessors(PathNode[] args, PathNode arg) {
+    public int getSuccessors(PathNode[] successors, PathNode node) {
         PathNode lv26;
         PathNode lv25;
         PathNode lv24;
@@ -103,104 +103,104 @@ extends LandPathNodeMaker {
         PathNode lv3;
         PathNode lv2;
         int i = 0;
-        PathNode lv = this.getNode(arg.x, arg.y, arg.z + 1);
+        PathNode lv = this.getNode(node.x, node.y, node.z + 1);
         if (this.unvisited(lv)) {
-            args[i++] = lv;
+            successors[i++] = lv;
         }
-        if (this.unvisited(lv2 = this.getNode(arg.x - 1, arg.y, arg.z))) {
-            args[i++] = lv2;
+        if (this.unvisited(lv2 = this.getNode(node.x - 1, node.y, node.z))) {
+            successors[i++] = lv2;
         }
-        if (this.unvisited(lv3 = this.getNode(arg.x + 1, arg.y, arg.z))) {
-            args[i++] = lv3;
+        if (this.unvisited(lv3 = this.getNode(node.x + 1, node.y, node.z))) {
+            successors[i++] = lv3;
         }
-        if (this.unvisited(lv4 = this.getNode(arg.x, arg.y, arg.z - 1))) {
-            args[i++] = lv4;
+        if (this.unvisited(lv4 = this.getNode(node.x, node.y, node.z - 1))) {
+            successors[i++] = lv4;
         }
-        if (this.unvisited(lv5 = this.getNode(arg.x, arg.y + 1, arg.z))) {
-            args[i++] = lv5;
+        if (this.unvisited(lv5 = this.getNode(node.x, node.y + 1, node.z))) {
+            successors[i++] = lv5;
         }
-        if (this.unvisited(lv6 = this.getNode(arg.x, arg.y - 1, arg.z))) {
-            args[i++] = lv6;
+        if (this.unvisited(lv6 = this.getNode(node.x, node.y - 1, node.z))) {
+            successors[i++] = lv6;
         }
-        if (this.unvisited(lv7 = this.getNode(arg.x, arg.y + 1, arg.z + 1)) && this.isPassable(lv) && this.isPassable(lv5)) {
-            args[i++] = lv7;
+        if (this.unvisited(lv7 = this.getNode(node.x, node.y + 1, node.z + 1)) && this.isPassable(lv) && this.isPassable(lv5)) {
+            successors[i++] = lv7;
         }
-        if (this.unvisited(lv8 = this.getNode(arg.x - 1, arg.y + 1, arg.z)) && this.isPassable(lv2) && this.isPassable(lv5)) {
-            args[i++] = lv8;
+        if (this.unvisited(lv8 = this.getNode(node.x - 1, node.y + 1, node.z)) && this.isPassable(lv2) && this.isPassable(lv5)) {
+            successors[i++] = lv8;
         }
-        if (this.unvisited(lv9 = this.getNode(arg.x + 1, arg.y + 1, arg.z)) && this.isPassable(lv3) && this.isPassable(lv5)) {
-            args[i++] = lv9;
+        if (this.unvisited(lv9 = this.getNode(node.x + 1, node.y + 1, node.z)) && this.isPassable(lv3) && this.isPassable(lv5)) {
+            successors[i++] = lv9;
         }
-        if (this.unvisited(lv10 = this.getNode(arg.x, arg.y + 1, arg.z - 1)) && this.isPassable(lv4) && this.isPassable(lv5)) {
-            args[i++] = lv10;
+        if (this.unvisited(lv10 = this.getNode(node.x, node.y + 1, node.z - 1)) && this.isPassable(lv4) && this.isPassable(lv5)) {
+            successors[i++] = lv10;
         }
-        if (this.unvisited(lv11 = this.getNode(arg.x, arg.y - 1, arg.z + 1)) && this.isPassable(lv) && this.isPassable(lv6)) {
-            args[i++] = lv11;
+        if (this.unvisited(lv11 = this.getNode(node.x, node.y - 1, node.z + 1)) && this.isPassable(lv) && this.isPassable(lv6)) {
+            successors[i++] = lv11;
         }
-        if (this.unvisited(lv12 = this.getNode(arg.x - 1, arg.y - 1, arg.z)) && this.isPassable(lv2) && this.isPassable(lv6)) {
-            args[i++] = lv12;
+        if (this.unvisited(lv12 = this.getNode(node.x - 1, node.y - 1, node.z)) && this.isPassable(lv2) && this.isPassable(lv6)) {
+            successors[i++] = lv12;
         }
-        if (this.unvisited(lv13 = this.getNode(arg.x + 1, arg.y - 1, arg.z)) && this.isPassable(lv3) && this.isPassable(lv6)) {
-            args[i++] = lv13;
+        if (this.unvisited(lv13 = this.getNode(node.x + 1, node.y - 1, node.z)) && this.isPassable(lv3) && this.isPassable(lv6)) {
+            successors[i++] = lv13;
         }
-        if (this.unvisited(lv14 = this.getNode(arg.x, arg.y - 1, arg.z - 1)) && this.isPassable(lv4) && this.isPassable(lv6)) {
-            args[i++] = lv14;
+        if (this.unvisited(lv14 = this.getNode(node.x, node.y - 1, node.z - 1)) && this.isPassable(lv4) && this.isPassable(lv6)) {
+            successors[i++] = lv14;
         }
-        if (this.unvisited(lv15 = this.getNode(arg.x + 1, arg.y, arg.z - 1)) && this.isPassable(lv4) && this.isPassable(lv3)) {
-            args[i++] = lv15;
+        if (this.unvisited(lv15 = this.getNode(node.x + 1, node.y, node.z - 1)) && this.isPassable(lv4) && this.isPassable(lv3)) {
+            successors[i++] = lv15;
         }
-        if (this.unvisited(lv16 = this.getNode(arg.x + 1, arg.y, arg.z + 1)) && this.isPassable(lv) && this.isPassable(lv3)) {
-            args[i++] = lv16;
+        if (this.unvisited(lv16 = this.getNode(node.x + 1, node.y, node.z + 1)) && this.isPassable(lv) && this.isPassable(lv3)) {
+            successors[i++] = lv16;
         }
-        if (this.unvisited(lv17 = this.getNode(arg.x - 1, arg.y, arg.z - 1)) && this.isPassable(lv4) && this.isPassable(lv2)) {
-            args[i++] = lv17;
+        if (this.unvisited(lv17 = this.getNode(node.x - 1, node.y, node.z - 1)) && this.isPassable(lv4) && this.isPassable(lv2)) {
+            successors[i++] = lv17;
         }
-        if (this.unvisited(lv18 = this.getNode(arg.x - 1, arg.y, arg.z + 1)) && this.isPassable(lv) && this.isPassable(lv2)) {
-            args[i++] = lv18;
+        if (this.unvisited(lv18 = this.getNode(node.x - 1, node.y, node.z + 1)) && this.isPassable(lv) && this.isPassable(lv2)) {
+            successors[i++] = lv18;
         }
-        if (this.unvisited(lv19 = this.getNode(arg.x + 1, arg.y + 1, arg.z - 1)) && this.isPassable(lv15) && this.isPassable(lv4) && this.isPassable(lv3) && this.isPassable(lv5) && this.isPassable(lv10) && this.isPassable(lv9)) {
-            args[i++] = lv19;
+        if (this.unvisited(lv19 = this.getNode(node.x + 1, node.y + 1, node.z - 1)) && this.isPassable(lv15) && this.isPassable(lv4) && this.isPassable(lv3) && this.isPassable(lv5) && this.isPassable(lv10) && this.isPassable(lv9)) {
+            successors[i++] = lv19;
         }
-        if (this.unvisited(lv20 = this.getNode(arg.x + 1, arg.y + 1, arg.z + 1)) && this.isPassable(lv16) && this.isPassable(lv) && this.isPassable(lv3) && this.isPassable(lv5) && this.isPassable(lv7) && this.isPassable(lv9)) {
-            args[i++] = lv20;
+        if (this.unvisited(lv20 = this.getNode(node.x + 1, node.y + 1, node.z + 1)) && this.isPassable(lv16) && this.isPassable(lv) && this.isPassable(lv3) && this.isPassable(lv5) && this.isPassable(lv7) && this.isPassable(lv9)) {
+            successors[i++] = lv20;
         }
-        if (this.unvisited(lv21 = this.getNode(arg.x - 1, arg.y + 1, arg.z - 1)) && this.isPassable(lv17) && this.isPassable(lv4) && this.isPassable(lv2) & this.isPassable(lv5) && this.isPassable(lv10) && this.isPassable(lv8)) {
-            args[i++] = lv21;
+        if (this.unvisited(lv21 = this.getNode(node.x - 1, node.y + 1, node.z - 1)) && this.isPassable(lv17) && this.isPassable(lv4) && this.isPassable(lv2) & this.isPassable(lv5) && this.isPassable(lv10) && this.isPassable(lv8)) {
+            successors[i++] = lv21;
         }
-        if (this.unvisited(lv22 = this.getNode(arg.x - 1, arg.y + 1, arg.z + 1)) && this.isPassable(lv18) && this.isPassable(lv) && this.isPassable(lv2) & this.isPassable(lv5) && this.isPassable(lv7) && this.isPassable(lv8)) {
-            args[i++] = lv22;
+        if (this.unvisited(lv22 = this.getNode(node.x - 1, node.y + 1, node.z + 1)) && this.isPassable(lv18) && this.isPassable(lv) && this.isPassable(lv2) & this.isPassable(lv5) && this.isPassable(lv7) && this.isPassable(lv8)) {
+            successors[i++] = lv22;
         }
-        if (this.unvisited(lv23 = this.getNode(arg.x + 1, arg.y - 1, arg.z - 1)) && this.isPassable(lv15) && this.isPassable(lv4) && this.isPassable(lv3) && this.isPassable(lv6) && this.isPassable(lv14) && this.isPassable(lv13)) {
-            args[i++] = lv23;
+        if (this.unvisited(lv23 = this.getNode(node.x + 1, node.y - 1, node.z - 1)) && this.isPassable(lv15) && this.isPassable(lv4) && this.isPassable(lv3) && this.isPassable(lv6) && this.isPassable(lv14) && this.isPassable(lv13)) {
+            successors[i++] = lv23;
         }
-        if (this.unvisited(lv24 = this.getNode(arg.x + 1, arg.y - 1, arg.z + 1)) && this.isPassable(lv16) && this.isPassable(lv) && this.isPassable(lv3) && this.isPassable(lv6) && this.isPassable(lv11) && this.isPassable(lv13)) {
-            args[i++] = lv24;
+        if (this.unvisited(lv24 = this.getNode(node.x + 1, node.y - 1, node.z + 1)) && this.isPassable(lv16) && this.isPassable(lv) && this.isPassable(lv3) && this.isPassable(lv6) && this.isPassable(lv11) && this.isPassable(lv13)) {
+            successors[i++] = lv24;
         }
-        if (this.unvisited(lv25 = this.getNode(arg.x - 1, arg.y - 1, arg.z - 1)) && this.isPassable(lv17) && this.isPassable(lv4) && this.isPassable(lv2) && this.isPassable(lv6) && this.isPassable(lv14) && this.isPassable(lv12)) {
-            args[i++] = lv25;
+        if (this.unvisited(lv25 = this.getNode(node.x - 1, node.y - 1, node.z - 1)) && this.isPassable(lv17) && this.isPassable(lv4) && this.isPassable(lv2) && this.isPassable(lv6) && this.isPassable(lv14) && this.isPassable(lv12)) {
+            successors[i++] = lv25;
         }
-        if (this.unvisited(lv26 = this.getNode(arg.x - 1, arg.y - 1, arg.z + 1)) && this.isPassable(lv18) && this.isPassable(lv) && this.isPassable(lv2) && this.isPassable(lv6) && this.isPassable(lv11) && this.isPassable(lv12)) {
-            args[i++] = lv26;
+        if (this.unvisited(lv26 = this.getNode(node.x - 1, node.y - 1, node.z + 1)) && this.isPassable(lv18) && this.isPassable(lv) && this.isPassable(lv2) && this.isPassable(lv6) && this.isPassable(lv11) && this.isPassable(lv12)) {
+            successors[i++] = lv26;
         }
         return i;
     }
 
-    private boolean isPassable(@Nullable PathNode arg) {
-        return arg != null && arg.penalty >= 0.0f;
+    private boolean isPassable(@Nullable PathNode node) {
+        return node != null && node.penalty >= 0.0f;
     }
 
-    private boolean unvisited(@Nullable PathNode arg) {
-        return arg != null && !arg.visited;
+    private boolean unvisited(@Nullable PathNode node) {
+        return node != null && !node.visited;
     }
 
     @Override
     @Nullable
-    protected PathNode getNode(int i, int j, int k) {
+    protected PathNode getNode(int x, int y, int z) {
         PathNode lv = null;
-        PathNodeType lv2 = this.getNodeType(this.entity, i, j, k);
+        PathNodeType lv2 = this.getNodeType(this.entity, x, y, z);
         float f = this.entity.getPathfindingPenalty(lv2);
         if (f >= 0.0f) {
-            lv = super.getNode(i, j, k);
+            lv = super.getNode(x, y, z);
             lv.type = lv2;
             lv.penalty = Math.max(lv.penalty, f);
             if (lv2 == PathNodeType.WALKABLE) {
@@ -214,35 +214,35 @@ extends LandPathNodeMaker {
     }
 
     @Override
-    public PathNodeType getNodeType(BlockView arg, int i, int j, int k, MobEntity arg2, int l, int m, int n, boolean bl, boolean bl2) {
+    public PathNodeType getNodeType(BlockView world, int x, int y, int z, MobEntity mob, int sizeX, int sizeY, int sizeZ, boolean canOpenDoors, boolean canEnterOpenDoors) {
         EnumSet<PathNodeType> enumSet = EnumSet.noneOf(PathNodeType.class);
         PathNodeType lv = PathNodeType.BLOCKED;
-        BlockPos lv2 = arg2.getBlockPos();
-        lv = this.findNearbyNodeTypes(arg, i, j, k, l, m, n, bl, bl2, enumSet, lv, lv2);
+        BlockPos lv2 = mob.getBlockPos();
+        lv = this.findNearbyNodeTypes(world, x, y, z, sizeX, sizeY, sizeZ, canOpenDoors, canEnterOpenDoors, enumSet, lv, lv2);
         if (enumSet.contains((Object)PathNodeType.FENCE)) {
             return PathNodeType.FENCE;
         }
         PathNodeType lv3 = PathNodeType.BLOCKED;
         for (PathNodeType lv4 : enumSet) {
-            if (arg2.getPathfindingPenalty(lv4) < 0.0f) {
+            if (mob.getPathfindingPenalty(lv4) < 0.0f) {
                 return lv4;
             }
-            if (!(arg2.getPathfindingPenalty(lv4) >= arg2.getPathfindingPenalty(lv3))) continue;
+            if (!(mob.getPathfindingPenalty(lv4) >= mob.getPathfindingPenalty(lv3))) continue;
             lv3 = lv4;
         }
-        if (lv == PathNodeType.OPEN && arg2.getPathfindingPenalty(lv3) == 0.0f) {
+        if (lv == PathNodeType.OPEN && mob.getPathfindingPenalty(lv3) == 0.0f) {
             return PathNodeType.OPEN;
         }
         return lv3;
     }
 
     @Override
-    public PathNodeType getDefaultNodeType(BlockView arg, int i, int j, int k) {
+    public PathNodeType getDefaultNodeType(BlockView world, int x, int y, int z) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        PathNodeType lv2 = BirdPathNodeMaker.getCommonNodeType(arg, lv.set(i, j, k));
-        if (lv2 == PathNodeType.OPEN && j >= 1) {
-            BlockState lv3 = arg.getBlockState(lv.set(i, j - 1, k));
-            PathNodeType lv4 = BirdPathNodeMaker.getCommonNodeType(arg, lv.set(i, j - 1, k));
+        PathNodeType lv2 = BirdPathNodeMaker.getCommonNodeType(world, lv.set(x, y, z));
+        if (lv2 == PathNodeType.OPEN && y >= 1) {
+            BlockState lv3 = world.getBlockState(lv.set(x, y - 1, z));
+            PathNodeType lv4 = BirdPathNodeMaker.getCommonNodeType(world, lv.set(x, y - 1, z));
             if (lv4 == PathNodeType.DAMAGE_FIRE || lv3.isOf(Blocks.MAGMA_BLOCK) || lv4 == PathNodeType.LAVA || lv3.isIn(BlockTags.CAMPFIRES)) {
                 lv2 = PathNodeType.DAMAGE_FIRE;
             } else if (lv4 == PathNodeType.DAMAGE_CACTUS) {
@@ -258,17 +258,17 @@ extends LandPathNodeMaker {
             }
         }
         if (lv2 == PathNodeType.WALKABLE || lv2 == PathNodeType.OPEN) {
-            lv2 = BirdPathNodeMaker.getNodeTypeFromNeighbors(arg, lv.set(i, j, k), lv2);
+            lv2 = BirdPathNodeMaker.getNodeTypeFromNeighbors(world, lv.set(x, y, z), lv2);
         }
         return lv2;
     }
 
-    private PathNodeType getNodeType(MobEntity arg, BlockPos arg2) {
-        return this.getNodeType(arg, arg2.getX(), arg2.getY(), arg2.getZ());
+    private PathNodeType getNodeType(MobEntity entity, BlockPos pos) {
+        return this.getNodeType(entity, pos.getX(), pos.getY(), pos.getZ());
     }
 
-    private PathNodeType getNodeType(MobEntity arg, int i, int j, int k) {
-        return this.getNodeType(this.cachedWorld, i, j, k, arg, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, this.canOpenDoors(), this.canEnterOpenDoors());
+    private PathNodeType getNodeType(MobEntity entity, int x, int y, int z) {
+        return this.getNodeType(this.cachedWorld, x, y, z, entity, this.entityBlockXSize, this.entityBlockYSize, this.entityBlockZSize, this.canOpenDoors(), this.canEnterOpenDoors());
     }
 }
 

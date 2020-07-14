@@ -48,23 +48,23 @@ extends BlockEntity {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         for (int i = 0; i < 4; ++i) {
             String string = Text.Serializer.toJson(this.text[i]);
-            arg.putString("Text" + (i + 1), string);
+            tag.putString("Text" + (i + 1), string);
         }
-        arg.putString("Color", this.textColor.getName());
-        return arg;
+        tag.putString("Color", this.textColor.getName());
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
+    public void fromTag(BlockState state, CompoundTag tag) {
         this.editable = false;
-        super.fromTag(arg, arg2);
-        this.textColor = DyeColor.byName(arg2.getString("Color"), DyeColor.BLACK);
+        super.fromTag(state, tag);
+        this.textColor = DyeColor.byName(tag.getString("Color"), DyeColor.BLACK);
         for (int i = 0; i < 4; ++i) {
-            String string = arg2.getString("Text" + (i + 1));
+            String string = tag.getString("Text" + (i + 1));
             MutableText lv = Text.Serializer.fromJson(string.isEmpty() ? "\"\"" : string);
             if (this.world instanceof ServerWorld) {
                 try {
@@ -80,18 +80,18 @@ extends BlockEntity {
         }
     }
 
-    public void setTextOnRow(int i, Text arg) {
-        this.text[i] = arg;
-        this.textBeingEdited[i] = null;
+    public void setTextOnRow(int row, Text text) {
+        this.text[row] = text;
+        this.textBeingEdited[row] = null;
     }
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public StringRenderable getTextBeingEditedOnRow(int i, UnaryOperator<StringRenderable> unaryOperator) {
-        if (this.textBeingEdited[i] == null && this.text[i] != null) {
-            this.textBeingEdited[i] = (StringRenderable)unaryOperator.apply(this.text[i]);
+    public StringRenderable getTextBeingEditedOnRow(int row, UnaryOperator<StringRenderable> unaryOperator) {
+        if (this.textBeingEdited[row] == null && this.text[row] != null) {
+            this.textBeingEdited[row] = (StringRenderable)unaryOperator.apply(this.text[row]);
         }
-        return this.textBeingEdited[i];
+        return this.textBeingEdited[row];
     }
 
     @Override
@@ -122,38 +122,38 @@ extends BlockEntity {
         }
     }
 
-    public void setEditor(PlayerEntity arg) {
-        this.editor = arg;
+    public void setEditor(PlayerEntity player) {
+        this.editor = player;
     }
 
     public PlayerEntity getEditor() {
         return this.editor;
     }
 
-    public boolean onActivate(PlayerEntity arg) {
+    public boolean onActivate(PlayerEntity player) {
         for (Text lv : this.text) {
             ClickEvent lv3;
             Style lv2;
             Style style = lv2 = lv == null ? null : lv.getStyle();
             if (lv2 == null || lv2.getClickEvent() == null || (lv3 = lv2.getClickEvent()).getAction() != ClickEvent.Action.RUN_COMMAND) continue;
-            arg.getServer().getCommandManager().execute(this.getCommandSource((ServerPlayerEntity)arg), lv3.getValue());
+            player.getServer().getCommandManager().execute(this.getCommandSource((ServerPlayerEntity)player), lv3.getValue());
         }
         return true;
     }
 
-    public ServerCommandSource getCommandSource(@Nullable ServerPlayerEntity arg) {
-        String string = arg == null ? "Sign" : arg.getName().getString();
-        Text lv = arg == null ? new LiteralText("Sign") : arg.getDisplayName();
-        return new ServerCommandSource(CommandOutput.DUMMY, Vec3d.ofCenter(this.pos), Vec2f.ZERO, (ServerWorld)this.world, 2, string, lv, this.world.getServer(), arg);
+    public ServerCommandSource getCommandSource(@Nullable ServerPlayerEntity player) {
+        String string = player == null ? "Sign" : player.getName().getString();
+        Text lv = player == null ? new LiteralText("Sign") : player.getDisplayName();
+        return new ServerCommandSource(CommandOutput.DUMMY, Vec3d.ofCenter(this.pos), Vec2f.ZERO, (ServerWorld)this.world, 2, string, lv, this.world.getServer(), player);
     }
 
     public DyeColor getTextColor() {
         return this.textColor;
     }
 
-    public boolean setTextColor(DyeColor arg) {
-        if (arg != this.getTextColor()) {
-            this.textColor = arg;
+    public boolean setTextColor(DyeColor value) {
+        if (value != this.getTextColor()) {
+            this.textColor = value;
             this.markDirty();
             this.world.updateListeners(this.getPos(), this.getCachedState(), this.getCachedState(), 3);
             return true;

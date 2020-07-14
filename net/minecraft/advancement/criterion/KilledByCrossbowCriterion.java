@@ -42,19 +42,19 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lvs, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg2, Collection<Entity> collection) {
+    public void trigger(ServerPlayerEntity player, Collection<Entity> piercingKilledEntities) {
         ArrayList list = Lists.newArrayList();
         HashSet set = Sets.newHashSet();
-        for (Entity lv : collection) {
+        for (Entity lv : piercingKilledEntities) {
             set.add(lv.getType());
-            list.add(EntityPredicate.createAdvancementEntityLootContext(arg2, lv));
+            list.add(EntityPredicate.createAdvancementEntityLootContext(player, lv));
         }
-        this.test(arg2, arg -> arg.matches(list, set.size()));
+        this.test(player, arg -> arg.matches(list, set.size()));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -62,29 +62,29 @@ extends AbstractCriterion<Conditions> {
         private final EntityPredicate.Extended[] victims;
         private final NumberRange.IntRange uniqueEntityTypes;
 
-        public Conditions(EntityPredicate.Extended arg, EntityPredicate.Extended[] args, NumberRange.IntRange arg2) {
-            super(ID, arg);
-            this.victims = args;
-            this.uniqueEntityTypes = arg2;
+        public Conditions(EntityPredicate.Extended player, EntityPredicate.Extended[] victims, NumberRange.IntRange uniqueEntityTypes) {
+            super(ID, player);
+            this.victims = victims;
+            this.uniqueEntityTypes = uniqueEntityTypes;
         }
 
-        public static Conditions create(EntityPredicate.Builder ... args) {
-            EntityPredicate.Extended[] lvs = new EntityPredicate.Extended[args.length];
-            for (int i = 0; i < args.length; ++i) {
-                EntityPredicate.Builder lv = args[i];
+        public static Conditions create(EntityPredicate.Builder ... victimPredicates) {
+            EntityPredicate.Extended[] lvs = new EntityPredicate.Extended[victimPredicates.length];
+            for (int i = 0; i < victimPredicates.length; ++i) {
+                EntityPredicate.Builder lv = victimPredicates[i];
                 lvs[i] = EntityPredicate.Extended.ofLegacy(lv.build());
             }
             return new Conditions(EntityPredicate.Extended.EMPTY, lvs, NumberRange.IntRange.ANY);
         }
 
-        public static Conditions create(NumberRange.IntRange arg) {
+        public static Conditions create(NumberRange.IntRange uniqueEntityTypes) {
             EntityPredicate.Extended[] lvs = new EntityPredicate.Extended[]{};
-            return new Conditions(EntityPredicate.Extended.EMPTY, lvs, arg);
+            return new Conditions(EntityPredicate.Extended.EMPTY, lvs, uniqueEntityTypes);
         }
 
-        public boolean matches(Collection<LootContext> collection, int i) {
+        public boolean matches(Collection<LootContext> victimContexts, int uniqueEntityTypeCount) {
             if (this.victims.length > 0) {
-                ArrayList list = Lists.newArrayList(collection);
+                ArrayList list = Lists.newArrayList(victimContexts);
                 for (EntityPredicate.Extended lv : this.victims) {
                     boolean bl = false;
                     Iterator iterator = list.iterator();
@@ -99,13 +99,13 @@ extends AbstractCriterion<Conditions> {
                     return false;
                 }
             }
-            return this.uniqueEntityTypes.test(i);
+            return this.uniqueEntityTypes.test(uniqueEntityTypeCount);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
-            jsonObject.add("victims", EntityPredicate.Extended.toPredicatesJsonArray(this.victims, arg));
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
+            jsonObject.add("victims", EntityPredicate.Extended.toPredicatesJsonArray(this.victims, predicateSerializer));
             jsonObject.add("unique_entity_types", this.uniqueEntityTypes.toJson());
             return jsonObject;
         }

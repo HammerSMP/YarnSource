@@ -45,28 +45,28 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState arg) {
-        return arg.get(AGE) < 2;
+    public boolean hasRandomTicks(BlockState state) {
+        return state.get(AGE) < 2;
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         int i;
-        if (arg2.random.nextInt(5) == 0 && (i = arg.get(AGE).intValue()) < 2) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(AGE, i + 1), 2);
+        if (world.random.nextInt(5) == 0 && (i = state.get(AGE).intValue()) < 2) {
+            world.setBlockState(pos, (BlockState)state.with(AGE, i + 1), 2);
         }
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        Block lv = arg2.getBlockState(arg3.offset(arg.get(FACING))).getBlock();
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        Block lv = world.getBlockState(pos.offset(state.get(FACING))).getBlock();
         return lv.isIn(BlockTags.JUNGLE_LOGS);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        int i = arg.get(AGE);
-        switch (arg.get(FACING)) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        int i = state.get(AGE);
+        switch (state.get(FACING)) {
             case SOUTH: {
                 return AGE_TO_SOUTH_SHAPE[i];
             }
@@ -83,11 +83,11 @@ implements Fertilizable {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState lv = this.getDefaultState();
-        World lv2 = arg.getWorld();
-        BlockPos lv3 = arg.getBlockPos();
-        for (Direction lv4 : arg.getPlacementDirections()) {
+        World lv2 = ctx.getWorld();
+        BlockPos lv3 = ctx.getBlockPos();
+        for (Direction lv4 : ctx.getPlacementDirections()) {
             if (!lv4.getAxis().isHorizontal() || !(lv = (BlockState)lv.with(FACING, lv4)).canPlaceAt(lv2, lv3)) continue;
             return lv;
         }
@@ -95,35 +95,35 @@ implements Fertilizable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == state.get(FACING) && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        return arg3.get(AGE) < 2;
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        return state.get(AGE) < 2;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        arg.setBlockState(arg2, (BlockState)arg3.with(AGE, arg3.get(AGE) + 1), 2);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        world.setBlockState(pos, (BlockState)state.with(AGE, state.get(AGE) + 1), 2);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, AGE);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

@@ -23,9 +23,9 @@ public class FollowCustomerTask
 extends Task<VillagerEntity> {
     private final float speed;
 
-    public FollowCustomerTask(float f) {
+    public FollowCustomerTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED)), Integer.MAX_VALUE);
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override
@@ -57,24 +57,24 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected boolean isTimeLimitExceeded(long l) {
+    protected boolean isTimeLimitExceeded(long time) {
         return false;
     }
 
-    private void update(VillagerEntity arg) {
-        Brain<VillagerEntity> lv = arg.getBrain();
-        lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget(arg.getCurrentCustomer(), false), this.speed, 2));
-        lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg.getCurrentCustomer(), true));
+    private void update(VillagerEntity villager) {
+        Brain<VillagerEntity> lv = villager.getBrain();
+        lv.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget(villager.getCurrentCustomer(), false), this.speed, 2));
+        lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(villager.getCurrentCustomer(), true));
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void run(ServerWorld arg, LivingEntity arg2, long l) {
-        this.run(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void run(ServerWorld world, LivingEntity entity, long time) {
+        this.run(world, (VillagerEntity)entity, time);
     }
 }
 

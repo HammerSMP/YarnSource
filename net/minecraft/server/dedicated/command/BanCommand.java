@@ -38,20 +38,20 @@ import net.minecraft.text.TranslatableText;
 public class BanCommand {
     private static final SimpleCommandExceptionType ALREADY_BANNED_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("commands.ban.failed"));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("ban").requires(arg -> arg.hasPermissionLevel(3))).then(((RequiredArgumentBuilder)CommandManager.argument("targets", GameProfileArgumentType.gameProfile()).executes(commandContext -> BanCommand.ban((ServerCommandSource)commandContext.getSource(), GameProfileArgumentType.getProfileArgument((CommandContext<ServerCommandSource>)commandContext, "targets"), null))).then(CommandManager.argument("reason", MessageArgumentType.message()).executes(commandContext -> BanCommand.ban((ServerCommandSource)commandContext.getSource(), GameProfileArgumentType.getProfileArgument((CommandContext<ServerCommandSource>)commandContext, "targets"), MessageArgumentType.getMessage((CommandContext<ServerCommandSource>)commandContext, "reason"))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("ban").requires(arg -> arg.hasPermissionLevel(3))).then(((RequiredArgumentBuilder)CommandManager.argument("targets", GameProfileArgumentType.gameProfile()).executes(commandContext -> BanCommand.ban((ServerCommandSource)commandContext.getSource(), GameProfileArgumentType.getProfileArgument((CommandContext<ServerCommandSource>)commandContext, "targets"), null))).then(CommandManager.argument("reason", MessageArgumentType.message()).executes(commandContext -> BanCommand.ban((ServerCommandSource)commandContext.getSource(), GameProfileArgumentType.getProfileArgument((CommandContext<ServerCommandSource>)commandContext, "targets"), MessageArgumentType.getMessage((CommandContext<ServerCommandSource>)commandContext, "reason"))))));
     }
 
-    private static int ban(ServerCommandSource arg, Collection<GameProfile> collection, @Nullable Text arg2) throws CommandSyntaxException {
-        BannedPlayerList lv = arg.getMinecraftServer().getPlayerManager().getUserBanList();
+    private static int ban(ServerCommandSource source, Collection<GameProfile> targets, @Nullable Text reason) throws CommandSyntaxException {
+        BannedPlayerList lv = source.getMinecraftServer().getPlayerManager().getUserBanList();
         int i = 0;
-        for (GameProfile gameProfile : collection) {
+        for (GameProfile gameProfile : targets) {
             if (lv.contains(gameProfile)) continue;
-            BannedPlayerEntry lv2 = new BannedPlayerEntry(gameProfile, null, arg.getName(), null, arg2 == null ? null : arg2.getString());
+            BannedPlayerEntry lv2 = new BannedPlayerEntry(gameProfile, null, source.getName(), null, reason == null ? null : reason.getString());
             lv.add(lv2);
             ++i;
-            arg.sendFeedback(new TranslatableText("commands.ban.success", Texts.toText(gameProfile), lv2.getReason()), true);
-            ServerPlayerEntity lv3 = arg.getMinecraftServer().getPlayerManager().getPlayer(gameProfile.getId());
+            source.sendFeedback(new TranslatableText("commands.ban.success", Texts.toText(gameProfile), lv2.getReason()), true);
+            ServerPlayerEntity lv3 = source.getMinecraftServer().getPlayerManager().getPlayer(gameProfile.getId());
             if (lv3 == null) continue;
             lv3.networkHandler.disconnect(new TranslatableText("multiplayer.disconnect.banned"));
         }

@@ -28,8 +28,8 @@ extends BlockStateProvider {
         return DataResult.success((Object)new WeightedBlockStateProvider(arg));
     }
 
-    private WeightedBlockStateProvider(WeightedList<BlockState> arg) {
-        this.states = arg;
+    private WeightedBlockStateProvider(WeightedList<BlockState> states) {
+        this.states = states;
     }
 
     @Override
@@ -41,13 +41,13 @@ extends BlockStateProvider {
         this(new WeightedList<BlockState>());
     }
 
-    public WeightedBlockStateProvider addState(BlockState arg, int i) {
-        this.states.add(arg, i);
+    public WeightedBlockStateProvider addState(BlockState state, int weight) {
+        this.states.add(state, weight);
         return this;
     }
 
     @Override
-    public BlockState getBlockState(Random random, BlockPos arg) {
+    public BlockState getBlockState(Random random, BlockPos pos) {
         return this.states.pickRandom(random);
     }
 }

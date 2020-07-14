@@ -62,54 +62,54 @@ implements AutoCloseable {
     private final DataFixer dataFixer;
     private final DataFixTypes dataFixType;
 
-    public SerializingRegionBasedStorage(File file, Function<Runnable, Codec<R>> function, Function<Runnable, R> function2, DataFixer dataFixer, DataFixTypes arg, boolean bl) {
+    public SerializingRegionBasedStorage(File directory, Function<Runnable, Codec<R>> function, Function<Runnable, R> function2, DataFixer dataFixer, DataFixTypes arg, boolean bl) {
         this.field_24750 = function;
         this.factory = function2;
         this.dataFixer = dataFixer;
         this.dataFixType = arg;
-        this.worker = new StorageIoWorker(file, bl, file.getName());
+        this.worker = new StorageIoWorker(directory, bl, directory.getName());
     }
 
-    protected void tick(BooleanSupplier booleanSupplier) {
-        while (!this.unsavedElements.isEmpty() && booleanSupplier.getAsBoolean()) {
+    protected void tick(BooleanSupplier shouldKeepTicking) {
+        while (!this.unsavedElements.isEmpty() && shouldKeepTicking.getAsBoolean()) {
             ChunkPos lv = ChunkSectionPos.from(this.unsavedElements.firstLong()).toChunkPos();
             this.save(lv);
         }
     }
 
     @Nullable
-    protected Optional<R> getIfLoaded(long l) {
-        return (Optional)this.loadedElements.get(l);
+    protected Optional<R> getIfLoaded(long pos) {
+        return (Optional)this.loadedElements.get(pos);
     }
 
-    protected Optional<R> get(long l) {
-        ChunkSectionPos lv = ChunkSectionPos.from(l);
+    protected Optional<R> get(long pos) {
+        ChunkSectionPos lv = ChunkSectionPos.from(pos);
         if (this.isPosInvalid(lv)) {
             return Optional.empty();
         }
-        Optional<R> optional = this.getIfLoaded(l);
+        Optional<R> optional = this.getIfLoaded(pos);
         if (optional != null) {
             return optional;
         }
         this.loadDataAt(lv.toChunkPos());
-        optional = this.getIfLoaded(l);
+        optional = this.getIfLoaded(pos);
         if (optional == null) {
             throw Util.throwOrPause(new IllegalStateException());
         }
         return optional;
     }
 
-    protected boolean isPosInvalid(ChunkSectionPos arg) {
-        return World.isHeightInvalid(ChunkSectionPos.getWorldCoord(arg.getSectionY()));
+    protected boolean isPosInvalid(ChunkSectionPos pos) {
+        return World.isHeightInvalid(ChunkSectionPos.getBlockCoord(pos.getSectionY()));
     }
 
-    protected R getOrCreate(long l) {
-        Optional<R> optional = this.get(l);
+    protected R getOrCreate(long pos) {
+        Optional<R> optional = this.get(pos);
         if (optional.isPresent()) {
             return optional.get();
         }
-        R object = this.factory.apply(() -> this.onUpdate(l));
-        this.loadedElements.put(l, Optional.of(object));
+        R object = this.factory.apply(() -> this.onUpdate(pos));
+        this.loadedElements.put(pos, Optional.of(object));
         return object;
     }
 
@@ -118,30 +118,30 @@ implements AutoCloseable {
     }
 
     @Nullable
-    private CompoundTag loadNbt(ChunkPos arg) {
+    private CompoundTag loadNbt(ChunkPos pos) {
         try {
-            return this.worker.getNbt(arg);
+            return this.worker.getNbt(pos);
         }
         catch (IOException iOException) {
-            LOGGER.error("Error reading chunk {} data from disk", (Object)arg, (Object)iOException);
+            LOGGER.error("Error reading chunk {} data from disk", (Object)pos, (Object)iOException);
             return null;
         }
     }
 
-    private <T> void update(ChunkPos arg, DynamicOps<T> dynamicOps, @Nullable T object2) {
-        if (object2 == null) {
+    private <T> void update(ChunkPos pos, DynamicOps<T> dynamicOps, @Nullable T data) {
+        if (data == null) {
             for (int i = 0; i < 16; ++i) {
-                this.loadedElements.put(ChunkSectionPos.from(arg, i).asLong(), Optional.empty());
+                this.loadedElements.put(ChunkSectionPos.from(pos, i).asLong(), Optional.empty());
             }
         } else {
             int k;
-            Dynamic dynamic2 = new Dynamic(dynamicOps, object2);
+            Dynamic dynamic2 = new Dynamic(dynamicOps, data);
             int j = SerializingRegionBasedStorage.getDataVersion(dynamic2);
             boolean bl = j != (k = SharedConstants.getGameVersion().getWorldVersion());
             Dynamic dynamic22 = this.dataFixer.update(this.dataFixType.getTypeReference(), dynamic2, j, k);
             OptionalDynamic optionalDynamic = dynamic22.get("Sections");
             for (int l = 0; l < 16; ++l) {
-                long m = ChunkSectionPos.from(arg, l).asLong();
+                long m = ChunkSectionPos.from(pos, l).asLong();
                 Optional optional = optionalDynamic.get(Integer.toString(l)).result().flatMap(dynamic -> this.field_24750.apply(() -> this.onUpdate(m)).parse(dynamic).resultOrPartial(((Logger)LOGGER)::error));
                 this.loadedElements.put(m, optional);
                 optional.ifPresent(object -> {
@@ -178,16 +178,16 @@ implements AutoCloseable {
         return new Dynamic(dynamicOps, dynamicOps.createMap((Map)ImmutableMap.of((Object)dynamicOps.createString("Sections"), (Object)dynamicOps.createMap((Map)map), (Object)dynamicOps.createString("DataVersion"), (Object)dynamicOps.createInt(SharedConstants.getGameVersion().getWorldVersion()))));
     }
 
-    protected void onLoad(long l) {
+    protected void onLoad(long pos) {
     }
 
-    protected void onUpdate(long l) {
-        Optional optional = (Optional)this.loadedElements.get(l);
+    protected void onUpdate(long pos) {
+        Optional optional = (Optional)this.loadedElements.get(pos);
         if (optional == null || !optional.isPresent()) {
-            LOGGER.warn("No data for position: {}", (Object)ChunkSectionPos.from(l));
+            LOGGER.warn("No data for position: {}", (Object)ChunkSectionPos.from(pos));
             return;
         }
-        this.unsavedElements.add(l);
+        this.unsavedElements.add(pos);
     }
 
     private static int getDataVersion(Dynamic<?> dynamic) {

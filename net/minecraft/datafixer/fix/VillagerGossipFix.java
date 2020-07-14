@@ -21,13 +21,13 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class VillagerGossipFix
 extends ChoiceFix {
-    public VillagerGossipFix(Schema schema, String string) {
-        super(schema, false, "Gossip for for " + string, TypeReferences.ENTITY, string);
+    public VillagerGossipFix(Schema outputSchema, String choiceType) {
+        super(outputSchema, false, "Gossip for for " + choiceType, TypeReferences.ENTITY, choiceType);
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), dynamic2 -> dynamic2.update("Gossips", dynamic -> (Dynamic)DataFixUtils.orElse(dynamic.asStreamOpt().result().map(stream -> stream.map(dynamic -> AbstractUuidFix.updateRegularMostLeast(dynamic, "Target", "Target").orElse((Dynamic<?>)dynamic))).map(((Dynamic)dynamic)::createList), (Object)dynamic)));
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), dynamic2 -> dynamic2.update("Gossips", dynamic -> (Dynamic)DataFixUtils.orElse(dynamic.asStreamOpt().result().map(stream -> stream.map(dynamic -> AbstractUuidFix.updateRegularMostLeast(dynamic, "Target", "Target").orElse((Dynamic<?>)dynamic))).map(((Dynamic)dynamic)::createList), (Object)dynamic)));
     }
 }
 

@@ -22,10 +22,10 @@ implements DecoratorConfig {
     public final int topOffset;
     public final int maximum;
 
-    public RangeDecoratorConfig(int i, int j, int k) {
-        this.bottomOffset = i;
-        this.topOffset = j;
-        this.maximum = k;
+    public RangeDecoratorConfig(int count, int bottomOffset, int topOffset) {
+        this.bottomOffset = count;
+        this.topOffset = bottomOffset;
+        this.maximum = topOffset;
     }
 }
 

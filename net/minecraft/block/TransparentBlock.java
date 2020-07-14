@@ -22,11 +22,11 @@ extends Block {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean isSideInvisible(BlockState arg, BlockState arg2, Direction arg3) {
-        if (arg2.isOf(this)) {
+    public boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
+        if (stateFrom.isOf(this)) {
             return true;
         }
-        return super.isSideInvisible(arg, arg2, arg3);
+        return super.isSideInvisible(state, stateFrom, direction);
     }
 }
 

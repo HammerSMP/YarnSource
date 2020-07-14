@@ -29,8 +29,8 @@ implements BlockStateSupplier {
     private final Block block;
     private final List<Multipart> multiparts = Lists.newArrayList();
 
-    private MultipartBlockStateSupplier(Block arg) {
-        this.block = arg;
+    private MultipartBlockStateSupplier(Block block) {
+        this.block = block;
     }
 
     @Override
@@ -38,8 +38,8 @@ implements BlockStateSupplier {
         return this.block;
     }
 
-    public static MultipartBlockStateSupplier create(Block arg) {
-        return new MultipartBlockStateSupplier(arg);
+    public static MultipartBlockStateSupplier create(Block block) {
+        return new MultipartBlockStateSupplier(block);
     }
 
     public MultipartBlockStateSupplier with(List<BlockStateVariant> list) {
@@ -84,19 +84,19 @@ implements BlockStateSupplier {
     extends Multipart {
         private final When when;
 
-        private ConditionalMultipart(When arg, List<BlockStateVariant> list) {
-            super(list);
-            this.when = arg;
+        private ConditionalMultipart(When when, List<BlockStateVariant> variants) {
+            super(variants);
+            this.when = when;
         }
 
         @Override
-        public void validate(StateManager<?, ?> arg) {
-            this.when.validate(arg);
+        public void validate(StateManager<?, ?> stateManager) {
+            this.when.validate(stateManager);
         }
 
         @Override
-        public void extraToJson(JsonObject jsonObject) {
-            jsonObject.add("when", (JsonElement)this.when.get());
+        public void extraToJson(JsonObject json) {
+            json.add("when", (JsonElement)this.when.get());
         }
     }
 
@@ -104,14 +104,14 @@ implements BlockStateSupplier {
     implements Supplier<JsonElement> {
         private final List<BlockStateVariant> variants;
 
-        private Multipart(List<BlockStateVariant> list) {
-            this.variants = list;
+        private Multipart(List<BlockStateVariant> variants) {
+            this.variants = variants;
         }
 
-        public void validate(StateManager<?, ?> arg) {
+        public void validate(StateManager<?, ?> stateManager) {
         }
 
-        public void extraToJson(JsonObject jsonObject) {
+        public void extraToJson(JsonObject json) {
         }
 
         @Override

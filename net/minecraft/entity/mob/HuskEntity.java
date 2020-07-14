@@ -25,8 +25,8 @@ extends ZombieEntity {
         super((EntityType<? extends ZombieEntity>)arg, arg2);
     }
 
-    public static boolean canSpawn(EntityType<HuskEntity> arg, class_5425 arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return HuskEntity.canSpawnInDark(arg, arg2, arg3, arg4, random) && (arg3 == SpawnReason.SPAWNER || arg2.isSkyVisible(arg4));
+    public static boolean canSpawn(EntityType<HuskEntity> type, class_5425 arg2, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return HuskEntity.canSpawnInDark(type, arg2, spawnReason, pos, random) && (spawnReason == SpawnReason.SPAWNER || arg2.isSkyVisible(pos));
     }
 
     @Override
@@ -40,7 +40,7 @@ extends ZombieEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_HUSK_HURT;
     }
 
@@ -55,11 +55,11 @@ extends ZombieEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        boolean bl = super.tryAttack(arg);
-        if (bl && this.getMainHandStack().isEmpty() && arg instanceof LivingEntity) {
+    public boolean tryAttack(Entity target) {
+        boolean bl = super.tryAttack(target);
+        if (bl && this.getMainHandStack().isEmpty() && target instanceof LivingEntity) {
             float f = this.world.getLocalDifficulty(this.getBlockPos()).getLocalDifficulty();
-            ((LivingEntity)arg).addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 140 * (int)f));
+            ((LivingEntity)target).addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 140 * (int)f));
         }
         return bl;
     }

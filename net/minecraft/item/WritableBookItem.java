@@ -30,32 +30,32 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos lv2;
-        World lv = arg.getWorld();
-        BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
+        World lv = context.getWorld();
+        BlockState lv3 = lv.getBlockState(lv2 = context.getBlockPos());
         if (lv3.isOf(Blocks.LECTERN)) {
-            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, arg.getStack()) ? ActionResult.success(lv.isClient) : ActionResult.PASS;
+            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, context.getStack()) ? ActionResult.success(lv.isClient) : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        arg2.openEditBookScreen(lv, arg3);
-        arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        return TypedActionResult.method_29237(lv, arg.isClient());
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        user.openEditBookScreen(lv, hand);
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
+        return TypedActionResult.method_29237(lv, world.isClient());
     }
 
-    public static boolean isValid(@Nullable CompoundTag arg) {
-        if (arg == null) {
+    public static boolean isValid(@Nullable CompoundTag tag) {
+        if (tag == null) {
             return false;
         }
-        if (!arg.contains("pages", 9)) {
+        if (!tag.contains("pages", 9)) {
             return false;
         }
-        ListTag lv = arg.getList("pages", 8);
+        ListTag lv = tag.getList("pages", 8);
         for (int i = 0; i < lv.size(); ++i) {
             String string = lv.getString(i);
             if (string.length() <= 32767) continue;

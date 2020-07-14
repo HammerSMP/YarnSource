@@ -29,17 +29,17 @@ extends FeatureRenderer<T, M> {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, int i, T arg3, float f, float g, float h, float j, float k, float l) {
-        if (!((SkinOverlayOwner)arg3).shouldRenderOverlay()) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+        if (!((SkinOverlayOwner)entity).shouldRenderOverlay()) {
             return;
         }
-        float m = (float)((Entity)arg3).age + h;
+        float m = (float)((Entity)entity).age + tickDelta;
         EntityModel<T> lv = this.getEnergySwirlModel();
-        lv.animateModel(arg3, f, g, h);
+        lv.animateModel(entity, limbAngle, limbDistance, tickDelta);
         ((EntityModel)this.getContextModel()).copyStateTo(lv);
-        VertexConsumer lv2 = arg2.getBuffer(RenderLayer.getEnergySwirl(this.getEnergySwirlTexture(), this.getEnergySwirlX(m), m * 0.01f));
-        lv.setAngles(arg3, f, g, j, k, l);
-        lv.render(arg, lv2, i, OverlayTexture.DEFAULT_UV, 0.5f, 0.5f, 0.5f, 1.0f);
+        VertexConsumer lv2 = vertexConsumers.getBuffer(RenderLayer.getEnergySwirl(this.getEnergySwirlTexture(), this.getEnergySwirlX(m), m * 0.01f));
+        lv.setAngles(entity, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
+        lv.render(matrices, lv2, light, OverlayTexture.DEFAULT_UV, 0.5f, 0.5f, 0.5f, 1.0f);
     }
 
     protected abstract float getEnergySwirlX(float var1);

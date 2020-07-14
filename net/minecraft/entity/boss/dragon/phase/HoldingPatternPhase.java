@@ -119,9 +119,9 @@ extends AbstractPhase {
     }
 
     @Override
-    public void crystalDestroyed(EndCrystalEntity arg, BlockPos arg2, DamageSource arg3, @Nullable PlayerEntity arg4) {
-        if (arg4 != null && !arg4.abilities.invulnerable) {
-            this.method_6843(arg4);
+    public void crystalDestroyed(EndCrystalEntity crystal, BlockPos pos, DamageSource source, @Nullable PlayerEntity player) {
+        if (player != null && !player.abilities.invulnerable) {
+            this.method_6843(player);
         }
     }
 }

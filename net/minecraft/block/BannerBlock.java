@@ -46,46 +46,46 @@ extends AbstractBannerBlock {
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return arg2.getBlockState(arg3.down()).getMaterial().isSolid();
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).getMaterial().isSolid();
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(ROTATION, MathHelper.floor((double)((180.0f + arg.getPlayerYaw()) * 16.0f / 360.0f) + 0.5) & 0xF);
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(ROTATION, MathHelper.floor((double)((180.0f + ctx.getPlayerYaw()) * 16.0f / 360.0f) + 0.5) & 0xF);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(ROTATION, arg2.rotate(arg.get(ROTATION), 16));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(ROTATION, rotation.rotate(state.get(ROTATION), 16));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return (BlockState)arg.with(ROTATION, arg2.mirror(arg.get(ROTATION), 16));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return (BlockState)state.with(ROTATION, mirror.mirror(state.get(ROTATION), 16));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(ROTATION);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(ROTATION);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Block getForColor(DyeColor arg) {
-        return COLORED_BANNERS.getOrDefault(arg, Blocks.WHITE_BANNER);
+    public static Block getForColor(DyeColor color) {
+        return COLORED_BANNERS.getOrDefault(color, Blocks.WHITE_BANNER);
     }
 }
 

@@ -9,13 +9,13 @@ public enum AxisCycleDirection {
     NONE{
 
         @Override
-        public int choose(int i, int j, int k, Direction.Axis arg) {
-            return arg.choose(i, j, k);
+        public int choose(int x, int y, int z, Direction.Axis axis) {
+            return axis.choose(x, y, z);
         }
 
         @Override
-        public Direction.Axis cycle(Direction.Axis arg) {
-            return arg;
+        public Direction.Axis cycle(Direction.Axis axis) {
+            return axis;
         }
 
         @Override
@@ -27,13 +27,13 @@ public enum AxisCycleDirection {
     FORWARD{
 
         @Override
-        public int choose(int i, int j, int k, Direction.Axis arg) {
-            return arg.choose(k, i, j);
+        public int choose(int x, int y, int z, Direction.Axis axis) {
+            return axis.choose(z, x, y);
         }
 
         @Override
-        public Direction.Axis cycle(Direction.Axis arg) {
-            return AXES[Math.floorMod(arg.ordinal() + 1, 3)];
+        public Direction.Axis cycle(Direction.Axis axis) {
+            return AXES[Math.floorMod(axis.ordinal() + 1, 3)];
         }
 
         @Override
@@ -45,13 +45,13 @@ public enum AxisCycleDirection {
     BACKWARD{
 
         @Override
-        public int choose(int i, int j, int k, Direction.Axis arg) {
-            return arg.choose(j, k, i);
+        public int choose(int x, int y, int z, Direction.Axis axis) {
+            return axis.choose(y, z, x);
         }
 
         @Override
-        public Direction.Axis cycle(Direction.Axis arg) {
-            return AXES[Math.floorMod(arg.ordinal() - 1, 3)];
+        public Direction.Axis cycle(Direction.Axis axis) {
+            return AXES[Math.floorMod(axis.ordinal() - 1, 3)];
         }
 
         @Override
@@ -69,8 +69,8 @@ public enum AxisCycleDirection {
 
     public abstract AxisCycleDirection opposite();
 
-    public static AxisCycleDirection between(Direction.Axis arg, Direction.Axis arg2) {
-        return VALUES[Math.floorMod(arg2.ordinal() - arg.ordinal(), 3)];
+    public static AxisCycleDirection between(Direction.Axis from, Direction.Axis to) {
+        return VALUES[Math.floorMod(to.ordinal() - from.ordinal(), 3)];
     }
 
     static {

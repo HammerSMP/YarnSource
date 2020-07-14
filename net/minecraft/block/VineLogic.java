@@ -7,8 +7,8 @@ import java.util.Random;
 import net.minecraft.block.BlockState;
 
 public class VineLogic {
-    public static boolean isValidForWeepingStem(BlockState arg) {
-        return arg.isAir();
+    public static boolean isValidForWeepingStem(BlockState state) {
+        return state.isAir();
     }
 
     public static int method_26381(Random random) {

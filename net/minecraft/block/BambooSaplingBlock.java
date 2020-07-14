@@ -48,65 +48,65 @@ implements Fertilizable {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        Vec3d lv = arg.getModelOffset(arg2, arg3);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        Vec3d lv = state.getModelOffset(world, pos);
         return SHAPE.offset(lv.x, lv.y, lv.z);
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (random.nextInt(3) == 0 && arg2.isAir(arg3.up()) && arg2.getBaseLightLevel(arg3.up(), 0) >= 9) {
-            this.grow(arg2, arg3);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (random.nextInt(3) == 0 && world.isAir(pos.up()) && world.getBaseLightLevel(pos.up(), 0) >= 9) {
+            this.grow(world, pos);
         }
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return arg2.getBlockState(arg3.down()).isIn(BlockTags.BAMBOO_PLANTABLE_ON);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).isIn(BlockTags.BAMBOO_PLANTABLE_ON);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        if (arg2 == Direction.UP && arg3.isOf(Blocks.BAMBOO)) {
-            arg4.setBlockState(arg5, Blocks.BAMBOO.getDefaultState(), 2);
+        if (direction == Direction.UP && newState.isOf(Blocks.BAMBOO)) {
+            world.setBlockState(pos, Blocks.BAMBOO.getDefaultState(), 2);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(Items.BAMBOO);
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        return arg.getBlockState(arg2.up()).isAir();
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        return world.getBlockState(pos.up()).isAir();
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        this.grow(arg, arg2);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        this.grow(world, pos);
     }
 
     @Override
-    public float calcBlockBreakingDelta(BlockState arg, PlayerEntity arg2, BlockView arg3, BlockPos arg4) {
-        if (arg2.getMainHandStack().getItem() instanceof SwordItem) {
+    public float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
+        if (player.getMainHandStack().getItem() instanceof SwordItem) {
             return 1.0f;
         }
-        return super.calcBlockBreakingDelta(arg, arg2, arg3, arg4);
+        return super.calcBlockBreakingDelta(state, player, world, pos);
     }
 
-    protected void grow(World arg, BlockPos arg2) {
-        arg.setBlockState(arg2.up(), (BlockState)Blocks.BAMBOO.getDefaultState().with(BambooBlock.LEAVES, BambooLeaves.SMALL), 3);
+    protected void grow(World world, BlockPos pos) {
+        world.setBlockState(pos.up(), (BlockState)Blocks.BAMBOO.getDefaultState().with(BambooBlock.LEAVES, BambooLeaves.SMALL), 3);
     }
 }
 

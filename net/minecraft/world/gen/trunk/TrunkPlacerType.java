@@ -25,8 +25,8 @@ public class TrunkPlacerType<P extends TrunkPlacer> {
     public static final TrunkPlacerType<LargeOakTrunkPlacer> FANCY_TRUNK_PLACER = TrunkPlacerType.register("fancy_trunk_placer", LargeOakTrunkPlacer.CODEC);
     private final Codec<P> codec;
 
-    private static <P extends TrunkPlacer> TrunkPlacerType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.TRUNK_PLACER_TYPE, string, new TrunkPlacerType<P>(codec));
+    private static <P extends TrunkPlacer> TrunkPlacerType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.TRUNK_PLACER_TYPE, id, new TrunkPlacerType<P>(codec));
     }
 
     private TrunkPlacerType(Codec<P> codec) {

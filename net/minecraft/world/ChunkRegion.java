@@ -72,30 +72,30 @@ implements ServerWorldAccess {
     private final WorldProperties levelProperties;
     private final Random random;
     private final DimensionType dimension;
-    private final TickScheduler<Block> blockTickScheduler = new MultiTickScheduler<Block>(arg -> this.getChunk((BlockPos)arg).getBlockTickScheduler());
-    private final TickScheduler<Fluid> fluidTickScheduler = new MultiTickScheduler<Fluid>(arg -> this.getChunk((BlockPos)arg).getFluidTickScheduler());
+    private final TickScheduler<Block> blockTickScheduler = new MultiTickScheduler<Block>(pos -> this.getChunk((BlockPos)pos).getBlockTickScheduler());
+    private final TickScheduler<Fluid> fluidTickScheduler = new MultiTickScheduler<Fluid>(pos -> this.getChunk((BlockPos)pos).getFluidTickScheduler());
     private final BiomeAccess biomeAccess;
     private final ChunkPos lowerCorner;
     private final ChunkPos upperCorner;
 
-    public ChunkRegion(ServerWorld arg2, List<Chunk> list) {
-        int i = MathHelper.floor(Math.sqrt(list.size()));
-        if (i * i != list.size()) {
+    public ChunkRegion(ServerWorld world, List<Chunk> chunks) {
+        int i = MathHelper.floor(Math.sqrt(chunks.size()));
+        if (i * i != chunks.size()) {
             throw Util.throwOrPause(new IllegalStateException("Cache size is not a square."));
         }
-        ChunkPos lv = list.get(list.size() / 2).getPos();
-        this.chunks = list;
+        ChunkPos lv = chunks.get(chunks.size() / 2).getPos();
+        this.chunks = chunks;
         this.centerChunkX = lv.x;
         this.centerChunkZ = lv.z;
         this.width = i;
-        this.world = arg2;
-        this.seed = arg2.getSeed();
-        this.levelProperties = arg2.getLevelProperties();
-        this.random = arg2.getRandom();
-        this.dimension = arg2.getDimension();
-        this.biomeAccess = new BiomeAccess(this, BiomeAccess.hashSeed(this.seed), arg2.getDimension().getBiomeAccessType());
-        this.lowerCorner = list.get(0).getPos();
-        this.upperCorner = list.get(list.size() - 1).getPos();
+        this.world = world;
+        this.seed = world.getSeed();
+        this.levelProperties = world.getLevelProperties();
+        this.random = world.getRandom();
+        this.dimension = world.getDimension();
+        this.biomeAccess = new BiomeAccess(this, BiomeAccess.hashSeed(this.seed), world.getDimension().getBiomeAccessType());
+        this.lowerCorner = chunks.get(0).getPos();
+        this.upperCorner = chunks.get(chunks.size() - 1).getPos();
     }
 
     public int getCenterChunkX() {
@@ -107,53 +107,53 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public Chunk getChunk(int i, int j) {
-        return this.getChunk(i, j, ChunkStatus.EMPTY);
+    public Chunk getChunk(int chunkX, int chunkZ) {
+        return this.getChunk(chunkX, chunkZ, ChunkStatus.EMPTY);
     }
 
     @Override
     @Nullable
-    public Chunk getChunk(int i, int j, ChunkStatus arg, boolean bl) {
+    public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
         Chunk lv2;
-        if (this.isChunkLoaded(i, j)) {
-            int k = i - this.lowerCorner.x;
-            int l = j - this.lowerCorner.z;
+        if (this.isChunkLoaded(chunkX, chunkZ)) {
+            int k = chunkX - this.lowerCorner.x;
+            int l = chunkZ - this.lowerCorner.z;
             Chunk lv = this.chunks.get(k + l * this.width);
-            if (lv.getStatus().isAtLeast(arg)) {
+            if (lv.getStatus().isAtLeast(leastStatus)) {
                 return lv;
             }
         } else {
             lv2 = null;
         }
-        if (!bl) {
+        if (!create) {
             return null;
         }
-        LOGGER.error("Requested chunk : {} {}", (Object)i, (Object)j);
+        LOGGER.error("Requested chunk : {} {}", (Object)chunkX, (Object)chunkZ);
         LOGGER.error("Region bounds : {} {} | {} {}", (Object)this.lowerCorner.x, (Object)this.lowerCorner.z, (Object)this.upperCorner.x, (Object)this.upperCorner.z);
         if (lv2 != null) {
-            throw Util.throwOrPause(new RuntimeException(String.format("Chunk is not of correct status. Expecting %s, got %s | %s %s", arg, lv2.getStatus(), i, j)));
+            throw Util.throwOrPause(new RuntimeException(String.format("Chunk is not of correct status. Expecting %s, got %s | %s %s", leastStatus, lv2.getStatus(), chunkX, chunkZ)));
         }
-        throw Util.throwOrPause(new RuntimeException(String.format("We are asking a region for a chunk out of bound | %s %s", i, j)));
+        throw Util.throwOrPause(new RuntimeException(String.format("We are asking a region for a chunk out of bound | %s %s", chunkX, chunkZ)));
     }
 
     @Override
-    public boolean isChunkLoaded(int i, int j) {
-        return i >= this.lowerCorner.x && i <= this.upperCorner.x && j >= this.lowerCorner.z && j <= this.upperCorner.z;
+    public boolean isChunkLoaded(int chunkX, int chunkZ) {
+        return chunkX >= this.lowerCorner.x && chunkX <= this.upperCorner.x && chunkZ >= this.lowerCorner.z && chunkZ <= this.upperCorner.z;
     }
 
     @Override
-    public BlockState getBlockState(BlockPos arg) {
-        return this.getChunk(arg.getX() >> 4, arg.getZ() >> 4).getBlockState(arg);
+    public BlockState getBlockState(BlockPos pos) {
+        return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).getBlockState(pos);
     }
 
     @Override
-    public FluidState getFluidState(BlockPos arg) {
-        return this.getChunk(arg).getFluidState(arg);
+    public FluidState getFluidState(BlockPos pos) {
+        return this.getChunk(pos).getFluidState(pos);
     }
 
     @Override
     @Nullable
-    public PlayerEntity getClosestPlayer(double d, double e, double f, double g, Predicate<Entity> predicate) {
+    public PlayerEntity getClosestPlayer(double x, double y, double z, double maxDistance, Predicate<Entity> targetPredicate) {
         return null;
     }
 
@@ -168,13 +168,13 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public Biome getGeneratorStoredBiome(int i, int j, int k) {
-        return this.world.getGeneratorStoredBiome(i, j, k);
+    public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ) {
+        return this.world.getGeneratorStoredBiome(biomeX, biomeY, biomeZ);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public float getBrightness(Direction arg, boolean bl) {
+    public float getBrightness(Direction direction, boolean shaded) {
         return 1.0f;
     }
 
@@ -184,28 +184,28 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public boolean breakBlock(BlockPos arg, boolean bl, @Nullable Entity arg2, int i) {
-        BlockState lv = this.getBlockState(arg);
+    public boolean breakBlock(BlockPos pos, boolean drop, @Nullable Entity breakingEntity, int maxUpdateDepth) {
+        BlockState lv = this.getBlockState(pos);
         if (lv.isAir()) {
             return false;
         }
-        if (bl) {
-            BlockEntity lv2 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(arg) : null;
-            Block.dropStacks(lv, this.world, arg, lv2, arg2, ItemStack.EMPTY);
+        if (drop) {
+            BlockEntity lv2 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(pos) : null;
+            Block.dropStacks(lv, this.world, pos, lv2, breakingEntity, ItemStack.EMPTY);
         }
-        return this.setBlockState(arg, Blocks.AIR.getDefaultState(), 3, i);
+        return this.setBlockState(pos, Blocks.AIR.getDefaultState(), 3, maxUpdateDepth);
     }
 
     @Override
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos arg) {
-        Chunk lv = this.getChunk(arg);
-        BlockEntity lv2 = lv.getBlockEntity(arg);
+    public BlockEntity getBlockEntity(BlockPos pos) {
+        Chunk lv = this.getChunk(pos);
+        BlockEntity lv2 = lv.getBlockEntity(pos);
         if (lv2 != null) {
             return lv2;
         }
-        CompoundTag lv3 = lv.getBlockEntityTag(arg);
-        BlockState lv4 = lv.getBlockState(arg);
+        CompoundTag lv3 = lv.getBlockEntityTag(pos);
+        BlockState lv4 = lv.getBlockState(pos);
         if (lv3 != null) {
             if ("DUMMY".equals(lv3.getString("id"))) {
                 Block lv5 = lv4.getBlock();
@@ -217,59 +217,59 @@ implements ServerWorldAccess {
                 lv2 = BlockEntity.createFromTag(lv4, lv3);
             }
             if (lv2 != null) {
-                lv.setBlockEntity(arg, lv2);
+                lv.setBlockEntity(pos, lv2);
                 return lv2;
             }
         }
         if (lv4.getBlock() instanceof BlockEntityProvider) {
-            LOGGER.warn("Tried to access a block entity before it was created. {}", (Object)arg);
+            LOGGER.warn("Tried to access a block entity before it was created. {}", (Object)pos);
         }
         return null;
     }
 
     @Override
-    public boolean setBlockState(BlockPos arg, BlockState arg2, int i, int j) {
+    public boolean setBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth) {
         Block lv3;
-        Chunk lv = this.getChunk(arg);
-        BlockState lv2 = lv.setBlockState(arg, arg2, false);
+        Chunk lv = this.getChunk(pos);
+        BlockState lv2 = lv.setBlockState(pos, state, false);
         if (lv2 != null) {
-            this.world.onBlockChanged(arg, lv2, arg2);
+            this.world.onBlockChanged(pos, lv2, state);
         }
-        if ((lv3 = arg2.getBlock()).hasBlockEntity()) {
-            if (lv.getStatus().getChunkType() == ChunkStatus.ChunkType.LEVELCHUNK) {
-                lv.setBlockEntity(arg, ((BlockEntityProvider)((Object)lv3)).createBlockEntity(this));
+        if ((lv3 = state.getBlock()).hasBlockEntity()) {
+            if (lv.getStatus().getChunkType() == ChunkStatus.ChunkType.field_12807) {
+                lv.setBlockEntity(pos, ((BlockEntityProvider)((Object)lv3)).createBlockEntity(this));
             } else {
                 CompoundTag lv4 = new CompoundTag();
-                lv4.putInt("x", arg.getX());
-                lv4.putInt("y", arg.getY());
-                lv4.putInt("z", arg.getZ());
+                lv4.putInt("x", pos.getX());
+                lv4.putInt("y", pos.getY());
+                lv4.putInt("z", pos.getZ());
                 lv4.putString("id", "DUMMY");
                 lv.addPendingBlockEntityTag(lv4);
             }
         } else if (lv2 != null && lv2.getBlock().hasBlockEntity()) {
-            lv.removeBlockEntity(arg);
+            lv.removeBlockEntity(pos);
         }
-        if (arg2.shouldPostProcess(this, arg)) {
-            this.markBlockForPostProcessing(arg);
+        if (state.shouldPostProcess(this, pos)) {
+            this.markBlockForPostProcessing(pos);
         }
         return true;
     }
 
-    private void markBlockForPostProcessing(BlockPos arg) {
-        this.getChunk(arg).markBlockForPostProcessing(arg);
+    private void markBlockForPostProcessing(BlockPos pos) {
+        this.getChunk(pos).markBlockForPostProcessing(pos);
     }
 
     @Override
-    public boolean spawnEntity(Entity arg) {
-        int i = MathHelper.floor(arg.getX() / 16.0);
-        int j = MathHelper.floor(arg.getZ() / 16.0);
-        this.getChunk(i, j).addEntity(arg);
+    public boolean spawnEntity(Entity entity) {
+        int i = MathHelper.floor(entity.getX() / 16.0);
+        int j = MathHelper.floor(entity.getZ() / 16.0);
+        this.getChunk(i, j).addEntity(entity);
         return true;
     }
 
     @Override
-    public boolean removeBlock(BlockPos arg, boolean bl) {
-        return this.setBlockState(arg, Blocks.AIR.getDefaultState(), 3);
+    public boolean removeBlock(BlockPos pos, boolean move) {
+        return this.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
     }
 
     @Override
@@ -294,8 +294,8 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public LocalDifficulty getLocalDifficulty(BlockPos arg) {
-        if (!this.isChunkLoaded(arg.getX() >> 4, arg.getZ() >> 4)) {
+    public LocalDifficulty getLocalDifficulty(BlockPos pos) {
+        if (!this.isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) {
             throw new RuntimeException("We are asking a region for a chunk out of bound");
         }
         return new LocalDifficulty(this.world.getDifficulty(), this.world.getTimeOfDay(), 0L, this.world.method_30272());
@@ -332,20 +332,20 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public int getTopY(Heightmap.Type arg, int i, int j) {
-        return this.getChunk(i >> 4, j >> 4).sampleHeightmap(arg, i & 0xF, j & 0xF) + 1;
+    public int getTopY(Heightmap.Type heightmap, int x, int z) {
+        return this.getChunk(x >> 4, z >> 4).sampleHeightmap(heightmap, x & 0xF, z & 0xF) + 1;
     }
 
     @Override
-    public void playSound(@Nullable PlayerEntity arg, BlockPos arg2, SoundEvent arg3, SoundCategory arg4, float f, float g) {
+    public void playSound(@Nullable PlayerEntity player, BlockPos pos, SoundEvent sound, SoundCategory category, float volume, float pitch) {
     }
 
     @Override
-    public void addParticle(ParticleEffect arg, double d, double e, double f, double g, double h, double i) {
+    public void addParticle(ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
     }
 
     @Override
-    public void syncWorldEvent(@Nullable PlayerEntity arg, int i, BlockPos arg2, int j) {
+    public void syncWorldEvent(@Nullable PlayerEntity player, int eventId, BlockPos pos, int data) {
     }
 
     @Override
@@ -354,17 +354,17 @@ implements ServerWorldAccess {
     }
 
     @Override
-    public boolean testBlockState(BlockPos arg, Predicate<BlockState> predicate) {
-        return predicate.test(this.getBlockState(arg));
+    public boolean testBlockState(BlockPos pos, Predicate<BlockState> state) {
+        return state.test(this.getBlockState(pos));
     }
 
     @Override
-    public <T extends Entity> List<T> getEntities(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntities(Class<? extends T> entityClass, Box box, @Nullable Predicate<? super T> predicate) {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Entity> getEntities(@Nullable Entity arg, Box arg2, @Nullable Predicate<? super Entity> predicate) {
+    public List<Entity> getEntities(@Nullable Entity except, Box box, @Nullable Predicate<? super Entity> predicate) {
         return Collections.emptyList();
     }
 

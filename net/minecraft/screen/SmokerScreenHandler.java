@@ -13,12 +13,12 @@ import net.minecraft.screen.ScreenHandlerType;
 
 public class SmokerScreenHandler
 extends AbstractFurnaceScreenHandler {
-    public SmokerScreenHandler(int i, PlayerInventory arg) {
-        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, RecipeBookCategory.SMOKER, i, arg);
+    public SmokerScreenHandler(int syncId, PlayerInventory playerInventory) {
+        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, RecipeBookCategory.SMOKER, syncId, playerInventory);
     }
 
-    public SmokerScreenHandler(int i, PlayerInventory arg, Inventory arg2, PropertyDelegate arg3) {
-        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, RecipeBookCategory.SMOKER, i, arg, arg2, arg3);
+    public SmokerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
+        super(ScreenHandlerType.SMOKER, RecipeType.SMOKING, RecipeBookCategory.SMOKER, syncId, playerInventory, inventory, propertyDelegate);
     }
 }
 

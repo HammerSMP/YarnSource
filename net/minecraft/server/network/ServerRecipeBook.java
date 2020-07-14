@@ -34,38 +34,38 @@ public class ServerRecipeBook
 extends RecipeBook {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public int unlockRecipes(Collection<Recipe<?>> collection, ServerPlayerEntity arg) {
+    public int unlockRecipes(Collection<Recipe<?>> recipes, ServerPlayerEntity player) {
         ArrayList list = Lists.newArrayList();
         int i = 0;
-        for (Recipe<?> lv : collection) {
+        for (Recipe<?> lv : recipes) {
             Identifier lv2 = lv.getId();
             if (this.recipes.contains(lv2) || lv.isIgnoredInRecipeBook()) continue;
             this.add(lv2);
             this.display(lv2);
             list.add(lv2);
-            Criteria.RECIPE_UNLOCKED.trigger(arg, lv);
+            Criteria.RECIPE_UNLOCKED.trigger(player, lv);
             ++i;
         }
-        this.sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action.ADD, arg, list);
+        this.sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action.ADD, player, list);
         return i;
     }
 
-    public int lockRecipes(Collection<Recipe<?>> collection, ServerPlayerEntity arg) {
+    public int lockRecipes(Collection<Recipe<?>> recipes, ServerPlayerEntity player) {
         ArrayList list = Lists.newArrayList();
         int i = 0;
-        for (Recipe<?> lv : collection) {
+        for (Recipe<?> lv : recipes) {
             Identifier lv2 = lv.getId();
             if (!this.recipes.contains(lv2)) continue;
             this.remove(lv2);
             list.add(lv2);
             ++i;
         }
-        this.sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action.REMOVE, arg, list);
+        this.sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action.REMOVE, player, list);
         return i;
     }
 
-    private void sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action arg, ServerPlayerEntity arg2, List<Identifier> list) {
-        arg2.networkHandler.sendPacket(new UnlockRecipesS2CPacket(arg, list, Collections.emptyList(), this.getOptions()));
+    private void sendUnlockRecipesPacket(UnlockRecipesS2CPacket.Action action, ServerPlayerEntity player, List<Identifier> recipeIds) {
+        player.networkHandler.sendPacket(new UnlockRecipesS2CPacket(action, recipeIds, Collections.emptyList(), this.getOptions()));
     }
 
     public CompoundTag toTag() {
@@ -84,17 +84,17 @@ extends RecipeBook {
         return lv;
     }
 
-    public void fromTag(CompoundTag arg, RecipeManager arg2) {
-        this.setOptions(RecipeBookOptions.fromTag(arg));
-        ListTag lv = arg.getList("recipes", 8);
+    public void fromTag(CompoundTag tag, RecipeManager arg2) {
+        this.setOptions(RecipeBookOptions.fromTag(tag));
+        ListTag lv = tag.getList("recipes", 8);
         this.handleList(lv, this::add, arg2);
-        ListTag lv2 = arg.getList("toBeDisplayed", 8);
+        ListTag lv2 = tag.getList("toBeDisplayed", 8);
         this.handleList(lv2, this::display, arg2);
     }
 
-    private void handleList(ListTag arg, Consumer<Recipe<?>> consumer, RecipeManager arg2) {
-        for (int i = 0; i < arg.size(); ++i) {
-            String string = arg.getString(i);
+    private void handleList(ListTag list, Consumer<Recipe<?>> handler, RecipeManager arg2) {
+        for (int i = 0; i < list.size(); ++i) {
+            String string = list.getString(i);
             try {
                 Identifier lv = new Identifier(string);
                 Optional<Recipe<?>> optional = arg2.get(lv);
@@ -102,7 +102,7 @@ extends RecipeBook {
                     LOGGER.error("Tried to load unrecognized recipe: {} removed now.", (Object)lv);
                     continue;
                 }
-                consumer.accept(optional.get());
+                handler.accept(optional.get());
                 continue;
             }
             catch (InvalidIdentifierException lv2) {
@@ -111,8 +111,8 @@ extends RecipeBook {
         }
     }
 
-    public void sendInitRecipesPacket(ServerPlayerEntity arg) {
-        arg.networkHandler.sendPacket(new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, this.recipes, this.toBeDisplayed, this.getOptions()));
+    public void sendInitRecipesPacket(ServerPlayerEntity player) {
+        player.networkHandler.sendPacket(new UnlockRecipesS2CPacket(UnlockRecipesS2CPacket.Action.INIT, this.recipes, this.toBeDisplayed, this.getOptions()));
     }
 }
 

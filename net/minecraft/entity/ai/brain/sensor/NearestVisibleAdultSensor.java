@@ -28,9 +28,9 @@ extends Sensor<PassiveEntity> {
         arg2.getBrain().getOptionalMemory(MemoryModuleType.VISIBLE_MOBS).ifPresent(list -> this.findNearestVisibleAdult(arg2, (List<LivingEntity>)list));
     }
 
-    private void findNearestVisibleAdult(PassiveEntity arg3, List<LivingEntity> list) {
-        Optional<PassiveEntity> optional = list.stream().filter(arg2 -> arg2.getType() == arg3.getType()).map(arg -> (PassiveEntity)arg).filter(arg -> !arg.isBaby()).findFirst();
-        arg3.getBrain().remember(MemoryModuleType.NEAREST_VISIBLE_ADULT, optional);
+    private void findNearestVisibleAdult(PassiveEntity entity, List<LivingEntity> visibleMobs) {
+        Optional<PassiveEntity> optional = visibleMobs.stream().filter(arg2 -> arg2.getType() == entity.getType()).map(arg -> (PassiveEntity)arg).filter(arg -> !arg.isBaby()).findFirst();
+        entity.getBrain().remember(MemoryModuleType.NEAREST_VISIBLE_ADULT, optional);
     }
 }
 

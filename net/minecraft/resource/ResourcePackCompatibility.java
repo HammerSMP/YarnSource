@@ -21,20 +21,20 @@ public enum ResourcePackCompatibility {
     private final Text notification;
     private final Text confirmMessage;
 
-    private ResourcePackCompatibility(String string2) {
-        this.notification = new TranslatableText("pack.incompatible." + string2);
-        this.confirmMessage = new TranslatableText("pack.incompatible.confirm." + string2);
+    private ResourcePackCompatibility(String translationSuffix) {
+        this.notification = new TranslatableText("pack.incompatible." + translationSuffix);
+        this.confirmMessage = new TranslatableText("pack.incompatible.confirm." + translationSuffix);
     }
 
     public boolean isCompatible() {
         return this == COMPATIBLE;
     }
 
-    public static ResourcePackCompatibility from(int i) {
-        if (i < SharedConstants.getGameVersion().getPackVersion()) {
+    public static ResourcePackCompatibility from(int packVersion) {
+        if (packVersion < SharedConstants.getGameVersion().getPackVersion()) {
             return TOO_OLD;
         }
-        if (i > SharedConstants.getGameVersion().getPackVersion()) {
+        if (packVersion > SharedConstants.getGameVersion().getPackVersion()) {
             return TOO_NEW;
         }
         return COMPATIBLE;

@@ -37,20 +37,20 @@ public abstract class Enchantment {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public static Enchantment byRawId(int i) {
-        return (Enchantment)Registry.ENCHANTMENT.get(i);
+    public static Enchantment byRawId(int id) {
+        return (Enchantment)Registry.ENCHANTMENT.get(id);
     }
 
-    protected Enchantment(Rarity arg, EnchantmentTarget arg2, EquipmentSlot[] args) {
-        this.rarity = arg;
-        this.type = arg2;
-        this.slotTypes = args;
+    protected Enchantment(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
+        this.rarity = weight;
+        this.type = type;
+        this.slotTypes = slotTypes;
     }
 
-    public Map<EquipmentSlot, ItemStack> getEquipment(LivingEntity arg) {
+    public Map<EquipmentSlot, ItemStack> getEquipment(LivingEntity entity) {
         EnumMap map = Maps.newEnumMap(EquipmentSlot.class);
         for (EquipmentSlot lv : this.slotTypes) {
-            ItemStack lv2 = arg.getEquippedStack(lv);
+            ItemStack lv2 = entity.getEquippedStack(lv);
             if (lv2.isEmpty()) continue;
             map.put(lv, lv2);
         }
@@ -69,28 +69,28 @@ public abstract class Enchantment {
         return 1;
     }
 
-    public int getMinPower(int i) {
-        return 1 + i * 10;
+    public int getMinPower(int level) {
+        return 1 + level * 10;
     }
 
-    public int getMaxPower(int i) {
-        return this.getMinPower(i) + 5;
+    public int getMaxPower(int level) {
+        return this.getMinPower(level) + 5;
     }
 
-    public int getProtectionAmount(int i, DamageSource arg) {
+    public int getProtectionAmount(int level, DamageSource source) {
         return 0;
     }
 
-    public float getAttackDamage(int i, EntityGroup arg) {
+    public float getAttackDamage(int level, EntityGroup group) {
         return 0.0f;
     }
 
-    public final boolean canCombine(Enchantment arg) {
-        return this.canAccept(arg) && arg.canAccept(this);
+    public final boolean canCombine(Enchantment other) {
+        return this.canAccept(other) && other.canAccept(this);
     }
 
-    protected boolean canAccept(Enchantment arg) {
-        return this != arg;
+    protected boolean canAccept(Enchantment other) {
+        return this != other;
     }
 
     protected String getOrCreateTranslationKey() {
@@ -104,27 +104,27 @@ public abstract class Enchantment {
         return this.getOrCreateTranslationKey();
     }
 
-    public Text getName(int i) {
+    public Text getName(int level) {
         TranslatableText lv = new TranslatableText(this.getTranslationKey());
         if (this.isCursed()) {
             lv.formatted(Formatting.RED);
         } else {
             lv.formatted(Formatting.GRAY);
         }
-        if (i != 1 || this.getMaxLevel() != 1) {
-            lv.append(" ").append(new TranslatableText("enchantment.level." + i));
+        if (level != 1 || this.getMaxLevel() != 1) {
+            lv.append(" ").append(new TranslatableText("enchantment.level." + level));
         }
         return lv;
     }
 
-    public boolean isAcceptableItem(ItemStack arg) {
-        return this.type.isAcceptableItem(arg.getItem());
+    public boolean isAcceptableItem(ItemStack stack) {
+        return this.type.isAcceptableItem(stack.getItem());
     }
 
-    public void onTargetDamaged(LivingEntity arg, Entity arg2, int i) {
+    public void onTargetDamaged(LivingEntity user, Entity target, int level) {
     }
 
-    public void onUserDamaged(LivingEntity arg, Entity arg2, int i) {
+    public void onUserDamaged(LivingEntity user, Entity attacker, int level) {
     }
 
     public boolean isTreasure() {
@@ -151,8 +151,8 @@ public abstract class Enchantment {
 
         private final int weight;
 
-        private Rarity(int j) {
-            this.weight = j;
+        private Rarity(int weight) {
+            this.weight = weight;
         }
 
         public int getWeight() {

@@ -28,24 +28,24 @@ implements Packet<ClientPlayPacketListener> {
     public OpenScreenS2CPacket() {
     }
 
-    public OpenScreenS2CPacket(int i, ScreenHandlerType<?> arg, Text arg2) {
-        this.syncId = i;
-        this.screenHandlerId = Registry.SCREEN_HANDLER.getRawId(arg);
-        this.name = arg2;
+    public OpenScreenS2CPacket(int syncId, ScreenHandlerType<?> type, Text name) {
+        this.syncId = syncId;
+        this.screenHandlerId = Registry.SCREEN_HANDLER.getRawId(type);
+        this.name = name;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readVarInt();
-        this.screenHandlerId = arg.readVarInt();
-        this.name = arg.readText();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readVarInt();
+        this.screenHandlerId = buf.readVarInt();
+        this.name = buf.readText();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.syncId);
-        arg.writeVarInt(this.screenHandlerId);
-        arg.writeText(this.name);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.syncId);
+        buf.writeVarInt(this.screenHandlerId);
+        buf.writeText(this.name);
     }
 
     @Override

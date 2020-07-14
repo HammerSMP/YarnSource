@@ -33,18 +33,18 @@ implements Packet<ClientPlayPacketListener> {
     public LookAtS2CPacket() {
     }
 
-    public LookAtS2CPacket(EntityAnchorArgumentType.EntityAnchor arg, double d, double e, double f) {
+    public LookAtS2CPacket(EntityAnchorArgumentType.EntityAnchor arg, double targetX, double targetY, double targetZ) {
         this.selfAnchor = arg;
-        this.targetX = d;
-        this.targetY = e;
-        this.targetZ = f;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.targetZ = targetZ;
     }
 
-    public LookAtS2CPacket(EntityAnchorArgumentType.EntityAnchor arg, Entity arg2, EntityAnchorArgumentType.EntityAnchor arg3) {
-        this.selfAnchor = arg;
-        this.entityId = arg2.getEntityId();
-        this.targetAnchor = arg3;
-        Vec3d lv = arg3.positionAt(arg2);
+    public LookAtS2CPacket(EntityAnchorArgumentType.EntityAnchor selfAnchor, Entity entity, EntityAnchorArgumentType.EntityAnchor targetAnchor) {
+        this.selfAnchor = selfAnchor;
+        this.entityId = entity.getEntityId();
+        this.targetAnchor = targetAnchor;
+        Vec3d lv = targetAnchor.positionAt(entity);
         this.targetX = lv.x;
         this.targetY = lv.y;
         this.targetZ = lv.z;
@@ -52,28 +52,28 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.selfAnchor = arg.readEnumConstant(EntityAnchorArgumentType.EntityAnchor.class);
-        this.targetX = arg.readDouble();
-        this.targetY = arg.readDouble();
-        this.targetZ = arg.readDouble();
-        if (arg.readBoolean()) {
+    public void read(PacketByteBuf buf) throws IOException {
+        this.selfAnchor = buf.readEnumConstant(EntityAnchorArgumentType.EntityAnchor.class);
+        this.targetX = buf.readDouble();
+        this.targetY = buf.readDouble();
+        this.targetZ = buf.readDouble();
+        if (buf.readBoolean()) {
             this.lookAtEntity = true;
-            this.entityId = arg.readVarInt();
-            this.targetAnchor = arg.readEnumConstant(EntityAnchorArgumentType.EntityAnchor.class);
+            this.entityId = buf.readVarInt();
+            this.targetAnchor = buf.readEnumConstant(EntityAnchorArgumentType.EntityAnchor.class);
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.selfAnchor);
-        arg.writeDouble(this.targetX);
-        arg.writeDouble(this.targetY);
-        arg.writeDouble(this.targetZ);
-        arg.writeBoolean(this.lookAtEntity);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.selfAnchor);
+        buf.writeDouble(this.targetX);
+        buf.writeDouble(this.targetY);
+        buf.writeDouble(this.targetZ);
+        buf.writeBoolean(this.lookAtEntity);
         if (this.lookAtEntity) {
-            arg.writeVarInt(this.entityId);
-            arg.writeEnumConstant(this.targetAnchor);
+            buf.writeVarInt(this.entityId);
+            buf.writeEnumConstant(this.targetAnchor);
         }
     }
 
@@ -89,9 +89,9 @@ implements Packet<ClientPlayPacketListener> {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public Vec3d getTargetPosition(World arg) {
+    public Vec3d getTargetPosition(World world) {
         if (this.lookAtEntity) {
-            Entity lv = arg.getEntityById(this.entityId);
+            Entity lv = world.getEntityById(this.entityId);
             if (lv == null) {
                 return new Vec3d(this.targetX, this.targetY, this.targetZ);
             }

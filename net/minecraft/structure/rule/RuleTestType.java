@@ -26,8 +26,8 @@ public interface RuleTestType<P extends RuleTest> {
 
     public Codec<P> codec();
 
-    public static <P extends RuleTest> RuleTestType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.RULE_TEST, string, () -> codec);
+    public static <P extends RuleTest> RuleTestType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.RULE_TEST, id, () -> codec);
     }
 }
 

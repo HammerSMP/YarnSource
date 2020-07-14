@@ -3,21 +3,21 @@
  */
 package net.minecraft.world.biome;
 
-import net.minecraft.class_5470;
-import net.minecraft.class_5471;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.sound.BiomeMoodSound;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeatures;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
+import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilders;
 
 public final class WoodedHillsBiome
 extends Biome {
     public WoodedHillsBiome() {
-        super(new Biome.Settings().configureSurfaceBuilder(class_5471.GRASS).precipitation(Biome.Precipitation.RAIN).category(Biome.Category.FOREST).depth(0.45f).scale(0.3f).temperature(0.7f).downfall(0.8f).effects(new BiomeEffects.Builder().waterColor(4159204).waterFogColor(329011).fogColor(12638463).moodSound(BiomeMoodSound.CAVE).build()).parent(null));
+        super(new Biome.Settings().configureSurfaceBuilder(ConfiguredSurfaceBuilders.GRASS).precipitation(Biome.Precipitation.RAIN).category(Biome.Category.FOREST).depth(0.45f).scale(0.3f).temperature(0.7f).downfall(0.8f).effects(new BiomeEffects.Builder().waterColor(4159204).waterFogColor(329011).fogColor(12638463).moodSound(BiomeMoodSound.CAVE).build()).parent(null));
         DefaultBiomeFeatures.addDefaultUndergroundStructures(this);
-        this.addStructureFeature(class_5470.RUINED_PORTAL);
+        this.addStructureFeature(ConfiguredStructureFeatures.RUINED_PORTAL);
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultLakes(this);
         DefaultBiomeFeatures.addDungeons(this);
@@ -32,9 +32,9 @@ extends Biome {
         DefaultBiomeFeatures.addDefaultVegetation(this);
         DefaultBiomeFeatures.addSprings(this);
         DefaultBiomeFeatures.addFrozenTopLayer(this);
-        DefaultBiomeFeatures.method_30580(this);
+        DefaultBiomeFeatures.addFarmAnimals(this);
         this.addSpawn(SpawnGroup.CREATURE, new Biome.SpawnEntry(EntityType.WOLF, 5, 4, 4));
-        DefaultBiomeFeatures.method_30581(this);
+        DefaultBiomeFeatures.addBatsAndMonsters(this);
     }
 }
 

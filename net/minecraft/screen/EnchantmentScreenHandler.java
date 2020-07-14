@@ -52,17 +52,17 @@ extends ScreenHandler {
     public final int[] enchantmentId = new int[]{-1, -1, -1};
     public final int[] enchantmentLevel = new int[]{-1, -1, -1};
 
-    public EnchantmentScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, ScreenHandlerContext.EMPTY);
+    public EnchantmentScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
     }
 
-    public EnchantmentScreenHandler(int i, PlayerInventory arg, ScreenHandlerContext arg2) {
-        super(ScreenHandlerType.ENCHANTMENT, i);
-        this.context = arg2;
+    public EnchantmentScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(ScreenHandlerType.ENCHANTMENT, syncId);
+        this.context = context;
         this.addSlot(new Slot(this.inventory, 0, 15, 47){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
+            public boolean canInsert(ItemStack stack) {
                 return true;
             }
 
@@ -74,22 +74,22 @@ extends ScreenHandler {
         this.addSlot(new Slot(this.inventory, 1, 35, 47){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
-                return arg.getItem() == Items.LAPIS_LAZULI;
+            public boolean canInsert(ItemStack stack) {
+                return stack.getItem() == Items.LAPIS_LAZULI;
             }
         });
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 9; ++k) {
-                this.addSlot(new Slot(arg, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
             }
         }
         for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(arg, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
         this.addProperty(Property.create(this.enchantmentPower, 0));
         this.addProperty(Property.create(this.enchantmentPower, 1));
         this.addProperty(Property.create(this.enchantmentPower, 2));
-        this.addProperty(this.seed).set(arg.player.getEnchantmentTableSeed());
+        this.addProperty(this.seed).set(playerInventory.player.getEnchantmentTableSeed());
         this.addProperty(Property.create(this.enchantmentId, 0));
         this.addProperty(Property.create(this.enchantmentId, 1));
         this.addProperty(Property.create(this.enchantmentId, 2));
@@ -99,9 +99,9 @@ extends ScreenHandler {
     }
 
     @Override
-    public void onContentChanged(Inventory arg) {
-        if (arg == this.inventory) {
-            ItemStack lv = arg.getStack(0);
+    public void onContentChanged(Inventory inventory) {
+        if (inventory == this.inventory) {
+            ItemStack lv = inventory.getStack(0);
             if (lv.isEmpty() || !lv.isEnchantable()) {
                 for (int i = 0; i < 3; ++i) {
                     this.enchantmentPower[i] = 0;
@@ -156,20 +156,20 @@ extends ScreenHandler {
     }
 
     @Override
-    public boolean onButtonClick(PlayerEntity arg, int i) {
+    public boolean onButtonClick(PlayerEntity player, int id) {
         ItemStack lv = this.inventory.getStack(0);
         ItemStack lv2 = this.inventory.getStack(1);
-        int j = i + 1;
-        if ((lv2.isEmpty() || lv2.getCount() < j) && !arg.abilities.creativeMode) {
+        int j = id + 1;
+        if ((lv2.isEmpty() || lv2.getCount() < j) && !player.abilities.creativeMode) {
             return false;
         }
-        if (this.enchantmentPower[i] > 0 && !lv.isEmpty() && (arg.experienceLevel >= j && arg.experienceLevel >= this.enchantmentPower[i] || arg.abilities.creativeMode)) {
+        if (this.enchantmentPower[id] > 0 && !lv.isEmpty() && (player.experienceLevel >= j && player.experienceLevel >= this.enchantmentPower[id] || player.abilities.creativeMode)) {
             this.context.run((arg4, arg5) -> {
                 ItemStack lv = lv;
-                List<EnchantmentLevelEntry> list = this.generateEnchantments(lv, i, this.enchantmentPower[i]);
+                List<EnchantmentLevelEntry> list = this.generateEnchantments(lv, id, this.enchantmentPower[id]);
                 if (!list.isEmpty()) {
                     boolean bl;
-                    arg.applyEnchantmentCosts(lv, j);
+                    player.applyEnchantmentCosts(lv, j);
                     boolean bl2 = bl = lv.getItem() == Items.BOOK;
                     if (bl) {
                         lv = new ItemStack(Items.ENCHANTED_BOOK);
@@ -193,12 +193,12 @@ extends ScreenHandler {
                             this.inventory.setStack(1, ItemStack.EMPTY);
                         }
                     }
-                    arg.incrementStat(Stats.ENCHANT_ITEM);
-                    if (arg instanceof ServerPlayerEntity) {
-                        Criteria.ENCHANTED_ITEM.trigger((ServerPlayerEntity)arg, lv, j);
+                    player.incrementStat(Stats.ENCHANT_ITEM);
+                    if (player instanceof ServerPlayerEntity) {
+                        Criteria.ENCHANTED_ITEM.trigger((ServerPlayerEntity)player, lv, j);
                     }
                     this.inventory.markDirty();
-                    this.seed.set(arg.getEnchantmentTableSeed());
+                    this.seed.set(player.getEnchantmentTableSeed());
                     this.onContentChanged(this.inventory);
                     arg4.playSound(null, (BlockPos)arg5, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 1.0f, arg4.random.nextFloat() * 0.1f + 0.9f);
                 }
@@ -208,10 +208,10 @@ extends ScreenHandler {
         return false;
     }
 
-    private List<EnchantmentLevelEntry> generateEnchantments(ItemStack arg, int i, int j) {
-        this.random.setSeed(this.seed.get() + i);
-        List<EnchantmentLevelEntry> list = EnchantmentHelper.generateEnchantments(this.random, arg, j, false);
-        if (arg.getItem() == Items.BOOK && list.size() > 1) {
+    private List<EnchantmentLevelEntry> generateEnchantments(ItemStack stack, int slot, int level) {
+        this.random.setSeed(this.seed.get() + slot);
+        List<EnchantmentLevelEntry> list = EnchantmentHelper.generateEnchantments(this.random, stack, level, false);
+        if (stack.getItem() == Items.BOOK && list.size() > 1) {
             list.remove(this.random.nextInt(list.size()));
         }
         return list;
@@ -232,28 +232,28 @@ extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
-        this.context.run((arg2, arg3) -> this.dropInventory(arg, arg.world, this.inventory));
+    public void close(PlayerEntity player) {
+        super.close(player);
+        this.context.run((arg2, arg3) -> this.dropInventory(player, arg.world, this.inventory));
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return EnchantmentScreenHandler.canUse(this.context, arg, Blocks.ENCHANTING_TABLE);
+    public boolean canUse(PlayerEntity player) {
+        return EnchantmentScreenHandler.canUse(this.context, player, Blocks.ENCHANTING_TABLE);
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i == 0) {
+            if (index == 0) {
                 if (!this.insertItem(lv3, 2, 38, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (i == 1) {
+            } else if (index == 1) {
                 if (!this.insertItem(lv3, 2, 38, true)) {
                     return ItemStack.EMPTY;
                 }
@@ -277,7 +277,7 @@ extends ScreenHandler {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
         }
         return lv;
     }

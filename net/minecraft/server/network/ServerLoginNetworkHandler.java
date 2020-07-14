@@ -65,9 +65,9 @@ implements ServerLoginPacketListener {
     private SecretKey secretKey;
     private ServerPlayerEntity player;
 
-    public ServerLoginNetworkHandler(MinecraftServer minecraftServer, ClientConnection arg) {
-        this.server = minecraftServer;
-        this.connection = arg;
+    public ServerLoginNetworkHandler(MinecraftServer server, ClientConnection connection) {
+        this.server = server;
+        this.connection = connection;
         RANDOM.nextBytes(this.nonce);
     }
 
@@ -90,11 +90,11 @@ implements ServerLoginPacketListener {
         return this.connection;
     }
 
-    public void disconnect(Text arg) {
+    public void disconnect(Text reason) {
         try {
-            LOGGER.info("Disconnecting {}: {}", (Object)this.getConnectionInfo(), (Object)arg.getString());
-            this.connection.send(new LoginDisconnectS2CPacket(arg));
-            this.connection.disconnect(arg);
+            LOGGER.info("Disconnecting {}: {}", (Object)this.getConnectionInfo(), (Object)reason.getString());
+            this.connection.send(new LoginDisconnectS2CPacket(reason));
+            this.connection.disconnect(reason);
         }
         catch (Exception exception) {
             LOGGER.error("Error whilst disconnecting player", (Throwable)exception);
@@ -125,8 +125,8 @@ implements ServerLoginPacketListener {
     }
 
     @Override
-    public void onDisconnected(Text arg) {
-        LOGGER.info("{} lost connection: {}", (Object)this.getConnectionInfo(), (Object)arg.getString());
+    public void onDisconnected(Text reason) {
+        LOGGER.info("{} lost connection: {}", (Object)this.getConnectionInfo(), (Object)reason.getString());
     }
 
     public String getConnectionInfo() {
@@ -137,9 +137,9 @@ implements ServerLoginPacketListener {
     }
 
     @Override
-    public void onHello(LoginHelloC2SPacket arg) {
+    public void onHello(LoginHelloC2SPacket packet) {
         Validate.validState((this.state == State.HELLO ? 1 : 0) != 0, (String)"Unexpected hello packet", (Object[])new Object[0]);
-        this.profile = arg.getProfile();
+        this.profile = packet.getProfile();
         if (this.server.isOnlineMode() && !this.connection.isLocal()) {
             this.state = State.KEY;
             this.connection.send(new LoginHelloS2CPacket("", this.server.getKeyPair().getPublic(), this.nonce));
@@ -149,13 +149,13 @@ implements ServerLoginPacketListener {
     }
 
     @Override
-    public void onKey(LoginKeyC2SPacket arg) {
+    public void onKey(LoginKeyC2SPacket packet) {
         Validate.validState((this.state == State.KEY ? 1 : 0) != 0, (String)"Unexpected key packet", (Object[])new Object[0]);
         PrivateKey privateKey = this.server.getKeyPair().getPrivate();
-        if (!Arrays.equals(this.nonce, arg.decryptNonce(privateKey))) {
+        if (!Arrays.equals(this.nonce, packet.decryptNonce(privateKey))) {
             throw new IllegalStateException("Invalid nonce!");
         }
-        this.secretKey = arg.decryptSecretKey(privateKey);
+        this.secretKey = packet.decryptSecretKey(privateKey);
         this.state = State.AUTHENTICATING;
         this.connection.setupEncryption(this.secretKey);
         Thread thread = new Thread("User Authenticator #" + authenticatorThreadId.incrementAndGet()){
@@ -200,13 +200,13 @@ implements ServerLoginPacketListener {
     }
 
     @Override
-    public void onQueryResponse(LoginQueryResponseC2SPacket arg) {
+    public void onQueryResponse(LoginQueryResponseC2SPacket packet) {
         this.disconnect(new TranslatableText("multiplayer.disconnect.unexpected_query_response"));
     }
 
-    protected GameProfile toOfflineProfile(GameProfile gameProfile) {
-        UUID uUID = PlayerEntity.getOfflinePlayerUuid(gameProfile.getName());
-        return new GameProfile(uUID, gameProfile.getName());
+    protected GameProfile toOfflineProfile(GameProfile profile) {
+        UUID uUID = PlayerEntity.getOfflinePlayerUuid(profile.getName());
+        return new GameProfile(uUID, profile.getName());
     }
 
     static enum State {

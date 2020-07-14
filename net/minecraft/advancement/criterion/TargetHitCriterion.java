@@ -35,14 +35,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void trigger(ServerPlayerEntity arg, Entity arg2, Vec3d arg32, int i) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg2);
-        this.test(arg, arg3 -> arg3.test(lv, arg32, i));
+    public void trigger(ServerPlayerEntity player, Entity projectile, Vec3d hitPos, int signalStrength) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, projectile);
+        this.test(player, arg3 -> arg3.test(lv, hitPos, signalStrength));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -50,29 +50,29 @@ extends AbstractCriterion<Conditions> {
         private final NumberRange.IntRange signalStrength;
         private final EntityPredicate.Extended projectile;
 
-        public Conditions(EntityPredicate.Extended arg, NumberRange.IntRange arg2, EntityPredicate.Extended arg3) {
-            super(ID, arg);
-            this.signalStrength = arg2;
-            this.projectile = arg3;
+        public Conditions(EntityPredicate.Extended player, NumberRange.IntRange signalStrength, EntityPredicate.Extended projectile) {
+            super(ID, player);
+            this.signalStrength = signalStrength;
+            this.projectile = projectile;
         }
 
-        public static Conditions create(NumberRange.IntRange arg, EntityPredicate.Extended arg2) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg, arg2);
+        public static Conditions create(NumberRange.IntRange signalStrength, EntityPredicate.Extended arg2) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, signalStrength, arg2);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("signal_strength", this.signalStrength.toJson());
-            jsonObject.add("projectile", this.projectile.toJson(arg));
+            jsonObject.add("projectile", this.projectile.toJson(predicateSerializer));
             return jsonObject;
         }
 
-        public boolean test(LootContext arg, Vec3d arg2, int i) {
-            if (!this.signalStrength.test(i)) {
+        public boolean test(LootContext projectileContext, Vec3d hitPos, int signalStrength) {
+            if (!this.signalStrength.test(signalStrength)) {
                 return false;
             }
-            return this.projectile.test(arg);
+            return this.projectile.test(projectileContext);
         }
     }
 }

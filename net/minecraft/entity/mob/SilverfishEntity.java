@@ -60,7 +60,7 @@ extends HostileEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 0.13f;
     }
 
@@ -79,7 +79,7 @@ extends HostileEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_SILVERFISH_HURT;
     }
 
@@ -89,19 +89,19 @@ extends HostileEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_SILVERFISH_STEP, 0.15f, 1.0f);
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        if ((arg instanceof EntityDamageSource || arg == DamageSource.MAGIC) && this.callForHelpGoal != null) {
+        if ((source instanceof EntityDamageSource || source == DamageSource.MAGIC) && this.callForHelpGoal != null) {
             this.callForHelpGoal.onHurt();
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
@@ -111,22 +111,22 @@ extends HostileEntity {
     }
 
     @Override
-    public void setYaw(float f) {
-        this.yaw = f;
-        super.setYaw(f);
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+        super.setYaw(yaw);
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        if (InfestedBlock.isInfestable(arg2.getBlockState(arg.down()))) {
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        if (InfestedBlock.isInfestable(world.getBlockState(pos.down()))) {
             return 10.0f;
         }
-        return super.getPathfindingFavor(arg, arg2);
+        return super.getPathfindingFavor(pos, world);
     }
 
-    public static boolean canSpawn(EntityType<SilverfishEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        if (SilverfishEntity.canSpawnIgnoreLightLevel(arg, arg2, arg3, arg4, random)) {
-            PlayerEntity lv = arg2.getClosestPlayer((double)arg4.getX() + 0.5, (double)arg4.getY() + 0.5, (double)arg4.getZ() + 0.5, 5.0, true);
+    public static boolean canSpawn(EntityType<SilverfishEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        if (SilverfishEntity.canSpawnIgnoreLightLevel(type, world, spawnReason, pos, random)) {
+            PlayerEntity lv = world.getClosestPlayer((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, 5.0, true);
             return lv == null;
         }
         return false;
@@ -142,8 +142,8 @@ extends HostileEntity {
         private Direction direction;
         private boolean canInfest;
 
-        public WanderAndInfestGoal(SilverfishEntity arg) {
-            super(arg, 1.0, 10);
+        public WanderAndInfestGoal(SilverfishEntity silverfish) {
+            super(silverfish, 1.0, 10);
             this.setControls(EnumSet.of(Goal.Control.MOVE));
         }
 
@@ -199,8 +199,8 @@ extends HostileEntity {
         private final SilverfishEntity silverfish;
         private int delay;
 
-        public CallForHelpGoal(SilverfishEntity arg) {
-            this.silverfish = arg;
+        public CallForHelpGoal(SilverfishEntity silverfish) {
+            this.silverfish = silverfish;
         }
 
         public void onHurt() {

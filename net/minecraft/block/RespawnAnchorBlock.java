@@ -54,46 +54,46 @@ extends Block {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        ItemStack lv = arg4.getStackInHand(arg5);
-        if (arg5 == Hand.MAIN_HAND && !RespawnAnchorBlock.isChargeItem(lv) && RespawnAnchorBlock.isChargeItem(arg4.getStackInHand(Hand.OFF_HAND))) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack lv = player.getStackInHand(hand);
+        if (hand == Hand.MAIN_HAND && !RespawnAnchorBlock.isChargeItem(lv) && RespawnAnchorBlock.isChargeItem(player.getStackInHand(Hand.OFF_HAND))) {
             return ActionResult.PASS;
         }
-        if (RespawnAnchorBlock.isChargeItem(lv) && RespawnAnchorBlock.canCharge(arg)) {
-            RespawnAnchorBlock.charge(arg2, arg3, arg);
-            if (!arg4.abilities.creativeMode) {
+        if (RespawnAnchorBlock.isChargeItem(lv) && RespawnAnchorBlock.canCharge(state)) {
+            RespawnAnchorBlock.charge(world, pos, state);
+            if (!player.abilities.creativeMode) {
                 lv.decrement(1);
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
-        if (arg.get(CHARGES) == 0) {
+        if (state.get(CHARGES) == 0) {
             return ActionResult.PASS;
         }
-        if (RespawnAnchorBlock.isNether(arg2)) {
+        if (RespawnAnchorBlock.isNether(world)) {
             ServerPlayerEntity lv2;
-            if (!(arg2.isClient || (lv2 = (ServerPlayerEntity)arg4).getSpawnPointDimension() == arg2.getRegistryKey() && lv2.getSpawnPointPosition().equals(arg3))) {
-                lv2.setSpawnPoint(arg2.getRegistryKey(), arg3, false, true);
-                arg2.playSound(null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            if (!(world.isClient || (lv2 = (ServerPlayerEntity)player).getSpawnPointDimension() == world.getRegistryKey() && lv2.getSpawnPointPosition().equals(pos))) {
+                lv2.setSpawnPoint(world.getRegistryKey(), pos, false, true);
+                world.playSound(null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.BLOCKS, 1.0f, 1.0f);
                 return ActionResult.SUCCESS;
             }
             return ActionResult.CONSUME;
         }
-        if (!arg2.isClient) {
-            this.explode(arg, arg2, arg3);
+        if (!world.isClient) {
+            this.explode(state, world, pos);
         }
-        return ActionResult.success(arg2.isClient);
+        return ActionResult.success(world.isClient);
     }
 
-    private static boolean isChargeItem(ItemStack arg) {
-        return arg.getItem() == Items.GLOWSTONE;
+    private static boolean isChargeItem(ItemStack stack) {
+        return stack.getItem() == Items.GLOWSTONE;
     }
 
-    private static boolean canCharge(BlockState arg) {
-        return arg.get(CHARGES) < 4;
+    private static boolean canCharge(BlockState state) {
+        return state.get(CHARGES) < 4;
     }
 
-    private static boolean hasStillWater(BlockPos arg, World arg2) {
-        FluidState lv = arg2.getFluidState(arg);
+    private static boolean hasStillWater(BlockPos pos, World world) {
+        FluidState lv = world.getFluidState(pos);
         if (!lv.isIn(FluidTags.WATER)) {
             return false;
         }
@@ -104,74 +104,74 @@ extends Block {
         if (f < 2.0f) {
             return false;
         }
-        FluidState lv2 = arg2.getFluidState(arg.down());
+        FluidState lv2 = world.getFluidState(pos.down());
         return !lv2.isIn(FluidTags.WATER);
     }
 
-    private void explode(BlockState arg, World arg22, final BlockPos arg3) {
-        arg22.removeBlock(arg3, false);
-        boolean bl = Direction.Type.HORIZONTAL.stream().map(arg3::offset).anyMatch(arg2 -> RespawnAnchorBlock.hasStillWater(arg2, arg22));
-        final boolean bl2 = bl || arg22.getFluidState(arg3.up()).isIn(FluidTags.WATER);
+    private void explode(BlockState state, World world, final BlockPos explodedPos) {
+        world.removeBlock(explodedPos, false);
+        boolean bl = Direction.Type.HORIZONTAL.stream().map(explodedPos::offset).anyMatch(arg2 -> RespawnAnchorBlock.hasStillWater(arg2, world));
+        final boolean bl2 = bl || world.getFluidState(explodedPos.up()).isIn(FluidTags.WATER);
         ExplosionBehavior lv = new ExplosionBehavior(){
 
             @Override
-            public Optional<Float> getBlastResistance(Explosion arg, BlockView arg2, BlockPos arg32, BlockState arg4, FluidState arg5) {
-                if (arg32.equals(arg3) && bl2) {
+            public Optional<Float> getBlastResistance(Explosion explosion, BlockView world, BlockPos pos, BlockState blockState, FluidState fluidState) {
+                if (pos.equals(explodedPos) && bl2) {
                     return Optional.of(Float.valueOf(Blocks.WATER.getBlastResistance()));
                 }
-                return super.getBlastResistance(arg, arg2, arg32, arg4, arg5);
+                return super.getBlastResistance(explosion, world, pos, blockState, fluidState);
             }
         };
-        arg22.createExplosion(null, DamageSource.badRespawnPoint(), lv, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
+        world.createExplosion(null, DamageSource.badRespawnPoint(), lv, (double)explodedPos.getX() + 0.5, (double)explodedPos.getY() + 0.5, (double)explodedPos.getZ() + 0.5, 5.0f, true, Explosion.DestructionType.DESTROY);
     }
 
     public static boolean isNether(World arg) {
         return arg.getDimension().isRespawnAnchorWorking();
     }
 
-    public static void charge(World arg, BlockPos arg2, BlockState arg3) {
-        arg.setBlockState(arg2, (BlockState)arg3.with(CHARGES, arg3.get(CHARGES) + 1), 3);
-        arg.playSound(null, (double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+    public static void charge(World world, BlockPos pos, BlockState state) {
+        world.setBlockState(pos, (BlockState)state.with(CHARGES, state.get(CHARGES) + 1), 3);
+        world.playSound(null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        if (arg.get(CHARGES) == 0) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (state.get(CHARGES) == 0) {
             return;
         }
         if (random.nextInt(100) == 0) {
-            arg2.playSound(null, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            world.playSound(null, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_RESPAWN_ANCHOR_AMBIENT, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
-        double d = (double)arg3.getX() + 0.5 + (0.5 - random.nextDouble());
-        double e = (double)arg3.getY() + 1.0;
-        double f = (double)arg3.getZ() + 0.5 + (0.5 - random.nextDouble());
+        double d = (double)pos.getX() + 0.5 + (0.5 - random.nextDouble());
+        double e = (double)pos.getY() + 1.0;
+        double f = (double)pos.getZ() + 0.5 + (0.5 - random.nextDouble());
         double g = (double)random.nextFloat() * 0.04;
-        arg2.addParticle(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
+        world.addParticle(ParticleTypes.REVERSE_PORTAL, d, e, f, 0.0, g, 0.0);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(CHARGES);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(CHARGES);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
-    public static int getLightLevel(BlockState arg, int i) {
-        return MathHelper.floor((float)(arg.get(CHARGES) - 0) / 4.0f * (float)i);
+    public static int getLightLevel(BlockState state, int maxLevel) {
+        return MathHelper.floor((float)(state.get(CHARGES) - 0) / 4.0f * (float)maxLevel);
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return RespawnAnchorBlock.getLightLevel(arg, 15);
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return RespawnAnchorBlock.getLightLevel(state, 15);
     }
 
-    public static Optional<Vec3d> findRespawnPosition(EntityType<?> arg, WorldView arg2, BlockPos arg3) {
-        for (BlockPos lv : BlockPos.iterate(arg3.add(-1, -1, -1), arg3.add(1, 1, 1))) {
-            Optional<Vec3d> optional = BedBlock.canWakeUpAt(arg, arg2, lv);
+    public static Optional<Vec3d> findRespawnPosition(EntityType<?> entity, WorldView world, BlockPos pos) {
+        for (BlockPos lv : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
+            Optional<Vec3d> optional = BedBlock.canWakeUpAt(entity, world, lv);
             if (!optional.isPresent()) continue;
             return optional;
         }
@@ -179,7 +179,7 @@ extends Block {
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

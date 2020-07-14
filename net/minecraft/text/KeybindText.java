@@ -21,17 +21,17 @@ import net.minecraft.text.Text;
 
 public class KeybindText
 extends BaseText {
-    private static Function<String, Supplier<Text>> translator = string -> () -> new LiteralText((String)string);
+    private static Function<String, Supplier<Text>> translator = key -> () -> new LiteralText((String)key);
     private final String key;
     private Supplier<Text> translated;
 
-    public KeybindText(String string) {
-        this.key = string;
+    public KeybindText(String key) {
+        this.key = key;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void setTranslator(Function<String, Supplier<Text>> function) {
-        translator = function;
+    public static void setTranslator(Function<String, Supplier<Text>> translator) {
+        KeybindText.translator = translator;
     }
 
     private Text getTranslated() {
@@ -42,14 +42,14 @@ extends BaseText {
     }
 
     @Override
-    public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> arg) {
-        return this.getTranslated().visit(arg);
+    public <T> Optional<T> visitSelf(StringRenderable.Visitor<T> visitor) {
+        return this.getTranslated().visit(visitor);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> arg, Style arg2) {
-        return this.getTranslated().visit(arg, arg2);
+    public <T> Optional<T> visitSelf(StringRenderable.StyledVisitor<T> visitor, Style style) {
+        return this.getTranslated().visit(visitor, style);
     }
 
     @Override

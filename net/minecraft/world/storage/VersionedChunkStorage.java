@@ -35,24 +35,24 @@ implements AutoCloseable {
         this.worker = new StorageIoWorker(file, bl, "chunk");
     }
 
-    public CompoundTag updateChunkTag(RegistryKey<World> arg, Supplier<PersistentStateManager> supplier, CompoundTag arg2) {
-        int i = VersionedChunkStorage.getDataVersion(arg2);
+    public CompoundTag updateChunkTag(RegistryKey<World> arg, Supplier<PersistentStateManager> persistentStateManagerFactory, CompoundTag tag) {
+        int i = VersionedChunkStorage.getDataVersion(tag);
         int j = 1493;
-        if (i < 1493 && (arg2 = NbtHelper.update(this.dataFixer, DataFixTypes.CHUNK, arg2, i, 1493)).getCompound("Level").getBoolean("hasLegacyStructureData")) {
+        if (i < 1493 && (tag = NbtHelper.update(this.dataFixer, DataFixTypes.CHUNK, tag, i, 1493)).getCompound("Level").getBoolean("hasLegacyStructureData")) {
             if (this.featureUpdater == null) {
-                this.featureUpdater = FeatureUpdater.create(arg, supplier.get());
+                this.featureUpdater = FeatureUpdater.create(arg, persistentStateManagerFactory.get());
             }
-            arg2 = this.featureUpdater.getUpdatedReferences(arg2);
+            tag = this.featureUpdater.getUpdatedReferences(tag);
         }
-        arg2 = NbtHelper.update(this.dataFixer, DataFixTypes.CHUNK, arg2, Math.max(1493, i));
+        tag = NbtHelper.update(this.dataFixer, DataFixTypes.CHUNK, tag, Math.max(1493, i));
         if (i < SharedConstants.getGameVersion().getWorldVersion()) {
-            arg2.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
+            tag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
         }
-        return arg2;
+        return tag;
     }
 
-    public static int getDataVersion(CompoundTag arg) {
-        return arg.contains("DataVersion", 99) ? arg.getInt("DataVersion") : -1;
+    public static int getDataVersion(CompoundTag tag) {
+        return tag.contains("DataVersion", 99) ? tag.getInt("DataVersion") : -1;
     }
 
     @Nullable

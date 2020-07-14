@@ -41,9 +41,9 @@ implements ArgumentType<Identifier> {
         return Identifier.fromCommandInput(stringReader);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        if (commandContext.getSource() instanceof CommandSource) {
-            return CommandSource.suggestIdentifiers(((CommandSource)commandContext.getSource()).getWorldKeys().stream().map(RegistryKey::getValue), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
+            return CommandSource.suggestIdentifiers(((CommandSource)context.getSource()).getWorldKeys().stream().map(RegistryKey::getValue), builder);
         }
         return Suggestions.empty();
     }
@@ -56,10 +56,10 @@ implements ArgumentType<Identifier> {
         return new DimensionArgumentType();
     }
 
-    public static ServerWorld getDimensionArgument(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        Identifier lv = (Identifier)commandContext.getArgument(string, Identifier.class);
+    public static ServerWorld getDimensionArgument(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        Identifier lv = (Identifier)context.getArgument(name, Identifier.class);
         RegistryKey<World> lv2 = RegistryKey.of(Registry.DIMENSION, lv);
-        ServerWorld lv3 = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getWorld(lv2);
+        ServerWorld lv3 = ((ServerCommandSource)context.getSource()).getMinecraftServer().getWorld(lv2);
         if (lv3 == null) {
             throw INVALID_DIMENSION_EXCEPTION.create((Object)lv);
         }

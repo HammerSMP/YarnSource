@@ -32,37 +32,37 @@ import net.minecraft.util.math.Direction;
 public class ItemModelGenerator {
     public static final List<String> LAYERS = Lists.newArrayList((Object[])new String[]{"layer0", "layer1", "layer2", "layer3", "layer4"});
 
-    public JsonUnbakedModel create(Function<SpriteIdentifier, Sprite> function, JsonUnbakedModel arg) {
+    public JsonUnbakedModel create(Function<SpriteIdentifier, Sprite> textureGetter, JsonUnbakedModel blockModel) {
         String string;
         HashMap map = Maps.newHashMap();
         ArrayList list = Lists.newArrayList();
-        for (int i = 0; i < LAYERS.size() && arg.textureExists(string = LAYERS.get(i)); ++i) {
-            SpriteIdentifier lv = arg.resolveSprite(string);
+        for (int i = 0; i < LAYERS.size() && blockModel.textureExists(string = LAYERS.get(i)); ++i) {
+            SpriteIdentifier lv = blockModel.resolveSprite(string);
             map.put(string, Either.left((Object)lv));
-            Sprite lv2 = function.apply(lv);
+            Sprite lv2 = textureGetter.apply(lv);
             list.addAll(this.addLayerElements(i, string, lv2));
         }
-        map.put("particle", arg.textureExists("particle") ? Either.left((Object)arg.resolveSprite("particle")) : (Either)map.get("layer0"));
-        JsonUnbakedModel lv3 = new JsonUnbakedModel(null, list, map, false, arg.getGuiLight(), arg.getTransformations(), arg.getOverrides());
-        lv3.id = arg.id;
+        map.put("particle", blockModel.textureExists("particle") ? Either.left((Object)blockModel.resolveSprite("particle")) : (Either)map.get("layer0"));
+        JsonUnbakedModel lv3 = new JsonUnbakedModel(null, list, map, false, blockModel.getGuiLight(), blockModel.getTransformations(), blockModel.getOverrides());
+        lv3.id = blockModel.id;
         return lv3;
     }
 
-    private List<ModelElement> addLayerElements(int i, String string, Sprite arg) {
+    private List<ModelElement> addLayerElements(int layer, String key, Sprite sprite) {
         HashMap map = Maps.newHashMap();
-        map.put(Direction.SOUTH, new ModelElementFace(null, i, string, new ModelElementTexture(new float[]{0.0f, 0.0f, 16.0f, 16.0f}, 0)));
-        map.put(Direction.NORTH, new ModelElementFace(null, i, string, new ModelElementTexture(new float[]{16.0f, 0.0f, 0.0f, 16.0f}, 0)));
+        map.put(Direction.SOUTH, new ModelElementFace(null, layer, key, new ModelElementTexture(new float[]{0.0f, 0.0f, 16.0f, 16.0f}, 0)));
+        map.put(Direction.NORTH, new ModelElementFace(null, layer, key, new ModelElementTexture(new float[]{16.0f, 0.0f, 0.0f, 16.0f}, 0)));
         ArrayList list = Lists.newArrayList();
         list.add(new ModelElement(new Vector3f(0.0f, 0.0f, 7.5f), new Vector3f(16.0f, 16.0f, 8.5f), map, null, true));
-        list.addAll(this.addSubComponents(arg, string, i));
+        list.addAll(this.addSubComponents(sprite, key, layer));
         return list;
     }
 
-    private List<ModelElement> addSubComponents(Sprite arg, String string, int i) {
-        float f = arg.getWidth();
-        float g = arg.getHeight();
+    private List<ModelElement> addSubComponents(Sprite sprite, String key, int layer) {
+        float f = sprite.getWidth();
+        float g = sprite.getHeight();
         ArrayList list = Lists.newArrayList();
-        for (Frame lv : this.getFrames(arg)) {
+        for (Frame lv : this.getFrames(sprite)) {
             float h = 0.0f;
             float j = 0.0f;
             float k = 0.0f;
@@ -119,7 +119,7 @@ public class ItemModelGenerator {
             j = 16.0f - j;
             l = 16.0f - l;
             HashMap map = Maps.newHashMap();
-            map.put(lv2.getDirection(), new ModelElementFace(null, i, string, new ModelElementTexture(new float[]{m *= q, o *= r, n *= q, p *= r}, 0)));
+            map.put(lv2.getDirection(), new ModelElementFace(null, layer, key, new ModelElementTexture(new float[]{m *= q, o *= r, n *= q, p *= r}, 0)));
             switch (lv2) {
                 case UP: {
                     list.add(new ModelElement(new Vector3f(h, j, 7.5f), new Vector3f(k, j, 8.5f), map, null, true));
@@ -141,57 +141,57 @@ public class ItemModelGenerator {
         return list;
     }
 
-    private List<Frame> getFrames(Sprite arg) {
-        int i = arg.getWidth();
-        int j = arg.getHeight();
+    private List<Frame> getFrames(Sprite sprite) {
+        int i = sprite.getWidth();
+        int j = sprite.getHeight();
         ArrayList list = Lists.newArrayList();
-        for (int k = 0; k < arg.getFrameCount(); ++k) {
+        for (int k = 0; k < sprite.getFrameCount(); ++k) {
             for (int l = 0; l < j; ++l) {
                 for (int m = 0; m < i; ++m) {
-                    boolean bl = !this.isPixelTransparent(arg, k, m, l, i, j);
-                    this.buildCube(Side.UP, list, arg, k, m, l, i, j, bl);
-                    this.buildCube(Side.DOWN, list, arg, k, m, l, i, j, bl);
-                    this.buildCube(Side.LEFT, list, arg, k, m, l, i, j, bl);
-                    this.buildCube(Side.RIGHT, list, arg, k, m, l, i, j, bl);
+                    boolean bl = !this.isPixelTransparent(sprite, k, m, l, i, j);
+                    this.buildCube(Side.UP, list, sprite, k, m, l, i, j, bl);
+                    this.buildCube(Side.DOWN, list, sprite, k, m, l, i, j, bl);
+                    this.buildCube(Side.LEFT, list, sprite, k, m, l, i, j, bl);
+                    this.buildCube(Side.RIGHT, list, sprite, k, m, l, i, j, bl);
                 }
             }
         }
         return list;
     }
 
-    private void buildCube(Side arg, List<Frame> list, Sprite arg2, int i, int j, int k, int l, int m, boolean bl) {
+    private void buildCube(Side arg, List<Frame> cubes, Sprite sprite, int frame, int x, int y, int l, int m, boolean bl) {
         boolean bl2;
-        boolean bl3 = bl2 = this.isPixelTransparent(arg2, i, j + arg.getOffsetX(), k + arg.getOffsetY(), l, m) && bl;
+        boolean bl3 = bl2 = this.isPixelTransparent(sprite, frame, x + arg.getOffsetX(), y + arg.getOffsetY(), l, m) && bl;
         if (bl2) {
-            this.buildCube(list, arg, j, k);
+            this.buildCube(cubes, arg, x, y);
         }
     }
 
-    private void buildCube(List<Frame> list, Side arg, int i, int j) {
+    private void buildCube(List<Frame> cubes, Side arg, int x, int y) {
         int m;
         Frame lv = null;
-        for (Frame lv2 : list) {
+        for (Frame lv2 : cubes) {
             int k;
             if (lv2.getSide() != arg) continue;
-            int n = k = arg.isVertical() ? j : i;
+            int n = k = arg.isVertical() ? y : x;
             if (lv2.getLevel() != k) continue;
             lv = lv2;
             break;
         }
-        int l = arg.isVertical() ? j : i;
-        int n = m = arg.isVertical() ? i : j;
+        int l = arg.isVertical() ? y : x;
+        int n = m = arg.isVertical() ? x : y;
         if (lv == null) {
-            list.add(new Frame(arg, m, l));
+            cubes.add(new Frame(arg, m, l));
         } else {
             lv.expand(m);
         }
     }
 
-    private boolean isPixelTransparent(Sprite arg, int i, int j, int k, int l, int m) {
-        if (j < 0 || k < 0 || j >= l || k >= m) {
+    private boolean isPixelTransparent(Sprite sprite, int frame, int x, int y, int l, int m) {
+        if (x < 0 || y < 0 || x >= l || y >= m) {
             return true;
         }
-        return arg.isPixelTransparent(i, j, k);
+        return sprite.isPixelTransparent(frame, x, y);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -201,18 +201,18 @@ public class ItemModelGenerator {
         private int max;
         private final int level;
 
-        public Frame(Side arg, int i, int j) {
+        public Frame(Side arg, int width, int depth) {
             this.side = arg;
-            this.min = i;
-            this.max = i;
-            this.level = j;
+            this.min = width;
+            this.max = width;
+            this.level = depth;
         }
 
-        public void expand(int i) {
-            if (i < this.min) {
-                this.min = i;
-            } else if (i > this.max) {
-                this.max = i;
+        public void expand(int newValue) {
+            if (newValue < this.min) {
+                this.min = newValue;
+            } else if (newValue > this.max) {
+                this.max = newValue;
             }
         }
 
@@ -244,10 +244,10 @@ public class ItemModelGenerator {
         private final int offsetX;
         private final int offsetY;
 
-        private Side(Direction arg, int j, int k) {
-            this.direction = arg;
-            this.offsetX = j;
-            this.offsetY = k;
+        private Side(Direction direction, int offsetX, int offsetY) {
+            this.direction = direction;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
         }
 
         public Direction getDirection() {

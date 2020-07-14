@@ -201,9 +201,9 @@ implements AudioStream {
     }
 
     @Override
-    public ByteBuffer getBuffer(int i) throws IOException {
-        ChannelList lv = new ChannelList(i + 8192);
-        while (this.readOggFile(lv) && lv.currentBufferSize < i) {
+    public ByteBuffer getBuffer(int size) throws IOException {
+        ChannelList lv = new ChannelList(size + 8192);
+        while (this.readOggFile(lv) && lv.currentBufferSize < size) {
         }
         return lv.getBuffer();
     }
@@ -222,8 +222,8 @@ implements AudioStream {
         private int currentBufferSize;
         private ByteBuffer buffer;
 
-        public ChannelList(int i) {
-            this.size = i + 1 & 0xFFFFFFFE;
+        public ChannelList(int size) {
+            this.size = size + 1 & 0xFFFFFFFE;
             this.init();
         }
 

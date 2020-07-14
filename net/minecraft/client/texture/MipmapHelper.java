@@ -20,19 +20,19 @@ public class MipmapHelper {
         }
     });
 
-    public static NativeImage[] getMipmapLevelsImages(NativeImage arg, int i) {
-        NativeImage[] lvs = new NativeImage[i + 1];
-        lvs[0] = arg;
-        if (i > 0) {
+    public static NativeImage[] getMipmapLevelsImages(NativeImage image, int mipmap) {
+        NativeImage[] lvs = new NativeImage[mipmap + 1];
+        lvs[0] = image;
+        if (mipmap > 0) {
             boolean bl = false;
-            block0: for (int j = 0; j < arg.getWidth(); ++j) {
-                for (int k = 0; k < arg.getHeight(); ++k) {
-                    if (arg.getPixelColor(j, k) >> 24 != 0) continue;
+            block0: for (int j = 0; j < image.getWidth(); ++j) {
+                for (int k = 0; k < image.getHeight(); ++k) {
+                    if (image.getPixelColor(j, k) >> 24 != 0) continue;
                     bl = true;
                     break block0;
                 }
             }
-            for (int l = 1; l <= i; ++l) {
+            for (int l = 1; l <= mipmap; ++l) {
                 NativeImage lv = lvs[l - 1];
                 NativeImage lv2 = new NativeImage(lv.getWidth() >> 1, lv.getHeight() >> 1, false);
                 int m = lv2.getWidth();
@@ -48,35 +48,35 @@ public class MipmapHelper {
         return lvs;
     }
 
-    private static int blend(int i, int j, int k, int l, boolean bl) {
-        if (bl) {
+    private static int blend(int one, int two, int three, int four, boolean checkAlpha) {
+        if (checkAlpha) {
             float f = 0.0f;
             float g = 0.0f;
             float h = 0.0f;
             float m = 0.0f;
-            if (i >> 24 != 0) {
-                f += MipmapHelper.getColorFraction(i >> 24);
-                g += MipmapHelper.getColorFraction(i >> 16);
-                h += MipmapHelper.getColorFraction(i >> 8);
-                m += MipmapHelper.getColorFraction(i >> 0);
+            if (one >> 24 != 0) {
+                f += MipmapHelper.getColorFraction(one >> 24);
+                g += MipmapHelper.getColorFraction(one >> 16);
+                h += MipmapHelper.getColorFraction(one >> 8);
+                m += MipmapHelper.getColorFraction(one >> 0);
             }
-            if (j >> 24 != 0) {
-                f += MipmapHelper.getColorFraction(j >> 24);
-                g += MipmapHelper.getColorFraction(j >> 16);
-                h += MipmapHelper.getColorFraction(j >> 8);
-                m += MipmapHelper.getColorFraction(j >> 0);
+            if (two >> 24 != 0) {
+                f += MipmapHelper.getColorFraction(two >> 24);
+                g += MipmapHelper.getColorFraction(two >> 16);
+                h += MipmapHelper.getColorFraction(two >> 8);
+                m += MipmapHelper.getColorFraction(two >> 0);
             }
-            if (k >> 24 != 0) {
-                f += MipmapHelper.getColorFraction(k >> 24);
-                g += MipmapHelper.getColorFraction(k >> 16);
-                h += MipmapHelper.getColorFraction(k >> 8);
-                m += MipmapHelper.getColorFraction(k >> 0);
+            if (three >> 24 != 0) {
+                f += MipmapHelper.getColorFraction(three >> 24);
+                g += MipmapHelper.getColorFraction(three >> 16);
+                h += MipmapHelper.getColorFraction(three >> 8);
+                m += MipmapHelper.getColorFraction(three >> 0);
             }
-            if (l >> 24 != 0) {
-                f += MipmapHelper.getColorFraction(l >> 24);
-                g += MipmapHelper.getColorFraction(l >> 16);
-                h += MipmapHelper.getColorFraction(l >> 8);
-                m += MipmapHelper.getColorFraction(l >> 0);
+            if (four >> 24 != 0) {
+                f += MipmapHelper.getColorFraction(four >> 24);
+                g += MipmapHelper.getColorFraction(four >> 16);
+                h += MipmapHelper.getColorFraction(four >> 8);
+                m += MipmapHelper.getColorFraction(four >> 0);
             }
             int n = (int)(Math.pow(f /= 4.0f, 0.45454545454545453) * 255.0);
             int o = (int)(Math.pow(g /= 4.0f, 0.45454545454545453) * 255.0);
@@ -87,24 +87,24 @@ public class MipmapHelper {
             }
             return n << 24 | o << 16 | p << 8 | q;
         }
-        int r = MipmapHelper.getColorComponent(i, j, k, l, 24);
-        int s = MipmapHelper.getColorComponent(i, j, k, l, 16);
-        int t = MipmapHelper.getColorComponent(i, j, k, l, 8);
-        int u = MipmapHelper.getColorComponent(i, j, k, l, 0);
+        int r = MipmapHelper.getColorComponent(one, two, three, four, 24);
+        int s = MipmapHelper.getColorComponent(one, two, three, four, 16);
+        int t = MipmapHelper.getColorComponent(one, two, three, four, 8);
+        int u = MipmapHelper.getColorComponent(one, two, three, four, 0);
         return r << 24 | s << 16 | t << 8 | u;
     }
 
-    private static int getColorComponent(int i, int j, int k, int l, int m) {
-        float f = MipmapHelper.getColorFraction(i >> m);
-        float g = MipmapHelper.getColorFraction(j >> m);
-        float h = MipmapHelper.getColorFraction(k >> m);
-        float n = MipmapHelper.getColorFraction(l >> m);
+    private static int getColorComponent(int one, int two, int three, int four, int bits) {
+        float f = MipmapHelper.getColorFraction(one >> bits);
+        float g = MipmapHelper.getColorFraction(two >> bits);
+        float h = MipmapHelper.getColorFraction(three >> bits);
+        float n = MipmapHelper.getColorFraction(four >> bits);
         float o = (float)((double)((float)Math.pow((double)(f + g + h + n) * 0.25, 0.45454545454545453)));
         return (int)((double)o * 255.0);
     }
 
-    private static float getColorFraction(int i) {
-        return COLOR_FRACTIONS[i & 0xFF];
+    private static float getColorFraction(int value) {
+        return COLOR_FRACTIONS[value & 0xFF];
     }
 }
 

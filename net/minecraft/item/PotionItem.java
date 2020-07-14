@@ -47,76 +47,76 @@ extends Item {
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack arg, World arg2, LivingEntity arg3) {
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         PlayerEntity lv;
-        PlayerEntity playerEntity = lv = arg3 instanceof PlayerEntity ? (PlayerEntity)arg3 : null;
+        PlayerEntity playerEntity = lv = user instanceof PlayerEntity ? (PlayerEntity)user : null;
         if (lv instanceof ServerPlayerEntity) {
-            Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity)lv, arg);
+            Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity)lv, stack);
         }
-        if (!arg2.isClient) {
-            List<StatusEffectInstance> list = PotionUtil.getPotionEffects(arg);
+        if (!world.isClient) {
+            List<StatusEffectInstance> list = PotionUtil.getPotionEffects(stack);
             for (StatusEffectInstance lv2 : list) {
                 if (lv2.getEffectType().isInstant()) {
-                    lv2.getEffectType().applyInstantEffect(lv, lv, arg3, lv2.getAmplifier(), 1.0);
+                    lv2.getEffectType().applyInstantEffect(lv, lv, user, lv2.getAmplifier(), 1.0);
                     continue;
                 }
-                arg3.addStatusEffect(new StatusEffectInstance(lv2));
+                user.addStatusEffect(new StatusEffectInstance(lv2));
             }
         }
         if (lv != null) {
             lv.incrementStat(Stats.USED.getOrCreateStat(this));
             if (!lv.abilities.creativeMode) {
-                arg.decrement(1);
+                stack.decrement(1);
             }
         }
         if (lv == null || !lv.abilities.creativeMode) {
-            if (arg.isEmpty()) {
+            if (stack.isEmpty()) {
                 return new ItemStack(Items.GLASS_BOTTLE);
             }
             if (lv != null) {
                 lv.inventory.insertStack(new ItemStack(Items.GLASS_BOTTLE));
             }
         }
-        return arg;
+        return stack;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack arg) {
+    public int getMaxUseTime(ItemStack stack) {
         return 32;
     }
 
     @Override
-    public UseAction getUseAction(ItemStack arg) {
+    public UseAction getUseAction(ItemStack stack) {
         return UseAction.DRINK;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        return ItemUsage.consumeHeldItem(arg, arg2, arg3);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        return ItemUsage.consumeHeldItem(world, user, hand);
     }
 
     @Override
-    public String getTranslationKey(ItemStack arg) {
-        return PotionUtil.getPotion(arg).finishTranslationKey(this.getTranslationKey() + ".effect.");
+    public String getTranslationKey(ItemStack stack) {
+        return PotionUtil.getPotion(stack).finishTranslationKey(this.getTranslationKey() + ".effect.");
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        PotionUtil.buildTooltip(arg, list, 1.0f);
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        PotionUtil.buildTooltip(stack, tooltip, 1.0f);
     }
 
     @Override
-    public boolean hasGlint(ItemStack arg) {
-        return super.hasGlint(arg) || !PotionUtil.getPotionEffects(arg).isEmpty();
+    public boolean hasGlint(ItemStack stack) {
+        return super.hasGlint(stack) || !PotionUtil.getPotionEffects(stack).isEmpty();
     }
 
     @Override
-    public void appendStacks(ItemGroup arg, DefaultedList<ItemStack> arg2) {
-        if (this.isIn(arg)) {
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        if (this.isIn(group)) {
             for (Potion lv : Registry.POTION) {
                 if (lv == Potions.EMPTY) continue;
-                arg2.add(PotionUtil.setPotion(new ItemStack(this), lv));
+                stacks.add(PotionUtil.setPotion(new ItemStack(this), lv));
             }
         }
     }

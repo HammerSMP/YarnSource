@@ -88,10 +88,10 @@ extends RealmsScreen {
     private long bytesPersSecond;
     private final Runnable field_22728;
 
-    public RealmsUploadScreen(long l, int i, RealmsResetWorldScreen arg, LevelSummary arg2, Runnable runnable) {
-        this.worldId = l;
-        this.slotId = i;
-        this.parent = arg;
+    public RealmsUploadScreen(long worldId, int slotId, RealmsResetWorldScreen parent, LevelSummary arg2, Runnable runnable) {
+        this.worldId = worldId;
+        this.slotId = slotId;
+        this.parent = parent;
         this.selectedLevel = arg2;
         this.uploadStatus = new UploadStatus();
         this.narrationRateLimiter = RateLimiter.create((double)0.1f);
@@ -133,8 +133,8 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             if (this.showDots) {
                 this.onCancel();
             } else {
@@ -142,30 +142,30 @@ extends RealmsScreen {
             }
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         if (!this.uploadFinished && this.uploadStatus.bytesWritten != 0L && this.uploadStatus.bytesWritten.longValue() == this.uploadStatus.totalBytes.longValue()) {
             this.status = new TranslatableText("mco.upload.verifying");
             this.cancelButton.active = false;
         }
-        this.drawCenteredText(arg, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
         if (this.showDots) {
-            this.drawDots(arg);
+            this.drawDots(matrices);
         }
         if (this.uploadStatus.bytesWritten != 0L && !this.cancelled) {
-            this.drawProgressBar(arg);
-            this.drawUploadSpeed(arg);
+            this.drawProgressBar(matrices);
+            this.drawUploadSpeed(matrices);
         }
         if (this.field_20503 != null) {
             for (int k = 0; k < this.field_20503.length; ++k) {
-                this.drawCenteredText(arg, this.textRenderer, this.field_20503[k], this.width / 2, 110 + 12 * k, 0xFF0000);
+                this.drawCenteredText(matrices, this.textRenderer, this.field_20503[k], this.width / 2, 110 + 12 * k, 0xFF0000);
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     private void drawDots(MatrixStack arg) {
@@ -362,42 +362,42 @@ extends RealmsScreen {
         LOGGER.debug("Upload was cancelled");
     }
 
-    private boolean verify(File file) {
-        return file.length() < 0x140000000L;
+    private boolean verify(File archive) {
+        return archive.length() < 0x140000000L;
     }
 
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    private File tarGzipArchive(File file) throws IOException {
+    private File tarGzipArchive(File pathToDirectoryFile) throws IOException {
         try (TarArchiveOutputStream tarArchiveOutputStream = null;){
             File file2 = File.createTempFile("realms-upload-file", ".tar.gz");
             tarArchiveOutputStream = new TarArchiveOutputStream((OutputStream)new GZIPOutputStream(new FileOutputStream(file2)));
             tarArchiveOutputStream.setLongFileMode(3);
-            this.addFileToTarGz(tarArchiveOutputStream, file.getAbsolutePath(), "world", true);
+            this.addFileToTarGz(tarArchiveOutputStream, pathToDirectoryFile.getAbsolutePath(), "world", true);
             tarArchiveOutputStream.finish();
-            File file3 = file2;
-            return file3;
+            File file = file2;
+            return file;
         }
     }
 
-    private void addFileToTarGz(TarArchiveOutputStream tarArchiveOutputStream, String string, String string2, boolean bl) throws IOException {
+    private void addFileToTarGz(TarArchiveOutputStream tOut, String path, String base, boolean root) throws IOException {
         if (this.cancelled) {
             return;
         }
-        File file = new File(string);
-        String string3 = bl ? string2 : string2 + file.getName();
+        File file = new File(path);
+        String string3 = root ? base : base + file.getName();
         TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(file, string3);
-        tarArchiveOutputStream.putArchiveEntry((ArchiveEntry)tarArchiveEntry);
+        tOut.putArchiveEntry((ArchiveEntry)tarArchiveEntry);
         if (file.isFile()) {
-            IOUtils.copy((InputStream)new FileInputStream(file), (OutputStream)tarArchiveOutputStream);
-            tarArchiveOutputStream.closeArchiveEntry();
+            IOUtils.copy((InputStream)new FileInputStream(file), (OutputStream)tOut);
+            tOut.closeArchiveEntry();
         } else {
-            tarArchiveOutputStream.closeArchiveEntry();
+            tOut.closeArchiveEntry();
             File[] files = file.listFiles();
             if (files != null) {
                 for (File file2 : files) {
-                    this.addFileToTarGz(tarArchiveOutputStream, file2.getAbsolutePath(), string3 + "/", false);
+                    this.addFileToTarGz(tOut, file2.getAbsolutePath(), string3 + "/", false);
                 }
             }
         }

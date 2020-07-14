@@ -40,66 +40,66 @@ extends Block {
     protected static final VoxelShape SHAPE = Block.createCuboidShape(5.0, 0.0, 5.0, 11.0, 6.0, 11.0);
     private final Block content;
 
-    public FlowerPotBlock(Block arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.content = arg;
-        CONTENT_TO_POTTED.put(arg, this);
+    public FlowerPotBlock(Block content, AbstractBlock.Settings settings) {
+        super(settings);
+        this.content = content;
+        CONTENT_TO_POTTED.put(content, this);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         boolean bl2;
-        ItemStack lv = arg4.getStackInHand(arg5);
+        ItemStack lv = player.getStackInHand(hand);
         Item lv2 = lv.getItem();
         Block lv3 = lv2 instanceof BlockItem ? CONTENT_TO_POTTED.getOrDefault(((BlockItem)lv2).getBlock(), Blocks.AIR) : Blocks.AIR;
         boolean bl = lv3 == Blocks.AIR;
         boolean bl3 = bl2 = this.content == Blocks.AIR;
         if (bl != bl2) {
             if (bl2) {
-                arg2.setBlockState(arg3, lv3.getDefaultState(), 3);
-                arg4.incrementStat(Stats.POT_FLOWER);
-                if (!arg4.abilities.creativeMode) {
+                world.setBlockState(pos, lv3.getDefaultState(), 3);
+                player.incrementStat(Stats.POT_FLOWER);
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                 }
             } else {
                 ItemStack lv4 = new ItemStack(this.content);
                 if (lv.isEmpty()) {
-                    arg4.setStackInHand(arg5, lv4);
-                } else if (!arg4.giveItemStack(lv4)) {
-                    arg4.dropItem(lv4, false);
+                    player.setStackInHand(hand, lv4);
+                } else if (!player.giveItemStack(lv4)) {
+                    player.dropItem(lv4, false);
                 }
-                arg2.setBlockState(arg3, Blocks.FLOWER_POT.getDefaultState(), 3);
+                world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState(), 3);
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
         return ActionResult.CONSUME;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         if (this.content == Blocks.AIR) {
-            return super.getPickStack(arg, arg2, arg3);
+            return super.getPickStack(world, pos, state);
         }
         return new ItemStack(this.content);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2 == Direction.DOWN && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction == Direction.DOWN && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     public Block getContent() {
@@ -107,7 +107,7 @@ extends Block {
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

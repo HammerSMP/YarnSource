@@ -22,8 +22,8 @@ import net.minecraft.util.math.BlockPos;
 @Environment(value=EnvType.CLIENT)
 public class BubbleColumnUpParticle
 extends SpriteBillboardParticle {
-    private BubbleColumnUpParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i) {
-        super(arg, d, e, f);
+    private BubbleColumnUpParticle(ClientWorld world, double x, double y, double z, double g, double h, double i) {
+        super(world, x, y, z);
         this.setBoundingBoxSpacing(0.02f, 0.02f);
         this.scale *= this.random.nextFloat() * 0.6f + 0.2f;
         this.velocityX = g * (double)0.2f + (Math.random() * 2.0 - 1.0) * (double)0.02f;
@@ -61,8 +61,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

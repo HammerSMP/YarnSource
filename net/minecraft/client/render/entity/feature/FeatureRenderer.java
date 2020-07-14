@@ -24,30 +24,30 @@ import net.minecraft.util.Identifier;
 public abstract class FeatureRenderer<T extends Entity, M extends EntityModel<T>> {
     private final FeatureRendererContext<T, M> context;
 
-    public FeatureRenderer(FeatureRendererContext<T, M> arg) {
-        this.context = arg;
+    public FeatureRenderer(FeatureRendererContext<T, M> context) {
+        this.context = context;
     }
 
-    protected static <T extends LivingEntity> void render(EntityModel<T> arg, EntityModel<T> arg2, Identifier arg3, MatrixStack arg4, VertexConsumerProvider arg5, int i, T arg6, float f, float g, float h, float j, float k, float l, float m, float n, float o) {
-        if (!arg6.isInvisible()) {
-            arg.copyStateTo(arg2);
-            arg2.animateModel(arg6, f, g, l);
-            arg2.setAngles(arg6, f, g, h, j, k);
-            FeatureRenderer.renderModel(arg2, arg3, arg4, arg5, i, arg6, m, n, o);
+    protected static <T extends LivingEntity> void render(EntityModel<T> contextModel, EntityModel<T> model, Identifier texture, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float limbAngle, float limbDistance, float age, float headYaw, float headPitch, float tickDelta, float red, float green, float blue) {
+        if (!entity.isInvisible()) {
+            contextModel.copyStateTo(model);
+            model.animateModel(entity, limbAngle, limbDistance, tickDelta);
+            model.setAngles(entity, limbAngle, limbDistance, age, headYaw, headPitch);
+            FeatureRenderer.renderModel(model, texture, matrices, vertexConsumers, light, entity, red, green, blue);
         }
     }
 
-    protected static <T extends LivingEntity> void renderModel(EntityModel<T> arg, Identifier arg2, MatrixStack arg3, VertexConsumerProvider arg4, int i, T arg5, float f, float g, float h) {
-        VertexConsumer lv = arg4.getBuffer(RenderLayer.getEntityCutoutNoCull(arg2));
-        arg.render(arg3, lv, i, LivingEntityRenderer.getOverlay(arg5, 0.0f), f, g, h, 1.0f);
+    protected static <T extends LivingEntity> void renderModel(EntityModel<T> model, Identifier texture, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float red, float green, float blue) {
+        VertexConsumer lv = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(texture));
+        model.render(matrices, lv, light, LivingEntityRenderer.getOverlay(entity, 0.0f), red, green, blue, 1.0f);
     }
 
     public M getContextModel() {
         return this.context.getModel();
     }
 
-    protected Identifier getTexture(T arg) {
-        return this.context.getTexture(arg);
+    protected Identifier getTexture(T entity) {
+        return this.context.getTexture(entity);
     }
 
     public abstract void render(MatrixStack var1, VertexConsumerProvider var2, int var3, T var4, float var5, float var6, float var7, float var8, float var9, float var10);

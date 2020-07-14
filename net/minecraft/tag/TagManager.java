@@ -29,42 +29,42 @@ public interface TagManager {
         Blocks.refreshShapeCache();
     }
 
-    default public void toPacket(PacketByteBuf arg) {
-        this.getBlocks().toPacket(arg, Registry.BLOCK);
-        this.getItems().toPacket(arg, Registry.ITEM);
-        this.getFluids().toPacket(arg, Registry.FLUID);
-        this.getEntityTypes().toPacket(arg, Registry.ENTITY_TYPE);
+    default public void toPacket(PacketByteBuf buf) {
+        this.getBlocks().toPacket(buf, Registry.BLOCK);
+        this.getItems().toPacket(buf, Registry.ITEM);
+        this.getFluids().toPacket(buf, Registry.FLUID);
+        this.getEntityTypes().toPacket(buf, Registry.ENTITY_TYPE);
     }
 
-    public static TagManager fromPacket(PacketByteBuf arg) {
-        TagGroup<Block> lv = TagGroup.fromPacket(arg, Registry.BLOCK);
-        TagGroup<Item> lv2 = TagGroup.fromPacket(arg, Registry.ITEM);
-        TagGroup<Fluid> lv3 = TagGroup.fromPacket(arg, Registry.FLUID);
-        TagGroup<EntityType<?>> lv4 = TagGroup.fromPacket(arg, Registry.ENTITY_TYPE);
+    public static TagManager fromPacket(PacketByteBuf buf) {
+        TagGroup<Block> lv = TagGroup.fromPacket(buf, Registry.BLOCK);
+        TagGroup<Item> lv2 = TagGroup.fromPacket(buf, Registry.ITEM);
+        TagGroup<Fluid> lv3 = TagGroup.fromPacket(buf, Registry.FLUID);
+        TagGroup<EntityType<?>> lv4 = TagGroup.fromPacket(buf, Registry.ENTITY_TYPE);
         return TagManager.create(lv, lv2, lv3, lv4);
     }
 
-    public static TagManager create(final TagGroup<Block> arg, final TagGroup<Item> arg2, final TagGroup<Fluid> arg3, final TagGroup<EntityType<?>> arg4) {
+    public static TagManager create(final TagGroup<Block> blocks, final TagGroup<Item> items, final TagGroup<Fluid> fluids, final TagGroup<EntityType<?>> entityTypes) {
         return new TagManager(){
 
             @Override
             public TagGroup<Block> getBlocks() {
-                return arg;
+                return blocks;
             }
 
             @Override
             public TagGroup<Item> getItems() {
-                return arg2;
+                return items;
             }
 
             @Override
             public TagGroup<Fluid> getFluids() {
-                return arg3;
+                return fluids;
             }
 
             @Override
             public TagGroup<EntityType<?>> getEntityTypes() {
-                return arg4;
+                return entityTypes;
             }
         };
     }

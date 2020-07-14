@@ -22,10 +22,10 @@ public class BlockStateVariant
 implements Supplier<JsonElement> {
     private final Map<VariantSetting<?>, VariantSetting.Value> properties = Maps.newLinkedHashMap();
 
-    public <T> BlockStateVariant put(VariantSetting<T> arg, T object) {
-        VariantSetting.Value lv = this.properties.put(arg, arg.evaluate(object));
+    public <T> BlockStateVariant put(VariantSetting<T> key, T value) {
+        VariantSetting.Value lv = this.properties.put(key, key.evaluate(value));
         if (lv != null) {
-            throw new IllegalStateException("Replacing value of " + lv + " with " + object);
+            throw new IllegalStateException("Replacing value of " + lv + " with " + value);
         }
         return this;
     }
@@ -34,10 +34,10 @@ implements Supplier<JsonElement> {
         return new BlockStateVariant();
     }
 
-    public static BlockStateVariant union(BlockStateVariant arg, BlockStateVariant arg2) {
+    public static BlockStateVariant union(BlockStateVariant first, BlockStateVariant second) {
         BlockStateVariant lv = new BlockStateVariant();
-        lv.properties.putAll(arg.properties);
-        lv.properties.putAll(arg2.properties);
+        lv.properties.putAll(first.properties);
+        lv.properties.putAll(second.properties);
         return lv;
     }
 
@@ -48,12 +48,12 @@ implements Supplier<JsonElement> {
         return jsonObject;
     }
 
-    public static JsonElement toJson(List<BlockStateVariant> list) {
-        if (list.size() == 1) {
-            return list.get(0).get();
+    public static JsonElement toJson(List<BlockStateVariant> variants) {
+        if (variants.size() == 1) {
+            return variants.get(0).get();
         }
         JsonArray jsonArray = new JsonArray();
-        list.forEach(arg -> jsonArray.add(arg.get()));
+        variants.forEach(arg -> jsonArray.add(arg.get()));
         return jsonArray;
     }
 

@@ -22,10 +22,10 @@ extends Task<E> {
     private final int timeLimit;
     private final int cooldown;
 
-    public AdmireItemTimeLimitTask(int i, int j) {
+    public AdmireItemTimeLimitTask(int timeLimit, int cooldown) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.ADMIRING_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.timeLimit = i;
-        this.cooldown = j;
+        this.timeLimit = timeLimit;
+        this.cooldown = cooldown;
     }
 
     @Override

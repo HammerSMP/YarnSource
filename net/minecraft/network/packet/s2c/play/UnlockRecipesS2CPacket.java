@@ -45,35 +45,35 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.action = arg.readEnumConstant(Action.class);
-        this.field_25797 = RecipeBookOptions.fromPacket(arg);
-        int i = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.action = buf.readEnumConstant(Action.class);
+        this.field_25797 = RecipeBookOptions.fromPacket(buf);
+        int i = buf.readVarInt();
         this.recipeIdsToChange = Lists.newArrayList();
         for (int j = 0; j < i; ++j) {
-            this.recipeIdsToChange.add(arg.readIdentifier());
+            this.recipeIdsToChange.add(buf.readIdentifier());
         }
         if (this.action == Action.INIT) {
-            i = arg.readVarInt();
+            i = buf.readVarInt();
             this.recipeIdsToInit = Lists.newArrayList();
             for (int k = 0; k < i; ++k) {
-                this.recipeIdsToInit.add(arg.readIdentifier());
+                this.recipeIdsToInit.add(buf.readIdentifier());
             }
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.action);
-        this.field_25797.toPacket(arg);
-        arg.writeVarInt(this.recipeIdsToChange.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.action);
+        this.field_25797.toPacket(buf);
+        buf.writeVarInt(this.recipeIdsToChange.size());
         for (Identifier lv : this.recipeIdsToChange) {
-            arg.writeIdentifier(lv);
+            buf.writeIdentifier(lv);
         }
         if (this.action == Action.INIT) {
-            arg.writeVarInt(this.recipeIdsToInit.size());
+            buf.writeVarInt(this.recipeIdsToInit.size());
             for (Identifier lv2 : this.recipeIdsToInit) {
-                arg.writeIdentifier(lv2);
+                buf.writeIdentifier(lv2);
             }
         }
     }

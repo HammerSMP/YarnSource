@@ -17,12 +17,12 @@ import net.minecraft.client.realms.RealmsSerializable;
 public class CheckedGson {
     private final Gson GSON = new Gson();
 
-    public String toJson(RealmsSerializable arg) {
-        return this.GSON.toJson((Object)arg);
+    public String toJson(RealmsSerializable serializable) {
+        return this.GSON.toJson((Object)serializable);
     }
 
-    public <T extends RealmsSerializable> T fromJson(String string, Class<T> class_) {
-        return (T)((RealmsSerializable)this.GSON.fromJson(string, class_));
+    public <T extends RealmsSerializable> T fromJson(String json, Class<T> type) {
+        return (T)((RealmsSerializable)this.GSON.fromJson(json, type));
     }
 }
 

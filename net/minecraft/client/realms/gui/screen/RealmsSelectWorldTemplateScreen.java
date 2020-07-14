@@ -74,25 +74,25 @@ extends RealmsScreen {
     private boolean hoverWarning;
     private List<TextRenderingUtils.Line> noTemplatesMessage;
 
-    public RealmsSelectWorldTemplateScreen(RealmsScreenWithCallback arg, RealmsServer.WorldType arg2) {
-        this(arg, arg2, null);
+    public RealmsSelectWorldTemplateScreen(RealmsScreenWithCallback parent, RealmsServer.WorldType worldType) {
+        this(parent, worldType, null);
     }
 
-    public RealmsSelectWorldTemplateScreen(RealmsScreenWithCallback arg, RealmsServer.WorldType arg2, @Nullable WorldTemplatePaginatedList arg3) {
-        this.parent = arg;
-        this.worldType = arg2;
-        if (arg3 == null) {
+    public RealmsSelectWorldTemplateScreen(RealmsScreenWithCallback parent, RealmsServer.WorldType worldType, @Nullable WorldTemplatePaginatedList list) {
+        this.parent = parent;
+        this.worldType = worldType;
+        if (list == null) {
             this.templateList = new WorldTemplateObjectSelectionList();
             this.setPagination(new WorldTemplatePaginatedList(10));
         } else {
-            this.templateList = new WorldTemplateObjectSelectionList(Lists.newArrayList(arg3.templates));
-            this.setPagination(arg3);
+            this.templateList = new WorldTemplateObjectSelectionList(Lists.newArrayList(list.templates));
+            this.setPagination(list);
         }
         this.title = new TranslatableText("mco.template.title");
     }
 
-    public void setTitle(Text arg) {
-        this.title = arg;
+    public void setTitle(Text title) {
+        this.title = title;
     }
 
     public void setWarning(Text ... args) {
@@ -101,12 +101,12 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.hoverWarning && this.warningURL != null) {
             Util.getOperatingSystem().open("https://beta.minecraft.net/realms/adventure-maps-in-1-9");
             return true;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -163,12 +163,12 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.backButtonClicked();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void backButtonClicked() {
@@ -250,25 +250,25 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.toolTip = null;
         this.currentLink = null;
         this.hoverWarning = false;
-        this.renderBackground(arg);
-        this.templateList.render(arg, i, j, f);
+        this.renderBackground(matrices);
+        this.templateList.render(matrices, mouseX, mouseY, delta);
         if (this.noTemplatesMessage != null) {
-            this.method_21414(arg, i, j, this.noTemplatesMessage);
+            this.method_21414(matrices, mouseX, mouseY, this.noTemplatesMessage);
         }
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 13, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 13, 0xFFFFFF);
         if (this.displayWarning) {
             Text[] lvs = this.warning;
             for (int k = 0; k < lvs.length; ++k) {
                 int l = this.textRenderer.getWidth(lvs[k]);
                 int m = this.width / 2 - l / 2;
                 int n = RealmsSelectWorldTemplateScreen.row(-1 + k);
-                if (i < m || i > m + l || j < n) continue;
+                if (mouseX < m || mouseX > m + l || mouseY < n) continue;
                 this.textRenderer.getClass();
-                if (j > n + 9) continue;
+                if (mouseY > n + 9) continue;
                 this.hoverWarning = true;
             }
             for (int o = 0; o < lvs.length; ++o) {
@@ -282,12 +282,12 @@ extends RealmsScreen {
                         p = 0x3366BB;
                     }
                 }
-                this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, RealmsSelectWorldTemplateScreen.row(-1 + o), p);
+                this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, RealmsSelectWorldTemplateScreen.row(-1 + o), p);
             }
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
         if (this.toolTip != null) {
-            this.renderMousehoverTooltip(arg, this.toolTip, i, j);
+            this.renderMousehoverTooltip(matrices, this.toolTip, mouseX, mouseY);
         }
     }
 
@@ -325,13 +325,13 @@ extends RealmsScreen {
     extends AlwaysSelectedEntryListWidget.Entry<WorldTemplateObjectSelectionListEntry> {
         private final WorldTemplate mTemplate;
 
-        public WorldTemplateObjectSelectionListEntry(WorldTemplate arg2) {
-            this.mTemplate = arg2;
+        public WorldTemplateObjectSelectionListEntry(WorldTemplate template) {
+            this.mTemplate = template;
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.renderWorldTemplateItem(arg, this.mTemplate, k, j, n, o);
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.renderWorldTemplateItem(matrices, this.mTemplate, x, y, mouseX, mouseY);
         }
 
         private void renderWorldTemplateItem(MatrixStack arg, WorldTemplate arg2, int i, int j, int k, int l) {
@@ -345,13 +345,13 @@ extends RealmsScreen {
             this.drawImage(arg, i, j + 1, k, l, arg2);
         }
 
-        private void drawImage(MatrixStack arg, int i, int j, int k, int l, WorldTemplate arg2) {
+        private void drawImage(MatrixStack arg, int y, int xm, int ym, int l, WorldTemplate arg2) {
             RealmsTextureManager.bindWorldTemplate(arg2.id, arg2.image);
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-            DrawableHelper.drawTexture(arg, i + 1, j + 1, 0.0f, 0.0f, 38, 38, 38, 38);
+            DrawableHelper.drawTexture(arg, y + 1, xm + 1, 0.0f, 0.0f, 38, 38, 38, 38);
             RealmsSelectWorldTemplateScreen.this.client.getTextureManager().bindTexture(SLOT_FRAME);
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-            DrawableHelper.drawTexture(arg, i, j, 0.0f, 0.0f, 40, 40, 40, 40);
+            DrawableHelper.drawTexture(arg, y, xm, 0.0f, 0.0f, 40, 40, 40, 40);
         }
 
         private void drawIcons(MatrixStack arg, int i, int j, int k, int l, String string, String string2, String string3) {
@@ -408,29 +408,29 @@ extends RealmsScreen {
             this(Collections.emptyList());
         }
 
-        public WorldTemplateObjectSelectionList(Iterable<WorldTemplate> iterable) {
+        public WorldTemplateObjectSelectionList(Iterable<WorldTemplate> templates) {
             super(RealmsSelectWorldTemplateScreen.this.width, RealmsSelectWorldTemplateScreen.this.height, RealmsSelectWorldTemplateScreen.this.displayWarning ? RealmsSelectWorldTemplateScreen.row(1) : 32, RealmsSelectWorldTemplateScreen.this.height - 40, 46);
-            iterable.forEach(this::addEntry);
+            templates.forEach(this::addEntry);
         }
 
-        public void addEntry(WorldTemplate arg) {
-            this.addEntry(new WorldTemplateObjectSelectionListEntry(arg));
+        public void addEntry(WorldTemplate template) {
+            this.addEntry(new WorldTemplateObjectSelectionListEntry(template));
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            if (i == 0 && e >= (double)this.top && e <= (double)this.bottom) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (button == 0 && mouseY >= (double)this.top && mouseY <= (double)this.bottom) {
                 int j = this.width / 2 - 150;
                 if (RealmsSelectWorldTemplateScreen.this.currentLink != null) {
                     Util.getOperatingSystem().open(RealmsSelectWorldTemplateScreen.this.currentLink);
                 }
-                int k = (int)Math.floor(e - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4;
+                int k = (int)Math.floor(mouseY - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4;
                 int l = k / this.itemHeight;
-                if (d >= (double)j && d < (double)this.getScrollbarPositionX() && l >= 0 && k >= 0 && l < this.getItemCount()) {
+                if (mouseX >= (double)j && mouseX < (double)this.getScrollbarPositionX() && l >= 0 && k >= 0 && l < this.getItemCount()) {
                     this.setSelected(l);
-                    this.itemClicked(k, l, d, e, this.width);
+                    this.itemClicked(k, l, mouseX, mouseY, this.width);
                     if (l >= RealmsSelectWorldTemplateScreen.this.templateList.getItemCount()) {
-                        return super.mouseClicked(d, e, i);
+                        return super.mouseClicked(mouseX, mouseY, button);
                     }
                     RealmsSelectWorldTemplateScreen.this.clicks = RealmsSelectWorldTemplateScreen.this.clicks + 7;
                     if (RealmsSelectWorldTemplateScreen.this.clicks >= 10) {
@@ -439,15 +439,15 @@ extends RealmsScreen {
                     return true;
                 }
             }
-            return super.mouseClicked(d, e, i);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
-        public void setSelected(int i) {
-            this.setSelectedItem(i);
-            if (i != -1) {
-                WorldTemplate lv = RealmsSelectWorldTemplateScreen.this.templateList.getItem(i);
-                String string = I18n.translate("narrator.select.list.position", i + 1, RealmsSelectWorldTemplateScreen.this.templateList.getItemCount());
+        public void setSelected(int index) {
+            this.setSelectedItem(index);
+            if (index != -1) {
+                WorldTemplate lv = RealmsSelectWorldTemplateScreen.this.templateList.getItem(index);
+                String string = I18n.translate("narrator.select.list.position", index + 1, RealmsSelectWorldTemplateScreen.this.templateList.getItemCount());
                 String string2 = I18n.translate("mco.template.select.narrate.version", lv.version);
                 String string3 = I18n.translate("mco.template.select.narrate.authors", lv.author);
                 String string4 = Realms.joinNarrations(Arrays.asList(lv.name, string3, lv.recommendedPlayers, string2, string));
@@ -473,8 +473,8 @@ extends RealmsScreen {
         }
 
         @Override
-        public void renderBackground(MatrixStack arg) {
-            RealmsSelectWorldTemplateScreen.this.renderBackground(arg);
+        public void renderBackground(MatrixStack matrices) {
+            RealmsSelectWorldTemplateScreen.this.renderBackground(matrices);
         }
 
         @Override
@@ -486,8 +486,8 @@ extends RealmsScreen {
             return this.getItemCount() == 0;
         }
 
-        public WorldTemplate getItem(int i) {
-            return ((WorldTemplateObjectSelectionListEntry)this.children().get(i)).mTemplate;
+        public WorldTemplate getItem(int index) {
+            return ((WorldTemplateObjectSelectionListEntry)this.children().get(index)).mTemplate;
         }
 
         public List<WorldTemplate> getValues() {

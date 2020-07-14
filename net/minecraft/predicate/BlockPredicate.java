@@ -38,22 +38,22 @@ public class BlockPredicate {
     private final StatePredicate state;
     private final NbtPredicate nbt;
 
-    public BlockPredicate(@Nullable Tag<Block> arg, @Nullable Block arg2, StatePredicate arg3, NbtPredicate arg4) {
-        this.tag = arg;
-        this.block = arg2;
-        this.state = arg3;
-        this.nbt = arg4;
+    public BlockPredicate(@Nullable Tag<Block> tag, @Nullable Block block, StatePredicate state, NbtPredicate nbt) {
+        this.tag = tag;
+        this.block = block;
+        this.state = state;
+        this.nbt = nbt;
     }
 
-    public boolean test(ServerWorld arg, BlockPos arg2) {
+    public boolean test(ServerWorld world, BlockPos pos) {
         BlockEntity lv3;
         if (this == ANY) {
             return true;
         }
-        if (!arg.canSetBlock(arg2)) {
+        if (!world.canSetBlock(pos)) {
             return false;
         }
-        BlockState lv = arg.getBlockState(arg2);
+        BlockState lv = world.getBlockState(pos);
         Block lv2 = lv.getBlock();
         if (this.tag != null && !this.tag.contains(lv2)) {
             return false;
@@ -64,14 +64,14 @@ public class BlockPredicate {
         if (!this.state.test(lv)) {
             return false;
         }
-        return this.nbt == NbtPredicate.ANY || (lv3 = arg.getBlockEntity(arg2)) != null && this.nbt.test(lv3.toTag(new CompoundTag()));
+        return this.nbt == NbtPredicate.ANY || (lv3 = world.getBlockEntity(pos)) != null && this.nbt.test(lv3.toTag(new CompoundTag()));
     }
 
-    public static BlockPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static BlockPredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "block");
+        JsonObject jsonObject = JsonHelper.asObject(json, "block");
         NbtPredicate lv = NbtPredicate.fromJson(jsonObject.get("nbt"));
         Block lv2 = null;
         if (jsonObject.has("block")) {
@@ -121,8 +121,8 @@ public class BlockPredicate {
             return new Builder();
         }
 
-        public Builder block(Block arg) {
-            this.block = arg;
+        public Builder block(Block block) {
+            this.block = block;
             return this;
         }
 
@@ -131,8 +131,8 @@ public class BlockPredicate {
             return this;
         }
 
-        public Builder state(StatePredicate arg) {
-            this.state = arg;
+        public Builder state(StatePredicate state) {
+            this.state = state;
             return this;
         }
 

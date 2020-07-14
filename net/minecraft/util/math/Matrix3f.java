@@ -36,11 +36,11 @@ public final class Matrix3f {
     public Matrix3f() {
     }
 
-    public Matrix3f(Quaternion arg) {
-        float f = arg.getX();
-        float g = arg.getY();
-        float h = arg.getZ();
-        float i = arg.getW();
+    public Matrix3f(Quaternion source) {
+        float f = source.getX();
+        float g = source.getY();
+        float h = source.getZ();
+        float i = source.getW();
         float j = 2.0f * f * f;
         float k = 2.0f * g * g;
         float l = 2.0f * h * h;
@@ -62,42 +62,42 @@ public final class Matrix3f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static Matrix3f scale(float f, float g, float h) {
+    public static Matrix3f scale(float x, float y, float z) {
         Matrix3f lv = new Matrix3f();
-        lv.a00 = f;
-        lv.a11 = g;
-        lv.a22 = h;
+        lv.a00 = x;
+        lv.a11 = y;
+        lv.a22 = z;
         return lv;
     }
 
-    public Matrix3f(Matrix4f arg) {
-        this.a00 = arg.a00;
-        this.a01 = arg.a01;
-        this.a02 = arg.a02;
-        this.a10 = arg.a10;
-        this.a11 = arg.a11;
-        this.a12 = arg.a12;
-        this.a20 = arg.a20;
-        this.a21 = arg.a21;
-        this.a22 = arg.a22;
+    public Matrix3f(Matrix4f source) {
+        this.a00 = source.a00;
+        this.a01 = source.a01;
+        this.a02 = source.a02;
+        this.a10 = source.a10;
+        this.a11 = source.a11;
+        this.a12 = source.a12;
+        this.a20 = source.a20;
+        this.a21 = source.a21;
+        this.a22 = source.a22;
     }
 
-    public Matrix3f(Matrix3f arg) {
-        this.a00 = arg.a00;
-        this.a01 = arg.a01;
-        this.a02 = arg.a02;
-        this.a10 = arg.a10;
-        this.a11 = arg.a11;
-        this.a12 = arg.a12;
-        this.a20 = arg.a20;
-        this.a21 = arg.a21;
-        this.a22 = arg.a22;
+    public Matrix3f(Matrix3f source) {
+        this.a00 = source.a00;
+        this.a01 = source.a01;
+        this.a02 = source.a02;
+        this.a10 = source.a10;
+        this.a11 = source.a11;
+        this.a12 = source.a12;
+        this.a20 = source.a20;
+        this.a21 = source.a21;
+        this.a22 = source.a22;
     }
 
     @Environment(value=EnvType.CLIENT)
-    private static Pair<Float, Float> getSinAndCosOfRotation(float f, float g, float h) {
-        float j = g;
-        float i = 2.0f * (f - h);
+    private static Pair<Float, Float> getSinAndCosOfRotation(float upperLeft, float diagonalAverage, float lowerRight) {
+        float j = diagonalAverage;
+        float i = 2.0f * (upperLeft - lowerRight);
         if (THREE_PLUS_TWO_SQRT_TWO * j * j < i * i) {
             float k = MathHelper.fastInverseSqrt(j * j + i * i);
             return Pair.of((Object)Float.valueOf(k * j), (Object)Float.valueOf(k * i));
@@ -295,16 +295,16 @@ public final class Matrix3f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void load(Matrix3f arg) {
-        this.a00 = arg.a00;
-        this.a01 = arg.a01;
-        this.a02 = arg.a02;
-        this.a10 = arg.a10;
-        this.a11 = arg.a11;
-        this.a12 = arg.a12;
-        this.a20 = arg.a20;
-        this.a21 = arg.a21;
-        this.a22 = arg.a22;
+    public void load(Matrix3f source) {
+        this.a00 = source.a00;
+        this.a01 = source.a01;
+        this.a02 = source.a02;
+        this.a10 = source.a10;
+        this.a11 = source.a11;
+        this.a12 = source.a12;
+        this.a20 = source.a20;
+        this.a21 = source.a21;
+        this.a22 = source.a22;
     }
 
     public String toString() {
@@ -378,42 +378,42 @@ public final class Matrix3f {
         return false;
     }
 
-    public void set(int i, int j, float f) {
-        if (i == 0) {
-            if (j == 0) {
-                this.a00 = f;
-            } else if (j == 1) {
-                this.a01 = f;
+    public void set(int x, int y, float value) {
+        if (x == 0) {
+            if (y == 0) {
+                this.a00 = value;
+            } else if (y == 1) {
+                this.a01 = value;
             } else {
-                this.a02 = f;
+                this.a02 = value;
             }
-        } else if (i == 1) {
-            if (j == 0) {
-                this.a10 = f;
-            } else if (j == 1) {
-                this.a11 = f;
+        } else if (x == 1) {
+            if (y == 0) {
+                this.a10 = value;
+            } else if (y == 1) {
+                this.a11 = value;
             } else {
-                this.a12 = f;
+                this.a12 = value;
             }
-        } else if (j == 0) {
-            this.a20 = f;
-        } else if (j == 1) {
-            this.a21 = f;
+        } else if (y == 0) {
+            this.a20 = value;
+        } else if (y == 1) {
+            this.a21 = value;
         } else {
-            this.a22 = f;
+            this.a22 = value;
         }
     }
 
-    public void multiply(Matrix3f arg) {
-        float f = this.a00 * arg.a00 + this.a01 * arg.a10 + this.a02 * arg.a20;
-        float g = this.a00 * arg.a01 + this.a01 * arg.a11 + this.a02 * arg.a21;
-        float h = this.a00 * arg.a02 + this.a01 * arg.a12 + this.a02 * arg.a22;
-        float i = this.a10 * arg.a00 + this.a11 * arg.a10 + this.a12 * arg.a20;
-        float j = this.a10 * arg.a01 + this.a11 * arg.a11 + this.a12 * arg.a21;
-        float k = this.a10 * arg.a02 + this.a11 * arg.a12 + this.a12 * arg.a22;
-        float l = this.a20 * arg.a00 + this.a21 * arg.a10 + this.a22 * arg.a20;
-        float m = this.a20 * arg.a01 + this.a21 * arg.a11 + this.a22 * arg.a21;
-        float n = this.a20 * arg.a02 + this.a21 * arg.a12 + this.a22 * arg.a22;
+    public void multiply(Matrix3f other) {
+        float f = this.a00 * other.a00 + this.a01 * other.a10 + this.a02 * other.a20;
+        float g = this.a00 * other.a01 + this.a01 * other.a11 + this.a02 * other.a21;
+        float h = this.a00 * other.a02 + this.a01 * other.a12 + this.a02 * other.a22;
+        float i = this.a10 * other.a00 + this.a11 * other.a10 + this.a12 * other.a20;
+        float j = this.a10 * other.a01 + this.a11 * other.a11 + this.a12 * other.a21;
+        float k = this.a10 * other.a02 + this.a11 * other.a12 + this.a12 * other.a22;
+        float l = this.a20 * other.a00 + this.a21 * other.a10 + this.a22 * other.a20;
+        float m = this.a20 * other.a01 + this.a21 * other.a11 + this.a22 * other.a21;
+        float n = this.a20 * other.a02 + this.a21 * other.a12 + this.a22 * other.a22;
         this.a00 = f;
         this.a01 = g;
         this.a02 = h;
@@ -431,16 +431,16 @@ public final class Matrix3f {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void multiply(float f) {
-        this.a00 *= f;
-        this.a01 *= f;
-        this.a02 *= f;
-        this.a10 *= f;
-        this.a11 *= f;
-        this.a12 *= f;
-        this.a20 *= f;
-        this.a21 *= f;
-        this.a22 *= f;
+    public void multiply(float scalar) {
+        this.a00 *= scalar;
+        this.a01 *= scalar;
+        this.a02 *= scalar;
+        this.a10 *= scalar;
+        this.a11 *= scalar;
+        this.a12 *= scalar;
+        this.a20 *= scalar;
+        this.a21 *= scalar;
+        this.a22 *= scalar;
     }
 
     @Environment(value=EnvType.CLIENT)

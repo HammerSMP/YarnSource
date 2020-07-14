@@ -44,9 +44,9 @@ extends JsonDataLoader {
     private AdvancementManager manager = new AdvancementManager();
     private final LootConditionManager conditionManager;
 
-    public ServerAdvancementLoader(LootConditionManager arg) {
+    public ServerAdvancementLoader(LootConditionManager conditionManager) {
         super(GSON, "advancements");
-        this.conditionManager = arg;
+        this.conditionManager = conditionManager;
     }
 
     @Override
@@ -72,8 +72,8 @@ extends JsonDataLoader {
     }
 
     @Nullable
-    public Advancement get(Identifier arg) {
-        return this.manager.get(arg);
+    public Advancement get(Identifier id) {
+        return this.manager.get(id);
     }
 
     public Collection<Advancement> getAdvancements() {

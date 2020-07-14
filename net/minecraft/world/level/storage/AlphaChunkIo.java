@@ -14,24 +14,24 @@ import net.minecraft.world.chunk.ChunkNibbleArray;
 import net.minecraft.world.level.storage.AlphaChunkDataArray;
 
 public class AlphaChunkIo {
-    public static AlphaChunk readAlphaChunk(CompoundTag arg) {
-        int i = arg.getInt("xPos");
-        int j = arg.getInt("zPos");
+    public static AlphaChunk readAlphaChunk(CompoundTag tag) {
+        int i = tag.getInt("xPos");
+        int j = tag.getInt("zPos");
         AlphaChunk lv = new AlphaChunk(i, j);
-        lv.blocks = arg.getByteArray("Blocks");
-        lv.data = new AlphaChunkDataArray(arg.getByteArray("Data"), 7);
-        lv.skyLight = new AlphaChunkDataArray(arg.getByteArray("SkyLight"), 7);
-        lv.blockLight = new AlphaChunkDataArray(arg.getByteArray("BlockLight"), 7);
-        lv.heightMap = arg.getByteArray("HeightMap");
-        lv.terrainPopulated = arg.getBoolean("TerrainPopulated");
-        lv.entities = arg.getList("Entities", 10);
-        lv.blockEntities = arg.getList("TileEntities", 10);
-        lv.blockTicks = arg.getList("TileTicks", 10);
+        lv.blocks = tag.getByteArray("Blocks");
+        lv.data = new AlphaChunkDataArray(tag.getByteArray("Data"), 7);
+        lv.skyLight = new AlphaChunkDataArray(tag.getByteArray("SkyLight"), 7);
+        lv.blockLight = new AlphaChunkDataArray(tag.getByteArray("BlockLight"), 7);
+        lv.heightMap = tag.getByteArray("HeightMap");
+        lv.terrainPopulated = tag.getBoolean("TerrainPopulated");
+        lv.entities = tag.getList("Entities", 10);
+        lv.blockEntities = tag.getList("TileEntities", 10);
+        lv.blockTicks = tag.getList("TileTicks", 10);
         try {
-            lv.lastUpdate = arg.getLong("LastUpdate");
+            lv.lastUpdate = tag.getLong("LastUpdate");
         }
         catch (ClassCastException classCastException) {
-            lv.lastUpdate = arg.getInt("LastUpdate");
+            lv.lastUpdate = tag.getInt("LastUpdate");
         }
         return lv;
     }
@@ -109,9 +109,9 @@ public class AlphaChunkIo {
         public final int x;
         public final int z;
 
-        public AlphaChunk(int i, int j) {
-            this.x = i;
-            this.z = j;
+        public AlphaChunk(int x, int z) {
+            this.x = x;
+            this.z = z;
         }
     }
 }

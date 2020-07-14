@@ -77,23 +77,23 @@ extends CompositeEntityModel<BoatEntity> {
         return this.bottom;
     }
 
-    protected ModelPart makePaddle(boolean bl) {
-        ModelPart lv = new ModelPart(this, 62, bl ? 0 : 20).setTextureSize(128, 64);
+    protected ModelPart makePaddle(boolean isLeft) {
+        ModelPart lv = new ModelPart(this, 62, isLeft ? 0 : 20).setTextureSize(128, 64);
         int i = 20;
         int j = 7;
         int k = 6;
         float f = -5.0f;
         lv.addCuboid(-1.0f, 0.0f, -5.0f, 2.0f, 2.0f, 18.0f);
-        lv.addCuboid(bl ? -1.001f : 0.001f, -3.0f, 8.0f, 1.0f, 6.0f, 7.0f);
+        lv.addCuboid(isLeft ? -1.001f : 0.001f, -3.0f, 8.0f, 1.0f, 6.0f, 7.0f);
         return lv;
     }
 
-    protected void setPaddleAngle(BoatEntity arg, int i, float f) {
-        float g = arg.interpolatePaddlePhase(i, f);
-        ModelPart lv = this.paddles[i];
+    protected void setPaddleAngle(BoatEntity boat, int paddle, float angle) {
+        float g = boat.interpolatePaddlePhase(paddle, angle);
+        ModelPart lv = this.paddles[paddle];
         lv.pitch = (float)MathHelper.clampedLerp(-1.0471975803375244, -0.2617993950843811, (MathHelper.sin(-g) + 1.0f) / 2.0f);
         lv.yaw = (float)MathHelper.clampedLerp(-0.7853981852531433, 0.7853981852531433, (MathHelper.sin(-g + 1.0f) + 1.0f) / 2.0f);
-        if (i == 1) {
+        if (paddle == 1) {
             lv.yaw = (float)Math.PI - lv.yaw;
         }
     }

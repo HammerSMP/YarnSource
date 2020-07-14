@@ -108,16 +108,16 @@ implements Angerable {
     }
 
     @Override
-    protected int getNextAirUnderwater(int i) {
-        return i;
+    protected int getNextAirUnderwater(int air) {
+        return air;
     }
 
     @Override
-    protected void pushAway(Entity arg) {
-        if (arg instanceof Monster && !(arg instanceof CreeperEntity) && this.getRandom().nextInt(20) == 0) {
-            this.setTarget((LivingEntity)arg);
+    protected void pushAway(Entity entity) {
+        if (entity instanceof Monster && !(entity instanceof CreeperEntity) && this.getRandom().nextInt(20) == 0) {
+            this.setTarget((LivingEntity)entity);
         }
-        super.pushAway(arg);
+        super.pushAway(entity);
     }
 
     @Override
@@ -142,28 +142,28 @@ implements Angerable {
     }
 
     @Override
-    public boolean canTarget(EntityType<?> arg) {
-        if (this.isPlayerCreated() && arg == EntityType.PLAYER) {
+    public boolean canTarget(EntityType<?> type) {
+        if (this.isPlayerCreated() && type == EntityType.PLAYER) {
             return false;
         }
-        if (arg == EntityType.CREEPER) {
+        if (type == EntityType.CREEPER) {
             return false;
         }
-        return super.canTarget(arg);
+        return super.canTarget(type);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putBoolean("PlayerCreated", this.isPlayerCreated());
-        this.angerToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putBoolean("PlayerCreated", this.isPlayerCreated());
+        this.angerToTag(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setPlayerCreated(arg.getBoolean("PlayerCreated"));
-        this.angerFromTag((ServerWorld)this.world, arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setPlayerCreated(tag.getBoolean("PlayerCreated"));
+        this.angerFromTag((ServerWorld)this.world, tag);
     }
 
     @Override
@@ -172,8 +172,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngerTime(int i) {
-        this.field_25366 = i;
+    public void setAngerTime(int ticks) {
+        this.field_25366 = ticks;
     }
 
     @Override
@@ -182,8 +182,8 @@ implements Angerable {
     }
 
     @Override
-    public void setAngryAt(@Nullable UUID uUID) {
-        this.field_25367 = uUID;
+    public void setAngryAt(@Nullable UUID uuid) {
+        this.field_25367 = uuid;
     }
 
     @Override
@@ -196,24 +196,24 @@ implements Angerable {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
+    public boolean tryAttack(Entity target) {
         this.attackTicksLeft = 10;
         this.world.sendEntityStatus(this, (byte)4);
         float f = this.getAttackDamage();
         float g = (int)f > 0 ? f / 2.0f + (float)this.random.nextInt((int)f) : f;
-        boolean bl = arg.damage(DamageSource.mob(this), g);
+        boolean bl = target.damage(DamageSource.mob(this), g);
         if (bl) {
-            arg.setVelocity(arg.getVelocity().add(0.0, 0.4f, 0.0));
-            this.dealDamage(this, arg);
+            target.setVelocity(target.getVelocity().add(0.0, 0.4f, 0.0));
+            this.dealDamage(this, target);
         }
         this.playSound(SoundEvents.ENTITY_IRON_GOLEM_ATTACK, 1.0f, 1.0f);
         return bl;
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
+    public boolean damage(DamageSource source, float amount) {
         Crack lv = this.getCrack();
-        boolean bl = super.damage(arg, f);
+        boolean bl = super.damage(source, amount);
         if (bl && this.getCrack() != lv) {
             this.playSound(SoundEvents.ENTITY_IRON_GOLEM_DAMAGE, 1.0f, 1.0f);
         }
@@ -226,16 +226,16 @@ implements Angerable {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 4) {
+    public void handleStatus(byte status) {
+        if (status == 4) {
             this.attackTicksLeft = 10;
             this.playSound(SoundEvents.ENTITY_IRON_GOLEM_ATTACK, 1.0f, 1.0f);
-        } else if (b == 11) {
+        } else if (status == 11) {
             this.lookingAtVillagerTicksLeft = 400;
-        } else if (b == 34) {
+        } else if (status == 34) {
             this.lookingAtVillagerTicksLeft = 0;
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -244,8 +244,8 @@ implements Angerable {
         return this.attackTicksLeft;
     }
 
-    public void setLookingAtVillager(boolean bl) {
-        if (bl) {
+    public void setLookingAtVillager(boolean lookingAtVillager) {
+        if (lookingAtVillager) {
             this.lookingAtVillagerTicksLeft = 400;
             this.world.sendEntityStatus(this, (byte)11);
         } else {
@@ -255,7 +255,7 @@ implements Angerable {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_IRON_GOLEM_HURT;
     }
 
@@ -265,8 +265,8 @@ implements Angerable {
     }
 
     @Override
-    protected ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    protected ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         Item lv2 = lv.getItem();
         if (lv2 != Items.IRON_INGOT) {
             return ActionResult.PASS;
@@ -278,14 +278,14 @@ implements Angerable {
         }
         float g = 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f;
         this.playSound(SoundEvents.ENTITY_IRON_GOLEM_REPAIR, 1.0f, g);
-        if (!arg.abilities.creativeMode) {
+        if (!player.abilities.creativeMode) {
             lv.decrement(1);
         }
         return ActionResult.success(this.world.isClient);
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_IRON_GOLEM_STEP, 1.0f, 1.0f);
     }
 
@@ -298,9 +298,9 @@ implements Angerable {
         return (this.dataTracker.get(IRON_GOLEM_FLAGS) & 1) != 0;
     }
 
-    public void setPlayerCreated(boolean bl) {
+    public void setPlayerCreated(boolean playerCreated) {
         byte b = this.dataTracker.get(IRON_GOLEM_FLAGS);
-        if (bl) {
+        if (playerCreated) {
             this.dataTracker.set(IRON_GOLEM_FLAGS, (byte)(b | 1));
         } else {
             this.dataTracker.set(IRON_GOLEM_FLAGS, (byte)(b & 0xFFFFFFFE));
@@ -308,23 +308,23 @@ implements Angerable {
     }
 
     @Override
-    public void onDeath(DamageSource arg) {
-        super.onDeath(arg);
+    public void onDeath(DamageSource source) {
+        super.onDeath(source);
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
+    public boolean canSpawn(WorldView world) {
         BlockPos lv = this.getBlockPos();
         BlockPos lv2 = lv.down();
-        BlockState lv3 = arg.getBlockState(lv2);
-        if (lv3.hasSolidTopSurface(arg, lv2, this)) {
+        BlockState lv3 = world.getBlockState(lv2);
+        if (lv3.hasSolidTopSurface(world, lv2, this)) {
             for (int i = 1; i < 3; ++i) {
                 BlockState lv5;
                 BlockPos lv4 = lv.up(i);
-                if (SpawnHelper.isClearForSpawn(arg, lv4, lv5 = arg.getBlockState(lv4), lv5.getFluidState(), EntityType.IRON_GOLEM)) continue;
+                if (SpawnHelper.isClearForSpawn(world, lv4, lv5 = world.getBlockState(lv4), lv5.getFluidState(), EntityType.IRON_GOLEM)) continue;
                 return false;
             }
-            return SpawnHelper.isClearForSpawn(arg, lv, arg.getBlockState(lv), Fluids.EMPTY.getDefaultState(), EntityType.IRON_GOLEM) && arg.intersectsEntities(this);
+            return SpawnHelper.isClearForSpawn(world, lv, world.getBlockState(lv), Fluids.EMPTY.getDefaultState(), EntityType.IRON_GOLEM) && world.intersectsEntities(this);
         }
         return false;
     }
@@ -344,13 +344,13 @@ implements Angerable {
         private static final List<Crack> VALUES;
         private final float maxHealthFraction;
 
-        private Crack(float f) {
-            this.maxHealthFraction = f;
+        private Crack(float maxHealthFraction) {
+            this.maxHealthFraction = maxHealthFraction;
         }
 
-        public static Crack from(float f) {
+        public static Crack from(float healthFraction) {
             for (Crack lv : VALUES) {
-                if (!(f < lv.maxHealthFraction)) continue;
+                if (!(healthFraction < lv.maxHealthFraction)) continue;
                 return lv;
             }
             return NONE;

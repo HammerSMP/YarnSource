@@ -26,22 +26,22 @@ extends Identifier {
         this(ModelIdentifier.split(string));
     }
 
-    public ModelIdentifier(Identifier arg, String string) {
-        this(arg.toString(), string);
+    public ModelIdentifier(Identifier id, String variant) {
+        this(id.toString(), variant);
     }
 
     public ModelIdentifier(String string, String string2) {
         this(ModelIdentifier.split(string + '#' + string2));
     }
 
-    protected static String[] split(String string) {
-        String[] strings = new String[]{null, string, ""};
-        int i = string.indexOf(35);
-        String string2 = string;
+    protected static String[] split(String id) {
+        String[] strings = new String[]{null, id, ""};
+        int i = id.indexOf(35);
+        String string2 = id;
         if (i >= 0) {
-            strings[2] = string.substring(i + 1, string.length());
+            strings[2] = id.substring(i + 1, id.length());
             if (i > 1) {
-                string2 = string.substring(0, i);
+                string2 = id.substring(0, i);
             }
         }
         System.arraycopy(Identifier.split(string2, ':'), 0, strings, 0, 2);

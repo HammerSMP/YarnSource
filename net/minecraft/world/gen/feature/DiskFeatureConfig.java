@@ -26,11 +26,11 @@ implements FeatureConfig {
     public final int ySize;
     public final List<BlockState> targets;
 
-    public DiskFeatureConfig(BlockState arg, class_5428 arg2, int i, List<BlockState> list) {
-        this.state = arg;
+    public DiskFeatureConfig(BlockState state, class_5428 arg2, int ySize, List<BlockState> targets) {
+        this.state = state;
         this.radius = arg2;
-        this.ySize = i;
-        this.targets = list;
+        this.ySize = ySize;
+        this.targets = targets;
     }
 }
 

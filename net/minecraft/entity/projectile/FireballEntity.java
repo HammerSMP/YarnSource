@@ -30,17 +30,17 @@ extends AbstractFireballEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public FireballEntity(World arg, double d, double e, double f, double g, double h, double i) {
-        super((EntityType<? extends AbstractFireballEntity>)EntityType.FIREBALL, d, e, f, g, h, i, arg);
+    public FireballEntity(World world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        super((EntityType<? extends AbstractFireballEntity>)EntityType.FIREBALL, x, y, z, velocityX, velocityY, velocityZ, world);
     }
 
-    public FireballEntity(World arg, LivingEntity arg2, double d, double e, double f) {
-        super((EntityType<? extends AbstractFireballEntity>)EntityType.FIREBALL, arg2, d, e, f, arg);
+    public FireballEntity(World world, LivingEntity owner, double velocityX, double velocityY, double velocityZ) {
+        super((EntityType<? extends AbstractFireballEntity>)EntityType.FIREBALL, owner, velocityX, velocityY, velocityZ, world);
     }
 
     @Override
-    protected void onCollision(HitResult arg) {
-        super.onCollision(arg);
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
         if (!this.world.isClient) {
             boolean bl;
             this.world.createExplosion(null, this.getX(), this.getY(), this.getZ(), this.explosionPower, bl, (bl = this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) ? Explosion.DestructionType.DESTROY : Explosion.DestructionType.NONE);
@@ -49,12 +49,12 @@ extends AbstractFireballEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
         if (this.world.isClient) {
             return;
         }
-        Entity lv = arg.getEntity();
+        Entity lv = entityHitResult.getEntity();
         Entity lv2 = this.getOwner();
         lv.damage(DamageSource.fireball(this, lv2), 6.0f);
         if (lv2 instanceof LivingEntity) {
@@ -63,16 +63,16 @@ extends AbstractFireballEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("ExplosionPower", this.explosionPower);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("ExplosionPower", this.explosionPower);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("ExplosionPower", 99)) {
-            this.explosionPower = arg.getInt("ExplosionPower");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("ExplosionPower", 99)) {
+            this.explosionPower = tag.getInt("ExplosionPower");
         }
     }
 }

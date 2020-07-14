@@ -58,15 +58,15 @@ implements ArgumentType<Integer> {
         return j;
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        StringReader stringReader = new StringReader(suggestionsBuilder.getRemaining());
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        StringReader stringReader = new StringReader(builder.getRemaining());
         try {
             stringReader.readFloat();
         }
         catch (CommandSyntaxException commandSyntaxException) {
-            return suggestionsBuilder.buildFuture();
+            return builder.buildFuture();
         }
-        return CommandSource.suggestMatching((Iterable<String>)units.keySet(), suggestionsBuilder.createOffset(suggestionsBuilder.getStart() + stringReader.getCursor()));
+        return CommandSource.suggestMatching((Iterable<String>)units.keySet(), builder.createOffset(builder.getStart() + stringReader.getCursor()));
     }
 
     public Collection<String> getExamples() {

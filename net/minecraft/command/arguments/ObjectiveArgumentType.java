@@ -39,9 +39,9 @@ implements ArgumentType<String> {
         return new ObjectiveArgumentType();
     }
 
-    public static ScoreboardObjective getObjective(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        String string2 = (String)commandContext.getArgument(string, String.class);
-        ServerScoreboard lv = ((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getScoreboard();
+    public static ScoreboardObjective getObjective(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        String string2 = (String)context.getArgument(name, String.class);
+        ServerScoreboard lv = ((ServerCommandSource)context.getSource()).getMinecraftServer().getScoreboard();
         ScoreboardObjective lv2 = lv.getNullableObjective(string2);
         if (lv2 == null) {
             throw UNKNOWN_OBJECTIVE_EXCEPTION.create((Object)string2);
@@ -49,8 +49,8 @@ implements ArgumentType<String> {
         return lv2;
     }
 
-    public static ScoreboardObjective getWritableObjective(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        ScoreboardObjective lv = ObjectiveArgumentType.getObjective(commandContext, string);
+    public static ScoreboardObjective getWritableObjective(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        ScoreboardObjective lv = ObjectiveArgumentType.getObjective(context, name);
         if (lv.getCriterion().isReadOnly()) {
             throw READONLY_OBJECTIVE_EXCEPTION.create((Object)lv.getName());
         }
@@ -65,13 +65,13 @@ implements ArgumentType<String> {
         return string;
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        if (commandContext.getSource() instanceof ServerCommandSource) {
-            return CommandSource.suggestMatching(((ServerCommandSource)commandContext.getSource()).getMinecraftServer().getScoreboard().getObjectiveNames(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof ServerCommandSource) {
+            return CommandSource.suggestMatching(((ServerCommandSource)context.getSource()).getMinecraftServer().getScoreboard().getObjectiveNames(), builder);
         }
-        if (commandContext.getSource() instanceof CommandSource) {
-            CommandSource lv = (CommandSource)commandContext.getSource();
-            return lv.getCompletions(commandContext, suggestionsBuilder);
+        if (context.getSource() instanceof CommandSource) {
+            CommandSource lv = (CommandSource)context.getSource();
+            return lv.getCompletions(context, builder);
         }
         return Suggestions.empty();
     }

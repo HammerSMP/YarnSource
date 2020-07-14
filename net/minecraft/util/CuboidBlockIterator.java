@@ -16,13 +16,13 @@ public class CuboidBlockIterator {
     private int y;
     private int z;
 
-    public CuboidBlockIterator(int i, int j, int k, int l, int m, int n) {
-        this.startX = i;
-        this.startY = j;
-        this.startZ = k;
-        this.sizeX = l - i + 1;
-        this.sizeY = m - j + 1;
-        this.sizeZ = n - k + 1;
+    public CuboidBlockIterator(int startX, int startY, int startZ, int endX, int endY, int endZ) {
+        this.startX = startX;
+        this.startY = startY;
+        this.startZ = startZ;
+        this.sizeX = endX - startX + 1;
+        this.sizeY = endY - startY + 1;
+        this.sizeZ = endZ - startZ + 1;
         this.totalSize = this.sizeX * this.sizeY * this.sizeZ;
     }
 

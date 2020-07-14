@@ -81,8 +81,8 @@ public class RealmsDataFetcher {
         }
     }
 
-    public boolean isFetchedSinceLastTry(Task arg) {
-        Boolean boolean_ = this.fetchStatus.get((Object)arg);
+    public boolean isFetchedSinceLastTry(Task task) {
+        Boolean boolean_ = this.fetchStatus.get((Object)task);
         return boolean_ == null ? false : boolean_;
     }
 
@@ -160,21 +160,21 @@ public class RealmsDataFetcher {
         }
     }
 
-    private synchronized void setServers(List<RealmsServer> list) {
+    private synchronized void setServers(List<RealmsServer> newServers) {
         int i = 0;
         for (RealmsServer lv : this.removedServers) {
-            if (!list.remove(lv)) continue;
+            if (!newServers.remove(lv)) continue;
             ++i;
         }
         if (i == 0) {
             this.removedServers.clear();
         }
-        this.servers = list;
+        this.servers = newServers;
     }
 
-    public synchronized void removeItem(RealmsServer arg) {
-        this.servers.remove(arg);
-        this.removedServers.add(arg);
+    public synchronized void removeItem(RealmsServer server) {
+        this.servers.remove(server);
+        this.removedServers.add(server);
     }
 
     private boolean isActive() {

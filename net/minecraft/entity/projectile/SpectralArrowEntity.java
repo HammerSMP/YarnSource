@@ -22,12 +22,12 @@ extends PersistentProjectileEntity {
         super((EntityType<? extends PersistentProjectileEntity>)arg, arg2);
     }
 
-    public SpectralArrowEntity(World arg, LivingEntity arg2) {
-        super(EntityType.SPECTRAL_ARROW, arg2, arg);
+    public SpectralArrowEntity(World world, LivingEntity owner) {
+        super(EntityType.SPECTRAL_ARROW, owner, world);
     }
 
-    public SpectralArrowEntity(World arg, double d, double e, double f) {
-        super(EntityType.SPECTRAL_ARROW, d, e, f, arg);
+    public SpectralArrowEntity(World world, double x, double y, double z) {
+        super(EntityType.SPECTRAL_ARROW, x, y, z, world);
     }
 
     @Override
@@ -44,24 +44,24 @@ extends PersistentProjectileEntity {
     }
 
     @Override
-    protected void onHit(LivingEntity arg) {
-        super.onHit(arg);
+    protected void onHit(LivingEntity target) {
+        super.onHit(target);
         StatusEffectInstance lv = new StatusEffectInstance(StatusEffects.GLOWING, this.duration, 0);
-        arg.addStatusEffect(lv);
+        target.addStatusEffect(lv);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("Duration")) {
-            this.duration = arg.getInt("Duration");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("Duration")) {
+            this.duration = tag.getInt("Duration");
         }
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Duration", this.duration);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Duration", this.duration);
     }
 }
 

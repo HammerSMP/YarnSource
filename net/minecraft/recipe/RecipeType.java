@@ -35,8 +35,8 @@ public interface RecipeType<T extends Recipe<?>> {
         });
     }
 
-    default public <C extends Inventory> Optional<T> get(Recipe<C> arg, World arg2, C arg3) {
-        return arg.matches(arg3, arg2) ? Optional.of(arg) : Optional.empty();
+    default public <C extends Inventory> Optional<T> get(Recipe<C> recipe, World world, C inventory) {
+        return recipe.matches(inventory, world) ? Optional.of(recipe) : Optional.empty();
     }
 }
 

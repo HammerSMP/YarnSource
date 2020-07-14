@@ -34,8 +34,8 @@ import net.minecraft.util.math.MathHelper;
 
 public class BitStorageAlignFix
 extends DataFix {
-    public BitStorageAlignFix(Schema schema) {
-        super(schema, false);
+    public BitStorageAlignFix(Schema outputSchema) {
+        super(outputSchema, false);
     }
 
     protected TypeRewriteRule makeRule() {

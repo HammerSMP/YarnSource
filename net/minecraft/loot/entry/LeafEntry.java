@@ -39,24 +39,24 @@ extends LootPoolEntry {
     private final LootChoice choice = new Choice(){
 
         @Override
-        public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
-            LeafEntry.this.generateLoot(LootFunction.apply(LeafEntry.this.compiledFunctions, consumer, arg), arg);
+        public void generateLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
+            LeafEntry.this.generateLoot(LootFunction.apply(LeafEntry.this.compiledFunctions, lootConsumer, context), context);
         }
     };
 
-    protected LeafEntry(int i, int j, LootCondition[] args, LootFunction[] args2) {
-        super(args);
-        this.weight = i;
-        this.quality = j;
-        this.functions = args2;
-        this.compiledFunctions = LootFunctionTypes.join(args2);
+    protected LeafEntry(int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+        super(conditions);
+        this.weight = weight;
+        this.quality = quality;
+        this.functions = functions;
+        this.compiledFunctions = LootFunctionTypes.join(functions);
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        super.validate(arg);
+    public void validate(LootTableReporter reporter) {
+        super.validate(reporter);
         for (int i = 0; i < this.functions.length; ++i) {
-            this.functions[i].validate(arg.makeChild(".functions[" + i + "]"));
+            this.functions[i].validate(reporter.makeChild(".functions[" + i + "]"));
         }
     }
 
@@ -71,8 +71,8 @@ extends LootPoolEntry {
         return false;
     }
 
-    public static Builder<?> builder(Factory arg) {
-        return new BasicBuilder(arg);
+    public static Builder<?> builder(Factory factory) {
+        return new BasicBuilder(factory);
     }
 
     public static abstract class Serializer<T extends LeafEntry>
@@ -101,8 +101,8 @@ extends LootPoolEntry {
         protected abstract T fromJson(JsonObject var1, JsonDeserializationContext var2, int var3, int var4, LootCondition[] var5, LootFunction[] var6);
 
         @Override
-        public /* synthetic */ LootPoolEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ LootPoolEntry fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -110,8 +110,8 @@ extends LootPoolEntry {
     extends Builder<BasicBuilder> {
         private final Factory factory;
 
-        public BasicBuilder(Factory arg) {
-            this.factory = arg;
+        public BasicBuilder(Factory factory) {
+            this.factory = factory;
         }
 
         @Override
@@ -152,19 +152,19 @@ extends LootPoolEntry {
             return this.functions.toArray(new LootFunction[0]);
         }
 
-        public T weight(int i) {
-            this.weight = i;
+        public T weight(int weight) {
+            this.weight = weight;
             return (T)((Builder)this.getThisBuilder());
         }
 
-        public T quality(int i) {
-            this.quality = i;
+        public T quality(int quality) {
+            this.quality = quality;
             return (T)((Builder)this.getThisBuilder());
         }
 
         @Override
-        public /* synthetic */ Object apply(LootFunction.Builder arg) {
-            return this.apply(arg);
+        public /* synthetic */ Object apply(LootFunction.Builder function) {
+            return this.apply(function);
         }
     }
 
@@ -174,8 +174,8 @@ extends LootPoolEntry {
         }
 
         @Override
-        public int getWeight(float f) {
-            return Math.max(MathHelper.floor((float)LeafEntry.this.weight + (float)LeafEntry.this.quality * f), 0);
+        public int getWeight(float luck) {
+            return Math.max(MathHelper.floor((float)LeafEntry.this.weight + (float)LeafEntry.this.quality * luck), 0);
         }
     }
 }

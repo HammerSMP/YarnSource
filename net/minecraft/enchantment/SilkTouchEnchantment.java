@@ -10,18 +10,18 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class SilkTouchEnchantment
 extends Enchantment {
-    protected SilkTouchEnchantment(Enchantment.Rarity arg, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.DIGGER, args);
+    protected SilkTouchEnchantment(Enchantment.Rarity weight, EquipmentSlot ... slotTypes) {
+        super(weight, EnchantmentTarget.DIGGER, slotTypes);
     }
 
     @Override
-    public int getMinPower(int i) {
+    public int getMinPower(int level) {
         return 15;
     }
 
     @Override
-    public int getMaxPower(int i) {
-        return super.getMinPower(i) + 50;
+    public int getMaxPower(int level) {
+        return super.getMinPower(level) + 50;
     }
 
     @Override
@@ -30,8 +30,8 @@ extends Enchantment {
     }
 
     @Override
-    public boolean canAccept(Enchantment arg) {
-        return super.canAccept(arg) && arg != Enchantments.FORTUNE;
+    public boolean canAccept(Enchantment other) {
+        return super.canAccept(other) && other != Enchantments.FORTUNE;
     }
 }
 

@@ -27,25 +27,25 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new MobSpawnerBlockEntity();
     }
 
     @Override
-    public void onStacksDropped(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
-        super.onStacksDropped(arg, arg2, arg3, arg4);
+    public void onStacksDropped(BlockState state, ServerWorld arg2, BlockPos pos, ItemStack stack) {
+        super.onStacksDropped(state, arg2, pos, stack);
         int i = 15 + arg2.random.nextInt(15) + arg2.random.nextInt(15);
-        this.dropExperience(arg2, arg3, i);
+        this.dropExperience(arg2, pos, i);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 }

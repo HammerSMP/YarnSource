@@ -41,9 +41,9 @@ implements DataCommandObject {
         }
 
         @Override
-        public DataCommandObject getObject(CommandContext<ServerCommandSource> commandContext) throws CommandSyntaxException {
-            BlockPos lv = BlockPosArgumentType.getLoadedBlockPos(commandContext, this.field_13787 + "Pos");
-            BlockEntity lv2 = ((ServerCommandSource)commandContext.getSource()).getWorld().getBlockEntity(lv);
+        public DataCommandObject getObject(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+            BlockPos lv = BlockPosArgumentType.getLoadedBlockPos(context, this.field_13787 + "Pos");
+            BlockEntity lv2 = ((ServerCommandSource)context.getSource()).getWorld().getBlockEntity(lv);
             if (lv2 == null) {
                 throw INVALID_BLOCK_EXCEPTION.create();
             }
@@ -51,25 +51,25 @@ implements DataCommandObject {
         }
 
         @Override
-        public ArgumentBuilder<ServerCommandSource, ?> addArgumentsToBuilder(ArgumentBuilder<ServerCommandSource, ?> argumentBuilder, Function<ArgumentBuilder<ServerCommandSource, ?>, ArgumentBuilder<ServerCommandSource, ?>> function) {
-            return argumentBuilder.then(CommandManager.literal("block").then(function.apply((ArgumentBuilder<ServerCommandSource, ?>)CommandManager.argument(this.field_13787 + "Pos", BlockPosArgumentType.blockPos()))));
+        public ArgumentBuilder<ServerCommandSource, ?> addArgumentsToBuilder(ArgumentBuilder<ServerCommandSource, ?> argument, Function<ArgumentBuilder<ServerCommandSource, ?>, ArgumentBuilder<ServerCommandSource, ?>> argumentAdder) {
+            return argument.then(CommandManager.literal("block").then(argumentAdder.apply((ArgumentBuilder<ServerCommandSource, ?>)CommandManager.argument(this.field_13787 + "Pos", BlockPosArgumentType.blockPos()))));
         }
     };
     private final BlockEntity blockEntity;
     private final BlockPos pos;
 
-    public BlockDataObject(BlockEntity arg, BlockPos arg2) {
-        this.blockEntity = arg;
-        this.pos = arg2;
+    public BlockDataObject(BlockEntity blockEntity, BlockPos pos) {
+        this.blockEntity = blockEntity;
+        this.pos = pos;
     }
 
     @Override
-    public void setTag(CompoundTag arg) {
-        arg.putInt("x", this.pos.getX());
-        arg.putInt("y", this.pos.getY());
-        arg.putInt("z", this.pos.getZ());
+    public void setTag(CompoundTag tag) {
+        tag.putInt("x", this.pos.getX());
+        tag.putInt("y", this.pos.getY());
+        tag.putInt("z", this.pos.getZ());
         BlockState lv = this.blockEntity.getWorld().getBlockState(this.pos);
-        this.blockEntity.fromTag(lv, arg);
+        this.blockEntity.fromTag(lv, tag);
         this.blockEntity.markDirty();
         this.blockEntity.getWorld().updateListeners(this.pos, lv, lv, 3);
     }
@@ -85,13 +85,13 @@ implements DataCommandObject {
     }
 
     @Override
-    public Text feedbackQuery(Tag arg) {
-        return new TranslatableText("commands.data.block.query", this.pos.getX(), this.pos.getY(), this.pos.getZ(), arg.toText());
+    public Text feedbackQuery(Tag tag) {
+        return new TranslatableText("commands.data.block.query", this.pos.getX(), this.pos.getY(), this.pos.getZ(), tag.toText());
     }
 
     @Override
-    public Text feedbackGet(NbtPathArgumentType.NbtPath arg, double d, int i) {
-        return new TranslatableText("commands.data.block.get", arg, this.pos.getX(), this.pos.getY(), this.pos.getZ(), String.format(Locale.ROOT, "%.2f", d), i);
+    public Text feedbackGet(NbtPathArgumentType.NbtPath arg, double scale, int result) {
+        return new TranslatableText("commands.data.block.get", arg, this.pos.getX(), this.pos.getY(), this.pos.getZ(), String.format(Locale.ROOT, "%.2f", scale), result);
     }
 }
 

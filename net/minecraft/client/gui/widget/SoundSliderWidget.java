@@ -22,9 +22,9 @@ public class SoundSliderWidget
 extends OptionSliderWidget {
     private final SoundCategory category;
 
-    public SoundSliderWidget(MinecraftClient arg, int i, int j, SoundCategory arg2, int k) {
-        super(arg.options, i, j, k, 20, (double)arg.options.getSoundVolume(arg2));
-        this.category = arg2;
+    public SoundSliderWidget(MinecraftClient client, int x, int y, SoundCategory category, int width) {
+        super(client.options, x, y, width, 20, (double)client.options.getSoundVolume(category));
+        this.category = category;
         this.updateMessage();
     }
 

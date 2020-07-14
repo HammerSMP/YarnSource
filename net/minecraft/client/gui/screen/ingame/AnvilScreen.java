@@ -31,8 +31,8 @@ extends ForgingScreen<AnvilScreenHandler> {
     private static final Identifier TEXTURE = new Identifier("textures/gui/container/anvil.png");
     private TextFieldWidget nameField;
 
-    public AnvilScreen(AnvilScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3, TEXTURE);
+    public AnvilScreen(AnvilScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title, TEXTURE);
         this.titleX = 60;
     }
 
@@ -53,9 +53,9 @@ extends ForgingScreen<AnvilScreenHandler> {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.nameField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.nameField.setText(string);
     }
 
@@ -66,21 +66,21 @@ extends ForgingScreen<AnvilScreenHandler> {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.player.closeHandledScreen();
         }
-        if (this.nameField.keyPressed(i, j, k) || this.nameField.isActive()) {
+        if (this.nameField.keyPressed(keyCode, scanCode, modifiers) || this.nameField.isActive()) {
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    private void onRenamed(String string) {
-        if (string.isEmpty()) {
+    private void onRenamed(String name) {
+        if (name.isEmpty()) {
             return;
         }
-        String string2 = string;
+        String string2 = name;
         Slot lv = ((AnvilScreenHandler)this.handler).getSlot(0);
         if (lv != null && lv.hasStack() && !lv.getStack().hasCustomName() && string2.equals(lv.getStack().getName().getString())) {
             string2 = "";
@@ -90,9 +90,9 @@ extends ForgingScreen<AnvilScreenHandler> {
     }
 
     @Override
-    protected void drawForeground(MatrixStack arg, int i, int j) {
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         RenderSystem.disableBlend();
-        super.drawForeground(arg, i, j);
+        super.drawForeground(matrices, mouseX, mouseY);
         int k = ((AnvilScreenHandler)this.handler).getLevelCost();
         if (k > 0) {
             int l = 8453920;
@@ -109,22 +109,22 @@ extends ForgingScreen<AnvilScreenHandler> {
             if (bl) {
                 int m = this.backgroundWidth - 8 - this.textRenderer.getWidth(string) - 2;
                 int n = 69;
-                AnvilScreen.fill(arg, m - 2, 67, this.backgroundWidth - 8, 79, 0x4F000000);
-                this.textRenderer.drawWithShadow(arg, string, (float)m, 69.0f, l);
+                AnvilScreen.fill(matrices, m - 2, 67, this.backgroundWidth - 8, 79, 0x4F000000);
+                this.textRenderer.drawWithShadow(matrices, string, (float)m, 69.0f, l);
             }
         }
     }
 
     @Override
-    public void renderForeground(MatrixStack arg, int i, int j, float f) {
-        this.nameField.render(arg, i, j, f);
+    public void renderForeground(MatrixStack arg, int mouseY, int j, float f) {
+        this.nameField.render(arg, mouseY, j, f);
     }
 
     @Override
-    public void onSlotUpdate(ScreenHandler arg, int i, ItemStack arg2) {
-        if (i == 0) {
-            this.nameField.setText(arg2.isEmpty() ? "" : arg2.getName().getString());
-            this.nameField.setEditable(!arg2.isEmpty());
+    public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
+        if (slotId == 0) {
+            this.nameField.setText(stack.isEmpty() ? "" : stack.getName().getString());
+            this.nameField.setEditable(!stack.isEmpty());
             this.setFocused(this.nameField);
         }
     }

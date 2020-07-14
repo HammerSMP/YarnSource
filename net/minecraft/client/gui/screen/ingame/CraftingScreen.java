@@ -32,8 +32,8 @@ implements RecipeBookProvider {
     private final RecipeBookWidget recipeBook = new RecipeBookWidget();
     private boolean narrow;
 
-    public CraftingScreen(CraftingScreenHandler arg, PlayerInventory arg2, Text arg3) {
-        super(arg, arg2, arg3);
+    public CraftingScreen(CraftingScreenHandler handler, PlayerInventory inventory, Text title) {
+        super(handler, inventory, title);
     }
 
     @Override
@@ -60,56 +60,56 @@ implements RecipeBookProvider {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         if (this.recipeBook.isOpen() && this.narrow) {
-            this.drawBackground(arg, f, i, j);
-            this.recipeBook.render(arg, i, j, f);
+            this.drawBackground(matrices, delta, mouseX, mouseY);
+            this.recipeBook.render(matrices, mouseX, mouseY, delta);
         } else {
-            this.recipeBook.render(arg, i, j, f);
-            super.render(arg, i, j, f);
-            this.recipeBook.drawGhostSlots(arg, this.x, this.y, true, f);
+            this.recipeBook.render(matrices, mouseX, mouseY, delta);
+            super.render(matrices, mouseX, mouseY, delta);
+            this.recipeBook.drawGhostSlots(matrices, this.x, this.y, true, delta);
         }
-        this.drawMouseoverTooltip(arg, i, j);
-        this.recipeBook.drawTooltip(arg, this.x, this.y, i, j);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+        this.recipeBook.drawTooltip(matrices, this.x, this.y, mouseX, mouseY);
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(TEXTURE);
         int k = this.x;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
     @Override
-    protected boolean isPointWithinBounds(int i, int j, int k, int l, double d, double e) {
-        return (!this.narrow || !this.recipeBook.isOpen()) && super.isPointWithinBounds(i, j, k, l, d, e);
+    protected boolean isPointWithinBounds(int xPosition, int yPosition, int width, int height, double pointX, double pointY) {
+        return (!this.narrow || !this.recipeBook.isOpen()) && super.isPointWithinBounds(xPosition, yPosition, width, height, pointX, pointY);
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (this.recipeBook.mouseClicked(d, e, i)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.recipeBook.mouseClicked(mouseX, mouseY, button)) {
             this.setFocused(this.recipeBook);
             return true;
         }
         if (this.narrow && this.recipeBook.isOpen()) {
             return true;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    protected boolean isClickOutsideBounds(double d, double e, int i, int j, int k) {
-        boolean bl = d < (double)i || e < (double)j || d >= (double)(i + this.backgroundWidth) || e >= (double)(j + this.backgroundHeight);
-        return this.recipeBook.isClickOutsideBounds(d, e, this.x, this.y, this.backgroundWidth, this.backgroundHeight, k) && bl;
+    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+        boolean bl = mouseX < (double)left || mouseY < (double)top || mouseX >= (double)(left + this.backgroundWidth) || mouseY >= (double)(top + this.backgroundHeight);
+        return this.recipeBook.isClickOutsideBounds(mouseX, mouseY, this.x, this.y, this.backgroundWidth, this.backgroundHeight, button) && bl;
     }
 
     @Override
-    protected void onMouseClick(Slot arg, int i, int j, SlotActionType arg2) {
-        super.onMouseClick(arg, i, j, arg2);
-        this.recipeBook.slotClicked(arg);
+    protected void onMouseClick(Slot slot, int invSlot, int clickData, SlotActionType actionType) {
+        super.onMouseClick(slot, invSlot, clickData, actionType);
+        this.recipeBook.slotClicked(slot);
     }
 
     @Override

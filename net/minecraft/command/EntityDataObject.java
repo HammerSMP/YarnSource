@@ -42,28 +42,28 @@ implements DataCommandObject {
         }
 
         @Override
-        public DataCommandObject getObject(CommandContext<ServerCommandSource> commandContext) throws CommandSyntaxException {
-            return new EntityDataObject(EntityArgumentType.getEntity(commandContext, this.field_13802));
+        public DataCommandObject getObject(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+            return new EntityDataObject(EntityArgumentType.getEntity(context, this.field_13802));
         }
 
         @Override
-        public ArgumentBuilder<ServerCommandSource, ?> addArgumentsToBuilder(ArgumentBuilder<ServerCommandSource, ?> argumentBuilder, Function<ArgumentBuilder<ServerCommandSource, ?>, ArgumentBuilder<ServerCommandSource, ?>> function) {
-            return argumentBuilder.then(CommandManager.literal("entity").then(function.apply((ArgumentBuilder<ServerCommandSource, ?>)CommandManager.argument(this.field_13802, EntityArgumentType.entity()))));
+        public ArgumentBuilder<ServerCommandSource, ?> addArgumentsToBuilder(ArgumentBuilder<ServerCommandSource, ?> argument, Function<ArgumentBuilder<ServerCommandSource, ?>, ArgumentBuilder<ServerCommandSource, ?>> argumentAdder) {
+            return argument.then(CommandManager.literal("entity").then(argumentAdder.apply((ArgumentBuilder<ServerCommandSource, ?>)CommandManager.argument(this.field_13802, EntityArgumentType.entity()))));
         }
     };
     private final Entity entity;
 
-    public EntityDataObject(Entity arg) {
-        this.entity = arg;
+    public EntityDataObject(Entity entity) {
+        this.entity = entity;
     }
 
     @Override
-    public void setTag(CompoundTag arg) throws CommandSyntaxException {
+    public void setTag(CompoundTag tag) throws CommandSyntaxException {
         if (this.entity instanceof PlayerEntity) {
             throw INVALID_ENTITY_EXCEPTION.create();
         }
         UUID uUID = this.entity.getUuid();
-        this.entity.fromTag(arg);
+        this.entity.fromTag(tag);
         this.entity.setUuid(uUID);
     }
 
@@ -78,13 +78,13 @@ implements DataCommandObject {
     }
 
     @Override
-    public Text feedbackQuery(Tag arg) {
-        return new TranslatableText("commands.data.entity.query", this.entity.getDisplayName(), arg.toText());
+    public Text feedbackQuery(Tag tag) {
+        return new TranslatableText("commands.data.entity.query", this.entity.getDisplayName(), tag.toText());
     }
 
     @Override
-    public Text feedbackGet(NbtPathArgumentType.NbtPath arg, double d, int i) {
-        return new TranslatableText("commands.data.entity.get", arg, this.entity.getDisplayName(), String.format(Locale.ROOT, "%.2f", d), i);
+    public Text feedbackGet(NbtPathArgumentType.NbtPath arg, double scale, int result) {
+        return new TranslatableText("commands.data.entity.get", arg, this.entity.getDisplayName(), String.format(Locale.ROOT, "%.2f", scale), result);
     }
 }
 

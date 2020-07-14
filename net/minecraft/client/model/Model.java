@@ -24,23 +24,23 @@ implements Consumer<ModelPart> {
     public int textureWidth = 64;
     public int textureHeight = 32;
 
-    public Model(Function<Identifier, RenderLayer> function) {
-        this.layerFactory = function;
+    public Model(Function<Identifier, RenderLayer> layerFactory) {
+        this.layerFactory = layerFactory;
     }
 
     @Override
     public void accept(ModelPart arg) {
     }
 
-    public final RenderLayer getLayer(Identifier arg) {
-        return this.layerFactory.apply(arg);
+    public final RenderLayer getLayer(Identifier texture) {
+        return this.layerFactory.apply(texture);
     }
 
     public abstract void render(MatrixStack var1, VertexConsumer var2, int var3, int var4, float var5, float var6, float var7, float var8);
 
     @Override
-    public /* synthetic */ void accept(Object object) {
-        this.accept((ModelPart)object);
+    public /* synthetic */ void accept(Object part) {
+        this.accept((ModelPart)part);
     }
 }
 

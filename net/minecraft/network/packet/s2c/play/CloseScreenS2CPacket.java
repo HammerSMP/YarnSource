@@ -15,8 +15,8 @@ implements Packet<ClientPlayPacketListener> {
     public CloseScreenS2CPacket() {
     }
 
-    public CloseScreenS2CPacket(int i) {
-        this.syncId = i;
+    public CloseScreenS2CPacket(int syncId) {
+        this.syncId = syncId;
     }
 
     @Override
@@ -25,13 +25,13 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.syncId = arg.readUnsignedByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.syncId = buf.readUnsignedByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.syncId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.syncId);
     }
 }
 

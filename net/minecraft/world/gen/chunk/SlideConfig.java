@@ -20,10 +20,10 @@ public class SlideConfig {
     private final int size;
     private final int offset;
 
-    public SlideConfig(int i, int j, int k) {
-        this.target = i;
-        this.size = j;
-        this.offset = k;
+    public SlideConfig(int target, int size, int offset) {
+        this.target = target;
+        this.size = size;
+        this.offset = offset;
     }
 
     public int getTarget() {

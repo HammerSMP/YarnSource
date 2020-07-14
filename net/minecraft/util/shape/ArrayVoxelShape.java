@@ -21,26 +21,26 @@ extends VoxelShape {
     private final DoubleList yPoints;
     private final DoubleList zPoints;
 
-    protected ArrayVoxelShape(VoxelSet arg, double[] ds, double[] es, double[] fs) {
-        this(arg, (DoubleList)DoubleArrayList.wrap((double[])Arrays.copyOf(ds, arg.getXSize() + 1)), (DoubleList)DoubleArrayList.wrap((double[])Arrays.copyOf(es, arg.getYSize() + 1)), (DoubleList)DoubleArrayList.wrap((double[])Arrays.copyOf(fs, arg.getZSize() + 1)));
+    protected ArrayVoxelShape(VoxelSet shape, double[] xPoints, double[] yPoints, double[] zPoints) {
+        this(shape, (DoubleList)DoubleArrayList.wrap((double[])Arrays.copyOf(xPoints, shape.getXSize() + 1)), (DoubleList)DoubleArrayList.wrap((double[])Arrays.copyOf(yPoints, shape.getYSize() + 1)), (DoubleList)DoubleArrayList.wrap((double[])Arrays.copyOf(zPoints, shape.getZSize() + 1)));
     }
 
-    ArrayVoxelShape(VoxelSet arg, DoubleList doubleList, DoubleList doubleList2, DoubleList doubleList3) {
-        super(arg);
-        int i = arg.getXSize() + 1;
-        int j = arg.getYSize() + 1;
-        int k = arg.getZSize() + 1;
-        if (i != doubleList.size() || j != doubleList2.size() || k != doubleList3.size()) {
+    ArrayVoxelShape(VoxelSet shape, DoubleList xPoints, DoubleList yPoints, DoubleList zPoints) {
+        super(shape);
+        int i = shape.getXSize() + 1;
+        int j = shape.getYSize() + 1;
+        int k = shape.getZSize() + 1;
+        if (i != xPoints.size() || j != yPoints.size() || k != zPoints.size()) {
             throw Util.throwOrPause(new IllegalArgumentException("Lengths of point arrays must be consistent with the size of the VoxelShape."));
         }
-        this.xPoints = doubleList;
-        this.yPoints = doubleList2;
-        this.zPoints = doubleList3;
+        this.xPoints = xPoints;
+        this.yPoints = yPoints;
+        this.zPoints = zPoints;
     }
 
     @Override
-    protected DoubleList getPointPositions(Direction.Axis arg) {
-        switch (arg) {
+    protected DoubleList getPointPositions(Direction.Axis axis) {
+        switch (axis) {
             case X: {
                 return this.xPoints;
             }

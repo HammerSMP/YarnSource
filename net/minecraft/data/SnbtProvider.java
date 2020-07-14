@@ -71,13 +71,13 @@ implements DataProvider {
     }
 
     @Override
-    public void run(DataCache arg) throws IOException {
+    public void run(DataCache cache) throws IOException {
         Path path3 = this.root.getOutput();
         ArrayList list = Lists.newArrayList();
         for (Path path22 : this.root.getInputs()) {
             Files.walk(path22, new FileVisitOption[0]).filter(path -> path.toString().endsWith(".snbt")).forEach(path2 -> list.add(CompletableFuture.supplyAsync(() -> this.toCompressedNbt((Path)path2, this.getFileName(path22, (Path)path2)), Util.getServerWorkerExecutor())));
         }
-        Util.combine(list).join().stream().filter(Objects::nonNull).forEach(arg2 -> this.write(arg, (CompressedData)arg2, path3));
+        Util.combine(list).join().stream().filter(Objects::nonNull).forEach(arg2 -> this.write(cache, (CompressedData)arg2, path3));
     }
 
     @Override
@@ -85,8 +85,8 @@ implements DataProvider {
         return "SNBT -> NBT";
     }
 
-    private String getFileName(Path path, Path path2) {
-        String string = path.relativize(path2).toString().replaceAll("\\\\", "/");
+    private String getFileName(Path root, Path file) {
+        String string = root.relativize(file).toString().replaceAll("\\\\", "/");
         return string.substring(0, string.length() - ".snbt".length());
     }
 
@@ -96,11 +96,11 @@ implements DataProvider {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    private CompressedData toCompressedNbt(Path path, String string) {
+    private CompressedData toCompressedNbt(Path path, String name) {
         try (BufferedReader bufferedReader = Files.newBufferedReader(path);){
             String string5;
             String string2 = IOUtils.toString((Reader)bufferedReader);
-            CompoundTag lv = this.write(string, StringNbtReader.parse(string2));
+            CompoundTag lv = this.write(name, StringNbtReader.parse(string2));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             NbtIo.writeCompressed(lv, byteArrayOutputStream);
             byte[] bs = byteArrayOutputStream.toByteArray();
@@ -110,15 +110,15 @@ implements DataProvider {
             } else {
                 string5 = null;
             }
-            CompressedData compressedData = new CompressedData(string, bs, string5, string3);
+            CompressedData compressedData = new CompressedData(name, bs, string5, string3);
             return compressedData;
         }
         catch (CommandSyntaxException commandSyntaxException) {
-            LOGGER.error("Couldn't convert {} from SNBT to NBT at {} as it's invalid SNBT", (Object)string, (Object)path, (Object)commandSyntaxException);
+            LOGGER.error("Couldn't convert {} from SNBT to NBT at {} as it's invalid SNBT", (Object)name, (Object)path, (Object)commandSyntaxException);
             return null;
         }
         catch (IOException iOException) {
-            LOGGER.error("Couldn't convert {} from SNBT to NBT at {}", (Object)string, (Object)path, (Object)iOException);
+            LOGGER.error("Couldn't convert {} from SNBT to NBT at {}", (Object)name, (Object)path, (Object)iOException);
         }
         return null;
     }
@@ -160,10 +160,10 @@ implements DataProvider {
         private final String field_24616;
         private final String sha1;
 
-        public CompressedData(String string, byte[] bs, @Nullable String string2, String string3) {
-            this.name = string;
-            this.bytes = bs;
-            this.field_24616 = string2;
+        public CompressedData(String name, byte[] bytes, @Nullable String sha1, String string3) {
+            this.name = name;
+            this.bytes = bytes;
+            this.field_24616 = sha1;
             this.sha1 = string3;
         }
     }

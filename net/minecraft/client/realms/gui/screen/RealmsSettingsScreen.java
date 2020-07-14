@@ -31,9 +31,9 @@ extends RealmsScreen {
     private TextFieldWidget nameEdit;
     private RealmsLabel titleLabel;
 
-    public RealmsSettingsScreen(RealmsConfigureWorldScreen arg, RealmsServer arg2) {
-        this.parent = arg;
-        this.serverData = arg2;
+    public RealmsSettingsScreen(RealmsConfigureWorldScreen parent, RealmsServer serverData) {
+        this.parent = parent;
+        this.serverData = serverData;
     }
 
     @Override
@@ -85,23 +85,23 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.titleLabel.render(this, arg);
-        this.textRenderer.draw(arg, I18n.translate("mco.configure.world.name", new Object[0]), (float)(this.width / 2 - 106), (float)RealmsSettingsScreen.row(3), 0xA0A0A0);
-        this.textRenderer.draw(arg, I18n.translate("mco.configure.world.description", new Object[0]), (float)(this.width / 2 - 106), (float)RealmsSettingsScreen.row(7), 0xA0A0A0);
-        this.nameEdit.render(arg, i, j, f);
-        this.descEdit.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.titleLabel.render(this, matrices);
+        this.textRenderer.draw(matrices, I18n.translate("mco.configure.world.name", new Object[0]), (float)(this.width / 2 - 106), (float)RealmsSettingsScreen.row(3), 0xA0A0A0);
+        this.textRenderer.draw(matrices, I18n.translate("mco.configure.world.description", new Object[0]), (float)(this.width / 2 - 106), (float)RealmsSettingsScreen.row(7), 0xA0A0A0);
+        this.nameEdit.render(matrices, mouseX, mouseY, delta);
+        this.descEdit.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     public void save() {

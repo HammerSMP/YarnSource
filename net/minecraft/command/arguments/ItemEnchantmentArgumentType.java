@@ -38,8 +38,8 @@ implements ArgumentType<Enchantment> {
         return new ItemEnchantmentArgumentType();
     }
 
-    public static Enchantment getEnchantment(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (Enchantment)commandContext.getArgument(string, Enchantment.class);
+    public static Enchantment getEnchantment(CommandContext<ServerCommandSource> context, String name) {
+        return (Enchantment)context.getArgument(name, Enchantment.class);
     }
 
     public Enchantment parse(StringReader stringReader) throws CommandSyntaxException {
@@ -47,8 +47,8 @@ implements ArgumentType<Enchantment> {
         return Registry.ENCHANTMENT.getOrEmpty(lv).orElseThrow(() -> UNKNOWN_ENCHANTMENT_EXCEPTION.create((Object)lv));
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestIdentifiers(Registry.ENCHANTMENT.getIds(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestIdentifiers(Registry.ENCHANTMENT.getIds(), builder);
     }
 
     public Collection<String> getExamples() {

@@ -30,15 +30,15 @@ implements BakedModel {
     private final Sprite sprite;
     private final boolean field_21862;
 
-    public BuiltinBakedModel(ModelTransformation arg, ModelOverrideList arg2, Sprite arg3, boolean bl) {
-        this.transformation = arg;
-        this.itemPropertyOverrides = arg2;
-        this.sprite = arg3;
+    public BuiltinBakedModel(ModelTransformation transformation, ModelOverrideList itemPropertyOverrides, Sprite sprite, boolean bl) {
+        this.transformation = transformation;
+        this.itemPropertyOverrides = itemPropertyOverrides;
+        this.sprite = sprite;
         this.field_21862 = bl;
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState arg, @Nullable Direction arg2, Random random) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction face, Random random) {
         return Collections.emptyList();
     }
 

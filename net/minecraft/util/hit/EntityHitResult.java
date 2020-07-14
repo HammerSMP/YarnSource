@@ -11,13 +11,13 @@ public class EntityHitResult
 extends HitResult {
     private final Entity entity;
 
-    public EntityHitResult(Entity arg) {
-        this(arg, arg.getPos());
+    public EntityHitResult(Entity entity) {
+        this(entity, entity.getPos());
     }
 
-    public EntityHitResult(Entity arg, Vec3d arg2) {
-        super(arg2);
-        this.entity = arg;
+    public EntityHitResult(Entity entity, Vec3d pos) {
+        super(pos);
+        this.entity = entity;
     }
 
     public Entity getEntity() {

@@ -37,13 +37,13 @@ implements ArgumentType<ItemStackArgument> {
         return new ItemStackArgument(lv.getItem(), lv.getTag());
     }
 
-    public static <S> ItemStackArgument getItemStackArgument(CommandContext<S> commandContext, String string) {
-        return (ItemStackArgument)commandContext.getArgument(string, ItemStackArgument.class);
+    public static <S> ItemStackArgument getItemStackArgument(CommandContext<S> context, String name) {
+        return (ItemStackArgument)context.getArgument(name, ItemStackArgument.class);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        StringReader stringReader = new StringReader(suggestionsBuilder.getInput());
-        stringReader.setCursor(suggestionsBuilder.getStart());
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        StringReader stringReader = new StringReader(builder.getInput());
+        stringReader.setCursor(builder.getStart());
         ItemStringReader lv = new ItemStringReader(stringReader, false);
         try {
             lv.consume();
@@ -51,7 +51,7 @@ implements ArgumentType<ItemStackArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder, ItemTags.getTagGroup());
+        return lv.getSuggestions(builder, ItemTags.getTagGroup());
     }
 
     public Collection<String> getExamples() {

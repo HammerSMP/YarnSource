@@ -17,18 +17,18 @@ implements Packet<ServerPlayPacketListener> {
     public RecipeBookDataC2SPacket() {
     }
 
-    public RecipeBookDataC2SPacket(Recipe<?> arg) {
-        this.recipeId = arg.getId();
+    public RecipeBookDataC2SPacket(Recipe<?> recipe) {
+        this.recipeId = recipe.getId();
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.recipeId = arg.readIdentifier();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.recipeId = buf.readIdentifier();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeIdentifier(this.recipeId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeIdentifier(this.recipeId);
     }
 
     @Override

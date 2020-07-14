@@ -28,7 +28,7 @@ extends InputSlotFiller<C> {
     }
 
     @Override
-    protected void fillInputSlots(Recipe<C> arg, boolean bl) {
+    protected void fillInputSlots(Recipe<C> arg, boolean craftAll) {
         ItemStack lv;
         this.slotMatchesRecipe = this.craftingScreenHandler.matches(arg);
         int i = this.recipeFinder.countRecipeCrafts(arg, null);
@@ -36,7 +36,7 @@ extends InputSlotFiller<C> {
             return;
         }
         IntArrayList intList = new IntArrayList();
-        int j = this.getAmountToFill(bl, i, this.slotMatchesRecipe);
+        int j = this.getAmountToFill(craftAll, i, this.slotMatchesRecipe);
         if (!this.recipeFinder.findRecipe(arg, (IntList)intList, j)) {
             return;
         }
@@ -53,14 +53,14 @@ extends InputSlotFiller<C> {
         super.returnInputs();
     }
 
-    protected void fillInputSlot(int i, IntList intList) {
-        IntListIterator iterator = intList.iterator();
+    protected void fillInputSlot(int limit, IntList inputs) {
+        IntListIterator iterator = inputs.iterator();
         Slot lv = this.craftingScreenHandler.getSlot(0);
         ItemStack lv2 = RecipeFinder.getStackFromId((Integer)iterator.next());
         if (lv2.isEmpty()) {
             return;
         }
-        int j = Math.min(lv2.getMaxCount(), i);
+        int j = Math.min(lv2.getMaxCount(), limit);
         if (this.slotMatchesRecipe) {
             j -= lv.getStack().getCount();
         }

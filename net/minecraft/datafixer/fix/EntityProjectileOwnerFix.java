@@ -27,8 +27,8 @@ import net.minecraft.datafixer.TypeReferences;
 
 public class EntityProjectileOwnerFix
 extends DataFix {
-    public EntityProjectileOwnerFix(Schema schema) {
-        super(schema, false);
+    public EntityProjectileOwnerFix(Schema outputSchema) {
+        super(outputSchema, false);
     }
 
     protected TypeRewriteRule makeRule() {
@@ -76,16 +76,16 @@ extends DataFix {
         return this.insertOwnerUuidArray(dynamic, l, m).remove("owner");
     }
 
-    private Dynamic<?> insertOwnerUuidArray(Dynamic<?> dynamic, long l, long m) {
+    private Dynamic<?> insertOwnerUuidArray(Dynamic<?> dynamic, long most, long least) {
         String string = "OwnerUUID";
-        if (l != 0L && m != 0L) {
-            return dynamic.set("OwnerUUID", dynamic.createIntList(Arrays.stream(EntityProjectileOwnerFix.makeUuidArray(l, m))));
+        if (most != 0L && least != 0L) {
+            return dynamic.set("OwnerUUID", dynamic.createIntList(Arrays.stream(EntityProjectileOwnerFix.makeUuidArray(most, least))));
         }
         return dynamic;
     }
 
-    private static int[] makeUuidArray(long l, long m) {
-        return new int[]{(int)(l >> 32), (int)l, (int)(m >> 32), (int)m};
+    private static int[] makeUuidArray(long most, long least) {
+        return new int[]{(int)(most >> 32), (int)most, (int)(least >> 32), (int)least};
     }
 
     private Typed<?> update(Typed<?> typed2, String string, Function<Dynamic<?>, Dynamic<?>> function) {

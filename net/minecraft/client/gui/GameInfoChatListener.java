@@ -20,16 +20,16 @@ public class GameInfoChatListener
 implements ClientChatListener {
     private final MinecraftClient client;
 
-    public GameInfoChatListener(MinecraftClient arg) {
-        this.client = arg;
+    public GameInfoChatListener(MinecraftClient client) {
+        this.client = client;
     }
 
     @Override
-    public void onChatMessage(MessageType arg, Text arg2, UUID uUID) {
-        if (this.client.shouldBlockMessages(uUID)) {
+    public void onChatMessage(MessageType messageType, Text message, UUID senderUuid) {
+        if (this.client.shouldBlockMessages(senderUuid)) {
             return;
         }
-        this.client.inGameHud.setOverlayMessage(arg2, false);
+        this.client.inGameHud.setOverlayMessage(message, false);
     }
 }
 

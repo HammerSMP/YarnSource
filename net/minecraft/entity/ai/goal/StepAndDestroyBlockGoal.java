@@ -33,10 +33,10 @@ extends MoveToTargetPosGoal {
     private final MobEntity stepAndDestroyMob;
     private int counter;
 
-    public StepAndDestroyBlockGoal(Block arg, PathAwareEntity arg2, double d, int i) {
-        super(arg2, d, 24, i);
-        this.targetBlock = arg;
-        this.stepAndDestroyMob = arg2;
+    public StepAndDestroyBlockGoal(Block targetBlock, PathAwareEntity mob, double speed, int maxYDifference) {
+        super(mob, speed, 24, maxYDifference);
+        this.targetBlock = targetBlock;
+        this.stepAndDestroyMob = mob;
     }
 
     @Override
@@ -75,10 +75,10 @@ extends MoveToTargetPosGoal {
         this.counter = 0;
     }
 
-    public void tickStepping(WorldAccess arg, BlockPos arg2) {
+    public void tickStepping(WorldAccess world, BlockPos pos) {
     }
 
-    public void onDestroyBlock(World arg, BlockPos arg2) {
+    public void onDestroyBlock(World world, BlockPos pos) {
     }
 
     @Override
@@ -121,23 +121,23 @@ extends MoveToTargetPosGoal {
     }
 
     @Nullable
-    private BlockPos tweakToProperPos(BlockPos arg, BlockView arg2) {
+    private BlockPos tweakToProperPos(BlockPos pos, BlockView world) {
         BlockPos[] lvs;
-        if (arg2.getBlockState(arg).isOf(this.targetBlock)) {
-            return arg;
+        if (world.getBlockState(pos).isOf(this.targetBlock)) {
+            return pos;
         }
-        for (BlockPos lv : lvs = new BlockPos[]{arg.down(), arg.west(), arg.east(), arg.north(), arg.south(), arg.down().down()}) {
-            if (!arg2.getBlockState(lv).isOf(this.targetBlock)) continue;
+        for (BlockPos lv : lvs = new BlockPos[]{pos.down(), pos.west(), pos.east(), pos.north(), pos.south(), pos.down().down()}) {
+            if (!world.getBlockState(lv).isOf(this.targetBlock)) continue;
             return lv;
         }
         return null;
     }
 
     @Override
-    protected boolean isTargetPos(WorldView arg, BlockPos arg2) {
-        Chunk lv = arg.getChunk(arg2.getX() >> 4, arg2.getZ() >> 4, ChunkStatus.FULL, false);
+    protected boolean isTargetPos(WorldView world, BlockPos pos) {
+        Chunk lv = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false);
         if (lv != null) {
-            return lv.getBlockState(arg2).isOf(this.targetBlock) && lv.getBlockState(arg2.up()).isAir() && lv.getBlockState(arg2.up(2)).isAir();
+            return lv.getBlockState(pos).isOf(this.targetBlock) && lv.getBlockState(pos.up()).isAir() && lv.getBlockState(pos.up(2)).isAir();
         }
         return false;
     }

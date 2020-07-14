@@ -47,9 +47,9 @@ public class CrashReport {
     private boolean hasStackTrace = true;
     private StackTraceElement[] stackTrace = new StackTraceElement[0];
 
-    public CrashReport(String string, Throwable throwable) {
-        this.message = string;
-        this.cause = throwable;
+    public CrashReport(String message, Throwable cause) {
+        this.message = message;
+        this.cause = cause;
         this.fillSystemDetails();
     }
 
@@ -205,14 +205,14 @@ public class CrashReport {
         return this.systemDetailsSection;
     }
 
-    public CrashReportSection addElement(String string) {
-        return this.addElement(string, 1);
+    public CrashReportSection addElement(String name) {
+        return this.addElement(name, 1);
     }
 
-    public CrashReportSection addElement(String string, int i) {
-        CrashReportSection lv = new CrashReportSection(this, string);
+    public CrashReportSection addElement(String name, int ignoredStackTraceCallCount) {
+        CrashReportSection lv = new CrashReportSection(this, name);
         if (this.hasStackTrace) {
-            int j = lv.initStackTrace(i);
+            int j = lv.initStackTrace(ignoredStackTraceCallCount);
             StackTraceElement[] stackTraceElements = this.cause.getStackTrace();
             StackTraceElement stackTraceElement = null;
             StackTraceElement stackTraceElement2 = null;
@@ -251,15 +251,15 @@ public class CrashReport {
         }
     }
 
-    public static CrashReport create(Throwable throwable, String string) {
+    public static CrashReport create(Throwable cause, String title) {
         CrashReport lv2;
-        while (throwable instanceof CompletionException && throwable.getCause() != null) {
-            throwable = throwable.getCause();
+        while (cause instanceof CompletionException && cause.getCause() != null) {
+            cause = cause.getCause();
         }
-        if (throwable instanceof CrashException) {
-            CrashReport lv = ((CrashException)throwable).getReport();
+        if (cause instanceof CrashException) {
+            CrashReport lv = ((CrashException)cause).getReport();
         } else {
-            lv2 = new CrashReport(string, throwable);
+            lv2 = new CrashReport(title, cause);
         }
         return lv2;
     }

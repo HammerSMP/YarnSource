@@ -56,8 +56,8 @@ public class PointOfInterestSet {
         return RecordCodecBuilder.create(instance -> instance.group((App)RecordCodecBuilder.point((Object)runnable), (App)Codec.BOOL.optionalFieldOf("Valid", (Object)false).forGetter(arg -> arg.valid), (App)PointOfInterest.method_28359(runnable).listOf().fieldOf("Records").forGetter(arg -> ImmutableList.copyOf((Collection)arg.pointsOfInterestByPos.values()))).apply((Applicative)instance, PointOfInterestSet::new)).orElseGet(Util.method_29188("Failed to read POI section: ", ((Logger)LOGGER)::error), () -> new PointOfInterestSet(runnable, false, (List<PointOfInterest>)ImmutableList.of()));
     }
 
-    public PointOfInterestSet(Runnable runnable) {
-        this(runnable, true, (List<PointOfInterest>)ImmutableList.of());
+    public PointOfInterestSet(Runnable updateListener) {
+        this(updateListener, true, (List<PointOfInterest>)ImmutableList.of());
     }
 
     private PointOfInterestSet(Runnable runnable, boolean bl, List<PointOfInterest> list) {
@@ -70,16 +70,16 @@ public class PointOfInterestSet {
         return this.pointsOfInterestByType.entrySet().stream().filter(entry -> predicate.test((PointOfInterestType)entry.getKey())).flatMap(entry -> ((Set)entry.getValue()).stream()).filter(arg.getPredicate());
     }
 
-    public void add(BlockPos arg, PointOfInterestType arg2) {
-        if (this.add(new PointOfInterest(arg, arg2, this.updateListener))) {
-            LOGGER.debug("Added POI of type {} @ {}", new Supplier[]{() -> arg2, () -> arg});
+    public void add(BlockPos pos, PointOfInterestType type) {
+        if (this.add(new PointOfInterest(pos, type, this.updateListener))) {
+            LOGGER.debug("Added POI of type {} @ {}", new Supplier[]{() -> type, () -> pos});
             this.updateListener.run();
         }
     }
 
-    private boolean add(PointOfInterest arg2) {
-        BlockPos lv = arg2.getPos();
-        PointOfInterestType lv2 = arg2.getType();
+    private boolean add(PointOfInterest poi) {
+        BlockPos lv = poi.getPos();
+        PointOfInterestType lv2 = poi.getType();
         short s = ChunkSectionPos.getPackedLocalPos(lv);
         PointOfInterest lv3 = (PointOfInterest)this.pointsOfInterestByPos.get(s);
         if (lv3 != null) {
@@ -88,15 +88,15 @@ public class PointOfInterestSet {
             }
             throw Util.throwOrPause(new IllegalStateException("POI data mismatch: already registered at " + lv));
         }
-        this.pointsOfInterestByPos.put(s, (Object)arg2);
-        this.pointsOfInterestByType.computeIfAbsent(lv2, arg -> Sets.newHashSet()).add(arg2);
+        this.pointsOfInterestByPos.put(s, (Object)poi);
+        this.pointsOfInterestByType.computeIfAbsent(lv2, arg -> Sets.newHashSet()).add(poi);
         return true;
     }
 
-    public void remove(BlockPos arg) {
-        PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.remove(ChunkSectionPos.getPackedLocalPos(arg));
+    public void remove(BlockPos pos) {
+        PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.remove(ChunkSectionPos.getPackedLocalPos(pos));
         if (lv == null) {
-            LOGGER.error("POI data mismatch: never registered at " + arg);
+            LOGGER.error("POI data mismatch: never registered at " + pos);
             return;
         }
         this.pointsOfInterestByType.get(lv.getType()).remove(lv);
@@ -107,24 +107,24 @@ public class PointOfInterestSet {
         this.updateListener.run();
     }
 
-    public boolean releaseTicket(BlockPos arg) {
-        PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.get(ChunkSectionPos.getPackedLocalPos(arg));
+    public boolean releaseTicket(BlockPos pos) {
+        PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.get(ChunkSectionPos.getPackedLocalPos(pos));
         if (lv == null) {
-            throw Util.throwOrPause(new IllegalStateException("POI never registered at " + arg));
+            throw Util.throwOrPause(new IllegalStateException("POI never registered at " + pos));
         }
         boolean bl = lv.releaseTicket();
         this.updateListener.run();
         return bl;
     }
 
-    public boolean test(BlockPos arg, Predicate<PointOfInterestType> predicate) {
-        short s = ChunkSectionPos.getPackedLocalPos(arg);
+    public boolean test(BlockPos pos, Predicate<PointOfInterestType> predicate) {
+        short s = ChunkSectionPos.getPackedLocalPos(pos);
         PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.get(s);
         return lv != null && predicate.test(lv.getType());
     }
 
-    public Optional<PointOfInterestType> getType(BlockPos arg) {
-        short s = ChunkSectionPos.getPackedLocalPos(arg);
+    public Optional<PointOfInterestType> getType(BlockPos pos) {
+        short s = ChunkSectionPos.getPackedLocalPos(pos);
         PointOfInterest lv = (PointOfInterest)this.pointsOfInterestByPos.get(s);
         return lv != null ? Optional.of(lv.getType()) : Optional.empty();
     }

@@ -22,10 +22,10 @@ implements DecoratorConfig {
     public final int belowNoise;
     public final int aboveNoise;
 
-    public NoiseHeightmapDecoratorConfig(double d, int i, int j) {
-        this.noiseLevel = d;
-        this.belowNoise = i;
-        this.aboveNoise = j;
+    public NoiseHeightmapDecoratorConfig(double noiseLevel, int belowNoise, int aboveNoise) {
+        this.noiseLevel = noiseLevel;
+        this.belowNoise = belowNoise;
+        this.aboveNoise = aboveNoise;
     }
 }
 

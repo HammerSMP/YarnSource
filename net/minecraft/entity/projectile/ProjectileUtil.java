@@ -125,16 +125,16 @@ public final class ProjectileUtil {
         arg.yaw = MathHelper.lerp(f, arg.prevYaw, arg.yaw);
     }
 
-    public static Hand getHandPossiblyHolding(LivingEntity arg, Item arg2) {
-        return arg.getMainHandStack().getItem() == arg2 ? Hand.MAIN_HAND : Hand.OFF_HAND;
+    public static Hand getHandPossiblyHolding(LivingEntity entity, Item item) {
+        return entity.getMainHandStack().getItem() == item ? Hand.MAIN_HAND : Hand.OFF_HAND;
     }
 
-    public static PersistentProjectileEntity createArrowProjectile(LivingEntity arg, ItemStack arg2, float f) {
-        ArrowItem lv = (ArrowItem)(arg2.getItem() instanceof ArrowItem ? arg2.getItem() : Items.ARROW);
-        PersistentProjectileEntity lv2 = lv.createArrow(arg.world, arg2, arg);
-        lv2.applyEnchantmentEffects(arg, f);
-        if (arg2.getItem() == Items.TIPPED_ARROW && lv2 instanceof ArrowEntity) {
-            ((ArrowEntity)lv2).initFromStack(arg2);
+    public static PersistentProjectileEntity createArrowProjectile(LivingEntity entity, ItemStack stack, float damageModifier) {
+        ArrowItem lv = (ArrowItem)(stack.getItem() instanceof ArrowItem ? stack.getItem() : Items.ARROW);
+        PersistentProjectileEntity lv2 = lv.createArrow(entity.world, stack, entity);
+        lv2.applyEnchantmentEffects(entity, damageModifier);
+        if (stack.getItem() == Items.TIPPED_ARROW && lv2 instanceof ArrowEntity) {
+            ((ArrowEntity)lv2).initFromStack(stack);
         }
         return lv2;
     }

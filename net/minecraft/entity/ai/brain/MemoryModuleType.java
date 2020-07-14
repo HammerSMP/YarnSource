@@ -93,8 +93,8 @@ public class MemoryModuleType<U> {
     public static final MemoryModuleType<Boolean> PACIFIED = MemoryModuleType.register("pacified");
     private final Optional<Codec<Memory<U>>> field_24668;
 
-    private MemoryModuleType(Optional<Codec<U>> optional) {
-        this.field_24668 = optional.map(Memory::method_28353);
+    private MemoryModuleType(Optional<Codec<U>> factory) {
+        this.field_24668 = factory.map(Memory::method_28353);
     }
 
     public String toString() {
@@ -105,12 +105,12 @@ public class MemoryModuleType<U> {
         return this.field_24668;
     }
 
-    private static <U> MemoryModuleType<U> register(String string, Codec<U> codec) {
-        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(string), new MemoryModuleType<U>(Optional.of(codec)));
+    private static <U> MemoryModuleType<U> register(String id, Codec<U> codec) {
+        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(id), new MemoryModuleType<U>(Optional.of(codec)));
     }
 
-    private static <U> MemoryModuleType<U> register(String string) {
-        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(string), new MemoryModuleType<U>(Optional.empty()));
+    private static <U> MemoryModuleType<U> register(String id) {
+        return Registry.register(Registry.MEMORY_MODULE_TYPE, new Identifier(id), new MemoryModuleType<U>(Optional.empty()));
     }
 }
 

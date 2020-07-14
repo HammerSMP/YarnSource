@@ -22,8 +22,8 @@ extends BlockStateProvider {
     public static final Codec<PillarBlockStateProvider> CODEC = BlockState.CODEC.fieldOf("state").xmap(AbstractBlock.AbstractBlockState::getBlock, Block::getDefaultState).xmap(PillarBlockStateProvider::new, arg -> arg.block).codec();
     private final Block block;
 
-    public PillarBlockStateProvider(Block arg) {
-        this.block = arg;
+    public PillarBlockStateProvider(Block block) {
+        this.block = block;
     }
 
     @Override
@@ -32,7 +32,7 @@ extends BlockStateProvider {
     }
 
     @Override
-    public BlockState getBlockState(Random random, BlockPos arg) {
+    public BlockState getBlockState(Random random, BlockPos pos) {
         Direction.Axis lv = Direction.Axis.pickRandomAxis(random);
         return (BlockState)this.block.getDefaultState().with(PillarBlock.AXIS, lv);
     }

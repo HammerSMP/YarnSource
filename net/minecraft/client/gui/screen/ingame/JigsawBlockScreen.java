@@ -42,9 +42,9 @@ extends Screen {
     private ButtonWidget doneButton;
     private JigsawBlockEntity.Joint joint;
 
-    public JigsawBlockScreen(JigsawBlockEntity arg) {
+    public JigsawBlockScreen(JigsawBlockEntity jigsaw) {
         super(NarratorManager.EMPTY);
-        this.jigsaw = arg;
+        this.jigsaw = jigsaw;
     }
 
     @Override
@@ -150,14 +150,14 @@ extends Screen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.nameField.getText();
         String string2 = this.targetField.getText();
         String string3 = this.poolField.getText();
         String string4 = this.finalStateField.getText();
         int k = this.generationDepth;
         JigsawBlockEntity.Joint lv = this.joint;
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.nameField.setText(string);
         this.targetField.setText(string2);
         this.poolField.setText(string3);
@@ -177,11 +177,11 @@ extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (this.doneButton.active && (i == 257 || i == 335)) {
+        if (this.doneButton.active && (keyCode == 257 || keyCode == 335)) {
             this.onDone();
             return true;
         }
@@ -189,20 +189,20 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.pool", new Object[0]), this.width / 2 - 153, 10, 0xA0A0A0);
-        this.poolField.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.name", new Object[0]), this.width / 2 - 153, 45, 0xA0A0A0);
-        this.nameField.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.target", new Object[0]), this.width / 2 - 153, 80, 0xA0A0A0);
-        this.targetField.render(arg, i, j, f);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.final_state", new Object[0]), this.width / 2 - 153, 115, 0xA0A0A0);
-        this.finalStateField.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("jigsaw_block.pool", new Object[0]), this.width / 2 - 153, 10, 0xA0A0A0);
+        this.poolField.render(matrices, mouseX, mouseY, delta);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("jigsaw_block.name", new Object[0]), this.width / 2 - 153, 45, 0xA0A0A0);
+        this.nameField.render(matrices, mouseX, mouseY, delta);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("jigsaw_block.target", new Object[0]), this.width / 2 - 153, 80, 0xA0A0A0);
+        this.targetField.render(matrices, mouseX, mouseY, delta);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("jigsaw_block.final_state", new Object[0]), this.width / 2 - 153, 115, 0xA0A0A0);
+        this.finalStateField.render(matrices, mouseX, mouseY, delta);
         if (JigsawBlock.getFacing(this.jigsaw.getCachedState()).getAxis().isVertical()) {
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("jigsaw_block.joint_label", new Object[0]), this.width / 2 - 153, 156, 0xFFFFFF);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("jigsaw_block.joint_label", new Object[0]), this.width / 2 - 153, 156, 0xFFFFFF);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

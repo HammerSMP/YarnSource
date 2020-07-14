@@ -76,8 +76,8 @@ extends DataFix {
     });
     private static final Set<String> LOGS_MAP = ImmutableSet.of((Object)"minecraft:acacia_bark", (Object)"minecraft:birch_bark", (Object)"minecraft:dark_oak_bark", (Object)"minecraft:jungle_bark", (Object)"minecraft:oak_bark", (Object)"minecraft:spruce_bark", (Object[])new String[]{"minecraft:acacia_log", "minecraft:birch_log", "minecraft:dark_oak_log", "minecraft:jungle_log", "minecraft:oak_log", "minecraft:spruce_log", "minecraft:stripped_acacia_log", "minecraft:stripped_birch_log", "minecraft:stripped_dark_oak_log", "minecraft:stripped_jungle_log", "minecraft:stripped_oak_log", "minecraft:stripped_spruce_log"});
 
-    public LeavesFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public LeavesFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     protected TypeRewriteRule makeRule() {
@@ -309,8 +309,8 @@ extends DataFix {
             return this.blockStateMap.get(i);
         }
 
-        protected int computeFlags(String string, boolean bl, int i) {
-            return LEAVES_MAP.get((Object)string) << 5 | (bl ? 16 : 0) | i;
+        protected int computeFlags(String leafBlockName, boolean persistent, int i) {
+            return LEAVES_MAP.get((Object)leafBlockName) << 5 | (persistent ? 16 : 0) | i;
         }
 
         int method_5077() {

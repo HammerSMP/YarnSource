@@ -30,33 +30,33 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public UpdateJigsawC2SPacket(BlockPos arg, Identifier arg2, Identifier arg3, Identifier arg4, String string, JigsawBlockEntity.Joint arg5) {
-        this.pos = arg;
-        this.attachmentType = arg2;
-        this.targetPool = arg3;
-        this.pool = arg4;
-        this.finalState = string;
-        this.jointType = arg5;
+    public UpdateJigsawC2SPacket(BlockPos pos, Identifier attachmentType, Identifier targetPool, Identifier pool, String finalState, JigsawBlockEntity.Joint jointType) {
+        this.pos = pos;
+        this.attachmentType = attachmentType;
+        this.targetPool = targetPool;
+        this.pool = pool;
+        this.finalState = finalState;
+        this.jointType = jointType;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.pos = arg.readBlockPos();
-        this.attachmentType = arg.readIdentifier();
-        this.targetPool = arg.readIdentifier();
-        this.pool = arg.readIdentifier();
-        this.finalState = arg.readString(32767);
-        this.jointType = JigsawBlockEntity.Joint.byName(arg.readString(32767)).orElse(JigsawBlockEntity.Joint.ALIGNED);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.pos = buf.readBlockPos();
+        this.attachmentType = buf.readIdentifier();
+        this.targetPool = buf.readIdentifier();
+        this.pool = buf.readIdentifier();
+        this.finalState = buf.readString(32767);
+        this.jointType = JigsawBlockEntity.Joint.byName(buf.readString(32767)).orElse(JigsawBlockEntity.Joint.ALIGNED);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBlockPos(this.pos);
-        arg.writeIdentifier(this.attachmentType);
-        arg.writeIdentifier(this.targetPool);
-        arg.writeIdentifier(this.pool);
-        arg.writeString(this.finalState);
-        arg.writeString(this.jointType.asString());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBlockPos(this.pos);
+        buf.writeIdentifier(this.attachmentType);
+        buf.writeIdentifier(this.targetPool);
+        buf.writeIdentifier(this.pool);
+        buf.writeString(this.finalState);
+        buf.writeString(this.jointType.asString());
     }
 
     @Override

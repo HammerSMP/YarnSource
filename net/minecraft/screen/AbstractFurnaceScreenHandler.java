@@ -40,13 +40,13 @@ extends AbstractRecipeScreenHandler<Inventory> {
     private final RecipeType<? extends AbstractCookingRecipe> recipeType;
     private final RecipeBookCategory field_25762;
 
-    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, RecipeBookCategory arg3, int i, PlayerInventory arg4) {
-        this(arg, arg2, arg3, i, arg4, new SimpleInventory(3), new ArrayPropertyDelegate(4));
+    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> type, RecipeType<? extends AbstractCookingRecipe> recipeType, RecipeBookCategory arg3, int i, PlayerInventory arg4) {
+        this(type, recipeType, arg3, i, arg4, new SimpleInventory(3), new ArrayPropertyDelegate(4));
     }
 
-    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> arg, RecipeType<? extends AbstractCookingRecipe> arg2, RecipeBookCategory arg3, int i, PlayerInventory arg4, Inventory arg5, PropertyDelegate arg6) {
-        super(arg, i);
-        this.recipeType = arg2;
+    protected AbstractFurnaceScreenHandler(ScreenHandlerType<?> type, RecipeType<? extends AbstractCookingRecipe> recipeType, RecipeBookCategory arg3, int i, PlayerInventory arg4, Inventory arg5, PropertyDelegate arg6) {
+        super(type, i);
+        this.recipeType = recipeType;
         this.field_25762 = arg3;
         AbstractFurnaceScreenHandler.checkSize(arg5, 3);
         AbstractFurnaceScreenHandler.checkDataCount(arg6, 4);
@@ -68,9 +68,9 @@ extends AbstractRecipeScreenHandler<Inventory> {
     }
 
     @Override
-    public void populateRecipeFinder(RecipeFinder arg) {
+    public void populateRecipeFinder(RecipeFinder finder) {
         if (this.inventory instanceof RecipeInputProvider) {
-            ((RecipeInputProvider)((Object)this.inventory)).provideRecipeInputs(arg);
+            ((RecipeInputProvider)((Object)this.inventory)).provideRecipeInputs(finder);
         }
     }
 
@@ -80,13 +80,13 @@ extends AbstractRecipeScreenHandler<Inventory> {
     }
 
     @Override
-    public void fillInputSlots(boolean bl, Recipe<?> arg, ServerPlayerEntity arg2) {
-        new FurnaceInputSlotFiller<Inventory>(this).fillInputSlots(arg2, arg, bl);
+    public void fillInputSlots(boolean craftAll, Recipe<?> recipe, ServerPlayerEntity player) {
+        new FurnaceInputSlotFiller<Inventory>(this).fillInputSlots(player, recipe, craftAll);
     }
 
     @Override
-    public boolean matches(Recipe<? super Inventory> arg) {
-        return arg.matches(this.inventory, this.world);
+    public boolean matches(Recipe<? super Inventory> recipe) {
+        return recipe.matches(this.inventory, this.world);
     }
 
     @Override
@@ -111,23 +111,23 @@ extends AbstractRecipeScreenHandler<Inventory> {
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return this.inventory.canPlayerUse(arg);
+    public boolean canUse(PlayerEntity player) {
+        return this.inventory.canPlayerUse(player);
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             lv = lv3.copy();
-            if (i == 2) {
+            if (index == 2) {
                 if (!this.insertItem(lv3, 3, 39, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i == 1 || i == 0 ? !this.insertItem(lv3, 3, 39, false) : (this.isSmeltable(lv3) ? !this.insertItem(lv3, 0, 1, false) : (this.isFuel(lv3) ? !this.insertItem(lv3, 1, 2, false) : (i >= 3 && i < 30 ? !this.insertItem(lv3, 30, 39, false) : i >= 30 && i < 39 && !this.insertItem(lv3, 3, 30, false))))) {
+            } else if (index == 1 || index == 0 ? !this.insertItem(lv3, 3, 39, false) : (this.isSmeltable(lv3) ? !this.insertItem(lv3, 0, 1, false) : (this.isFuel(lv3) ? !this.insertItem(lv3, 1, 2, false) : (index >= 3 && index < 30 ? !this.insertItem(lv3, 30, 39, false) : index >= 30 && index < 39 && !this.insertItem(lv3, 3, 30, false))))) {
                 return ItemStack.EMPTY;
             }
             if (lv3.isEmpty()) {
@@ -138,17 +138,17 @@ extends AbstractRecipeScreenHandler<Inventory> {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
         }
         return lv;
     }
 
-    protected boolean isSmeltable(ItemStack arg) {
-        return this.world.getRecipeManager().getFirstMatch(this.recipeType, new SimpleInventory(arg), this.world).isPresent();
+    protected boolean isSmeltable(ItemStack itemStack) {
+        return this.world.getRecipeManager().getFirstMatch(this.recipeType, new SimpleInventory(itemStack), this.world).isPresent();
     }
 
-    protected boolean isFuel(ItemStack arg) {
-        return AbstractFurnaceBlockEntity.canUseAsFuel(arg);
+    protected boolean isFuel(ItemStack itemStack) {
+        return AbstractFurnaceBlockEntity.canUseAsFuel(itemStack);
     }
 
     @Environment(value=EnvType.CLIENT)

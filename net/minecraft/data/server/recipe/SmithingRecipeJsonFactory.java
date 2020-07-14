@@ -31,35 +31,35 @@ public class SmithingRecipeJsonFactory {
     private final Advancement.Task builder = Advancement.Task.create();
     private final RecipeSerializer<?> serializer;
 
-    public SmithingRecipeJsonFactory(RecipeSerializer<?> arg, Ingredient arg2, Ingredient arg3, Item arg4) {
-        this.serializer = arg;
-        this.base = arg2;
-        this.addition = arg3;
-        this.result = arg4;
+    public SmithingRecipeJsonFactory(RecipeSerializer<?> serializer, Ingredient base, Ingredient addition, Item result) {
+        this.serializer = serializer;
+        this.base = base;
+        this.addition = addition;
+        this.result = result;
     }
 
-    public static SmithingRecipeJsonFactory create(Ingredient arg, Ingredient arg2, Item arg3) {
-        return new SmithingRecipeJsonFactory(RecipeSerializer.SMITHING, arg, arg2, arg3);
+    public static SmithingRecipeJsonFactory create(Ingredient base, Ingredient addition, Item result) {
+        return new SmithingRecipeJsonFactory(RecipeSerializer.SMITHING, base, addition, result);
     }
 
-    public SmithingRecipeJsonFactory criterion(String string, CriterionConditions arg) {
-        this.builder.criterion(string, arg);
+    public SmithingRecipeJsonFactory criterion(String criterionName, CriterionConditions conditions) {
+        this.builder.criterion(criterionName, conditions);
         return this;
     }
 
-    public void offerTo(Consumer<RecipeJsonProvider> consumer, String string) {
-        this.offerTo(consumer, new Identifier(string));
+    public void offerTo(Consumer<RecipeJsonProvider> exporter, String recipeId) {
+        this.offerTo(exporter, new Identifier(recipeId));
     }
 
-    public void offerTo(Consumer<RecipeJsonProvider> consumer, Identifier arg) {
-        this.validate(arg);
-        this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(arg)).rewards(AdvancementRewards.Builder.recipe(arg)).criteriaMerger(CriterionMerger.OR);
-        consumer.accept(new SmithingRecipeJsonProvider(arg, this.serializer, this.base, this.addition, this.result, this.builder, new Identifier(arg.getNamespace(), "recipes/" + this.result.getGroup().getName() + "/" + arg.getPath())));
+    public void offerTo(Consumer<RecipeJsonProvider> exporter, Identifier recipeId) {
+        this.validate(recipeId);
+        this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId)).rewards(AdvancementRewards.Builder.recipe(recipeId)).criteriaMerger(CriterionMerger.OR);
+        exporter.accept(new SmithingRecipeJsonProvider(recipeId, this.serializer, this.base, this.addition, this.result, this.builder, new Identifier(recipeId.getNamespace(), "recipes/" + this.result.getGroup().getName() + "/" + recipeId.getPath())));
     }
 
-    private void validate(Identifier arg) {
+    private void validate(Identifier recipeId) {
         if (this.builder.getCriteria().isEmpty()) {
-            throw new IllegalStateException("No way of obtaining recipe " + arg);
+            throw new IllegalStateException("No way of obtaining recipe " + recipeId);
         }
     }
 
@@ -73,23 +73,23 @@ public class SmithingRecipeJsonFactory {
         private final Identifier advancementId;
         private final RecipeSerializer<?> serializer;
 
-        public SmithingRecipeJsonProvider(Identifier arg, RecipeSerializer<?> arg2, Ingredient arg3, Ingredient arg4, Item arg5, Advancement.Task arg6, Identifier arg7) {
-            this.recipeId = arg;
-            this.serializer = arg2;
-            this.base = arg3;
-            this.addition = arg4;
-            this.result = arg5;
-            this.builder = arg6;
-            this.advancementId = arg7;
+        public SmithingRecipeJsonProvider(Identifier recipeId, RecipeSerializer<?> serializer, Ingredient base, Ingredient addition, Item result, Advancement.Task builder, Identifier advancementId) {
+            this.recipeId = recipeId;
+            this.serializer = serializer;
+            this.base = base;
+            this.addition = addition;
+            this.result = result;
+            this.builder = builder;
+            this.advancementId = advancementId;
         }
 
         @Override
-        public void serialize(JsonObject jsonObject) {
-            jsonObject.add("base", this.base.toJson());
-            jsonObject.add("addition", this.addition.toJson());
+        public void serialize(JsonObject json) {
+            json.add("base", this.base.toJson());
+            json.add("addition", this.addition.toJson());
             JsonObject jsonObject2 = new JsonObject();
             jsonObject2.addProperty("item", Registry.ITEM.getId(this.result).toString());
-            jsonObject.add("result", (JsonElement)jsonObject2);
+            json.add("result", (JsonElement)jsonObject2);
         }
 
         @Override

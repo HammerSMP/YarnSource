@@ -25,8 +25,8 @@ import net.minecraft.world.poi.PointOfInterestType;
 public class PortalForcer {
     private final ServerWorld world;
 
-    public PortalForcer(ServerWorld arg) {
-        this.world = arg;
+    public PortalForcer(ServerWorld world) {
+        this.world = world;
     }
 
     public Optional<class_5459.class_5460> method_30483(BlockPos arg3, boolean bl) {
@@ -36,7 +36,7 @@ public class PortalForcer {
         Optional<PointOfInterest> optional = lv.getInSquare(arg -> arg == PointOfInterestType.NETHER_PORTAL, arg3, i, PointOfInterestStorage.OccupationStatus.ANY).min(Comparator.comparingDouble(arg2 -> arg2.getPos().getSquaredDistance(arg3)).thenComparingInt(arg -> arg.getPos().getY()));
         return optional.map(arg -> {
             BlockPos lv = arg.getPos();
-            this.world.getChunkManager().addTicket(ChunkTicketType.PORTAL, new ChunkPos(lv), 3, lv);
+            this.world.getChunkManager().addTicket(ChunkTicketType.field_19280, new ChunkPos(lv), 3, lv);
             BlockState lv2 = this.world.getBlockState(lv);
             return class_5459.method_30574(lv, lv2.get(Properties.HORIZONTAL_AXIS), 21, Direction.Axis.Y, 21, arg2 -> this.world.getBlockState((BlockPos)arg2) == lv2);
         });

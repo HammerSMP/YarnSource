@@ -22,11 +22,11 @@ public class NoiseSamplingConfig {
     private final double xzFactor;
     private final double yFactor;
 
-    public NoiseSamplingConfig(double d, double e, double f, double g) {
-        this.xzScale = d;
-        this.yScale = e;
-        this.xzFactor = f;
-        this.yFactor = g;
+    public NoiseSamplingConfig(double xzScale, double yScale, double xzFactor, double yFactor) {
+        this.xzScale = xzScale;
+        this.yScale = yScale;
+        this.xzFactor = xzFactor;
+        this.yFactor = yFactor;
     }
 
     public double getXZScale() {

@@ -27,40 +27,40 @@ extends RealmsScreen {
     private Text line1;
     private Text line2;
 
-    public RealmsGenericErrorScreen(RealmsServiceException arg, Screen arg2) {
-        this.parent = arg2;
-        this.errorMessage(arg);
+    public RealmsGenericErrorScreen(RealmsServiceException realmsServiceException, Screen parent) {
+        this.parent = parent;
+        this.errorMessage(realmsServiceException);
     }
 
-    public RealmsGenericErrorScreen(Text arg, Screen arg2) {
-        this.parent = arg2;
-        this.errorMessage(arg);
+    public RealmsGenericErrorScreen(Text line2, Screen parent) {
+        this.parent = parent;
+        this.errorMessage(line2);
     }
 
-    public RealmsGenericErrorScreen(Text arg, Text arg2, Screen arg3) {
-        this.parent = arg3;
-        this.errorMessage(arg, arg2);
+    public RealmsGenericErrorScreen(Text line1, Text line2, Screen parent) {
+        this.parent = parent;
+        this.errorMessage(line1, line2);
     }
 
-    private void errorMessage(RealmsServiceException arg) {
-        if (arg.errorCode == -1) {
-            this.line1 = new LiteralText("An error occurred (" + arg.httpResultCode + "):");
-            this.line2 = new LiteralText(arg.httpResponseContent);
+    private void errorMessage(RealmsServiceException realmsServiceException) {
+        if (realmsServiceException.errorCode == -1) {
+            this.line1 = new LiteralText("An error occurred (" + realmsServiceException.httpResultCode + "):");
+            this.line2 = new LiteralText(realmsServiceException.httpResponseContent);
         } else {
-            this.line1 = new LiteralText("Realms (" + arg.errorCode + "):");
-            String string = "mco.errorMessage." + arg.errorCode;
-            this.line2 = I18n.hasTranslation(string) ? new TranslatableText(string) : Text.method_30163(arg.errorMsg);
+            this.line1 = new LiteralText("Realms (" + realmsServiceException.errorCode + "):");
+            String string = "mco.errorMessage." + realmsServiceException.errorCode;
+            this.line2 = I18n.hasTranslation(string) ? new TranslatableText(string) : Text.method_30163(realmsServiceException.errorMsg);
         }
     }
 
-    private void errorMessage(Text arg) {
+    private void errorMessage(Text line2) {
         this.line1 = new LiteralText("An error occurred: ");
-        this.line2 = arg;
+        this.line2 = line2;
     }
 
-    private void errorMessage(Text arg, Text arg2) {
-        this.line1 = arg;
-        this.line2 = arg2;
+    private void errorMessage(Text line1, Text line2) {
+        this.line1 = line1;
+        this.line2 = line2;
     }
 
     @Override
@@ -70,11 +70,11 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.line1, this.width / 2, 80, 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, this.line2, this.width / 2, 100, 0xFF0000);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.line1, this.width / 2, 80, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.line2, this.width / 2, 100, 0xFF0000);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

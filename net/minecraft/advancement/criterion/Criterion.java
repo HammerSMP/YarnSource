@@ -29,28 +29,28 @@ public interface Criterion<T extends CriterionConditions> {
         private final Advancement advancement;
         private final String id;
 
-        public ConditionsContainer(T arg, Advancement arg2, String string) {
-            this.conditions = arg;
-            this.advancement = arg2;
-            this.id = string;
+        public ConditionsContainer(T conditions, Advancement advancement, String id) {
+            this.conditions = conditions;
+            this.advancement = advancement;
+            this.id = id;
         }
 
         public T getConditions() {
             return this.conditions;
         }
 
-        public void grant(PlayerAdvancementTracker arg) {
-            arg.grantCriterion(this.advancement, this.id);
+        public void grant(PlayerAdvancementTracker tracker) {
+            tracker.grantCriterion(this.advancement, this.id);
         }
 
-        public boolean equals(Object object) {
-            if (this == object) {
+        public boolean equals(Object o) {
+            if (this == o) {
                 return true;
             }
-            if (object == null || this.getClass() != object.getClass()) {
+            if (o == null || this.getClass() != o.getClass()) {
                 return false;
             }
-            ConditionsContainer lv = (ConditionsContainer)object;
+            ConditionsContainer lv = (ConditionsContainer)o;
             if (!this.conditions.equals(lv.conditions)) {
                 return false;
             }

@@ -17,9 +17,9 @@ public enum GameMode {
     private final int id;
     private final String name;
 
-    private GameMode(int j, String string2) {
-        this.id = j;
-        this.name = string2;
+    private GameMode(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public int getId() {
@@ -34,23 +34,23 @@ public enum GameMode {
         return new TranslatableText("gameMode." + this.name);
     }
 
-    public void setAbilities(PlayerAbilities arg) {
+    public void setAbilities(PlayerAbilities abilities) {
         if (this == CREATIVE) {
-            arg.allowFlying = true;
-            arg.creativeMode = true;
-            arg.invulnerable = true;
+            abilities.allowFlying = true;
+            abilities.creativeMode = true;
+            abilities.invulnerable = true;
         } else if (this == SPECTATOR) {
-            arg.allowFlying = true;
-            arg.creativeMode = false;
-            arg.invulnerable = true;
-            arg.flying = true;
+            abilities.allowFlying = true;
+            abilities.creativeMode = false;
+            abilities.invulnerable = true;
+            abilities.flying = true;
         } else {
-            arg.allowFlying = false;
-            arg.creativeMode = false;
-            arg.invulnerable = false;
-            arg.flying = false;
+            abilities.allowFlying = false;
+            abilities.creativeMode = false;
+            abilities.invulnerable = false;
+            abilities.flying = false;
         }
-        arg.allowModifyWorld = !this.isBlockBreakingRestricted();
+        abilities.allowModifyWorld = !this.isBlockBreakingRestricted();
     }
 
     public boolean isBlockBreakingRestricted() {
@@ -65,28 +65,28 @@ public enum GameMode {
         return this == SURVIVAL || this == ADVENTURE;
     }
 
-    public static GameMode byId(int i) {
-        return GameMode.byId(i, SURVIVAL);
+    public static GameMode byId(int id) {
+        return GameMode.byId(id, SURVIVAL);
     }
 
-    public static GameMode byId(int i, GameMode arg) {
+    public static GameMode byId(int id, GameMode defaultMode) {
         for (GameMode lv : GameMode.values()) {
-            if (lv.id != i) continue;
+            if (lv.id != id) continue;
             return lv;
         }
-        return arg;
+        return defaultMode;
     }
 
-    public static GameMode byName(String string) {
-        return GameMode.byName(string, SURVIVAL);
+    public static GameMode byName(String name) {
+        return GameMode.byName(name, SURVIVAL);
     }
 
-    public static GameMode byName(String string, GameMode arg) {
+    public static GameMode byName(String name, GameMode defaultMode) {
         for (GameMode lv : GameMode.values()) {
-            if (!lv.name.equals(string)) continue;
+            if (!lv.name.equals(name)) continue;
             return lv;
         }
-        return arg;
+        return defaultMode;
     }
 }
 

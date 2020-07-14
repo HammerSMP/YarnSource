@@ -33,24 +33,24 @@ extends ProjectileEntity {
         super((EntityType<? extends ProjectileEntity>)arg, arg2);
     }
 
-    protected ThrownEntity(EntityType<? extends ThrownEntity> arg, double d, double e, double f, World arg2) {
-        this(arg, arg2);
-        this.updatePosition(d, e, f);
+    protected ThrownEntity(EntityType<? extends ThrownEntity> type, double x, double y, double z, World world) {
+        this(type, world);
+        this.updatePosition(x, y, z);
     }
 
-    protected ThrownEntity(EntityType<? extends ThrownEntity> arg, LivingEntity arg2, World arg3) {
-        this(arg, arg2.getX(), arg2.getEyeY() - (double)0.1f, arg2.getZ(), arg3);
-        this.setOwner(arg2);
+    protected ThrownEntity(EntityType<? extends ThrownEntity> type, LivingEntity owner, World world) {
+        this(type, owner.getX(), owner.getEyeY() - (double)0.1f, owner.getZ(), world);
+        this.setOwner(owner);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
+    public boolean shouldRender(double distance) {
         double e = this.getBoundingBox().getAverageSideLength() * 4.0;
         if (Double.isNaN(e)) {
             e = 4.0;
         }
-        return d < (e *= 64.0) * e;
+        return distance < (e *= 64.0) * e;
     }
 
     @Override

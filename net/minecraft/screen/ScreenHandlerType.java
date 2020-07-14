@@ -59,17 +59,17 @@ public class ScreenHandlerType<T extends ScreenHandler> {
     public static final ScreenHandlerType<StonecutterScreenHandler> STONECUTTER = ScreenHandlerType.register("stonecutter", StonecutterScreenHandler::new);
     private final Factory<T> factory;
 
-    private static <T extends ScreenHandler> ScreenHandlerType<T> register(String string, Factory<T> arg) {
-        return Registry.register(Registry.SCREEN_HANDLER, string, new ScreenHandlerType<T>(arg));
+    private static <T extends ScreenHandler> ScreenHandlerType<T> register(String id, Factory<T> factory) {
+        return Registry.register(Registry.SCREEN_HANDLER, id, new ScreenHandlerType<T>(factory));
     }
 
-    private ScreenHandlerType(Factory<T> arg) {
-        this.factory = arg;
+    private ScreenHandlerType(Factory<T> factory) {
+        this.factory = factory;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public T create(int i, PlayerInventory arg) {
-        return this.factory.create(i, arg);
+    public T create(int syncId, PlayerInventory playerInventory) {
+        return this.factory.create(syncId, playerInventory);
     }
 
     static interface Factory<T extends ScreenHandler> {

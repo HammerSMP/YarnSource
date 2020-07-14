@@ -19,15 +19,15 @@ import net.minecraft.world.World;
 
 public class SignItem
 extends WallStandingBlockItem {
-    public SignItem(Item.Settings arg, Block arg2, Block arg3) {
-        super(arg2, arg3, arg);
+    public SignItem(Item.Settings settings, Block standingBlock, Block wallBlock) {
+        super(standingBlock, wallBlock, settings);
     }
 
     @Override
-    protected boolean postPlacement(BlockPos arg, World arg2, @Nullable PlayerEntity arg3, ItemStack arg4, BlockState arg5) {
-        boolean bl = super.postPlacement(arg, arg2, arg3, arg4, arg5);
-        if (!arg2.isClient && !bl && arg3 != null) {
-            arg3.openEditSignScreen((SignBlockEntity)arg2.getBlockEntity(arg));
+    protected boolean postPlacement(BlockPos pos, World world, @Nullable PlayerEntity player, ItemStack stack, BlockState state) {
+        boolean bl = super.postPlacement(pos, world, player, stack, state);
+        if (!world.isClient && !bl && player != null) {
+            player.openEditSignScreen((SignBlockEntity)world.getBlockEntity(pos));
         }
         return bl;
     }

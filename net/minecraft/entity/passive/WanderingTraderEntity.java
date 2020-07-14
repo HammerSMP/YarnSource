@@ -98,22 +98,22 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() != Items.VILLAGER_SPAWN_EGG && this.isAlive() && !this.hasCustomer() && !this.isBaby()) {
-            if (arg2 == Hand.MAIN_HAND) {
-                arg.incrementStat(Stats.TALKED_TO_VILLAGER);
+            if (hand == Hand.MAIN_HAND) {
+                player.incrementStat(Stats.TALKED_TO_VILLAGER);
             }
             if (this.getOffers().isEmpty()) {
                 return ActionResult.success(this.world.isClient);
             }
             if (!this.world.isClient) {
-                this.setCurrentCustomer(arg);
-                this.sendOffers(arg, this.getDisplayName(), 1);
+                this.setCurrentCustomer(player);
+                this.sendOffers(player, this.getDisplayName(), 1);
             }
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
     @Override
@@ -134,34 +134,34 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("DespawnDelay", this.despawnDelay);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("DespawnDelay", this.despawnDelay);
         if (this.wanderTarget != null) {
-            arg.put("WanderTarget", NbtHelper.fromBlockPos(this.wanderTarget));
+            tag.put("WanderTarget", NbtHelper.fromBlockPos(this.wanderTarget));
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("DespawnDelay", 99)) {
-            this.despawnDelay = arg.getInt("DespawnDelay");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("DespawnDelay", 99)) {
+            this.despawnDelay = tag.getInt("DespawnDelay");
         }
-        if (arg.contains("WanderTarget")) {
-            this.wanderTarget = NbtHelper.toBlockPos(arg.getCompound("WanderTarget"));
+        if (tag.contains("WanderTarget")) {
+            this.wanderTarget = NbtHelper.toBlockPos(tag.getCompound("WanderTarget"));
         }
         this.setBreedingAge(Math.max(0, this.getBreedingAge()));
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return false;
     }
 
     @Override
-    protected void afterUsing(TradeOffer arg) {
-        if (arg.shouldRewardPlayerExperience()) {
+    protected void afterUsing(TradeOffer offer) {
+        if (offer.shouldRewardPlayerExperience()) {
             int i = 3 + this.random.nextInt(4);
             this.world.spawnEntity(new ExperienceOrbEntity(this.world, this.getX(), this.getY() + 0.5, this.getZ(), i));
         }
@@ -176,7 +176,7 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_WANDERING_TRADER_HURT;
     }
 
@@ -186,8 +186,8 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    protected SoundEvent getDrinkSound(ItemStack arg) {
-        Item lv = arg.getItem();
+    protected SoundEvent getDrinkSound(ItemStack stack) {
+        Item lv = stack.getItem();
         if (lv == Items.MILK_BUCKET) {
             return SoundEvents.ENTITY_WANDERING_TRADER_DRINK_MILK;
         }
@@ -195,8 +195,8 @@ extends AbstractTraderEntity {
     }
 
     @Override
-    protected SoundEvent getTradingSound(boolean bl) {
-        return bl ? SoundEvents.ENTITY_WANDERING_TRADER_YES : SoundEvents.ENTITY_WANDERING_TRADER_NO;
+    protected SoundEvent getTradingSound(boolean sold) {
+        return sold ? SoundEvents.ENTITY_WANDERING_TRADER_YES : SoundEvents.ENTITY_WANDERING_TRADER_NO;
     }
 
     @Override
@@ -204,8 +204,8 @@ extends AbstractTraderEntity {
         return SoundEvents.ENTITY_WANDERING_TRADER_YES;
     }
 
-    public void setDespawnDelay(int i) {
-        this.despawnDelay = i;
+    public void setDespawnDelay(int delay) {
+        this.despawnDelay = delay;
     }
 
     public int getDespawnDelay() {
@@ -226,8 +226,8 @@ extends AbstractTraderEntity {
         }
     }
 
-    public void setWanderTarget(@Nullable BlockPos arg) {
-        this.wanderTarget = arg;
+    public void setWanderTarget(@Nullable BlockPos pos) {
+        this.wanderTarget = pos;
     }
 
     @Nullable
@@ -241,10 +241,10 @@ extends AbstractTraderEntity {
         final double proximityDistance;
         final double speed;
 
-        WanderToTargetGoal(WanderingTraderEntity arg2, double d, double e) {
-            this.trader = arg2;
-            this.proximityDistance = d;
-            this.speed = e;
+        WanderToTargetGoal(WanderingTraderEntity trader, double proximityDistance, double speed) {
+            this.trader = trader;
+            this.proximityDistance = proximityDistance;
+            this.speed = speed;
             this.setControls(EnumSet.of(Goal.Control.MOVE));
         }
 
@@ -274,8 +274,8 @@ extends AbstractTraderEntity {
             }
         }
 
-        private boolean isTooFarFrom(BlockPos arg, double d) {
-            return !arg.isWithinDistance(this.trader.getPos(), d);
+        private boolean isTooFarFrom(BlockPos pos, double proximityDistance) {
+            return !pos.isWithinDistance(this.trader.getPos(), proximityDistance);
         }
     }
 }

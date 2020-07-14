@@ -129,20 +129,20 @@ public class Biome {
         return long2FloatLinkedOpenHashMap;
     }));
 
-    protected Biome(Settings arg) {
-        if (arg.surfaceBuilder == null || arg.precipitation == null || arg.category == null || arg.depth == null || arg.scale == null || arg.temperature == null || arg.downfall == null || arg.specialEffects == null) {
-            throw new IllegalStateException("You are missing parameters to build a proper biome for " + this.getClass().getSimpleName() + "\n" + arg);
+    protected Biome(Settings settings) {
+        if (settings.surfaceBuilder == null || settings.precipitation == null || settings.category == null || settings.depth == null || settings.scale == null || settings.temperature == null || settings.downfall == null || settings.specialEffects == null) {
+            throw new IllegalStateException("You are missing parameters to build a proper biome for " + this.getClass().getSimpleName() + "\n" + settings);
         }
-        this.surfaceBuilder = arg.surfaceBuilder;
-        this.precipitation = arg.precipitation;
-        this.category = arg.category;
-        this.depth = arg.depth.floatValue();
-        this.scale = arg.scale.floatValue();
-        this.temperature = arg.temperature.floatValue();
-        this.downfall = arg.downfall.floatValue();
+        this.surfaceBuilder = settings.surfaceBuilder;
+        this.precipitation = settings.precipitation;
+        this.category = settings.category;
+        this.depth = settings.depth.floatValue();
+        this.scale = settings.scale.floatValue();
+        this.temperature = settings.temperature.floatValue();
+        this.downfall = settings.downfall.floatValue();
         this.skyColor = this.calculateSkyColor();
-        this.parent = arg.parent;
-        this.effects = arg.specialEffects;
+        this.parent = settings.parent;
+        this.effects = settings.specialEffects;
         this.carvers = Maps.newHashMap();
         this.structureFeatures = Lists.newArrayList();
         this.features = Lists.newArrayList();
@@ -189,21 +189,21 @@ public class Biome {
         return this.skyColor;
     }
 
-    public void addSpawn(SpawnGroup arg, SpawnEntry arg2) {
-        this.spawns.get(arg).add(arg2);
+    public void addSpawn(SpawnGroup group, SpawnEntry spawnEntry) {
+        this.spawns.get(group).add(spawnEntry);
     }
 
-    protected void addSpawnDensity(EntityType<?> arg, double d, double e) {
-        this.spawnDensities.put(arg, new SpawnDensity(e, d));
+    protected void addSpawnDensity(EntityType<?> type, double maxMass, double mass) {
+        this.spawnDensities.put(type, new SpawnDensity(mass, maxMass));
     }
 
-    public List<SpawnEntry> getEntitySpawnList(SpawnGroup arg) {
-        return this.spawns.get(arg);
+    public List<SpawnEntry> getEntitySpawnList(SpawnGroup group) {
+        return this.spawns.get(group);
     }
 
     @Nullable
-    public SpawnDensity getSpawnDensity(EntityType<?> arg) {
-        return this.spawnDensities.get(arg);
+    public SpawnDensity getSpawnDensity(EntityType<?> type) {
+        return this.spawnDensities.get(type);
     }
 
     public Precipitation getPrecipitation() {
@@ -218,22 +218,22 @@ public class Biome {
         return 0.1f;
     }
 
-    protected float computeTemperature(BlockPos arg) {
-        if (arg.getY() > 64) {
-            float f = (float)(TEMPERATURE_NOISE.sample((float)arg.getX() / 8.0f, (float)arg.getZ() / 8.0f, false) * 4.0);
-            return this.getTemperature() - (f + (float)arg.getY() - 64.0f) * 0.05f / 30.0f;
+    protected float computeTemperature(BlockPos blockPos) {
+        if (blockPos.getY() > 64) {
+            float f = (float)(TEMPERATURE_NOISE.sample((float)blockPos.getX() / 8.0f, (float)blockPos.getZ() / 8.0f, false) * 4.0);
+            return this.getTemperature() - (f + (float)blockPos.getY() - 64.0f) * 0.05f / 30.0f;
         }
         return this.getTemperature();
     }
 
-    public final float getTemperature(BlockPos arg) {
-        long l = arg.asLong();
+    public final float getTemperature(BlockPos blockPos) {
+        long l = blockPos.asLong();
         Long2FloatLinkedOpenHashMap long2FloatLinkedOpenHashMap = this.temperatureCache.get();
         float f = long2FloatLinkedOpenHashMap.get(l);
         if (!Float.isNaN(f)) {
             return f;
         }
-        float g = this.computeTemperature(arg);
+        float g = this.computeTemperature(blockPos);
         if (long2FloatLinkedOpenHashMap.size() == 1024) {
             long2FloatLinkedOpenHashMap.removeFirstFloat();
         }
@@ -241,23 +241,23 @@ public class Biome {
         return g;
     }
 
-    public boolean canSetIce(WorldView arg, BlockPos arg2) {
-        return this.canSetIce(arg, arg2, true);
+    public boolean canSetIce(WorldView world, BlockPos blockPos) {
+        return this.canSetIce(world, blockPos, true);
     }
 
-    public boolean canSetIce(WorldView arg, BlockPos arg2, boolean bl) {
-        if (this.getTemperature(arg2) >= 0.15f) {
+    public boolean canSetIce(WorldView world, BlockPos pos, boolean doWaterCheck) {
+        if (this.getTemperature(pos) >= 0.15f) {
             return false;
         }
-        if (arg2.getY() >= 0 && arg2.getY() < 256 && arg.getLightLevel(LightType.BLOCK, arg2) < 10) {
-            BlockState lv = arg.getBlockState(arg2);
-            FluidState lv2 = arg.getFluidState(arg2);
+        if (pos.getY() >= 0 && pos.getY() < 256 && world.getLightLevel(LightType.BLOCK, pos) < 10) {
+            BlockState lv = world.getBlockState(pos);
+            FluidState lv2 = world.getFluidState(pos);
             if (lv2.getFluid() == Fluids.WATER && lv.getBlock() instanceof FluidBlock) {
                 boolean bl2;
-                if (!bl) {
+                if (!doWaterCheck) {
                     return true;
                 }
-                boolean bl3 = bl2 = arg.isWater(arg2.west()) && arg.isWater(arg2.east()) && arg.isWater(arg2.north()) && arg.isWater(arg2.south());
+                boolean bl = bl2 = world.isWater(pos.west()) && world.isWater(pos.east()) && world.isWater(pos.north()) && world.isWater(pos.south());
                 if (!bl2) {
                     return true;
                 }
@@ -266,42 +266,42 @@ public class Biome {
         return false;
     }
 
-    public boolean canSetSnow(WorldView arg, BlockPos arg2) {
+    public boolean canSetSnow(WorldView world, BlockPos blockPos) {
         BlockState lv;
-        if (this.getTemperature(arg2) >= 0.15f) {
+        if (this.getTemperature(blockPos) >= 0.15f) {
             return false;
         }
-        return arg2.getY() >= 0 && arg2.getY() < 256 && arg.getLightLevel(LightType.BLOCK, arg2) < 10 && (lv = arg.getBlockState(arg2)).isAir() && Blocks.SNOW.getDefaultState().canPlaceAt(arg, arg2);
+        return blockPos.getY() >= 0 && blockPos.getY() < 256 && world.getLightLevel(LightType.BLOCK, blockPos) < 10 && (lv = world.getBlockState(blockPos)).isAir() && Blocks.SNOW.getDefaultState().canPlaceAt(world, blockPos);
     }
 
-    public void addFeature(GenerationStep.Feature arg, ConfiguredFeature<?, ?> arg2) {
-        this.addFeature(arg.ordinal(), () -> arg2);
+    public void addFeature(GenerationStep.Feature step, ConfiguredFeature<?, ?> arg2) {
+        this.addFeature(step.ordinal(), () -> arg2);
     }
 
-    public void addFeature(int i, Supplier<ConfiguredFeature<?, ?>> supplier) {
+    public void addFeature(int stepIndex, Supplier<ConfiguredFeature<?, ?>> supplier) {
         if (supplier.get().feature == Feature.DECORATED_FLOWER) {
             this.flowerFeatures.add(supplier.get());
         }
-        while (this.features.size() <= i) {
+        while (this.features.size() <= stepIndex) {
             this.features.add(Lists.newArrayList());
         }
-        this.features.get(i).add(supplier);
+        this.features.get(stepIndex).add(supplier);
     }
 
-    public <C extends CarverConfig> void addCarver(GenerationStep.Carver arg2, ConfiguredCarver<C> arg22) {
-        this.carvers.computeIfAbsent(arg2, arg -> Lists.newArrayList()).add(() -> arg22);
+    public <C extends CarverConfig> void addCarver(GenerationStep.Carver step, ConfiguredCarver<C> configuredCarver) {
+        this.carvers.computeIfAbsent(step, arg -> Lists.newArrayList()).add(() -> configuredCarver);
     }
 
-    public List<Supplier<ConfiguredCarver<?>>> getCarversForStep(GenerationStep.Carver arg) {
-        return (List)this.carvers.getOrDefault(arg, (List<Supplier<ConfiguredCarver<?>>>)ImmutableList.of());
+    public List<Supplier<ConfiguredCarver<?>>> getCarversForStep(GenerationStep.Carver carver) {
+        return (List)this.carvers.getOrDefault(carver, (List<Supplier<ConfiguredCarver<?>>>)ImmutableList.of());
     }
 
-    public void addStructureFeature(ConfiguredStructureFeature<?, ?> arg) {
-        this.structureFeatures.add(() -> arg);
+    public void addStructureFeature(ConfiguredStructureFeature<?, ?> configuredStructureFeature) {
+        this.structureFeatures.add(() -> configuredStructureFeature);
     }
 
-    public boolean hasStructureFeature(StructureFeature<?> arg) {
-        return this.structureFeatures.stream().anyMatch(supplier -> ((ConfiguredStructureFeature)supplier.get()).feature == arg);
+    public boolean hasStructureFeature(StructureFeature<?> structureFeature) {
+        return this.structureFeatures.stream().anyMatch(supplier -> ((ConfiguredStructureFeature)supplier.get()).feature == structureFeature);
     }
 
     public Iterable<Supplier<ConfiguredStructureFeature<?, ?>>> getStructureFeatures() {
@@ -320,13 +320,13 @@ public class Biome {
         return this.features;
     }
 
-    public void generateFeatureStep(StructureAccessor arg, ChunkGenerator arg2, ChunkRegion arg3, long l, ChunkRandom arg4, BlockPos arg52) {
+    public void generateFeatureStep(StructureAccessor arg, ChunkGenerator arg2, ChunkRegion arg3, long populationSeed, ChunkRandom arg4, BlockPos arg52) {
         for (int i = 0; i < this.features.size(); ++i) {
             int j = 0;
             if (arg.shouldGenerateStructures()) {
                 for (StructureFeature structureFeature : Registry.STRUCTURE_FEATURE) {
                     if (structureFeature.getGenerationStep().ordinal() != i) continue;
-                    arg4.setDecoratorSeed(l, j, i);
+                    arg4.setDecoratorSeed(populationSeed, j, i);
                     int k = arg52.getX() >> 4;
                     int m = arg52.getZ() >> 4;
                     int n = k << 4;
@@ -344,7 +344,7 @@ public class Biome {
             }
             for (Supplier<ConfiguredFeature<?, ?>> supplier : this.features.get(i)) {
                 ConfiguredFeature<?, ?> lv3 = supplier.get();
-                arg4.setDecoratorSeed(l, j, i);
+                arg4.setDecoratorSeed(populationSeed, j, i);
                 try {
                     lv3.generate(arg3, arg2, arg4, arg52);
                 }
@@ -364,7 +364,7 @@ public class Biome {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public int getGrassColorAt(double d, double e) {
+    public int getGrassColorAt(double x, double z) {
         double f = MathHelper.clamp(this.getTemperature(), 0.0f, 1.0f);
         double g = MathHelper.clamp(this.getRainfall(), 0.0f, 1.0f);
         return GrassColors.getColor(f, g);
@@ -377,10 +377,10 @@ public class Biome {
         return FoliageColors.getColor(d, e);
     }
 
-    public void buildSurface(Random random, Chunk arg, int i, int j, int k, double d, BlockState arg2, BlockState arg3, int l, long m) {
+    public void buildSurface(Random random, Chunk chunk, int x, int z, int worldHeight, double noise, BlockState defaultBlock, BlockState defaultFluid, int seaLevel, long seed) {
         ConfiguredSurfaceBuilder<?> lv = this.surfaceBuilder.get();
-        lv.initSeed(m);
-        lv.generate(random, arg, this, i, j, k, d, arg2, arg3, l, m);
+        lv.initSeed(seed);
+        lv.generate(random, chunk, this, x, z, worldHeight, noise, defaultBlock, defaultFluid, seaLevel, seed);
     }
 
     public TemperatureGroup getTemperatureGroup() {
@@ -481,12 +481,12 @@ public class Biome {
         private final float weirdness;
         private final float weight;
 
-        public MixedNoisePoint(float f, float g, float h, float i, float j) {
-            this.temperature = f;
-            this.humidity = g;
-            this.altitude = h;
-            this.weirdness = i;
-            this.weight = j;
+        public MixedNoisePoint(float temperature, float humidity, float altitude, float weirdness, float weight) {
+            this.temperature = temperature;
+            this.humidity = humidity;
+            this.altitude = altitude;
+            this.weirdness = weirdness;
+            this.weight = weight;
         }
 
         public boolean equals(Object object) {
@@ -517,8 +517,8 @@ public class Biome {
             return i;
         }
 
-        public float calculateDistanceTo(MixedNoisePoint arg) {
-            return (this.temperature - arg.temperature) * (this.temperature - arg.temperature) + (this.humidity - arg.humidity) * (this.humidity - arg.humidity) + (this.altitude - arg.altitude) * (this.altitude - arg.altitude) + (this.weirdness - arg.weirdness) * (this.weirdness - arg.weirdness) + (this.weight - arg.weight) * (this.weight - arg.weight);
+        public float calculateDistanceTo(MixedNoisePoint other) {
+            return (this.temperature - other.temperature) * (this.temperature - other.temperature) + (this.humidity - other.humidity) * (this.humidity - other.humidity) + (this.altitude - other.altitude) * (this.altitude - other.altitude) + (this.weirdness - other.weirdness) * (this.weirdness - other.weirdness) + (this.weight - other.weight) * (this.weight - other.weight);
         }
     }
 
@@ -551,43 +551,43 @@ public class Biome {
             return this;
         }
 
-        public Settings precipitation(Precipitation arg) {
-            this.precipitation = arg;
+        public Settings precipitation(Precipitation precipitation) {
+            this.precipitation = precipitation;
             return this;
         }
 
-        public Settings category(Category arg) {
-            this.category = arg;
+        public Settings category(Category category) {
+            this.category = category;
             return this;
         }
 
-        public Settings depth(float f) {
-            this.depth = Float.valueOf(f);
+        public Settings depth(float depth) {
+            this.depth = Float.valueOf(depth);
             return this;
         }
 
-        public Settings scale(float f) {
-            this.scale = Float.valueOf(f);
+        public Settings scale(float scale) {
+            this.scale = Float.valueOf(scale);
             return this;
         }
 
-        public Settings temperature(float f) {
-            this.temperature = Float.valueOf(f);
+        public Settings temperature(float temperature) {
+            this.temperature = Float.valueOf(temperature);
             return this;
         }
 
-        public Settings downfall(float f) {
-            this.downfall = Float.valueOf(f);
+        public Settings downfall(float downfall) {
+            this.downfall = Float.valueOf(downfall);
             return this;
         }
 
-        public Settings parent(@Nullable String string) {
-            this.parent = string;
+        public Settings parent(@Nullable String parent) {
+            this.parent = parent;
             return this;
         }
 
-        public Settings effects(BiomeEffects arg) {
-            this.specialEffects = arg;
+        public Settings effects(BiomeEffects effects) {
+            this.specialEffects = effects;
             return this;
         }
 
@@ -603,11 +603,11 @@ public class Biome {
         public final int minGroupSize;
         public final int maxGroupSize;
 
-        public SpawnEntry(EntityType<?> arg, int i, int j, int k) {
-            super(i);
-            this.type = arg.getSpawnGroup() == SpawnGroup.MISC ? EntityType.PIG : arg;
-            this.minGroupSize = j;
-            this.maxGroupSize = k;
+        public SpawnEntry(EntityType<?> type, int weight, int minGroupSize, int maxGroupSize) {
+            super(weight);
+            this.type = type.getSpawnGroup() == SpawnGroup.MISC ? EntityType.PIG : type;
+            this.minGroupSize = minGroupSize;
+            this.maxGroupSize = maxGroupSize;
         }
 
         public String toString() {
@@ -620,9 +620,9 @@ public class Biome {
         private final double gravityLimit;
         private final double mass;
 
-        public SpawnDensity(double d, double e) {
-            this.gravityLimit = d;
-            this.mass = e;
+        public SpawnDensity(double gravityLimit, double mass) {
+            this.gravityLimit = gravityLimit;
+            this.mass = mass;
         }
 
         public double getGravityLimit() {
@@ -644,8 +644,8 @@ public class Biome {
         private static final Map<String, Precipitation> NAME_MAP;
         private final String name;
 
-        private Precipitation(String string2) {
-            this.name = string2;
+        private Precipitation(String name) {
+            this.name = name;
         }
 
         public String getName() {
@@ -691,8 +691,8 @@ public class Biome {
         private static final Map<String, Category> NAME_MAP;
         private final String name;
 
-        private Category(String string2) {
-            this.name = string2;
+        private Category(String name) {
+            this.name = name;
         }
 
         public String getName() {
@@ -723,8 +723,8 @@ public class Biome {
         private static final Map<String, TemperatureGroup> NAME_MAP;
         private final String name;
 
-        private TemperatureGroup(String string2) {
-            this.name = string2;
+        private TemperatureGroup(String name) {
+            this.name = name;
         }
 
         public String getName() {

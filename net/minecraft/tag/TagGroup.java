@@ -37,8 +37,8 @@ public interface TagGroup<T> {
     public Map<Identifier, Tag<T>> getTags();
 
     @Nullable
-    default public Tag<T> getTag(Identifier arg) {
-        return this.getTags().get(arg);
+    default public Tag<T> getTag(Identifier id) {
+        return this.getTags().get(id);
     }
 
     public Tag<T> getTagOrEmpty(Identifier var1);
@@ -46,8 +46,8 @@ public interface TagGroup<T> {
     @Nullable
     public Identifier getUncheckedTagId(Tag<T> var1);
 
-    default public Identifier getTagId(Tag<T> arg) {
-        Identifier lv = this.getUncheckedTagId(arg);
+    default public Identifier getTagId(Tag<T> tag) {
+        Identifier lv = this.getUncheckedTagId(tag);
         if (lv == null) {
             throw new IllegalStateException("Unrecognized tag");
         }
@@ -68,27 +68,27 @@ public interface TagGroup<T> {
         return list;
     }
 
-    default public void toPacket(PacketByteBuf arg, DefaultedRegistry<T> arg2) {
+    default public void toPacket(PacketByteBuf buf, DefaultedRegistry<T> registry) {
         Map<Identifier, Tag<T>> map = this.getTags();
-        arg.writeVarInt(map.size());
+        buf.writeVarInt(map.size());
         for (Map.Entry<Identifier, Tag<T>> entry : map.entrySet()) {
-            arg.writeIdentifier(entry.getKey());
-            arg.writeVarInt(entry.getValue().values().size());
+            buf.writeIdentifier(entry.getKey());
+            buf.writeVarInt(entry.getValue().values().size());
             for (T object : entry.getValue().values()) {
-                arg.writeVarInt(arg2.getRawId(object));
+                buf.writeVarInt(registry.getRawId(object));
             }
         }
     }
 
-    public static <T> TagGroup<T> fromPacket(PacketByteBuf arg, Registry<T> arg2) {
+    public static <T> TagGroup<T> fromPacket(PacketByteBuf buf, Registry<T> registry) {
         HashMap map = Maps.newHashMap();
-        int i = arg.readVarInt();
+        int i = buf.readVarInt();
         for (int j = 0; j < i; ++j) {
-            Identifier lv = arg.readIdentifier();
-            int k = arg.readVarInt();
+            Identifier lv = buf.readIdentifier();
+            int k = buf.readVarInt();
             ImmutableSet.Builder builder = ImmutableSet.builder();
             for (int l = 0; l < k; ++l) {
-                builder.add(arg2.get(arg.readVarInt()));
+                builder.add(registry.get(buf.readVarInt()));
             }
             map.put(lv, Tag.of(builder.build()));
         }
@@ -99,8 +99,8 @@ public interface TagGroup<T> {
         return TagGroup.create(ImmutableBiMap.of());
     }
 
-    public static <T> TagGroup<T> create(Map<Identifier, Tag<T>> map) {
-        ImmutableBiMap biMap = ImmutableBiMap.copyOf(map);
+    public static <T> TagGroup<T> create(Map<Identifier, Tag<T>> tags) {
+        ImmutableBiMap biMap = ImmutableBiMap.copyOf(tags);
         return new TagGroup<T>((BiMap)biMap){
             private final Tag<T> emptyTag = SetTag.empty();
             final /* synthetic */ BiMap tags;
@@ -109,17 +109,17 @@ public interface TagGroup<T> {
             }
 
             @Override
-            public Tag<T> getTagOrEmpty(Identifier arg) {
-                return (Tag)this.tags.getOrDefault((Object)arg, this.emptyTag);
+            public Tag<T> getTagOrEmpty(Identifier id) {
+                return (Tag)this.tags.getOrDefault((Object)id, this.emptyTag);
             }
 
             @Override
             @Nullable
-            public Identifier getUncheckedTagId(Tag<T> arg) {
-                if (arg instanceof Tag.Identified) {
-                    return ((Tag.Identified)arg).getId();
+            public Identifier getUncheckedTagId(Tag<T> tag) {
+                if (tag instanceof Tag.Identified) {
+                    return ((Tag.Identified)tag).getId();
                 }
-                return (Identifier)this.tags.inverse().get(arg);
+                return (Identifier)this.tags.inverse().get(tag);
             }
 
             @Override

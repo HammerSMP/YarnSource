@@ -256,10 +256,10 @@ extends DataFix {
         private final int separation;
         private final int salt;
 
-        public Information(int i, int j, int k) {
-            this.spacing = i;
-            this.separation = j;
-            this.salt = k;
+        public Information(int spacing, int separation, int salt) {
+            this.spacing = spacing;
+            this.separation = separation;
+            this.salt = salt;
         }
 
         public <T> Dynamic<T> method_28288(DynamicOps<T> dynamicOps) {

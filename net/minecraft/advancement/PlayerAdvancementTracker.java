@@ -104,8 +104,8 @@ public class PlayerAdvancementTracker {
         this.load(arg2);
     }
 
-    public void setOwner(ServerPlayerEntity arg) {
-        this.owner = arg;
+    public void setOwner(ServerPlayerEntity owner) {
+        this.owner = owner;
     }
 
     public void clearCriteria() {
@@ -114,7 +114,7 @@ public class PlayerAdvancementTracker {
         }
     }
 
-    public void reload(ServerAdvancementLoader arg) {
+    public void reload(ServerAdvancementLoader advancementLoader) {
         this.clearCriteria();
         this.advancementToProgress.clear();
         this.visibleAdvancements.clear();
@@ -122,11 +122,11 @@ public class PlayerAdvancementTracker {
         this.progressUpdates.clear();
         this.dirty = true;
         this.currentDisplayTab = null;
-        this.load(arg);
+        this.load(advancementLoader);
     }
 
-    private void beginTrackingAllAdvancements(ServerAdvancementLoader arg) {
-        for (Advancement lv : arg.getAdvancements()) {
+    private void beginTrackingAllAdvancements(ServerAdvancementLoader advancementLoader) {
+        for (Advancement lv : advancementLoader.getAdvancements()) {
             this.beginTracking(lv);
         }
     }
@@ -143,15 +143,15 @@ public class PlayerAdvancementTracker {
         }
     }
 
-    private void rewardEmptyAdvancements(ServerAdvancementLoader arg) {
-        for (Advancement lv : arg.getAdvancements()) {
+    private void rewardEmptyAdvancements(ServerAdvancementLoader advancementLoader) {
+        for (Advancement lv : advancementLoader.getAdvancements()) {
             if (!lv.getCriteria().isEmpty()) continue;
             this.grantCriterion(lv, "");
             lv.getRewards().apply(this.owner);
         }
     }
 
-    private void load(ServerAdvancementLoader arg) {
+    private void load(ServerAdvancementLoader advancementLoader) {
         if (this.advancementFile.isFile()) {
             try (JsonReader jsonReader = new JsonReader((Reader)new StringReader(Files.toString((File)this.advancementFile, (Charset)StandardCharsets.UTF_8)));){
                 jsonReader.setLenient(false);
@@ -167,7 +167,7 @@ public class PlayerAdvancementTracker {
                 }
                 Stream<Map.Entry> stream = map.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue));
                 for (Map.Entry entry : stream.collect(Collectors.toList())) {
-                    Advancement lv = arg.get((Identifier)entry.getKey());
+                    Advancement lv = advancementLoader.get((Identifier)entry.getKey());
                     if (lv == null) {
                         LOGGER.warn("Ignored advancement '{}' in progress file {} - it doesn't exist anymore?", entry.getKey(), (Object)this.advancementFile);
                         continue;
@@ -182,9 +182,9 @@ public class PlayerAdvancementTracker {
                 LOGGER.error("Couldn't access player advancements in {}", (Object)this.advancementFile, (Object)iOException);
             }
         }
-        this.rewardEmptyAdvancements(arg);
+        this.rewardEmptyAdvancements(advancementLoader);
         this.updateCompleted();
-        this.beginTrackingAllAdvancements(arg);
+        this.beginTrackingAllAdvancements(advancementLoader);
     }
 
     public void save() {
@@ -208,67 +208,67 @@ public class PlayerAdvancementTracker {
         }
     }
 
-    public boolean grantCriterion(Advancement arg, String string) {
+    public boolean grantCriterion(Advancement advancement, String criterionName) {
         boolean bl = false;
-        AdvancementProgress lv = this.getProgress(arg);
+        AdvancementProgress lv = this.getProgress(advancement);
         boolean bl2 = lv.isDone();
-        if (lv.obtain(string)) {
-            this.endTrackingCompleted(arg);
-            this.progressUpdates.add(arg);
+        if (lv.obtain(criterionName)) {
+            this.endTrackingCompleted(advancement);
+            this.progressUpdates.add(advancement);
             bl = true;
             if (!bl2 && lv.isDone()) {
-                arg.getRewards().apply(this.owner);
-                if (arg.getDisplay() != null && arg.getDisplay().shouldAnnounceToChat() && this.owner.world.getGameRules().getBoolean(GameRules.ANNOUNCE_ADVANCEMENTS)) {
-                    this.field_25325.broadcastChatMessage(new TranslatableText("chat.type.advancement." + arg.getDisplay().getFrame().getId(), this.owner.getDisplayName(), arg.toHoverableText()), MessageType.SYSTEM, Util.NIL_UUID);
+                advancement.getRewards().apply(this.owner);
+                if (advancement.getDisplay() != null && advancement.getDisplay().shouldAnnounceToChat() && this.owner.world.getGameRules().getBoolean(GameRules.ANNOUNCE_ADVANCEMENTS)) {
+                    this.field_25325.broadcastChatMessage(new TranslatableText("chat.type.advancement." + advancement.getDisplay().getFrame().getId(), this.owner.getDisplayName(), advancement.toHoverableText()), MessageType.SYSTEM, Util.NIL_UUID);
                 }
             }
         }
         if (lv.isDone()) {
-            this.updateDisplay(arg);
+            this.updateDisplay(advancement);
         }
         return bl;
     }
 
-    public boolean revokeCriterion(Advancement arg, String string) {
+    public boolean revokeCriterion(Advancement advancement, String criterionName) {
         boolean bl = false;
-        AdvancementProgress lv = this.getProgress(arg);
-        if (lv.reset(string)) {
-            this.beginTracking(arg);
-            this.progressUpdates.add(arg);
+        AdvancementProgress lv = this.getProgress(advancement);
+        if (lv.reset(criterionName)) {
+            this.beginTracking(advancement);
+            this.progressUpdates.add(advancement);
             bl = true;
         }
         if (!lv.isAnyObtained()) {
-            this.updateDisplay(arg);
+            this.updateDisplay(advancement);
         }
         return bl;
     }
 
-    private void beginTracking(Advancement arg) {
-        AdvancementProgress lv = this.getProgress(arg);
+    private void beginTracking(Advancement advancement) {
+        AdvancementProgress lv = this.getProgress(advancement);
         if (lv.isDone()) {
             return;
         }
-        for (Map.Entry<String, AdvancementCriterion> entry : arg.getCriteria().entrySet()) {
+        for (Map.Entry<String, AdvancementCriterion> entry : advancement.getCriteria().entrySet()) {
             Criterion<CriterionConditions> lv4;
             CriterionConditions lv3;
             CriterionProgress lv2 = lv.getCriterionProgress(entry.getKey());
             if (lv2 == null || lv2.isObtained() || (lv3 = entry.getValue().getConditions()) == null || (lv4 = Criteria.getById(lv3.getId())) == null) continue;
-            lv4.beginTrackingCondition(this, new Criterion.ConditionsContainer<CriterionConditions>(lv3, arg, entry.getKey()));
+            lv4.beginTrackingCondition(this, new Criterion.ConditionsContainer<CriterionConditions>(lv3, advancement, entry.getKey()));
         }
     }
 
-    private void endTrackingCompleted(Advancement arg) {
-        AdvancementProgress lv = this.getProgress(arg);
-        for (Map.Entry<String, AdvancementCriterion> entry : arg.getCriteria().entrySet()) {
+    private void endTrackingCompleted(Advancement advancement) {
+        AdvancementProgress lv = this.getProgress(advancement);
+        for (Map.Entry<String, AdvancementCriterion> entry : advancement.getCriteria().entrySet()) {
             Criterion<CriterionConditions> lv4;
             CriterionConditions lv3;
             CriterionProgress lv2 = lv.getCriterionProgress(entry.getKey());
             if (lv2 == null || !lv2.isObtained() && !lv.isDone() || (lv3 = entry.getValue().getConditions()) == null || (lv4 = Criteria.getById(lv3.getId())) == null) continue;
-            lv4.endTrackingCondition(this, new Criterion.ConditionsContainer<CriterionConditions>(lv3, arg, entry.getKey()));
+            lv4.endTrackingCondition(this, new Criterion.ConditionsContainer<CriterionConditions>(lv3, advancement, entry.getKey()));
         }
     }
 
-    public void sendUpdate(ServerPlayerEntity arg) {
+    public void sendUpdate(ServerPlayerEntity player) {
         if (this.dirty || !this.visibilityUpdates.isEmpty() || !this.progressUpdates.isEmpty()) {
             HashMap map = Maps.newHashMap();
             LinkedHashSet set = Sets.newLinkedHashSet();
@@ -285,7 +285,7 @@ public class PlayerAdvancementTracker {
                 set2.add(lv2.getId());
             }
             if (this.dirty || !map.isEmpty() || !set.isEmpty() || !set2.isEmpty()) {
-                arg.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(this.dirty, set, set2, map));
+                player.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(this.dirty, set, set2, map));
                 this.visibilityUpdates.clear();
                 this.progressUpdates.clear();
             }
@@ -293,73 +293,73 @@ public class PlayerAdvancementTracker {
         this.dirty = false;
     }
 
-    public void setDisplayTab(@Nullable Advancement arg) {
+    public void setDisplayTab(@Nullable Advancement advancement) {
         Advancement lv = this.currentDisplayTab;
-        this.currentDisplayTab = arg != null && arg.getParent() == null && arg.getDisplay() != null ? arg : null;
+        this.currentDisplayTab = advancement != null && advancement.getParent() == null && advancement.getDisplay() != null ? advancement : null;
         if (lv != this.currentDisplayTab) {
             this.owner.networkHandler.sendPacket(new SelectAdvancementTabS2CPacket(this.currentDisplayTab == null ? null : this.currentDisplayTab.getId()));
         }
     }
 
-    public AdvancementProgress getProgress(Advancement arg) {
-        AdvancementProgress lv = this.advancementToProgress.get(arg);
+    public AdvancementProgress getProgress(Advancement advancement) {
+        AdvancementProgress lv = this.advancementToProgress.get(advancement);
         if (lv == null) {
             lv = new AdvancementProgress();
-            this.initProgress(arg, lv);
+            this.initProgress(advancement, lv);
         }
         return lv;
     }
 
-    private void initProgress(Advancement arg, AdvancementProgress arg2) {
-        arg2.init(arg.getCriteria(), arg.getRequirements());
-        this.advancementToProgress.put(arg, arg2);
+    private void initProgress(Advancement advancement, AdvancementProgress progress) {
+        progress.init(advancement.getCriteria(), advancement.getRequirements());
+        this.advancementToProgress.put(advancement, progress);
     }
 
-    private void updateDisplay(Advancement arg) {
-        boolean bl = this.canSee(arg);
-        boolean bl2 = this.visibleAdvancements.contains(arg);
+    private void updateDisplay(Advancement advancement) {
+        boolean bl = this.canSee(advancement);
+        boolean bl2 = this.visibleAdvancements.contains(advancement);
         if (bl && !bl2) {
-            this.visibleAdvancements.add(arg);
-            this.visibilityUpdates.add(arg);
-            if (this.advancementToProgress.containsKey(arg)) {
-                this.progressUpdates.add(arg);
+            this.visibleAdvancements.add(advancement);
+            this.visibilityUpdates.add(advancement);
+            if (this.advancementToProgress.containsKey(advancement)) {
+                this.progressUpdates.add(advancement);
             }
         } else if (!bl && bl2) {
-            this.visibleAdvancements.remove(arg);
-            this.visibilityUpdates.add(arg);
+            this.visibleAdvancements.remove(advancement);
+            this.visibilityUpdates.add(advancement);
         }
-        if (bl != bl2 && arg.getParent() != null) {
-            this.updateDisplay(arg.getParent());
+        if (bl != bl2 && advancement.getParent() != null) {
+            this.updateDisplay(advancement.getParent());
         }
-        for (Advancement lv : arg.getChildren()) {
+        for (Advancement lv : advancement.getChildren()) {
             this.updateDisplay(lv);
         }
     }
 
-    private boolean canSee(Advancement arg) {
-        for (int i = 0; arg != null && i <= 2; arg = arg.getParent(), ++i) {
-            if (i == 0 && this.hasChildrenDone(arg)) {
+    private boolean canSee(Advancement advancement) {
+        for (int i = 0; advancement != null && i <= 2; advancement = advancement.getParent(), ++i) {
+            if (i == 0 && this.hasChildrenDone(advancement)) {
                 return true;
             }
-            if (arg.getDisplay() == null) {
+            if (advancement.getDisplay() == null) {
                 return false;
             }
-            AdvancementProgress lv = this.getProgress(arg);
+            AdvancementProgress lv = this.getProgress(advancement);
             if (lv.isDone()) {
                 return true;
             }
-            if (!arg.getDisplay().isHidden()) continue;
+            if (!advancement.getDisplay().isHidden()) continue;
             return false;
         }
         return false;
     }
 
-    private boolean hasChildrenDone(Advancement arg) {
-        AdvancementProgress lv = this.getProgress(arg);
+    private boolean hasChildrenDone(Advancement advancement) {
+        AdvancementProgress lv = this.getProgress(advancement);
         if (lv.isDone()) {
             return true;
         }
-        for (Advancement lv2 : arg.getChildren()) {
+        for (Advancement lv2 : advancement.getChildren()) {
             if (!this.hasChildrenDone(lv2)) continue;
             return true;
         }

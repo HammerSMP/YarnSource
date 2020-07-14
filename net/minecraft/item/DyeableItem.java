@@ -10,42 +10,42 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 
 public interface DyeableItem {
-    default public boolean hasColor(ItemStack arg) {
-        CompoundTag lv = arg.getSubTag("display");
+    default public boolean hasColor(ItemStack stack) {
+        CompoundTag lv = stack.getSubTag("display");
         return lv != null && lv.contains("color", 99);
     }
 
-    default public int getColor(ItemStack arg) {
-        CompoundTag lv = arg.getSubTag("display");
+    default public int getColor(ItemStack stack) {
+        CompoundTag lv = stack.getSubTag("display");
         if (lv != null && lv.contains("color", 99)) {
             return lv.getInt("color");
         }
         return 10511680;
     }
 
-    default public void removeColor(ItemStack arg) {
-        CompoundTag lv = arg.getSubTag("display");
+    default public void removeColor(ItemStack stack) {
+        CompoundTag lv = stack.getSubTag("display");
         if (lv != null && lv.contains("color")) {
             lv.remove("color");
         }
     }
 
-    default public void setColor(ItemStack arg, int i) {
-        arg.getOrCreateSubTag("display").putInt("color", i);
+    default public void setColor(ItemStack stack, int color) {
+        stack.getOrCreateSubTag("display").putInt("color", color);
     }
 
-    public static ItemStack blendAndSetColor(ItemStack arg, List<DyeItem> list) {
+    public static ItemStack blendAndSetColor(ItemStack stack, List<DyeItem> colors) {
         ItemStack lv = ItemStack.EMPTY;
         int[] is = new int[3];
         int i = 0;
         int j = 0;
         DyeableItem lv2 = null;
-        Item lv3 = arg.getItem();
+        Item lv3 = stack.getItem();
         if (lv3 instanceof DyeableItem) {
             lv2 = (DyeableItem)((Object)lv3);
-            lv = arg.copy();
+            lv = stack.copy();
             lv.setCount(1);
-            if (lv2.hasColor(arg)) {
+            if (lv2.hasColor(stack)) {
                 int k = lv2.getColor(lv);
                 float f = (float)(k >> 16 & 0xFF) / 255.0f;
                 float g = (float)(k >> 8 & 0xFF) / 255.0f;
@@ -56,7 +56,7 @@ public interface DyeableItem {
                 is[2] = (int)((float)is[2] + h * 255.0f);
                 ++j;
             }
-            for (DyeItem lv4 : list) {
+            for (DyeItem lv4 : colors) {
                 float[] fs = lv4.getColor().getColorComponents();
                 int l = (int)(fs[0] * 255.0f);
                 int m = (int)(fs[1] * 255.0f);

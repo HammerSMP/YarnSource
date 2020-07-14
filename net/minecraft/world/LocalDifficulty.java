@@ -15,9 +15,9 @@ public class LocalDifficulty {
     private final Difficulty globalDifficulty;
     private final float localDifficulty;
 
-    public LocalDifficulty(Difficulty arg, long l, long m, float f) {
-        this.globalDifficulty = arg;
-        this.localDifficulty = this.setLocalDifficulty(arg, l, m, f);
+    public LocalDifficulty(Difficulty difficulty, long timeOfDay, long inhabitedTime, float moonSize) {
+        this.globalDifficulty = difficulty;
+        this.localDifficulty = this.setLocalDifficulty(difficulty, timeOfDay, inhabitedTime, moonSize);
     }
 
     public Difficulty getGlobalDifficulty() {
@@ -28,8 +28,8 @@ public class LocalDifficulty {
         return this.localDifficulty;
     }
 
-    public boolean isHarderThan(float f) {
-        return this.localDifficulty > f;
+    public boolean isHarderThan(float difficulty) {
+        return this.localDifficulty > difficulty;
     }
 
     public float getClampedLocalDifficulty() {
@@ -42,21 +42,21 @@ public class LocalDifficulty {
         return (this.localDifficulty - 2.0f) / 2.0f;
     }
 
-    private float setLocalDifficulty(Difficulty arg, long l, long m, float f) {
-        if (arg == Difficulty.PEACEFUL) {
+    private float setLocalDifficulty(Difficulty difficulty, long timeOfDay, long inhabitedTime, float moonSize) {
+        if (difficulty == Difficulty.PEACEFUL) {
             return 0.0f;
         }
-        boolean bl = arg == Difficulty.HARD;
+        boolean bl = difficulty == Difficulty.HARD;
         float g = 0.75f;
-        float h = MathHelper.clamp(((float)l + -72000.0f) / 1440000.0f, 0.0f, 1.0f) * 0.25f;
+        float h = MathHelper.clamp(((float)timeOfDay + -72000.0f) / 1440000.0f, 0.0f, 1.0f) * 0.25f;
         g += h;
         float i = 0.0f;
-        i += MathHelper.clamp((float)m / 3600000.0f, 0.0f, 1.0f) * (bl ? 1.0f : 0.75f);
-        i += MathHelper.clamp(f * 0.25f, 0.0f, h);
-        if (arg == Difficulty.EASY) {
+        i += MathHelper.clamp((float)inhabitedTime / 3600000.0f, 0.0f, 1.0f) * (bl ? 1.0f : 0.75f);
+        i += MathHelper.clamp(moonSize * 0.25f, 0.0f, h);
+        if (difficulty == Difficulty.EASY) {
             i *= 0.5f;
         }
-        return (float)arg.getId() * (g += i);
+        return (float)difficulty.getId() * (g += i);
     }
 }
 

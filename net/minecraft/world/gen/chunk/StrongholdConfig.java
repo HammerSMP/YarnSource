@@ -20,10 +20,10 @@ public class StrongholdConfig {
     private final int spread;
     private final int count;
 
-    public StrongholdConfig(int i, int j, int k) {
-        this.distance = i;
-        this.spread = j;
-        this.count = k;
+    public StrongholdConfig(int distance, int spread, int count) {
+        this.distance = distance;
+        this.spread = spread;
+        this.count = count;
     }
 
     public int getDistance() {

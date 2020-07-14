@@ -23,27 +23,27 @@ public class Schedule {
     public static final Schedule VILLAGER_DEFAULT = Schedule.register("villager_default").withActivity(10, Activity.IDLE).withActivity(2000, Activity.WORK).withActivity(9000, Activity.MEET).withActivity(11000, Activity.IDLE).withActivity(12000, Activity.REST).build();
     private final Map<Activity, ScheduleRule> scheduleRules = Maps.newHashMap();
 
-    protected static ScheduleBuilder register(String string) {
-        Schedule lv = Registry.register(Registry.SCHEDULE, string, new Schedule());
+    protected static ScheduleBuilder register(String id) {
+        Schedule lv = Registry.register(Registry.SCHEDULE, id, new Schedule());
         return new ScheduleBuilder(lv);
     }
 
-    protected void addActivity(Activity arg) {
-        if (!this.scheduleRules.containsKey(arg)) {
-            this.scheduleRules.put(arg, new ScheduleRule());
+    protected void addActivity(Activity activity) {
+        if (!this.scheduleRules.containsKey(activity)) {
+            this.scheduleRules.put(activity, new ScheduleRule());
         }
     }
 
-    protected ScheduleRule getRule(Activity arg) {
-        return this.scheduleRules.get(arg);
+    protected ScheduleRule getRule(Activity activity) {
+        return this.scheduleRules.get(activity);
     }
 
-    protected List<ScheduleRule> getOtherRules(Activity arg) {
-        return this.scheduleRules.entrySet().stream().filter(entry -> entry.getKey() != arg).map(Map.Entry::getValue).collect(Collectors.toList());
+    protected List<ScheduleRule> getOtherRules(Activity activity) {
+        return this.scheduleRules.entrySet().stream().filter(entry -> entry.getKey() != activity).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
-    public Activity getActivityForTime(int i) {
-        return this.scheduleRules.entrySet().stream().max(Comparator.comparingDouble(entry -> ((ScheduleRule)entry.getValue()).getPriority(i))).map(Map.Entry::getKey).orElse(Activity.IDLE);
+    public Activity getActivityForTime(int time) {
+        return this.scheduleRules.entrySet().stream().max(Comparator.comparingDouble(entry -> ((ScheduleRule)entry.getValue()).getPriority(time))).map(Map.Entry::getKey).orElse(Activity.IDLE);
     }
 }
 

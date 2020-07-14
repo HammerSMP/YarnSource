@@ -84,11 +84,11 @@ public class FileDownload {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public long contentLength(String string) {
+    public long contentLength(String downloadLink) {
         CloseableHttpClient closeableHttpClient = null;
         HttpGet httpGet = null;
         try {
-            httpGet = new HttpGet(string);
+            httpGet = new HttpGet(downloadLink);
             closeableHttpClient = HttpClientBuilder.create().setDefaultRequestConfig(this.requestConfig).build();
             CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute((HttpUriRequest)httpGet);
             long l = Long.parseLong(closeableHttpResponse.getFirstHeader("Content-Length").getValue());
@@ -114,7 +114,7 @@ public class FileDownload {
         }
     }
 
-    public void downloadWorld(WorldDownload arg, String string, RealmsDownloadLatestWorldScreen.DownloadStatus arg2, LevelStorage arg3) {
+    public void downloadWorld(WorldDownload download, String message, RealmsDownloadLatestWorldScreen.DownloadStatus status, LevelStorage storage) {
         if (this.currentThread != null) {
             return;
         }
@@ -132,7 +132,7 @@ public class FileDownload {
                     return;
                 }
                 FileOutputStream outputStream2 = new FileOutputStream(this.backupFile);
-                ProgressListener lv3 = new ProgressListener(string.trim(), this.backupFile, arg3, arg2);
+                ProgressListener lv3 = new ProgressListener(message.trim(), this.backupFile, storage, status);
                 DownloadCountingOutputStream lv4 = new DownloadCountingOutputStream(outputStream2);
                 lv4.setListener(lv3);
                 IOUtils.copy((InputStream)httpResponse.getEntity().getContent(), (OutputStream)((Object)lv4));
@@ -169,7 +169,7 @@ public class FileDownload {
                             this.error = true;
                         }
                         FileOutputStream outputStream4 = new FileOutputStream(this.backupFile);
-                        ResourcePackProgressListener lv7 = new ResourcePackProgressListener(this.backupFile, arg2, arg);
+                        ResourcePackProgressListener lv7 = new ResourcePackProgressListener(this.backupFile, status, download);
                         DownloadCountingOutputStream lv8 = new DownloadCountingOutputStream(outputStream4);
                         lv8.setListener(lv7);
                         IOUtils.copy((InputStream)httpResponse4.getEntity().getContent(), (OutputStream)((Object)lv8));
@@ -219,13 +219,13 @@ public class FileDownload {
         return this.extracting;
     }
 
-    public static String findAvailableFolderName(String string) {
-        string = string.replaceAll("[\\./\"]", "_");
+    public static String findAvailableFolderName(String folder) {
+        folder = folder.replaceAll("[\\./\"]", "_");
         for (String string2 : INVALID_FILE_NAMES) {
-            if (!string.equalsIgnoreCase(string2)) continue;
-            string = "_" + string + "_";
+            if (!folder.equalsIgnoreCase(string2)) continue;
+            folder = "_" + folder + "_";
         }
-        return string;
+        return folder;
     }
 
     /*
@@ -234,7 +234,7 @@ public class FileDownload {
      * Enabled unnecessary exception pruning
      * Enabled aggressive exception aggregation
      */
-    private void untarGzipArchive(String string, File file, LevelStorage arg) throws IOException {
+    private void untarGzipArchive(String name, File archive, LevelStorage storage) throws IOException {
         File file2;
         TarArchiveInputStream tarArchiveInputStream;
         String string3;
@@ -244,16 +244,16 @@ public class FileDownload {
             int i = 1;
             char[] arrc = SharedConstants.INVALID_CHARS_LEVEL_NAME;
             int n = arrc.length;
-            for (int n2 = 0; n2 < n; string = string.replace(c, '_'), ++n2) {
+            for (int n2 = 0; n2 < n; name = name.replace(c, '_'), ++n2) {
                 c = arrc[n2];
             }
-            if (StringUtils.isEmpty((CharSequence)string)) {
-                string = "Realm";
+            if (StringUtils.isEmpty((CharSequence)name)) {
+                name = "Realm";
             }
-            string = FileDownload.findAvailableFolderName(string);
+            name = FileDownload.findAvailableFolderName(name);
             try {
-                for (LevelSummary lv : arg.getLevelList()) {
-                    if (!lv.getName().toLowerCase(Locale.ROOT).startsWith(string.toLowerCase(Locale.ROOT))) continue;
+                for (LevelSummary lv : storage.getLevelList()) {
+                    if (!lv.getName().toLowerCase(Locale.ROOT).startsWith(name.toLowerCase(Locale.ROOT))) continue;
                     Matcher matcher = pattern.matcher(lv.getName());
                     if (matcher.matches()) {
                         if (Integer.valueOf(matcher.group(1)) <= i) continue;
@@ -268,24 +268,24 @@ public class FileDownload {
                 this.error = true;
                 return;
             }
-            if (!arg.isLevelNameValid(string) || i > 1) {
-                String string2 = string + (i == 1 ? "" : "-" + i);
-                if (!arg.isLevelNameValid(string2)) {
+            if (!storage.isLevelNameValid(name) || i > 1) {
+                String string2 = name + (i == 1 ? "" : "-" + i);
+                if (!storage.isLevelNameValid(string2)) {
                     boolean bl = false;
                     while (!bl) {
-                        string2 = string + (++i == 1 ? "" : "-" + i);
-                        if (!arg.isLevelNameValid(string2)) continue;
+                        string2 = name + (++i == 1 ? "" : "-" + i);
+                        if (!storage.isLevelNameValid(string2)) continue;
                         bl = true;
                     }
                 }
             } else {
-                string3 = string;
+                string3 = name;
             }
             tarArchiveInputStream = null;
             file2 = new File(MinecraftClient.getInstance().runDirectory.getAbsolutePath(), "saves");
             try {
                 file2.mkdir();
-                tarArchiveInputStream = new TarArchiveInputStream((InputStream)new GzipCompressorInputStream((InputStream)new BufferedInputStream(new FileInputStream(file))));
+                tarArchiveInputStream = new TarArchiveInputStream((InputStream)new GzipCompressorInputStream((InputStream)new BufferedInputStream(new FileInputStream(archive))));
                 TarArchiveEntry tarArchiveEntry = tarArchiveInputStream.getNextTarEntry();
                 while (tarArchiveEntry != null) {
                     File file3 = new File(file2, tarArchiveEntry.getName().replace("world", string3));
@@ -308,12 +308,12 @@ public class FileDownload {
             }
             tarArchiveInputStream.close();
         }
-        if (file != null) {
-            file.delete();
+        if (archive != null) {
+            archive.delete();
         }
         try {
             Throwable throwable = null;
-            try (LevelStorage.Session lv2 = arg.createSession(string3);){
+            try (LevelStorage.Session lv2 = storage.createSession(string3);){
                 lv2.save(string3.trim());
                 Path path = lv2.getDirectory(WorldSavePath.LEVEL_DAT);
                 FileDownload.readNbtFile(path.toFile());
@@ -332,10 +332,10 @@ public class FileDownload {
             if (tarArchiveInputStream != null) {
                 tarArchiveInputStream.close();
             }
-            if (file != null) {
-                file.delete();
+            if (archive != null) {
+                archive.delete();
             }
-            try (LevelStorage.Session lv3 = arg.createSession(string3);){
+            try (LevelStorage.Session lv3 = storage.createSession(string3);){
                 lv3.save(string3.trim());
                 Path path2 = lv3.getDirectory(WorldSavePath.LEVEL_DAT);
                 FileDownload.readNbtFile(path2.toFile());
@@ -366,16 +366,16 @@ public class FileDownload {
     extends CountingOutputStream {
         private ActionListener listener;
 
-        public DownloadCountingOutputStream(OutputStream outputStream) {
-            super(outputStream);
+        public DownloadCountingOutputStream(OutputStream out) {
+            super(out);
         }
 
-        public void setListener(ActionListener actionListener) {
-            this.listener = actionListener;
+        public void setListener(ActionListener listener) {
+            this.listener = listener;
         }
 
-        protected void afterWrite(int i) throws IOException {
-            super.afterWrite(i);
+        protected void afterWrite(int n) throws IOException {
+            super.afterWrite(n);
             if (this.listener != null) {
                 this.listener.actionPerformed(new ActionEvent((Object)this, 0, null));
             }
@@ -389,15 +389,15 @@ public class FileDownload {
         private final RealmsDownloadLatestWorldScreen.DownloadStatus downloadStatus;
         private final WorldDownload worldDownload;
 
-        private ResourcePackProgressListener(File file, RealmsDownloadLatestWorldScreen.DownloadStatus arg2, WorldDownload arg3) {
-            this.tempFile = file;
-            this.downloadStatus = arg2;
-            this.worldDownload = arg3;
+        private ResourcePackProgressListener(File tempFile, RealmsDownloadLatestWorldScreen.DownloadStatus downloadStatus, WorldDownload worldDownload) {
+            this.tempFile = tempFile;
+            this.downloadStatus = downloadStatus;
+            this.worldDownload = worldDownload;
         }
 
         @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            this.downloadStatus.bytesWritten = ((DownloadCountingOutputStream)((Object)actionEvent.getSource())).getByteCount();
+        public void actionPerformed(ActionEvent e) {
+            this.downloadStatus.bytesWritten = ((DownloadCountingOutputStream)((Object)e.getSource())).getByteCount();
             if (this.downloadStatus.bytesWritten >= this.downloadStatus.totalBytes && !FileDownload.this.cancelled) {
                 try {
                     String string = Hashing.sha1().hashBytes(Files.toByteArray((File)this.tempFile)).toString();
@@ -426,16 +426,16 @@ public class FileDownload {
         private final LevelStorage levelStorageSource;
         private final RealmsDownloadLatestWorldScreen.DownloadStatus downloadStatus;
 
-        private ProgressListener(String string, File file, LevelStorage arg2, RealmsDownloadLatestWorldScreen.DownloadStatus arg3) {
-            this.worldName = string;
-            this.tempFile = file;
-            this.levelStorageSource = arg2;
-            this.downloadStatus = arg3;
+        private ProgressListener(String worldName, File tempFile, LevelStorage storage, RealmsDownloadLatestWorldScreen.DownloadStatus downloadStatus) {
+            this.worldName = worldName;
+            this.tempFile = tempFile;
+            this.levelStorageSource = storage;
+            this.downloadStatus = downloadStatus;
         }
 
         @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            this.downloadStatus.bytesWritten = ((DownloadCountingOutputStream)((Object)actionEvent.getSource())).getByteCount();
+        public void actionPerformed(ActionEvent e) {
+            this.downloadStatus.bytesWritten = ((DownloadCountingOutputStream)((Object)e.getSource())).getByteCount();
             if (this.downloadStatus.bytesWritten >= this.downloadStatus.totalBytes && !FileDownload.this.cancelled && !FileDownload.this.error) {
                 try {
                     FileDownload.this.extracting = true;

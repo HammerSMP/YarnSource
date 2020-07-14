@@ -36,8 +36,8 @@ implements TutorialStepHandler {
     private int moveAroundCompletionTicks = -1;
     private int lookAroundCompletionTicks = -1;
 
-    public MovementTutorialStepHandler(TutorialManager arg) {
-        this.manager = arg;
+    public MovementTutorialStepHandler(TutorialManager manager) {
+        this.manager = manager;
     }
 
     @Override
@@ -102,15 +102,15 @@ implements TutorialStepHandler {
     }
 
     @Override
-    public void onMovement(Input arg) {
-        if (arg.pressingForward || arg.pressingBack || arg.pressingLeft || arg.pressingRight || arg.jumping) {
+    public void onMovement(Input input) {
+        if (input.pressingForward || input.pressingBack || input.pressingLeft || input.pressingRight || input.jumping) {
             this.movedLastTick = true;
         }
     }
 
     @Override
-    public void onMouseUpdate(double d, double e) {
-        if (Math.abs(d) > 0.01 || Math.abs(e) > 0.01) {
+    public void onMouseUpdate(double deltaX, double deltaY) {
+        if (Math.abs(deltaX) > 0.01 || Math.abs(deltaY) > 0.01) {
             this.lookedAroundLastTick = true;
         }
     }

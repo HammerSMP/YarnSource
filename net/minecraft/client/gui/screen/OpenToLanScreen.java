@@ -31,9 +31,9 @@ extends Screen {
     private String gameMode = "survival";
     private boolean allowCommands;
 
-    public OpenToLanScreen(Screen arg) {
+    public OpenToLanScreen(Screen parent) {
         super(new TranslatableText("lanServer.title"));
-        this.parent = arg;
+        this.parent = parent;
     }
 
     @Override
@@ -68,11 +68,11 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("lanServer.otherPlayers", new Object[0]), this.width / 2, 82, 0xFFFFFF);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("lanServer.otherPlayers", new Object[0]), this.width / 2, 82, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

@@ -48,23 +48,23 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.field_26345 = ChunkSectionPos.from(arg.readLong());
-        int i = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.field_26345 = ChunkSectionPos.from(buf.readLong());
+        int i = buf.readVarInt();
         this.method_30620(i);
         for (int j = 0; j < this.field_26346.length; ++j) {
-            long l = arg.readVarLong();
+            long l = buf.readVarLong();
             this.field_26346[j] = (short)(l & 0xFFFL);
             this.field_26347[j] = Block.STATE_IDS.get((int)(l >>> 12));
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeLong(this.field_26345.asLong());
-        arg.writeVarInt(this.field_26346.length);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeLong(this.field_26345.asLong());
+        buf.writeVarInt(this.field_26346.length);
         for (int i = 0; i < this.field_26346.length; ++i) {
-            arg.writeVarLong(Block.getRawIdFromState(this.field_26347[i]) << 12 | this.field_26346[i]);
+            buf.writeVarLong(Block.getRawIdFromState(this.field_26347[i]) << 12 | this.field_26346[i]);
         }
     }
 

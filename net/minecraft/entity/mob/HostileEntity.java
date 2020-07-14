@@ -71,15 +71,15 @@ implements Monster {
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        if (this.isInvulnerableTo(arg)) {
+    public boolean damage(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(source)) {
             return false;
         }
-        return super.damage(arg, f);
+        return super.damage(source, amount);
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_HOSTILE_HURT;
     }
 
@@ -89,32 +89,32 @@ implements Monster {
     }
 
     @Override
-    protected SoundEvent getFallSound(int i) {
-        if (i > 4) {
+    protected SoundEvent getFallSound(int distance) {
+        if (distance > 4) {
             return SoundEvents.ENTITY_HOSTILE_BIG_FALL;
         }
         return SoundEvents.ENTITY_HOSTILE_SMALL_FALL;
     }
 
     @Override
-    public float getPathfindingFavor(BlockPos arg, WorldView arg2) {
-        return 0.5f - arg2.getBrightness(arg);
+    public float getPathfindingFavor(BlockPos pos, WorldView world) {
+        return 0.5f - world.getBrightness(pos);
     }
 
-    public static boolean isSpawnDark(class_5425 arg, BlockPos arg2, Random random) {
-        if (arg.getLightLevel(LightType.SKY, arg2) > random.nextInt(32)) {
+    public static boolean isSpawnDark(class_5425 arg, BlockPos pos, Random random) {
+        if (arg.getLightLevel(LightType.SKY, pos) > random.nextInt(32)) {
             return false;
         }
-        int i = arg.getWorld().isThundering() ? arg.getLightLevel(arg2, 10) : arg.getLightLevel(arg2);
+        int i = arg.getWorld().isThundering() ? arg.getLightLevel(pos, 10) : arg.getLightLevel(pos);
         return i <= random.nextInt(8);
     }
 
-    public static boolean canSpawnInDark(EntityType<? extends HostileEntity> arg, class_5425 arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.isSpawnDark(arg2, arg4, random) && HostileEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+    public static boolean canSpawnInDark(EntityType<? extends HostileEntity> type, class_5425 arg2, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return arg2.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.isSpawnDark(arg2, pos, random) && HostileEntity.canMobSpawn(type, arg2, spawnReason, pos, random);
     }
 
-    public static boolean canSpawnIgnoreLightLevel(EntityType<? extends HostileEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return arg2.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.canMobSpawn(arg, arg2, arg3, arg4, random);
+    public static boolean canSpawnIgnoreLightLevel(EntityType<? extends HostileEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return world.getDifficulty() != Difficulty.PEACEFUL && HostileEntity.canMobSpawn(type, world, spawnReason, pos, random);
     }
 
     public static DefaultAttributeContainer.Builder createHostileAttributes() {
@@ -131,14 +131,14 @@ implements Monster {
         return true;
     }
 
-    public boolean isAngryAt(PlayerEntity arg) {
+    public boolean isAngryAt(PlayerEntity player) {
         return true;
     }
 
     @Override
-    public ItemStack getArrowType(ItemStack arg) {
-        if (arg.getItem() instanceof RangedWeaponItem) {
-            Predicate<ItemStack> predicate = ((RangedWeaponItem)arg.getItem()).getHeldProjectiles();
+    public ItemStack getArrowType(ItemStack stack) {
+        if (stack.getItem() instanceof RangedWeaponItem) {
+            Predicate<ItemStack> predicate = ((RangedWeaponItem)stack.getItem()).getHeldProjectiles();
             ItemStack lv = RangedWeaponItem.getHeldProjectile(this, predicate);
             return lv.isEmpty() ? new ItemStack(Items.ARROW) : lv;
         }

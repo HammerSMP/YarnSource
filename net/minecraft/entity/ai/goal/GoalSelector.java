@@ -42,17 +42,17 @@ public class GoalSelector {
     private final EnumSet<Goal.Control> disabledControls = EnumSet.noneOf(Goal.Control.class);
     private int timeInterval = 3;
 
-    public GoalSelector(Supplier<Profiler> supplier) {
-        this.profiler = supplier;
+    public GoalSelector(Supplier<Profiler> profiler) {
+        this.profiler = profiler;
     }
 
-    public void add(int i, Goal arg) {
-        this.goals.add(new PrioritizedGoal(i, arg));
+    public void add(int priority, Goal goal) {
+        this.goals.add(new PrioritizedGoal(priority, goal));
     }
 
-    public void remove(Goal arg) {
-        this.goals.stream().filter(arg2 -> arg2.getGoal() == arg).filter(PrioritizedGoal::isRunning).forEach(PrioritizedGoal::stop);
-        this.goals.removeIf(arg2 -> arg2.getGoal() == arg);
+    public void remove(Goal goal) {
+        this.goals.stream().filter(arg2 -> arg2.getGoal() == goal).filter(PrioritizedGoal::isRunning).forEach(PrioritizedGoal::stop);
+        this.goals.removeIf(arg2 -> arg2.getGoal() == goal);
     }
 
     public void tick() {
@@ -89,19 +89,19 @@ public class GoalSelector {
         return this.goals.stream().filter(PrioritizedGoal::isRunning);
     }
 
-    public void disableControl(Goal.Control arg) {
-        this.disabledControls.add(arg);
+    public void disableControl(Goal.Control control) {
+        this.disabledControls.add(control);
     }
 
-    public void enableControl(Goal.Control arg) {
-        this.disabledControls.remove((Object)arg);
+    public void enableControl(Goal.Control control) {
+        this.disabledControls.remove((Object)control);
     }
 
-    public void setControlEnabled(Goal.Control arg, boolean bl) {
-        if (bl) {
-            this.enableControl(arg);
+    public void setControlEnabled(Goal.Control control, boolean enabled) {
+        if (enabled) {
+            this.enableControl(control);
         } else {
-            this.disableControl(arg);
+            this.disableControl(control);
         }
     }
 }

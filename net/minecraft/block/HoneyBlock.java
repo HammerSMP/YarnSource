@@ -39,98 +39,98 @@ extends TransparentBlock {
         super(arg);
     }
 
-    private static boolean hasHoneyBlockEffects(Entity arg) {
-        return arg instanceof LivingEntity || arg instanceof AbstractMinecartEntity || arg instanceof TntEntity || arg instanceof BoatEntity;
+    private static boolean hasHoneyBlockEffects(Entity entity) {
+        return entity instanceof LivingEntity || entity instanceof AbstractMinecartEntity || entity instanceof TntEntity || entity instanceof BoatEntity;
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public void onLandedUpon(World arg, BlockPos arg2, Entity arg3, float f) {
-        arg3.playSound(SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, 1.0f, 1.0f);
-        if (!arg.isClient) {
-            arg.sendEntityStatus(arg3, (byte)54);
+    public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance) {
+        entity.playSound(SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, 1.0f, 1.0f);
+        if (!world.isClient) {
+            world.sendEntityStatus(entity, (byte)54);
         }
-        if (arg3.handleFallDamage(f, 0.2f)) {
-            arg3.playSound(this.soundGroup.getFallSound(), this.soundGroup.getVolume() * 0.5f, this.soundGroup.getPitch() * 0.75f);
+        if (entity.handleFallDamage(distance, 0.2f)) {
+            entity.playSound(this.soundGroup.getFallSound(), this.soundGroup.getVolume() * 0.5f, this.soundGroup.getPitch() * 0.75f);
         }
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (this.isSliding(arg3, arg4)) {
-            this.triggerAdvancement(arg4, arg3);
-            this.updateSlidingVelocity(arg4);
-            this.addCollisionEffects(arg2, arg4);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (this.isSliding(pos, entity)) {
+            this.triggerAdvancement(entity, pos);
+            this.updateSlidingVelocity(entity);
+            this.addCollisionEffects(world, entity);
         }
-        super.onEntityCollision(arg, arg2, arg3, arg4);
+        super.onEntityCollision(state, world, pos, entity);
     }
 
-    private boolean isSliding(BlockPos arg, Entity arg2) {
-        if (arg2.isOnGround()) {
+    private boolean isSliding(BlockPos pos, Entity entity) {
+        if (entity.isOnGround()) {
             return false;
         }
-        if (arg2.getY() > (double)arg.getY() + 0.9375 - 1.0E-7) {
+        if (entity.getY() > (double)pos.getY() + 0.9375 - 1.0E-7) {
             return false;
         }
-        if (arg2.getVelocity().y >= -0.08) {
+        if (entity.getVelocity().y >= -0.08) {
             return false;
         }
-        double d = Math.abs((double)arg.getX() + 0.5 - arg2.getX());
-        double e = Math.abs((double)arg.getZ() + 0.5 - arg2.getZ());
-        double f = 0.4375 + (double)(arg2.getWidth() / 2.0f);
+        double d = Math.abs((double)pos.getX() + 0.5 - entity.getX());
+        double e = Math.abs((double)pos.getZ() + 0.5 - entity.getZ());
+        double f = 0.4375 + (double)(entity.getWidth() / 2.0f);
         return d + 1.0E-7 > f || e + 1.0E-7 > f;
     }
 
-    private void triggerAdvancement(Entity arg, BlockPos arg2) {
-        if (arg instanceof ServerPlayerEntity && arg.world.getTime() % 20L == 0L) {
-            Criteria.SLIDE_DOWN_BLOCK.test((ServerPlayerEntity)arg, arg.world.getBlockState(arg2));
+    private void triggerAdvancement(Entity entity, BlockPos pos) {
+        if (entity instanceof ServerPlayerEntity && entity.world.getTime() % 20L == 0L) {
+            Criteria.SLIDE_DOWN_BLOCK.test((ServerPlayerEntity)entity, entity.world.getBlockState(pos));
         }
     }
 
-    private void updateSlidingVelocity(Entity arg) {
-        Vec3d lv = arg.getVelocity();
+    private void updateSlidingVelocity(Entity entity) {
+        Vec3d lv = entity.getVelocity();
         if (lv.y < -0.13) {
             double d = -0.05 / lv.y;
-            arg.setVelocity(new Vec3d(lv.x * d, -0.05, lv.z * d));
+            entity.setVelocity(new Vec3d(lv.x * d, -0.05, lv.z * d));
         } else {
-            arg.setVelocity(new Vec3d(lv.x, -0.05, lv.z));
+            entity.setVelocity(new Vec3d(lv.x, -0.05, lv.z));
         }
-        arg.fallDistance = 0.0f;
+        entity.fallDistance = 0.0f;
     }
 
-    private void addCollisionEffects(World arg, Entity arg2) {
-        if (HoneyBlock.hasHoneyBlockEffects(arg2)) {
-            if (arg.random.nextInt(5) == 0) {
-                arg2.playSound(SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, 1.0f, 1.0f);
+    private void addCollisionEffects(World world, Entity entity) {
+        if (HoneyBlock.hasHoneyBlockEffects(entity)) {
+            if (world.random.nextInt(5) == 0) {
+                entity.playSound(SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, 1.0f, 1.0f);
             }
-            if (!arg.isClient && arg.random.nextInt(5) == 0) {
-                arg.sendEntityStatus(arg2, (byte)53);
+            if (!world.isClient && world.random.nextInt(5) == 0) {
+                world.sendEntityStatus(entity, (byte)53);
             }
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void addRegularParticles(Entity arg) {
-        HoneyBlock.addParticles(arg, 5);
+    public static void addRegularParticles(Entity entity) {
+        HoneyBlock.addParticles(entity, 5);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static void addRichParticles(Entity arg) {
-        HoneyBlock.addParticles(arg, 10);
+    public static void addRichParticles(Entity entity) {
+        HoneyBlock.addParticles(entity, 10);
     }
 
     @Environment(value=EnvType.CLIENT)
-    private static void addParticles(Entity arg, int i) {
-        if (!arg.world.isClient) {
+    private static void addParticles(Entity entity, int count) {
+        if (!entity.world.isClient) {
             return;
         }
         BlockState lv = Blocks.HONEY_BLOCK.getDefaultState();
-        for (int j = 0; j < i; ++j) {
-            arg.world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, lv), arg.getX(), arg.getY(), arg.getZ(), 0.0, 0.0, 0.0);
+        for (int j = 0; j < count; ++j) {
+            entity.world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, lv), entity.getX(), entity.getY(), entity.getZ(), 0.0, 0.0, 0.0);
         }
     }
 }

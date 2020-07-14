@@ -26,22 +26,22 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public class SpawnPointCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("spawnpoint").requires(arg -> arg.hasPermissionLevel(2))).executes(commandContext -> SpawnPointCommand.execute((ServerCommandSource)commandContext.getSource(), Collections.singleton(((ServerCommandSource)commandContext.getSource()).getPlayer()), new BlockPos(((ServerCommandSource)commandContext.getSource()).getPosition())))).then(((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).executes(commandContext -> SpawnPointCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), new BlockPos(((ServerCommandSource)commandContext.getSource()).getPosition())))).then(CommandManager.argument("pos", BlockPosArgumentType.blockPos()).executes(commandContext -> SpawnPointCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), BlockPosArgumentType.getBlockPos((CommandContext<ServerCommandSource>)commandContext, "pos"))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("spawnpoint").requires(arg -> arg.hasPermissionLevel(2))).executes(commandContext -> SpawnPointCommand.execute((ServerCommandSource)commandContext.getSource(), Collections.singleton(((ServerCommandSource)commandContext.getSource()).getPlayer()), new BlockPos(((ServerCommandSource)commandContext.getSource()).getPosition())))).then(((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).executes(commandContext -> SpawnPointCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), new BlockPos(((ServerCommandSource)commandContext.getSource()).getPosition())))).then(CommandManager.argument("pos", BlockPosArgumentType.blockPos()).executes(commandContext -> SpawnPointCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), BlockPosArgumentType.getBlockPos((CommandContext<ServerCommandSource>)commandContext, "pos"))))));
     }
 
-    private static int execute(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, BlockPos arg2) {
-        RegistryKey<World> lv = arg.getWorld().getRegistryKey();
-        for (ServerPlayerEntity lv2 : collection) {
-            lv2.setSpawnPoint(lv, arg2, true, false);
+    private static int execute(ServerCommandSource source, Collection<ServerPlayerEntity> targets, BlockPos pos) {
+        RegistryKey<World> lv = source.getWorld().getRegistryKey();
+        for (ServerPlayerEntity lv2 : targets) {
+            lv2.setSpawnPoint(lv, pos, true, false);
         }
         String string = lv.getValue().toString();
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText("commands.spawnpoint.success.single", arg2.getX(), arg2.getY(), arg2.getZ(), string, collection.iterator().next().getDisplayName()), true);
+        if (targets.size() == 1) {
+            source.sendFeedback(new TranslatableText("commands.spawnpoint.success.single", pos.getX(), pos.getY(), pos.getZ(), string, targets.iterator().next().getDisplayName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.spawnpoint.success.multiple", arg2.getX(), arg2.getY(), arg2.getZ(), string, collection.size()), true);
+            source.sendFeedback(new TranslatableText("commands.spawnpoint.success.multiple", pos.getX(), pos.getY(), pos.getZ(), string, targets.size()), true);
         }
-        return collection.size();
+        return targets.size();
     }
 }
 

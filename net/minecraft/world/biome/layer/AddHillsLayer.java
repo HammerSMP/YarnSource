@@ -52,10 +52,10 @@ NorthWestCoordinateTransformer
     private static final int TAIGA_HILLS_ID;
 
     @Override
-    public int sample(LayerRandomnessSource arg, LayerSampler arg2, LayerSampler arg3, int i, int j) {
+    public int sample(LayerRandomnessSource context, LayerSampler sampler1, LayerSampler sampler2, int x, int z) {
         Biome lv;
-        int k = arg2.sample(this.transformX(i + 1), this.transformZ(j + 1));
-        int l = arg3.sample(this.transformX(i + 1), this.transformZ(j + 1));
+        int k = sampler1.sample(this.transformX(x + 1), this.transformZ(z + 1));
+        int l = sampler2.sample(this.transformX(x + 1), this.transformZ(z + 1));
         if (k > 255) {
             LOGGER.debug("old! {}", (Object)k);
         }
@@ -64,7 +64,7 @@ NorthWestCoordinateTransformer
             Biome lv2 = Biomes.method_30360(lv);
             return lv2 == null ? k : BuiltinRegistries.BIOME.getRawId(lv2);
         }
-        if (arg.nextInt(3) == 0 || m == 0) {
+        if (context.nextInt(3) == 0 || m == 0) {
             int n = k;
             if (k == DESERT_ID) {
                 n = DESERT_HILLS_ID;
@@ -81,7 +81,7 @@ NorthWestCoordinateTransformer
             } else if (k == SNOWY_TAIGA_ID) {
                 n = SNOWY_TAIGA_HILLS_ID;
             } else if (k == PLAINS_ID) {
-                n = arg.nextInt(3) == 0 ? WOODED_HILLS_ID : FOREST_ID;
+                n = context.nextInt(3) == 0 ? WOODED_HILLS_ID : FOREST_ID;
             } else if (k == SNOWY_TUNDRA_ID) {
                 n = SNOWY_MOUNTAINS_ID;
             } else if (k == JUNGLE_ID) {
@@ -102,8 +102,8 @@ NorthWestCoordinateTransformer
                 n = SAVANNA_PLATEAU_ID;
             } else if (BiomeLayers.areSimilar(k, WOODED_BADLANDS_PLATEAU_ID)) {
                 n = BADLANDS_ID;
-            } else if ((k == BiomeLayers.DEEP_OCEAN_ID || k == BiomeLayers.DEEP_LUKEWARM_OCEAN_ID || k == BiomeLayers.DEEP_COLD_OCEAN_ID || k == BiomeLayers.DEEP_FROZEN_OCEAN_ID) && arg.nextInt(3) == 0) {
-                int n2 = n = arg.nextInt(2) == 0 ? PLAINS_ID : FOREST_ID;
+            } else if ((k == BiomeLayers.DEEP_OCEAN_ID || k == BiomeLayers.DEEP_LUKEWARM_OCEAN_ID || k == BiomeLayers.DEEP_COLD_OCEAN_ID || k == BiomeLayers.DEEP_FROZEN_OCEAN_ID) && context.nextInt(3) == 0) {
+                int n2 = n = context.nextInt(2) == 0 ? PLAINS_ID : FOREST_ID;
             }
             if (m == 0 && n != k) {
                 Biome lv3 = Biomes.method_30360((Biome)BuiltinRegistries.BIOME.get(n));
@@ -111,16 +111,16 @@ NorthWestCoordinateTransformer
             }
             if (n != k) {
                 int o = 0;
-                if (BiomeLayers.areSimilar(arg2.sample(this.transformX(i + 1), this.transformZ(j + 0)), k)) {
+                if (BiomeLayers.areSimilar(sampler1.sample(this.transformX(x + 1), this.transformZ(z + 0)), k)) {
                     ++o;
                 }
-                if (BiomeLayers.areSimilar(arg2.sample(this.transformX(i + 2), this.transformZ(j + 1)), k)) {
+                if (BiomeLayers.areSimilar(sampler1.sample(this.transformX(x + 2), this.transformZ(z + 1)), k)) {
                     ++o;
                 }
-                if (BiomeLayers.areSimilar(arg2.sample(this.transformX(i + 0), this.transformZ(j + 1)), k)) {
+                if (BiomeLayers.areSimilar(sampler1.sample(this.transformX(x + 0), this.transformZ(z + 1)), k)) {
                     ++o;
                 }
-                if (BiomeLayers.areSimilar(arg2.sample(this.transformX(i + 1), this.transformZ(j + 2)), k)) {
+                if (BiomeLayers.areSimilar(sampler1.sample(this.transformX(x + 1), this.transformZ(z + 2)), k)) {
                     ++o;
                 }
                 if (o >= 3) {

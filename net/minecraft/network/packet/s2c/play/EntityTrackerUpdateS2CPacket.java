@@ -24,26 +24,26 @@ implements Packet<ClientPlayPacketListener> {
     public EntityTrackerUpdateS2CPacket() {
     }
 
-    public EntityTrackerUpdateS2CPacket(int i, DataTracker arg, boolean bl) {
-        this.id = i;
-        if (bl) {
-            this.trackedValues = arg.getAllEntries();
-            arg.clearDirty();
+    public EntityTrackerUpdateS2CPacket(int id, DataTracker tracker, boolean forceUpdateAll) {
+        this.id = id;
+        if (forceUpdateAll) {
+            this.trackedValues = tracker.getAllEntries();
+            tracker.clearDirty();
         } else {
-            this.trackedValues = arg.getDirtyEntries();
+            this.trackedValues = tracker.getDirtyEntries();
         }
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.trackedValues = DataTracker.deserializePacket(arg);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.trackedValues = DataTracker.deserializePacket(buf);
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        DataTracker.entriesToPacket(this.trackedValues, arg);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        DataTracker.entriesToPacket(this.trackedValues, buf);
     }
 
     @Override

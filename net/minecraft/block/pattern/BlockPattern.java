@@ -28,12 +28,12 @@ public class BlockPattern {
     private final int height;
     private final int width;
 
-    public BlockPattern(Predicate<CachedBlockPosition>[][][] predicates) {
-        this.pattern = predicates;
-        this.depth = predicates.length;
+    public BlockPattern(Predicate<CachedBlockPosition>[][][] pattern) {
+        this.pattern = pattern;
+        this.depth = pattern.length;
         if (this.depth > 0) {
-            this.height = predicates[0].length;
-            this.width = this.height > 0 ? predicates[0][0].length : 0;
+            this.height = pattern[0].length;
+            this.width = this.height > 0 ? pattern[0][0].length : 0;
         } else {
             this.height = 0;
             this.width = 0;
@@ -53,23 +53,23 @@ public class BlockPattern {
     }
 
     @Nullable
-    private Result testTransform(BlockPos arg, Direction arg2, Direction arg3, LoadingCache<BlockPos, CachedBlockPosition> loadingCache) {
+    private Result testTransform(BlockPos frontTopLeft, Direction forwards, Direction up, LoadingCache<BlockPos, CachedBlockPosition> cache) {
         for (int i = 0; i < this.width; ++i) {
             for (int j = 0; j < this.height; ++j) {
                 for (int k = 0; k < this.depth; ++k) {
-                    if (this.pattern[k][j][i].test((CachedBlockPosition)loadingCache.getUnchecked((Object)BlockPattern.translate(arg, arg2, arg3, i, j, k)))) continue;
+                    if (this.pattern[k][j][i].test((CachedBlockPosition)cache.getUnchecked((Object)BlockPattern.translate(frontTopLeft, forwards, up, i, j, k)))) continue;
                     return null;
                 }
             }
         }
-        return new Result(arg, arg2, arg3, loadingCache, this.width, this.height, this.depth);
+        return new Result(frontTopLeft, forwards, up, cache, this.width, this.height, this.depth);
     }
 
     @Nullable
-    public Result searchAround(WorldView arg, BlockPos arg2) {
-        LoadingCache<BlockPos, CachedBlockPosition> loadingCache = BlockPattern.makeCache(arg, false);
+    public Result searchAround(WorldView world, BlockPos pos) {
+        LoadingCache<BlockPos, CachedBlockPosition> loadingCache = BlockPattern.makeCache(world, false);
         int i = Math.max(Math.max(this.width, this.height), this.depth);
-        for (BlockPos lv : BlockPos.iterate(arg2, arg2.add(i - 1, i - 1, i - 1))) {
+        for (BlockPos lv : BlockPos.iterate(pos, pos.add(i - 1, i - 1, i - 1))) {
             for (Direction lv2 : Direction.values()) {
                 for (Direction lv3 : Direction.values()) {
                     Result lv4;
@@ -81,18 +81,18 @@ public class BlockPattern {
         return null;
     }
 
-    public static LoadingCache<BlockPos, CachedBlockPosition> makeCache(WorldView arg, boolean bl) {
-        return CacheBuilder.newBuilder().build((CacheLoader)new BlockStateCacheLoader(arg, bl));
+    public static LoadingCache<BlockPos, CachedBlockPosition> makeCache(WorldView world, boolean forceLoad) {
+        return CacheBuilder.newBuilder().build((CacheLoader)new BlockStateCacheLoader(world, forceLoad));
     }
 
-    protected static BlockPos translate(BlockPos arg, Direction arg2, Direction arg3, int i, int j, int k) {
-        if (arg2 == arg3 || arg2 == arg3.getOpposite()) {
+    protected static BlockPos translate(BlockPos pos, Direction forwards, Direction up, int offsetLeft, int offsetDown, int offsetForwards) {
+        if (forwards == up || forwards == up.getOpposite()) {
             throw new IllegalArgumentException("Invalid forwards & up combination");
         }
-        Vec3i lv = new Vec3i(arg2.getOffsetX(), arg2.getOffsetY(), arg2.getOffsetZ());
-        Vec3i lv2 = new Vec3i(arg3.getOffsetX(), arg3.getOffsetY(), arg3.getOffsetZ());
+        Vec3i lv = new Vec3i(forwards.getOffsetX(), forwards.getOffsetY(), forwards.getOffsetZ());
+        Vec3i lv2 = new Vec3i(up.getOffsetX(), up.getOffsetY(), up.getOffsetZ());
         Vec3i lv3 = lv.crossProduct(lv2);
-        return arg.add(lv2.getX() * -j + lv3.getX() * i + lv.getX() * k, lv2.getY() * -j + lv3.getY() * i + lv.getY() * k, lv2.getZ() * -j + lv3.getZ() * i + lv.getZ() * k);
+        return pos.add(lv2.getX() * -offsetDown + lv3.getX() * offsetLeft + lv.getX() * offsetForwards, lv2.getY() * -offsetDown + lv3.getY() * offsetLeft + lv.getY() * offsetForwards, lv2.getZ() * -offsetDown + lv3.getZ() * offsetLeft + lv.getZ() * offsetForwards);
     }
 
     public static class Result {
@@ -104,14 +104,14 @@ public class BlockPattern {
         private final int height;
         private final int depth;
 
-        public Result(BlockPos arg, Direction arg2, Direction arg3, LoadingCache<BlockPos, CachedBlockPosition> loadingCache, int i, int j, int k) {
-            this.frontTopLeft = arg;
-            this.forwards = arg2;
-            this.up = arg3;
-            this.cache = loadingCache;
-            this.width = i;
-            this.height = j;
-            this.depth = k;
+        public Result(BlockPos frontTopLeft, Direction forwards, Direction up, LoadingCache<BlockPos, CachedBlockPosition> cache, int width, int height, int depth) {
+            this.frontTopLeft = frontTopLeft;
+            this.forwards = forwards;
+            this.up = up;
+            this.cache = cache;
+            this.width = width;
+            this.height = height;
+            this.depth = depth;
         }
 
         public BlockPos getFrontTopLeft() {
@@ -140,17 +140,17 @@ public class BlockPattern {
         private final WorldView world;
         private final boolean forceLoad;
 
-        public BlockStateCacheLoader(WorldView arg, boolean bl) {
-            this.world = arg;
-            this.forceLoad = bl;
+        public BlockStateCacheLoader(WorldView world, boolean forceLoad) {
+            this.world = world;
+            this.forceLoad = forceLoad;
         }
 
         public CachedBlockPosition load(BlockPos arg) throws Exception {
             return new CachedBlockPosition(this.world, arg, this.forceLoad);
         }
 
-        public /* synthetic */ Object load(Object object) throws Exception {
-            return this.load((BlockPos)object);
+        public /* synthetic */ Object load(Object pos) throws Exception {
+            return this.load((BlockPos)pos);
         }
     }
 }

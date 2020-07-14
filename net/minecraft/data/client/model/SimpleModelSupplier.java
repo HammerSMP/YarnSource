@@ -16,8 +16,8 @@ public class SimpleModelSupplier
 implements Supplier<JsonElement> {
     private final Identifier parent;
 
-    public SimpleModelSupplier(Identifier arg) {
-        this.parent = arg;
+    public SimpleModelSupplier(Identifier parent) {
+        this.parent = parent;
     }
 
     @Override

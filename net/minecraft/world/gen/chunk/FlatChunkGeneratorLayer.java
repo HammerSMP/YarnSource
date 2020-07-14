@@ -24,9 +24,9 @@ public class FlatChunkGeneratorLayer {
     private final int thickness;
     private int startY;
 
-    public FlatChunkGeneratorLayer(int i, Block arg) {
-        this.thickness = i;
-        this.blockState = arg.getDefaultState();
+    public FlatChunkGeneratorLayer(int thickness, Block block) {
+        this.thickness = thickness;
+        this.blockState = block.getDefaultState();
     }
 
     public int getThickness() {
@@ -41,8 +41,8 @@ public class FlatChunkGeneratorLayer {
         return this.startY;
     }
 
-    public void setStartY(int i) {
-        this.startY = i;
+    public void setStartY(int startY) {
+        this.startY = startY;
     }
 
     public String toString() {

@@ -54,8 +54,8 @@ extends HostileEntity {
 
     protected abstract boolean canHunt();
 
-    public void setImmuneToZombification(boolean bl) {
-        this.getDataTracker().set(IMMUNE_TO_ZOMBIFICATION, bl);
+    public void setImmuneToZombification(boolean immuneToZombification) {
+        this.getDataTracker().set(IMMUNE_TO_ZOMBIFICATION, immuneToZombification);
     }
 
     protected boolean isImmuneToZombification() {
@@ -69,19 +69,19 @@ extends HostileEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.isImmuneToZombification()) {
-            arg.putBoolean("IsImmuneToZombification", true);
+            tag.putBoolean("IsImmuneToZombification", true);
         }
-        arg.putInt("TimeInOverworld", this.timeInOverworld);
+        tag.putInt("TimeInOverworld", this.timeInOverworld);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setImmuneToZombification(arg.getBoolean("IsImmuneToZombification"));
-        this.timeInOverworld = arg.getInt("TimeInOverworld");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setImmuneToZombification(tag.getBoolean("IsImmuneToZombification"));
+        this.timeInOverworld = tag.getInt("TimeInOverworld");
     }
 
     @Override
@@ -98,7 +98,7 @@ extends HostileEntity {
         return !this.world.getDimension().isPiglinSafe() && !this.isImmuneToZombification() && !this.isAiDisabled();
     }
 
-    protected void zombify(ServerWorld arg) {
+    protected void zombify(ServerWorld world) {
         ZombifiedPiglinEntity lv = this.method_29243(EntityType.ZOMBIFIED_PIGLIN);
         if (lv != null) {
             lv.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));

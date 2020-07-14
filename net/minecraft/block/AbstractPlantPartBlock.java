@@ -28,21 +28,21 @@ extends Block {
     protected final boolean tickWater;
     protected final VoxelShape outlineShape;
 
-    protected AbstractPlantPartBlock(AbstractBlock.Settings arg, Direction arg2, VoxelShape arg3, boolean bl) {
-        super(arg);
-        this.growthDirection = arg2;
-        this.outlineShape = arg3;
-        this.tickWater = bl;
+    protected AbstractPlantPartBlock(AbstractBlock.Settings settings, Direction growthDirection, VoxelShape outlineShape, boolean tickWater) {
+        super(settings);
+        this.growthDirection = growthDirection;
+        this.outlineShape = outlineShape;
+        this.tickWater = tickWater;
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        BlockState lv = arg.getWorld().getBlockState(arg.getBlockPos().offset(this.growthDirection));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        BlockState lv = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(this.growthDirection));
         if (lv.isOf(this.getStem()) || lv.isOf(this.getPlant())) {
             return this.getPlant().getDefaultState();
         }
-        return this.getRandomGrowthState(arg.getWorld());
+        return this.getRandomGrowthState(ctx.getWorld());
     }
 
     public BlockState getRandomGrowthState(WorldAccess arg) {
@@ -50,29 +50,29 @@ extends Block {
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockPos lv = arg3.offset(this.growthDirection.getOpposite());
-        BlockState lv2 = arg2.getBlockState(lv);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockPos lv = pos.offset(this.growthDirection.getOpposite());
+        BlockState lv2 = world.getBlockState(lv);
         Block lv3 = lv2.getBlock();
         if (!this.canAttachTo(lv3)) {
             return false;
         }
-        return lv3 == this.getStem() || lv3 == this.getPlant() || lv2.isSideSolidFullSquare(arg2, lv, this.growthDirection);
+        return lv3 == this.getStem() || lv3 == this.getPlant() || lv2.isSideSolidFullSquare(world, lv, this.growthDirection);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.breakBlock(arg3, true);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.breakBlock(pos, true);
         }
     }
 
-    protected boolean canAttachTo(Block arg) {
+    protected boolean canAttachTo(Block block) {
         return true;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return this.outlineShape;
     }
 

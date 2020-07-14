@@ -64,8 +64,8 @@ public abstract class StructurePoolElement {
     public void method_16756(WorldAccess arg, Structure.StructureBlockInfo arg2, BlockPos arg3, BlockRotation arg4, Random random, BlockBox arg5) {
     }
 
-    public StructurePoolElement setProjection(StructurePool.Projection arg) {
-        this.projection = arg;
+    public StructurePoolElement setProjection(StructurePool.Projection projection) {
+        this.projection = projection;
         return this;
     }
 

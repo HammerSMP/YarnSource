@@ -36,18 +36,18 @@ extends AlwaysSelectedEntryListWidget<ResourcePackEntry> {
     private static final Text INCOMPATIBLE_CONFIRM = new TranslatableText("pack.incompatible.confirm.title");
     private final Text title;
 
-    public PackListWidget(MinecraftClient arg, int i, int j, Text arg2) {
-        super(arg, i, j, 32, j - 55 + 4, 36);
-        this.title = arg2;
+    public PackListWidget(MinecraftClient client, int width, int height, Text title) {
+        super(client, width, height, 32, height - 55 + 4, 36);
+        this.title = title;
         this.centerListVertically = false;
-        arg.textRenderer.getClass();
+        client.textRenderer.getClass();
         this.setRenderHeader(true, (int)(9.0f * 1.5f));
     }
 
     @Override
-    protected void renderHeader(MatrixStack arg, int i, int j, Tessellator arg2) {
+    protected void renderHeader(MatrixStack matrices, int x, int y, Tessellator arg2) {
         MutableText lv = new LiteralText("").append(this.title).formatted(Formatting.UNDERLINE, Formatting.BOLD);
-        this.client.textRenderer.draw(arg, lv, (float)(i + this.width / 2 - this.client.textRenderer.getWidth(lv) / 2), (float)Math.min(this.top + 3, j), 0xFFFFFF);
+        this.client.textRenderer.draw(matrices, lv, (float)(x + this.width / 2 - this.client.textRenderer.getWidth(lv) / 2), (float)Math.min(this.top + 3, y), 0xFFFFFF);
     }
 
     @Override
@@ -68,76 +68,76 @@ extends AlwaysSelectedEntryListWidget<ResourcePackEntry> {
         protected final Screen screen;
         private final ResourcePackOrganizer.Pack pack;
 
-        public ResourcePackEntry(MinecraftClient arg, PackListWidget arg2, Screen arg3, ResourcePackOrganizer.Pack arg4) {
-            this.client = arg;
-            this.screen = arg3;
-            this.pack = arg4;
-            this.widget = arg2;
+        public ResourcePackEntry(MinecraftClient client, PackListWidget widget, Screen screen, ResourcePackOrganizer.Pack pack) {
+            this.client = client;
+            this.screen = screen;
+            this.pack = pack;
+            this.widget = widget;
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             int r;
             ResourcePackCompatibility lv = this.pack.getCompatibility();
             if (!lv.isCompatible()) {
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                DrawableHelper.fill(arg, k - 1, j - 1, k + l - 9, j + m + 1, -8978432);
+                DrawableHelper.fill(matrices, x - 1, y - 1, x + entryWidth - 9, y + entryHeight + 1, -8978432);
             }
             this.client.getTextureManager().bindTexture(this.pack.method_30286());
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-            DrawableHelper.drawTexture(arg, k, j, 0.0f, 0.0f, 32, 32, 32, 32);
+            DrawableHelper.drawTexture(matrices, x, y, 0.0f, 0.0f, 32, 32, 32, 32);
             Text lv2 = this.pack.getDisplayName();
             StringRenderable lv3 = this.pack.getDecoratedDescription();
-            if (this.isSelectable() && (this.client.options.touchscreen || bl)) {
+            if (this.isSelectable() && (this.client.options.touchscreen || hovered)) {
                 this.client.getTextureManager().bindTexture(RESOURCE_PACKS_TEXTURE);
-                DrawableHelper.fill(arg, k, j, k + 32, j + 32, -1601138544);
+                DrawableHelper.fill(matrices, x, y, x + 32, y + 32, -1601138544);
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                int p = n - k;
-                int q = o - j;
+                int p = mouseX - x;
+                int q = mouseY - y;
                 if (!lv.isCompatible()) {
                     lv2 = INCOMPATIBLE;
                     lv3 = lv.getNotification();
                 }
                 if (this.pack.canBeEnabled()) {
                     if (p < 32) {
-                        DrawableHelper.drawTexture(arg, k, j, 0.0f, 32.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 0.0f, 32.0f, 32, 32, 256, 256);
                     } else {
-                        DrawableHelper.drawTexture(arg, k, j, 0.0f, 0.0f, 32, 32, 256, 256);
+                        DrawableHelper.drawTexture(matrices, x, y, 0.0f, 0.0f, 32, 32, 256, 256);
                     }
                 } else {
                     if (this.pack.canBeDisabled()) {
                         if (p < 16) {
-                            DrawableHelper.drawTexture(arg, k, j, 32.0f, 32.0f, 32, 32, 256, 256);
+                            DrawableHelper.drawTexture(matrices, x, y, 32.0f, 32.0f, 32, 32, 256, 256);
                         } else {
-                            DrawableHelper.drawTexture(arg, k, j, 32.0f, 0.0f, 32, 32, 256, 256);
+                            DrawableHelper.drawTexture(matrices, x, y, 32.0f, 0.0f, 32, 32, 256, 256);
                         }
                     }
                     if (this.pack.canMoveTowardStart()) {
                         if (p < 32 && p > 16 && q < 16) {
-                            DrawableHelper.drawTexture(arg, k, j, 96.0f, 32.0f, 32, 32, 256, 256);
+                            DrawableHelper.drawTexture(matrices, x, y, 96.0f, 32.0f, 32, 32, 256, 256);
                         } else {
-                            DrawableHelper.drawTexture(arg, k, j, 96.0f, 0.0f, 32, 32, 256, 256);
+                            DrawableHelper.drawTexture(matrices, x, y, 96.0f, 0.0f, 32, 32, 256, 256);
                         }
                     }
                     if (this.pack.canMoveTowardEnd()) {
                         if (p < 32 && p > 16 && q > 16) {
-                            DrawableHelper.drawTexture(arg, k, j, 64.0f, 32.0f, 32, 32, 256, 256);
+                            DrawableHelper.drawTexture(matrices, x, y, 64.0f, 32.0f, 32, 32, 256, 256);
                         } else {
-                            DrawableHelper.drawTexture(arg, k, j, 64.0f, 0.0f, 32, 32, 256, 256);
+                            DrawableHelper.drawTexture(matrices, x, y, 64.0f, 0.0f, 32, 32, 256, 256);
                         }
                     }
                 }
             }
             if ((r = this.client.textRenderer.getWidth(lv2)) > 157) {
                 StringRenderable lv4 = StringRenderable.concat(this.client.textRenderer.trimToWidth(lv2, 157 - this.client.textRenderer.getWidth("...")), StringRenderable.plain("..."));
-                this.client.textRenderer.drawWithShadow(arg, lv4, (float)(k + 32 + 2), (float)(j + 1), 0xFFFFFF);
+                this.client.textRenderer.drawWithShadow(matrices, lv4, (float)(x + 32 + 2), (float)(y + 1), 0xFFFFFF);
             } else {
-                this.client.textRenderer.drawWithShadow(arg, lv2, (float)(k + 32 + 2), (float)(j + 1), 0xFFFFFF);
+                this.client.textRenderer.drawWithShadow(matrices, lv2, (float)(x + 32 + 2), (float)(y + 1), 0xFFFFFF);
             }
-            this.client.textRenderer.drawWithShadow(arg, lv2, (float)(k + 32 + 2), (float)(j + 1), 0xFFFFFF);
+            this.client.textRenderer.drawWithShadow(matrices, lv2, (float)(x + 32 + 2), (float)(y + 1), 0xFFFFFF);
             List<StringRenderable> list = this.client.textRenderer.wrapLines(lv3, 157);
             for (int s = 0; s < 2 && s < list.size(); ++s) {
-                this.client.textRenderer.drawWithShadow(arg, list.get(s), (float)(k + 32 + 2), (float)(j + 12 + 10 * s), 0x808080);
+                this.client.textRenderer.drawWithShadow(matrices, list.get(s), (float)(x + 32 + 2), (float)(y + 12 + 10 * s), 0x808080);
             }
         }
 
@@ -146,9 +146,9 @@ extends AlwaysSelectedEntryListWidget<ResourcePackEntry> {
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            double f = d - (double)this.widget.getRowLeft();
-            double g = e - (double)this.widget.getRowTop(this.widget.children().indexOf(this));
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            double f = mouseX - (double)this.widget.getRowLeft();
+            double g = mouseY - (double)this.widget.getRowTop(this.widget.children().indexOf(this));
             if (this.isSelectable() && f <= 32.0) {
                 if (this.pack.canBeEnabled()) {
                     ResourcePackCompatibility lv = this.pack.getCompatibility();

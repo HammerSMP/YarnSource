@@ -37,13 +37,13 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void trigger(ServerPlayerEntity arg, RegistryKey<World> arg2, RegistryKey<World> arg32) {
-        this.test(arg, arg3 -> arg3.matches(arg2, arg32));
+    public void trigger(ServerPlayerEntity player, RegistryKey<World> from, RegistryKey<World> to) {
+        this.test(player, arg3 -> arg3.matches(from, to));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -53,26 +53,26 @@ extends AbstractCriterion<Conditions> {
         @Nullable
         private final RegistryKey<World> to;
 
-        public Conditions(EntityPredicate.Extended arg, @Nullable RegistryKey<World> arg2, @Nullable RegistryKey<World> arg3) {
-            super(ID, arg);
-            this.from = arg2;
-            this.to = arg3;
+        public Conditions(EntityPredicate.Extended player, @Nullable RegistryKey<World> from, @Nullable RegistryKey<World> to) {
+            super(ID, player);
+            this.from = from;
+            this.to = to;
         }
 
-        public static Conditions to(RegistryKey<World> arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, null, arg);
+        public static Conditions to(RegistryKey<World> to) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, null, to);
         }
 
-        public boolean matches(RegistryKey<World> arg, RegistryKey<World> arg2) {
-            if (this.from != null && this.from != arg) {
+        public boolean matches(RegistryKey<World> from, RegistryKey<World> to) {
+            if (this.from != null && this.from != from) {
                 return false;
             }
-            return this.to == null || this.to == arg2;
+            return this.to == null || this.to == to;
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             if (this.from != null) {
                 jsonObject.addProperty("from", this.from.getValue().toString());
             }

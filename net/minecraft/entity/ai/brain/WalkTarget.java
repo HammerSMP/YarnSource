@@ -13,18 +13,18 @@ public class WalkTarget {
     private final float speed;
     private final int completionRange;
 
-    public WalkTarget(BlockPos arg, float f, int i) {
-        this(new BlockPosLookTarget(arg), f, i);
+    public WalkTarget(BlockPos pos, float speed, int completionRange) {
+        this(new BlockPosLookTarget(pos), speed, completionRange);
     }
 
-    public WalkTarget(Vec3d arg, float f, int i) {
-        this(new BlockPosLookTarget(new BlockPos(arg)), f, i);
+    public WalkTarget(Vec3d pos, float speed, int completionRange) {
+        this(new BlockPosLookTarget(new BlockPos(pos)), speed, completionRange);
     }
 
-    public WalkTarget(LookTarget arg, float f, int i) {
-        this.lookTarget = arg;
-        this.speed = f;
-        this.completionRange = i;
+    public WalkTarget(LookTarget lookTarget, float speed, int completionRange) {
+        this.lookTarget = lookTarget;
+        this.speed = speed;
+        this.completionRange = completionRange;
     }
 
     public LookTarget getLookTarget() {

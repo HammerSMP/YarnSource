@@ -36,8 +36,8 @@ extends SinglePoolElement {
     }
 
     @Override
-    protected StructurePlacementData createPlacementData(BlockRotation arg, BlockBox arg2, boolean bl) {
-        StructurePlacementData lv = super.createPlacementData(arg, arg2, bl);
+    protected StructurePlacementData createPlacementData(BlockRotation arg, BlockBox arg2, boolean keepJigsaws) {
+        StructurePlacementData lv = super.createPlacementData(arg, arg2, keepJigsaws);
         lv.removeProcessor(BlockIgnoreStructureProcessor.IGNORE_STRUCTURE_BLOCKS);
         lv.addProcessor(BlockIgnoreStructureProcessor.IGNORE_AIR_AND_STRUCTURE_BLOCKS);
         return lv;

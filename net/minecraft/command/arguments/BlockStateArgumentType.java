@@ -38,13 +38,13 @@ implements ArgumentType<BlockStateArgument> {
         return new BlockStateArgument(lv.getBlockState(), lv.getBlockProperties().keySet(), lv.getNbtData());
     }
 
-    public static BlockStateArgument getBlockState(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (BlockStateArgument)commandContext.getArgument(string, BlockStateArgument.class);
+    public static BlockStateArgument getBlockState(CommandContext<ServerCommandSource> context, String name) {
+        return (BlockStateArgument)context.getArgument(name, BlockStateArgument.class);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        StringReader stringReader = new StringReader(suggestionsBuilder.getInput());
-        stringReader.setCursor(suggestionsBuilder.getStart());
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        StringReader stringReader = new StringReader(builder.getInput());
+        stringReader.setCursor(builder.getStart());
         BlockArgumentParser lv = new BlockArgumentParser(stringReader, false);
         try {
             lv.parse(true);
@@ -52,7 +52,7 @@ implements ArgumentType<BlockStateArgument> {
         catch (CommandSyntaxException commandSyntaxException) {
             // empty catch block
         }
-        return lv.getSuggestions(suggestionsBuilder, BlockTags.getTagGroup());
+        return lv.getSuggestions(builder, BlockTags.getTagGroup());
     }
 
     public Collection<String> getExamples() {

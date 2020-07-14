@@ -100,8 +100,8 @@ public final class BlockTags {
     public static final Tag.Identified<Block> BASE_STONE_OVERWORLD = BlockTags.register("base_stone_overworld");
     public static final Tag.Identified<Block> BASE_STONE_NETHER = BlockTags.register("base_stone_nether");
 
-    private static Tag.Identified<Block> register(String string) {
-        return REQUIRED_TAGS.add(string);
+    private static Tag.Identified<Block> register(String id) {
+        return REQUIRED_TAGS.add(id);
     }
 
     public static TagGroup<Block> getTagGroup() {

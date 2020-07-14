@@ -29,41 +29,41 @@ extends HorizontalFacingBlock {
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        return WallMountedBlock.canPlaceAt(arg2, arg3, WallMountedBlock.getDirection(arg).getOpposite());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        return WallMountedBlock.canPlaceAt(world, pos, WallMountedBlock.getDirection(state).getOpposite());
     }
 
-    public static boolean canPlaceAt(WorldView arg, BlockPos arg2, Direction arg3) {
-        BlockPos lv = arg2.offset(arg3);
-        return arg.getBlockState(lv).isSideSolidFullSquare(arg, lv, arg3.getOpposite());
+    public static boolean canPlaceAt(WorldView arg, BlockPos pos, Direction direction) {
+        BlockPos lv = pos.offset(direction);
+        return arg.getBlockState(lv).isSideSolidFullSquare(arg, lv, direction.getOpposite());
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        for (Direction lv : arg.getPlacementDirections()) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        for (Direction lv : ctx.getPlacementDirections()) {
             BlockState lv3;
             if (lv.getAxis() == Direction.Axis.Y) {
-                BlockState lv2 = (BlockState)((BlockState)this.getDefaultState().with(FACE, lv == Direction.UP ? WallMountLocation.CEILING : WallMountLocation.FLOOR)).with(FACING, arg.getPlayerFacing());
+                BlockState lv2 = (BlockState)((BlockState)this.getDefaultState().with(FACE, lv == Direction.UP ? WallMountLocation.CEILING : WallMountLocation.FLOOR)).with(FACING, ctx.getPlayerFacing());
             } else {
                 lv3 = (BlockState)((BlockState)this.getDefaultState().with(FACE, WallMountLocation.WALL)).with(FACING, lv.getOpposite());
             }
-            if (!lv3.canPlaceAt(arg.getWorld(), arg.getBlockPos())) continue;
+            if (!lv3.canPlaceAt(ctx.getWorld(), ctx.getBlockPos())) continue;
             return lv3;
         }
         return null;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (WallMountedBlock.getDirection(arg).getOpposite() == arg2 && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (WallMountedBlock.getDirection(state).getOpposite() == direction && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
-    protected static Direction getDirection(BlockState arg) {
-        switch (arg.get(FACE)) {
+    protected static Direction getDirection(BlockState state) {
+        switch (state.get(FACE)) {
             case CEILING: {
                 return Direction.DOWN;
             }
@@ -71,7 +71,7 @@ extends HorizontalFacingBlock {
                 return Direction.UP;
             }
         }
-        return arg.get(FACING);
+        return state.get(FACING);
     }
 }
 

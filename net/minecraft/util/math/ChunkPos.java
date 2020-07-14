@@ -18,35 +18,35 @@ public class ChunkPos {
     public final int x;
     public final int z;
 
-    public ChunkPos(int i, int j) {
-        this.x = i;
-        this.z = j;
+    public ChunkPos(int x, int z) {
+        this.x = x;
+        this.z = z;
     }
 
-    public ChunkPos(BlockPos arg) {
-        this.x = arg.getX() >> 4;
-        this.z = arg.getZ() >> 4;
+    public ChunkPos(BlockPos pos) {
+        this.x = pos.getX() >> 4;
+        this.z = pos.getZ() >> 4;
     }
 
-    public ChunkPos(long l) {
-        this.x = (int)l;
-        this.z = (int)(l >> 32);
+    public ChunkPos(long pos) {
+        this.x = (int)pos;
+        this.z = (int)(pos >> 32);
     }
 
     public long toLong() {
         return ChunkPos.toLong(this.x, this.z);
     }
 
-    public static long toLong(int i, int j) {
-        return (long)i & 0xFFFFFFFFL | ((long)j & 0xFFFFFFFFL) << 32;
+    public static long toLong(int chunkX, int chunkZ) {
+        return (long)chunkX & 0xFFFFFFFFL | ((long)chunkZ & 0xFFFFFFFFL) << 32;
     }
 
-    public static int getPackedX(long l) {
-        return (int)(l & 0xFFFFFFFFL);
+    public static int getPackedX(long pos) {
+        return (int)(pos & 0xFFFFFFFFL);
     }
 
-    public static int getPackedZ(long l) {
-        return (int)(l >>> 32 & 0xFFFFFFFFL);
+    public static int getPackedZ(long pos) {
+        return (int)(pos >>> 32 & 0xFFFFFFFFL);
     }
 
     public int hashCode() {
@@ -55,12 +55,12 @@ public class ChunkPos {
         return i ^ j;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object instanceof ChunkPos) {
-            ChunkPos lv = (ChunkPos)object;
+        if (o instanceof ChunkPos) {
+            ChunkPos lv = (ChunkPos)o;
             return this.x == lv.x && this.z == lv.z;
         }
         return false;
@@ -110,15 +110,15 @@ public class ChunkPos {
         return Math.max(Math.abs(this.x - arg.x), Math.abs(this.z - arg.z));
     }
 
-    public static Stream<ChunkPos> stream(ChunkPos arg, int i) {
-        return ChunkPos.stream(new ChunkPos(arg.x - i, arg.z - i), new ChunkPos(arg.x + i, arg.z + i));
+    public static Stream<ChunkPos> stream(ChunkPos center, int radius) {
+        return ChunkPos.stream(new ChunkPos(center.x - radius, center.z - radius), new ChunkPos(center.x + radius, center.z + radius));
     }
 
-    public static Stream<ChunkPos> stream(final ChunkPos arg, final ChunkPos arg2) {
-        int i = Math.abs(arg.x - arg2.x) + 1;
-        int j = Math.abs(arg.z - arg2.z) + 1;
-        final int k = arg.x < arg2.x ? 1 : -1;
-        final int l = arg.z < arg2.z ? 1 : -1;
+    public static Stream<ChunkPos> stream(final ChunkPos pos1, final ChunkPos pos2) {
+        int i = Math.abs(pos1.x - pos2.x) + 1;
+        int j = Math.abs(pos1.z - pos2.z) + 1;
+        final int k = pos1.x < pos2.x ? 1 : -1;
+        final int l = pos1.z < pos2.z ? 1 : -1;
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<ChunkPos>((long)(i * j), 64){
             @Nullable
             private ChunkPos position;
@@ -126,15 +126,15 @@ public class ChunkPos {
             @Override
             public boolean tryAdvance(Consumer<? super ChunkPos> consumer) {
                 if (this.position == null) {
-                    this.position = arg;
+                    this.position = pos1;
                 } else {
                     int i = this.position.x;
                     int j = this.position.z;
-                    if (i == arg2.x) {
-                        if (j == arg2.z) {
+                    if (i == pos2.x) {
+                        if (j == pos2.z) {
                             return false;
                         }
-                        this.position = new ChunkPos(arg.x, j + l);
+                        this.position = new ChunkPos(pos1.x, j + l);
                     } else {
                         this.position = new ChunkPos(i + k, j);
                     }

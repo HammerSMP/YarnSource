@@ -35,14 +35,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void handle(ServerPlayerEntity arg, AbstractTraderEntity arg2, ItemStack arg32) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg2);
-        this.test(arg, arg3 -> arg3.matches(lv, arg32));
+    public void handle(ServerPlayerEntity player, AbstractTraderEntity trader, ItemStack stack) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, trader);
+        this.test(player, arg3 -> arg3.matches(lv, stack));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -50,28 +50,28 @@ extends AbstractCriterion<Conditions> {
         private final EntityPredicate.Extended villager;
         private final ItemPredicate item;
 
-        public Conditions(EntityPredicate.Extended arg, EntityPredicate.Extended arg2, ItemPredicate arg3) {
-            super(ID, arg);
-            this.villager = arg2;
-            this.item = arg3;
+        public Conditions(EntityPredicate.Extended player, EntityPredicate.Extended villager, ItemPredicate item) {
+            super(ID, player);
+            this.villager = villager;
+            this.item = item;
         }
 
         public static Conditions any() {
             return new Conditions(EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.EMPTY, ItemPredicate.ANY);
         }
 
-        public boolean matches(LootContext arg, ItemStack arg2) {
-            if (!this.villager.test(arg)) {
+        public boolean matches(LootContext traderContext, ItemStack stack) {
+            if (!this.villager.test(traderContext)) {
                 return false;
             }
-            return this.item.test(arg2);
+            return this.item.test(stack);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("item", this.item.toJson());
-            jsonObject.add("villager", this.villager.toJson(arg));
+            jsonObject.add("villager", this.villager.toJson(predicateSerializer));
             return jsonObject;
         }
     }

@@ -24,9 +24,9 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public CreativeInventoryActionC2SPacket(int i, ItemStack arg) {
-        this.slot = i;
-        this.stack = arg.copy();
+    public CreativeInventoryActionC2SPacket(int slot, ItemStack stack) {
+        this.slot = slot;
+        this.stack = stack.copy();
     }
 
     @Override
@@ -35,15 +35,15 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.slot = arg.readShort();
-        this.stack = arg.readItemStack();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.slot = buf.readShort();
+        this.stack = buf.readItemStack();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeShort(this.slot);
-        arg.writeItemStack(this.stack);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeShort(this.slot);
+        buf.writeItemStack(this.stack);
     }
 
     public int getSlot() {

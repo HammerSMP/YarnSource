@@ -36,18 +36,18 @@ extends TreeDecorator {
     }
 
     @Override
-    public void generate(ServerWorldAccess arg2, Random random, List<BlockPos> list, List<BlockPos> list2, Set<BlockPos> set, BlockBox arg22) {
+    public void generate(ServerWorldAccess arg2, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions, Set<BlockPos> set, BlockBox box) {
         if (random.nextFloat() >= this.field_21318) {
             return;
         }
-        int i = list.get(0).getY();
-        list.stream().filter(arg -> arg.getY() - i <= 2).forEach(arg3 -> {
+        int i = logPositions.get(0).getY();
+        logPositions.stream().filter(arg -> arg.getY() - i <= 2).forEach(arg3 -> {
             for (Direction lv : Direction.Type.HORIZONTAL) {
                 Direction lv2;
                 BlockPos lv3;
                 if (!(random.nextFloat() <= 0.25f) || !Feature.isAir(arg2, lv3 = arg3.add((lv2 = lv.getOpposite()).getOffsetX(), 0, lv2.getOffsetZ()))) continue;
                 BlockState lv4 = (BlockState)((BlockState)Blocks.COCOA.getDefaultState().with(CocoaBlock.AGE, random.nextInt(3))).with(CocoaBlock.FACING, lv);
-                this.setBlockStateAndEncompassPosition(arg2, lv3, lv4, set, arg22);
+                this.setBlockStateAndEncompassPosition(arg2, lv3, lv4, set, box);
             }
         });
     }

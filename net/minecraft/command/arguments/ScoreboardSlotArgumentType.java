@@ -39,8 +39,8 @@ implements ArgumentType<Integer> {
         return new ScoreboardSlotArgumentType();
     }
 
-    public static int getScoreboardSlot(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (Integer)commandContext.getArgument(string, Integer.class);
+    public static int getScoreboardSlot(CommandContext<ServerCommandSource> context, String name) {
+        return (Integer)context.getArgument(name, Integer.class);
     }
 
     public Integer parse(StringReader stringReader) throws CommandSyntaxException {
@@ -52,8 +52,8 @@ implements ArgumentType<Integer> {
         return i;
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestMatching(Scoreboard.getDisplaySlotNames(), suggestionsBuilder);
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        return CommandSource.suggestMatching(Scoreboard.getDisplaySlotNames(), builder);
     }
 
     public Collection<String> getExamples() {

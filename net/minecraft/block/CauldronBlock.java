@@ -51,131 +51,131 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return OUTLINE_SHAPE;
     }
 
     @Override
-    public VoxelShape getRayTraceShape(BlockState arg, BlockView arg2, BlockPos arg3) {
+    public VoxelShape getRayTraceShape(BlockState state, BlockView world, BlockPos pos) {
         return RAY_TRACE_SHAPE;
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        int i = arg.get(LEVEL);
-        float f = (float)arg3.getY() + (6.0f + (float)(3 * i)) / 16.0f;
-        if (!arg2.isClient && arg4.isOnFire() && i > 0 && arg4.getY() <= (double)f) {
-            arg4.extinguish();
-            this.setLevel(arg2, arg3, arg, i - 1);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        int i = state.get(LEVEL);
+        float f = (float)pos.getY() + (6.0f + (float)(3 * i)) / 16.0f;
+        if (!world.isClient && entity.isOnFire() && i > 0 && entity.getY() <= (double)f) {
+            entity.extinguish();
+            this.setLevel(world, pos, state, i - 1);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         DyeableItem lv5;
-        ItemStack lv = arg4.getStackInHand(arg5);
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.isEmpty()) {
             return ActionResult.PASS;
         }
-        int i = arg.get(LEVEL);
+        int i = state.get(LEVEL);
         Item lv2 = lv.getItem();
         if (lv2 == Items.WATER_BUCKET) {
-            if (i < 3 && !arg2.isClient) {
-                if (!arg4.abilities.creativeMode) {
-                    arg4.setStackInHand(arg5, new ItemStack(Items.BUCKET));
+            if (i < 3 && !world.isClient) {
+                if (!player.abilities.creativeMode) {
+                    player.setStackInHand(hand, new ItemStack(Items.BUCKET));
                 }
-                arg4.incrementStat(Stats.FILL_CAULDRON);
-                this.setLevel(arg2, arg3, arg, 3);
-                arg2.playSound(null, arg3, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                player.incrementStat(Stats.FILL_CAULDRON);
+                this.setLevel(world, pos, state, 3);
+                world.playSound(null, pos, SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
         if (lv2 == Items.BUCKET) {
-            if (i == 3 && !arg2.isClient) {
-                if (!arg4.abilities.creativeMode) {
+            if (i == 3 && !world.isClient) {
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
                     if (lv.isEmpty()) {
-                        arg4.setStackInHand(arg5, new ItemStack(Items.WATER_BUCKET));
-                    } else if (!arg4.inventory.insertStack(new ItemStack(Items.WATER_BUCKET))) {
-                        arg4.dropItem(new ItemStack(Items.WATER_BUCKET), false);
+                        player.setStackInHand(hand, new ItemStack(Items.WATER_BUCKET));
+                    } else if (!player.inventory.insertStack(new ItemStack(Items.WATER_BUCKET))) {
+                        player.dropItem(new ItemStack(Items.WATER_BUCKET), false);
                     }
                 }
-                arg4.incrementStat(Stats.USE_CAULDRON);
-                this.setLevel(arg2, arg3, arg, 0);
-                arg2.playSound(null, arg3, SoundEvents.ITEM_BUCKET_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                player.incrementStat(Stats.USE_CAULDRON);
+                this.setLevel(world, pos, state, 0);
+                world.playSound(null, pos, SoundEvents.ITEM_BUCKET_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
         if (lv2 == Items.GLASS_BOTTLE) {
-            if (i > 0 && !arg2.isClient) {
-                if (!arg4.abilities.creativeMode) {
+            if (i > 0 && !world.isClient) {
+                if (!player.abilities.creativeMode) {
                     ItemStack lv3 = PotionUtil.setPotion(new ItemStack(Items.POTION), Potions.WATER);
-                    arg4.incrementStat(Stats.USE_CAULDRON);
+                    player.incrementStat(Stats.USE_CAULDRON);
                     lv.decrement(1);
                     if (lv.isEmpty()) {
-                        arg4.setStackInHand(arg5, lv3);
-                    } else if (!arg4.inventory.insertStack(lv3)) {
-                        arg4.dropItem(lv3, false);
-                    } else if (arg4 instanceof ServerPlayerEntity) {
-                        ((ServerPlayerEntity)arg4).openHandledScreen(arg4.playerScreenHandler);
+                        player.setStackInHand(hand, lv3);
+                    } else if (!player.inventory.insertStack(lv3)) {
+                        player.dropItem(lv3, false);
+                    } else if (player instanceof ServerPlayerEntity) {
+                        ((ServerPlayerEntity)player).openHandledScreen(player.playerScreenHandler);
                     }
                 }
-                arg2.playSound(null, arg3, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
-                this.setLevel(arg2, arg3, arg, i - 1);
+                world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                this.setLevel(world, pos, state, i - 1);
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
         if (lv2 == Items.POTION && PotionUtil.getPotion(lv) == Potions.WATER) {
-            if (i < 3 && !arg2.isClient) {
-                if (!arg4.abilities.creativeMode) {
+            if (i < 3 && !world.isClient) {
+                if (!player.abilities.creativeMode) {
                     ItemStack lv4 = new ItemStack(Items.GLASS_BOTTLE);
-                    arg4.incrementStat(Stats.USE_CAULDRON);
-                    arg4.setStackInHand(arg5, lv4);
-                    if (arg4 instanceof ServerPlayerEntity) {
-                        ((ServerPlayerEntity)arg4).openHandledScreen(arg4.playerScreenHandler);
+                    player.incrementStat(Stats.USE_CAULDRON);
+                    player.setStackInHand(hand, lv4);
+                    if (player instanceof ServerPlayerEntity) {
+                        ((ServerPlayerEntity)player).openHandledScreen(player.playerScreenHandler);
                     }
                 }
-                arg2.playSound(null, arg3, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
-                this.setLevel(arg2, arg3, arg, i + 1);
+                world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                this.setLevel(world, pos, state, i + 1);
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
-        if (i > 0 && lv2 instanceof DyeableItem && (lv5 = (DyeableItem)((Object)lv2)).hasColor(lv) && !arg2.isClient) {
+        if (i > 0 && lv2 instanceof DyeableItem && (lv5 = (DyeableItem)((Object)lv2)).hasColor(lv) && !world.isClient) {
             lv5.removeColor(lv);
-            this.setLevel(arg2, arg3, arg, i - 1);
-            arg4.incrementStat(Stats.CLEAN_ARMOR);
+            this.setLevel(world, pos, state, i - 1);
+            player.incrementStat(Stats.CLEAN_ARMOR);
             return ActionResult.SUCCESS;
         }
         if (i > 0 && lv2 instanceof BannerItem) {
-            if (BannerBlockEntity.getPatternCount(lv) > 0 && !arg2.isClient) {
+            if (BannerBlockEntity.getPatternCount(lv) > 0 && !world.isClient) {
                 ItemStack lv6 = lv.copy();
                 lv6.setCount(1);
                 BannerBlockEntity.loadFromItemStack(lv6);
-                arg4.incrementStat(Stats.CLEAN_BANNER);
-                if (!arg4.abilities.creativeMode) {
+                player.incrementStat(Stats.CLEAN_BANNER);
+                if (!player.abilities.creativeMode) {
                     lv.decrement(1);
-                    this.setLevel(arg2, arg3, arg, i - 1);
+                    this.setLevel(world, pos, state, i - 1);
                 }
                 if (lv.isEmpty()) {
-                    arg4.setStackInHand(arg5, lv6);
-                } else if (!arg4.inventory.insertStack(lv6)) {
-                    arg4.dropItem(lv6, false);
-                } else if (arg4 instanceof ServerPlayerEntity) {
-                    ((ServerPlayerEntity)arg4).openHandledScreen(arg4.playerScreenHandler);
+                    player.setStackInHand(hand, lv6);
+                } else if (!player.inventory.insertStack(lv6)) {
+                    player.dropItem(lv6, false);
+                } else if (player instanceof ServerPlayerEntity) {
+                    ((ServerPlayerEntity)player).openHandledScreen(player.playerScreenHandler);
                 }
             }
-            return ActionResult.success(arg2.isClient);
+            return ActionResult.success(world.isClient);
         }
         if (i > 0 && lv2 instanceof BlockItem) {
             Block lv7 = ((BlockItem)lv2).getBlock();
-            if (lv7 instanceof ShulkerBoxBlock && !arg2.isClient()) {
+            if (lv7 instanceof ShulkerBoxBlock && !world.isClient()) {
                 ItemStack lv8 = new ItemStack(Blocks.SHULKER_BOX, 1);
                 if (lv.hasTag()) {
                     lv8.setTag(lv.getTag().copy());
                 }
-                arg4.setStackInHand(arg5, lv8);
-                this.setLevel(arg2, arg3, arg, i - 1);
-                arg4.incrementStat(Stats.CLEAN_SHULKER_BOX);
+                player.setStackInHand(hand, lv8);
+                this.setLevel(world, pos, state, i - 1);
+                player.incrementStat(Stats.CLEAN_SHULKER_BOX);
                 return ActionResult.SUCCESS;
             }
             return ActionResult.CONSUME;
@@ -183,43 +183,43 @@ extends Block {
         return ActionResult.PASS;
     }
 
-    public void setLevel(World arg, BlockPos arg2, BlockState arg3, int i) {
-        arg.setBlockState(arg2, (BlockState)arg3.with(LEVEL, MathHelper.clamp(i, 0, 3)), 2);
-        arg.updateComparators(arg2, this);
+    public void setLevel(World world, BlockPos pos, BlockState state, int level) {
+        world.setBlockState(pos, (BlockState)state.with(LEVEL, MathHelper.clamp(level, 0, 3)), 2);
+        world.updateComparators(pos, this);
     }
 
     @Override
-    public void rainTick(World arg, BlockPos arg2) {
-        if (arg.random.nextInt(20) != 1) {
+    public void rainTick(World world, BlockPos pos) {
+        if (world.random.nextInt(20) != 1) {
             return;
         }
-        float f = arg.getBiome(arg2).getTemperature(arg2);
+        float f = world.getBiome(pos).getTemperature(pos);
         if (f < 0.15f) {
             return;
         }
-        BlockState lv = arg.getBlockState(arg2);
+        BlockState lv = world.getBlockState(pos);
         if (lv.get(LEVEL) < 3) {
-            arg.setBlockState(arg2, (BlockState)lv.cycle(LEVEL), 2);
+            world.setBlockState(pos, (BlockState)lv.cycle(LEVEL), 2);
         }
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return arg.get(LEVEL);
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return state.get(LEVEL);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(LEVEL);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(LEVEL);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState arg, BlockView arg2, BlockPos arg3, NavigationType arg4) {
+    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
         return false;
     }
 }

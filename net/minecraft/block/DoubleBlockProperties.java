@@ -14,29 +14,29 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 
 public class DoubleBlockProperties {
-    public static <S extends BlockEntity> PropertySource<S> toPropertySource(BlockEntityType<S> arg, Function<BlockState, Type> function, Function<BlockState, Direction> function2, DirectionProperty arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BiPredicate<WorldAccess, BlockPos> biPredicate) {
+    public static <S extends BlockEntity> PropertySource<S> toPropertySource(BlockEntityType<S> blockEntityType, Function<BlockState, Type> typeMapper, Function<BlockState, Direction> function2, DirectionProperty arg2, BlockState state, WorldAccess world, BlockPos pos, BiPredicate<WorldAccess, BlockPos> fallbackTester) {
         Type lv5;
         boolean bl2;
-        S lv = arg.get(arg4, arg5);
+        S lv = blockEntityType.get(world, pos);
         if (lv == null) {
             return PropertyRetriever::getFallback;
         }
-        if (biPredicate.test(arg4, arg5)) {
+        if (fallbackTester.test(world, pos)) {
             return PropertyRetriever::getFallback;
         }
-        Type lv2 = function.apply(arg3);
+        Type lv2 = typeMapper.apply(state);
         boolean bl = lv2 == Type.SINGLE;
         boolean bl3 = bl2 = lv2 == Type.FIRST;
         if (bl) {
             return new PropertySource.Single<S>(lv);
         }
-        BlockPos lv3 = arg5.offset(function2.apply(arg3));
-        BlockState lv4 = arg4.getBlockState(lv3);
-        if (lv4.isOf(arg3.getBlock()) && (lv5 = function.apply(lv4)) != Type.SINGLE && lv2 != lv5 && lv4.get(arg2) == arg3.get(arg2)) {
-            if (biPredicate.test(arg4, lv3)) {
+        BlockPos lv3 = pos.offset(function2.apply(state));
+        BlockState lv4 = world.getBlockState(lv3);
+        if (lv4.isOf(state.getBlock()) && (lv5 = typeMapper.apply(lv4)) != Type.SINGLE && lv2 != lv5 && lv4.get(arg2) == state.get(arg2)) {
+            if (fallbackTester.test(world, lv3)) {
                 return PropertyRetriever::getFallback;
             }
-            S lv6 = arg.get(arg4, lv3);
+            S lv6 = blockEntityType.get(world, lv3);
             if (lv6 != null) {
                 S lv7 = bl2 ? lv : lv6;
                 S lv8 = bl2 ? lv6 : lv;
@@ -53,8 +53,8 @@ public class DoubleBlockProperties {
         implements PropertySource<S> {
             private final S single;
 
-            public Single(S object) {
-                this.single = object;
+            public Single(S single) {
+                this.single = single;
             }
 
             @Override
@@ -68,9 +68,9 @@ public class DoubleBlockProperties {
             private final S first;
             private final S second;
 
-            public Pair(S object, S object2) {
-                this.first = object;
-                this.second = object2;
+            public Pair(S first, S second) {
+                this.first = first;
+                this.second = second;
             }
 
             @Override

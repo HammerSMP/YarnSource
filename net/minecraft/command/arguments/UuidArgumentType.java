@@ -31,8 +31,8 @@ implements ArgumentType<UUID> {
     private static final Collection<String> EXAMPLES = Arrays.asList("dd12be42-52a9-4a91-a8a1-11c01849e498");
     private static final Pattern VALID_CHARACTERS = Pattern.compile("^([-A-Fa-f0-9]+)");
 
-    public static UUID getUuid(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (UUID)commandContext.getArgument(string, UUID.class);
+    public static UUID getUuid(CommandContext<ServerCommandSource> context, String name) {
+        return (UUID)context.getArgument(name, UUID.class);
     }
 
     public static UuidArgumentType uuid() {
@@ -60,8 +60,8 @@ implements ArgumentType<UUID> {
         return EXAMPLES;
     }
 
-    public /* synthetic */ Object parse(StringReader stringReader) throws CommandSyntaxException {
-        return this.parse(stringReader);
+    public /* synthetic */ Object parse(StringReader reader) throws CommandSyntaxException {
+        return this.parse(reader);
     }
 }
 

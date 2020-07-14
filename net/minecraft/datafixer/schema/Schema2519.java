@@ -20,8 +20,8 @@ extends IdentifierNormalizingSchema {
         super(i, schema);
     }
 
-    protected static void updateStriderItems(Schema schema, Map<String, Supplier<TypeTemplate>> map, String string) {
-        schema.register(map, string, () -> Schema100.targetItems(schema));
+    protected static void updateStriderItems(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, String name) {
+        schema.register(entityTypes, name, () -> Schema100.targetItems(schema));
     }
 
     public Map<String, Supplier<TypeTemplate>> registerEntities(Schema schema) {

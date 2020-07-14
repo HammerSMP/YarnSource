@@ -13,12 +13,12 @@ import net.minecraft.screen.ScreenHandlerType;
 
 public class FurnaceScreenHandler
 extends AbstractFurnaceScreenHandler {
-    public FurnaceScreenHandler(int i, PlayerInventory arg) {
-        super(ScreenHandlerType.FURNACE, RecipeType.SMELTING, RecipeBookCategory.FURNACE, i, arg);
+    public FurnaceScreenHandler(int syncId, PlayerInventory playerInventory) {
+        super(ScreenHandlerType.FURNACE, RecipeType.SMELTING, RecipeBookCategory.FURNACE, syncId, playerInventory);
     }
 
-    public FurnaceScreenHandler(int i, PlayerInventory arg, Inventory arg2, PropertyDelegate arg3) {
-        super(ScreenHandlerType.FURNACE, RecipeType.SMELTING, RecipeBookCategory.FURNACE, i, arg, arg2, arg3);
+    public FurnaceScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
+        super(ScreenHandlerType.FURNACE, RecipeType.SMELTING, RecipeBookCategory.FURNACE, syncId, playerInventory, inventory, propertyDelegate);
     }
 }
 

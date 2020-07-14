@@ -16,20 +16,20 @@ import net.minecraft.world.World;
 public abstract class ProjectileDispenserBehavior
 extends ItemDispenserBehavior {
     @Override
-    public ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-        ServerWorld lv = arg.getWorld();
-        Position lv2 = DispenserBlock.getOutputLocation(arg);
-        Direction lv3 = arg.getBlockState().get(DispenserBlock.FACING);
-        ProjectileEntity lv4 = this.createProjectile(lv, lv2, arg2);
+    public ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
+        ServerWorld lv = pointer.getWorld();
+        Position lv2 = DispenserBlock.getOutputLocation(pointer);
+        Direction lv3 = pointer.getBlockState().get(DispenserBlock.FACING);
+        ProjectileEntity lv4 = this.createProjectile(lv, lv2, stack);
         lv4.setVelocity(lv3.getOffsetX(), (float)lv3.getOffsetY() + 0.1f, lv3.getOffsetZ(), this.getForce(), this.getVariation());
         lv.spawnEntity(lv4);
-        arg2.decrement(1);
-        return arg2;
+        stack.decrement(1);
+        return stack;
     }
 
     @Override
-    protected void playSound(BlockPointer arg) {
-        arg.getWorld().syncWorldEvent(1002, arg.getBlockPos(), 0);
+    protected void playSound(BlockPointer pointer) {
+        pointer.getWorld().syncWorldEvent(1002, pointer.getBlockPos(), 0);
     }
 
     protected abstract ProjectileEntity createProjectile(World var1, Position var2, ItemStack var3);

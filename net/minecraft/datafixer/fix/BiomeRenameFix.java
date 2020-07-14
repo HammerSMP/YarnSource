@@ -25,10 +25,10 @@ extends DataFix {
     private final String name;
     private final Map<String, String> renames;
 
-    public BiomeRenameFix(Schema schema, boolean bl, String string, Map<String, String> map) {
-        super(schema, bl);
-        this.renames = map;
-        this.name = string;
+    public BiomeRenameFix(Schema outputSchema, boolean changesType, String name, Map<String, String> changes) {
+        super(outputSchema, changesType);
+        this.renames = changes;
+        this.name = name;
     }
 
     protected TypeRewriteRule makeRule() {

@@ -25,9 +25,9 @@ public abstract class EntityRenameFix
 extends DataFix {
     private final String name;
 
-    public EntityRenameFix(String string, Schema schema, boolean bl) {
-        super(schema, bl);
-        this.name = string;
+    public EntityRenameFix(String name, Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
+        this.name = name;
     }
 
     public TypeRewriteRule makeRule() {

@@ -70,8 +70,8 @@ implements ArgumentType<Identifier> {
         return Registry.ATTRIBUTE.getOrEmpty(lv).orElseThrow(() -> field_24267.create((Object)lv));
     }
 
-    public static Identifier getIdentifier(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (Identifier)commandContext.getArgument(string, Identifier.class);
+    public static Identifier getIdentifier(CommandContext<ServerCommandSource> context, String name) {
+        return (Identifier)context.getArgument(name, Identifier.class);
     }
 
     public Identifier parse(StringReader stringReader) throws CommandSyntaxException {

@@ -30,35 +30,35 @@ extends Block {
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(LIT, arg.getWorld().isReceivingRedstonePower(arg.getBlockPos()));
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(LIT, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (arg2.isClient) {
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (world.isClient) {
             return;
         }
-        boolean bl2 = arg.get(LIT);
-        if (bl2 != arg2.isReceivingRedstonePower(arg3)) {
+        boolean bl2 = state.get(LIT);
+        if (bl2 != world.isReceivingRedstonePower(pos)) {
             if (bl2) {
-                arg2.getBlockTickScheduler().schedule(arg3, this, 4);
+                world.getBlockTickScheduler().schedule(pos, this, 4);
             } else {
-                arg2.setBlockState(arg3, (BlockState)arg.cycle(LIT), 2);
+                world.setBlockState(pos, (BlockState)state.cycle(LIT), 2);
             }
         }
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg.get(LIT).booleanValue() && !arg2.isReceivingRedstonePower(arg3)) {
-            arg2.setBlockState(arg3, (BlockState)arg.cycle(LIT), 2);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (state.get(LIT).booleanValue() && !world.isReceivingRedstonePower(pos)) {
+            world.setBlockState(pos, (BlockState)state.cycle(LIT), 2);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(LIT);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(LIT);
     }
 }
 

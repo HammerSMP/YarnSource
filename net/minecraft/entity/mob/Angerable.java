@@ -32,22 +32,22 @@ public interface Angerable {
 
     public void chooseRandomAngerTime();
 
-    default public void angerToTag(CompoundTag arg) {
-        arg.putInt("AngerTime", this.getAngerTime());
+    default public void angerToTag(CompoundTag tag) {
+        tag.putInt("AngerTime", this.getAngerTime());
         if (this.getAngryAt() != null) {
-            arg.putUuid("AngryAt", this.getAngryAt());
+            tag.putUuid("AngryAt", this.getAngryAt());
         }
     }
 
-    default public void angerFromTag(ServerWorld arg, CompoundTag arg2) {
-        this.setAngerTime(arg2.getInt("AngerTime"));
-        if (!arg2.containsUuid("AngryAt")) {
+    default public void angerFromTag(ServerWorld world, CompoundTag tag) {
+        this.setAngerTime(tag.getInt("AngerTime"));
+        if (!tag.containsUuid("AngryAt")) {
             this.setAngryAt(null);
             return;
         }
-        UUID uUID = arg2.getUuid("AngryAt");
+        UUID uUID = tag.getUuid("AngryAt");
         this.setAngryAt(uUID);
-        Entity lv = arg.getEntity(uUID);
+        Entity lv = world.getEntity(uUID);
         if (lv == null) {
             return;
         }
@@ -59,10 +59,10 @@ public interface Angerable {
         }
     }
 
-    default public void tickAngerLogic(ServerWorld arg, boolean bl) {
+    default public void tickAngerLogic(ServerWorld world, boolean bl) {
         LivingEntity lv = this.getTarget();
         UUID uUID = this.getAngryAt();
-        if ((lv == null || lv.isDead()) && uUID != null && arg.getEntity(uUID) instanceof MobEntity) {
+        if ((lv == null || lv.isDead()) && uUID != null && world.getEntity(uUID) instanceof MobEntity) {
             this.stopAnger();
             return;
         }
@@ -78,29 +78,29 @@ public interface Angerable {
         }
     }
 
-    default public boolean shouldAngerAt(LivingEntity arg) {
-        if (!EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL.test(arg)) {
+    default public boolean shouldAngerAt(LivingEntity entity) {
+        if (!EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL.test(entity)) {
             return false;
         }
-        if (arg.getType() == EntityType.PLAYER && this.isUniversallyAngry(arg.world)) {
+        if (entity.getType() == EntityType.PLAYER && this.isUniversallyAngry(entity.world)) {
             return true;
         }
-        return arg.getUuid().equals(this.getAngryAt());
+        return entity.getUuid().equals(this.getAngryAt());
     }
 
-    default public boolean isUniversallyAngry(World arg) {
-        return arg.getGameRules().getBoolean(GameRules.UNIVERSAL_ANGER) && this.hasAngerTime() && this.getAngryAt() == null;
+    default public boolean isUniversallyAngry(World world) {
+        return world.getGameRules().getBoolean(GameRules.UNIVERSAL_ANGER) && this.hasAngerTime() && this.getAngryAt() == null;
     }
 
     default public boolean hasAngerTime() {
         return this.getAngerTime() > 0;
     }
 
-    default public void forgive(PlayerEntity arg) {
-        if (!arg.world.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)) {
+    default public void forgive(PlayerEntity player) {
+        if (!player.world.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)) {
             return;
         }
-        if (!arg.getUuid().equals(this.getAngryAt())) {
+        if (!player.getUuid().equals(this.getAngryAt())) {
             return;
         }
         this.stopAnger();

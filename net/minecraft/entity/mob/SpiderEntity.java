@@ -77,8 +77,8 @@ extends HostileEntity {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        return new SpiderNavigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new SpiderNavigation(this, world);
     }
 
     @Override
@@ -105,7 +105,7 @@ extends HostileEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_SPIDER_HURT;
     }
 
@@ -115,7 +115,7 @@ extends HostileEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_SPIDER_STEP, 0.15f, 1.0f);
     }
 
@@ -125,9 +125,9 @@ extends HostileEntity {
     }
 
     @Override
-    public void slowMovement(BlockState arg, Vec3d arg2) {
-        if (!arg.isOf(Blocks.COBWEB)) {
-            super.slowMovement(arg, arg2);
+    public void slowMovement(BlockState state, Vec3d multiplier) {
+        if (!state.isOf(Blocks.COBWEB)) {
+            super.slowMovement(state, multiplier);
         }
     }
 
@@ -137,56 +137,56 @@ extends HostileEntity {
     }
 
     @Override
-    public boolean canHaveStatusEffect(StatusEffectInstance arg) {
-        if (arg.getEffectType() == StatusEffects.POISON) {
+    public boolean canHaveStatusEffect(StatusEffectInstance effect) {
+        if (effect.getEffectType() == StatusEffects.POISON) {
             return false;
         }
-        return super.canHaveStatusEffect(arg);
+        return super.canHaveStatusEffect(effect);
     }
 
     public boolean isClimbingWall() {
         return (this.dataTracker.get(SPIDER_FLAGS) & 1) != 0;
     }
 
-    public void setClimbingWall(boolean bl) {
+    public void setClimbingWall(boolean climbing) {
         byte b = this.dataTracker.get(SPIDER_FLAGS);
-        b = bl ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE);
+        b = climbing ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE);
         this.dataTracker.set(SPIDER_FLAGS, b);
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         StatusEffect lv2;
-        arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
+        entityData = super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         if (arg.getRandom().nextInt(100) == 0) {
             SkeletonEntity lv = EntityType.SKELETON.create(this.world);
             lv.refreshPositionAndAngles(this.getX(), this.getY(), this.getZ(), this.yaw, 0.0f);
-            lv.initialize(arg, arg2, arg3, null, null);
+            lv.initialize(arg, difficulty, spawnReason, null, null);
             lv.startRiding(this);
             arg.spawnEntity(lv);
         }
-        if (arg4 == null) {
-            arg4 = new SpiderData();
-            if (arg.getDifficulty() == Difficulty.HARD && arg.getRandom().nextFloat() < 0.1f * arg2.getClampedLocalDifficulty()) {
-                ((SpiderData)arg4).setEffect(arg.getRandom());
+        if (entityData == null) {
+            entityData = new SpiderData();
+            if (arg.getDifficulty() == Difficulty.HARD && arg.getRandom().nextFloat() < 0.1f * difficulty.getClampedLocalDifficulty()) {
+                ((SpiderData)entityData).setEffect(arg.getRandom());
             }
         }
-        if (arg4 instanceof SpiderData && (lv2 = ((SpiderData)arg4).effect) != null) {
+        if (entityData instanceof SpiderData && (lv2 = ((SpiderData)entityData).effect) != null) {
             this.addStatusEffect(new StatusEffectInstance(lv2, Integer.MAX_VALUE));
         }
-        return arg4;
+        return entityData;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 0.65f;
     }
 
     static class FollowTargetGoal<T extends LivingEntity>
     extends net.minecraft.entity.ai.goal.FollowTargetGoal<T> {
-        public FollowTargetGoal(SpiderEntity arg, Class<T> class_) {
-            super((MobEntity)arg, class_, true);
+        public FollowTargetGoal(SpiderEntity spider, Class<T> targetEntityClass) {
+            super((MobEntity)spider, targetEntityClass, true);
         }
 
         @Override
@@ -201,8 +201,8 @@ extends HostileEntity {
 
     static class AttackGoal
     extends MeleeAttackGoal {
-        public AttackGoal(SpiderEntity arg) {
-            super(arg, 1.0, true);
+        public AttackGoal(SpiderEntity spider) {
+            super(spider, 1.0, true);
         }
 
         @Override
@@ -221,8 +221,8 @@ extends HostileEntity {
         }
 
         @Override
-        protected double getSquaredMaxAttackDistance(LivingEntity arg) {
-            return 4.0f + arg.getWidth();
+        protected double getSquaredMaxAttackDistance(LivingEntity entity) {
+            return 4.0f + entity.getWidth();
         }
     }
 

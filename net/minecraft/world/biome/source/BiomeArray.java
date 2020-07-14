@@ -102,10 +102,10 @@ implements BiomeAccess.Storage {
     }
 
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        int l = i & HORIZONTAL_BIT_MASK;
-        int m = MathHelper.clamp(j, 0, VERTICAL_BIT_MASK);
-        int n = k & HORIZONTAL_BIT_MASK;
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        int l = biomeX & HORIZONTAL_BIT_MASK;
+        int m = MathHelper.clamp(biomeY, 0, VERTICAL_BIT_MASK);
+        int n = biomeZ & HORIZONTAL_BIT_MASK;
         return this.data[m << HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT | n << HORIZONTAL_SECTION_COUNT | l];
     }
 }

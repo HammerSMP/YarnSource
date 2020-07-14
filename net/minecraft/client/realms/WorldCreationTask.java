@@ -23,11 +23,11 @@ extends LongRunningTask {
     private final long worldId;
     private final Screen lastScreen;
 
-    public WorldCreationTask(long l, String string, String string2, Screen arg) {
-        this.worldId = l;
-        this.name = string;
-        this.motd = string2;
-        this.lastScreen = arg;
+    public WorldCreationTask(long worldId, String name, String motd, Screen lastScreen) {
+        this.worldId = worldId;
+        this.name = name;
+        this.motd = motd;
+        this.lastScreen = lastScreen;
     }
 
     @Override

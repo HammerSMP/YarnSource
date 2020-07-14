@@ -28,19 +28,19 @@ public class LocateBiomeCommand {
     public static final DynamicCommandExceptionType INVALID_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("commands.locatebiome.invalid", object));
     private static final DynamicCommandExceptionType NOT_FOUND_EXCEPTION = new DynamicCommandExceptionType(object -> new TranslatableText("commands.locatebiome.notFound", object));
 
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("locatebiome").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.argument("biome", IdentifierArgumentType.identifier()).suggests(SuggestionProviders.ALL_BIOMES).executes(commandContext -> LocateBiomeCommand.execute((ServerCommandSource)commandContext.getSource(), (Identifier)commandContext.getArgument("biome", Identifier.class)))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("locatebiome").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.argument("biome", IdentifierArgumentType.identifier()).suggests(SuggestionProviders.ALL_BIOMES).executes(commandContext -> LocateBiomeCommand.execute((ServerCommandSource)commandContext.getSource(), (Identifier)commandContext.getArgument("biome", Identifier.class)))));
     }
 
-    private static int execute(ServerCommandSource arg, Identifier arg2) throws CommandSyntaxException {
-        Biome lv = (Biome)arg.getMinecraftServer().method_30611().method_30530(Registry.BIOME_KEY).getOrEmpty(arg2).orElseThrow(() -> INVALID_EXCEPTION.create((Object)arg2));
-        BlockPos lv2 = new BlockPos(arg.getPosition());
-        BlockPos lv3 = arg.getWorld().locateBiome(lv, lv2, 6400, 8);
+    private static int execute(ServerCommandSource source, Identifier arg2) throws CommandSyntaxException {
+        Biome lv = (Biome)source.getMinecraftServer().method_30611().method_30530(Registry.BIOME_KEY).getOrEmpty(arg2).orElseThrow(() -> INVALID_EXCEPTION.create((Object)arg2));
+        BlockPos lv2 = new BlockPos(source.getPosition());
+        BlockPos lv3 = source.getWorld().locateBiome(lv, lv2, 6400, 8);
         String string = arg2.toString();
         if (lv3 == null) {
             throw NOT_FOUND_EXCEPTION.create((Object)string);
         }
-        return LocateCommand.sendCoordinates(arg, string, lv2, lv3, "commands.locatebiome.success");
+        return LocateCommand.sendCoordinates(source, string, lv2, lv3, "commands.locatebiome.success");
     }
 }
 

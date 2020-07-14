@@ -25,21 +25,21 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerInteractBlockC2SPacket(Hand arg, BlockHitResult arg2) {
-        this.hand = arg;
-        this.blockHitResult = arg2;
+    public PlayerInteractBlockC2SPacket(Hand hand, BlockHitResult blockHitResult) {
+        this.hand = hand;
+        this.blockHitResult = blockHitResult;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.hand = arg.readEnumConstant(Hand.class);
-        this.blockHitResult = arg.readBlockHitResult();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.hand = buf.readEnumConstant(Hand.class);
+        this.blockHitResult = buf.readBlockHitResult();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeEnumConstant(this.hand);
-        arg.writeBlockHitResult(this.blockHitResult);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeEnumConstant(this.hand);
+        buf.writeBlockHitResult(this.blockHitResult);
     }
 
     @Override

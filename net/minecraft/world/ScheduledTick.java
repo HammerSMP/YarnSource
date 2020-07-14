@@ -15,20 +15,20 @@ public class ScheduledTick<T> {
     public final TickPriority priority;
     private final long id = idCounter++;
 
-    public ScheduledTick(BlockPos arg, T object) {
-        this(arg, object, 0L, TickPriority.NORMAL);
+    public ScheduledTick(BlockPos pos, T t) {
+        this(pos, t, 0L, TickPriority.NORMAL);
     }
 
-    public ScheduledTick(BlockPos arg, T object, long l, TickPriority arg2) {
-        this.pos = arg.toImmutable();
-        this.object = object;
-        this.time = l;
-        this.priority = arg2;
+    public ScheduledTick(BlockPos pos, T t, long time, TickPriority priority) {
+        this.pos = pos.toImmutable();
+        this.object = t;
+        this.time = time;
+        this.priority = priority;
     }
 
-    public boolean equals(Object object) {
-        if (object instanceof ScheduledTick) {
-            ScheduledTick lv = (ScheduledTick)object;
+    public boolean equals(Object o) {
+        if (o instanceof ScheduledTick) {
+            ScheduledTick lv = (ScheduledTick)o;
             return this.pos.equals(lv.pos) && this.object == lv.object;
         }
         return false;

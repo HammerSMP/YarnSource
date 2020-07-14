@@ -24,17 +24,17 @@ public class Activity {
     private final String id;
     private final int field_23827;
 
-    private Activity(String string) {
-        this.id = string;
-        this.field_23827 = string.hashCode();
+    private Activity(String id) {
+        this.id = id;
+        this.field_23827 = id.hashCode();
     }
 
     public String getId() {
         return this.id;
     }
 
-    private static Activity register(String string) {
-        return Registry.register(Registry.ACTIVITY, string, new Activity(string));
+    private static Activity register(String id) {
+        return Registry.register(Registry.ACTIVITY, id, new Activity(id));
     }
 
     public boolean equals(Object object) {

@@ -14,37 +14,37 @@ public enum BlockMirror {
 
     private final DirectionTransformation directionTransformation;
 
-    private BlockMirror(DirectionTransformation arg) {
-        this.directionTransformation = arg;
+    private BlockMirror(DirectionTransformation directionTransformation) {
+        this.directionTransformation = directionTransformation;
     }
 
-    public int mirror(int i, int j) {
-        int k = j / 2;
-        int l = i > k ? i - j : i;
+    public int mirror(int rotation, int fullTurn) {
+        int k = fullTurn / 2;
+        int l = rotation > k ? rotation - fullTurn : rotation;
         switch (this) {
             case FRONT_BACK: {
-                return (j - l) % j;
+                return (fullTurn - l) % fullTurn;
             }
             case LEFT_RIGHT: {
-                return (k - l + j) % j;
+                return (k - l + fullTurn) % fullTurn;
             }
         }
-        return i;
+        return rotation;
     }
 
-    public BlockRotation getRotation(Direction arg) {
-        Direction.Axis lv = arg.getAxis();
+    public BlockRotation getRotation(Direction direction) {
+        Direction.Axis lv = direction.getAxis();
         return this == LEFT_RIGHT && lv == Direction.Axis.Z || this == FRONT_BACK && lv == Direction.Axis.X ? BlockRotation.CLOCKWISE_180 : BlockRotation.NONE;
     }
 
-    public Direction apply(Direction arg) {
-        if (this == FRONT_BACK && arg.getAxis() == Direction.Axis.X) {
-            return arg.getOpposite();
+    public Direction apply(Direction direction) {
+        if (this == FRONT_BACK && direction.getAxis() == Direction.Axis.X) {
+            return direction.getOpposite();
         }
-        if (this == LEFT_RIGHT && arg.getAxis() == Direction.Axis.Z) {
-            return arg.getOpposite();
+        if (this == LEFT_RIGHT && direction.getAxis() == Direction.Axis.Z) {
+            return direction.getOpposite();
         }
-        return arg;
+        return direction;
     }
 
     public DirectionTransformation getDirectionTransformation() {

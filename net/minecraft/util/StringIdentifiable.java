@@ -27,34 +27,34 @@ import java.util.stream.Stream;
 public interface StringIdentifiable {
     public String asString();
 
-    public static <E extends Enum<E>> Codec<E> createCodec(Supplier<E[]> supplier, Function<? super String, ? extends E> function) {
-        Enum[] enums = (Enum[])supplier.get();
-        return StringIdentifiable.createCodec(Enum::ordinal, i -> enums[i], function);
+    public static <E extends Enum<E>> Codec<E> createCodec(Supplier<E[]> enumValues, Function<? super String, ? extends E> fromString) {
+        Enum[] enums = (Enum[])enumValues.get();
+        return StringIdentifiable.createCodec(Enum::ordinal, ordinal -> enums[ordinal], fromString);
     }
 
-    public static <E extends StringIdentifiable> Codec<E> createCodec(final ToIntFunction<E> toIntFunction, final IntFunction<E> intFunction, final Function<? super String, ? extends E> function) {
+    public static <E extends StringIdentifiable> Codec<E> createCodec(final ToIntFunction<E> compressedEncoder, final IntFunction<E> compressedDecoder, final Function<? super String, ? extends E> decoder) {
         return new Codec<E>(){
 
             public <T> DataResult<T> encode(E arg, DynamicOps<T> dynamicOps, T object) {
                 if (dynamicOps.compressMaps()) {
-                    return dynamicOps.mergeToPrimitive(object, dynamicOps.createInt(toIntFunction.applyAsInt(arg)));
+                    return dynamicOps.mergeToPrimitive(object, dynamicOps.createInt(compressedEncoder.applyAsInt(arg)));
                 }
                 return dynamicOps.mergeToPrimitive(object, dynamicOps.createString(arg.asString()));
             }
 
             public <T> DataResult<Pair<E, T>> decode(DynamicOps<T> dynamicOps, T object) {
                 if (dynamicOps.compressMaps()) {
-                    return dynamicOps.getNumberValue(object).flatMap(number -> Optional.ofNullable(intFunction.apply(number.intValue())).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown element id: " + number)))).map(arg -> Pair.of((Object)arg, (Object)dynamicOps.empty()));
+                    return dynamicOps.getNumberValue(object).flatMap(number -> Optional.ofNullable(compressedDecoder.apply(number.intValue())).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown element id: " + number)))).map(arg -> Pair.of((Object)arg, (Object)dynamicOps.empty()));
                 }
-                return dynamicOps.getStringValue(object).flatMap(string -> Optional.ofNullable(function.apply(string)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown element name: " + string)))).map(arg -> Pair.of((Object)arg, (Object)dynamicOps.empty()));
+                return dynamicOps.getStringValue(object).flatMap(string -> Optional.ofNullable(decoder.apply(string)).map(DataResult::success).orElseGet(() -> DataResult.error((String)("Unknown element name: " + string)))).map(arg -> Pair.of((Object)arg, (Object)dynamicOps.empty()));
             }
 
             public String toString() {
-                return "StringRepresentable[" + toIntFunction + "]";
+                return "StringRepresentable[" + compressedEncoder + "]";
             }
 
-            public /* synthetic */ DataResult encode(Object object, DynamicOps dynamicOps, Object object2) {
-                return this.encode((E)((StringIdentifiable)object), (DynamicOps<T>)dynamicOps, (T)object2);
+            public /* synthetic */ DataResult encode(Object value, DynamicOps dynamicOps, Object object2) {
+                return this.encode((E)((StringIdentifiable)value), (DynamicOps<T>)dynamicOps, (T)object2);
             }
         };
     }

@@ -24,10 +24,10 @@ public class CloudParticle
 extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    private CloudParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, 0.0, 0.0, 0.0);
+    private CloudParticle(ClientWorld world, double x, double y, double z, double g, double h, double i, SpriteProvider spriteProvider) {
+        super(world, x, y, z, 0.0, 0.0, 0.0);
         float k;
-        this.spriteProvider = arg2;
+        this.spriteProvider = spriteProvider;
         float j = 2.5f;
         this.velocityX *= (double)0.1f;
         this.velocityY *= (double)0.1f;
@@ -42,7 +42,7 @@ extends SpriteBillboardParticle {
         int l = (int)(8.0 / (Math.random() * 0.8 + 0.3));
         this.maxAge = (int)Math.max((float)l * 2.5f, 1.0f);
         this.collidesWithWorld = false;
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -51,8 +51,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
-        return this.scale * MathHelper.clamp(((float)this.age + f) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
+    public float getSize(float tickDelta) {
+        return this.scale * MathHelper.clamp(((float)this.age + tickDelta) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
     }
 
     @Override
@@ -87,8 +87,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public SneezeFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public SneezeFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override
@@ -105,8 +105,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public CloudFactory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public CloudFactory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

@@ -96,14 +96,14 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (validClient) {
-            this.drawIcons(arg, i, j);
+            this.drawIcons(matrices, mouseX, mouseY);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private void drawIcons(MatrixStack arg, int i, int j) {
+    private void drawIcons(MatrixStack matrices, int mouseX, int mouseY) {
         int k = this.numberOfPendingInvites;
         int l = 24;
         int m = this.height / 4 + 48;
@@ -115,14 +115,14 @@ extends RealmsScreen {
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.pushMatrix();
             RenderSystem.scalef(0.4f, 0.4f, 0.4f);
-            DrawableHelper.drawTexture(arg, (int)((double)(n + 2 - p) * 2.5), (int)((double)o * 2.5), 0.0f, 0.0f, 40, 40, 40, 40);
+            DrawableHelper.drawTexture(matrices, (int)((double)(n + 2 - p) * 2.5), (int)((double)o * 2.5), 0.0f, 0.0f, 40, 40, 40, 40);
             RenderSystem.popMatrix();
             p += 14;
         }
         if (k != 0) {
             this.client.getTextureManager().bindTexture(INVITE_ICON);
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-            DrawableHelper.drawTexture(arg, n - p, o - 6, 0.0f, 0.0f, 15, 25, 31, 25);
+            DrawableHelper.drawTexture(matrices, n - p, o - 6, 0.0f, 0.0f, 15, 25, 31, 25);
             p += 16;
         }
         if (trialAvailable) {
@@ -132,7 +132,7 @@ extends RealmsScreen {
             if ((Util.getMeasuringTimeMs() / 800L & 1L) == 1L) {
                 q = 8;
             }
-            DrawableHelper.drawTexture(arg, n + 4 - p, o + 4, 0.0f, q, 8, 8, 8, 16);
+            DrawableHelper.drawTexture(matrices, n + 4 - p, o + 4, 0.0f, q, 8, 8, 8, 16);
         }
     }
 

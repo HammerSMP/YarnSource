@@ -21,8 +21,8 @@ public class SkeletonHorseTrapTriggerGoal
 extends Goal {
     private final SkeletonHorseEntity skeletonHorse;
 
-    public SkeletonHorseTrapTriggerGoal(SkeletonHorseEntity arg) {
-        this.skeletonHorse = arg;
+    public SkeletonHorseTrapTriggerGoal(SkeletonHorseEntity skeletonHorse) {
+        this.skeletonHorse = skeletonHorse;
     }
 
     @Override
@@ -50,9 +50,9 @@ extends Goal {
         }
     }
 
-    private HorseBaseEntity getHorse(LocalDifficulty arg) {
+    private HorseBaseEntity getHorse(LocalDifficulty localDifficulty) {
         SkeletonHorseEntity lv = EntityType.SKELETON_HORSE.create(this.skeletonHorse.world);
-        lv.initialize((ServerWorld)this.skeletonHorse.world, arg, SpawnReason.TRIGGERED, null, null);
+        lv.initialize((ServerWorld)this.skeletonHorse.world, localDifficulty, SpawnReason.TRIGGERED, null, null);
         lv.updatePosition(this.skeletonHorse.getX(), this.skeletonHorse.getY(), this.skeletonHorse.getZ());
         lv.timeUntilRegen = 60;
         lv.setPersistent();
@@ -62,17 +62,17 @@ extends Goal {
         return lv;
     }
 
-    private SkeletonEntity getSkeleton(LocalDifficulty arg, HorseBaseEntity arg2) {
-        SkeletonEntity lv = EntityType.SKELETON.create(arg2.world);
-        lv.initialize((ServerWorld)arg2.world, arg, SpawnReason.TRIGGERED, null, null);
-        lv.updatePosition(arg2.getX(), arg2.getY(), arg2.getZ());
+    private SkeletonEntity getSkeleton(LocalDifficulty localDifficulty, HorseBaseEntity vehicle) {
+        SkeletonEntity lv = EntityType.SKELETON.create(vehicle.world);
+        lv.initialize((ServerWorld)vehicle.world, localDifficulty, SpawnReason.TRIGGERED, null, null);
+        lv.updatePosition(vehicle.getX(), vehicle.getY(), vehicle.getZ());
         lv.timeUntilRegen = 60;
         lv.setPersistent();
         if (lv.getEquippedStack(EquipmentSlot.HEAD).isEmpty()) {
             lv.equipStack(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         }
-        lv.equipStack(EquipmentSlot.MAINHAND, EnchantmentHelper.enchant(lv.getRandom(), lv.getMainHandStack(), (int)(5.0f + arg.getClampedLocalDifficulty() * (float)lv.getRandom().nextInt(18)), false));
-        lv.equipStack(EquipmentSlot.HEAD, EnchantmentHelper.enchant(lv.getRandom(), lv.getEquippedStack(EquipmentSlot.HEAD), (int)(5.0f + arg.getClampedLocalDifficulty() * (float)lv.getRandom().nextInt(18)), false));
+        lv.equipStack(EquipmentSlot.MAINHAND, EnchantmentHelper.enchant(lv.getRandom(), lv.getMainHandStack(), (int)(5.0f + localDifficulty.getClampedLocalDifficulty() * (float)lv.getRandom().nextInt(18)), false));
+        lv.equipStack(EquipmentSlot.HEAD, EnchantmentHelper.enchant(lv.getRandom(), lv.getEquippedStack(EquipmentSlot.HEAD), (int)(5.0f + localDifficulty.getClampedLocalDifficulty() * (float)lv.getRandom().nextInt(18)), false));
         lv.world.spawnEntity(lv);
         return lv;
     }

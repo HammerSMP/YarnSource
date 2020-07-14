@@ -226,16 +226,16 @@ IndexedIterable<T> {
     private final RegistryKey<? extends Registry<T>> registryKey;
     private final Lifecycle lifecycle;
 
-    private static <T> RegistryKey<Registry<T>> createRegistryKey(String string) {
-        return RegistryKey.ofRegistry(new Identifier(string));
+    private static <T> RegistryKey<Registry<T>> createRegistryKey(String registryId) {
+        return RegistryKey.ofRegistry(new Identifier(registryId));
     }
 
-    public static <T extends MutableRegistry<?>> void validate(MutableRegistry<T> arg) {
-        arg.forEach(arg2 -> {
+    public static <T extends MutableRegistry<?>> void validate(MutableRegistry<T> registry) {
+        registry.forEach(arg2 -> {
             if (arg2.getIds().isEmpty()) {
-                LOGGER.error("Registry '{}' was empty after loading", (Object)arg.getId(arg2));
+                LOGGER.error("Registry '{}' was empty after loading", (Object)registry.getId(arg2));
                 if (SharedConstants.isDevelopment) {
-                    throw new IllegalStateException("Registry: '" + arg.getId(arg2) + "' is empty, not allowed, fix me!");
+                    throw new IllegalStateException("Registry: '" + registry.getId(arg2) + "' is empty, not allowed, fix me!");
                 }
             }
             if (arg2 instanceof DefaultedRegistry) {
@@ -245,27 +245,27 @@ IndexedIterable<T> {
         });
     }
 
-    private static <T> Registry<T> create(RegistryKey<? extends Registry<T>> arg, Supplier<T> supplier) {
-        return Registry.create(arg, Lifecycle.experimental(), supplier);
+    private static <T> Registry<T> create(RegistryKey<? extends Registry<T>> arg, Supplier<T> defaultEntry) {
+        return Registry.create(arg, Lifecycle.experimental(), defaultEntry);
     }
 
-    private static <T> DefaultedRegistry<T> create(RegistryKey<? extends Registry<T>> arg, String string, Supplier<T> supplier) {
-        return Registry.create(arg, string, Lifecycle.experimental(), supplier);
+    private static <T> DefaultedRegistry<T> create(RegistryKey<? extends Registry<T>> arg, String defaultId, Supplier<T> defaultEntry) {
+        return Registry.create(arg, defaultId, Lifecycle.experimental(), defaultEntry);
     }
 
-    private static <T> Registry<T> create(RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle, Supplier<T> supplier) {
-        return Registry.create(arg, new SimpleRegistry(arg, lifecycle), supplier);
+    private static <T> Registry<T> create(RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle, Supplier<T> defaultEntry) {
+        return Registry.create(arg, new SimpleRegistry(arg, lifecycle), defaultEntry);
     }
 
-    private static <T> DefaultedRegistry<T> create(RegistryKey<? extends Registry<T>> arg, String string, Lifecycle lifecycle, Supplier<T> supplier) {
-        return Registry.create(arg, new DefaultedRegistry(string, arg, lifecycle), supplier);
+    private static <T> DefaultedRegistry<T> create(RegistryKey<? extends Registry<T>> arg, String defaultId, Lifecycle lifecycle, Supplier<T> defaultEntry) {
+        return Registry.create(arg, new DefaultedRegistry(defaultId, arg, lifecycle), defaultEntry);
     }
 
-    private static <T, R extends MutableRegistry<T>> R create(RegistryKey<? extends Registry<T>> arg, R arg2, Supplier<T> supplier) {
+    private static <T, R extends MutableRegistry<T>> R create(RegistryKey<? extends Registry<T>> arg, R registry, Supplier<T> defaultEntry) {
         Identifier lv = arg.getValue();
-        DEFAULT_ENTRIES.put(lv, supplier);
+        DEFAULT_ENTRIES.put(lv, defaultEntry);
         MutableRegistry<MutableRegistry<?>> lv2 = ROOT;
-        return lv2.add(arg, arg2);
+        return lv2.add(arg, registry);
     }
 
     protected Registry(RegistryKey<? extends Registry<T>> arg, Lifecycle lifecycle) {
@@ -329,8 +329,8 @@ IndexedIterable<T> {
     @Nullable
     public abstract T get(@Nullable Identifier var1);
 
-    public Optional<T> getOrEmpty(@Nullable Identifier arg) {
-        return Optional.ofNullable(this.get(arg));
+    public Optional<T> getOrEmpty(@Nullable Identifier id) {
+        return Optional.ofNullable(this.get(id));
     }
 
     public abstract Set<Identifier> getIds();
@@ -347,16 +347,16 @@ IndexedIterable<T> {
 
     public abstract boolean containsId(int var1);
 
-    public static <T> T register(Registry<? super T> arg, String string, T object) {
-        return Registry.register(arg, new Identifier(string), object);
+    public static <T> T register(Registry<? super T> registry, String id, T entry) {
+        return Registry.register(registry, new Identifier(id), entry);
     }
 
-    public static <V, T extends V> T register(Registry<V> arg, Identifier arg2, T object) {
-        return ((MutableRegistry)arg).add(RegistryKey.of(arg.registryKey, arg2), object);
+    public static <V, T extends V> T register(Registry<V> registry, Identifier id, T entry) {
+        return ((MutableRegistry)registry).add(RegistryKey.of(registry.registryKey, id), entry);
     }
 
-    public static <V, T extends V> T register(Registry<V> arg, int i, String string, T object) {
-        return ((MutableRegistry)arg).set(i, RegistryKey.of(arg.registryKey, new Identifier(string)), object);
+    public static <V, T extends V> T register(Registry<V> registry, int rawId, String id, T entry) {
+        return ((MutableRegistry)registry).set(rawId, RegistryKey.of(registry.registryKey, new Identifier(id)), entry);
     }
 
     static {

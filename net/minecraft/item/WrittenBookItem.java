@@ -45,73 +45,73 @@ extends Item {
         super(arg);
     }
 
-    public static boolean isValid(@Nullable CompoundTag arg) {
-        if (!WritableBookItem.isValid(arg)) {
+    public static boolean isValid(@Nullable CompoundTag tag) {
+        if (!WritableBookItem.isValid(tag)) {
             return false;
         }
-        if (!arg.contains("title", 8)) {
+        if (!tag.contains("title", 8)) {
             return false;
         }
-        String string = arg.getString("title");
+        String string = tag.getString("title");
         if (string.length() > 32) {
             return false;
         }
-        return arg.contains("author", 8);
+        return tag.contains("author", 8);
     }
 
-    public static int getGeneration(ItemStack arg) {
-        return arg.getTag().getInt("generation");
+    public static int getGeneration(ItemStack stack) {
+        return stack.getTag().getInt("generation");
     }
 
-    public static int getPageCount(ItemStack arg) {
-        CompoundTag lv = arg.getTag();
+    public static int getPageCount(ItemStack stack) {
+        CompoundTag lv = stack.getTag();
         return lv != null ? lv.getList("pages", 8).size() : 0;
     }
 
     @Override
-    public Text getName(ItemStack arg) {
+    public Text getName(ItemStack stack) {
         CompoundTag lv;
         String string;
-        if (arg.hasTag() && !ChatUtil.isEmpty(string = (lv = arg.getTag()).getString("title"))) {
+        if (stack.hasTag() && !ChatUtil.isEmpty(string = (lv = stack.getTag()).getString("title"))) {
             return new LiteralText(string);
         }
-        return super.getName(arg);
+        return super.getName(stack);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
-        if (arg.hasTag()) {
-            CompoundTag lv = arg.getTag();
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        if (stack.hasTag()) {
+            CompoundTag lv = stack.getTag();
             String string = lv.getString("author");
             if (!ChatUtil.isEmpty(string)) {
-                list.add(new TranslatableText("book.byAuthor", string).formatted(Formatting.GRAY));
+                tooltip.add(new TranslatableText("book.byAuthor", string).formatted(Formatting.GRAY));
             }
-            list.add(new TranslatableText("book.generation." + lv.getInt("generation")).formatted(Formatting.GRAY));
+            tooltip.add(new TranslatableText("book.generation." + lv.getInt("generation")).formatted(Formatting.GRAY));
         }
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos lv2;
-        World lv = arg.getWorld();
-        BlockState lv3 = lv.getBlockState(lv2 = arg.getBlockPos());
+        World lv = context.getWorld();
+        BlockState lv3 = lv.getBlockState(lv2 = context.getBlockPos());
         if (lv3.isOf(Blocks.LECTERN)) {
-            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, arg.getStack()) ? ActionResult.success(lv.isClient) : ActionResult.PASS;
+            return LecternBlock.putBookIfAbsent(lv, lv2, lv3, context.getStack()) ? ActionResult.success(lv.isClient) : ActionResult.PASS;
         }
         return ActionResult.PASS;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        ItemStack lv = arg2.getStackInHand(arg3);
-        arg2.openEditBookScreen(lv, arg3);
-        arg2.incrementStat(Stats.USED.getOrCreateStat(this));
-        return TypedActionResult.method_29237(lv, arg.isClient());
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack lv = user.getStackInHand(hand);
+        user.openEditBookScreen(lv, hand);
+        user.incrementStat(Stats.USED.getOrCreateStat(this));
+        return TypedActionResult.method_29237(lv, world.isClient());
     }
 
-    public static boolean resolve(ItemStack arg, @Nullable ServerCommandSource arg2, @Nullable PlayerEntity arg3) {
-        CompoundTag lv = arg.getTag();
+    public static boolean resolve(ItemStack book, @Nullable ServerCommandSource commandSource, @Nullable PlayerEntity player) {
+        CompoundTag lv = book.getTag();
         if (lv == null || lv.getBoolean("resolved")) {
             return false;
         }
@@ -125,7 +125,7 @@ extends Item {
             String string = lv2.getString(i);
             try {
                 MutableText lv3 = Text.Serializer.fromLenientJson(string);
-                lv3 = Texts.parse(arg2, lv3, arg3, 0);
+                lv3 = Texts.parse(commandSource, lv3, player, 0);
             }
             catch (Exception exception) {
                 lv4 = new LiteralText(string);
@@ -137,7 +137,7 @@ extends Item {
     }
 
     @Override
-    public boolean hasGlint(ItemStack arg) {
+    public boolean hasGlint(ItemStack stack) {
         return true;
     }
 }

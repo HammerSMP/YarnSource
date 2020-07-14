@@ -80,9 +80,9 @@ extends Screen {
         }
     }
 
-    private OptimizeWorldScreen(BooleanConsumer booleanConsumer, DataFixer dataFixer, LevelStorage.Session arg, LevelInfo arg2, boolean bl, ImmutableSet<RegistryKey<World>> immutableSet) {
+    private OptimizeWorldScreen(BooleanConsumer callback, DataFixer dataFixer, LevelStorage.Session arg, LevelInfo arg2, boolean bl, ImmutableSet<RegistryKey<World>> immutableSet) {
         super(new TranslatableText("optimizeWorld.title", arg2.getLevelName()));
-        this.callback = booleanConsumer;
+        this.callback = callback;
         this.updater = new WorldUpdater(arg, dataFixer, immutableSet, bl);
     }
 
@@ -113,35 +113,35 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
         int k = this.width / 2 - 150;
         int l = this.width / 2 + 150;
         int m = this.height / 4 + 100;
         int n = m + 10;
         this.textRenderer.getClass();
-        this.drawCenteredText(arg, this.textRenderer, this.updater.getStatus(), this.width / 2, m - 9 - 2, 0xA0A0A0);
+        this.drawCenteredText(matrices, this.textRenderer, this.updater.getStatus(), this.width / 2, m - 9 - 2, 0xA0A0A0);
         if (this.updater.getTotalChunkCount() > 0) {
-            OptimizeWorldScreen.fill(arg, k - 1, m - 1, l + 1, n + 1, -16777216);
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.converted", this.updater.getUpgradedChunkCount()), k, 40, 0xA0A0A0);
+            OptimizeWorldScreen.fill(matrices, k - 1, m - 1, l + 1, n + 1, -16777216);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("optimizeWorld.info.converted", this.updater.getUpgradedChunkCount()), k, 40, 0xA0A0A0);
             this.textRenderer.getClass();
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.skipped", this.updater.getSkippedChunkCount()), k, 40 + 9 + 3, 0xA0A0A0);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("optimizeWorld.info.skipped", this.updater.getSkippedChunkCount()), k, 40 + 9 + 3, 0xA0A0A0);
             this.textRenderer.getClass();
-            this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("optimizeWorld.info.total", this.updater.getTotalChunkCount()), k, 40 + (9 + 3) * 2, 0xA0A0A0);
+            this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("optimizeWorld.info.total", this.updater.getTotalChunkCount()), k, 40 + (9 + 3) * 2, 0xA0A0A0);
             int o = 0;
             for (RegistryKey lv : this.updater.method_28304()) {
                 int p = MathHelper.floor(this.updater.getProgress(lv) * (float)(l - k));
-                OptimizeWorldScreen.fill(arg, k + o, m, k + o + p, n, DIMENSION_COLORS.getInt((Object)lv));
+                OptimizeWorldScreen.fill(matrices, k + o, m, k + o + p, n, DIMENSION_COLORS.getInt((Object)lv));
                 o += p;
             }
             int q = this.updater.getUpgradedChunkCount() + this.updater.getSkippedChunkCount();
             this.textRenderer.getClass();
-            this.drawCenteredString(arg, this.textRenderer, q + " / " + this.updater.getTotalChunkCount(), this.width / 2, m + 2 * 9 + 2, 0xA0A0A0);
+            this.drawCenteredString(matrices, this.textRenderer, q + " / " + this.updater.getTotalChunkCount(), this.width / 2, m + 2 * 9 + 2, 0xA0A0A0);
             this.textRenderer.getClass();
-            this.drawCenteredString(arg, this.textRenderer, MathHelper.floor(this.updater.getProgress() * 100.0f) + "%", this.width / 2, m + (n - m) / 2 - 9 / 2, 0xA0A0A0);
+            this.drawCenteredString(matrices, this.textRenderer, MathHelper.floor(this.updater.getProgress() * 100.0f) + "%", this.width / 2, m + (n - m) / 2 - 9 / 2, 0xA0A0A0);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

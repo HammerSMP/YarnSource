@@ -27,11 +27,11 @@ extends LongRunningTask {
     private final Screen lastScreen;
     private final String downloadName;
 
-    public DownloadTask(long l, int i, String string, Screen arg) {
-        this.worldId = l;
-        this.slot = i;
-        this.lastScreen = arg;
-        this.downloadName = string;
+    public DownloadTask(long worldId, int slot, String downloadName, Screen lastScreen) {
+        this.worldId = worldId;
+        this.slot = slot;
+        this.lastScreen = lastScreen;
+        this.downloadName = downloadName;
     }
 
     @Override

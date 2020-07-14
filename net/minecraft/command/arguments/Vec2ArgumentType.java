@@ -44,16 +44,16 @@ implements ArgumentType<PosArgument> {
     public static final SimpleCommandExceptionType INCOMPLETE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("argument.pos2d.incomplete"));
     private final boolean centerIntegers;
 
-    public Vec2ArgumentType(boolean bl) {
-        this.centerIntegers = bl;
+    public Vec2ArgumentType(boolean centerIntegers) {
+        this.centerIntegers = centerIntegers;
     }
 
     public static Vec2ArgumentType vec2() {
         return new Vec2ArgumentType(true);
     }
 
-    public static Vec2f getVec2(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        Vec3d lv = ((PosArgument)commandContext.getArgument(string, PosArgument.class)).toAbsolutePos((ServerCommandSource)commandContext.getSource());
+    public static Vec2f getVec2(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        Vec3d lv = ((PosArgument)context.getArgument(name, PosArgument.class)).toAbsolutePos((ServerCommandSource)context.getSource());
         return new Vec2f((float)lv.x, (float)lv.z);
     }
 
@@ -72,16 +72,16 @@ implements ArgumentType<PosArgument> {
         return new DefaultPosArgument(lv, new CoordinateArgument(true, 0.0), lv2);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        if (commandContext.getSource() instanceof CommandSource) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
             Collection<CommandSource.RelativePosition> collection2;
-            String string = suggestionsBuilder.getRemaining();
+            String string = builder.getRemaining();
             if (!string.isEmpty() && string.charAt(0) == '^') {
                 Set<CommandSource.RelativePosition> collection = Collections.singleton(CommandSource.RelativePosition.ZERO_LOCAL);
             } else {
-                collection2 = ((CommandSource)commandContext.getSource()).getPositionSuggestions();
+                collection2 = ((CommandSource)context.getSource()).getPositionSuggestions();
             }
-            return CommandSource.suggestColumnPositions(string, collection2, suggestionsBuilder, CommandManager.getCommandValidator(this::parse));
+            return CommandSource.suggestColumnPositions(string, collection2, builder, CommandManager.getCommandValidator(this::parse));
         }
         return Suggestions.empty();
     }

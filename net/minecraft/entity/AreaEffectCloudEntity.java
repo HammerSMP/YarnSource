@@ -75,9 +75,9 @@ extends Entity {
         this.setRadius(3.0f);
     }
 
-    public AreaEffectCloudEntity(World arg, double d, double e, double f) {
-        this((EntityType<? extends AreaEffectCloudEntity>)EntityType.AREA_EFFECT_CLOUD, arg);
-        this.updatePosition(d, e, f);
+    public AreaEffectCloudEntity(World world, double x, double y, double z) {
+        this((EntityType<? extends AreaEffectCloudEntity>)EntityType.AREA_EFFECT_CLOUD, world);
+        this.updatePosition(x, y, z);
     }
 
     @Override
@@ -88,9 +88,9 @@ extends Entity {
         this.getDataTracker().startTracking(PARTICLE_ID, ParticleTypes.ENTITY_EFFECT);
     }
 
-    public void setRadius(float f) {
+    public void setRadius(float radius) {
         if (!this.world.isClient) {
-            this.getDataTracker().set(RADIUS, Float.valueOf(f));
+            this.getDataTracker().set(RADIUS, Float.valueOf(radius));
         }
     }
 
@@ -107,8 +107,8 @@ extends Entity {
         return this.getDataTracker().get(RADIUS).floatValue();
     }
 
-    public void setPotion(Potion arg) {
-        this.potion = arg;
+    public void setPotion(Potion potion) {
+        this.potion = potion;
         if (!this.customColor) {
             this.updateColor();
         }
@@ -122,8 +122,8 @@ extends Entity {
         }
     }
 
-    public void addEffect(StatusEffectInstance arg) {
-        this.effects.add(arg);
+    public void addEffect(StatusEffectInstance effect) {
+        this.effects.add(effect);
         if (!this.customColor) {
             this.updateColor();
         }
@@ -133,21 +133,21 @@ extends Entity {
         return this.getDataTracker().get(COLOR);
     }
 
-    public void setColor(int i) {
+    public void setColor(int rgb) {
         this.customColor = true;
-        this.getDataTracker().set(COLOR, i);
+        this.getDataTracker().set(COLOR, rgb);
     }
 
     public ParticleEffect getParticleType() {
         return this.getDataTracker().get(PARTICLE_ID);
     }
 
-    public void setParticleType(ParticleEffect arg) {
-        this.getDataTracker().set(PARTICLE_ID, arg);
+    public void setParticleType(ParticleEffect particle) {
+        this.getDataTracker().set(PARTICLE_ID, particle);
     }
 
-    protected void setWaiting(boolean bl) {
-        this.getDataTracker().set(WAITING, bl);
+    protected void setWaiting(boolean waiting) {
+        this.getDataTracker().set(WAITING, waiting);
     }
 
     public boolean isWaiting() {
@@ -158,8 +158,8 @@ extends Entity {
         return this.duration;
     }
 
-    public void setDuration(int i) {
-        this.duration = i;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     @Override
@@ -282,21 +282,21 @@ extends Entity {
         }
     }
 
-    public void setRadiusOnUse(float f) {
-        this.radiusOnUse = f;
+    public void setRadiusOnUse(float radius) {
+        this.radiusOnUse = radius;
     }
 
-    public void setRadiusGrowth(float f) {
-        this.radiusGrowth = f;
+    public void setRadiusGrowth(float growth) {
+        this.radiusGrowth = growth;
     }
 
-    public void setWaitTime(int i) {
-        this.waitTime = i;
+    public void setWaitTime(int ticks) {
+        this.waitTime = ticks;
     }
 
-    public void setOwner(@Nullable LivingEntity arg) {
-        this.owner = arg;
-        this.ownerUuid = arg == null ? null : arg.getUuid();
+    public void setOwner(@Nullable LivingEntity owner) {
+        this.owner = owner;
+        this.ownerUuid = owner == null ? null : owner.getUuid();
     }
 
     @Nullable
@@ -309,34 +309,34 @@ extends Entity {
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag arg) {
-        this.age = arg.getInt("Age");
-        this.duration = arg.getInt("Duration");
-        this.waitTime = arg.getInt("WaitTime");
-        this.reapplicationDelay = arg.getInt("ReapplicationDelay");
-        this.durationOnUse = arg.getInt("DurationOnUse");
-        this.radiusOnUse = arg.getFloat("RadiusOnUse");
-        this.radiusGrowth = arg.getFloat("RadiusPerTick");
-        this.setRadius(arg.getFloat("Radius"));
-        if (arg.containsUuid("Owner")) {
-            this.ownerUuid = arg.getUuid("Owner");
+    protected void readCustomDataFromTag(CompoundTag tag) {
+        this.age = tag.getInt("Age");
+        this.duration = tag.getInt("Duration");
+        this.waitTime = tag.getInt("WaitTime");
+        this.reapplicationDelay = tag.getInt("ReapplicationDelay");
+        this.durationOnUse = tag.getInt("DurationOnUse");
+        this.radiusOnUse = tag.getFloat("RadiusOnUse");
+        this.radiusGrowth = tag.getFloat("RadiusPerTick");
+        this.setRadius(tag.getFloat("Radius"));
+        if (tag.containsUuid("Owner")) {
+            this.ownerUuid = tag.getUuid("Owner");
         }
-        if (arg.contains("Particle", 8)) {
+        if (tag.contains("Particle", 8)) {
             try {
-                this.setParticleType(ParticleArgumentType.readParameters(new StringReader(arg.getString("Particle"))));
+                this.setParticleType(ParticleArgumentType.readParameters(new StringReader(tag.getString("Particle"))));
             }
             catch (CommandSyntaxException commandSyntaxException) {
-                LOGGER.warn("Couldn't load custom particle {}", (Object)arg.getString("Particle"), (Object)commandSyntaxException);
+                LOGGER.warn("Couldn't load custom particle {}", (Object)tag.getString("Particle"), (Object)commandSyntaxException);
             }
         }
-        if (arg.contains("Color", 99)) {
-            this.setColor(arg.getInt("Color"));
+        if (tag.contains("Color", 99)) {
+            this.setColor(tag.getInt("Color"));
         }
-        if (arg.contains("Potion", 8)) {
-            this.setPotion(PotionUtil.getPotion(arg));
+        if (tag.contains("Potion", 8)) {
+            this.setPotion(PotionUtil.getPotion(tag));
         }
-        if (arg.contains("Effects", 9)) {
-            ListTag lv = arg.getList("Effects", 10);
+        if (tag.contains("Effects", 9)) {
+            ListTag lv = tag.getList("Effects", 10);
             this.effects.clear();
             for (int i = 0; i < lv.size(); ++i) {
                 StatusEffectInstance lv2 = StatusEffectInstance.fromTag(lv.getCompound(i));
@@ -347,40 +347,40 @@ extends Entity {
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag arg) {
-        arg.putInt("Age", this.age);
-        arg.putInt("Duration", this.duration);
-        arg.putInt("WaitTime", this.waitTime);
-        arg.putInt("ReapplicationDelay", this.reapplicationDelay);
-        arg.putInt("DurationOnUse", this.durationOnUse);
-        arg.putFloat("RadiusOnUse", this.radiusOnUse);
-        arg.putFloat("RadiusPerTick", this.radiusGrowth);
-        arg.putFloat("Radius", this.getRadius());
-        arg.putString("Particle", this.getParticleType().asString());
+    protected void writeCustomDataToTag(CompoundTag tag) {
+        tag.putInt("Age", this.age);
+        tag.putInt("Duration", this.duration);
+        tag.putInt("WaitTime", this.waitTime);
+        tag.putInt("ReapplicationDelay", this.reapplicationDelay);
+        tag.putInt("DurationOnUse", this.durationOnUse);
+        tag.putFloat("RadiusOnUse", this.radiusOnUse);
+        tag.putFloat("RadiusPerTick", this.radiusGrowth);
+        tag.putFloat("Radius", this.getRadius());
+        tag.putString("Particle", this.getParticleType().asString());
         if (this.ownerUuid != null) {
-            arg.putUuid("Owner", this.ownerUuid);
+            tag.putUuid("Owner", this.ownerUuid);
         }
         if (this.customColor) {
-            arg.putInt("Color", this.getColor());
+            tag.putInt("Color", this.getColor());
         }
         if (this.potion != Potions.EMPTY && this.potion != null) {
-            arg.putString("Potion", Registry.POTION.getId(this.potion).toString());
+            tag.putString("Potion", Registry.POTION.getId(this.potion).toString());
         }
         if (!this.effects.isEmpty()) {
             ListTag lv = new ListTag();
             for (StatusEffectInstance lv2 : this.effects) {
                 lv.add(lv2.toTag(new CompoundTag()));
             }
-            arg.put("Effects", lv);
+            tag.put("Effects", lv);
         }
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (RADIUS.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (RADIUS.equals(data)) {
             this.calculateDimensions();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -394,7 +394,7 @@ extends Entity {
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose arg) {
+    public EntityDimensions getDimensions(EntityPose pose) {
         return EntityDimensions.changing(this.getRadius() * 2.0f, 0.5f);
     }
 }

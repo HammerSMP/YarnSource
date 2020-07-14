@@ -75,13 +75,13 @@ extends SurfaceBuilder<TernarySurfaceConfig> {
     }
 
     @Override
-    public void initSeed(long l) {
-        if (this.field_23920 != l || this.field_23923 == null || this.field_23921.isEmpty() || this.field_23922.isEmpty()) {
-            this.field_23921 = AbstractNetherSurfaceBuilder.method_27131(this.method_27129(), l);
-            this.field_23922 = AbstractNetherSurfaceBuilder.method_27131(this.method_27133(), l + (long)this.field_23921.size());
-            this.field_23923 = new OctavePerlinNoiseSampler(new ChunkRandom(l + (long)this.field_23921.size() + (long)this.field_23922.size()), (List<Integer>)ImmutableList.of((Object)0));
+    public void initSeed(long seed) {
+        if (this.field_23920 != seed || this.field_23923 == null || this.field_23921.isEmpty() || this.field_23922.isEmpty()) {
+            this.field_23921 = AbstractNetherSurfaceBuilder.method_27131(this.method_27129(), seed);
+            this.field_23922 = AbstractNetherSurfaceBuilder.method_27131(this.method_27133(), seed + (long)this.field_23921.size());
+            this.field_23923 = new OctavePerlinNoiseSampler(new ChunkRandom(seed + (long)this.field_23921.size() + (long)this.field_23922.size()), (List<Integer>)ImmutableList.of((Object)0));
         }
-        this.field_23920 = l;
+        this.field_23920 = seed;
     }
 
     private static ImmutableMap<BlockState, OctavePerlinNoiseSampler> method_27131(ImmutableList<BlockState> immutableList, long l) {

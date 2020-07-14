@@ -19,9 +19,9 @@ extends Goal {
     private double targetY;
     private double targetZ;
 
-    public HorseBondWithPlayerGoal(HorseBaseEntity arg, double d) {
-        this.horse = arg;
-        this.speed = d;
+    public HorseBondWithPlayerGoal(HorseBaseEntity horse, double speed) {
+        this.horse = horse;
+        this.speed = speed;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 

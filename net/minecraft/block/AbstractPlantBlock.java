@@ -36,44 +36,44 @@ implements Fertilizable {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
         Block lv2;
-        if (arg2 == this.growthDirection.getOpposite() && !arg.canPlaceAt(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+        if (direction == this.growthDirection.getOpposite() && !state.canPlaceAt(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
         AbstractPlantStemBlock lv = this.getStem();
-        if (arg2 == this.growthDirection && (lv2 = arg3.getBlock()) != this && lv2 != lv) {
-            return lv.getRandomGrowthState(arg4);
+        if (direction == this.growthDirection && (lv2 = newState.getBlock()) != this && lv2 != lv) {
+            return lv.getRandomGrowthState(world);
         }
         if (this.tickWater) {
-            arg4.getFluidTickScheduler().schedule(arg5, Fluids.WATER, Fluids.WATER.getTickRate(arg4));
+            world.getFluidTickScheduler().schedule(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(this.getStem());
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        Optional<BlockPos> optional = this.method_25960(arg, arg2, arg3);
-        return optional.isPresent() && this.getStem().chooseStemState(arg.getBlockState(optional.get().offset(this.growthDirection)));
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        Optional<BlockPos> optional = this.method_25960(world, pos, state);
+        return optional.isPresent() && this.getStem().chooseStemState(world.getBlockState(optional.get().offset(this.growthDirection)));
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        Optional<BlockPos> optional = this.method_25960(arg, arg2, arg3);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        Optional<BlockPos> optional = this.method_25960(world, pos, state);
         if (optional.isPresent()) {
-            BlockState lv = arg.getBlockState(optional.get());
-            ((AbstractPlantStemBlock)lv.getBlock()).grow(arg, random, optional.get(), lv);
+            BlockState lv = world.getBlockState(optional.get());
+            ((AbstractPlantStemBlock)lv.getBlock()).grow(world, random, optional.get(), lv);
         }
     }
 
@@ -89,9 +89,9 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean canReplace(BlockState arg, ItemPlacementContext arg2) {
-        boolean bl = super.canReplace(arg, arg2);
-        if (bl && arg2.getStack().getItem() == this.getStem().asItem()) {
+    public boolean canReplace(BlockState state, ItemPlacementContext context) {
+        boolean bl = super.canReplace(state, context);
+        if (bl && context.getStack().getItem() == this.getStem().asItem()) {
             return false;
         }
         return bl;

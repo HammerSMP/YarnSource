@@ -60,10 +60,10 @@ extends RealmsScreen {
     private RealmsLabel field_20063;
     private final Runnable field_22717;
 
-    public RealmsSelectFileToUploadScreen(long l, int i, RealmsResetWorldScreen arg, Runnable runnable) {
-        this.parent = arg;
-        this.worldId = l;
-        this.slotId = i;
+    public RealmsSelectFileToUploadScreen(long worldId, int slotId, RealmsResetWorldScreen parent, Runnable runnable) {
+        this.parent = parent;
+        this.worldId = worldId;
+        this.slotId = slotId;
         this.field_22717 = runnable;
     }
 
@@ -119,24 +119,24 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.worldSelectionList.render(arg, i, j, f);
-        this.titleLabel.render(this, arg);
-        this.subtitleLabel.render(this, arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.worldSelectionList.render(matrices, mouseX, mouseY, delta);
+        this.titleLabel.render(this, matrices);
+        this.subtitleLabel.render(this, matrices);
         if (this.field_20063 != null) {
-            this.field_20063.render(this, arg);
+            this.field_20063.render(this, matrices);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.client.openScreen(this.parent);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private static String method_21400(LevelSummary arg) {
@@ -157,12 +157,12 @@ extends RealmsScreen {
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            this.renderItem(arg, this.field_22718, i, k, j);
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.renderItem(matrices, this.field_22718, index, x, y);
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             RealmsSelectFileToUploadScreen.this.worldSelectionList.setSelected(RealmsSelectFileToUploadScreen.this.levelList.indexOf(this.field_22718));
             return true;
         }
@@ -215,16 +215,16 @@ extends RealmsScreen {
         }
 
         @Override
-        public void renderBackground(MatrixStack arg) {
-            RealmsSelectFileToUploadScreen.this.renderBackground(arg);
+        public void renderBackground(MatrixStack matrices) {
+            RealmsSelectFileToUploadScreen.this.renderBackground(matrices);
         }
 
         @Override
-        public void setSelected(int i) {
-            this.setSelectedItem(i);
-            if (i != -1) {
-                LevelSummary lv = (LevelSummary)RealmsSelectFileToUploadScreen.this.levelList.get(i);
-                String string = I18n.translate("narrator.select.list.position", i + 1, RealmsSelectFileToUploadScreen.this.levelList.size());
+        public void setSelected(int index) {
+            this.setSelectedItem(index);
+            if (index != -1) {
+                LevelSummary lv = (LevelSummary)RealmsSelectFileToUploadScreen.this.levelList.get(index);
+                String string = I18n.translate("narrator.select.list.position", index + 1, RealmsSelectFileToUploadScreen.this.levelList.size());
                 String string2 = Realms.joinNarrations(Arrays.asList(lv.getDisplayName(), RealmsSelectFileToUploadScreen.method_21404(lv), RealmsSelectFileToUploadScreen.method_21400(lv), string));
                 Realms.narrateNow(I18n.translate("narrator.select", string2));
             }

@@ -60,38 +60,38 @@ implements FlyingItemEntity {
         super((EntityType<? extends ProjectileEntity>)arg, arg2);
     }
 
-    public FireworkRocketEntity(World arg, double d, double e, double f, ItemStack arg2) {
-        super((EntityType<? extends ProjectileEntity>)EntityType.FIREWORK_ROCKET, arg);
+    public FireworkRocketEntity(World world, double x, double y, double z, ItemStack stack) {
+        super((EntityType<? extends ProjectileEntity>)EntityType.FIREWORK_ROCKET, world);
         this.life = 0;
-        this.updatePosition(d, e, f);
+        this.updatePosition(x, y, z);
         int i = 1;
-        if (!arg2.isEmpty() && arg2.hasTag()) {
-            this.dataTracker.set(ITEM, arg2.copy());
-            i += arg2.getOrCreateSubTag("Fireworks").getByte("Flight");
+        if (!stack.isEmpty() && stack.hasTag()) {
+            this.dataTracker.set(ITEM, stack.copy());
+            i += stack.getOrCreateSubTag("Fireworks").getByte("Flight");
         }
         this.setVelocity(this.random.nextGaussian() * 0.001, 0.05, this.random.nextGaussian() * 0.001);
         this.lifeTime = 10 * i + this.random.nextInt(6) + this.random.nextInt(7);
     }
 
-    public FireworkRocketEntity(World arg, @Nullable Entity arg2, double d, double e, double f, ItemStack arg3) {
-        this(arg, d, e, f, arg3);
-        this.setOwner(arg2);
+    public FireworkRocketEntity(World world, @Nullable Entity entity, double x, double y, double z, ItemStack stack) {
+        this(world, x, y, z, stack);
+        this.setOwner(entity);
     }
 
-    public FireworkRocketEntity(World arg, ItemStack arg2, LivingEntity arg3) {
-        this(arg, arg3, arg3.getX(), arg3.getY(), arg3.getZ(), arg2);
-        this.dataTracker.set(SHOOTER_ENTITY_ID, OptionalInt.of(arg3.getEntityId()));
-        this.shooter = arg3;
+    public FireworkRocketEntity(World world, ItemStack stack, LivingEntity shooter) {
+        this(world, shooter, shooter.getX(), shooter.getY(), shooter.getZ(), stack);
+        this.dataTracker.set(SHOOTER_ENTITY_ID, OptionalInt.of(shooter.getEntityId()));
+        this.shooter = shooter;
     }
 
-    public FireworkRocketEntity(World arg, ItemStack arg2, double d, double e, double f, boolean bl) {
-        this(arg, d, e, f, arg2);
-        this.dataTracker.set(SHOT_AT_ANGLE, bl);
+    public FireworkRocketEntity(World world, ItemStack stack, double x, double y, double z, boolean shotAtAngle) {
+        this(world, x, y, z, stack);
+        this.dataTracker.set(SHOT_AT_ANGLE, shotAtAngle);
     }
 
-    public FireworkRocketEntity(World arg, ItemStack arg2, Entity arg3, double d, double e, double f, boolean bl) {
-        this(arg, arg2, d, e, f, bl);
-        this.setOwner(arg3);
+    public FireworkRocketEntity(World world, ItemStack stack, Entity entity, double x, double y, double z, boolean shotAtAngle) {
+        this(world, stack, x, y, z, shotAtAngle);
+        this.setOwner(entity);
     }
 
     @Override
@@ -103,14 +103,14 @@ implements FlyingItemEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d) {
-        return d < 4096.0 && !this.wasShotByEntity();
+    public boolean shouldRender(double distance) {
+        return distance < 4096.0 && !this.wasShotByEntity();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldRender(double d, double e, double f) {
-        return super.shouldRender(d, e, f) && !this.wasShotByEntity();
+    public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {
+        return super.shouldRender(cameraX, cameraY, cameraZ) && !this.wasShotByEntity();
     }
 
     @Override
@@ -169,8 +169,8 @@ implements FlyingItemEntity {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult arg) {
-        super.onEntityHit(arg);
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        super.onEntityHit(entityHitResult);
         if (this.world.isClient) {
             return;
         }
@@ -178,13 +178,13 @@ implements FlyingItemEntity {
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult arg) {
-        BlockPos lv = new BlockPos(arg.getBlockPos());
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        BlockPos lv = new BlockPos(blockHitResult.getBlockPos());
         this.world.getBlockState(lv).onEntityCollision(this.world, lv, this);
         if (!this.world.isClient() && this.hasExplosionEffects()) {
             this.explodeAndRemove();
         }
-        super.onBlockHit(arg);
+        super.onBlockHit(blockHitResult);
     }
 
     private boolean hasExplosionEffects() {
@@ -237,8 +237,8 @@ implements FlyingItemEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 17 && this.world.isClient) {
+    public void handleStatus(byte status) {
+        if (status == 17 && this.world.isClient) {
             if (!this.hasExplosionEffects()) {
                 for (int i = 0; i < this.random.nextInt(3) + 2; ++i) {
                     this.world.addParticle(ParticleTypes.POOF, this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.05, 0.005, this.random.nextGaussian() * 0.05);
@@ -250,32 +250,32 @@ implements FlyingItemEntity {
                 this.world.addFireworkParticle(this.getX(), this.getY(), this.getZ(), lv3.x, lv3.y, lv3.z, lv2);
             }
         }
-        super.handleStatus(b);
+        super.handleStatus(status);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Life", this.life);
-        arg.putInt("LifeTime", this.lifeTime);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Life", this.life);
+        tag.putInt("LifeTime", this.lifeTime);
         ItemStack lv = this.dataTracker.get(ITEM);
         if (!lv.isEmpty()) {
-            arg.put("FireworksItem", lv.toTag(new CompoundTag()));
+            tag.put("FireworksItem", lv.toTag(new CompoundTag()));
         }
-        arg.putBoolean("ShotAtAngle", this.dataTracker.get(SHOT_AT_ANGLE));
+        tag.putBoolean("ShotAtAngle", this.dataTracker.get(SHOT_AT_ANGLE));
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.life = arg.getInt("Life");
-        this.lifeTime = arg.getInt("LifeTime");
-        ItemStack lv = ItemStack.fromTag(arg.getCompound("FireworksItem"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.life = tag.getInt("Life");
+        this.lifeTime = tag.getInt("LifeTime");
+        ItemStack lv = ItemStack.fromTag(tag.getCompound("FireworksItem"));
         if (!lv.isEmpty()) {
             this.dataTracker.set(ITEM, lv);
         }
-        if (arg.contains("ShotAtAngle")) {
-            this.dataTracker.set(SHOT_AT_ANGLE, arg.getBoolean("ShotAtAngle"));
+        if (tag.contains("ShotAtAngle")) {
+            this.dataTracker.set(SHOT_AT_ANGLE, tag.getBoolean("ShotAtAngle"));
         }
     }
 

@@ -44,30 +44,30 @@ extends CompositeEntityModel<T> {
     }
 
     @Override
-    public void setAngles(T arg, float f, float g, float h, float i, float j) {
-        float k = h * (float)Math.PI * -0.1f;
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        float k = animationProgress * (float)Math.PI * -0.1f;
         for (int l = 0; l < 4; ++l) {
-            this.rods[l].pivotY = -2.0f + MathHelper.cos(((float)(l * 2) + h) * 0.25f);
+            this.rods[l].pivotY = -2.0f + MathHelper.cos(((float)(l * 2) + animationProgress) * 0.25f);
             this.rods[l].pivotX = MathHelper.cos(k) * 9.0f;
             this.rods[l].pivotZ = MathHelper.sin(k) * 9.0f;
             k += 1.5707964f;
         }
-        k = 0.7853982f + h * (float)Math.PI * 0.03f;
+        k = 0.7853982f + animationProgress * (float)Math.PI * 0.03f;
         for (int m = 4; m < 8; ++m) {
-            this.rods[m].pivotY = 2.0f + MathHelper.cos(((float)(m * 2) + h) * 0.25f);
+            this.rods[m].pivotY = 2.0f + MathHelper.cos(((float)(m * 2) + animationProgress) * 0.25f);
             this.rods[m].pivotX = MathHelper.cos(k) * 7.0f;
             this.rods[m].pivotZ = MathHelper.sin(k) * 7.0f;
             k += 1.5707964f;
         }
-        k = 0.47123894f + h * (float)Math.PI * -0.05f;
+        k = 0.47123894f + animationProgress * (float)Math.PI * -0.05f;
         for (int n = 8; n < 12; ++n) {
-            this.rods[n].pivotY = 11.0f + MathHelper.cos(((float)n * 1.5f + h) * 0.5f);
+            this.rods[n].pivotY = 11.0f + MathHelper.cos(((float)n * 1.5f + animationProgress) * 0.5f);
             this.rods[n].pivotX = MathHelper.cos(k) * 5.0f;
             this.rods[n].pivotZ = MathHelper.sin(k) * 5.0f;
             k += 1.5707964f;
         }
-        this.head.yaw = i * ((float)Math.PI / 180);
-        this.head.pitch = j * ((float)Math.PI / 180);
+        this.head.yaw = headYaw * ((float)Math.PI / 180);
+        this.head.pitch = headPitch * ((float)Math.PI / 180);
     }
 }
 

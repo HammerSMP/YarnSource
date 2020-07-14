@@ -24,11 +24,11 @@ extends SpriteBillboardParticle {
     private boolean reachedGround;
     private final SpriteProvider spriteProvider;
 
-    private DragonBreathParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f);
-        this.velocityX = g;
-        this.velocityY = h;
-        this.velocityZ = i;
+    private DragonBreathParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z);
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
         this.colorRed = MathHelper.nextFloat(this.random, 0.7176471f, 0.8745098f);
         this.colorGreen = MathHelper.nextFloat(this.random, 0.0f, 0.0f);
         this.colorBlue = MathHelper.nextFloat(this.random, 0.8235294f, 0.9764706f);
@@ -36,8 +36,8 @@ extends SpriteBillboardParticle {
         this.maxAge = (int)(20.0 / ((double)this.random.nextFloat() * 0.8 + 0.2));
         this.reachedGround = false;
         this.collidesWithWorld = false;
-        this.spriteProvider = arg2;
-        this.setSpriteForAge(arg2);
+        this.spriteProvider = spriteProvider;
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -75,8 +75,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public float getSize(float f) {
-        return this.scale * MathHelper.clamp(((float)this.age + f) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
+    public float getSize(float tickDelta) {
+        return this.scale * MathHelper.clamp(((float)this.age + tickDelta) / (float)this.maxAge * 32.0f, 0.0f, 1.0f);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -84,8 +84,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

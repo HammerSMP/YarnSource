@@ -29,17 +29,17 @@ extends Goal {
     private final Ingredient food;
     private final boolean canBeScared;
 
-    public TemptGoal(PathAwareEntity arg, double d, Ingredient arg2, boolean bl) {
-        this(arg, d, bl, arg2);
+    public TemptGoal(PathAwareEntity mob, double speed, Ingredient food, boolean canBeScared) {
+        this(mob, speed, canBeScared, food);
     }
 
-    public TemptGoal(PathAwareEntity arg, double d, boolean bl, Ingredient arg2) {
-        this.mob = arg;
-        this.speed = d;
-        this.food = arg2;
-        this.canBeScared = bl;
+    public TemptGoal(PathAwareEntity mob, double speed, boolean canBeScared, Ingredient food) {
+        this.mob = mob;
+        this.speed = speed;
+        this.food = food;
+        this.canBeScared = canBeScared;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
-        if (!(arg.getNavigation() instanceof MobNavigation) && !(arg.getNavigation() instanceof BirdNavigation)) {
+        if (!(mob.getNavigation() instanceof MobNavigation) && !(mob.getNavigation() instanceof BirdNavigation)) {
             throw new IllegalArgumentException("Unsupported mob type for TemptGoal");
         }
     }
@@ -57,8 +57,8 @@ extends Goal {
         return this.isTemptedBy(this.closestPlayer.getMainHandStack()) || this.isTemptedBy(this.closestPlayer.getOffHandStack());
     }
 
-    protected boolean isTemptedBy(ItemStack arg) {
-        return this.food.test(arg);
+    protected boolean isTemptedBy(ItemStack stack) {
+        return this.food.test(stack);
     }
 
     @Override

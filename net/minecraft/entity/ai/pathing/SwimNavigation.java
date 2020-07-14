@@ -27,10 +27,10 @@ extends EntityNavigation {
     }
 
     @Override
-    protected PathNodeNavigator createPathNodeNavigator(int i) {
+    protected PathNodeNavigator createPathNodeNavigator(int range) {
         this.canJumpOutOfWater = this.entity instanceof DolphinEntity;
         this.nodeMaker = new WaterPathNodeMaker(this.canJumpOutOfWater);
-        return new PathNodeNavigator(this.nodeMaker, i);
+        return new PathNodeNavigator(this.nodeMaker, range);
     }
 
     @Override
@@ -95,13 +95,13 @@ extends EntityNavigation {
     }
 
     @Override
-    protected void checkTimeouts(Vec3d arg) {
+    protected void checkTimeouts(Vec3d currentPos) {
         if (this.tickCount - this.pathStartTime > 100) {
-            if (arg.squaredDistanceTo(this.pathStartPos) < 2.25) {
+            if (currentPos.squaredDistanceTo(this.pathStartPos) < 2.25) {
                 this.stop();
             }
             this.pathStartTime = this.tickCount;
-            this.pathStartPos = arg;
+            this.pathStartPos = currentPos;
         }
         if (this.currentPath != null && !this.currentPath.isFinished()) {
             Vec3i lv = this.currentPath.getCurrentPosition();
@@ -109,7 +109,7 @@ extends EntityNavigation {
                 this.currentNodeMs += Util.getMeasuringTimeMs() - this.lastActiveTickMs;
             } else {
                 this.lastNodePosition = lv;
-                double d = arg.distanceTo(Vec3d.ofCenter(this.lastNodePosition));
+                double d = currentPos.distanceTo(Vec3d.ofCenter(this.lastNodePosition));
                 double d2 = this.currentNodeTimeout = this.entity.getMovementSpeed() > 0.0f ? d / (double)this.entity.getMovementSpeed() * 100.0 : 0.0;
             }
             if (this.currentNodeTimeout > 0.0 && (double)this.currentNodeMs > this.currentNodeTimeout * 2.0) {
@@ -123,18 +123,18 @@ extends EntityNavigation {
     }
 
     @Override
-    protected boolean canPathDirectlyThrough(Vec3d arg, Vec3d arg2, int i, int j, int k) {
-        Vec3d lv = new Vec3d(arg2.x, arg2.y + (double)this.entity.getHeight() * 0.5, arg2.z);
-        return this.world.rayTrace(new RayTraceContext(arg, lv, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, this.entity)).getType() == HitResult.Type.MISS;
+    protected boolean canPathDirectlyThrough(Vec3d origin, Vec3d target, int sizeX, int sizeY, int sizeZ) {
+        Vec3d lv = new Vec3d(target.x, target.y + (double)this.entity.getHeight() * 0.5, target.z);
+        return this.world.rayTrace(new RayTraceContext(origin, lv, RayTraceContext.ShapeType.COLLIDER, RayTraceContext.FluidHandling.NONE, this.entity)).getType() == HitResult.Type.MISS;
     }
 
     @Override
-    public boolean isValidPosition(BlockPos arg) {
-        return !this.world.getBlockState(arg).isOpaqueFullCube(this.world, arg);
+    public boolean isValidPosition(BlockPos pos) {
+        return !this.world.getBlockState(pos).isOpaqueFullCube(this.world, pos);
     }
 
     @Override
-    public void setCanSwim(boolean bl) {
+    public void setCanSwim(boolean canSwim) {
     }
 }
 

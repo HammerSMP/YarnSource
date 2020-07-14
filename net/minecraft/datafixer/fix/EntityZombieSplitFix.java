@@ -16,13 +16,13 @@ import net.minecraft.datafixer.fix.EntitySimpleTransformFix;
 
 public class EntityZombieSplitFix
 extends EntitySimpleTransformFix {
-    public EntityZombieSplitFix(Schema schema, boolean bl) {
-        super("EntityZombieSplitFix", schema, bl);
+    public EntityZombieSplitFix(Schema outputSchema, boolean changesType) {
+        super("EntityZombieSplitFix", outputSchema, changesType);
     }
 
     @Override
-    protected Pair<String, Dynamic<?>> transform(String string, Dynamic<?> dynamic) {
-        if (Objects.equals("Zombie", string)) {
+    protected Pair<String, Dynamic<?>> transform(String choice, Dynamic<?> dynamic) {
+        if (Objects.equals("Zombie", choice)) {
             String string2 = "Zombie";
             int i = dynamic.get("ZombieType").asInt(0);
             switch (i) {
@@ -45,7 +45,7 @@ extends EntitySimpleTransformFix {
             dynamic = dynamic.remove("ZombieType");
             return Pair.of((Object)string2, (Object)dynamic);
         }
-        return Pair.of((Object)string, dynamic);
+        return Pair.of((Object)choice, dynamic);
     }
 }
 

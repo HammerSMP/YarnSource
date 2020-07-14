@@ -16,9 +16,9 @@ public class FollowTargetIfTamedGoal<T extends LivingEntity>
 extends FollowTargetGoal<T> {
     private final TameableEntity tameable;
 
-    public FollowTargetIfTamedGoal(TameableEntity arg, Class<T> class_, boolean bl, @Nullable Predicate<LivingEntity> predicate) {
-        super(arg, class_, 10, bl, false, predicate);
-        this.tameable = arg;
+    public FollowTargetIfTamedGoal(TameableEntity tameable, Class<T> targetClass, boolean checkVisibility, @Nullable Predicate<LivingEntity> targetPredicate) {
+        super(tameable, targetClass, 10, checkVisibility, false, targetPredicate);
+        this.tameable = tameable;
     }
 
     @Override

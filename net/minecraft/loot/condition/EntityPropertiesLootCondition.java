@@ -31,9 +31,9 @@ implements LootCondition {
     private final EntityPredicate predicate;
     private final LootContext.EntityTarget entity;
 
-    private EntityPropertiesLootCondition(EntityPredicate arg, LootContext.EntityTarget arg2) {
-        this.predicate = arg;
-        this.entity = arg2;
+    private EntityPropertiesLootCondition(EntityPredicate predicate, LootContext.EntityTarget entity) {
+        this.predicate = predicate;
+        this.entity = entity;
     }
 
     @Override
@@ -53,21 +53,21 @@ implements LootCondition {
         return this.predicate.test(arg.getWorld(), lv2, lv);
     }
 
-    public static LootCondition.Builder create(LootContext.EntityTarget arg) {
-        return EntityPropertiesLootCondition.builder(arg, EntityPredicate.Builder.create());
+    public static LootCondition.Builder create(LootContext.EntityTarget entity) {
+        return EntityPropertiesLootCondition.builder(entity, EntityPredicate.Builder.create());
     }
 
-    public static LootCondition.Builder builder(LootContext.EntityTarget arg, EntityPredicate.Builder arg2) {
-        return () -> new EntityPropertiesLootCondition(arg2.build(), arg);
+    public static LootCondition.Builder builder(LootContext.EntityTarget entity, EntityPredicate.Builder predicateBuilder) {
+        return () -> new EntityPropertiesLootCondition(predicateBuilder.build(), entity);
     }
 
-    public static LootCondition.Builder builder(LootContext.EntityTarget arg, EntityPredicate arg2) {
-        return () -> new EntityPropertiesLootCondition(arg2, arg);
+    public static LootCondition.Builder builder(LootContext.EntityTarget entity, EntityPredicate predicate) {
+        return () -> new EntityPropertiesLootCondition(predicate, entity);
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -85,8 +85,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

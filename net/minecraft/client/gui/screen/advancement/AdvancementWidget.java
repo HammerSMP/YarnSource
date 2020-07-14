@@ -49,21 +49,21 @@ extends DrawableHelper {
     private final int xPos;
     private final int yPos;
 
-    public AdvancementWidget(AdvancementTab arg, MinecraftClient arg2, Advancement arg3, AdvancementDisplay arg4) {
-        this.tab = arg;
-        this.advancement = arg3;
-        this.display = arg4;
-        this.client = arg2;
-        this.title = arg2.textRenderer.trimToWidth(arg4.getTitle(), 163);
-        this.xPos = MathHelper.floor(arg4.getX() * 28.0f);
-        this.yPos = MathHelper.floor(arg4.getY() * 27.0f);
-        int i = arg3.getRequirementCount();
+    public AdvancementWidget(AdvancementTab tab, MinecraftClient client, Advancement advancement, AdvancementDisplay display) {
+        this.tab = tab;
+        this.advancement = advancement;
+        this.display = display;
+        this.client = client;
+        this.title = client.textRenderer.trimToWidth(display.getTitle(), 163);
+        this.xPos = MathHelper.floor(display.getX() * 28.0f);
+        this.yPos = MathHelper.floor(display.getY() * 27.0f);
+        int i = advancement.getRequirementCount();
         int j = String.valueOf(i).length();
-        int k = i > 1 ? arg2.textRenderer.getWidth("  ") + arg2.textRenderer.getWidth("0") * j * 2 + arg2.textRenderer.getWidth("/") : 0;
-        int l = 29 + arg2.textRenderer.getWidth(this.title) + k;
-        this.description = this.wrapDescription(Texts.setStyleIfAbsent(arg4.getDescription().shallowCopy(), Style.EMPTY.withColor(arg4.getFrame().getTitleFormat())), l);
+        int k = i > 1 ? client.textRenderer.getWidth("  ") + client.textRenderer.getWidth("0") * j * 2 + client.textRenderer.getWidth("/") : 0;
+        int l = 29 + client.textRenderer.getWidth(this.title) + k;
+        this.description = this.wrapDescription(Texts.setStyleIfAbsent(display.getDescription().shallowCopy(), Style.EMPTY.withColor(display.getFrame().getTitleFormat())), l);
         for (StringRenderable lv : this.description) {
-            l = Math.max(l, arg2.textRenderer.getWidth(lv));
+            l = Math.max(l, client.textRenderer.getWidth(lv));
         }
         this.width = l + 3 + 5;
     }
@@ -72,13 +72,13 @@ extends DrawableHelper {
         return (float)list.stream().mapToDouble(arg::getWidth).max().orElse(0.0);
     }
 
-    private List<StringRenderable> wrapDescription(Text arg, int i) {
+    private List<StringRenderable> wrapDescription(Text arg, int width) {
         TextHandler lv = this.client.textRenderer.getTextHandler();
         List<StringRenderable> list = null;
         float f = Float.MAX_VALUE;
         for (int j : field_24262) {
-            List<StringRenderable> list2 = lv.wrapLines(arg, i - j, Style.EMPTY);
-            float g = Math.abs(AdvancementWidget.method_27572(lv, list2) - (float)i);
+            List<StringRenderable> list2 = lv.wrapLines(arg, width - j, Style.EMPTY);
+            float g = Math.abs(AdvancementWidget.method_27572(lv, list2) - (float)width);
             if (g <= 10.0f) {
                 return list2;
             }
@@ -90,13 +90,13 @@ extends DrawableHelper {
     }
 
     @Nullable
-    private AdvancementWidget getParent(Advancement arg) {
-        while ((arg = arg.getParent()) != null && arg.getDisplay() == null) {
+    private AdvancementWidget getParent(Advancement advancement) {
+        while ((advancement = advancement.getParent()) != null && advancement.getDisplay() == null) {
         }
-        if (arg == null || arg.getDisplay() == null) {
+        if (advancement == null || advancement.getDisplay() == null) {
             return null;
         }
-        return this.tab.getWidget(arg);
+        return this.tab.getWidget(advancement);
     }
 
     public void renderLines(MatrixStack arg, int i, int j, boolean bl) {
@@ -147,20 +147,20 @@ extends DrawableHelper {
         }
     }
 
-    public void setProgress(AdvancementProgress arg) {
-        this.progress = arg;
+    public void setProgress(AdvancementProgress progress) {
+        this.progress = progress;
     }
 
-    public void addChild(AdvancementWidget arg) {
-        this.children.add(arg);
+    public void addChild(AdvancementWidget widget) {
+        this.children.add(widget);
     }
 
-    public void drawTooltip(MatrixStack arg, int i, int j, float f, int k, int l) {
+    public void drawTooltip(MatrixStack arg, int i, int j, float f, int y, int l) {
         int r;
         AdvancementObtainedStatus lv12;
         AdvancementObtainedStatus lv11;
         AdvancementObtainedStatus lv10;
-        boolean bl = k + i + this.xPos + this.width + 26 >= this.tab.getScreen().width;
+        boolean bl = y + i + this.xPos + this.width + 26 >= this.tab.getScreen().width;
         String string = this.progress == null ? null : this.progress.getProgressBarFraction();
         int m = string == null ? 0 : this.client.textRenderer.getWidth(string);
         this.client.textRenderer.getClass();
@@ -258,15 +258,15 @@ extends DrawableHelper {
         }
     }
 
-    public boolean shouldRender(int i, int j, int k, int l) {
+    public boolean shouldRender(int originX, int originY, int mouseX, int mouseY) {
         if (this.display.isHidden() && (this.progress == null || !this.progress.isDone())) {
             return false;
         }
-        int m = i + this.xPos;
+        int m = originX + this.xPos;
         int n = m + 26;
-        int o = j + this.yPos;
+        int o = originY + this.yPos;
         int p = o + 26;
-        return k >= m && k <= n && l >= o && l <= p;
+        return mouseX >= m && mouseX <= n && mouseY >= o && mouseY <= p;
     }
 
     public void addToTree() {

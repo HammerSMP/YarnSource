@@ -28,29 +28,29 @@ implements Recipe<Inventory> {
     protected final float experience;
     protected final int cookTime;
 
-    public AbstractCookingRecipe(RecipeType<?> arg, Identifier arg2, String string, Ingredient arg3, ItemStack arg4, float f, int i) {
-        this.type = arg;
-        this.id = arg2;
-        this.group = string;
-        this.input = arg3;
-        this.output = arg4;
-        this.experience = f;
-        this.cookTime = i;
+    public AbstractCookingRecipe(RecipeType<?> type, Identifier id, String group, Ingredient input, ItemStack output, float experience, int cookTime) {
+        this.type = type;
+        this.id = id;
+        this.group = group;
+        this.input = input;
+        this.output = output;
+        this.experience = experience;
+        this.cookTime = cookTime;
     }
 
     @Override
-    public boolean matches(Inventory arg, World arg2) {
-        return this.input.test(arg.getStack(0));
+    public boolean matches(Inventory inv, World world) {
+        return this.input.test(inv.getStack(0));
     }
 
     @Override
-    public ItemStack craft(Inventory arg) {
+    public ItemStack craft(Inventory inv) {
         return this.output.copy();
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean fits(int i, int j) {
+    public boolean fits(int width, int height) {
         return true;
     }
 

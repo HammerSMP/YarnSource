@@ -39,34 +39,34 @@ public class ModelOverrideList {
         this.models = Collections.emptyList();
     }
 
-    public ModelOverrideList(ModelLoader arg, JsonUnbakedModel arg2, Function<Identifier, UnbakedModel> function, List<ModelOverride> list) {
-        this.models = list.stream().map(arg3 -> {
-            UnbakedModel lv = (UnbakedModel)function.apply(arg3.getModelId());
-            if (Objects.equals(lv, arg2)) {
+    public ModelOverrideList(ModelLoader modelLoader, JsonUnbakedModel unbakedModel, Function<Identifier, UnbakedModel> unbakedModelGetter, List<ModelOverride> overrides) {
+        this.models = overrides.stream().map(arg3 -> {
+            UnbakedModel lv = (UnbakedModel)unbakedModelGetter.apply(arg3.getModelId());
+            if (Objects.equals(lv, unbakedModel)) {
                 return null;
             }
-            return arg.bake(arg3.getModelId(), ModelRotation.X0_Y0);
+            return modelLoader.bake(arg3.getModelId(), ModelRotation.X0_Y0);
         }).collect(Collectors.toList());
         Collections.reverse(this.models);
-        for (int i = list.size() - 1; i >= 0; --i) {
-            this.overrides.add(list.get(i));
+        for (int i = overrides.size() - 1; i >= 0; --i) {
+            this.overrides.add(overrides.get(i));
         }
     }
 
     @Nullable
-    public BakedModel apply(BakedModel arg, ItemStack arg2, @Nullable ClientWorld arg3, @Nullable LivingEntity arg4) {
+    public BakedModel apply(BakedModel model, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity entity) {
         if (!this.overrides.isEmpty()) {
             for (int i = 0; i < this.overrides.size(); ++i) {
                 ModelOverride lv = this.overrides.get(i);
-                if (!lv.matches(arg2, arg3, arg4)) continue;
+                if (!lv.matches(stack, world, entity)) continue;
                 BakedModel lv2 = this.models.get(i);
                 if (lv2 == null) {
-                    return arg;
+                    return model;
                 }
                 return lv2;
             }
         }
-        return arg;
+        return model;
     }
 }
 

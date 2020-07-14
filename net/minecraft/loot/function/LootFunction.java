@@ -15,8 +15,8 @@ extends LootContextAware,
 BiFunction<ItemStack, LootContext, ItemStack> {
     public LootFunctionType getType();
 
-    public static Consumer<ItemStack> apply(BiFunction<ItemStack, LootContext, ItemStack> biFunction, Consumer<ItemStack> consumer, LootContext arg) {
-        return arg2 -> consumer.accept((ItemStack)biFunction.apply((ItemStack)arg2, arg));
+    public static Consumer<ItemStack> apply(BiFunction<ItemStack, LootContext, ItemStack> itemApplier, Consumer<ItemStack> lootConsumer, LootContext context) {
+        return stack -> lootConsumer.accept((ItemStack)itemApplier.apply((ItemStack)stack, context));
     }
 
     public static interface Builder {

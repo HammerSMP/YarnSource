@@ -26,10 +26,10 @@ extends LongRunningTask {
     private final long worldId;
     private final RealmsConfigureWorldScreen lastScreen;
 
-    public RestoreTask(Backup arg, long l, RealmsConfigureWorldScreen arg2) {
-        this.backup = arg;
-        this.worldId = l;
-        this.lastScreen = arg2;
+    public RestoreTask(Backup backup, long worldId, RealmsConfigureWorldScreen lastScreen) {
+        this.backup = backup;
+        this.worldId = worldId;
+        this.lastScreen = lastScreen;
     }
 
     @Override

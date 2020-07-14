@@ -41,13 +41,13 @@ extends TreeDecorator {
     }
 
     @Override
-    public void generate(ServerWorldAccess arg2, Random random, List<BlockPos> list, List<BlockPos> list2, Set<BlockPos> set, BlockBox arg22) {
+    public void generate(ServerWorldAccess arg2, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions, Set<BlockPos> set, BlockBox box) {
         if (random.nextFloat() >= this.chance) {
             return;
         }
         Direction lv = BeehiveBlock.getRandomGenerationDirection(random);
-        int i = !list2.isEmpty() ? Math.max(list2.get(0).getY() - 1, list.get(0).getY()) : Math.min(list.get(0).getY() + 1 + random.nextInt(3), list.get(list.size() - 1).getY());
-        List list3 = list.stream().filter(arg -> arg.getY() == i).collect(Collectors.toList());
+        int i = !leavesPositions.isEmpty() ? Math.max(leavesPositions.get(0).getY() - 1, logPositions.get(0).getY()) : Math.min(logPositions.get(0).getY() + 1 + random.nextInt(3), logPositions.get(logPositions.size() - 1).getY());
+        List list3 = logPositions.stream().filter(arg -> arg.getY() == i).collect(Collectors.toList());
         if (list3.isEmpty()) {
             return;
         }
@@ -57,7 +57,7 @@ extends TreeDecorator {
             return;
         }
         BlockState lv4 = (BlockState)Blocks.BEE_NEST.getDefaultState().with(BeehiveBlock.FACING, Direction.SOUTH);
-        this.setBlockStateAndEncompassPosition(arg2, lv3, lv4, set, arg22);
+        this.setBlockStateAndEncompassPosition(arg2, lv3, lv4, set, box);
         BlockEntity lv5 = arg2.getBlockEntity(lv3);
         if (lv5 instanceof BeehiveBlockEntity) {
             BeehiveBlockEntity lv6 = (BeehiveBlockEntity)lv5;

@@ -33,55 +33,55 @@ extends Block {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg.canPlaceAt(arg2, arg3)) {
-            arg2.breakBlock(arg3, true);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.breakBlock(pos, true);
         }
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.isAir(arg3.up())) {
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.isAir(pos.up())) {
             int i = 1;
-            while (arg2.getBlockState(arg3.down(i)).isOf(this)) {
+            while (world.getBlockState(pos.down(i)).isOf(this)) {
                 ++i;
             }
             if (i < 3) {
-                int j = arg.get(AGE);
+                int j = state.get(AGE);
                 if (j == 15) {
-                    arg2.setBlockState(arg3.up(), this.getDefaultState());
-                    arg2.setBlockState(arg3, (BlockState)arg.with(AGE, 0), 4);
+                    world.setBlockState(pos.up(), this.getDefaultState());
+                    world.setBlockState(pos, (BlockState)state.with(AGE, 0), 4);
                 } else {
-                    arg2.setBlockState(arg3, (BlockState)arg.with(AGE, j + 1), 4);
+                    world.setBlockState(pos, (BlockState)state.with(AGE, j + 1), 4);
                 }
             }
         }
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (!arg.canPlaceAt(arg4, arg5)) {
-            arg4.getBlockTickScheduler().schedule(arg5, this, 1);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (!state.canPlaceAt(world, pos)) {
+            world.getBlockTickScheduler().schedule(pos, this, 1);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        BlockState lv = arg2.getBlockState(arg3.down());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        BlockState lv = world.getBlockState(pos.down());
         if (lv.getBlock() == this) {
             return true;
         }
         if (lv.isOf(Blocks.GRASS_BLOCK) || lv.isOf(Blocks.DIRT) || lv.isOf(Blocks.COARSE_DIRT) || lv.isOf(Blocks.PODZOL) || lv.isOf(Blocks.SAND) || lv.isOf(Blocks.RED_SAND)) {
-            BlockPos lv2 = arg3.down();
+            BlockPos lv2 = pos.down();
             for (Direction lv3 : Direction.Type.HORIZONTAL) {
-                BlockState lv4 = arg2.getBlockState(lv2.offset(lv3));
-                FluidState lv5 = arg2.getFluidState(lv2.offset(lv3));
+                BlockState lv4 = world.getBlockState(lv2.offset(lv3));
+                FluidState lv5 = world.getFluidState(lv2.offset(lv3));
                 if (!lv5.isIn(FluidTags.WATER) && !lv4.isOf(Blocks.FROSTED_ICE)) continue;
                 return true;
             }
@@ -90,8 +90,8 @@ extends Block {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(AGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(AGE);
     }
 }
 

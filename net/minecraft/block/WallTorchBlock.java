@@ -55,30 +55,30 @@ extends TorchBlock {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return WallTorchBlock.getBoundingShape(arg);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return WallTorchBlock.getBoundingShape(state);
     }
 
-    public static VoxelShape getBoundingShape(BlockState arg) {
-        return BOUNDING_SHAPES.get(arg.get(FACING));
+    public static VoxelShape getBoundingShape(BlockState state) {
+        return BOUNDING_SHAPES.get(state.get(FACING));
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        Direction lv = arg.get(FACING);
-        BlockPos lv2 = arg3.offset(lv.getOpposite());
-        BlockState lv3 = arg2.getBlockState(lv2);
-        return lv3.isSideSolidFullSquare(arg2, lv2, lv);
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        Direction lv = state.get(FACING);
+        BlockPos lv2 = pos.offset(lv.getOpposite());
+        BlockState lv3 = world.getBlockState(lv2);
+        return lv3.isSideSolidFullSquare(world, lv2, lv);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         Direction[] lvs;
         BlockState lv = this.getDefaultState();
-        World lv2 = arg.getWorld();
-        BlockPos lv3 = arg.getBlockPos();
-        for (Direction lv4 : lvs = arg.getPlacementDirections()) {
+        World lv2 = ctx.getWorld();
+        BlockPos lv3 = ctx.getBlockPos();
+        for (Direction lv4 : lvs = ctx.getPlacementDirections()) {
             Direction lv5;
             if (!lv4.getAxis().isHorizontal() || !(lv = (BlockState)lv.with(FACING, lv5 = lv4.getOpposite())).canPlaceAt(lv2, lv3)) continue;
             return lv;
@@ -87,40 +87,40 @@ extends TorchBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2.getOpposite() == arg.get(FACING) && !arg.canPlaceAt(arg4, arg5)) {
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction.getOpposite() == state.get(FACING) && !state.canPlaceAt(world, pos)) {
             return Blocks.AIR.getDefaultState();
         }
-        return arg;
+        return state;
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        Direction lv = arg.get(FACING);
-        double d = (double)arg3.getX() + 0.5;
-        double e = (double)arg3.getY() + 0.7;
-        double f = (double)arg3.getZ() + 0.5;
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        Direction lv = state.get(FACING);
+        double d = (double)pos.getX() + 0.5;
+        double e = (double)pos.getY() + 0.7;
+        double f = (double)pos.getZ() + 0.5;
         double g = 0.22;
         double h = 0.27;
         Direction lv2 = lv.getOpposite();
-        arg2.addParticle(ParticleTypes.SMOKE, d + 0.27 * (double)lv2.getOffsetX(), e + 0.22, f + 0.27 * (double)lv2.getOffsetZ(), 0.0, 0.0, 0.0);
-        arg2.addParticle(this.particle, d + 0.27 * (double)lv2.getOffsetX(), e + 0.22, f + 0.27 * (double)lv2.getOffsetZ(), 0.0, 0.0, 0.0);
+        world.addParticle(ParticleTypes.SMOKE, d + 0.27 * (double)lv2.getOffsetX(), e + 0.22, f + 0.27 * (double)lv2.getOffsetZ(), 0.0, 0.0, 0.0);
+        world.addParticle(this.particle, d + 0.27 * (double)lv2.getOffsetX(), e + 0.22, f + 0.27 * (double)lv2.getOffsetZ(), 0.0, 0.0, 0.0);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
     }
 }
 

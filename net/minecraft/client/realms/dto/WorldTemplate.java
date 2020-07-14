@@ -35,18 +35,18 @@ extends ValueObject {
     public String recommendedPlayers = "";
     public WorldTemplateType type = WorldTemplateType.WORLD_TEMPLATE;
 
-    public static WorldTemplate parse(JsonObject jsonObject) {
+    public static WorldTemplate parse(JsonObject node) {
         WorldTemplate lv = new WorldTemplate();
         try {
-            lv.id = JsonUtils.getStringOr("id", jsonObject, "");
-            lv.name = JsonUtils.getStringOr("name", jsonObject, "");
-            lv.version = JsonUtils.getStringOr("version", jsonObject, "");
-            lv.author = JsonUtils.getStringOr("author", jsonObject, "");
-            lv.link = JsonUtils.getStringOr("link", jsonObject, "");
-            lv.image = JsonUtils.getStringOr("image", jsonObject, null);
-            lv.trailer = JsonUtils.getStringOr("trailer", jsonObject, "");
-            lv.recommendedPlayers = JsonUtils.getStringOr("recommendedPlayers", jsonObject, "");
-            lv.type = WorldTemplateType.valueOf(JsonUtils.getStringOr("type", jsonObject, WorldTemplateType.WORLD_TEMPLATE.name()));
+            lv.id = JsonUtils.getStringOr("id", node, "");
+            lv.name = JsonUtils.getStringOr("name", node, "");
+            lv.version = JsonUtils.getStringOr("version", node, "");
+            lv.author = JsonUtils.getStringOr("author", node, "");
+            lv.link = JsonUtils.getStringOr("link", node, "");
+            lv.image = JsonUtils.getStringOr("image", node, null);
+            lv.trailer = JsonUtils.getStringOr("trailer", node, "");
+            lv.recommendedPlayers = JsonUtils.getStringOr("recommendedPlayers", node, "");
+            lv.type = WorldTemplateType.valueOf(JsonUtils.getStringOr("type", node, WorldTemplateType.WORLD_TEMPLATE.name()));
         }
         catch (Exception exception) {
             LOGGER.error("Could not parse WorldTemplate: " + exception.getMessage());

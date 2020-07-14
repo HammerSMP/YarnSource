@@ -24,8 +24,8 @@ extends BlockEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean shouldDrawSide(Direction arg) {
-        return arg == Direction.UP;
+    public boolean shouldDrawSide(Direction direction) {
+        return direction == Direction.UP;
     }
 }
 

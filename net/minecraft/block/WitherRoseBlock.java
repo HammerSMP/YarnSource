@@ -31,35 +31,35 @@ import net.minecraft.world.World;
 
 public class WitherRoseBlock
 extends FlowerBlock {
-    public WitherRoseBlock(StatusEffect arg, AbstractBlock.Settings arg2) {
-        super(arg, 8, arg2);
+    public WitherRoseBlock(StatusEffect effect, AbstractBlock.Settings settings) {
+        super(effect, 8, settings);
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return super.canPlantOnTop(arg, arg2, arg3) || arg.isOf(Blocks.NETHERRACK) || arg.isOf(Blocks.SOUL_SAND) || arg.isOf(Blocks.SOUL_SOIL);
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return super.canPlantOnTop(floor, world, pos) || floor.isOf(Blocks.NETHERRACK) || floor.isOf(Blocks.SOUL_SAND) || floor.isOf(Blocks.SOUL_SOIL);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        VoxelShape lv = this.getOutlineShape(arg, arg2, arg3, ShapeContext.absent());
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        VoxelShape lv = this.getOutlineShape(state, world, pos, ShapeContext.absent());
         Vec3d lv2 = lv.getBoundingBox().getCenter();
-        double d = (double)arg3.getX() + lv2.x;
-        double e = (double)arg3.getZ() + lv2.z;
+        double d = (double)pos.getX() + lv2.x;
+        double e = (double)pos.getZ() + lv2.z;
         for (int i = 0; i < 3; ++i) {
             if (!random.nextBoolean()) continue;
-            arg2.addParticle(ParticleTypes.SMOKE, d + random.nextDouble() / 5.0, (double)arg3.getY() + (0.5 - random.nextDouble()), e + random.nextDouble() / 5.0, 0.0, 0.0, 0.0);
+            world.addParticle(ParticleTypes.SMOKE, d + random.nextDouble() / 5.0, (double)pos.getY() + (0.5 - random.nextDouble()), e + random.nextDouble() / 5.0, 0.0, 0.0, 0.0);
         }
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
         LivingEntity lv;
-        if (arg2.isClient || arg2.getDifficulty() == Difficulty.PEACEFUL) {
+        if (world.isClient || world.getDifficulty() == Difficulty.PEACEFUL) {
             return;
         }
-        if (arg4 instanceof LivingEntity && !(lv = (LivingEntity)arg4).isInvulnerableTo(DamageSource.WITHER)) {
+        if (entity instanceof LivingEntity && !(lv = (LivingEntity)entity).isInvulnerableTo(DamageSource.WITHER)) {
             lv.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 40));
         }
     }

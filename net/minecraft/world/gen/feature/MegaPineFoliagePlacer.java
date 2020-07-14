@@ -40,34 +40,34 @@ extends FoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
         BlockPos lv = arg3.getCenter();
         int m = 0;
-        for (int n = lv.getY() - j + l; n <= lv.getY() + l; ++n) {
+        for (int n = lv.getY() - foliageHeight + l; n <= lv.getY() + l; ++n) {
             int r;
             int o = lv.getY() - n;
-            int p = k + arg3.getFoliageRadius() + MathHelper.floor((float)o / (float)j * 3.5f);
+            int p = radius + arg3.getFoliageRadius() + MathHelper.floor((float)o / (float)foliageHeight * 3.5f);
             if (o > 0 && p == m && (n & 1) == 0) {
                 int q = p + 1;
             } else {
                 r = p;
             }
-            this.generate(arg, random, arg2, new BlockPos(lv.getX(), n, lv.getZ()), r, set, 0, arg3.isGiantTrunk(), arg4);
+            this.generate(world, random, config, new BlockPos(lv.getX(), n, lv.getZ()), r, leaves, 0, arg3.isGiantTrunk(), arg4);
             m = p;
         }
     }
 
     @Override
-    public int getHeight(Random random, int i, TreeFeatureConfig arg) {
+    public int getHeight(Random random, int trunkHeight, TreeFeatureConfig config) {
         return this.crownHeight.method_30321(random);
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        if (i + k >= 7) {
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        if (baseHeight + dy >= 7) {
             return true;
         }
-        return i * i + k * k > l * l;
+        return baseHeight * baseHeight + dy * dy > dz * dz;
     }
 }
 

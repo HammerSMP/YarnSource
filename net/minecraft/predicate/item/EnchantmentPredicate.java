@@ -35,9 +35,9 @@ public class EnchantmentPredicate {
         this.levels = NumberRange.IntRange.ANY;
     }
 
-    public EnchantmentPredicate(@Nullable Enchantment arg, NumberRange.IntRange arg2) {
-        this.enchantment = arg;
-        this.levels = arg2;
+    public EnchantmentPredicate(@Nullable Enchantment enchantment, NumberRange.IntRange levels) {
+        this.enchantment = enchantment;
+        this.levels = levels;
     }
 
     public boolean test(Map<Enchantment, Integer> map) {
@@ -71,11 +71,11 @@ public class EnchantmentPredicate {
         return jsonObject;
     }
 
-    public static EnchantmentPredicate deserialize(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static EnchantmentPredicate deserialize(@Nullable JsonElement el) {
+        if (el == null || el.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "enchantment");
+        JsonObject jsonObject = JsonHelper.asObject(el, "enchantment");
         Enchantment lv = null;
         if (jsonObject.has("enchantment")) {
             Identifier lv2 = new Identifier(JsonHelper.getString(jsonObject, "enchantment"));
@@ -85,11 +85,11 @@ public class EnchantmentPredicate {
         return new EnchantmentPredicate(lv, lv3);
     }
 
-    public static EnchantmentPredicate[] deserializeAll(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static EnchantmentPredicate[] deserializeAll(@Nullable JsonElement el) {
+        if (el == null || el.isJsonNull()) {
             return ARRAY_OF_ANY;
         }
-        JsonArray jsonArray = JsonHelper.asArray(jsonElement, "enchantments");
+        JsonArray jsonArray = JsonHelper.asArray(el, "enchantments");
         EnchantmentPredicate[] lvs = new EnchantmentPredicate[jsonArray.size()];
         for (int i = 0; i < lvs.length; ++i) {
             lvs[i] = EnchantmentPredicate.deserialize(jsonArray.get(i));

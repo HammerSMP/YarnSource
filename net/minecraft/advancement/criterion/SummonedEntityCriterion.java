@@ -32,37 +32,37 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv);
     }
 
-    public void trigger(ServerPlayerEntity arg, Entity arg22) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg22);
-        this.test(arg, arg2 -> arg2.matches(lv));
+    public void trigger(ServerPlayerEntity player, Entity entity) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, entity);
+        this.test(player, arg2 -> arg2.matches(lv));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
     extends AbstractCriterionConditions {
         private final EntityPredicate.Extended entity;
 
-        public Conditions(EntityPredicate.Extended arg, EntityPredicate.Extended arg2) {
-            super(ID, arg);
-            this.entity = arg2;
+        public Conditions(EntityPredicate.Extended player, EntityPredicate.Extended entity) {
+            super(ID, player);
+            this.entity = entity;
         }
 
-        public static Conditions create(EntityPredicate.Builder arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(arg.build()));
+        public static Conditions create(EntityPredicate.Builder summonedEntityPredicateBuilder) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, EntityPredicate.Extended.ofLegacy(summonedEntityPredicateBuilder.build()));
         }
 
-        public boolean matches(LootContext arg) {
-            return this.entity.test(arg);
+        public boolean matches(LootContext summonedEntityContext) {
+            return this.entity.test(summonedEntityContext);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
-            jsonObject.add("entity", this.entity.toJson(arg));
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
+            jsonObject.add("entity", this.entity.toJson(predicateSerializer));
             return jsonObject;
         }
     }

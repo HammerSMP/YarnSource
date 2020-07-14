@@ -38,24 +38,24 @@ implements FeatureConfig {
     public final boolean ignoreVines;
     public final Heightmap.Type heightmap;
 
-    protected TreeFeatureConfig(BlockStateProvider arg, BlockStateProvider arg2, FoliagePlacer arg3, TrunkPlacer arg4, FeatureSize arg5, List<TreeDecorator> list, int i, boolean bl, Heightmap.Type arg6) {
-        this.trunkProvider = arg;
-        this.leavesProvider = arg2;
-        this.decorators = list;
-        this.foliagePlacer = arg3;
-        this.minimumSize = arg5;
-        this.trunkPlacer = arg4;
-        this.maxWaterDepth = i;
-        this.ignoreVines = bl;
-        this.heightmap = arg6;
+    protected TreeFeatureConfig(BlockStateProvider trunkProvider, BlockStateProvider leavesProvider, FoliagePlacer foliagePlacer, TrunkPlacer trunkPlacer, FeatureSize minimumSize, List<TreeDecorator> decorators, int maxWaterDepth, boolean ignoreVines, Heightmap.Type heightmap) {
+        this.trunkProvider = trunkProvider;
+        this.leavesProvider = leavesProvider;
+        this.decorators = decorators;
+        this.foliagePlacer = foliagePlacer;
+        this.minimumSize = minimumSize;
+        this.trunkPlacer = trunkPlacer;
+        this.maxWaterDepth = maxWaterDepth;
+        this.ignoreVines = ignoreVines;
+        this.heightmap = heightmap;
     }
 
     public void ignoreFluidCheck() {
         this.skipFluidCheck = true;
     }
 
-    public TreeFeatureConfig setTreeDecorators(List<TreeDecorator> list) {
-        return new TreeFeatureConfig(this.trunkProvider, this.leavesProvider, this.foliagePlacer, this.trunkPlacer, this.minimumSize, list, this.maxWaterDepth, this.ignoreVines, this.heightmap);
+    public TreeFeatureConfig setTreeDecorators(List<TreeDecorator> decorators) {
+        return new TreeFeatureConfig(this.trunkProvider, this.leavesProvider, this.foliagePlacer, this.trunkPlacer, this.minimumSize, decorators, this.maxWaterDepth, this.ignoreVines, this.heightmap);
     }
 
     public static class Builder {
@@ -69,21 +69,21 @@ implements FeatureConfig {
         private boolean ignoreVines;
         private Heightmap.Type heightmap = Heightmap.Type.OCEAN_FLOOR;
 
-        public Builder(BlockStateProvider arg, BlockStateProvider arg2, FoliagePlacer arg3, TrunkPlacer arg4, FeatureSize arg5) {
-            this.trunkProvider = arg;
-            this.leavesProvider = arg2;
-            this.foliagePlacer = arg3;
-            this.trunkPlacer = arg4;
-            this.minimumSize = arg5;
+        public Builder(BlockStateProvider trunkProvider, BlockStateProvider leavesProvider, FoliagePlacer foliagePlacer, TrunkPlacer trunkPlacer, FeatureSize minimumSize) {
+            this.trunkProvider = trunkProvider;
+            this.leavesProvider = leavesProvider;
+            this.foliagePlacer = foliagePlacer;
+            this.trunkPlacer = trunkPlacer;
+            this.minimumSize = minimumSize;
         }
 
-        public Builder decorators(List<TreeDecorator> list) {
-            this.decorators = list;
+        public Builder decorators(List<TreeDecorator> decorators) {
+            this.decorators = decorators;
             return this;
         }
 
-        public Builder maxWaterDepth(int i) {
-            this.maxWaterDepth = i;
+        public Builder maxWaterDepth(int maxWaterDepth) {
+            this.maxWaterDepth = maxWaterDepth;
             return this;
         }
 
@@ -92,8 +92,8 @@ implements FeatureConfig {
             return this;
         }
 
-        public Builder heightmap(Heightmap.Type arg) {
-            this.heightmap = arg;
+        public Builder heightmap(Heightmap.Type heightmap) {
+            this.heightmap = heightmap;
             return this;
         }
 

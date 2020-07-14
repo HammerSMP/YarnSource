@@ -63,18 +63,18 @@ implements Tickable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.targetUuid = arg2.containsUuid("Target") ? arg2.getUuid("Target") : null;
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.targetUuid = tag.containsUuid("Target") ? tag.getUuid("Target") : null;
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         if (this.targetEntity != null) {
-            arg.putUuid("Target", this.targetEntity.getUuid());
+            tag.putUuid("Target", this.targetEntity.getUuid());
         }
-        return arg;
+        return tag;
     }
 
     @Override
@@ -249,20 +249,20 @@ implements Tickable {
         return this.eyeOpen;
     }
 
-    private void setActive(boolean bl) {
-        if (bl != this.active) {
-            this.playSound(bl ? SoundEvents.BLOCK_CONDUIT_ACTIVATE : SoundEvents.BLOCK_CONDUIT_DEACTIVATE);
+    private void setActive(boolean active) {
+        if (active != this.active) {
+            this.playSound(active ? SoundEvents.BLOCK_CONDUIT_ACTIVATE : SoundEvents.BLOCK_CONDUIT_DEACTIVATE);
         }
-        this.active = bl;
+        this.active = active;
     }
 
-    private void setEyeOpen(boolean bl) {
-        this.eyeOpen = bl;
+    private void setEyeOpen(boolean eyeOpen) {
+        this.eyeOpen = eyeOpen;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getRotation(float f) {
-        return (this.ticksActive + f) * -0.0375f;
+    public float getRotation(float tickDelta) {
+        return (this.ticksActive + tickDelta) * -0.0375f;
     }
 
     public void playSound(SoundEvent arg) {

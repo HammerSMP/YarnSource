@@ -20,9 +20,9 @@ public class AdmireItemTask<E extends PiglinEntity>
 extends Task<E> {
     private final int duration;
 
-    public AdmireItemTask(int i) {
+    public AdmireItemTask(int duration) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.ADMIRING_ITEM, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.ADMIRING_DISABLED, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.DISABLE_WALK_TO_ADMIRE_ITEM, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.duration = i;
+        this.duration = duration;
     }
 
     @Override

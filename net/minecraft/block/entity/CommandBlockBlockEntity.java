@@ -35,8 +35,8 @@ extends BlockEntity {
     private final CommandBlockExecutor commandExecutor = new CommandBlockExecutor(){
 
         @Override
-        public void setCommand(String string) {
-            super.setCommand(string);
+        public void setCommand(String command) {
+            super.setCommand(command);
             CommandBlockBlockEntity.this.markDirty();
         }
 
@@ -68,22 +68,22 @@ extends BlockEntity {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        this.commandExecutor.serialize(arg);
-        arg.putBoolean("powered", this.isPowered());
-        arg.putBoolean("conditionMet", this.isConditionMet());
-        arg.putBoolean("auto", this.isAuto());
-        return arg;
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        this.commandExecutor.serialize(tag);
+        tag.putBoolean("powered", this.isPowered());
+        tag.putBoolean("conditionMet", this.isConditionMet());
+        tag.putBoolean("auto", this.isAuto());
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.commandExecutor.deserialize(arg2);
-        this.powered = arg2.getBoolean("powered");
-        this.conditionMet = arg2.getBoolean("conditionMet");
-        this.setAuto(arg2.getBoolean("auto"));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.commandExecutor.deserialize(tag);
+        this.powered = tag.getBoolean("powered");
+        this.conditionMet = tag.getBoolean("conditionMet");
+        this.setAuto(tag.getBoolean("auto"));
     }
 
     @Override
@@ -106,8 +106,8 @@ extends BlockEntity {
         return this.commandExecutor;
     }
 
-    public void setPowered(boolean bl) {
-        this.powered = bl;
+    public void setPowered(boolean powered) {
+        this.powered = powered;
     }
 
     public boolean isPowered() {
@@ -118,10 +118,10 @@ extends BlockEntity {
         return this.auto;
     }
 
-    public void setAuto(boolean bl) {
+    public void setAuto(boolean auto) {
         boolean bl2 = this.auto;
-        this.auto = bl;
-        if (!bl2 && bl && !this.powered && this.world != null && this.getCommandBlockType() != Type.SEQUENCE) {
+        this.auto = auto;
+        if (!bl2 && auto && !this.powered && this.world != null && this.getCommandBlockType() != Type.SEQUENCE) {
             this.method_23360();
         }
     }
@@ -159,8 +159,8 @@ extends BlockEntity {
         return this.needsUpdatePacket;
     }
 
-    public void setNeedsUpdatePacket(boolean bl) {
-        this.needsUpdatePacket = bl;
+    public void setNeedsUpdatePacket(boolean needsUpdatePacket) {
+        this.needsUpdatePacket = needsUpdatePacket;
     }
 
     public Type getCommandBlockType() {

@@ -32,55 +32,55 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerInteractEntityC2SPacket(Entity arg, boolean bl) {
-        this.entityId = arg.getEntityId();
+    public PlayerInteractEntityC2SPacket(Entity target, boolean playerSneaking) {
+        this.entityId = target.getEntityId();
         this.type = InteractionType.ATTACK;
-        this.playerSneaking = bl;
+        this.playerSneaking = playerSneaking;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerInteractEntityC2SPacket(Entity arg, Hand arg2, boolean bl) {
-        this.entityId = arg.getEntityId();
+    public PlayerInteractEntityC2SPacket(Entity entity, Hand hand, boolean playerSneaking) {
+        this.entityId = entity.getEntityId();
         this.type = InteractionType.INTERACT;
-        this.hand = arg2;
-        this.playerSneaking = bl;
+        this.hand = hand;
+        this.playerSneaking = playerSneaking;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public PlayerInteractEntityC2SPacket(Entity arg, Hand arg2, Vec3d arg3, boolean bl) {
-        this.entityId = arg.getEntityId();
+    public PlayerInteractEntityC2SPacket(Entity entity, Hand hand, Vec3d hitPos, boolean playerSneaking) {
+        this.entityId = entity.getEntityId();
         this.type = InteractionType.INTERACT_AT;
-        this.hand = arg2;
-        this.hitPos = arg3;
-        this.playerSneaking = bl;
+        this.hand = hand;
+        this.hitPos = hitPos;
+        this.playerSneaking = playerSneaking;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
-        this.type = arg.readEnumConstant(InteractionType.class);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
+        this.type = buf.readEnumConstant(InteractionType.class);
         if (this.type == InteractionType.INTERACT_AT) {
-            this.hitPos = new Vec3d(arg.readFloat(), arg.readFloat(), arg.readFloat());
+            this.hitPos = new Vec3d(buf.readFloat(), buf.readFloat(), buf.readFloat());
         }
         if (this.type == InteractionType.INTERACT || this.type == InteractionType.INTERACT_AT) {
-            this.hand = arg.readEnumConstant(Hand.class);
+            this.hand = buf.readEnumConstant(Hand.class);
         }
-        this.playerSneaking = arg.readBoolean();
+        this.playerSneaking = buf.readBoolean();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
-        arg.writeEnumConstant(this.type);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
+        buf.writeEnumConstant(this.type);
         if (this.type == InteractionType.INTERACT_AT) {
-            arg.writeFloat((float)this.hitPos.x);
-            arg.writeFloat((float)this.hitPos.y);
-            arg.writeFloat((float)this.hitPos.z);
+            buf.writeFloat((float)this.hitPos.x);
+            buf.writeFloat((float)this.hitPos.y);
+            buf.writeFloat((float)this.hitPos.z);
         }
         if (this.type == InteractionType.INTERACT || this.type == InteractionType.INTERACT_AT) {
-            arg.writeEnumConstant(this.hand);
+            buf.writeEnumConstant(this.hand);
         }
-        arg.writeBoolean(this.playerSneaking);
+        buf.writeBoolean(this.playerSneaking);
     }
 
     @Override
@@ -89,8 +89,8 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Nullable
-    public Entity getEntity(World arg) {
-        return arg.getEntityById(this.entityId);
+    public Entity getEntity(World world) {
+        return world.getEntityById(this.entityId);
     }
 
     public InteractionType getType() {

@@ -57,66 +57,66 @@ public class LocationPredicate {
     private final BlockPredicate block;
     private final FluidPredicate fluid;
 
-    public LocationPredicate(NumberRange.FloatRange arg, NumberRange.FloatRange arg2, NumberRange.FloatRange arg3, @Nullable Biome arg4, @Nullable StructureFeature<?> arg5, @Nullable RegistryKey<World> arg6, @Nullable Boolean boolean_, LightPredicate arg7, BlockPredicate arg8, FluidPredicate arg9) {
-        this.x = arg;
-        this.y = arg2;
-        this.z = arg3;
-        this.biome = arg4;
-        this.feature = arg5;
-        this.dimension = arg6;
-        this.smokey = boolean_;
-        this.light = arg7;
-        this.block = arg8;
-        this.fluid = arg9;
+    public LocationPredicate(NumberRange.FloatRange x, NumberRange.FloatRange y, NumberRange.FloatRange z, @Nullable Biome biome, @Nullable StructureFeature<?> feature, @Nullable RegistryKey<World> dimension, @Nullable Boolean smokey, LightPredicate light, BlockPredicate block, FluidPredicate fluid) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.biome = biome;
+        this.feature = feature;
+        this.dimension = dimension;
+        this.smokey = smokey;
+        this.light = light;
+        this.block = block;
+        this.fluid = fluid;
     }
 
-    public static LocationPredicate biome(Biome arg) {
-        return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, arg, null, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
+    public static LocationPredicate biome(Biome biome) {
+        return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, biome, null, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
-    public static LocationPredicate dimension(RegistryKey<World> arg) {
-        return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, null, arg, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
+    public static LocationPredicate dimension(RegistryKey<World> dimension) {
+        return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, null, dimension, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
-    public static LocationPredicate feature(StructureFeature<?> arg) {
-        return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, arg, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
+    public static LocationPredicate feature(StructureFeature<?> feature) {
+        return new LocationPredicate(NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, NumberRange.FloatRange.ANY, null, feature, null, null, LightPredicate.ANY, BlockPredicate.ANY, FluidPredicate.ANY);
     }
 
-    public boolean test(ServerWorld arg, double d, double e, double f) {
-        return this.test(arg, (float)d, (float)e, (float)f);
+    public boolean test(ServerWorld world, double x, double y, double z) {
+        return this.test(world, (float)x, (float)y, (float)z);
     }
 
-    public boolean test(ServerWorld arg, float f, float g, float h) {
-        if (!this.x.test(f)) {
+    public boolean test(ServerWorld world, float x, float y, float z) {
+        if (!this.x.test(x)) {
             return false;
         }
-        if (!this.y.test(g)) {
+        if (!this.y.test(y)) {
             return false;
         }
-        if (!this.z.test(h)) {
+        if (!this.z.test(z)) {
             return false;
         }
-        if (this.dimension != null && this.dimension != arg.getRegistryKey()) {
+        if (this.dimension != null && this.dimension != world.getRegistryKey()) {
             return false;
         }
-        BlockPos lv = new BlockPos(f, g, h);
-        boolean bl = arg.canSetBlock(lv);
-        if (!(this.biome == null || bl && this.biome == arg.getBiome(lv))) {
+        BlockPos lv = new BlockPos(x, y, z);
+        boolean bl = world.canSetBlock(lv);
+        if (!(this.biome == null || bl && this.biome == world.getBiome(lv))) {
             return false;
         }
-        if (!(this.feature == null || bl && arg.getStructureAccessor().method_28388(lv, true, this.feature).hasChildren())) {
+        if (!(this.feature == null || bl && world.getStructureAccessor().method_28388(lv, true, this.feature).hasChildren())) {
             return false;
         }
-        if (!(this.smokey == null || bl && this.smokey == CampfireBlock.isLitCampfireInRange(arg, lv))) {
+        if (!(this.smokey == null || bl && this.smokey == CampfireBlock.isLitCampfireInRange(world, lv))) {
             return false;
         }
-        if (!this.light.test(arg, lv)) {
+        if (!this.light.test(world, lv)) {
             return false;
         }
-        if (!this.block.test(arg, lv)) {
+        if (!this.block.test(world, lv)) {
             return false;
         }
-        return this.fluid.test(arg, lv);
+        return this.fluid.test(world, lv);
     }
 
     public JsonElement toJson() {
@@ -149,11 +149,11 @@ public class LocationPredicate {
         return jsonObject;
     }
 
-    public static LocationPredicate fromJson(@Nullable JsonElement jsonElement) {
-        if (jsonElement == null || jsonElement.isJsonNull()) {
+    public static LocationPredicate fromJson(@Nullable JsonElement json) {
+        if (json == null || json.isJsonNull()) {
             return ANY;
         }
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "location");
+        JsonObject jsonObject = JsonHelper.asObject(json, "location");
         JsonObject jsonObject2 = JsonHelper.getObject(jsonObject, "position", new JsonObject());
         NumberRange.FloatRange lv = NumberRange.FloatRange.fromJson(jsonObject2.get("x"));
         NumberRange.FloatRange lv2 = NumberRange.FloatRange.fromJson(jsonObject2.get("y"));
@@ -192,18 +192,18 @@ public class LocationPredicate {
             return new Builder();
         }
 
-        public Builder biome(@Nullable Biome arg) {
-            this.biome = arg;
+        public Builder biome(@Nullable Biome biome) {
+            this.biome = biome;
             return this;
         }
 
-        public Builder block(BlockPredicate arg) {
-            this.block = arg;
+        public Builder block(BlockPredicate block) {
+            this.block = block;
             return this;
         }
 
-        public Builder smokey(Boolean boolean_) {
-            this.smokey = boolean_;
+        public Builder smokey(Boolean smokey) {
+            this.smokey = smokey;
             return this;
         }
 

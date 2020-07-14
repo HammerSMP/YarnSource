@@ -12,11 +12,11 @@ public class BlockEvent {
     private final int type;
     private final int data;
 
-    public BlockEvent(BlockPos arg, Block arg2, int i, int j) {
-        this.pos = arg;
-        this.block = arg2;
-        this.type = i;
-        this.data = j;
+    public BlockEvent(BlockPos pos, Block block, int type, int data) {
+        this.pos = pos;
+        this.block = block;
+        this.type = type;
+        this.data = data;
     }
 
     public BlockPos getPos() {
@@ -35,9 +35,9 @@ public class BlockEvent {
         return this.data;
     }
 
-    public boolean equals(Object object) {
-        if (object instanceof BlockEvent) {
-            BlockEvent lv = (BlockEvent)object;
+    public boolean equals(Object o) {
+        if (o instanceof BlockEvent) {
+            BlockEvent lv = (BlockEvent)o;
             return this.pos.equals(lv.pos) && this.type == lv.type && this.data == lv.data && this.block == lv.block;
         }
         return false;

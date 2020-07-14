@@ -51,28 +51,28 @@ public class HandledScreens {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Map<ScreenHandlerType<?>, Provider<?, ?>> PROVIDERS = Maps.newHashMap();
 
-    public static <T extends ScreenHandler> void open(@Nullable ScreenHandlerType<T> arg, MinecraftClient arg2, int i, Text arg3) {
-        if (arg == null) {
-            LOGGER.warn("Trying to open invalid screen with name: {}", (Object)arg3.getString());
+    public static <T extends ScreenHandler> void open(@Nullable ScreenHandlerType<T> type, MinecraftClient client, int id, Text title) {
+        if (type == null) {
+            LOGGER.warn("Trying to open invalid screen with name: {}", (Object)title.getString());
             return;
         }
-        Provider<T, ?> lv = HandledScreens.getProvider(arg);
+        Provider<T, ?> lv = HandledScreens.getProvider(type);
         if (lv == null) {
-            LOGGER.warn("Failed to create screen for menu type: {}", (Object)Registry.SCREEN_HANDLER.getId(arg));
+            LOGGER.warn("Failed to create screen for menu type: {}", (Object)Registry.SCREEN_HANDLER.getId(type));
             return;
         }
-        lv.open(arg3, arg, arg2, i);
+        lv.open(title, type, client, id);
     }
 
     @Nullable
-    private static <T extends ScreenHandler> Provider<T, ?> getProvider(ScreenHandlerType<T> arg) {
-        return PROVIDERS.get(arg);
+    private static <T extends ScreenHandler> Provider<T, ?> getProvider(ScreenHandlerType<T> type) {
+        return PROVIDERS.get(type);
     }
 
-    private static <M extends ScreenHandler, U extends Screen> void register(ScreenHandlerType<? extends M> arg, Provider<M, U> arg2) {
-        Provider<M, U> lv = PROVIDERS.put(arg, arg2);
+    private static <M extends ScreenHandler, U extends Screen> void register(ScreenHandlerType<? extends M> type, Provider<M, U> provider) {
+        Provider<M, U> lv = PROVIDERS.put(type, provider);
         if (lv != null) {
-            throw new IllegalStateException("Duplicate registration for " + Registry.SCREEN_HANDLER.getId(arg));
+            throw new IllegalStateException("Duplicate registration for " + Registry.SCREEN_HANDLER.getId(type));
         }
     }
 
@@ -115,10 +115,10 @@ public class HandledScreens {
 
     @Environment(value=EnvType.CLIENT)
     static interface Provider<T extends ScreenHandler, U extends Screen> {
-        default public void open(Text arg, ScreenHandlerType<T> arg2, MinecraftClient arg3, int i) {
-            U lv = this.create(arg2.create(i, arg3.player.inventory), arg3.player.inventory, arg);
-            arg3.player.currentScreenHandler = ((ScreenHandlerProvider)lv).getScreenHandler();
-            arg3.openScreen((Screen)lv);
+        default public void open(Text name, ScreenHandlerType<T> type, MinecraftClient client, int id) {
+            U lv = this.create(type.create(id, client.player.inventory), client.player.inventory, name);
+            client.player.currentScreenHandler = ((ScreenHandlerProvider)lv).getScreenHandler();
+            client.openScreen((Screen)lv);
         }
 
         public U create(T var1, PlayerInventory var2, Text var3);

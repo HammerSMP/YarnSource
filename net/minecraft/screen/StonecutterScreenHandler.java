@@ -54,46 +54,46 @@ extends ScreenHandler {
     };
     private final CraftingResultInventory output = new CraftingResultInventory();
 
-    public StonecutterScreenHandler(int i, PlayerInventory arg) {
-        this(i, arg, ScreenHandlerContext.EMPTY);
+    public StonecutterScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
     }
 
-    public StonecutterScreenHandler(int i, PlayerInventory arg, final ScreenHandlerContext arg2) {
-        super(ScreenHandlerType.STONECUTTER, i);
-        this.context = arg2;
-        this.world = arg.player.world;
+    public StonecutterScreenHandler(int syncId, PlayerInventory playerInventory, final ScreenHandlerContext context) {
+        super(ScreenHandlerType.STONECUTTER, syncId);
+        this.context = context;
+        this.world = playerInventory.player.world;
         this.inputSlot = this.addSlot(new Slot(this.input, 0, 20, 33));
         this.outputSlot = this.addSlot(new Slot(this.output, 1, 143, 33){
 
             @Override
-            public boolean canInsert(ItemStack arg) {
+            public boolean canInsert(ItemStack stack) {
                 return false;
             }
 
             @Override
-            public ItemStack onTakeItem(PlayerEntity arg3, ItemStack arg22) {
+            public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
                 ItemStack lv = StonecutterScreenHandler.this.inputSlot.takeStack(1);
                 if (!lv.isEmpty()) {
                     StonecutterScreenHandler.this.populateResult();
                 }
-                arg22.getItem().onCraft(arg22, arg3.world, arg3);
-                arg2.run((arg, arg2) -> {
+                stack.getItem().onCraft(stack, player.world, player);
+                context.run((arg, arg2) -> {
                     long l = arg.getTime();
                     if (StonecutterScreenHandler.this.lastTakeTime != l) {
                         arg.playSound(null, (BlockPos)arg2, SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundCategory.BLOCKS, 1.0f, 1.0f);
                         StonecutterScreenHandler.this.lastTakeTime = l;
                     }
                 });
-                return super.onTakeItem(arg3, arg22);
+                return super.onTakeItem(player, stack);
             }
         });
         for (int j = 0; j < 3; ++j) {
             for (int k = 0; k < 9; ++k) {
-                this.addSlot(new Slot(arg, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
+                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, 84 + j * 18));
             }
         }
         for (int l = 0; l < 9; ++l) {
-            this.addSlot(new Slot(arg, l, 8 + l * 18, 142));
+            this.addSlot(new Slot(playerInventory, l, 8 + l * 18, 142));
         }
         this.addProperty(this.selectedRecipe);
     }
@@ -119,14 +119,14 @@ extends ScreenHandler {
     }
 
     @Override
-    public boolean canUse(PlayerEntity arg) {
-        return StonecutterScreenHandler.canUse(this.context, arg, Blocks.STONECUTTER);
+    public boolean canUse(PlayerEntity player) {
+        return StonecutterScreenHandler.canUse(this.context, player, Blocks.STONECUTTER);
     }
 
     @Override
-    public boolean onButtonClick(PlayerEntity arg, int i) {
-        if (this.method_30160(i)) {
-            this.selectedRecipe.set(i);
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (this.method_30160(id)) {
+            this.selectedRecipe.set(id);
             this.populateResult();
         }
         return true;
@@ -137,20 +137,20 @@ extends ScreenHandler {
     }
 
     @Override
-    public void onContentChanged(Inventory arg) {
+    public void onContentChanged(Inventory inventory) {
         ItemStack lv = this.inputSlot.getStack();
         if (lv.getItem() != this.inputStack.getItem()) {
             this.inputStack = lv.copy();
-            this.updateInput(arg, lv);
+            this.updateInput(inventory, lv);
         }
     }
 
-    private void updateInput(Inventory arg, ItemStack arg2) {
+    private void updateInput(Inventory input, ItemStack stack) {
         this.availableRecipes.clear();
         this.selectedRecipe.set(-1);
         this.outputSlot.setStack(ItemStack.EMPTY);
-        if (!arg2.isEmpty()) {
-            this.availableRecipes = this.world.getRecipeManager().getAllMatches(RecipeType.STONECUTTING, arg, this.world);
+        if (!stack.isEmpty()) {
+            this.availableRecipes = this.world.getRecipeManager().getAllMatches(RecipeType.STONECUTTING, input, this.world);
         }
     }
 
@@ -175,31 +175,31 @@ extends ScreenHandler {
     }
 
     @Override
-    public boolean canInsertIntoSlot(ItemStack arg, Slot arg2) {
-        return arg2.inventory != this.output && super.canInsertIntoSlot(arg, arg2);
+    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+        return slot.inventory != this.output && super.canInsertIntoSlot(stack, slot);
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity arg, int i) {
+    public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack lv = ItemStack.EMPTY;
-        Slot lv2 = (Slot)this.slots.get(i);
+        Slot lv2 = (Slot)this.slots.get(index);
         if (lv2 != null && lv2.hasStack()) {
             ItemStack lv3 = lv2.getStack();
             Item lv4 = lv3.getItem();
             lv = lv3.copy();
-            if (i == 1) {
-                lv4.onCraft(lv3, arg.world, arg);
+            if (index == 1) {
+                lv4.onCraft(lv3, player.world, player);
                 if (!this.insertItem(lv3, 2, 38, true)) {
                     return ItemStack.EMPTY;
                 }
                 lv2.onStackChanged(lv3, lv);
-            } else if (i == 0) {
+            } else if (index == 0) {
                 if (!this.insertItem(lv3, 2, 38, false)) {
                     return ItemStack.EMPTY;
                 }
             } else {
                 ItemStack[] arritemStack = new ItemStack[]{lv3};
-                if (this.world.getRecipeManager().getFirstMatch(RecipeType.STONECUTTING, new SimpleInventory(arritemStack), this.world).isPresent() ? !this.insertItem(lv3, 0, 1, false) : (i >= 2 && i < 29 ? !this.insertItem(lv3, 29, 38, false) : i >= 29 && i < 38 && !this.insertItem(lv3, 2, 29, false))) {
+                if (this.world.getRecipeManager().getFirstMatch(RecipeType.STONECUTTING, new SimpleInventory(arritemStack), this.world).isPresent() ? !this.insertItem(lv3, 0, 1, false) : (index >= 2 && index < 29 ? !this.insertItem(lv3, 29, 38, false) : index >= 29 && index < 38 && !this.insertItem(lv3, 2, 29, false))) {
                     return ItemStack.EMPTY;
                 }
             }
@@ -210,17 +210,17 @@ extends ScreenHandler {
             if (lv3.getCount() == lv.getCount()) {
                 return ItemStack.EMPTY;
             }
-            lv2.onTakeItem(arg, lv3);
+            lv2.onTakeItem(player, lv3);
             this.sendContentUpdates();
         }
         return lv;
     }
 
     @Override
-    public void close(PlayerEntity arg) {
-        super.close(arg);
+    public void close(PlayerEntity player) {
+        super.close(player);
         this.output.removeStack(1);
-        this.context.run((arg2, arg3) -> this.dropInventory(arg, arg.world, this.input));
+        this.context.run((arg2, arg3) -> this.dropInventory(player, arg.world, this.input));
     }
 }
 

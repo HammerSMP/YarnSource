@@ -25,21 +25,21 @@ implements Packet<ClientPlayPacketListener> {
     public EntityAttachS2CPacket() {
     }
 
-    public EntityAttachS2CPacket(Entity arg, @Nullable Entity arg2) {
-        this.attachedId = arg.getEntityId();
-        this.holdingId = arg2 != null ? arg2.getEntityId() : 0;
+    public EntityAttachS2CPacket(Entity attachedEntity, @Nullable Entity holdingEntity) {
+        this.attachedId = attachedEntity.getEntityId();
+        this.holdingId = holdingEntity != null ? holdingEntity.getEntityId() : 0;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.attachedId = arg.readInt();
-        this.holdingId = arg.readInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.attachedId = buf.readInt();
+        this.holdingId = buf.readInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeInt(this.attachedId);
-        arg.writeInt(this.holdingId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeInt(this.attachedId);
+        buf.writeInt(this.holdingId);
     }
 
     @Override

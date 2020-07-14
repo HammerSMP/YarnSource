@@ -29,9 +29,9 @@ implements Runnable {
     private final MinecraftDedicatedServer server;
     private final long maxTickTime;
 
-    public DedicatedServerWatchdog(MinecraftDedicatedServer arg) {
-        this.server = arg;
-        this.maxTickTime = arg.getMaxTickTime();
+    public DedicatedServerWatchdog(MinecraftDedicatedServer server) {
+        this.server = server;
+        this.maxTickTime = server.getMaxTickTime();
     }
 
     @Override

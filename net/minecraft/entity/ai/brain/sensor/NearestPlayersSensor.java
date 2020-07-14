@@ -32,11 +32,11 @@ extends Sensor<LivingEntity> {
     }
 
     @Override
-    protected void sense(ServerWorld arg, LivingEntity arg22) {
-        List list = arg.getPlayers().stream().filter(EntityPredicates.EXCEPT_SPECTATOR).filter(arg2 -> arg22.squaredDistanceTo((Entity)arg2) < 256.0).sorted(Comparator.comparingDouble(arg22::squaredDistanceTo)).collect(Collectors.toList());
-        Brain<?> lv = arg22.getBrain();
+    protected void sense(ServerWorld world, LivingEntity entity) {
+        List list = world.getPlayers().stream().filter(EntityPredicates.EXCEPT_SPECTATOR).filter(arg2 -> entity.squaredDistanceTo((Entity)arg2) < 256.0).sorted(Comparator.comparingDouble(entity::squaredDistanceTo)).collect(Collectors.toList());
+        Brain<?> lv = entity.getBrain();
         lv.remember(MemoryModuleType.NEAREST_PLAYERS, list);
-        List list2 = list.stream().filter(arg2 -> field_25161.test(arg22, (LivingEntity)arg2)).collect(Collectors.toList());
+        List list2 = list.stream().filter(arg2 -> field_25161.test(entity, (LivingEntity)arg2)).collect(Collectors.toList());
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_PLAYER, list2.isEmpty() ? null : (PlayerEntity)list2.get(0));
         Optional<Entity> optional = list2.stream().filter(EntityPredicates.EXCEPT_CREATIVE_SPECTATOR_OR_PEACEFUL).findFirst();
         lv.remember(MemoryModuleType.NEAREST_VISIBLE_TARGETABLE_PLAYER, optional);

@@ -56,8 +56,8 @@ extends BlockWithEntity {
     public static final BooleanProperty TRIGGERED = Properties.TRIGGERED;
     private static final Map<Item, DispenserBehavior> BEHAVIORS = (Map)Util.make(new Object2ObjectOpenHashMap(), object2ObjectOpenHashMap -> object2ObjectOpenHashMap.defaultReturnValue((Object)new ItemDispenserBehavior()));
 
-    public static void registerBehavior(ItemConvertible arg, DispenserBehavior arg2) {
-        BEHAVIORS.put(arg.asItem(), arg2);
+    public static void registerBehavior(ItemConvertible provider, DispenserBehavior behavior) {
+        BEHAVIORS.put(provider.asItem(), behavior);
     }
 
     protected DispenserBlock(AbstractBlock.Settings arg) {
@@ -66,28 +66,28 @@ extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg2, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        if (arg2.isClient) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
             return ActionResult.SUCCESS;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof DispenserBlockEntity) {
-            arg4.openHandledScreen((DispenserBlockEntity)lv);
+            player.openHandledScreen((DispenserBlockEntity)lv);
             if (lv instanceof DropperBlockEntity) {
-                arg4.incrementStat(Stats.INSPECT_DROPPER);
+                player.incrementStat(Stats.INSPECT_DROPPER);
             } else {
-                arg4.incrementStat(Stats.INSPECT_DISPENSER);
+                player.incrementStat(Stats.INSPECT_DISPENSER);
             }
         }
         return ActionResult.CONSUME;
     }
 
-    protected void dispense(ServerWorld arg, BlockPos arg2) {
-        BlockPointerImpl lv = new BlockPointerImpl(arg, arg2);
+    protected void dispense(ServerWorld arg, BlockPos pos) {
+        BlockPointerImpl lv = new BlockPointerImpl(arg, pos);
         DispenserBlockEntity lv2 = (DispenserBlockEntity)lv.getBlockEntity();
         int i = lv2.chooseNonEmptySlot();
         if (i < 0) {
-            arg.syncWorldEvent(1001, arg2, 0);
+            arg.syncWorldEvent(1001, pos, 0);
             return;
         }
         ItemStack lv3 = lv2.getStack(i);
@@ -97,94 +97,94 @@ extends BlockWithEntity {
         }
     }
 
-    protected DispenserBehavior getBehaviorForItem(ItemStack arg) {
-        return BEHAVIORS.get(arg.getItem());
+    protected DispenserBehavior getBehaviorForItem(ItemStack stack) {
+        return BEHAVIORS.get(stack.getItem());
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        boolean bl2 = arg2.isReceivingRedstonePower(arg3) || arg2.isReceivingRedstonePower(arg3.up());
-        boolean bl3 = arg.get(TRIGGERED);
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        boolean bl2 = world.isReceivingRedstonePower(pos) || world.isReceivingRedstonePower(pos.up());
+        boolean bl3 = state.get(TRIGGERED);
         if (bl2 && !bl3) {
-            arg2.getBlockTickScheduler().schedule(arg3, this, 4);
-            arg2.setBlockState(arg3, (BlockState)arg.with(TRIGGERED, true), 4);
+            world.getBlockTickScheduler().schedule(pos, this, 4);
+            world.setBlockState(pos, (BlockState)state.with(TRIGGERED, true), 4);
         } else if (!bl2 && bl3) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(TRIGGERED, false), 4);
+            world.setBlockState(pos, (BlockState)state.with(TRIGGERED, false), 4);
         }
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        this.dispense(arg2, arg3);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        this.dispense(world, pos);
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new DispenserBlockEntity();
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerLookDirection().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite());
     }
 
     @Override
-    public void onPlaced(World arg, BlockPos arg2, BlockState arg3, LivingEntity arg4, ItemStack arg5) {
+    public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         BlockEntity lv;
-        if (arg5.hasCustomName() && (lv = arg.getBlockEntity(arg2)) instanceof DispenserBlockEntity) {
-            ((DispenserBlockEntity)lv).setCustomName(arg5.getName());
+        if (itemStack.hasCustomName() && (lv = world.getBlockEntity(pos)) instanceof DispenserBlockEntity) {
+            ((DispenserBlockEntity)lv).setCustomName(itemStack.getName());
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        BlockEntity lv = arg2.getBlockEntity(arg3);
+        BlockEntity lv = world.getBlockEntity(pos);
         if (lv instanceof DispenserBlockEntity) {
-            ItemScatterer.spawn(arg2, arg3, (Inventory)((DispenserBlockEntity)lv));
-            arg2.updateComparators(arg3, this);
+            ItemScatterer.spawn(world, pos, (Inventory)((DispenserBlockEntity)lv));
+            world.updateComparators(pos, this);
         }
-        super.onStateReplaced(arg, arg2, arg3, arg4, bl);
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    public static Position getOutputLocation(BlockPointer arg) {
-        Direction lv = arg.getBlockState().get(FACING);
-        double d = arg.getX() + 0.7 * (double)lv.getOffsetX();
-        double e = arg.getY() + 0.7 * (double)lv.getOffsetY();
-        double f = arg.getZ() + 0.7 * (double)lv.getOffsetZ();
+    public static Position getOutputLocation(BlockPointer pointer) {
+        Direction lv = pointer.getBlockState().get(FACING);
+        double d = pointer.getX() + 0.7 * (double)lv.getOffsetX();
+        double e = pointer.getY() + 0.7 * (double)lv.getOffsetY();
+        double f = pointer.getZ() + 0.7 * (double)lv.getOffsetZ();
         return new PositionImpl(d, e, f);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState arg) {
+    public boolean hasComparatorOutput(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState arg, World arg2, BlockPos arg3) {
-        return ScreenHandler.calculateComparatorOutput(arg2.getBlockEntity(arg3));
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState arg) {
+    public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, TRIGGERED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, TRIGGERED);
     }
 }
 

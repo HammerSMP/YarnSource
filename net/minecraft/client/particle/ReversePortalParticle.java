@@ -19,15 +19,15 @@ import net.minecraft.particle.DefaultParticleType;
 @Environment(value=EnvType.CLIENT)
 public class ReversePortalParticle
 extends PortalParticle {
-    private ReversePortalParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i) {
-        super(arg, d, e, f, g, h, i);
+    private ReversePortalParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ);
         this.scale = (float)((double)this.scale * 1.5);
         this.maxAge = (int)(Math.random() * 2.0) + 60;
     }
 
     @Override
-    public float getSize(float f) {
-        float g = 1.0f - ((float)this.age + f) / ((float)this.maxAge * 1.5f);
+    public float getSize(float tickDelta) {
+        float g = 1.0f - ((float)this.age + tickDelta) / ((float)this.maxAge * 1.5f);
         return this.scale * g;
     }
 
@@ -51,8 +51,8 @@ extends PortalParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

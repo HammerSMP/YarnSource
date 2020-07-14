@@ -71,11 +71,11 @@ extends RealmsScreen {
     private boolean checked;
     private final BooleanConsumer field_22693;
 
-    public RealmsDownloadLatestWorldScreen(Screen arg, WorldDownload arg2, String string, BooleanConsumer booleanConsumer) {
+    public RealmsDownloadLatestWorldScreen(Screen parent, WorldDownload worldDownload, String worldName, BooleanConsumer booleanConsumer) {
         this.field_22693 = booleanConsumer;
-        this.parent = arg;
-        this.worldName = string;
-        this.worldDownload = arg2;
+        this.parent = parent;
+        this.worldName = worldName;
+        this.worldDownload = worldDownload;
         this.downloadStatus = new DownloadStatus();
         this.downloadTitle = new TranslatableText("mco.download.title");
         this.narrationRateLimiter = RateLimiter.create((double)0.1f);
@@ -108,9 +108,9 @@ extends RealmsScreen {
         }
     }
 
-    private long getContentLength(String string) {
+    private long getContentLength(String downloadLink) {
         FileDownload lv = new FileDownload();
-        return lv.contentLength(string);
+        return lv.contentLength(downloadLink);
     }
 
     @Override
@@ -134,13 +134,13 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.cancelled = true;
             this.backButtonClicked();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void backButtonClicked() {
@@ -151,24 +151,24 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         if (this.extracting && !this.finished) {
             this.status = new TranslatableText("mco.download.extracting");
         }
-        this.drawCenteredText(arg, this.textRenderer, this.downloadTitle, this.width / 2, 20, 0xFFFFFF);
-        this.drawCenteredText(arg, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.downloadTitle, this.width / 2, 20, 0xFFFFFF);
+        this.drawCenteredText(matrices, this.textRenderer, this.status, this.width / 2, 50, 0xFFFFFF);
         if (this.showDots) {
-            this.drawDots(arg);
+            this.drawDots(matrices);
         }
         if (this.downloadStatus.bytesWritten != 0L && !this.cancelled) {
-            this.drawProgressBar(arg);
-            this.drawDownloadSpeed(arg);
+            this.drawProgressBar(matrices);
+            this.drawDownloadSpeed(matrices);
         }
         if (this.field_20494 != null) {
-            this.drawCenteredText(arg, this.textRenderer, this.field_20494, this.width / 2, 110, 0xFF0000);
+            this.drawCenteredText(matrices, this.textRenderer, this.field_20494, this.width / 2, 110, 0xFF0000);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     private void drawDots(MatrixStack arg) {

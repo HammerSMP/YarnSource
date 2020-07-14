@@ -29,8 +29,8 @@ implements ArgumentType<CompoundTag> {
         return new NbtCompoundTagArgumentType();
     }
 
-    public static <S> CompoundTag getCompoundTag(CommandContext<S> commandContext, String string) {
-        return (CompoundTag)commandContext.getArgument(string, CompoundTag.class);
+    public static <S> CompoundTag getCompoundTag(CommandContext<S> context, String name) {
+        return (CompoundTag)context.getArgument(name, CompoundTag.class);
     }
 
     public CompoundTag parse(StringReader stringReader) throws CommandSyntaxException {

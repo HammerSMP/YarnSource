@@ -37,14 +37,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void test(ServerPlayerEntity arg, BlockPos arg2, ItemStack arg3) {
-        BlockState lv = arg.getServerWorld().getBlockState(arg2);
-        this.test(arg, arg5 -> arg5.test(lv, arg.getServerWorld(), arg2, arg3));
+    public void test(ServerPlayerEntity player, BlockPos pos, ItemStack stack) {
+        BlockState lv = player.getServerWorld().getBlockState(pos);
+        this.test(player, conditions -> conditions.test(lv, player.getServerWorld(), pos, stack));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -52,26 +52,26 @@ extends AbstractCriterion<Conditions> {
         private final LocationPredicate location;
         private final ItemPredicate item;
 
-        public Conditions(EntityPredicate.Extended arg, LocationPredicate arg2, ItemPredicate arg3) {
+        public Conditions(EntityPredicate.Extended arg, LocationPredicate location, ItemPredicate item) {
             super(ID, arg);
-            this.location = arg2;
-            this.item = arg3;
+            this.location = location;
+            this.item = item;
         }
 
         public static Conditions create(LocationPredicate.Builder arg, ItemPredicate.Builder arg2) {
             return new Conditions(EntityPredicate.Extended.EMPTY, arg.build(), arg2.build());
         }
 
-        public boolean test(BlockState arg, ServerWorld arg2, BlockPos arg3, ItemStack arg4) {
-            if (!this.location.test(arg2, (double)arg3.getX() + 0.5, (double)arg3.getY() + 0.5, (double)arg3.getZ() + 0.5)) {
+        public boolean test(BlockState state, ServerWorld world, BlockPos pos, ItemStack stack) {
+            if (!this.location.test(world, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5)) {
                 return false;
             }
-            return this.item.test(arg4);
+            return this.item.test(stack);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("location", this.location.toJson());
             jsonObject.add("item", this.item.toJson());
             return jsonObject;

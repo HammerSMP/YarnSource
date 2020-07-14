@@ -41,36 +41,36 @@ public abstract class GeneratorType {
     public static final GeneratorType DEFAULT = new GeneratorType("default"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
-            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
+        protected ChunkGenerator getChunkGenerator(long seed) {
+            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(seed, false, false), seed, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     private static final GeneratorType FLAT = new GeneratorType("flat"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
+        protected ChunkGenerator getChunkGenerator(long seed) {
             return new FlatChunkGenerator(FlatChunkGeneratorConfig.getDefaultConfig());
         }
     };
     private static final GeneratorType LARGE_BIOMES = new GeneratorType("large_biomes"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
-            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, true), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
+        protected ChunkGenerator getChunkGenerator(long seed) {
+            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(seed, false, true), seed, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     public static final GeneratorType AMPLIFIED = new GeneratorType("amplified"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
-            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(l, false, false), l, ChunkGeneratorType.Preset.AMPLIFIED.getChunkGeneratorType());
+        protected ChunkGenerator getChunkGenerator(long seed) {
+            return new SurfaceChunkGenerator(new VanillaLayeredBiomeSource(seed, false, false), seed, ChunkGeneratorType.Preset.AMPLIFIED.getChunkGeneratorType());
         }
     };
     private static final GeneratorType SINGLE_BIOME_SURFACE = new GeneratorType("single_biome_surface"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), l, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
+        protected ChunkGenerator getChunkGenerator(long seed) {
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), seed, ChunkGeneratorType.Preset.OVERWORLD.getChunkGeneratorType());
         }
     };
     private static final GeneratorType SINGLE_BIOME_CAVES = new GeneratorType("single_biome_caves"){
@@ -81,21 +81,21 @@ public abstract class GeneratorType {
         }
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), l, ChunkGeneratorType.Preset.CAVES.getChunkGeneratorType());
+        protected ChunkGenerator getChunkGenerator(long seed) {
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), seed, ChunkGeneratorType.Preset.CAVES.getChunkGeneratorType());
         }
     };
     private static final GeneratorType SINGLE_BIOME_FLOATING_ISLANDS = new GeneratorType("single_biome_floating_islands"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
-            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), l, ChunkGeneratorType.Preset.FLOATING_ISLANDS.getChunkGeneratorType());
+        protected ChunkGenerator getChunkGenerator(long seed) {
+            return new SurfaceChunkGenerator(new FixedBiomeSource(Biomes.PLAINS), seed, ChunkGeneratorType.Preset.FLOATING_ISLANDS.getChunkGeneratorType());
         }
     };
     private static final GeneratorType DEBUG_ALL_BLOCK_STATES = new GeneratorType("debug_all_block_states"){
 
         @Override
-        protected ChunkGenerator getChunkGenerator(long l) {
+        protected ChunkGenerator getChunkGenerator(long seed) {
             return DebugChunkGenerator.INSTANCE;
         }
     };
@@ -106,8 +106,8 @@ public abstract class GeneratorType {
     }, Optional.of(SINGLE_BIOME_SURFACE), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg.moreOptionsDialog.method_29700(), arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_SURFACE, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_CAVES), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg.moreOptionsDialog.method_29700(), arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_CAVES, arg3)), GeneratorType.getFirstBiome(arg2)), Optional.of(SINGLE_BIOME_FLOATING_ISLANDS), (arg, arg2) -> new CustomizeBuffetLevelScreen(arg, arg.moreOptionsDialog.method_29700(), arg3 -> arg.moreOptionsDialog.setGeneratorOptions(GeneratorType.method_29079(arg2, SINGLE_BIOME_FLOATING_ISLANDS, arg3)), GeneratorType.getFirstBiome(arg2)));
     private final Text translationKey;
 
-    private GeneratorType(String string) {
-        this.translationKey = new TranslatableText("generator." + string);
+    private GeneratorType(String translationKey) {
+        this.translationKey = new TranslatableText("generator." + translationKey);
     }
 
     private static GeneratorOptions method_29079(GeneratorOptions arg, GeneratorType arg2, Biome arg3) {
@@ -123,8 +123,8 @@ public abstract class GeneratorType {
         return new GeneratorOptions(arg.getSeed(), arg.shouldGenerateStructures(), arg.hasBonusChest(), GeneratorOptions.method_28608(arg.getDimensionMap(), new SurfaceChunkGenerator(lv, arg.getSeed(), lv4)));
     }
 
-    private static Biome getFirstBiome(GeneratorOptions arg) {
-        return arg.getChunkGenerator().getBiomeSource().getBiomes().stream().findFirst().orElse(Biomes.PLAINS);
+    private static Biome getFirstBiome(GeneratorOptions options) {
+        return options.getChunkGenerator().getBiomeSource().getBiomes().stream().findFirst().orElse(Biomes.PLAINS);
     }
 
     public static Optional<GeneratorType> method_29078(GeneratorOptions arg) {

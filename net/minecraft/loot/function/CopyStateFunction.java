@@ -44,10 +44,10 @@ extends ConditionalLootFunction {
     private final Block block;
     private final Set<Property<?>> properties;
 
-    private CopyStateFunction(LootCondition[] args, Block arg, Set<Property<?>> set) {
+    private CopyStateFunction(LootCondition[] args, Block arg, Set<Property<?>> properties) {
         super(args);
         this.block = arg;
-        this.properties = set;
+        this.properties = properties;
     }
 
     @Override
@@ -61,11 +61,11 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    protected ItemStack process(ItemStack arg, LootContext arg2) {
-        BlockState lv = arg2.get(LootContextParameters.BLOCK_STATE);
+    protected ItemStack process(ItemStack stack, LootContext context) {
+        BlockState lv = context.get(LootContextParameters.BLOCK_STATE);
         if (lv != null) {
             CompoundTag lv4;
-            CompoundTag lv2 = arg.getOrCreateTag();
+            CompoundTag lv2 = stack.getOrCreateTag();
             if (lv2.contains("BlockStateTag", 10)) {
                 CompoundTag lv3 = lv2.getCompound("BlockStateTag");
             } else {
@@ -74,7 +74,7 @@ extends ConditionalLootFunction {
             }
             this.properties.stream().filter(lv::contains).forEach(arg3 -> lv4.putString(arg3.getName(), CopyStateFunction.method_21893(lv, arg3)));
         }
-        return arg;
+        return stack;
     }
 
     public static Builder getBuilder(Block arg) {
@@ -111,8 +111,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 

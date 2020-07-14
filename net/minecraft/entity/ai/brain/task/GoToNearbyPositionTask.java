@@ -26,9 +26,9 @@ extends Task<PathAwareEntity> {
     private final float field_25753;
     private long nextRunTime;
 
-    public GoToNearbyPositionTask(MemoryModuleType<GlobalPos> arg, float f, int i, int j) {
-        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
-        this.memoryModuleType = arg;
+    public GoToNearbyPositionTask(MemoryModuleType<GlobalPos> memoryModuleType, float f, int i, int j) {
+        super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), memoryModuleType, (Object)((Object)MemoryModuleState.VALUE_PRESENT)));
+        this.memoryModuleType = memoryModuleType;
         this.field_25753 = f;
         this.completionRange = i;
         this.maxDistance = j;

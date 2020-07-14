@@ -34,22 +34,22 @@ implements Recipe<Inventory> {
     private final ItemStack result;
     private final Identifier id;
 
-    public SmithingRecipe(Identifier arg, Ingredient arg2, Ingredient arg3, ItemStack arg4) {
-        this.id = arg;
-        this.base = arg2;
-        this.addition = arg3;
-        this.result = arg4;
+    public SmithingRecipe(Identifier id, Ingredient base, Ingredient addition, ItemStack result) {
+        this.id = id;
+        this.base = base;
+        this.addition = addition;
+        this.result = result;
     }
 
     @Override
-    public boolean matches(Inventory arg, World arg2) {
-        return this.base.test(arg.getStack(0)) && this.addition.test(arg.getStack(1));
+    public boolean matches(Inventory inv, World world) {
+        return this.base.test(inv.getStack(0)) && this.addition.test(inv.getStack(1));
     }
 
     @Override
-    public ItemStack craft(Inventory arg) {
+    public ItemStack craft(Inventory inv) {
         ItemStack lv = this.result.copy();
-        CompoundTag lv2 = arg.getStack(0).getTag();
+        CompoundTag lv2 = inv.getStack(0).getTag();
         if (lv2 != null) {
             lv.setTag(lv2.copy());
         }
@@ -58,8 +58,8 @@ implements Recipe<Inventory> {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean fits(int i, int j) {
-        return i * j >= 2;
+    public boolean fits(int width, int height) {
+        return width * height >= 2;
     }
 
     @Override
@@ -118,13 +118,13 @@ implements Recipe<Inventory> {
         }
 
         @Override
-        public /* synthetic */ Recipe read(Identifier arg, PacketByteBuf arg2) {
-            return this.read(arg, arg2);
+        public /* synthetic */ Recipe read(Identifier id, PacketByteBuf buf) {
+            return this.read(id, buf);
         }
 
         @Override
-        public /* synthetic */ Recipe read(Identifier arg, JsonObject jsonObject) {
-            return this.read(arg, jsonObject);
+        public /* synthetic */ Recipe read(Identifier id, JsonObject json) {
+            return this.read(id, json);
         }
     }
 }

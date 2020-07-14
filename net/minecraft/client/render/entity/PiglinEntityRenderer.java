@@ -28,14 +28,14 @@ public class PiglinEntityRenderer
 extends BipedEntityRenderer<MobEntity, PiglinEntityModel<MobEntity>> {
     private static final Map<EntityType<?>, Identifier> field_25793 = ImmutableMap.of(EntityType.PIGLIN, (Object)new Identifier("textures/entity/piglin/piglin.png"), EntityType.ZOMBIFIED_PIGLIN, (Object)new Identifier("textures/entity/piglin/zombified_piglin.png"), EntityType.PIGLIN_BRUTE, (Object)new Identifier("textures/entity/piglin/piglin_brute.png"));
 
-    public PiglinEntityRenderer(EntityRenderDispatcher arg, boolean bl) {
-        super(arg, PiglinEntityRenderer.getPiglinModel(bl), 0.5f, 1.0019531f, 1.0f, 1.0019531f);
+    public PiglinEntityRenderer(EntityRenderDispatcher dispatcher, boolean zombified) {
+        super(dispatcher, PiglinEntityRenderer.getPiglinModel(zombified), 0.5f, 1.0019531f, 1.0f, 1.0019531f);
         this.addFeature(new ArmorFeatureRenderer(this, new BipedEntityModel(0.5f), new BipedEntityModel(1.02f)));
     }
 
-    private static PiglinEntityModel<MobEntity> getPiglinModel(boolean bl) {
+    private static PiglinEntityModel<MobEntity> getPiglinModel(boolean zombified) {
         PiglinEntityModel<MobEntity> lv = new PiglinEntityModel<MobEntity>(0.0f, 64, 64);
-        if (bl) {
+        if (zombified) {
             lv.leftEar.visible = false;
         }
         return lv;
@@ -56,8 +56,8 @@ extends BipedEntityRenderer<MobEntity, PiglinEntityModel<MobEntity>> {
     }
 
     @Override
-    protected /* synthetic */ boolean isShaking(LivingEntity arg) {
-        return this.isShaking((MobEntity)arg);
+    protected /* synthetic */ boolean isShaking(LivingEntity entity) {
+        return this.isShaking((MobEntity)entity);
     }
 }
 

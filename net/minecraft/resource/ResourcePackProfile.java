@@ -53,18 +53,18 @@ implements AutoCloseable {
      * Enabled aggressive exception aggregation
      */
     @Nullable
-    public static ResourcePackProfile of(String string, boolean bl, Supplier<ResourcePack> supplier, Factory arg, InsertionPosition arg2, ResourcePackSource arg3) {
-        try (ResourcePack lv = supplier.get();){
+    public static ResourcePackProfile of(String name, boolean alwaysEnabled, Supplier<ResourcePack> packFactory, Factory containerFactory, InsertionPosition insertionPosition, ResourcePackSource arg3) {
+        try (ResourcePack lv = packFactory.get();){
             PackResourceMetadata lv2 = lv.parseMetadata(PackResourceMetadata.READER);
-            if (bl && lv2 == null) {
+            if (alwaysEnabled && lv2 == null) {
                 LOGGER.error("Broken/missing pack.mcmeta detected, fudging it into existance. Please check that your launcher has downloaded all assets for the game correctly!");
                 lv2 = BROKEN_PACK_META;
             }
             if (lv2 != null) {
-                ResourcePackProfile resourcePackProfile = arg.create(string, bl, supplier, lv, lv2, arg2, arg3);
+                ResourcePackProfile resourcePackProfile = containerFactory.create(name, alwaysEnabled, packFactory, lv, lv2, insertionPosition, arg3);
                 return resourcePackProfile;
             }
-            LOGGER.warn("Couldn't find pack meta for pack {}", (Object)string);
+            LOGGER.warn("Couldn't find pack meta for pack {}", (Object)name);
             return null;
         }
         catch (IOException iOException) {
@@ -73,20 +73,20 @@ implements AutoCloseable {
         return null;
     }
 
-    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, Text arg, Text arg2, ResourcePackCompatibility arg3, InsertionPosition arg4, boolean bl2, ResourcePackSource arg5) {
-        this.name = string;
-        this.packGetter = supplier;
-        this.displayName = arg;
-        this.description = arg2;
-        this.compatibility = arg3;
-        this.alwaysEnabled = bl;
-        this.position = arg4;
-        this.pinned = bl2;
-        this.source = arg5;
+    public ResourcePackProfile(String name, boolean alwaysEnabled, Supplier<ResourcePack> packFactory, Text displayName, Text description, ResourcePackCompatibility compatibility, InsertionPosition direction, boolean pinned, ResourcePackSource source) {
+        this.name = name;
+        this.packGetter = packFactory;
+        this.displayName = displayName;
+        this.description = description;
+        this.compatibility = compatibility;
+        this.alwaysEnabled = alwaysEnabled;
+        this.position = direction;
+        this.pinned = pinned;
+        this.source = source;
     }
 
-    public ResourcePackProfile(String string, boolean bl, Supplier<ResourcePack> supplier, ResourcePack arg, PackResourceMetadata arg2, InsertionPosition arg3, ResourcePackSource arg4) {
-        this(string, bl, supplier, new LiteralText(arg.getName()), arg2.getDescription(), ResourcePackCompatibility.from(arg2.getPackFormat()), arg3, false, arg4);
+    public ResourcePackProfile(String name, boolean alwaysEnabled, Supplier<ResourcePack> packFactory, ResourcePack pack, PackResourceMetadata metadata, InsertionPosition direction, ResourcePackSource source) {
+        this(name, alwaysEnabled, packFactory, new LiteralText(pack.getName()), metadata.getDescription(), ResourcePackCompatibility.from(metadata.getPackFormat()), direction, false, source);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -99,8 +99,8 @@ implements AutoCloseable {
         return this.description;
     }
 
-    public Text getInformationText(boolean bl) {
-        return Texts.bracketed(this.source.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(bl ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
+    public Text getInformationText(boolean enabled) {
+        return Texts.bracketed(this.source.decorate(new LiteralText(this.name))).styled(arg -> arg.withColor(enabled ? Formatting.GREEN : Formatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.name)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("").append(this.displayName).append("\n").append(this.description))));
     }
 
     public ResourcePackCompatibility getCompatibility() {
@@ -132,14 +132,14 @@ implements AutoCloseable {
         return this.source;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(object instanceof ResourcePackProfile)) {
+        if (!(o instanceof ResourcePackProfile)) {
             return false;
         }
-        ResourcePackProfile lv = (ResourcePackProfile)object;
+        ResourcePackProfile lv = (ResourcePackProfile)o;
         return this.name.equals(lv.name);
     }
 
@@ -156,22 +156,22 @@ implements AutoCloseable {
         BOTTOM;
 
 
-        public <T> int insert(List<T> list, T object, Function<T, ResourcePackProfile> function, boolean bl) {
+        public <T> int insert(List<T> items, T item, Function<T, ResourcePackProfile> profileGetter, boolean listInverted) {
             ResourcePackProfile lv3;
             int j;
             InsertionPosition lv;
-            InsertionPosition insertionPosition = lv = bl ? this.inverse() : this;
+            InsertionPosition insertionPosition = lv = listInverted ? this.inverse() : this;
             if (lv == BOTTOM) {
                 ResourcePackProfile lv2;
                 int i;
-                for (i = 0; i < list.size() && (lv2 = function.apply(list.get(i))).isPinned() && lv2.getInitialPosition() == this; ++i) {
+                for (i = 0; i < items.size() && (lv2 = profileGetter.apply(items.get(i))).isPinned() && lv2.getInitialPosition() == this; ++i) {
                 }
-                list.add(i, object);
+                items.add(i, item);
                 return i;
             }
-            for (j = list.size() - 1; j >= 0 && (lv3 = function.apply(list.get(j))).isPinned() && lv3.getInitialPosition() == this; --j) {
+            for (j = items.size() - 1; j >= 0 && (lv3 = profileGetter.apply(items.get(j))).isPinned() && lv3.getInitialPosition() == this; --j) {
             }
-            list.add(j + 1, object);
+            items.add(j + 1, item);
             return j + 1;
         }
 

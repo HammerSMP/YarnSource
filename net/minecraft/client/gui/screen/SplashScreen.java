@@ -43,19 +43,19 @@ extends Overlay {
     private long applyCompleteTime = -1L;
     private long prepareCompleteTime = -1L;
 
-    public SplashScreen(MinecraftClient arg, ResourceReloadMonitor arg2, Consumer<Optional<Throwable>> consumer, boolean bl) {
-        this.client = arg;
-        this.reloadMonitor = arg2;
-        this.exceptionHandler = consumer;
-        this.reloading = bl;
+    public SplashScreen(MinecraftClient client, ResourceReloadMonitor monitor, Consumer<Optional<Throwable>> exceptionHandler, boolean reloading) {
+        this.client = client;
+        this.reloadMonitor = monitor;
+        this.exceptionHandler = exceptionHandler;
+        this.reloading = reloading;
     }
 
-    public static void init(MinecraftClient arg) {
-        arg.getTextureManager().registerTexture(LOGO, new LogoTexture());
+    public static void init(MinecraftClient client) {
+        client.getTextureManager().registerTexture(LOGO, new LogoTexture());
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         float r;
         float h;
         int k = this.client.getWindow().getScaledWidth();
@@ -65,23 +65,23 @@ extends Overlay {
             this.prepareCompleteTime = m;
         }
         float g = this.applyCompleteTime > -1L ? (float)(m - this.applyCompleteTime) / 1000.0f : -1.0f;
-        float f2 = h = this.prepareCompleteTime > -1L ? (float)(m - this.prepareCompleteTime) / 500.0f : -1.0f;
+        float f = h = this.prepareCompleteTime > -1L ? (float)(m - this.prepareCompleteTime) / 500.0f : -1.0f;
         if (g >= 1.0f) {
             if (this.client.currentScreen != null) {
-                this.client.currentScreen.render(arg, 0, 0, f);
+                this.client.currentScreen.render(matrices, 0, 0, delta);
             }
             int n = MathHelper.ceil((1.0f - MathHelper.clamp(g - 1.0f, 0.0f, 1.0f)) * 255.0f);
-            SplashScreen.fill(arg, 0, 0, k, l, field_25042 | n << 24);
+            SplashScreen.fill(matrices, 0, 0, k, l, field_25042 | n << 24);
             float o = 1.0f - MathHelper.clamp(g - 1.0f, 0.0f, 1.0f);
         } else if (this.reloading) {
             if (this.client.currentScreen != null && h < 1.0f) {
-                this.client.currentScreen.render(arg, i, j, f);
+                this.client.currentScreen.render(matrices, mouseX, mouseY, delta);
             }
             int p = MathHelper.ceil(MathHelper.clamp((double)h, 0.15, 1.0) * 255.0);
-            SplashScreen.fill(arg, 0, 0, k, l, field_25042 | p << 24);
+            SplashScreen.fill(matrices, 0, 0, k, l, field_25042 | p << 24);
             float q = MathHelper.clamp(h, 0.0f, 1.0f);
         } else {
-            SplashScreen.fill(arg, 0, 0, k, l, field_25041);
+            SplashScreen.fill(matrices, 0, 0, k, l, field_25041);
             r = 1.0f;
         }
         int s = (int)((double)this.client.getWindow().getScaledWidth() * 0.5);
@@ -96,8 +96,8 @@ extends Overlay {
         RenderSystem.blendFunc(770, 1);
         RenderSystem.alphaFunc(516, 0.0f);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, r);
-        SplashScreen.drawTexture(arg, s - v, t - u, v, (int)d, -0.0625f, 0.0f, 120, 60, 120, 120);
-        SplashScreen.drawTexture(arg, s, t - u, v, (int)d, 0.0625f, 60.0f, 120, 60, 120, 120);
+        SplashScreen.drawTexture(matrices, s - v, t - u, v, (int)d, -0.0625f, 0.0f, 120, 60, 120, 120);
+        SplashScreen.drawTexture(matrices, s, t - u, v, (int)d, 0.0625f, 60.0f, 120, 60, 120, 120);
         RenderSystem.defaultBlendFunc();
         RenderSystem.defaultAlphaFunc();
         RenderSystem.disableBlend();
@@ -105,7 +105,7 @@ extends Overlay {
         float x = this.reloadMonitor.getProgress();
         this.progress = MathHelper.clamp(this.progress * 0.95f + x * 0.050000012f, 0.0f, 1.0f);
         if (g < 1.0f) {
-            this.renderProgressBar(arg, k / 2 - v, w - 5, k / 2 + v, w + 5, 1.0f - MathHelper.clamp(g, 0.0f, 1.0f));
+            this.renderProgressBar(matrices, k / 2 - v, w - 5, k / 2 + v, w + 5, 1.0f - MathHelper.clamp(g, 0.0f, 1.0f));
         }
         if (g >= 2.0f) {
             this.client.setOverlay(null);
@@ -154,7 +154,7 @@ extends Overlay {
          * Enabled aggressive exception aggregation
          */
         @Override
-        protected ResourceTexture.TextureData loadTextureData(ResourceManager arg) {
+        protected ResourceTexture.TextureData loadTextureData(ResourceManager resourceManager) {
             MinecraftClient lv = MinecraftClient.getInstance();
             DefaultResourcePack lv2 = lv.getResourcePackDownloader().getPack();
             try (InputStream inputStream = lv2.open(ResourceType.CLIENT_RESOURCES, LOGO);){

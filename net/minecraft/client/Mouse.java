@@ -44,28 +44,28 @@ public class Mouse {
     private double lastMouseUpdateTime = Double.MIN_VALUE;
     private boolean isCursorLocked;
 
-    public Mouse(MinecraftClient arg) {
-        this.client = arg;
+    public Mouse(MinecraftClient client) {
+        this.client = client;
     }
 
-    private void onMouseButton(long l, int i, int j, int k) {
+    private void onMouseButton(long window, int button, int action, int mods) {
         boolean bl;
-        if (l != this.client.getWindow().getHandle()) {
+        if (window != this.client.getWindow().getHandle()) {
             return;
         }
-        boolean bl2 = bl = j == 1;
-        if (MinecraftClient.IS_SYSTEM_MAC && i == 0) {
+        boolean bl2 = bl = action == 1;
+        if (MinecraftClient.IS_SYSTEM_MAC && button == 0) {
             if (bl) {
-                if ((k & 2) == 2) {
-                    i = 1;
+                if ((mods & 2) == 2) {
+                    button = 1;
                     ++this.controlLeftTicks;
                 }
             } else if (this.controlLeftTicks > 0) {
-                i = 1;
+                button = 1;
                 --this.controlLeftTicks;
             }
         }
-        int m = i;
+        int m = button;
         if (bl) {
             if (this.client.options.touchscreen && this.field_1796++ > 0) {
                 return;
@@ -117,9 +117,9 @@ public class Mouse {
         }
     }
 
-    private void onMouseScroll(long l, double d, double e) {
-        if (l == MinecraftClient.getInstance().getWindow().getHandle()) {
-            double f = (this.client.options.discreteMouseScroll ? Math.signum(e) : e) * this.client.options.mouseWheelSensitivity;
+    private void onMouseScroll(long window, double horizontal, double vertical) {
+        if (window == MinecraftClient.getInstance().getWindow().getHandle()) {
+            double f = (this.client.options.discreteMouseScroll ? Math.signum(vertical) : vertical) * this.client.options.mouseWheelSensitivity;
             if (this.client.overlay == null) {
                 if (this.client.currentScreen != null) {
                     double g = this.x * (double)this.client.getWindow().getScaledWidth() / (double)this.client.getWindow().getWidth();
@@ -166,34 +166,34 @@ public class Mouse {
         });
     }
 
-    private void onCursorPos(long l, double d, double e) {
+    private void onCursorPos(long window, double x, double y) {
         Screen lv;
-        if (l != MinecraftClient.getInstance().getWindow().getHandle()) {
+        if (window != MinecraftClient.getInstance().getWindow().getHandle()) {
             return;
         }
         if (this.hasResolutionChanged) {
-            this.x = d;
-            this.y = e;
+            this.x = x;
+            this.y = y;
             this.hasResolutionChanged = false;
         }
         if ((lv = this.client.currentScreen) != null && this.client.overlay == null) {
-            double f = d * (double)this.client.getWindow().getScaledWidth() / (double)this.client.getWindow().getWidth();
-            double g = e * (double)this.client.getWindow().getScaledHeight() / (double)this.client.getWindow().getHeight();
+            double f = x * (double)this.client.getWindow().getScaledWidth() / (double)this.client.getWindow().getWidth();
+            double g = y * (double)this.client.getWindow().getScaledHeight() / (double)this.client.getWindow().getHeight();
             Screen.wrapScreenError(() -> lv.mouseMoved(f, g), "mouseMoved event handler", lv.getClass().getCanonicalName());
             if (this.activeButton != -1 && this.glfwTime > 0.0) {
-                double h = (d - this.x) * (double)this.client.getWindow().getScaledWidth() / (double)this.client.getWindow().getWidth();
-                double i = (e - this.y) * (double)this.client.getWindow().getScaledHeight() / (double)this.client.getWindow().getHeight();
+                double h = (x - this.x) * (double)this.client.getWindow().getScaledWidth() / (double)this.client.getWindow().getWidth();
+                double i = (y - this.y) * (double)this.client.getWindow().getScaledHeight() / (double)this.client.getWindow().getHeight();
                 Screen.wrapScreenError(() -> lv.mouseDragged(f, g, this.activeButton, h, i), "mouseDragged event handler", lv.getClass().getCanonicalName());
             }
         }
         this.client.getProfiler().push("mouse");
         if (this.isCursorLocked() && this.client.isWindowFocused()) {
-            this.cursorDeltaX += d - this.x;
-            this.cursorDeltaY += e - this.y;
+            this.cursorDeltaX += x - this.x;
+            this.cursorDeltaY += y - this.y;
         }
         this.updateMouse();
-        this.x = d;
-        this.y = e;
+        this.x = x;
+        this.y = y;
         this.client.getProfiler().pop();
     }
 

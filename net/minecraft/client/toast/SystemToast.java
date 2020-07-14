@@ -36,26 +36,26 @@ implements Toast {
     private boolean justUpdated;
     private final int width;
 
-    public SystemToast(Type arg, Text arg2, @Nullable Text arg3) {
-        this(arg, arg2, (List<StringRenderable>)SystemToast.getTextAsList(arg3), 160);
+    public SystemToast(Type type, Text title, @Nullable Text description) {
+        this(type, title, (List<StringRenderable>)SystemToast.getTextAsList(description), 160);
     }
 
-    public static SystemToast create(MinecraftClient arg, Type arg2, Text arg3, Text arg4) {
-        TextRenderer lv = arg.textRenderer;
-        List<StringRenderable> list = lv.getTextHandler().wrapLines(arg4, 200, Style.EMPTY);
+    public static SystemToast create(MinecraftClient client, Type type, Text title, Text description) {
+        TextRenderer lv = client.textRenderer;
+        List<StringRenderable> list = lv.getTextHandler().wrapLines(description, 200, Style.EMPTY);
         int i = Math.max(200, list.stream().mapToInt(lv::getWidth).max().orElse(200));
-        return new SystemToast(arg2, arg3, list, i + 30);
+        return new SystemToast(type, title, list, i + 30);
     }
 
-    private SystemToast(Type arg, Text arg2, List<StringRenderable> list, int i) {
-        this.type = arg;
-        this.title = arg2;
-        this.lines = list;
-        this.width = i;
+    private SystemToast(Type type, Text title, List<StringRenderable> lines, int width) {
+        this.type = type;
+        this.title = title;
+        this.lines = lines;
+        this.width = width;
     }
 
-    private static ImmutableList<StringRenderable> getTextAsList(@Nullable Text arg) {
-        return arg == null ? ImmutableList.of() : ImmutableList.of((Object)arg);
+    private static ImmutableList<StringRenderable> getTextAsList(@Nullable Text text) {
+        return text == null ? ImmutableList.of() : ImmutableList.of((Object)text);
     }
 
     @Override
@@ -64,51 +64,51 @@ implements Toast {
     }
 
     @Override
-    public Toast.Visibility draw(MatrixStack arg, ToastManager arg2, long l) {
+    public Toast.Visibility draw(MatrixStack matrices, ToastManager manager, long startTime) {
         if (this.justUpdated) {
-            this.startTime = l;
+            this.startTime = startTime;
             this.justUpdated = false;
         }
-        arg2.getGame().getTextureManager().bindTexture(TOASTS_TEX);
+        manager.getGame().getTextureManager().bindTexture(TOASTS_TEX);
         RenderSystem.color3f(1.0f, 1.0f, 1.0f);
         int i = this.getWidth();
         int j = 12;
         if (i == 160 && this.lines.size() <= 1) {
-            arg2.drawTexture(arg, 0, 0, 0, 64, i, this.getHeight());
+            manager.drawTexture(matrices, 0, 0, 0, 64, i, this.getHeight());
         } else {
             int k = this.getHeight() + Math.max(0, this.lines.size() - 1) * 12;
             int m = 28;
             int n = Math.min(4, k - 28);
-            this.drawPart(arg, arg2, i, 0, 0, 28);
+            this.drawPart(matrices, manager, i, 0, 0, 28);
             for (int o = 28; o < k - n; o += 10) {
-                this.drawPart(arg, arg2, i, 16, o, Math.min(16, k - o - n));
+                this.drawPart(matrices, manager, i, 16, o, Math.min(16, k - o - n));
             }
-            this.drawPart(arg, arg2, i, 32 - n, k - n, n);
+            this.drawPart(matrices, manager, i, 32 - n, k - n, n);
         }
         if (this.lines == null) {
-            arg2.getGame().textRenderer.draw(arg, this.title, 18.0f, 12.0f, -256);
+            manager.getGame().textRenderer.draw(matrices, this.title, 18.0f, 12.0f, -256);
         } else {
-            arg2.getGame().textRenderer.draw(arg, this.title, 18.0f, 7.0f, -256);
+            manager.getGame().textRenderer.draw(matrices, this.title, 18.0f, 7.0f, -256);
             for (int p = 0; p < this.lines.size(); ++p) {
-                arg2.getGame().textRenderer.draw(arg, this.lines.get(p), 18.0f, (float)(18 + p * 12), -1);
+                manager.getGame().textRenderer.draw(matrices, this.lines.get(p), 18.0f, (float)(18 + p * 12), -1);
             }
         }
-        return l - this.startTime < 5000L ? Toast.Visibility.SHOW : Toast.Visibility.HIDE;
+        return startTime - this.startTime < 5000L ? Toast.Visibility.SHOW : Toast.Visibility.HIDE;
     }
 
-    private void drawPart(MatrixStack arg, ToastManager arg2, int i, int j, int k, int l) {
-        int m = j == 0 ? 20 : 5;
-        int n = Math.min(60, i - m);
-        arg2.drawTexture(arg, 0, k, 0, 64 + j, m, l);
-        for (int o = m; o < i - n; o += 64) {
-            arg2.drawTexture(arg, o, k, 32, 64 + j, Math.min(64, i - o - n), l);
+    private void drawPart(MatrixStack matrices, ToastManager manager, int width, int textureV, int y, int height) {
+        int m = textureV == 0 ? 20 : 5;
+        int n = Math.min(60, width - m);
+        manager.drawTexture(matrices, 0, y, 0, 64 + textureV, m, height);
+        for (int o = m; o < width - n; o += 64) {
+            manager.drawTexture(matrices, o, y, 32, 64 + textureV, Math.min(64, width - o - n), height);
         }
-        arg2.drawTexture(arg, i - n, k, 160 - n, 64 + j, n, l);
+        manager.drawTexture(matrices, width - n, y, 160 - n, 64 + textureV, n, height);
     }
 
-    public void setContent(Text arg, @Nullable Text arg2) {
-        this.title = arg;
-        this.lines = SystemToast.getTextAsList(arg2);
+    public void setContent(Text title, @Nullable Text description) {
+        this.title = title;
+        this.lines = SystemToast.getTextAsList(description);
         this.justUpdated = true;
     }
 
@@ -116,29 +116,29 @@ implements Toast {
         return this.type;
     }
 
-    public static void add(ToastManager arg, Type arg2, Text arg3, @Nullable Text arg4) {
-        arg.add(new SystemToast(arg2, arg3, arg4));
+    public static void add(ToastManager manager, Type type, Text title, @Nullable Text description) {
+        manager.add(new SystemToast(type, title, description));
     }
 
-    public static void show(ToastManager arg, Type arg2, Text arg3, @Nullable Text arg4) {
-        SystemToast lv = arg.getToast(SystemToast.class, (Object)arg2);
+    public static void show(ToastManager manager, Type type, Text title, @Nullable Text description) {
+        SystemToast lv = manager.getToast(SystemToast.class, (Object)type);
         if (lv == null) {
-            SystemToast.add(arg, arg2, arg3, arg4);
+            SystemToast.add(manager, type, title, description);
         } else {
-            lv.setContent(arg3, arg4);
+            lv.setContent(title, description);
         }
     }
 
-    public static void addWorldAccessFailureToast(MinecraftClient arg, String string) {
-        SystemToast.add(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.access_failure"), new LiteralText(string));
+    public static void addWorldAccessFailureToast(MinecraftClient client, String worldName) {
+        SystemToast.add(client.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.access_failure"), new LiteralText(worldName));
     }
 
-    public static void addWorldDeleteFailureToast(MinecraftClient arg, String string) {
-        SystemToast.add(arg.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.delete_failure"), new LiteralText(string));
+    public static void addWorldDeleteFailureToast(MinecraftClient client, String worldName) {
+        SystemToast.add(client.getToastManager(), Type.WORLD_ACCESS_FAILURE, new TranslatableText("selectWorld.delete_failure"), new LiteralText(worldName));
     }
 
-    public static void addPackCopyFailure(MinecraftClient arg, String string) {
-        SystemToast.add(arg.getToastManager(), Type.PACK_COPY_FAILURE, new TranslatableText("pack.copyFailure"), new LiteralText(string));
+    public static void addPackCopyFailure(MinecraftClient client, String directory) {
+        SystemToast.add(client.getToastManager(), Type.PACK_COPY_FAILURE, new TranslatableText("pack.copyFailure"), new LiteralText(directory));
     }
 
     @Override

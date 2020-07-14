@@ -78,27 +78,27 @@ extends BlockEntityRenderer<BedBlockEntity> {
         }
     }
 
-    private void method_3558(MatrixStack arg, VertexConsumerProvider arg2, boolean bl, Direction arg3, SpriteIdentifier arg4, int i, int j, boolean bl2) {
+    private void method_3558(MatrixStack matrix, VertexConsumerProvider arg2, boolean bl, Direction arg3, SpriteIdentifier arg4, int light, int overlay, boolean bl2) {
         this.field_20813.visible = bl;
         this.field_20814.visible = !bl;
         this.legs[0].visible = !bl;
         this.legs[1].visible = bl;
         this.legs[2].visible = !bl;
         this.legs[3].visible = bl;
-        arg.push();
-        arg.translate(0.0, 0.5625, bl2 ? -1.0 : 0.0);
-        arg.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(90.0f));
-        arg.translate(0.5, 0.5, 0.5);
-        arg.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180.0f + arg3.asRotation()));
-        arg.translate(-0.5, -0.5, -0.5);
+        matrix.push();
+        matrix.translate(0.0, 0.5625, bl2 ? -1.0 : 0.0);
+        matrix.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+        matrix.translate(0.5, 0.5, 0.5);
+        matrix.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180.0f + arg3.asRotation()));
+        matrix.translate(-0.5, -0.5, -0.5);
         VertexConsumer lv = arg4.getVertexConsumer(arg2, RenderLayer::getEntitySolid);
-        this.field_20813.render(arg, lv, i, j);
-        this.field_20814.render(arg, lv, i, j);
-        this.legs[0].render(arg, lv, i, j);
-        this.legs[1].render(arg, lv, i, j);
-        this.legs[2].render(arg, lv, i, j);
-        this.legs[3].render(arg, lv, i, j);
-        arg.pop();
+        this.field_20813.render(matrix, lv, light, overlay);
+        this.field_20814.render(matrix, lv, light, overlay);
+        this.legs[0].render(matrix, lv, light, overlay);
+        this.legs[1].render(matrix, lv, light, overlay);
+        this.legs[2].render(matrix, lv, light, overlay);
+        this.legs[3].render(matrix, lv, light, overlay);
+        matrix.pop();
     }
 }
 

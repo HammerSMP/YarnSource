@@ -16,8 +16,8 @@ extends Goal {
     private VillagerEntity targetVillager;
     private int lookCountdown;
 
-    public IronGolemLookGoal(IronGolemEntity arg) {
-        this.golem = arg;
+    public IronGolemLookGoal(IronGolemEntity golem) {
+        this.golem = golem;
         this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
     }
 

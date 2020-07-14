@@ -25,8 +25,8 @@ public class JigsawRotationFix
 extends DataFix {
     private static final Map<String, String> ORIENTATION_UPDATES = ImmutableMap.builder().put((Object)"down", (Object)"down_south").put((Object)"up", (Object)"up_north").put((Object)"north", (Object)"north_up").put((Object)"south", (Object)"south_up").put((Object)"west", (Object)"west_up").put((Object)"east", (Object)"east_up").build();
 
-    public JigsawRotationFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public JigsawRotationFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     private static Dynamic<?> updateBlockState(Dynamic<?> dynamic2) {

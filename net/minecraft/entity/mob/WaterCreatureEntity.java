@@ -30,8 +30,8 @@ extends PathAwareEntity {
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return arg.intersectsEntities(this);
+    public boolean canSpawn(WorldView world) {
+        return world.intersectsEntities(this);
     }
 
     @Override
@@ -40,13 +40,13 @@ extends PathAwareEntity {
     }
 
     @Override
-    protected int getCurrentExperience(PlayerEntity arg) {
+    protected int getCurrentExperience(PlayerEntity player) {
         return 1 + this.world.random.nextInt(3);
     }
 
-    protected void tickWaterBreathingAir(int i) {
+    protected void tickWaterBreathingAir(int air) {
         if (this.isAlive() && !this.isInsideWaterOrBubbleColumn()) {
-            this.setAir(i - 1);
+            this.setAir(air - 1);
             if (this.getAir() == -20) {
                 this.setAir(0);
                 this.damage(DamageSource.DROWN, 2.0f);
@@ -69,7 +69,7 @@ extends PathAwareEntity {
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return false;
     }
 }

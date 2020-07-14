@@ -37,7 +37,7 @@ public class SpectatorMenu {
     public static final SpectatorMenuCommand BLANK_COMMAND = new SpectatorMenuCommand(){
 
         @Override
-        public void use(SpectatorMenu arg) {
+        public void use(SpectatorMenu menu) {
         }
 
         @Override
@@ -59,22 +59,22 @@ public class SpectatorMenu {
     private int selectedSlot = -1;
     private int page;
 
-    public SpectatorMenu(SpectatorMenuCloseCallback arg) {
-        this.closeCallback = arg;
+    public SpectatorMenu(SpectatorMenuCloseCallback closeCallback) {
+        this.closeCallback = closeCallback;
     }
 
-    public SpectatorMenuCommand getCommand(int i) {
-        int j = i + this.page * 6;
-        if (this.page > 0 && i == 0) {
+    public SpectatorMenuCommand getCommand(int slot) {
+        int j = slot + this.page * 6;
+        if (this.page > 0 && slot == 0) {
             return PREVIOUS_PAGE_COMMAND;
         }
-        if (i == 7) {
+        if (slot == 7) {
             if (j < this.currentGroup.getCommands().size()) {
                 return NEXT_PAGE_COMMAND;
             }
             return DISABLED_NEXT_PAGE_COMMAND;
         }
-        if (i == 8) {
+        if (slot == 8) {
             return CLOSE_COMMAND;
         }
         if (j < 0 || j >= this.currentGroup.getCommands().size()) {
@@ -99,13 +99,13 @@ public class SpectatorMenu {
         return this.currentGroup;
     }
 
-    public void useCommand(int i) {
-        SpectatorMenuCommand lv = this.getCommand(i);
+    public void useCommand(int slot) {
+        SpectatorMenuCommand lv = this.getCommand(slot);
         if (lv != BLANK_COMMAND) {
-            if (this.selectedSlot == i && lv.isEnabled()) {
+            if (this.selectedSlot == slot && lv.isEnabled()) {
                 lv.use(this);
             } else {
-                this.selectedSlot = i;
+                this.selectedSlot = slot;
             }
         }
     }
@@ -118,8 +118,8 @@ public class SpectatorMenu {
         return this.selectedSlot;
     }
 
-    public void selectElement(SpectatorMenuCommandGroup arg) {
-        this.currentGroup = arg;
+    public void selectElement(SpectatorMenuCommandGroup group) {
+        this.currentGroup = group;
         this.selectedSlot = -1;
         this.page = 0;
     }
@@ -134,14 +134,14 @@ public class SpectatorMenu {
         private final int direction;
         private final boolean enabled;
 
-        public ChangePageSpectatorMenuCommand(int i, boolean bl) {
-            this.direction = i;
-            this.enabled = bl;
+        public ChangePageSpectatorMenuCommand(int direction, boolean enabled) {
+            this.direction = direction;
+            this.enabled = enabled;
         }
 
         @Override
-        public void use(SpectatorMenu arg) {
-            arg.page = arg.page + this.direction;
+        public void use(SpectatorMenu menu) {
+            menu.page = menu.page + this.direction;
         }
 
         @Override
@@ -175,8 +175,8 @@ public class SpectatorMenu {
         }
 
         @Override
-        public void use(SpectatorMenu arg) {
-            arg.close();
+        public void use(SpectatorMenu menu) {
+            menu.close();
         }
 
         @Override

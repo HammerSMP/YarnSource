@@ -32,13 +32,13 @@ extends ResourceTexture {
     }
 
     @Override
-    protected ResourceTexture.TextureData loadTextureData(ResourceManager arg) {
+    protected ResourceTexture.TextureData loadTextureData(ResourceManager resourceManager) {
         if (this.future != null) {
             ResourceTexture.TextureData lv = this.future.join();
             this.future = null;
             return lv;
         }
-        return ResourceTexture.TextureData.load(arg, this.location);
+        return ResourceTexture.TextureData.load(resourceManager, this.location);
     }
 
     public CompletableFuture<Void> getLoadCompleteFuture() {

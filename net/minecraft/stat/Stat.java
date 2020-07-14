@@ -24,19 +24,19 @@ extends ScoreboardCriterion {
     private final T value;
     private final StatType<T> type;
 
-    protected Stat(StatType<T> arg, T object, StatFormatter arg2) {
-        super(Stat.getName(arg, object));
-        this.type = arg;
-        this.formatter = arg2;
-        this.value = object;
+    protected Stat(StatType<T> type, T value, StatFormatter formatter) {
+        super(Stat.getName(type, value));
+        this.type = type;
+        this.formatter = formatter;
+        this.value = value;
     }
 
-    public static <T> String getName(StatType<T> arg, T object) {
-        return Stat.getName(Registry.STAT_TYPE.getId(arg)) + ":" + Stat.getName(arg.getRegistry().getId(object));
+    public static <T> String getName(StatType<T> type, T value) {
+        return Stat.getName(Registry.STAT_TYPE.getId(type)) + ":" + Stat.getName(type.getRegistry().getId(value));
     }
 
-    private static <T> String getName(@Nullable Identifier arg) {
-        return arg.toString().replace(':', '.');
+    private static <T> String getName(@Nullable Identifier id) {
+        return id.toString().replace(':', '.');
     }
 
     public StatType<T> getType() {
@@ -52,8 +52,8 @@ extends ScoreboardCriterion {
         return this.formatter.format(i);
     }
 
-    public boolean equals(Object object) {
-        return this == object || object instanceof Stat && Objects.equals(this.getName(), ((Stat)object).getName());
+    public boolean equals(Object o) {
+        return this == o || o instanceof Stat && Objects.equals(this.getName(), ((Stat)o).getName());
     }
 
     public int hashCode() {

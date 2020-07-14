@@ -31,23 +31,23 @@ extends TreeDecorator {
     }
 
     @Override
-    public void generate(ServerWorldAccess arg, Random random, List<BlockPos> list, List<BlockPos> list2, Set<BlockPos> set, BlockBox arg2) {
-        list2.forEach(arg3 -> {
+    public void generate(ServerWorldAccess arg, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions, Set<BlockPos> set, BlockBox box) {
+        leavesPositions.forEach(arg3 -> {
             BlockPos lv4;
             BlockPos lv3;
             BlockPos lv2;
             BlockPos lv;
             if (random.nextInt(4) == 0 && Feature.isAir(arg, lv = arg3.west())) {
-                this.method_23467(arg, lv, VineBlock.EAST, set, arg2);
+                this.method_23467(arg, lv, VineBlock.EAST, set, box);
             }
             if (random.nextInt(4) == 0 && Feature.isAir(arg, lv2 = arg3.east())) {
-                this.method_23467(arg, lv2, VineBlock.WEST, set, arg2);
+                this.method_23467(arg, lv2, VineBlock.WEST, set, box);
             }
             if (random.nextInt(4) == 0 && Feature.isAir(arg, lv3 = arg3.north())) {
-                this.method_23467(arg, lv3, VineBlock.SOUTH, set, arg2);
+                this.method_23467(arg, lv3, VineBlock.SOUTH, set, box);
             }
             if (random.nextInt(4) == 0 && Feature.isAir(arg, lv4 = arg3.south())) {
-                this.method_23467(arg, lv4, VineBlock.NORTH, set, arg2);
+                this.method_23467(arg, lv4, VineBlock.NORTH, set, box);
             }
         });
     }

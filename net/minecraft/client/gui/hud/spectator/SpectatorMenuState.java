@@ -22,17 +22,17 @@ public class SpectatorMenuState {
     private final List<SpectatorMenuCommand> commands;
     private final int selectedSlot;
 
-    public SpectatorMenuState(SpectatorMenuCommandGroup arg, List<SpectatorMenuCommand> list, int i) {
-        this.group = arg;
-        this.commands = list;
-        this.selectedSlot = i;
+    public SpectatorMenuState(SpectatorMenuCommandGroup group, List<SpectatorMenuCommand> commands, int selectedSlot) {
+        this.group = group;
+        this.commands = commands;
+        this.selectedSlot = selectedSlot;
     }
 
-    public SpectatorMenuCommand getCommand(int i) {
-        if (i < 0 || i >= this.commands.size()) {
+    public SpectatorMenuCommand getCommand(int slot) {
+        if (slot < 0 || slot >= this.commands.size()) {
             return SpectatorMenu.BLANK_COMMAND;
         }
-        return (SpectatorMenuCommand)MoreObjects.firstNonNull((Object)this.commands.get(i), (Object)SpectatorMenu.BLANK_COMMAND);
+        return (SpectatorMenuCommand)MoreObjects.firstNonNull((Object)this.commands.get(slot), (Object)SpectatorMenu.BLANK_COMMAND);
     }
 
     public int getSelectedSlot() {

@@ -49,8 +49,8 @@ public class AreaHelper {
         return Optional.of(new AreaHelper(arg, arg2, lv)).filter(predicate);
     }
 
-    public AreaHelper(WorldAccess arg, BlockPos arg2, Direction.Axis arg3) {
-        this.world = arg;
+    public AreaHelper(WorldAccess world, BlockPos arg2, Direction.Axis arg3) {
+        this.world = world;
         this.axis = arg3;
         this.negativeDir = arg3 == Direction.Axis.X ? Direction.WEST : Direction.SOUTH;
         this.lowerCorner = this.method_30492(arg2);

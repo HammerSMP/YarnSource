@@ -29,9 +29,9 @@ import org.lwjgl.system.MemoryUtil;
 public class Clipboard {
     private final ByteBuffer clipboardBuffer = BufferUtils.createByteBuffer((int)8192);
 
-    public String getClipboard(long l, GLFWErrorCallbackI gLFWErrorCallbackI) {
+    public String getClipboard(long window, GLFWErrorCallbackI gLFWErrorCallbackI) {
         GLFWErrorCallback gLFWErrorCallback = GLFW.glfwSetErrorCallback((GLFWErrorCallbackI)gLFWErrorCallbackI);
-        String string = GLFW.glfwGetClipboardString((long)l);
+        String string = GLFW.glfwGetClipboardString((long)window);
         string = string != null ? TextVisitFactory.validateSurrogates(string) : "";
         GLFWErrorCallback gLFWErrorCallback2 = GLFW.glfwSetErrorCallback((GLFWErrorCallbackI)gLFWErrorCallback);
         if (gLFWErrorCallback2 != null) {
@@ -51,15 +51,15 @@ public class Clipboard {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public void setClipboard(long l, String string) {
+    public void setClipboard(long window, String string) {
         byte[] bs = string.getBytes(Charsets.UTF_8);
         int i = bs.length + 1;
         if (i < this.clipboardBuffer.capacity()) {
-            Clipboard.setClipboard(l, this.clipboardBuffer, bs);
+            Clipboard.setClipboard(window, this.clipboardBuffer, bs);
         } else {
             ByteBuffer byteBuffer = MemoryUtil.memAlloc((int)i);
             try {
-                Clipboard.setClipboard(l, byteBuffer, bs);
+                Clipboard.setClipboard(window, byteBuffer, bs);
             }
             finally {
                 MemoryUtil.memFree((Buffer)byteBuffer);

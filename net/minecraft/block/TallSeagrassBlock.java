@@ -44,54 +44,54 @@ implements FluidFillable {
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    protected boolean canPlantOnTop(BlockState arg, BlockView arg2, BlockPos arg3) {
-        return arg.isSideSolidFullSquare(arg2, arg3, Direction.UP) && !arg.isOf(Blocks.MAGMA_BLOCK);
+    protected boolean canPlantOnTop(BlockState floor, BlockView world, BlockPos pos) {
+        return floor.isSideSolidFullSquare(world, pos, Direction.UP) && !floor.isOf(Blocks.MAGMA_BLOCK);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(Blocks.SEAGRASS);
     }
 
     @Override
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext arg) {
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
         FluidState lv2;
-        BlockState lv = super.getPlacementState(arg);
-        if (lv != null && (lv2 = arg.getWorld().getFluidState(arg.getBlockPos().up())).isIn(FluidTags.WATER) && lv2.getLevel() == 8) {
+        BlockState lv = super.getPlacementState(ctx);
+        if (lv != null && (lv2 = ctx.getWorld().getFluidState(ctx.getBlockPos().up())).isIn(FluidTags.WATER) && lv2.getLevel() == 8) {
             return lv;
         }
         return null;
     }
 
     @Override
-    public boolean canPlaceAt(BlockState arg, WorldView arg2, BlockPos arg3) {
-        if (arg.get(HALF) == DoubleBlockHalf.UPPER) {
-            BlockState lv = arg2.getBlockState(arg3.down());
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        if (state.get(HALF) == DoubleBlockHalf.UPPER) {
+            BlockState lv = world.getBlockState(pos.down());
             return lv.isOf(this) && lv.get(HALF) == DoubleBlockHalf.LOWER;
         }
-        FluidState lv2 = arg2.getFluidState(arg3);
-        return super.canPlaceAt(arg, arg2, arg3) && lv2.isIn(FluidTags.WATER) && lv2.getLevel() == 8;
+        FluidState lv2 = world.getFluidState(pos);
+        return super.canPlaceAt(state, world, pos) && lv2.isIn(FluidTags.WATER) && lv2.getLevel() == 8;
     }
 
     @Override
-    public FluidState getFluidState(BlockState arg) {
+    public FluidState getFluidState(BlockState state) {
         return Fluids.WATER.getStill(false);
     }
 
     @Override
-    public boolean canFillWithFluid(BlockView arg, BlockPos arg2, BlockState arg3, Fluid arg4) {
+    public boolean canFillWithFluid(BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
         return false;
     }
 
     @Override
-    public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
+    public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
         return false;
     }
 }

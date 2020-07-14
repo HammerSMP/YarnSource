@@ -114,7 +114,7 @@ public abstract class ItemGroup {
 
         @Override
         @Environment(value=EnvType.CLIENT)
-        public void appendStacks(DefaultedList<ItemStack> arg) {
+        public void appendStacks(DefaultedList<ItemStack> stacks) {
             throw new RuntimeException("Implement exception client-side.");
         }
 
@@ -141,11 +141,11 @@ public abstract class ItemGroup {
     private EnchantmentTarget[] enchantments = new EnchantmentTarget[0];
     private ItemStack icon;
 
-    public ItemGroup(int i, String string) {
-        this.index = i;
-        this.id = string;
+    public ItemGroup(int index, String id) {
+        this.index = index;
+        this.id = id;
         this.icon = ItemStack.EMPTY;
-        ItemGroup.GROUPS[i] = this;
+        ItemGroup.GROUPS[index] = this;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -183,13 +183,13 @@ public abstract class ItemGroup {
         return this.texture;
     }
 
-    public ItemGroup setTexture(String string) {
-        this.texture = string;
+    public ItemGroup setTexture(String texture) {
+        this.texture = texture;
         return this;
     }
 
-    public ItemGroup setName(String string) {
-        this.name = string;
+    public ItemGroup setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -232,15 +232,15 @@ public abstract class ItemGroup {
         return this.enchantments;
     }
 
-    public ItemGroup setEnchantments(EnchantmentTarget ... args) {
-        this.enchantments = args;
+    public ItemGroup setEnchantments(EnchantmentTarget ... targets) {
+        this.enchantments = targets;
         return this;
     }
 
-    public boolean containsEnchantments(@Nullable EnchantmentTarget arg) {
-        if (arg != null) {
+    public boolean containsEnchantments(@Nullable EnchantmentTarget target) {
+        if (target != null) {
             for (EnchantmentTarget lv : this.enchantments) {
-                if (lv != arg) continue;
+                if (lv != target) continue;
                 return true;
             }
         }
@@ -248,9 +248,9 @@ public abstract class ItemGroup {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void appendStacks(DefaultedList<ItemStack> arg) {
+    public void appendStacks(DefaultedList<ItemStack> stacks) {
         for (Item lv : Registry.ITEM) {
-            lv.appendStacks(this, arg);
+            lv.appendStacks(this, stacks);
         }
     }
 }

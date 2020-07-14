@@ -49,10 +49,10 @@ implements TickScheduler<T> {
     private final List<ScheduledTick<T>> consumedTickActions = Lists.newArrayList();
     private final Consumer<ScheduledTick<T>> tickConsumer;
 
-    public ServerTickScheduler(ServerWorld arg, Predicate<T> predicate, Function<T, Identifier> function, Consumer<ScheduledTick<T>> consumer) {
-        this.invalidObjPredicate = predicate;
-        this.idToName = function;
-        this.world = arg;
+    public ServerTickScheduler(ServerWorld world, Predicate<T> invalidObjPredicate, Function<T, Identifier> idToName, Consumer<ScheduledTick<T>> consumer) {
+        this.invalidObjPredicate = invalidObjPredicate;
+        this.idToName = idToName;
+        this.world = world;
         this.tickConsumer = consumer;
     }
 
@@ -100,53 +100,53 @@ implements TickScheduler<T> {
     }
 
     @Override
-    public boolean isTicking(BlockPos arg, T object) {
-        return this.currentTickActions.contains(new ScheduledTick<T>(arg, object));
+    public boolean isTicking(BlockPos pos, T object) {
+        return this.currentTickActions.contains(new ScheduledTick<T>(pos, object));
     }
 
-    public List<ScheduledTick<T>> getScheduledTicksInChunk(ChunkPos arg, boolean bl, boolean bl2) {
+    public List<ScheduledTick<T>> getScheduledTicksInChunk(ChunkPos arg, boolean updateState, boolean getStaleTicks) {
         int i = (arg.x << 4) - 2;
         int j = i + 16 + 2;
         int k = (arg.z << 4) - 2;
         int l = k + 16 + 2;
-        return this.getScheduledTicks(new BlockBox(i, 0, k, j, 256, l), bl, bl2);
+        return this.getScheduledTicks(new BlockBox(i, 0, k, j, 256, l), updateState, getStaleTicks);
     }
 
-    public List<ScheduledTick<T>> getScheduledTicks(BlockBox arg, boolean bl, boolean bl2) {
-        List<ScheduledTick<T>> list = this.transferTicksInBounds(null, this.scheduledTickActionsInOrder, arg, bl);
-        if (bl && list != null) {
+    public List<ScheduledTick<T>> getScheduledTicks(BlockBox bounds, boolean updateState, boolean getStaleTicks) {
+        List<ScheduledTick<T>> list = this.transferTicksInBounds(null, this.scheduledTickActionsInOrder, bounds, updateState);
+        if (updateState && list != null) {
             this.scheduledTickActions.removeAll(list);
         }
-        list = this.transferTicksInBounds(list, this.currentTickActions, arg, bl);
-        if (!bl2) {
-            list = this.transferTicksInBounds(list, this.consumedTickActions, arg, bl);
+        list = this.transferTicksInBounds(list, this.currentTickActions, bounds, updateState);
+        if (!getStaleTicks) {
+            list = this.transferTicksInBounds(list, this.consumedTickActions, bounds, updateState);
         }
         return list == null ? Collections.emptyList() : list;
     }
 
     @Nullable
-    private List<ScheduledTick<T>> transferTicksInBounds(@Nullable List<ScheduledTick<T>> list, Collection<ScheduledTick<T>> collection, BlockBox arg, boolean bl) {
-        Iterator<ScheduledTick<T>> iterator = collection.iterator();
+    private List<ScheduledTick<T>> transferTicksInBounds(@Nullable List<ScheduledTick<T>> dst, Collection<ScheduledTick<T>> src, BlockBox bounds, boolean move) {
+        Iterator<ScheduledTick<T>> iterator = src.iterator();
         while (iterator.hasNext()) {
             ScheduledTick<T> lv = iterator.next();
             BlockPos lv2 = lv.pos;
-            if (lv2.getX() < arg.minX || lv2.getX() >= arg.maxX || lv2.getZ() < arg.minZ || lv2.getZ() >= arg.maxZ) continue;
-            if (bl) {
+            if (lv2.getX() < bounds.minX || lv2.getX() >= bounds.maxX || lv2.getZ() < bounds.minZ || lv2.getZ() >= bounds.maxZ) continue;
+            if (move) {
                 iterator.remove();
             }
-            if (list == null) {
-                list = Lists.newArrayList();
+            if (dst == null) {
+                dst = Lists.newArrayList();
             }
-            list.add(lv);
+            dst.add(lv);
         }
-        return list;
+        return dst;
     }
 
-    public void copyScheduledTicks(BlockBox arg, BlockPos arg2) {
-        List<ScheduledTick<T>> list = this.getScheduledTicks(arg, false, false);
+    public void copyScheduledTicks(BlockBox box, BlockPos offset) {
+        List<ScheduledTick<T>> list = this.getScheduledTicks(box, false, false);
         for (ScheduledTick<T> lv : list) {
-            if (!arg.contains(lv.pos)) continue;
-            BlockPos lv2 = lv.pos.add(arg2);
+            if (!box.contains(lv.pos)) continue;
+            BlockPos lv2 = lv.pos.add(offset);
             T object = lv.getObject();
             this.addScheduledTick(new ScheduledTick<T>(lv2, object, lv.time, lv.priority));
         }
@@ -157,15 +157,15 @@ implements TickScheduler<T> {
         return ServerTickScheduler.serializeScheduledTicks(this.idToName, list, this.world.getTime());
     }
 
-    private static <T> ListTag serializeScheduledTicks(Function<T, Identifier> function, Iterable<ScheduledTick<T>> iterable, long l) {
+    private static <T> ListTag serializeScheduledTicks(Function<T, Identifier> identifierProvider, Iterable<ScheduledTick<T>> scheduledTicks, long time) {
         ListTag lv = new ListTag();
-        for (ScheduledTick<T> lv2 : iterable) {
+        for (ScheduledTick<T> lv2 : scheduledTicks) {
             CompoundTag lv3 = new CompoundTag();
-            lv3.putString("i", function.apply(lv2.getObject()).toString());
+            lv3.putString("i", identifierProvider.apply(lv2.getObject()).toString());
             lv3.putInt("x", lv2.pos.getX());
             lv3.putInt("y", lv2.pos.getY());
             lv3.putInt("z", lv2.pos.getZ());
-            lv3.putInt("t", (int)(lv2.time - l));
+            lv3.putInt("t", (int)(lv2.time - time));
             lv3.putInt("p", lv2.priority.getIndex());
             lv.add(lv3);
         }
@@ -173,14 +173,14 @@ implements TickScheduler<T> {
     }
 
     @Override
-    public boolean isScheduled(BlockPos arg, T object) {
-        return this.scheduledTickActions.contains(new ScheduledTick<T>(arg, object));
+    public boolean isScheduled(BlockPos pos, T object) {
+        return this.scheduledTickActions.contains(new ScheduledTick<T>(pos, object));
     }
 
     @Override
-    public void schedule(BlockPos arg, T object, int i, TickPriority arg2) {
+    public void schedule(BlockPos pos, T object, int delay, TickPriority priority) {
         if (!this.invalidObjPredicate.test(object)) {
-            this.addScheduledTick(new ScheduledTick<T>(arg, object, (long)i + this.world.getTime(), arg2));
+            this.addScheduledTick(new ScheduledTick<T>(pos, object, (long)delay + this.world.getTime(), priority));
         }
     }
 

@@ -42,8 +42,8 @@ public interface StructureProcessorType<P extends StructureProcessor> {
 
     public Codec<P> codec();
 
-    public static <P extends StructureProcessor> StructureProcessorType<P> register(String string, Codec<P> codec) {
-        return Registry.register(Registry.STRUCTURE_PROCESSOR, string, () -> codec);
+    public static <P extends StructureProcessor> StructureProcessorType<P> register(String id, Codec<P> codec) {
+        return Registry.register(Registry.STRUCTURE_PROCESSOR, id, () -> codec);
     }
 }
 

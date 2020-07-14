@@ -26,38 +26,38 @@ public class SeekSkyTask
 extends Task<LivingEntity> {
     private final float speed;
 
-    public SeekSkyTask(float f) {
+    public SeekSkyTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override
-    protected void run(ServerWorld arg2, LivingEntity arg22, long l) {
-        Optional<Vec3d> optional = Optional.ofNullable(this.findNearbySky(arg2, arg22));
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        Optional<Vec3d> optional = Optional.ofNullable(this.findNearbySky(world, entity));
         if (optional.isPresent()) {
-            arg22.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.speed, 0)));
+            entity.getBrain().remember(MemoryModuleType.WALK_TARGET, optional.map(arg -> new WalkTarget((Vec3d)arg, this.speed, 0)));
         }
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return !arg.isSkyVisible(arg2.getBlockPos());
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        return !world.isSkyVisible(entity.getBlockPos());
     }
 
     @Nullable
-    private Vec3d findNearbySky(ServerWorld arg, LivingEntity arg2) {
-        Random random = arg2.getRandom();
-        BlockPos lv = arg2.getBlockPos();
+    private Vec3d findNearbySky(ServerWorld world, LivingEntity entity) {
+        Random random = entity.getRandom();
+        BlockPos lv = entity.getBlockPos();
         for (int i = 0; i < 10; ++i) {
             BlockPos lv2 = lv.add(random.nextInt(20) - 10, random.nextInt(6) - 3, random.nextInt(20) - 10);
-            if (!SeekSkyTask.isSkyVisible(arg, arg2, lv2)) continue;
+            if (!SeekSkyTask.isSkyVisible(world, entity, lv2)) continue;
             return Vec3d.ofBottomCenter(lv2);
         }
         return null;
     }
 
-    public static boolean isSkyVisible(ServerWorld arg, LivingEntity arg2, BlockPos arg3) {
-        return arg.isSkyVisible(arg3) && (double)arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING, arg3).getY() <= arg2.getY();
+    public static boolean isSkyVisible(ServerWorld world, LivingEntity entity, BlockPos pos) {
+        return world.isSkyVisible(pos) && (double)world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, pos).getY() <= entity.getY();
     }
 }
 

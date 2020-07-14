@@ -30,15 +30,15 @@ extends EntityRenderer<T> {
     private final float scale;
     private final boolean lit;
 
-    public FlyingItemEntityRenderer(EntityRenderDispatcher arg, ItemRenderer arg2, float f, boolean bl) {
-        super(arg);
-        this.itemRenderer = arg2;
-        this.scale = f;
-        this.lit = bl;
+    public FlyingItemEntityRenderer(EntityRenderDispatcher dispatcher, ItemRenderer itemRenderer, float scale, boolean lit) {
+        super(dispatcher);
+        this.itemRenderer = itemRenderer;
+        this.scale = scale;
+        this.lit = lit;
     }
 
-    public FlyingItemEntityRenderer(EntityRenderDispatcher arg, ItemRenderer arg2) {
-        this(arg, arg2, 1.0f, false);
+    public FlyingItemEntityRenderer(EntityRenderDispatcher dispatcher, ItemRenderer itemRenderer) {
+        this(dispatcher, itemRenderer, 1.0f, false);
     }
 
     @Override
@@ -47,21 +47,21 @@ extends EntityRenderer<T> {
     }
 
     @Override
-    public void render(T arg, float f, float g, MatrixStack arg2, VertexConsumerProvider arg3, int i) {
-        if (((Entity)arg).age < 2 && this.dispatcher.camera.getFocusedEntity().squaredDistanceTo((Entity)arg) < 12.25) {
+    public void render(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        if (((Entity)entity).age < 2 && this.dispatcher.camera.getFocusedEntity().squaredDistanceTo((Entity)entity) < 12.25) {
             return;
         }
-        arg2.push();
-        arg2.scale(this.scale, this.scale, this.scale);
-        arg2.multiply(this.dispatcher.getRotation());
-        arg2.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
-        this.itemRenderer.renderItem(((FlyingItemEntity)arg).getStack(), ModelTransformation.Mode.GROUND, i, OverlayTexture.DEFAULT_UV, arg2, arg3);
-        arg2.pop();
-        super.render(arg, f, g, arg2, arg3, i);
+        matrices.push();
+        matrices.scale(this.scale, this.scale, this.scale);
+        matrices.multiply(this.dispatcher.getRotation());
+        matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+        this.itemRenderer.renderItem(((FlyingItemEntity)entity).getStack(), ModelTransformation.Mode.GROUND, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+        matrices.pop();
+        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
     @Override
-    public Identifier getTexture(Entity arg) {
+    public Identifier getTexture(Entity entity) {
         return SpriteAtlasTexture.BLOCK_ATLAS_TEX;
     }
 }

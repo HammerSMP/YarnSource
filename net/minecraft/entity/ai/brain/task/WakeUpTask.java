@@ -22,13 +22,13 @@ extends Task<LivingEntity> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return !arg2.getBrain().hasActivity(Activity.REST) && arg2.isSleeping();
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        return !entity.getBrain().hasActivity(Activity.REST) && entity.isSleeping();
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
-        arg2.wakeUp();
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
+        entity.wakeUp();
     }
 }
 

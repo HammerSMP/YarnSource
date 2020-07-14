@@ -38,8 +38,8 @@ public class WeightedList<U> {
         return Entry.method_28341(codec).listOf().xmap(WeightedList::new, arg -> arg.entries);
     }
 
-    public WeightedList<U> add(U object, int i) {
-        this.entries.add(new Entry(object, i));
+    public WeightedList<U> add(U item, int weight) {
+        this.entries.add(new Entry(item, weight));
         return this;
     }
 
@@ -83,8 +83,8 @@ public class WeightedList<U> {
             return this.shuffledOrder;
         }
 
-        private void setShuffledOrder(float f) {
-            this.shuffledOrder = -Math.pow(f, 1.0f / (float)this.weight);
+        private void setShuffledOrder(float random) {
+            this.shuffledOrder = -Math.pow(random, 1.0f / (float)this.weight);
         }
 
         public T getElement() {

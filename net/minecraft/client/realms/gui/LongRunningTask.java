@@ -26,22 +26,22 @@ Runnable {
     public static final Logger LOGGER = LogManager.getLogger();
     protected RealmsLongRunningMcoTaskScreen longRunningMcoTaskScreen;
 
-    protected static void pause(int i) {
+    protected static void pause(int seconds) {
         try {
-            Thread.sleep(i * 1000);
+            Thread.sleep(seconds * 1000);
         }
         catch (InterruptedException interruptedException) {
             LOGGER.error("", (Throwable)interruptedException);
         }
     }
 
-    public static void setScreen(Screen arg) {
+    public static void setScreen(Screen screen) {
         MinecraftClient lv = MinecraftClient.getInstance();
-        lv.execute(() -> lv.openScreen(arg));
+        lv.execute(() -> lv.openScreen(screen));
     }
 
-    public void setScreen(RealmsLongRunningMcoTaskScreen arg) {
-        this.longRunningMcoTaskScreen = arg;
+    public void setScreen(RealmsLongRunningMcoTaskScreen longRunningMcoTaskScreen) {
+        this.longRunningMcoTaskScreen = longRunningMcoTaskScreen;
     }
 
     @Override
@@ -49,8 +49,8 @@ Runnable {
         this.longRunningMcoTaskScreen.error(arg);
     }
 
-    public void setTitle(String string) {
-        this.longRunningMcoTaskScreen.setTitle(string);
+    public void setTitle(String title) {
+        this.longRunningMcoTaskScreen.setTitle(title);
     }
 
     public boolean aborted() {

@@ -31,31 +31,31 @@ implements Packet<ClientPlayPacketListener> {
     public PlaySoundFromEntityS2CPacket() {
     }
 
-    public PlaySoundFromEntityS2CPacket(SoundEvent arg, SoundCategory arg2, Entity arg3, float f, float g) {
-        Validate.notNull((Object)arg, (String)"sound", (Object[])new Object[0]);
-        this.sound = arg;
-        this.category = arg2;
-        this.entityId = arg3.getEntityId();
-        this.volume = f;
-        this.pitch = g;
+    public PlaySoundFromEntityS2CPacket(SoundEvent sound, SoundCategory category, Entity entity, float volume, float pitch) {
+        Validate.notNull((Object)sound, (String)"sound", (Object[])new Object[0]);
+        this.sound = sound;
+        this.category = category;
+        this.entityId = entity.getEntityId();
+        this.volume = volume;
+        this.pitch = pitch;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.sound = (SoundEvent)Registry.SOUND_EVENT.get(arg.readVarInt());
-        this.category = arg.readEnumConstant(SoundCategory.class);
-        this.entityId = arg.readVarInt();
-        this.volume = arg.readFloat();
-        this.pitch = arg.readFloat();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.sound = (SoundEvent)Registry.SOUND_EVENT.get(buf.readVarInt());
+        this.category = buf.readEnumConstant(SoundCategory.class);
+        this.entityId = buf.readVarInt();
+        this.volume = buf.readFloat();
+        this.pitch = buf.readFloat();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(Registry.SOUND_EVENT.getRawId(this.sound));
-        arg.writeEnumConstant(this.category);
-        arg.writeVarInt(this.entityId);
-        arg.writeFloat(this.volume);
-        arg.writeFloat(this.pitch);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(Registry.SOUND_EVENT.getRawId(this.sound));
+        buf.writeEnumConstant(this.category);
+        buf.writeVarInt(this.entityId);
+        buf.writeFloat(this.volume);
+        buf.writeFloat(this.pitch);
     }
 
     @Environment(value=EnvType.CLIENT)

@@ -15,12 +15,12 @@ public class BlockPredicate
 implements Predicate<BlockState> {
     private final Block block;
 
-    public BlockPredicate(Block arg) {
-        this.block = arg;
+    public BlockPredicate(Block block) {
+        this.block = block;
     }
 
-    public static BlockPredicate make(Block arg) {
-        return new BlockPredicate(arg);
+    public static BlockPredicate make(Block block) {
+        return new BlockPredicate(block);
     }
 
     @Override
@@ -29,8 +29,8 @@ implements Predicate<BlockState> {
     }
 
     @Override
-    public /* synthetic */ boolean test(@Nullable Object object) {
-        return this.test((BlockState)object);
+    public /* synthetic */ boolean test(@Nullable Object context) {
+        return this.test((BlockState)context);
     }
 }
 

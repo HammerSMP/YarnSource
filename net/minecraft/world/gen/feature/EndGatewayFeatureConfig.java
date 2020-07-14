@@ -23,13 +23,13 @@ implements FeatureConfig {
     private final Optional<BlockPos> exitPos;
     private final boolean exact;
 
-    private EndGatewayFeatureConfig(Optional<BlockPos> optional, boolean bl) {
-        this.exitPos = optional;
-        this.exact = bl;
+    private EndGatewayFeatureConfig(Optional<BlockPos> exitPos, boolean exact) {
+        this.exitPos = exitPos;
+        this.exact = exact;
     }
 
-    public static EndGatewayFeatureConfig createConfig(BlockPos arg, boolean bl) {
-        return new EndGatewayFeatureConfig(Optional.of(arg), bl);
+    public static EndGatewayFeatureConfig createConfig(BlockPos exitPortalPosition, boolean exitsAtSpawn) {
+        return new EndGatewayFeatureConfig(Optional.of(exitPortalPosition), exitsAtSpawn);
     }
 
     public static EndGatewayFeatureConfig createConfig() {

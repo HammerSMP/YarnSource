@@ -55,15 +55,15 @@ extends Task<VillagerEntity> {
         return this.duration < 80 && this.pos.isPresent();
     }
 
-    private Optional<BlockPos> findBoneMealPos(ServerWorld arg, VillagerEntity arg2) {
+    private Optional<BlockPos> findBoneMealPos(ServerWorld world, VillagerEntity entity) {
         BlockPos.Mutable lv = new BlockPos.Mutable();
         Optional<BlockPos> optional = Optional.empty();
         int i = 0;
         for (int j = -1; j <= 1; ++j) {
             for (int k = -1; k <= 1; ++k) {
                 for (int l = -1; l <= 1; ++l) {
-                    lv.set(arg2.getBlockPos(), j, k, l);
-                    if (!this.canBoneMeal(lv, arg) || arg.random.nextInt(++i) != 0) continue;
+                    lv.set(entity.getBlockPos(), j, k, l);
+                    if (!this.canBoneMeal(lv, world) || world.random.nextInt(++i) != 0) continue;
                     optional = Optional.of(lv.toImmutable());
                 }
             }
@@ -71,8 +71,8 @@ extends Task<VillagerEntity> {
         return optional;
     }
 
-    private boolean canBoneMeal(BlockPos arg, ServerWorld arg2) {
-        BlockState lv = arg2.getBlockState(arg);
+    private boolean canBoneMeal(BlockPos pos, ServerWorld world) {
+        BlockState lv = world.getBlockState(pos);
         Block lv2 = lv.getBlock();
         return lv2 instanceof CropBlock && !((CropBlock)lv2).isMature(lv);
     }
@@ -85,11 +85,11 @@ extends Task<VillagerEntity> {
         this.duration = 0;
     }
 
-    private void addLookWalkTargets(VillagerEntity arg) {
+    private void addLookWalkTargets(VillagerEntity villager) {
         this.pos.ifPresent(arg2 -> {
             BlockPosLookTarget lv = new BlockPosLookTarget((BlockPos)arg2);
-            arg.getBrain().remember(MemoryModuleType.LOOK_TARGET, lv);
-            arg.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv, 0.5f, 1));
+            villager.getBrain().remember(MemoryModuleType.LOOK_TARGET, lv);
+            villager.getBrain().remember(MemoryModuleType.WALK_TARGET, new WalkTarget(lv, 0.5f, 1));
         });
     }
 
@@ -124,13 +124,13 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void run(ServerWorld arg, LivingEntity arg2, long l) {
-        this.run(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void run(ServerWorld world, LivingEntity entity, long time) {
+        this.run(world, (VillagerEntity)entity, time);
     }
 }
 

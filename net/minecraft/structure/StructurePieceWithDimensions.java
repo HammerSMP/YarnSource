@@ -20,13 +20,13 @@ extends StructurePiece {
     protected final int depth;
     protected int hPos = -1;
 
-    protected StructurePieceWithDimensions(StructurePieceType arg, Random random, int i, int j, int k, int l, int m, int n) {
-        super(arg, 0);
-        this.width = l;
-        this.height = m;
-        this.depth = n;
+    protected StructurePieceWithDimensions(StructurePieceType type, Random random, int x, int y, int z, int width, int height, int depth) {
+        super(type, 0);
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
         this.setOrientation(Direction.Type.HORIZONTAL.random(random));
-        this.boundingBox = this.getFacing().getAxis() == Direction.Axis.Z ? new BlockBox(i, j, k, i + l - 1, j + m - 1, k + n - 1) : new BlockBox(i, j, k, i + n - 1, j + m - 1, k + l - 1);
+        this.boundingBox = this.getFacing().getAxis() == Direction.Axis.Z ? new BlockBox(x, y, z, x + width - 1, y + height - 1, z + depth - 1) : new BlockBox(x, y, z, x + depth - 1, y + height - 1, z + width - 1);
     }
 
     protected StructurePieceWithDimensions(StructurePieceType arg, CompoundTag arg2) {
@@ -38,14 +38,14 @@ extends StructurePiece {
     }
 
     @Override
-    protected void toNbt(CompoundTag arg) {
-        arg.putInt("Width", this.width);
-        arg.putInt("Height", this.height);
-        arg.putInt("Depth", this.depth);
-        arg.putInt("HPos", this.hPos);
+    protected void toNbt(CompoundTag tag) {
+        tag.putInt("Width", this.width);
+        tag.putInt("Height", this.height);
+        tag.putInt("Depth", this.depth);
+        tag.putInt("HPos", this.hPos);
     }
 
-    protected boolean method_14839(WorldAccess arg, BlockBox arg2, int i) {
+    protected boolean method_14839(WorldAccess world, BlockBox boundingBox, int i) {
         if (this.hPos >= 0) {
             return true;
         }
@@ -55,8 +55,8 @@ extends StructurePiece {
         for (int l = this.boundingBox.minZ; l <= this.boundingBox.maxZ; ++l) {
             for (int m = this.boundingBox.minX; m <= this.boundingBox.maxX; ++m) {
                 lv.set(m, 64, l);
-                if (!arg2.contains(lv)) continue;
-                j += arg.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv).getY();
+                if (!boundingBox.contains(lv)) continue;
+                j += world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, lv).getY();
                 ++k;
             }
         }

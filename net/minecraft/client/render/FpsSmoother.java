@@ -16,15 +16,15 @@ public class FpsSmoother {
     private int size;
     private int index;
 
-    public FpsSmoother(int i) {
-        this.times = new long[i];
+    public FpsSmoother(int size) {
+        this.times = new long[size];
     }
 
-    public long getTargetUsedTime(long l) {
+    public long getTargetUsedTime(long time) {
         if (this.size < this.times.length) {
             ++this.size;
         }
-        this.times[this.index] = l;
+        this.times[this.index] = time;
         this.index = (this.index + 1) % this.times.length;
         long m = Long.MAX_VALUE;
         long n = Long.MIN_VALUE;

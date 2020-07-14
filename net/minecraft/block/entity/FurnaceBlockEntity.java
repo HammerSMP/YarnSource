@@ -24,8 +24,8 @@ extends AbstractFurnaceBlockEntity {
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return new FurnaceScreenHandler(i, arg, this, this.propertyDelegate);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new FurnaceScreenHandler(syncId, playerInventory, this, this.propertyDelegate);
     }
 }
 

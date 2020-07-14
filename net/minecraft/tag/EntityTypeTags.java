@@ -19,8 +19,8 @@ public final class EntityTypeTags {
     public static final Tag.Identified<EntityType<?>> ARROWS = EntityTypeTags.register("arrows");
     public static final Tag.Identified<EntityType<?>> IMPACT_PROJECTILES = EntityTypeTags.register("impact_projectiles");
 
-    private static Tag.Identified<EntityType<?>> register(String string) {
-        return REQUIRED_TAGS.add(string);
+    private static Tag.Identified<EntityType<?>> register(String id) {
+        return REQUIRED_TAGS.add(id);
     }
 
     public static TagGroup<EntityType<?>> getTagGroup() {

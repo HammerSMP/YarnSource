@@ -14,18 +14,18 @@ import net.minecraft.block.SeaPickleBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.gen.CountConfig;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.SeaPickleFeatureConfig;
 
 public class SeaPickleFeature
-extends Feature<SeaPickleFeatureConfig> {
-    public SeaPickleFeature(Codec<SeaPickleFeatureConfig> codec) {
+extends Feature<CountConfig> {
+    public SeaPickleFeature(Codec<CountConfig> codec) {
         super(codec);
     }
 
     @Override
-    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, SeaPickleFeatureConfig arg4) {
+    public boolean generate(ServerWorldAccess arg, ChunkGenerator arg2, Random random, BlockPos arg3, CountConfig arg4) {
         int i = 0;
         int j = arg4.method_30396().method_30321(random);
         for (int k = 0; k < j; ++k) {

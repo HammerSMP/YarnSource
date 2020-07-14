@@ -55,13 +55,13 @@ extends FlowableFluid {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(World arg, BlockPos arg2, FluidState arg3, Random random) {
-        if (!arg3.isStill() && !arg3.get(FALLING).booleanValue()) {
+    public void randomDisplayTick(World world, BlockPos pos, FluidState state, Random random) {
+        if (!state.isStill() && !state.get(FALLING).booleanValue()) {
             if (random.nextInt(64) == 0) {
-                arg.playSound((double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5, SoundEvents.BLOCK_WATER_AMBIENT, SoundCategory.BLOCKS, random.nextFloat() * 0.25f + 0.75f, random.nextFloat() + 0.5f, false);
+                world.playSound((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, SoundEvents.BLOCK_WATER_AMBIENT, SoundCategory.BLOCKS, random.nextFloat() * 0.25f + 0.75f, random.nextFloat() + 0.5f, false);
             }
         } else if (random.nextInt(10) == 0) {
-            arg.addParticle(ParticleTypes.UNDERWATER, (double)arg2.getX() + random.nextDouble(), (double)arg2.getY() + random.nextDouble(), (double)arg2.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
+            world.addParticle(ParticleTypes.UNDERWATER, (double)pos.getX() + random.nextDouble(), (double)pos.getY() + random.nextDouble(), (double)pos.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
         }
     }
 
@@ -78,39 +78,39 @@ extends FlowableFluid {
     }
 
     @Override
-    protected void beforeBreakingBlock(WorldAccess arg, BlockPos arg2, BlockState arg3) {
-        BlockEntity lv = arg3.getBlock().hasBlockEntity() ? arg.getBlockEntity(arg2) : null;
-        Block.dropStacks(arg3, arg, arg2, lv);
+    protected void beforeBreakingBlock(WorldAccess world, BlockPos pos, BlockState state) {
+        BlockEntity lv = state.getBlock().hasBlockEntity() ? world.getBlockEntity(pos) : null;
+        Block.dropStacks(state, world, pos, lv);
     }
 
     @Override
-    public int getFlowSpeed(WorldView arg) {
+    public int getFlowSpeed(WorldView world) {
         return 4;
     }
 
     @Override
-    public BlockState toBlockState(FluidState arg) {
-        return (BlockState)Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, WaterFluid.method_15741(arg));
+    public BlockState toBlockState(FluidState state) {
+        return (BlockState)Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, WaterFluid.method_15741(state));
     }
 
     @Override
-    public boolean matchesType(Fluid arg) {
-        return arg == Fluids.WATER || arg == Fluids.FLOWING_WATER;
+    public boolean matchesType(Fluid fluid) {
+        return fluid == Fluids.WATER || fluid == Fluids.FLOWING_WATER;
     }
 
     @Override
-    public int getLevelDecreasePerBlock(WorldView arg) {
+    public int getLevelDecreasePerBlock(WorldView world) {
         return 1;
     }
 
     @Override
-    public int getTickRate(WorldView arg) {
+    public int getTickRate(WorldView world) {
         return 5;
     }
 
     @Override
-    public boolean canBeReplacedWith(FluidState arg, BlockView arg2, BlockPos arg3, Fluid arg4, Direction arg5) {
-        return arg5 == Direction.DOWN && !arg4.isIn(FluidTags.WATER);
+    public boolean canBeReplacedWith(FluidState state, BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
+        return direction == Direction.DOWN && !fluid.isIn(FluidTags.WATER);
     }
 
     @Override
@@ -127,12 +127,12 @@ extends FlowableFluid {
         }
 
         @Override
-        public int getLevel(FluidState arg) {
-            return arg.get(LEVEL);
+        public int getLevel(FluidState state) {
+            return state.get(LEVEL);
         }
 
         @Override
-        public boolean isStill(FluidState arg) {
+        public boolean isStill(FluidState state) {
             return false;
         }
     }
@@ -140,12 +140,12 @@ extends FlowableFluid {
     public static class Still
     extends WaterFluid {
         @Override
-        public int getLevel(FluidState arg) {
+        public int getLevel(FluidState state) {
             return 8;
         }
 
         @Override
-        public boolean isStill(FluidState arg) {
+        public boolean isStill(FluidState state) {
             return true;
         }
     }

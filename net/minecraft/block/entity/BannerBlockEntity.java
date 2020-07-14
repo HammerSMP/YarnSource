@@ -50,16 +50,16 @@ implements Nameable {
         super(BlockEntityType.BANNER);
     }
 
-    public BannerBlockEntity(DyeColor arg) {
+    public BannerBlockEntity(DyeColor baseColor) {
         this();
-        this.baseColor = arg;
+        this.baseColor = baseColor;
     }
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public static ListTag getPatternListTag(ItemStack arg) {
+    public static ListTag getPatternListTag(ItemStack stack) {
         ListTag lv = null;
-        CompoundTag lv2 = arg.getSubTag("BlockEntityTag");
+        CompoundTag lv2 = stack.getSubTag("BlockEntityTag");
         if (lv2 != null && lv2.contains("Patterns", 9)) {
             lv = lv2.getList("Patterns", 10).copy();
         }
@@ -67,12 +67,12 @@ implements Nameable {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void readFrom(ItemStack arg, DyeColor arg2) {
-        this.patternListTag = BannerBlockEntity.getPatternListTag(arg);
-        this.baseColor = arg2;
+    public void readFrom(ItemStack stack, DyeColor baseColor) {
+        this.patternListTag = BannerBlockEntity.getPatternListTag(stack);
+        this.baseColor = baseColor;
         this.patterns = null;
         this.patternListTagRead = true;
-        this.customName = arg.hasCustomName() ? arg.getName() : null;
+        this.customName = stack.hasCustomName() ? stack.getName() : null;
     }
 
     @Override
@@ -89,30 +89,30 @@ implements Nameable {
         return this.customName;
     }
 
-    public void setCustomName(Text arg) {
-        this.customName = arg;
+    public void setCustomName(Text customName) {
+        this.customName = customName;
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         if (this.patternListTag != null) {
-            arg.put("Patterns", this.patternListTag);
+            tag.put("Patterns", this.patternListTag);
         }
         if (this.customName != null) {
-            arg.putString("CustomName", Text.Serializer.toJson(this.customName));
+            tag.putString("CustomName", Text.Serializer.toJson(this.customName));
         }
-        return arg;
+        return tag;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        if (arg2.contains("CustomName", 8)) {
-            this.customName = Text.Serializer.fromJson(arg2.getString("CustomName"));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        if (tag.contains("CustomName", 8)) {
+            this.customName = Text.Serializer.fromJson(tag.getString("CustomName"));
         }
         this.baseColor = this.hasWorld() ? ((AbstractBannerBlock)this.getCachedState().getBlock()).getColor() : null;
-        this.patternListTag = arg2.getList("Patterns", 10);
+        this.patternListTag = tag.getList("Patterns", 10);
         this.patterns = null;
         this.patternListTagRead = true;
     }
@@ -128,8 +128,8 @@ implements Nameable {
         return this.toTag(new CompoundTag());
     }
 
-    public static int getPatternCount(ItemStack arg) {
-        CompoundTag lv = arg.getSubTag("BlockEntityTag");
+    public static int getPatternCount(ItemStack stack) {
+        CompoundTag lv = stack.getSubTag("BlockEntityTag");
         if (lv != null && lv.contains("Patterns")) {
             return lv.getList("Patterns", 10).size();
         }
@@ -160,8 +160,8 @@ implements Nameable {
         return list;
     }
 
-    public static void loadFromItemStack(ItemStack arg) {
-        CompoundTag lv = arg.getSubTag("BlockEntityTag");
+    public static void loadFromItemStack(ItemStack stack) {
+        CompoundTag lv = stack.getSubTag("BlockEntityTag");
         if (lv == null || !lv.contains("Patterns", 9)) {
             return;
         }
@@ -171,13 +171,13 @@ implements Nameable {
         }
         lv2.remove(lv2.size() - 1);
         if (lv2.isEmpty()) {
-            arg.removeSubTag("BlockEntityTag");
+            stack.removeSubTag("BlockEntityTag");
         }
     }
 
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockState arg) {
-        ItemStack lv = new ItemStack(BannerBlock.getForColor(this.getColorForState(() -> arg)));
+    public ItemStack getPickStack(BlockState state) {
+        ItemStack lv = new ItemStack(BannerBlock.getForColor(this.getColorForState(() -> state)));
         if (this.patternListTag != null && !this.patternListTag.isEmpty()) {
             lv.getOrCreateSubTag("BlockEntityTag").put("Patterns", this.patternListTag.copy());
         }

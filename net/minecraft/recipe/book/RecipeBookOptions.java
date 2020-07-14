@@ -26,8 +26,8 @@ public final class RecipeBookOptions {
     private static final Map<RecipeBookCategory, Pair<String, String>> CATEGORY_OPTION_NAMES = ImmutableMap.of((Object)((Object)RecipeBookCategory.CRAFTING), (Object)Pair.of((Object)"isGuiOpen", (Object)"isFilteringCraftable"), (Object)((Object)RecipeBookCategory.FURNACE), (Object)Pair.of((Object)"isFurnaceGuiOpen", (Object)"isFurnaceFilteringCraftable"), (Object)((Object)RecipeBookCategory.BLAST_FURNACE), (Object)Pair.of((Object)"isBlastingFurnaceGuiOpen", (Object)"isBlastingFurnaceFilteringCraftable"), (Object)((Object)RecipeBookCategory.SMOKER), (Object)Pair.of((Object)"isSmokerGuiOpen", (Object)"isSmokerFilteringCraftable"));
     private final Map<RecipeBookCategory, CategoryOption> categoryOptions;
 
-    private RecipeBookOptions(Map<RecipeBookCategory, CategoryOption> map) {
-        this.categoryOptions = map;
+    private RecipeBookOptions(Map<RecipeBookCategory, CategoryOption> categoryOptions) {
+        this.categoryOptions = categoryOptions;
     }
 
     public RecipeBookOptions() {
@@ -39,61 +39,61 @@ public final class RecipeBookOptions {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isGuiOpen(RecipeBookCategory arg) {
-        return this.categoryOptions.get((Object)arg).guiOpen;
+    public boolean isGuiOpen(RecipeBookCategory category) {
+        return this.categoryOptions.get((Object)category).guiOpen;
     }
 
-    public void setGuiOpen(RecipeBookCategory arg, boolean bl) {
-        this.categoryOptions.get((Object)arg).guiOpen = bl;
+    public void setGuiOpen(RecipeBookCategory category, boolean open) {
+        this.categoryOptions.get((Object)category).guiOpen = open;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public boolean isFilteringCraftable(RecipeBookCategory arg) {
-        return this.categoryOptions.get((Object)arg).filteringCraftable;
+    public boolean isFilteringCraftable(RecipeBookCategory category) {
+        return this.categoryOptions.get((Object)category).filteringCraftable;
     }
 
-    public void setFilteringCraftable(RecipeBookCategory arg, boolean bl) {
-        this.categoryOptions.get((Object)arg).filteringCraftable = bl;
+    public void setFilteringCraftable(RecipeBookCategory category, boolean filtering) {
+        this.categoryOptions.get((Object)category).filteringCraftable = filtering;
     }
 
-    public static RecipeBookOptions fromPacket(PacketByteBuf arg) {
+    public static RecipeBookOptions fromPacket(PacketByteBuf buf) {
         EnumMap map = Maps.newEnumMap(RecipeBookCategory.class);
         for (RecipeBookCategory lv : RecipeBookCategory.values()) {
-            boolean bl = arg.readBoolean();
-            boolean bl2 = arg.readBoolean();
+            boolean bl = buf.readBoolean();
+            boolean bl2 = buf.readBoolean();
             map.put(lv, new CategoryOption(bl, bl2));
         }
         return new RecipeBookOptions(map);
     }
 
-    public void toPacket(PacketByteBuf arg) {
+    public void toPacket(PacketByteBuf buf) {
         for (RecipeBookCategory lv : RecipeBookCategory.values()) {
             CategoryOption lv2 = this.categoryOptions.get((Object)lv);
             if (lv2 == null) {
-                arg.writeBoolean(false);
-                arg.writeBoolean(false);
+                buf.writeBoolean(false);
+                buf.writeBoolean(false);
                 continue;
             }
-            arg.writeBoolean(lv2.guiOpen);
-            arg.writeBoolean(lv2.filteringCraftable);
+            buf.writeBoolean(lv2.guiOpen);
+            buf.writeBoolean(lv2.filteringCraftable);
         }
     }
 
-    public static RecipeBookOptions fromTag(CompoundTag arg) {
+    public static RecipeBookOptions fromTag(CompoundTag tag) {
         EnumMap map = Maps.newEnumMap(RecipeBookCategory.class);
         CATEGORY_OPTION_NAMES.forEach((arg2, pair) -> {
-            boolean bl = arg.getBoolean((String)pair.getFirst());
-            boolean bl2 = arg.getBoolean((String)pair.getSecond());
+            boolean bl = tag.getBoolean((String)pair.getFirst());
+            boolean bl2 = tag.getBoolean((String)pair.getSecond());
             map.put(arg2, new CategoryOption(bl, bl2));
         });
         return new RecipeBookOptions(map);
     }
 
-    public void toTag(CompoundTag arg) {
+    public void toTag(CompoundTag tag) {
         CATEGORY_OPTION_NAMES.forEach((arg2, pair) -> {
             CategoryOption lv = this.categoryOptions.get(arg2);
-            arg.putBoolean((String)pair.getFirst(), lv.guiOpen);
-            arg.putBoolean((String)pair.getSecond(), lv.filteringCraftable);
+            tag.putBoolean((String)pair.getFirst(), lv.guiOpen);
+            tag.putBoolean((String)pair.getSecond(), lv.filteringCraftable);
         });
     }
 
@@ -106,10 +106,10 @@ public final class RecipeBookOptions {
         return new RecipeBookOptions(map);
     }
 
-    public void copyFrom(RecipeBookOptions arg) {
+    public void copyFrom(RecipeBookOptions other) {
         this.categoryOptions.clear();
         for (RecipeBookCategory lv : RecipeBookCategory.values()) {
-            CategoryOption lv2 = arg.categoryOptions.get((Object)lv);
+            CategoryOption lv2 = other.categoryOptions.get((Object)lv);
             this.categoryOptions.put(lv, lv2.copy());
         }
     }
@@ -126,9 +126,9 @@ public final class RecipeBookOptions {
         private boolean guiOpen;
         private boolean filteringCraftable;
 
-        public CategoryOption(boolean bl, boolean bl2) {
-            this.guiOpen = bl;
-            this.filteringCraftable = bl2;
+        public CategoryOption(boolean guiOpen, boolean filteringCraftable) {
+            this.guiOpen = guiOpen;
+            this.filteringCraftable = filteringCraftable;
         }
 
         public CategoryOption copy() {

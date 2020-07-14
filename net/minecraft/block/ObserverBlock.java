@@ -31,95 +31,95 @@ extends FacingBlock {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(FACING, POWERED);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, POWERED);
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        return (BlockState)arg.with(FACING, arg2.rotate(arg.get(FACING)));
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(FACING, rotation.rotate(state.get(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        return arg.rotate(arg2.getRotation(arg.get(FACING)));
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation(state.get(FACING)));
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg.get(POWERED).booleanValue()) {
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWERED, false), 2);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (state.get(POWERED).booleanValue()) {
+            world.setBlockState(pos, (BlockState)state.with(POWERED, false), 2);
         } else {
-            arg2.setBlockState(arg3, (BlockState)arg.with(POWERED, true), 2);
-            arg2.getBlockTickScheduler().schedule(arg3, this, 2);
+            world.setBlockState(pos, (BlockState)state.with(POWERED, true), 2);
+            world.getBlockTickScheduler().schedule(pos, this, 2);
         }
-        this.updateNeighbors(arg2, arg3, arg);
+        this.updateNeighbors(world, pos, state);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg.get(FACING) == arg2 && !arg.get(POWERED).booleanValue()) {
-            this.scheduleTick(arg4, arg5);
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (state.get(FACING) == direction && !state.get(POWERED).booleanValue()) {
+            this.scheduleTick(world, pos);
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
-    private void scheduleTick(WorldAccess arg, BlockPos arg2) {
-        if (!arg.isClient() && !arg.getBlockTickScheduler().isScheduled(arg2, this)) {
-            arg.getBlockTickScheduler().schedule(arg2, this, 2);
+    private void scheduleTick(WorldAccess world, BlockPos pos) {
+        if (!world.isClient() && !world.getBlockTickScheduler().isScheduled(pos, this)) {
+            world.getBlockTickScheduler().schedule(pos, this, 2);
         }
     }
 
-    protected void updateNeighbors(World arg, BlockPos arg2, BlockState arg3) {
-        Direction lv = arg3.get(FACING);
-        BlockPos lv2 = arg2.offset(lv.getOpposite());
-        arg.updateNeighbor(lv2, this, arg2);
-        arg.updateNeighborsExcept(lv2, this, lv);
+    protected void updateNeighbors(World world, BlockPos pos, BlockState state) {
+        Direction lv = state.get(FACING);
+        BlockPos lv2 = pos.offset(lv.getOpposite());
+        world.updateNeighbor(lv2, this, pos);
+        world.updateNeighborsExcept(lv2, this, lv);
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState arg) {
+    public boolean emitsRedstonePower(BlockState state) {
         return true;
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        return arg.getWeakRedstonePower(arg2, arg3, arg4);
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return state.getWeakRedstonePower(world, pos, direction);
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-        if (arg.get(POWERED).booleanValue() && arg.get(FACING) == arg4) {
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (state.get(POWERED).booleanValue() && state.get(FACING) == direction) {
             return 15;
         }
         return 0;
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (state.isOf(oldState.getBlock())) {
             return;
         }
-        if (!arg2.isClient() && arg.get(POWERED).booleanValue() && !arg2.getBlockTickScheduler().isScheduled(arg3, this)) {
-            BlockState lv = (BlockState)arg.with(POWERED, false);
-            arg2.setBlockState(arg3, lv, 18);
-            this.updateNeighbors(arg2, arg3, lv);
+        if (!world.isClient() && state.get(POWERED).booleanValue() && !world.getBlockTickScheduler().isScheduled(pos, this)) {
+            BlockState lv = (BlockState)state.with(POWERED, false);
+            world.setBlockState(pos, lv, 18);
+            this.updateNeighbors(world, pos, lv);
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.isOf(newState.getBlock())) {
             return;
         }
-        if (!arg2.isClient && arg.get(POWERED).booleanValue() && arg2.getBlockTickScheduler().isScheduled(arg3, this)) {
-            this.updateNeighbors(arg2, arg3, (BlockState)arg.with(POWERED, false));
+        if (!world.isClient && state.get(POWERED).booleanValue() && world.getBlockTickScheduler().isScheduled(pos, this)) {
+            this.updateNeighbors(world, pos, (BlockState)state.with(POWERED, false));
         }
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        return (BlockState)this.getDefaultState().with(FACING, arg.getPlayerLookDirection().getOpposite().getOpposite());
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return (BlockState)this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite().getOpposite());
     }
 }
 

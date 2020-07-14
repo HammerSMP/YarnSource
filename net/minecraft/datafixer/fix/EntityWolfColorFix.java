@@ -18,8 +18,8 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class EntityWolfColorFix
 extends ChoiceFix {
-    public EntityWolfColorFix(Schema schema, boolean bl) {
-        super(schema, bl, "EntityWolfColorFix", TypeReferences.ENTITY, "minecraft:wolf");
+    public EntityWolfColorFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "EntityWolfColorFix", TypeReferences.ENTITY, "minecraft:wolf");
     }
 
     public Dynamic<?> fixCollarColor(Dynamic<?> dynamic2) {
@@ -27,8 +27,8 @@ extends ChoiceFix {
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixCollarColor);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixCollarColor);
     }
 }
 

@@ -13,8 +13,8 @@ extends Item {
     }
 
     @Override
-    public boolean isEnchantable(ItemStack arg) {
-        return arg.getCount() == 1;
+    public boolean isEnchantable(ItemStack stack) {
+        return stack.getCount() == 1;
     }
 
     @Override

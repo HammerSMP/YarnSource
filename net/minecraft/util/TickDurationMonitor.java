@@ -49,15 +49,15 @@ public class TickDurationMonitor {
     }
 
     @Nullable
-    public static TickDurationMonitor create(String string) {
+    public static TickDurationMonitor create(String name) {
         return null;
     }
 
-    public static Profiler tickProfiler(Profiler arg, @Nullable TickDurationMonitor arg2) {
-        if (arg2 != null) {
-            return Profiler.union(arg2.nextProfiler(), arg);
+    public static Profiler tickProfiler(Profiler profiler, @Nullable TickDurationMonitor monitor) {
+        if (monitor != null) {
+            return Profiler.union(monitor.nextProfiler(), profiler);
         }
-        return arg;
+        return profiler;
     }
 }
 

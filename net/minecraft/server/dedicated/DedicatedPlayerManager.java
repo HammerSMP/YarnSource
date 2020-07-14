@@ -23,9 +23,9 @@ public class DedicatedPlayerManager
 extends PlayerManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public DedicatedPlayerManager(MinecraftDedicatedServer arg, class_5455.class_5457 arg2, WorldSaveHandler arg3) {
-        super(arg, arg2, arg3, arg.getProperties().maxPlayers);
-        ServerPropertiesHandler lv = arg.getProperties();
+    public DedicatedPlayerManager(MinecraftDedicatedServer server, class_5455.class_5457 tracker, WorldSaveHandler saveHandler) {
+        super(server, tracker, saveHandler, server.getProperties().maxPlayers);
+        ServerPropertiesHandler lv = server.getProperties();
         this.setViewDistance(lv.viewDistance);
         super.setWhitelistEnabled(lv.whiteList.get());
         this.loadUserBanList();
@@ -41,20 +41,20 @@ extends PlayerManager {
     }
 
     @Override
-    public void setWhitelistEnabled(boolean bl) {
-        super.setWhitelistEnabled(bl);
-        this.getServer().setUseWhitelist(bl);
+    public void setWhitelistEnabled(boolean whitelistEnabled) {
+        super.setWhitelistEnabled(whitelistEnabled);
+        this.getServer().setUseWhitelist(whitelistEnabled);
     }
 
     @Override
-    public void addToOperators(GameProfile gameProfile) {
-        super.addToOperators(gameProfile);
+    public void addToOperators(GameProfile profile) {
+        super.addToOperators(profile);
         this.saveOpList();
     }
 
     @Override
-    public void removeFromOperators(GameProfile gameProfile) {
-        super.removeFromOperators(gameProfile);
+    public void removeFromOperators(GameProfile profile) {
+        super.removeFromOperators(profile);
         this.saveOpList();
     }
 
@@ -136,8 +136,8 @@ extends PlayerManager {
     }
 
     @Override
-    public boolean isWhitelisted(GameProfile gameProfile) {
-        return !this.isWhitelistEnabled() || this.isOperator(gameProfile) || this.getWhitelist().isAllowed(gameProfile);
+    public boolean isWhitelisted(GameProfile profile) {
+        return !this.isWhitelistEnabled() || this.isOperator(profile) || this.getWhitelist().isAllowed(profile);
     }
 
     @Override
@@ -146,8 +146,8 @@ extends PlayerManager {
     }
 
     @Override
-    public boolean canBypassPlayerLimit(GameProfile gameProfile) {
-        return this.getOpList().isOp(gameProfile);
+    public boolean canBypassPlayerLimit(GameProfile profile) {
+        return this.getOpList().isOp(profile);
     }
 
     @Override

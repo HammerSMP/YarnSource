@@ -25,32 +25,32 @@ import net.minecraft.util.math.Box;
 public class ShearsDispenserBehavior
 extends FallibleItemDispenserBehavior {
     @Override
-    protected ItemStack dispenseSilently(BlockPointer arg, ItemStack arg2) {
-        ServerWorld lv = arg.getWorld();
+    protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
+        ServerWorld lv = pointer.getWorld();
         if (!lv.isClient()) {
-            BlockPos lv2 = arg.getBlockPos().offset(arg.getBlockState().get(DispenserBlock.FACING));
+            BlockPos lv2 = pointer.getBlockPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
             this.setSuccess(ShearsDispenserBehavior.tryShearBlock(lv, lv2) || ShearsDispenserBehavior.tryShearEntity(lv, lv2));
-            if (this.isSuccess() && arg2.damage(1, lv.getRandom(), null)) {
-                arg2.setCount(0);
+            if (this.isSuccess() && stack.damage(1, lv.getRandom(), null)) {
+                stack.setCount(0);
             }
         }
-        return arg2;
+        return stack;
     }
 
-    private static boolean tryShearBlock(ServerWorld arg, BlockPos arg2) {
+    private static boolean tryShearBlock(ServerWorld world, BlockPos pos) {
         int i;
-        BlockState lv = arg.getBlockState(arg2);
+        BlockState lv = world.getBlockState(pos);
         if (lv.isIn(BlockTags.BEEHIVES) && (i = lv.get(BeehiveBlock.HONEY_LEVEL).intValue()) >= 5) {
-            arg.playSound(null, arg2, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0f, 1.0f);
-            BeehiveBlock.dropHoneycomb(arg, arg2);
-            ((BeehiveBlock)lv.getBlock()).takeHoney(arg, lv, arg2, null, BeehiveBlockEntity.BeeState.BEE_RELEASED);
+            world.playSound(null, pos, SoundEvents.BLOCK_BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            BeehiveBlock.dropHoneycomb(world, pos);
+            ((BeehiveBlock)lv.getBlock()).takeHoney(world, lv, pos, null, BeehiveBlockEntity.BeeState.BEE_RELEASED);
             return true;
         }
         return false;
     }
 
-    private static boolean tryShearEntity(ServerWorld arg, BlockPos arg2) {
-        List<Entity> list = arg.getEntities(LivingEntity.class, new Box(arg2), EntityPredicates.EXCEPT_SPECTATOR);
+    private static boolean tryShearEntity(ServerWorld world, BlockPos pos) {
+        List<Entity> list = world.getEntities(LivingEntity.class, new Box(pos), EntityPredicates.EXCEPT_SPECTATOR);
         for (LivingEntity livingEntity : list) {
             Shearable lv2;
             if (!(livingEntity instanceof Shearable) || !(lv2 = (Shearable)((Object)livingEntity)).isShearable()) continue;

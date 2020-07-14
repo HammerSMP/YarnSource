@@ -19,13 +19,13 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class OminousBannerBlockEntityRenameFix
 extends ChoiceFix {
-    public OminousBannerBlockEntityRenameFix(Schema schema, boolean bl) {
-        super(schema, bl, "OminousBannerBlockEntityRenameFix", TypeReferences.BLOCK_ENTITY, "minecraft:banner");
+    public OminousBannerBlockEntityRenameFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "OminousBannerBlockEntityRenameFix", TypeReferences.BLOCK_ENTITY, "minecraft:banner");
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), this::fixBannerName);
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), this::fixBannerName);
     }
 
     private Dynamic<?> fixBannerName(Dynamic<?> dynamic) {

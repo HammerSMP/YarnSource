@@ -44,13 +44,13 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext arg) {
-        World lv = arg.getWorld();
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        World lv = context.getWorld();
         if (!lv.isClient) {
-            ItemStack lv2 = arg.getStack();
-            Vec3d lv3 = arg.getHitPos();
-            Direction lv4 = arg.getSide();
-            FireworkRocketEntity lv5 = new FireworkRocketEntity(lv, arg.getPlayer(), lv3.x + (double)lv4.getOffsetX() * 0.15, lv3.y + (double)lv4.getOffsetY() * 0.15, lv3.z + (double)lv4.getOffsetZ() * 0.15, lv2);
+            ItemStack lv2 = context.getStack();
+            Vec3d lv3 = context.getHitPos();
+            Direction lv4 = context.getSide();
+            FireworkRocketEntity lv5 = new FireworkRocketEntity(lv, context.getPlayer(), lv3.x + (double)lv4.getOffsetX() * 0.15, lv3.y + (double)lv4.getOffsetY() * 0.15, lv3.z + (double)lv4.getOffsetZ() * 0.15, lv2);
             lv.spawnEntity(lv5);
             lv2.decrement(1);
         }
@@ -58,30 +58,30 @@ extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World arg, PlayerEntity arg2, Hand arg3) {
-        if (arg2.isFallFlying()) {
-            ItemStack lv = arg2.getStackInHand(arg3);
-            if (!arg.isClient) {
-                arg.spawnEntity(new FireworkRocketEntity(arg, lv, arg2));
-                if (!arg2.abilities.creativeMode) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        if (user.isFallFlying()) {
+            ItemStack lv = user.getStackInHand(hand);
+            if (!world.isClient) {
+                world.spawnEntity(new FireworkRocketEntity(world, lv, user));
+                if (!user.abilities.creativeMode) {
                     lv.decrement(1);
                 }
             }
-            return TypedActionResult.method_29237(arg2.getStackInHand(arg3), arg.isClient());
+            return TypedActionResult.method_29237(user.getStackInHand(hand), world.isClient());
         }
-        return TypedActionResult.pass(arg2.getStackInHand(arg3));
+        return TypedActionResult.pass(user.getStackInHand(hand));
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void appendTooltip(ItemStack arg, @Nullable World arg2, List<Text> list, TooltipContext arg3) {
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         ListTag lv2;
-        CompoundTag lv = arg.getSubTag("Fireworks");
+        CompoundTag lv = stack.getSubTag("Fireworks");
         if (lv == null) {
             return;
         }
         if (lv.contains("Flight", 99)) {
-            list.add(new TranslatableText("item.minecraft.firework_rocket.flight").append(" ").append(String.valueOf(lv.getByte("Flight"))).formatted(Formatting.GRAY));
+            tooltip.add(new TranslatableText("item.minecraft.firework_rocket.flight").append(" ").append(String.valueOf(lv.getByte("Flight"))).formatted(Formatting.GRAY));
         }
         if (!(lv2 = lv.getList("Explosions", 10)).isEmpty()) {
             for (int i = 0; i < lv2.size(); ++i) {
@@ -92,7 +92,7 @@ extends Item {
                 for (int j = 1; j < list2.size(); ++j) {
                     list2.set(j, new LiteralText("  ").append((Text)list2.get(j)).formatted(Formatting.GRAY));
                 }
-                list.addAll(list2);
+                tooltip.addAll(list2);
             }
         }
     }
@@ -108,9 +108,9 @@ extends Item {
         private final int id;
         private final String name;
 
-        private Type(int j, String string2) {
-            this.id = j;
-            this.name = string2;
+        private Type(int id, String name) {
+            this.id = id;
+            this.name = name;
         }
 
         public int getId() {
@@ -123,15 +123,15 @@ extends Item {
         }
 
         @Environment(value=EnvType.CLIENT)
-        public static Type byId(int i) {
-            if (i < 0 || i >= TYPES.length) {
+        public static Type byId(int id) {
+            if (id < 0 || id >= TYPES.length) {
                 return SMALL_BALL;
             }
-            return TYPES[i];
+            return TYPES[id];
         }
 
         static {
-            TYPES = (Type[])Arrays.stream(Type.values()).sorted(Comparator.comparingInt(arg -> arg.id)).toArray(Type[]::new);
+            TYPES = (Type[])Arrays.stream(Type.values()).sorted(Comparator.comparingInt(type -> type.id)).toArray(Type[]::new);
         }
     }
 }

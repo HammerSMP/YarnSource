@@ -21,12 +21,12 @@ extends ServerConfigList<GameProfile, WhitelistEntry> {
     }
 
     @Override
-    protected ServerConfigEntry<GameProfile> fromJson(JsonObject jsonObject) {
-        return new WhitelistEntry(jsonObject);
+    protected ServerConfigEntry<GameProfile> fromJson(JsonObject json) {
+        return new WhitelistEntry(json);
     }
 
-    public boolean isAllowed(GameProfile gameProfile) {
-        return this.contains(gameProfile);
+    public boolean isAllowed(GameProfile profile) {
+        return this.contains(profile);
     }
 
     @Override
@@ -45,8 +45,8 @@ extends ServerConfigList<GameProfile, WhitelistEntry> {
     }
 
     @Override
-    protected /* synthetic */ String toString(Object object) {
-        return this.toString((GameProfile)object);
+    protected /* synthetic */ String toString(Object profile) {
+        return this.toString((GameProfile)profile);
     }
 }
 

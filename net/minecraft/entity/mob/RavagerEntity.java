@@ -98,19 +98,19 @@ extends RaiderEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("AttackTick", this.attackTick);
-        arg.putInt("StunTick", this.stunTick);
-        arg.putInt("RoarTick", this.roarTick);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("AttackTick", this.attackTick);
+        tag.putInt("StunTick", this.stunTick);
+        tag.putInt("RoarTick", this.roarTick);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.attackTick = arg.getInt("AttackTick");
-        this.stunTick = arg.getInt("StunTick");
-        this.roarTick = arg.getInt("RoarTick");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.attackTick = tag.getInt("AttackTick");
+        this.stunTick = tag.getInt("StunTick");
+        this.roarTick = tag.getInt("RoarTick");
     }
 
     @Override
@@ -119,8 +119,8 @@ extends RaiderEntity {
     }
 
     @Override
-    protected EntityNavigation createNavigation(World arg) {
-        return new Navigation(this, arg);
+    protected EntityNavigation createNavigation(World world) {
+        return new Navigation(this, world);
     }
 
     @Override
@@ -207,25 +207,25 @@ extends RaiderEntity {
     }
 
     @Override
-    public boolean canSee(Entity arg) {
+    public boolean canSee(Entity entity) {
         if (this.stunTick > 0 || this.roarTick > 0) {
             return false;
         }
-        return super.canSee(arg);
+        return super.canSee(entity);
     }
 
     @Override
-    protected void knockback(LivingEntity arg) {
+    protected void knockback(LivingEntity target) {
         if (this.roarTick == 0) {
             if (this.random.nextDouble() < 0.5) {
                 this.stunTick = 40;
                 this.playSound(SoundEvents.ENTITY_RAVAGER_STUNNED, 1.0f, 1.0f);
                 this.world.sendEntityStatus(this, (byte)39);
-                arg.pushAwayFrom(this);
+                target.pushAwayFrom(this);
             } else {
-                this.knockBack(arg);
+                this.knockBack(target);
             }
-            arg.velocityModified = true;
+            target.velocityModified = true;
         }
     }
 
@@ -248,23 +248,23 @@ extends RaiderEntity {
         }
     }
 
-    private void knockBack(Entity arg) {
-        double d = arg.getX() - this.getX();
-        double e = arg.getZ() - this.getZ();
+    private void knockBack(Entity entity) {
+        double d = entity.getX() - this.getX();
+        double e = entity.getZ() - this.getZ();
         double f = Math.max(d * d + e * e, 0.001);
-        arg.addVelocity(d / f * 4.0, 0.2, e / f * 4.0);
+        entity.addVelocity(d / f * 4.0, 0.2, e / f * 4.0);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 4) {
+    public void handleStatus(byte status) {
+        if (status == 4) {
             this.attackTick = 10;
             this.playSound(SoundEvents.ENTITY_RAVAGER_ATTACK, 1.0f, 1.0f);
-        } else if (b == 39) {
+        } else if (status == 39) {
             this.stunTick = 40;
         }
-        super.handleStatus(b);
+        super.handleStatus(status);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -283,11 +283,11 @@ extends RaiderEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
+    public boolean tryAttack(Entity target) {
         this.attackTick = 10;
         this.world.sendEntityStatus(this, (byte)4);
         this.playSound(SoundEvents.ENTITY_RAVAGER_ATTACK, 1.0f, 1.0f);
-        return super.tryAttack(arg);
+        return super.tryAttack(target);
     }
 
     @Override
@@ -297,7 +297,7 @@ extends RaiderEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_RAVAGER_HURT;
     }
 
@@ -307,17 +307,17 @@ extends RaiderEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_RAVAGER_STEP, 0.15f, 1.0f);
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return !arg.containsFluid(this.getBoundingBox());
+    public boolean canSpawn(WorldView world) {
+        return !world.containsFluid(this.getBoundingBox());
     }
 
     @Override
-    public void addBonusForWave(int i, boolean bl) {
+    public void addBonusForWave(int wave, boolean unused) {
     }
 
     @Override
@@ -331,11 +331,11 @@ extends RaiderEntity {
         }
 
         @Override
-        protected PathNodeType adjustNodeType(BlockView arg, boolean bl, boolean bl2, BlockPos arg2, PathNodeType arg3) {
-            if (arg3 == PathNodeType.LEAVES) {
+        protected PathNodeType adjustNodeType(BlockView world, boolean canOpenDoors, boolean canEnterOpenDoors, BlockPos pos, PathNodeType type) {
+            if (type == PathNodeType.LEAVES) {
                 return PathNodeType.OPEN;
             }
-            return super.adjustNodeType(arg, bl, bl2, arg2, arg3);
+            return super.adjustNodeType(world, canOpenDoors, canEnterOpenDoors, pos, type);
         }
     }
 
@@ -346,9 +346,9 @@ extends RaiderEntity {
         }
 
         @Override
-        protected PathNodeNavigator createPathNodeNavigator(int i) {
+        protected PathNodeNavigator createPathNodeNavigator(int range) {
             this.nodeMaker = new PathNodeMaker();
-            return new PathNodeNavigator(this.nodeMaker, i);
+            return new PathNodeNavigator(this.nodeMaker, range);
         }
     }
 
@@ -359,9 +359,9 @@ extends RaiderEntity {
         }
 
         @Override
-        protected double getSquaredMaxAttackDistance(LivingEntity arg) {
+        protected double getSquaredMaxAttackDistance(LivingEntity entity) {
             float f = RavagerEntity.this.getWidth() - 0.1f;
-            return f * 2.0f * (f * 2.0f) + arg.getWidth();
+            return f * 2.0f * (f * 2.0f) + entity.getWidth();
         }
     }
 }

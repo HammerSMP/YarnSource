@@ -9,18 +9,18 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class PowerEnchantment
 extends Enchantment {
-    public PowerEnchantment(Enchantment.Rarity arg, EquipmentSlot ... args) {
-        super(arg, EnchantmentTarget.BOW, args);
+    public PowerEnchantment(Enchantment.Rarity weight, EquipmentSlot ... slotTypes) {
+        super(weight, EnchantmentTarget.BOW, slotTypes);
     }
 
     @Override
-    public int getMinPower(int i) {
-        return 1 + (i - 1) * 10;
+    public int getMinPower(int level) {
+        return 1 + (level - 1) * 10;
     }
 
     @Override
-    public int getMaxPower(int i) {
-        return this.getMinPower(i) + 15;
+    public int getMaxPower(int level) {
+        return this.getMinPower(level) + 15;
     }
 
     @Override

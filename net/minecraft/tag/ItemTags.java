@@ -68,8 +68,8 @@ public final class ItemTags {
     public static final Tag.Identified<Item> STONE_TOOL_MATERIALS = ItemTags.register("stone_tool_materials");
     public static final Tag.Identified<Item> STONE_CRAFTING_MATERIALS = ItemTags.register("stone_crafting_materials");
 
-    private static Tag.Identified<Item> register(String string) {
-        return REQUIRED_TAGS.add(string);
+    private static Tag.Identified<Item> register(String id) {
+        return REQUIRED_TAGS.add(id);
     }
 
     public static TagGroup<Item> getTagGroup() {

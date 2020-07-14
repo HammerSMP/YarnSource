@@ -104,10 +104,10 @@ public abstract class StructureFeature<C extends FeatureConfig> {
     private static final Map<String, String> field_25839 = ImmutableMap.builder().put((Object)"nvi", (Object)"jigsaw").put((Object)"pcp", (Object)"jigsaw").put((Object)"bastionremnant", (Object)"jigsaw").put((Object)"runtime", (Object)"jigsaw").build();
     private final Codec<ConfiguredStructureFeature<C, StructureFeature<C>>> codec;
 
-    private static <F extends StructureFeature<?>> F register(String string, F arg, GenerationStep.Feature arg2) {
-        STRUCTURES.put((Object)string.toLowerCase(Locale.ROOT), arg);
-        STRUCTURE_TO_GENERATION_STEP.put(arg, arg2);
-        return (F)Registry.register(Registry.STRUCTURE_FEATURE, string.toLowerCase(Locale.ROOT), arg);
+    private static <F extends StructureFeature<?>> F register(String name, F structureFeature, GenerationStep.Feature step) {
+        STRUCTURES.put((Object)name.toLowerCase(Locale.ROOT), structureFeature);
+        STRUCTURE_TO_GENERATION_STEP.put(structureFeature, step);
+        return (F)Registry.register(Registry.STRUCTURE_FEATURE, name.toLowerCase(Locale.ROOT), structureFeature);
     }
 
     public StructureFeature(Codec<C> codec) {
@@ -122,8 +122,8 @@ public abstract class StructureFeature<C extends FeatureConfig> {
     }
 
     @Nullable
-    public static StructureStart<?> readStructureStart(StructureManager arg, CompoundTag arg2, long l) {
-        String string = arg2.getString("id");
+    public static StructureStart<?> readStructureStart(StructureManager arg, CompoundTag tag, long worldSeed) {
+        String string = tag.getString("id");
         if ("INVALID".equals(string)) {
             return StructureStart.DEFAULT;
         }
@@ -132,13 +132,13 @@ public abstract class StructureFeature<C extends FeatureConfig> {
             LOGGER.error("Unknown feature id: {}", (Object)string);
             return null;
         }
-        int i = arg2.getInt("ChunkX");
-        int j = arg2.getInt("ChunkZ");
-        int k = arg2.getInt("references");
-        BlockBox lv2 = arg2.contains("BB") ? new BlockBox(arg2.getIntArray("BB")) : BlockBox.empty();
-        ListTag lv3 = arg2.getList("Children", 10);
+        int i = tag.getInt("ChunkX");
+        int j = tag.getInt("ChunkZ");
+        int k = tag.getInt("references");
+        BlockBox lv2 = tag.contains("BB") ? new BlockBox(tag.getIntArray("BB")) : BlockBox.empty();
+        ListTag lv3 = tag.getList("Children", 10);
         try {
-            StructureStart<?> lv4 = super.createStart(i, j, lv2, k, l);
+            StructureStart<?> lv4 = super.createStart(i, j, lv2, k, worldSeed);
             for (int m = 0; m < lv3.size(); ++m) {
                 CompoundTag lv5 = lv3.getCompound(m);
                 String string2 = lv5.getString("id").toLowerCase(Locale.ROOT);
@@ -169,34 +169,34 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         return this.codec;
     }
 
-    public ConfiguredStructureFeature<C, ? extends StructureFeature<C>> configure(C arg) {
-        return new ConfiguredStructureFeature<C, StructureFeature>(this, arg);
+    public ConfiguredStructureFeature<C, ? extends StructureFeature<C>> configure(C config) {
+        return new ConfiguredStructureFeature<C, StructureFeature>(this, config);
     }
 
     @Nullable
-    public BlockPos locateStructure(WorldView arg, StructureAccessor arg2, BlockPos arg3, int i, boolean bl, long l, StructureConfig arg4) {
-        int j = arg4.getSpacing();
-        int k = arg3.getX() >> 4;
-        int m = arg3.getZ() >> 4;
+    public BlockPos locateStructure(WorldView arg, StructureAccessor arg2, BlockPos searchStartPos, int searchRadius, boolean skipExistingChunks, long worldSeed, StructureConfig config) {
+        int j = config.getSpacing();
+        int k = searchStartPos.getX() >> 4;
+        int m = searchStartPos.getZ() >> 4;
         ChunkRandom lv = new ChunkRandom();
-        block0: for (int n = 0; n <= i; ++n) {
+        block0: for (int n = 0; n <= searchRadius; ++n) {
             for (int o = -n; o <= n; ++o) {
                 boolean bl2 = o == -n || o == n;
                 for (int p = -n; p <= n; ++p) {
                     boolean bl3;
-                    boolean bl4 = bl3 = p == -n || p == n;
+                    boolean bl = bl3 = p == -n || p == n;
                     if (!bl2 && !bl3) continue;
                     int q = k + j * o;
                     int r = m + j * p;
-                    ChunkPos lv2 = this.getStartChunk(arg4, l, lv, q, r);
+                    ChunkPos lv2 = this.getStartChunk(config, worldSeed, lv, q, r);
                     Chunk lv3 = arg.getChunk(lv2.x, lv2.z, ChunkStatus.STRUCTURE_STARTS);
                     StructureStart<?> lv4 = arg2.getStructureStart(ChunkSectionPos.from(lv3.getPos(), 0), this, lv3);
                     if (lv4 != null && lv4.hasChildren()) {
-                        if (bl && lv4.isInExistingChunk()) {
+                        if (skipExistingChunks && lv4.isInExistingChunk()) {
                             lv4.incrementReferences();
                             return lv4.getPos();
                         }
-                        if (!bl) {
+                        if (!skipExistingChunks) {
                             return lv4.getPos();
                         }
                     }
@@ -212,36 +212,36 @@ public abstract class StructureFeature<C extends FeatureConfig> {
         return true;
     }
 
-    public final ChunkPos getStartChunk(StructureConfig arg, long l, ChunkRandom arg2, int i, int j) {
+    public final ChunkPos getStartChunk(StructureConfig config, long worldSeed, ChunkRandom placementRandom, int chunkX, int chunkY) {
         int s;
         int r;
-        int k = arg.getSpacing();
-        int m = arg.getSeparation();
-        int n = Math.floorDiv(i, k);
-        int o = Math.floorDiv(j, k);
-        arg2.setRegionSeed(l, n, o, arg.getSalt());
+        int k = config.getSpacing();
+        int m = config.getSeparation();
+        int n = Math.floorDiv(chunkX, k);
+        int o = Math.floorDiv(chunkY, k);
+        placementRandom.setRegionSeed(worldSeed, n, o, config.getSalt());
         if (this.isUniformDistribution()) {
-            int p = arg2.nextInt(k - m);
-            int q = arg2.nextInt(k - m);
+            int p = placementRandom.nextInt(k - m);
+            int q = placementRandom.nextInt(k - m);
         } else {
-            r = (arg2.nextInt(k - m) + arg2.nextInt(k - m)) / 2;
-            s = (arg2.nextInt(k - m) + arg2.nextInt(k - m)) / 2;
+            r = (placementRandom.nextInt(k - m) + placementRandom.nextInt(k - m)) / 2;
+            s = (placementRandom.nextInt(k - m) + placementRandom.nextInt(k - m)) / 2;
         }
         return new ChunkPos(n * k + r, o * k + s);
     }
 
-    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long l, ChunkRandom arg3, int i, int j, Biome arg4, ChunkPos arg5, C arg6) {
+    protected boolean shouldStartAt(ChunkGenerator arg, BiomeSource arg2, long worldSeed, ChunkRandom arg3, int chunkX, int chunkZ, Biome arg4, ChunkPos chunkPos, C arg6) {
         return true;
     }
 
-    private StructureStart<C> createStart(int i, int j, BlockBox arg, int k, long l) {
-        return this.getStructureStartFactory().create(this, i, j, arg, k, l);
+    private StructureStart<C> createStart(int chunkX, int chunkZ, BlockBox boundingBox, int referenceCount, long worldSeed) {
+        return this.getStructureStartFactory().create(this, chunkX, chunkZ, boundingBox, referenceCount, worldSeed);
     }
 
-    public StructureStart<?> tryPlaceStart(class_5455 arg, ChunkGenerator arg2, BiomeSource arg3, StructureManager arg4, long l, ChunkPos arg5, Biome arg6, int i, ChunkRandom arg7, StructureConfig arg8, C arg9) {
-        ChunkPos lv = this.getStartChunk(arg8, l, arg7, arg5.x, arg5.z);
-        if (arg5.x == lv.x && arg5.z == lv.z && this.shouldStartAt(arg2, arg3, l, arg7, arg5.x, arg5.z, arg6, lv, arg9)) {
-            StructureStart<C> lv2 = this.createStart(arg5.x, arg5.z, BlockBox.empty(), i, l);
+    public StructureStart<?> tryPlaceStart(class_5455 arg, ChunkGenerator arg2, BiomeSource arg3, StructureManager arg4, long worldSeed, ChunkPos arg5, Biome arg6, int referenceCount, ChunkRandom arg7, StructureConfig arg8, C arg9) {
+        ChunkPos lv = this.getStartChunk(arg8, worldSeed, arg7, arg5.x, arg5.z);
+        if (arg5.x == lv.x && arg5.z == lv.z && this.shouldStartAt(arg2, arg3, worldSeed, arg7, arg5.x, arg5.z, arg6, lv, arg9)) {
+            StructureStart<C> lv2 = this.createStart(arg5.x, arg5.z, BlockBox.empty(), referenceCount, worldSeed);
             lv2.init(arg, arg2, arg4, arg5.x, arg5.z, arg6, arg9);
             if (lv2.hasChildren()) {
                 return lv2;

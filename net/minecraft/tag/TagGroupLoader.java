@@ -48,20 +48,20 @@ public class TagGroupLoader<T> {
     private final String dataType;
     private final String entryType;
 
-    public TagGroupLoader(Function<Identifier, Optional<T>> function, String string, String string2) {
-        this.registryGetter = function;
-        this.dataType = string;
-        this.entryType = string2;
+    public TagGroupLoader(Function<Identifier, Optional<T>> registryGetter, String dataType, String entryType) {
+        this.registryGetter = registryGetter;
+        this.dataType = dataType;
+        this.entryType = entryType;
     }
 
-    public CompletableFuture<Map<Identifier, Tag.Builder>> prepareReload(ResourceManager arg, Executor executor) {
+    public CompletableFuture<Map<Identifier, Tag.Builder>> prepareReload(ResourceManager manager, Executor prepareExecutor) {
         return CompletableFuture.supplyAsync(() -> {
             HashMap map = Maps.newHashMap();
-            for (Identifier lv : arg.findResources(this.dataType, string -> string.endsWith(".json"))) {
+            for (Identifier lv : manager.findResources(this.dataType, string -> string.endsWith(".json"))) {
                 String string2 = lv.getPath();
                 Identifier lv2 = new Identifier(lv.getNamespace(), string2.substring(this.dataType.length() + 1, string2.length() - JSON_EXTENSION_LENGTH));
                 try {
-                    for (Resource lv3 : arg.getAllResources(lv)) {
+                    for (Resource lv3 : manager.getAllResources(lv)) {
                         try {
                             InputStream inputStream = lv3.getInputStream();
                             Throwable throwable = null;
@@ -125,16 +125,16 @@ public class TagGroupLoader<T> {
                 }
             }
             return map;
-        }, executor);
+        }, prepareExecutor);
     }
 
-    public TagGroup<T> applyReload(Map<Identifier, Tag.Builder> map) {
+    public TagGroup<T> applyReload(Map<Identifier, Tag.Builder> tags) {
         HashMap map2 = Maps.newHashMap();
         Function function = map2::get;
         Function<Identifier, Object> function2 = arg -> this.registryGetter.apply((Identifier)arg).orElse(null);
-        while (!map.isEmpty()) {
+        while (!tags.isEmpty()) {
             boolean bl = false;
-            Iterator<Map.Entry<Identifier, Tag.Builder>> iterator = map.entrySet().iterator();
+            Iterator<Map.Entry<Identifier, Tag.Builder>> iterator = tags.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<Identifier, Tag.Builder> entry = iterator.next();
                 Optional<Tag<Object>> optional = entry.getValue().build(function, function2);
@@ -146,7 +146,7 @@ public class TagGroupLoader<T> {
             if (bl) continue;
             break;
         }
-        map.forEach((arg, arg2) -> LOGGER.error("Couldn't load {} tag {} as it is missing following references: {}", (Object)this.entryType, arg, (Object)arg2.streamUnresolvedEntries(function, function2).map(Objects::toString).collect(Collectors.joining(","))));
+        tags.forEach((arg, arg2) -> LOGGER.error("Couldn't load {} tag {} as it is missing following references: {}", (Object)this.entryType, arg, (Object)arg2.streamUnresolvedEntries(function, function2).map(Objects::toString).collect(Collectors.joining(","))));
         return TagGroup.create(map2);
     }
 }

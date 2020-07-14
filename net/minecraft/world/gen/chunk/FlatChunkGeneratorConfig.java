@@ -32,8 +32,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.class_5464;
-import net.minecraft.class_5470;
 import net.minecraft.util.Util;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
@@ -43,7 +41,9 @@ import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
 import net.minecraft.world.gen.chunk.StructureConfig;
 import net.minecraft.world.gen.chunk.StructuresConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.ConfiguredFeatures;
 import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeatures;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.FillLayerFeatureConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
@@ -54,22 +54,22 @@ public class FlatChunkGeneratorConfig {
     private static final Logger LOGGER = LogManager.getLogger();
     public static final Codec<FlatChunkGeneratorConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)StructuresConfig.CODEC.fieldOf("structures").forGetter(FlatChunkGeneratorConfig::getConfig), (App)FlatChunkGeneratorLayer.CODEC.listOf().fieldOf("layers").forGetter(FlatChunkGeneratorConfig::getLayers), (App)Codec.BOOL.fieldOf("lakes").orElse((Object)false).forGetter(arg -> arg.field_24977), (App)Codec.BOOL.fieldOf("features").orElse((Object)false).forGetter(arg -> arg.field_24976), (App)Biome.field_24677.fieldOf("biome").orElseGet(Util.method_29188("Unknown biome, defaulting to plains", ((Logger)LOGGER)::error), () -> () -> Biomes.PLAINS).forGetter(arg -> arg.biome)).apply((Applicative)instance, FlatChunkGeneratorConfig::new)).stable();
     private static final Map<StructureFeature<?>, ConfiguredStructureFeature<?, ?>> STRUCTURE_TO_FEATURES = Util.make(Maps.newHashMap(), hashMap -> {
-        hashMap.put(StructureFeature.MINESHAFT, class_5470.MINESHAFT);
-        hashMap.put(StructureFeature.VILLAGE, class_5470.VILLAGE_PLAINS);
-        hashMap.put(StructureFeature.STRONGHOLD, class_5470.STRONGHOLD);
-        hashMap.put(StructureFeature.SWAMP_HUT, class_5470.SWAMP_HUT);
-        hashMap.put(StructureFeature.DESERT_PYRAMID, class_5470.DESERT_PYRAMID);
-        hashMap.put(StructureFeature.JUNGLE_PYRAMID, class_5470.JUNGLE_PYRAMID);
-        hashMap.put(StructureFeature.IGLOO, class_5470.IGLOO);
-        hashMap.put(StructureFeature.OCEAN_RUIN, class_5470.OCEAN_RUIN_COLD);
-        hashMap.put(StructureFeature.SHIPWRECK, class_5470.SHIPWRECK);
-        hashMap.put(StructureFeature.MONUMENT, class_5470.MONUMENT);
-        hashMap.put(StructureFeature.END_CITY, class_5470.END_CITY);
-        hashMap.put(StructureFeature.MANSION, class_5470.MANSION);
-        hashMap.put(StructureFeature.FORTRESS, class_5470.FORTRESS);
-        hashMap.put(StructureFeature.PILLAGER_OUTPOST, class_5470.PILLAGER_OUTPOST);
-        hashMap.put(StructureFeature.RUINED_PORTAL, class_5470.RUINED_PORTAL);
-        hashMap.put(StructureFeature.BASTION_REMNANT, class_5470.BASTION_REMNANT);
+        hashMap.put(StructureFeature.MINESHAFT, ConfiguredStructureFeatures.MINESHAFT);
+        hashMap.put(StructureFeature.VILLAGE, ConfiguredStructureFeatures.VILLAGE_PLAINS);
+        hashMap.put(StructureFeature.STRONGHOLD, ConfiguredStructureFeatures.STRONGHOLD);
+        hashMap.put(StructureFeature.SWAMP_HUT, ConfiguredStructureFeatures.SWAMP_HUT);
+        hashMap.put(StructureFeature.DESERT_PYRAMID, ConfiguredStructureFeatures.DESERT_PYRAMID);
+        hashMap.put(StructureFeature.JUNGLE_PYRAMID, ConfiguredStructureFeatures.JUNGLE_PYRAMID);
+        hashMap.put(StructureFeature.IGLOO, ConfiguredStructureFeatures.IGLOO);
+        hashMap.put(StructureFeature.OCEAN_RUIN, ConfiguredStructureFeatures.OCEAN_RUIN_COLD);
+        hashMap.put(StructureFeature.SHIPWRECK, ConfiguredStructureFeatures.SHIPWRECK);
+        hashMap.put(StructureFeature.MONUMENT, ConfiguredStructureFeatures.MONUMENT);
+        hashMap.put(StructureFeature.END_CITY, ConfiguredStructureFeatures.END_CITY);
+        hashMap.put(StructureFeature.MANSION, ConfiguredStructureFeatures.MANSION);
+        hashMap.put(StructureFeature.FORTRESS, ConfiguredStructureFeatures.FORTRESS);
+        hashMap.put(StructureFeature.PILLAGER_OUTPOST, ConfiguredStructureFeatures.PILLAGER_OUTPOST);
+        hashMap.put(StructureFeature.RUINED_PORTAL, ConfiguredStructureFeatures.RUINED_PORTAL);
+        hashMap.put(StructureFeature.BASTION_REMNANT, ConfiguredStructureFeatures.BASTION_REMNANT);
     });
     private final StructuresConfig config;
     private final List<FlatChunkGeneratorLayer> layers = Lists.newArrayList();
@@ -92,8 +92,8 @@ public class FlatChunkGeneratorConfig {
         this.biome = supplier;
     }
 
-    public FlatChunkGeneratorConfig(StructuresConfig arg) {
-        this.config = arg;
+    public FlatChunkGeneratorConfig(StructuresConfig config) {
+        this.config = config;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -131,8 +131,8 @@ public class FlatChunkGeneratorConfig {
         Biome lv = this.getBiome();
         Biome lv2 = new Biome(new Biome.Settings().surfaceBuilder(lv.getSurfaceBuilder()).precipitation(lv.getPrecipitation()).category(lv.getCategory()).depth(lv.getDepth()).scale(lv.getScale()).temperature(lv.getTemperature()).downfall(lv.getRainfall()).effects(lv.getEffects()).parent(lv.getParent())){};
         if (this.field_24977) {
-            lv2.addFeature(GenerationStep.Feature.LAKES, class_5464.LAKE_WATER);
-            lv2.addFeature(GenerationStep.Feature.LAKES, class_5464.LAKE_LAVA);
+            lv2.addFeature(GenerationStep.Feature.LAKES, ConfiguredFeatures.LAKE_WATER);
+            lv2.addFeature(GenerationStep.Feature.LAKES, ConfiguredFeatures.LAKE_LAVA);
         }
         for (Map.Entry<StructureFeature<?>, StructureConfig> entry : this.config.getStructures().entrySet()) {
             lv2.addStructureFeature(lv.method_28405(STRUCTURE_TO_FEATURES.get(entry.getKey())));

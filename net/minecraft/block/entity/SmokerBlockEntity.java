@@ -25,13 +25,13 @@ extends AbstractFurnaceBlockEntity {
     }
 
     @Override
-    protected int getFuelTime(ItemStack arg) {
-        return super.getFuelTime(arg) / 2;
+    protected int getFuelTime(ItemStack fuel) {
+        return super.getFuelTime(fuel) / 2;
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return new SmokerScreenHandler(i, arg, this, this.propertyDelegate);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new SmokerScreenHandler(syncId, playerInventory, this, this.propertyDelegate);
     }
 }
 

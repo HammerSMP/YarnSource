@@ -22,12 +22,12 @@ implements Predicate<BlockState> {
     private final StateManager<Block, BlockState> manager;
     private final Map<Property<?>, Predicate<Object>> propertyTests = Maps.newHashMap();
 
-    private BlockStatePredicate(StateManager<Block, BlockState> arg) {
-        this.manager = arg;
+    private BlockStatePredicate(StateManager<Block, BlockState> manager) {
+        this.manager = manager;
     }
 
-    public static BlockStatePredicate forBlock(Block arg) {
-        return new BlockStatePredicate(arg.getStateManager());
+    public static BlockStatePredicate forBlock(Block block) {
+        return new BlockStatePredicate(block.getStateManager());
     }
 
     @Override
@@ -45,16 +45,16 @@ implements Predicate<BlockState> {
         return true;
     }
 
-    protected <T extends Comparable<T>> boolean testProperty(BlockState arg, Property<T> arg2, Predicate<Object> predicate) {
-        T comparable = arg.get(arg2);
+    protected <T extends Comparable<T>> boolean testProperty(BlockState blockState, Property<T> property, Predicate<Object> predicate) {
+        T comparable = blockState.get(property);
         return predicate.test(comparable);
     }
 
-    public <V extends Comparable<V>> BlockStatePredicate with(Property<V> arg, Predicate<Object> predicate) {
-        if (!this.manager.getProperties().contains(arg)) {
-            throw new IllegalArgumentException(this.manager + " cannot support property " + arg);
+    public <V extends Comparable<V>> BlockStatePredicate with(Property<V> property, Predicate<Object> predicate) {
+        if (!this.manager.getProperties().contains(property)) {
+            throw new IllegalArgumentException(this.manager + " cannot support property " + property);
         }
-        this.propertyTests.put(arg, predicate);
+        this.propertyTests.put(property, predicate);
         return this;
     }
 

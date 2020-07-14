@@ -31,17 +31,17 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.TranslatableText;
 
 public class GiveCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("give").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.argument("targets", EntityArgumentType.players()).then(((RequiredArgumentBuilder)CommandManager.argument("item", ItemStackArgumentType.itemStack()).executes(commandContext -> GiveCommand.execute((ServerCommandSource)commandContext.getSource(), ItemStackArgumentType.getItemStackArgument(commandContext, "item"), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), 1))).then(CommandManager.argument("count", IntegerArgumentType.integer((int)1)).executes(commandContext -> GiveCommand.execute((ServerCommandSource)commandContext.getSource(), ItemStackArgumentType.getItemStackArgument(commandContext, "item"), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"count")))))));
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("give").requires(arg -> arg.hasPermissionLevel(2))).then(CommandManager.argument("targets", EntityArgumentType.players()).then(((RequiredArgumentBuilder)CommandManager.argument("item", ItemStackArgumentType.itemStack()).executes(commandContext -> GiveCommand.execute((ServerCommandSource)commandContext.getSource(), ItemStackArgumentType.getItemStackArgument(commandContext, "item"), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), 1))).then(CommandManager.argument("count", IntegerArgumentType.integer((int)1)).executes(commandContext -> GiveCommand.execute((ServerCommandSource)commandContext.getSource(), ItemStackArgumentType.getItemStackArgument(commandContext, "item"), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), IntegerArgumentType.getInteger((CommandContext)commandContext, (String)"count")))))));
     }
 
-    private static int execute(ServerCommandSource arg, ItemStackArgument arg2, Collection<ServerPlayerEntity> collection, int i) throws CommandSyntaxException {
-        for (ServerPlayerEntity lv : collection) {
-            int j = i;
+    private static int execute(ServerCommandSource source, ItemStackArgument item, Collection<ServerPlayerEntity> targets, int count) throws CommandSyntaxException {
+        for (ServerPlayerEntity lv : targets) {
+            int j = count;
             while (j > 0) {
-                int k = Math.min(arg2.getItem().getMaxCount(), j);
+                int k = Math.min(item.getItem().getMaxCount(), j);
                 j -= k;
-                ItemStack lv2 = arg2.createStack(k, false);
+                ItemStack lv2 = item.createStack(k, false);
                 boolean bl = lv.inventory.insertStack(lv2);
                 if (!bl || !lv2.isEmpty()) {
                     ItemEntity lv3 = lv.dropItem(lv2, false);
@@ -59,12 +59,12 @@ public class GiveCommand {
                 lv.playerScreenHandler.sendContentUpdates();
             }
         }
-        if (collection.size() == 1) {
-            arg.sendFeedback(new TranslatableText("commands.give.success.single", i, arg2.createStack(i, false).toHoverableText(), collection.iterator().next().getDisplayName()), true);
+        if (targets.size() == 1) {
+            source.sendFeedback(new TranslatableText("commands.give.success.single", count, item.createStack(count, false).toHoverableText(), targets.iterator().next().getDisplayName()), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.give.success.single", i, arg2.createStack(i, false).toHoverableText(), collection.size()), true);
+            source.sendFeedback(new TranslatableText("commands.give.success.single", count, item.createStack(count, false).toHoverableText(), targets.size()), true);
         }
-        return collection.size();
+        return targets.size();
     }
 }
 

@@ -36,37 +36,37 @@ public class ScreenshotUtils {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
-    public static void saveScreenshot(File file, int i, int j, Framebuffer arg, Consumer<Text> consumer) {
-        ScreenshotUtils.saveScreenshot(file, null, i, j, arg, consumer);
+    public static void saveScreenshot(File gameDirectory, int framebufferWidth, int framebufferHeight, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
+        ScreenshotUtils.saveScreenshot(gameDirectory, null, framebufferWidth, framebufferHeight, framebuffer, messageReceiver);
     }
 
-    public static void saveScreenshot(File file, @Nullable String string, int i, int j, Framebuffer arg, Consumer<Text> consumer) {
+    public static void saveScreenshot(File gameDirectory, @Nullable String fileName, int framebufferWidth, int framebufferHeight, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
         if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(() -> ScreenshotUtils.saveScreenshotInner(file, string, i, j, arg, consumer));
+            RenderSystem.recordRenderCall(() -> ScreenshotUtils.saveScreenshotInner(gameDirectory, fileName, framebufferWidth, framebufferHeight, framebuffer, messageReceiver));
         } else {
-            ScreenshotUtils.saveScreenshotInner(file, string, i, j, arg, consumer);
+            ScreenshotUtils.saveScreenshotInner(gameDirectory, fileName, framebufferWidth, framebufferHeight, framebuffer, messageReceiver);
         }
     }
 
-    private static void saveScreenshotInner(File file, @Nullable String string, int i, int j, Framebuffer arg, Consumer<Text> consumer) {
+    private static void saveScreenshotInner(File gameDirectory, @Nullable String fileName, int framebufferWidth, int framebufferHeight, Framebuffer framebuffer, Consumer<Text> messageReceiver) {
         File file4;
-        NativeImage lv = ScreenshotUtils.takeScreenshot(i, j, arg);
-        File file2 = new File(file, "screenshots");
+        NativeImage lv = ScreenshotUtils.takeScreenshot(framebufferWidth, framebufferHeight, framebuffer);
+        File file2 = new File(gameDirectory, "screenshots");
         file2.mkdir();
-        if (string == null) {
+        if (fileName == null) {
             File file3 = ScreenshotUtils.getScreenshotFilename(file2);
         } else {
-            file4 = new File(file2, string);
+            file4 = new File(file2, fileName);
         }
         Util.method_27958().execute(() -> {
             try {
                 lv.writeFile(file4);
                 MutableText lv = new LiteralText(file4.getName()).formatted(Formatting.UNDERLINE).styled(arg -> arg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file4.getAbsolutePath())));
-                consumer.accept(new TranslatableText("screenshot.success", lv));
+                messageReceiver.accept(new TranslatableText("screenshot.success", lv));
             }
             catch (Exception exception) {
                 LOGGER.warn("Couldn't save screenshot", (Throwable)exception);
-                consumer.accept(new TranslatableText("screenshot.failure", exception.getMessage()));
+                messageReceiver.accept(new TranslatableText("screenshot.failure", exception.getMessage()));
             }
             finally {
                 lv.close();
@@ -74,21 +74,21 @@ public class ScreenshotUtils {
         });
     }
 
-    public static NativeImage takeScreenshot(int i, int j, Framebuffer arg) {
-        i = arg.textureWidth;
-        j = arg.textureHeight;
-        NativeImage lv = new NativeImage(i, j, false);
-        RenderSystem.bindTexture(arg.method_30277());
+    public static NativeImage takeScreenshot(int width, int height, Framebuffer framebuffer) {
+        width = framebuffer.textureWidth;
+        height = framebuffer.textureHeight;
+        NativeImage lv = new NativeImage(width, height, false);
+        RenderSystem.bindTexture(framebuffer.method_30277());
         lv.loadFromTextureImage(0, true);
         lv.mirrorVertically();
         return lv;
     }
 
-    private static File getScreenshotFilename(File file) {
+    private static File getScreenshotFilename(File directory) {
         String string = DATE_FORMAT.format(new Date());
         int i = 1;
         File file2;
-        while ((file2 = new File(file, string + (i == 1 ? "" : "_" + i) + ".png")).exists()) {
+        while ((file2 = new File(directory, string + (i == 1 ? "" : "_" + i) + ".png")).exists()) {
             ++i;
         }
         return file2;

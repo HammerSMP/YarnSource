@@ -73,11 +73,11 @@ public class WorldUpdater {
     private static final Pattern REGION_FILE_PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
     private final PersistentStateManager persistentStateManager;
 
-    public WorldUpdater(LevelStorage.Session arg, DataFixer dataFixer, ImmutableSet<RegistryKey<World>> immutableSet, boolean bl) {
-        this.worlds = immutableSet;
-        this.eraseCache = bl;
+    public WorldUpdater(LevelStorage.Session session, DataFixer dataFixer, ImmutableSet<RegistryKey<World>> worlds, boolean eraseCache) {
+        this.worlds = worlds;
+        this.eraseCache = eraseCache;
         this.dataFixer = dataFixer;
-        this.session = arg;
+        this.session = session;
         this.persistentStateManager = new PersistentStateManager(new File(this.session.getWorldDirectory(World.OVERWORLD), "data"), dataFixer);
         this.updateThread = UPDATE_THREAD_FACTORY.newThread(this::updateWorld);
         this.updateThread.setUncaughtExceptionHandler((thread, throwable) -> {

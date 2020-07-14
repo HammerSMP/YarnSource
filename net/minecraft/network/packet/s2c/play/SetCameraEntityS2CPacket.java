@@ -25,18 +25,18 @@ implements Packet<ClientPlayPacketListener> {
     public SetCameraEntityS2CPacket() {
     }
 
-    public SetCameraEntityS2CPacket(Entity arg) {
-        this.entityId = arg.getEntityId();
+    public SetCameraEntityS2CPacket(Entity entity) {
+        this.entityId = entity.getEntityId();
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entityId = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entityId = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entityId);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entityId);
     }
 
     @Override
@@ -46,8 +46,8 @@ implements Packet<ClientPlayPacketListener> {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public Entity getEntity(World arg) {
-        return arg.getEntityById(this.entityId);
+    public Entity getEntity(World world) {
+        return world.getEntityById(this.entityId);
     }
 }
 

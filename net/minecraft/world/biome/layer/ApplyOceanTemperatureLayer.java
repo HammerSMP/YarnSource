@@ -16,9 +16,9 @@ IdentityCoordinateTransformer
 
 
     @Override
-    public int sample(LayerRandomnessSource arg, LayerSampler arg2, LayerSampler arg3, int i, int j) {
-        int k = arg2.sample(this.transformX(i), this.transformZ(j));
-        int l = arg3.sample(this.transformX(i), this.transformZ(j));
+    public int sample(LayerRandomnessSource context, LayerSampler sampler1, LayerSampler sampler2, int x, int z) {
+        int k = sampler1.sample(this.transformX(x), this.transformZ(z));
+        int l = sampler2.sample(this.transformX(x), this.transformZ(z));
         if (!BiomeLayers.isOcean(k)) {
             return k;
         }
@@ -26,7 +26,7 @@ IdentityCoordinateTransformer
         int n = 4;
         for (int o = -8; o <= 8; o += 4) {
             for (int p = -8; p <= 8; p += 4) {
-                int q = arg2.sample(this.transformX(i + o), this.transformZ(j + p));
+                int q = sampler1.sample(this.transformX(x + o), this.transformZ(z + p));
                 if (BiomeLayers.isOcean(q)) continue;
                 if (l == BiomeLayers.WARM_OCEAN_ID) {
                     return BiomeLayers.LUKEWARM_OCEAN_ID;

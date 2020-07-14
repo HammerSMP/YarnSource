@@ -27,31 +27,31 @@ extends ButtonWidget {
     private final int textureWidth;
     private final int textureHeight;
 
-    public TexturedButtonWidget(int i, int j, int k, int l, int m, int n, int o, Identifier arg, ButtonWidget.PressAction arg2) {
-        this(i, j, k, l, m, n, o, arg, 256, 256, arg2);
+    public TexturedButtonWidget(int x, int y, int width, int height, int u, int v, int hoveredVOffset, Identifier texture, ButtonWidget.PressAction pressAction) {
+        this(x, y, width, height, u, v, hoveredVOffset, texture, 256, 256, pressAction);
     }
 
-    public TexturedButtonWidget(int i, int j, int k, int l, int m, int n, int o, Identifier arg, int p, int q, ButtonWidget.PressAction arg2) {
-        this(i, j, k, l, m, n, o, arg, p, q, arg2, LiteralText.EMPTY);
+    public TexturedButtonWidget(int x, int y, int width, int height, int u, int v, int hoveredVOffset, Identifier texture, int textureWidth, int textureHeight, ButtonWidget.PressAction pressAction) {
+        this(x, y, width, height, u, v, hoveredVOffset, texture, textureWidth, textureHeight, pressAction, LiteralText.EMPTY);
     }
 
-    public TexturedButtonWidget(int i, int j, int k, int l, int m, int n, int o, Identifier arg, int p, int q, ButtonWidget.PressAction arg2, Text arg3) {
-        super(i, j, k, l, arg3, arg2);
-        this.textureWidth = p;
-        this.textureHeight = q;
-        this.u = m;
-        this.v = n;
-        this.hoveredVOffset = o;
-        this.texture = arg;
+    public TexturedButtonWidget(int x, int y, int width, int height, int u, int v, int hoveredVOffset, Identifier texture, int textureWidth, int textureHeight, ButtonWidget.PressAction pressAction, Text arg3) {
+        super(x, y, width, height, arg3, pressAction);
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
+        this.u = u;
+        this.v = v;
+        this.hoveredVOffset = hoveredVOffset;
+        this.texture = texture;
     }
 
-    public void setPos(int i, int j) {
-        this.x = i;
-        this.y = j;
+    public void setPos(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     @Override
-    public void renderButton(MatrixStack arg, int i, int j, float f) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         MinecraftClient lv = MinecraftClient.getInstance();
         lv.getTextureManager().bindTexture(this.texture);
         int k = this.v;
@@ -59,7 +59,7 @@ extends ButtonWidget {
             k += this.hoveredVOffset;
         }
         RenderSystem.enableDepthTest();
-        TexturedButtonWidget.drawTexture(arg, this.x, this.y, this.u, k, this.width, this.height, this.textureWidth, this.textureHeight);
+        TexturedButtonWidget.drawTexture(matrices, this.x, this.y, this.u, k, this.width, this.height, this.textureWidth, this.textureHeight);
     }
 }
 

@@ -39,44 +39,44 @@ extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView arg) {
+    public BlockEntity createBlockEntity(BlockView world) {
         return new EndPortalBlockEntity();
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (arg2 instanceof ServerWorld && !arg4.hasVehicle() && !arg4.hasPassengers() && arg4.canUsePortals() && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(arg4.getBoundingBox().offset(-arg3.getX(), -arg3.getY(), -arg3.getZ())), arg.getOutlineShape(arg2, arg3), BooleanBiFunction.AND)) {
-            RegistryKey<World> lv = arg2.getRegistryKey() == World.END ? World.OVERWORLD : World.END;
-            ServerWorld lv2 = ((ServerWorld)arg2).getServer().getWorld(lv);
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (world instanceof ServerWorld && !entity.hasVehicle() && !entity.hasPassengers() && entity.canUsePortals() && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(entity.getBoundingBox().offset(-pos.getX(), -pos.getY(), -pos.getZ())), state.getOutlineShape(world, pos), BooleanBiFunction.AND)) {
+            RegistryKey<World> lv = world.getRegistryKey() == World.END ? World.OVERWORLD : World.END;
+            ServerWorld lv2 = ((ServerWorld)world).getServer().getWorld(lv);
             if (lv2 == null) {
                 return;
             }
-            arg4.moveToWorld(lv2);
+            entity.moveToWorld(lv2);
         }
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void randomDisplayTick(BlockState arg, World arg2, BlockPos arg3, Random random) {
-        double d = (double)arg3.getX() + random.nextDouble();
-        double e = (double)arg3.getY() + 0.8;
-        double f = (double)arg3.getZ() + random.nextDouble();
-        arg2.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        double d = (double)pos.getX() + random.nextDouble();
+        double e = (double)pos.getY() + 0.8;
+        double f = (double)pos.getZ() + random.nextDouble();
+        world.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public ItemStack getPickStack(BlockView arg, BlockPos arg2, BlockState arg3) {
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public boolean canBucketPlace(BlockState arg, Fluid arg2) {
+    public boolean canBucketPlace(BlockState state, Fluid fluid) {
         return false;
     }
 }

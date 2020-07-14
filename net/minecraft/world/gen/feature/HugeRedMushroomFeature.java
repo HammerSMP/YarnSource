@@ -22,10 +22,10 @@ extends HugeMushroomFeature {
     }
 
     @Override
-    protected void generateCap(WorldAccess arg, Random random, BlockPos arg2, int i, BlockPos.Mutable arg3, HugeMushroomFeatureConfig arg4) {
-        for (int j = i - 3; j <= i; ++j) {
-            int k = j < i ? arg4.capSize : arg4.capSize - 1;
-            int l = arg4.capSize - 2;
+    protected void generateCap(WorldAccess world, Random random, BlockPos start, int y, BlockPos.Mutable mutable, HugeMushroomFeatureConfig config) {
+        for (int j = y - 3; j <= y; ++j) {
+            int k = j < y ? config.capSize : config.capSize - 1;
+            int l = config.capSize - 2;
             for (int m = -k; m <= k; ++m) {
                 for (int n = -k; n <= k; ++n) {
                     boolean bl6;
@@ -35,22 +35,22 @@ extends HugeMushroomFeature {
                     boolean bl4 = n == k;
                     boolean bl5 = bl || bl2;
                     boolean bl7 = bl6 = bl3 || bl4;
-                    if (j < i && bl5 == bl6) continue;
-                    arg3.set(arg2, m, j, n);
-                    if (arg.getBlockState(arg3).isOpaqueFullCube(arg, arg3)) continue;
-                    this.setBlockState(arg, arg3, (BlockState)((BlockState)((BlockState)((BlockState)((BlockState)arg4.capProvider.getBlockState(random, arg2).with(MushroomBlock.UP, j >= i - 1)).with(MushroomBlock.WEST, m < -l)).with(MushroomBlock.EAST, m > l)).with(MushroomBlock.NORTH, n < -l)).with(MushroomBlock.SOUTH, n > l));
+                    if (j < y && bl5 == bl6) continue;
+                    mutable.set(start, m, j, n);
+                    if (world.getBlockState(mutable).isOpaqueFullCube(world, mutable)) continue;
+                    this.setBlockState(world, mutable, (BlockState)((BlockState)((BlockState)((BlockState)((BlockState)config.capProvider.getBlockState(random, start).with(MushroomBlock.UP, j >= y - 1)).with(MushroomBlock.WEST, m < -l)).with(MushroomBlock.EAST, m > l)).with(MushroomBlock.NORTH, n < -l)).with(MushroomBlock.SOUTH, n > l));
                 }
             }
         }
     }
 
     @Override
-    protected int getCapSize(int i, int j, int k, int l) {
+    protected int getCapSize(int i, int j, int capSize, int y) {
         int m = 0;
-        if (l < j && l >= j - 3) {
-            m = k;
-        } else if (l == j) {
-            m = k;
+        if (y < j && y >= j - 3) {
+            m = capSize;
+        } else if (y == j) {
+            m = capSize;
         }
         return m;
     }

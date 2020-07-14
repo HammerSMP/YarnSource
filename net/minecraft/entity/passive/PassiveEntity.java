@@ -33,16 +33,16 @@ extends PathAwareEntity {
     }
 
     @Override
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
         PassiveData lv;
-        if (arg4 == null) {
-            arg4 = new PassiveData(true);
+        if (entityData == null) {
+            entityData = new PassiveData(true);
         }
-        if ((lv = (PassiveData)arg4).canSpawnBaby() && lv.getSpawnedCount() > 0 && this.random.nextFloat() <= lv.getBabyChance()) {
+        if ((lv = (PassiveData)entityData).canSpawnBaby() && lv.getSpawnedCount() > 0 && this.random.nextFloat() <= lv.getBabyChance()) {
             this.setBreedingAge(-24000);
         }
         lv.countSpawned();
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Nullable
@@ -65,15 +65,15 @@ extends PathAwareEntity {
         return this.breedingAge;
     }
 
-    public void growUp(int i, boolean bl) {
+    public void growUp(int age, boolean overGrow) {
         int j;
         int k = j = this.getBreedingAge();
-        if ((j += i * 20) > 0) {
+        if ((j += age * 20) > 0) {
             j = 0;
         }
         int l = j - k;
         this.setBreedingAge(j);
-        if (bl) {
+        if (overGrow) {
             this.forcedAge += l;
             if (this.happyTicksRemaining == 0) {
                 this.happyTicksRemaining = 40;
@@ -84,39 +84,39 @@ extends PathAwareEntity {
         }
     }
 
-    public void growUp(int i) {
-        this.growUp(i, false);
+    public void growUp(int age) {
+        this.growUp(age, false);
     }
 
-    public void setBreedingAge(int i) {
+    public void setBreedingAge(int age) {
         int j = this.breedingAge;
-        this.breedingAge = i;
-        if (j < 0 && i >= 0 || j >= 0 && i < 0) {
-            this.dataTracker.set(CHILD, i < 0);
+        this.breedingAge = age;
+        if (j < 0 && age >= 0 || j >= 0 && age < 0) {
+            this.dataTracker.set(CHILD, age < 0);
             this.onGrowUp();
         }
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("Age", this.getBreedingAge());
-        arg.putInt("ForcedAge", this.forcedAge);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("Age", this.getBreedingAge());
+        tag.putInt("ForcedAge", this.forcedAge);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setBreedingAge(arg.getInt("Age"));
-        this.forcedAge = arg.getInt("ForcedAge");
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setBreedingAge(tag.getInt("Age"));
+        this.forcedAge = tag.getInt("ForcedAge");
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (CHILD.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (CHILD.equals(data)) {
             this.calculateDimensions();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
@@ -148,8 +148,8 @@ extends PathAwareEntity {
     }
 
     @Override
-    public void setBaby(boolean bl) {
-        this.setBreedingAge(bl ? -24000 : 0);
+    public void setBaby(boolean baby) {
+        this.setBreedingAge(baby ? -24000 : 0);
     }
 
     public static class PassiveData

@@ -18,16 +18,16 @@ extends EntityRenameFix {
     public static final Map<String, String> BLOCKS = ImmutableMap.builder().put((Object)"minecraft:portal", (Object)"minecraft:nether_portal").put((Object)"minecraft:oak_bark", (Object)"minecraft:oak_wood").put((Object)"minecraft:spruce_bark", (Object)"minecraft:spruce_wood").put((Object)"minecraft:birch_bark", (Object)"minecraft:birch_wood").put((Object)"minecraft:jungle_bark", (Object)"minecraft:jungle_wood").put((Object)"minecraft:acacia_bark", (Object)"minecraft:acacia_wood").put((Object)"minecraft:dark_oak_bark", (Object)"minecraft:dark_oak_wood").put((Object)"minecraft:stripped_oak_bark", (Object)"minecraft:stripped_oak_wood").put((Object)"minecraft:stripped_spruce_bark", (Object)"minecraft:stripped_spruce_wood").put((Object)"minecraft:stripped_birch_bark", (Object)"minecraft:stripped_birch_wood").put((Object)"minecraft:stripped_jungle_bark", (Object)"minecraft:stripped_jungle_wood").put((Object)"minecraft:stripped_acacia_bark", (Object)"minecraft:stripped_acacia_wood").put((Object)"minecraft:stripped_dark_oak_bark", (Object)"minecraft:stripped_dark_oak_wood").put((Object)"minecraft:mob_spawner", (Object)"minecraft:spawner").build();
     public static final Map<String, String> ITEMS = ImmutableMap.builder().putAll(BLOCKS).put((Object)"minecraft:clownfish", (Object)"minecraft:tropical_fish").put((Object)"minecraft:chorus_fruit_popped", (Object)"minecraft:popped_chorus_fruit").put((Object)"minecraft:evocation_illager_spawn_egg", (Object)"minecraft:evoker_spawn_egg").put((Object)"minecraft:vindication_illager_spawn_egg", (Object)"minecraft:vindicator_spawn_egg").build();
 
-    public EntityTheRenameningBlock(Schema schema, boolean bl) {
-        super("EntityTheRenameningBlock", schema, bl);
+    public EntityTheRenameningBlock(Schema outputSchema, boolean changesType) {
+        super("EntityTheRenameningBlock", outputSchema, changesType);
     }
 
     @Override
-    protected String rename(String string) {
-        if (string.startsWith("minecraft:bred_")) {
-            string = "minecraft:" + string.substring("minecraft:bred_".length());
+    protected String rename(String oldName) {
+        if (oldName.startsWith("minecraft:bred_")) {
+            oldName = "minecraft:" + oldName.substring("minecraft:bred_".length());
         }
-        return ENTITIES.getOrDefault(string, string);
+        return ENTITIES.getOrDefault(oldName, oldName);
     }
 }
 

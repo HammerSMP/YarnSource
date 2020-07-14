@@ -28,31 +28,31 @@ public class MatrixStack {
         arrayDeque.add(new Entry(lv, lv2));
     });
 
-    public void translate(double d, double e, double f) {
+    public void translate(double x, double y, double z) {
         Entry lv = this.stack.getLast();
-        lv.modelMatrix.multiply(Matrix4f.translate((float)d, (float)e, (float)f));
+        lv.modelMatrix.multiply(Matrix4f.translate((float)x, (float)y, (float)z));
     }
 
-    public void scale(float f, float g, float h) {
+    public void scale(float x, float y, float z) {
         Entry lv = this.stack.getLast();
-        lv.modelMatrix.multiply(Matrix4f.scale(f, g, h));
-        if (f == g && g == h) {
-            if (f > 0.0f) {
+        lv.modelMatrix.multiply(Matrix4f.scale(x, y, z));
+        if (x == y && y == z) {
+            if (x > 0.0f) {
                 return;
             }
             lv.normalMatrix.multiply(-1.0f);
         }
-        float i = 1.0f / f;
-        float j = 1.0f / g;
-        float k = 1.0f / h;
+        float i = 1.0f / x;
+        float j = 1.0f / y;
+        float k = 1.0f / z;
         float l = MathHelper.fastInverseCbrt(i * j * k);
         lv.normalMatrix.multiply(Matrix3f.scale(l * i, l * j, l * k));
     }
 
-    public void multiply(Quaternion arg) {
+    public void multiply(Quaternion quaternion) {
         Entry lv = this.stack.getLast();
-        lv.modelMatrix.multiply(arg);
-        lv.normalMatrix.multiply(arg);
+        lv.modelMatrix.multiply(quaternion);
+        lv.normalMatrix.multiply(quaternion);
     }
 
     public void push() {

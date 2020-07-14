@@ -15,24 +15,24 @@ extends HitResult {
     private final boolean missed;
     private final boolean insideBlock;
 
-    public static BlockHitResult createMissed(Vec3d arg, Direction arg2, BlockPos arg3) {
-        return new BlockHitResult(true, arg, arg2, arg3, false);
+    public static BlockHitResult createMissed(Vec3d pos, Direction side, BlockPos blockPos) {
+        return new BlockHitResult(true, pos, side, blockPos, false);
     }
 
-    public BlockHitResult(Vec3d arg, Direction arg2, BlockPos arg3, boolean bl) {
-        this(false, arg, arg2, arg3, bl);
+    public BlockHitResult(Vec3d pos, Direction side, BlockPos blockPos, boolean insideBlock) {
+        this(false, pos, side, blockPos, insideBlock);
     }
 
-    private BlockHitResult(boolean bl, Vec3d arg, Direction arg2, BlockPos arg3, boolean bl2) {
-        super(arg);
-        this.missed = bl;
-        this.side = arg2;
-        this.blockPos = arg3;
-        this.insideBlock = bl2;
+    private BlockHitResult(boolean missed, Vec3d pos, Direction side, BlockPos blockPos, boolean insideBlock) {
+        super(pos);
+        this.missed = missed;
+        this.side = side;
+        this.blockPos = blockPos;
+        this.insideBlock = insideBlock;
     }
 
-    public BlockHitResult withSide(Direction arg) {
-        return new BlockHitResult(this.missed, this.pos, arg, this.blockPos, this.insideBlock);
+    public BlockHitResult withSide(Direction side) {
+        return new BlockHitResult(this.missed, this.pos, side, this.blockPos, this.insideBlock);
     }
 
     public BlockHitResult method_29328(BlockPos arg) {

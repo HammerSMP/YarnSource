@@ -50,41 +50,41 @@ implements CommandOutput {
         return this.successCount;
     }
 
-    public void setSuccessCount(int i) {
-        this.successCount = i;
+    public void setSuccessCount(int successCount) {
+        this.successCount = successCount;
     }
 
     public Text getLastOutput() {
         return this.lastOutput == null ? LiteralText.EMPTY : this.lastOutput;
     }
 
-    public CompoundTag serialize(CompoundTag arg) {
-        arg.putString("Command", this.command);
-        arg.putInt("SuccessCount", this.successCount);
-        arg.putString("CustomName", Text.Serializer.toJson(this.customName));
-        arg.putBoolean("TrackOutput", this.trackOutput);
+    public CompoundTag serialize(CompoundTag tag) {
+        tag.putString("Command", this.command);
+        tag.putInt("SuccessCount", this.successCount);
+        tag.putString("CustomName", Text.Serializer.toJson(this.customName));
+        tag.putBoolean("TrackOutput", this.trackOutput);
         if (this.lastOutput != null && this.trackOutput) {
-            arg.putString("LastOutput", Text.Serializer.toJson(this.lastOutput));
+            tag.putString("LastOutput", Text.Serializer.toJson(this.lastOutput));
         }
-        arg.putBoolean("UpdateLastExecution", this.updateLastExecution);
+        tag.putBoolean("UpdateLastExecution", this.updateLastExecution);
         if (this.updateLastExecution && this.lastExecution > 0L) {
-            arg.putLong("LastExecution", this.lastExecution);
+            tag.putLong("LastExecution", this.lastExecution);
         }
-        return arg;
+        return tag;
     }
 
-    public void deserialize(CompoundTag arg) {
-        this.command = arg.getString("Command");
-        this.successCount = arg.getInt("SuccessCount");
-        if (arg.contains("CustomName", 8)) {
-            this.setCustomName(Text.Serializer.fromJson(arg.getString("CustomName")));
+    public void deserialize(CompoundTag tag) {
+        this.command = tag.getString("Command");
+        this.successCount = tag.getInt("SuccessCount");
+        if (tag.contains("CustomName", 8)) {
+            this.setCustomName(Text.Serializer.fromJson(tag.getString("CustomName")));
         }
-        if (arg.contains("TrackOutput", 1)) {
-            this.trackOutput = arg.getBoolean("TrackOutput");
+        if (tag.contains("TrackOutput", 1)) {
+            this.trackOutput = tag.getBoolean("TrackOutput");
         }
-        if (arg.contains("LastOutput", 8) && this.trackOutput) {
+        if (tag.contains("LastOutput", 8) && this.trackOutput) {
             try {
-                this.lastOutput = Text.Serializer.fromJson(arg.getString("LastOutput"));
+                this.lastOutput = Text.Serializer.fromJson(tag.getString("LastOutput"));
             }
             catch (Throwable throwable) {
                 this.lastOutput = new LiteralText(throwable.getMessage());
@@ -92,14 +92,14 @@ implements CommandOutput {
         } else {
             this.lastOutput = null;
         }
-        if (arg.contains("UpdateLastExecution")) {
-            this.updateLastExecution = arg.getBoolean("UpdateLastExecution");
+        if (tag.contains("UpdateLastExecution")) {
+            this.updateLastExecution = tag.getBoolean("UpdateLastExecution");
         }
-        this.lastExecution = this.updateLastExecution && arg.contains("LastExecution") ? arg.getLong("LastExecution") : -1L;
+        this.lastExecution = this.updateLastExecution && tag.contains("LastExecution") ? tag.getLong("LastExecution") : -1L;
     }
 
-    public void setCommand(String string) {
-        this.command = string;
+    public void setCommand(String command) {
+        this.command = command;
         this.successCount = 0;
     }
 
@@ -107,8 +107,8 @@ implements CommandOutput {
         return this.command;
     }
 
-    public boolean execute(World arg) {
-        if (arg.isClient || arg.getTime() == this.lastExecution) {
+    public boolean execute(World world) {
+        if (world.isClient || world.getTime() == this.lastExecution) {
             return false;
         }
         if ("Searge".equalsIgnoreCase(this.command)) {
@@ -136,7 +136,7 @@ implements CommandOutput {
                 throw new CrashException(lv2);
             }
         }
-        this.lastExecution = this.updateLastExecution ? arg.getTime() : -1L;
+        this.lastExecution = this.updateLastExecution ? world.getTime() : -1L;
         return true;
     }
 
@@ -144,14 +144,14 @@ implements CommandOutput {
         return this.customName;
     }
 
-    public void setCustomName(@Nullable Text arg) {
-        this.customName = arg != null ? arg : DEFAULT_NAME;
+    public void setCustomName(@Nullable Text name) {
+        this.customName = name != null ? name : DEFAULT_NAME;
     }
 
     @Override
-    public void sendSystemMessage(Text arg, UUID uUID) {
+    public void sendSystemMessage(Text message, UUID senderUuid) {
         if (this.trackOutput) {
-            this.lastOutput = new LiteralText("[" + DATE_FORMAT.format(new Date()) + "] ").append(arg);
+            this.lastOutput = new LiteralText("[" + DATE_FORMAT.format(new Date()) + "] ").append(message);
             this.markDirty();
         }
     }
@@ -160,12 +160,12 @@ implements CommandOutput {
 
     public abstract void markDirty();
 
-    public void setLastOutput(@Nullable Text arg) {
-        this.lastOutput = arg;
+    public void setLastOutput(@Nullable Text lastOutput) {
+        this.lastOutput = lastOutput;
     }
 
-    public void shouldTrackOutput(boolean bl) {
-        this.trackOutput = bl;
+    public void shouldTrackOutput(boolean trackOutput) {
+        this.trackOutput = trackOutput;
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -173,14 +173,14 @@ implements CommandOutput {
         return this.trackOutput;
     }
 
-    public ActionResult interact(PlayerEntity arg) {
-        if (!arg.isCreativeLevelTwoOp()) {
+    public ActionResult interact(PlayerEntity player) {
+        if (!player.isCreativeLevelTwoOp()) {
             return ActionResult.PASS;
         }
-        if (arg.getEntityWorld().isClient) {
-            arg.openCommandBlockMinecartScreen(this);
+        if (player.getEntityWorld().isClient) {
+            player.openCommandBlockMinecartScreen(this);
         }
-        return ActionResult.success(arg.world.isClient);
+        return ActionResult.success(player.world.isClient);
     }
 
     @Environment(value=EnvType.CLIENT)

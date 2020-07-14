@@ -22,10 +22,10 @@ implements DecoratorConfig {
     public final double noiseFactor;
     public final double noiseOffset;
 
-    public TopSolidHeightmapNoiseBiasedDecoratorConfig(int i, double d, double e) {
-        this.noiseToCountRatio = i;
-        this.noiseFactor = d;
-        this.noiseOffset = e;
+    public TopSolidHeightmapNoiseBiasedDecoratorConfig(int noiseToCountRatio, double noiseFactor, double noiseOffset) {
+        this.noiseToCountRatio = noiseToCountRatio;
+        this.noiseFactor = noiseFactor;
+        this.noiseOffset = noiseOffset;
     }
 }
 

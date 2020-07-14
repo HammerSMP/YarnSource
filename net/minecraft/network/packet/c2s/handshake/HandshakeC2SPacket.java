@@ -27,27 +27,27 @@ implements Packet<ServerHandshakePacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public HandshakeC2SPacket(String string, int i, NetworkState arg) {
+    public HandshakeC2SPacket(String address, int port, NetworkState intendedState) {
         this.protocolVersion = SharedConstants.getGameVersion().getProtocolVersion();
-        this.address = string;
-        this.port = i;
-        this.intendedState = arg;
+        this.address = address;
+        this.port = port;
+        this.intendedState = intendedState;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.protocolVersion = arg.readVarInt();
-        this.address = arg.readString(255);
-        this.port = arg.readUnsignedShort();
-        this.intendedState = NetworkState.byId(arg.readVarInt());
+    public void read(PacketByteBuf buf) throws IOException {
+        this.protocolVersion = buf.readVarInt();
+        this.address = buf.readString(255);
+        this.port = buf.readUnsignedShort();
+        this.intendedState = NetworkState.byId(buf.readVarInt());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.protocolVersion);
-        arg.writeString(this.address);
-        arg.writeShort(this.port);
-        arg.writeVarInt(this.intendedState.getId());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.protocolVersion);
+        buf.writeString(this.address);
+        buf.writeShort(this.port);
+        buf.writeVarInt(this.intendedState.getId());
     }
 
     @Override

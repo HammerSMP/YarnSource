@@ -23,20 +23,20 @@ public interface ParentElement
 extends Element {
     public List<? extends Element> children();
 
-    default public Optional<Element> hoveredElement(double d, double e) {
+    default public Optional<Element> hoveredElement(double mouseX, double mouseY) {
         for (Element element : this.children()) {
-            if (!element.isMouseOver(d, e)) continue;
+            if (!element.isMouseOver(mouseX, mouseY)) continue;
             return Optional.of(element);
         }
         return Optional.empty();
     }
 
     @Override
-    default public boolean mouseClicked(double d, double e, int i) {
+    default public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (Element element : this.children()) {
-            if (!element.mouseClicked(d, e, i)) continue;
+            if (!element.mouseClicked(mouseX, mouseY, button)) continue;
             this.setFocused(element);
-            if (i == 0) {
+            if (button == 0) {
                 this.setDragging(true);
             }
             return true;
@@ -45,15 +45,15 @@ extends Element {
     }
 
     @Override
-    default public boolean mouseReleased(double d, double e, int i) {
+    default public boolean mouseReleased(double mouseX, double mouseY, int button) {
         this.setDragging(false);
-        return this.hoveredElement(d, e).filter(arg -> arg.mouseReleased(d, e, i)).isPresent();
+        return this.hoveredElement(mouseX, mouseY).filter(arg -> arg.mouseReleased(mouseX, mouseY, button)).isPresent();
     }
 
     @Override
-    default public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (this.getFocused() != null && this.isDragging() && i == 0) {
-            return this.getFocused().mouseDragged(d, e, i, f, g);
+    default public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (this.getFocused() != null && this.isDragging() && button == 0) {
+            return this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
         return false;
     }
@@ -63,23 +63,23 @@ extends Element {
     public void setDragging(boolean var1);
 
     @Override
-    default public boolean mouseScrolled(double d, double e, double f) {
-        return this.hoveredElement(d, e).filter(arg -> arg.mouseScrolled(d, e, f)).isPresent();
+    default public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return this.hoveredElement(mouseX, mouseY).filter(arg -> arg.mouseScrolled(mouseX, mouseY, amount)).isPresent();
     }
 
     @Override
-    default public boolean keyPressed(int i, int j, int k) {
-        return this.getFocused() != null && this.getFocused().keyPressed(i, j, k);
+    default public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return this.getFocused() != null && this.getFocused().keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    default public boolean keyReleased(int i, int j, int k) {
-        return this.getFocused() != null && this.getFocused().keyReleased(i, j, k);
+    default public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        return this.getFocused() != null && this.getFocused().keyReleased(keyCode, scanCode, modifiers);
     }
 
     @Override
-    default public boolean charTyped(char c, int i) {
-        return this.getFocused() != null && this.getFocused().charTyped(c, i);
+    default public boolean charTyped(char chr, int keyCode) {
+        return this.getFocused() != null && this.getFocused().charTyped(chr, keyCode);
     }
 
     @Nullable
@@ -87,41 +87,41 @@ extends Element {
 
     public void setFocused(@Nullable Element var1);
 
-    default public void setInitialFocus(@Nullable Element arg) {
-        this.setFocused(arg);
-        arg.changeFocus(true);
+    default public void setInitialFocus(@Nullable Element element) {
+        this.setFocused(element);
+        element.changeFocus(true);
     }
 
-    default public void focusOn(@Nullable Element arg) {
-        this.setFocused(arg);
+    default public void focusOn(@Nullable Element element) {
+        this.setFocused(element);
     }
 
     @Override
-    default public boolean changeFocus(boolean bl) {
+    default public boolean changeFocus(boolean lookForwards) {
         Supplier<Element> supplier;
         BooleanSupplier booleanSupplier;
         int l;
         boolean bl2;
         Element lv = this.getFocused();
-        boolean bl3 = bl2 = lv != null;
-        if (bl2 && lv.changeFocus(bl)) {
+        boolean bl = bl2 = lv != null;
+        if (bl2 && lv.changeFocus(lookForwards)) {
             return true;
         }
         List<? extends Element> list = this.children();
         int i = list.indexOf(lv);
         if (bl2 && i >= 0) {
-            int j = i + (bl ? 1 : 0);
-        } else if (bl) {
+            int j = i + (lookForwards ? 1 : 0);
+        } else if (lookForwards) {
             boolean k = false;
         } else {
             l = list.size();
         }
         ListIterator<? extends Element> listIterator = list.listIterator(l);
-        BooleanSupplier booleanSupplier2 = bl ? listIterator::hasNext : (booleanSupplier = listIterator::hasPrevious);
-        Supplier<Element> supplier2 = bl ? listIterator::next : (supplier = listIterator::previous);
+        BooleanSupplier booleanSupplier2 = lookForwards ? listIterator::hasNext : (booleanSupplier = listIterator::hasPrevious);
+        Supplier<Element> supplier2 = lookForwards ? listIterator::next : (supplier = listIterator::previous);
         while (booleanSupplier.getAsBoolean()) {
             Element lv2 = supplier.get();
-            if (!lv2.changeFocus(bl)) continue;
+            if (!lv2.changeFocus(lookForwards)) continue;
             this.setFocused(lv2);
             return true;
         }

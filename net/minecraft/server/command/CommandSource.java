@@ -61,60 +61,60 @@ public interface CommandSource {
 
     public boolean hasPermissionLevel(int var1);
 
-    public static <T> void forEachMatching(Iterable<T> iterable, String string, Function<T, Identifier> function, Consumer<T> consumer) {
+    public static <T> void forEachMatching(Iterable<T> candidates, String string, Function<T, Identifier> identifier, Consumer<T> action) {
         boolean bl = string.indexOf(58) > -1;
-        for (T object : iterable) {
-            Identifier lv = function.apply(object);
+        for (T object : candidates) {
+            Identifier lv = identifier.apply(object);
             if (bl) {
                 String string2 = lv.toString();
                 if (!CommandSource.method_27136(string, string2)) continue;
-                consumer.accept(object);
+                action.accept(object);
                 continue;
             }
             if (!CommandSource.method_27136(string, lv.getNamespace()) && (!lv.getNamespace().equals("minecraft") || !CommandSource.method_27136(string, lv.getPath()))) continue;
-            consumer.accept(object);
+            action.accept(object);
         }
     }
 
-    public static <T> void forEachMatching(Iterable<T> iterable, String string, String string2, Function<T, Identifier> function, Consumer<T> consumer) {
+    public static <T> void forEachMatching(Iterable<T> candidates, String string, String string2, Function<T, Identifier> identifier, Consumer<T> action) {
         if (string.isEmpty()) {
-            iterable.forEach(consumer);
+            candidates.forEach(action);
         } else {
             String string3 = Strings.commonPrefix((CharSequence)string, (CharSequence)string2);
             if (!string3.isEmpty()) {
                 String string4 = string.substring(string3.length());
-                CommandSource.forEachMatching(iterable, string4, function, consumer);
+                CommandSource.forEachMatching(candidates, string4, identifier, action);
             }
         }
     }
 
-    public static CompletableFuture<Suggestions> suggestIdentifiers(Iterable<Identifier> iterable, SuggestionsBuilder suggestionsBuilder, String string) {
-        String string2 = suggestionsBuilder.getRemaining().toLowerCase(Locale.ROOT);
-        CommandSource.forEachMatching(iterable, string2, string, arg -> arg, arg -> suggestionsBuilder.suggest(string + arg));
-        return suggestionsBuilder.buildFuture();
+    public static CompletableFuture<Suggestions> suggestIdentifiers(Iterable<Identifier> candidates, SuggestionsBuilder builder, String string) {
+        String string2 = builder.getRemaining().toLowerCase(Locale.ROOT);
+        CommandSource.forEachMatching(candidates, string2, string, arg -> arg, arg -> builder.suggest(string + arg));
+        return builder.buildFuture();
     }
 
-    public static CompletableFuture<Suggestions> suggestIdentifiers(Iterable<Identifier> iterable, SuggestionsBuilder suggestionsBuilder) {
-        String string = suggestionsBuilder.getRemaining().toLowerCase(Locale.ROOT);
-        CommandSource.forEachMatching(iterable, string, arg -> arg, arg -> suggestionsBuilder.suggest(arg.toString()));
-        return suggestionsBuilder.buildFuture();
+    public static CompletableFuture<Suggestions> suggestIdentifiers(Iterable<Identifier> candidates, SuggestionsBuilder builder) {
+        String string = builder.getRemaining().toLowerCase(Locale.ROOT);
+        CommandSource.forEachMatching(candidates, string, arg -> arg, arg -> builder.suggest(arg.toString()));
+        return builder.buildFuture();
     }
 
-    public static <T> CompletableFuture<Suggestions> suggestFromIdentifier(Iterable<T> iterable, SuggestionsBuilder suggestionsBuilder, Function<T, Identifier> function, Function<T, Message> function2) {
-        String string = suggestionsBuilder.getRemaining().toLowerCase(Locale.ROOT);
-        CommandSource.forEachMatching(iterable, string, function, object -> suggestionsBuilder.suggest(((Identifier)function.apply(object)).toString(), (Message)function2.apply(object)));
-        return suggestionsBuilder.buildFuture();
+    public static <T> CompletableFuture<Suggestions> suggestFromIdentifier(Iterable<T> candidates, SuggestionsBuilder builder, Function<T, Identifier> identifier, Function<T, Message> tooltip) {
+        String string = builder.getRemaining().toLowerCase(Locale.ROOT);
+        CommandSource.forEachMatching(candidates, string, identifier, object -> builder.suggest(((Identifier)identifier.apply(object)).toString(), (Message)tooltip.apply(object)));
+        return builder.buildFuture();
     }
 
-    public static CompletableFuture<Suggestions> suggestIdentifiers(Stream<Identifier> stream, SuggestionsBuilder suggestionsBuilder) {
-        return CommandSource.suggestIdentifiers(stream::iterator, suggestionsBuilder);
+    public static CompletableFuture<Suggestions> suggestIdentifiers(Stream<Identifier> stream, SuggestionsBuilder builder) {
+        return CommandSource.suggestIdentifiers(stream::iterator, builder);
     }
 
-    public static <T> CompletableFuture<Suggestions> suggestFromIdentifier(Stream<T> stream, SuggestionsBuilder suggestionsBuilder, Function<T, Identifier> function, Function<T, Message> function2) {
-        return CommandSource.suggestFromIdentifier(stream::iterator, suggestionsBuilder, function, function2);
+    public static <T> CompletableFuture<Suggestions> suggestFromIdentifier(Stream<T> candidates, SuggestionsBuilder builder, Function<T, Identifier> identifier, Function<T, Message> tooltip) {
+        return CommandSource.suggestFromIdentifier(candidates::iterator, builder, identifier, tooltip);
     }
 
-    public static CompletableFuture<Suggestions> suggestPositions(String string, Collection<RelativePosition> collection, SuggestionsBuilder suggestionsBuilder, Predicate<String> predicate) {
+    public static CompletableFuture<Suggestions> suggestPositions(String string, Collection<RelativePosition> candidates, SuggestionsBuilder builder, Predicate<String> predicate) {
         ArrayList list;
         block4: {
             String[] strings;
@@ -122,7 +122,7 @@ public interface CommandSource {
                 block3: {
                     list = Lists.newArrayList();
                     if (!Strings.isNullOrEmpty((String)string)) break block3;
-                    for (RelativePosition lv : collection) {
+                    for (RelativePosition lv : candidates) {
                         String string2 = lv.x + " " + lv.y + " " + lv.z;
                         if (!predicate.test(string2)) continue;
                         list.add(lv.x);
@@ -133,7 +133,7 @@ public interface CommandSource {
                 }
                 strings = string.split(" ");
                 if (strings.length != 1) break block5;
-                for (RelativePosition lv2 : collection) {
+                for (RelativePosition lv2 : candidates) {
                     String string3 = strings[0] + " " + lv2.y + " " + lv2.z;
                     if (!predicate.test(string3)) continue;
                     list.add(strings[0] + " " + lv2.y);
@@ -142,13 +142,13 @@ public interface CommandSource {
                 break block4;
             }
             if (strings.length != 2) break block4;
-            for (RelativePosition lv3 : collection) {
+            for (RelativePosition lv3 : candidates) {
                 String string4 = strings[0] + " " + strings[1] + " " + lv3.z;
                 if (!predicate.test(string4)) continue;
                 list.add(string4);
             }
         }
-        return CommandSource.suggestMatching(list, suggestionsBuilder);
+        return CommandSource.suggestMatching(list, builder);
     }
 
     public static CompletableFuture<Suggestions> suggestColumnPositions(String string, Collection<RelativePosition> collection, SuggestionsBuilder suggestionsBuilder, Predicate<String> predicate) {
@@ -218,10 +218,10 @@ public interface CommandSource {
         public final String y;
         public final String z;
 
-        public RelativePosition(String string, String string2, String string3) {
-            this.x = string;
-            this.y = string2;
-            this.z = string3;
+        public RelativePosition(String x, String y, String z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
     }
 }

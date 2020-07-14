@@ -50,27 +50,27 @@ extends Task<VillagerEntity> {
         }
     }
 
-    public static boolean isHostileNearby(LivingEntity arg) {
-        return arg.getBrain().hasMemoryModule(MemoryModuleType.NEAREST_HOSTILE);
+    public static boolean isHostileNearby(LivingEntity entity) {
+        return entity.getBrain().hasMemoryModule(MemoryModuleType.NEAREST_HOSTILE);
     }
 
-    public static boolean wasHurt(LivingEntity arg) {
-        return arg.getBrain().hasMemoryModule(MemoryModuleType.HURT_BY);
-    }
-
-    @Override
-    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        return this.shouldKeepRunning(arg, (VillagerEntity)arg2, l);
+    public static boolean wasHurt(LivingEntity entity) {
+        return entity.getBrain().hasMemoryModule(MemoryModuleType.HURT_BY);
     }
 
     @Override
-    protected /* synthetic */ void keepRunning(ServerWorld arg, LivingEntity arg2, long l) {
-        this.keepRunning(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ boolean shouldKeepRunning(ServerWorld world, LivingEntity entity, long time) {
+        return this.shouldKeepRunning(world, (VillagerEntity)entity, time);
     }
 
     @Override
-    protected /* synthetic */ void run(ServerWorld arg, LivingEntity arg2, long l) {
-        this.run(arg, (VillagerEntity)arg2, l);
+    protected /* synthetic */ void keepRunning(ServerWorld world, LivingEntity entity, long time) {
+        this.keepRunning(world, (VillagerEntity)entity, time);
+    }
+
+    @Override
+    protected /* synthetic */ void run(ServerWorld world, LivingEntity entity, long time) {
+        this.run(world, (VillagerEntity)entity, time);
     }
 }
 

@@ -22,9 +22,9 @@ implements Thread.UncaughtExceptionHandler {
     }
 
     @Override
-    public void uncaughtException(Thread thread, Throwable throwable) {
+    public void uncaughtException(Thread t, Throwable e) {
         this.logger.error("Caught previously unhandled exception :");
-        this.logger.error((Object)throwable);
+        this.logger.error((Object)e);
     }
 }
 

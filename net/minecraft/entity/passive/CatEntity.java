@@ -140,23 +140,23 @@ extends TameableEntity {
         return this.dataTracker.get(CAT_TYPE);
     }
 
-    public void setCatType(int i) {
-        if (i < 0 || i >= 11) {
-            i = this.random.nextInt(10);
+    public void setCatType(int type) {
+        if (type < 0 || type >= 11) {
+            type = this.random.nextInt(10);
         }
-        this.dataTracker.set(CAT_TYPE, i);
+        this.dataTracker.set(CAT_TYPE, type);
     }
 
-    public void setSleepingWithOwner(boolean bl) {
-        this.dataTracker.set(SLEEPING_WITH_OWNER, bl);
+    public void setSleepingWithOwner(boolean sleeping) {
+        this.dataTracker.set(SLEEPING_WITH_OWNER, sleeping);
     }
 
     public boolean isSleepingWithOwner() {
         return this.dataTracker.get(SLEEPING_WITH_OWNER);
     }
 
-    public void setHeadDown(boolean bl) {
-        this.dataTracker.set(HEAD_DOWN, bl);
+    public void setHeadDown(boolean headDown) {
+        this.dataTracker.set(HEAD_DOWN, headDown);
     }
 
     public boolean isHeadDown() {
@@ -167,8 +167,8 @@ extends TameableEntity {
         return DyeColor.byId(this.dataTracker.get(COLLAR_COLOR));
     }
 
-    public void setCollarColor(DyeColor arg) {
-        this.dataTracker.set(COLLAR_COLOR, arg.getId());
+    public void setCollarColor(DyeColor color) {
+        this.dataTracker.set(COLLAR_COLOR, color.getId());
     }
 
     @Override
@@ -181,18 +181,18 @@ extends TameableEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("CatType", this.getCatType());
-        arg.putByte("CollarColor", (byte)this.getCollarColor().getId());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("CatType", this.getCatType());
+        tag.putByte("CollarColor", (byte)this.getCollarColor().getId());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setCatType(arg.getInt("CatType"));
-        if (arg.contains("CollarColor", 99)) {
-            this.setCollarColor(DyeColor.byId(arg.getInt("CollarColor")));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setCatType(tag.getInt("CatType"));
+        if (tag.contains("CollarColor", 99)) {
+            this.setCollarColor(DyeColor.byId(tag.getInt("CollarColor")));
         }
     }
 
@@ -241,7 +241,7 @@ extends TameableEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_CAT_HURT;
     }
 
@@ -255,16 +255,16 @@ extends TameableEntity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
     @Override
-    protected void eat(PlayerEntity arg, ItemStack arg2) {
-        if (this.isBreedingItem(arg2)) {
+    protected void eat(PlayerEntity player, ItemStack stack) {
+        if (this.isBreedingItem(stack)) {
             this.playSound(SoundEvents.ENTITY_CAT_EAT, 1.0f, 1.0f);
         }
-        super.eat(arg, arg2);
+        super.eat(player, stack);
     }
 
     private float getAttackDamage() {
@@ -272,8 +272,8 @@ extends TameableEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        return arg.damage(DamageSource.mob(this), this.getAttackDamage());
+    public boolean tryAttack(Entity target) {
+        return target.damage(DamageSource.mob(this), this.getAttackDamage());
     }
 
     @Override
@@ -311,18 +311,18 @@ extends TameableEntity {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getSleepAnimation(float f) {
-        return MathHelper.lerp(f, this.prevSleepAnimation, this.sleepAnimation);
+    public float getSleepAnimation(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.prevSleepAnimation, this.sleepAnimation);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getTailCurlAnimation(float f) {
-        return MathHelper.lerp(f, this.prevTailCurlAnimation, this.tailCurlAnimation);
+    public float getTailCurlAnimation(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.prevTailCurlAnimation, this.tailCurlAnimation);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public float getHeadDownAnimation(float f) {
-        return MathHelper.lerp(f, this.prevHeadDownAnimation, this.headDownAnimation);
+    public float getHeadDownAnimation(float tickDelta) {
+        return MathHelper.lerp(tickDelta, this.prevHeadDownAnimation, this.headDownAnimation);
     }
 
     @Override
@@ -348,21 +348,21 @@ extends TameableEntity {
     }
 
     @Override
-    public boolean canBreedWith(AnimalEntity arg) {
+    public boolean canBreedWith(AnimalEntity other) {
         if (!this.isTamed()) {
             return false;
         }
-        if (!(arg instanceof CatEntity)) {
+        if (!(other instanceof CatEntity)) {
             return false;
         }
-        CatEntity lv = (CatEntity)arg;
-        return lv.isTamed() && super.canBreedWith(arg);
+        CatEntity lv = (CatEntity)other;
+        return lv.isTamed() && super.canBreedWith(other);
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        entityData = super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         if (arg.method_30272() > 0.9f) {
             this.setCatType(this.random.nextInt(11));
         } else {
@@ -373,14 +373,14 @@ extends TameableEntity {
             this.setCatType(10);
             this.setPersistent();
         }
-        return arg4;
+        return entityData;
     }
 
     /*
      * Exception decompiling
      */
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * org.benf.cfr.reader.util.ConfusedCFRException: Started 2 blocks at once
@@ -403,17 +403,17 @@ extends TameableEntity {
     }
 
     @Override
-    public boolean isBreedingItem(ItemStack arg) {
-        return TAMING_INGREDIENT.test(arg);
+    public boolean isBreedingItem(ItemStack stack) {
+        return TAMING_INGREDIENT.test(stack);
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
-        return arg2.height * 0.5f;
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
+        return dimensions.height * 0.5f;
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return !this.isTamed() && this.age > 2400;
     }
 
@@ -440,8 +440,8 @@ extends TameableEntity {
         private BlockPos bedPos;
         private int ticksOnBed;
 
-        public SleepWithOwnerGoal(CatEntity arg) {
-            this.cat = arg;
+        public SleepWithOwnerGoal(CatEntity cat) {
+            this.cat = cat;
         }
 
         @Override
@@ -546,9 +546,9 @@ extends TameableEntity {
         private PlayerEntity player;
         private final CatEntity cat;
 
-        public TemptGoal(CatEntity arg, double d, Ingredient arg2, boolean bl) {
-            super((PathAwareEntity)arg, d, arg2, bl);
-            this.cat = arg;
+        public TemptGoal(CatEntity cat, double speed, Ingredient food, boolean canBeScared) {
+            super((PathAwareEntity)cat, speed, food, canBeScared);
+            this.cat = cat;
         }
 
         @Override
@@ -579,9 +579,9 @@ extends TameableEntity {
     extends FleeEntityGoal<T> {
         private final CatEntity cat;
 
-        public CatFleeGoal(CatEntity arg, Class<T> class_, float f, double d, double e) {
-            super(arg, class_, f, d, e, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
-            this.cat = arg;
+        public CatFleeGoal(CatEntity cat, Class<T> fleeFromType, float distance, double slowSpeed, double fastSpeed) {
+            super(cat, fleeFromType, distance, slowSpeed, fastSpeed, EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR::test);
+            this.cat = cat;
         }
 
         @Override

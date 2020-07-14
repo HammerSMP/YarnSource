@@ -20,28 +20,28 @@ implements Clearable {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        if (arg2.contains("RecordItem", 10)) {
-            this.setRecord(ItemStack.fromTag(arg2.getCompound("RecordItem")));
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        if (tag.contains("RecordItem", 10)) {
+            this.setRecord(ItemStack.fromTag(tag.getCompound("RecordItem")));
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
         if (!this.getRecord().isEmpty()) {
-            arg.put("RecordItem", this.getRecord().toTag(new CompoundTag()));
+            tag.put("RecordItem", this.getRecord().toTag(new CompoundTag()));
         }
-        return arg;
+        return tag;
     }
 
     public ItemStack getRecord() {
         return this.record;
     }
 
-    public void setRecord(ItemStack arg) {
-        this.record = arg;
+    public void setRecord(ItemStack stack) {
+        this.record = stack;
         this.markDirty();
     }
 

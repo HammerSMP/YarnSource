@@ -35,10 +35,10 @@ extends ElementListWidget<Entry> {
     private final ControlsOptionsScreen parent;
     private int maxKeyNameLength;
 
-    public ControlsListWidget(ControlsOptionsScreen arg, MinecraftClient arg2) {
-        super(arg2, arg.width + 45, arg.height, 43, arg.height - 32, 20);
-        this.parent = arg;
-        Object[] lvs = (KeyBinding[])ArrayUtils.clone((Object[])arg2.options.keysAll);
+    public ControlsListWidget(ControlsOptionsScreen parent, MinecraftClient client) {
+        super(client, parent.width + 45, parent.height, 43, parent.height - 32, 20);
+        this.parent = parent;
+        Object[] lvs = (KeyBinding[])ArrayUtils.clone((Object[])client.options.keysAll);
         Arrays.sort(lvs);
         String string = null;
         for (Object lv : lvs) {
@@ -49,7 +49,7 @@ extends ElementListWidget<Entry> {
                 string = string2;
                 this.addEntry(new CategoryEntry(new TranslatableText(string2)));
             }
-            if ((i = arg2.textRenderer.getWidth(lv2 = new TranslatableText(((KeyBinding)lv).getTranslationKey()))) > this.maxKeyNameLength) {
+            if ((i = client.textRenderer.getWidth(lv2 = new TranslatableText(((KeyBinding)lv).getTranslationKey()))) > this.maxKeyNameLength) {
                 this.maxKeyNameLength = i;
             }
             this.addEntry(new KeyBindingEntry((KeyBinding)lv, lv2));
@@ -74,44 +74,44 @@ extends ElementListWidget<Entry> {
         private final ButtonWidget editButton;
         private final ButtonWidget resetButton;
 
-        private KeyBindingEntry(final KeyBinding arg22, final Text arg3) {
-            this.binding = arg22;
-            this.bindingName = arg3;
-            this.editButton = new ButtonWidget(0, 0, 75, 20, arg3, arg2 -> {
-                ((ControlsListWidget)ControlsListWidget.this).parent.focusedBinding = arg22;
+        private KeyBindingEntry(final KeyBinding binding, final Text text) {
+            this.binding = binding;
+            this.bindingName = text;
+            this.editButton = new ButtonWidget(0, 0, 75, 20, text, arg2 -> {
+                ((ControlsListWidget)ControlsListWidget.this).parent.focusedBinding = binding;
             }){
 
                 @Override
                 protected MutableText getNarrationMessage() {
-                    if (arg22.isUnbound()) {
-                        return new TranslatableText("narrator.controls.unbound", arg3);
+                    if (binding.isUnbound()) {
+                        return new TranslatableText("narrator.controls.unbound", text);
                     }
-                    return new TranslatableText("narrator.controls.bound", arg3, super.getNarrationMessage());
+                    return new TranslatableText("narrator.controls.bound", text, super.getNarrationMessage());
                 }
             };
             this.resetButton = new ButtonWidget(0, 0, 50, 20, new TranslatableText("controls.reset"), arg2 -> {
-                ((ControlsListWidget)ControlsListWidget.this).client.options.setKeyCode(arg22, arg22.getDefaultKey());
+                ((ControlsListWidget)ControlsListWidget.this).client.options.setKeyCode(binding, binding.getDefaultKey());
                 KeyBinding.updateKeysByCode();
             }){
 
                 @Override
                 protected MutableText getNarrationMessage() {
-                    return new TranslatableText("narrator.controls.reset", arg3);
+                    return new TranslatableText("narrator.controls.reset", text);
                 }
             };
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             boolean bl2 = ((ControlsListWidget)ControlsListWidget.this).parent.focusedBinding == this.binding;
             ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.getClass();
-            ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.draw(arg, this.bindingName, (float)(k + 90 - ControlsListWidget.this.maxKeyNameLength), (float)(j + m / 2 - 9 / 2), 0xFFFFFF);
-            this.resetButton.x = k + 190;
-            this.resetButton.y = j;
+            ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.draw(matrices, this.bindingName, (float)(x + 90 - ControlsListWidget.this.maxKeyNameLength), (float)(y + entryHeight / 2 - 9 / 2), 0xFFFFFF);
+            this.resetButton.x = x + 190;
+            this.resetButton.y = y;
             this.resetButton.active = !this.binding.isDefault();
-            this.resetButton.render(arg, n, o, f);
-            this.editButton.x = k + 105;
-            this.editButton.y = j;
+            this.resetButton.render(matrices, mouseX, mouseY, tickDelta);
+            this.editButton.x = x + 105;
+            this.editButton.y = y;
             this.editButton.setMessage(this.binding.getBoundKeyLocalizedText());
             boolean bl3 = false;
             if (!this.binding.isUnbound()) {
@@ -126,7 +126,7 @@ extends ElementListWidget<Entry> {
             } else if (bl3) {
                 this.editButton.setMessage(this.editButton.getMessage().shallowCopy().formatted(Formatting.RED));
             }
-            this.editButton.render(arg, n, o, f);
+            this.editButton.render(matrices, mouseX, mouseY, tickDelta);
         }
 
         @Override
@@ -135,16 +135,16 @@ extends ElementListWidget<Entry> {
         }
 
         @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            if (this.editButton.mouseClicked(d, e, i)) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (this.editButton.mouseClicked(mouseX, mouseY, button)) {
                 return true;
             }
-            return this.resetButton.mouseClicked(d, e, i);
+            return this.resetButton.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
-        public boolean mouseReleased(double d, double e, int i) {
-            return this.editButton.mouseReleased(d, e, i) || this.resetButton.mouseReleased(d, e, i);
+        public boolean mouseReleased(double mouseX, double mouseY, int button) {
+            return this.editButton.mouseReleased(mouseX, mouseY, button) || this.resetButton.mouseReleased(mouseX, mouseY, button);
         }
     }
 
@@ -154,19 +154,19 @@ extends ElementListWidget<Entry> {
         private final Text text;
         private final int textWidth;
 
-        public CategoryEntry(Text arg2) {
-            this.text = arg2;
+        public CategoryEntry(Text text) {
+            this.text = text;
             this.textWidth = ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.getWidth(this.text);
         }
 
         @Override
-        public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
+        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.getClass();
-            ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.draw(arg, this.text, (float)(((ControlsListWidget)ControlsListWidget.this).client.currentScreen.width / 2 - this.textWidth / 2), (float)(j + m - 9 - 1), 0xFFFFFF);
+            ((ControlsListWidget)ControlsListWidget.this).client.textRenderer.draw(matrices, this.text, (float)(((ControlsListWidget)ControlsListWidget.this).client.currentScreen.width / 2 - this.textWidth / 2), (float)(y + entryHeight - 9 - 1), 0xFFFFFF);
         }
 
         @Override
-        public boolean changeFocus(boolean bl) {
+        public boolean changeFocus(boolean lookForwards) {
             return false;
         }
 

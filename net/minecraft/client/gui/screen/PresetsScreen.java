@@ -70,9 +70,9 @@ extends Screen {
     private TextFieldWidget customPresetField;
     private FlatChunkGeneratorConfig field_25044;
 
-    public PresetsScreen(CustomizeFlatLevelScreen arg) {
+    public PresetsScreen(CustomizeFlatLevelScreen parent) {
         super(new TranslatableText("createWorld.customize.presets.title"));
-        this.parent = arg;
+        this.parent = parent;
     }
 
     /*
@@ -187,14 +187,14 @@ extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
-        return this.listWidget.mouseScrolled(d, e, f);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return this.listWidget.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.customPresetField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.customPresetField.setText(string);
     }
 
@@ -209,17 +209,17 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.listWidget.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.listWidget.render(matrices, mouseX, mouseY, delta);
         RenderSystem.pushMatrix();
         RenderSystem.translatef(0.0f, 0.0f, 400.0f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        this.drawTextWithShadow(arg, this.textRenderer, this.shareText, 50, 30, 0xA0A0A0);
-        this.drawTextWithShadow(arg, this.textRenderer, this.listText, 50, 70, 0xA0A0A0);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawTextWithShadow(matrices, this.textRenderer, this.shareText, 50, 30, 0xA0A0A0);
+        this.drawTextWithShadow(matrices, this.textRenderer, this.listText, 50, 70, 0xA0A0A0);
         RenderSystem.popMatrix();
-        this.customPresetField.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+        this.customPresetField.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
@@ -228,13 +228,13 @@ extends Screen {
         super.tick();
     }
 
-    public void updateSelectButton(boolean bl) {
-        this.selectPresetButton.active = bl || this.customPresetField.getText().length() > 1;
+    public void updateSelectButton(boolean hasSelected) {
+        this.selectPresetButton.active = hasSelected || this.customPresetField.getText().length() > 1;
     }
 
-    private static void addPreset(Text arg, ItemConvertible arg2, Biome arg3, List<StructureFeature<?>> list, boolean bl, boolean bl2, boolean bl3, FlatChunkGeneratorLayer ... args) {
+    private static void addPreset(Text arg, ItemConvertible icon, Biome biome, List<StructureFeature<?>> structures, boolean bl, boolean bl2, boolean bl3, FlatChunkGeneratorLayer ... args) {
         HashMap map = Maps.newHashMap();
-        for (StructureFeature<?> lv : list) {
+        for (StructureFeature<?> lv : structures) {
             map.put(lv, StructuresConfig.DEFAULT_STRUCTURES.get(lv));
         }
         StructuresConfig lv2 = new StructuresConfig(bl ? Optional.of(StructuresConfig.DEFAULT_STRONGHOLD) : Optional.empty(), map);
@@ -248,9 +248,9 @@ extends Screen {
         for (int i = args.length - 1; i >= 0; --i) {
             lv3.getLayers().add(args[i]);
         }
-        lv3.setBiome(arg3);
+        lv3.setBiome(biome);
         lv3.updateLayerBlocks();
-        presets.add(new SuperflatPreset(arg2.asItem(), arg, lv3.method_28912(lv2)));
+        presets.add(new SuperflatPreset(icon.asItem(), arg, lv3.method_28912(lv2)));
     }
 
     static {
@@ -271,8 +271,8 @@ extends Screen {
         public final Text name;
         public final FlatChunkGeneratorConfig field_25045;
 
-        public SuperflatPreset(Item arg, Text arg2, FlatChunkGeneratorConfig arg3) {
-            this.icon = arg;
+        public SuperflatPreset(Item icon, Text arg2, FlatChunkGeneratorConfig arg3) {
+            this.icon = icon;
             this.name = arg2;
             this.field_25045 = arg3;
         }
@@ -307,11 +307,11 @@ extends Screen {
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (super.keyPressed(i, j, k)) {
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            if (super.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }
-            if ((i == 257 || i == 335) && this.getSelected() != null) {
+            if ((keyCode == 257 || keyCode == 335) && this.getSelected() != null) {
                 ((SuperflatPresetEntry)this.getSelected()).setPreset();
             }
             return false;
@@ -321,15 +321,15 @@ extends Screen {
         public class SuperflatPresetEntry
         extends AlwaysSelectedEntryListWidget.Entry<SuperflatPresetEntry> {
             @Override
-            public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-                SuperflatPreset lv = (SuperflatPreset)presets.get(i);
-                this.method_2200(arg, k, j, lv.icon);
-                PresetsScreen.this.textRenderer.draw(arg, lv.name, (float)(k + 18 + 5), (float)(j + 6), 0xFFFFFF);
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                SuperflatPreset lv = (SuperflatPreset)presets.get(index);
+                this.method_2200(matrices, x, y, lv.icon);
+                PresetsScreen.this.textRenderer.draw(matrices, lv.name, (float)(x + 18 + 5), (float)(y + 6), 0xFFFFFF);
             }
 
             @Override
-            public boolean mouseClicked(double d, double e, int i) {
-                if (i == 0) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
                     this.setPreset();
                 }
                 return false;

@@ -35,14 +35,14 @@ extends AbstractCriterion<Conditions> {
         return new Conditions(arg, lv, lv2);
     }
 
-    public void trigger(ServerPlayerEntity arg, Entity arg2, DamageSource arg3, float f, float g, boolean bl) {
-        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(arg, arg2);
-        this.test(arg, arg4 -> arg4.matches(arg, lv, arg3, f, g, bl));
+    public void trigger(ServerPlayerEntity player, Entity entity, DamageSource damage, float dealt, float taken, boolean blocked) {
+        LootContext lv = EntityPredicate.createAdvancementEntityLootContext(player, entity);
+        this.test(player, arg4 -> arg4.matches(player, lv, damage, dealt, taken, blocked));
     }
 
     @Override
-    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended arg, AdvancementEntityPredicateDeserializer arg2) {
-        return this.conditionsFromJson(jsonObject, arg, arg2);
+    public /* synthetic */ AbstractCriterionConditions conditionsFromJson(JsonObject obj, EntityPredicate.Extended playerPredicate, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, playerPredicate, predicateDeserializer);
     }
 
     public static class Conditions
@@ -50,28 +50,28 @@ extends AbstractCriterion<Conditions> {
         private final DamagePredicate damage;
         private final EntityPredicate.Extended entity;
 
-        public Conditions(EntityPredicate.Extended arg, DamagePredicate arg2, EntityPredicate.Extended arg3) {
-            super(ID, arg);
-            this.damage = arg2;
-            this.entity = arg3;
+        public Conditions(EntityPredicate.Extended player, DamagePredicate damage, EntityPredicate.Extended entity) {
+            super(ID, player);
+            this.damage = damage;
+            this.entity = entity;
         }
 
-        public static Conditions create(DamagePredicate.Builder arg) {
-            return new Conditions(EntityPredicate.Extended.EMPTY, arg.build(), EntityPredicate.Extended.EMPTY);
+        public static Conditions create(DamagePredicate.Builder hurtEntityPredicateBuilder) {
+            return new Conditions(EntityPredicate.Extended.EMPTY, hurtEntityPredicateBuilder.build(), EntityPredicate.Extended.EMPTY);
         }
 
-        public boolean matches(ServerPlayerEntity arg, LootContext arg2, DamageSource arg3, float f, float g, boolean bl) {
-            if (!this.damage.test(arg, arg3, f, g, bl)) {
+        public boolean matches(ServerPlayerEntity player, LootContext entityContext, DamageSource source, float dealt, float taken, boolean blocked) {
+            if (!this.damage.test(player, source, dealt, taken, blocked)) {
                 return false;
             }
-            return this.entity.test(arg2);
+            return this.entity.test(entityContext);
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
-            JsonObject jsonObject = super.toJson(arg);
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
+            JsonObject jsonObject = super.toJson(predicateSerializer);
             jsonObject.add("damage", this.damage.toJson());
-            jsonObject.add("entity", this.entity.toJson(arg));
+            jsonObject.add("entity", this.entity.toJson(predicateSerializer));
             return jsonObject;
         }
     }

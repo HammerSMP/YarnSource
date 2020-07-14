@@ -19,23 +19,23 @@ public class PhaseManager {
     private final Phase[] phases = new Phase[PhaseType.count()];
     private Phase current;
 
-    public PhaseManager(EnderDragonEntity arg) {
-        this.dragon = arg;
+    public PhaseManager(EnderDragonEntity dragon) {
+        this.dragon = dragon;
         this.setPhase(PhaseType.HOVER);
     }
 
-    public void setPhase(PhaseType<?> arg) {
-        if (this.current != null && arg == this.current.getType()) {
+    public void setPhase(PhaseType<?> type) {
+        if (this.current != null && type == this.current.getType()) {
             return;
         }
         if (this.current != null) {
             this.current.endPhase();
         }
-        this.current = this.create(arg);
+        this.current = this.create(type);
         if (!this.dragon.world.isClient) {
-            this.dragon.getDataTracker().set(EnderDragonEntity.PHASE_TYPE, arg.getTypeId());
+            this.dragon.getDataTracker().set(EnderDragonEntity.PHASE_TYPE, type.getTypeId());
         }
-        LOGGER.debug("Dragon is now in phase {} on the {}", arg, (Object)(this.dragon.world.isClient ? "client" : "server"));
+        LOGGER.debug("Dragon is now in phase {} on the {}", type, (Object)(this.dragon.world.isClient ? "client" : "server"));
         this.current.beginPhase();
     }
 
@@ -43,10 +43,10 @@ public class PhaseManager {
         return this.current;
     }
 
-    public <T extends Phase> T create(PhaseType<T> arg) {
-        int i = arg.getTypeId();
+    public <T extends Phase> T create(PhaseType<T> type) {
+        int i = type.getTypeId();
         if (this.phases[i] == null) {
-            this.phases[i] = arg.create(this.dragon);
+            this.phases[i] = type.create(this.dragon);
         }
         return (T)this.phases[i];
     }

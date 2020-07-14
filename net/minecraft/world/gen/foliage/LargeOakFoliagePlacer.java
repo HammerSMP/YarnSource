@@ -31,16 +31,16 @@ extends BlobFoliagePlacer {
     }
 
     @Override
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, FoliagePlacer.TreeNode arg3, int j, int k, Set<BlockPos> set, int l, BlockBox arg4) {
-        for (int m = l; m >= l - j; --m) {
-            int n = k + (m == l || m == l - j ? 0 : 1);
-            this.generate(arg, random, arg2, arg3.getCenter(), n, set, m, arg3.isGiantTrunk(), arg4);
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, FoliagePlacer.TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, int l, BlockBox arg4) {
+        for (int m = l; m >= l - foliageHeight; --m) {
+            int n = radius + (m == l || m == l - foliageHeight ? 0 : 1);
+            this.generate(world, random, config, arg3.getCenter(), n, leaves, m, arg3.isGiantTrunk(), arg4);
         }
     }
 
     @Override
-    protected boolean isInvalidForLeaves(Random random, int i, int j, int k, int l, boolean bl) {
-        return MathHelper.square((float)i + 0.5f) + MathHelper.square((float)k + 0.5f) > (float)(l * l);
+    protected boolean isInvalidForLeaves(Random random, int baseHeight, int dx, int dy, int dz, boolean bl) {
+        return MathHelper.square((float)baseHeight + 0.5f) + MathHelper.square((float)dy + 0.5f) > (float)(dz * dz);
     }
 }
 

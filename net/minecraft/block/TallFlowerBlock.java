@@ -23,23 +23,23 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean canReplace(BlockState arg, ItemPlacementContext arg2) {
+    public boolean canReplace(BlockState state, ItemPlacementContext context) {
         return false;
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        TallFlowerBlock.dropStack(arg, arg2, new ItemStack(this));
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        TallFlowerBlock.dropStack(world, pos, new ItemStack(this));
     }
 }
 

@@ -43,10 +43,10 @@ implements JsonDeserializer<SoundEntry> {
         return new SoundEntry(list, bl, string);
     }
 
-    private List<Sound> deserializeSounds(JsonObject jsonObject) {
+    private List<Sound> deserializeSounds(JsonObject json) {
         ArrayList list = Lists.newArrayList();
-        if (jsonObject.has("sounds")) {
-            JsonArray jsonArray = JsonHelper.getArray(jsonObject, "sounds");
+        if (json.has("sounds")) {
+            JsonArray jsonArray = JsonHelper.getArray(json, "sounds");
             for (int i = 0; i < jsonArray.size(); ++i) {
                 JsonElement jsonElement = jsonArray.get(i);
                 if (JsonHelper.isString(jsonElement)) {
@@ -60,32 +60,32 @@ implements JsonDeserializer<SoundEntry> {
         return list;
     }
 
-    private Sound deserializeSound(JsonObject jsonObject) {
-        String string = JsonHelper.getString(jsonObject, "name");
-        Sound.RegistrationType lv = this.deserializeType(jsonObject, Sound.RegistrationType.FILE);
-        float f = JsonHelper.getFloat(jsonObject, "volume", 1.0f);
+    private Sound deserializeSound(JsonObject json) {
+        String string = JsonHelper.getString(json, "name");
+        Sound.RegistrationType lv = this.deserializeType(json, Sound.RegistrationType.FILE);
+        float f = JsonHelper.getFloat(json, "volume", 1.0f);
         Validate.isTrue((f > 0.0f ? 1 : 0) != 0, (String)"Invalid volume", (Object[])new Object[0]);
-        float g = JsonHelper.getFloat(jsonObject, "pitch", 1.0f);
+        float g = JsonHelper.getFloat(json, "pitch", 1.0f);
         Validate.isTrue((g > 0.0f ? 1 : 0) != 0, (String)"Invalid pitch", (Object[])new Object[0]);
-        int i = JsonHelper.getInt(jsonObject, "weight", 1);
+        int i = JsonHelper.getInt(json, "weight", 1);
         Validate.isTrue((i > 0 ? 1 : 0) != 0, (String)"Invalid weight", (Object[])new Object[0]);
-        boolean bl = JsonHelper.getBoolean(jsonObject, "preload", false);
-        boolean bl2 = JsonHelper.getBoolean(jsonObject, "stream", false);
-        int j = JsonHelper.getInt(jsonObject, "attenuation_distance", 16);
+        boolean bl = JsonHelper.getBoolean(json, "preload", false);
+        boolean bl2 = JsonHelper.getBoolean(json, "stream", false);
+        int j = JsonHelper.getInt(json, "attenuation_distance", 16);
         return new Sound(string, f, g, i, lv, bl2, bl, j);
     }
 
-    private Sound.RegistrationType deserializeType(JsonObject jsonObject, Sound.RegistrationType arg) {
-        Sound.RegistrationType lv = arg;
-        if (jsonObject.has("type")) {
-            lv = Sound.RegistrationType.getByName(JsonHelper.getString(jsonObject, "type"));
+    private Sound.RegistrationType deserializeType(JsonObject json, Sound.RegistrationType fallback) {
+        Sound.RegistrationType lv = fallback;
+        if (json.has("type")) {
+            lv = Sound.RegistrationType.getByName(JsonHelper.getString(json, "type"));
             Validate.notNull((Object)((Object)lv), (String)"Invalid type", (Object[])new Object[0]);
         }
         return lv;
     }
 
-    public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        return this.deserialize(jsonElement, type, jsonDeserializationContext);
+    public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+        return this.deserialize(functionJson, unused, context);
     }
 }
 

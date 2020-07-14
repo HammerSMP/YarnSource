@@ -43,12 +43,12 @@ public interface Toast {
 
         private final SoundEvent sound;
 
-        private Visibility(SoundEvent arg) {
-            this.sound = arg;
+        private Visibility(SoundEvent sound) {
+            this.sound = sound;
         }
 
-        public void playSound(SoundManager arg) {
-            arg.play(PositionedSoundInstance.master(this.sound, 1.0f, 1.0f));
+        public void playSound(SoundManager soundManager) {
+            soundManager.play(PositionedSoundInstance.master(this.sound, 1.0f, 1.0f));
         }
     }
 }

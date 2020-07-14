@@ -44,64 +44,64 @@ extends Block {
     protected static final VoxelShape DETACHED_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
     private final TripwireHookBlock hookBlock;
 
-    public TripwireBlock(TripwireHookBlock arg, AbstractBlock.Settings arg2) {
-        super(arg2);
+    public TripwireBlock(TripwireHookBlock hookBlock, AbstractBlock.Settings settings) {
+        super(settings);
         this.setDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateManager.getDefaultState()).with(POWERED, false)).with(ATTACHED, false)).with(DISARMED, false)).with(NORTH, false)).with(EAST, false)).with(SOUTH, false)).with(WEST, false));
-        this.hookBlock = arg;
+        this.hookBlock = hookBlock;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
-        return arg.get(ATTACHED) != false ? ATTACHED_SHAPE : DETACHED_SHAPE;
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return state.get(ATTACHED) != false ? ATTACHED_SHAPE : DETACHED_SHAPE;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext arg) {
-        World lv = arg.getWorld();
-        BlockPos lv2 = arg.getBlockPos();
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        World lv = ctx.getWorld();
+        BlockPos lv2 = ctx.getBlockPos();
         return (BlockState)((BlockState)((BlockState)((BlockState)this.getDefaultState().with(NORTH, this.shouldConnectTo(lv.getBlockState(lv2.north()), Direction.NORTH))).with(EAST, this.shouldConnectTo(lv.getBlockState(lv2.east()), Direction.EAST))).with(SOUTH, this.shouldConnectTo(lv.getBlockState(lv2.south()), Direction.SOUTH))).with(WEST, this.shouldConnectTo(lv.getBlockState(lv2.west()), Direction.WEST));
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState arg, Direction arg2, BlockState arg3, WorldAccess arg4, BlockPos arg5, BlockPos arg6) {
-        if (arg2.getAxis().isHorizontal()) {
-            return (BlockState)arg.with(FACING_PROPERTIES.get(arg2), this.shouldConnectTo(arg3, arg2));
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
+        if (direction.getAxis().isHorizontal()) {
+            return (BlockState)state.with(FACING_PROPERTIES.get(direction), this.shouldConnectTo(newState, direction));
         }
-        return super.getStateForNeighborUpdate(arg, arg2, arg3, arg4, arg5, arg6);
+        return super.getStateForNeighborUpdate(state, direction, newState, world, pos, posFrom);
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg4.isOf(arg.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (oldState.isOf(state.getBlock())) {
             return;
         }
-        this.update(arg2, arg3, arg);
+        this.update(world, pos, state);
     }
 
     @Override
-    public void onStateReplaced(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (bl || arg.isOf(arg4.getBlock())) {
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (moved || state.isOf(newState.getBlock())) {
             return;
         }
-        this.update(arg2, arg3, (BlockState)arg.with(POWERED, true));
+        this.update(world, pos, (BlockState)state.with(POWERED, true));
     }
 
     @Override
-    public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        if (!arg.isClient && !arg4.getMainHandStack().isEmpty() && arg4.getMainHandStack().getItem() == Items.SHEARS) {
-            arg.setBlockState(arg2, (BlockState)arg3.with(DISARMED, true), 4);
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!world.isClient && !player.getMainHandStack().isEmpty() && player.getMainHandStack().getItem() == Items.SHEARS) {
+            world.setBlockState(pos, (BlockState)state.with(DISARMED, true), 4);
         }
-        super.onBreak(arg, arg2, arg3, arg4);
+        super.onBreak(world, pos, state, player);
     }
 
-    private void update(World arg, BlockPos arg2, BlockState arg3) {
+    private void update(World world, BlockPos pos, BlockState state) {
         block0: for (Direction lv : new Direction[]{Direction.SOUTH, Direction.WEST}) {
             for (int i = 1; i < 42; ++i) {
-                BlockPos lv2 = arg2.offset(lv, i);
-                BlockState lv3 = arg.getBlockState(lv2);
+                BlockPos lv2 = pos.offset(lv, i);
+                BlockState lv3 = world.getBlockState(lv2);
                 if (lv3.isOf(this.hookBlock)) {
                     if (lv3.get(TripwireHookBlock.FACING) != lv.getOpposite()) continue block0;
-                    this.hookBlock.update(arg, lv2, lv3, false, true, i, arg3);
+                    this.hookBlock.update(world, lv2, lv3, false, true, i, state);
                     continue block0;
                 }
                 if (!lv3.isOf(this)) continue block0;
@@ -110,29 +110,29 @@ extends Block {
     }
 
     @Override
-    public void onEntityCollision(BlockState arg, World arg2, BlockPos arg3, Entity arg4) {
-        if (arg2.isClient) {
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (world.isClient) {
             return;
         }
-        if (arg.get(POWERED).booleanValue()) {
+        if (state.get(POWERED).booleanValue()) {
             return;
         }
-        this.updatePowered(arg2, arg3);
+        this.updatePowered(world, pos);
     }
 
     @Override
-    public void scheduledTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (!arg2.getBlockState(arg3).get(POWERED).booleanValue()) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!world.getBlockState(pos).get(POWERED).booleanValue()) {
             return;
         }
-        this.updatePowered(arg2, arg3);
+        this.updatePowered(world, pos);
     }
 
-    private void updatePowered(World arg, BlockPos arg2) {
-        BlockState lv = arg.getBlockState(arg2);
+    private void updatePowered(World world, BlockPos pos) {
+        BlockState lv = world.getBlockState(pos);
         boolean bl = lv.get(POWERED);
         boolean bl2 = false;
-        List<Entity> list = arg.getEntities(null, lv.getOutlineShape(arg, arg2).getBoundingBox().offset(arg2));
+        List<Entity> list = world.getEntities(null, lv.getOutlineShape(world, pos).getBoundingBox().offset(pos));
         if (!list.isEmpty()) {
             for (Entity lv2 : list) {
                 if (lv2.canAvoidTraps()) continue;
@@ -142,54 +142,54 @@ extends Block {
         }
         if (bl2 != bl) {
             lv = (BlockState)lv.with(POWERED, bl2);
-            arg.setBlockState(arg2, lv, 3);
-            this.update(arg, arg2, lv);
+            world.setBlockState(pos, lv, 3);
+            this.update(world, pos, lv);
         }
         if (bl2) {
-            arg.getBlockTickScheduler().schedule(new BlockPos(arg2), this, 10);
+            world.getBlockTickScheduler().schedule(new BlockPos(pos), this, 10);
         }
     }
 
-    public boolean shouldConnectTo(BlockState arg, Direction arg2) {
-        Block lv = arg.getBlock();
+    public boolean shouldConnectTo(BlockState state, Direction facing) {
+        Block lv = state.getBlock();
         if (lv == this.hookBlock) {
-            return arg.get(TripwireHookBlock.FACING) == arg2.getOpposite();
+            return state.get(TripwireHookBlock.FACING) == facing.getOpposite();
         }
         return lv == this;
     }
 
     @Override
-    public BlockState rotate(BlockState arg, BlockRotation arg2) {
-        switch (arg2) {
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        switch (rotation) {
             case CLOCKWISE_180: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH, arg.get(SOUTH))).with(EAST, arg.get(WEST))).with(SOUTH, arg.get(NORTH))).with(WEST, arg.get(EAST));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH, state.get(SOUTH))).with(EAST, state.get(WEST))).with(SOUTH, state.get(NORTH))).with(WEST, state.get(EAST));
             }
             case COUNTERCLOCKWISE_90: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH, arg.get(EAST))).with(EAST, arg.get(SOUTH))).with(SOUTH, arg.get(WEST))).with(WEST, arg.get(NORTH));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH, state.get(EAST))).with(EAST, state.get(SOUTH))).with(SOUTH, state.get(WEST))).with(WEST, state.get(NORTH));
             }
             case CLOCKWISE_90: {
-                return (BlockState)((BlockState)((BlockState)((BlockState)arg.with(NORTH, arg.get(WEST))).with(EAST, arg.get(NORTH))).with(SOUTH, arg.get(EAST))).with(WEST, arg.get(SOUTH));
+                return (BlockState)((BlockState)((BlockState)((BlockState)state.with(NORTH, state.get(WEST))).with(EAST, state.get(NORTH))).with(SOUTH, state.get(EAST))).with(WEST, state.get(SOUTH));
             }
         }
-        return arg;
+        return state;
     }
 
     @Override
-    public BlockState mirror(BlockState arg, BlockMirror arg2) {
-        switch (arg2) {
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        switch (mirror) {
             case LEFT_RIGHT: {
-                return (BlockState)((BlockState)arg.with(NORTH, arg.get(SOUTH))).with(SOUTH, arg.get(NORTH));
+                return (BlockState)((BlockState)state.with(NORTH, state.get(SOUTH))).with(SOUTH, state.get(NORTH));
             }
             case FRONT_BACK: {
-                return (BlockState)((BlockState)arg.with(EAST, arg.get(WEST))).with(WEST, arg.get(EAST));
+                return (BlockState)((BlockState)state.with(EAST, state.get(WEST))).with(WEST, state.get(EAST));
             }
         }
-        return super.mirror(arg, arg2);
+        return super.mirror(state, mirror);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(POWERED, ATTACHED, DISARMED, NORTH, EAST, WEST, SOUTH);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(POWERED, ATTACHED, DISARMED, NORTH, EAST, WEST, SOUTH);
     }
 }
 

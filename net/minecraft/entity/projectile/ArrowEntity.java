@@ -42,38 +42,38 @@ extends PersistentProjectileEntity {
         super((EntityType<? extends PersistentProjectileEntity>)arg, arg2);
     }
 
-    public ArrowEntity(World arg, double d, double e, double f) {
-        super(EntityType.ARROW, d, e, f, arg);
+    public ArrowEntity(World world, double x, double y, double z) {
+        super(EntityType.ARROW, x, y, z, world);
     }
 
-    public ArrowEntity(World arg, LivingEntity arg2) {
-        super(EntityType.ARROW, arg2, arg);
+    public ArrowEntity(World world, LivingEntity owner) {
+        super(EntityType.ARROW, owner, world);
     }
 
-    public void initFromStack(ItemStack arg) {
-        if (arg.getItem() == Items.TIPPED_ARROW) {
+    public void initFromStack(ItemStack stack) {
+        if (stack.getItem() == Items.TIPPED_ARROW) {
             int i;
-            this.potion = PotionUtil.getPotion(arg);
-            List<StatusEffectInstance> collection = PotionUtil.getCustomPotionEffects(arg);
+            this.potion = PotionUtil.getPotion(stack);
+            List<StatusEffectInstance> collection = PotionUtil.getCustomPotionEffects(stack);
             if (!collection.isEmpty()) {
                 for (StatusEffectInstance lv : collection) {
                     this.effects.add(new StatusEffectInstance(lv));
                 }
             }
-            if ((i = ArrowEntity.getCustomPotionColor(arg)) == -1) {
+            if ((i = ArrowEntity.getCustomPotionColor(stack)) == -1) {
                 this.initColor();
             } else {
                 this.setColor(i);
             }
-        } else if (arg.getItem() == Items.ARROW) {
+        } else if (stack.getItem() == Items.ARROW) {
             this.potion = Potions.EMPTY;
             this.effects.clear();
             this.dataTracker.set(COLOR, -1);
         }
     }
 
-    public static int getCustomPotionColor(ItemStack arg) {
-        CompoundTag lv = arg.getTag();
+    public static int getCustomPotionColor(ItemStack stack) {
+        CompoundTag lv = stack.getTag();
         if (lv != null && lv.contains("CustomPotionColor", 99)) {
             return lv.getInt("CustomPotionColor");
         }
@@ -89,8 +89,8 @@ extends PersistentProjectileEntity {
         }
     }
 
-    public void addEffect(StatusEffectInstance arg) {
-        this.effects.add(arg);
+    public void addEffect(StatusEffectInstance effect) {
+        this.effects.add(effect);
         this.getDataTracker().set(COLOR, PotionUtil.getColor(PotionUtil.getPotionEffects(this.potion, this.effects)));
     }
 
@@ -136,54 +136,54 @@ extends PersistentProjectileEntity {
         return this.dataTracker.get(COLOR);
     }
 
-    private void setColor(int i) {
+    private void setColor(int color) {
         this.colorSet = true;
-        this.dataTracker.set(COLOR, i);
+        this.dataTracker.set(COLOR, color);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.potion != Potions.EMPTY && this.potion != null) {
-            arg.putString("Potion", Registry.POTION.getId(this.potion).toString());
+            tag.putString("Potion", Registry.POTION.getId(this.potion).toString());
         }
         if (this.colorSet) {
-            arg.putInt("Color", this.getColor());
+            tag.putInt("Color", this.getColor());
         }
         if (!this.effects.isEmpty()) {
             ListTag lv = new ListTag();
             for (StatusEffectInstance lv2 : this.effects) {
                 lv.add(lv2.toTag(new CompoundTag()));
             }
-            arg.put("CustomPotionEffects", lv);
+            tag.put("CustomPotionEffects", lv);
         }
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        if (arg.contains("Potion", 8)) {
-            this.potion = PotionUtil.getPotion(arg);
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        if (tag.contains("Potion", 8)) {
+            this.potion = PotionUtil.getPotion(tag);
         }
-        for (StatusEffectInstance lv : PotionUtil.getCustomPotionEffects(arg)) {
+        for (StatusEffectInstance lv : PotionUtil.getCustomPotionEffects(tag)) {
             this.addEffect(lv);
         }
-        if (arg.contains("Color", 99)) {
-            this.setColor(arg.getInt("Color"));
+        if (tag.contains("Color", 99)) {
+            this.setColor(tag.getInt("Color"));
         } else {
             this.initColor();
         }
     }
 
     @Override
-    protected void onHit(LivingEntity arg) {
-        super.onHit(arg);
+    protected void onHit(LivingEntity target) {
+        super.onHit(target);
         for (StatusEffectInstance lv : this.potion.getEffects()) {
-            arg.addStatusEffect(new StatusEffectInstance(lv.getEffectType(), Math.max(lv.getDuration() / 8, 1), lv.getAmplifier(), lv.isAmbient(), lv.shouldShowParticles()));
+            target.addStatusEffect(new StatusEffectInstance(lv.getEffectType(), Math.max(lv.getDuration() / 8, 1), lv.getAmplifier(), lv.isAmbient(), lv.shouldShowParticles()));
         }
         if (!this.effects.isEmpty()) {
             for (StatusEffectInstance lv2 : this.effects) {
-                arg.addStatusEffect(lv2);
+                target.addStatusEffect(lv2);
             }
         }
     }
@@ -204,8 +204,8 @@ extends PersistentProjectileEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 0) {
+    public void handleStatus(byte status) {
+        if (status == 0) {
             int i = this.getColor();
             if (i != -1) {
                 double d = (double)(i >> 16 & 0xFF) / 255.0;
@@ -216,7 +216,7 @@ extends PersistentProjectileEntity {
                 }
             }
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 }

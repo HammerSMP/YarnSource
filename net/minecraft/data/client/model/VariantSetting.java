@@ -15,13 +15,13 @@ public class VariantSetting<T> {
     private final String key;
     private final Function<T, JsonElement> writer;
 
-    public VariantSetting(String string, Function<T, JsonElement> function) {
-        this.key = string;
-        this.writer = function;
+    public VariantSetting(String key, Function<T, JsonElement> writer) {
+        this.key = key;
+        this.writer = writer;
     }
 
-    public Value evaluate(T object) {
-        return new Value(object);
+    public Value evaluate(T value) {
+        return new Value(value);
     }
 
     public String toString() {
@@ -31,12 +31,12 @@ public class VariantSetting<T> {
     public class Value {
         private final T value;
 
-        public Value(T object) {
-            this.value = object;
+        public Value(T value) {
+            this.value = value;
         }
 
-        public void writeTo(JsonObject jsonObject) {
-            jsonObject.add(VariantSetting.this.key, (JsonElement)VariantSetting.this.writer.apply(this.value));
+        public void writeTo(JsonObject json) {
+            json.add(VariantSetting.this.key, (JsonElement)VariantSetting.this.writer.apply(this.value));
         }
 
         public String toString() {

@@ -30,31 +30,31 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class StopSoundCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> commandDispatcher) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         RequiredArgumentBuilder requiredArgumentBuilder = (RequiredArgumentBuilder)((RequiredArgumentBuilder)CommandManager.argument("targets", EntityArgumentType.players()).executes(commandContext -> StopSoundCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), null, null))).then(CommandManager.literal("*").then(CommandManager.argument("sound", IdentifierArgumentType.identifier()).suggests(SuggestionProviders.AVAILABLE_SOUNDS).executes(commandContext -> StopSoundCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), null, IdentifierArgumentType.getIdentifier((CommandContext<ServerCommandSource>)commandContext, "sound")))));
         for (SoundCategory lv : SoundCategory.values()) {
             requiredArgumentBuilder.then(((LiteralArgumentBuilder)CommandManager.literal(lv.getName()).executes(commandContext -> StopSoundCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), lv, null))).then(CommandManager.argument("sound", IdentifierArgumentType.identifier()).suggests(SuggestionProviders.AVAILABLE_SOUNDS).executes(commandContext -> StopSoundCommand.execute((ServerCommandSource)commandContext.getSource(), EntityArgumentType.getPlayers((CommandContext<ServerCommandSource>)commandContext, "targets"), lv, IdentifierArgumentType.getIdentifier((CommandContext<ServerCommandSource>)commandContext, "sound")))));
         }
-        commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("stopsound").requires(arg -> arg.hasPermissionLevel(2))).then((ArgumentBuilder)requiredArgumentBuilder));
+        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)CommandManager.literal("stopsound").requires(arg -> arg.hasPermissionLevel(2))).then((ArgumentBuilder)requiredArgumentBuilder));
     }
 
-    private static int execute(ServerCommandSource arg, Collection<ServerPlayerEntity> collection, @Nullable SoundCategory arg2, @Nullable Identifier arg3) {
-        StopSoundS2CPacket lv = new StopSoundS2CPacket(arg3, arg2);
-        for (ServerPlayerEntity lv2 : collection) {
+    private static int execute(ServerCommandSource source, Collection<ServerPlayerEntity> targets, @Nullable SoundCategory category, @Nullable Identifier sound) {
+        StopSoundS2CPacket lv = new StopSoundS2CPacket(sound, category);
+        for (ServerPlayerEntity lv2 : targets) {
             lv2.networkHandler.sendPacket(lv);
         }
-        if (arg2 != null) {
-            if (arg3 != null) {
-                arg.sendFeedback(new TranslatableText("commands.stopsound.success.source.sound", arg3, arg2.getName()), true);
+        if (category != null) {
+            if (sound != null) {
+                source.sendFeedback(new TranslatableText("commands.stopsound.success.source.sound", sound, category.getName()), true);
             } else {
-                arg.sendFeedback(new TranslatableText("commands.stopsound.success.source.any", arg2.getName()), true);
+                source.sendFeedback(new TranslatableText("commands.stopsound.success.source.any", category.getName()), true);
             }
-        } else if (arg3 != null) {
-            arg.sendFeedback(new TranslatableText("commands.stopsound.success.sourceless.sound", arg3), true);
+        } else if (sound != null) {
+            source.sendFeedback(new TranslatableText("commands.stopsound.success.sourceless.sound", sound), true);
         } else {
-            arg.sendFeedback(new TranslatableText("commands.stopsound.success.sourceless.any"), true);
+            source.sendFeedback(new TranslatableText("commands.stopsound.success.sourceless.any"), true);
         }
-        return collection.size();
+        return targets.size();
     }
 }
 

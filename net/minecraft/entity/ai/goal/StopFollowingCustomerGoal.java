@@ -12,8 +12,8 @@ public class StopFollowingCustomerGoal
 extends Goal {
     private final AbstractTraderEntity trader;
 
-    public StopFollowingCustomerGoal(AbstractTraderEntity arg) {
-        this.trader = arg;
+    public StopFollowingCustomerGoal(AbstractTraderEntity trader) {
+        this.trader = trader;
         this.setControls(EnumSet.of(Goal.Control.JUMP, Goal.Control.MOVE));
     }
 

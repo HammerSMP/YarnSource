@@ -28,11 +28,11 @@ extends ValueObject {
     public String resourcePackUrl;
     public String resourcePackHash;
 
-    public static RealmsServerAddress parse(String string) {
+    public static RealmsServerAddress parse(String json) {
         JsonParser jsonParser = new JsonParser();
         RealmsServerAddress lv = new RealmsServerAddress();
         try {
-            JsonObject jsonObject = jsonParser.parse(string).getAsJsonObject();
+            JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
             lv.address = JsonUtils.getStringOr("address", jsonObject, null);
             lv.resourcePackUrl = JsonUtils.getStringOr("resourcePackUrl", jsonObject, null);
             lv.resourcePackHash = JsonUtils.getStringOr("resourcePackHash", jsonObject, null);

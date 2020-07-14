@@ -18,10 +18,10 @@ implements PairList {
     private final DoubleList second;
     private final boolean inverted;
 
-    public DisjointPairList(DoubleList doubleList, DoubleList doubleList2, boolean bl) {
-        this.first = doubleList;
-        this.second = doubleList2;
-        this.inverted = bl;
+    public DisjointPairList(DoubleList first, DoubleList second, boolean inverted) {
+        this.first = first;
+        this.second = second;
+        this.inverted = inverted;
     }
 
     public int size() {
@@ -29,11 +29,11 @@ implements PairList {
     }
 
     @Override
-    public boolean forEachPair(PairList.Consumer arg) {
+    public boolean forEachPair(PairList.Consumer predicate) {
         if (this.inverted) {
-            return this.iterateSections((i, j, k) -> arg.merge(j, i, k));
+            return this.iterateSections((i, j, k) -> predicate.merge(j, i, k));
         }
-        return this.iterateSections(arg);
+        return this.iterateSections(predicate);
     }
 
     private boolean iterateSections(PairList.Consumer arg) {
@@ -52,11 +52,11 @@ implements PairList {
         return true;
     }
 
-    public double getDouble(int i) {
-        if (i < this.first.size()) {
-            return this.first.getDouble(i);
+    public double getDouble(int position) {
+        if (position < this.first.size()) {
+            return this.first.getDouble(position);
         }
-        return this.second.getDouble(i - this.first.size());
+        return this.second.getDouble(position - this.first.size());
     }
 
     @Override

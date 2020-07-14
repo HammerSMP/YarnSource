@@ -31,9 +31,9 @@ implements LootCondition {
     private final float chance;
     private final float lootingMultiplier;
 
-    private RandomChanceWithLootingLootCondition(float f, float g) {
-        this.chance = f;
-        this.lootingMultiplier = g;
+    private RandomChanceWithLootingLootCondition(float chance, float lootingMultiplier) {
+        this.chance = chance;
+        this.lootingMultiplier = lootingMultiplier;
     }
 
     @Override
@@ -56,13 +56,13 @@ implements LootCondition {
         return arg.getRandom().nextFloat() < this.chance + (float)i * this.lootingMultiplier;
     }
 
-    public static LootCondition.Builder builder(float f, float g) {
-        return () -> new RandomChanceWithLootingLootCondition(f, g);
+    public static LootCondition.Builder builder(float chance, float lootingMultiplier) {
+        return () -> new RandomChanceWithLootingLootCondition(chance, lootingMultiplier);
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -79,8 +79,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

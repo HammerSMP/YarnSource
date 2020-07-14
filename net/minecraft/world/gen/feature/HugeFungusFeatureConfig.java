@@ -30,12 +30,12 @@ implements FeatureConfig {
     public final BlockState decorationState;
     public final boolean planted;
 
-    public HugeFungusFeatureConfig(BlockState arg, BlockState arg2, BlockState arg3, BlockState arg4, boolean bl) {
-        this.validBaseBlock = arg;
-        this.stemState = arg2;
-        this.hatState = arg3;
-        this.decorationState = arg4;
-        this.planted = bl;
+    public HugeFungusFeatureConfig(BlockState validBaseBlock, BlockState stemState, BlockState hatState, BlockState decorationState, boolean planted) {
+        this.validBaseBlock = validBaseBlock;
+        this.stemState = stemState;
+        this.hatState = hatState;
+        this.decorationState = decorationState;
+        this.planted = planted;
     }
 }
 

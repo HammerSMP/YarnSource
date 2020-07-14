@@ -59,11 +59,11 @@ extends Screen {
     private int creditsHeight;
     private float speed = 0.5f;
 
-    public CreditsScreen(boolean bl, Runnable runnable) {
+    public CreditsScreen(boolean endCredits, Runnable finishAction) {
         super(NarratorManager.EMPTY);
-        this.endCredits = bl;
-        this.finishAction = runnable;
-        if (!bl) {
+        this.endCredits = endCredits;
+        this.finishAction = finishAction;
+        if (!endCredits) {
             this.speed = 0.75f;
         }
     }
@@ -156,7 +156,7 @@ extends Screen {
         }
     }
 
-    private void renderBackground(int i, int j, float f) {
+    private void renderBackground(int mouseX, int mouseY, float tickDelta) {
         this.client.getTextureManager().bindTexture(DrawableHelper.BACKGROUND_TEXTURE);
         int k = this.width;
         float g = -this.time * 0.5f * this.speed;
@@ -184,12 +184,12 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(mouseX, mouseY, delta);
         int k = 274;
         int l = this.width / 2 - 137;
         int m = this.height + 50;
-        this.time += f;
+        this.time += delta;
         float g = -this.time * this.speed;
         RenderSystem.pushMatrix();
         RenderSystem.translatef(0.0f, g, 0.0f);
@@ -198,12 +198,12 @@ extends Screen {
         RenderSystem.enableAlphaTest();
         RenderSystem.enableBlend();
         this.method_29343(l, m, (integer, integer2) -> {
-            this.drawTexture(arg, integer + 0, (int)integer2, 0, 0, 155, 44);
-            this.drawTexture(arg, integer + 155, (int)integer2, 0, 45, 155, 44);
+            this.drawTexture(matrices, integer + 0, (int)integer2, 0, 0, 155, 44);
+            this.drawTexture(matrices, integer + 155, (int)integer2, 0, 45, 155, 44);
         });
         RenderSystem.disableBlend();
         this.client.getTextureManager().bindTexture(EDITION_TITLE_TEXTURE);
-        CreditsScreen.drawTexture(arg, l + 88, m + 37, 0.0f, 0.0f, 98, 14, 128, 16);
+        CreditsScreen.drawTexture(matrices, l + 88, m + 37, 0.0f, 0.0f, 98, 14, 128, 16);
         RenderSystem.disableAlphaTest();
         int n = m + 100;
         for (int o = 0; o < this.credits.size(); ++o) {
@@ -214,10 +214,10 @@ extends Screen {
             if ((float)n + g + 12.0f + 8.0f > 0.0f && (float)n + g < (float)this.height) {
                 StringRenderable lv = this.credits.get(o);
                 if (this.field_24261.contains(o)) {
-                    this.textRenderer.drawWithShadow(arg, lv, (float)(l + (274 - this.textRenderer.getWidth(lv)) / 2), (float)n, 0xFFFFFF);
+                    this.textRenderer.drawWithShadow(matrices, lv, (float)(l + (274 - this.textRenderer.getWidth(lv)) / 2), (float)n, 0xFFFFFF);
                 } else {
                     this.textRenderer.random.setSeed((long)((float)((long)o * 4238972211L) + this.time / 4.0f));
-                    this.textRenderer.drawWithShadow(arg, lv, (float)l, (float)n, 0xFFFFFF);
+                    this.textRenderer.drawWithShadow(matrices, lv, (float)l, (float)n, 0xFFFFFF);
                 }
             }
             n += 12;
@@ -237,7 +237,7 @@ extends Screen {
         lv3.vertex(0.0, 0.0, this.getZOffset()).texture(0.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 1.0f).next();
         lv2.draw();
         RenderSystem.disableBlend();
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

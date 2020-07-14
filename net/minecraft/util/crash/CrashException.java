@@ -9,8 +9,8 @@ public class CrashException
 extends RuntimeException {
     private final CrashReport report;
 
-    public CrashException(CrashReport arg) {
-        this.report = arg;
+    public CrashException(CrashReport report) {
+        this.report = report;
     }
 
     public CrashReport getReport() {

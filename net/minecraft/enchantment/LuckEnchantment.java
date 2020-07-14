@@ -15,13 +15,13 @@ extends Enchantment {
     }
 
     @Override
-    public int getMinPower(int i) {
-        return 15 + (i - 1) * 9;
+    public int getMinPower(int level) {
+        return 15 + (level - 1) * 9;
     }
 
     @Override
-    public int getMaxPower(int i) {
-        return super.getMinPower(i) + 50;
+    public int getMaxPower(int level) {
+        return super.getMinPower(level) + 50;
     }
 
     @Override
@@ -30,8 +30,8 @@ extends Enchantment {
     }
 
     @Override
-    public boolean canAccept(Enchantment arg) {
-        return super.canAccept(arg) && arg != Enchantments.SILK_TOUCH;
+    public boolean canAccept(Enchantment other) {
+        return super.canAccept(other) && other != Enchantments.SILK_TOUCH;
     }
 }
 

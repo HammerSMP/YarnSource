@@ -23,10 +23,10 @@ implements FeatureConfig {
     public final float largeProbability;
     public final float clusterProbability;
 
-    public OceanRuinFeatureConfig(OceanRuinFeature.BiomeType arg, float f, float g) {
-        this.biomeType = arg;
-        this.largeProbability = f;
-        this.clusterProbability = g;
+    public OceanRuinFeatureConfig(OceanRuinFeature.BiomeType biomeType, float largeProbability, float clusterProbability) {
+        this.biomeType = biomeType;
+        this.largeProbability = largeProbability;
+        this.clusterProbability = clusterProbability;
     }
 }
 

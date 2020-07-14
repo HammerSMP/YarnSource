@@ -127,28 +127,28 @@ extends SinglePreparationResourceReloadListener<WarningPatternLoader> {
         this.warnings = arg.buildWarnings();
     }
 
-    private static void compilePatterns(JsonArray jsonArray, List<Pattern> list) {
-        jsonArray.forEach(jsonElement -> list.add(Pattern.compile(jsonElement.getAsString(), 2)));
+    private static void compilePatterns(JsonArray array, List<Pattern> patterns) {
+        array.forEach(jsonElement -> patterns.add(Pattern.compile(jsonElement.getAsString(), 2)));
     }
 
     @Nullable
-    private static JsonObject loadWarnlist(ResourceManager arg, Profiler arg2) {
-        arg2.push("parse_json");
+    private static JsonObject loadWarnlist(ResourceManager resourceManager, Profiler profiler) {
+        profiler.push("parse_json");
         JsonObject jsonObject = null;
-        try (Resource lv = arg.getResource(GPU_WARNLIST_ID);
+        try (Resource lv = resourceManager.getResource(GPU_WARNLIST_ID);
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(lv.getInputStream(), StandardCharsets.UTF_8));){
             jsonObject = new JsonParser().parse((Reader)bufferedReader).getAsJsonObject();
         }
         catch (JsonSyntaxException | IOException exception) {
             LOGGER.warn("Failed to load GPU warnlist");
         }
-        arg2.pop();
+        profiler.pop();
         return jsonObject;
     }
 
     @Override
-    protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-        return this.prepare(arg, arg2);
+    protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+        return this.prepare(manager, profiler);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -157,16 +157,16 @@ extends SinglePreparationResourceReloadListener<WarningPatternLoader> {
         private final List<Pattern> versionPatterns;
         private final List<Pattern> vendorPatterns;
 
-        private WarningPatternLoader(List<Pattern> list, List<Pattern> list2, List<Pattern> list3) {
-            this.rendererPatterns = list;
-            this.versionPatterns = list2;
-            this.vendorPatterns = list3;
+        private WarningPatternLoader(List<Pattern> rendererPatterns, List<Pattern> versionPatterns, List<Pattern> vendorPatterns) {
+            this.rendererPatterns = rendererPatterns;
+            this.versionPatterns = versionPatterns;
+            this.vendorPatterns = vendorPatterns;
         }
 
-        private static String buildWarning(List<Pattern> list, String string) {
+        private static String buildWarning(List<Pattern> warningPattern, String info) {
             ArrayList list2 = Lists.newArrayList();
-            for (Pattern pattern : list) {
-                Matcher matcher = pattern.matcher(string);
+            for (Pattern pattern : warningPattern) {
+                Matcher matcher = pattern.matcher(info);
                 while (matcher.find()) {
                     list2.add(matcher.group());
                 }

@@ -18,8 +18,8 @@ public enum Arm {
 
     private final Text optionName;
 
-    private Arm(Text arg) {
-        this.optionName = arg;
+    private Arm(Text optionName) {
+        this.optionName = optionName;
     }
 
     @Environment(value=EnvType.CLIENT)

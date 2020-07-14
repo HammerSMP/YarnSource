@@ -30,12 +30,12 @@ extends ValueObject {
     private static final Logger LOGGER = LogManager.getLogger();
     public List<Backup> backups;
 
-    public static BackupList parse(String string) {
+    public static BackupList parse(String json) {
         JsonParser jsonParser = new JsonParser();
         BackupList lv = new BackupList();
         lv.backups = Lists.newArrayList();
         try {
-            JsonElement jsonElement = jsonParser.parse(string).getAsJsonObject().get("backups");
+            JsonElement jsonElement = jsonParser.parse(json).getAsJsonObject().get("backups");
             if (jsonElement.isJsonArray()) {
                 Iterator iterator = jsonElement.getAsJsonArray().iterator();
                 while (iterator.hasNext()) {

@@ -1079,31 +1079,31 @@ public class Items {
     public static final Item CRACKED_POLISHED_BLACKSTONE_BRICKS = Items.register(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS, ItemGroup.BUILDING_BLOCKS);
     public static final Item RESPAWN_ANCHOR = Items.register(Blocks.RESPAWN_ANCHOR, ItemGroup.DECORATIONS);
 
-    private static Item register(Block arg) {
-        return Items.register(new BlockItem(arg, new Item.Settings()));
+    private static Item register(Block block) {
+        return Items.register(new BlockItem(block, new Item.Settings()));
     }
 
-    private static Item register(Block arg, ItemGroup arg2) {
-        return Items.register(new BlockItem(arg, new Item.Settings().group(arg2)));
+    private static Item register(Block block, ItemGroup group) {
+        return Items.register(new BlockItem(block, new Item.Settings().group(group)));
     }
 
-    private static Item register(BlockItem arg) {
-        return Items.register(arg.getBlock(), (Item)arg);
+    private static Item register(BlockItem item) {
+        return Items.register(item.getBlock(), (Item)item);
     }
 
-    protected static Item register(Block arg, Item arg2) {
-        return Items.register(Registry.BLOCK.getId(arg), arg2);
+    protected static Item register(Block block, Item item) {
+        return Items.register(Registry.BLOCK.getId(block), item);
     }
 
-    private static Item register(String string, Item arg) {
-        return Items.register(new Identifier(string), arg);
+    private static Item register(String id, Item item) {
+        return Items.register(new Identifier(id), item);
     }
 
-    private static Item register(Identifier arg, Item arg2) {
-        if (arg2 instanceof BlockItem) {
-            ((BlockItem)arg2).appendBlocks(Item.BLOCK_ITEMS, arg2);
+    private static Item register(Identifier id, Item item) {
+        if (item instanceof BlockItem) {
+            ((BlockItem)item).appendBlocks(Item.BLOCK_ITEMS, item);
         }
-        return Registry.register(Registry.ITEM, arg, arg2);
+        return Registry.register(Registry.ITEM, id, item);
     }
 }
 

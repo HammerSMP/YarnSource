@@ -34,9 +34,9 @@ extends TreeDecorator {
     }
 
     @Override
-    public void generate(ServerWorldAccess arg3, Random random, List<BlockPos> list, List<BlockPos> list2, Set<BlockPos> set, BlockBox arg22) {
-        int i = list.get(0).getY();
-        list.stream().filter(arg -> arg.getY() == i).forEach(arg2 -> {
+    public void generate(ServerWorldAccess arg3, Random random, List<BlockPos> logPositions, List<BlockPos> leavesPositions, Set<BlockPos> set, BlockBox box) {
+        int i = logPositions.get(0).getY();
+        logPositions.stream().filter(arg -> arg.getY() == i).forEach(arg2 -> {
             this.method_23462(arg3, random, arg2.west().north());
             this.method_23462(arg3, random, arg2.east(2).north());
             this.method_23462(arg3, random, arg2.west().south(2));

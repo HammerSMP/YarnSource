@@ -16,13 +16,13 @@ import net.minecraft.datafixer.fix.ChoiceFix;
 
 public class BlockEntityShulkerBoxColorFix
 extends ChoiceFix {
-    public BlockEntityShulkerBoxColorFix(Schema schema, boolean bl) {
-        super(schema, bl, "BlockEntityShulkerBoxColorFix", TypeReferences.BLOCK_ENTITY, "minecraft:shulker_box");
+    public BlockEntityShulkerBoxColorFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "BlockEntityShulkerBoxColorFix", TypeReferences.BLOCK_ENTITY, "minecraft:shulker_box");
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed) {
-        return typed.update(DSL.remainderFinder(), dynamic -> dynamic.remove("Color"));
+    protected Typed<?> transform(Typed<?> inputType) {
+        return inputType.update(DSL.remainderFinder(), dynamic -> dynamic.remove("Color"));
     }
 }
 

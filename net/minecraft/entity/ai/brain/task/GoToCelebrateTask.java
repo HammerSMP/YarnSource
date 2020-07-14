@@ -23,9 +23,9 @@ extends Task<E> {
     private final int completionRange;
     private final float field_23130;
 
-    public GoToCelebrateTask(int i, float f) {
+    public GoToCelebrateTask(int completionRange, float f) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.CELEBRATE_LOCATION, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.VALUE_ABSENT), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.completionRange = i;
+        this.completionRange = completionRange;
         this.field_23130 = f;
     }
 
@@ -38,17 +38,17 @@ extends Task<E> {
         }
     }
 
-    private static BlockPos fuzz(MobEntity arg, BlockPos arg2) {
-        Random random = arg.world.random;
-        return arg2.add(GoToCelebrateTask.fuzz(random), 0, GoToCelebrateTask.fuzz(random));
+    private static BlockPos fuzz(MobEntity mob, BlockPos pos) {
+        Random random = mob.world.random;
+        return pos.add(GoToCelebrateTask.fuzz(random), 0, GoToCelebrateTask.fuzz(random));
     }
 
     private static int fuzz(Random random) {
         return random.nextInt(3) - 1;
     }
 
-    private static BlockPos getCelebrateLocation(MobEntity arg) {
-        return arg.getBrain().getOptionalMemory(MemoryModuleType.CELEBRATE_LOCATION).get();
+    private static BlockPos getCelebrateLocation(MobEntity entity) {
+        return entity.getBrain().getOptionalMemory(MemoryModuleType.CELEBRATE_LOCATION).get();
     }
 }
 

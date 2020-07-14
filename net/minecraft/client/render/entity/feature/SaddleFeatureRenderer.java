@@ -28,22 +28,22 @@ extends FeatureRenderer<T, M> {
     private final Identifier TEXTURE;
     private final M model;
 
-    public SaddleFeatureRenderer(FeatureRendererContext<T, M> arg, M arg2, Identifier arg3) {
-        super(arg);
-        this.model = arg2;
-        this.TEXTURE = arg3;
+    public SaddleFeatureRenderer(FeatureRendererContext<T, M> context, M model, Identifier texture) {
+        super(context);
+        this.model = model;
+        this.TEXTURE = texture;
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, int i, T arg3, float f, float g, float h, float j, float k, float l) {
-        if (!((Saddleable)arg3).isSaddled()) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, T entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+        if (!((Saddleable)entity).isSaddled()) {
             return;
         }
         ((EntityModel)this.getContextModel()).copyStateTo(this.model);
-        ((EntityModel)this.model).animateModel(arg3, f, g, h);
-        ((EntityModel)this.model).setAngles(arg3, f, g, j, k, l);
-        VertexConsumer lv = arg2.getBuffer(RenderLayer.getEntityCutoutNoCull(this.TEXTURE));
-        ((Model)this.model).render(arg, lv, i, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
+        ((EntityModel)this.model).animateModel(entity, limbAngle, limbDistance, tickDelta);
+        ((EntityModel)this.model).setAngles(entity, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
+        VertexConsumer lv = vertexConsumers.getBuffer(RenderLayer.getEntityCutoutNoCull(this.TEXTURE));
+        ((Model)this.model).render(matrices, lv, light, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 

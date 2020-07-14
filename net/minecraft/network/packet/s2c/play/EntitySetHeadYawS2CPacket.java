@@ -24,21 +24,21 @@ implements Packet<ClientPlayPacketListener> {
     public EntitySetHeadYawS2CPacket() {
     }
 
-    public EntitySetHeadYawS2CPacket(Entity arg, byte b) {
-        this.entity = arg.getEntityId();
-        this.headYaw = b;
+    public EntitySetHeadYawS2CPacket(Entity entity, byte headYaw) {
+        this.entity = entity.getEntityId();
+        this.headYaw = headYaw;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.entity = arg.readVarInt();
-        this.headYaw = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.entity = buf.readVarInt();
+        this.headYaw = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.entity);
-        arg.writeByte(this.headYaw);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.entity);
+        buf.writeByte(this.headYaw);
     }
 
     @Override
@@ -47,8 +47,8 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public Entity getEntity(World arg) {
-        return arg.getEntityById(this.entity);
+    public Entity getEntity(World world) {
+        return world.getEntityById(this.entity);
     }
 
     @Environment(value=EnvType.CLIENT)

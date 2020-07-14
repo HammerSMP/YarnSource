@@ -30,13 +30,13 @@ implements Palette<T> {
     private final Function<T, CompoundTag> elementSerializer;
     private final int indexBits;
 
-    public BiMapPalette(IdList<T> arg, int i, PaletteResizeListener<T> arg2, Function<CompoundTag, T> function, Function<T, CompoundTag> function2) {
-        this.idList = arg;
-        this.indexBits = i;
-        this.resizeHandler = arg2;
-        this.elementDeserializer = function;
-        this.elementSerializer = function2;
-        this.map = new Int2ObjectBiMap(1 << i);
+    public BiMapPalette(IdList<T> idList, int indexBits, PaletteResizeListener<T> resizeHandler, Function<CompoundTag, T> elementDeserializer, Function<T, CompoundTag> elementSerializer) {
+        this.idList = idList;
+        this.indexBits = indexBits;
+        this.resizeHandler = resizeHandler;
+        this.elementDeserializer = elementDeserializer;
+        this.elementSerializer = elementSerializer;
+        this.map = new Int2ObjectBiMap(1 << indexBits);
     }
 
     @Override
@@ -59,26 +59,26 @@ implements Palette<T> {
 
     @Override
     @Nullable
-    public T getByIndex(int i) {
-        return this.map.get(i);
+    public T getByIndex(int index) {
+        return this.map.get(index);
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void fromPacket(PacketByteBuf arg) {
+    public void fromPacket(PacketByteBuf buf) {
         this.map.clear();
-        int i = arg.readVarInt();
+        int i = buf.readVarInt();
         for (int j = 0; j < i; ++j) {
-            this.map.add(this.idList.get(arg.readVarInt()));
+            this.map.add(this.idList.get(buf.readVarInt()));
         }
     }
 
     @Override
-    public void toPacket(PacketByteBuf arg) {
+    public void toPacket(PacketByteBuf buf) {
         int i = this.getIndexBits();
-        arg.writeVarInt(i);
+        buf.writeVarInt(i);
         for (int j = 0; j < i; ++j) {
-            arg.writeVarInt(this.idList.getRawId(this.map.get(j)));
+            buf.writeVarInt(this.idList.getRawId(this.map.get(j)));
         }
     }
 
@@ -96,16 +96,16 @@ implements Palette<T> {
     }
 
     @Override
-    public void fromTag(ListTag arg) {
+    public void fromTag(ListTag tag) {
         this.map.clear();
-        for (int i = 0; i < arg.size(); ++i) {
-            this.map.add(this.elementDeserializer.apply(arg.getCompound(i)));
+        for (int i = 0; i < tag.size(); ++i) {
+            this.map.add(this.elementDeserializer.apply(tag.getCompound(i)));
         }
     }
 
-    public void toTag(ListTag arg) {
+    public void toTag(ListTag tag) {
         for (int i = 0; i < this.getIndexBits(); ++i) {
-            arg.add(this.elementSerializer.apply(this.map.get(i)));
+            tag.add(this.elementSerializer.apply(this.map.get(i)));
         }
     }
 }

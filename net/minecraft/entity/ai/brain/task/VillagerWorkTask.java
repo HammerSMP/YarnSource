@@ -52,7 +52,7 @@ extends Task<VillagerEntity> {
         }
     }
 
-    protected void performAdditionalWork(ServerWorld arg, VillagerEntity arg2) {
+    protected void performAdditionalWork(ServerWorld world, VillagerEntity entity) {
     }
 
     @Override
@@ -66,8 +66,8 @@ extends Task<VillagerEntity> {
     }
 
     @Override
-    protected /* synthetic */ boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return this.shouldRun(arg, (VillagerEntity)arg2);
+    protected /* synthetic */ boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        return this.shouldRun(world, (VillagerEntity)entity);
     }
 }
 

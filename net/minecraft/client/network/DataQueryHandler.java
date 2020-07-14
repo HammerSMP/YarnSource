@@ -25,32 +25,32 @@ public class DataQueryHandler {
     @Nullable
     private Consumer<CompoundTag> callback;
 
-    public DataQueryHandler(ClientPlayNetworkHandler arg) {
-        this.networkHandler = arg;
+    public DataQueryHandler(ClientPlayNetworkHandler networkHandler) {
+        this.networkHandler = networkHandler;
     }
 
-    public boolean handleQueryResponse(int i, @Nullable CompoundTag arg) {
-        if (this.expectedTransactionId == i && this.callback != null) {
-            this.callback.accept(arg);
+    public boolean handleQueryResponse(int transactionId, @Nullable CompoundTag tag) {
+        if (this.expectedTransactionId == transactionId && this.callback != null) {
+            this.callback.accept(tag);
             this.callback = null;
             return true;
         }
         return false;
     }
 
-    private int nextQuery(Consumer<CompoundTag> consumer) {
-        this.callback = consumer;
+    private int nextQuery(Consumer<CompoundTag> callback) {
+        this.callback = callback;
         return ++this.expectedTransactionId;
     }
 
-    public void queryEntityNbt(int i, Consumer<CompoundTag> consumer) {
-        int j = this.nextQuery(consumer);
-        this.networkHandler.sendPacket(new QueryEntityNbtC2SPacket(j, i));
+    public void queryEntityNbt(int entityNetworkId, Consumer<CompoundTag> callback) {
+        int j = this.nextQuery(callback);
+        this.networkHandler.sendPacket(new QueryEntityNbtC2SPacket(j, entityNetworkId));
     }
 
-    public void queryBlockNbt(BlockPos arg, Consumer<CompoundTag> consumer) {
-        int i = this.nextQuery(consumer);
-        this.networkHandler.sendPacket(new QueryBlockNbtC2SPacket(i, arg));
+    public void queryBlockNbt(BlockPos pos, Consumer<CompoundTag> callback) {
+        int i = this.nextQuery(callback);
+        this.networkHandler.sendPacket(new QueryBlockNbtC2SPacket(i, pos));
     }
 }
 

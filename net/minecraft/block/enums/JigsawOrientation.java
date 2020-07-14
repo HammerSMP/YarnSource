@@ -32,14 +32,14 @@ public enum JigsawOrientation implements StringIdentifiable
     private final Direction rotation;
     private final Direction facing;
 
-    private static int getIndex(Direction arg, Direction arg2) {
-        return arg.ordinal() << 3 | arg2.ordinal();
+    private static int getIndex(Direction facing, Direction rotation) {
+        return facing.ordinal() << 3 | rotation.ordinal();
     }
 
-    private JigsawOrientation(String string2, Direction arg, Direction arg2) {
-        this.name = string2;
-        this.facing = arg;
-        this.rotation = arg2;
+    private JigsawOrientation(String name, Direction facing, Direction rotation) {
+        this.name = name;
+        this.facing = facing;
+        this.rotation = rotation;
     }
 
     @Override
@@ -47,8 +47,8 @@ public enum JigsawOrientation implements StringIdentifiable
         return this.name;
     }
 
-    public static JigsawOrientation byDirections(Direction arg, Direction arg2) {
-        int i = JigsawOrientation.getIndex(arg2, arg);
+    public static JigsawOrientation byDirections(Direction facing, Direction rotation) {
+        int i = JigsawOrientation.getIndex(rotation, facing);
         return (JigsawOrientation)BY_INDEX.get(i);
     }
 

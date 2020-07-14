@@ -16,21 +16,21 @@ import net.minecraft.datafixer.fix.EntitySimpleTransformFix;
 
 public class EntitySkeletonSplitFix
 extends EntitySimpleTransformFix {
-    public EntitySkeletonSplitFix(Schema schema, boolean bl) {
-        super("EntitySkeletonSplitFix", schema, bl);
+    public EntitySkeletonSplitFix(Schema outputSchema, boolean changesType) {
+        super("EntitySkeletonSplitFix", outputSchema, changesType);
     }
 
     @Override
-    protected Pair<String, Dynamic<?>> transform(String string, Dynamic<?> dynamic) {
-        if (Objects.equals(string, "Skeleton")) {
+    protected Pair<String, Dynamic<?>> transform(String choice, Dynamic<?> dynamic) {
+        if (Objects.equals(choice, "Skeleton")) {
             int i = dynamic.get("SkeletonType").asInt(0);
             if (i == 1) {
-                string = "WitherSkeleton";
+                choice = "WitherSkeleton";
             } else if (i == 2) {
-                string = "Stray";
+                choice = "Stray";
             }
         }
-        return Pair.of((Object)string, dynamic);
+        return Pair.of((Object)choice, dynamic);
     }
 }
 

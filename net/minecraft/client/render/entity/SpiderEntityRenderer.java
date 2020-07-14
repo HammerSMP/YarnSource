@@ -38,8 +38,8 @@ extends MobEntityRenderer<T, SpiderEntityModel<T>> {
     }
 
     @Override
-    protected /* synthetic */ float getLyingAngle(LivingEntity arg) {
-        return this.getLyingAngle((T)((SpiderEntity)arg));
+    protected /* synthetic */ float getLyingAngle(LivingEntity entity) {
+        return this.getLyingAngle((T)((SpiderEntity)entity));
     }
 }
 

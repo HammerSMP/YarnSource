@@ -43,76 +43,76 @@ public class ShapelessRecipeJsonFactory {
     private final Advancement.Task builder = Advancement.Task.create();
     private String group;
 
-    public ShapelessRecipeJsonFactory(ItemConvertible arg, int i) {
-        this.output = arg.asItem();
-        this.outputCount = i;
+    public ShapelessRecipeJsonFactory(ItemConvertible itemProvider, int outputCount) {
+        this.output = itemProvider.asItem();
+        this.outputCount = outputCount;
     }
 
-    public static ShapelessRecipeJsonFactory create(ItemConvertible arg) {
-        return new ShapelessRecipeJsonFactory(arg, 1);
+    public static ShapelessRecipeJsonFactory create(ItemConvertible output) {
+        return new ShapelessRecipeJsonFactory(output, 1);
     }
 
-    public static ShapelessRecipeJsonFactory create(ItemConvertible arg, int i) {
-        return new ShapelessRecipeJsonFactory(arg, i);
+    public static ShapelessRecipeJsonFactory create(ItemConvertible output, int outputCount) {
+        return new ShapelessRecipeJsonFactory(output, outputCount);
     }
 
-    public ShapelessRecipeJsonFactory input(Tag<Item> arg) {
-        return this.input(Ingredient.fromTag(arg));
+    public ShapelessRecipeJsonFactory input(Tag<Item> tag) {
+        return this.input(Ingredient.fromTag(tag));
     }
 
-    public ShapelessRecipeJsonFactory input(ItemConvertible arg) {
-        return this.input(arg, 1);
+    public ShapelessRecipeJsonFactory input(ItemConvertible itemProvider) {
+        return this.input(itemProvider, 1);
     }
 
-    public ShapelessRecipeJsonFactory input(ItemConvertible arg, int i) {
-        for (int j = 0; j < i; ++j) {
-            this.input(Ingredient.ofItems(arg));
+    public ShapelessRecipeJsonFactory input(ItemConvertible itemProvider, int size) {
+        for (int j = 0; j < size; ++j) {
+            this.input(Ingredient.ofItems(itemProvider));
         }
         return this;
     }
 
-    public ShapelessRecipeJsonFactory input(Ingredient arg) {
-        return this.input(arg, 1);
+    public ShapelessRecipeJsonFactory input(Ingredient ingredient) {
+        return this.input(ingredient, 1);
     }
 
-    public ShapelessRecipeJsonFactory input(Ingredient arg, int i) {
-        for (int j = 0; j < i; ++j) {
-            this.inputs.add(arg);
+    public ShapelessRecipeJsonFactory input(Ingredient ingredient, int size) {
+        for (int j = 0; j < size; ++j) {
+            this.inputs.add(ingredient);
         }
         return this;
     }
 
-    public ShapelessRecipeJsonFactory criterion(String string, CriterionConditions arg) {
-        this.builder.criterion(string, arg);
+    public ShapelessRecipeJsonFactory criterion(String criterionName, CriterionConditions conditions) {
+        this.builder.criterion(criterionName, conditions);
         return this;
     }
 
-    public ShapelessRecipeJsonFactory group(String string) {
-        this.group = string;
+    public ShapelessRecipeJsonFactory group(String group) {
+        this.group = group;
         return this;
     }
 
-    public void offerTo(Consumer<RecipeJsonProvider> consumer) {
-        this.offerTo(consumer, Registry.ITEM.getId(this.output));
+    public void offerTo(Consumer<RecipeJsonProvider> exporter) {
+        this.offerTo(exporter, Registry.ITEM.getId(this.output));
     }
 
-    public void offerTo(Consumer<RecipeJsonProvider> consumer, String string) {
+    public void offerTo(Consumer<RecipeJsonProvider> exporter, String recipeIdStr) {
         Identifier lv = Registry.ITEM.getId(this.output);
-        if (new Identifier(string).equals(lv)) {
-            throw new IllegalStateException("Shapeless Recipe " + string + " should remove its 'save' argument");
+        if (new Identifier(recipeIdStr).equals(lv)) {
+            throw new IllegalStateException("Shapeless Recipe " + recipeIdStr + " should remove its 'save' argument");
         }
-        this.offerTo(consumer, new Identifier(string));
+        this.offerTo(exporter, new Identifier(recipeIdStr));
     }
 
-    public void offerTo(Consumer<RecipeJsonProvider> consumer, Identifier arg) {
-        this.validate(arg);
-        this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(arg)).rewards(AdvancementRewards.Builder.recipe(arg)).criteriaMerger(CriterionMerger.OR);
-        consumer.accept(new ShapelessRecipeJsonProvider(arg, this.output, this.outputCount, this.group == null ? "" : this.group, this.inputs, this.builder, new Identifier(arg.getNamespace(), "recipes/" + this.output.getGroup().getName() + "/" + arg.getPath())));
+    public void offerTo(Consumer<RecipeJsonProvider> exporter, Identifier recipeId) {
+        this.validate(recipeId);
+        this.builder.parent(new Identifier("recipes/root")).criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId)).rewards(AdvancementRewards.Builder.recipe(recipeId)).criteriaMerger(CriterionMerger.OR);
+        exporter.accept(new ShapelessRecipeJsonProvider(recipeId, this.output, this.outputCount, this.group == null ? "" : this.group, this.inputs, this.builder, new Identifier(recipeId.getNamespace(), "recipes/" + this.output.getGroup().getName() + "/" + recipeId.getPath())));
     }
 
-    private void validate(Identifier arg) {
+    private void validate(Identifier recipeId) {
         if (this.builder.getCriteria().isEmpty()) {
-            throw new IllegalStateException("No way of obtaining recipe " + arg);
+            throw new IllegalStateException("No way of obtaining recipe " + recipeId);
         }
     }
 
@@ -126,32 +126,32 @@ public class ShapelessRecipeJsonFactory {
         private final Advancement.Task builder;
         private final Identifier advancementId;
 
-        public ShapelessRecipeJsonProvider(Identifier arg, Item arg2, int i, String string, List<Ingredient> list, Advancement.Task arg3, Identifier arg4) {
-            this.recipeId = arg;
-            this.output = arg2;
-            this.count = i;
-            this.group = string;
-            this.inputs = list;
-            this.builder = arg3;
-            this.advancementId = arg4;
+        public ShapelessRecipeJsonProvider(Identifier recipeId, Item output, int outputCount, String group, List<Ingredient> inputs, Advancement.Task builder, Identifier advancementId) {
+            this.recipeId = recipeId;
+            this.output = output;
+            this.count = outputCount;
+            this.group = group;
+            this.inputs = inputs;
+            this.builder = builder;
+            this.advancementId = advancementId;
         }
 
         @Override
-        public void serialize(JsonObject jsonObject) {
+        public void serialize(JsonObject json) {
             if (!this.group.isEmpty()) {
-                jsonObject.addProperty("group", this.group);
+                json.addProperty("group", this.group);
             }
             JsonArray jsonArray = new JsonArray();
             for (Ingredient lv : this.inputs) {
                 jsonArray.add(lv.toJson());
             }
-            jsonObject.add("ingredients", (JsonElement)jsonArray);
+            json.add("ingredients", (JsonElement)jsonArray);
             JsonObject jsonObject2 = new JsonObject();
             jsonObject2.addProperty("item", Registry.ITEM.getId(this.output).toString());
             if (this.count > 1) {
                 jsonObject2.addProperty("count", (Number)this.count);
             }
-            jsonObject.add("result", (JsonElement)jsonObject2);
+            json.add("result", (JsonElement)jsonObject2);
         }
 
         @Override

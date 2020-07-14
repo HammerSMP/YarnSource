@@ -26,9 +26,9 @@ extends Goal {
     @Nullable
     private BlockPos targetPosition;
 
-    public GoToVillageGoal(PathAwareEntity arg, int i) {
-        this.mob = arg;
-        this.searchRange = i;
+    public GoToVillageGoal(PathAwareEntity mob, int searchRange) {
+        this.mob = mob;
+        this.searchRange = searchRange;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 

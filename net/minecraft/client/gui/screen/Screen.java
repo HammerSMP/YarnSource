@@ -76,8 +76,8 @@ Drawable {
     protected TextRenderer textRenderer;
     private URI clickedLink;
 
-    protected Screen(Text arg) {
-        this.title = arg;
+    protected Screen(Text title) {
+        this.title = title;
     }
 
     public Text getTitle() {
@@ -89,19 +89,19 @@ Drawable {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         for (int k = 0; k < this.buttons.size(); ++k) {
-            this.buttons.get(k).render(arg, i, j, f);
+            this.buttons.get(k).render(matrices, mouseX, mouseY, delta);
         }
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256 && this.shouldCloseOnEsc()) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256 && this.shouldCloseOnEsc()) {
             this.onClose();
             return true;
         }
-        if (i == 258) {
+        if (keyCode == 258) {
             boolean bl;
             boolean bl2 = bl = !Screen.hasShiftDown();
             if (!this.changeFocus(bl)) {
@@ -109,7 +109,7 @@ Drawable {
             }
             return false;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public boolean shouldCloseOnEsc() {
@@ -120,48 +120,48 @@ Drawable {
         this.client.openScreen(null);
     }
 
-    protected <T extends AbstractButtonWidget> T addButton(T arg) {
-        this.buttons.add(arg);
-        return this.addChild(arg);
+    protected <T extends AbstractButtonWidget> T addButton(T button) {
+        this.buttons.add(button);
+        return this.addChild(button);
     }
 
-    protected <T extends Element> T addChild(T arg) {
-        this.children.add(arg);
-        return arg;
+    protected <T extends Element> T addChild(T child) {
+        this.children.add(child);
+        return child;
     }
 
-    protected void renderTooltip(MatrixStack arg, ItemStack arg2, int i, int j) {
-        this.renderTooltip(arg, this.getTooltipFromItem(arg2), i, j);
+    protected void renderTooltip(MatrixStack matrices, ItemStack stack, int x, int y) {
+        this.renderTooltip(matrices, this.getTooltipFromItem(stack), x, y);
     }
 
-    public List<Text> getTooltipFromItem(ItemStack arg) {
-        return arg.getTooltip(this.client.player, this.client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
+    public List<Text> getTooltipFromItem(ItemStack stack) {
+        return stack.getTooltip(this.client.player, this.client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
     }
 
-    public void renderTooltip(MatrixStack arg, StringRenderable arg2, int i, int j) {
-        this.renderTooltip(arg, Arrays.asList(arg2), i, j);
+    public void renderTooltip(MatrixStack matrices, StringRenderable text, int x, int y) {
+        this.renderTooltip(matrices, Arrays.asList(text), x, y);
     }
 
     /*
      * WARNING - void declaration
      */
-    public void renderTooltip(MatrixStack arg, List<? extends StringRenderable> list, int i, int j) {
+    public void renderTooltip(MatrixStack matrices, List<? extends StringRenderable> lines, int x, int y) {
         int n;
-        if (list.isEmpty()) {
+        if (lines.isEmpty()) {
             return;
         }
         int k = 0;
-        for (StringRenderable stringRenderable : list) {
+        for (StringRenderable stringRenderable : lines) {
             int l = this.textRenderer.getWidth(stringRenderable);
             if (l <= k) continue;
             k = l;
         }
-        int m = i + 12;
-        int n2 = j - 12;
+        int m = x + 12;
+        int n2 = y - 12;
         int o = k;
         int p = 8;
-        if (list.size() > 1) {
-            p += 2 + (list.size() - 1) * 10;
+        if (lines.size() > 1) {
+            p += 2 + (lines.size() - 1) * 10;
         }
         if (m + k > this.width) {
             m -= 28 + k;
@@ -169,7 +169,7 @@ Drawable {
         if (n2 + p + 6 > this.height) {
             n = this.height - p - 6;
         }
-        arg.push();
+        matrices.push();
         int q = -267386864;
         int r = 0x505000FF;
         int s = 1344798847;
@@ -177,7 +177,7 @@ Drawable {
         Tessellator lv2 = Tessellator.getInstance();
         BufferBuilder lv3 = lv2.getBuffer();
         lv3.begin(7, VertexFormats.POSITION_COLOR);
-        Matrix4f lv4 = arg.peek().getModel();
+        Matrix4f lv4 = matrices.peek().getModel();
         Screen.fillGradient(lv4, lv3, m - 3, n - 4, m + o + 3, n - 3, 400, -267386864, -267386864);
         Screen.fillGradient(lv4, lv3, m - 3, n + p + 3, m + o + 3, n + p + 4, 400, -267386864, -267386864);
         Screen.fillGradient(lv4, lv3, m - 3, n - 3, m + o + 3, n + p + 3, 400, -267386864, -267386864);
@@ -198,9 +198,9 @@ Drawable {
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
         VertexConsumerProvider.Immediate lv5 = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        arg.translate(0.0, 0.0, 400.0);
-        for (int u = 0; u < list.size(); ++u) {
-            StringRenderable lv6 = list.get(u);
+        matrices.translate(0.0, 0.0, 400.0);
+        for (int u = 0; u < lines.size(); ++u) {
+            StringRenderable lv6 = lines.get(u);
             if (lv6 != null) {
                 void var7_11;
                 this.textRenderer.draw(lv6, (float)m, (float)var7_11, -1, true, lv4, (VertexConsumerProvider)lv5, false, 0, 0xF000F0);
@@ -211,33 +211,33 @@ Drawable {
             var7_11 += 10;
         }
         lv5.draw();
-        arg.pop();
+        matrices.pop();
     }
 
-    protected void renderTextHoverEffect(MatrixStack arg, @Nullable Style arg2, int i, int j) {
+    protected void renderTextHoverEffect(MatrixStack matrices, @Nullable Style arg2, int i, int j) {
         if (arg2 == null || arg2.getHoverEvent() == null) {
             return;
         }
         HoverEvent lv = arg2.getHoverEvent();
         HoverEvent.ItemStackContent lv2 = lv.getValue(HoverEvent.Action.SHOW_ITEM);
         if (lv2 != null) {
-            this.renderTooltip(arg, lv2.asStack(), i, j);
+            this.renderTooltip(matrices, lv2.asStack(), i, j);
         } else {
             HoverEvent.EntityContent lv3 = lv.getValue(HoverEvent.Action.SHOW_ENTITY);
             if (lv3 != null) {
                 if (this.client.options.advancedItemTooltips) {
-                    this.renderTooltip(arg, lv3.asTooltip(), i, j);
+                    this.renderTooltip(matrices, lv3.asTooltip(), i, j);
                 }
             } else {
                 Text lv4 = lv.getValue(HoverEvent.Action.SHOW_TEXT);
                 if (lv4 != null) {
-                    this.renderTooltip(arg, this.client.textRenderer.wrapLines(lv4, Math.max(this.width / 2, 200)), i, j);
+                    this.renderTooltip(matrices, this.client.textRenderer.wrapLines(lv4, Math.max(this.width / 2, 200)), i, j);
                 }
             }
         }
     }
 
-    protected void insertText(String string, boolean bl) {
+    protected void insertText(String text, boolean override) {
     }
 
     public boolean handleTextClick(@Nullable Style arg) {
@@ -292,23 +292,23 @@ Drawable {
         return false;
     }
 
-    public void sendMessage(String string) {
-        this.sendMessage(string, true);
+    public void sendMessage(String message) {
+        this.sendMessage(message, true);
     }
 
-    public void sendMessage(String string, boolean bl) {
-        if (bl) {
-            this.client.inGameHud.getChatHud().addToMessageHistory(string);
+    public void sendMessage(String message, boolean toHud) {
+        if (toHud) {
+            this.client.inGameHud.getChatHud().addToMessageHistory(message);
         }
-        this.client.player.sendChatMessage(string);
+        this.client.player.sendChatMessage(message);
     }
 
-    public void init(MinecraftClient arg, int i, int j) {
-        this.client = arg;
-        this.itemRenderer = arg.getItemRenderer();
-        this.textRenderer = arg.textRenderer;
-        this.width = i;
-        this.height = j;
+    public void init(MinecraftClient client, int width, int height) {
+        this.client = client;
+        this.itemRenderer = client.getItemRenderer();
+        this.textRenderer = client.textRenderer;
+        this.width = width;
+        this.height = height;
         this.buttons.clear();
         this.children.clear();
         this.setFocused(null);
@@ -330,29 +330,29 @@ Drawable {
     public void removed() {
     }
 
-    public void renderBackground(MatrixStack arg) {
-        this.renderBackground(arg, 0);
+    public void renderBackground(MatrixStack matrices) {
+        this.renderBackground(matrices, 0);
     }
 
-    public void renderBackground(MatrixStack arg, int i) {
+    public void renderBackground(MatrixStack matrices, int vOffset) {
         if (this.client.world != null) {
-            this.fillGradient(arg, 0, 0, this.width, this.height, -1072689136, -804253680);
+            this.fillGradient(matrices, 0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            this.renderBackgroundTexture(i);
+            this.renderBackgroundTexture(vOffset);
         }
     }
 
-    public void renderBackgroundTexture(int i) {
+    public void renderBackgroundTexture(int vOffset) {
         Tessellator lv = Tessellator.getInstance();
         BufferBuilder lv2 = lv.getBuffer();
         this.client.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         float f = 32.0f;
         lv2.begin(7, VertexFormats.POSITION_TEXTURE_COLOR);
-        lv2.vertex(0.0, this.height, 0.0).texture(0.0f, (float)this.height / 32.0f + (float)i).color(64, 64, 64, 255).next();
-        lv2.vertex(this.width, this.height, 0.0).texture((float)this.width / 32.0f, (float)this.height / 32.0f + (float)i).color(64, 64, 64, 255).next();
-        lv2.vertex(this.width, 0.0, 0.0).texture((float)this.width / 32.0f, i).color(64, 64, 64, 255).next();
-        lv2.vertex(0.0, 0.0, 0.0).texture(0.0f, i).color(64, 64, 64, 255).next();
+        lv2.vertex(0.0, this.height, 0.0).texture(0.0f, (float)this.height / 32.0f + (float)vOffset).color(64, 64, 64, 255).next();
+        lv2.vertex(this.width, this.height, 0.0).texture((float)this.width / 32.0f, (float)this.height / 32.0f + (float)vOffset).color(64, 64, 64, 255).next();
+        lv2.vertex(this.width, 0.0, 0.0).texture((float)this.width / 32.0f, vOffset).color(64, 64, 64, 255).next();
+        lv2.vertex(0.0, 0.0, 0.0).texture(0.0f, vOffset).color(64, 64, 64, 255).next();
         lv.draw();
     }
 
@@ -360,16 +360,16 @@ Drawable {
         return true;
     }
 
-    private void confirmLink(boolean bl) {
-        if (bl) {
+    private void confirmLink(boolean open) {
+        if (open) {
             this.openLink(this.clickedLink);
         }
         this.clickedLink = null;
         this.client.openScreen(this);
     }
 
-    private void openLink(URI uRI) {
-        Util.getOperatingSystem().open(uRI);
+    private void openLink(URI link) {
+        Util.getOperatingSystem().open(link);
     }
 
     public static boolean hasControlDown() {
@@ -387,56 +387,56 @@ Drawable {
         return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), 342) || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), 346);
     }
 
-    public static boolean isCut(int i) {
-        return i == 88 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+    public static boolean isCut(int code) {
+        return code == 88 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
     }
 
-    public static boolean isPaste(int i) {
-        return i == 86 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+    public static boolean isPaste(int code) {
+        return code == 86 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
     }
 
-    public static boolean isCopy(int i) {
-        return i == 67 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+    public static boolean isCopy(int code) {
+        return code == 67 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
     }
 
-    public static boolean isSelectAll(int i) {
-        return i == 65 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
+    public static boolean isSelectAll(int code) {
+        return code == 65 && Screen.hasControlDown() && !Screen.hasShiftDown() && !Screen.hasAltDown();
     }
 
-    public void resize(MinecraftClient arg, int i, int j) {
-        this.init(arg, i, j);
+    public void resize(MinecraftClient client, int width, int height) {
+        this.init(client, width, height);
     }
 
-    public static void wrapScreenError(Runnable runnable, String string, String string2) {
+    public static void wrapScreenError(Runnable task, String errorTitle, String screenName) {
         try {
-            runnable.run();
+            task.run();
         }
         catch (Throwable throwable) {
-            CrashReport lv = CrashReport.create(throwable, string);
+            CrashReport lv = CrashReport.create(throwable, errorTitle);
             CrashReportSection lv2 = lv.addElement("Affected screen");
-            lv2.add("Screen name", () -> string2);
+            lv2.add("Screen name", () -> screenName);
             throw new CrashException(lv);
         }
     }
 
-    protected boolean isValidCharacterForName(String string, char c, int i) {
-        int j = string.indexOf(58);
-        int k = string.indexOf(47);
-        if (c == ':') {
-            return (k == -1 || i <= k) && j == -1;
+    protected boolean isValidCharacterForName(String name, char character, int cursorPos) {
+        int j = name.indexOf(58);
+        int k = name.indexOf(47);
+        if (character == ':') {
+            return (k == -1 || cursorPos <= k) && j == -1;
         }
-        if (c == '/') {
-            return i > j;
+        if (character == '/') {
+            return cursorPos > j;
         }
-        return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.';
+        return character == '_' || character == '-' || character >= 'a' && character <= 'z' || character >= '0' && character <= '9' || character == '.';
     }
 
     @Override
-    public boolean isMouseOver(double d, double e) {
+    public boolean isMouseOver(double mouseX, double mouseY) {
         return true;
     }
 
-    public void filesDragged(List<Path> list) {
+    public void filesDragged(List<Path> paths) {
     }
 }
 

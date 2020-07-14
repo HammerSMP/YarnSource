@@ -41,94 +41,94 @@ extends Block {
     }
 
     @Override
-    public void onBlockAdded(BlockState arg, World arg2, BlockPos arg3, BlockState arg4, boolean bl) {
-        if (arg4.isOf(arg.getBlock())) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (oldState.isOf(state.getBlock())) {
             return;
         }
-        if (arg2.isReceivingRedstonePower(arg3)) {
-            TntBlock.primeTnt(arg2, arg3);
-            arg2.removeBlock(arg3, false);
+        if (world.isReceivingRedstonePower(pos)) {
+            TntBlock.primeTnt(world, pos);
+            world.removeBlock(pos, false);
         }
     }
 
     @Override
-    public void neighborUpdate(BlockState arg, World arg2, BlockPos arg3, Block arg4, BlockPos arg5, boolean bl) {
-        if (arg2.isReceivingRedstonePower(arg3)) {
-            TntBlock.primeTnt(arg2, arg3);
-            arg2.removeBlock(arg3, false);
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+        if (world.isReceivingRedstonePower(pos)) {
+            TntBlock.primeTnt(world, pos);
+            world.removeBlock(pos, false);
         }
     }
 
     @Override
-    public void onBreak(World arg, BlockPos arg2, BlockState arg3, PlayerEntity arg4) {
-        if (!arg.isClient() && !arg4.isCreative() && arg3.get(UNSTABLE).booleanValue()) {
-            TntBlock.primeTnt(arg, arg2);
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!world.isClient() && !player.isCreative() && state.get(UNSTABLE).booleanValue()) {
+            TntBlock.primeTnt(world, pos);
         }
-        super.onBreak(arg, arg2, arg3, arg4);
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
-    public void onDestroyedByExplosion(World arg, BlockPos arg2, Explosion arg3) {
-        if (arg.isClient) {
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        if (world.isClient) {
             return;
         }
-        TntEntity lv = new TntEntity(arg, (double)arg2.getX() + 0.5, arg2.getY(), (double)arg2.getZ() + 0.5, arg3.getCausingEntity());
-        lv.setFuse((short)(arg.random.nextInt(lv.getFuseTimer() / 4) + lv.getFuseTimer() / 8));
-        arg.spawnEntity(lv);
+        TntEntity lv = new TntEntity(world, (double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5, explosion.getCausingEntity());
+        lv.setFuse((short)(world.random.nextInt(lv.getFuseTimer() / 4) + lv.getFuseTimer() / 8));
+        world.spawnEntity(lv);
     }
 
-    public static void primeTnt(World arg, BlockPos arg2) {
-        TntBlock.primeTnt(arg, arg2, null);
+    public static void primeTnt(World world, BlockPos pos) {
+        TntBlock.primeTnt(world, pos, null);
     }
 
-    private static void primeTnt(World arg, BlockPos arg2, @Nullable LivingEntity arg3) {
-        if (arg.isClient) {
+    private static void primeTnt(World world, BlockPos pos, @Nullable LivingEntity igniter) {
+        if (world.isClient) {
             return;
         }
-        TntEntity lv = new TntEntity(arg, (double)arg2.getX() + 0.5, arg2.getY(), (double)arg2.getZ() + 0.5, arg3);
-        arg.spawnEntity(lv);
-        arg.playSound(null, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        TntEntity lv = new TntEntity(world, (double)pos.getX() + 0.5, pos.getY(), (double)pos.getZ() + 0.5, igniter);
+        world.spawnEntity(lv);
+        world.playSound(null, lv.getX(), lv.getY(), lv.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
-    public ActionResult onUse(BlockState arg, World arg22, BlockPos arg3, PlayerEntity arg4, Hand arg5, BlockHitResult arg6) {
-        ItemStack lv = arg4.getStackInHand(arg5);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack lv = player.getStackInHand(hand);
         Item lv2 = lv.getItem();
         if (lv2 == Items.FLINT_AND_STEEL || lv2 == Items.FIRE_CHARGE) {
-            TntBlock.primeTnt(arg22, arg3, arg4);
-            arg22.setBlockState(arg3, Blocks.AIR.getDefaultState(), 11);
-            if (!arg4.isCreative()) {
+            TntBlock.primeTnt(world, pos, player);
+            world.setBlockState(pos, Blocks.AIR.getDefaultState(), 11);
+            if (!player.isCreative()) {
                 if (lv2 == Items.FLINT_AND_STEEL) {
-                    lv.damage(1, arg4, arg2 -> arg2.sendToolBreakStatus(arg5));
+                    lv.damage(1, player, arg2 -> arg2.sendToolBreakStatus(hand));
                 } else {
                     lv.decrement(1);
                 }
             }
-            return ActionResult.success(arg22.isClient);
+            return ActionResult.success(world.isClient);
         }
-        return super.onUse(arg, arg22, arg3, arg4, arg5, arg6);
+        return super.onUse(state, world, pos, player, hand, hit);
     }
 
     @Override
-    public void onProjectileHit(World arg, BlockState arg2, BlockHitResult arg3, ProjectileEntity arg4) {
-        if (!arg.isClient) {
-            Entity lv = arg4.getOwner();
-            if (arg4.isOnFire()) {
-                BlockPos lv2 = arg3.getBlockPos();
-                TntBlock.primeTnt(arg, lv2, lv instanceof LivingEntity ? (LivingEntity)lv : null);
-                arg.removeBlock(lv2, false);
+    public void onProjectileHit(World world, BlockState state, BlockHitResult hit, ProjectileEntity projectile) {
+        if (!world.isClient) {
+            Entity lv = projectile.getOwner();
+            if (projectile.isOnFire()) {
+                BlockPos lv2 = hit.getBlockPos();
+                TntBlock.primeTnt(world, lv2, lv instanceof LivingEntity ? (LivingEntity)lv : null);
+                world.removeBlock(lv2, false);
             }
         }
     }
 
     @Override
-    public boolean shouldDropItemsOnExplosion(Explosion arg) {
+    public boolean shouldDropItemsOnExplosion(Explosion explosion) {
         return false;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(UNSTABLE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(UNSTABLE);
     }
 }
 

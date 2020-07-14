@@ -8,32 +8,32 @@ import net.minecraft.screen.PropertyDelegate;
 public abstract class Property {
     private int oldValue;
 
-    public static Property create(final PropertyDelegate arg, final int i) {
+    public static Property create(final PropertyDelegate delegate, final int index) {
         return new Property(){
 
             @Override
             public int get() {
-                return arg.get(i);
+                return delegate.get(index);
             }
 
             @Override
-            public void set(int i2) {
-                arg.set(i, i2);
+            public void set(int value) {
+                delegate.set(index, value);
             }
         };
     }
 
-    public static Property create(final int[] is, final int i) {
+    public static Property create(final int[] array, final int index) {
         return new Property(){
 
             @Override
             public int get() {
-                return is[i];
+                return array[index];
             }
 
             @Override
-            public void set(int i2) {
-                is[i] = i2;
+            public void set(int value) {
+                array[index] = value;
             }
         };
     }
@@ -48,8 +48,8 @@ public abstract class Property {
             }
 
             @Override
-            public void set(int i) {
-                this.value = i;
+            public void set(int value) {
+                this.value = value;
             }
         };
     }

@@ -52,8 +52,8 @@ implements ArgumentType<TestFunction> {
         return new TestFunctionArgumentType();
     }
 
-    public static TestFunction getFunction(CommandContext<ServerCommandSource> commandContext, String string) {
-        return (TestFunction)commandContext.getArgument(string, TestFunction.class);
+    public static TestFunction getFunction(CommandContext<ServerCommandSource> context, String name) {
+        return (TestFunction)context.getArgument(name, TestFunction.class);
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {

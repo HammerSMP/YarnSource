@@ -92,27 +92,27 @@ implements RangedAttackMob {
     }
 
     @Override
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        arg4 = super.initialize(arg, arg2, arg3, arg4, arg5);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        entityData = super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         if (this.getEquippedStack(EquipmentSlot.OFFHAND).isEmpty() && this.random.nextFloat() < 0.03f) {
             this.equipStack(EquipmentSlot.OFFHAND, new ItemStack(Items.NAUTILUS_SHELL));
             this.handDropChances[EquipmentSlot.OFFHAND.getEntitySlotId()] = 2.0f;
         }
-        return arg4;
+        return entityData;
     }
 
-    public static boolean canSpawn(EntityType<DrownedEntity> arg, class_5425 arg2, SpawnReason arg3, BlockPos arg4, Random random) {
+    public static boolean canSpawn(EntityType<DrownedEntity> type, class_5425 arg2, SpawnReason spawnReason, BlockPos pos, Random random) {
         boolean bl;
-        Biome lv = arg2.getBiome(arg4);
-        boolean bl2 = bl = arg2.getDifficulty() != Difficulty.PEACEFUL && DrownedEntity.isSpawnDark(arg2, arg4, random) && (arg3 == SpawnReason.SPAWNER || arg2.getFluidState(arg4).isIn(FluidTags.WATER));
+        Biome lv = arg2.getBiome(pos);
+        boolean bl2 = bl = arg2.getDifficulty() != Difficulty.PEACEFUL && DrownedEntity.isSpawnDark(arg2, pos, random) && (spawnReason == SpawnReason.SPAWNER || arg2.getFluidState(pos).isIn(FluidTags.WATER));
         if (lv == Biomes.RIVER || lv == Biomes.FROZEN_RIVER) {
             return random.nextInt(15) == 0 && bl;
         }
-        return random.nextInt(40) == 0 && DrownedEntity.isValidSpawnDepth(arg2, arg4) && bl;
+        return random.nextInt(40) == 0 && DrownedEntity.isValidSpawnDepth(arg2, pos) && bl;
     }
 
-    private static boolean isValidSpawnDepth(WorldAccess arg, BlockPos arg2) {
-        return arg2.getY() < arg.getSeaLevel() - 5;
+    private static boolean isValidSpawnDepth(WorldAccess world, BlockPos pos) {
+        return pos.getY() < world.getSeaLevel() - 5;
     }
 
     @Override
@@ -129,7 +129,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         if (this.isTouchingWater()) {
             return SoundEvents.ENTITY_DROWNED_HURT_WATER;
         }
@@ -160,7 +160,7 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         if ((double)this.random.nextFloat() > 0.9) {
             int i = this.random.nextInt(16);
             if (i < 10) {
@@ -172,20 +172,20 @@ implements RangedAttackMob {
     }
 
     @Override
-    protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
-        if (arg2.getItem() == Items.NAUTILUS_SHELL) {
+    protected boolean prefersNewEquipment(ItemStack newStack, ItemStack oldStack) {
+        if (oldStack.getItem() == Items.NAUTILUS_SHELL) {
             return false;
         }
-        if (arg2.getItem() == Items.TRIDENT) {
-            if (arg.getItem() == Items.TRIDENT) {
-                return arg.getDamage() < arg2.getDamage();
+        if (oldStack.getItem() == Items.TRIDENT) {
+            if (newStack.getItem() == Items.TRIDENT) {
+                return newStack.getDamage() < oldStack.getDamage();
             }
             return false;
         }
-        if (arg.getItem() == Items.TRIDENT) {
+        if (newStack.getItem() == Items.TRIDENT) {
             return true;
         }
-        return super.prefersNewEquipment(arg, arg2);
+        return super.prefersNewEquipment(newStack, oldStack);
     }
 
     @Override
@@ -194,13 +194,13 @@ implements RangedAttackMob {
     }
 
     @Override
-    public boolean canSpawn(WorldView arg) {
-        return arg.intersectsEntities(this);
+    public boolean canSpawn(WorldView world) {
+        return world.intersectsEntities(this);
     }
 
-    public boolean canDrownedAttackTarget(@Nullable LivingEntity arg) {
-        if (arg != null) {
-            return !this.world.isDay() || arg.isTouchingWater();
+    public boolean canDrownedAttackTarget(@Nullable LivingEntity target) {
+        if (target != null) {
+            return !this.world.isDay() || target.isTouchingWater();
         }
         return false;
     }
@@ -219,13 +219,13 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void travel(Vec3d arg) {
+    public void travel(Vec3d movementInput) {
         if (this.canMoveVoluntarily() && this.isTouchingWater() && this.isTargetingUnderwater()) {
-            this.updateVelocity(0.01f, arg);
+            this.updateVelocity(0.01f, movementInput);
             this.move(MovementType.SELF, this.getVelocity());
             this.setVelocity(this.getVelocity().multiply(0.9));
         } else {
-            super.travel(arg);
+            super.travel(movementInput);
         }
     }
 
@@ -250,28 +250,28 @@ implements RangedAttackMob {
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
+    public void attack(LivingEntity target, float pullProgress) {
         TridentEntity lv = new TridentEntity(this.world, (LivingEntity)this, new ItemStack(Items.TRIDENT));
-        double d = arg.getX() - this.getX();
-        double e = arg.getBodyY(0.3333333333333333) - lv.getY();
-        double g = arg.getZ() - this.getZ();
+        double d = target.getX() - this.getX();
+        double e = target.getBodyY(0.3333333333333333) - lv.getY();
+        double g = target.getZ() - this.getZ();
         double h = MathHelper.sqrt(d * d + g * g);
         lv.setVelocity(d, e + h * (double)0.2f, g, 1.6f, 14 - this.world.getDifficulty().getId() * 4);
         this.playSound(SoundEvents.ENTITY_DROWNED_SHOOT, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
         this.world.spawnEntity(lv);
     }
 
-    public void setTargetingUnderwater(boolean bl) {
-        this.targetingUnderwater = bl;
+    public void setTargetingUnderwater(boolean targetingUnderwater) {
+        this.targetingUnderwater = targetingUnderwater;
     }
 
     static class DrownedMoveControl
     extends MoveControl {
         private final DrownedEntity drowned;
 
-        public DrownedMoveControl(DrownedEntity arg) {
-            super(arg);
-            this.drowned = arg;
+        public DrownedMoveControl(DrownedEntity drowned) {
+            super(drowned);
+            this.drowned = drowned;
         }
 
         @Override
@@ -308,9 +308,9 @@ implements RangedAttackMob {
     extends ZombieAttackGoal {
         private final DrownedEntity drowned;
 
-        public DrownedAttackGoal(DrownedEntity arg, double d, boolean bl) {
-            super(arg, d, bl);
-            this.drowned = arg;
+        public DrownedAttackGoal(DrownedEntity drowned, double speed, boolean pauseWhenMobIdle) {
+            super(drowned, speed, pauseWhenMobIdle);
+            this.drowned = drowned;
         }
 
         @Override
@@ -333,10 +333,10 @@ implements RangedAttackMob {
         private final double speed;
         private final World world;
 
-        public WanderAroundOnSurfaceGoal(PathAwareEntity arg, double d) {
-            this.mob = arg;
-            this.speed = d;
-            this.world = arg.world;
+        public WanderAroundOnSurfaceGoal(PathAwareEntity mob, double speed) {
+            this.mob = mob;
+            this.speed = speed;
+            this.world = mob.world;
             this.setControls(EnumSet.of(Goal.Control.MOVE));
         }
 
@@ -385,9 +385,9 @@ implements RangedAttackMob {
     extends MoveToTargetPosGoal {
         private final DrownedEntity drowned;
 
-        public LeaveWaterGoal(DrownedEntity arg, double d) {
-            super(arg, d, 8, 2);
-            this.drowned = arg;
+        public LeaveWaterGoal(DrownedEntity drowned, double speed) {
+            super(drowned, speed, 8, 2);
+            this.drowned = drowned;
         }
 
         @Override
@@ -401,12 +401,12 @@ implements RangedAttackMob {
         }
 
         @Override
-        protected boolean isTargetPos(WorldView arg, BlockPos arg2) {
-            BlockPos lv = arg2.up();
-            if (!arg.isAir(lv) || !arg.isAir(lv.up())) {
+        protected boolean isTargetPos(WorldView world, BlockPos pos) {
+            BlockPos lv = pos.up();
+            if (!world.isAir(lv) || !world.isAir(lv.up())) {
                 return false;
             }
-            return arg.getBlockState(arg2).hasSolidTopSurface(arg, arg2, this.drowned);
+            return world.getBlockState(pos).hasSolidTopSurface(world, pos, this.drowned);
         }
 
         @Override
@@ -429,10 +429,10 @@ implements RangedAttackMob {
         private final int minY;
         private boolean foundTarget;
 
-        public TargetAboveWaterGoal(DrownedEntity arg, double d, int i) {
-            this.drowned = arg;
-            this.speed = d;
-            this.minY = i;
+        public TargetAboveWaterGoal(DrownedEntity drowned, double speed, int minY) {
+            this.drowned = drowned;
+            this.speed = speed;
+            this.minY = minY;
         }
 
         @Override

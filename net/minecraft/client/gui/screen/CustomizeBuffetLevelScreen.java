@@ -69,12 +69,12 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackgroundTexture(0);
-        this.biomeSelectionList.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
-        this.drawCenteredString(arg, this.textRenderer, I18n.translate("createWorld.customize.buffet.biome", new Object[0]), this.width / 2, 28, 0xA0A0A0);
-        super.render(arg, i, j, f);
+        this.biomeSelectionList.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 0xFFFFFF);
+        this.drawCenteredString(matrices, this.textRenderer, I18n.translate("createWorld.customize.buffet.biome", new Object[0]), this.width / 2, 28, 0xA0A0A0);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -110,13 +110,13 @@ extends Screen {
             }
 
             @Override
-            public void render(MatrixStack arg, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-                BuffetBiomesListWidget.this.drawStringWithShadow(arg, CustomizeBuffetLevelScreen.this.textRenderer, CustomizeBuffetLevelScreen.this.field_25888.getId(this.field_24564).toString(), k + 5, j + 2, 0xFFFFFF);
+            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                BuffetBiomesListWidget.this.drawStringWithShadow(matrices, CustomizeBuffetLevelScreen.this.textRenderer, CustomizeBuffetLevelScreen.this.field_25888.getId(this.field_24564).toString(), x + 5, y + 2, 0xFFFFFF);
             }
 
             @Override
-            public boolean mouseClicked(double d, double e, int i) {
-                if (i == 0) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
                     BuffetBiomesListWidget.this.setSelected(this);
                     return true;
                 }

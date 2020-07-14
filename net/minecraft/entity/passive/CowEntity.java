@@ -63,7 +63,7 @@ extends AnimalEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_COW_HURT;
     }
 
@@ -73,7 +73,7 @@ extends AnimalEntity {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_COW_STEP, 0.15f, 1.0f);
     }
 
@@ -83,15 +83,15 @@ extends AnimalEntity {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ItemStack lv = arg.getStackInHand(arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ItemStack lv = player.getStackInHand(hand);
         if (lv.getItem() == Items.BUCKET && !this.isBaby()) {
-            arg.playSound(SoundEvents.ENTITY_COW_MILK, 1.0f, 1.0f);
-            ItemStack lv2 = ItemUsage.method_30012(lv, arg, Items.MILK_BUCKET.getStackForRender());
-            arg.setStackInHand(arg2, lv2);
+            player.playSound(SoundEvents.ENTITY_COW_MILK, 1.0f, 1.0f);
+            ItemStack lv2 = ItemUsage.method_30012(lv, player, Items.MILK_BUCKET.getStackForRender());
+            player.setStackInHand(hand, lv2);
             return ActionResult.success(this.world.isClient);
         }
-        return super.interactMob(arg, arg2);
+        return super.interactMob(player, hand);
     }
 
     @Override
@@ -100,9 +100,9 @@ extends AnimalEntity {
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         if (this.isBaby()) {
-            return arg2.height * 0.95f;
+            return dimensions.height * 0.95f;
         }
         return 1.3f;
     }

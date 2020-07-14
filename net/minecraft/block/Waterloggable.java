@@ -18,16 +18,16 @@ public interface Waterloggable
 extends FluidDrainable,
 FluidFillable {
     @Override
-    default public boolean canFillWithFluid(BlockView arg, BlockPos arg2, BlockState arg3, Fluid arg4) {
-        return arg3.get(Properties.WATERLOGGED) == false && arg4 == Fluids.WATER;
+    default public boolean canFillWithFluid(BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
+        return state.get(Properties.WATERLOGGED) == false && fluid == Fluids.WATER;
     }
 
     @Override
-    default public boolean tryFillWithFluid(WorldAccess arg, BlockPos arg2, BlockState arg3, FluidState arg4) {
-        if (!arg3.get(Properties.WATERLOGGED).booleanValue() && arg4.getFluid() == Fluids.WATER) {
-            if (!arg.isClient()) {
-                arg.setBlockState(arg2, (BlockState)arg3.with(Properties.WATERLOGGED, true), 3);
-                arg.getFluidTickScheduler().schedule(arg2, arg4.getFluid(), arg4.getFluid().getTickRate(arg));
+    default public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
+        if (!state.get(Properties.WATERLOGGED).booleanValue() && fluidState.getFluid() == Fluids.WATER) {
+            if (!world.isClient()) {
+                world.setBlockState(pos, (BlockState)state.with(Properties.WATERLOGGED, true), 3);
+                world.getFluidTickScheduler().schedule(pos, fluidState.getFluid(), fluidState.getFluid().getTickRate(world));
             }
             return true;
         }
@@ -35,9 +35,9 @@ FluidFillable {
     }
 
     @Override
-    default public Fluid tryDrainFluid(WorldAccess arg, BlockPos arg2, BlockState arg3) {
-        if (arg3.get(Properties.WATERLOGGED).booleanValue()) {
-            arg.setBlockState(arg2, (BlockState)arg3.with(Properties.WATERLOGGED, false), 3);
+    default public Fluid tryDrainFluid(WorldAccess world, BlockPos pos, BlockState state) {
+        if (state.get(Properties.WATERLOGGED).booleanValue()) {
+            world.setBlockState(pos, (BlockState)state.with(Properties.WATERLOGGED, false), 3);
             return Fluids.WATER;
         }
         return Fluids.EMPTY;

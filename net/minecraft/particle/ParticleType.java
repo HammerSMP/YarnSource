@@ -17,9 +17,9 @@ public abstract class ParticleType<T extends ParticleEffect> {
     private final boolean shouldAlwaysSpawn;
     private final ParticleEffect.Factory<T> parametersFactory;
 
-    protected ParticleType(boolean bl, ParticleEffect.Factory<T> arg) {
-        this.shouldAlwaysSpawn = bl;
-        this.parametersFactory = arg;
+    protected ParticleType(boolean shouldAlwaysShow, ParticleEffect.Factory<T> parametersFactory) {
+        this.shouldAlwaysSpawn = shouldAlwaysShow;
+        this.parametersFactory = parametersFactory;
     }
 
     @Environment(value=EnvType.CLIENT)

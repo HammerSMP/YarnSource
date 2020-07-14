@@ -22,19 +22,19 @@ public class FishingParticle
 extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    private FishingParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f, 0.0, 0.0, 0.0);
-        this.spriteProvider = arg2;
+    private FishingParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z, 0.0, 0.0, 0.0);
+        this.spriteProvider = spriteProvider;
         this.velocityX *= (double)0.3f;
         this.velocityY = Math.random() * (double)0.2f + (double)0.1f;
         this.velocityZ *= (double)0.3f;
         this.setBoundingBoxSpacing(0.01f, 0.01f);
         this.maxAge = (int)(8.0 / (Math.random() * 0.8 + 0.2));
-        this.setSpriteForAge(arg2);
+        this.setSpriteForAge(spriteProvider);
         this.gravityStrength = 0.0f;
-        this.velocityX = g;
-        this.velocityY = h;
-        this.velocityZ = i;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
     }
 
     @Override
@@ -67,8 +67,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

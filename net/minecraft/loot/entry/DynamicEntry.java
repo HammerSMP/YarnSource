@@ -26,9 +26,9 @@ public class DynamicEntry
 extends LeafEntry {
     private final Identifier name;
 
-    private DynamicEntry(Identifier arg, int i, int j, LootCondition[] args, LootFunction[] args2) {
-        super(i, j, args, args2);
-        this.name = arg;
+    private DynamicEntry(Identifier name, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+        super(weight, quality, conditions, functions);
+        this.name = name;
     }
 
     @Override
@@ -37,12 +37,12 @@ extends LeafEntry {
     }
 
     @Override
-    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
-        arg.drop(this.name, consumer);
+    public void generateLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
+        context.drop(this.name, lootConsumer);
     }
 
-    public static LeafEntry.Builder<?> builder(Identifier arg) {
-        return DynamicEntry.builder((int i, int j, LootCondition[] args, LootFunction[] args2) -> new DynamicEntry(arg, i, j, args, args2));
+    public static LeafEntry.Builder<?> builder(Identifier name) {
+        return DynamicEntry.builder((int weight, int quality, LootCondition[] conditions, LootFunction[] functions) -> new DynamicEntry(name, weight, quality, conditions, functions));
     }
 
     public static class Serializer
@@ -60,8 +60,8 @@ extends LeafEntry {
         }
 
         @Override
-        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, args2);
+        protected /* synthetic */ LeafEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+            return this.fromJson(entryJson, context, weight, quality, conditions, functions);
         }
     }
 }

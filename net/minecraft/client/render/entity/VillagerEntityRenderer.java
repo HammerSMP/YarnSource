@@ -25,8 +25,8 @@ public class VillagerEntityRenderer
 extends MobEntityRenderer<VillagerEntity, VillagerResemblingModel<VillagerEntity>> {
     private static final Identifier TEXTURE = new Identifier("textures/entity/villager/villager.png");
 
-    public VillagerEntityRenderer(EntityRenderDispatcher arg, ReloadableResourceManager arg2) {
-        super(arg, new VillagerResemblingModel(0.0f), 0.5f);
+    public VillagerEntityRenderer(EntityRenderDispatcher dispatcher, ReloadableResourceManager arg2) {
+        super(dispatcher, new VillagerResemblingModel(0.0f), 0.5f);
         this.addFeature(new HeadFeatureRenderer<VillagerEntity, VillagerResemblingModel<VillagerEntity>>(this));
         this.addFeature(new VillagerClothingFeatureRenderer<VillagerEntity, VillagerResemblingModel<VillagerEntity>>(this, arg2, "villager"));
         this.addFeature(new VillagerHeldItemFeatureRenderer<VillagerEntity, VillagerResemblingModel<VillagerEntity>>(this));

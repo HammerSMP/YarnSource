@@ -22,9 +22,9 @@ extends LongRunningTask {
     private final RealmsConnect realmsConnect;
     private final net.minecraft.client.realms.dto.RealmsServerAddress a;
 
-    public RealmsConnectTask(Screen arg, net.minecraft.client.realms.dto.RealmsServerAddress arg2) {
-        this.a = arg2;
-        this.realmsConnect = new RealmsConnect(arg);
+    public RealmsConnectTask(Screen lastScreen, net.minecraft.client.realms.dto.RealmsServerAddress address) {
+        this.a = address;
+        this.realmsConnect = new RealmsConnect(lastScreen);
     }
 
     @Override

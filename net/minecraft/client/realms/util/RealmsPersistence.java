@@ -35,10 +35,10 @@ public class RealmsPersistence {
         }
     }
 
-    public static void writeFile(RealmsPersistenceData arg) {
+    public static void writeFile(RealmsPersistenceData data) {
         File file = RealmsPersistence.getFile();
         try {
-            FileUtils.writeStringToFile((File)file, (String)CHECKED_GSON.toJson(arg), (Charset)StandardCharsets.UTF_8);
+            FileUtils.writeStringToFile((File)file, (String)CHECKED_GSON.toJson(data), (Charset)StandardCharsets.UTF_8);
         }
         catch (IOException iOException) {
             // empty catch block

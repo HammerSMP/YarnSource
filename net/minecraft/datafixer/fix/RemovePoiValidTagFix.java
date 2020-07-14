@@ -22,8 +22,8 @@ import net.minecraft.datafixer.TypeReferences;
 
 public class RemovePoiValidTagFix
 extends DataFix {
-    public RemovePoiValidTagFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public RemovePoiValidTagFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     protected TypeRewriteRule makeRule() {

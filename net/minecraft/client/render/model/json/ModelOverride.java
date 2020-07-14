@@ -40,20 +40,20 @@ public class ModelOverride {
     private final Identifier modelId;
     private final Map<Identifier, Float> predicateToThresholds;
 
-    public ModelOverride(Identifier arg, Map<Identifier, Float> map) {
-        this.modelId = arg;
-        this.predicateToThresholds = map;
+    public ModelOverride(Identifier modelId, Map<Identifier, Float> predicateToThresholds) {
+        this.modelId = modelId;
+        this.predicateToThresholds = predicateToThresholds;
     }
 
     public Identifier getModelId() {
         return this.modelId;
     }
 
-    boolean matches(ItemStack arg, @Nullable ClientWorld arg2, @Nullable LivingEntity arg3) {
-        Item lv = arg.getItem();
+    boolean matches(ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity entity) {
+        Item lv = stack.getItem();
         for (Map.Entry<Identifier, Float> entry : this.predicateToThresholds.entrySet()) {
             ModelPredicateProvider lv2 = ModelPredicateProviderRegistry.get(lv, entry.getKey());
-            if (lv2 != null && !(lv2.call(arg, arg2, arg3) < entry.getValue().floatValue())) continue;
+            if (lv2 != null && !(lv2.call(stack, world, entity) < entry.getValue().floatValue())) continue;
             return false;
         }
         return true;
@@ -72,17 +72,17 @@ public class ModelOverride {
             return new ModelOverride(lv, map);
         }
 
-        protected Map<Identifier, Float> deserializeMinPropertyValues(JsonObject jsonObject) {
+        protected Map<Identifier, Float> deserializeMinPropertyValues(JsonObject object) {
             LinkedHashMap map = Maps.newLinkedHashMap();
-            JsonObject jsonObject2 = JsonHelper.getObject(jsonObject, "predicate");
+            JsonObject jsonObject2 = JsonHelper.getObject(object, "predicate");
             for (Map.Entry entry : jsonObject2.entrySet()) {
                 map.put(new Identifier((String)entry.getKey()), Float.valueOf(JsonHelper.asFloat((JsonElement)entry.getValue(), (String)entry.getKey())));
             }
             return map;
         }
 
-        public /* synthetic */ Object deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            return this.deserialize(jsonElement, type, jsonDeserializationContext);
+        public /* synthetic */ Object deserialize(JsonElement functionJson, Type unused, JsonDeserializationContext context) throws JsonParseException {
+            return this.deserialize(functionJson, unused, context);
         }
     }
 }

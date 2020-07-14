@@ -44,19 +44,19 @@ public enum ModelRotation implements ModelBakeSettings
     private final DirectionTransformation directionTransformation;
     private final int index;
 
-    private static int getIndex(int i, int j) {
-        return i * 360 + j;
+    private static int getIndex(int x, int y) {
+        return x * 360 + y;
     }
 
-    private ModelRotation(int j, int k) {
-        this.index = ModelRotation.getIndex(j, k);
-        Quaternion lv = new Quaternion(new Vector3f(0.0f, 1.0f, 0.0f), -k, true);
-        lv.hamiltonProduct(new Quaternion(new Vector3f(1.0f, 0.0f, 0.0f), -j, true));
+    private ModelRotation(int x, int y) {
+        this.index = ModelRotation.getIndex(x, y);
+        Quaternion lv = new Quaternion(new Vector3f(0.0f, 1.0f, 0.0f), -y, true);
+        lv.hamiltonProduct(new Quaternion(new Vector3f(1.0f, 0.0f, 0.0f), -x, true));
         DirectionTransformation lv2 = DirectionTransformation.IDENTITY;
-        for (int l = 0; l < k; l += 90) {
+        for (int l = 0; l < y; l += 90) {
             lv2 = lv2.prepend(DirectionTransformation.ROT_90_Y_NEG);
         }
-        for (int m = 0; m < j; m += 90) {
+        for (int m = 0; m < x; m += 90) {
             lv2 = lv2.prepend(DirectionTransformation.ROT_90_X_NEG);
         }
         this.rotation = new AffineTransformation(null, lv, null, null);
@@ -68,8 +68,8 @@ public enum ModelRotation implements ModelBakeSettings
         return this.rotation;
     }
 
-    public static ModelRotation get(int i, int j) {
-        return BY_INDEX.get(ModelRotation.getIndex(MathHelper.floorMod(i, 360), MathHelper.floorMod(j, 360)));
+    public static ModelRotation get(int x, int y) {
+        return BY_INDEX.get(ModelRotation.getIndex(MathHelper.floorMod(x, 360), MathHelper.floorMod(y, 360)));
     }
 
     static {

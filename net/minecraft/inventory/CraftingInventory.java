@@ -20,11 +20,11 @@ RecipeInputProvider {
     private final int height;
     private final ScreenHandler handler;
 
-    public CraftingInventory(ScreenHandler arg, int i, int j) {
-        this.stacks = DefaultedList.ofSize(i * j, ItemStack.EMPTY);
-        this.handler = arg;
-        this.width = i;
-        this.height = j;
+    public CraftingInventory(ScreenHandler handler, int width, int height) {
+        this.stacks = DefaultedList.ofSize(width * height, ItemStack.EMPTY);
+        this.handler = handler;
+        this.width = width;
+        this.height = height;
     }
 
     @Override
@@ -42,21 +42,21 @@ RecipeInputProvider {
     }
 
     @Override
-    public ItemStack getStack(int i) {
-        if (i >= this.size()) {
+    public ItemStack getStack(int slot) {
+        if (slot >= this.size()) {
             return ItemStack.EMPTY;
         }
-        return this.stacks.get(i);
+        return this.stacks.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int i) {
-        return Inventories.removeStack(this.stacks, i);
+    public ItemStack removeStack(int slot) {
+        return Inventories.removeStack(this.stacks, slot);
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
-        ItemStack lv = Inventories.splitStack(this.stacks, i, j);
+    public ItemStack removeStack(int slot, int amount) {
+        ItemStack lv = Inventories.splitStack(this.stacks, slot, amount);
         if (!lv.isEmpty()) {
             this.handler.onContentChanged(this);
         }
@@ -64,8 +64,8 @@ RecipeInputProvider {
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        this.stacks.set(i, arg);
+    public void setStack(int slot, ItemStack stack) {
+        this.stacks.set(slot, stack);
         this.handler.onContentChanged(this);
     }
 
@@ -74,7 +74,7 @@ RecipeInputProvider {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
+    public boolean canPlayerUse(PlayerEntity player) {
         return true;
     }
 
@@ -92,9 +92,9 @@ RecipeInputProvider {
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder arg) {
+    public void provideRecipeInputs(RecipeFinder finder) {
         for (ItemStack lv : this.stacks) {
-            arg.addNormalItem(lv);
+            finder.addNormalItem(lv);
         }
     }
 }

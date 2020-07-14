@@ -45,50 +45,50 @@ public class LootConditionTypes {
     public static final LootConditionType REFERENCE = LootConditionTypes.register("reference", new ReferenceLootCondition.Serializer());
     public static final LootConditionType TIME_CHECK = LootConditionTypes.register("time_check", new TimeCheckLootCondition.Serializer());
 
-    private static LootConditionType register(String string, JsonSerializer<? extends LootCondition> arg) {
-        return Registry.register(Registry.LOOT_CONDITION_TYPE, new Identifier(string), new LootConditionType(arg));
+    private static LootConditionType register(String id, JsonSerializer<? extends LootCondition> serializer) {
+        return Registry.register(Registry.LOOT_CONDITION_TYPE, new Identifier(id), new LootConditionType(serializer));
     }
 
     public static Object createGsonSerializer() {
         return JsonSerializing.createTypeHandler(Registry.LOOT_CONDITION_TYPE, "condition", "condition", LootCondition::getType).createGsonSerializer();
     }
 
-    public static <T> Predicate<T> joinAnd(Predicate<T>[] predicates) {
-        switch (predicates.length) {
+    public static <T> Predicate<T> joinAnd(Predicate<T>[] predicates2) {
+        switch (predicates2.length) {
             case 0: {
-                return object -> true;
+                return predicates -> true;
             }
             case 1: {
-                return predicates[0];
+                return predicates2[0];
             }
             case 2: {
-                return predicates[0].and(predicates[1]);
+                return predicates2[0].and(predicates2[1]);
             }
         }
-        return object -> {
-            for (Predicate predicate : predicates) {
-                if (predicate.test(object)) continue;
+        return operand -> {
+            for (Predicate predicate : predicates2) {
+                if (predicate.test(operand)) continue;
                 return false;
             }
             return true;
         };
     }
 
-    public static <T> Predicate<T> joinOr(Predicate<T>[] predicates) {
-        switch (predicates.length) {
+    public static <T> Predicate<T> joinOr(Predicate<T>[] predicates2) {
+        switch (predicates2.length) {
             case 0: {
-                return object -> false;
+                return predicates -> false;
             }
             case 1: {
-                return predicates[0];
+                return predicates2[0];
             }
             case 2: {
-                return predicates[0].or(predicates[1]);
+                return predicates2[0].or(predicates2[1]);
             }
         }
-        return object -> {
-            for (Predicate predicate : predicates) {
-                if (!predicate.test(object)) continue;
+        return operand -> {
+            for (Predicate predicate : predicates2) {
+                if (!predicate.test(operand)) continue;
                 return true;
             }
             return false;

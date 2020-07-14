@@ -74,14 +74,14 @@ AutoCloseable {
     private final GlShader vertexShader;
     private final GlShader fragmentShader;
 
-    public JsonGlProgram(ResourceManager arg, String string) throws IOException {
-        Identifier lv = new Identifier("shaders/program/" + string + ".json");
-        this.name = string;
+    public JsonGlProgram(ResourceManager resource, String name) throws IOException {
+        Identifier lv = new Identifier("shaders/program/" + name + ".json");
+        this.name = name;
         Resource lv2 = null;
         try {
             JsonArray jsonArray3;
             JsonArray jsonArray2;
-            lv2 = arg.getResource(lv);
+            lv2 = resource.getResource(lv);
             JsonObject jsonObject = JsonHelper.deserialize(new InputStreamReader(lv2.getInputStream(), StandardCharsets.UTF_8));
             String string2 = JsonHelper.getString(jsonObject, "vertex");
             String string3 = JsonHelper.getString(jsonObject, "fragment");
@@ -134,8 +134,8 @@ AutoCloseable {
                 }
             }
             this.blendState = JsonGlProgram.deserializeBlendState(JsonHelper.getObject(jsonObject, "blend", null));
-            this.vertexShader = JsonGlProgram.getShader(arg, GlShader.Type.VERTEX, string2);
-            this.fragmentShader = JsonGlProgram.getShader(arg, GlShader.Type.FRAGMENT, string3);
+            this.vertexShader = JsonGlProgram.getShader(resource, GlShader.Type.VERTEX, string2);
+            this.fragmentShader = JsonGlProgram.getShader(resource, GlShader.Type.FRAGMENT, string3);
             this.programRef = GlProgramManager.createProgram();
             GlProgramManager.linkProgram(this);
             this.finalizeUniformsAndSamplers();
@@ -160,13 +160,13 @@ AutoCloseable {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public static GlShader getShader(ResourceManager arg, GlShader.Type arg2, String string) throws IOException {
-        GlShader lv = arg2.getLoadedShaders().get(string);
+    public static GlShader getShader(ResourceManager resourceManager, GlShader.Type type, String name) throws IOException {
+        GlShader lv = type.getLoadedShaders().get(name);
         if (lv == null) {
-            Identifier lv2 = new Identifier("shaders/program/" + string + arg2.getFileExtension());
-            Resource lv3 = arg.getResource(lv2);
+            Identifier lv2 = new Identifier("shaders/program/" + name + type.getFileExtension());
+            Resource lv3 = resourceManager.getResource(lv2);
             try {
-                lv = GlShader.createFromResource(arg2, string, lv3.getInputStream());
+                lv = GlShader.createFromResource(type, name, lv3.getInputStream());
             }
             finally {
                 IOUtils.closeQuietly((Closeable)lv3);
@@ -175,8 +175,8 @@ AutoCloseable {
         return lv;
     }
 
-    public static GlBlendState deserializeBlendState(JsonObject jsonObject) {
-        if (jsonObject == null) {
+    public static GlBlendState deserializeBlendState(JsonObject json) {
+        if (json == null) {
             return new GlBlendState();
         }
         int i = 32774;
@@ -186,24 +186,24 @@ AutoCloseable {
         int m = 0;
         boolean bl = true;
         boolean bl2 = false;
-        if (JsonHelper.hasString(jsonObject, "func") && (i = GlBlendState.getFuncFromString(jsonObject.get("func").getAsString())) != 32774) {
+        if (JsonHelper.hasString(json, "func") && (i = GlBlendState.getFuncFromString(json.get("func").getAsString())) != 32774) {
             bl = false;
         }
-        if (JsonHelper.hasString(jsonObject, "srcrgb") && (j = GlBlendState.getComponentFromString(jsonObject.get("srcrgb").getAsString())) != 1) {
+        if (JsonHelper.hasString(json, "srcrgb") && (j = GlBlendState.getComponentFromString(json.get("srcrgb").getAsString())) != 1) {
             bl = false;
         }
-        if (JsonHelper.hasString(jsonObject, "dstrgb") && (k = GlBlendState.getComponentFromString(jsonObject.get("dstrgb").getAsString())) != 0) {
+        if (JsonHelper.hasString(json, "dstrgb") && (k = GlBlendState.getComponentFromString(json.get("dstrgb").getAsString())) != 0) {
             bl = false;
         }
-        if (JsonHelper.hasString(jsonObject, "srcalpha")) {
-            l = GlBlendState.getComponentFromString(jsonObject.get("srcalpha").getAsString());
+        if (JsonHelper.hasString(json, "srcalpha")) {
+            l = GlBlendState.getComponentFromString(json.get("srcalpha").getAsString());
             if (l != 1) {
                 bl = false;
             }
             bl2 = true;
         }
-        if (JsonHelper.hasString(jsonObject, "dstalpha")) {
-            m = GlBlendState.getComponentFromString(jsonObject.get("dstalpha").getAsString());
+        if (JsonHelper.hasString(json, "dstalpha")) {
+            m = GlBlendState.getComponentFromString(json.get("dstalpha").getAsString());
             if (m != 0) {
                 bl = false;
             }
@@ -270,14 +270,14 @@ AutoCloseable {
     }
 
     @Nullable
-    public GlUniform getUniformByName(String string) {
+    public GlUniform getUniformByName(String name) {
         RenderSystem.assertThread(RenderSystem::isOnRenderThread);
-        return this.uniformByName.get(string);
+        return this.uniformByName.get(name);
     }
 
-    public Uniform getUniformByNameOrDummy(String string) {
+    public Uniform getUniformByNameOrDummy(String name) {
         RenderSystem.assertThread(RenderSystem::isOnGameThread);
-        GlUniform lv = this.getUniformByName(string);
+        GlUniform lv = this.getUniformByName(name);
         return lv == null ? dummyUniform : lv;
     }
 
@@ -322,11 +322,11 @@ AutoCloseable {
         this.samplerNames.add(string);
     }
 
-    public void bindSampler(String string, IntSupplier intSupplier) {
-        if (this.samplerBinds.containsKey(string)) {
-            this.samplerBinds.remove(string);
+    public void bindSampler(String samplerName, IntSupplier intSupplier) {
+        if (this.samplerBinds.containsKey(samplerName)) {
+            this.samplerBinds.remove(samplerName);
         }
-        this.samplerBinds.put(string, intSupplier);
+        this.samplerBinds.put(samplerName, intSupplier);
         this.markUniformsDirty();
     }
 

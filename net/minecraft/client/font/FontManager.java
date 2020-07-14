@@ -156,18 +156,18 @@ implements AutoCloseable {
         }
 
         @Override
-        protected /* synthetic */ Object prepare(ResourceManager arg, Profiler arg2) {
-            return this.prepare(arg, arg2);
+        protected /* synthetic */ Object prepare(ResourceManager manager, Profiler profiler) {
+            return this.prepare(manager, profiler);
         }
     };
 
-    public FontManager(TextureManager arg2) {
-        this.textureManager = arg2;
-        this.missingStorage = Util.make(new FontStorage(arg2, MISSING_STORAGE_ID), arg -> arg.setFonts(Lists.newArrayList((Object[])new Font[]{new BlankFont()})));
+    public FontManager(TextureManager manager) {
+        this.textureManager = manager;
+        this.missingStorage = Util.make(new FontStorage(manager, MISSING_STORAGE_ID), arg -> arg.setFonts(Lists.newArrayList((Object[])new Font[]{new BlankFont()})));
     }
 
-    public void setIdOverrides(Map<Identifier, Identifier> map) {
-        this.idOverrides = map;
+    public void setIdOverrides(Map<Identifier, Identifier> overrides) {
+        this.idOverrides = overrides;
     }
 
     public TextRenderer createTextRenderer() {

@@ -25,8 +25,8 @@ public class InvertedLootCondition
 implements LootCondition {
     private final LootCondition term;
 
-    private InvertedLootCondition(LootCondition arg) {
-        this.term = arg;
+    private InvertedLootCondition(LootCondition term) {
+        this.term = term;
     }
 
     @Override
@@ -45,19 +45,19 @@ implements LootCondition {
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        LootCondition.super.validate(arg);
-        this.term.validate(arg);
+    public void validate(LootTableReporter reporter) {
+        LootCondition.super.validate(reporter);
+        this.term.validate(reporter);
     }
 
-    public static LootCondition.Builder builder(LootCondition.Builder arg) {
-        InvertedLootCondition lv = new InvertedLootCondition(arg.build());
+    public static LootCondition.Builder builder(LootCondition.Builder term) {
+        InvertedLootCondition lv = new InvertedLootCondition(term.build());
         return () -> lv;
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -74,8 +74,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

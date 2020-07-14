@@ -19,12 +19,12 @@ implements PairList {
     private final IntArrayList minValues;
     private final IntArrayList maxValues;
 
-    protected SimplePairList(DoubleList doubleList, DoubleList doubleList2, boolean bl, boolean bl2) {
+    protected SimplePairList(DoubleList first, DoubleList second, boolean includeFirstOnly, boolean includeSecondOnly) {
         int i = 0;
         int j = 0;
         double d = Double.NaN;
-        int k = doubleList.size();
-        int l = doubleList2.size();
+        int k = first.size();
+        int l = second.size();
         int m = k + l;
         this.valueIndices = new DoubleArrayList(m);
         this.minValues = new IntArrayList(m);
@@ -33,11 +33,11 @@ implements PairList {
             double e;
             boolean bl4;
             boolean bl3 = i < k;
-            boolean bl5 = bl4 = j < l;
+            boolean bl = bl4 = j < l;
             if (!bl3 && !bl4) break;
-            boolean bl52 = bl3 && (!bl4 || doubleList.getDouble(i) < doubleList2.getDouble(j) + 1.0E-7);
-            double d2 = e = bl52 ? doubleList.getDouble(i++) : doubleList2.getDouble(j++);
-            if ((i == 0 || !bl3) && !bl52 && !bl2 || (j == 0 || !bl4) && bl52 && !bl) continue;
+            boolean bl5 = bl3 && (!bl4 || first.getDouble(i) < second.getDouble(j) + 1.0E-7);
+            double d2 = e = bl5 ? first.getDouble(i++) : second.getDouble(j++);
+            if ((i == 0 || !bl3) && !bl5 && !includeSecondOnly || (j == 0 || !bl4) && bl5 && !includeFirstOnly) continue;
             if (!(d >= e - 1.0E-7)) {
                 this.minValues.add(i - 1);
                 this.maxValues.add(j - 1);
@@ -50,14 +50,14 @@ implements PairList {
             this.maxValues.set(this.maxValues.size() - 1, j - 1);
         } while (true);
         if (this.valueIndices.isEmpty()) {
-            this.valueIndices.add(Math.min(doubleList.getDouble(k - 1), doubleList2.getDouble(l - 1)));
+            this.valueIndices.add(Math.min(first.getDouble(k - 1), second.getDouble(l - 1)));
         }
     }
 
     @Override
-    public boolean forEachPair(PairList.Consumer arg) {
+    public boolean forEachPair(PairList.Consumer predicate) {
         for (int i = 0; i < this.valueIndices.size() - 1; ++i) {
-            if (arg.merge(this.minValues.getInt(i), this.maxValues.getInt(i), i)) continue;
+            if (predicate.merge(this.minValues.getInt(i), this.maxValues.getInt(i), i)) continue;
             return false;
         }
         return true;

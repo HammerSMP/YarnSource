@@ -39,63 +39,63 @@ implements Packet<ClientPlayPacketListener> {
     public EntitySpawnS2CPacket() {
     }
 
-    public EntitySpawnS2CPacket(int i, UUID uUID, double d, double e, double f, float g, float h, EntityType<?> arg, int j, Vec3d arg2) {
-        this.id = i;
-        this.uuid = uUID;
-        this.x = d;
-        this.y = e;
-        this.z = f;
-        this.pitch = MathHelper.floor(g * 256.0f / 360.0f);
-        this.yaw = MathHelper.floor(h * 256.0f / 360.0f);
-        this.entityTypeId = arg;
-        this.entityData = j;
-        this.velocityX = (int)(MathHelper.clamp(arg2.x, -3.9, 3.9) * 8000.0);
-        this.velocityY = (int)(MathHelper.clamp(arg2.y, -3.9, 3.9) * 8000.0);
-        this.velocityZ = (int)(MathHelper.clamp(arg2.z, -3.9, 3.9) * 8000.0);
+    public EntitySpawnS2CPacket(int id, UUID uuid, double x, double y, double z, float pitch, float yaw, EntityType<?> entityTypeId, int entityData, Vec3d velocity) {
+        this.id = id;
+        this.uuid = uuid;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.pitch = MathHelper.floor(pitch * 256.0f / 360.0f);
+        this.yaw = MathHelper.floor(yaw * 256.0f / 360.0f);
+        this.entityTypeId = entityTypeId;
+        this.entityData = entityData;
+        this.velocityX = (int)(MathHelper.clamp(velocity.x, -3.9, 3.9) * 8000.0);
+        this.velocityY = (int)(MathHelper.clamp(velocity.y, -3.9, 3.9) * 8000.0);
+        this.velocityZ = (int)(MathHelper.clamp(velocity.z, -3.9, 3.9) * 8000.0);
     }
 
-    public EntitySpawnS2CPacket(Entity arg) {
-        this(arg, 0);
+    public EntitySpawnS2CPacket(Entity entity) {
+        this(entity, 0);
     }
 
-    public EntitySpawnS2CPacket(Entity arg, int i) {
-        this(arg.getEntityId(), arg.getUuid(), arg.getX(), arg.getY(), arg.getZ(), arg.pitch, arg.yaw, arg.getType(), i, arg.getVelocity());
+    public EntitySpawnS2CPacket(Entity entity, int entityData) {
+        this(entity.getEntityId(), entity.getUuid(), entity.getX(), entity.getY(), entity.getZ(), entity.pitch, entity.yaw, entity.getType(), entityData, entity.getVelocity());
     }
 
-    public EntitySpawnS2CPacket(Entity arg, EntityType<?> arg2, int i, BlockPos arg3) {
-        this(arg.getEntityId(), arg.getUuid(), arg3.getX(), arg3.getY(), arg3.getZ(), arg.pitch, arg.yaw, arg2, i, arg.getVelocity());
-    }
-
-    @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
-        this.uuid = arg.readUuid();
-        this.entityTypeId = Registry.ENTITY_TYPE.get(arg.readVarInt());
-        this.x = arg.readDouble();
-        this.y = arg.readDouble();
-        this.z = arg.readDouble();
-        this.pitch = arg.readByte();
-        this.yaw = arg.readByte();
-        this.entityData = arg.readInt();
-        this.velocityX = arg.readShort();
-        this.velocityY = arg.readShort();
-        this.velocityZ = arg.readShort();
+    public EntitySpawnS2CPacket(Entity entity, EntityType<?> entityType, int data, BlockPos pos) {
+        this(entity.getEntityId(), entity.getUuid(), pos.getX(), pos.getY(), pos.getZ(), entity.pitch, entity.yaw, entityType, data, entity.getVelocity());
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
-        arg.writeUuid(this.uuid);
-        arg.writeVarInt(Registry.ENTITY_TYPE.getRawId(this.entityTypeId));
-        arg.writeDouble(this.x);
-        arg.writeDouble(this.y);
-        arg.writeDouble(this.z);
-        arg.writeByte(this.pitch);
-        arg.writeByte(this.yaw);
-        arg.writeInt(this.entityData);
-        arg.writeShort(this.velocityX);
-        arg.writeShort(this.velocityY);
-        arg.writeShort(this.velocityZ);
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
+        this.uuid = buf.readUuid();
+        this.entityTypeId = Registry.ENTITY_TYPE.get(buf.readVarInt());
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.pitch = buf.readByte();
+        this.yaw = buf.readByte();
+        this.entityData = buf.readInt();
+        this.velocityX = buf.readShort();
+        this.velocityY = buf.readShort();
+        this.velocityZ = buf.readShort();
+    }
+
+    @Override
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
+        buf.writeUuid(this.uuid);
+        buf.writeVarInt(Registry.ENTITY_TYPE.getRawId(this.entityTypeId));
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeByte(this.pitch);
+        buf.writeByte(this.yaw);
+        buf.writeInt(this.entityData);
+        buf.writeShort(this.velocityX);
+        buf.writeShort(this.velocityY);
+        buf.writeShort(this.velocityZ);
     }
 
     @Override

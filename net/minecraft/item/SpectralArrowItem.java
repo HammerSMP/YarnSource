@@ -18,8 +18,8 @@ extends ArrowItem {
     }
 
     @Override
-    public PersistentProjectileEntity createArrow(World arg, ItemStack arg2, LivingEntity arg3) {
-        return new SpectralArrowEntity(arg, arg3);
+    public PersistentProjectileEntity createArrow(World world, ItemStack stack, LivingEntity shooter) {
+        return new SpectralArrowEntity(world, shooter);
     }
 }
 

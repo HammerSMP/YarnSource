@@ -21,24 +21,24 @@ public class BiomeLayerSampler {
     private static final Logger LOGGER = LogManager.getLogger();
     private final CachingLayerSampler sampler;
 
-    public BiomeLayerSampler(LayerFactory<CachingLayerSampler> arg) {
-        this.sampler = arg.make();
+    public BiomeLayerSampler(LayerFactory<CachingLayerSampler> layerFactory) {
+        this.sampler = layerFactory.make();
     }
 
-    private Biome getBiome(int i) {
-        Biome lv = (Biome)BuiltinRegistries.BIOME.get(i);
+    private Biome getBiome(int id) {
+        Biome lv = (Biome)BuiltinRegistries.BIOME.get(id);
         if (lv == null) {
             if (SharedConstants.isDevelopment) {
-                throw Util.throwOrPause(new IllegalStateException("Unknown biome id: " + i));
+                throw Util.throwOrPause(new IllegalStateException("Unknown biome id: " + id));
             }
-            LOGGER.warn("Unknown biome id: ", (Object)i);
+            LOGGER.warn("Unknown biome id: ", (Object)id);
             return Biomes.DEFAULT;
         }
         return lv;
     }
 
-    public Biome sample(int i, int j) {
-        return this.getBiome(this.sampler.sample(i, j));
+    public Biome sample(int x, int y) {
+        return this.getBiome(this.sampler.sample(x, y));
     }
 }
 

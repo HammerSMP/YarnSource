@@ -23,20 +23,20 @@ extends PersistentState {
     }
 
     @Override
-    public void fromTag(CompoundTag arg) {
+    public void fromTag(CompoundTag tag) {
         this.idCounts.clear();
-        for (String string : arg.getKeys()) {
-            if (!arg.contains(string, 99)) continue;
-            this.idCounts.put((Object)string, arg.getInt(string));
+        for (String string : tag.getKeys()) {
+            if (!tag.contains(string, 99)) continue;
+            this.idCounts.put((Object)string, tag.getInt(string));
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
+    public CompoundTag toTag(CompoundTag tag) {
         for (Object2IntMap.Entry entry : this.idCounts.object2IntEntrySet()) {
-            arg.putInt((String)entry.getKey(), entry.getIntValue());
+            tag.putInt((String)entry.getKey(), entry.getIntValue());
         }
-        return arg;
+        return tag;
     }
 
     public int getNextMapId() {

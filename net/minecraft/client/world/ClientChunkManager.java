@@ -47,11 +47,11 @@ extends ChunkManager {
     private volatile ClientChunkMap chunks;
     private final ClientWorld world;
 
-    public ClientChunkManager(ClientWorld arg, int i) {
-        this.world = arg;
-        this.emptyChunk = new EmptyChunk((World)arg, new ChunkPos(0, 0));
-        this.lightingProvider = new LightingProvider(this, true, arg.getDimension().hasSkyLight());
-        this.chunks = new ClientChunkMap(ClientChunkManager.getChunkMapRadius(i));
+    public ClientChunkManager(ClientWorld world, int loadDistance) {
+        this.world = world;
+        this.emptyChunk = new EmptyChunk((World)world, new ChunkPos(0, 0));
+        this.lightingProvider = new LightingProvider(this, true, world.getDimension().hasSkyLight());
+        this.chunks = new ClientChunkMap(ClientChunkManager.getChunkMapRadius(loadDistance));
     }
 
     @Override
@@ -59,21 +59,21 @@ extends ChunkManager {
         return this.lightingProvider;
     }
 
-    private static boolean positionEquals(@Nullable WorldChunk arg, int i, int j) {
-        if (arg == null) {
+    private static boolean positionEquals(@Nullable WorldChunk chunk, int x, int y) {
+        if (chunk == null) {
             return false;
         }
-        ChunkPos lv = arg.getPos();
-        return lv.x == i && lv.z == j;
+        ChunkPos lv = chunk.getPos();
+        return lv.x == x && lv.z == y;
     }
 
-    public void unload(int i, int j) {
-        if (!this.chunks.isInRadius(i, j)) {
+    public void unload(int chunkX, int chunkZ) {
+        if (!this.chunks.isInRadius(chunkX, chunkZ)) {
             return;
         }
-        int k = this.chunks.getIndex(i, j);
+        int k = this.chunks.getIndex(chunkX, chunkZ);
         WorldChunk lv = this.chunks.getChunk(k);
-        if (ClientChunkManager.positionEquals(lv, i, j)) {
+        if (ClientChunkManager.positionEquals(lv, chunkX, chunkZ)) {
             this.chunks.compareAndSet(k, lv, null);
         }
     }
@@ -97,47 +97,47 @@ extends ChunkManager {
     }
 
     @Nullable
-    public WorldChunk loadChunkFromPacket(int i, int j, @Nullable BiomeArray arg, PacketByteBuf arg2, CompoundTag arg3, int k, boolean bl) {
-        if (!this.chunks.isInRadius(i, j)) {
-            LOGGER.warn("Ignoring chunk since it's not in the view range: {}, {}", (Object)i, (Object)j);
+    public WorldChunk loadChunkFromPacket(int x, int z, @Nullable BiomeArray biomes, PacketByteBuf buf, CompoundTag tag, int verticalStripBitmask, boolean complete) {
+        if (!this.chunks.isInRadius(x, z)) {
+            LOGGER.warn("Ignoring chunk since it's not in the view range: {}, {}", (Object)x, (Object)z);
             return null;
         }
-        int l = this.chunks.getIndex(i, j);
+        int l = this.chunks.getIndex(x, z);
         WorldChunk lv = (WorldChunk)this.chunks.chunks.get(l);
-        if (bl || !ClientChunkManager.positionEquals(lv, i, j)) {
-            if (arg == null) {
-                LOGGER.warn("Ignoring chunk since we don't have complete data: {}, {}", (Object)i, (Object)j);
+        if (complete || !ClientChunkManager.positionEquals(lv, x, z)) {
+            if (biomes == null) {
+                LOGGER.warn("Ignoring chunk since we don't have complete data: {}, {}", (Object)x, (Object)z);
                 return null;
             }
-            lv = new WorldChunk(this.world, new ChunkPos(i, j), arg);
-            lv.loadFromPacket(arg, arg2, arg3, k);
+            lv = new WorldChunk(this.world, new ChunkPos(x, z), biomes);
+            lv.loadFromPacket(biomes, buf, tag, verticalStripBitmask);
             this.chunks.set(l, lv);
         } else {
-            lv.loadFromPacket(arg, arg2, arg3, k);
+            lv.loadFromPacket(biomes, buf, tag, verticalStripBitmask);
         }
         ChunkSection[] lvs = lv.getSectionArray();
         LightingProvider lv2 = this.getLightingProvider();
-        lv2.setLightEnabled(new ChunkPos(i, j), true);
+        lv2.setColumnEnabled(new ChunkPos(x, z), true);
         for (int m = 0; m < lvs.length; ++m) {
             ChunkSection lv3 = lvs[m];
-            lv2.updateSectionStatus(ChunkSectionPos.from(i, m, j), ChunkSection.isEmpty(lv3));
+            lv2.setSectionStatus(ChunkSectionPos.from(x, m, z), ChunkSection.isEmpty(lv3));
         }
-        this.world.resetChunkColor(i, j);
+        this.world.resetChunkColor(x, z);
         return lv;
     }
 
-    public void tick(BooleanSupplier booleanSupplier) {
+    public void tick(BooleanSupplier shouldKeepTicking) {
     }
 
-    public void setChunkMapCenter(int i, int j) {
-        this.chunks.centerChunkX = i;
-        this.chunks.centerChunkZ = j;
+    public void setChunkMapCenter(int x, int z) {
+        this.chunks.centerChunkX = x;
+        this.chunks.centerChunkZ = z;
     }
 
-    public void updateLoadDistance(int i) {
+    public void updateLoadDistance(int loadDistance) {
         int k;
         int j = this.chunks.radius;
-        if (j != (k = ClientChunkManager.getChunkMapRadius(i))) {
+        if (j != (k = ClientChunkManager.getChunkMapRadius(loadDistance))) {
             ClientChunkMap lv = new ClientChunkMap(k);
             lv.centerChunkX = this.chunks.centerChunkX;
             lv.centerChunkZ = this.chunks.centerChunkZ;
@@ -152,8 +152,8 @@ extends ChunkManager {
         }
     }
 
-    private static int getChunkMapRadius(int i) {
-        return Math.max(2, i) + 3;
+    private static int getChunkMapRadius(int loadDistance) {
+        return Math.max(2, loadDistance) + 3;
     }
 
     @Override
@@ -166,29 +166,29 @@ extends ChunkManager {
     }
 
     @Override
-    public void onLightUpdate(LightType arg, ChunkSectionPos arg2) {
-        MinecraftClient.getInstance().worldRenderer.scheduleBlockRender(arg2.getSectionX(), arg2.getSectionY(), arg2.getSectionZ());
+    public void onLightUpdate(LightType type, ChunkSectionPos pos) {
+        MinecraftClient.getInstance().worldRenderer.scheduleBlockRender(pos.getSectionX(), pos.getSectionY(), pos.getSectionZ());
     }
 
     @Override
-    public boolean shouldTickBlock(BlockPos arg) {
-        return this.isChunkLoaded(arg.getX() >> 4, arg.getZ() >> 4);
+    public boolean shouldTickBlock(BlockPos pos) {
+        return this.isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
     @Override
-    public boolean shouldTickChunk(ChunkPos arg) {
-        return this.isChunkLoaded(arg.x, arg.z);
+    public boolean shouldTickChunk(ChunkPos pos) {
+        return this.isChunkLoaded(pos.x, pos.z);
     }
 
     @Override
-    public boolean shouldTickEntity(Entity arg) {
-        return this.isChunkLoaded(MathHelper.floor(arg.getX()) >> 4, MathHelper.floor(arg.getZ()) >> 4);
+    public boolean shouldTickEntity(Entity entity) {
+        return this.isChunkLoaded(MathHelper.floor(entity.getX()) >> 4, MathHelper.floor(entity.getZ()) >> 4);
     }
 
     @Override
     @Nullable
-    public /* synthetic */ Chunk getChunk(int i, int j, ChunkStatus arg, boolean bl) {
-        return this.getChunk(i, j, arg, bl);
+    public /* synthetic */ Chunk getChunk(int x, int z, ChunkStatus leastStatus, boolean create) {
+        return this.getChunk(x, z, leastStatus, create);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -200,42 +200,42 @@ extends ChunkManager {
         private volatile int centerChunkZ;
         private int loadedChunkCount;
 
-        private ClientChunkMap(int i) {
-            this.radius = i;
-            this.diameter = i * 2 + 1;
+        private ClientChunkMap(int loadDistance) {
+            this.radius = loadDistance;
+            this.diameter = loadDistance * 2 + 1;
             this.chunks = new AtomicReferenceArray(this.diameter * this.diameter);
         }
 
-        private int getIndex(int i, int j) {
-            return Math.floorMod(j, this.diameter) * this.diameter + Math.floorMod(i, this.diameter);
+        private int getIndex(int chunkX, int chunkZ) {
+            return Math.floorMod(chunkZ, this.diameter) * this.diameter + Math.floorMod(chunkX, this.diameter);
         }
 
-        protected void set(int i, @Nullable WorldChunk arg) {
-            WorldChunk lv = this.chunks.getAndSet(i, arg);
+        protected void set(int index, @Nullable WorldChunk chunk) {
+            WorldChunk lv = this.chunks.getAndSet(index, chunk);
             if (lv != null) {
                 --this.loadedChunkCount;
                 ClientChunkManager.this.world.unloadBlockEntities(lv);
             }
-            if (arg != null) {
+            if (chunk != null) {
                 ++this.loadedChunkCount;
             }
         }
 
-        protected WorldChunk compareAndSet(int i, WorldChunk arg, @Nullable WorldChunk arg2) {
-            if (this.chunks.compareAndSet(i, arg, arg2) && arg2 == null) {
+        protected WorldChunk compareAndSet(int index, WorldChunk expect, @Nullable WorldChunk update) {
+            if (this.chunks.compareAndSet(index, expect, update) && update == null) {
                 --this.loadedChunkCount;
             }
-            ClientChunkManager.this.world.unloadBlockEntities(arg);
-            return arg;
+            ClientChunkManager.this.world.unloadBlockEntities(expect);
+            return expect;
         }
 
-        private boolean isInRadius(int i, int j) {
-            return Math.abs(i - this.centerChunkX) <= this.radius && Math.abs(j - this.centerChunkZ) <= this.radius;
+        private boolean isInRadius(int chunkX, int chunkZ) {
+            return Math.abs(chunkX - this.centerChunkX) <= this.radius && Math.abs(chunkZ - this.centerChunkZ) <= this.radius;
         }
 
         @Nullable
-        protected WorldChunk getChunk(int i) {
-            return this.chunks.get(i);
+        protected WorldChunk getChunk(int index) {
+            return this.chunks.get(index);
         }
     }
 }

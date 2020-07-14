@@ -14,8 +14,8 @@ public class MoveIntoWaterGoal
 extends Goal {
     private final PathAwareEntity mob;
 
-    public MoveIntoWaterGoal(PathAwareEntity arg) {
-        this.mob = arg;
+    public MoveIntoWaterGoal(PathAwareEntity mob) {
+        this.mob = mob;
     }
 
     @Override

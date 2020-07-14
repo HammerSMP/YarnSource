@@ -49,13 +49,13 @@ extends ConditionalLootFunction {
     private final int searchRadius;
     private final boolean skipExistingChunks;
 
-    private ExplorationMapLootFunction(LootCondition[] args, StructureFeature<?> arg, MapIcon.Type arg2, byte b, int i, boolean bl) {
-        super(args);
+    private ExplorationMapLootFunction(LootCondition[] conditions, StructureFeature<?> arg, MapIcon.Type decoration, byte zoom, int searchRadius, boolean skipExistingChunks) {
+        super(conditions);
         this.destination = arg;
-        this.decoration = arg2;
-        this.zoom = b;
-        this.searchRadius = i;
-        this.skipExistingChunks = bl;
+        this.decoration = decoration;
+        this.zoom = zoom;
+        this.searchRadius = searchRadius;
+        this.skipExistingChunks = skipExistingChunks;
     }
 
     @Override
@@ -69,21 +69,21 @@ extends ConditionalLootFunction {
     }
 
     @Override
-    public ItemStack process(ItemStack arg, LootContext arg2) {
+    public ItemStack process(ItemStack stack, LootContext context) {
         ServerWorld lv2;
         BlockPos lv3;
-        if (arg.getItem() != Items.MAP) {
-            return arg;
+        if (stack.getItem() != Items.MAP) {
+            return stack;
         }
-        BlockPos lv = arg2.get(LootContextParameters.POSITION);
-        if (lv != null && (lv3 = (lv2 = arg2.getWorld()).locateStructure(this.destination, lv, this.searchRadius, this.skipExistingChunks)) != null) {
+        BlockPos lv = context.get(LootContextParameters.POSITION);
+        if (lv != null && (lv3 = (lv2 = context.getWorld()).locateStructure(this.destination, lv, this.searchRadius, this.skipExistingChunks)) != null) {
             ItemStack lv4 = FilledMapItem.createMap(lv2, lv3.getX(), lv3.getZ(), this.zoom, true, true);
             FilledMapItem.fillExplorationMap(lv2, lv4);
             MapState.addDecorationsTag(lv4, lv3, "+", this.decoration);
             lv4.setCustomName(new TranslatableText("filled_map." + this.destination.getName().toLowerCase(Locale.ROOT)));
             return lv4;
         }
-        return arg;
+        return stack;
     }
 
     public static Builder create() {
@@ -139,8 +139,8 @@ extends ConditionalLootFunction {
         }
 
         @Override
-        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, LootCondition[] args) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, args);
+        public /* synthetic */ ConditionalLootFunction fromJson(JsonObject json, JsonDeserializationContext context, LootCondition[] conditions) {
+            return this.fromJson(json, context, conditions);
         }
     }
 
@@ -162,18 +162,18 @@ extends ConditionalLootFunction {
             return this;
         }
 
-        public Builder withDecoration(MapIcon.Type arg) {
-            this.decoration = arg;
+        public Builder withDecoration(MapIcon.Type decoration) {
+            this.decoration = decoration;
             return this;
         }
 
-        public Builder withZoom(byte b) {
-            this.zoom = b;
+        public Builder withZoom(byte zoom) {
+            this.zoom = zoom;
             return this;
         }
 
-        public Builder withSkipExistingChunks(boolean bl) {
-            this.skipExistingChunks = bl;
+        public Builder withSkipExistingChunks(boolean skipExistingChunks) {
+            this.skipExistingChunks = skipExistingChunks;
             return this;
         }
 

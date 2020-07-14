@@ -22,15 +22,15 @@ extends MovingSoundInstance {
     private final AbstractMinecartEntity minecart;
     private float distance = 0.0f;
 
-    public MovingMinecartSoundInstance(AbstractMinecartEntity arg) {
+    public MovingMinecartSoundInstance(AbstractMinecartEntity minecart) {
         super(SoundEvents.ENTITY_MINECART_RIDING, SoundCategory.NEUTRAL);
-        this.minecart = arg;
+        this.minecart = minecart;
         this.repeat = true;
         this.repeatDelay = 0;
         this.volume = 0.0f;
-        this.x = (float)arg.getX();
-        this.y = (float)arg.getY();
-        this.z = (float)arg.getZ();
+        this.x = (float)minecart.getX();
+        this.y = (float)minecart.getY();
+        this.z = (float)minecart.getZ();
     }
 
     @Override

@@ -29,53 +29,53 @@ import net.minecraft.util.JsonHelper;
 public class AdvancementCriterion {
     private final CriterionConditions conditions;
 
-    public AdvancementCriterion(CriterionConditions arg) {
-        this.conditions = arg;
+    public AdvancementCriterion(CriterionConditions conditions) {
+        this.conditions = conditions;
     }
 
     public AdvancementCriterion() {
         this.conditions = null;
     }
 
-    public void toPacket(PacketByteBuf arg) {
+    public void toPacket(PacketByteBuf buf) {
     }
 
-    public static AdvancementCriterion fromJson(JsonObject jsonObject, AdvancementEntityPredicateDeserializer arg) {
-        Identifier lv = new Identifier(JsonHelper.getString(jsonObject, "trigger"));
+    public static AdvancementCriterion fromJson(JsonObject obj, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        Identifier lv = new Identifier(JsonHelper.getString(obj, "trigger"));
         Criterion lv2 = Criteria.getById(lv);
         if (lv2 == null) {
             throw new JsonSyntaxException("Invalid criterion trigger: " + lv);
         }
-        Object lv3 = lv2.conditionsFromJson(JsonHelper.getObject(jsonObject, "conditions", new JsonObject()), arg);
+        Object lv3 = lv2.conditionsFromJson(JsonHelper.getObject(obj, "conditions", new JsonObject()), predicateDeserializer);
         return new AdvancementCriterion((CriterionConditions)lv3);
     }
 
-    public static AdvancementCriterion fromPacket(PacketByteBuf arg) {
+    public static AdvancementCriterion fromPacket(PacketByteBuf buf) {
         return new AdvancementCriterion();
     }
 
-    public static Map<String, AdvancementCriterion> criteriaFromJson(JsonObject jsonObject, AdvancementEntityPredicateDeserializer arg) {
+    public static Map<String, AdvancementCriterion> criteriaFromJson(JsonObject obj, AdvancementEntityPredicateDeserializer predicateDeserializer) {
         HashMap map = Maps.newHashMap();
-        for (Map.Entry entry : jsonObject.entrySet()) {
-            map.put(entry.getKey(), AdvancementCriterion.fromJson(JsonHelper.asObject((JsonElement)entry.getValue(), "criterion"), arg));
+        for (Map.Entry entry : obj.entrySet()) {
+            map.put(entry.getKey(), AdvancementCriterion.fromJson(JsonHelper.asObject((JsonElement)entry.getValue(), "criterion"), predicateDeserializer));
         }
         return map;
     }
 
-    public static Map<String, AdvancementCriterion> criteriaFromPacket(PacketByteBuf arg) {
+    public static Map<String, AdvancementCriterion> criteriaFromPacket(PacketByteBuf buf) {
         HashMap map = Maps.newHashMap();
-        int i = arg.readVarInt();
+        int i = buf.readVarInt();
         for (int j = 0; j < i; ++j) {
-            map.put(arg.readString(32767), AdvancementCriterion.fromPacket(arg));
+            map.put(buf.readString(32767), AdvancementCriterion.fromPacket(buf));
         }
         return map;
     }
 
-    public static void criteriaToPacket(Map<String, AdvancementCriterion> map, PacketByteBuf arg) {
-        arg.writeVarInt(map.size());
-        for (Map.Entry<String, AdvancementCriterion> entry : map.entrySet()) {
-            arg.writeString(entry.getKey());
-            entry.getValue().toPacket(arg);
+    public static void criteriaToPacket(Map<String, AdvancementCriterion> criteria, PacketByteBuf buf) {
+        buf.writeVarInt(criteria.size());
+        for (Map.Entry<String, AdvancementCriterion> entry : criteria.entrySet()) {
+            buf.writeString(entry.getKey());
+            entry.getValue().toPacket(buf);
         }
     }
 

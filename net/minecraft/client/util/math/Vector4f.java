@@ -24,25 +24,25 @@ public class Vector4f {
     public Vector4f() {
     }
 
-    public Vector4f(float f, float g, float h, float i) {
-        this.x = f;
-        this.y = g;
-        this.z = h;
-        this.w = i;
+    public Vector4f(float x, float y, float z, float w) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
     }
 
-    public Vector4f(Vector3f arg) {
-        this(arg.getX(), arg.getY(), arg.getZ(), 1.0f);
+    public Vector4f(Vector3f vector) {
+        this(vector.getX(), vector.getY(), vector.getZ(), 1.0f);
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (object == null || this.getClass() != object.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        Vector4f lv = (Vector4f)object;
+        Vector4f lv = (Vector4f)o;
         if (Float.compare(lv.x, this.x) != 0) {
             return false;
         }
@@ -79,21 +79,21 @@ public class Vector4f {
         return this.w;
     }
 
-    public void multiplyComponentwise(Vector3f arg) {
-        this.x *= arg.getX();
-        this.y *= arg.getY();
-        this.z *= arg.getZ();
+    public void multiplyComponentwise(Vector3f vector) {
+        this.x *= vector.getX();
+        this.y *= vector.getY();
+        this.z *= vector.getZ();
     }
 
-    public void set(float f, float g, float h, float i) {
-        this.x = f;
-        this.y = g;
-        this.z = h;
-        this.w = i;
+    public void set(float x, float y, float z, float w) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
     }
 
-    public float dotProduct(Vector4f arg) {
-        return this.x * arg.x + this.y * arg.y + this.z * arg.z + this.w * arg.w;
+    public float dotProduct(Vector4f other) {
+        return this.x * other.x + this.y * other.y + this.z * other.z + this.w * other.w;
     }
 
     public boolean normalize() {
@@ -109,21 +109,21 @@ public class Vector4f {
         return true;
     }
 
-    public void transform(Matrix4f arg) {
+    public void transform(Matrix4f matrix) {
         float f = this.x;
         float g = this.y;
         float h = this.z;
         float i = this.w;
-        this.x = arg.a00 * f + arg.a01 * g + arg.a02 * h + arg.a03 * i;
-        this.y = arg.a10 * f + arg.a11 * g + arg.a12 * h + arg.a13 * i;
-        this.z = arg.a20 * f + arg.a21 * g + arg.a22 * h + arg.a23 * i;
-        this.w = arg.a30 * f + arg.a31 * g + arg.a32 * h + arg.a33 * i;
+        this.x = matrix.a00 * f + matrix.a01 * g + matrix.a02 * h + matrix.a03 * i;
+        this.y = matrix.a10 * f + matrix.a11 * g + matrix.a12 * h + matrix.a13 * i;
+        this.z = matrix.a20 * f + matrix.a21 * g + matrix.a22 * h + matrix.a23 * i;
+        this.w = matrix.a30 * f + matrix.a31 * g + matrix.a32 * h + matrix.a33 * i;
     }
 
-    public void rotate(Quaternion arg) {
-        Quaternion lv = new Quaternion(arg);
+    public void rotate(Quaternion rotation) {
+        Quaternion lv = new Quaternion(rotation);
         lv.hamiltonProduct(new Quaternion(this.getX(), this.getY(), this.getZ(), 0.0f));
-        Quaternion lv2 = new Quaternion(arg);
+        Quaternion lv2 = new Quaternion(rotation);
         lv2.conjugate();
         lv.hamiltonProduct(lv2);
         this.set(lv.getX(), lv.getY(), lv.getZ(), this.getW());

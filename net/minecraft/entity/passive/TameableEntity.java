@@ -52,22 +52,22 @@ extends AnimalEntity {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.getOwnerUuid() != null) {
-            arg.putUuid("Owner", this.getOwnerUuid());
+            tag.putUuid("Owner", this.getOwnerUuid());
         }
-        arg.putBoolean("Sitting", this.sitting);
+        tag.putBoolean("Sitting", this.sitting);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
+    public void readCustomDataFromTag(CompoundTag tag) {
         UUID uUID2;
-        super.readCustomDataFromTag(arg);
-        if (arg.containsUuid("Owner")) {
-            UUID uUID = arg.getUuid("Owner");
+        super.readCustomDataFromTag(tag);
+        if (tag.containsUuid("Owner")) {
+            UUID uUID = tag.getUuid("Owner");
         } else {
-            String string = arg.getString("Owner");
+            String string = tag.getString("Owner");
             uUID2 = ServerConfigHandler.getPlayerUuidByName(this.getServer(), string);
         }
         if (uUID2 != null) {
@@ -79,19 +79,19 @@ extends AnimalEntity {
                 this.setTamed(false);
             }
         }
-        this.sitting = arg.getBoolean("Sitting");
+        this.sitting = tag.getBoolean("Sitting");
         this.setInSittingPose(this.sitting);
     }
 
     @Override
-    public boolean canBeLeashedBy(PlayerEntity arg) {
+    public boolean canBeLeashedBy(PlayerEntity player) {
         return !this.isLeashed();
     }
 
     @Environment(value=EnvType.CLIENT)
-    protected void showEmoteParticle(boolean bl) {
+    protected void showEmoteParticle(boolean positive) {
         DefaultParticleType lv = ParticleTypes.HEART;
-        if (!bl) {
+        if (!positive) {
             lv = ParticleTypes.SMOKE;
         }
         for (int i = 0; i < 7; ++i) {
@@ -104,13 +104,13 @@ extends AnimalEntity {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public void handleStatus(byte b) {
-        if (b == 7) {
+    public void handleStatus(byte status) {
+        if (status == 7) {
             this.showEmoteParticle(true);
-        } else if (b == 6) {
+        } else if (status == 6) {
             this.showEmoteParticle(false);
         } else {
-            super.handleStatus(b);
+            super.handleStatus(status);
         }
     }
 
@@ -118,9 +118,9 @@ extends AnimalEntity {
         return (this.dataTracker.get(TAMEABLE_FLAGS) & 4) != 0;
     }
 
-    public void setTamed(boolean bl) {
+    public void setTamed(boolean tamed) {
         byte b = this.dataTracker.get(TAMEABLE_FLAGS);
-        if (bl) {
+        if (tamed) {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 4));
         } else {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & 0xFFFFFFFB));
@@ -135,9 +135,9 @@ extends AnimalEntity {
         return (this.dataTracker.get(TAMEABLE_FLAGS) & 1) != 0;
     }
 
-    public void setInSittingPose(boolean bl) {
+    public void setInSittingPose(boolean inSittingPose) {
         byte b = this.dataTracker.get(TAMEABLE_FLAGS);
-        if (bl) {
+        if (inSittingPose) {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b | 1));
         } else {
             this.dataTracker.set(TAMEABLE_FLAGS, (byte)(b & 0xFFFFFFFE));
@@ -149,15 +149,15 @@ extends AnimalEntity {
         return this.dataTracker.get(OWNER_UUID).orElse(null);
     }
 
-    public void setOwnerUuid(@Nullable UUID uUID) {
-        this.dataTracker.set(OWNER_UUID, Optional.ofNullable(uUID));
+    public void setOwnerUuid(@Nullable UUID uuid) {
+        this.dataTracker.set(OWNER_UUID, Optional.ofNullable(uuid));
     }
 
-    public void setOwner(PlayerEntity arg) {
+    public void setOwner(PlayerEntity player) {
         this.setTamed(true);
-        this.setOwnerUuid(arg.getUuid());
-        if (arg instanceof ServerPlayerEntity) {
-            Criteria.TAME_ANIMAL.trigger((ServerPlayerEntity)arg, this);
+        this.setOwnerUuid(player.getUuid());
+        if (player instanceof ServerPlayerEntity) {
+            Criteria.TAME_ANIMAL.trigger((ServerPlayerEntity)player, this);
         }
     }
 
@@ -176,18 +176,18 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean canTarget(LivingEntity arg) {
-        if (this.isOwner(arg)) {
+    public boolean canTarget(LivingEntity target) {
+        if (this.isOwner(target)) {
             return false;
         }
-        return super.canTarget(arg);
+        return super.canTarget(target);
     }
 
-    public boolean isOwner(LivingEntity arg) {
-        return arg == this.getOwner();
+    public boolean isOwner(LivingEntity entity) {
+        return entity == this.getOwner();
     }
 
-    public boolean canAttackWithOwner(LivingEntity arg, LivingEntity arg2) {
+    public boolean canAttackWithOwner(LivingEntity target, LivingEntity owner) {
         return true;
     }
 
@@ -201,33 +201,33 @@ extends AnimalEntity {
     }
 
     @Override
-    public boolean isTeammate(Entity arg) {
+    public boolean isTeammate(Entity other) {
         if (this.isTamed()) {
             LivingEntity lv = this.getOwner();
-            if (arg == lv) {
+            if (other == lv) {
                 return true;
             }
             if (lv != null) {
-                return lv.isTeammate(arg);
+                return lv.isTeammate(other);
             }
         }
-        return super.isTeammate(arg);
+        return super.isTeammate(other);
     }
 
     @Override
-    public void onDeath(DamageSource arg) {
+    public void onDeath(DamageSource source) {
         if (!this.world.isClient && this.world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES) && this.getOwner() instanceof ServerPlayerEntity) {
             this.getOwner().sendSystemMessage(this.getDamageTracker().getDeathMessage(), Util.NIL_UUID);
         }
-        super.onDeath(arg);
+        super.onDeath(source);
     }
 
     public boolean isSitting() {
         return this.sitting;
     }
 
-    public void setSitting(boolean bl) {
-        this.sitting = bl;
+    public void setSitting(boolean sitting) {
+        this.sitting = sitting;
     }
 }
 

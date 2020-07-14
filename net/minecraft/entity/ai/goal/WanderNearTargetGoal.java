@@ -20,10 +20,10 @@ extends Goal {
     private final double speed;
     private final float maxDistance;
 
-    public WanderNearTargetGoal(PathAwareEntity arg, double d, float f) {
-        this.mob = arg;
-        this.speed = d;
-        this.maxDistance = f;
+    public WanderNearTargetGoal(PathAwareEntity mob, double speed, float maxDistance) {
+        this.mob = mob;
+        this.speed = speed;
+        this.maxDistance = maxDistance;
         this.setControls(EnumSet.of(Goal.Control.MOVE));
     }
 

@@ -22,8 +22,8 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public GuiCloseC2SPacket(int i) {
-        this.id = i;
+    public GuiCloseC2SPacket(int id) {
+        this.id = id;
     }
 
     @Override
@@ -32,13 +32,13 @@ implements Packet<ServerPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readByte();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readByte();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeByte(this.id);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeByte(this.id);
     }
 }
 

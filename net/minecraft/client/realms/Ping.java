@@ -21,12 +21,12 @@ import net.minecraft.util.Util;
 
 @Environment(value=EnvType.CLIENT)
 public class Ping {
-    public static List<RegionPingResult> ping(Region ... args) {
-        for (Region lv : args) {
+    public static List<RegionPingResult> ping(Region ... regions) {
+        for (Region lv : regions) {
             Ping.ping(lv.endpoint);
         }
         ArrayList list = Lists.newArrayList();
-        for (Region lv2 : args) {
+        for (Region lv2 : regions) {
             list.add(new RegionPingResult(lv2.name, Ping.ping(lv2.endpoint)));
         }
         list.sort(Comparator.comparingInt(RegionPingResult::getPing));
@@ -36,13 +36,13 @@ public class Ping {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    private static int ping(String string) {
+    private static int ping(String host) {
         int i = 700;
         long l = 0L;
         Socket socket = null;
         for (int j = 0; j < 5; ++j) {
             try {
-                InetSocketAddress socketAddress = new InetSocketAddress(string, 80);
+                InetSocketAddress socketAddress = new InetSocketAddress(host, 80);
                 socket = new Socket();
                 long m = Ping.now();
                 socket.connect(socketAddress, 700);
@@ -94,9 +94,9 @@ public class Ping {
         private final String name;
         private final String endpoint;
 
-        private Region(String string2, String string3) {
-            this.name = string2;
-            this.endpoint = string3;
+        private Region(String name, String endpoint) {
+            this.name = name;
+            this.endpoint = endpoint;
         }
     }
 }

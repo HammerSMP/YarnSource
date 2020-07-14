@@ -18,40 +18,40 @@ extends Slot {
     private final PlayerEntity player;
     private int amount;
 
-    public CraftingResultSlot(PlayerEntity arg, CraftingInventory arg2, Inventory arg3, int i, int j, int k) {
-        super(arg3, i, j, k);
-        this.player = arg;
-        this.input = arg2;
+    public CraftingResultSlot(PlayerEntity player, CraftingInventory input, Inventory inventory, int index, int x, int y) {
+        super(inventory, index, x, y);
+        this.player = player;
+        this.input = input;
     }
 
     @Override
-    public boolean canInsert(ItemStack arg) {
+    public boolean canInsert(ItemStack stack) {
         return false;
     }
 
     @Override
-    public ItemStack takeStack(int i) {
+    public ItemStack takeStack(int amount) {
         if (this.hasStack()) {
-            this.amount += Math.min(i, this.getStack().getCount());
+            this.amount += Math.min(amount, this.getStack().getCount());
         }
-        return super.takeStack(i);
+        return super.takeStack(amount);
     }
 
     @Override
-    protected void onCrafted(ItemStack arg, int i) {
-        this.amount += i;
-        this.onCrafted(arg);
+    protected void onCrafted(ItemStack stack, int amount) {
+        this.amount += amount;
+        this.onCrafted(stack);
     }
 
     @Override
-    protected void onTake(int i) {
-        this.amount += i;
+    protected void onTake(int amount) {
+        this.amount += amount;
     }
 
     @Override
-    protected void onCrafted(ItemStack arg) {
+    protected void onCrafted(ItemStack stack) {
         if (this.amount > 0) {
-            arg.onCraft(this.player.world, this.player, this.amount);
+            stack.onCraft(this.player.world, this.player, this.amount);
         }
         if (this.inventory instanceof RecipeUnlocker) {
             ((RecipeUnlocker)((Object)this.inventory)).unlockLastRecipe(this.player);
@@ -60,9 +60,9 @@ extends Slot {
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity arg, ItemStack arg2) {
-        this.onCrafted(arg2);
-        DefaultedList<ItemStack> lv = arg.world.getRecipeManager().getRemainingStacks(RecipeType.CRAFTING, this.input, arg.world);
+    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+        this.onCrafted(stack);
+        DefaultedList<ItemStack> lv = player.world.getRecipeManager().getRemainingStacks(RecipeType.CRAFTING, this.input, player.world);
         for (int i = 0; i < lv.size(); ++i) {
             ItemStack lv2 = this.input.getStack(i);
             ItemStack lv3 = lv.get(i);
@@ -83,7 +83,7 @@ extends Slot {
             if (this.player.inventory.insertStack(lv3)) continue;
             this.player.dropItem(lv3, false);
         }
-        return arg2;
+        return stack;
     }
 }
 

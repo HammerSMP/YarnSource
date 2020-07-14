@@ -16,24 +16,24 @@ extends Task<E> {
     private final Task<? super E> delegate;
     private int timeLeft;
 
-    public TimeLimitedTask(Task<? super E> arg, IntRange arg2) {
-        this(arg, false, arg2);
+    public TimeLimitedTask(Task<? super E> delegate, IntRange timeRange) {
+        this(delegate, false, timeRange);
     }
 
-    public TimeLimitedTask(Task<? super E> arg, boolean bl, IntRange arg2) {
-        super(arg.requiredMemoryStates);
-        this.delegate = arg;
-        this.needsTimeReset = !bl;
-        this.timeRange = arg2;
+    public TimeLimitedTask(Task<? super E> delegate, boolean skipFirstRun, IntRange timeRange) {
+        super(delegate.requiredMemoryStates);
+        this.delegate = delegate;
+        this.needsTimeReset = !skipFirstRun;
+        this.timeRange = timeRange;
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, E arg2) {
-        if (!this.delegate.shouldRun(arg, arg2)) {
+    protected boolean shouldRun(ServerWorld world, E entity) {
+        if (!this.delegate.shouldRun(world, entity)) {
             return false;
         }
         if (this.needsTimeReset) {
-            this.resetTimeLeft(arg);
+            this.resetTimeLeft(world);
             this.needsTimeReset = false;
         }
         if (this.timeLeft > 0) {
@@ -43,33 +43,33 @@ extends Task<E> {
     }
 
     @Override
-    protected void run(ServerWorld arg, E arg2, long l) {
-        this.delegate.run(arg, arg2, l);
+    protected void run(ServerWorld world, E entity, long time) {
+        this.delegate.run(world, entity, time);
     }
 
     @Override
-    protected boolean shouldKeepRunning(ServerWorld arg, E arg2, long l) {
-        return this.delegate.shouldKeepRunning(arg, arg2, l);
+    protected boolean shouldKeepRunning(ServerWorld world, E entity, long time) {
+        return this.delegate.shouldKeepRunning(world, entity, time);
     }
 
     @Override
-    protected void keepRunning(ServerWorld arg, E arg2, long l) {
-        this.delegate.keepRunning(arg, arg2, l);
+    protected void keepRunning(ServerWorld world, E entity, long time) {
+        this.delegate.keepRunning(world, entity, time);
         this.delegateRunning = this.delegate.getStatus() == Task.Status.RUNNING;
     }
 
     @Override
-    protected void finishRunning(ServerWorld arg, E arg2, long l) {
-        this.resetTimeLeft(arg);
-        this.delegate.finishRunning(arg, arg2, l);
+    protected void finishRunning(ServerWorld world, E entity, long time) {
+        this.resetTimeLeft(world);
+        this.delegate.finishRunning(world, entity, time);
     }
 
-    private void resetTimeLeft(ServerWorld arg) {
-        this.timeLeft = this.timeRange.choose(arg.random);
+    private void resetTimeLeft(ServerWorld world) {
+        this.timeLeft = this.timeRange.choose(world.random);
     }
 
     @Override
-    protected boolean isTimeLimitExceeded(long l) {
+    protected boolean isTimeLimitExceeded(long time) {
         return false;
     }
 

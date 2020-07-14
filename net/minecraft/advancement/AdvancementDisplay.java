@@ -45,20 +45,20 @@ public class AdvancementDisplay {
     private float xPos;
     private float yPos;
 
-    public AdvancementDisplay(ItemStack arg, Text arg2, Text arg3, @Nullable Identifier arg4, AdvancementFrame arg5, boolean bl, boolean bl2, boolean bl3) {
-        this.title = arg2;
-        this.description = arg3;
-        this.icon = arg;
-        this.background = arg4;
-        this.frame = arg5;
-        this.showToast = bl;
-        this.announceToChat = bl2;
-        this.hidden = bl3;
+    public AdvancementDisplay(ItemStack icon, Text title, Text description, @Nullable Identifier background, AdvancementFrame frame, boolean showToast, boolean announceToChat, boolean hidden) {
+        this.title = title;
+        this.description = description;
+        this.icon = icon;
+        this.background = background;
+        this.frame = frame;
+        this.showToast = showToast;
+        this.announceToChat = announceToChat;
+        this.hidden = hidden;
     }
 
-    public void setPosition(float f, float g) {
-        this.xPos = f;
-        this.yPos = g;
+    public void setPosition(float xPos, float yPos) {
+        this.xPos = xPos;
+        this.yPos = yPos;
     }
 
     public Text getTitle() {
@@ -107,33 +107,33 @@ public class AdvancementDisplay {
         return this.hidden;
     }
 
-    public static AdvancementDisplay fromJson(JsonObject jsonObject) {
-        MutableText lv = Text.Serializer.fromJson(jsonObject.get("title"));
-        MutableText lv2 = Text.Serializer.fromJson(jsonObject.get("description"));
+    public static AdvancementDisplay fromJson(JsonObject obj) {
+        MutableText lv = Text.Serializer.fromJson(obj.get("title"));
+        MutableText lv2 = Text.Serializer.fromJson(obj.get("description"));
         if (lv == null || lv2 == null) {
             throw new JsonSyntaxException("Both title and description must be set");
         }
-        ItemStack lv3 = AdvancementDisplay.iconFromJson(JsonHelper.getObject(jsonObject, "icon"));
-        Identifier lv4 = jsonObject.has("background") ? new Identifier(JsonHelper.getString(jsonObject, "background")) : null;
-        AdvancementFrame lv5 = jsonObject.has("frame") ? AdvancementFrame.forName(JsonHelper.getString(jsonObject, "frame")) : AdvancementFrame.TASK;
-        boolean bl = JsonHelper.getBoolean(jsonObject, "show_toast", true);
-        boolean bl2 = JsonHelper.getBoolean(jsonObject, "announce_to_chat", true);
-        boolean bl3 = JsonHelper.getBoolean(jsonObject, "hidden", false);
+        ItemStack lv3 = AdvancementDisplay.iconFromJson(JsonHelper.getObject(obj, "icon"));
+        Identifier lv4 = obj.has("background") ? new Identifier(JsonHelper.getString(obj, "background")) : null;
+        AdvancementFrame lv5 = obj.has("frame") ? AdvancementFrame.forName(JsonHelper.getString(obj, "frame")) : AdvancementFrame.TASK;
+        boolean bl = JsonHelper.getBoolean(obj, "show_toast", true);
+        boolean bl2 = JsonHelper.getBoolean(obj, "announce_to_chat", true);
+        boolean bl3 = JsonHelper.getBoolean(obj, "hidden", false);
         return new AdvancementDisplay(lv3, lv, lv2, lv4, lv5, bl, bl2, bl3);
     }
 
-    private static ItemStack iconFromJson(JsonObject jsonObject) {
-        if (!jsonObject.has("item")) {
+    private static ItemStack iconFromJson(JsonObject json) {
+        if (!json.has("item")) {
             throw new JsonSyntaxException("Unsupported icon type, currently only items are supported (add 'item' key)");
         }
-        Item lv = JsonHelper.getItem(jsonObject, "item");
-        if (jsonObject.has("data")) {
+        Item lv = JsonHelper.getItem(json, "item");
+        if (json.has("data")) {
             throw new JsonParseException("Disallowed data tag found");
         }
         ItemStack lv2 = new ItemStack(lv);
-        if (jsonObject.has("nbt")) {
+        if (json.has("nbt")) {
             try {
-                CompoundTag lv3 = StringNbtReader.parse(JsonHelper.asString(jsonObject.get("nbt"), "nbt"));
+                CompoundTag lv3 = StringNbtReader.parse(JsonHelper.asString(json.get("nbt"), "nbt"));
                 lv2.setTag(lv3);
             }
             catch (CommandSyntaxException commandSyntaxException) {
@@ -143,11 +143,11 @@ public class AdvancementDisplay {
         return lv2;
     }
 
-    public void toPacket(PacketByteBuf arg) {
-        arg.writeText(this.title);
-        arg.writeText(this.description);
-        arg.writeItemStack(this.icon);
-        arg.writeEnumConstant(this.frame);
+    public void toPacket(PacketByteBuf buf) {
+        buf.writeText(this.title);
+        buf.writeText(this.description);
+        buf.writeItemStack(this.icon);
+        buf.writeEnumConstant(this.frame);
         int i = 0;
         if (this.background != null) {
             i |= 1;
@@ -158,25 +158,25 @@ public class AdvancementDisplay {
         if (this.hidden) {
             i |= 4;
         }
-        arg.writeInt(i);
+        buf.writeInt(i);
         if (this.background != null) {
-            arg.writeIdentifier(this.background);
+            buf.writeIdentifier(this.background);
         }
-        arg.writeFloat(this.xPos);
-        arg.writeFloat(this.yPos);
+        buf.writeFloat(this.xPos);
+        buf.writeFloat(this.yPos);
     }
 
-    public static AdvancementDisplay fromPacket(PacketByteBuf arg) {
-        Text lv = arg.readText();
-        Text lv2 = arg.readText();
-        ItemStack lv3 = arg.readItemStack();
-        AdvancementFrame lv4 = arg.readEnumConstant(AdvancementFrame.class);
-        int i = arg.readInt();
-        Identifier lv5 = (i & 1) != 0 ? arg.readIdentifier() : null;
+    public static AdvancementDisplay fromPacket(PacketByteBuf buf) {
+        Text lv = buf.readText();
+        Text lv2 = buf.readText();
+        ItemStack lv3 = buf.readItemStack();
+        AdvancementFrame lv4 = buf.readEnumConstant(AdvancementFrame.class);
+        int i = buf.readInt();
+        Identifier lv5 = (i & 1) != 0 ? buf.readIdentifier() : null;
         boolean bl = (i & 2) != 0;
         boolean bl2 = (i & 4) != 0;
         AdvancementDisplay lv6 = new AdvancementDisplay(lv3, lv, lv2, lv5, lv4, bl, false, bl2);
-        lv6.setPosition(arg.readFloat(), arg.readFloat());
+        lv6.setPosition(buf.readFloat(), buf.readFloat());
         return lv6;
     }
 

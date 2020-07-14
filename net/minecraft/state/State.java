@@ -43,8 +43,8 @@ public abstract class State<O, S> {
             return lv.getName() + "=" + this.nameValue(lv, entry.getValue());
         }
 
-        private <T extends Comparable<T>> String nameValue(Property<T> arg, Comparable<?> comparable) {
-            return arg.name(comparable);
+        private <T extends Comparable<T>> String nameValue(Property<T> property, Comparable<?> value) {
+            return property.name(value);
         }
 
         @Override
@@ -57,24 +57,24 @@ public abstract class State<O, S> {
     private Table<Property<?>, Comparable<?>, S> withTable;
     protected final MapCodec<S> field_24740;
 
-    protected State(O object, ImmutableMap<Property<?>, Comparable<?>> immutableMap, MapCodec<S> mapCodec) {
-        this.owner = object;
-        this.entries = immutableMap;
+    protected State(O owner, ImmutableMap<Property<?>, Comparable<?>> entries, MapCodec<S> mapCodec) {
+        this.owner = owner;
+        this.entries = entries;
         this.field_24740 = mapCodec;
     }
 
-    public <T extends Comparable<T>> S cycle(Property<T> arg) {
-        return this.with(arg, (Comparable)State.getNext(arg.getValues(), this.get(arg)));
+    public <T extends Comparable<T>> S cycle(Property<T> property) {
+        return this.with(property, (Comparable)State.getNext(property.getValues(), this.get(property)));
     }
 
-    protected static <T> T getNext(Collection<T> collection, T object) {
-        Iterator<T> iterator = collection.iterator();
+    protected static <T> T getNext(Collection<T> values, T value) {
+        Iterator<T> iterator = values.iterator();
         while (iterator.hasNext()) {
-            if (!iterator.next().equals(object)) continue;
+            if (!iterator.next().equals(value)) continue;
             if (iterator.hasNext()) {
                 return iterator.next();
             }
-            return collection.iterator().next();
+            return values.iterator().next();
         }
         return iterator.next();
     }
@@ -94,42 +94,42 @@ public abstract class State<O, S> {
         return Collections.unmodifiableCollection(this.entries.keySet());
     }
 
-    public <T extends Comparable<T>> boolean contains(Property<T> arg) {
-        return this.entries.containsKey(arg);
+    public <T extends Comparable<T>> boolean contains(Property<T> property) {
+        return this.entries.containsKey(property);
     }
 
-    public <T extends Comparable<T>> T get(Property<T> arg) {
-        Comparable comparable = (Comparable)this.entries.get(arg);
+    public <T extends Comparable<T>> T get(Property<T> property) {
+        Comparable comparable = (Comparable)this.entries.get(property);
         if (comparable == null) {
-            throw new IllegalArgumentException("Cannot get property " + arg + " as it does not exist in " + this.owner);
+            throw new IllegalArgumentException("Cannot get property " + property + " as it does not exist in " + this.owner);
         }
-        return (T)((Comparable)arg.getType().cast(comparable));
+        return (T)((Comparable)property.getType().cast(comparable));
     }
 
-    public <T extends Comparable<T>> Optional<T> method_28500(Property<T> arg) {
-        Comparable comparable = (Comparable)this.entries.get(arg);
+    public <T extends Comparable<T>> Optional<T> method_28500(Property<T> property) {
+        Comparable comparable = (Comparable)this.entries.get(property);
         if (comparable == null) {
             return Optional.empty();
         }
-        return Optional.of(arg.getType().cast(comparable));
+        return Optional.of(property.getType().cast(comparable));
     }
 
-    public <T extends Comparable<T>, V extends T> S with(Property<T> arg, V comparable) {
-        Comparable comparable2 = (Comparable)this.entries.get(arg);
+    public <T extends Comparable<T>, V extends T> S with(Property<T> property, V value) {
+        Comparable comparable2 = (Comparable)this.entries.get(property);
         if (comparable2 == null) {
-            throw new IllegalArgumentException("Cannot set property " + arg + " as it does not exist in " + this.owner);
+            throw new IllegalArgumentException("Cannot set property " + property + " as it does not exist in " + this.owner);
         }
-        if (comparable2 == comparable) {
+        if (comparable2 == value) {
             return (S)this;
         }
-        Object object = this.withTable.get(arg, comparable);
+        Object object = this.withTable.get(property, value);
         if (object == null) {
-            throw new IllegalArgumentException("Cannot set property " + arg + " to " + comparable + " on " + this.owner + ", it is not an allowed value");
+            throw new IllegalArgumentException("Cannot set property " + property + " to " + value + " on " + this.owner + ", it is not an allowed value");
         }
         return (S)object;
     }
 
-    public void createWithTable(Map<Map<Property<?>, Comparable<?>>, S> map) {
+    public void createWithTable(Map<Map<Property<?>, Comparable<?>>, S> states) {
         if (this.withTable != null) {
             throw new IllegalStateException();
         }
@@ -138,15 +138,15 @@ public abstract class State<O, S> {
             Property lv = (Property)entry.getKey();
             for (Comparable comparable : lv.getValues()) {
                 if (comparable == entry.getValue()) continue;
-                table.put((Object)lv, (Object)comparable, map.get(this.toMapWith(lv, comparable)));
+                table.put((Object)lv, (Object)comparable, states.get(this.toMapWith(lv, comparable)));
             }
         }
         this.withTable = table.isEmpty() ? table : ArrayTable.create((Table)table);
     }
 
-    private Map<Property<?>, Comparable<?>> toMapWith(Property<?> arg, Comparable<?> comparable) {
+    private Map<Property<?>, Comparable<?>> toMapWith(Property<?> property, Comparable<?> value) {
         HashMap map = Maps.newHashMap(this.entries);
-        map.put(arg, comparable);
+        map.put(property, value);
         return map;
     }
 
@@ -154,9 +154,9 @@ public abstract class State<O, S> {
         return this.entries;
     }
 
-    protected static <O, S extends State<O, S>> Codec<S> createCodec(Codec<O> codec, Function<O, S> function) {
+    protected static <O, S extends State<O, S>> Codec<S> createCodec(Codec<O> codec, Function<O, S> ownerToStateFunction) {
         return codec.dispatch("Name", arg -> arg.owner, object -> {
-            State lv = (State)function.apply(object);
+            State lv = (State)ownerToStateFunction.apply(object);
             if (lv.getEntries().isEmpty()) {
                 return Codec.unit((Object)lv);
             }

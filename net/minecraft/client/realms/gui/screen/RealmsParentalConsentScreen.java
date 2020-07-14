@@ -27,8 +27,8 @@ public class RealmsParentalConsentScreen
 extends RealmsScreen {
     private final Screen parent;
 
-    public RealmsParentalConsentScreen(Screen arg) {
-        this.parent = arg;
+    public RealmsParentalConsentScreen(Screen parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -45,15 +45,15 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
         List<StringRenderable> list = this.client.textRenderer.wrapLines(new TranslatableText("mco.account.privacyinfo"), (int)Math.round((double)this.width * 0.9));
         int k = 15;
         for (StringRenderable lv : list) {
-            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             k += 15;
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

@@ -118,14 +118,14 @@ AutoCloseable {
     private final RegistryKey<World> registryKey;
     private final RegistryKey<DimensionType> dimensionRegistryKey;
 
-    protected World(MutableWorldProperties arg, RegistryKey<World> arg2, RegistryKey<DimensionType> arg3, DimensionType arg4, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l) {
-        this.profiler = supplier;
-        this.properties = arg;
-        this.dimension = arg4;
-        this.registryKey = arg2;
-        this.dimensionRegistryKey = arg3;
-        this.isClient = bl;
-        this.border = arg4.isShrunk() ? new WorldBorder(){
+    protected World(MutableWorldProperties properties, RegistryKey<World> registryKey, RegistryKey<DimensionType> dimensionRegistryKey, DimensionType dimension, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long seed) {
+        this.profiler = profiler;
+        this.properties = properties;
+        this.dimension = dimension;
+        this.registryKey = registryKey;
+        this.dimensionRegistryKey = dimensionRegistryKey;
+        this.isClient = isClient;
+        this.border = dimension.isShrunk() ? new WorldBorder(){
 
             @Override
             public double getCenterX() {
@@ -138,8 +138,8 @@ AutoCloseable {
             }
         } : new WorldBorder();
         this.thread = Thread.currentThread();
-        this.biomeAccess = new BiomeAccess(this, l, arg4.getBiomeAccessType());
-        this.debugWorld = bl2;
+        this.biomeAccess = new BiomeAccess(this, seed, dimension.getBiomeAccessType());
+        this.debugWorld = debugWorld;
     }
 
     @Override
@@ -160,24 +160,24 @@ AutoCloseable {
         return !World.method_25952(arg.getY()) && World.isValid(arg);
     }
 
-    private static boolean isValid(BlockPos arg) {
-        return arg.getX() >= -30000000 && arg.getZ() >= -30000000 && arg.getX() < 30000000 && arg.getZ() < 30000000;
+    private static boolean isValid(BlockPos pos) {
+        return pos.getX() >= -30000000 && pos.getZ() >= -30000000 && pos.getX() < 30000000 && pos.getZ() < 30000000;
     }
 
     private static boolean method_25952(int i) {
         return i < -20000000 || i >= 20000000;
     }
 
-    public static boolean isHeightInvalid(BlockPos arg) {
-        return World.isHeightInvalid(arg.getY());
+    public static boolean isHeightInvalid(BlockPos pos) {
+        return World.isHeightInvalid(pos.getY());
     }
 
-    public static boolean isHeightInvalid(int i) {
-        return i < 0 || i >= 256;
+    public static boolean isHeightInvalid(int y) {
+        return y < 0 || y >= 256;
     }
 
-    public WorldChunk getWorldChunk(BlockPos arg) {
-        return this.getChunk(arg.getX() >> 4, arg.getZ() >> 4);
+    public WorldChunk getWorldChunk(BlockPos pos) {
+        return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
     @Override
@@ -186,159 +186,159 @@ AutoCloseable {
     }
 
     @Override
-    public Chunk getChunk(int i, int j, ChunkStatus arg, boolean bl) {
-        Chunk lv = this.getChunkManager().getChunk(i, j, arg, bl);
-        if (lv == null && bl) {
+    public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
+        Chunk lv = this.getChunkManager().getChunk(chunkX, chunkZ, leastStatus, create);
+        if (lv == null && create) {
             throw new IllegalStateException("Should always be able to create a chunk!");
         }
         return lv;
     }
 
     @Override
-    public boolean setBlockState(BlockPos arg, BlockState arg2, int i) {
-        return this.setBlockState(arg, arg2, i, 512);
+    public boolean setBlockState(BlockPos pos, BlockState state, int flags) {
+        return this.setBlockState(pos, state, flags, 512);
     }
 
     @Override
-    public boolean setBlockState(BlockPos arg, BlockState arg2, int i, int j) {
-        if (World.isHeightInvalid(arg)) {
+    public boolean setBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth) {
+        if (World.isHeightInvalid(pos)) {
             return false;
         }
         if (!this.isClient && this.isDebugWorld()) {
             return false;
         }
-        WorldChunk lv = this.getWorldChunk(arg);
-        Block lv2 = arg2.getBlock();
-        BlockState lv3 = lv.setBlockState(arg, arg2, (i & 0x40) != 0);
+        WorldChunk lv = this.getWorldChunk(pos);
+        Block lv2 = state.getBlock();
+        BlockState lv3 = lv.setBlockState(pos, state, (flags & 0x40) != 0);
         if (lv3 != null) {
-            BlockState lv4 = this.getBlockState(arg);
-            if (lv4 != lv3 && (lv4.getOpacity(this, arg) != lv3.getOpacity(this, arg) || lv4.getLuminance() != lv3.getLuminance() || lv4.hasSidedTransparency() || lv3.hasSidedTransparency())) {
+            BlockState lv4 = this.getBlockState(pos);
+            if (lv4 != lv3 && (lv4.getOpacity(this, pos) != lv3.getOpacity(this, pos) || lv4.getLuminance() != lv3.getLuminance() || lv4.hasSidedTransparency() || lv3.hasSidedTransparency())) {
                 this.getProfiler().push("queueCheckLight");
-                this.getChunkManager().getLightingProvider().checkBlock(arg);
+                this.getChunkManager().getLightingProvider().checkBlock(pos);
                 this.getProfiler().pop();
             }
-            if (lv4 == arg2) {
+            if (lv4 == state) {
                 if (lv3 != lv4) {
-                    this.scheduleBlockRerenderIfNeeded(arg, lv3, lv4);
+                    this.scheduleBlockRerenderIfNeeded(pos, lv3, lv4);
                 }
-                if ((i & 2) != 0 && (!this.isClient || (i & 4) == 0) && (this.isClient || lv.getLevelType() != null && lv.getLevelType().isAfter(ChunkHolder.LevelType.TICKING))) {
-                    this.updateListeners(arg, lv3, arg2, i);
+                if ((flags & 2) != 0 && (!this.isClient || (flags & 4) == 0) && (this.isClient || lv.getLevelType() != null && lv.getLevelType().isAfter(ChunkHolder.LevelType.TICKING))) {
+                    this.updateListeners(pos, lv3, state, flags);
                 }
-                if ((i & 1) != 0) {
-                    this.updateNeighbors(arg, lv3.getBlock());
-                    if (!this.isClient && arg2.hasComparatorOutput()) {
-                        this.updateComparators(arg, lv2);
+                if ((flags & 1) != 0) {
+                    this.updateNeighbors(pos, lv3.getBlock());
+                    if (!this.isClient && state.hasComparatorOutput()) {
+                        this.updateComparators(pos, lv2);
                     }
                 }
-                if ((i & 0x10) == 0 && j > 0) {
-                    int k = i & 0xFFFFFFDE;
-                    lv3.prepare(this, arg, k, j - 1);
-                    arg2.updateNeighbors(this, arg, k, j - 1);
-                    arg2.prepare(this, arg, k, j - 1);
+                if ((flags & 0x10) == 0 && maxUpdateDepth > 0) {
+                    int k = flags & 0xFFFFFFDE;
+                    lv3.prepare(this, pos, k, maxUpdateDepth - 1);
+                    state.updateNeighbors(this, pos, k, maxUpdateDepth - 1);
+                    state.prepare(this, pos, k, maxUpdateDepth - 1);
                 }
-                this.onBlockChanged(arg, lv3, lv4);
+                this.onBlockChanged(pos, lv3, lv4);
             }
             return true;
         }
         return false;
     }
 
-    public void onBlockChanged(BlockPos arg, BlockState arg2, BlockState arg3) {
+    public void onBlockChanged(BlockPos pos, BlockState oldBlock, BlockState newBlock) {
     }
 
     @Override
-    public boolean removeBlock(BlockPos arg, boolean bl) {
-        FluidState lv = this.getFluidState(arg);
-        return this.setBlockState(arg, lv.getBlockState(), 3 | (bl ? 64 : 0));
+    public boolean removeBlock(BlockPos pos, boolean move) {
+        FluidState lv = this.getFluidState(pos);
+        return this.setBlockState(pos, lv.getBlockState(), 3 | (move ? 64 : 0));
     }
 
     @Override
-    public boolean breakBlock(BlockPos arg, boolean bl, @Nullable Entity arg2, int i) {
-        BlockState lv = this.getBlockState(arg);
+    public boolean breakBlock(BlockPos pos, boolean drop, @Nullable Entity breakingEntity, int maxUpdateDepth) {
+        BlockState lv = this.getBlockState(pos);
         if (lv.isAir()) {
             return false;
         }
-        FluidState lv2 = this.getFluidState(arg);
+        FluidState lv2 = this.getFluidState(pos);
         if (!(lv.getBlock() instanceof AbstractFireBlock)) {
-            this.syncWorldEvent(2001, arg, Block.getRawIdFromState(lv));
+            this.syncWorldEvent(2001, pos, Block.getRawIdFromState(lv));
         }
-        if (bl) {
-            BlockEntity lv3 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(arg) : null;
-            Block.dropStacks(lv, this, arg, lv3, arg2, ItemStack.EMPTY);
+        if (drop) {
+            BlockEntity lv3 = lv.getBlock().hasBlockEntity() ? this.getBlockEntity(pos) : null;
+            Block.dropStacks(lv, this, pos, lv3, breakingEntity, ItemStack.EMPTY);
         }
-        return this.setBlockState(arg, lv2.getBlockState(), 3, i);
+        return this.setBlockState(pos, lv2.getBlockState(), 3, maxUpdateDepth);
     }
 
-    public boolean setBlockState(BlockPos arg, BlockState arg2) {
-        return this.setBlockState(arg, arg2, 3);
+    public boolean setBlockState(BlockPos pos, BlockState state) {
+        return this.setBlockState(pos, state, 3);
     }
 
     public abstract void updateListeners(BlockPos var1, BlockState var2, BlockState var3, int var4);
 
-    public void scheduleBlockRerenderIfNeeded(BlockPos arg, BlockState arg2, BlockState arg3) {
+    public void scheduleBlockRerenderIfNeeded(BlockPos pos, BlockState old, BlockState updated) {
     }
 
-    public void updateNeighborsAlways(BlockPos arg, Block arg2) {
-        this.updateNeighbor(arg.west(), arg2, arg);
-        this.updateNeighbor(arg.east(), arg2, arg);
-        this.updateNeighbor(arg.down(), arg2, arg);
-        this.updateNeighbor(arg.up(), arg2, arg);
-        this.updateNeighbor(arg.north(), arg2, arg);
-        this.updateNeighbor(arg.south(), arg2, arg);
+    public void updateNeighborsAlways(BlockPos pos, Block block) {
+        this.updateNeighbor(pos.west(), block, pos);
+        this.updateNeighbor(pos.east(), block, pos);
+        this.updateNeighbor(pos.down(), block, pos);
+        this.updateNeighbor(pos.up(), block, pos);
+        this.updateNeighbor(pos.north(), block, pos);
+        this.updateNeighbor(pos.south(), block, pos);
     }
 
-    public void updateNeighborsExcept(BlockPos arg, Block arg2, Direction arg3) {
-        if (arg3 != Direction.WEST) {
-            this.updateNeighbor(arg.west(), arg2, arg);
+    public void updateNeighborsExcept(BlockPos pos, Block sourceBlock, Direction direction) {
+        if (direction != Direction.WEST) {
+            this.updateNeighbor(pos.west(), sourceBlock, pos);
         }
-        if (arg3 != Direction.EAST) {
-            this.updateNeighbor(arg.east(), arg2, arg);
+        if (direction != Direction.EAST) {
+            this.updateNeighbor(pos.east(), sourceBlock, pos);
         }
-        if (arg3 != Direction.DOWN) {
-            this.updateNeighbor(arg.down(), arg2, arg);
+        if (direction != Direction.DOWN) {
+            this.updateNeighbor(pos.down(), sourceBlock, pos);
         }
-        if (arg3 != Direction.UP) {
-            this.updateNeighbor(arg.up(), arg2, arg);
+        if (direction != Direction.UP) {
+            this.updateNeighbor(pos.up(), sourceBlock, pos);
         }
-        if (arg3 != Direction.NORTH) {
-            this.updateNeighbor(arg.north(), arg2, arg);
+        if (direction != Direction.NORTH) {
+            this.updateNeighbor(pos.north(), sourceBlock, pos);
         }
-        if (arg3 != Direction.SOUTH) {
-            this.updateNeighbor(arg.south(), arg2, arg);
+        if (direction != Direction.SOUTH) {
+            this.updateNeighbor(pos.south(), sourceBlock, pos);
         }
     }
 
-    public void updateNeighbor(BlockPos arg, Block arg2, BlockPos arg3) {
+    public void updateNeighbor(BlockPos sourcePos, Block sourceBlock, BlockPos neighborPos) {
         if (this.isClient) {
             return;
         }
-        BlockState lv = this.getBlockState(arg);
+        BlockState lv = this.getBlockState(sourcePos);
         try {
-            lv.neighborUpdate(this, arg, arg2, arg3, false);
+            lv.neighborUpdate(this, sourcePos, sourceBlock, neighborPos, false);
         }
         catch (Throwable throwable) {
             CrashReport lv2 = CrashReport.create(throwable, "Exception while updating neighbours");
             CrashReportSection lv3 = lv2.addElement("Block being updated");
             lv3.add("Source block type", () -> {
                 try {
-                    return String.format("ID #%s (%s // %s)", Registry.BLOCK.getId(arg2), arg2.getTranslationKey(), arg2.getClass().getCanonicalName());
+                    return String.format("ID #%s (%s // %s)", Registry.BLOCK.getId(sourceBlock), sourceBlock.getTranslationKey(), sourceBlock.getClass().getCanonicalName());
                 }
                 catch (Throwable throwable) {
-                    return "ID #" + Registry.BLOCK.getId(arg2);
+                    return "ID #" + Registry.BLOCK.getId(sourceBlock);
                 }
             });
-            CrashReportSection.addBlockInfo(lv3, arg, lv);
+            CrashReportSection.addBlockInfo(lv3, sourcePos, lv);
             throw new CrashException(lv2);
         }
     }
 
     @Override
-    public int getTopY(Heightmap.Type arg, int i, int j) {
+    public int getTopY(Heightmap.Type heightmap, int x, int z) {
         boolean m;
-        if (i < -30000000 || j < -30000000 || i >= 30000000 || j >= 30000000) {
+        if (x < -30000000 || z < -30000000 || x >= 30000000 || z >= 30000000) {
             int k = this.getSeaLevel() + 1;
-        } else if (this.isChunkLoaded(i >> 4, j >> 4)) {
-            int l = this.getChunk(i >> 4, j >> 4).sampleHeightmap(arg, i & 0xF, j & 0xF) + 1;
+        } else if (this.isChunkLoaded(x >> 4, z >> 4)) {
+            int l = this.getChunk(x >> 4, z >> 4).sampleHeightmap(heightmap, x & 0xF, z & 0xF) + 1;
         } else {
             m = false;
         }
@@ -351,21 +351,21 @@ AutoCloseable {
     }
 
     @Override
-    public BlockState getBlockState(BlockPos arg) {
-        if (World.isHeightInvalid(arg)) {
+    public BlockState getBlockState(BlockPos pos) {
+        if (World.isHeightInvalid(pos)) {
             return Blocks.VOID_AIR.getDefaultState();
         }
-        WorldChunk lv = this.getChunk(arg.getX() >> 4, arg.getZ() >> 4);
-        return lv.getBlockState(arg);
+        WorldChunk lv = this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        return lv.getBlockState(pos);
     }
 
     @Override
-    public FluidState getFluidState(BlockPos arg) {
-        if (World.isHeightInvalid(arg)) {
+    public FluidState getFluidState(BlockPos pos) {
+        if (World.isHeightInvalid(pos)) {
             return Fluids.EMPTY.getDefaultState();
         }
-        WorldChunk lv = this.getWorldChunk(arg);
-        return lv.getFluidState(arg);
+        WorldChunk lv = this.getWorldChunk(pos);
+        return lv.getFluidState(pos);
     }
 
     public boolean isDay() {
@@ -377,60 +377,60 @@ AutoCloseable {
     }
 
     @Override
-    public void playSound(@Nullable PlayerEntity arg, BlockPos arg2, SoundEvent arg3, SoundCategory arg4, float f, float g) {
-        this.playSound(arg, (double)arg2.getX() + 0.5, (double)arg2.getY() + 0.5, (double)arg2.getZ() + 0.5, arg3, arg4, f, g);
+    public void playSound(@Nullable PlayerEntity player, BlockPos pos, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+        this.playSound(player, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, sound, category, volume, pitch);
     }
 
     public abstract void playSound(@Nullable PlayerEntity var1, double var2, double var4, double var6, SoundEvent var8, SoundCategory var9, float var10, float var11);
 
     public abstract void playSoundFromEntity(@Nullable PlayerEntity var1, Entity var2, SoundEvent var3, SoundCategory var4, float var5, float var6);
 
-    public void playSound(double d, double e, double f, SoundEvent arg, SoundCategory arg2, float g, float h, boolean bl) {
+    public void playSound(double x, double y, double z, SoundEvent sound, SoundCategory category, float volume, float pitch, boolean bl) {
     }
 
     @Override
-    public void addParticle(ParticleEffect arg, double d, double e, double f, double g, double h, double i) {
+    public void addParticle(ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void addParticle(ParticleEffect arg, boolean bl, double d, double e, double f, double g, double h, double i) {
+    public void addParticle(ParticleEffect parameters, boolean alwaysSpawn, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
     }
 
-    public void addImportantParticle(ParticleEffect arg, double d, double e, double f, double g, double h, double i) {
+    public void addImportantParticle(ParticleEffect parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
     }
 
-    public void addImportantParticle(ParticleEffect arg, boolean bl, double d, double e, double f, double g, double h, double i) {
+    public void addImportantParticle(ParticleEffect parameters, boolean alwaysSpawn, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
     }
 
-    public float getSkyAngleRadians(float f) {
-        float g = this.method_30274(f);
+    public float getSkyAngleRadians(float tickDelta) {
+        float g = this.method_30274(tickDelta);
         return g * ((float)Math.PI * 2);
     }
 
-    public boolean addBlockEntity(BlockEntity arg) {
+    public boolean addBlockEntity(BlockEntity blockEntity) {
         boolean bl;
         if (this.iteratingTickingBlockEntities) {
             org.apache.logging.log4j.util.Supplier[] arrsupplier = new org.apache.logging.log4j.util.Supplier[2];
-            arrsupplier[0] = () -> Registry.BLOCK_ENTITY_TYPE.getId(arg.getType());
-            arrsupplier[1] = arg::getPos;
+            arrsupplier[0] = () -> Registry.BLOCK_ENTITY_TYPE.getId(blockEntity.getType());
+            arrsupplier[1] = blockEntity::getPos;
             LOGGER.error("Adding block entity while ticking: {} @ {}", arrsupplier);
         }
-        if ((bl = this.blockEntities.add(arg)) && arg instanceof Tickable) {
-            this.tickingBlockEntities.add(arg);
+        if ((bl = this.blockEntities.add(blockEntity)) && blockEntity instanceof Tickable) {
+            this.tickingBlockEntities.add(blockEntity);
         }
         if (this.isClient) {
-            BlockPos lv = arg.getPos();
+            BlockPos lv = blockEntity.getPos();
             BlockState lv2 = this.getBlockState(lv);
             this.updateListeners(lv, lv2, lv2, 2);
         }
         return bl;
     }
 
-    public void addBlockEntities(Collection<BlockEntity> collection) {
+    public void addBlockEntities(Collection<BlockEntity> blockEntities) {
         if (this.iteratingTickingBlockEntities) {
-            this.pendingBlockEntities.addAll(collection);
+            this.pendingBlockEntities.addAll(blockEntities);
         } else {
-            for (BlockEntity lv : collection) {
+            for (BlockEntity lv : blockEntities) {
                 this.addBlockEntity(lv);
             }
         }
@@ -494,28 +494,28 @@ AutoCloseable {
         lv.pop();
     }
 
-    public void tickEntity(Consumer<Entity> consumer, Entity arg) {
+    public void tickEntity(Consumer<Entity> tickConsumer, Entity entity) {
         try {
-            consumer.accept(arg);
+            tickConsumer.accept(entity);
         }
         catch (Throwable throwable) {
             CrashReport lv = CrashReport.create(throwable, "Ticking entity");
             CrashReportSection lv2 = lv.addElement("Entity being ticked");
-            arg.populateCrashReport(lv2);
+            entity.populateCrashReport(lv2);
             throw new CrashException(lv);
         }
     }
 
-    public Explosion createExplosion(@Nullable Entity arg, double d, double e, double f, float g, Explosion.DestructionType arg2) {
-        return this.createExplosion(arg, null, null, d, e, f, g, false, arg2);
+    public Explosion createExplosion(@Nullable Entity entity, double x, double y, double z, float power, Explosion.DestructionType destructionType) {
+        return this.createExplosion(entity, null, null, x, y, z, power, false, destructionType);
     }
 
-    public Explosion createExplosion(@Nullable Entity arg, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg2) {
-        return this.createExplosion(arg, null, null, d, e, f, g, bl, arg2);
+    public Explosion createExplosion(@Nullable Entity entity, double x, double y, double z, float power, boolean createFire, Explosion.DestructionType destructionType) {
+        return this.createExplosion(entity, null, null, x, y, z, power, createFire, destructionType);
     }
 
-    public Explosion createExplosion(@Nullable Entity arg, @Nullable DamageSource arg2, @Nullable ExplosionBehavior arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
-        Explosion lv = new Explosion(this, arg, arg2, arg3, d, e, f, g, bl, arg4);
+    public Explosion createExplosion(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionBehavior arg3, double d, double e, double f, float g, boolean bl, Explosion.DestructionType arg4) {
+        Explosion lv = new Explosion(this, entity, damageSource, arg3, d, e, f, g, bl, arg4);
         lv.collectBlocksAndDamageEntities();
         lv.affectWorld(true);
         return lv;
@@ -528,8 +528,8 @@ AutoCloseable {
 
     @Override
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos arg) {
-        if (World.isHeightInvalid(arg)) {
+    public BlockEntity getBlockEntity(BlockPos pos) {
+        if (World.isHeightInvalid(pos)) {
             return null;
         }
         if (!this.isClient && Thread.currentThread() != this.thread) {
@@ -537,51 +537,51 @@ AutoCloseable {
         }
         BlockEntity lv = null;
         if (this.iteratingTickingBlockEntities) {
-            lv = this.getPendingBlockEntity(arg);
+            lv = this.getPendingBlockEntity(pos);
         }
         if (lv == null) {
-            lv = this.getWorldChunk(arg).getBlockEntity(arg, WorldChunk.CreationType.IMMEDIATE);
+            lv = this.getWorldChunk(pos).getBlockEntity(pos, WorldChunk.CreationType.IMMEDIATE);
         }
         if (lv == null) {
-            lv = this.getPendingBlockEntity(arg);
+            lv = this.getPendingBlockEntity(pos);
         }
         return lv;
     }
 
     @Nullable
-    private BlockEntity getPendingBlockEntity(BlockPos arg) {
+    private BlockEntity getPendingBlockEntity(BlockPos pos) {
         for (int i = 0; i < this.pendingBlockEntities.size(); ++i) {
             BlockEntity lv = this.pendingBlockEntities.get(i);
-            if (lv.isRemoved() || !lv.getPos().equals(arg)) continue;
+            if (lv.isRemoved() || !lv.getPos().equals(pos)) continue;
             return lv;
         }
         return null;
     }
 
-    public void setBlockEntity(BlockPos arg, @Nullable BlockEntity arg2) {
-        if (World.isHeightInvalid(arg)) {
+    public void setBlockEntity(BlockPos pos, @Nullable BlockEntity blockEntity) {
+        if (World.isHeightInvalid(pos)) {
             return;
         }
-        if (arg2 != null && !arg2.isRemoved()) {
+        if (blockEntity != null && !blockEntity.isRemoved()) {
             if (this.iteratingTickingBlockEntities) {
-                arg2.setLocation(this, arg);
+                blockEntity.setLocation(this, pos);
                 Iterator<BlockEntity> iterator = this.pendingBlockEntities.iterator();
                 while (iterator.hasNext()) {
                     BlockEntity lv = iterator.next();
-                    if (!lv.getPos().equals(arg)) continue;
+                    if (!lv.getPos().equals(pos)) continue;
                     lv.markRemoved();
                     iterator.remove();
                 }
-                this.pendingBlockEntities.add(arg2);
+                this.pendingBlockEntities.add(blockEntity);
             } else {
-                this.getWorldChunk(arg).setBlockEntity(arg, arg2);
-                this.addBlockEntity(arg2);
+                this.getWorldChunk(pos).setBlockEntity(pos, blockEntity);
+                this.addBlockEntity(blockEntity);
             }
         }
     }
 
-    public void removeBlockEntity(BlockPos arg) {
-        BlockEntity lv = this.getBlockEntity(arg);
+    public void removeBlockEntity(BlockPos pos) {
+        BlockEntity lv = this.getBlockEntity(pos);
         if (lv != null && this.iteratingTickingBlockEntities) {
             lv.markRemoved();
             this.pendingBlockEntities.remove(lv);
@@ -591,30 +591,30 @@ AutoCloseable {
                 this.blockEntities.remove(lv);
                 this.tickingBlockEntities.remove(lv);
             }
-            this.getWorldChunk(arg).removeBlockEntity(arg);
+            this.getWorldChunk(pos).removeBlockEntity(pos);
         }
     }
 
-    public boolean canSetBlock(BlockPos arg) {
-        if (World.isHeightInvalid(arg)) {
+    public boolean canSetBlock(BlockPos pos) {
+        if (World.isHeightInvalid(pos)) {
             return false;
         }
-        return this.getChunkManager().isChunkLoaded(arg.getX() >> 4, arg.getZ() >> 4);
+        return this.getChunkManager().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
-    public boolean isDirectionSolid(BlockPos arg, Entity arg2, Direction arg3) {
-        if (World.isHeightInvalid(arg)) {
+    public boolean isDirectionSolid(BlockPos pos, Entity entity, Direction direction) {
+        if (World.isHeightInvalid(pos)) {
             return false;
         }
-        Chunk lv = this.getChunk(arg.getX() >> 4, arg.getZ() >> 4, ChunkStatus.FULL, false);
+        Chunk lv = this.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false);
         if (lv == null) {
             return false;
         }
-        return lv.getBlockState(arg).hasSolidTopSurface(this, arg, arg2, arg3);
+        return lv.getBlockState(pos).hasSolidTopSurface(this, pos, entity, direction);
     }
 
-    public boolean isTopSolid(BlockPos arg, Entity arg2) {
-        return this.isDirectionSolid(arg, arg2, Direction.UP);
+    public boolean isTopSolid(BlockPos pos, Entity entity) {
+        return this.isDirectionSolid(pos, entity, Direction.UP);
     }
 
     public void calculateAmbientDarkness() {
@@ -624,8 +624,8 @@ AutoCloseable {
         this.ambientDarkness = (int)((1.0 - f * d * e) * 11.0);
     }
 
-    public void setMobSpawnOptions(boolean bl, boolean bl2) {
-        this.getChunkManager().setMobSpawnOptions(bl, bl2);
+    public void setMobSpawnOptions(boolean spawnMonsters, boolean spawnAnimals) {
+        this.getChunkManager().setMobSpawnOptions(spawnMonsters, spawnAnimals);
     }
 
     protected void initWeatherGradients() {
@@ -644,79 +644,79 @@ AutoCloseable {
 
     @Override
     @Nullable
-    public BlockView getExistingChunk(int i, int j) {
-        return this.getChunk(i, j, ChunkStatus.FULL, false);
+    public BlockView getExistingChunk(int chunkX, int chunkZ) {
+        return this.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
     }
 
     @Override
-    public List<Entity> getEntities(@Nullable Entity arg, Box arg2, @Nullable Predicate<? super Entity> predicate) {
+    public List<Entity> getEntities(@Nullable Entity except, Box box, @Nullable Predicate<? super Entity> predicate) {
         this.getProfiler().visit("getEntities");
         ArrayList list = Lists.newArrayList();
-        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
-        int j = MathHelper.floor((arg2.maxX + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
-        int l = MathHelper.floor((arg2.maxZ + 2.0) / 16.0);
+        int i = MathHelper.floor((box.minX - 2.0) / 16.0);
+        int j = MathHelper.floor((box.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((box.minZ - 2.0) / 16.0);
+        int l = MathHelper.floor((box.maxZ + 2.0) / 16.0);
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m <= j; ++m) {
             for (int n = k; n <= l; ++n) {
                 WorldChunk lv2 = lv.getWorldChunk(m, n, false);
                 if (lv2 == null) continue;
-                lv2.getEntities(arg, arg2, list, predicate);
+                lv2.getEntities(except, box, list, predicate);
             }
         }
         return list;
     }
 
-    public <T extends Entity> List<T> getEntities(@Nullable EntityType<T> arg, Box arg2, Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntities(@Nullable EntityType<T> type, Box box, Predicate<? super T> predicate) {
         this.getProfiler().visit("getEntities");
-        int i = MathHelper.floor((arg2.minX - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg2.maxX + 2.0) / 16.0);
-        int k = MathHelper.floor((arg2.minZ - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg2.maxZ + 2.0) / 16.0);
+        int i = MathHelper.floor((box.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((box.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((box.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((box.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         for (int m = i; m < j; ++m) {
             for (int n = k; n < l; ++n) {
                 WorldChunk lv = this.getChunkManager().getWorldChunk(m, n, false);
                 if (lv == null) continue;
-                lv.getEntities(arg, arg2, list, predicate);
+                lv.getEntities(type, box, list, predicate);
             }
         }
         return list;
     }
 
     @Override
-    public <T extends Entity> List<T> getEntities(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntities(Class<? extends T> entityClass, Box box, @Nullable Predicate<? super T> predicate) {
         this.getProfiler().visit("getEntities");
-        int i = MathHelper.floor((arg.minX - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg.maxX + 2.0) / 16.0);
-        int k = MathHelper.floor((arg.minZ - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg.maxZ + 2.0) / 16.0);
+        int i = MathHelper.floor((box.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((box.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((box.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((box.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m < j; ++m) {
             for (int n = k; n < l; ++n) {
                 WorldChunk lv2 = lv.getWorldChunk(m, n, false);
                 if (lv2 == null) continue;
-                lv2.getEntities(class_, arg, list, predicate);
+                lv2.getEntities(entityClass, box, list, predicate);
             }
         }
         return list;
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> class_, Box arg, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntitiesIncludingUngeneratedChunks(Class<? extends T> entityClass, Box box, @Nullable Predicate<? super T> predicate) {
         this.getProfiler().visit("getLoadedEntities");
-        int i = MathHelper.floor((arg.minX - 2.0) / 16.0);
-        int j = MathHelper.ceil((arg.maxX + 2.0) / 16.0);
-        int k = MathHelper.floor((arg.minZ - 2.0) / 16.0);
-        int l = MathHelper.ceil((arg.maxZ + 2.0) / 16.0);
+        int i = MathHelper.floor((box.minX - 2.0) / 16.0);
+        int j = MathHelper.ceil((box.maxX + 2.0) / 16.0);
+        int k = MathHelper.floor((box.minZ - 2.0) / 16.0);
+        int l = MathHelper.ceil((box.maxZ + 2.0) / 16.0);
         ArrayList list = Lists.newArrayList();
         ChunkManager lv = this.getChunkManager();
         for (int m = i; m < j; ++m) {
             for (int n = k; n < l; ++n) {
                 WorldChunk lv2 = lv.getWorldChunk(m, n);
                 if (lv2 == null) continue;
-                lv2.getEntities(class_, arg, list, predicate);
+                lv2.getEntities(entityClass, box, list, predicate);
             }
         }
         return list;
@@ -725,9 +725,9 @@ AutoCloseable {
     @Nullable
     public abstract Entity getEntityById(int var1);
 
-    public void markDirty(BlockPos arg, BlockEntity arg2) {
-        if (this.isChunkLoaded(arg)) {
-            this.getWorldChunk(arg).markDirty();
+    public void markDirty(BlockPos pos, BlockEntity blockEntity) {
+        if (this.isChunkLoaded(pos)) {
+            this.getWorldChunk(pos).markDirty();
         }
     }
 
@@ -736,65 +736,65 @@ AutoCloseable {
         return 63;
     }
 
-    public int getReceivedStrongRedstonePower(BlockPos arg) {
+    public int getReceivedStrongRedstonePower(BlockPos pos) {
         int i = 0;
-        if ((i = Math.max(i, this.getStrongRedstonePower(arg.down(), Direction.DOWN))) >= 15) {
+        if ((i = Math.max(i, this.getStrongRedstonePower(pos.down(), Direction.DOWN))) >= 15) {
             return i;
         }
-        if ((i = Math.max(i, this.getStrongRedstonePower(arg.up(), Direction.UP))) >= 15) {
+        if ((i = Math.max(i, this.getStrongRedstonePower(pos.up(), Direction.UP))) >= 15) {
             return i;
         }
-        if ((i = Math.max(i, this.getStrongRedstonePower(arg.north(), Direction.NORTH))) >= 15) {
+        if ((i = Math.max(i, this.getStrongRedstonePower(pos.north(), Direction.NORTH))) >= 15) {
             return i;
         }
-        if ((i = Math.max(i, this.getStrongRedstonePower(arg.south(), Direction.SOUTH))) >= 15) {
+        if ((i = Math.max(i, this.getStrongRedstonePower(pos.south(), Direction.SOUTH))) >= 15) {
             return i;
         }
-        if ((i = Math.max(i, this.getStrongRedstonePower(arg.west(), Direction.WEST))) >= 15) {
+        if ((i = Math.max(i, this.getStrongRedstonePower(pos.west(), Direction.WEST))) >= 15) {
             return i;
         }
-        if ((i = Math.max(i, this.getStrongRedstonePower(arg.east(), Direction.EAST))) >= 15) {
+        if ((i = Math.max(i, this.getStrongRedstonePower(pos.east(), Direction.EAST))) >= 15) {
             return i;
         }
         return i;
     }
 
-    public boolean isEmittingRedstonePower(BlockPos arg, Direction arg2) {
-        return this.getEmittedRedstonePower(arg, arg2) > 0;
+    public boolean isEmittingRedstonePower(BlockPos pos, Direction direction) {
+        return this.getEmittedRedstonePower(pos, direction) > 0;
     }
 
-    public int getEmittedRedstonePower(BlockPos arg, Direction arg2) {
-        BlockState lv = this.getBlockState(arg);
-        int i = lv.getWeakRedstonePower(this, arg, arg2);
-        if (lv.isSolidBlock(this, arg)) {
-            return Math.max(i, this.getReceivedStrongRedstonePower(arg));
+    public int getEmittedRedstonePower(BlockPos pos, Direction direction) {
+        BlockState lv = this.getBlockState(pos);
+        int i = lv.getWeakRedstonePower(this, pos, direction);
+        if (lv.isSolidBlock(this, pos)) {
+            return Math.max(i, this.getReceivedStrongRedstonePower(pos));
         }
         return i;
     }
 
-    public boolean isReceivingRedstonePower(BlockPos arg) {
-        if (this.getEmittedRedstonePower(arg.down(), Direction.DOWN) > 0) {
+    public boolean isReceivingRedstonePower(BlockPos pos) {
+        if (this.getEmittedRedstonePower(pos.down(), Direction.DOWN) > 0) {
             return true;
         }
-        if (this.getEmittedRedstonePower(arg.up(), Direction.UP) > 0) {
+        if (this.getEmittedRedstonePower(pos.up(), Direction.UP) > 0) {
             return true;
         }
-        if (this.getEmittedRedstonePower(arg.north(), Direction.NORTH) > 0) {
+        if (this.getEmittedRedstonePower(pos.north(), Direction.NORTH) > 0) {
             return true;
         }
-        if (this.getEmittedRedstonePower(arg.south(), Direction.SOUTH) > 0) {
+        if (this.getEmittedRedstonePower(pos.south(), Direction.SOUTH) > 0) {
             return true;
         }
-        if (this.getEmittedRedstonePower(arg.west(), Direction.WEST) > 0) {
+        if (this.getEmittedRedstonePower(pos.west(), Direction.WEST) > 0) {
             return true;
         }
-        return this.getEmittedRedstonePower(arg.east(), Direction.EAST) > 0;
+        return this.getEmittedRedstonePower(pos.east(), Direction.EAST) > 0;
     }
 
-    public int getReceivedRedstonePower(BlockPos arg) {
+    public int getReceivedRedstonePower(BlockPos pos) {
         int i = 0;
         for (Direction lv : DIRECTIONS) {
-            int j = this.getEmittedRedstonePower(arg.offset(lv), lv);
+            int j = this.getEmittedRedstonePower(pos.offset(lv), lv);
             if (j >= 15) {
                 return 15;
             }
@@ -816,15 +816,15 @@ AutoCloseable {
         return this.properties.getTimeOfDay();
     }
 
-    public boolean canPlayerModifyAt(PlayerEntity arg, BlockPos arg2) {
+    public boolean canPlayerModifyAt(PlayerEntity player, BlockPos pos) {
         return true;
     }
 
-    public void sendEntityStatus(Entity arg, byte b) {
+    public void sendEntityStatus(Entity entity, byte status) {
     }
 
-    public void addSyncedBlockEvent(BlockPos arg, Block arg2, int i, int j) {
-        this.getBlockState(arg).onSyncedBlockEvent(this, arg, i, j);
+    public void addSyncedBlockEvent(BlockPos pos, Block block, int type, int data) {
+        this.getBlockState(pos).onSyncedBlockEvent(this, pos, type, data);
     }
 
     @Override
@@ -836,24 +836,24 @@ AutoCloseable {
         return this.properties.getGameRules();
     }
 
-    public float getThunderGradient(float f) {
-        return MathHelper.lerp(f, this.thunderGradientPrev, this.thunderGradient) * this.getRainGradient(f);
+    public float getThunderGradient(float delta) {
+        return MathHelper.lerp(delta, this.thunderGradientPrev, this.thunderGradient) * this.getRainGradient(delta);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setThunderGradient(float f) {
-        this.thunderGradientPrev = f;
-        this.thunderGradient = f;
+    public void setThunderGradient(float thunderGradient) {
+        this.thunderGradientPrev = thunderGradient;
+        this.thunderGradient = thunderGradient;
     }
 
-    public float getRainGradient(float f) {
-        return MathHelper.lerp(f, this.rainGradientPrev, this.rainGradient);
+    public float getRainGradient(float delta) {
+        return MathHelper.lerp(delta, this.rainGradientPrev, this.rainGradient);
     }
 
     @Environment(value=EnvType.CLIENT)
-    public void setRainGradient(float f) {
-        this.rainGradientPrev = f;
-        this.rainGradient = f;
+    public void setRainGradient(float rainGradient) {
+        this.rainGradientPrev = rainGradient;
+        this.rainGradient = rainGradient;
     }
 
     public boolean isThundering() {
@@ -867,22 +867,22 @@ AutoCloseable {
         return (double)this.getRainGradient(1.0f) > 0.2;
     }
 
-    public boolean hasRain(BlockPos arg) {
+    public boolean hasRain(BlockPos pos) {
         if (!this.isRaining()) {
             return false;
         }
-        if (!this.isSkyVisible(arg)) {
+        if (!this.isSkyVisible(pos)) {
             return false;
         }
-        if (this.getTopPosition(Heightmap.Type.MOTION_BLOCKING, arg).getY() > arg.getY()) {
+        if (this.getTopPosition(Heightmap.Type.MOTION_BLOCKING, pos).getY() > pos.getY()) {
             return false;
         }
-        Biome lv = this.getBiome(arg);
-        return lv.getPrecipitation() == Biome.Precipitation.RAIN && lv.getTemperature(arg) >= 0.15f;
+        Biome lv = this.getBiome(pos);
+        return lv.getPrecipitation() == Biome.Precipitation.RAIN && lv.getTemperature(pos) >= 0.15f;
     }
 
-    public boolean hasHighHumidity(BlockPos arg) {
-        Biome lv = this.getBiome(arg);
+    public boolean hasHighHumidity(BlockPos pos) {
+        Biome lv = this.getBiome(pos);
         return lv.hasHighHumidity();
     }
 
@@ -893,11 +893,11 @@ AutoCloseable {
 
     public abstract int getNextMapId();
 
-    public void syncGlobalEvent(int i, BlockPos arg, int j) {
+    public void syncGlobalEvent(int eventId, BlockPos pos, int data) {
     }
 
-    public CrashReportSection addDetailsToCrashReport(CrashReport arg) {
-        CrashReportSection lv = arg.addElement("Affected level", 1);
+    public CrashReportSection addDetailsToCrashReport(CrashReport report) {
+        CrashReportSection lv = report.addElement("Affected level", 1);
         lv.add("All players", () -> this.getPlayers().size() + " total; " + this.getPlayers());
         lv.add("Chunk stats", this.getChunkManager()::getDebugString);
         lv.add("Level dimension", () -> this.getRegistryKey().getValue().toString());
@@ -913,32 +913,32 @@ AutoCloseable {
     public abstract void setBlockBreakingInfo(int var1, BlockPos var2, int var3);
 
     @Environment(value=EnvType.CLIENT)
-    public void addFireworkParticle(double d, double e, double f, double g, double h, double i, @Nullable CompoundTag arg) {
+    public void addFireworkParticle(double x, double y, double z, double velocityX, double velocityY, double velocityZ, @Nullable CompoundTag tag) {
     }
 
     public abstract Scoreboard getScoreboard();
 
-    public void updateComparators(BlockPos arg, Block arg2) {
+    public void updateComparators(BlockPos pos, Block block) {
         for (Direction lv : Direction.Type.HORIZONTAL) {
-            BlockPos lv2 = arg.offset(lv);
+            BlockPos lv2 = pos.offset(lv);
             if (!this.isChunkLoaded(lv2)) continue;
             BlockState lv3 = this.getBlockState(lv2);
             if (lv3.isOf(Blocks.COMPARATOR)) {
-                lv3.neighborUpdate(this, lv2, arg2, arg, false);
+                lv3.neighborUpdate(this, lv2, block, pos, false);
                 continue;
             }
             if (!lv3.isSolidBlock(this, lv2) || !(lv3 = this.getBlockState(lv2 = lv2.offset(lv))).isOf(Blocks.COMPARATOR)) continue;
-            lv3.neighborUpdate(this, lv2, arg2, arg, false);
+            lv3.neighborUpdate(this, lv2, block, pos, false);
         }
     }
 
     @Override
-    public LocalDifficulty getLocalDifficulty(BlockPos arg) {
+    public LocalDifficulty getLocalDifficulty(BlockPos pos) {
         long l = 0L;
         float f = 0.0f;
-        if (this.isChunkLoaded(arg)) {
+        if (this.isChunkLoaded(pos)) {
             f = this.method_30272();
-            l = this.getWorldChunk(arg).getInhabitedTime();
+            l = this.getWorldChunk(pos).getInhabitedTime();
         }
         return new LocalDifficulty(this.getDifficulty(), this.getTimeOfDay(), l, f);
     }
@@ -948,7 +948,7 @@ AutoCloseable {
         return this.ambientDarkness;
     }
 
-    public void setLightningTicksLeft(int i) {
+    public void setLightningTicksLeft(int lightningTicksLeft) {
     }
 
     @Override
@@ -956,7 +956,7 @@ AutoCloseable {
         return this.border;
     }
 
-    public void sendPacket(Packet<?> arg) {
+    public void sendPacket(Packet<?> packet) {
         throw new UnsupportedOperationException("Can't send packets to server unless you're on the client.");
     }
 
@@ -979,18 +979,18 @@ AutoCloseable {
     }
 
     @Override
-    public boolean testBlockState(BlockPos arg, Predicate<BlockState> predicate) {
-        return predicate.test(this.getBlockState(arg));
+    public boolean testBlockState(BlockPos pos, Predicate<BlockState> state) {
+        return state.test(this.getBlockState(pos));
     }
 
     public abstract RecipeManager getRecipeManager();
 
     public abstract TagManager getTagManager();
 
-    public BlockPos getRandomPosInChunk(int i, int j, int k, int l) {
+    public BlockPos getRandomPosInChunk(int x, int y, int z, int l) {
         this.lcgBlockSeed = this.lcgBlockSeed * 3 + 1013904223;
         int m = this.lcgBlockSeed >> 2;
-        return new BlockPos(i + (m & 0xF), j + (m >> 16 & l), k + (m >> 8 & 0xF));
+        return new BlockPos(x + (m & 0xF), y + (m >> 16 & l), z + (m >> 8 & 0xF));
     }
 
     public boolean isSavingDisabled() {
@@ -1017,8 +1017,8 @@ AutoCloseable {
     public abstract class_5455 method_30349();
 
     @Override
-    public /* synthetic */ Chunk getChunk(int i, int j) {
-        return this.getChunk(i, j);
+    public /* synthetic */ Chunk getChunk(int chunkX, int chunkZ) {
+        return this.getChunk(chunkX, chunkZ);
     }
 }
 

@@ -26,18 +26,18 @@ extends Task<LivingEntity> {
     }
 
     @Override
-    protected boolean shouldRun(ServerWorld arg, LivingEntity arg2) {
-        return arg.random.nextFloat() > 0.95f;
+    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+        return world.random.nextFloat() > 0.95f;
     }
 
     @Override
-    protected void run(ServerWorld arg, LivingEntity arg2, long l) {
+    protected void run(ServerWorld world, LivingEntity entity, long time) {
         BlockState lv3;
-        Brain<?> lv = arg2.getBrain();
+        Brain<?> lv = entity.getBrain();
         BlockPos lv2 = lv.getOptionalMemory(MemoryModuleType.MEETING_POINT).get().getPos();
-        if (lv2.isWithinDistance(arg2.getBlockPos(), 3.0) && (lv3 = arg.getBlockState(lv2)).isOf(Blocks.BELL)) {
+        if (lv2.isWithinDistance(entity.getBlockPos(), 3.0) && (lv3 = world.getBlockState(lv2)).isOf(Blocks.BELL)) {
             BellBlock lv4 = (BellBlock)lv3.getBlock();
-            lv4.ring(arg, lv2, null);
+            lv4.ring(world, lv2, null);
         }
     }
 }

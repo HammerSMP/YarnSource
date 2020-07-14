@@ -59,24 +59,24 @@ implements AutoCloseable {
     private float time;
     private float lastTickDelta;
 
-    public ShaderEffect(TextureManager arg, ResourceManager arg2, Framebuffer arg3, Identifier arg4) throws IOException, JsonSyntaxException {
+    public ShaderEffect(TextureManager arg, ResourceManager arg2, Framebuffer framebuffer, Identifier location) throws IOException, JsonSyntaxException {
         this.resourceManager = arg2;
-        this.mainTarget = arg3;
+        this.mainTarget = framebuffer;
         this.time = 0.0f;
         this.lastTickDelta = 0.0f;
-        this.width = arg3.viewportWidth;
-        this.height = arg3.viewportHeight;
-        this.name = arg4.toString();
+        this.width = framebuffer.viewportWidth;
+        this.height = framebuffer.viewportHeight;
+        this.name = location.toString();
         this.setupProjectionMatrix();
-        this.parseEffect(arg, arg4);
+        this.parseEffect(arg, location);
     }
 
-    private void parseEffect(TextureManager arg, Identifier arg2) throws IOException, JsonSyntaxException {
+    private void parseEffect(TextureManager arg, Identifier location) throws IOException, JsonSyntaxException {
         Resource lv;
         block11: {
             lv = null;
             try {
-                lv = this.resourceManager.getResource(arg2);
+                lv = this.resourceManager.getResource(location);
                 JsonObject jsonObject = JsonHelper.deserialize(new InputStreamReader(lv.getInputStream(), StandardCharsets.UTF_8));
                 if (JsonHelper.hasArray(jsonObject, "targets")) {
                     JsonArray jsonArray = jsonObject.getAsJsonArray("targets");
@@ -111,7 +111,7 @@ implements AutoCloseable {
             catch (Exception exception3) {
                 try {
                     ShaderParseException lv4 = ShaderParseException.wrap(exception3);
-                    lv4.addFaultyFile(arg2.getPath());
+                    lv4.addFaultyFile(location.getPath());
                     throw lv4;
                 }
                 catch (Throwable throwable) {
@@ -123,11 +123,11 @@ implements AutoCloseable {
         IOUtils.closeQuietly((Closeable)lv);
     }
 
-    private void parseTarget(JsonElement jsonElement) throws ShaderParseException {
-        if (JsonHelper.isString(jsonElement)) {
-            this.addTarget(jsonElement.getAsString(), this.width, this.height);
+    private void parseTarget(JsonElement jsonTarget) throws ShaderParseException {
+        if (JsonHelper.isString(jsonTarget)) {
+            this.addTarget(jsonTarget.getAsString(), this.width, this.height);
         } else {
-            JsonObject jsonObject = JsonHelper.asObject(jsonElement, "target");
+            JsonObject jsonObject = JsonHelper.asObject(jsonTarget, "target");
             String string = JsonHelper.getString(jsonObject, "name");
             int i = JsonHelper.getInt(jsonObject, "width", this.width);
             int j = JsonHelper.getInt(jsonObject, "height", this.height);
@@ -138,11 +138,11 @@ implements AutoCloseable {
         }
     }
 
-    private void parsePass(TextureManager arg, JsonElement jsonElement) throws IOException {
+    private void parsePass(TextureManager arg, JsonElement jsonPass) throws IOException {
         JsonArray jsonArray2;
         JsonObject jsonObject;
         block21: {
-            jsonObject = JsonHelper.asObject(jsonElement, "pass");
+            jsonObject = JsonHelper.asObject(jsonPass, "pass");
             String string = JsonHelper.getString(jsonObject, "name");
             String string2 = JsonHelper.getString(jsonObject, "intarget");
             String string3 = JsonHelper.getString(jsonObject, "outtarget");
@@ -242,8 +242,8 @@ implements AutoCloseable {
         }
     }
 
-    private void parseUniform(JsonElement jsonElement) throws ShaderParseException {
-        JsonObject jsonObject = JsonHelper.asObject(jsonElement, "uniform");
+    private void parseUniform(JsonElement jsonUniform) throws ShaderParseException {
+        JsonObject jsonObject = JsonHelper.asObject(jsonUniform, "uniform");
         String string = JsonHelper.getString(jsonObject, "name");
         GlUniform lv = this.passes.get(this.passes.size() - 1).getProgram().getUniformByName(string);
         if (lv == null) {
@@ -285,15 +285,15 @@ implements AutoCloseable {
         }
     }
 
-    public Framebuffer getSecondaryTarget(String string) {
-        return this.targetsByName.get(string);
+    public Framebuffer getSecondaryTarget(String name) {
+        return this.targetsByName.get(name);
     }
 
-    public void addTarget(String string, int i, int j) {
-        Framebuffer lv = new Framebuffer(i, j, true, MinecraftClient.IS_SYSTEM_MAC);
+    public void addTarget(String name, int width, int height) {
+        Framebuffer lv = new Framebuffer(width, height, true, MinecraftClient.IS_SYSTEM_MAC);
         lv.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        this.targetsByName.put(string, lv);
-        if (i == this.width && j == this.height) {
+        this.targetsByName.put(name, lv);
+        if (width == this.width && height == this.height) {
             this.defaultSizedTargets.add(lv);
         }
     }
@@ -309,8 +309,8 @@ implements AutoCloseable {
         this.passes.clear();
     }
 
-    public PostProcessShader addPass(String string, Framebuffer arg, Framebuffer arg2) throws IOException {
-        PostProcessShader lv = new PostProcessShader(this.resourceManager, string, arg, arg2);
+    public PostProcessShader addPass(String programName, Framebuffer source, Framebuffer dest) throws IOException {
+        PostProcessShader lv = new PostProcessShader(this.resourceManager, programName, source, dest);
         this.passes.add(this.passes.size(), lv);
         return lv;
     }
@@ -319,7 +319,7 @@ implements AutoCloseable {
         this.projectionMatrix = Matrix4f.projectionMatrix(this.mainTarget.textureWidth, this.mainTarget.textureHeight, 0.1f, 1000.0f);
     }
 
-    public void setupDimensions(int i, int j) {
+    public void setupDimensions(int targetsWidth, int targetsHeight) {
         this.width = this.mainTarget.textureWidth;
         this.height = this.mainTarget.textureHeight;
         this.setupProjectionMatrix();
@@ -327,18 +327,18 @@ implements AutoCloseable {
             lv.setProjectionMatrix(this.projectionMatrix);
         }
         for (Framebuffer lv2 : this.defaultSizedTargets) {
-            lv2.resize(i, j, MinecraftClient.IS_SYSTEM_MAC);
+            lv2.resize(targetsWidth, targetsHeight, MinecraftClient.IS_SYSTEM_MAC);
         }
     }
 
-    public void render(float f) {
-        if (f < this.lastTickDelta) {
+    public void render(float tickDelta) {
+        if (tickDelta < this.lastTickDelta) {
             this.time += 1.0f - this.lastTickDelta;
-            this.time += f;
+            this.time += tickDelta;
         } else {
-            this.time += f - this.lastTickDelta;
+            this.time += tickDelta - this.lastTickDelta;
         }
-        this.lastTickDelta = f;
+        this.lastTickDelta = tickDelta;
         while (this.time > 20.0f) {
             this.time -= 20.0f;
         }
@@ -351,14 +351,14 @@ implements AutoCloseable {
         return this.name;
     }
 
-    private Framebuffer getTarget(String string) {
-        if (string == null) {
+    private Framebuffer getTarget(String name) {
+        if (name == null) {
             return null;
         }
-        if (string.equals("minecraft:main")) {
+        if (name.equals("minecraft:main")) {
             return this.mainTarget;
         }
-        return this.targetsByName.get(string);
+        return this.targetsByName.get(name);
     }
 }
 

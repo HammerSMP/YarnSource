@@ -169,9 +169,9 @@ public class ModelLoader {
     private int nextStateId = 1;
     private final Object2IntMap<BlockState> stateLookup = (Object2IntMap)Util.make(new Object2IntOpenHashMap(), object2IntOpenHashMap -> object2IntOpenHashMap.defaultReturnValue(-1));
 
-    public ModelLoader(ResourceManager arg2, BlockColors arg23, Profiler arg3, int i) {
-        this.resourceManager = arg2;
-        this.blockColors = arg23;
+    public ModelLoader(ResourceManager resourceManager, BlockColors arg2, Profiler arg3, int i) {
+        this.resourceManager = resourceManager;
+        this.blockColors = arg2;
         arg3.push("missing_model");
         try {
             this.unbakedModels.put(MISSING, this.loadModelFromJson(MISSING));
@@ -237,13 +237,13 @@ public class ModelLoader {
         return this.spriteAtlasManager;
     }
 
-    private static Predicate<BlockState> stateKeyToPredicate(StateManager<Block, BlockState> arg, String string) {
+    private static Predicate<BlockState> stateKeyToPredicate(StateManager<Block, BlockState> stateFactory, String key) {
         HashMap map = Maps.newHashMap();
-        for (String string2 : COMMA_SPLITTER.split((CharSequence)string)) {
+        for (String string2 : COMMA_SPLITTER.split((CharSequence)key)) {
             Iterator iterator = KEY_VALUE_SPLITTER.split((CharSequence)string2).iterator();
             if (!iterator.hasNext()) continue;
             String string3 = (String)iterator.next();
-            Property<?> lv = arg.getProperty(string3);
+            Property<?> lv = stateFactory.getProperty(string3);
             if (lv != null && iterator.hasNext()) {
                 String string4 = (String)iterator.next();
                 Object comparable = ModelLoader.getPropertyValue(lv, string4);
@@ -256,7 +256,7 @@ public class ModelLoader {
             if (string3.isEmpty()) continue;
             throw new RuntimeException("Unknown blockstate property: '" + string3 + "'");
         }
-        Block lv2 = arg.getOwner();
+        Block lv2 = stateFactory.getOwner();
         return arg2 -> {
             if (arg2 == null || lv2 != arg2.getBlock()) {
                 return false;
@@ -270,21 +270,21 @@ public class ModelLoader {
     }
 
     @Nullable
-    static <T extends Comparable<T>> T getPropertyValue(Property<T> arg, String string) {
-        return (T)((Comparable)arg.parse(string).orElse(null));
+    static <T extends Comparable<T>> T getPropertyValue(Property<T> property, String string) {
+        return (T)((Comparable)property.parse(string).orElse(null));
     }
 
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public UnbakedModel getOrLoadModel(Identifier arg) {
-        if (this.unbakedModels.containsKey(arg)) {
-            return this.unbakedModels.get(arg);
+    public UnbakedModel getOrLoadModel(Identifier id) {
+        if (this.unbakedModels.containsKey(id)) {
+            return this.unbakedModels.get(id);
         }
-        if (this.modelsToLoad.contains(arg)) {
-            throw new IllegalStateException("Circular reference while loading " + arg);
+        if (this.modelsToLoad.contains(id)) {
+            throw new IllegalStateException("Circular reference while loading " + id);
         }
-        this.modelsToLoad.add(arg);
+        this.modelsToLoad.add(id);
         UnbakedModel lv = this.unbakedModels.get(MISSING);
         while (!this.modelsToLoad.isEmpty()) {
             Identifier lv2 = this.modelsToLoad.iterator().next();
@@ -297,32 +297,32 @@ public class ModelLoader {
                 this.unbakedModels.put(lv2, lv);
             }
             catch (Exception exception) {
-                LOGGER.warn("Unable to load model: '{}' referenced from: {}: {}", (Object)lv2, (Object)arg, (Object)exception);
+                LOGGER.warn("Unable to load model: '{}' referenced from: {}: {}", (Object)lv2, (Object)id, (Object)exception);
                 this.unbakedModels.put(lv2, lv);
             }
             finally {
                 this.modelsToLoad.remove(lv2);
             }
         }
-        return this.unbakedModels.getOrDefault(arg, lv);
+        return this.unbakedModels.getOrDefault(id, lv);
     }
 
     /*
      * WARNING - void declaration
      */
-    private void loadModel(Identifier arg4) throws Exception {
-        if (!(arg4 instanceof ModelIdentifier)) {
-            this.putModel(arg4, this.loadModelFromJson(arg4));
+    private void loadModel(Identifier id) throws Exception {
+        if (!(id instanceof ModelIdentifier)) {
+            this.putModel(id, this.loadModelFromJson(id));
             return;
         }
-        ModelIdentifier lv = (ModelIdentifier)arg4;
+        ModelIdentifier lv = (ModelIdentifier)id;
         if (Objects.equals(lv.getVariant(), "inventory")) {
-            Identifier lv2 = new Identifier(arg4.getNamespace(), "item/" + arg4.getPath());
+            Identifier lv2 = new Identifier(id.getNamespace(), "item/" + id.getPath());
             JsonUnbakedModel lv3 = this.loadModelFromJson(lv2);
             this.putModel(lv, lv3);
             this.unbakedModels.put(lv2, lv3);
         } else {
-            Identifier lv4 = new Identifier(arg4.getNamespace(), arg4.getPath());
+            Identifier lv4 = new Identifier(id.getNamespace(), id.getPath());
             StateManager lv5 = Optional.ofNullable(STATIC_DEFINITIONS.get(lv4)).orElseGet(() -> Registry.BLOCK.get(lv4).getStateManager());
             this.variantMapDeserializationContext.setStateFactory(lv5);
             ImmutableList list = ImmutableList.copyOf(this.blockColors.getProperties((Block)lv5.getOwner()));
@@ -330,7 +330,7 @@ public class ModelLoader {
             HashMap map = Maps.newHashMap();
             immutableList.forEach(arg2 -> map.put(BlockModels.getModelId(lv4, arg2), arg2));
             HashMap map2 = Maps.newHashMap();
-            Identifier lv6 = new Identifier(arg4.getNamespace(), "blockstates/" + arg4.getPath() + ".json");
+            Identifier lv6 = new Identifier(id.getNamespace(), "blockstates/" + id.getPath() + ".json");
             UnbakedModel lv7 = this.unbakedModels.get(MISSING);
             ModelDefinition lv8 = new ModelDefinition((List<UnbakedModel>)ImmutableList.of((Object)lv7), (List<Object>)ImmutableList.of());
             Pair pair = Pair.of((Object)lv7, () -> lv8);
@@ -432,26 +432,26 @@ public class ModelLoader {
         }
     }
 
-    private void putModel(Identifier arg, UnbakedModel arg2) {
-        this.unbakedModels.put(arg, arg2);
-        this.modelsToLoad.addAll(arg2.getModelDependencies());
+    private void putModel(Identifier id, UnbakedModel unbakedModel) {
+        this.unbakedModels.put(id, unbakedModel);
+        this.modelsToLoad.addAll(unbakedModel.getModelDependencies());
     }
 
-    private void addModel(ModelIdentifier arg) {
-        UnbakedModel lv = this.getOrLoadModel(arg);
-        this.unbakedModels.put(arg, lv);
-        this.modelsToBake.put(arg, lv);
+    private void addModel(ModelIdentifier modelId) {
+        UnbakedModel lv = this.getOrLoadModel(modelId);
+        this.unbakedModels.put(modelId, lv);
+        this.modelsToBake.put(modelId, lv);
     }
 
-    private void addStates(Iterable<BlockState> iterable) {
+    private void addStates(Iterable<BlockState> states) {
         int i = this.nextStateId++;
-        iterable.forEach(arg -> this.stateLookup.put(arg, i));
+        states.forEach(arg -> this.stateLookup.put(arg, i));
     }
 
     @Nullable
-    public BakedModel bake(Identifier arg, ModelBakeSettings arg2) {
+    public BakedModel bake(Identifier arg, ModelBakeSettings settings) {
         JsonUnbakedModel lv2;
-        Triple triple = Triple.of((Object)arg, (Object)arg2.getRotation(), (Object)arg2.isShaded());
+        Triple triple = Triple.of((Object)arg, (Object)settings.getRotation(), (Object)settings.isShaded());
         if (this.bakedModelCache.containsKey((Object)triple)) {
             return this.bakedModelCache.get((Object)triple);
         }
@@ -460,9 +460,9 @@ public class ModelLoader {
         }
         UnbakedModel lv = this.getOrLoadModel(arg);
         if (lv instanceof JsonUnbakedModel && (lv2 = (JsonUnbakedModel)lv).getRootModel() == GENERATION_MARKER) {
-            return ITEM_MODEL_GENERATOR.create(this.spriteAtlasManager::getSprite, lv2).bake(this, lv2, this.spriteAtlasManager::getSprite, arg2, arg, false);
+            return ITEM_MODEL_GENERATOR.create(this.spriteAtlasManager::getSprite, lv2).bake(this, lv2, this.spriteAtlasManager::getSprite, settings, arg, false);
         }
-        BakedModel lv3 = lv.bake(this, this.spriteAtlasManager::getSprite, arg2, arg);
+        BakedModel lv3 = lv.bake(this, this.spriteAtlasManager::getSprite, settings, arg);
         this.bakedModelCache.put((Triple<Identifier, AffineTransformation, Boolean>)triple, lv3);
         return lv3;
     }
@@ -470,7 +470,7 @@ public class ModelLoader {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    private JsonUnbakedModel loadModelFromJson(Identifier arg) throws IOException {
+    private JsonUnbakedModel loadModelFromJson(Identifier id) throws IOException {
         String string;
         Resource lv;
         Reader reader;
@@ -480,7 +480,7 @@ public class ModelLoader {
                 reader = null;
                 lv = null;
                 try {
-                    string = arg.getPath();
+                    string = id.getPath();
                     if (!"builtin/generated".equals(string)) break block7;
                     jsonUnbakedModel = GENERATION_MARKER;
                 }
@@ -503,15 +503,15 @@ public class ModelLoader {
             String string2 = string.substring("builtin/".length());
             String string3 = BUILTIN_MODEL_DEFINITIONS.get(string2);
             if (string3 == null) {
-                throw new FileNotFoundException(arg.toString());
+                throw new FileNotFoundException(id.toString());
             }
             reader = new StringReader(string3);
         } else {
-            lv = this.resourceManager.getResource(new Identifier(arg.getNamespace(), "models/" + arg.getPath() + ".json"));
+            lv = this.resourceManager.getResource(new Identifier(id.getNamespace(), "models/" + id.getPath() + ".json"));
             reader = new InputStreamReader(lv.getInputStream(), StandardCharsets.UTF_8);
         }
         JsonUnbakedModel lv2 = JsonUnbakedModel.deserialize(reader);
-        lv2.id = arg.toString();
+        lv2.id = id.toString();
         JsonUnbakedModel jsonUnbakedModel = lv2;
         IOUtils.closeQuietly((Reader)reader);
         IOUtils.closeQuietly((Closeable)lv);
@@ -550,17 +550,17 @@ public class ModelLoader {
         private final List<UnbakedModel> components;
         private final List<Object> values;
 
-        public ModelDefinition(List<UnbakedModel> list, List<Object> list2) {
-            this.components = list;
-            this.values = list2;
+        public ModelDefinition(List<UnbakedModel> components, List<Object> values) {
+            this.components = components;
+            this.values = values;
         }
 
-        public boolean equals(Object object) {
-            if (this == object) {
+        public boolean equals(Object o) {
+            if (this == o) {
                 return true;
             }
-            if (object instanceof ModelDefinition) {
-                ModelDefinition lv = (ModelDefinition)object;
+            if (o instanceof ModelDefinition) {
+                ModelDefinition lv = (ModelDefinition)o;
                 return Objects.equals(this.components, lv.components) && Objects.equals(this.values, lv.values);
             }
             return false;
@@ -570,28 +570,28 @@ public class ModelLoader {
             return 31 * this.components.hashCode() + this.values.hashCode();
         }
 
-        public static ModelDefinition create(BlockState arg, MultipartUnbakedModel arg2, Collection<Property<?>> collection) {
-            StateManager<Block, BlockState> lv = arg.getBlock().getStateManager();
-            List list = (List)arg2.getComponents().stream().filter(arg3 -> arg3.getPredicate(lv).test(arg)).map(MultipartModelComponent::getModel).collect(ImmutableList.toImmutableList());
-            List<Object> list2 = ModelDefinition.getStateValues(arg, collection);
+        public static ModelDefinition create(BlockState state, MultipartUnbakedModel rawModel, Collection<Property<?>> properties) {
+            StateManager<Block, BlockState> lv = state.getBlock().getStateManager();
+            List list = (List)rawModel.getComponents().stream().filter(arg3 -> arg3.getPredicate(lv).test(state)).map(MultipartModelComponent::getModel).collect(ImmutableList.toImmutableList());
+            List<Object> list2 = ModelDefinition.getStateValues(state, properties);
             return new ModelDefinition(list, list2);
         }
 
-        public static ModelDefinition create(BlockState arg, UnbakedModel arg2, Collection<Property<?>> collection) {
-            List<Object> list = ModelDefinition.getStateValues(arg, collection);
-            return new ModelDefinition((List<UnbakedModel>)ImmutableList.of((Object)arg2), list);
+        public static ModelDefinition create(BlockState state, UnbakedModel rawModel, Collection<Property<?>> properties) {
+            List<Object> list = ModelDefinition.getStateValues(state, properties);
+            return new ModelDefinition((List<UnbakedModel>)ImmutableList.of((Object)rawModel), list);
         }
 
-        private static List<Object> getStateValues(BlockState arg, Collection<Property<?>> collection) {
-            return (List)collection.stream().map(arg::get).collect(ImmutableList.toImmutableList());
+        private static List<Object> getStateValues(BlockState state, Collection<Property<?>> properties) {
+            return (List)properties.stream().map(state::get).collect(ImmutableList.toImmutableList());
         }
     }
 
     @Environment(value=EnvType.CLIENT)
     static class ModelLoaderException
     extends RuntimeException {
-        public ModelLoaderException(String string) {
-            super(string);
+        public ModelLoaderException(String message) {
+            super(message);
         }
     }
 }

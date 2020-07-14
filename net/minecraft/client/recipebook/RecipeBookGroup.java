@@ -48,8 +48,8 @@ public enum RecipeBookGroup {
     public static final Map<RecipeBookGroup, List<RecipeBookGroup>> field_25783;
     private final List<ItemStack> icons;
 
-    private RecipeBookGroup(ItemStack ... args) {
-        this.icons = ImmutableList.copyOf((Object[])args);
+    private RecipeBookGroup(ItemStack ... entries) {
+        this.icons = ImmutableList.copyOf((Object[])entries);
     }
 
     public static List<RecipeBookGroup> method_30285(RecipeBookCategory arg) {

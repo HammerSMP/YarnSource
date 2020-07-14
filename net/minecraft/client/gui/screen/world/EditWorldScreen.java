@@ -77,9 +77,9 @@ extends Screen {
     private TextFieldWidget levelNameTextField;
     private final LevelStorage.Session field_23777;
 
-    public EditWorldScreen(BooleanConsumer booleanConsumer, LevelStorage.Session arg) {
+    public EditWorldScreen(BooleanConsumer callback, LevelStorage.Session arg) {
         super(new TranslatableText("selectWorld.edit.title"));
-        this.callback = booleanConsumer;
+        this.callback = callback;
         this.field_23777 = arg;
     }
 
@@ -157,9 +157,9 @@ extends Screen {
     }
 
     @Override
-    public void resize(MinecraftClient arg, int i, int j) {
+    public void resize(MinecraftClient client, int width, int height) {
         String string = this.levelNameTextField.getText();
-        this.init(arg, i, j);
+        this.init(client, width, height);
         this.levelNameTextField.setText(string);
     }
 
@@ -221,12 +221,12 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
-        this.drawStringWithShadow(arg, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 24, 0xA0A0A0);
-        this.levelNameTextField.render(arg, i, j, f);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
+        this.drawStringWithShadow(matrices, this.textRenderer, I18n.translate("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 24, 0xA0A0A0);
+        this.levelNameTextField.render(matrices, mouseX, mouseY, delta);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

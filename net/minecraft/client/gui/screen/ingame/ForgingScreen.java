@@ -27,9 +27,9 @@ extends HandledScreen<T>
 implements ScreenHandlerListener {
     private Identifier texture;
 
-    public ForgingScreen(T arg, PlayerInventory arg2, Text arg3, Identifier arg4) {
-        super(arg, arg2, arg3);
-        this.texture = arg4;
+    public ForgingScreen(T handler, PlayerInventory playerInventory, Text title, Identifier texture) {
+        super(handler, playerInventory, title);
+        this.texture = texture;
     }
 
     protected void setup() {
@@ -49,41 +49,41 @@ implements ScreenHandlerListener {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
         RenderSystem.disableBlend();
-        this.renderForeground(arg, i, j, f);
-        this.drawMouseoverTooltip(arg, i, j);
+        this.renderForeground(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
 
-    protected void renderForeground(MatrixStack arg, int i, int j, float f) {
+    protected void renderForeground(MatrixStack arg, int mouseY, int j, float f) {
     }
 
     @Override
-    protected void drawBackground(MatrixStack arg, float f, int i, int j) {
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.client.getTextureManager().bindTexture(this.texture);
         int k = (this.width - this.backgroundWidth) / 2;
         int l = (this.height - this.backgroundHeight) / 2;
-        this.drawTexture(arg, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
-        this.drawTexture(arg, k + 59, l + 20, 0, this.backgroundHeight + (((ForgingScreenHandler)this.handler).getSlot(0).hasStack() ? 0 : 16), 110, 16);
+        this.drawTexture(matrices, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.drawTexture(matrices, k + 59, l + 20, 0, this.backgroundHeight + (((ForgingScreenHandler)this.handler).getSlot(0).hasStack() ? 0 : 16), 110, 16);
         if ((((ForgingScreenHandler)this.handler).getSlot(0).hasStack() || ((ForgingScreenHandler)this.handler).getSlot(1).hasStack()) && !((ForgingScreenHandler)this.handler).getSlot(2).hasStack()) {
-            this.drawTexture(arg, k + 99, l + 45, this.backgroundWidth, 0, 28, 21);
+            this.drawTexture(matrices, k + 99, l + 45, this.backgroundWidth, 0, 28, 21);
         }
     }
 
     @Override
-    public void onHandlerRegistered(ScreenHandler arg, DefaultedList<ItemStack> arg2) {
-        this.onSlotUpdate(arg, 0, arg.getSlot(0).getStack());
+    public void onHandlerRegistered(ScreenHandler handler, DefaultedList<ItemStack> stacks) {
+        this.onSlotUpdate(handler, 0, handler.getSlot(0).getStack());
     }
 
     @Override
-    public void onPropertyUpdate(ScreenHandler arg, int i, int j) {
+    public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
     }
 
     @Override
-    public void onSlotUpdate(ScreenHandler arg, int i, ItemStack arg2) {
+    public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
     }
 }
 

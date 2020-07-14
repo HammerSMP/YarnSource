@@ -76,23 +76,23 @@ implements ResourcePackProvider {
     @Nullable
     private ResourcePackProfile serverContainer;
 
-    public ClientBuiltinResourcePackProvider(File file, ResourceIndex arg) {
-        this.serverPacksRoot = file;
-        this.index = arg;
-        this.pack = new DefaultClientResourcePack(arg);
+    public ClientBuiltinResourcePackProvider(File serverPacksRoot, ResourceIndex index) {
+        this.serverPacksRoot = serverPacksRoot;
+        this.index = index;
+        this.pack = new DefaultClientResourcePack(index);
     }
 
     @Override
-    public void register(Consumer<ResourcePackProfile> consumer, ResourcePackProfile.Factory arg) {
+    public void register(Consumer<ResourcePackProfile> consumer, ResourcePackProfile.Factory factory) {
         ResourcePackProfile lv2;
-        ResourcePackProfile lv = ResourcePackProfile.of("vanilla", true, () -> this.pack, arg, ResourcePackProfile.InsertionPosition.BOTTOM, ResourcePackSource.PACK_SOURCE_BUILTIN);
+        ResourcePackProfile lv = ResourcePackProfile.of("vanilla", true, () -> this.pack, factory, ResourcePackProfile.InsertionPosition.BOTTOM, ResourcePackSource.PACK_SOURCE_BUILTIN);
         if (lv != null) {
             consumer.accept(lv);
         }
         if (this.serverContainer != null) {
             consumer.accept(this.serverContainer);
         }
-        if ((lv2 = this.method_25454(arg)) != null) {
+        if ((lv2 = this.method_25454(factory)) != null) {
             consumer.accept(lv2);
         }
     }
@@ -180,21 +180,21 @@ implements ResourcePackProvider {
     /*
      * WARNING - void declaration
      */
-    private boolean verifyFile(String string, File file) {
+    private boolean verifyFile(String expectedSha1, File file) {
         try {
             void string3;
             try (FileInputStream fileInputStream = new FileInputStream(file);){
                 String string2 = DigestUtils.sha1Hex((InputStream)fileInputStream);
             }
-            if (string.isEmpty()) {
+            if (expectedSha1.isEmpty()) {
                 LOGGER.info("Found file {} without verification hash", (Object)file);
                 return true;
             }
-            if (string3.toLowerCase(Locale.ROOT).equals(string.toLowerCase(Locale.ROOT))) {
-                LOGGER.info("Found file {} matching requested hash {}", (Object)file, (Object)string);
+            if (string3.toLowerCase(Locale.ROOT).equals(expectedSha1.toLowerCase(Locale.ROOT))) {
+                LOGGER.info("Found file {} matching requested hash {}", (Object)file, (Object)expectedSha1);
                 return true;
             }
-            LOGGER.warn("File {} had wrong hash (expected {}, found {}).", (Object)file, (Object)string, (Object)string3);
+            LOGGER.warn("File {} had wrong hash (expected {}, found {}).", (Object)file, (Object)expectedSha1, (Object)string3);
         }
         catch (IOException iOException) {
             LOGGER.warn("File {} couldn't be hashed.", (Object)file, (Object)iOException);
@@ -221,16 +221,16 @@ implements ResourcePackProvider {
     /*
      * WARNING - void declaration
      */
-    public CompletableFuture<Void> loadServerPack(File file, ResourcePackSource arg) {
+    public CompletableFuture<Void> loadServerPack(File packZip, ResourcePackSource arg) {
         void lv4;
-        try (ZipResourcePack lv = new ZipResourcePack(file);){
+        try (ZipResourcePack lv = new ZipResourcePack(packZip);){
             PackResourceMetadata lv2 = lv.parseMetadata(PackResourceMetadata.READER);
         }
         catch (IOException iOException) {
-            return Util.completeExceptionally(new IOException(String.format("Invalid resourcepack at %s", file), iOException));
+            return Util.completeExceptionally(new IOException(String.format("Invalid resourcepack at %s", packZip), iOException));
         }
-        LOGGER.info("Applying server pack {}", (Object)file);
-        this.serverContainer = new ResourcePackProfile("server", true, () -> new ZipResourcePack(file), new TranslatableText("resourcePack.server.name"), lv4.getDescription(), ResourcePackCompatibility.from(lv4.getPackFormat()), ResourcePackProfile.InsertionPosition.TOP, true, arg);
+        LOGGER.info("Applying server pack {}", (Object)packZip);
+        this.serverContainer = new ResourcePackProfile("server", true, () -> new ZipResourcePack(packZip), new TranslatableText("resourcePack.server.name"), lv4.getDescription(), ResourcePackCompatibility.from(lv4.getPackFormat()), ResourcePackProfile.InsertionPosition.TOP, true, arg);
         return MinecraftClient.getInstance().reloadResourcesConcurrently();
     }
 

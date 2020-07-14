@@ -24,39 +24,39 @@ extends Option {
     private final Predicate<GameOptions> getter;
     private final BiConsumer<GameOptions, Boolean> setter;
 
-    public BooleanOption(String string, Predicate<GameOptions> predicate, BiConsumer<GameOptions, Boolean> biConsumer) {
-        super(string);
-        this.getter = predicate;
-        this.setter = biConsumer;
+    public BooleanOption(String key, Predicate<GameOptions> getter, BiConsumer<GameOptions, Boolean> setter) {
+        super(key);
+        this.getter = getter;
+        this.setter = setter;
     }
 
-    public void set(GameOptions arg, String string) {
-        this.set(arg, "true".equals(string));
+    public void set(GameOptions options, String value) {
+        this.set(options, "true".equals(value));
     }
 
-    public void set(GameOptions arg) {
-        this.set(arg, !this.get(arg));
-        arg.write();
+    public void set(GameOptions options) {
+        this.set(options, !this.get(options));
+        options.write();
     }
 
-    private void set(GameOptions arg, boolean bl) {
-        this.setter.accept(arg, bl);
+    private void set(GameOptions options, boolean value) {
+        this.setter.accept(options, value);
     }
 
-    public boolean get(GameOptions arg) {
-        return this.getter.test(arg);
+    public boolean get(GameOptions options) {
+        return this.getter.test(options);
     }
 
     @Override
-    public AbstractButtonWidget createButton(GameOptions arg, int i, int j, int k) {
-        return new OptionButtonWidget(i, j, k, 20, this, this.getDisplayString(arg), arg2 -> {
-            this.set(arg);
-            arg2.setMessage(this.getDisplayString(arg));
+    public AbstractButtonWidget createButton(GameOptions options, int x, int y, int width) {
+        return new OptionButtonWidget(x, y, width, 20, this, this.getDisplayString(options), button -> {
+            this.set(options);
+            button.setMessage(this.getDisplayString(options));
         });
     }
 
-    public Text getDisplayString(GameOptions arg) {
-        return ScreenTexts.method_30619(this.getDisplayPrefix(), this.get(arg));
+    public Text getDisplayString(GameOptions options) {
+        return ScreenTexts.method_30619(this.getDisplayPrefix(), this.get(options));
     }
 }
 

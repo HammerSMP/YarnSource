@@ -36,13 +36,13 @@ extends JsonDataLoader {
     private Map<Identifier, LootTable> tables = ImmutableMap.of();
     private final LootConditionManager conditionManager;
 
-    public LootManager(LootConditionManager arg) {
+    public LootManager(LootConditionManager conditionManager) {
         super(GSON, "loot_tables");
-        this.conditionManager = arg;
+        this.conditionManager = conditionManager;
     }
 
-    public LootTable getTable(Identifier arg) {
-        return this.tables.getOrDefault(arg, LootTable.EMPTY);
+    public LootTable getTable(Identifier id) {
+        return this.tables.getOrDefault(id, LootTable.EMPTY);
     }
 
     @Override
@@ -65,16 +65,16 @@ extends JsonDataLoader {
         ImmutableMap immutableMap = builder.build();
         LootTableReporter lv = new LootTableReporter(LootContextTypes.GENERIC, this.conditionManager::get, ((ImmutableMap)immutableMap)::get);
         immutableMap.forEach((arg2, arg3) -> LootManager.validate(lv, arg2, arg3));
-        lv.getMessages().forEach((string, string2) -> LOGGER.warn("Found validation problem in " + string + ": " + string2));
+        lv.getMessages().forEach((key, value) -> LOGGER.warn("Found validation problem in " + key + ": " + value));
         this.tables = immutableMap;
     }
 
-    public static void validate(LootTableReporter arg, Identifier arg2, LootTable arg3) {
-        arg3.validate(arg.withContextType(arg3.getType()).withTable("{" + arg2 + "}", arg2));
+    public static void validate(LootTableReporter reporter, Identifier id, LootTable table) {
+        table.validate(reporter.withContextType(table.getType()).withTable("{" + id + "}", id));
     }
 
-    public static JsonElement toJson(LootTable arg) {
-        return GSON.toJsonTree((Object)arg);
+    public static JsonElement toJson(LootTable table) {
+        return GSON.toJsonTree((Object)table);
     }
 
     public Set<Identifier> getTableIds() {

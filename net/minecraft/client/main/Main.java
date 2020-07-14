@@ -62,7 +62,7 @@ public class Main {
      * WARNING - Removed try catching itself - possible behaviour change.
      * WARNING - void declaration
      */
-    public static void main(String[] strings) {
+    public static void main(String[] args) {
         Thread thread3;
         void lv7;
         OptionParser optionParser = new OptionParser();
@@ -96,7 +96,7 @@ public class Main {
         ArgumentAcceptingOptionSpec optionSpec22 = optionParser.accepts("userType").withRequiredArg().defaultsTo((Object)"legacy", (Object[])new String[0]);
         ArgumentAcceptingOptionSpec optionSpec23 = optionParser.accepts("versionType").withRequiredArg().defaultsTo((Object)"release", (Object[])new String[0]);
         NonOptionArgumentSpec optionSpec24 = optionParser.nonOptions();
-        OptionSet optionSet = optionParser.parse(strings);
+        OptionSet optionSet = optionParser.parse(args);
         List list = optionSet.valuesOf((OptionSpec)optionSpec24);
         if (!list.isEmpty()) {
             System.out.println("Completely ignored arguments: " + list);
@@ -229,8 +229,8 @@ public class Main {
         }
     }
 
-    private static OptionalInt toOptional(@Nullable Integer integer) {
-        return integer != null ? OptionalInt.of(integer) : OptionalInt.empty();
+    private static OptionalInt toOptional(@Nullable Integer i) {
+        return i != null ? OptionalInt.of(i) : OptionalInt.empty();
     }
 
     @Nullable
@@ -248,8 +248,8 @@ public class Main {
         }
     }
 
-    private static boolean isNotNullOrEmpty(@Nullable String string) {
-        return string != null && !string.isEmpty();
+    private static boolean isNotNullOrEmpty(@Nullable String s) {
+        return s != null && !s.isEmpty();
     }
 
     static {

@@ -29,14 +29,14 @@ extends ValueObject {
     public String worldOwnerUuid;
     public Date date;
 
-    public static PendingInvite parse(JsonObject jsonObject) {
+    public static PendingInvite parse(JsonObject json) {
         PendingInvite lv = new PendingInvite();
         try {
-            lv.invitationId = JsonUtils.getStringOr("invitationId", jsonObject, "");
-            lv.worldName = JsonUtils.getStringOr("worldName", jsonObject, "");
-            lv.worldOwnerName = JsonUtils.getStringOr("worldOwnerName", jsonObject, "");
-            lv.worldOwnerUuid = JsonUtils.getStringOr("worldOwnerUuid", jsonObject, "");
-            lv.date = JsonUtils.getDateOr("date", jsonObject);
+            lv.invitationId = JsonUtils.getStringOr("invitationId", json, "");
+            lv.worldName = JsonUtils.getStringOr("worldName", json, "");
+            lv.worldOwnerName = JsonUtils.getStringOr("worldOwnerName", json, "");
+            lv.worldOwnerUuid = JsonUtils.getStringOr("worldOwnerUuid", json, "");
+            lv.date = JsonUtils.getDateOr("date", json);
         }
         catch (Exception exception) {
             LOGGER.error("Could not parse PendingInvite: " + exception.getMessage());

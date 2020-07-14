@@ -40,8 +40,8 @@ extends DataFix {
     private static final Splitter SPLIT_ON_ASTERISK = Splitter.on((char)'*').limit(2);
     private static final Splitter SPLIT_ON_COLON = Splitter.on((char)':').limit(3);
 
-    public LevelFlatGeneratorInfoFix(Schema schema, boolean bl) {
-        super(schema, bl);
+    public LevelFlatGeneratorInfoFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType);
     }
 
     public TypeRewriteRule makeRule() {
@@ -56,20 +56,20 @@ extends DataFix {
     }
 
     @VisibleForTesting
-    String fixFlatGeneratorOptions(String string2) {
+    String fixFlatGeneratorOptions(String generatorOptions) {
         String string4;
         int j;
-        if (string2.isEmpty()) {
+        if (generatorOptions.isEmpty()) {
             return "minecraft:bedrock,2*minecraft:dirt,minecraft:grass_block;1;village";
         }
-        Iterator iterator = SPLIT_ON_SEMICOLON.split((CharSequence)string2).iterator();
-        String string22 = (String)iterator.next();
+        Iterator iterator = SPLIT_ON_SEMICOLON.split((CharSequence)generatorOptions).iterator();
+        String string2 = (String)iterator.next();
         if (iterator.hasNext()) {
-            int i = NumberUtils.toInt((String)string22, (int)0);
+            int i = NumberUtils.toInt((String)string2, (int)0);
             String string3 = (String)iterator.next();
         } else {
             j = 0;
-            string4 = string22;
+            string4 = string2;
         }
         if (j < 0 || j > 3) {
             return "minecraft:bedrock,2*minecraft:dirt,minecraft:grass_block;1;village";

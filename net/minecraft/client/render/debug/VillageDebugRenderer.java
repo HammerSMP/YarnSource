@@ -74,27 +74,27 @@ implements DebugRenderer.Renderer {
         this.pointsOfInterest.remove(arg);
     }
 
-    public void setFreeTicketCount(BlockPos arg, int i) {
-        PointOfInterest lv = this.pointsOfInterest.get(arg);
+    public void setFreeTicketCount(BlockPos pos, int freeTicketCount) {
+        PointOfInterest lv = this.pointsOfInterest.get(pos);
         if (lv == null) {
-            LOGGER.warn("Strange, setFreeTicketCount was called for an unknown POI: " + arg);
+            LOGGER.warn("Strange, setFreeTicketCount was called for an unknown POI: " + pos);
             return;
         }
-        lv.freeTicketCount = i;
+        lv.freeTicketCount = freeTicketCount;
     }
 
-    public void addBrain(Brain arg) {
-        this.brains.put(arg.uuid, arg);
+    public void addBrain(Brain brain) {
+        this.brains.put(brain.uuid, brain);
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumerProvider arg2, double d, double e, double f) {
+    public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, double cameraX, double cameraY, double cameraZ) {
         RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableTexture();
         this.method_24805();
-        this.method_23135(d, e, f);
+        this.method_23135(cameraX, cameraY, cameraZ);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
         RenderSystem.popMatrix();
@@ -133,148 +133,148 @@ implements DebugRenderer.Renderer {
         });
     }
 
-    private static void drawPointOfInterest(BlockPos arg) {
+    private static void drawPointOfInterest(BlockPos pos) {
         float f = 0.05f;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        DebugRenderer.drawBox(arg, 0.05f, 0.2f, 0.2f, 1.0f, 0.3f);
+        DebugRenderer.drawBox(pos, 0.05f, 0.2f, 0.2f, 1.0f, 0.3f);
     }
 
-    private void drawGhostPointOfInterest(BlockPos arg, List<String> list) {
+    private void drawGhostPointOfInterest(BlockPos pos, List<String> brains) {
         float f = 0.05f;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        DebugRenderer.drawBox(arg, 0.05f, 0.2f, 0.2f, 1.0f, 0.3f);
-        VillageDebugRenderer.drawString("" + list, arg, 0, -256);
-        VillageDebugRenderer.drawString("Ghost POI", arg, 1, -65536);
+        DebugRenderer.drawBox(pos, 0.05f, 0.2f, 0.2f, 1.0f, 0.3f);
+        VillageDebugRenderer.drawString("" + brains, pos, 0, -256);
+        VillageDebugRenderer.drawString("Ghost POI", pos, 1, -65536);
     }
 
-    private void drawPointOfInterestInfo(PointOfInterest arg) {
+    private void drawPointOfInterestInfo(PointOfInterest pointOfInterest) {
         int i = 0;
-        Set<String> set = this.getVillagerNames(arg);
+        Set<String> set = this.getVillagerNames(pointOfInterest);
         if (set.size() < 4) {
-            VillageDebugRenderer.drawString("Owners: " + set, arg, i, -256);
+            VillageDebugRenderer.drawString("Owners: " + set, pointOfInterest, i, -256);
         } else {
-            VillageDebugRenderer.drawString("" + set.size() + " ticket holders", arg, i, -256);
+            VillageDebugRenderer.drawString("" + set.size() + " ticket holders", pointOfInterest, i, -256);
         }
         ++i;
-        Set<String> set2 = this.method_29385(arg);
+        Set<String> set2 = this.method_29385(pointOfInterest);
         if (set2.size() < 4) {
-            VillageDebugRenderer.drawString("Candidates: " + set2, arg, i, -23296);
+            VillageDebugRenderer.drawString("Candidates: " + set2, pointOfInterest, i, -23296);
         } else {
-            VillageDebugRenderer.drawString("" + set2.size() + " potential owners", arg, i, -23296);
+            VillageDebugRenderer.drawString("" + set2.size() + " potential owners", pointOfInterest, i, -23296);
         }
-        VillageDebugRenderer.drawString("Free tickets: " + arg.freeTicketCount, arg, ++i, -256);
-        VillageDebugRenderer.drawString(arg.field_18932, arg, ++i, -1);
+        VillageDebugRenderer.drawString("Free tickets: " + pointOfInterest.freeTicketCount, pointOfInterest, ++i, -256);
+        VillageDebugRenderer.drawString(pointOfInterest.field_18932, pointOfInterest, ++i, -1);
     }
 
-    private void drawPath(Brain arg, double d, double e, double f) {
-        if (arg.path != null) {
-            PathfindingDebugRenderer.drawPath(arg.path, 0.5f, false, false, d, e, f);
+    private void drawPath(Brain brain, double cameraX, double cameraY, double cameraZ) {
+        if (brain.path != null) {
+            PathfindingDebugRenderer.drawPath(brain.path, 0.5f, false, false, cameraX, cameraY, cameraZ);
         }
     }
 
-    private void drawBrain(Brain arg, double d, double e, double f) {
-        boolean bl = this.isTargeted(arg);
+    private void drawBrain(Brain brain, double cameraX, double cameraY, double cameraZ) {
+        boolean bl = this.isTargeted(brain);
         int i = 0;
-        VillageDebugRenderer.drawString(arg.pos, i, arg.field_19328, -1, 0.03f);
+        VillageDebugRenderer.drawString(brain.pos, i, brain.field_19328, -1, 0.03f);
         ++i;
         if (bl) {
-            VillageDebugRenderer.drawString(arg.pos, i, arg.profession + " " + arg.xp + " xp", -1, 0.02f);
+            VillageDebugRenderer.drawString(brain.pos, i, brain.profession + " " + brain.xp + " xp", -1, 0.02f);
             ++i;
         }
         if (bl) {
-            int j = arg.field_22406 < arg.field_22407 ? -23296 : -1;
-            VillageDebugRenderer.drawString(arg.pos, i, "health: " + String.format("%.1f", Float.valueOf(arg.field_22406)) + " / " + String.format("%.1f", Float.valueOf(arg.field_22407)), j, 0.02f);
+            int j = brain.field_22406 < brain.field_22407 ? -23296 : -1;
+            VillageDebugRenderer.drawString(brain.pos, i, "health: " + String.format("%.1f", Float.valueOf(brain.field_22406)) + " / " + String.format("%.1f", Float.valueOf(brain.field_22407)), j, 0.02f);
             ++i;
         }
-        if (bl && !arg.field_19372.equals("")) {
-            VillageDebugRenderer.drawString(arg.pos, i, arg.field_19372, -98404, 0.02f);
+        if (bl && !brain.field_19372.equals("")) {
+            VillageDebugRenderer.drawString(brain.pos, i, brain.field_19372, -98404, 0.02f);
             ++i;
         }
         if (bl) {
-            for (String string : arg.field_18928) {
-                VillageDebugRenderer.drawString(arg.pos, i, string, -16711681, 0.02f);
+            for (String string : brain.field_18928) {
+                VillageDebugRenderer.drawString(brain.pos, i, string, -16711681, 0.02f);
                 ++i;
             }
         }
         if (bl) {
-            for (String string2 : arg.field_18927) {
-                VillageDebugRenderer.drawString(arg.pos, i, string2, -16711936, 0.02f);
+            for (String string2 : brain.field_18927) {
+                VillageDebugRenderer.drawString(brain.pos, i, string2, -16711936, 0.02f);
                 ++i;
             }
         }
-        if (arg.wantsGolem) {
-            VillageDebugRenderer.drawString(arg.pos, i, "Wants Golem", -23296, 0.02f);
+        if (brain.wantsGolem) {
+            VillageDebugRenderer.drawString(brain.pos, i, "Wants Golem", -23296, 0.02f);
             ++i;
         }
         if (bl) {
-            for (String string3 : arg.field_19375) {
-                if (string3.startsWith(arg.field_19328)) {
-                    VillageDebugRenderer.drawString(arg.pos, i, string3, -1, 0.02f);
+            for (String string3 : brain.field_19375) {
+                if (string3.startsWith(brain.field_19328)) {
+                    VillageDebugRenderer.drawString(brain.pos, i, string3, -1, 0.02f);
                 } else {
-                    VillageDebugRenderer.drawString(arg.pos, i, string3, -23296, 0.02f);
+                    VillageDebugRenderer.drawString(brain.pos, i, string3, -23296, 0.02f);
                 }
                 ++i;
             }
         }
         if (bl) {
-            for (String string4 : Lists.reverse(arg.field_19374)) {
-                VillageDebugRenderer.drawString(arg.pos, i, string4, -3355444, 0.02f);
+            for (String string4 : Lists.reverse(brain.field_19374)) {
+                VillageDebugRenderer.drawString(brain.pos, i, string4, -3355444, 0.02f);
                 ++i;
             }
         }
         if (bl) {
-            this.drawPath(arg, d, e, f);
+            this.drawPath(brain, cameraX, cameraY, cameraZ);
         }
     }
 
-    private static void drawString(String string, PointOfInterest arg, int i, int j) {
-        BlockPos lv = arg.pos;
-        VillageDebugRenderer.drawString(string, lv, i, j);
+    private static void drawString(String string, PointOfInterest pointOfInterest, int offsetY, int color) {
+        BlockPos lv = pointOfInterest.pos;
+        VillageDebugRenderer.drawString(string, lv, offsetY, color);
     }
 
-    private static void drawString(String string, BlockPos arg, int i, int j) {
+    private static void drawString(String string, BlockPos pos, int offsetY, int color) {
         double d = 1.3;
         double e = 0.2;
-        double f = (double)arg.getX() + 0.5;
-        double g = (double)arg.getY() + 1.3 + (double)i * 0.2;
-        double h = (double)arg.getZ() + 0.5;
-        DebugRenderer.drawString(string, f, g, h, j, 0.02f, true, 0.0f, true);
+        double f = (double)pos.getX() + 0.5;
+        double g = (double)pos.getY() + 1.3 + (double)offsetY * 0.2;
+        double h = (double)pos.getZ() + 0.5;
+        DebugRenderer.drawString(string, f, g, h, color, 0.02f, true, 0.0f, true);
     }
 
-    private static void drawString(Position arg, int i, String string, int j, float f) {
+    private static void drawString(Position pos, int offsetY, String string, int color, float size) {
         double d = 2.4;
         double e = 0.25;
-        BlockPos lv = new BlockPos(arg);
+        BlockPos lv = new BlockPos(pos);
         double g = (double)lv.getX() + 0.5;
-        double h = arg.getY() + 2.4 + (double)i * 0.25;
+        double h = pos.getY() + 2.4 + (double)offsetY * 0.25;
         double k = (double)lv.getZ() + 0.5;
         float l = 0.5f;
-        DebugRenderer.drawString(string, g, h, k, j, f, false, 0.5f, true);
+        DebugRenderer.drawString(string, g, h, k, color, size, false, 0.5f, true);
     }
 
-    private Set<String> getVillagerNames(PointOfInterest arg) {
-        return this.getBrains(arg.pos).stream().map(NameGenerator::name).collect(Collectors.toSet());
+    private Set<String> getVillagerNames(PointOfInterest pointOfInterest) {
+        return this.getBrains(pointOfInterest.pos).stream().map(NameGenerator::name).collect(Collectors.toSet());
     }
 
     private Set<String> method_29385(PointOfInterest arg) {
         return this.method_29386(arg.pos).stream().map(NameGenerator::name).collect(Collectors.toSet());
     }
 
-    private boolean isTargeted(Brain arg) {
-        return Objects.equals(this.targetedEntity, arg.uuid);
+    private boolean isTargeted(Brain brain) {
+        return Objects.equals(this.targetedEntity, brain.uuid);
     }
 
-    private boolean isClose(Brain arg) {
+    private boolean isClose(Brain brain) {
         ClientPlayerEntity lv = this.client.player;
-        BlockPos lv2 = new BlockPos(lv.getX(), arg.pos.getY(), lv.getZ());
-        BlockPos lv3 = new BlockPos(arg.pos);
+        BlockPos lv2 = new BlockPos(lv.getX(), brain.pos.getY(), lv.getZ());
+        BlockPos lv3 = new BlockPos(brain.pos);
         return lv2.isWithinDistance(lv3, 30.0);
     }
 
-    private Collection<UUID> getBrains(BlockPos arg) {
-        return this.brains.values().stream().filter(arg2 -> ((Brain)arg2).isPointOfInterest(arg)).map(Brain::getUuid).collect(Collectors.toSet());
+    private Collection<UUID> getBrains(BlockPos pointOfInterest) {
+        return this.brains.values().stream().filter(arg2 -> ((Brain)arg2).isPointOfInterest(pointOfInterest)).map(Brain::getUuid).collect(Collectors.toSet());
     }
 
     private Collection<UUID> method_29386(BlockPos arg) {
@@ -318,12 +318,12 @@ implements DebugRenderer.Renderer {
         public final Set<BlockPos> pointsOfInterest = Sets.newHashSet();
         public final Set<BlockPos> field_25287 = Sets.newHashSet();
 
-        public Brain(UUID uUID, int i, String string, String string2, int j, float f, float g, Position arg, String string3, @Nullable Path arg2, boolean bl) {
+        public Brain(UUID uUID, int i, String string, String profession, int xp, float f, float g, Position arg, String string3, @Nullable Path arg2, boolean bl) {
             this.uuid = uUID;
             this.field_18924 = i;
             this.field_19328 = string;
-            this.profession = string2;
-            this.xp = j;
+            this.profession = profession;
+            this.xp = xp;
             this.field_22406 = f;
             this.field_22407 = g;
             this.pos = arg;

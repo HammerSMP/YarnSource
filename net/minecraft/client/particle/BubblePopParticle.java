@@ -22,15 +22,15 @@ public class BubblePopParticle
 extends SpriteBillboardParticle {
     private final SpriteProvider spriteProvider;
 
-    private BubblePopParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, SpriteProvider arg2) {
-        super(arg, d, e, f);
-        this.spriteProvider = arg2;
+    private BubblePopParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, SpriteProvider spriteProvider) {
+        super(world, x, y, z);
+        this.spriteProvider = spriteProvider;
         this.maxAge = 4;
         this.gravityStrength = 0.008f;
-        this.velocityX = g;
-        this.velocityY = h;
-        this.velocityZ = i;
-        this.setSpriteForAge(arg2);
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
+        this.setSpriteForAge(spriteProvider);
     }
 
     @Override
@@ -57,8 +57,8 @@ extends SpriteBillboardParticle {
     implements ParticleFactory<DefaultParticleType> {
         private final SpriteProvider spriteProvider;
 
-        public Factory(SpriteProvider arg) {
-            this.spriteProvider = arg;
+        public Factory(SpriteProvider spriteProvider) {
+            this.spriteProvider = spriteProvider;
         }
 
         @Override

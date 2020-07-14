@@ -18,16 +18,16 @@ extends Item {
     }
 
     @Override
-    public ActionResult useOnEntity(ItemStack arg, PlayerEntity arg2, LivingEntity arg3, Hand arg4) {
-        if (arg.hasCustomName() && !(arg3 instanceof PlayerEntity)) {
-            if (!arg2.world.isClient && arg3.isAlive()) {
-                arg3.setCustomName(arg.getName());
-                if (arg3 instanceof MobEntity) {
-                    ((MobEntity)arg3).setPersistent();
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        if (stack.hasCustomName() && !(entity instanceof PlayerEntity)) {
+            if (!user.world.isClient && entity.isAlive()) {
+                entity.setCustomName(stack.getName());
+                if (entity instanceof MobEntity) {
+                    ((MobEntity)entity).setPersistent();
                 }
-                arg.decrement(1);
+                stack.decrement(1);
             }
-            return ActionResult.success(arg2.world.isClient);
+            return ActionResult.success(user.world.isClient);
         }
         return ActionResult.PASS;
     }

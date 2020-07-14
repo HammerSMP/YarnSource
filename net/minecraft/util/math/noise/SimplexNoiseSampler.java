@@ -31,38 +31,38 @@ public class SimplexNoiseSampler {
         }
     }
 
-    private int getGradient(int i) {
-        return this.permutations[i & 0xFF];
+    private int getGradient(int hash) {
+        return this.permutations[hash & 0xFF];
     }
 
-    protected static double dot(int[] is, double d, double e, double f) {
-        return (double)is[0] * d + (double)is[1] * e + (double)is[2] * f;
+    protected static double dot(int[] gArr, double x, double y, double z) {
+        return (double)gArr[0] * x + (double)gArr[1] * y + (double)gArr[2] * z;
     }
 
-    private double grad(int i, double d, double e, double f, double g) {
+    private double grad(int hash, double x, double y, double z, double g) {
         double k;
-        double h = g - d * d - e * e - f * f;
+        double h = g - x * x - y * y - z * z;
         if (h < 0.0) {
             double j = 0.0;
         } else {
             h *= h;
-            k = h * h * SimplexNoiseSampler.dot(gradients[i], d, e, f);
+            k = h * h * SimplexNoiseSampler.dot(gradients[hash], x, y, z);
         }
         return k;
     }
 
-    public double sample(double d, double e) {
+    public double sample(double x, double y) {
         int q;
         int p;
         double k;
         double m;
         int j;
         double g;
-        double f = (d + e) * SKEW_FACTOR_2D;
-        int i = MathHelper.floor(d + f);
-        double h = (double)i - (g = (double)(i + (j = MathHelper.floor(e + f))) * UNSKEW_FACTOR_2D);
-        double l = d - h;
-        if (l > (m = e - (k = (double)j - g))) {
+        double f = (x + y) * SKEW_FACTOR_2D;
+        int i = MathHelper.floor(x + f);
+        double h = (double)i - (g = (double)(i + (j = MathHelper.floor(y + f))) * UNSKEW_FACTOR_2D);
+        double l = x - h;
+        if (l > (m = y - (k = (double)j - g))) {
             boolean n = true;
             boolean o = false;
         } else {
@@ -75,11 +75,11 @@ public class SimplexNoiseSampler {
         double u = m - 1.0 + 2.0 * UNSKEW_FACTOR_2D;
         int v = i & 0xFF;
         int w = j & 0xFF;
-        int x = this.getGradient(v + this.getGradient(w)) % 12;
-        int y = this.getGradient(v + p + this.getGradient(w + q)) % 12;
+        int x2 = this.getGradient(v + this.getGradient(w)) % 12;
+        int y2 = this.getGradient(v + p + this.getGradient(w + q)) % 12;
         int z = this.getGradient(v + 1 + this.getGradient(w + 1)) % 12;
-        double aa = this.grad(x, l, m, 0.0, 0.5);
-        double ab = this.grad(y, r, s, 0.0, 0.5);
+        double aa = this.grad(x2, l, m, 0.0, 0.5);
+        double ab = this.grad(y2, r, s, 0.0, 0.5);
         double ac = this.grad(z, t, u, 0.0, 0.5);
         return 70.0 * (aa + ab + ac);
     }

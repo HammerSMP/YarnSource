@@ -40,12 +40,12 @@ implements ResourceReloadListener {
     }
 
     @Override
-    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer arg, ResourceManager arg2, Profiler arg3, Profiler arg4, Executor executor, Executor executor2) {
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.blocks.prepareReload(arg2, executor);
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture2 = this.items.prepareReload(arg2, executor);
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture3 = this.fluids.prepareReload(arg2, executor);
-        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture4 = this.entityTypes.prepareReload(arg2, executor);
-        return ((CompletableFuture)CompletableFuture.allOf(completableFuture, completableFuture2, completableFuture3, completableFuture4).thenCompose(arg::whenPrepared)).thenAcceptAsync(void_ -> {
+    public CompletableFuture<Void> reload(ResourceReloadListener.Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture = this.blocks.prepareReload(manager, prepareExecutor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture2 = this.items.prepareReload(manager, prepareExecutor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture3 = this.fluids.prepareReload(manager, prepareExecutor);
+        CompletableFuture<Map<Identifier, Tag.Builder>> completableFuture4 = this.entityTypes.prepareReload(manager, prepareExecutor);
+        return ((CompletableFuture)CompletableFuture.allOf(completableFuture, completableFuture2, completableFuture3, completableFuture4).thenCompose(synchronizer::whenPrepared)).thenAcceptAsync(void_ -> {
             TagGroup<EntityType<?>> lv4;
             TagGroup<Fluid> lv3;
             TagGroup<Item> lv2;
@@ -57,7 +57,7 @@ implements ResourceReloadListener {
             }
             ServerTagManagerHolder.setTagManager(lv5);
             this.tagManager = lv5;
-        }, executor2);
+        }, applyExecutor);
     }
 }
 

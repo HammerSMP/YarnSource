@@ -46,10 +46,10 @@ extends LootableContainerBlockEntity {
         return i;
     }
 
-    public int addToFirstFreeSlot(ItemStack arg) {
+    public int addToFirstFreeSlot(ItemStack stack) {
         for (int i = 0; i < this.inventory.size(); ++i) {
             if (!this.inventory.get(i).isEmpty()) continue;
-            this.setStack(i, arg);
+            this.setStack(i, stack);
             return i;
         }
         return -1;
@@ -61,21 +61,21 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
         this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-        if (!this.deserializeLootTable(arg2)) {
-            Inventories.fromTag(arg2, this.inventory);
+        if (!this.deserializeLootTable(tag)) {
+            Inventories.fromTag(tag, this.inventory);
         }
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        if (!this.serializeLootTable(arg)) {
-            Inventories.toTag(arg, this.inventory);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        if (!this.serializeLootTable(tag)) {
+            Inventories.toTag(tag, this.inventory);
         }
-        return arg;
+        return tag;
     }
 
     @Override
@@ -84,13 +84,13 @@ extends LootableContainerBlockEntity {
     }
 
     @Override
-    protected void setInvStackList(DefaultedList<ItemStack> arg) {
-        this.inventory = arg;
+    protected void setInvStackList(DefaultedList<ItemStack> list) {
+        this.inventory = list;
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int i, PlayerInventory arg) {
-        return new Generic3x3ContainerScreenHandler(i, arg, this);
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new Generic3x3ContainerScreenHandler(syncId, playerInventory, this);
     }
 }
 

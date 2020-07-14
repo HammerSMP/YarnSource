@@ -11,25 +11,25 @@ extends EntityAttribute {
     private final double minValue;
     private final double maxValue;
 
-    public ClampedEntityAttribute(String string, double d, double e, double f) {
-        super(string, d);
-        this.minValue = e;
-        this.maxValue = f;
-        if (e > f) {
+    public ClampedEntityAttribute(String translationKey, double fallback, double min, double max) {
+        super(translationKey, fallback);
+        this.minValue = min;
+        this.maxValue = max;
+        if (min > max) {
             throw new IllegalArgumentException("Minimum value cannot be bigger than maximum value!");
         }
-        if (d < e) {
+        if (fallback < min) {
             throw new IllegalArgumentException("Default value cannot be lower than minimum value!");
         }
-        if (d > f) {
+        if (fallback > max) {
             throw new IllegalArgumentException("Default value cannot be bigger than maximum value!");
         }
     }
 
     @Override
-    public double clamp(double d) {
-        d = MathHelper.clamp(d, this.minValue, this.maxValue);
-        return d;
+    public double clamp(double value) {
+        value = MathHelper.clamp(value, this.minValue, this.maxValue);
+        return value;
     }
 }
 

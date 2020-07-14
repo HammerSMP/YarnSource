@@ -22,18 +22,18 @@ implements Packet<ClientLoginPacketListener> {
     public LoginDisconnectS2CPacket() {
     }
 
-    public LoginDisconnectS2CPacket(Text arg) {
-        this.reason = arg;
+    public LoginDisconnectS2CPacket(Text reason) {
+        this.reason = reason;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.reason = Text.Serializer.fromLenientJson(arg.readString(262144));
+    public void read(PacketByteBuf buf) throws IOException {
+        this.reason = Text.Serializer.fromLenientJson(buf.readString(262144));
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeText(this.reason);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeText(this.reason);
     }
 
     @Override

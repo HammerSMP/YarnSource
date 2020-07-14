@@ -32,8 +32,8 @@ implements Packet<ClientPlayPacketListener> {
     protected boolean rotate;
     protected boolean positionChanged;
 
-    public static long encodePacketCoordinate(double d) {
-        return MathHelper.lfloor(d * 4096.0);
+    public static long encodePacketCoordinate(double coord) {
+        return MathHelper.lfloor(coord * 4096.0);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -49,25 +49,25 @@ implements Packet<ClientPlayPacketListener> {
         return new Vec3d(d, e, f);
     }
 
-    public static Vec3d decodePacketCoordinates(long l, long m, long n) {
-        return new Vec3d(l, m, n).multiply(2.44140625E-4);
+    public static Vec3d decodePacketCoordinates(long x, long y, long z) {
+        return new Vec3d(x, y, z).multiply(2.44140625E-4);
     }
 
     public EntityS2CPacket() {
     }
 
-    public EntityS2CPacket(int i) {
-        this.id = i;
+    public EntityS2CPacket(int entityId) {
+        this.id = entityId;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.id = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.id = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeVarInt(this.id);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeVarInt(this.id);
     }
 
     @Override
@@ -81,8 +81,8 @@ implements Packet<ClientPlayPacketListener> {
 
     @Nullable
     @Environment(value=EnvType.CLIENT)
-    public Entity getEntity(World arg) {
-        return arg.getEntityById(this.id);
+    public Entity getEntity(World world) {
+        return world.getEntityById(this.id);
     }
 
     @Environment(value=EnvType.CLIENT)
@@ -116,28 +116,28 @@ implements Packet<ClientPlayPacketListener> {
             this.rotate = true;
         }
 
-        public Rotate(int i, byte b, byte c, boolean bl) {
-            super(i);
-            this.yaw = b;
-            this.pitch = c;
+        public Rotate(int entityId, byte yaw, byte pitch, boolean onGround) {
+            super(entityId);
+            this.yaw = yaw;
+            this.pitch = pitch;
             this.rotate = true;
-            this.onGround = bl;
+            this.onGround = onGround;
         }
 
         @Override
-        public void read(PacketByteBuf arg) throws IOException {
-            super.read(arg);
-            this.yaw = arg.readByte();
-            this.pitch = arg.readByte();
-            this.onGround = arg.readBoolean();
+        public void read(PacketByteBuf buf) throws IOException {
+            super.read(buf);
+            this.yaw = buf.readByte();
+            this.pitch = buf.readByte();
+            this.onGround = buf.readBoolean();
         }
 
         @Override
-        public void write(PacketByteBuf arg) throws IOException {
-            super.write(arg);
-            arg.writeByte(this.yaw);
-            arg.writeByte(this.pitch);
-            arg.writeBoolean(this.onGround);
+        public void write(PacketByteBuf buf) throws IOException {
+            super.write(buf);
+            buf.writeByte(this.yaw);
+            buf.writeByte(this.pitch);
+            buf.writeBoolean(this.onGround);
         }
     }
 
@@ -147,31 +147,31 @@ implements Packet<ClientPlayPacketListener> {
             this.positionChanged = true;
         }
 
-        public MoveRelative(int i, short s, short t, short u, boolean bl) {
-            super(i);
-            this.deltaX = s;
-            this.deltaY = t;
-            this.deltaZ = u;
-            this.onGround = bl;
+        public MoveRelative(int entityId, short deltaX, short deltaY, short deltaZ, boolean onGround) {
+            super(entityId);
+            this.deltaX = deltaX;
+            this.deltaY = deltaY;
+            this.deltaZ = deltaZ;
+            this.onGround = onGround;
             this.positionChanged = true;
         }
 
         @Override
-        public void read(PacketByteBuf arg) throws IOException {
-            super.read(arg);
-            this.deltaX = arg.readShort();
-            this.deltaY = arg.readShort();
-            this.deltaZ = arg.readShort();
-            this.onGround = arg.readBoolean();
+        public void read(PacketByteBuf buf) throws IOException {
+            super.read(buf);
+            this.deltaX = buf.readShort();
+            this.deltaY = buf.readShort();
+            this.deltaZ = buf.readShort();
+            this.onGround = buf.readBoolean();
         }
 
         @Override
-        public void write(PacketByteBuf arg) throws IOException {
-            super.write(arg);
-            arg.writeShort(this.deltaX);
-            arg.writeShort(this.deltaY);
-            arg.writeShort(this.deltaZ);
-            arg.writeBoolean(this.onGround);
+        public void write(PacketByteBuf buf) throws IOException {
+            super.write(buf);
+            buf.writeShort(this.deltaX);
+            buf.writeShort(this.deltaY);
+            buf.writeShort(this.deltaZ);
+            buf.writeBoolean(this.onGround);
         }
     }
 
@@ -182,38 +182,38 @@ implements Packet<ClientPlayPacketListener> {
             this.positionChanged = true;
         }
 
-        public RotateAndMoveRelative(int i, short s, short t, short u, byte b, byte c, boolean bl) {
-            super(i);
-            this.deltaX = s;
-            this.deltaY = t;
-            this.deltaZ = u;
-            this.yaw = b;
-            this.pitch = c;
-            this.onGround = bl;
+        public RotateAndMoveRelative(int entityId, short deltaX, short deltaY, short deltaZ, byte yaw, byte pitch, boolean onGround) {
+            super(entityId);
+            this.deltaX = deltaX;
+            this.deltaY = deltaY;
+            this.deltaZ = deltaZ;
+            this.yaw = yaw;
+            this.pitch = pitch;
+            this.onGround = onGround;
             this.rotate = true;
             this.positionChanged = true;
         }
 
         @Override
-        public void read(PacketByteBuf arg) throws IOException {
-            super.read(arg);
-            this.deltaX = arg.readShort();
-            this.deltaY = arg.readShort();
-            this.deltaZ = arg.readShort();
-            this.yaw = arg.readByte();
-            this.pitch = arg.readByte();
-            this.onGround = arg.readBoolean();
+        public void read(PacketByteBuf buf) throws IOException {
+            super.read(buf);
+            this.deltaX = buf.readShort();
+            this.deltaY = buf.readShort();
+            this.deltaZ = buf.readShort();
+            this.yaw = buf.readByte();
+            this.pitch = buf.readByte();
+            this.onGround = buf.readBoolean();
         }
 
         @Override
-        public void write(PacketByteBuf arg) throws IOException {
-            super.write(arg);
-            arg.writeShort(this.deltaX);
-            arg.writeShort(this.deltaY);
-            arg.writeShort(this.deltaZ);
-            arg.writeByte(this.yaw);
-            arg.writeByte(this.pitch);
-            arg.writeBoolean(this.onGround);
+        public void write(PacketByteBuf buf) throws IOException {
+            super.write(buf);
+            buf.writeShort(this.deltaX);
+            buf.writeShort(this.deltaY);
+            buf.writeShort(this.deltaZ);
+            buf.writeByte(this.yaw);
+            buf.writeByte(this.pitch);
+            buf.writeBoolean(this.onGround);
         }
     }
 }

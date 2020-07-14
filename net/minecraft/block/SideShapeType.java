@@ -16,8 +16,8 @@ public enum SideShapeType {
     FULL{
 
         @Override
-        public boolean matches(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-            return Block.isFaceFullSquare(arg.getSidesShape(arg2, arg3), arg4);
+        public boolean matches(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+            return Block.isFaceFullSquare(state.getSidesShape(world, pos), direction);
         }
     }
     ,
@@ -26,8 +26,8 @@ public enum SideShapeType {
         private final VoxelShape squareCuboid = Block.createCuboidShape(7.0, 0.0, 7.0, 9.0, 10.0, 9.0);
 
         @Override
-        public boolean matches(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-            return !VoxelShapes.matchesAnywhere(arg.getSidesShape(arg2, arg3).getFace(arg4), this.squareCuboid, BooleanBiFunction.ONLY_SECOND);
+        public boolean matches(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+            return !VoxelShapes.matchesAnywhere(state.getSidesShape(world, pos).getFace(direction), this.squareCuboid, BooleanBiFunction.ONLY_SECOND);
         }
     }
     ,
@@ -36,8 +36,8 @@ public enum SideShapeType {
         private final VoxelShape hollowSquareCuboid = VoxelShapes.combineAndSimplify(VoxelShapes.fullCube(), Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 16.0, 14.0), BooleanBiFunction.ONLY_FIRST);
 
         @Override
-        public boolean matches(BlockState arg, BlockView arg2, BlockPos arg3, Direction arg4) {
-            return !VoxelShapes.matchesAnywhere(arg.getSidesShape(arg2, arg3).getFace(arg4), this.hollowSquareCuboid, BooleanBiFunction.ONLY_SECOND);
+        public boolean matches(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+            return !VoxelShapes.matchesAnywhere(state.getSidesShape(world, pos).getFace(direction), this.hollowSquareCuboid, BooleanBiFunction.ONLY_SECOND);
         }
     };
 

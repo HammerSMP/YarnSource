@@ -41,15 +41,15 @@ public abstract class FoliagePlacer {
 
     protected abstract FoliagePlacerType<?> getType();
 
-    public void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, int i, TreeNode arg3, int j, int k, Set<BlockPos> set, BlockBox arg4) {
-        this.generate(arg, random, arg2, i, arg3, j, k, set, this.method_27386(random), arg4);
+    public void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, int trunkHeight, TreeNode arg3, int foliageHeight, int radius, Set<BlockPos> leaves, BlockBox arg4) {
+        this.generate(world, random, config, trunkHeight, arg3, foliageHeight, radius, leaves, this.method_27386(random), arg4);
     }
 
     protected abstract void generate(ModifiableTestableWorld var1, Random var2, TreeFeatureConfig var3, int var4, TreeNode var5, int var6, int var7, Set<BlockPos> var8, int var9, BlockBox var10);
 
     public abstract int getHeight(Random var1, int var2, TreeFeatureConfig var3);
 
-    public int getRadius(Random random, int i) {
+    public int getRadius(Random random, int baseHeight) {
         return this.radius.method_30321(random);
     }
 
@@ -72,15 +72,15 @@ public abstract class FoliagePlacer {
         return this.isInvalidForLeaves(random, o, j, p, l, bl);
     }
 
-    protected void generate(ModifiableTestableWorld arg, Random random, TreeFeatureConfig arg2, BlockPos arg3, int i, Set<BlockPos> set, int j, boolean bl, BlockBox arg4) {
-        int k = bl ? 1 : 0;
+    protected void generate(ModifiableTestableWorld world, Random random, TreeFeatureConfig config, BlockPos arg3, int baseHeight, Set<BlockPos> set, int j, boolean giantTrunk, BlockBox arg4) {
+        int k = giantTrunk ? 1 : 0;
         BlockPos.Mutable lv = new BlockPos.Mutable();
-        for (int l = -i; l <= i + k; ++l) {
-            for (int m = -i; m <= i + k; ++m) {
-                if (this.method_27387(random, l, j, m, i, bl)) continue;
+        for (int l = -baseHeight; l <= baseHeight + k; ++l) {
+            for (int m = -baseHeight; m <= baseHeight + k; ++m) {
+                if (this.method_27387(random, l, j, m, baseHeight, giantTrunk)) continue;
                 lv.set(arg3, l, j, m);
-                if (!TreeFeature.canReplace(arg, lv)) continue;
-                arg.setBlockState(lv, arg2.leavesProvider.getBlockState(random, lv), 19);
+                if (!TreeFeature.canReplace(world, lv)) continue;
+                world.setBlockState(lv, config.leavesProvider.getBlockState(random, lv), 19);
                 arg4.encompass(new BlockBox(lv, lv));
                 set.add(lv.toImmutable());
             }
@@ -92,10 +92,10 @@ public abstract class FoliagePlacer {
         private final int foliageRadius;
         private final boolean giantTrunk;
 
-        public TreeNode(BlockPos arg, int i, boolean bl) {
-            this.center = arg;
-            this.foliageRadius = i;
-            this.giantTrunk = bl;
+        public TreeNode(BlockPos center, int foliageRadius, boolean giantTrunk) {
+            this.center = center;
+            this.foliageRadius = foliageRadius;
+            this.giantTrunk = giantTrunk;
         }
 
         public BlockPos getCenter() {

@@ -82,37 +82,37 @@ implements CrossbowUser {
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
         if (this.isBaby()) {
-            arg.putBoolean("IsBaby", true);
+            tag.putBoolean("IsBaby", true);
         }
         if (this.cannotHunt) {
-            arg.putBoolean("CannotHunt", true);
+            tag.putBoolean("CannotHunt", true);
         }
-        arg.put("Inventory", this.inventory.getTags());
+        tag.put("Inventory", this.inventory.getTags());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setBaby(arg.getBoolean("IsBaby"));
-        this.setCannotHunt(arg.getBoolean("CannotHunt"));
-        this.inventory.readTags(arg.getList("Inventory", 10));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setBaby(tag.getBoolean("IsBaby"));
+        this.setCannotHunt(tag.getBoolean("CannotHunt"));
+        this.inventory.readTags(tag.getList("Inventory", 10));
     }
 
     @Override
-    protected void dropEquipment(DamageSource arg, int i, boolean bl) {
-        super.dropEquipment(arg, i, bl);
+    protected void dropEquipment(DamageSource source, int lootingMultiplier, boolean allowDrops) {
+        super.dropEquipment(source, lootingMultiplier, allowDrops);
         this.inventory.clearToList().forEach(this::dropStack);
     }
 
-    protected ItemStack addItem(ItemStack arg) {
-        return this.inventory.addStack(arg);
+    protected ItemStack addItem(ItemStack stack) {
+        return this.inventory.addStack(stack);
     }
 
-    protected boolean canInsertIntoInventory(ItemStack arg) {
-        return this.inventory.canInsert(arg);
+    protected boolean canInsertIntoInventory(ItemStack stack) {
+        return this.inventory.canInsert(stack);
     }
 
     @Override
@@ -124,9 +124,9 @@ implements CrossbowUser {
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        super.onTrackedDataSet(arg);
-        if (BABY.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        super.onTrackedDataSet(data);
+        if (BABY.equals(data)) {
             this.calculateDimensions();
         }
     }
@@ -135,14 +135,14 @@ implements CrossbowUser {
         return HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 16.0).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.35f).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5.0);
     }
 
-    public static boolean canSpawn(EntityType<PiglinEntity> arg, WorldAccess arg2, SpawnReason arg3, BlockPos arg4, Random random) {
-        return !arg2.getBlockState(arg4.down()).isOf(Blocks.NETHER_WART_BLOCK);
+    public static boolean canSpawn(EntityType<PiglinEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
+        return !world.getBlockState(pos.down()).isOf(Blocks.NETHER_WART_BLOCK);
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        if (arg3 != SpawnReason.STRUCTURE) {
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        if (spawnReason != SpawnReason.STRUCTURE) {
             if (arg.getRandom().nextFloat() < 0.2f) {
                 this.setBaby(true);
             } else if (this.isAdult()) {
@@ -150,9 +150,9 @@ implements CrossbowUser {
             }
         }
         PiglinBrain.setHuntedRecently(this);
-        this.initEquipment(arg2);
-        this.updateEnchantments(arg2);
-        return super.initialize(arg, arg2, arg3, arg4, arg5);
+        this.initEquipment(difficulty);
+        this.updateEnchantments(difficulty);
+        return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
     @Override
@@ -161,12 +161,12 @@ implements CrossbowUser {
     }
 
     @Override
-    public boolean canImmediatelyDespawn(double d) {
+    public boolean canImmediatelyDespawn(double distanceSquared) {
         return !this.isPersistent();
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         if (this.isAdult()) {
             this.equipAtChance(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
             this.equipAtChance(EquipmentSlot.CHEST, new ItemStack(Items.GOLDEN_CHESTPLATE));
@@ -175,9 +175,9 @@ implements CrossbowUser {
         }
     }
 
-    private void equipAtChance(EquipmentSlot arg, ItemStack arg2) {
+    private void equipAtChance(EquipmentSlot slot, ItemStack stack) {
         if (this.world.random.nextFloat() < 0.1f) {
-            this.equipStack(arg, arg2);
+            this.equipStack(slot, stack);
         }
     }
 
@@ -195,20 +195,20 @@ implements CrossbowUser {
     }
 
     @Override
-    public ActionResult interactMob(PlayerEntity arg, Hand arg2) {
-        ActionResult lv = super.interactMob(arg, arg2);
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        ActionResult lv = super.interactMob(player, hand);
         if (lv.isAccepted()) {
             return lv;
         }
         if (this.world.isClient) {
-            boolean bl = PiglinBrain.isWillingToTrade(this, arg.getStackInHand(arg2)) && this.getActivity() != PiglinActivity.ADMIRING_ITEM;
+            boolean bl = PiglinBrain.isWillingToTrade(this, player.getStackInHand(hand)) && this.getActivity() != PiglinActivity.ADMIRING_ITEM;
             return bl ? ActionResult.SUCCESS : ActionResult.PASS;
         }
-        return PiglinBrain.playerInteract(this, arg, arg2);
+        return PiglinBrain.playerInteract(this, player, hand);
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return this.isBaby() ? 0.93f : 1.74f;
     }
 
@@ -223,12 +223,12 @@ implements CrossbowUser {
     }
 
     @Override
-    public void setBaby(boolean bl) {
-        this.getDataTracker().set(BABY, bl);
+    public void setBaby(boolean baby) {
+        this.getDataTracker().set(BABY, baby);
         if (!this.world.isClient) {
             EntityAttributeInstance lv = this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
             lv.removeModifier(BABY_SPEED_BOOST);
-            if (bl) {
+            if (baby) {
                 lv.addTemporaryModifier(BABY_SPEED_BOOST);
             }
         }
@@ -239,8 +239,8 @@ implements CrossbowUser {
         return this.getDataTracker().get(BABY);
     }
 
-    private void setCannotHunt(boolean bl) {
-        this.cannotHunt = bl;
+    private void setCannotHunt(boolean cannotHunt) {
+        this.cannotHunt = cannotHunt;
     }
 
     @Override
@@ -258,15 +258,15 @@ implements CrossbowUser {
     }
 
     @Override
-    protected int getCurrentExperience(PlayerEntity arg) {
+    protected int getCurrentExperience(PlayerEntity player) {
         return this.experiencePoints;
     }
 
     @Override
-    protected void zombify(ServerWorld arg) {
+    protected void zombify(ServerWorld world) {
         PiglinBrain.pickupItemWithOffHand(this);
         this.inventory.clearToList().forEach(this::dropStack);
-        super.zombify(arg);
+        super.zombify(world);
     }
 
     private ItemStack makeInitialWeapon() {
@@ -281,8 +281,8 @@ implements CrossbowUser {
     }
 
     @Override
-    public void setCharging(boolean bl) {
-        this.dataTracker.set(CHARGING, bl);
+    public void setCharging(boolean charging) {
+        this.dataTracker.set(CHARGING, charging);
     }
 
     @Override
@@ -314,93 +314,93 @@ implements CrossbowUser {
         return this.dataTracker.get(DANCING);
     }
 
-    public void setDancing(boolean bl) {
-        this.dataTracker.set(DANCING, bl);
+    public void setDancing(boolean dancing) {
+        this.dataTracker.set(DANCING, dancing);
     }
 
     @Override
-    public boolean damage(DamageSource arg, float f) {
-        boolean bl = super.damage(arg, f);
+    public boolean damage(DamageSource source, float amount) {
+        boolean bl = super.damage(source, amount);
         if (this.world.isClient) {
             return false;
         }
-        if (bl && arg.getAttacker() instanceof LivingEntity) {
-            PiglinBrain.onAttacked(this, (LivingEntity)arg.getAttacker());
+        if (bl && source.getAttacker() instanceof LivingEntity) {
+            PiglinBrain.onAttacked(this, (LivingEntity)source.getAttacker());
         }
         return bl;
     }
 
     @Override
-    public void attack(LivingEntity arg, float f) {
+    public void attack(LivingEntity target, float pullProgress) {
         this.shoot(this, 1.6f);
     }
 
     @Override
-    public void shoot(LivingEntity arg, ItemStack arg2, ProjectileEntity arg3, float f) {
-        this.shoot(this, arg, arg3, f, 1.6f);
+    public void shoot(LivingEntity target, ItemStack crossbow, ProjectileEntity projectile, float multiShotSpray) {
+        this.shoot(this, target, projectile, multiShotSpray, 1.6f);
     }
 
     @Override
-    public boolean canUseRangedWeapon(RangedWeaponItem arg) {
-        return arg == Items.CROSSBOW;
+    public boolean canUseRangedWeapon(RangedWeaponItem weapon) {
+        return weapon == Items.CROSSBOW;
     }
 
-    protected void equipToMainHand(ItemStack arg) {
-        this.equipLootStack(EquipmentSlot.MAINHAND, arg);
+    protected void equipToMainHand(ItemStack stack) {
+        this.equipLootStack(EquipmentSlot.MAINHAND, stack);
     }
 
-    protected void equipToOffHand(ItemStack arg) {
-        if (arg.getItem() == PiglinBrain.BARTERING_ITEM) {
-            this.equipStack(EquipmentSlot.OFFHAND, arg);
+    protected void equipToOffHand(ItemStack stack) {
+        if (stack.getItem() == PiglinBrain.BARTERING_ITEM) {
+            this.equipStack(EquipmentSlot.OFFHAND, stack);
             this.updateDropChances(EquipmentSlot.OFFHAND);
         } else {
-            this.equipLootStack(EquipmentSlot.OFFHAND, arg);
+            this.equipLootStack(EquipmentSlot.OFFHAND, stack);
         }
     }
 
     @Override
-    public boolean canGather(ItemStack arg) {
-        return this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) && this.canPickUpLoot() && PiglinBrain.canGather(this, arg);
+    public boolean canGather(ItemStack stack) {
+        return this.world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING) && this.canPickUpLoot() && PiglinBrain.canGather(this, stack);
     }
 
-    protected boolean method_24846(ItemStack arg) {
-        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(arg);
+    protected boolean method_24846(ItemStack stack) {
+        EquipmentSlot lv = MobEntity.getPreferredEquipmentSlot(stack);
         ItemStack lv2 = this.getEquippedStack(lv);
-        return this.prefersNewEquipment(arg, lv2);
+        return this.prefersNewEquipment(stack, lv2);
     }
 
     @Override
-    protected boolean prefersNewEquipment(ItemStack arg, ItemStack arg2) {
+    protected boolean prefersNewEquipment(ItemStack newStack, ItemStack oldStack) {
         boolean bl2;
-        if (EnchantmentHelper.hasBindingCurse(arg2)) {
+        if (EnchantmentHelper.hasBindingCurse(oldStack)) {
             return false;
         }
-        boolean bl = PiglinBrain.isGoldenItem(arg.getItem()) || arg.getItem() == Items.CROSSBOW;
-        boolean bl3 = bl2 = PiglinBrain.isGoldenItem(arg2.getItem()) || arg2.getItem() == Items.CROSSBOW;
+        boolean bl = PiglinBrain.isGoldenItem(newStack.getItem()) || newStack.getItem() == Items.CROSSBOW;
+        boolean bl3 = bl2 = PiglinBrain.isGoldenItem(oldStack.getItem()) || oldStack.getItem() == Items.CROSSBOW;
         if (bl && !bl2) {
             return true;
         }
         if (!bl && bl2) {
             return false;
         }
-        if (this.isAdult() && arg.getItem() != Items.CROSSBOW && arg2.getItem() == Items.CROSSBOW) {
+        if (this.isAdult() && newStack.getItem() != Items.CROSSBOW && oldStack.getItem() == Items.CROSSBOW) {
             return false;
         }
-        return super.prefersNewEquipment(arg, arg2);
+        return super.prefersNewEquipment(newStack, oldStack);
     }
 
     @Override
-    protected void loot(ItemEntity arg) {
-        this.method_29499(arg);
-        PiglinBrain.loot(this, arg);
+    protected void loot(ItemEntity item) {
+        this.method_29499(item);
+        PiglinBrain.loot(this, item);
     }
 
     @Override
-    public boolean startRiding(Entity arg, boolean bl) {
-        if (this.isBaby() && arg.getType() == EntityType.HOGLIN) {
-            arg = this.method_26089(arg, 3);
+    public boolean startRiding(Entity entity, boolean force) {
+        if (this.isBaby() && entity.getType() == EntityType.HOGLIN) {
+            entity = this.method_26089(entity, 3);
         }
-        return super.startRiding(arg, bl);
+        return super.startRiding(entity, force);
     }
 
     private Entity method_26089(Entity arg, int i) {
@@ -420,7 +420,7 @@ implements CrossbowUser {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PIGLIN_HURT;
     }
 
@@ -430,12 +430,12 @@ implements CrossbowUser {
     }
 
     @Override
-    protected void playStepSound(BlockPos arg, BlockState arg2) {
+    protected void playStepSound(BlockPos pos, BlockState state) {
         this.playSound(SoundEvents.ENTITY_PIGLIN_STEP, 0.15f, 1.0f);
     }
 
-    protected void playSound(SoundEvent arg) {
-        this.playSound(arg, this.getSoundVolume(), this.getSoundPitch());
+    protected void playSound(SoundEvent sound) {
+        this.playSound(sound, this.getSoundVolume(), this.getSoundPitch());
     }
 
     @Override

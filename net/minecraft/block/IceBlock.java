@@ -31,38 +31,38 @@ extends TransparentBlock {
     }
 
     @Override
-    public void afterBreak(World arg, PlayerEntity arg2, BlockPos arg3, BlockState arg4, @Nullable BlockEntity arg5, ItemStack arg6) {
-        super.afterBreak(arg, arg2, arg3, arg4, arg5, arg6);
-        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, arg6) == 0) {
-            if (arg.getDimension().isUltrawarm()) {
-                arg.removeBlock(arg3, false);
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
+        super.afterBreak(world, player, pos, state, blockEntity, stack);
+        if (EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, stack) == 0) {
+            if (world.getDimension().isUltrawarm()) {
+                world.removeBlock(pos, false);
                 return;
             }
-            Material lv = arg.getBlockState(arg3.down()).getMaterial();
+            Material lv = world.getBlockState(pos.down()).getMaterial();
             if (lv.blocksMovement() || lv.isLiquid()) {
-                arg.setBlockState(arg3, Blocks.WATER.getDefaultState());
+                world.setBlockState(pos, Blocks.WATER.getDefaultState());
             }
         }
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.getLightLevel(LightType.BLOCK, arg3) > 11 - arg.getOpacity(arg2, arg3)) {
-            this.melt(arg, arg2, arg3);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.getLightLevel(LightType.BLOCK, pos) > 11 - state.getOpacity(world, pos)) {
+            this.melt(state, world, pos);
         }
     }
 
-    protected void melt(BlockState arg, World arg2, BlockPos arg3) {
-        if (arg2.getDimension().isUltrawarm()) {
-            arg2.removeBlock(arg3, false);
+    protected void melt(BlockState state, World world, BlockPos pos) {
+        if (world.getDimension().isUltrawarm()) {
+            world.removeBlock(pos, false);
             return;
         }
-        arg2.setBlockState(arg3, Blocks.WATER.getDefaultState());
-        arg2.updateNeighbor(arg3, Blocks.WATER, arg3);
+        world.setBlockState(pos, Blocks.WATER.getDefaultState());
+        world.updateNeighbor(pos, Blocks.WATER, pos);
     }
 
     @Override
-    public PistonBehavior getPistonBehavior(BlockState arg) {
+    public PistonBehavior getPistonBehavior(BlockState state) {
         return PistonBehavior.NORMAL;
     }
 }

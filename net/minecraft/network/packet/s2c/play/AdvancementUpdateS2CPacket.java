@@ -34,14 +34,14 @@ implements Packet<ClientPlayPacketListener> {
     public AdvancementUpdateS2CPacket() {
     }
 
-    public AdvancementUpdateS2CPacket(boolean bl, Collection<Advancement> collection, Set<Identifier> set, Map<Identifier, AdvancementProgress> map) {
-        this.clearCurrent = bl;
+    public AdvancementUpdateS2CPacket(boolean clearCurrent, Collection<Advancement> toEarn, Set<Identifier> toRemove, Map<Identifier, AdvancementProgress> toSetProgress) {
+        this.clearCurrent = clearCurrent;
         this.toEarn = Maps.newHashMap();
-        for (Advancement lv : collection) {
+        for (Advancement lv : toEarn) {
             this.toEarn.put(lv.getId(), lv.createTask());
         }
-        this.toRemove = set;
-        this.toSetProgress = Maps.newHashMap(map);
+        this.toRemove = toRemove;
+        this.toSetProgress = Maps.newHashMap(toSetProgress);
     }
 
     @Override
@@ -50,47 +50,47 @@ implements Packet<ClientPlayPacketListener> {
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.clearCurrent = arg.readBoolean();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.clearCurrent = buf.readBoolean();
         this.toEarn = Maps.newHashMap();
         this.toRemove = Sets.newLinkedHashSet();
         this.toSetProgress = Maps.newHashMap();
-        int i = arg.readVarInt();
+        int i = buf.readVarInt();
         for (int j = 0; j < i; ++j) {
-            Identifier lv = arg.readIdentifier();
-            Advancement.Task lv2 = Advancement.Task.fromPacket(arg);
+            Identifier lv = buf.readIdentifier();
+            Advancement.Task lv2 = Advancement.Task.fromPacket(buf);
             this.toEarn.put(lv, lv2);
         }
-        i = arg.readVarInt();
+        i = buf.readVarInt();
         for (int k = 0; k < i; ++k) {
-            Identifier lv3 = arg.readIdentifier();
+            Identifier lv3 = buf.readIdentifier();
             this.toRemove.add(lv3);
         }
-        i = arg.readVarInt();
+        i = buf.readVarInt();
         for (int l = 0; l < i; ++l) {
-            Identifier lv4 = arg.readIdentifier();
-            this.toSetProgress.put(lv4, AdvancementProgress.fromPacket(arg));
+            Identifier lv4 = buf.readIdentifier();
+            this.toSetProgress.put(lv4, AdvancementProgress.fromPacket(buf));
         }
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeBoolean(this.clearCurrent);
-        arg.writeVarInt(this.toEarn.size());
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeBoolean(this.clearCurrent);
+        buf.writeVarInt(this.toEarn.size());
         for (Map.Entry<Identifier, Advancement.Task> entry : this.toEarn.entrySet()) {
             Identifier lv = entry.getKey();
             Advancement.Task lv2 = entry.getValue();
-            arg.writeIdentifier(lv);
-            lv2.toPacket(arg);
+            buf.writeIdentifier(lv);
+            lv2.toPacket(buf);
         }
-        arg.writeVarInt(this.toRemove.size());
+        buf.writeVarInt(this.toRemove.size());
         for (Identifier identifier : this.toRemove) {
-            arg.writeIdentifier(identifier);
+            buf.writeIdentifier(identifier);
         }
-        arg.writeVarInt(this.toSetProgress.size());
+        buf.writeVarInt(this.toSetProgress.size());
         for (Map.Entry entry : this.toSetProgress.entrySet()) {
-            arg.writeIdentifier((Identifier)entry.getKey());
-            ((AdvancementProgress)entry.getValue()).toPacket(arg);
+            buf.writeIdentifier((Identifier)entry.getKey());
+            ((AdvancementProgress)entry.getValue()).toPacket(buf);
         }
     }
 

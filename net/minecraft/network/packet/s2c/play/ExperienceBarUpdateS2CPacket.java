@@ -23,24 +23,24 @@ implements Packet<ClientPlayPacketListener> {
     public ExperienceBarUpdateS2CPacket() {
     }
 
-    public ExperienceBarUpdateS2CPacket(float f, int i, int j) {
-        this.barProgress = f;
-        this.experienceLevel = i;
-        this.experience = j;
+    public ExperienceBarUpdateS2CPacket(float barProgress, int experienceLevel, int experience) {
+        this.barProgress = barProgress;
+        this.experienceLevel = experienceLevel;
+        this.experience = experience;
     }
 
     @Override
-    public void read(PacketByteBuf arg) throws IOException {
-        this.barProgress = arg.readFloat();
-        this.experience = arg.readVarInt();
-        this.experienceLevel = arg.readVarInt();
+    public void read(PacketByteBuf buf) throws IOException {
+        this.barProgress = buf.readFloat();
+        this.experience = buf.readVarInt();
+        this.experienceLevel = buf.readVarInt();
     }
 
     @Override
-    public void write(PacketByteBuf arg) throws IOException {
-        arg.writeFloat(this.barProgress);
-        arg.writeVarInt(this.experience);
-        arg.writeVarInt(this.experienceLevel);
+    public void write(PacketByteBuf buf) throws IOException {
+        buf.writeFloat(this.barProgress);
+        buf.writeVarInt(this.experience);
+        buf.writeVarInt(this.experienceLevel);
     }
 
     @Override

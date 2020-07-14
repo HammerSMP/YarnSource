@@ -31,10 +31,10 @@ extends SpriteBillboardParticle {
     private final float sampleU;
     private final float sampleV;
 
-    public BlockDustParticle(ClientWorld arg, double d, double e, double f, double g, double h, double i, BlockState arg2) {
-        super(arg, d, e, f, g, h, i);
-        this.blockState = arg2;
-        this.setSprite(MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(arg2));
+    public BlockDustParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, BlockState blockState) {
+        super(world, x, y, z, velocityX, velocityY, velocityZ);
+        this.blockState = blockState;
+        this.setSprite(MinecraftClient.getInstance().getBlockRenderManager().getModels().getSprite(blockState));
         this.gravityStrength = 1.0f;
         this.colorRed = 0.6f;
         this.colorGreen = 0.6f;
@@ -49,12 +49,12 @@ extends SpriteBillboardParticle {
         return ParticleTextureSheet.TERRAIN_SHEET;
     }
 
-    public BlockDustParticle setBlockPos(BlockPos arg) {
-        this.blockPos = arg;
+    public BlockDustParticle setBlockPos(BlockPos blockPos) {
+        this.blockPos = blockPos;
         if (this.blockState.isOf(Blocks.GRASS_BLOCK)) {
             return this;
         }
-        this.updateColor(arg);
+        this.updateColor(blockPos);
         return this;
     }
 
@@ -67,8 +67,8 @@ extends SpriteBillboardParticle {
         return this;
     }
 
-    protected void updateColor(@Nullable BlockPos arg) {
-        int i = MinecraftClient.getInstance().getBlockColors().getColor(this.blockState, this.world, arg, 0);
+    protected void updateColor(@Nullable BlockPos blockPos) {
+        int i = MinecraftClient.getInstance().getBlockColors().getColor(this.blockState, this.world, blockPos, 0);
         this.colorRed *= (float)(i >> 16 & 0xFF) / 255.0f;
         this.colorGreen *= (float)(i >> 8 & 0xFF) / 255.0f;
         this.colorBlue *= (float)(i & 0xFF) / 255.0f;
@@ -95,8 +95,8 @@ extends SpriteBillboardParticle {
     }
 
     @Override
-    public int getColorMultiplier(float f) {
-        int i = super.getColorMultiplier(f);
+    public int getColorMultiplier(float tint) {
+        int i = super.getColorMultiplier(tint);
         int j = 0;
         if (this.world.isChunkLoaded(this.blockPos)) {
             j = WorldRenderer.getLightmapCoordinates(this.world, this.blockPos);

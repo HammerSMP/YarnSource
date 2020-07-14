@@ -21,9 +21,9 @@ extends MovingSoundInstance {
     private final ClientPlayerEntity player;
     private int tickCount;
 
-    public ElytraSoundInstance(ClientPlayerEntity arg) {
+    public ElytraSoundInstance(ClientPlayerEntity player) {
         super(SoundEvents.ITEM_ELYTRA_FLYING, SoundCategory.PLAYERS);
-        this.player = arg;
+        this.player = player;
         this.repeat = true;
         this.repeatDelay = 0;
         this.volume = 0.1f;

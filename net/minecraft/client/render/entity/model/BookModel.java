@@ -44,12 +44,12 @@ extends Model {
     }
 
     @Override
-    public void render(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
-        this.method_24184(arg, arg2, i, j, f, g, h, k);
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+        this.method_24184(matrices, vertices, light, overlay, red, green, blue, alpha);
     }
 
-    public void method_24184(MatrixStack arg, VertexConsumer arg2, int i, int j, float f, float g, float h, float k) {
-        this.parts.forEach(arg3 -> arg3.render(arg, arg2, i, j, f, g, h, k));
+    public void method_24184(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+        this.parts.forEach(arg3 -> arg3.render(matrices, vertices, light, overlay, red, green, blue, alpha));
     }
 
     public void setPageAngles(float f, float g, float h, float i) {

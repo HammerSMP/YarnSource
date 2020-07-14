@@ -46,10 +46,10 @@ public class FluidRenderer {
         this.waterOverlaySprite = ModelLoader.WATER_OVERLAY.getSprite();
     }
 
-    private static boolean isSameFluid(BlockView arg, BlockPos arg2, Direction arg3, FluidState arg4) {
-        BlockPos lv = arg2.offset(arg3);
-        FluidState lv2 = arg.getFluidState(lv);
-        return lv2.getFluid().matchesType(arg4.getFluid());
+    private static boolean isSameFluid(BlockView world, BlockPos pos, Direction side, FluidState state) {
+        BlockPos lv = pos.offset(side);
+        FluidState lv2 = world.getFluidState(lv);
+        return lv2.getFluid().matchesType(state.getFluid());
     }
 
     private static boolean method_29710(BlockView arg, Direction arg2, float f, BlockPos arg3, BlockState arg4) {
@@ -61,10 +61,10 @@ public class FluidRenderer {
         return false;
     }
 
-    private static boolean isSideCovered(BlockView arg, BlockPos arg2, Direction arg3, float f) {
-        BlockPos lv = arg2.offset(arg3);
-        BlockState lv2 = arg.getBlockState(lv);
-        return FluidRenderer.method_29710(arg, arg3, f, lv, lv2);
+    private static boolean isSideCovered(BlockView world, BlockPos pos, Direction direction, float maxDeviation) {
+        BlockPos lv = pos.offset(direction);
+        BlockState lv2 = world.getBlockState(lv);
+        return FluidRenderer.method_29710(world, direction, maxDeviation, lv, lv2);
     }
 
     private static boolean method_29709(BlockView arg, BlockPos arg2, BlockState arg3, Direction arg4) {
@@ -75,39 +75,39 @@ public class FluidRenderer {
         return !FluidRenderer.method_29709(arg, arg2, arg4, arg5) && !FluidRenderer.isSameFluid(arg, arg2, arg5, arg3);
     }
 
-    public boolean render(BlockRenderView arg, BlockPos arg2, VertexConsumer arg3, FluidState arg4) {
+    public boolean render(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, FluidState state) {
         float t;
-        boolean bl = arg4.isIn(FluidTags.LAVA);
+        boolean bl = state.isIn(FluidTags.LAVA);
         Sprite[] lvs = bl ? this.lavaSprites : this.waterSprites;
-        BlockState lv = arg.getBlockState(arg2);
-        int i = bl ? 0xFFFFFF : BiomeColors.getWaterColor(arg, arg2);
+        BlockState lv = world.getBlockState(pos);
+        int i = bl ? 0xFFFFFF : BiomeColors.getWaterColor(world, pos);
         float f = (float)(i >> 16 & 0xFF) / 255.0f;
         float g = (float)(i >> 8 & 0xFF) / 255.0f;
         float h = (float)(i & 0xFF) / 255.0f;
-        boolean bl2 = !FluidRenderer.isSameFluid(arg, arg2, Direction.UP, arg4);
-        boolean bl3 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.DOWN) && !FluidRenderer.isSideCovered(arg, arg2, Direction.DOWN, 0.8888889f);
-        boolean bl4 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.NORTH);
-        boolean bl5 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.SOUTH);
-        boolean bl6 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.WEST);
-        boolean bl7 = FluidRenderer.method_29708(arg, arg2, arg4, lv, Direction.EAST);
+        boolean bl2 = !FluidRenderer.isSameFluid(world, pos, Direction.UP, state);
+        boolean bl3 = FluidRenderer.method_29708(world, pos, state, lv, Direction.DOWN) && !FluidRenderer.isSideCovered(world, pos, Direction.DOWN, 0.8888889f);
+        boolean bl4 = FluidRenderer.method_29708(world, pos, state, lv, Direction.NORTH);
+        boolean bl5 = FluidRenderer.method_29708(world, pos, state, lv, Direction.SOUTH);
+        boolean bl6 = FluidRenderer.method_29708(world, pos, state, lv, Direction.WEST);
+        boolean bl7 = FluidRenderer.method_29708(world, pos, state, lv, Direction.EAST);
         if (!(bl2 || bl3 || bl7 || bl6 || bl4 || bl5)) {
             return false;
         }
         boolean bl8 = false;
-        float j = arg.getBrightness(Direction.DOWN, true);
-        float k = arg.getBrightness(Direction.UP, true);
-        float l = arg.getBrightness(Direction.NORTH, true);
-        float m = arg.getBrightness(Direction.WEST, true);
-        float n = this.getNorthWestCornerFluidHeight(arg, arg2, arg4.getFluid());
-        float o = this.getNorthWestCornerFluidHeight(arg, arg2.south(), arg4.getFluid());
-        float p = this.getNorthWestCornerFluidHeight(arg, arg2.east().south(), arg4.getFluid());
-        float q = this.getNorthWestCornerFluidHeight(arg, arg2.east(), arg4.getFluid());
-        double d = arg2.getX() & 0xF;
-        double e = arg2.getY() & 0xF;
-        double r = arg2.getZ() & 0xF;
+        float j = world.getBrightness(Direction.DOWN, true);
+        float k = world.getBrightness(Direction.UP, true);
+        float l = world.getBrightness(Direction.NORTH, true);
+        float m = world.getBrightness(Direction.WEST, true);
+        float n = this.getNorthWestCornerFluidHeight(world, pos, state.getFluid());
+        float o = this.getNorthWestCornerFluidHeight(world, pos.south(), state.getFluid());
+        float p = this.getNorthWestCornerFluidHeight(world, pos.east().south(), state.getFluid());
+        float q = this.getNorthWestCornerFluidHeight(world, pos.east(), state.getFluid());
+        double d = pos.getX() & 0xF;
+        double e = pos.getY() & 0xF;
+        double r = pos.getZ() & 0xF;
         float s = 0.001f;
         float f2 = t = bl3 ? 0.001f : 0.0f;
-        if (bl2 && !FluidRenderer.isSideCovered(arg, arg2, Direction.UP, Math.min(Math.min(n, o), Math.min(p, q)))) {
+        if (bl2 && !FluidRenderer.isSideCovered(world, pos, Direction.UP, Math.min(Math.min(n, o), Math.min(p, q)))) {
             float an;
             float am;
             float al;
@@ -121,7 +121,7 @@ public class FluidRenderer {
             o -= 0.001f;
             p -= 0.001f;
             q -= 0.001f;
-            Vec3d lv2 = arg4.getVelocity(arg, arg2);
+            Vec3d lv2 = state.getVelocity(world, pos);
             if (lv2.x == 0.0 && lv2.z == 0.0) {
                 Sprite lv3 = lvs[0];
                 float u = lv3.getFrameU(0.0);
@@ -160,19 +160,19 @@ public class FluidRenderer {
             aj = MathHelper.lerp(as, aj, (float)ap);
             al = MathHelper.lerp(as, al, (float)ap);
             an = MathHelper.lerp(as, an, (float)ap);
-            int at = this.getLight(arg, arg2);
+            int at = this.getLight(world, pos);
             float au = k * f;
             float av = k * g;
             float aw = k * h;
-            this.vertex(arg3, d + 0.0, e + (double)n, r + 0.0, au, av, aw, ag, ah, at);
-            this.vertex(arg3, d + 0.0, e + (double)o, r + 1.0, au, av, aw, ai, aj, at);
-            this.vertex(arg3, d + 1.0, e + (double)p, r + 1.0, au, av, aw, ak, al, at);
-            this.vertex(arg3, d + 1.0, e + (double)q, r + 0.0, au, av, aw, am, an, at);
-            if (arg4.method_15756(arg, arg2.up())) {
-                this.vertex(arg3, d + 0.0, e + (double)n, r + 0.0, au, av, aw, ag, ah, at);
-                this.vertex(arg3, d + 1.0, e + (double)q, r + 0.0, au, av, aw, am, an, at);
-                this.vertex(arg3, d + 1.0, e + (double)p, r + 1.0, au, av, aw, ak, al, at);
-                this.vertex(arg3, d + 0.0, e + (double)o, r + 1.0, au, av, aw, ai, aj, at);
+            this.vertex(vertexConsumer, d + 0.0, e + (double)n, r + 0.0, au, av, aw, ag, ah, at);
+            this.vertex(vertexConsumer, d + 0.0, e + (double)o, r + 1.0, au, av, aw, ai, aj, at);
+            this.vertex(vertexConsumer, d + 1.0, e + (double)p, r + 1.0, au, av, aw, ak, al, at);
+            this.vertex(vertexConsumer, d + 1.0, e + (double)q, r + 0.0, au, av, aw, am, an, at);
+            if (state.method_15756(world, pos.up())) {
+                this.vertex(vertexConsumer, d + 0.0, e + (double)n, r + 0.0, au, av, aw, ag, ah, at);
+                this.vertex(vertexConsumer, d + 1.0, e + (double)q, r + 0.0, au, av, aw, am, an, at);
+                this.vertex(vertexConsumer, d + 1.0, e + (double)p, r + 1.0, au, av, aw, ak, al, at);
+                this.vertex(vertexConsumer, d + 0.0, e + (double)o, r + 1.0, au, av, aw, ai, aj, at);
             }
         }
         if (bl3) {
@@ -180,14 +180,14 @@ public class FluidRenderer {
             float ay = lvs[0].getMaxU();
             float az = lvs[0].getMinV();
             float ba = lvs[0].getMaxV();
-            int bb = this.getLight(arg, arg2.down());
+            int bb = this.getLight(world, pos.down());
             float bc = j * f;
             float bd = j * g;
             float be = j * h;
-            this.vertex(arg3, d, e + (double)t, r + 1.0, bc, bd, be, ax, ba, bb);
-            this.vertex(arg3, d, e + (double)t, r, bc, bd, be, ax, az, bb);
-            this.vertex(arg3, d + 1.0, e + (double)t, r, bc, bd, be, ay, az, bb);
-            this.vertex(arg3, d + 1.0, e + (double)t, r + 1.0, bc, bd, be, ay, ba, bb);
+            this.vertex(vertexConsumer, d, e + (double)t, r + 1.0, bc, bd, be, ax, ba, bb);
+            this.vertex(vertexConsumer, d, e + (double)t, r, bc, bd, be, ax, az, bb);
+            this.vertex(vertexConsumer, d + 1.0, e + (double)t, r, bc, bd, be, ay, az, bb);
+            this.vertex(vertexConsumer, d + 1.0, e + (double)t, r + 1.0, bc, bd, be, ay, ba, bb);
             bl8 = true;
         }
         for (int bf = 0; bf < 4; ++bf) {
@@ -237,11 +237,11 @@ public class FluidRenderer {
                 lv8 = Direction.EAST;
                 bl12 = bl7;
             }
-            if (!bl12 || FluidRenderer.isSideCovered(arg, arg2, lv8, Math.max(bz, ca))) continue;
+            if (!bl12 || FluidRenderer.isSideCovered(world, pos, lv8, Math.max(bz, ca))) continue;
             bl8 = true;
-            BlockPos lv9 = arg2.offset(lv8);
+            BlockPos lv9 = pos.offset(lv8);
             Sprite lv10 = lvs[1];
-            if (!bl && ((lv11 = arg.getBlockState(lv9).getBlock()) instanceof TransparentBlock || lv11 instanceof LeavesBlock)) {
+            if (!bl && ((lv11 = world.getBlockState(lv9).getBlock()) instanceof TransparentBlock || lv11 instanceof LeavesBlock)) {
                 lv10 = this.waterOverlaySprite;
             }
             float cf = lv10.getFrameU(0.0);
@@ -249,31 +249,31 @@ public class FluidRenderer {
             float ch = lv10.getFrameV((1.0f - bz) * 16.0f * 0.5f);
             float ci = lv10.getFrameV((1.0f - ca) * 16.0f * 0.5f);
             float cj = lv10.getFrameV(8.0);
-            int ck = this.getLight(arg, lv9);
+            int ck = this.getLight(world, lv9);
             float cl = bf < 2 ? l : m;
             float cm = k * cl * f;
             float cn = k * cl * g;
             float co = k * cl * h;
-            this.vertex(arg3, cb, e + (double)bz, cd, cm, cn, co, cf, ch, ck);
-            this.vertex(arg3, cc, e + (double)ca, ce, cm, cn, co, cg, ci, ck);
-            this.vertex(arg3, cc, e + (double)t, ce, cm, cn, co, cg, cj, ck);
-            this.vertex(arg3, cb, e + (double)t, cd, cm, cn, co, cf, cj, ck);
+            this.vertex(vertexConsumer, cb, e + (double)bz, cd, cm, cn, co, cf, ch, ck);
+            this.vertex(vertexConsumer, cc, e + (double)ca, ce, cm, cn, co, cg, ci, ck);
+            this.vertex(vertexConsumer, cc, e + (double)t, ce, cm, cn, co, cg, cj, ck);
+            this.vertex(vertexConsumer, cb, e + (double)t, cd, cm, cn, co, cf, cj, ck);
             if (lv10 == this.waterOverlaySprite) continue;
-            this.vertex(arg3, cb, e + (double)t, cd, cm, cn, co, cf, cj, ck);
-            this.vertex(arg3, cc, e + (double)t, ce, cm, cn, co, cg, cj, ck);
-            this.vertex(arg3, cc, e + (double)ca, ce, cm, cn, co, cg, ci, ck);
-            this.vertex(arg3, cb, e + (double)bz, cd, cm, cn, co, cf, ch, ck);
+            this.vertex(vertexConsumer, cb, e + (double)t, cd, cm, cn, co, cf, cj, ck);
+            this.vertex(vertexConsumer, cc, e + (double)t, ce, cm, cn, co, cg, cj, ck);
+            this.vertex(vertexConsumer, cc, e + (double)ca, ce, cm, cn, co, cg, ci, ck);
+            this.vertex(vertexConsumer, cb, e + (double)bz, cd, cm, cn, co, cf, ch, ck);
         }
         return bl8;
     }
 
-    private void vertex(VertexConsumer arg, double d, double e, double f, float g, float h, float i, float j, float k, int l) {
-        arg.vertex(d, e, f).color(g, h, i, 1.0f).texture(j, k).light(l).normal(0.0f, 1.0f, 0.0f).next();
+    private void vertex(VertexConsumer vertexConsumer, double x, double y, double z, float red, float green, float blue, float u, float v, int light) {
+        vertexConsumer.vertex(x, y, z).color(red, green, blue, 1.0f).texture(u, v).light(light).normal(0.0f, 1.0f, 0.0f).next();
     }
 
-    private int getLight(BlockRenderView arg, BlockPos arg2) {
-        int i = WorldRenderer.getLightmapCoordinates(arg, arg2);
-        int j = WorldRenderer.getLightmapCoordinates(arg, arg2.up());
+    private int getLight(BlockRenderView world, BlockPos pos) {
+        int i = WorldRenderer.getLightmapCoordinates(world, pos);
+        int j = WorldRenderer.getLightmapCoordinates(world, pos.up());
         int k = i & 0xFF;
         int l = j & 0xFF;
         int m = i >> 16 & 0xFF;
@@ -281,17 +281,17 @@ public class FluidRenderer {
         return (k > l ? k : l) | (m > n ? m : n) << 16;
     }
 
-    private float getNorthWestCornerFluidHeight(BlockView arg, BlockPos arg2, Fluid arg3) {
+    private float getNorthWestCornerFluidHeight(BlockView world, BlockPos pos, Fluid fluid) {
         int i = 0;
         float f = 0.0f;
         for (int j = 0; j < 4; ++j) {
-            BlockPos lv = arg2.add(-(j & 1), 0, -(j >> 1 & 1));
-            if (arg.getFluidState(lv.up()).getFluid().matchesType(arg3)) {
+            BlockPos lv = pos.add(-(j & 1), 0, -(j >> 1 & 1));
+            if (world.getFluidState(lv.up()).getFluid().matchesType(fluid)) {
                 return 1.0f;
             }
-            FluidState lv2 = arg.getFluidState(lv);
-            if (lv2.getFluid().matchesType(arg3)) {
-                float g = lv2.getHeight(arg, lv);
+            FluidState lv2 = world.getFluidState(lv);
+            if (lv2.getFluid().matchesType(fluid)) {
+                float g = lv2.getHeight(world, lv);
                 if (g >= 0.8f) {
                     f += g * 10.0f;
                     i += 10;
@@ -301,7 +301,7 @@ public class FluidRenderer {
                 ++i;
                 continue;
             }
-            if (arg.getBlockState(lv).getMaterial().isSolid()) continue;
+            if (world.getBlockState(lv).getMaterial().isSolid()) continue;
             ++i;
         }
         return f / (float)i;

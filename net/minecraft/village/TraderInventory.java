@@ -48,46 +48,46 @@ implements Inventory {
     }
 
     @Override
-    public ItemStack getStack(int i) {
-        return this.inventory.get(i);
+    public ItemStack getStack(int slot) {
+        return this.inventory.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int i, int j) {
-        ItemStack lv = this.inventory.get(i);
-        if (i == 2 && !lv.isEmpty()) {
-            return Inventories.splitStack(this.inventory, i, lv.getCount());
+    public ItemStack removeStack(int slot, int amount) {
+        ItemStack lv = this.inventory.get(slot);
+        if (slot == 2 && !lv.isEmpty()) {
+            return Inventories.splitStack(this.inventory, slot, lv.getCount());
         }
-        ItemStack lv2 = Inventories.splitStack(this.inventory, i, j);
-        if (!lv2.isEmpty() && this.needRecipeUpdate(i)) {
+        ItemStack lv2 = Inventories.splitStack(this.inventory, slot, amount);
+        if (!lv2.isEmpty() && this.needRecipeUpdate(slot)) {
             this.updateRecipes();
         }
         return lv2;
     }
 
-    private boolean needRecipeUpdate(int i) {
-        return i == 0 || i == 1;
+    private boolean needRecipeUpdate(int slot) {
+        return slot == 0 || slot == 1;
     }
 
     @Override
-    public ItemStack removeStack(int i) {
-        return Inventories.removeStack(this.inventory, i);
+    public ItemStack removeStack(int slot) {
+        return Inventories.removeStack(this.inventory, slot);
     }
 
     @Override
-    public void setStack(int i, ItemStack arg) {
-        this.inventory.set(i, arg);
-        if (!arg.isEmpty() && arg.getCount() > this.getMaxCountPerStack()) {
-            arg.setCount(this.getMaxCountPerStack());
+    public void setStack(int slot, ItemStack stack) {
+        this.inventory.set(slot, stack);
+        if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack()) {
+            stack.setCount(this.getMaxCountPerStack());
         }
-        if (this.needRecipeUpdate(i)) {
+        if (this.needRecipeUpdate(slot)) {
             this.updateRecipes();
         }
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity arg) {
-        return this.trader.getCurrentCustomer() == arg;
+    public boolean canPlayerUse(PlayerEntity player) {
+        return this.trader.getCurrentCustomer() == player;
     }
 
     @Override
@@ -135,8 +135,8 @@ implements Inventory {
         return this.traderRecipe;
     }
 
-    public void setRecipeIndex(int i) {
-        this.recipeIndex = i;
+    public void setRecipeIndex(int index) {
+        this.recipeIndex = index;
         this.updateRecipes();
     }
 

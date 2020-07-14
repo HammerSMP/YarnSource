@@ -124,8 +124,8 @@ extends SimpleChannelInboundHandler<Packet<?>> {
     private int ticks;
     private boolean errored;
 
-    public ClientConnection(NetworkSide arg) {
-        this.side = arg;
+    public ClientConnection(NetworkSide side) {
+        this.side = side;
     }
 
     public void channelActive(ChannelHandlerContext channelHandlerContext) throws Exception {
@@ -140,8 +140,8 @@ extends SimpleChannelInboundHandler<Packet<?>> {
         }
     }
 
-    public void setState(NetworkState arg) {
-        this.channel.attr(ATTR_KEY_PROTOCOL).set((Object)arg);
+    public void setState(NetworkState state) {
+        this.channel.attr(ATTR_KEY_PROTOCOL).set((Object)state);
         this.channel.config().setAutoRead(true);
         LOGGER.debug("Enabled auto read");
     }
@@ -188,30 +188,30 @@ extends SimpleChannelInboundHandler<Packet<?>> {
         }
     }
 
-    private static <T extends PacketListener> void handlePacket(Packet<T> arg, PacketListener arg2) {
-        arg.apply(arg2);
+    private static <T extends PacketListener> void handlePacket(Packet<T> packet, PacketListener listener) {
+        packet.apply(listener);
     }
 
-    public void setPacketListener(PacketListener arg) {
-        Validate.notNull((Object)arg, (String)"packetListener", (Object[])new Object[0]);
-        this.packetListener = arg;
+    public void setPacketListener(PacketListener listener) {
+        Validate.notNull((Object)listener, (String)"packetListener", (Object[])new Object[0]);
+        this.packetListener = listener;
     }
 
-    public void send(Packet<?> arg) {
-        this.send(arg, null);
+    public void send(Packet<?> packet) {
+        this.send(packet, null);
     }
 
-    public void send(Packet<?> arg, @Nullable GenericFutureListener<? extends Future<? super Void>> genericFutureListener) {
+    public void send(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
         if (this.isOpen()) {
             this.sendQueuedPackets();
-            this.sendImmediately(arg, genericFutureListener);
+            this.sendImmediately(packet, callback);
         } else {
-            this.packetQueue.add(new QueuedPacket(arg, genericFutureListener));
+            this.packetQueue.add(new QueuedPacket(packet, callback));
         }
     }
 
-    private void sendImmediately(Packet<?> arg, @Nullable GenericFutureListener<? extends Future<? super Void>> genericFutureListener) {
-        NetworkState lv = NetworkState.getPacketHandlerState(arg);
+    private void sendImmediately(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+        NetworkState lv = NetworkState.getPacketHandlerState(packet);
         NetworkState lv2 = (NetworkState)((Object)this.channel.attr(ATTR_KEY_PROTOCOL).get());
         ++this.packetsSentCounter;
         if (lv2 != lv) {
@@ -222,9 +222,9 @@ extends SimpleChannelInboundHandler<Packet<?>> {
             if (lv != lv2) {
                 this.setState(lv);
             }
-            ChannelFuture channelFuture = this.channel.writeAndFlush(arg);
-            if (genericFutureListener != null) {
-                channelFuture.addListener(genericFutureListener);
+            ChannelFuture channelFuture = this.channel.writeAndFlush(packet);
+            if (callback != null) {
+                channelFuture.addListener(callback);
             }
             channelFuture.addListener((GenericFutureListener)ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         } else {
@@ -232,9 +232,9 @@ extends SimpleChannelInboundHandler<Packet<?>> {
                 if (lv != lv2) {
                     this.setState(lv);
                 }
-                ChannelFuture channelFuture = this.channel.writeAndFlush((Object)arg);
-                if (genericFutureListener != null) {
-                    channelFuture.addListener(genericFutureListener);
+                ChannelFuture channelFuture = this.channel.writeAndFlush((Object)packet);
+                if (callback != null) {
+                    channelFuture.addListener(callback);
                 }
                 channelFuture.addListener((GenericFutureListener)ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             });
@@ -284,10 +284,10 @@ extends SimpleChannelInboundHandler<Packet<?>> {
         return this.address;
     }
 
-    public void disconnect(Text arg) {
+    public void disconnect(Text disconnectReason) {
         if (this.channel.isOpen()) {
             this.channel.close().awaitUninterruptibly();
-            this.disconnectReason = arg;
+            this.disconnectReason = disconnectReason;
         }
     }
 
@@ -296,11 +296,11 @@ extends SimpleChannelInboundHandler<Packet<?>> {
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static ClientConnection connect(InetAddress inetAddress, int i, boolean bl) {
+    public static ClientConnection connect(InetAddress address, int port, boolean shouldUseNativeTransport) {
         Lazy<NioEventLoopGroup> lv3;
         Class<NioSocketChannel> class2;
         final ClientConnection lv = new ClientConnection(NetworkSide.CLIENTBOUND);
-        if (Epoll.isAvailable() && bl) {
+        if (Epoll.isAvailable() && shouldUseNativeTransport) {
             Class<EpollSocketChannel> class_ = EpollSocketChannel.class;
             Lazy<EpollEventLoopGroup> lv2 = CLIENT_IO_GROUP_EPOLL;
         } else {
@@ -318,19 +318,19 @@ extends SimpleChannelInboundHandler<Packet<?>> {
                 }
                 channel.pipeline().addLast("timeout", (ChannelHandler)new ReadTimeoutHandler(30)).addLast("splitter", (ChannelHandler)new SplitterHandler()).addLast("decoder", (ChannelHandler)new DecoderHandler(NetworkSide.CLIENTBOUND)).addLast("prepender", (ChannelHandler)new SizePrepender()).addLast("encoder", (ChannelHandler)new PacketEncoder(NetworkSide.SERVERBOUND)).addLast("packet_handler", (ChannelHandler)lv);
             }
-        })).channel(class2)).connect(inetAddress, i).syncUninterruptibly();
+        })).channel(class2)).connect(address, port).syncUninterruptibly();
         return lv;
     }
 
     @Environment(value=EnvType.CLIENT)
-    public static ClientConnection connectLocal(SocketAddress socketAddress) {
+    public static ClientConnection connectLocal(SocketAddress address) {
         final ClientConnection lv = new ClientConnection(NetworkSide.CLIENTBOUND);
         ((Bootstrap)((Bootstrap)((Bootstrap)new Bootstrap().group((EventLoopGroup)CLIENT_IO_GROUP_LOCAL.get())).handler((ChannelHandler)new ChannelInitializer<Channel>(){
 
             protected void initChannel(Channel channel) throws Exception {
                 channel.pipeline().addLast("packet_handler", (ChannelHandler)lv);
             }
-        })).channel(LocalChannel.class)).connect(socketAddress).syncUninterruptibly();
+        })).channel(LocalChannel.class)).connect(address).syncUninterruptibly();
         return lv;
     }
 
@@ -366,17 +366,17 @@ extends SimpleChannelInboundHandler<Packet<?>> {
         this.channel.config().setAutoRead(false);
     }
 
-    public void setCompressionThreshold(int i) {
-        if (i >= 0) {
+    public void setCompressionThreshold(int compressionThreshold) {
+        if (compressionThreshold >= 0) {
             if (this.channel.pipeline().get("decompress") instanceof PacketInflater) {
-                ((PacketInflater)this.channel.pipeline().get("decompress")).setCompressionThreshold(i);
+                ((PacketInflater)this.channel.pipeline().get("decompress")).setCompressionThreshold(compressionThreshold);
             } else {
-                this.channel.pipeline().addBefore("decoder", "decompress", (ChannelHandler)new PacketInflater(i));
+                this.channel.pipeline().addBefore("decoder", "decompress", (ChannelHandler)new PacketInflater(compressionThreshold));
             }
             if (this.channel.pipeline().get("compress") instanceof PacketDeflater) {
-                ((PacketDeflater)this.channel.pipeline().get("compress")).setCompressionThreshold(i);
+                ((PacketDeflater)this.channel.pipeline().get("compress")).setCompressionThreshold(compressionThreshold);
             } else {
-                this.channel.pipeline().addBefore("encoder", "compress", (ChannelHandler)new PacketDeflater(i));
+                this.channel.pipeline().addBefore("encoder", "compress", (ChannelHandler)new PacketDeflater(compressionThreshold));
             }
         } else {
             if (this.channel.pipeline().get("decompress") instanceof PacketInflater) {
@@ -422,9 +422,9 @@ extends SimpleChannelInboundHandler<Packet<?>> {
         @Nullable
         private final GenericFutureListener<? extends Future<? super Void>> callback;
 
-        public QueuedPacket(Packet<?> arg, @Nullable GenericFutureListener<? extends Future<? super Void>> genericFutureListener) {
-            this.packet = arg;
-            this.callback = genericFutureListener;
+        public QueuedPacket(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+            this.packet = packet;
+            this.callback = callback;
         }
     }
 }

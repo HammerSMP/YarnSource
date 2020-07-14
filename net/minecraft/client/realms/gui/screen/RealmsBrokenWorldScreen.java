@@ -62,10 +62,10 @@ extends RealmsScreen {
     private final List<Integer> slotsThatHasBeenDownloaded = Lists.newArrayList();
     private int animTick;
 
-    public RealmsBrokenWorldScreen(Screen arg, RealmsMainScreen arg2, long l, boolean bl) {
-        this.parent = arg;
-        this.mainScreen = arg2;
-        this.serverId = l;
+    public RealmsBrokenWorldScreen(Screen parent, RealmsMainScreen mainScreen, long serverId, boolean bl) {
+        this.parent = parent;
+        this.mainScreen = mainScreen;
+        this.serverId = serverId;
         this.field_24204 = bl ? new TranslatableText("mco.brokenworld.minigame.title") : new TranslatableText("mco.brokenworld.title");
     }
 
@@ -140,22 +140,22 @@ extends RealmsScreen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        super.render(arg, i, j, f);
-        this.drawCenteredText(arg, this.textRenderer, this.field_24204, this.width / 2, 17, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawCenteredText(matrices, this.textRenderer, this.field_24204, this.width / 2, 17, 0xFFFFFF);
         for (int k = 0; k < this.message.length; ++k) {
-            this.drawCenteredText(arg, this.textRenderer, this.message[k], this.width / 2, RealmsBrokenWorldScreen.row(-1) + 3 + k * 12, 0xA0A0A0);
+            this.drawCenteredText(matrices, this.textRenderer, this.message[k], this.width / 2, RealmsBrokenWorldScreen.row(-1) + 3 + k * 12, 0xA0A0A0);
         }
         if (this.field_20492 == null) {
             return;
         }
         for (Map.Entry<Integer, RealmsWorldOptions> entry : this.field_20492.slots.entrySet()) {
             if (entry.getValue().templateImage != null && entry.getValue().templateId != -1L) {
-                this.drawSlotFrame(arg, this.getFramePositionX(entry.getKey()), RealmsBrokenWorldScreen.row(1) + 5, i, j, this.field_20492.activeSlot == entry.getKey() && !this.isMinigame(), entry.getValue().getSlotName(entry.getKey()), entry.getKey(), entry.getValue().templateId, entry.getValue().templateImage, entry.getValue().empty);
+                this.drawSlotFrame(matrices, this.getFramePositionX(entry.getKey()), RealmsBrokenWorldScreen.row(1) + 5, mouseX, mouseY, this.field_20492.activeSlot == entry.getKey() && !this.isMinigame(), entry.getValue().getSlotName(entry.getKey()), entry.getKey(), entry.getValue().templateId, entry.getValue().templateImage, entry.getValue().empty);
                 continue;
             }
-            this.drawSlotFrame(arg, this.getFramePositionX(entry.getKey()), RealmsBrokenWorldScreen.row(1) + 5, i, j, this.field_20492.activeSlot == entry.getKey() && !this.isMinigame(), entry.getValue().getSlotName(entry.getKey()), entry.getKey(), -1L, null, entry.getValue().empty);
+            this.drawSlotFrame(matrices, this.getFramePositionX(entry.getKey()), RealmsBrokenWorldScreen.row(1) + 5, mouseX, mouseY, this.field_20492.activeSlot == entry.getKey() && !this.isMinigame(), entry.getValue().getSlotName(entry.getKey()), entry.getKey(), -1L, null, entry.getValue().empty);
         }
     }
 
@@ -169,23 +169,23 @@ extends RealmsScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             this.backButtonClicked();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void backButtonClicked() {
         this.client.openScreen(this.parent);
     }
 
-    private void fetchServerData(long l) {
+    private void fetchServerData(long worldId) {
         new Thread(() -> {
             RealmsClient lv = RealmsClient.createRealmsClient();
             try {
-                this.field_20492 = lv.getOwnWorld(l);
+                this.field_20492 = lv.getOwnWorld(worldId);
                 this.addButtons();
             }
             catch (RealmsServiceException lv2) {
@@ -212,13 +212,13 @@ extends RealmsScreen {
         }).start();
     }
 
-    private void downloadWorld(int i) {
+    private void downloadWorld(int slotId) {
         RealmsClient lv = RealmsClient.createRealmsClient();
         try {
-            WorldDownload lv2 = lv.download(this.field_20492.id, i);
-            RealmsDownloadLatestWorldScreen lv3 = new RealmsDownloadLatestWorldScreen(this, lv2, this.field_20492.getWorldName(i), bl -> {
+            WorldDownload lv2 = lv.download(this.field_20492.id, slotId);
+            RealmsDownloadLatestWorldScreen lv3 = new RealmsDownloadLatestWorldScreen(this, lv2, this.field_20492.getWorldName(slotId), bl -> {
                 if (bl) {
-                    this.slotsThatHasBeenDownloaded.add(i);
+                    this.slotsThatHasBeenDownloaded.add(slotId);
                     this.children.clear();
                     this.addButtons();
                 } else {
@@ -237,7 +237,7 @@ extends RealmsScreen {
         return this.field_20492 != null && this.field_20492.worldType == RealmsServer.WorldType.MINIGAME;
     }
 
-    private void drawSlotFrame(MatrixStack arg, int i, int j, int k, int l, boolean bl, String string, int m, long n, String string2, boolean bl2) {
+    private void drawSlotFrame(MatrixStack arg, int y, int xm, int ym, int l, boolean bl, String string, int m, long n, String string2, boolean bl2) {
         if (bl2) {
             this.client.getTextureManager().bindTexture(RealmsWorldSlotButton.EMPTY_FRAME);
         } else if (string2 != null && n != -1L) {
@@ -257,15 +257,15 @@ extends RealmsScreen {
             float f = 0.9f + 0.1f * MathHelper.cos((float)this.animTick * 0.2f);
             RenderSystem.color4f(f, f, f, 1.0f);
         }
-        DrawableHelper.drawTexture(arg, i + 3, j + 3, 0.0f, 0.0f, 74, 74, 74, 74);
+        DrawableHelper.drawTexture(arg, y + 3, xm + 3, 0.0f, 0.0f, 74, 74, 74, 74);
         this.client.getTextureManager().bindTexture(RealmsWorldSlotButton.SLOT_FRAME);
         if (bl) {
             RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         } else {
             RenderSystem.color4f(0.56f, 0.56f, 0.56f, 1.0f);
         }
-        DrawableHelper.drawTexture(arg, i, j, 0.0f, 0.0f, 80, 80, 80, 80);
-        this.drawCenteredString(arg, this.textRenderer, string, i + 40, j + 66, 0xFFFFFF);
+        DrawableHelper.drawTexture(arg, y, xm, 0.0f, 0.0f, 80, 80, 80, 80);
+        this.drawCenteredString(arg, this.textRenderer, string, y + 40, xm + 66, 0xFFFFFF);
     }
 }
 

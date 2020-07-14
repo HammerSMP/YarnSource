@@ -26,40 +26,40 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
-        return arg.getBlockState(arg2.up()).isAir();
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
+        return world.getBlockState(pos.up()).isAir();
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
         return true;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        BlockPos lv = arg2.up();
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        BlockPos lv = pos.up();
         BlockState lv2 = Blocks.GRASS.getDefaultState();
         block0: for (int i = 0; i < 128; ++i) {
             BlockState lv7;
             BlockPos lv3 = lv;
             for (int j = 0; j < i / 16; ++j) {
-                if (!arg.getBlockState((lv3 = lv3.add(random.nextInt(3) - 1, (random.nextInt(3) - 1) * random.nextInt(3) / 2, random.nextInt(3) - 1)).down()).isOf(this) || arg.getBlockState(lv3).isFullCube(arg, lv3)) continue block0;
+                if (!world.getBlockState((lv3 = lv3.add(random.nextInt(3) - 1, (random.nextInt(3) - 1) * random.nextInt(3) / 2, random.nextInt(3) - 1)).down()).isOf(this) || world.getBlockState(lv3).isFullCube(world, lv3)) continue block0;
             }
-            BlockState lv4 = arg.getBlockState(lv3);
+            BlockState lv4 = world.getBlockState(lv3);
             if (lv4.isOf(lv2.getBlock()) && random.nextInt(10) == 0) {
-                ((Fertilizable)((Object)lv2.getBlock())).grow(arg, random, lv3, lv4);
+                ((Fertilizable)((Object)lv2.getBlock())).grow(world, random, lv3, lv4);
             }
             if (!lv4.isAir()) continue;
             if (random.nextInt(8) == 0) {
-                List<ConfiguredFeature<?, ?>> list = arg.getBiome(lv3).getFlowerFeatures();
+                List<ConfiguredFeature<?, ?>> list = world.getBiome(lv3).getFlowerFeatures();
                 if (list.isEmpty()) continue;
                 ConfiguredFeature<?, ?> lv5 = ((DecoratedFeatureConfig)list.get((int)0).config).feature.get();
                 BlockState lv6 = ((FlowerFeature)lv5.feature).getFlowerState(random, lv3, lv5.config);
             } else {
                 lv7 = lv2;
             }
-            if (!lv7.canPlaceAt(arg, lv3)) continue;
-            arg.setBlockState(lv3, lv7, 3);
+            if (!lv7.canPlaceAt(world, lv3)) continue;
+            world.setBlockState(lv3, lv7, 3);
         }
     }
 }

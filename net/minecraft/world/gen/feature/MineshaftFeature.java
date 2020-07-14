@@ -85,15 +85,15 @@ extends StructureFeature<MineshaftFeatureConfig> {
             return this.name;
         }
 
-        private static Type byName(String string) {
-            return nameMap.get(string);
+        private static Type byName(String nam) {
+            return nameMap.get(nam);
         }
 
-        public static Type byIndex(int i) {
-            if (i < 0 || i >= Type.values().length) {
+        public static Type byIndex(int index) {
+            if (index < 0 || index >= Type.values().length) {
                 return NORMAL;
             }
-            return Type.values()[i];
+            return Type.values()[index];
         }
 
         @Override

@@ -58,28 +58,28 @@ extends FishEntity {
         return this.dataTracker.get(PUFF_STATE);
     }
 
-    public void setPuffState(int i) {
-        this.dataTracker.set(PUFF_STATE, i);
+    public void setPuffState(int puffState) {
+        this.dataTracker.set(PUFF_STATE, puffState);
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> arg) {
-        if (PUFF_STATE.equals(arg)) {
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (PUFF_STATE.equals(data)) {
             this.calculateDimensions();
         }
-        super.onTrackedDataSet(arg);
+        super.onTrackedDataSet(data);
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag arg) {
-        super.writeCustomDataToTag(arg);
-        arg.putInt("PuffState", this.getPuffState());
+    public void writeCustomDataToTag(CompoundTag tag) {
+        super.writeCustomDataToTag(tag);
+        tag.putInt("PuffState", this.getPuffState());
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag arg) {
-        super.readCustomDataFromTag(arg);
-        this.setPuffState(arg.getInt("PuffState"));
+    public void readCustomDataFromTag(CompoundTag tag) {
+        super.readCustomDataFromTag(tag);
+        this.setPuffState(tag.getInt("PuffState"));
     }
 
     @Override
@@ -131,22 +131,22 @@ extends FishEntity {
         }
     }
 
-    private void sting(MobEntity arg) {
+    private void sting(MobEntity mob) {
         int i = this.getPuffState();
-        if (arg.damage(DamageSource.mob(this), 1 + i)) {
-            arg.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60 * i, 0));
+        if (mob.damage(DamageSource.mob(this), 1 + i)) {
+            mob.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60 * i, 0));
             this.playSound(SoundEvents.ENTITY_PUFFER_FISH_STING, 1.0f, 1.0f);
         }
     }
 
     @Override
-    public void onPlayerCollision(PlayerEntity arg) {
+    public void onPlayerCollision(PlayerEntity player) {
         int i = this.getPuffState();
-        if (arg instanceof ServerPlayerEntity && i > 0 && arg.damage(DamageSource.mob(this), 1 + i)) {
+        if (player instanceof ServerPlayerEntity && i > 0 && player.damage(DamageSource.mob(this), 1 + i)) {
             if (!this.isSilent()) {
-                ((ServerPlayerEntity)arg).networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.PUFFERFISH_STING, 0.0f));
+                ((ServerPlayerEntity)player).networkHandler.sendPacket(new GameStateChangeS2CPacket(GameStateChangeS2CPacket.PUFFERFISH_STING, 0.0f));
             }
-            arg.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60 * i, 0));
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 60 * i, 0));
         }
     }
 
@@ -161,7 +161,7 @@ extends FishEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_PUFFER_FISH_HURT;
     }
 
@@ -171,12 +171,12 @@ extends FishEntity {
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose arg) {
-        return super.getDimensions(arg).scaled(PufferfishEntity.getScaleForPuffState(this.getPuffState()));
+    public EntityDimensions getDimensions(EntityPose pose) {
+        return super.getDimensions(pose).scaled(PufferfishEntity.getScaleForPuffState(this.getPuffState()));
     }
 
-    private static float getScaleForPuffState(int i) {
-        switch (i) {
+    private static float getScaleForPuffState(int puffState) {
+        switch (puffState) {
             case 1: {
                 return 0.7f;
             }
@@ -191,8 +191,8 @@ extends FishEntity {
     extends Goal {
         private final PufferfishEntity pufferfish;
 
-        public InflateGoal(PufferfishEntity arg) {
-            this.pufferfish = arg;
+        public InflateGoal(PufferfishEntity pufferfish) {
+            this.pufferfish = pufferfish;
         }
 
         @Override

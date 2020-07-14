@@ -22,9 +22,9 @@ implements FeatureConfig {
     public final int height;
     public final BlockState state;
 
-    public FillLayerFeatureConfig(int i, BlockState arg) {
-        this.height = i;
-        this.state = arg;
+    public FillLayerFeatureConfig(int height, BlockState state) {
+        this.height = height;
+        this.state = state;
     }
 }
 

@@ -24,11 +24,11 @@ extends Goal {
     private final Predicate<? super T> condition;
     private final SoundEvent sound;
 
-    public HoldInHandsGoal(T arg, ItemStack arg2, @Nullable SoundEvent arg3, Predicate<? super T> predicate) {
-        this.actor = arg;
-        this.item = arg2;
-        this.sound = arg3;
-        this.condition = predicate;
+    public HoldInHandsGoal(T actor, ItemStack item, @Nullable SoundEvent sound, Predicate<? super T> condition) {
+        this.actor = actor;
+        this.item = item;
+        this.sound = sound;
+        this.condition = condition;
     }
 
     @Override

@@ -67,21 +67,21 @@ implements ProgressListener {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (this.done) {
             if (!this.client.isConnectedToRealms()) {
                 this.client.openScreen(null);
             }
             return;
         }
-        this.renderBackground(arg);
+        this.renderBackground(matrices);
         if (this.title != null) {
-            this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
         }
         if (this.task != null && this.progress != 0) {
-            this.drawCenteredText(arg, this.textRenderer, new LiteralText("").append(this.task).append(" " + this.progress + "%"), this.width / 2, 90, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, new LiteralText("").append(this.task).append(" " + this.progress + "%"), this.width / 2, 90, 0xFFFFFF);
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 }
 

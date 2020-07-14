@@ -35,17 +35,17 @@ extends ValueObject {
     public boolean empty;
     private static final String DEFAULT_WORLD_TEMPLATE_IMAGE = null;
 
-    public RealmsWorldOptions(Boolean boolean_, Boolean boolean2, Boolean boolean3, Boolean boolean4, Integer integer, Boolean boolean5, Integer integer2, Integer integer3, Boolean boolean6, String string) {
-        this.pvp = boolean_;
-        this.spawnAnimals = boolean2;
-        this.spawnMonsters = boolean3;
-        this.spawnNPCs = boolean4;
-        this.spawnProtection = integer;
-        this.commandBlocks = boolean5;
-        this.difficulty = integer2;
-        this.gameMode = integer3;
-        this.forceGameMode = boolean6;
-        this.slotName = string;
+    public RealmsWorldOptions(Boolean pvp, Boolean spawnAnimals, Boolean spawnMonsters, Boolean spawnNPCs, Integer spawnProtection, Boolean commandBlocks, Integer difficulty, Integer gameMode, Boolean forceGameMode, String slotName) {
+        this.pvp = pvp;
+        this.spawnAnimals = spawnAnimals;
+        this.spawnMonsters = spawnMonsters;
+        this.spawnNPCs = spawnNPCs;
+        this.spawnProtection = spawnProtection;
+        this.commandBlocks = commandBlocks;
+        this.difficulty = difficulty;
+        this.gameMode = gameMode;
+        this.forceGameMode = forceGameMode;
+        this.slotName = slotName;
     }
 
     public static RealmsWorldOptions getDefaults() {
@@ -58,30 +58,30 @@ extends ValueObject {
         return lv;
     }
 
-    public void setEmpty(boolean bl) {
-        this.empty = bl;
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
     }
 
-    public static RealmsWorldOptions parse(JsonObject jsonObject) {
-        RealmsWorldOptions lv = new RealmsWorldOptions(JsonUtils.getBooleanOr("pvp", jsonObject, true), JsonUtils.getBooleanOr("spawnAnimals", jsonObject, true), JsonUtils.getBooleanOr("spawnMonsters", jsonObject, true), JsonUtils.getBooleanOr("spawnNPCs", jsonObject, true), JsonUtils.getIntOr("spawnProtection", jsonObject, 0), JsonUtils.getBooleanOr("commandBlocks", jsonObject, false), JsonUtils.getIntOr("difficulty", jsonObject, 2), JsonUtils.getIntOr("gameMode", jsonObject, 0), JsonUtils.getBooleanOr("forceGameMode", jsonObject, false), JsonUtils.getStringOr("slotName", jsonObject, ""));
-        lv.templateId = JsonUtils.getLongOr("worldTemplateId", jsonObject, -1L);
-        lv.templateImage = JsonUtils.getStringOr("worldTemplateImage", jsonObject, DEFAULT_WORLD_TEMPLATE_IMAGE);
-        lv.adventureMap = JsonUtils.getBooleanOr("adventureMap", jsonObject, false);
+    public static RealmsWorldOptions parse(JsonObject json) {
+        RealmsWorldOptions lv = new RealmsWorldOptions(JsonUtils.getBooleanOr("pvp", json, true), JsonUtils.getBooleanOr("spawnAnimals", json, true), JsonUtils.getBooleanOr("spawnMonsters", json, true), JsonUtils.getBooleanOr("spawnNPCs", json, true), JsonUtils.getIntOr("spawnProtection", json, 0), JsonUtils.getBooleanOr("commandBlocks", json, false), JsonUtils.getIntOr("difficulty", json, 2), JsonUtils.getIntOr("gameMode", json, 0), JsonUtils.getBooleanOr("forceGameMode", json, false), JsonUtils.getStringOr("slotName", json, ""));
+        lv.templateId = JsonUtils.getLongOr("worldTemplateId", json, -1L);
+        lv.templateImage = JsonUtils.getStringOr("worldTemplateImage", json, DEFAULT_WORLD_TEMPLATE_IMAGE);
+        lv.adventureMap = JsonUtils.getBooleanOr("adventureMap", json, false);
         return lv;
     }
 
-    public String getSlotName(int i) {
+    public String getSlotName(int index) {
         if (this.slotName == null || this.slotName.isEmpty()) {
             if (this.empty) {
                 return I18n.translate("mco.configure.world.slot.empty", new Object[0]);
             }
-            return this.getDefaultSlotName(i);
+            return this.getDefaultSlotName(index);
         }
         return this.slotName;
     }
 
-    public String getDefaultSlotName(int i) {
-        return I18n.translate("mco.configure.world.slot", i);
+    public String getDefaultSlotName(int index) {
+        return I18n.translate("mco.configure.world.slot", index);
     }
 
     public String toJson() {

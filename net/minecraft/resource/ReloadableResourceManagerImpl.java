@@ -60,8 +60,8 @@ implements ReloadableResourceManager {
     private final List<ResourcePack> field_25145 = Lists.newArrayList();
     private final ResourceType type;
 
-    public ReloadableResourceManagerImpl(ResourceType arg) {
-        this.type = arg;
+    public ReloadableResourceManagerImpl(ResourceType type) {
+        this.type = type;
     }
 
     public void addPack(ResourcePack arg) {
@@ -84,47 +84,47 @@ implements ReloadableResourceManager {
     }
 
     @Override
-    public Resource getResource(Identifier arg) throws IOException {
-        ResourceManager lv = this.namespaceManagers.get(arg.getNamespace());
+    public Resource getResource(Identifier id) throws IOException {
+        ResourceManager lv = this.namespaceManagers.get(id.getNamespace());
         if (lv != null) {
-            return lv.getResource(arg);
+            return lv.getResource(id);
         }
-        throw new FileNotFoundException(arg.toString());
+        throw new FileNotFoundException(id.toString());
     }
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public boolean containsResource(Identifier arg) {
-        ResourceManager lv = this.namespaceManagers.get(arg.getNamespace());
+    public boolean containsResource(Identifier id) {
+        ResourceManager lv = this.namespaceManagers.get(id.getNamespace());
         if (lv != null) {
-            return lv.containsResource(arg);
+            return lv.containsResource(id);
         }
         return false;
     }
 
     @Override
-    public List<Resource> getAllResources(Identifier arg) throws IOException {
-        ResourceManager lv = this.namespaceManagers.get(arg.getNamespace());
+    public List<Resource> getAllResources(Identifier id) throws IOException {
+        ResourceManager lv = this.namespaceManagers.get(id.getNamespace());
         if (lv != null) {
-            return lv.getAllResources(arg);
+            return lv.getAllResources(id);
         }
-        throw new FileNotFoundException(arg.toString());
+        throw new FileNotFoundException(id.toString());
     }
 
     @Override
-    public Collection<Identifier> findResources(Identifier arg, Predicate<String> predicate) {
-        ResourceManager lv = this.namespaceManagers.get(arg.getNamespace());
+    public Collection<Identifier> findResources(Identifier resourceType, Predicate<String> predicate) {
+        ResourceManager lv = this.namespaceManagers.get(resourceType.getNamespace());
         if (lv != null) {
-            return lv.findResources(arg.getPath(), predicate);
+            return lv.findResources(resourceType.getPath(), predicate);
         }
         return ImmutableSet.of();
     }
 
     @Override
-    public Collection<Identifier> findResources(String string, Predicate<String> predicate) {
+    public Collection<Identifier> findResources(String resourceType, Predicate<String> pathPredicate) {
         HashSet set = Sets.newHashSet();
         for (NamespaceResourceManager lv : this.namespaceManagers.values()) {
-            set.addAll(lv.findResources(string, predicate));
+            set.addAll(lv.findResources(resourceType, pathPredicate));
         }
         ArrayList list = Lists.newArrayList((Iterable)set);
         Collections.sort(list);
@@ -144,27 +144,27 @@ implements ReloadableResourceManager {
     }
 
     @Override
-    public void registerListener(ResourceReloadListener arg) {
-        this.listeners.add(arg);
-        this.initialListeners.add(arg);
+    public void registerListener(ResourceReloadListener listener) {
+        this.listeners.add(listener);
+        this.initialListeners.add(listener);
     }
 
-    protected ResourceReloadMonitor beginReloadInner(Executor executor, Executor executor2, List<ResourceReloadListener> list, CompletableFuture<Unit> completableFuture) {
+    protected ResourceReloadMonitor beginReloadInner(Executor prepareExecutor, Executor applyExecutor, List<ResourceReloadListener> listeners, CompletableFuture<Unit> initialStage) {
         ResourceReloader<Void> lv2;
         if (LOGGER.isDebugEnabled()) {
-            ProfilingResourceReloader lv = new ProfilingResourceReloader(this, Lists.newArrayList(list), executor, executor2, completableFuture);
+            ProfilingResourceReloader lv = new ProfilingResourceReloader(this, Lists.newArrayList(listeners), prepareExecutor, applyExecutor, initialStage);
         } else {
-            lv2 = ResourceReloader.create(this, Lists.newArrayList(list), executor, executor2, completableFuture);
+            lv2 = ResourceReloader.create(this, Lists.newArrayList(listeners), prepareExecutor, applyExecutor, initialStage);
         }
         this.initialListeners.clear();
         return lv2;
     }
 
     @Override
-    public ResourceReloadMonitor beginMonitoredReload(Executor executor, Executor executor2, CompletableFuture<Unit> completableFuture, List<ResourcePack> list) {
+    public ResourceReloadMonitor beginMonitoredReload(Executor prepareExecutor, Executor applyExecutor, CompletableFuture<Unit> initialStage, List<ResourcePack> packs) {
         this.clear();
-        LOGGER.info("Reloading ResourceManager: {}", new Supplier[]{() -> list.stream().map(ResourcePack::getName).collect(Collectors.joining(", "))});
-        for (ResourcePack lv : list) {
+        LOGGER.info("Reloading ResourceManager: {}", new Supplier[]{() -> packs.stream().map(ResourcePack::getName).collect(Collectors.joining(", "))});
+        for (ResourcePack lv : packs) {
             try {
                 this.addPack(lv);
             }
@@ -173,7 +173,7 @@ implements ReloadableResourceManager {
                 return new FailedResourceReloadMonitor(new PackAdditionFailedException(lv, (Throwable)exception));
             }
         }
-        return this.beginReloadInner(executor, executor2, this.listeners, completableFuture);
+        return this.beginReloadInner(prepareExecutor, applyExecutor, this.listeners, initialStage);
     }
 
     @Override
@@ -187,10 +187,10 @@ implements ReloadableResourceManager {
         private final PackAdditionFailedException exception;
         private final CompletableFuture<Unit> future;
 
-        public FailedResourceReloadMonitor(PackAdditionFailedException arg) {
-            this.exception = arg;
+        public FailedResourceReloadMonitor(PackAdditionFailedException exception) {
+            this.exception = exception;
             this.future = new CompletableFuture();
-            this.future.completeExceptionally(arg);
+            this.future.completeExceptionally(exception);
         }
 
         @Override
@@ -227,9 +227,9 @@ implements ReloadableResourceManager {
     extends RuntimeException {
         private final ResourcePack pack;
 
-        public PackAdditionFailedException(ResourcePack arg, Throwable throwable) {
-            super(arg.getName(), throwable);
-            this.pack = arg;
+        public PackAdditionFailedException(ResourcePack pack, Throwable cause) {
+            super(pack.getName(), cause);
+            this.pack = pack;
         }
 
         @Environment(value=EnvType.CLIENT)

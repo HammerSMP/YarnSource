@@ -20,21 +20,21 @@ public class CreativeInventoryListener
 implements ScreenHandlerListener {
     private final MinecraftClient client;
 
-    public CreativeInventoryListener(MinecraftClient arg) {
-        this.client = arg;
+    public CreativeInventoryListener(MinecraftClient client) {
+        this.client = client;
     }
 
     @Override
-    public void onHandlerRegistered(ScreenHandler arg, DefaultedList<ItemStack> arg2) {
+    public void onHandlerRegistered(ScreenHandler handler, DefaultedList<ItemStack> stacks) {
     }
 
     @Override
-    public void onSlotUpdate(ScreenHandler arg, int i, ItemStack arg2) {
-        this.client.interactionManager.clickCreativeStack(arg2, i);
+    public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
+        this.client.interactionManager.clickCreativeStack(stack, slotId);
     }
 
     @Override
-    public void onPropertyUpdate(ScreenHandler arg, int i, int j) {
+    public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
     }
 }
 

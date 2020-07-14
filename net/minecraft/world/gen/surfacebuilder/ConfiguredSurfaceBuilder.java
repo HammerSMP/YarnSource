@@ -25,17 +25,17 @@ public class ConfiguredSurfaceBuilder<SC extends SurfaceConfig> {
     public final SurfaceBuilder<SC> surfaceBuilder;
     public final SC config;
 
-    public ConfiguredSurfaceBuilder(SurfaceBuilder<SC> arg, SC arg2) {
-        this.surfaceBuilder = arg;
+    public ConfiguredSurfaceBuilder(SurfaceBuilder<SC> surfaceBuilder, SC arg2) {
+        this.surfaceBuilder = surfaceBuilder;
         this.config = arg2;
     }
 
-    public void generate(Random random, Chunk arg, Biome arg2, int i, int j, int k, double d, BlockState arg3, BlockState arg4, int l, long m) {
-        this.surfaceBuilder.generate(random, arg, arg2, i, j, k, d, arg3, arg4, l, m, this.config);
+    public void generate(Random random, Chunk chunk, Biome biome, int i, int j, int k, double d, BlockState defaultBlock, BlockState defaultFluid, int l, long seed) {
+        this.surfaceBuilder.generate(random, chunk, biome, i, j, k, d, defaultBlock, defaultFluid, l, seed, this.config);
     }
 
-    public void initSeed(long l) {
-        this.surfaceBuilder.initSeed(l);
+    public void initSeed(long seed) {
+        this.surfaceBuilder.initSeed(seed);
     }
 
     public SC getConfig() {

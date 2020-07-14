@@ -23,9 +23,9 @@ public class RangedApproachTask
 extends Task<MobEntity> {
     private final float speed;
 
-    public RangedApproachTask(float f) {
+    public RangedApproachTask(float speed) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.LOOK_TARGET, (Object)((Object)MemoryModuleState.REGISTERED), MemoryModuleType.ATTACK_TARGET, (Object)((Object)MemoryModuleState.VALUE_PRESENT), MemoryModuleType.VISIBLE_MOBS, (Object)((Object)MemoryModuleState.REGISTERED)));
-        this.speed = f;
+        this.speed = speed;
     }
 
     @Override
@@ -38,15 +38,15 @@ extends Task<MobEntity> {
         }
     }
 
-    private void rememberWalkTarget(LivingEntity arg, LivingEntity arg2) {
-        Brain<?> lv = arg.getBrain();
-        lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(arg2, true));
-        WalkTarget lv2 = new WalkTarget(new EntityLookTarget(arg2, false), this.speed, 0);
+    private void rememberWalkTarget(LivingEntity entity, LivingEntity target) {
+        Brain<?> lv = entity.getBrain();
+        lv.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(target, true));
+        WalkTarget lv2 = new WalkTarget(new EntityLookTarget(target, false), this.speed, 0);
         lv.remember(MemoryModuleType.WALK_TARGET, lv2);
     }
 
-    private void forgetWalkTarget(LivingEntity arg) {
-        arg.getBrain().forget(MemoryModuleType.WALK_TARGET);
+    private void forgetWalkTarget(LivingEntity entity) {
+        entity.getBrain().forget(MemoryModuleType.WALK_TARGET);
     }
 }
 

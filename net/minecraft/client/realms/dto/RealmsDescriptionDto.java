@@ -23,9 +23,9 @@ implements RealmsSerializable {
     @SerializedName(value="description")
     public String description;
 
-    public RealmsDescriptionDto(String string, String string2) {
-        this.name = string;
-        this.description = string2;
+    public RealmsDescriptionDto(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 }
 

@@ -12,8 +12,8 @@ public class AvoidSunlightGoal
 extends Goal {
     private final PathAwareEntity mob;
 
-    public AvoidSunlightGoal(PathAwareEntity arg) {
-        this.mob = arg;
+    public AvoidSunlightGoal(PathAwareEntity mob) {
+        this.mob = mob;
     }
 
     @Override

@@ -24,15 +24,15 @@ implements Criterion<Conditions> {
     }
 
     @Override
-    public void beginTrackingCondition(PlayerAdvancementTracker arg, Criterion.ConditionsContainer<Conditions> arg2) {
+    public void beginTrackingCondition(PlayerAdvancementTracker manager, Criterion.ConditionsContainer<Conditions> arg2) {
     }
 
     @Override
-    public void endTrackingCondition(PlayerAdvancementTracker arg, Criterion.ConditionsContainer<Conditions> arg2) {
+    public void endTrackingCondition(PlayerAdvancementTracker manager, Criterion.ConditionsContainer<Conditions> arg2) {
     }
 
     @Override
-    public void endTracking(PlayerAdvancementTracker arg) {
+    public void endTracking(PlayerAdvancementTracker tracker) {
     }
 
     @Override
@@ -41,8 +41,8 @@ implements Criterion<Conditions> {
     }
 
     @Override
-    public /* synthetic */ CriterionConditions conditionsFromJson(JsonObject jsonObject, AdvancementEntityPredicateDeserializer arg) {
-        return this.conditionsFromJson(jsonObject, arg);
+    public /* synthetic */ CriterionConditions conditionsFromJson(JsonObject obj, AdvancementEntityPredicateDeserializer predicateDeserializer) {
+        return this.conditionsFromJson(obj, predicateDeserializer);
     }
 
     public static class Conditions
@@ -53,7 +53,7 @@ implements Criterion<Conditions> {
         }
 
         @Override
-        public JsonObject toJson(AdvancementEntityPredicateSerializer arg) {
+        public JsonObject toJson(AdvancementEntityPredicateSerializer predicateSerializer) {
             return new JsonObject();
         }
     }

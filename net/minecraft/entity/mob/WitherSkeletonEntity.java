@@ -54,7 +54,7 @@ extends AbstractSkeletonEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_WITHER_SKELETON_HURT;
     }
 
@@ -69,10 +69,10 @@ extends AbstractSkeletonEntity {
     }
 
     @Override
-    protected void dropEquipment(DamageSource arg, int i, boolean bl) {
+    protected void dropEquipment(DamageSource source, int lootingMultiplier, boolean allowDrops) {
         CreeperEntity lv2;
-        super.dropEquipment(arg, i, bl);
-        Entity lv = arg.getAttacker();
+        super.dropEquipment(source, lootingMultiplier, allowDrops);
+        Entity lv = source.getAttacker();
         if (lv instanceof CreeperEntity && (lv2 = (CreeperEntity)lv).shouldDropHead()) {
             lv2.onHeadDropped();
             this.dropItem(Items.WITHER_SKELETON_SKULL);
@@ -80,52 +80,52 @@ extends AbstractSkeletonEntity {
     }
 
     @Override
-    protected void initEquipment(LocalDifficulty arg) {
+    protected void initEquipment(LocalDifficulty difficulty) {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.STONE_SWORD));
     }
 
     @Override
-    protected void updateEnchantments(LocalDifficulty arg) {
+    protected void updateEnchantments(LocalDifficulty difficulty) {
     }
 
     @Override
     @Nullable
-    public EntityData initialize(class_5425 arg, LocalDifficulty arg2, SpawnReason arg3, @Nullable EntityData arg4, @Nullable CompoundTag arg5) {
-        EntityData lv = super.initialize(arg, arg2, arg3, arg4, arg5);
+    public EntityData initialize(class_5425 arg, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable CompoundTag entityTag) {
+        EntityData lv = super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
         this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(4.0);
         this.updateAttackType();
         return lv;
     }
 
     @Override
-    protected float getActiveEyeHeight(EntityPose arg, EntityDimensions arg2) {
+    protected float getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions) {
         return 2.1f;
     }
 
     @Override
-    public boolean tryAttack(Entity arg) {
-        if (!super.tryAttack(arg)) {
+    public boolean tryAttack(Entity target) {
+        if (!super.tryAttack(target)) {
             return false;
         }
-        if (arg instanceof LivingEntity) {
-            ((LivingEntity)arg).addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 200));
+        if (target instanceof LivingEntity) {
+            ((LivingEntity)target).addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 200));
         }
         return true;
     }
 
     @Override
-    protected PersistentProjectileEntity createArrowProjectile(ItemStack arg, float f) {
-        PersistentProjectileEntity lv = super.createArrowProjectile(arg, f);
+    protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
+        PersistentProjectileEntity lv = super.createArrowProjectile(arrow, damageModifier);
         lv.setOnFireFor(100);
         return lv;
     }
 
     @Override
-    public boolean canHaveStatusEffect(StatusEffectInstance arg) {
-        if (arg.getEffectType() == StatusEffects.WITHER) {
+    public boolean canHaveStatusEffect(StatusEffectInstance effect) {
+        if (effect.getEffectType() == StatusEffects.WITHER) {
             return false;
         }
-        return super.canHaveStatusEffect(arg);
+        return super.canHaveStatusEffect(effect);
     }
 }
 

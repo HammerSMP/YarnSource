@@ -86,11 +86,11 @@ extends BlockEntityRenderer<T> {
     }
 
     @Override
-    public void render(T arg, float f, MatrixStack arg2, VertexConsumerProvider arg3, int i, int j) {
+    public void render(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         DoubleBlockProperties.PropertySource<ChestBlockEntity> lv7;
-        World lv = ((BlockEntity)arg).getWorld();
+        World lv = ((BlockEntity)entity).getWorld();
         boolean bl = lv != null;
-        BlockState lv2 = bl ? ((BlockEntity)arg).getCachedState() : (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH);
+        BlockState lv2 = bl ? ((BlockEntity)entity).getCachedState() : (BlockState)Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH);
         ChestType lv3 = lv2.contains(ChestBlock.CHEST_TYPE) ? lv2.get(ChestBlock.CHEST_TYPE) : ChestType.SINGLE;
         Block lv4 = lv2.getBlock();
         if (!(lv4 instanceof AbstractChestBlock)) {
@@ -98,39 +98,39 @@ extends BlockEntityRenderer<T> {
         }
         AbstractChestBlock lv5 = (AbstractChestBlock)lv4;
         boolean bl2 = lv3 != ChestType.SINGLE;
-        arg2.push();
+        matrices.push();
         float g = lv2.get(ChestBlock.FACING).asRotation();
-        arg2.translate(0.5, 0.5, 0.5);
-        arg2.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-g));
-        arg2.translate(-0.5, -0.5, -0.5);
+        matrices.translate(0.5, 0.5, 0.5);
+        matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(-g));
+        matrices.translate(-0.5, -0.5, -0.5);
         if (bl) {
-            DoubleBlockProperties.PropertySource<ChestBlockEntity> lv6 = lv5.getBlockEntitySource(lv2, lv, ((BlockEntity)arg).getPos(), true);
+            DoubleBlockProperties.PropertySource<ChestBlockEntity> lv6 = lv5.getBlockEntitySource(lv2, lv, ((BlockEntity)entity).getPos(), true);
         } else {
             lv7 = DoubleBlockProperties.PropertyRetriever::getFallback;
         }
-        float h = lv7.apply(ChestBlock.getAnimationProgressRetriever((ChestAnimationProgress)arg)).get(f);
+        float h = lv7.apply(ChestBlock.getAnimationProgressRetriever((ChestAnimationProgress)entity)).get(tickDelta);
         h = 1.0f - h;
         h = 1.0f - h * h * h;
-        int k = ((Int2IntFunction)lv7.apply(new LightmapCoordinatesRetriever())).applyAsInt(i);
-        SpriteIdentifier lv8 = TexturedRenderLayers.getChestTexture(arg, lv3, this.christmas);
-        VertexConsumer lv9 = lv8.getVertexConsumer(arg3, RenderLayer::getEntityCutout);
+        int k = ((Int2IntFunction)lv7.apply(new LightmapCoordinatesRetriever())).applyAsInt(light);
+        SpriteIdentifier lv8 = TexturedRenderLayers.getChestTexture(entity, lv3, this.christmas);
+        VertexConsumer lv9 = lv8.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
         if (bl2) {
             if (lv3 == ChestType.LEFT) {
-                this.method_22749(arg2, lv9, this.field_21479, this.field_21481, this.field_21480, h, k, j);
+                this.method_22749(matrices, lv9, this.field_21479, this.field_21481, this.field_21480, h, k, overlay);
             } else {
-                this.method_22749(arg2, lv9, this.field_20820, this.field_20822, this.field_20821, h, k, j);
+                this.method_22749(matrices, lv9, this.field_20820, this.field_20822, this.field_20821, h, k, overlay);
             }
         } else {
-            this.method_22749(arg2, lv9, this.field_20817, this.field_20819, this.field_20818, h, k, j);
+            this.method_22749(matrices, lv9, this.field_20817, this.field_20819, this.field_20818, h, k, overlay);
         }
-        arg2.pop();
+        matrices.pop();
     }
 
-    private void method_22749(MatrixStack arg, VertexConsumer arg2, ModelPart arg3, ModelPart arg4, ModelPart arg5, float f, int i, int j) {
+    private void method_22749(MatrixStack matrices, VertexConsumer vertices, ModelPart arg3, ModelPart arg4, ModelPart arg5, float f, int light, int overlay) {
         arg4.pitch = arg3.pitch = -(f * 1.5707964f);
-        arg3.render(arg, arg2, i, j);
-        arg4.render(arg, arg2, i, j);
-        arg5.render(arg, arg2, i, j);
+        arg3.render(matrices, vertices, light, overlay);
+        arg4.render(matrices, vertices, light, overlay);
+        arg5.render(matrices, vertices, light, overlay);
     }
 }
 

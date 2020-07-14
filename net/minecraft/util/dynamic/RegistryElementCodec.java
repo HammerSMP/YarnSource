@@ -26,12 +26,12 @@ implements Codec<Supplier<E>> {
     private final RegistryKey<? extends Registry<E>> registryRef;
     private final MapCodec<E> elementCodec;
 
-    public static <E> RegistryElementCodec<E> of(RegistryKey<? extends Registry<E>> arg, MapCodec<E> mapCodec) {
-        return new RegistryElementCodec<E>(arg, mapCodec);
+    public static <E> RegistryElementCodec<E> of(RegistryKey<? extends Registry<E>> registryRef, MapCodec<E> mapCodec) {
+        return new RegistryElementCodec<E>(registryRef, mapCodec);
     }
 
-    private RegistryElementCodec(RegistryKey<? extends Registry<E>> arg, MapCodec<E> mapCodec) {
-        this.registryRef = arg;
+    private RegistryElementCodec(RegistryKey<? extends Registry<E>> registryRef, MapCodec<E> mapCodec) {
+        this.registryRef = registryRef;
         this.elementCodec = mapCodec;
     }
 
@@ -42,19 +42,19 @@ implements Codec<Supplier<E>> {
         return this.elementCodec.codec().encode(supplier.get(), dynamicOps, object);
     }
 
-    public <T> DataResult<Pair<Supplier<E>, T>> decode(DynamicOps<T> dynamicOps, T object) {
-        if (dynamicOps instanceof RegistryOps) {
-            return ((RegistryOps)dynamicOps).decodeOrId(object, this.registryRef, this.elementCodec);
+    public <T> DataResult<Pair<Supplier<E>, T>> decode(DynamicOps<T> ops, T input) {
+        if (ops instanceof RegistryOps) {
+            return ((RegistryOps)ops).decodeOrId(input, this.registryRef, this.elementCodec);
         }
-        return this.elementCodec.codec().decode(dynamicOps, object).map(pair -> pair.mapFirst(object -> () -> object));
+        return this.elementCodec.codec().decode(ops, input).map(pair -> pair.mapFirst(object -> () -> object));
     }
 
     public String toString() {
         return "RegistryFileCodec[" + this.registryRef + " " + this.elementCodec + "]";
     }
 
-    public /* synthetic */ DataResult encode(Object object, DynamicOps dynamicOps, Object object2) {
-        return this.encode((Supplier)object, dynamicOps, object2);
+    public /* synthetic */ DataResult encode(Object input, DynamicOps ops, Object prefix) {
+        return this.encode((Supplier)input, ops, prefix);
     }
 }
 

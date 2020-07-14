@@ -27,21 +27,21 @@ implements Fertilizable {
     protected static final VoxelShape SHAPE = Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 12.0, 14.0);
     private final SaplingGenerator generator;
 
-    protected SaplingBlock(SaplingGenerator arg, AbstractBlock.Settings arg2) {
-        super(arg2);
-        this.generator = arg;
+    protected SaplingBlock(SaplingGenerator generator, AbstractBlock.Settings settings) {
+        super(settings);
+        this.generator = generator;
         this.setDefaultState((BlockState)((BlockState)this.stateManager.getDefaultState()).with(STAGE, 0));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState arg, BlockView arg2, BlockPos arg3, ShapeContext arg4) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
     }
 
     @Override
-    public void randomTick(BlockState arg, ServerWorld arg2, BlockPos arg3, Random random) {
-        if (arg2.getLightLevel(arg3.up()) >= 9 && random.nextInt(7) == 0) {
-            this.generate(arg2, arg3, arg, random);
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (world.getLightLevel(pos.up()) >= 9 && random.nextInt(7) == 0) {
+            this.generate(world, pos, state, random);
         }
     }
 
@@ -54,23 +54,23 @@ implements Fertilizable {
     }
 
     @Override
-    public boolean isFertilizable(BlockView arg, BlockPos arg2, BlockState arg3, boolean bl) {
+    public boolean isFertilizable(BlockView world, BlockPos pos, BlockState state, boolean isClient) {
         return true;
     }
 
     @Override
-    public boolean canGrow(World arg, Random random, BlockPos arg2, BlockState arg3) {
-        return (double)arg.random.nextFloat() < 0.45;
+    public boolean canGrow(World world, Random random, BlockPos pos, BlockState state) {
+        return (double)world.random.nextFloat() < 0.45;
     }
 
     @Override
-    public void grow(ServerWorld arg, Random random, BlockPos arg2, BlockState arg3) {
-        this.generate(arg, arg2, arg3, random);
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
+        this.generate(world, pos, state, random);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> arg) {
-        arg.add(STAGE);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(STAGE);
     }
 }
 

@@ -119,9 +119,9 @@ extends Feature<SingleStateFeatureConfig> {
         }
     }
 
-    private void clearSnowAbove(WorldAccess arg, BlockPos arg2) {
-        if (arg.getBlockState(arg2.up()).isOf(Blocks.SNOW)) {
-            this.setBlockState(arg, arg2.up(), Blocks.AIR.getDefaultState());
+    private void clearSnowAbove(WorldAccess world, BlockPos pos) {
+        if (world.getBlockState(pos.up()).isOf(Blocks.SNOW)) {
+            this.setBlockState(world, pos.up(), Blocks.AIR.getDefaultState());
         }
     }
 
@@ -192,36 +192,36 @@ extends Feature<SingleStateFeatureConfig> {
         return MathHelper.ceil(g / 2.0f);
     }
 
-    private boolean isSnowyOrIcy(Block arg) {
-        return arg == Blocks.PACKED_ICE || arg == Blocks.SNOW_BLOCK || arg == Blocks.BLUE_ICE;
+    private boolean isSnowyOrIcy(Block block) {
+        return block == Blocks.PACKED_ICE || block == Blocks.SNOW_BLOCK || block == Blocks.BLUE_ICE;
     }
 
-    private boolean isAirBelow(BlockView arg, BlockPos arg2) {
-        return arg.getBlockState(arg2.down()).getMaterial() == Material.AIR;
+    private boolean isAirBelow(BlockView world, BlockPos pos) {
+        return world.getBlockState(pos.down()).getMaterial() == Material.AIR;
     }
 
-    private void method_13418(WorldAccess arg, BlockPos arg2, int i, int j, boolean bl, int k) {
+    private void method_13418(WorldAccess world, BlockPos pos, int i, int j, boolean bl, int k) {
         int l = bl ? k : i / 2;
         for (int m = -l; m <= l; ++m) {
             for (int n = -l; n <= l; ++n) {
                 for (int o = 0; o <= j; ++o) {
-                    BlockPos lv = arg2.add(m, o, n);
-                    Block lv2 = arg.getBlockState(lv).getBlock();
+                    BlockPos lv = pos.add(m, o, n);
+                    Block lv2 = world.getBlockState(lv).getBlock();
                     if (!this.isSnowyOrIcy(lv2) && lv2 != Blocks.SNOW) continue;
-                    if (this.isAirBelow(arg, lv)) {
-                        this.setBlockState(arg, lv, Blocks.AIR.getDefaultState());
-                        this.setBlockState(arg, lv.up(), Blocks.AIR.getDefaultState());
+                    if (this.isAirBelow(world, lv)) {
+                        this.setBlockState(world, lv, Blocks.AIR.getDefaultState());
+                        this.setBlockState(world, lv.up(), Blocks.AIR.getDefaultState());
                         continue;
                     }
                     if (!this.isSnowyOrIcy(lv2)) continue;
-                    Block[] lvs = new Block[]{arg.getBlockState(lv.west()).getBlock(), arg.getBlockState(lv.east()).getBlock(), arg.getBlockState(lv.north()).getBlock(), arg.getBlockState(lv.south()).getBlock()};
+                    Block[] lvs = new Block[]{world.getBlockState(lv.west()).getBlock(), world.getBlockState(lv.east()).getBlock(), world.getBlockState(lv.north()).getBlock(), world.getBlockState(lv.south()).getBlock()};
                     int p = 0;
                     for (Block lv3 : lvs) {
                         if (this.isSnowyOrIcy(lv3)) continue;
                         ++p;
                     }
                     if (p < 3) continue;
-                    this.setBlockState(arg, lv, Blocks.AIR.getDefaultState());
+                    this.setBlockState(world, lv, Blocks.AIR.getDefaultState());
                 }
             }
         }

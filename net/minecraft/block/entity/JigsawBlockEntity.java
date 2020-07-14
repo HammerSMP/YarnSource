@@ -78,45 +78,45 @@ extends BlockEntity {
         return this.joint;
     }
 
-    public void setAttachmentType(Identifier arg) {
-        this.name = arg;
+    public void setAttachmentType(Identifier value) {
+        this.name = value;
     }
 
-    public void setTargetPool(Identifier arg) {
-        this.target = arg;
+    public void setTargetPool(Identifier target) {
+        this.target = target;
     }
 
-    public void setPool(Identifier arg) {
-        this.pool = arg;
+    public void setPool(Identifier pool) {
+        this.pool = pool;
     }
 
-    public void setFinalState(String string) {
-        this.finalState = string;
+    public void setFinalState(String finalState) {
+        this.finalState = finalState;
     }
 
-    public void setJoint(Joint arg) {
-        this.joint = arg;
-    }
-
-    @Override
-    public CompoundTag toTag(CompoundTag arg) {
-        super.toTag(arg);
-        arg.putString("name", this.name.toString());
-        arg.putString("target", this.target.toString());
-        arg.putString("pool", this.pool.toString());
-        arg.putString("final_state", this.finalState);
-        arg.putString("joint", this.joint.asString());
-        return arg;
+    public void setJoint(Joint joint) {
+        this.joint = joint;
     }
 
     @Override
-    public void fromTag(BlockState arg, CompoundTag arg2) {
-        super.fromTag(arg, arg2);
-        this.name = new Identifier(arg2.getString("name"));
-        this.target = new Identifier(arg2.getString("target"));
-        this.pool = new Identifier(arg2.getString("pool"));
-        this.finalState = arg2.getString("final_state");
-        this.joint = Joint.byName(arg2.getString("joint")).orElseGet(() -> JigsawBlock.getFacing(arg).getAxis().isHorizontal() ? Joint.ALIGNED : Joint.ROLLABLE);
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putString("name", this.name.toString());
+        tag.putString("target", this.target.toString());
+        tag.putString("pool", this.pool.toString());
+        tag.putString("final_state", this.finalState);
+        tag.putString("joint", this.joint.asString());
+        return tag;
+    }
+
+    @Override
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.name = new Identifier(tag.getString("name"));
+        this.target = new Identifier(tag.getString("target"));
+        this.pool = new Identifier(tag.getString("pool"));
+        this.finalState = tag.getString("final_state");
+        this.joint = Joint.byName(tag.getString("joint")).orElseGet(() -> JigsawBlock.getFacing(state).getAxis().isHorizontal() ? Joint.ALIGNED : Joint.ROLLABLE);
     }
 
     @Override
@@ -130,20 +130,20 @@ extends BlockEntity {
         return this.toTag(new CompoundTag());
     }
 
-    public void generate(ServerWorld arg, int i, boolean bl) {
-        ChunkGenerator lv = arg.getChunkManager().getChunkGenerator();
-        StructureManager lv2 = arg.getStructureManager();
-        StructureAccessor lv3 = arg.getStructureAccessor();
-        Random random = arg.getRandom();
+    public void generate(ServerWorld world, int maxDepth, boolean keepJigsaws) {
+        ChunkGenerator lv = world.getChunkManager().getChunkGenerator();
+        StructureManager lv2 = world.getStructureManager();
+        StructureAccessor lv3 = world.getStructureAccessor();
+        Random random = world.getRandom();
         BlockPos lv4 = this.getPos();
         ArrayList list = Lists.newArrayList();
         Structure lv5 = new Structure();
-        lv5.saveFromWorld(arg, lv4, new BlockPos(1, 1, 1), false, null);
+        lv5.saveFromWorld(world, lv4, new BlockPos(1, 1, 1), false, null);
         SinglePoolElement lv6 = new SinglePoolElement(lv5);
         PoolStructurePiece lv7 = new PoolStructurePiece(lv2, lv6, lv4, 1, BlockRotation.NONE, new BlockBox(lv4, lv4));
-        StructurePoolBasedGenerator.method_27230(arg.method_30349(), lv7, i, PoolStructurePiece::new, lv, lv2, list, random);
+        StructurePoolBasedGenerator.method_27230(world.method_30349(), lv7, maxDepth, PoolStructurePiece::new, lv, lv2, list, random);
         for (PoolStructurePiece lv8 : list) {
-            lv8.method_27236(arg, lv3, lv, random, BlockBox.infinite(), lv4, bl);
+            lv8.method_27236(world, lv3, lv, random, BlockBox.infinite(), lv4, keepJigsaws);
         }
     }
 
@@ -154,8 +154,8 @@ extends BlockEntity {
 
         private final String name;
 
-        private Joint(String string2) {
-            this.name = string2;
+        private Joint(String name) {
+            this.name = name;
         }
 
         @Override
@@ -163,8 +163,8 @@ extends BlockEntity {
             return this.name;
         }
 
-        public static Optional<Joint> byName(String string) {
-            return Arrays.stream(Joint.values()).filter(arg -> arg.asString().equals(string)).findFirst();
+        public static Optional<Joint> byName(String name) {
+            return Arrays.stream(Joint.values()).filter(arg -> arg.asString().equals(name)).findFirst();
         }
     }
 }

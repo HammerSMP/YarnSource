@@ -74,7 +74,7 @@ extends HostileEntity {
     }
 
     @Override
-    protected SoundEvent getHurtSound(DamageSource arg) {
+    protected SoundEvent getHurtSound(DamageSource source) {
         return SoundEvents.ENTITY_BLAZE_HURT;
     }
 
@@ -126,7 +126,7 @@ extends HostileEntity {
     }
 
     @Override
-    public boolean handleFallDamage(float f, float g) {
+    public boolean handleFallDamage(float fallDistance, float damageMultiplier) {
         return false;
     }
 
@@ -139,9 +139,9 @@ extends HostileEntity {
         return (this.dataTracker.get(BLAZE_FLAGS) & 1) != 0;
     }
 
-    private void setFireActive(boolean bl) {
+    private void setFireActive(boolean fireActive) {
         byte b = this.dataTracker.get(BLAZE_FLAGS);
-        b = bl ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE);
+        b = fireActive ? (byte)(b | 1) : (byte)(b & 0xFFFFFFFE);
         this.dataTracker.set(BLAZE_FLAGS, b);
     }
 
@@ -152,8 +152,8 @@ extends HostileEntity {
         private int fireballCooldown;
         private int targetNotVisibleTicks;
 
-        public ShootFireballGoal(BlazeEntity arg) {
-            this.blaze = arg;
+        public ShootFireballGoal(BlazeEntity blaze) {
+            this.blaze = blaze;
             this.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK));
         }
 

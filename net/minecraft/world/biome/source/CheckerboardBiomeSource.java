@@ -31,11 +31,11 @@ extends BiomeSource {
     private final int gridSize;
     private final int field_24716;
 
-    public CheckerboardBiomeSource(List<Supplier<Biome>> list, int i) {
+    public CheckerboardBiomeSource(List<Supplier<Biome>> list, int size) {
         super((List)list.stream().map(Supplier::get).collect(ImmutableList.toImmutableList()));
         this.biomeArray = list;
-        this.gridSize = i + 2;
-        this.field_24716 = i;
+        this.gridSize = size + 2;
+        this.field_24716 = size;
     }
 
     @Override
@@ -45,13 +45,13 @@ extends BiomeSource {
 
     @Override
     @Environment(value=EnvType.CLIENT)
-    public BiomeSource withSeed(long l) {
+    public BiomeSource withSeed(long seed) {
         return this;
     }
 
     @Override
-    public Biome getBiomeForNoiseGen(int i, int j, int k) {
-        return this.biomeArray.get(Math.floorMod((i >> this.gridSize) + (k >> this.gridSize), this.biomeArray.size())).get();
+    public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+        return this.biomeArray.get(Math.floorMod((biomeX >> this.gridSize) + (biomeZ >> this.gridSize), this.biomeArray.size())).get();
     }
 }
 

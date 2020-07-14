@@ -42,20 +42,20 @@ implements ArgumentType<PosArgument> {
     public static final SimpleCommandExceptionType MIXED_COORDINATE_EXCEPTION = new SimpleCommandExceptionType((Message)new TranslatableText("argument.pos.mixed"));
     private final boolean centerIntegers;
 
-    public Vec3ArgumentType(boolean bl) {
-        this.centerIntegers = bl;
+    public Vec3ArgumentType(boolean centerIntegers) {
+        this.centerIntegers = centerIntegers;
     }
 
     public static Vec3ArgumentType vec3() {
         return new Vec3ArgumentType(true);
     }
 
-    public static Vec3ArgumentType vec3(boolean bl) {
-        return new Vec3ArgumentType(bl);
+    public static Vec3ArgumentType vec3(boolean centerIntegers) {
+        return new Vec3ArgumentType(centerIntegers);
     }
 
-    public static Vec3d getVec3(CommandContext<ServerCommandSource> commandContext, String string) throws CommandSyntaxException {
-        return ((PosArgument)commandContext.getArgument(string, PosArgument.class)).toAbsolutePos((ServerCommandSource)commandContext.getSource());
+    public static Vec3d getVec3(CommandContext<ServerCommandSource> context, String name) throws CommandSyntaxException {
+        return ((PosArgument)context.getArgument(name, PosArgument.class)).toAbsolutePos((ServerCommandSource)context.getSource());
     }
 
     public static PosArgument getPosArgument(CommandContext<ServerCommandSource> commandContext, String string) {
@@ -69,16 +69,16 @@ implements ArgumentType<PosArgument> {
         return DefaultPosArgument.parse(stringReader, this.centerIntegers);
     }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> commandContext, SuggestionsBuilder suggestionsBuilder) {
-        if (commandContext.getSource() instanceof CommandSource) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        if (context.getSource() instanceof CommandSource) {
             Collection<CommandSource.RelativePosition> collection2;
-            String string = suggestionsBuilder.getRemaining();
+            String string = builder.getRemaining();
             if (!string.isEmpty() && string.charAt(0) == '^') {
                 Set<CommandSource.RelativePosition> collection = Collections.singleton(CommandSource.RelativePosition.ZERO_LOCAL);
             } else {
-                collection2 = ((CommandSource)commandContext.getSource()).getPositionSuggestions();
+                collection2 = ((CommandSource)context.getSource()).getPositionSuggestions();
             }
-            return CommandSource.suggestPositions(string, collection2, suggestionsBuilder, CommandManager.getCommandValidator(this::parse));
+            return CommandSource.suggestPositions(string, collection2, builder, CommandManager.getCommandValidator(this::parse));
         }
         return Suggestions.empty();
     }

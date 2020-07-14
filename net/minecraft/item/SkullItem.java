@@ -27,11 +27,11 @@ extends WallStandingBlockItem {
     }
 
     @Override
-    public Text getName(ItemStack arg) {
-        if (arg.getItem() == Items.PLAYER_HEAD && arg.hasTag()) {
+    public Text getName(ItemStack stack) {
+        if (stack.getItem() == Items.PLAYER_HEAD && stack.hasTag()) {
             CompoundTag lv2;
             String string = null;
-            CompoundTag lv = arg.getTag();
+            CompoundTag lv = stack.getTag();
             if (lv.contains("SkullOwner", 8)) {
                 string = lv.getString("SkullOwner");
             } else if (lv.contains("SkullOwner", 10) && (lv2 = lv.getCompound("SkullOwner")).contains("Name", 8)) {
@@ -41,16 +41,16 @@ extends WallStandingBlockItem {
                 return new TranslatableText(this.getTranslationKey() + ".named", string);
             }
         }
-        return super.getName(arg);
+        return super.getName(stack);
     }
 
     @Override
-    public boolean postProcessTag(CompoundTag arg) {
-        super.postProcessTag(arg);
-        if (arg.contains("SkullOwner", 8) && !StringUtils.isBlank((CharSequence)arg.getString("SkullOwner"))) {
-            GameProfile gameProfile = new GameProfile(null, arg.getString("SkullOwner"));
+    public boolean postProcessTag(CompoundTag tag) {
+        super.postProcessTag(tag);
+        if (tag.contains("SkullOwner", 8) && !StringUtils.isBlank((CharSequence)tag.getString("SkullOwner"))) {
+            GameProfile gameProfile = new GameProfile(null, tag.getString("SkullOwner"));
             gameProfile = SkullBlockEntity.loadProperties(gameProfile);
-            arg.put("SkullOwner", NbtHelper.fromGameProfile(new CompoundTag(), gameProfile));
+            tag.put("SkullOwner", NbtHelper.fromGameProfile(new CompoundTag(), gameProfile));
             return true;
         }
         return false;

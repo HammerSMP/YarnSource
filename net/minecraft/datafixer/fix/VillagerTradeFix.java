@@ -27,13 +27,13 @@ import net.minecraft.datafixer.schema.IdentifierNormalizingSchema;
 
 public class VillagerTradeFix
 extends ChoiceFix {
-    public VillagerTradeFix(Schema schema, boolean bl) {
-        super(schema, bl, "Villager trade fix", TypeReferences.ENTITY, "minecraft:villager");
+    public VillagerTradeFix(Schema outputSchema, boolean changesType) {
+        super(outputSchema, changesType, "Villager trade fix", TypeReferences.ENTITY, "minecraft:villager");
     }
 
     @Override
-    protected Typed<?> transform(Typed<?> typed2) {
-        OpticFinder opticFinder = typed2.getType().findField("Offers");
+    protected Typed<?> transform(Typed<?> inputType) {
+        OpticFinder opticFinder = inputType.getType().findField("Offers");
         OpticFinder opticFinder2 = opticFinder.type().findField("Recipes");
         Type type = opticFinder2.type();
         if (!(type instanceof List.ListType)) {
@@ -47,7 +47,7 @@ extends ChoiceFix {
         OpticFinder opticFinder6 = type2.findField("sell");
         OpticFinder opticFinder7 = DSL.fieldFinder((String)"id", (Type)DSL.named((String)TypeReferences.ITEM_NAME.typeName(), IdentifierNormalizingSchema.getIdentifierType()));
         Function<Typed, Typed> function = typed -> this.fixPumpkinTrade((OpticFinder<Pair<String, String>>)opticFinder7, (Typed<?>)typed);
-        return typed2.updateTyped(opticFinder, typed -> typed.updateTyped(opticFinder2, typed2 -> typed2.updateTyped(opticFinder3, typed -> typed.updateTyped(opticFinder4, function).updateTyped(opticFinder5, function).updateTyped(opticFinder6, function))));
+        return inputType.updateTyped(opticFinder, typed -> typed.updateTyped(opticFinder2, typed2 -> typed2.updateTyped(opticFinder3, typed -> typed.updateTyped(opticFinder4, function).updateTyped(opticFinder5, function).updateTyped(opticFinder6, function))));
     }
 
     private Typed<?> fixPumpkinTrade(OpticFinder<Pair<String, String>> opticFinder, Typed<?> typed) {

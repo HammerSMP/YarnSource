@@ -38,7 +38,7 @@ implements DataProvider {
     }
 
     @Override
-    public void run(DataCache arg) throws IOException {
+    public void run(DataCache cache) throws IOException {
         JsonObject jsonObject = new JsonObject();
         for (Block lv : Registry.BLOCK) {
             Identifier lv2 = Registry.BLOCK.getId(lv);
@@ -75,7 +75,7 @@ implements DataProvider {
             jsonObject.add(lv2.toString(), (JsonElement)jsonObject2);
         }
         Path path = this.root.getOutput().resolve("reports/blocks.json");
-        DataProvider.writeToPath(GSON, arg, (JsonElement)jsonObject, path);
+        DataProvider.writeToPath(GSON, cache, (JsonElement)jsonObject, path);
     }
 
     @Override

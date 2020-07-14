@@ -29,14 +29,14 @@ extends Screen {
     protected final Text buttonString;
     private int field_2347;
 
-    public NoticeScreen(Runnable runnable, Text arg, Text arg2) {
-        this(runnable, arg, arg2, ScreenTexts.BACK);
+    public NoticeScreen(Runnable actionHandler, Text title, Text notice) {
+        this(actionHandler, title, notice, ScreenTexts.BACK);
     }
 
-    public NoticeScreen(Runnable runnable, Text arg, Text arg2, Text arg3) {
-        super(arg);
-        this.actionHandler = runnable;
-        this.notice = arg2;
+    public NoticeScreen(Runnable actionHandler, Text title, Text notice, Text arg3) {
+        super(title);
+        this.actionHandler = actionHandler;
+        this.notice = notice;
         this.buttonString = arg3;
     }
 
@@ -49,16 +49,16 @@ extends Screen {
     }
 
     @Override
-    public void render(MatrixStack arg, int i, int j, float f) {
-        this.renderBackground(arg);
-        this.drawCenteredText(arg, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 70, 0xFFFFFF);
         int k = 90;
         for (StringRenderable lv : this.noticeLines) {
-            this.drawCenteredText(arg, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
+            this.drawCenteredText(matrices, this.textRenderer, lv, this.width / 2, k, 0xFFFFFF);
             this.textRenderer.getClass();
             k += 9;
         }
-        super.render(arg, i, j, f);
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override

@@ -25,12 +25,12 @@ extends Task<E> {
     private final MemoryModuleType<T> targetType;
     private final IntRange duration;
 
-    public MemoryTransferTask(Predicate<E> predicate, MemoryModuleType<? extends T> arg, MemoryModuleType<T> arg2, IntRange arg3) {
+    public MemoryTransferTask(Predicate<E> runPredicate, MemoryModuleType<? extends T> arg, MemoryModuleType<T> arg2, IntRange duration) {
         super((Map<MemoryModuleType<?>, MemoryModuleState>)ImmutableMap.of(arg, (Object)((Object)MemoryModuleState.VALUE_PRESENT), arg2, (Object)((Object)MemoryModuleState.VALUE_ABSENT)));
-        this.runPredicate = predicate;
+        this.runPredicate = runPredicate;
         this.sourceType = arg;
         this.targetType = arg2;
-        this.duration = arg3;
+        this.duration = duration;
     }
 
     @Override

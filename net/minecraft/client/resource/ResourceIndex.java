@@ -50,9 +50,9 @@ public class ResourceIndex {
     /*
      * WARNING - Removed try catching itself - possible behaviour change.
      */
-    public ResourceIndex(File file, String string) {
-        File file2 = new File(file, "objects");
-        File file3 = new File(file, "indexes/" + string + ".json");
+    public ResourceIndex(File directory, String indexName) {
+        File file2 = new File(directory, "objects");
+        File file3 = new File(directory, "indexes/" + indexName + ".json");
         BufferedReader bufferedReader = null;
         try {
             bufferedReader = Files.newReader((File)file3, (Charset)StandardCharsets.UTF_8);
@@ -85,13 +85,13 @@ public class ResourceIndex {
     }
 
     @Nullable
-    public File getResource(Identifier arg) {
-        return this.field_21556.get(arg);
+    public File getResource(Identifier identifier) {
+        return this.field_21556.get(identifier);
     }
 
     @Nullable
-    public File findFile(String string) {
-        return this.index.get(string);
+    public File findFile(String path) {
+        return this.index.get(path);
     }
 
     public Collection<Identifier> getFilesRecursively(String string, String string2, int i, Predicate<String> predicate) {

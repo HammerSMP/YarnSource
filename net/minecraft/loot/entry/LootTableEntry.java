@@ -28,9 +28,9 @@ public class LootTableEntry
 extends LeafEntry {
     private final Identifier id;
 
-    private LootTableEntry(Identifier arg, int i, int j, LootCondition[] args, LootFunction[] args2) {
-        super(i, j, args, args2);
-        this.id = arg;
+    private LootTableEntry(Identifier id, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+        super(weight, quality, conditions, functions);
+        this.id = id;
     }
 
     @Override
@@ -39,28 +39,28 @@ extends LeafEntry {
     }
 
     @Override
-    public void generateLoot(Consumer<ItemStack> consumer, LootContext arg) {
-        LootTable lv = arg.getSupplier(this.id);
-        lv.generateUnprocessedLoot(arg, consumer);
+    public void generateLoot(Consumer<ItemStack> lootConsumer, LootContext context) {
+        LootTable lv = context.getSupplier(this.id);
+        lv.generateUnprocessedLoot(context, lootConsumer);
     }
 
     @Override
-    public void validate(LootTableReporter arg) {
-        if (arg.hasTable(this.id)) {
-            arg.report("Table " + this.id + " is recursively called");
+    public void validate(LootTableReporter reporter) {
+        if (reporter.hasTable(this.id)) {
+            reporter.report("Table " + this.id + " is recursively called");
             return;
         }
-        super.validate(arg);
-        LootTable lv = arg.getTable(this.id);
+        super.validate(reporter);
+        LootTable lv = reporter.getTable(this.id);
         if (lv == null) {
-            arg.report("Unknown loot table called " + this.id);
+            reporter.report("Unknown loot table called " + this.id);
         } else {
-            lv.validate(arg.withTable("->{" + this.id + "}", this.id));
+            lv.validate(reporter.withTable("->{" + this.id + "}", this.id));
         }
     }
 
-    public static LeafEntry.Builder<?> builder(Identifier arg) {
-        return LootTableEntry.builder((int i, int j, LootCondition[] args, LootFunction[] args2) -> new LootTableEntry(arg, i, j, args, args2));
+    public static LeafEntry.Builder<?> builder(Identifier id) {
+        return LootTableEntry.builder((int weight, int quality, LootCondition[] conditions, LootFunction[] functions) -> new LootTableEntry(id, weight, quality, conditions, functions));
     }
 
     public static class Serializer
@@ -78,8 +78,8 @@ extends LeafEntry {
         }
 
         @Override
-        protected /* synthetic */ LeafEntry fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext, int i, int j, LootCondition[] args, LootFunction[] args2) {
-            return this.fromJson(jsonObject, jsonDeserializationContext, i, j, args, args2);
+        protected /* synthetic */ LeafEntry fromJson(JsonObject entryJson, JsonDeserializationContext context, int weight, int quality, LootCondition[] conditions, LootFunction[] functions) {
+            return this.fromJson(entryJson, context, weight, quality, conditions, functions);
         }
     }
 }

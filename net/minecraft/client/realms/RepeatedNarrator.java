@@ -27,15 +27,15 @@ public class RepeatedNarrator {
         this.permitsPerSecond = 1000.0f / (float)duration.toMillis();
     }
 
-    public void narrate(String string) {
+    public void narrate(String message) {
         Parameters lv = this.params.updateAndGet(arg -> {
-            if (arg == null || !string.equals(((Parameters)arg).message)) {
-                return new Parameters(string, RateLimiter.create((double)this.permitsPerSecond));
+            if (arg == null || !message.equals(((Parameters)arg).message)) {
+                return new Parameters(message, RateLimiter.create((double)this.permitsPerSecond));
             }
             return arg;
         });
         if (lv.rateLimiter.tryAcquire(1)) {
-            NarratorManager.INSTANCE.onChatMessage(MessageType.SYSTEM, new LiteralText(string), Util.NIL_UUID);
+            NarratorManager.INSTANCE.onChatMessage(MessageType.SYSTEM, new LiteralText(message), Util.NIL_UUID);
         }
     }
 
@@ -44,8 +44,8 @@ public class RepeatedNarrator {
         private final String message;
         private final RateLimiter rateLimiter;
 
-        Parameters(String string, RateLimiter rateLimiter) {
-            this.message = string;
+        Parameters(String message, RateLimiter rateLimiter) {
+            this.message = message;
             this.rateLimiter = rateLimiter;
         }
     }

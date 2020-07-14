@@ -3,26 +3,26 @@
  */
 package net.minecraft.world.biome;
 
-import net.minecraft.class_5464;
-import net.minecraft.class_5470;
-import net.minecraft.class_5471;
 import net.minecraft.sound.BiomeMoodSound;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.feature.ConfiguredFeatures;
+import net.minecraft.world.gen.feature.ConfiguredStructureFeatures;
 import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
+import net.minecraft.world.gen.surfacebuilder.ConfiguredSurfaceBuilders;
 
 public final class IceSpikesBiome
 extends Biome {
     public IceSpikesBiome() {
-        super(new Biome.Settings().configureSurfaceBuilder(class_5471.ICE_SPIKES).precipitation(Biome.Precipitation.SNOW).category(Biome.Category.ICY).depth(0.425f).scale(0.45000002f).temperature(0.0f).downfall(0.5f).effects(new BiomeEffects.Builder().waterColor(4159204).waterFogColor(329011).fogColor(12638463).moodSound(BiomeMoodSound.CAVE).build()).parent("snowy_tundra"));
+        super(new Biome.Settings().configureSurfaceBuilder(ConfiguredSurfaceBuilders.ICE_SPIKES).precipitation(Biome.Precipitation.SNOW).category(Biome.Category.ICY).depth(0.425f).scale(0.45000002f).temperature(0.0f).downfall(0.5f).effects(new BiomeEffects.Builder().waterColor(4159204).waterFogColor(329011).fogColor(12638463).moodSound(BiomeMoodSound.CAVE).build()).parent("snowy_tundra"));
         DefaultBiomeFeatures.addDefaultUndergroundStructures(this);
-        this.addStructureFeature(class_5470.RUINED_PORTAL);
+        this.addStructureFeature(ConfiguredStructureFeatures.RUINED_PORTAL);
         DefaultBiomeFeatures.addLandCarvers(this);
         DefaultBiomeFeatures.addDefaultLakes(this);
         DefaultBiomeFeatures.addDungeons(this);
-        this.addFeature(GenerationStep.Feature.SURFACE_STRUCTURES, class_5464.ICE_SPIKE);
-        this.addFeature(GenerationStep.Feature.SURFACE_STRUCTURES, class_5464.ICE_PATCH);
+        this.addFeature(GenerationStep.Feature.SURFACE_STRUCTURES, ConfiguredFeatures.ICE_SPIKE);
+        this.addFeature(GenerationStep.Feature.SURFACE_STRUCTURES, ConfiguredFeatures.ICE_PATCH);
         DefaultBiomeFeatures.addMineables(this);
         DefaultBiomeFeatures.addDefaultOres(this);
         DefaultBiomeFeatures.addDefaultDisks(this);
@@ -33,7 +33,7 @@ extends Biome {
         DefaultBiomeFeatures.addDefaultVegetation(this);
         DefaultBiomeFeatures.addSprings(this);
         DefaultBiomeFeatures.addFrozenTopLayer(this);
-        DefaultBiomeFeatures.method_30582(this);
+        DefaultBiomeFeatures.addSnowyMobs(this);
     }
 
     @Override

@@ -28,8 +28,8 @@ public class MatchToolLootCondition
 implements LootCondition {
     private final ItemPredicate predicate;
 
-    public MatchToolLootCondition(ItemPredicate arg) {
-        this.predicate = arg;
+    public MatchToolLootCondition(ItemPredicate predicate) {
+        this.predicate = predicate;
     }
 
     @Override
@@ -48,13 +48,13 @@ implements LootCondition {
         return lv != null && this.predicate.test(lv);
     }
 
-    public static LootCondition.Builder builder(ItemPredicate.Builder arg) {
-        return () -> new MatchToolLootCondition(arg.build());
+    public static LootCondition.Builder builder(ItemPredicate.Builder predicate) {
+        return () -> new MatchToolLootCondition(predicate.build());
     }
 
     @Override
-    public /* synthetic */ boolean test(Object object) {
-        return this.test((LootContext)object);
+    public /* synthetic */ boolean test(Object context) {
+        return this.test((LootContext)context);
     }
 
     public static class Serializer
@@ -71,8 +71,8 @@ implements LootCondition {
         }
 
         @Override
-        public /* synthetic */ Object fromJson(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
-            return this.fromJson(jsonObject, jsonDeserializationContext);
+        public /* synthetic */ Object fromJson(JsonObject json, JsonDeserializationContext context) {
+            return this.fromJson(json, context);
         }
     }
 }

@@ -11,9 +11,9 @@ extends MeleeAttackGoal {
     private final ZombieEntity zombie;
     private int ticks;
 
-    public ZombieAttackGoal(ZombieEntity arg, double d, boolean bl) {
-        super(arg, d, bl);
-        this.zombie = arg;
+    public ZombieAttackGoal(ZombieEntity zombie, double speed, boolean pauseWhenMobIdle) {
+        super(zombie, speed, pauseWhenMobIdle);
+        this.zombie = zombie;
     }
 
     @Override

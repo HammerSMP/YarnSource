@@ -13,30 +13,30 @@ public interface ScreenHandlerContext {
     public static final ScreenHandlerContext EMPTY = new ScreenHandlerContext(){
 
         @Override
-        public <T> Optional<T> run(BiFunction<World, BlockPos, T> biFunction) {
+        public <T> Optional<T> run(BiFunction<World, BlockPos, T> function) {
             return Optional.empty();
         }
     };
 
-    public static ScreenHandlerContext create(final World arg, final BlockPos arg2) {
+    public static ScreenHandlerContext create(final World world, final BlockPos pos) {
         return new ScreenHandlerContext(){
 
             @Override
-            public <T> Optional<T> run(BiFunction<World, BlockPos, T> biFunction) {
-                return Optional.of(biFunction.apply(arg, arg2));
+            public <T> Optional<T> run(BiFunction<World, BlockPos, T> function) {
+                return Optional.of(function.apply(world, pos));
             }
         };
     }
 
     public <T> Optional<T> run(BiFunction<World, BlockPos, T> var1);
 
-    default public <T> T run(BiFunction<World, BlockPos, T> biFunction, T object) {
-        return this.run(biFunction).orElse(object);
+    default public <T> T run(BiFunction<World, BlockPos, T> function, T defaultValue) {
+        return this.run(function).orElse(defaultValue);
     }
 
-    default public void run(BiConsumer<World, BlockPos> biConsumer) {
+    default public void run(BiConsumer<World, BlockPos> function) {
         this.run((World arg, BlockPos arg2) -> {
-            biConsumer.accept((World)arg, (BlockPos)arg2);
+            function.accept((World)arg, (BlockPos)arg2);
             return Optional.empty();
         });
     }
