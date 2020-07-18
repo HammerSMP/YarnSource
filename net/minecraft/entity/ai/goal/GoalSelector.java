@@ -56,8 +56,8 @@ public class GoalSelector {
     }
 
     public void tick() {
-        Profiler lv = this.profiler.get();
-        lv.push("goalCleanup");
+        Profiler profiler = this.profiler.get();
+        profiler.push("goalCleanup");
         this.getRunningGoals().filter(arg -> {
             if (!arg.isRunning()) return true;
             if (arg.getControls().stream().anyMatch(this.disabledControls::contains)) return true;
@@ -69,20 +69,35 @@ public class GoalSelector {
                 this.goalsByControl.remove(arg);
             }
         });
-        lv.pop();
-        lv.push("goalUpdate");
-        this.goals.stream().filter(arg -> !arg.isRunning()).filter(arg -> arg.getControls().stream().noneMatch(this.disabledControls::contains)).filter(arg -> arg.getControls().stream().allMatch(arg2 -> this.goalsByControl.getOrDefault(arg2, REPLACEABLE_GOAL).canBeReplacedBy((PrioritizedGoal)arg))).filter(PrioritizedGoal::canStart).forEach(arg -> {
-            arg.getControls().forEach(arg2 -> {
-                PrioritizedGoal lv = this.goalsByControl.getOrDefault(arg2, REPLACEABLE_GOAL);
-                lv.stop();
-                this.goalsByControl.put((Goal.Control)((Object)((Object)arg2)), (PrioritizedGoal)arg);
-            });
-            arg.start();
-        });
-        lv.pop();
-        lv.push("goalTick");
+        profiler.pop();
+        profiler.push("goalUpdate");
+        
+        // whatmst in the fuck
+        this.goals.stream().filter(arg -> !arg.isRunning())
+            .filter(arg ->
+                arg.getControls().
+                    stream().noneMatch(
+                        this.disabledControls::contains
+                    )).filter(arg -> 
+                        arg.getControls()
+                            .stream().allMatch(
+                                arg2 -> this.goalsByControl.getOrDefault(arg2, REPLACEABLE_GOAL)
+                                    .canBeReplacedBy((PrioritizedGoal)arg)
+                                ))
+                            .filter(PrioritizedGoal::canStart)
+                        .forEach(goals -> {
+                            goals.getControls().forEach(currentGoal -> {
+                                    PrioritizedGoal newGoal = this.goalsByControl.getOrDefault(currentGoal, REPLACEABLE_GOAL);
+                                    newGoal.stop();
+                                    this.goalsByControl.put((Goal.Control)((Object)((Object)currentGoal)), (PrioritizedGoal)goals);
+                            });
+                            goals.start();
+                        });
+
+        profiler.pop();
+        profiler.push("goalTick");
         this.getRunningGoals().forEach(PrioritizedGoal::tick);
-        lv.pop();
+        profiler.pop();
     }
 
     public Stream<PrioritizedGoal> getRunningGoals() {
