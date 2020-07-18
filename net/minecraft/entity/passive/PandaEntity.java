@@ -263,6 +263,9 @@ extends AnimalEntity {
         this.goalSelector.add(6, new PandaFleeGoal<HostileEntity>(this, HostileEntity.class, 4.0f, 2.0, 2.0));
         this.goalSelector.add(7, new PickUpFoodGoal());
         this.goalSelector.add(8, new LieOnBackGoal(this));
+        // goal priotity is level 8 which is low in comparison to all the other goals.
+        // it looks like it must be prevented from reaching the other goals that are more
+        // important, could be done possibly by preventing pathing
         this.goalSelector.add(8, new SneezeGoal(this));
         this.lookAtPlayerGoal = new LookAtEntityGoal(this, PlayerEntity.class, 6.0f);
         this.goalSelector.add(9, this.lookAtPlayerGoal);
@@ -460,12 +463,14 @@ extends AnimalEntity {
         Vec3d lv = this.getVelocity();
         this.world.addParticle(ParticleTypes.SNEEZE, this.getX() - (double)(this.getWidth() + 1.0f) * 0.5 * (double)MathHelper.sin(this.bodyYaw * ((float)Math.PI / 180)), this.getEyeY() - (double)0.1f, this.getZ() + (double)(this.getWidth() + 1.0f) * 0.5 * (double)MathHelper.cos(this.bodyYaw * ((float)Math.PI / 180)), lv.x, 0.0, lv.z);
         this.playSound(SoundEvents.ENTITY_PANDA_SNEEZE, 1.0f, 1.0f);
-        List<PandaEntity> list = this.world.getNonSpectatingEntities(PandaEntity.class, this.getBoundingBox().expand(10.0));
-        for (PandaEntity lv2 : list) {
-            if (lv2.isBaby() || !lv2.onGround || lv2.isTouchingWater() || !lv2.isIdle()) continue;
-            lv2.jump();
+        List<PandaEntity> PandasNearby = this.world.getNonSpectatingEntities(PandaEntity.class, this.getBoundingBox().expand(10.0));
+        for (PandaEntity panda : PandasNearby) {
+            if (panda.isBaby() || !panda.onGround || panda.isTouchingWater() || !panda.isIdle()) continue;
+            panda.jump();
         }
+        // on server side, 1 in 700 or 0.14% times it will drop a slime ball
         if (!this.world.isClient() && this.random.nextInt(700) == 0 && this.world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) {
+            // 0.02% is the total chance to get this code
             this.dropItem(Items.SLIME_BALL);
         }
     }
@@ -500,6 +505,9 @@ extends AnimalEntity {
         return super.initialize(arg, difficulty, spawnReason, entityData, entityTag);
     }
 
+    // it is entirely possible that a panda will share no traits with its mother or father 
+    // therefore breeding pandas based on traits is not a guarenteed way to do anything 
+    // here, all pandas need to be validated.
     public void initGenes(PandaEntity mother, @Nullable PandaEntity father) {
         if (father == null) {
             if (this.random.nextBoolean()) {
@@ -623,6 +631,8 @@ extends AnimalEntity {
         return SoundEvents.ENTITY_PANDA_HURT;
     }
 
+    // means that is cant be tired or during a thunderstorm or eating or playing or scared.
+    // is possible while pathfinding or similar
     public boolean isIdle() {
         return !this.isLyingOnBack() && !this.isScaredByThunderstorm() && !this.isEating() && !this.isPlaying() && !this.isScared();
     }
@@ -856,12 +866,18 @@ extends AnimalEntity {
 
         @Override
         public boolean canStart() {
+
+            // cant have a panda in an idle state and it needs to be full grown.
             if (!this.panda.isBaby() || !this.panda.isIdle()) {
                 return false;
             }
+
+            // exclusive to the weak gene, 1 in 500 chance or a 0.2% chance
             if (this.panda.isWeak() && this.panda.random.nextInt(500) == 1) {
                 return true;
             }
+
+            // 1 in 6000 0.016% chance or for it to do it if the panda doesnt have the weak gene
             return this.panda.random.nextInt(6000) == 1;
         }
 

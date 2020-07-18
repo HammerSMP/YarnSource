@@ -337,13 +337,13 @@ extends ChunkManager {
         boolean bl = this.world.isDebugWorld();
         boolean bl2 = this.world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING);
         if (!bl) {
-            SpawnHelper.Info lv2;
+            SpawnHelper.Info info;
             this.world.getProfiler().push("pollingChunks");
             int i = this.world.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
             boolean bl3 = lv.getTime() % 400L == 0L;
             this.world.getProfiler().push("naturalSpawnCount");
             int j = this.ticketManager.getSpawningChunkCount();
-            this.spawnEntry = lv2 = SpawnHelper.setupSpawn(j, this.world.iterateEntities(), (arg_0, arg_1) -> this.ifChunkLoaded(arg_0, arg_1));
+            this.spawnEntry = info = SpawnHelper.setupSpawn(j, this.world.iterateEntities(), (arg_0, arg_1) -> this.ifChunkLoaded(arg_0, arg_1));
             this.world.getProfiler().pop();
             ArrayList list = Lists.newArrayList(this.threadedAnvilChunkStorage.entryIterator());
             Collections.shuffle(list);
@@ -359,16 +359,16 @@ extends ChunkManager {
                 if (!optional2.isPresent()) {
                     return;
                 }
-                WorldChunk lv = (WorldChunk)optional2.get();
-                ChunkPos lv2 = arg2.getPos();
-                if (this.threadedAnvilChunkStorage.isTooFarFromPlayersToSpawnMobs(lv2)) {
+                WorldChunk worldChunk = (WorldChunk)optional2.get();
+                ChunkPos cringe = arg2.getPos();
+                if (this.threadedAnvilChunkStorage.isTooFarFromPlayersToSpawnMobs(cringe)) {
                     return;
                 }
-                lv.setInhabitedTime(lv.getInhabitedTime() + m);
-                if (bl2 && (this.spawnMonsters || this.spawnAnimals) && this.world.getWorldBorder().contains(lv.getPos())) {
-                    SpawnHelper.spawn(this.world, lv, lv2, this.spawnAnimals, this.spawnMonsters, bl3);
+                worldChunk.setInhabitedTime(worldChunk.getInhabitedTime() + m);
+                if (bl2 && (this.spawnMonsters || this.spawnAnimals) && this.world.getWorldBorder().contains(worldChunk.getPos())) {
+                    SpawnHelper.spawn(this.world, worldChunk, info, this.spawnAnimals, this.spawnMonsters, bl3);
                 }
-                this.world.tickChunk(lv, i);
+                this.world.tickChunk(worldChunk, i);
             });
             this.world.getProfiler().push("customSpawners");
             if (bl2) {

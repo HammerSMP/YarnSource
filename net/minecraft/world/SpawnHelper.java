@@ -95,9 +95,9 @@ public final class SpawnHelper {
 
     public static void spawn(ServerWorld world, WorldChunk chunk, Info info, boolean spawnAnimals, boolean spawnMonsters, boolean shouldSpawnAnimals) {
         world.getProfiler().push("spawner");
-        for (SpawnGroup lv : SPAWNABLE_GROUPS) {
-            if (!spawnAnimals && lv.isPeaceful() || !spawnMonsters && !lv.isPeaceful() || !shouldSpawnAnimals && lv.isAnimal() || !info.isBelowCap(lv)) continue;
-            SpawnHelper.spawnEntitiesInChunk(lv, world, chunk, (arg2, arg3, arg4) -> info.test(arg2, arg3, arg4), (arg2, arg3) -> info.run(arg2, arg3));
+        for (SpawnGroup mobSpawnGroup : SPAWNABLE_GROUPS) {
+            if (!spawnAnimals && mobSpawnGroup.isPeaceful() || !spawnMonsters && !mobSpawnGroup.isPeaceful() || !shouldSpawnAnimals && mobSpawnGroup.isAnimal() || !info.isBelowCap(mobSpawnGroup)) continue;
+            SpawnHelper.spawnEntitiesInChunk(mobSpawnGroup, world, chunk, (arg2, arg3, arg4) -> info.test(arg2, arg3, arg4), (arg2, arg3) -> info.run(arg2, arg3));
         }
         world.getProfiler().pop();
     }
