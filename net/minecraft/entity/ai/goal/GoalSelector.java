@@ -78,20 +78,21 @@ public class GoalSelector {
                 arg.getControls().
                     stream().noneMatch(
                         this.disabledControls::contains
-                    )).filter(arg -> 
+                    ))
+                    .filter(arg -> 
                         arg.getControls()
                             .stream().allMatch(
                                 arg2 -> this.goalsByControl.getOrDefault(arg2, REPLACEABLE_GOAL)
                                     .canBeReplacedBy((PrioritizedGoal)arg)
                                 ))
                             .filter(PrioritizedGoal::canStart)
-                        .forEach(goals -> {
-                            goals.getControls().forEach(currentGoal -> {
+                        .forEach(lgoals -> {
+                            lgoals.getControls().forEach(currentGoal -> {
                                     PrioritizedGoal newGoal = this.goalsByControl.getOrDefault(currentGoal, REPLACEABLE_GOAL);
-                                    newGoal.stop();
-                                    this.goalsByControl.put((Goal.Control)((Object)((Object)currentGoal)), (PrioritizedGoal)goals);
+                                    goal.stop();
+                                    this.goalsByControl.put((Goal.Control)((Object)((Object)currentGoal)), (PrioritizedGoal)lgoals);
                             });
-                            goals.start();
+                            lgoals.start();
                         });
 
         profiler.pop();
